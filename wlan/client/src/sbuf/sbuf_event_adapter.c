@@ -176,6 +176,7 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
         HDF_LOGE("%s: fail to get level", __FUNCTION__);
         return;
     }
+    scanResult.level /= SIGNAL_LEVEL_CONFFICIENT;  /* mBm to dBm */
     if (!HdfSbufReadUint32(reqData, &(scanResult.freq))) {
         HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;

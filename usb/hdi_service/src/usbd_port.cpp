@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  */
 
 #include "usbd_port.h"
-#include "default_config.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "usbd_function.h"
@@ -71,7 +70,10 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
     }
 
     uint32_t len = modeStr.size();
-    int32_t fd = open(PORT_FILE_PATH, O_WRONLY | O_TRUNC);
+    if (path_.empty()) {
+        return HDF_FAILURE;
+    }
+    int32_t fd = open(path_.c_str(), O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
         return HDF_FAILURE;
@@ -84,6 +86,11 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+}
+
+void UsbdPort::setPortPath(const std::string &path)
+{
+    path_ = path;
 }
 
 int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)

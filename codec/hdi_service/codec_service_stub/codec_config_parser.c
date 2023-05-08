@@ -406,7 +406,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
                 codecCapGroup->capablitis = NULL;
                 continue;
             }
-            size_t capablitisSize = sizeof(CodecCapability) * codecNum;
+            size_t capablitisSize = sizeof(CodecCapability) * (size_t)codecNum;
             codecCapGroup->capablitis = (CodecCapability *)OsalMemAlloc(capablitisSize);
             if (codecCapGroup->capablitis == NULL) {
                 codecCapGroup->num = 0;

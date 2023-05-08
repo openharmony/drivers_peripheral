@@ -211,7 +211,18 @@ static int32_t RegLibraryInstByName(char *libPath)
         return HDF_FAILURE;
     }
 
-    libHandle = dlopen(libPath, RTLD_LAZY);
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(libPath, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (strncmp(HDF_LIBRARY_DIR, pathBuf, strlen(HDF_LIBRARY_DIR)) != 0) {
+        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        return HDF_FAILURE;
+    }
+
+    libHandle = dlopen(pathBuf, RTLD_LAZY);
     if (libHandle == NULL) {
         HDF_LOGE("%{public}s: open so failed, reason:%{public}s", __func__, dlerror());
         return HDF_FAILURE;

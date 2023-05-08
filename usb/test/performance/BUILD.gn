@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -26,17 +26,17 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/usb/test/unittest/common",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../unittest/common",
     ]
 
-    sources = [ "//drivers/peripheral/usb/test/performance/common/usb_device_liteos_sdk_io_test.cpp" ]
+    sources = [ "./common/usb_device_liteos_sdk_io_test.cpp" ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/platform:hdf_platform",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "./../../../../hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 

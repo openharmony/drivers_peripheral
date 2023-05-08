@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("./../../../../../audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
@@ -44,7 +43,7 @@ ohos_systemtest("hdf_audio_idlhdi_capture_hardware_dependence_test") {
     defines += [ "AUDIO_ADM_SERVICE" ]
   }
 
-  if (drivers_peripheral_audio_alsa_lib) {
+  if (drivers_peripheral_audio_feature_alsa_lib) {
     defines += [ "ALSA_LIB_MODE" ]
   }
 }

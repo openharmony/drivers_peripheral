@@ -11,15 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("motion.gni")
+
 group("motion_entry") {
   deps = []
-  HDI_MOTION_SERVICE_PATH =
-      rebase_path("//device/soc/${device_company}/common/hal/motion")
-  cmd = "if [ -f ${HDI_MOTION_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-  HAVE_MOTION_DAL_SERVICE =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-  if (HAVE_MOTION_DAL_SERVICE) {
-    deps += [ "${HDI_MOTION_SERVICE_PATH}:motion_hdi_service" ]
-  }
 }

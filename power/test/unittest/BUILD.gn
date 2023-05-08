@@ -13,15 +13,15 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_power/power"
-power_hdi_service_path = "//drivers/peripheral/power/interfaces/hdi_service"
+power_hdi_service_path = "../../interfaces/hdi_service"
 
 ohos_unittest("hdi_unittest_power") {
   module_out_path = module_output_path
 
-  include_dirs = [ "//drivers/peripheral/power/interfaces/hdi_service/include" ]
+  include_dirs = [ "../../interfaces/hdi_service/include" ]
 
   sources = [ "src/hdf_power_hdi_test.cpp" ]
 
@@ -34,7 +34,7 @@ ohos_unittest("hdi_unittest_power") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [ "//drivers/interface/power/v1_1:libpower_stub_1.1" ]
+  deps = [ "../../../../interface/power/v1_1:libpower_stub_1.1" ]
 
   external_deps = [
     "c_utils:utils",

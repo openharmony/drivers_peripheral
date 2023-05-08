@@ -636,9 +636,14 @@ static int32_t AudioPathSelGetPlanCapture(struct AudioHwCaptureParam *capturePar
 {
     enum AudioCategory type = captureParam->frameCaptureMode.attrs.type;
 
-    if (type == AUDIO_IN_RINGTONE || type == AUDIO_MMAP_NOIRQ) {
+    if (type == AUDIO_IN_RINGTONE) {
         AUDIO_FUNC_LOGE("useCase not support!");
         return HDF_ERR_NOT_SUPPORT;
+    }
+
+    if (type == AUDIO_MMAP_NOIRQ) {
+        AUDIO_FUNC_LOGE("useCase set as AUDIO_IN_MEDIA");
+        type = AUDIO_IN_MEDIA;
     }
 
     const char *useCase = AudioPathSelGetUseCase(type);

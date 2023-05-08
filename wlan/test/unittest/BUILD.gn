@@ -11,11 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+TEST_ROOT_DIR = "../.."
+HDF_CORE_DIR = "../../../.."
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 configFlag = [
@@ -33,27 +36,26 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/framework/include/platform",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/test/unittest/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "$HDF_CORE_DIR/hdf_core/framework/include/platform",
+      "$HDF_CORE_DIR/hdf_core/framework/include/core",
+      "$HDF_CORE_DIR/hdf_core/framework/include",
+      "$HDF_CORE_DIR/hdf_core/framework/test/unittest/include",
     ]
 
     sources = [
-      "//drivers/peripheral/wlan/test/unittest/common/hdf_flow_control_test.cpp",
-      "//drivers/peripheral/wlan/test/unittest/common/hdf_message_test.cpp",
-      "//drivers/peripheral/wlan/test/unittest/common/hdf_module_test.cpp",
-      "//drivers/peripheral/wlan/test/unittest/common/hdf_net_buff_test.cpp",
-      "//drivers/peripheral/wlan/test/unittest/common/hdf_net_device_test.cpp",
+      "common/hdf_flow_control_test.cpp",
+      "common/hdf_message_test.cpp",
+      "common/hdf_module_test.cpp",
+      "common/hdf_net_buff_test.cpp",
+      "common/hdf_net_device_test.cpp",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
+      "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "$HDF_CORE_DIR/hdf_core/adapter/uhdf/manager:hdf_core",
+      "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    external_deps = [ "hilog_featured_lite:hilog_shared" ]
 
     cflags = configFlag
   }
@@ -63,19 +65,18 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
 
-    sources =
-        [ "//drivers/peripheral/wlan/test/unittest/hal/wifi_hal_test.cpp" ]
+    sources = [ "hal/wifi_hal_test.cpp" ]
     public_deps = [
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/hal:wifi_hal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    external_deps = [ "hdf_core:hdf_posix_osal" ]
 
     cflags = configFlag
   }
@@ -85,18 +86,17 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
 
-    sources =
-        [ "//drivers/peripheral/wlan/test/unittest/client/hdf_client_test.cpp" ]
+    sources = [ "client/hdf_client_test.cpp" ]
     public_deps = [
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    external_deps = [ "hdf_core:hdf_posix_osal" ]
 
     cflags = configFlag
   }
@@ -105,9 +105,9 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_common_wifi") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
     sources = [
       "./common/hdf_flow_control_test.cpp",
@@ -117,10 +117,12 @@ if (defined(ohos_lite)) {
       "./common/hdf_net_device_test.cpp",
     ]
     resource_config_file =
-        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [ "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common" ]
+    deps = [
+      "$HDF_CORE_DIR/hdf_core/adapter/build/test_common:libhdf_test_common",
+    ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
@@ -136,18 +138,18 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_hal_wifi") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
     sources = [ "./hal/wifi_hal_test.cpp" ]
     resource_config_file =
-        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
     deps = [
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/hal:wifi_hal",
     ]
     if (is_standard_system) {
       external_deps = [
@@ -163,16 +165,16 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_client_wifi") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
     sources = [ "./client/hdf_client_test.cpp" ]
     resource_config_file =
-        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [ "//drivers/peripheral/wlan/client:wifi_driver_client" ]
+    deps = [ "$TEST_ROOT_DIR/client:wifi_driver_client" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",

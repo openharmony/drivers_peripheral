@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/input/input.gni")
+import("./../input.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
@@ -20,10 +20,7 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_input") {
     # add hdf subsystem unittest
     if (ohos_build_type == "debug") {
-      if (ohos_kernel_type == "linux" && board_name == "hispark_taurus") {
-        deps = [ "unittest:hdf_peripheral_input_test" ]
-      } else if (ohos_kernel_type == "liteos_a" &&
-                 board_name == "hispark_taurus") {
+      if (drivers_peripheral_input_feature_lite_support_test) {
         deps = [ "unittest:hdf_peripheral_input_test" ]
       }
     }

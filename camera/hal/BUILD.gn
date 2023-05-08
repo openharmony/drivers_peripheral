@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("camera.gni")
+import("./camera.gni")
 
 if (defined(ohos_lite)) {
   group("camera_hal") {
@@ -19,7 +19,6 @@ if (defined(ohos_lite)) {
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
       "hdi_impl:camera_host_service_1.0",
-      "init:ohos_camera_demo",
       "pipeline_core:camera_pipeline_core",
       "utils:camera_utils",
     ]
@@ -37,7 +36,6 @@ if (defined(ohos_lite)) {
         "buffer_manager:camera_buffer_manager",
         "device_manager:camera_device_manager",
         "hdi_impl:camera_host_service_1.0",
-        "init:ohos_camera_demo",
         "pipeline_core:camera_pipeline_core",
         "utils:camera_utils",
       ]
@@ -50,6 +48,9 @@ if (defined(ohos_lite)) {
     } else {
       testonly = true
       deps = [
+        #benchmark test
+        "test/benchmarktest:hdf_camera_benchmark_test",
+
         # acceptance unit test
         "device_manager/test:camera_hal_device_manager_unittest",
         "test/at:camera_test_at",

@@ -14,8 +14,6 @@
 hdf_audio_path = "./../.."
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -23,7 +21,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "./",
-      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -44,7 +41,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "./",
-      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
       "$hdf_audio_path/hal/hdi_binder/server/include",
     ]
@@ -107,7 +103,7 @@ if (defined(ohos_lite)) {
 
     defines = []
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 
@@ -168,7 +164,7 @@ if (defined(ohos_lite)) {
     ]
 
     defines = [ "IDL_SAMPLE" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 
@@ -200,7 +196,7 @@ if (defined(ohos_lite)) {
     ]
 
     defines = [ "IDL_SAMPLE" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 
@@ -223,7 +219,7 @@ if (defined(ohos_lite)) {
 }
 
 group("audio_sample") {
-  if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+  if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     deps = [
       ":audio_sample_capture",
       ":audio_sample_render",
@@ -233,7 +229,7 @@ group("audio_sample") {
 
 group("idl_audio_sample") {
   if (!defined(ohos_lite)) {
-    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+    if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       deps = [
         ":idl_capture",
         ":idl_render",

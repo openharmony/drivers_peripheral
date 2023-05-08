@@ -18,7 +18,6 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 
-#include "default_config.h"
 #include "usbfn_mtp_impl.h"
 #include "v1_0/usbfn_mtp_interface_stub.h"
 

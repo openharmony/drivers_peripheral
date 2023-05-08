@@ -412,7 +412,7 @@ The core functions of this repository are as follows:
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-[Driver Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver-subsystem.md)
+[Driver Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver.md)
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
 

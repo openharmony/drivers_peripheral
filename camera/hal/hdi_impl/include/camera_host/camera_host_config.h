@@ -38,6 +38,8 @@ public:
     std::string GenerateNewLogicalCameraId();
     std::string ReturnPhysicalCameraIdToString(const CameraId &physicalCameraId);
     std::string ReturnLogicalCameraIdToString(const std::string &physicalCameraId);
+    void AddUsbCameraId(std::string cameraId);
+    bool SearchUsbCameraId(std::string cameraId);
 
 public:
     virtual ~CameraHostConfig();
@@ -73,6 +75,7 @@ private:
     // key: logicCameraId, value: physicsCameraIds
     using CameraIdMap = std::map<std::string, std::vector<std::string>>;
     CameraIdMap cameraIdMap_;
+    std::vector<std::string> usbCameraIdVector_;
 };
 } // end namespace OHOS::Camera
 #endif // CAMERA_HOST_CONFIG_MANAGER_H

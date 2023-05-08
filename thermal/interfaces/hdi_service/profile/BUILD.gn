@@ -12,10 +12,10 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-## Install thermal_hdi_config.xml to /system/etc/thermal_config/thermal_hdi_config.xml
+## Install thermal_hdi_config.xml to /vendor/etc/thermal_config/thermal_hdi_config.xml
 ohos_prebuilt_etc("thermal_hdf_config") {
   source = "thermal_hdi_config.xml"
-  relative_install_dir = "thermal_config/hdf"
+  relative_install_dir = "thermal_config"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_thermal"

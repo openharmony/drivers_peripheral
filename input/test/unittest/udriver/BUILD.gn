@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-hdi_input_base_path = "//drivers/peripheral/input"
+
+hdi_input_base_path = "./../../.."
 module_output_path = "drivers_peripheral_input/input"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
@@ -54,7 +54,7 @@ ohos_unittest("input_udriver_unittest") {
     "$hdi_input_base_path/udriver/include",
   ]
 
-  deps = [ "//drivers/peripheral/input/udriver:hdi_input_udriver" ]
+  deps = [ "$hdi_input_base_path/udriver:hdi_input_udriver" ]
 
   if (is_standard_system) {
     external_deps = [

@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_wlan",
   "description": "wlan device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -12,15 +12,21 @@
   "component": {
     "name": "drivers_peripheral_wlan",
     "subsystem": "hdf",
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "features": [
+      "drivers_peripheral_wlan_feature_enable_HDF_NL80211",
+      "drivers_peripheral_wlan_feature_enable_HDF_UT"
+    ],
+    "adapted_system_type": ["standard", "small"],
     "rom": "660KB",
     "ram": "7600KB",
     "deps": {
       "components": [
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
+        "c_utils",
+        "hilog_featured_lite",
+        "drivers_interface_wlan",
+        "hilog"
       ],
       "third_party": [
         "bounds_checking_function",

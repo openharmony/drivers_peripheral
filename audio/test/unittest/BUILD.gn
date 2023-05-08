@@ -16,7 +16,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 group("audiotest") {
@@ -26,10 +25,10 @@ group("audiotest") {
   deps = [ "common:hdi_base_common" ]
 
   # hal ut
-  if (drivers_peripheral_audio_rich_device) {
+  if (drivers_peripheral_audio_feature_rich_device) {
     # deps += [ "hdi/client_advance:hdi_client_advance" ]
   }
-  if (drivers_peripheral_audio_full_test_suite) {
+  if (drivers_peripheral_audio_feature_full_test_suite) {
     deps += [
       "hdi/client:hdi_client",
       "hdi/passthrough:hdi_passthrough",

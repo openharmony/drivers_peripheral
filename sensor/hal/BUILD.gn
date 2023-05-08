@@ -14,8 +14,6 @@
 
 import("//build/ohos.gni")
 
-SENSOR_ROOT_DIR = "//drivers/peripheral/sensor"
-
 if (defined(ohos_lite)) {
   config("libhdi_sensor_pub_config") {
     visibility = [ ":*" ]
@@ -25,22 +23,22 @@ if (defined(ohos_lite)) {
     output_extension = "z.so"
     public_configs = [ ":libhdi_sensor_pub_config" ]
     sources = [
-      "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
+      "src/sensor_channel.c",
+      "src/sensor_controller.c",
+      "src/sensor_manager.c",
     ]
 
     include_dirs = [
-      "$SENSOR_ROOT_DIR/hal/include",
-      "$SENSOR_ROOT_DIR/interfaces/include",
+      "include",
+      "../interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     cflags = [
       "-Wall",
       "-Wextra",
@@ -62,21 +60,21 @@ if (defined(ohos_lite)) {
   config("libhdi_sensor_pub_config") {
     visibility = [ ":*" ]
 
-    include_dirs = [ "$SENSOR_ROOT_DIR/interfaces/include" ]
+    include_dirs = [ "../interfaces/include" ]
   }
 
   ohos_shared_library("hdi_sensor") {
     public_configs = [ ":libhdi_sensor_pub_config" ]
     sources = [
-      "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_dump.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
+      "src/sensor_channel.c",
+      "src/sensor_controller.c",
+      "src/sensor_dump.c",
+      "src/sensor_manager.c",
     ]
 
     include_dirs = [
-      "$SENSOR_ROOT_DIR/hal/include",
-      "$SENSOR_ROOT_DIR/interfaces/include",
+      "include",
+      " ../interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
     defines = [ "__OHOS__USER__" ]

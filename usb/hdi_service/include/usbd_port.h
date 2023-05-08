@@ -58,6 +58,7 @@ public:
         UsbdSubscriber *usbdSubscribers, uint32_t len);
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t UpdatePort(int32_t mode, const sptr<HDI::Usb::V1_0::IUsbdSubscriber> &subscriber);
+    void setPortPath(const std::string &path);
 
 private:
     UsbdPort() = default;
@@ -71,6 +72,7 @@ private:
     int32_t WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mode);
     int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
     HDI::Usb::V1_0::PortInfo currentPortInfo_ = {DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE, PORT_MODE_DEVICE};
+    std::string path_;
 };
 } // namespace V1_0
 } // namespace Usb

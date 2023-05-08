@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../usb.gni")
 
 config("usbd_private_config") {
   include_dirs = []
@@ -27,11 +27,10 @@ config("usbd_public_config") {
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
-    "//drivers/hdf_core/framework/model/usb/include",
+    "./../../../hdf_core/framework/model/usb/include",
     "${usb_driver_path}/hdi_service",
     "${usb_driver_path}/interfaces/ddk/common/include",
     "${usb_driver_path}/interfaces/ddk/device",
-    "${default_config_path}",
   ]
 }
 
@@ -51,8 +50,8 @@ ohos_shared_library("libusb_interface_service_1.0") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
     "//drivers/interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0",
-    "//drivers/peripheral/usb/gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
   ]
 
   if (is_standard_system) {
@@ -88,7 +87,7 @@ ohos_shared_library("libusb_driver") {
 
   public_deps = [
     ":libusb_interface_service_1.0",
-    "//drivers/interface/usb/v1_0:libusb_stub_1.0",
+    "./../../../interface/usb/v1_0:libusb_stub_1.0",
   ]
 
   shlib_type = "hdi"
