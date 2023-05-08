@@ -101,6 +101,8 @@ private:
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealJpegOrientation(
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealJpegQuality(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealCameraMemoryType(
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<CameraMetadata> &metadata);
     RetCode DealAvaliableExtendConfigurations(

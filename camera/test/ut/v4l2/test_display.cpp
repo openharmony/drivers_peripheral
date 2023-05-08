@@ -740,6 +740,7 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
 int32_t DemoCameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
 {
     CAMERA_LOGI("%{public}s, enter.", __func__);
+    std::cout << "OnCameraStatus, enter, cameraId = " << cameraId << ", status = " << status << std::endl;
     return RC_OK;
 }
 
@@ -754,6 +755,7 @@ int32_t DemoCameraHostCallback::OnCameraEvent(const std::string& cameraId, Camer
 {
     CAMERA_LOGI("%{public}s, enter. cameraId = %s, event = %d",
         __func__, cameraId.c_str(), static_cast<int>(event));
+    std::cout << "OnCameraEvent, enter, cameraId = " << cameraId << ", event = " << event<< std::endl;
     return RC_OK;
 }
 
