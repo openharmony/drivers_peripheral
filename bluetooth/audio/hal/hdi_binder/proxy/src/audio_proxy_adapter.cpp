@@ -499,7 +499,8 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (hwAdapter == NULL || !HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data) || hwAdapter->adapterDescriptor.adapterName == NULL) {
+    if (hwAdapter == NULL || !HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data) ||
+        hwAdapter->adapterDescriptor.adapterName == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
