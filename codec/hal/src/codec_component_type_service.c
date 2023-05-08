@@ -37,7 +37,7 @@ static int32_t CodecComponentTypeGetComponentVersion(struct CodecComponentType *
 static int32_t CodecComponentTypeSendCommand(struct CodecComponentType *self,
     enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
-    HDF_LOGI("%{public}s, service impl!, type [%{public}d], cmd [%{public}d]", __func__,
+    HDF_LOGI("%{public}s, service impl, type [%{public}d], cmd [%{public}d]!", __func__,
              (uint32_t)cmd, param);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
@@ -47,7 +47,7 @@ static int32_t CodecComponentTypeSendCommand(struct CodecComponentType *self,
 static int32_t CodecComponentTypeGetParameter(struct CodecComponentType *self,
     uint32_t paramIndex, int8_t *paramStruct, uint32_t paramStructLen)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, index [%{public}x]!", __func__, paramIndex);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     int32_t err = OmxAdapterGetParameter(service->codecNode, paramIndex, paramStruct, paramStructLen);
@@ -62,7 +62,7 @@ static int32_t CodecComponentTypeGetParameter(struct CodecComponentType *self,
 static int32_t CodecComponentTypeSetParameter(struct CodecComponentType *self,
     uint32_t index, int8_t *paramStruct, uint32_t paramStructLen)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, index [%{public}x]!", __func__, index);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     int32_t err = OmxAdapterSetParameter(service->codecNode, index, paramStruct, paramStructLen);
@@ -76,7 +76,7 @@ static int32_t CodecComponentTypeSetParameter(struct CodecComponentType *self,
 static int32_t CodecComponentTypeGetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, index [%{public}x]!", __func__, index);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     int32_t err = OmxAdapterGetConfig(service->codecNode, index, cfgStruct, cfgStructLen);
@@ -89,7 +89,7 @@ static int32_t CodecComponentTypeGetConfig(struct CodecComponentType *self,
 static int32_t CodecComponentTypeSetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, index [%{public}x]!", __func__, index);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     int32_t err = OmxAdapterSetConfig(service->codecNode, index, cfgStruct, cfgStructLen);
@@ -128,7 +128,7 @@ static int32_t CodecComponentTypeComponentTunnelRequest(struct CodecComponentTyp
 static int32_t CodecComponentTypeUseBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, portIndex: [%{public}d]!", __func__, portIndex);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     return OmxAdapterUseBuffer(service->codecNode, portIndex, buffer);
@@ -137,7 +137,7 @@ static int32_t CodecComponentTypeUseBuffer(struct CodecComponentType *self,
 static int32_t CodecComponentTypeAllocateBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, portIndex: [%{public}d]!", __func__, portIndex);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     return OmxAdapterAllocateBuffer(service->codecNode, portIndex, buffer);
@@ -146,7 +146,8 @@ static int32_t CodecComponentTypeAllocateBuffer(struct CodecComponentType *self,
 static int32_t CodecComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIndex,
     const struct OmxCodecBuffer *buffer)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl, portIndex: [%{public}d], bufferId: [%{public}d]!",
+        __func__, portIndex, buffer->bufferId);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     return OmxAdapterFreeBuffer(service->codecNode, portIndex, (struct OmxCodecBuffer *)buffer);
