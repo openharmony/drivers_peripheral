@@ -13,8 +13,8 @@
     "name": "drivers_peripheral_camera",
     "subsystem": "hdf",
     "adapted_system_type": ["standard"],
-    "rom": "2440KB",
-    "ram": "8500KB",
+    "rom": "22212KB",
+    "ram": "78517KB",
     "deps": {
       "components": [
         "hdf_core",
