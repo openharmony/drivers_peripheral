@@ -12,22 +12,23 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+
+HDI_SERVICE_ROOT_DIR = "../.."
 
 ohos_shared_library("libwlan_service_extend") {
   include_dirs = [
-    "//drivers/peripheral/wlan/interfaces/include",
-    "//drivers/peripheral/wlan/client/include",
-    "//drivers/peripheral/wlan/hal/include",
-    "//drivers/peripheral/wlan/hdi_service/service_common",
-    "//drivers/peripheral/wlan/hdi_service/service_extend",
+    "$HDI_SERVICE_ROOT_DIR/interfaces/include",
+    "$HDI_SERVICE_ROOT_DIR/client/include",
+    "$HDI_SERVICE_ROOT_DIR/hal/include",
+    "$HDI_SERVICE_ROOT_DIR/hdi_service/service_common",
+    "$HDI_SERVICE_ROOT_DIR/hdi_service/service_extend",
   ]
   sources = [ "wlan_extend_cmd.c" ]
 
-  deps = [
-    "//drivers/interface/wlan/v1_1:wlan_idl_headers",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
-  ]
+  deps = [ "$HDI_SERVICE_ROOT_DIR/hal:wifi_hal" ]
+
+  external_deps = [ "drivers_interface_wlan:wlan_idl_headers" ]
 
   defines = [ "__OHOS__USER__" ]
 
@@ -42,7 +43,7 @@ ohos_shared_library("libwlan_service_extend") {
   ]
 
   if (is_standard_system) {
-    external_deps = [
+    external_deps += [
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -50,7 +51,7 @@ ohos_shared_library("libwlan_service_extend") {
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]
