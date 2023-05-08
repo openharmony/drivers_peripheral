@@ -69,6 +69,7 @@ private:
     CreateComposerVdiFunc createVdiFunc_;
     DestroyComposerVdiFunc destroyVdiFunc_;
 
+    uint32_t currentBacklightLevel_;
     std::shared_ptr<IDisplayComposerVdi> vdiImpl_;
     std::unique_ptr<HdiDisplayCmdResponser> cmdResponser_;
     sptr<IHotPlugCallback> hotPlugCb_;
