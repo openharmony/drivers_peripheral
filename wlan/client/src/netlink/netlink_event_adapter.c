@@ -39,7 +39,6 @@
 
 #define BUFSIZE 1024
 #define POLLTIMEOUT 1000
-#define SIGNALLEVELCONFFICIENT 100
 
 static inline uint32_t BitLeftShift(uint8_t x)
 {
@@ -198,7 +197,7 @@ static int32_t DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *s
     }
     if (attr[NL80211_BSS_SIGNAL_MBM]) {
          /* mBm to dBm */
-        scanResult->level = (int32_t)nla_get_u32(attr[NL80211_BSS_SIGNAL_MBM]) / SIGNALLEVELCONFFICIENT;
+        scanResult->level = (int32_t)nla_get_u32(attr[NL80211_BSS_SIGNAL_MBM]) / SIGNAL_LEVEL_CONFFICIENT;
         scanResult->flags |= SCAN_LEVEL_DBM | SCAN_QUAL_INVALID;
     } else if (attr[NL80211_BSS_SIGNAL_UNSPEC]) {
         scanResult->level = (int32_t)nla_get_u8(attr[NL80211_BSS_SIGNAL_UNSPEC]);

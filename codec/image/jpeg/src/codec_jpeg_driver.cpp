@@ -44,7 +44,7 @@ static int32_t CodecJpegDriverDispatch(struct HdfDeviceIoClient *client, int cmd
         CODEC_LOGE("invalid data sbuf object to dispatch, error [%{public}d]", ret);
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     ret = SbufToParcel(reply, &replyParcel);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("invalid reply sbuf object to dispatch, error [%{public}d]", ret);

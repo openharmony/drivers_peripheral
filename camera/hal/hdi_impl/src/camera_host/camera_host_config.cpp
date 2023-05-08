@@ -203,4 +203,18 @@ std::string CameraHostConfig::ReturnLogicalCameraIdToString(const std::string &p
     }
     return std::string("");
 }
+
+void CameraHostConfig::AddUsbCameraId(std::string cameraId)
+{
+    usbCameraIdVector_.push_back(cameraId);
+}
+
+bool CameraHostConfig::SearchUsbCameraId(std::string cameraId)
+{
+    auto iter = std::find(usbCameraIdVector_.begin(), usbCameraIdVector_.end(), cameraId);
+    if (iter != usbCameraIdVector_.end()) {
+        return true;
+    }
+    return false;
+}
 } // end namespace OHOS::Camera

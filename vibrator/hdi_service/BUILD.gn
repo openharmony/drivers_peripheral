@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,7 +12,7 @@
 # limitations under the License.
 
 HDF_CORE_PATH = "../../../hdf_core"
-hdf_interface_path = "../../../interface"
+DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
@@ -22,8 +22,12 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("libvibrator_interface_service_1.1") {
-    include_dirs = [ "../interfaces/include/" ]
-    sources = [ "vibrator_interface_impl.cpp" ]
+    include_dirs = [
+      "../interfaces/include/",
+      ".",
+      "../interfaces/v1_1/",
+    ]
+    sources = [ "vibrator_if_service.cpp" ]
     deps = [ "../hal:hdi_vibrator" ]
 
     cflags = [
@@ -39,6 +43,8 @@ if (defined(ohos_lite)) {
       external_deps = [
         "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
+        "hdf_core:libhdf_host",
+        "hitrace_native:hitrace_meter",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]
@@ -56,9 +62,9 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("libvibrator_driver") {
     include_dirs = [ "../interfaces/include/" ]
-    sources = [ "vibrator_interface_driver.cpp" ]
+    sources = [ "vibrator_if_driver.cpp" ]
 
-    deps = [ "$hdf_interface_path/vibrator/v1_1:libvibrator_stub_1.1" ]
+    deps = [ "$DRIVERS_INTERFACE_PATH/vibrator/v1_1:libvibrator_stub_1.1" ]
 
     cflags = [
       "-Wall",

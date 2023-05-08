@@ -581,7 +581,7 @@ int32_t AudioHwiCaptureStop(struct IAudioCapture *capture)
     int32_t ret = hwiCapture->control.Stop(hwiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{pubilc}d", ret);
-        return ret;
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     return HDF_SUCCESS;

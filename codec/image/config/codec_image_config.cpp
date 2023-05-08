@@ -152,7 +152,7 @@ int32_t CodecImageConfig::GetOneCapability(const struct DeviceResourceIface &ifa
         CHECK_AND_RETURN_RET_LOG(err == HDF_SUCCESS, HDF_FAILURE, "failed to get %{public}s.%{public}s!",
             childNode.name, nodeAttrs[i].attrName.c_str());
     }
-    
+
     ConfigUintArrayNodeAttr attr = {CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS, cap.supportPixFmts};
     ret = GetUintTableConfig(iface, childNode, attr);
     CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, HDF_FAILURE, "get uint table config [%{public}s] err!",

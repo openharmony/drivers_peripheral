@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 #include "ddk_sysfs_device.h"
-#include "default_config.h"
 #include "hdf_base.h"
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
@@ -49,9 +48,7 @@ struct UsbDdkDeviceList {
 static struct UsbDdkDeviceList g_ddkDevList = {.isInit = false};
 #define STATE_STRING_LENGTH 20
 
-#ifndef USB_GADGET_STATE_PATH
-#define USB_GADGET_STATE_PATH "invalid_path"
-#endif
+char *g_gadgetStatePath = "invalid_path";
 
 static struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
 {
@@ -198,12 +195,18 @@ static int32_t DdkDevMgrScanSysfs(const char *sysfsDevDir)
     return HDF_SUCCESS;
 }
 
-int32_t DdkDevMgrInit(void)
+int32_t DdkDevMgrInit(const char *gadgetStatePath)
 {
     if (g_ddkDevList.isInit) {
         return HDF_SUCCESS;
     }
 
+    if (gadgetStatePath == NULL) {
+        HDF_LOGE("%{public}s: invalid gadgetStatePath", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    g_gadgetStatePath = (char *)gadgetStatePath;
     int32_t ret = OsalMutexInit(&g_ddkDevList.listMutex);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: init mutex failed", __func__);
@@ -247,9 +250,9 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
         HDF_LOGE("%{public}s: invalid param.", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    int32_t fd = open(USB_GADGET_STATE_PATH, O_RDONLY | O_CLOEXEC);
+    int32_t fd = open(g_gadgetStatePath, O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
-        HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, USB_GADGET_STATE_PATH, errno);
+        HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, g_gadgetStatePath, errno);
         return HDF_ERR_IO;
     }
 
@@ -274,8 +277,9 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
 #else                                                                           // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 struct HdfIoService *g_usbPnpSrv = NULL;
 #define HDF_USB_INFO_MAX_SIZE (127 * sizeof(struct UsbPnpNotifyMatchInfoTable)) // 127  is max deivce num
-int32_t DdkDevMgrInit(void)
+int32_t DdkDevMgrInit(const char *gadgetStatePath)
 {
+    (void)gadgetStatePath;
     g_usbPnpSrv = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (g_usbPnpSrv == NULL) {
         HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);

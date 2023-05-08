@@ -379,6 +379,7 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
 
     if (status == AVAILABLE) {
         std::string logicalCameraId = config->GenerateNewLogicalCameraId();
+        config->AddUsbCameraId(logicalCameraId);
         RetCode rc = config->AddCameraId(logicalCameraId, physicalCameraIds, ability);
         if (rc == RC_OK && logicalCameraId.size() > 0) {
             CAMERA_LOGI("add physicalCameraIds %{public}d logicalCameraId %{public}s",

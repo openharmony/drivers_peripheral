@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "ddk_pnp_listener_mgr.h"
+#include "device_resource_if.h"
 #include "hdf_slist.h"
 #include "hisysevent.h"
 #include "osal_mutex.h"
@@ -49,7 +50,12 @@ uint32_t UsbImpl::attachFailedCount_ = 0;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
-    return new (std::nothrow) UsbImpl();
+    using OHOS::HDI::Usb::V1_0::UsbImpl;
+    UsbImpl *service = new (std::nothrow) UsbImpl();
+    if (service == nullptr) {
+        return nullptr;
+    }
+    return service;
 }
 
 UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
@@ -1633,6 +1639,23 @@ int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 
 int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
+    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    if (iface == nullptr) {
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        return HDF_FAILURE;
+    }
+
+    const char *path = nullptr;
+    const char *pathDef = nullptr;
+    if (device_ == nullptr) {
+        HDF_LOGE("%{public}s: device_ is empty\n", __func__);
+        return HDF_FAILURE;
+    }
+    if (iface->GetString(device_->property, "port_file_path", &path, pathDef) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read port_file_path failed", __func__);
+        return HDF_FAILURE;
+    }
+    UsbdPort::GetInstance().setPortPath(path);
     int32_t ret = UsbdPort::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:FunSetRole failed, ret:%{public}d", __func__, ret);

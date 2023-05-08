@@ -36,11 +36,11 @@ if (defined(ohos_lite)) {
     public_configs = [ ":input_hdi_public_config" ]
     include_dirs = []
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [

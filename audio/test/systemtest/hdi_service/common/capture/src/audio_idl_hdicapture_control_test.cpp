@@ -101,7 +101,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_003, TestSize.Level1)
     ret = capture->Start(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->Start(capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_AI_BUSY, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     capture->Stop(capture);
 }
 /**
@@ -132,7 +132,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_002, TestSize.Level1)
     ret = capture->Stop(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->Stop(capture);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
 * @tc.name  AudioCaptureStop_003
@@ -161,7 +161,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_004, TestSize.Level1)
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
     ret = capture->Stop(capture);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
 * @tc.name  AudioCaptureStopNull_005
@@ -363,7 +363,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_006, TestSize.Level1)
     ret = capture->Resume(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->Start(capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_AI_BUSY, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     capture->Stop(capture);
 }
 

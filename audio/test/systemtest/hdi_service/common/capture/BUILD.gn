@@ -13,7 +13,6 @@
 
 if (!defined(ohos_lite)) {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 }
 import("./../../../../../audio.gni")
 

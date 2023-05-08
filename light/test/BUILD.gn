@@ -11,9 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  drivers_peripheral_light_feature_model = false
-}
+import("../light.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
@@ -22,10 +20,7 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_light") {
     # add hdf subsystem unittest
     if (ohos_build_type == "debug") {
-      if (ohos_kernel_type == "linux" && board_name == "hispark_taurus") {
-        deps = [ "unittest:hdf_peripheral_test_light" ]
-      } else if (ohos_kernel_type == "liteos_a" &&
-                 board_name == "hispark_taurus") {
+      if (drivers_peripheral_light_feature_lite_support_test) {
         deps = [ "unittest:hdf_peripheral_test_light" ]
       }
     }
@@ -45,15 +40,7 @@ if (defined(ohos_lite)) {
       ]
     }
 
-    HDI_LIGHT_UNITTEST_PATH =
-        rebase_path("//device/soc/${device_company}/common/hal/light/test")
-    cmd = "if [ -f ${HDI_LIGHT_UNITTEST_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-    HAVE_LIGHT_UNITTEST =
-        exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-    if (HAVE_LIGHT_UNITTEST) {
-      deps += [ "${HDI_LIGHT_UNITTEST_PATH}:light_hdi_unittest" ]
-    } else {
+    if (drivers_peripheral_light_feature_community) {
       deps += [ "unittest/hdi:hdf_unittest_hdi_light" ]
     }
   }
