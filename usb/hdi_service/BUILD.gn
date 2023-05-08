@@ -50,8 +50,8 @@ ohos_shared_library("libusb_interface_service_1.0") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
+    "./../../../interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
-    "//drivers/interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0",
   ]
 
   if (is_standard_system) {
