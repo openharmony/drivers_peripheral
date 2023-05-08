@@ -42,6 +42,7 @@ public:
     struct AudioDeviceDescriptor devDescRender_ = {};
     struct AudioSampleAttributes attrsRender_ = {};
     uint32_t renderId_ = 0;
+    char *devDescriptorName_ = nullptr;
     uint32_t size_ = MAX_AUDIO_ADAPTER_DESC;
     virtual void SetUp();
     virtual void TearDown();
@@ -69,7 +70,8 @@ void AudioUtRenderMmapTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 void AudioUtRenderMmapTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
 {
     devDesc.pins = PIN_OUT_SPEAKER;
-    devDesc.desc = strdup("cardname");
+    devDescriptorName_ = strdup("cardname");
+    devDesc.desc = devDescriptorName_;
 
     ASSERT_NE(desc_, nullptr);
     ASSERT_NE(desc_->ports, nullptr);
@@ -133,6 +135,9 @@ void AudioUtRenderMmapTest::SetUp()
 
 void AudioUtRenderMmapTest::TearDown()
 {
+    ASSERT_NE(devDescriptorName_, nullptr);
+    free(devDescriptorName_);
+
     if (adapter_ != nullptr) {
         adapter_->DestroyRender(adapter_, renderId_);
         render_ = nullptr;

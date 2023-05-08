@@ -25,6 +25,8 @@ using namespace std;
 
 namespace {
 static const uint32_t g_audioAdapterNumMax = 5;
+const int32_t ITERATION_FREQUENCY = 100;
+const int32_t REPETITION_FREQUENCY = 3;
 
 class AudioManagerBenchmarkTest : public benchmark::Fixture {
 public:
@@ -78,7 +80,7 @@ void AudioManagerBenchmarkTest::TearDown(const ::benchmark::State &state)
     IAudioManagerRelease(manager_, false);
 }
 
-BENCHMARK_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_GetAllAdapters)(benchmark::State &state)
+BENCHMARK_F(AudioManagerBenchmarkTest, GetAllAdapters)(benchmark::State &state)
 {
     int32_t ret;
     uint32_t size = g_audioAdapterNumMax;
@@ -93,10 +95,10 @@ BENCHMARK_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_GetAll
     ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
 }
 
-BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_GetAllAdapters)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, GetAllAdapters)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_LoadAdapter)(benchmark::State &state)
+BENCHMARK_F(AudioManagerBenchmarkTest, LoadAdapterAndUnloadAdapter)(benchmark::State &state)
 {
     int32_t ret;
     uint32_t size = g_audioAdapterNumMax;
@@ -119,8 +121,8 @@ BENCHMARK_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_LoadAd
     ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
 }
 
-BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, DriverSystem_AudioManagerBenchmark_LoadAdapter)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, LoadAdapterAndUnloadAdapter)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
 
 BENCHMARK_MAIN();

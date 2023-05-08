@@ -32,6 +32,9 @@ using namespace std;
 
 namespace {
 static const uint32_t g_audioAdapterNumMax = 5;
+const int32_t AUDIO_ADAPTER_BUF_TEST = 1024;
+const int32_t ITERATION_FREQUENCY = 100;
+const int32_t REPETITION_FREQUENCY = 3;
 
 class AudioAdapterBenchmarkTest : public benchmark::Fixture {
 public:
@@ -70,7 +73,7 @@ void AudioAdapterBenchmarkTest::AudioAdapterDescriptorFree(struct AudioAdapterDe
 
 void AudioAdapterBenchmarkTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
 {
-    if ((descsLen > 0) && (descs != nullptr) && ((*descs) == nullptr)) {
+    if ((descsLen > 0) || (descs != nullptr) || ((*descs) == nullptr)) {
         return;
     }
 
@@ -147,7 +150,7 @@ void AudioAdapterBenchmarkTest::TearDown(const ::benchmark::State &state)
     manager_ = nullptr;
 }
 
-BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_InitAllPorts)(benchmark::State &state)
+BENCHMARK_F(AudioAdapterBenchmarkTest, InitAllPorts)(benchmark::State &state)
 {
     int32_t ret;
     for (auto _ : state) {
@@ -156,10 +159,10 @@ BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_InitAl
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_InitAllPorts)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, InitAllPorts)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_CreateRender)(benchmark::State &state)
+BENCHMARK_F(AudioAdapterBenchmarkTest, CreateRenderAndDestroyRender)(benchmark::State &state)
 {
     int32_t ret;
     struct IAudioRender *render = nullptr;
@@ -183,10 +186,10 @@ BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_Create
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_CreateRender)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, CreateRenderAndDestroyRender)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_CreateCapture)(benchmark::State &state)
+BENCHMARK_F(AudioAdapterBenchmarkTest, CreateCaptureAndDestroyCapture)(benchmark::State &state)
 {
     int32_t ret;
     struct IAudioCapture *capture = nullptr;
@@ -209,10 +212,10 @@ BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_Create
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_CreateCapture)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, CreateCaptureAndDestroyCapture)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_GetPortCapability)(benchmark::State &state)
+BENCHMARK_F(AudioAdapterBenchmarkTest, GetPortCapability)(benchmark::State &state)
 {
     int32_t ret;
     struct AudioPort port = {};
@@ -227,6 +230,114 @@ BENCHMARK_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_GetPor
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
-BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, DriverSystem_AudioAdapterBenchmark_GetPortCapability)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, GetPortCapability)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, SetPassthroughMode)(benchmark::State &state)
+{
+    int32_t ret;
+    struct AudioPort port = {};
+    port.dir = PORT_OUT;
+    port.portId = 0;
+    port.portName = const_cast<char*>("primary");
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+
+    for (auto _ : state) {
+        ret = adapter_->SetPassthroughMode(adapter_, &port, mode);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, SetPassthroughMode)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, GetPassthroughMode)(benchmark::State &state)
+{
+    int32_t ret;
+    struct AudioPort port = {};
+    port.dir = PORT_OUT;
+    port.portId = 0;
+    port.portName = const_cast<char*>("primary");
+    enum AudioPortPassthroughMode mode;
+
+    for (auto _ : state) {
+        ret = adapter_->GetPassthroughMode(adapter_, &port, &mode);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, GetPassthroughMode)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, GetDeviceStatus)(benchmark::State &state)
+{
+    int32_t ret;
+    struct AudioDeviceStatus status = {};
+
+    for (auto _ : state) {
+        ret = adapter_->GetDeviceStatus(adapter_, &status);
+    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, GetDeviceStatus)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, SetMicMute)(benchmark::State &state)
+{
+    int32_t ret;
+    bool mute = false;
+
+    for (auto _ : state) {
+        ret = adapter_->SetMicMute(adapter_, mute);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, SetMicMute)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, GetMicMute)(benchmark::State &state)
+{
+    int32_t ret;
+    bool mute = false;
+
+    for (auto _ : state) {
+        ret = adapter_->GetMicMute(adapter_, &mute);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, GetMicMute)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, SetVoiceVolume)(benchmark::State &state)
+{
+    int32_t ret;
+    float volume = 0;
+
+    for (auto _ : state) {
+        ret = adapter_->SetVoiceVolume(adapter_, volume);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, SetVoiceVolume)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+BENCHMARK_F(AudioAdapterBenchmarkTest, SetExtraParams)(benchmark::State &state)
+{
+    int32_t ret;
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_LOWPOWER;
+    char condition[AUDIO_ADAPTER_BUF_TEST];
+    const char *value = "sup_sampling_rates=4800;sup_channels=1;sup_formats=2;";
+
+    for (auto _ : state) {
+        ret = adapter_->SetExtraParams(adapter_, key, condition, value);
+    }
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, SetExtraParams)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
