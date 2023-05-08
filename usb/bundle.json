@@ -30,7 +30,6 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base",
         "samgr",
         "init",
         "hitrace_native",
