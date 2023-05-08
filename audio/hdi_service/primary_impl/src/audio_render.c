@@ -92,6 +92,7 @@ int32_t AudioRenderStart(struct IAudioRender *handle)
         return AUDIO_ERR_AO_BUSY; // render is busy now
     }
     if (hwRender->devDataHandle == NULL) {
+        AUDIO_FUNC_LOGE("devDataHandle is null!")
         return AUDIO_ERR_INTERNAL;
     }
 

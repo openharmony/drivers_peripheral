@@ -163,7 +163,7 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     pthread_attr_t tidsAttr;
     const char *threadName = "pnp_headset";
 
-    AUDIO_FUNC_LOGI("enter.");
+    AUDIO_FUNC_LOGI("create audio headset pnp uevent thread");
     g_bRunThread = true;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
@@ -183,7 +183,7 @@ int32_t AudioHeadsetPnpInputStartThread(void)
 
 void AudioHeadsetPnpInputEndThread(void)
 {
-    AUDIO_FUNC_LOGI("enter.");
+    AUDIO_FUNC_LOGI("audio headset pnp uevent thread exit");
     g_bRunThread = false;
     OsalMSleep(WAIT_THREAD_END_TIME_MS);
 }
