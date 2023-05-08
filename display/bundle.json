@@ -12,8 +12,7 @@
   "component": {
     "name": "drivers_peripheral_display",
     "subsystem": "hdf",
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "1260KB",
     "ram": "7700KB",
     "features": [
@@ -21,15 +20,12 @@
     ],
     "deps": {
       "components": [
-        "graphic_standard",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
-      ],
-      "third_party": [
-        "bounds_checking_function",
-        "libdrm",
-        "googletest"
+        "c_utils",
+        "ipc",
+        "drivers_interface_display",
+        "graphic_chipsetsdk"
       ]
     },
     "build": {
