@@ -395,6 +395,21 @@ int32_t RilImpl::SetDeviceState(
         &Telephony::HRilManager::SetDeviceState, slotId, serialId, deviceStateType, deviceStateOn);
 }
 
+int32_t RilImpl::SetNrOptionMode(int32_t slotId, int32_t serialId, int32_t mode)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetNrOptionMode, slotId, serialId, mode);
+}
+
+int32_t RilImpl::GetNrOptionMode(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNrOptionMode, slotId, serialId);
+}
+
+int32_t RilImpl::GetRrcConnectionState(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetRrcConnectionState, slotId, serialId);
+}
+
 int32_t RilImpl::SetCallback(const sptr<IRilCallback> &rilCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
