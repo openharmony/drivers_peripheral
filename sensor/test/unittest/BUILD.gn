@@ -70,7 +70,7 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-    deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
+    deps = [ "../../hal:hdi_sensor" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",

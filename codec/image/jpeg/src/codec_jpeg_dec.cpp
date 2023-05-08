@@ -40,7 +40,7 @@ int32_t CodecJpegDecoder::JpegInit()
 {
     CODEC_LOGI("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
-    
+
     int32_t ret = core_->Init();
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("error = [%{public}d]", ret);
@@ -101,7 +101,7 @@ int32_t CodecJpegDecoder::FreeInBuffer(const CodecImageBuffer& inBuffer)
 {
     CODEC_LOGI("servcie impl, bufferId [%{public}d]!", inBuffer.id);
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
-    
+
     uint32_t bufferId = inBuffer.id;
     auto entry = bufferHandleMap_.find(bufferId);
     CHECK_AND_RETURN_RET_LOG(entry != bufferHandleMap_.end(), HDF_FAILURE, "not find bufferId:[%{public}d]", bufferId);

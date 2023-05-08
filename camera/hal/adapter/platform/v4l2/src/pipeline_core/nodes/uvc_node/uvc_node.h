@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,14 +32,22 @@ public:
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
-    void SetBufferCallback();
+    RetCode SetCallback() override;
+    void SetBufferCallback() override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
-protected:
-    RetCode StartCheck(int64_t &bufferPoolId);
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
 private:
-    std::shared_ptr<SensorController>       sensorController_ = nullptr;
-    std::shared_ptr<IBufferPool>            bufferPool_ = nullptr;
-    std::shared_ptr<IDeviceManager>     deviceManager_ = nullptr;
+    void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
+    int32_t GetStreamId(const CaptureMeta &meta);
+    void GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata);
+    void YUV422To420(uint8_t yuv422[], uint8_t yuv420[], int width, int height);
+
+private:
+    std::mutex requestLock_;
+    std::map<int32_t, std::list<int32_t>> captureRequests_ = {};
+    std::shared_ptr<SensorController> sensorController_ = nullptr;
+    std::shared_ptr<IDeviceManager> deviceManager_ = nullptr;
+    std::shared_ptr<CameraMetadata> meta_ = nullptr;
 };
 } // namespace OHOS::Camera
 #endif

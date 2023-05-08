@@ -787,6 +787,14 @@ HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
     rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
     flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NODATA);
     ASSERT_TRUE(flag);
+    rc = g_wlanObj->StartChannelMeas(g_wlanObj, nullptr, &measChannelParam);
+    ASSERT_NE(rc, HDF_SUCCESS);
+    rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, nullptr);
+    ASSERT_NE(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, nullptr, &measChannelResult);
+    ASSERT_NE(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, nullptr);
+    ASSERT_NE(rc, HDF_SUCCESS);
 }
 
 /**

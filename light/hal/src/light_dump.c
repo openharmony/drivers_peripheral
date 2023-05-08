@@ -180,7 +180,13 @@ static int32_t LightDriverDump(struct HdfSBuf *data, struct HdfSBuf *reply)
     return HDF_SUCCESS;
 }
 
-void LightDevRegisterDumpFunc(void)
+int32_t GetLightDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    DevHostRegisterDumpHost(LightDriverDump);
+    int32_t ret = LightDriverDump(data, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get light dump failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
 }

@@ -13,11 +13,25 @@
  * limitations under the License.
  */
 
-#include <securec.h>
-#include <stdio.h>
-
 #ifndef LIGHT_DUMP_H
 #define LIGHT_DUMP_H
 
-void LightDevRegisterDumpFunc();
+#include <securec.h>
+#include <stdio.h>
+#include "hdf_sbuf.h"
+
+#ifdef __cplusplus
+#if __cplusplus
+extern "C" {
 #endif
+#endif /* __cplusplus */
+
+int32_t GetLightDump(struct HdfSBuf *data, struct HdfSBuf *reply);
+
+#ifdef __cplusplus
+#if __cplusplus
+}
+#endif
+#endif /* __cplusplus */
+
+#endif /* HDI_SENSOR_DUMP_H */

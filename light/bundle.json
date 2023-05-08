@@ -14,7 +14,8 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_light_feature_model",
-      "drivers_peripheral_light_community"
+      "drivers_peripheral_light_feature_community",
+      "drivers_peripheral_light_feature_lite_support_test"
     ],
     "syscap": [],
     "adapted_system_type": ["standard"],
@@ -25,10 +26,9 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
-      ],
-      "third_party": [
-        "bounds_checking_function"
+        "c_utils",
+        "drivers_interface_light",
+        "hitrace_native"
       ]
     },
     "build": {

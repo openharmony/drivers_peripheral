@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libbattery_interface_service_1.2") {
   include_dirs = [
@@ -56,12 +56,12 @@ ohos_shared_library("libbattery_driver") {
     "include",
     "../include",
     "../../utils/include",
-    "//drivers/peripheral/battery/charger/led",
+    "../../charger/led",
   ]
   sources = [ "src/battery_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/interface/battery/v1_2:libbattery_stub_1.2",
+    "../../../../interface/battery/v1_2:libbattery_stub_1.2",
     "//third_party/jsoncpp:jsoncpp",
   ]
 

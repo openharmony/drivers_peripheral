@@ -67,7 +67,7 @@ BENCHMARK_F(CodecBenchmarkTest, DriverSystem_CodecBenchmark_GetComponentCapabili
     auto ret = manager_->GetComponentNum(count);
     EXPECT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(count > 0);
-    
+
     std::vector<CodecCompCapability> capList;;
     for (auto _ : state) {
         ret = manager_->GetComponentCapabilityList(capList, count);
@@ -103,7 +103,7 @@ BENCHMARK_F(CodecBenchmarkTest, DriverSystem_CodecBenchmark_DestoryComponent)(be
     auto ret = manager_->GetComponentNum(count);
     EXPECT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(count > 0);
-   
+
     std::vector<CodecCompCapability> capList;;
     ret = manager_->GetComponentCapabilityList(capList, count);
     EXPECT_EQ(ret, HDF_SUCCESS);

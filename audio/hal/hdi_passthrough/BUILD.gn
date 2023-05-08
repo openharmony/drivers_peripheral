@@ -34,10 +34,12 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       ":hdi_audio_common",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
+    ]
     defines = []
     if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
@@ -118,11 +120,11 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]

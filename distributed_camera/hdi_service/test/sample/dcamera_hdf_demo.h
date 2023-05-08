@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,6 @@
 
 #include "constants.h"
 #include "camera_metadata_operator.h"
-#include "camera.h"
 #include "display_type.h"
 #include "v1_0/icamera_device.h"
 #include "v1_0/icamera_host.h"
@@ -46,6 +45,8 @@ namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::Camera;
 using namespace OHOS::HDI::Camera::V1_0;
+using CameraAbility = OHOS::Camera::CameraMetadata;
+using CameraSetting = OHOS::Camera::CameraMetadata;
 
 #define CAMERA_PREVIEW_WIDTH 640
 #define CAMERA_PREVIEW_HEIGHT 480

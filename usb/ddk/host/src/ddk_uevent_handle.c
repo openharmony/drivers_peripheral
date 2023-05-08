@@ -253,9 +253,9 @@ void *DdkUeventMain(void *param)
     return NULL;
 }
 
-int32_t DdkUeventInit(void)
+int32_t DdkUeventInit(const char *gadgetEventPath)
 {
-    return HDF_SUCCESS;
+    return UsbFnUeventInit(gadgetEventPath);
 }
 #else  // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t DdkUeventCallBack(void *priv, uint32_t id, struct HdfSBuf *data)
@@ -284,8 +284,9 @@ static int32_t DdkUeventCallBack(void *priv, uint32_t id, struct HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
-int32_t DdkUeventInit(void)
+int32_t DdkUeventInit(const char *gadgetEventPath)
 {
+    (void)gadgetEventPath;
     struct HdfIoService *usbPnpSrv = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (usbPnpSrv == NULL) {
         HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
