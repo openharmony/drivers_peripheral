@@ -257,6 +257,14 @@ struct AudioSceneDescriptorVdi {
     struct AudioDeviceDescriptorVdi desc;
 };
 
+enum AudioInputTypeVdi {
+    AUDIO_VDI_INPUT_DEFAULT_TYPE             = 0,
+    AUDIO_VDI_INPUT_MIC_TYPE                 = 1 << 0,
+    AUDIO_VDI_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1,
+    AUDIO_VDI_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2,
+    AUDIO_VDI_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
+};
+
 struct AudioSampleAttributesVdi {
     enum AudioCategoryVdi type;
     bool interleaved;
@@ -271,6 +279,7 @@ struct AudioSampleAttributesVdi {
     uint32_t stopThreshold;
     uint32_t silenceThreshold;
     int32_t streamId;
+    int32_t sourceType;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {
