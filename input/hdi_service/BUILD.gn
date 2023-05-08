@@ -11,22 +11,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+INPUT_ROOT_DIR = "./.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/input/input.gni")
+import("./../input.gni")
 
 ohos_shared_library("libinput_interfaces_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include/",
-    "//drivers/peripheral/input/hal/include/",
+    "$INPUT_ROOT_DIR/interfaces/include/",
+    "$INPUT_ROOT_DIR/hal/include/",
     "//third_party/FreeBSD/sys/dev/evdev",
   ]
   if (drivers_peripheral_input_feature_model) {
-    deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
+    deps = [ "$INPUT_ROOT_DIR/hal:hdi_input" ]
   }
   if (drivers_peripheral_input_feature_udriver) {
-    include_dirs += [ "//drivers/peripheral/input/udriver/include/" ]
-    deps = [ "//drivers/peripheral/input/udriver:hdi_input_udriver" ]
+    include_dirs += [ "$INPUT_ROOT_DIR/udriver/include/" ]
+    deps = [ "$INPUT_ROOT_DIR/udriver:hdi_input_udriver" ]
   }
 
   sources = [ "input_interfaces_impl.cpp" ]
@@ -57,13 +57,13 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 if (!drivers_peripheral_input_feature_passthrough) {
   ohos_shared_library("libinput_driver") {
     include_dirs = [
-      "//drivers/peripheral/input/interfaces/include/",
-      "//drivers/peripheral/input/hal/include/",
+      "$INPUT_ROOT_DIR/interfaces/include/",
+      "$INPUT_ROOT_DIR/hal/include/",
     ]
 
     sources = [ "input_interfaces_driver.cpp" ]
 
-    deps = [ "//drivers/interface/input/v1_0:libinput_stub_1.0" ]
+    deps = [ "$INPUT_ROOT_DIR/../../interface/input/v1_0:libinput_stub_1.0" ]
 
     if (is_standard_system) {
       external_deps = [

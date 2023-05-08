@@ -12,9 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/peripheral/display/display_config.gni")
-
-base_root = "../../../../../../"
+import("./../../../display_config.gni")
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -30,20 +28,12 @@ ohos_static_library("disp_dev_hdi_test_common") {
     "hdi_test_display.cpp",
     "hdi_test_layer.cpp",
   ]
-  include_dirs = [
-    "include",
-    "$base_root/foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "$base_root/drivers/peripheral/base",
-    "$base_root/drivers/interface/display/composer/hdifd_parcelable",
-    "$base_root/drivers/interface/display/composer/bufferhandle_parcelable",
-  ]
+
   output_name = "disp_dev_hdi_test_common"
   cflags = [
     "-DGRALLOC_GBM_SUPPORT",
     "-Wno-macro-redefined",
   ]
-
-  deps = []
 
   external_deps = [
     "c_utils:utils",
@@ -51,8 +41,10 @@ ohos_static_library("disp_dev_hdi_test_common") {
     "drivers_interface_display:display_composer_idl_headers",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"

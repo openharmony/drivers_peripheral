@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,18 +12,17 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../../usb.gni")
 
 ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
   sources = [ "src/usbfn_mtp_impl.cpp" ]
 
   include_dirs = [
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "./../../../interfaces/ddk/device",
+    "./../../../interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
-    default_config_path,
   ]
 
   deps = [ "${usb_driver_path}/ddk:libusb_ddk_device" ]
@@ -46,14 +45,14 @@ ohos_shared_library("libusbfn_mtp_driver") {
   sources = [ "src/usbfn_mtp_interface_driver.cpp" ]
 
   include_dirs = [
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "./../../../interfaces/ddk/device",
+    "./../../../interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
-    default_config_path,
   ]
 
-  deps = [ "//drivers/interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0" ]
+  deps =
+      [ "./../../../../../interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0" ]
 
   external_deps = [
     "c_utils:utils",

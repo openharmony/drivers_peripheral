@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,23 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/ohos.gni")
-} else {
-  import("//build/ohos.gni")
-  WLAN_HAL_PATH =
-      rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
-
-  cmd = "if [ -f $WLAN_HAL_PATH/product.gni ]; then echo true; else echo false; fi"
-  HAVE_WLAN_HAL_PATH =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-  if (HAVE_WLAN_HAL_PATH) {
-    import("$WLAN_HAL_PATH/product.gni")
-  } else {
-    enable_HDF_NL80211 = true
-  }
-}
+import("//build/ohos.gni")
+import("../wlan.gni")
 
 if (defined(ohos_lite)) {
   ohos_shared_library("wifi_driver_client") {
@@ -39,10 +24,7 @@ if (defined(ohos_lite)) {
       "src/sbuf/sbuf_wpa_cmd_adapter.c",
     ]
 
-    include_dirs = [
-      "include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    ]
+    include_dirs = [ "include" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
@@ -65,22 +47,22 @@ if (defined(ohos_lite)) {
     install_images = [ "system" ]
   }
 } else {
-  CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
+  CLIENT_ROOT_DIR = "./.."
   sources = [
-    "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_common_adapter.c",
-    "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_wpa_cmd_adapter.c",
-    "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c",
+    "src/sbuf/sbuf_common_adapter.c",
+    "src/sbuf/sbuf_wpa_cmd_adapter.c",
+    "src/wifi_driver_client.c",
   ]
 
   ohos_shared_library("wifi_driver_client") {
-    if (enable_HDF_NL80211) {
+    if (drivers_peripheral_wlan_feature_enable_HDF_NL80211) {
       sources += [
-        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
-        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
+        "src/sbuf/sbuf_cmd_adapter.c",
+        "src/sbuf/sbuf_event_adapter.c",
       ]
 
       include_dirs = [
-        "$CLIENT_ROOT_DIR/client/include",
+        "include",
         "$CLIENT_ROOT_DIR/interfaces/include",
       ]
 
@@ -105,13 +87,13 @@ if (defined(ohos_lite)) {
       part_name = "drivers_peripheral_wlan"
     } else {
       sources += [
-        "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c",
-        "$CLIENT_ROOT_DIR/client/src/netlink/netlink_event_adapter.c",
-        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
+        "src/netlink/netlink_cmd_adapter.c",
+        "src/netlink/netlink_event_adapter.c",
+        "src/sbuf/sbuf_event_adapter.c",
       ]
 
       include_dirs = [
-        "$CLIENT_ROOT_DIR/client/include",
+        "include",
         "$CLIENT_ROOT_DIR/interfaces/include",
         "//third_party/libnl/libnl-3.5.0/include",
         "$root_out_dir/include",

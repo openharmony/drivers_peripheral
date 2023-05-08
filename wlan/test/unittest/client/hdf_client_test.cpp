@@ -80,8 +80,11 @@ HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level1)
     int32_t ret;
     const char *code = "CN";
     const char *codeDigital = "99";
+    const char *ifNameInvalid = "wlanTest";
     uint32_t len = 2;
 
+    ret = WifiSetCountryCode(ifNameInvalid, code, len);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiSetCountryCode(WLAN_IFNAME, code, len);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
     ret = WifiSetCountryCode(WLAN_IFNAME, codeDigital, len);
@@ -144,6 +147,7 @@ HWTEST_F(WifiClientTest, WifiClientGetComboInfo001, TestSize.Level1)
 HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level1)
 {
     int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
     unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     unsigned char errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
@@ -151,6 +155,8 @@ HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level1)
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
     ret = SetMacAddr(WLAN_IFNAME, errorMac, ETH_ADDR_LEN);
+    EXPECT_NE(RET_CODE_SUCCESS, ret);
+    ret = SetMacAddr(ifNameInvalid, mac, ETH_ADDR_LEN);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
 }
 
@@ -165,9 +171,12 @@ HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level1)
     int32_t ret;
     unsigned char mac[ETH_ADDR_LEN] = {};
     int32_t type = WIFI_IFTYPE_STATION;
-
+    const char *ifNameInvalid = "wlanTest";
+    
     ret = GetDevMacAddr(WLAN_IFNAME, type, mac, ETH_ADDR_LEN);
     EXPECT_NE(RET_CODE_FAILURE, ret);
+    ret = GetDevMacAddr(ifNameInvalid, type, mac, ETH_ADDR_LEN);
+    EXPECT_NE(RET_CODE_SUCCESS, ret);
 }
 
 /**
@@ -200,6 +209,7 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     struct FreqInfoResult result;
     uint32_t size = 14;
     uint32_t i;
+    const char *ifNameInvalid = "wlanTest";
 
     result.freqs = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
     if (result.freqs == NULL) {
@@ -215,6 +225,10 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     }
 
     ret = GetValidFreqByBand(WLAN_IFNAME, bandNotSupport, &result, size);
+    EXPECT_NE(RET_CODE_SUCCESS, ret);
+    ret = GetValidFreqByBand(WLAN_IFNAME, band, nullptr, size);
+    EXPECT_NE(RET_CODE_SUCCESS, ret);
+    ret = GetValidFreqByBand(ifNameInvalid, band, &result, size);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
     ret = GetValidFreqByBand(WLAN_IFNAME, band, &result, size);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
@@ -239,7 +253,10 @@ HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level1)
 {
     int32_t ret;
     int32_t power = 10;
+    const char *ifNameInvalid = "wlanTest";
 
+    ret = SetTxPower(ifNameInvalid, power);
+    EXPECT_NE(RET_CODE_SUCCESS, ret);
     ret = SetTxPower(WLAN_IFNAME, power);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
@@ -268,8 +285,11 @@ HWTEST_F(WifiClientTest, WifiClientGetAssociatedStas001, TestSize.Level1)
 HWTEST_F(WifiClientTest, WifiClientSetScanMacAddr001, TestSize.Level1)
 {
     int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
     unsigned char scanMac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
+    ret = SetScanMacAddr(ifNameInvalid, scanMac, ETH_ADDR_LEN);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = SetScanMacAddr(WLAN_IFNAME, scanMac, ETH_ADDR_LEN);
     bool flag = (ret == RET_CODE_SUCCESS || ret == RET_CODE_NOT_SUPPORT);
     ASSERT_TRUE(flag);
@@ -287,6 +307,10 @@ HWTEST_F(WifiClientTest, WifiClientAcquireChipId001, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
     uint8_t chipId = 0;
 
+    ret = AcquireChipId(nullptr, &chipId);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
+    ret = AcquireChipId(WLAN_IFNAME, nullptr);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = AcquireChipId(ifNameInvalid, &chipId);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
     ret = AcquireChipId(WLAN_IFNAME, &chipId);
@@ -316,6 +340,10 @@ HWTEST_F(WifiClientTest, WifiClientGetIfNamesByChipId001, TestSize.Level1)
     ret = GetIfNamesByChipId(chipId, &ifNames, &num);
     EXPECT_NE(ifNames, nullptr);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    ret = GetIfNamesByChipId(chipId, &ifNames, nullptr);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
+    ret = GetIfNamesByChipId(chipId, nullptr, &num);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     free(ifNames);
 }
 

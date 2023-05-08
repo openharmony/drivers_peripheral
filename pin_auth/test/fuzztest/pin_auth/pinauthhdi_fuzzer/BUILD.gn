@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,8 +16,7 @@ import("//build/test.gni")
 
 ohos_fuzztest("PinAuthHdiFuzzTest") {
   module_out_path = "hdf/pin_auth"
-  fuzz_config_file =
-      "//drivers/peripheral/pin_auth/test/fuzztest/pin_auth/pinauthhdi_fuzzer"
+  fuzz_config_file = "../pinauthhdi_fuzzer"
   cflags = [
     "-g",
     "-O0",
@@ -25,17 +24,17 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   include_dirs = [
-    "//drivers/peripheral/pin_auth/hdi_service/service/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/main/inc",
-    "//base/useriam/user_auth_framework/common/logs",
+    "../../../../hdi_service/service/inc",
+    "../../../../hdi_service/main/inc",
+    "../../../../common/logs",
   ]
 
-  sources = [ "pin_auth_hdi_fuzzer.cpp" ]
-
-  deps = [
-    "//base/useriam/user_auth_framework/common:iam_test",
-    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
+  sources = [
+    "iam_fuzz_test.cpp",
+    "pin_auth_hdi_fuzzer.cpp",
   ]
+
+  deps = [ "../../../../hdi_service:libpin_auth_interface_service_1.0" ]
 
   external_deps = [
     "c_utils:utils",
@@ -43,4 +42,7 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_pin_auth"
 }

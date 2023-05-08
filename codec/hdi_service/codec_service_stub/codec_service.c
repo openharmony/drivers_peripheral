@@ -369,11 +369,15 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int32_t 
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < paramCnt; i++) {
-        if (params[i].key == KEY_CODEC_TYPE) {
-            int32_t codecType = 0;
-            memcpy_s(&codecType, sizeof(codecType), params[i].val, params[i].size);
-            instance->codecType = codecType;
+       if (params[i].key != KEY_CODEC_TYPE) {
+            continue;
         }
+        int32_t codecType = 0;
+        if (memcpy_s(&codecType, sizeof(codecType), params[i].val, params[i].size) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s params failed!", __func__);
+            return HDF_FAILURE;
+        }
+        instance->codecType = codecType;
     }
     return g_codecOemIface->codecSetParameter(handle, params, paramCnt);
 }

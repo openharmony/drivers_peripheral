@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../../usb.gni")
 
 group("usbfn") {
   deps = [ ":libusbfn" ]
@@ -21,15 +21,14 @@ group("usbfn") {
 
 ohos_shared_library("libusbfn") {
   include_dirs = [
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "./../../../interfaces/ddk/device",
+    "./../../../interfaces/ddk/common",
     "../include",
-    default_config_path,
   ]
 
   sources = [ "dev_usbfn.c" ]
 
-  deps = [ "//drivers/peripheral/usb/ddk:libusb_ddk_device" ]
+  deps = [ "./../../../ddk:libusb_ddk_device" ]
 
   if (is_standard_system) {
     external_deps = [

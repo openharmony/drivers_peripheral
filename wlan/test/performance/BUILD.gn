@@ -11,11 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+TEST_ROOT_DIR = "../.."
+HDF_CORE_DIR = "../../../.."
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("$HDF_CORE_DIR/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -25,21 +28,22 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
 
-    sources = [ "//drivers/peripheral/wlan/test/performance/common/hdf_wlan_performance_test.cpp" ]
+    sources = [ "common/hdf_wlan_performance_test.cpp" ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "$HDF_CORE_DIR/hdf_core/adapter/uhdf/manager:hdf_core",
+      "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/hal:wifi_hal",
       "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "hilog_featured_lite:hilog_shared",
     ]
 
     cflags = [
@@ -56,9 +60,9 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_peripheral_wlan_test_performance") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/wlan/client/include",
-      "//drivers/peripheral/wlan/hal/include",
-      "//drivers/peripheral/wlan/interfaces/include",
+      "$TEST_ROOT_DIR/client/include",
+      "$TEST_ROOT_DIR/hal/include",
+      "$TEST_ROOT_DIR/interfaces/include",
     ]
     sources = [ "./common/hdf_wlan_performance_test.cpp" ]
     cflags = [
@@ -70,8 +74,8 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/hal:wifi_hal",
     ]
     if (is_standard_system) {
       external_deps = [

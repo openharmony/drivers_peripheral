@@ -12,8 +12,7 @@
   "component": {
     "name": "drivers_peripheral_partitionslot",
     "subsystem": "hdf",
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "600KB",
     "ram": "7400KB",
     "deps": {

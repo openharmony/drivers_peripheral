@@ -43,6 +43,7 @@
 #define CHN_STEREO             (1 << 1)
 #define OUTPUT_ALIGN           16
 #define BIT_VALULE_OFFSET      31
+#define STRTOL_BASE            10
 
 #define IFACE(v) [AUDIO_CTL_ELEM_IFACE_##v] = #v
 #define TYPE(v)  [AUDIO_CTL_ELEM_TYPE_##v] = #v
@@ -992,31 +993,31 @@ static int32_t fillIntVal(struct AudioMixerCtlElemInfo *info, unsigned int argc,
     DEBUG_LOG("argv[%u] = %s\n", argc - 1, ptr);
     vals = strtok_r(ptr, ",", &outPtr);
     if (outPtr == NULL) {
-        info->value.intVal.vals[0] = atol(ptr);
+        info->value.intVal.vals[0] = strtol(ptr, NULL, STRTOL_BASE);
         info->value.intVal.min = 0;
         info->value.intVal.step = 0;
 
         return U_SUCCESS;
     }
 
-    info->value.intVal.vals[0] = atol(vals);
+    info->value.intVal.vals[0] = strtol(vals, NULL, STRTOL_BASE);
     maxPtr = strtok_r(NULL, ",", &outPtr);
     if (outPtr == NULL) {
-        info->value.intVal.max = atoi(maxPtr);
+        info->value.intVal.max = (int32_t)strtol(maxPtr, NULL, STRTOL_BASE);
         info->value.intVal.min = 0;
         info->value.intVal.step = 0;
 
         return U_SUCCESS;
     }
 
-    info->value.intVal.max = atoi(maxPtr);
+    info->value.intVal.max = (int32_t)strtol(maxPtr, NULL, STRTOL_BASE);
     minPtr = strtok_r(NULL, ",", &outPtr);
     if (outPtr != NULL) {
-        info->value.intVal.min = atoi(minPtr);
+        info->value.intVal.min = (int32_t)strtol(minPtr, NULL, STRTOL_BASE);
         stepPtr = strtok_r(NULL, ",", &outPtr);
-        info->value.intVal.step = outPtr != NULL ? atoi(stepPtr) : 0;
+        info->value.intVal.step = outPtr != NULL ? (int32_t)strtol(stepPtr, NULL, STRTOL_BASE) : 0;
     } else {
-        info->value.intVal.min = atoi(minPtr);
+        info->value.intVal.min = (int32_t)strtol(minPtr, NULL, STRTOL_BASE);
         info->value.intVal.step = 0;
     }
 

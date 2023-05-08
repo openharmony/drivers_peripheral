@@ -52,7 +52,7 @@ int32_t AudioCaptureStart(struct IAudioCapture *handle)
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         AUDIO_FUNC_LOGE("IAudioCapture already start!");
-        return AUDIO_ERR_AI_BUSY; // capture is busy now
+        return AUDIO_SUCCESS; // capture is busy now
     }
     if (hwCapture->devDataHandle == NULL) {
         AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
@@ -93,7 +93,7 @@ int32_t AudioCaptureStop(struct IAudioCapture *handle)
         AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
     } else {
         AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
-        return AUDIO_ERR_NOT_SUPPORT;
+        return AUDIO_SUCCESS;
     }
 
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
@@ -885,7 +885,7 @@ int32_t AudioCaptureReqMmapBuffer(
     (void)handle;
     (void)reqSize;
     (void)desc;
-    return AUDIO_SUCCESS;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *handle, uint64_t *frames, struct AudioTimeStamp *time)

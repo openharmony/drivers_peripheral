@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/display/display_config.gni")
+import("./../../display_config.gni")
 
 group("display_composer_hdi_service") {
   deps = [

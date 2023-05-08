@@ -4,43 +4,30 @@ if (defined(ohos_lite)) {
   import("${ohos_product_adapter_dir}/audio/product.gni")
 } else {
   import("//build/ohos.gni")
-  if (product_name == "ohos-arm64") {
-    enable_audio_hal_notsupport_pathselect = false
-  }
 }
 
 declare_args() {
   drivers_peripheral_audio_feature_mono_to_stereo = false
-  drivers_peripheral_audio_hal_notsupport_pathselect = false
-  drivers_peripheral_audio_hdf_proxy_stub = true
-  drivers_peripheral_audio_user_mode = false
-  drivers_peripheral_audio_full_test_suite = false
-  drivers_peripheral_audio_policy_config = true
-  drivers_peripheral_audio_alsa_lib = false
-  drivers_peripheral_audio_rich_device = false
-  drivers_peripheral_audio_community = true
+  drivers_peripheral_audio_feature_hal_notsupport_pathselect = false
+  drivers_peripheral_audio_feature_hdf_proxy_stub = true
+  drivers_peripheral_audio_feature_user_mode = false
+  drivers_peripheral_audio_feature_full_test_suite = false
+  drivers_peripheral_audio_feature_policy_config = true
+  drivers_peripheral_audio_feature_alsa_lib = false
+  drivers_peripheral_audio_feature_rich_device = false
+  drivers_peripheral_audio_feature_community = true
   drivers_peripheral_audio_feature_effect = false
-}
-
-if (product_name == "ohos-arm64") {
-  drivers_peripheral_audio_hal_notsupport_pathselect = false
 }
 
 if (defined(ohos_lite)) {
   if (defined(enable_audio_hal_notsupport_pathselect) &&
       enable_audio_hal_notsupport_pathselect == true) {
-    drivers_peripheral_audio_hal_notsupport_pathselect = true
+    drivers_peripheral_audio_feature_hal_notsupport_pathselect = true
   } else {
-    drivers_peripheral_audio_hal_notsupport_pathselect = false
-  }
-  if (defined(enable_audio_policy_config) &&
-      enable_audio_policy_config == true) {
-    drivers_peripheral_audio_policy_config = true
-  } else {
-    drivers_peripheral_audio_policy_config = false
+    drivers_peripheral_audio_feature_hal_notsupport_pathselect = false
   }
   if (defined(enable_hdf_audio_full_test_suite)) {
-    drivers_peripheral_audio_full_test_suite = true
+    drivers_peripheral_audio_feature_full_test_suite = true
   }
 }
 

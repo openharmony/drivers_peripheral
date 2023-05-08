@@ -12,9 +12,7 @@
 # limitations under the License.
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("./../../../../audio.gni")
 
 group("volume") {
   testonly = true

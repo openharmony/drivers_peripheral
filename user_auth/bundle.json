@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_user_auth",
   "description": "user_auth device driver",
-  "version": "3.2",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -21,7 +21,9 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "c_utils"
+        "c_utils",
+        "user_auth_framework",
+        "drivers_interface_user_auth"
       ],
       "third_party": [
         "openssl"

@@ -335,7 +335,7 @@ int32_t ComponentNode::OnEvent(EventType event, uint32_t length, int32_t eventDa
         case EVENT_ERROR: {
             omxEvent = OMX_EventError;
             if (length > 0) {
-                info.data1 = eventData[0];
+                info.data1 = static_cast<uint32_t>(eventData[0]);
             }
             break;
         }

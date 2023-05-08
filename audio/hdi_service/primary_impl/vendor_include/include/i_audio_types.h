@@ -199,6 +199,13 @@ enum AudioHwiSampleRatesMask {
     AUDIO_HW_SAMPLE_RATE_MASK_INVALID = 0xFFFFFFFFu, /**< Invalid sampling rate */
 };
 
+enum AudioHwiInputType {
+    AUDIO_HW_INPUT_DEFAULT_TYPE             = 0,
+    AUDIO_HW_INPUT_MIC_TYPE                 = 1 << 0,
+    AUDIO_HW_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1,
+    AUDIO_HW_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2,
+    AUDIO_HW_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
+};
 /**
  * @brief Defines audio sampling attributes.
  */
@@ -218,6 +225,7 @@ struct AudioHwiSampleAttributes {
     uint32_t stopThreshold;    /**< Audio render stop threshold. */
     uint32_t silenceThreshold; /**< Audio capture buffer threshold. */
     int32_t streamId;          /**< Audio Identifier of render or capture */
+    int32_t sourceType;
 };
 
 /**

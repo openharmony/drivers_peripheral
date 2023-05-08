@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_sensor",
   "description": "sensor device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -13,10 +13,12 @@
     "name": "drivers_peripheral_sensor",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_sensor_feature_model"
+      "drivers_peripheral_sensor_feature_model",
+      "drivers_peripheral_sensor_feature_community",
+      "drivers_peripheral_sensor_feature_lite_support_test"
     ],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "syscap": [],
+    "adapted_system_type": ["standard", "small"],
     "rom": "650KB",
     "ram": "7600KB",
     "deps": {
@@ -24,10 +26,9 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
-      ],
-      "third_party": [
-        "bounds_checking_function"
+        "hitrace_native",
+        "c_utils",
+        "drivers_interface_sensor"
       ]
     },
     "build": {

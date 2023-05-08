@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 import("$hdf_audio_path/audio.gni")
 
@@ -63,8 +62,8 @@ if (defined(ohos_lite)) {
       "$hdf_audio_test_path/common/hdi_common/src/audio_hdi_common.cpp",
       "$hdf_audio_test_path/common/lib_common/src/audio_lib_common.cpp",
     ]
-    if (defined(drivers_peripheral_audio_alsa_lib) &&
-        drivers_peripheral_audio_alsa_lib == true) {
+    if (defined(drivers_peripheral_audio_feature_alsa_lib) &&
+        drivers_peripheral_audio_feature_alsa_lib == true) {
       sources += [ "src/audio_alsa_librender_test.cpp" ]
     } else {
       sources += [ "src/audio_librender_test.cpp" ]

@@ -11,15 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+HDF_CORE_PATH = "../../../../hdf_core"
 import("//build/lite/config/test.gni")
 
 unittest("hdf_peripheral_sensor_test_performance") {
   output_extension = "bin"
   output_dir = "$root_out_dir/test/unittest/hdf"
-  include_dirs = [
-    "//third_party/bounds_checking_function/include",
-    "//drivers/peripheral/sensor/interfaces/include",
-  ]
+  include_dirs = [ "../../interfaces/include" ]
 
   sources = [ "./common/hdf_sensor_performance_test.cpp" ]
   cflags = [
@@ -37,11 +35,11 @@ unittest("hdf_peripheral_sensor_test_performance") {
     ]
   }
   public_deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-    "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-    "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "$HDF_CORE_PATH/adapter/uhdf/manager:hdf_core",
+    "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
+    "$HDF_CORE_PATH/adapter/uhdf/test/unittest/common:hdf_test_common",
+    "../../hal:hdi_sensor",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
+  external_deps = [ "hilog_featured_lite:hilog_shared" ]
 }

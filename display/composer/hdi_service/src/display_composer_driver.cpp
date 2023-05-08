@@ -19,6 +19,9 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/display_composer_stub.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG COMPOSER_DRV
+
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
 struct HdfDisplayComposerHost {
