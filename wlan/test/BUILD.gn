@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,20 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../wlan.gni")
+
 if (!defined(ohos_lite)) {
   import("//build/ohos.gni")
-  WLAN_HALUT_PATH =
-      rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
-
-  cmd = "if [ -f $WLAN_HALUT_PATH/product.gni ]; then echo true; else echo false; fi"
-  HAVE_WLAN_HALUT_PATH =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-  if (HAVE_WLAN_HALUT_PATH) {
-    import("$WLAN_HALUT_PATH/product.gni")
-  } else {
-    enable_HDF_UT = false
-  }
 }
 
 if (defined(ohos_lite)) {
@@ -45,7 +35,7 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_wlan") {
     testonly = true
-    if (enable_HDF_UT) {
+    if (drivers_peripheral_wlan_feature_enable_HDF_UT) {
       deps = [
         "fuzztest:hdf_wlan_fuzztest",
         "hdi_service:WlanHdiServiceTestC",
@@ -53,7 +43,7 @@ if (defined(ohos_lite)) {
         "unittest:hdf_client_wifi",
         "unittest:hdf_hal_wifi",
       ]
-      if (enable_HDF_NL80211) {
+      if (drivers_peripheral_wlan_feature_enable_HDF_NL80211) {
         deps += [ "unittest:hdf_common_wifi" ]
       }
     }
