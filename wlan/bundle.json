@@ -24,14 +24,9 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "c_utils",
-        "hilog_featured_lite",
-        "drivers_interface_wlan",
-        "hilog"
+        "drivers_interface_wlan"
       ],
-      "third_party": [
-        "bounds_checking_function",
-        "third_party_libnl"
-      ]
+      "third_party": []
     },
     "build": {
       "sub_component": [
