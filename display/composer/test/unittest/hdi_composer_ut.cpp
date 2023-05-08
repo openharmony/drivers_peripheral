@@ -605,6 +605,28 @@ HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
+HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
+{
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = GREEN
+        }
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+
+    auto layer = layers[0];
+
+    MaskInfo maskInfo = MaskInfo::LAYER_HBM_SYNC;
+    auto ret = g_composerDevice->SetLayerMaskInfo(g_displayIds[0], layer->GetId(), maskInfo);
+
+    PrepareAndPrensent();
+
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
 HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
 {
     std::vector<LayerSettings> settings = {
