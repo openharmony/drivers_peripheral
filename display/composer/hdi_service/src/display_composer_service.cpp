@@ -186,9 +186,7 @@ int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t& le
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayBacklight(devId, level);
-	ret = HDF_SUCCESS;
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-	level = m_current_backlight_level;
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_SUCCESS, level = currentBacklightLevel_);
     return ret;
 }
 
@@ -197,7 +195,7 @@ int32_t DisplayComposerService::SetDisplayBacklight(uint32_t devId, uint32_t lev
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayBacklight(devId, level);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-	m_current_backlight_level = level;
+    currentBacklightLevel_ = level;
     return ret;
 }
 
