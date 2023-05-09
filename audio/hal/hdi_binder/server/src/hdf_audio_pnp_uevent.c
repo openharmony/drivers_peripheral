@@ -375,7 +375,7 @@ static int32_t ScanUsbBusSubDir(const char *subDir)
             break;
         }
 
-        AUDIO_FUNC_LOGD("audio sub dir[%{public}s]", devName);
+        AUDIO_FUNC_LOGD("audio usb dir[%{public}s]", devName);
         state = ReadAndScanUsbDev(devName);
         if (state == AUDIO_DEVICE_ONLINE) {
             char *subDevName = devName + strlen("/dev/");

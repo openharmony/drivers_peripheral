@@ -72,7 +72,7 @@ int32_t AudioHwiCaptureFrame(struct IAudioCapture *capture, int8_t *frame, uint3
 
     int32_t ret = hwiCapture->CaptureFrame(hwiCapture, frame, *frameLen, replyBytes);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -92,7 +92,7 @@ int32_t AudioHwiGetCapturePosition(struct IAudioCapture *capture, uint64_t *fram
 
     int32_t ret = hwiCapture->GetCapturePosition(hwiCapture, frames, (struct AudioHwiTimeStamp *)time);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture get position fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture get position fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -122,7 +122,7 @@ int32_t AudioHwiCaptureCheckSceneCapability(struct IAudioCapture *capture, const
     ret = hwiCapture->scene.CheckSceneCapability(hwiCapture, &hwiScene, supported);
     OsalMemFree((void *)hwiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture CheckSceneCapability fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture CheckSceneCapability fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -150,7 +150,7 @@ int32_t AudioHwiCaptureSelectScene(struct IAudioCapture *capture, const struct A
     ret = hwiCapture->scene.SelectScene(hwiCapture, &hwiScene);
     OsalMemFree((void *)hwiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture select scene fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture select scene fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -168,7 +168,7 @@ int32_t AudioHwiCaptureSetMute(struct IAudioCapture *capture, bool mute)
 
     int32_t ret = hwiCapture->volume.SetMute(hwiCapture, mute);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SetMute fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SetMute fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -187,7 +187,7 @@ int32_t AudioHwiCaptureGetMute(struct IAudioCapture *capture, bool *mute)
 
     int32_t ret = hwiCapture->volume.GetMute(hwiCapture, mute);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetMute fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetMute fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -205,7 +205,7 @@ int32_t AudioHwiCaptureSetVolume(struct IAudioCapture *capture, float volume)
 
     int32_t ret = hwiCapture->volume.SetVolume(hwiCapture, volume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SetVolume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SetVolume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -224,7 +224,7 @@ int32_t AudioHwiCaptureGetVolume(struct IAudioCapture *capture, float *volume)
 
     int32_t ret = hwiCapture->volume.GetVolume(hwiCapture, volume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetVolume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetVolume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -244,7 +244,7 @@ int32_t AudioHwiCaptureGetGainThreshold(struct IAudioCapture *capture, float *mi
 
     int32_t ret = hwiCapture->volume.GetGainThreshold(hwiCapture, min, max);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetGainThreshold fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetGainThreshold fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -263,7 +263,7 @@ int32_t AudioHwiCaptureGetGain(struct IAudioCapture *capture, float *gain)
 
     int32_t ret = hwiCapture->volume.GetGain(hwiCapture, gain);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetGain fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetGain fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -281,7 +281,7 @@ int32_t AudioHwiCaptureSetGain(struct IAudioCapture *capture, float gain)
 
     int32_t ret = hwiCapture->volume.SetGain(hwiCapture, gain);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SetGain fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SetGain fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -300,7 +300,7 @@ int32_t AudioHwiCaptureGetFrameSize(struct IAudioCapture *capture, uint64_t *siz
 
     int32_t ret = hwiCapture->attr.GetFrameSize(hwiCapture, size);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetFrameSize fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetFrameSize fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -319,7 +319,7 @@ int32_t AudioHwiCaptureGetFrameCount(struct IAudioCapture *capture, uint64_t *co
 
     int32_t ret = hwiCapture->attr.GetFrameCount(hwiCapture, count);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetFrameCount fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetFrameCount fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -340,13 +340,13 @@ int32_t AudioHwiCaptureSetSampleAttributes(struct IAudioCapture *capture, const 
     (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
     int32_t ret = AudioHwiCommonSampleAttrToHwiSampleAttr(attrs, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SampleAttr to hwisampleAttr fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SampleAttr to hwisampleAttr fail, ret=%{public}d", ret);
         return ret;
     }
 
     ret = hwiCapture->attr.SetSampleAttributes(hwiCapture, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SetSampleAttributes fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SetSampleAttributes fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -367,13 +367,13 @@ int32_t AudioHwiCaptureGetSampleAttributes(struct IAudioCapture *capture, struct
     (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
     int32_t ret = hwiCapture->attr.GetSampleAttributes(hwiCapture, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetSampleAttributes fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetSampleAttributes fail, ret=%{public}d", ret);
         return ret;
     }
 
     ret = AudioHwiCommonHwiSampleAttrToSampleAttr(&hwiAttrs, attrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture hwiSampleAttr to SampleAttr fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture hwiSampleAttr to SampleAttr fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -392,7 +392,7 @@ int32_t AudioHwiCaptureGetCurrentChannelId(struct IAudioCapture *capture, uint32
 
     int32_t ret = hwiCapture->attr.GetCurrentChannelId(hwiCapture, channelId);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetCurrentChannelId fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetCurrentChannelId fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -411,7 +411,7 @@ int32_t AudioHwiCaptureSetExtraParams(struct IAudioCapture *capture, const char 
 
     int32_t ret = hwiCapture->attr.SetExtraParams(hwiCapture, keyValueList);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture SetExtraParams fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture SetExtraParams fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -430,7 +430,7 @@ int32_t AudioHwiCaptureGetExtraParams(struct IAudioCapture *capture, char *keyVa
 
     int32_t ret = hwiCapture->attr.GetExtraParams(hwiCapture, keyValueList, keyValueListLen);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetExtraParams fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetExtraParams fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -486,7 +486,7 @@ int32_t AudioHwiCaptureGetMmapPosition(struct IAudioCapture *capture, uint64_t *
 
     int32_t ret = hwiCapture->attr.GetMmapPosition(hwiCapture, frames, &hwiTime);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetMmapPosition fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetMmapPosition fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -507,7 +507,7 @@ int32_t AudioHwiCaptureAddAudioEffect(struct IAudioCapture *capture, uint64_t ef
 
     int32_t ret = hwiCapture->attr.AddAudioEffect(hwiCapture, effectid);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture AddAudioEffect fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture AddAudioEffect fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -525,7 +525,7 @@ int32_t AudioHwiCaptureRemoveAudioEffect(struct IAudioCapture *capture, uint64_t
 
     int32_t ret = hwiCapture->attr.RemoveAudioEffect(hwiCapture, effectid);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture RemoveAudioEffect fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture RemoveAudioEffect fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -544,7 +544,7 @@ int32_t AudioHwiCaptureGetFrameBufferSize(struct IAudioCapture *capture, uint64_
 
     int32_t ret = hwiCapture->attr.GetFrameBufferSize(hwiCapture, bufferSize);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture GetFrameBufferSize fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture GetFrameBufferSize fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -562,7 +562,7 @@ int32_t AudioHwiCaptureStart(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.Start(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture Start fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture Start fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -580,7 +580,7 @@ int32_t AudioHwiCaptureStop(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.Stop(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{public}d", ret);
         return HDF_ERR_NOT_SUPPORT;
     }
 
@@ -598,7 +598,7 @@ int32_t AudioHwiCapturePause(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.Pause(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture Pause fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture Pause fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -616,7 +616,7 @@ int32_t AudioHwiCaptureResume(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.Resume(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture Resume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture Resume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -634,7 +634,7 @@ int32_t AudioHwiCaptureFlush(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.Flush(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture Flush fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture Flush fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -652,7 +652,7 @@ int32_t AudioHwiCaptureTurnStandbyMode(struct IAudioCapture *capture)
 
     int32_t ret = hwiCapture->control.TurnStandbyMode(hwiCapture);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture TurnStandbyMode fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture TurnStandbyMode fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -670,7 +670,7 @@ int32_t AudioHwiCaptureAudioDevDump(struct IAudioCapture *capture, int32_t range
 
     int32_t ret = hwiCapture->control.AudioDevDump(hwiCapture, range, fd);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture AudioDevDump fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture AudioDevDump fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -690,7 +690,7 @@ int32_t AudioHwiCaptureIsSupportsPauseAndResume(struct IAudioCapture *capture, b
 
     int32_t ret = hwiCapture->control.IsSupportsPauseAndResume(hwiCapture, supportPause, supportResume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio capture IsSupportsPauseAndResume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio capture IsSupportsPauseAndResume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -839,7 +839,7 @@ struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttribut
     capture = &(priv->captureInfos[*captureId]->capture);
     AudioHwiInitCaptureInstance(capture);
 
-    AUDIO_FUNC_LOGI("audio captureId capture success");
+    AUDIO_FUNC_LOGI("audio create capture success");
     return capture;
 };
 
