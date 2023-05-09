@@ -24,7 +24,9 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
 
   sources = [
     "adapter/audio_adapter_benchmarktest.cpp",
+    "capture/audio_capture_benchmarktest.cpp",
     "manager/audio_manager_benchmarktest.cpp",
+    "render/audio_render_benchmarktest.cpp",
   ]
   cflags = [
     "-Wall",
