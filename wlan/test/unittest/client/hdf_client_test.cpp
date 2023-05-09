@@ -172,7 +172,7 @@ HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level1)
     unsigned char mac[ETH_ADDR_LEN] = {};
     int32_t type = WIFI_IFTYPE_STATION;
     const char *ifNameInvalid = "wlanTest";
-    
+
     ret = GetDevMacAddr(WLAN_IFNAME, type, mac, ETH_ADDR_LEN);
     EXPECT_NE(RET_CODE_FAILURE, ret);
     ret = GetDevMacAddr(ifNameInvalid, type, mac, ETH_ADDR_LEN);
