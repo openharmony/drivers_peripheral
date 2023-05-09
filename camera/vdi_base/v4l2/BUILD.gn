@@ -30,7 +30,7 @@ if (defined(ohos_lite)) {
     ldflags += [ "--coverage" ]
   }
 
-  ohos_shared_library("camera_host_service_1.0") {
+  ohos_shared_library("camera_host_vdi_impl_1.0") {
     output_extension = "z.so"
     sources = [
       "./src/camera_device/camera_device_impl.cpp",
@@ -38,11 +38,11 @@ if (defined(ohos_lite)) {
       "./src/camera_host/camera_host_impl.cpp",
       "./src/camera_host/hcs_deal.cpp",
       "./src/offline_stream_operator/offline_stream.cpp",
-      "./src/offline_stream_operator/offline_stream_operator.cpp",
+      "./src/offline_stream_operator/offline_stream_operator_vdi_impl.cpp",
       "./src/stream_operator/capture_message.cpp",
       "./src/stream_operator/capture_request.cpp",
       "./src/stream_operator/stream_base.cpp",
-      "./src/stream_operator/stream_operator.cpp",
+      "./src/stream_operator/stream_operator_vdi_impl.cpp",
       "./src/stream_operator/stream_post_view.cpp",
       "./src/stream_operator/stream_preview.cpp",
       "./src/stream_operator/stream_statistics.cpp",
@@ -53,10 +53,9 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "$camera_path/../../interfaces/include",
-      "$camera_path/../../interfaces/hdi_passthrough",
       "$camera_path/include",
-      "$camera_path/../v4l2",
       "$camera_path/utils/watchdog",
+      "$camera_path/../interfaces",
       "$camera_path/../v4l2/include",
       "$camera_path/../v4l2/include/camera_host",
       "$camera_path/../v4l2/include/camera_device",
@@ -125,18 +124,17 @@ if (defined(ohos_lite)) {
   }
 
   host_sources = [
-    "$camera_path/../../interfaces/hdi_ipc/camera_host_driver.cpp",
-    "$camera_path/../v4l2/src/camera_device/camera_device_impl.cpp",
+    "$camera_path/../v4l2/src/camera_device/camera_device_vdi_impl.cpp",
     "$camera_path/../v4l2/src/camera_dump.cpp",
     "$camera_path/../v4l2/src/camera_host/camera_host_config.cpp",
-    "$camera_path/../v4l2/src/camera_host/camera_host_impl.cpp",
+    "$camera_path/../v4l2/src/camera_host/camera_host_vdi_impl.cpp",
     "$camera_path/../v4l2/src/camera_host/hcs_deal.cpp",
     "$camera_path/../v4l2/src/offline_stream_operator/offline_stream.cpp",
-    "$camera_path/../v4l2/src/offline_stream_operator/offline_stream_operator.cpp",
+    "$camera_path/../v4l2/src/offline_stream_operator/offline_stream_operator_vdi_impl.cpp",
     "$camera_path/../v4l2/src/stream_operator/capture_message.cpp",
     "$camera_path/../v4l2/src/stream_operator/capture_request.cpp",
     "$camera_path/../v4l2/src/stream_operator/stream_base.cpp",
-    "$camera_path/../v4l2/src/stream_operator/stream_operator.cpp",
+    "$camera_path/../v4l2/src/stream_operator/stream_operator_vdi_impl.cpp",
     "$camera_path/../v4l2/src/stream_operator/stream_post_view.cpp",
     "$camera_path/../v4l2/src/stream_operator/stream_preview.cpp",
     "$camera_path/../v4l2/src/stream_operator/stream_statistics.cpp",
@@ -147,15 +145,10 @@ if (defined(ohos_lite)) {
 
   host_includes = [
     "$camera_path/../../interfaces/include",
-    "$camera_path/../../interfaces/hdi_ipc",
-    "$camera_path/../../interfaces/hdi_ipc/utils/include",
-    "$camera_path/../../interfaces/hdi_ipc/callback/host/include",
-    "$camera_path/../../interfaces/hdi_ipc/callback/device/include",
-    "$camera_path/../../interfaces/hdi_ipc/callback/operator/include",
     "$camera_path/include",
-    "$camera_path/../v4l2",
     "$camera_path/metadata_manager/include",
     "$camera_path/utils/watchdog",
+    "$camera_path/../interfaces",
     "$camera_path/../v4l2/include",
     "$camera_path/../v4l2/include/camera_host",
     "$camera_path/../v4l2/include/camera_device",
@@ -183,7 +176,7 @@ if (defined(ohos_lite)) {
     "$camera_path/pipeline_core/ipp/include",
   ]
 
-  ohos_shared_library("camera_host_service_1.0") {
+  ohos_shared_library("camera_host_vdi_impl_1.0") {
     sources = host_sources
     include_dirs = host_includes
 
@@ -226,14 +219,13 @@ if (defined(ohos_lite)) {
       "hitrace_native:hitrace_meter",
       "ipc:ipc_single",
     ]
-    shlib_type = "hdi"
     public_configs = [ ":camhdi_impl_config" ]
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_camera"
   }
 
-  ohos_static_library("camera_host_service_1.0_static") {
+  ohos_static_library("camera_host_vdi_impl_1.0_static") {
     sources = host_sources
     include_dirs = host_includes
 

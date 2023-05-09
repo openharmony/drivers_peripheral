@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "camera_device_impl.h"
 #include <chrono>
+#include "camera_device_vdi_impl.h"
 #include "ipipeline_core.h"
 #include "camera_host_config.h"
 #include "idevice_manager.h"
@@ -27,10 +27,10 @@
 
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
-    PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this))
+    PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceVdiImpl::OnRequestTimeout, this))
 
 namespace OHOS::Camera {
-CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
+CameraDeviceVdiImpl::CameraDeviceVdiImpl(const std::string &cameraId,
     const std::shared_ptr<IPipelineCore> &pipelineCore)
     : isOpened_(false),
       cameraId_(cameraId),
@@ -42,7 +42,7 @@ CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
 {
 }
 
-std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std::string &cameraId)
+std::shared_ptr<CameraDeviceVdiImpl> CameraDeviceVdiImpl::CreateCameraDevice(const std::string &cameraId)
 {
     HDF_CAMERA_TRACE;
     // create pipelineCore
@@ -58,7 +58,7 @@ std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std
         return nullptr;
     }
 
-    std::shared_ptr<CameraDeviceImpl> device = std::make_shared<CameraDeviceImpl>(cameraId, pipelineCore);
+    std::shared_ptr<CameraDeviceVdiImpl> device = std::make_shared<CameraDeviceVdiImpl>(cameraId, pipelineCore);
     if (device == nullptr) {
         CAMERA_LOGW("create camera device failed. [cameraId = %{public}s]", cameraId.c_str());
         return nullptr;
@@ -79,8 +79,8 @@ std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std
     return device;
 }
 
-int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
-    sptr<IStreamOperator>& streamOperator)
+int32_t CameraDeviceVdiImpl::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+    sptr<IStreamOperatorVdi> &streamOperator)
 {
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
@@ -92,9 +92,9 @@ int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>&
 
     if (spStreamOperator_ == nullptr) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-        spStreamOperator_ = std::make_shared<StreamOperator>(callbackObj, shared_from_this());
+        spStreamOperator_ = std::make_shared<StreamOperatorVdiImpl>(callbackObj, shared_from_this());
 #else
-        spStreamOperator_ = new(std::nothrow) StreamOperator(callbackObj, shared_from_this());
+        spStreamOperator_ = new(std::nothrow) StreamOperatorVdiImpl(callbackObj, shared_from_this());
 #endif
         if (spStreamOperator_ == nullptr) {
             CAMERA_LOGW("create stream operator failed.");
@@ -111,7 +111,7 @@ int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>&
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
+int32_t CameraDeviceVdiImpl::UpdateSettings(const std::vector<uint8_t> &settings)
 {
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
@@ -128,15 +128,15 @@ int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 
     std::shared_ptr<CameraMetadata> updateSettings;
     MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
-    CameraDumper& dumper = CameraDumper::GetInstance();
+    CameraDumper &dumper = CameraDumper::GetInstance();
     dumper.DumpMetadata(updateSettings, "updatesetting");
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.UpdateSettingsConfig(updateSettings);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceImpl::GetSettings(std::vector<uint8_t> &settings)
+int32_t CameraDeviceVdiImpl::GetSettings(std::vector<uint8_t> &settings)
 {
     std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     if (meta == nullptr) {
@@ -149,10 +149,10 @@ int32_t CameraDeviceImpl::GetSettings(std::vector<uint8_t> &settings)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceImpl::SetResultMode(ResultCallbackMode mode)
+int32_t CameraDeviceVdiImpl::SetResultMode(ResultCallbackMode mode)
 {
     CAMERA_LOGD("entry.");
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     if (mode < PER_FRAME || mode > ON_CHANGED) {
         CAMERA_LOGE("parameter out of range.");
         return INVALID_ARGUMENT;
@@ -166,12 +166,12 @@ int32_t CameraDeviceImpl::SetResultMode(ResultCallbackMode mode)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-ResultCallbackMode CameraDeviceImpl::GetMetaResultMode() const
+ResultCallbackMode CameraDeviceVdiImpl::GetMetaResultMode() const
 {
     return metaResultMode_;
 }
 
-int32_t CameraDeviceImpl::GetEnabledResults(std::vector<int32_t>& results)
+int32_t CameraDeviceVdiImpl::GetEnabledResults(std::vector<int32_t> &results)
 {
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
@@ -185,13 +185,13 @@ int32_t CameraDeviceImpl::GetEnabledResults(std::vector<int32_t>& results)
     }
 
     std::unique_lock<std::mutex> l(enabledRstMutex_);
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.GetEnabledAbility(results);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-RetCode CameraDeviceImpl::GetEnabledFromCfg()
+RetCode CameraDeviceVdiImpl::GetEnabledFromCfg()
 {
     // Get devicemanager
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
@@ -230,7 +230,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     return RC_OK;
 }
 
-int32_t CameraDeviceImpl::EnableResult(const std::vector<int32_t>& results)
+int32_t CameraDeviceVdiImpl::EnableResult(const std::vector<int32_t> &results)
 {
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
@@ -244,13 +244,13 @@ int32_t CameraDeviceImpl::EnableResult(const std::vector<int32_t>& results)
             CAMERA_LOGW("enabled result is existed. [metaType = %{public}d]", metaType);
         }
     }
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.AddEnabledAbility(enabledResults_);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceImpl::DisableResult(const std::vector<int32_t>& results)
+int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
 {
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
@@ -266,19 +266,19 @@ int32_t CameraDeviceImpl::DisableResult(const std::vector<int32_t>& results)
             ret = INVALID_ARGUMENT;
         }
     }
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.DelEnabledAbility(results);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceImpl::Close()
+int32_t CameraDeviceVdiImpl::Close()
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
-    MetadataController& metaDataController = MetadataController::GetInstance();
+    MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.Stop();
     metaDataController.UnSetUpdateSettingCallback();
 
@@ -328,7 +328,7 @@ int32_t CameraDeviceImpl::Close()
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraDeviceImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback)
+CamRetCode CameraDeviceVdiImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback)
 {
     if (callback == nullptr) {
         return INVALID_ARGUMENT;
@@ -337,12 +337,12 @@ CamRetCode CameraDeviceImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback>
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-std::shared_ptr<IPipelineCore> CameraDeviceImpl::GetPipelineCore() const
+std::shared_ptr<IPipelineCore> CameraDeviceVdiImpl::GetPipelineCore() const
 {
     return pipelineCore_;
 }
 
-uint64_t CameraDeviceImpl::GetCurrentLocalTimeStamp()
+uint64_t CameraDeviceVdiImpl::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
         std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
@@ -350,7 +350,7 @@ uint64_t CameraDeviceImpl::GetCurrentLocalTimeStamp()
     return static_cast<uint64_t>(tmp.count());
 }
 
-void CameraDeviceImpl::InitMetadataController()
+void CameraDeviceVdiImpl::InitMetadataController()
 {
     std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     const int32_t deviceStreamId = 0;
@@ -363,19 +363,19 @@ void CameraDeviceImpl::InitMetadataController()
     });
 }
 
-void CameraDeviceImpl::GetCameraId(std::string &cameraId) const
+void CameraDeviceVdiImpl::GetCameraId(std::string &cameraId) const
 {
     cameraId = cameraId_;
 }
 
-void CameraDeviceImpl::OnRequestTimeout()
+void CameraDeviceVdiImpl::OnRequestTimeout()
 {
     CAMERA_LOGD("OnRequestTimeout callback success.");
     // request error
     cameraDeciceCallback_->OnError(REQUEST_TIMEOUT, 0);
 }
 
-void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata)
+void CameraDeviceVdiImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata)
 {
     CAMERA_LOGI("OnMetadataChanged callback success.");
 
@@ -387,24 +387,24 @@ void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &
     uint64_t timestamp = GetCurrentLocalTimeStamp();
     std::vector<uint8_t> result;
     MetadataUtils::ConvertMetadataToVec(metadata, result);
-    CameraDumper& dumper = CameraDumper::GetInstance();
+    CameraDumper &dumper = CameraDumper::GetInstance();
     dumper.DumpMetadata(metadata, "reportmeta");
     cameraDeciceCallback_->OnResult(timestamp, result);
 }
 
-void CameraDeviceImpl::OnDevStatusErr()
+void CameraDeviceVdiImpl::OnDevStatusErr()
 {
     CAMERA_LOGD("OnDevStatusErr callback success.");
     // device error
     cameraDeciceCallback_->OnError(FATAL_ERROR, 0);
 }
 
-bool CameraDeviceImpl::IsOpened() const
+bool CameraDeviceVdiImpl::IsOpened() const
 {
     return isOpened_;
 }
 
-void CameraDeviceImpl::SetStatus(bool isOpened)
+void CameraDeviceVdiImpl::SetStatus(bool isOpened)
 {
     isOpened_ = isOpened;
 }

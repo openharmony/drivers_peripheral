@@ -16,11 +16,12 @@ import("./camera.gni")
 if (defined(ohos_lite)) {
   group("camera_hal") {
     deps = [
+      "hdi_service/v1_0:camera_host_service_1.0",
       "vdi_base/common/buffer_manager:camera_buffer_manager",
       "vdi_base/common/device_manager:camera_device_manager",
       "vdi_base/common/pipeline_core:camera_pipeline_core",
       "vdi_base/common/utils:camera_utils",
-      "vdi_base/v4l2:camera_host_service_1.0",
+      "vdi_base/v4l2:camera_host_vdi_impl_1.0",
     ]
     deps += [ "${chipset_build_deps}" ]
   }
@@ -33,11 +34,12 @@ if (defined(ohos_lite)) {
       deps = []
     } else {
       deps = [
+        "hdi_service/v1_0:camera_host_service_1.0",
         "vdi_base/common/buffer_manager:camera_buffer_manager",
         "vdi_base/common/device_manager:camera_device_manager",
         "vdi_base/common/pipeline_core:camera_pipeline_core",
         "vdi_base/common/utils:camera_utils",
-        "vdi_base/v4l2:camera_host_service_1.0",
+        "vdi_base/v4l2:camera_host_vdi_impl_1.0",
       ]
       deps += [ "${chipset_build_deps}" ]
     }
