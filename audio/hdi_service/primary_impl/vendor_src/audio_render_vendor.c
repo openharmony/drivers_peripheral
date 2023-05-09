@@ -72,7 +72,7 @@ int32_t AudioHwiGetLatency(struct IAudioRender *render, uint32_t *ms)
 
     int32_t ret = hwiRender->GetLatency(hwiRender, ms);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio GetLatency fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio GetLatency fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -92,7 +92,7 @@ int32_t AudioHwiRenderFrame(struct IAudioRender *render, const int8_t *frame, ui
 
     int32_t ret = hwiRender->RenderFrame(hwiRender, frame, frameLen, replyBytes);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render frame fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -112,7 +112,7 @@ int32_t AudioHwiGetRenderPosition(struct IAudioRender *render, uint64_t *frames,
 
     int32_t ret = hwiRender->GetRenderPosition(hwiRender, frames, (struct AudioHwiTimeStamp *)time);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render, get position fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render, get position fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -130,7 +130,7 @@ int32_t AudioHwiSetRenderSpeed(struct IAudioRender *render, float speed)
 
     int32_t ret = hwiRender->SetRenderSpeed(hwiRender, speed);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetRenderSpeed fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetRenderSpeed fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -149,7 +149,7 @@ int32_t AudioHwiGetRenderSpeed(struct IAudioRender *render, float *speed)
 
     int32_t ret = hwiRender->GetRenderSpeed(hwiRender, speed);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetRenderSpeed fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetRenderSpeed fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -167,7 +167,7 @@ int32_t AudioHwiRenderSetChannelMode(struct IAudioRender *render, enum AudioChan
 
     int32_t ret = hwiRender->SetChannelMode(hwiRender, (enum AudioHwiChannelMode)mode);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio SetChannelMode fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio SetChannelMode fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -186,7 +186,7 @@ int32_t AudioHwiRenderGetChannelMode(struct IAudioRender *render, enum AudioChan
 
     int32_t ret = hwiRender->GetChannelMode(hwiRender, (enum AudioHwiChannelMode *)mode);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetChannelMode fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetChannelMode fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -249,7 +249,7 @@ int32_t AudioHwiRenderDrainBuffer(struct IAudioRender *render, enum AudioDrainNo
 
     int32_t ret = hwiRender->DrainBuffer(hwiRender, (enum AudioHwiDrainNotifyType *)type);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render DrainBuffer fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render DrainBuffer fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -268,7 +268,7 @@ int32_t AudioHwiRenderIsSupportsDrain(struct IAudioRender *render, bool *support
 
     int32_t ret = hwiRender->IsSupportsDrain(hwiRender, support);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render IsSupportsDrain fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render IsSupportsDrain fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -298,7 +298,7 @@ int32_t AudioHwiRenderCheckSceneCapability(struct IAudioRender *render, const st
     ret = hwiRender->scene.CheckSceneCapability(hwiRender, &hwiScene, supported);
     OsalMemFree((void *)hwiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render CheckSceneCapability fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render CheckSceneCapability fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -326,7 +326,7 @@ int32_t AudioHwiRenderSelectScene(struct IAudioRender *render, const struct Audi
     ret = hwiRender->scene.SelectScene(hwiRender, &hwiScene);
     OsalMemFree((void *)hwiScene.desc.desc);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render select scene fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render select scene fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -344,7 +344,7 @@ int32_t AudioHwiRenderSetMute(struct IAudioRender *render, bool mute)
 
     int32_t ret = hwiRender->volume.SetMute(hwiRender, mute);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetMute fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetMute fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -363,7 +363,7 @@ int32_t AudioHwiRenderGetMute(struct IAudioRender *render, bool *mute)
 
     int32_t ret = hwiRender->volume.GetMute(hwiRender, mute);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetMute fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetMute fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -381,7 +381,7 @@ int32_t AudioHwiRenderSetVolume(struct IAudioRender *render, float volume)
 
     int32_t ret = hwiRender->volume.SetVolume(hwiRender, volume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetVolume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetVolume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -400,7 +400,7 @@ int32_t AudioHwiRenderGetVolume(struct IAudioRender *render, float *volume)
 
     int32_t ret = hwiRender->volume.GetVolume(hwiRender, volume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetVolume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetVolume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -420,7 +420,7 @@ int32_t AudioHwiRenderGetGainThreshold(struct IAudioRender *render, float *min, 
 
     int32_t ret = hwiRender->volume.GetGainThreshold(hwiRender, min, max);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetGainThreshold fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetGainThreshold fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -439,7 +439,7 @@ int32_t AudioHwiRenderGetGain(struct IAudioRender *render, float *gain)
 
     int32_t ret = hwiRender->volume.GetGain(hwiRender, gain);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetGain fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetGain fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -457,7 +457,7 @@ int32_t AudioHwiRenderSetGain(struct IAudioRender *render, float gain)
 
     int32_t ret = hwiRender->volume.SetGain(hwiRender, gain);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetGain fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetGain fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -476,7 +476,7 @@ int32_t AudioHwiRenderGetFrameSize(struct IAudioRender *render, uint64_t *size)
 
     int32_t ret = hwiRender->attr.GetFrameSize(hwiRender, size);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetFrameSize fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetFrameSize fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -495,7 +495,7 @@ int32_t AudioHwiRenderGetFrameCount(struct IAudioRender *render, uint64_t *count
 
     int32_t ret = hwiRender->attr.GetFrameCount(hwiRender, count);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetFrameCount fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetFrameCount fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -516,13 +516,13 @@ int32_t AudioHwiRenderSetSampleAttributes(struct IAudioRender *render, const str
     (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
     int32_t ret = AudioHwiCommonSampleAttrToHwiSampleAttr(attrs, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SampleAttr to hwisampleAttr fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SampleAttr to hwisampleAttr fail, ret=%{public}d", ret);
         return ret;
     }
 
     ret = hwiRender->attr.SetSampleAttributes(hwiRender, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetSampleAttributes fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetSampleAttributes fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -543,13 +543,13 @@ int32_t AudioHwiRenderGetSampleAttributes(struct IAudioRender *render, struct Au
     (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
     int32_t ret = hwiRender->attr.GetSampleAttributes(hwiRender, &hwiAttrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetSampleAttributes fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetSampleAttributes fail, ret=%{public}d", ret);
         return ret;
     }
 
     ret = AudioHwiCommonHwiSampleAttrToSampleAttr(&hwiAttrs, attrs);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render hwiSampleAttr to SampleAttr fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render hwiSampleAttr to SampleAttr fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -568,7 +568,7 @@ int32_t AudioHwiRenderGetCurrentChannelId(struct IAudioRender *render, uint32_t 
 
     int32_t ret = hwiRender->attr.GetCurrentChannelId(hwiRender, channelId);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetCurrentChannelId fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetCurrentChannelId fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -587,7 +587,7 @@ int32_t AudioHwiRenderSetExtraParams(struct IAudioRender *render, const char *ke
 
     int32_t ret = hwiRender->attr.SetExtraParams(hwiRender, keyValueList);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render SetExtraParams fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render SetExtraParams fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -606,7 +606,7 @@ int32_t AudioHwiRenderGetExtraParams(struct IAudioRender *render, char *keyValue
 
     int32_t ret = hwiRender->attr.GetExtraParams(hwiRender, keyValueList, keyValueListLen);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetExtraParams fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetExtraParams fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -627,7 +627,7 @@ int32_t AudioHwiRenderReqMmapBuffer(struct IAudioRender *render, int32_t reqSize
     struct AudioHwiMmapBufferDescriptor hwiDesc = {0};
     int32_t ret = hwiRender->attr.ReqMmapBuffer(hwiRender, reqSize, &hwiDesc);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render ReqMmapBuffer fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render ReqMmapBuffer fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -660,7 +660,7 @@ int32_t AudioHwiRenderGetMmapPosition(struct IAudioRender *render, uint64_t *fra
 
     int32_t ret = hwiRender->attr.GetMmapPosition(hwiRender, frames, &hwiTime);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetMmapPosition fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetMmapPosition fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -681,7 +681,7 @@ int32_t AudioHwiRenderAddAudioEffect(struct IAudioRender *render, uint64_t effec
 
     int32_t ret = hwiRender->attr.AddAudioEffect(hwiRender, effectid);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render AddAudioEffect fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render AddAudioEffect fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -699,7 +699,7 @@ int32_t AudioHwiRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t ef
 
     int32_t ret = hwiRender->attr.RemoveAudioEffect(hwiRender, effectid);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render RemoveAudioEffect fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render RemoveAudioEffect fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -718,7 +718,7 @@ int32_t AudioHwiRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t *
 
     int32_t ret = hwiRender->attr.GetFrameBufferSize(hwiRender, bufferSize);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetFrameBufferSize fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render GetFrameBufferSize fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -736,7 +736,7 @@ int32_t AudioHwiRenderStart(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.Start(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render Start fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render Start fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -754,7 +754,7 @@ int32_t AudioHwiRenderStop(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.Stop(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render Stop fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -772,7 +772,7 @@ int32_t AudioHwiRenderPause(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.Pause(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render Pause fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render Pause fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -790,7 +790,7 @@ int32_t AudioHwiRenderResume(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.Resume(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render Resume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render Resume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -808,7 +808,7 @@ int32_t AudioHwiRenderFlush(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.Flush(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render Flush fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render Flush fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -826,7 +826,7 @@ int32_t AudioHwiRenderTurnStandbyMode(struct IAudioRender *render)
 
     int32_t ret = hwiRender->control.TurnStandbyMode(hwiRender);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render TurnStandbyMode fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render TurnStandbyMode fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -844,7 +844,7 @@ int32_t AudioHwiRenderAudioDevDump(struct IAudioRender *render, int32_t range, i
 
     int32_t ret = hwiRender->control.AudioDevDump(hwiRender, range, fd);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render AudioDevDump fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render AudioDevDump fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -864,7 +864,7 @@ int32_t AudioHwiRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool
 
     int32_t ret = hwiRender->control.IsSupportsPauseAndResume(hwiRender, supportPause, supportResume);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render IsSupportsPauseAndResume fail, ret=%{pubilc}d", ret);
+        AUDIO_FUNC_LOGE("audio render IsSupportsPauseAndResume fail, ret=%{public}d", ret);
         return ret;
     }
 
@@ -1015,7 +1015,7 @@ struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes
     render = &(priv->renderInfos[*renderId]->render);
     AudioHwiInitRenderInstance(render);
 
-    AUDIO_FUNC_LOGI("audio create adapter success");
+    AUDIO_FUNC_LOGI("audio create render success");
     return render;
 };
 
