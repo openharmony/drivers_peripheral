@@ -15,8 +15,6 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-samgr_dir = "//foundation/systemabilitymgr/samgr"
-
 declare_args() {
   bluetooth_a2dp_hdi = false
 }
@@ -77,7 +75,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
   ]
 
   deps = [
-    "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//foundation/communication/bluetooth/services/bluetooth/ipc:btipc_static",
   ]
 
@@ -95,6 +92,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
   external_deps += [
     "c_utils:utils",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   public_configs = [ ":hdi_audio_config" ]
