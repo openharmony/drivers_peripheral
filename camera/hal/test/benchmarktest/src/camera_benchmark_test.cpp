@@ -321,4 +321,167 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_Close_benchmark_0012)(
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_Close_benchmark_0012)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: CancelCapture
+  * @tc.desc: CancelCapture, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_CancelCapture_benchmark_0013)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    cameraTest->intents = {PREVIEW};
+    cameraTest->StartStream(cameraTest->intents);
+    int captureId = 2001;
+    cameraTest->captureInfo = std::make_shared<CaptureInfo>();
+    cameraTest->captureInfo->streamIds_ = {-1};
+    cameraTest->captureInfo->captureSetting_ = cameraTest->abilityVec;
+    cameraTest->captureInfo->enableShutterCallback_ = true;
+    cameraTest->rc = cameraTest->streamOperator->Capture(captureId, *cameraTest->captureInfo, true);
+    for (auto _ : st) {
+        cameraTest->streamOperator->CancelCapture(captureId);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_CancelCapture_benchmark_0013)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: EnableResult
+  * @tc.desc: EnableResult, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_EnableResult_benchmark_0014)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    std::vector<int32_t> resultsList;
+    resultsList.push_back(OHOS_CAMERA_STREAM_ID);
+    resultsList.push_back(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION);
+    for (auto _ : st) {
+        cameraTest->cameraDevice->EnableResult(resultsList);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_EnableResult_benchmark_0014)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: DisableResult
+  * @tc.desc: DisableResult, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_DisableResult_benchmark_0015)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    std::vector<OHOS::Camera::MetaType> resultsOriginal;
+    for (auto _ : st) {
+        cameraTest->cameraDevice->DisableResult(resultsOriginal);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_DisableResult_benchmark_0015)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: UpdateSettings
+  * @tc.desc: UpdateSettings, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_UpdateSettings_benchmark_0016)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    cameraTest->intents = {PREVIEW};
+    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    std::shared_ptr<OHOS::Camera::CameraMetadata> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 200);
+    int32_t expo = 0xa0;
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    std::vector<uint8_t> metaVec;
+    OHOS::Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    for (auto _ : st) {
+        cameraTest->cameraDevice->UpdateSettings(metaVec);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_UpdateSettings_benchmark_0016)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetEnabledResults
+  * @tc.desc: GetEnabledResults, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_GetEnabledResults_benchmark_0017)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    std::vector<OHOS::Camera::MetaType> enableTypes;
+    for (auto _ : st) {
+        cameraTest->cameraDevice->GetEnabledResults(enableTypes);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_GetEnabledResults_benchmark_0017)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: IsStreamsSupported
+  * @tc.desc: IsStreamsSupported, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, SUB_IsStreamsSupported_benchmark_0018)(
+    benchmark::State &st)
+{
+    cameraTest->Open();
+    EXPECT_EQ(false, cameraTest->cameraDevice == nullptr);
+    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    std::shared_ptr<OHOS::Camera::CameraMetadata> modeSetting = std::make_shared<OHOS::Camera::CameraMetadata>(2, 128);
+    int64_t expoTime = 0;
+    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
+    int64_t colorGains[4] = {0};
+    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
+
+    cameraTest->streamInfo = std::make_shared<StreamInfo>();
+    cameraTest->streamInfo->streamId_ = 1001;
+    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->streamInfo->height_ = 480;
+    cameraTest->streamInfo->width_ = 640;
+    cameraTest->streamInfo->dataspace_ = 8;
+
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
+        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
+    });
+
+    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
+    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->streamInfo->intent_ = PREVIEW;
+    cameraTest->streamInfo->tunneledMode_ = 5;
+    StreamSupportType pType;
+    std::vector<StreamInfo> streams;
+    streams.push_back(*cameraTest->streamInfo);
+    std::vector<uint8_t> modeSettingVec;
+    OHOS::Camera::MetadataUtils::ConvertMetadataToVec(modeSetting, modeSettingVec);
+    for (auto _ : st) {
+        cameraTest->streamOperator->IsStreamsSupported(OperationMode::NORMAL, modeSettingVec,
+        streams, pType);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_IsStreamsSupported_benchmark_0018)->Iterations(100)->
+    Repetitions(3)->ReportAggregatesOnly();
+
 BENCHMARK_MAIN();
