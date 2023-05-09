@@ -12,8 +12,10 @@
     "component": {
       "name": "drivers_peripheral_location_agnss",
       "subsystem": "hdf",
-      "syscap": [ "" ],
-      "adapter_system_type": ["standard"],
+      "syscap": [ "SystemCapability.Location.Location.Gnss" ],
+      "adapted_system_type": [
+        "standard"
+      ],
       "rom": "1000KB",
       "ram": "1000KB",
       "deps": {
