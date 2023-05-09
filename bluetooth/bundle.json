@@ -17,10 +17,12 @@
     "ram": "7400KB",
     "deps": {
       "components": [
+        "c_utils",
+        "drivers_peripheral_bluetooth",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base",
-        "ipc"
+        "ipc",
+        "samgr"
       ]
     },
     "build": {
