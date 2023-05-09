@@ -146,6 +146,48 @@ HWTEST_F(EffectModelTest, HdfAudioGetAllEffectDescriptors003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: HdfAudioCreateEffectController001
+ * @tc.desc: Verify the CreateEffectController function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I71E1I
+ */
+HWTEST_F(EffectModelTest, HdfAudioCreateEffectController001, TestSize.Level1)
+{
+    struct EffectInfo info = {
+        .libName = libName_,
+        .effectId = effectId_,
+        .ioDirection = 1,
+    };
+
+    struct IEffectControl *contoller = NULL;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, model_->CreateEffectController(nullptr, &info, &contoller, &contollerId_));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->CreateEffectController(model_, nullptr, &contoller, &contollerId_));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->CreateEffectController(model_, &info, &contoller, nullptr));
+}
+
+/**
+ * @tc.name: HdfAudioDestroyEffectController001
+ * @tc.desc: Verify the DestroyEffectController function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I71E1I
+ */
+HWTEST_F(EffectModelTest, HdfAudioDestroyEffectController001, TestSize.Level1)
+{
+    struct EffectInfo info = {
+        .libName = libName_,
+        .effectId = effectId_,
+        .ioDirection = 1,
+    };
+
+    struct IEffectControl *contoller = NULL;
+    ASSERT_EQ(HDF_SUCCESS, model_->CreateEffectController(model_, &info, &contoller, &contollerId_));
+    ASSERT_NE(contoller, nullptr);
+
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, model_->DestroyEffectController(nullptr, &contollerId_));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->DestroyEffectController(model_, nullptr));
+}
+
+/**
  * @tc.name: HdfAudioCreateDestroyController001
  * @tc.desc: Verify the EffectModelCreateEffectController and EffectModelDestroyEffectController function.
  * @tc.type: FUNC
