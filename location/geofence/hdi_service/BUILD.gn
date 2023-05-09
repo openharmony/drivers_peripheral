@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,11 +12,12 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../location.gni")
 
 ohos_shared_library("libgeofence_interface_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/location/geofence/hdi_service",
-    "//drivers/peripheral/location/gnss/hdi_service",
+    "${location_driver_path}/geofence/hdi_service",
+    "${location_driver_path}/gnss/hdi_service",
   ]
   sources = [ "geofence_interface_impl.cpp" ]
 
@@ -51,12 +52,12 @@ ohos_shared_library("libgeofence_interface_service_1.0") {
 }
 
 ohos_shared_library("liblocation_geofence_hdi_driver") {
-  include_dirs = [ "//drivers/peripheral/location/geofence/hdi_service" ]
+  include_dirs = [ "${location_driver_path}/geofence/hdi_service" ]
 
   sources = [ "geofence_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/interface/location/geofence/v1_0:liblocation_geofence_stub_1.0",
+    "${location_interface_path}/geofence/v1_0:liblocation_geofence_stub_1.0",
   ]
 
   cflags = [
