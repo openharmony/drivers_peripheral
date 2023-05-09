@@ -54,7 +54,7 @@ static int HdfCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-extern "C" ICameraHost *CameraHostImplGetInstance(void);
+extern "C" ICameraHost *CameraHostServiceGetInstance(void);
 
 static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
@@ -70,7 +70,7 @@ static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
     hdfCameraHostHost->ioService.Open = NULL;
     hdfCameraHostHost->ioService.Release = NULL;
 
-    OHOS::sptr<ICameraHost> serviceImpl {CameraHostImplGetInstance()};
+    OHOS::sptr<ICameraHost> serviceImpl {CameraHostServiceGetInstance()};
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfCameraHostHost;

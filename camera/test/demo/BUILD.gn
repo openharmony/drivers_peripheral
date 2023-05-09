@@ -104,12 +104,6 @@ if (defined(ohos_lite)) {
       "$camera_path/../../interfaces/hdi_ipc/utils/include",
       "$camera_path/../../test/common/callback/include",
       "$camera_path/include",
-      "$camera_path/../v4l2",
-      "$camera_path/../v4l2/include",
-      "$camera_path/../v4l2/include/camera_host",
-      "$camera_path/../v4l2/include/camera_device",
-      "$camera_path/../v4l2/include/stream_operator",
-      "$camera_path/../v4l2/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
       "$camera_path/utils/event",
@@ -133,7 +127,6 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$camera_path/../v4l2:camera_host_service_1.0",
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",

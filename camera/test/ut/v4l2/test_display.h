@@ -17,15 +17,14 @@
 #define TEST_DISPLAY_H
 #include <gtest/gtest.h>
 #include "camera.h"
-#include "stream_operator.h"
-#include "utils.h"
 #include <thread>
 #include <map>
 #include <cstdio>
 #include <climits>
 #include "v1_0/types.h"
-#include "camera_device_impl.h"
-#include "camera_host_impl.h"
+#include "v1_0/icamera_host.h"
+#include "v1_0/icamera_device.h"
+#include "v1_0/istream_operator.h"
 #include "v1_0/stream_operator_proxy.h"
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
@@ -144,7 +143,6 @@ public:
 
 public:
     TestDisplay();
-    sptr<ICameraHost> CameraHostImplGetInstance(void);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t SaveYUV(char* type, unsigned char* buffer, int32_t size);
     int DoFbMunmap(unsigned char* addr);
