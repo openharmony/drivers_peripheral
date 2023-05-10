@@ -19,6 +19,7 @@
 #include "codec_component_service.h"
 #include "codec_log_wrapper.h"
 #include "component_node.h"
+#include "codec_dfx_service.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -26,7 +27,9 @@ namespace V1_0 {
 using OHOS::Codec::Omx::ComponentNode;
 extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
-    return new (std::nothrow) CodecComponentManagerService();
+    sptr<CodecComponentManagerService> manager = new (std::nothrow) CodecComponentManagerService();
+    CodecDfxService::GetInstance().SetComponentManager(manager);
+    return manager;
 }
 
 CodecComponentManagerService::CodecComponentManagerService() : componentId_(0)
@@ -98,6 +101,11 @@ uint32_t CodecComponentManagerService::GetNextComponentId(void)
 void CodecComponentManagerService::LoadCapabilityData(const DeviceResourceNode &node)
 {
     resourceNode_ = node;
+}
+
+void CodecComponentManagerService::GetManagerMap(std::map<uint32_t, sptr<ICodecComponent>> &dumpMap)
+{
+    dumpMap = componentMap_;
 }
 }  // namespace V1_0
 }  // namespace Codec
