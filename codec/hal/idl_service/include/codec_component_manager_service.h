@@ -36,7 +36,7 @@ public:
                             int64_t appData, const sptr<ICodecCallback> &callbacks) override;
     int32_t DestoryComponent(uint32_t componentId) override;
     void LoadCapabilityData(const DeviceResourceNode &node);
-
+    void GetManagerMap(std::map<uint32_t, sptr<ICodecComponent>> &dumpMap);
 private:
     uint32_t GetNextComponentId(void);
 

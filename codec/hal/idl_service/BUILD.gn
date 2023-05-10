@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+# Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,6 +23,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
     "src/codec_component_config.cpp",
     "src/codec_component_manager_service.cpp",
     "src/codec_component_service.cpp",
+    "src/codec_dfx_service.cpp",
     "src/codec_dyna_buffer.cpp",
     "src/codec_handle_buffer.cpp",
     "src/codec_omx_core.cpp",
@@ -37,6 +38,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
       "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -63,7 +65,8 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
 
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
-    "../../codec/interfaces/include/",
+    "../../interfaces/include/",
+    "//third_party/openmax/api/1.1.2",
     "include",
   ]
 
