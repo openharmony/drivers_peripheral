@@ -14,12 +14,12 @@
  */
 #include "icodec_buffer.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <poll.h>
 #include <securec.h>
 #include "codec_dyna_buffer.h"
 #include "codec_handle_buffer.h"
 #include "codec_share_buffer.h"
+#include "codec_log_wrapper.h"
 
 namespace OHOS {
 namespace Codec {
@@ -45,7 +45,7 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
             buffer = CodecDynaBuffer::Create(codecBuffer);
             break;
         default:
-            HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
+            CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
             break;
     }
     return buffer;
@@ -57,7 +57,7 @@ sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &code
     if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         buffer = CodecShareBuffer::Allocate(codecBuffer);
     } else {
-        HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
+        CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
     }
     return buffer;
 }
@@ -75,8 +75,8 @@ void ICodecBuffer::SetBufferId(int32_t bufferId)
 bool ICodecBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
 {
     if (codecBuffer_.type != codecBuffer.type) {
-        HDF_LOGE("%{public}s :input buffer type [%{public}d], but expect type [%{public}d]", __func__,
-                 codecBuffer.bufferType, codecBuffer_.bufferType);
+        CODEC_LOGE("input buffer type [%{public}d], but expect type [%{public}d]", codecBuffer.bufferType,
+            codecBuffer_.bufferType);
         return false;
     }
     return true;
@@ -86,7 +86,7 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
 {
     int retCode = -EPERM;
     if (fd < 0) {
-        HDF_LOGE("%{public}s The fence id is invalid.", __func__);
+        CODEC_LOGE("The fence id is invalid.");
         return retCode;
     }
 

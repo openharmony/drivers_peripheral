@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,11 @@
  */
 
 #include "codec_config_parser.h"
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
 #include <OMX_IVCommon.h>
+#include "codec_log_wrapper.h"
 
-#define HDF_LOG_TAG codec_config_parser
 #ifdef __ARCH64__
 #define MASK_NUM_LIMIT  64
 #else
@@ -30,7 +29,7 @@ static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     const char *nodeName, int32_t *num)
 {
     if (node == NULL || nodeName == NULL || num == NULL) {
-        HDF_LOGE("%{public}s, failed for codec %{public}s, invalid param!", __func__, nodeName);
+        CODEC_LOGE("failed for codec %{public}s, invalid param!", nodeName);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -40,13 +39,13 @@ static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGE("%{public}s, failed, iface NULL!", __func__);
+        CODEC_LOGE("failed, iface NULL!");
         return HDF_FAILURE;
     }
 
     codecGroupNode = iface->GetChildNode(node, nodeName);
     if (codecGroupNode == NULL) {
-        HDF_LOGE("%{public}s, failed to get child node %{public}s,!", __func__, nodeName);
+        CODEC_LOGE("failed to get child node %{public}s!", nodeName);
         return HDF_FAILURE;
     }
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode) {
@@ -61,18 +60,18 @@ static int32_t GetUintTableConfig(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *node, ConfigUintArrayNodeAttr *attr)
 {
     if (iface == NULL || node == NULL || attr == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
     if (attr->array == NULL || attr->attrName == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid attr!", __func__);
+        CODEC_LOGE("invalid attr!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     int32_t count = iface->GetElemNum(node, attr->attrName);
     if (count < 0 || count >= attr->length) {
-        HDF_LOGE("%{public}s, %{public}s table size: %{public}d incorrect or exceed max size %{public}d!",
-            __func__, attr->attrName, count, attr->length - 1);
+        CODEC_LOGE("%{public}s table size: %{public}d incorrect or exceed max size %{public}d!", attr->attrName,
+            count, attr->length - 1);
         return HDF_FAILURE;
     }
 
@@ -88,7 +87,7 @@ static int32_t GetMaskedConfig(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *node, const char *attrName, uint32_t *mask)
 {
     if (iface == NULL || node == NULL || attrName == NULL || mask == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -97,14 +96,14 @@ static int32_t GetMaskedConfig(const struct DeviceResourceIface *iface,
 
     *mask = 0;
     if (count < 0 || count > MASK_NUM_LIMIT) {
-        HDF_LOGE("%{public}s, failed, count %{public}d incorrect!", __func__, count);
+        CODEC_LOGE("count %{public}d incorrect!", count);
         return HDF_FAILURE;
     }
 
     if (count > 0) {
         values = (uint32_t *)OsalMemAlloc(sizeof(uint32_t) * count);
         if (values == NULL) {
-            HDF_LOGE("%{public}s, failed to allocate mem for %{public}s!", __func__, attrName);
+            CODEC_LOGE("failed to allocate mem for %{public}s!", attrName);
             return HDF_FAILURE;
         }
         iface->GetUint32Array(node, attrName, values, count, 0);
@@ -121,7 +120,7 @@ static int32_t GetVideoPortCapability(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *childNode, CodecCompCapability *cap)
 {
     if (iface == NULL || childNode == NULL || cap == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -146,8 +145,7 @@ static int32_t GetVideoPortCapability(const struct DeviceResourceIface *iface,
     for (int32_t i = 0; i < count; i++) {
         if (iface->GetUint32(childNode, nodeAttrs[i].attrName, nodeAttrs[i].valueAddr,
             nodeAttrs[i].defaultValue) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s, failed to get %{public}s.%{public}s!",
-                __func__, childNode->name, nodeAttrs[i].attrName);
+            CODEC_LOGE("failed to get %{public}s.%{public}s!", childNode->name, nodeAttrs[i].attrName);
             return HDF_FAILURE;
         }
     }
@@ -162,8 +160,7 @@ static int32_t GetVideoPortCapability(const struct DeviceResourceIface *iface,
     count = sizeof(arrayAttrs) / sizeof(ConfigUintArrayNodeAttr);
     for (int32_t i = 0; i < count; i++) {
         if (GetUintTableConfig(iface, childNode, &arrayAttrs[i]) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s, failed to get %{public}s.%{public}s!", __func__, childNode->name,
-                     nodeAttrs[i].attrName);
+            CODEC_LOGE("failed to get %{public}s.%{public}s!", childNode->name, nodeAttrs[i].attrName);
             return HDF_FAILURE;
         }
     }
@@ -174,7 +171,7 @@ static int32_t GetAudioPortCapability(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *childNode, CodecCompCapability *cap)
 {
     if (iface == NULL || childNode == NULL || cap == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -188,8 +185,7 @@ static int32_t GetAudioPortCapability(const struct DeviceResourceIface *iface,
     int32_t count = sizeof(arrayAttrs) / sizeof(ConfigUintArrayNodeAttr);
     for (int32_t i = 0; i < count; i++) {
         if (GetUintTableConfig(iface, childNode, &arrayAttrs[i]) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s, failed to get %{public}s.%{public}s!",
-                __func__, childNode->name, arrayAttrs[i].attrName);
+            CODEC_LOGE("failed to get %{public}s.%{public}s!", childNode->name, arrayAttrs[i].attrName);
             return HDF_FAILURE;
         }
     }
@@ -201,7 +197,7 @@ static int32_t GetMiscOfCapability(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *childNode, CodecCompCapability *cap)
 {
     if (iface == NULL || childNode == NULL || cap == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -234,21 +230,21 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
     const struct DeviceResourceNode *childNode, CodecCompCapability *cap, bool isVideoGroup)
 {
     if (iface == NULL || childNode == NULL || cap == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_ROLE,
         (uint32_t*)&cap->role, MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
         cap->role = MEDIA_ROLETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get mime for: %{public}s! Discarded", __func__, childNode->name);
+        CODEC_LOGE("failed to get mime for: %{public}s! Discarded", childNode->name);
         return HDF_FAILURE;
     }
 
     if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_TYPE, (uint32_t*)&cap->type, INVALID_TYPE) != HDF_SUCCESS) {
         cap->role = MEDIA_ROLETYPE_INVALID;
         cap->type = INVALID_TYPE;
-        HDF_LOGE("%{public}s, failed to get type for: %{public}s! Discarded", __func__, childNode->name);
+        CODEC_LOGE("failed to get type for: %{public}s! Discarded", childNode->name);
         return HDF_FAILURE;
     }
 
@@ -263,7 +259,7 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
     }
     int32_t ret = strcpy_s(cap->compName, NAME_LENGTH, compName);
     if (ret != EOK) {
-        HDF_LOGE("%{public}s, strcpy_s is failed, error code: %{public}d!", __func__, ret);
+        CODEC_LOGE("strcpy_s is failed, error code: %{public}d!", ret);
         return HDF_FAILURE;
     }
     cap->isSoftwareCodec = iface->GetBool(childNode, CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC);
@@ -293,7 +289,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     const char *nodeName, CodecCapablityGroup *capsGroup)
 {
     if (node == NULL || nodeName == NULL || capsGroup == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -304,13 +300,13 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGE("%{public}s, failed, iface NULL!", __func__);
+        CODEC_LOGE("iface NULL!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     codecGroupNode = iface->GetChildNode(node, nodeName);
     if (codecGroupNode == NULL) {
-        HDF_LOGE("%{public}s, failed to get child node: %{public}s!", __func__, nodeName);
+        CODEC_LOGE("failed to get child node: %{public}s!", nodeName);
         return HDF_FAILURE;
     }
 
@@ -320,7 +316,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode) {
         cap = &(capsGroup->capablitis[index++]);
         if (GetOneCapability(iface, childNode, cap, isVideoGroup) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s, GetOneCapability failed, role is %{public}d!", __func__, cap->role);
+            CODEC_LOGE("GetOneCapability failed, role is %{public}d!", cap->role);
         }
     }
 
@@ -330,7 +326,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
 int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecCapablites *caps)
 {
     if (node == NULL || caps == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -364,7 +360,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
             }
             if (codecNum > 0 && codecCapGroup->capablitis == NULL) {
                 codecCapGroup->num = 0;
-                HDF_LOGE("%{public}s, MemAlloc for capability group failed!", __func__);
+                CODEC_LOGE("MemAlloc for capability group failed!");
                 return HDF_FAILURE;
             }
             caps->total += codecCapGroup->num;
@@ -373,7 +369,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
 
     for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         if (GetGroupCapabilities(node, codecGroupsNodeName[index], codecCapGroups[index]) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s, GetGroupCapabilities failed index: %{public}d!", __func__, index);
+            CODEC_LOGE("GetGroupCapabilities failed index: %{public}d!", index);
             return HDF_FAILURE;
         }
     }
@@ -385,7 +381,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
 int32_t ClearCapabilityGroup(CodecCapablites *caps)
 {
     if (caps == NULL) {
-        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
 

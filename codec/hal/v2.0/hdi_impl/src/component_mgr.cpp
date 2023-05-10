@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +15,7 @@
 
 #include "component_mgr.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
-#define HDF_LOG_TAG codec_hdi_server
+#include "codec_log_wrapper.h"
 
 namespace OHOS {
 namespace Codec {
@@ -40,7 +39,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
 
     auto iter = compoentsCore_.find(componentName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
-        HDF_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, componentName);
+        CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return err;
     }
     auto core = iter->second;
@@ -120,7 +119,7 @@ int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const char *compon
 {
     auto iter = compoentsCore_.find(componentName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
-        HDF_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, componentName);
+        CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return HDF_FAILURE;
     }
     core = iter->second.get();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,28 +15,26 @@
 
 #include "codec_callback_type_service.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
-
-#define HDF_LOG_TAG codec_hdi_cb_server
+#include "codec_log_wrapper.h"
 
 static int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent,
                                              struct EventInfo *info)
 {
-    HDF_LOGI("%{public}s, callback service impl", __func__);
+    CODEC_LOGI("callback service impl");
     return HDF_SUCCESS;
 }
 
 static int32_t CodecCallbackTypeEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                                 const struct OmxCodecBuffer *buffer)
 {
-    HDF_LOGI("%{public}s, callback service impl", __func__);
+    CODEC_LOGI("callback service impl");
     return HDF_SUCCESS;
 }
 
 static int32_t CodecCallbackTypeFillBufferDone(struct CodecCallbackType *self, int64_t appData,
                                                const struct OmxCodecBuffer *buffer)
 {
-    HDF_LOGI("%{public}s, callback service impl", __func__);
+    CODEC_LOGI("callback service impl");
     return HDF_SUCCESS;
 }
 

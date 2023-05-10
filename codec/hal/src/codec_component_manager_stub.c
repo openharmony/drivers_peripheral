@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,12 @@
 #include <dlfcn.h>
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
 #include "codec_component_capability_config.h"
 #include "codec_component_manager_service.h"
+#include "codec_log_wrapper.h"
+
 #define CODEC_SERVICE_IMPL "libcodec_hdi_omx_service_impl"
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct OmxComponentManager *);
 static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
@@ -28,7 +29,7 @@ static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl,
 {
     int32_t num = serviceImpl->GetComponentNum();
     if (!HdfSbufWriteInt32(reply, num)) {
-        HDF_LOGE("%{public}s: write num failed!", __func__);
+        CODEC_LOGE("write num failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
@@ -41,23 +42,23 @@ static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *se
     int32_t err = HDF_SUCCESS;
     CodecCompCapability *caps = NULL;
     if (!HdfSbufReadInt32(data, &count) || (count <= 0)) {
-        HDF_LOGE("%{public}s: read count failed!", __func__);
+        CODEC_LOGE("read count failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     caps = (CodecCompCapability *)OsalMemCalloc(sizeof(CodecCompCapability) * (count));
     if (caps == NULL) {
-        HDF_LOGE("%{public}s: alloc caps failed!", __func__);
+        CODEC_LOGE("alloc caps failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     err = serviceImpl->GetComponentCapabilityList(caps, count);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetComponentCapabilityList function failed!", __func__);
+        CODEC_LOGE("call GetComponentCapabilityList function failed!");
         return err;
     }
 
     for (int32_t i = 0; i < count; i++) {
         if (!CodecCompCapabilityBlockMarshalling(reply, &caps[i])) {
-            HDF_LOGE("%{public}s: call CodecCompCapabilityBlockMarshalling function failed!", __func__);
+            CODEC_LOGE("call CodecCompCapabilityBlockMarshalling function failed!");
             err = HDF_ERR_INVALID_PARAM;
             break;
         }
@@ -71,19 +72,19 @@ static int32_t ReadParamsForCreateComponent(struct HdfSBuf *data, char **compNam
 {
     const char *compNameCp = HdfSbufReadString(data);
     if (compNameCp == NULL) {
-        HDF_LOGE("%{public}s: read compNameCp failed!", __func__);
+        CODEC_LOGE("read compNameCp failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadInt64(data, appData)) {
-        HDF_LOGE("%{public}s: read appData failed!", __func__);
+        CODEC_LOGE("read appData failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     *compName = strdup(compNameCp);
 
     struct HdfRemoteService *callbackRemote = HdfSbufReadRemoteService(data);
     if (callbackRemote == NULL) {
-        HDF_LOGE("%{public}s: read callbackRemote failed!", __func__);
+        CODEC_LOGE("read callbackRemote failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     *callback = CodecCallbackTypeGet(callbackRemote);
@@ -115,16 +116,16 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
         compName = NULL;
     }
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call CreateComponent function failed!", __func__);
+        CODEC_LOGE("call CreateComponent function failed!");
         return ret;
     }
 
     if (HdfSbufWriteRemoteService(reply, component->AsObject(component)) != 0) {
-        HDF_LOGE("%{public}s: write component failed!", __func__);
+        CODEC_LOGE("write component failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(reply, componentId)) {
-        HDF_LOGE("%{public}s: write componentId failed!", __func__);
+        CODEC_LOGE("write componentId failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     return ret;
@@ -135,12 +136,12 @@ static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl
 {
     uint32_t componentId = 0;
     if (!HdfSbufReadUint32(data, &componentId)) {
-        HDF_LOGE("%{public}s: read componentId failed!", __func__);
+        CODEC_LOGE("read componentId failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = serviceImpl->DestroyComponent(componentId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call DestroyComponent function failed!", __func__);
+        CODEC_LOGE("call DestroyComponent function failed!");
     }
     return ret;
 }
@@ -158,7 +159,7 @@ static int32_t CodecComponentManagerServiceOnRemoteRequest(struct CodecComponent
         case CMD_DESTROY_COMPONENT:
             return SerStubDestroyComponent(serviceImpl, data, reply);
         default:
-            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
+            CODEC_LOGE("not support cmd %{public}d", cmdId);
             return HDF_ERR_INVALID_PARAM;
     }
 }
@@ -171,7 +172,7 @@ static struct HdfRemoteService *CodecComponentManagerStubAsObject(struct CodecCo
 bool CodecComponentManagerStubConstruct(struct CodecComponentManagerStub *stub)
 {
     if (stub == NULL) {
-        HDF_LOGE("%{public}s: stub is null!", __func__);
+        CODEC_LOGE("stub is null!");
         return false;
     }
 

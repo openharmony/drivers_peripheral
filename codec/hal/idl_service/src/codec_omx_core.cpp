@@ -33,7 +33,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
 {
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(libName.c_str(), pathBuf) == nullptr) {
-        HDF_LOGE("%{public}s: realpath failed! error code: %{public}d", __func__, errno);
+        CODEC_LOGE("realpath failed! error code: %{public}d", errno);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -116,7 +116,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
     for (uint32_t i = 0; i < roleCount; i++) {
         int32_t ret = memset_s(array[i], OMX_MAX_STRINGNAME_SIZE, 0, OMX_MAX_STRINGNAME_SIZE);
         if (ret != EOK) {
-            HDF_LOGE("%{public}s: memset_s array err [%{public}x].", __func__, ret);
+            CODEC_LOGE("memset_s array err [%{public}x].", ret);
             return ret;
         }
         role[i] = array[i];

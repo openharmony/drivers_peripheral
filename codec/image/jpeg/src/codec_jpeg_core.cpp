@@ -18,7 +18,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "codec_jpeg_core.h"
-#include "codec_image_log.h"
+#include "codec_log_wrapper.h"
 #include "hdf_base.h"
 
 #define MAX_WAIT_MS 10

@@ -14,11 +14,10 @@
  */
 #include "codec_dfx_service.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include "codec_adapter_interface.h"
 #include "codec_component_manager_service.h"
+#include "codec_log_wrapper.h"
 
-#define HDF_LOG_TAG codec_dfx_server
 #define CODEC_MAX_DFX_DUMP_LEN  256
 
 int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -43,7 +42,7 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &managerService->head, struct ComponentTypeNode, node)
         {
             if (pos == NULL) {
-                HDF_LOGE("%{public}s: pos is NULL", __func__);
+                CODEC_LOGE("pos is NULL");
                 return HDF_FAILURE;
             }
             struct CodecComponentNode *codecNode = CodecComponentTypeServiceGetCodecNode(pos->service);
@@ -51,14 +50,14 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
                 char dump[CODEC_MAX_DFX_DUMP_LEN + 1] = { 0 };
                 int32_t ret = OmxAdapterWriteDumperData(dump, CODEC_MAX_DFX_DUMP_LEN, pos->componentId, codecNode);
                 if (ret != HDF_SUCCESS) {
-                    HDF_LOGE("%{public}s: OmxAdapterWriteDumperData err", __func__);
+                    CODEC_LOGE("OmxAdapterWriteDumperData err");
                     return HDF_FAILURE;
                 }
                 HdfSbufWriteString(reply, dump);
                 HdfSbufWriteString(reply, "--------------------------------------------------------------------- \n");
             }
         }
-        HDF_LOGI("%{public}s: codec hidumper success!", __func__);
+        CODEC_LOGI("codec hidumper success!");
         return HDF_SUCCESS;
     }
     HdfSbufWriteString(reply, "unknow param, please enter -h for help! \n");

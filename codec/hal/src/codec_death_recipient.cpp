@@ -14,15 +14,13 @@
  */
 
 #include "codec_death_recipient.h"
-#include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <map>
 #include <mutex>
 #include <securec.h>
 #include <set>
 #include <unistd.h>
-
-#define HDF_LOG_TAG codec_death_server
+#include "codec_log_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +37,7 @@ bool RegisterService(struct CodecCallbackType *callbacks, uint32_t componentId,
     uint32_t remotePid =  static_cast<uint32_t>(HdfRemoteGetCallingPid());
     auto comps = g_pidCompsMap.find(remotePid);
     if (comps != g_pidCompsMap.end()) {
-        HDF_LOGI("%{public}s: RemoteService had been added deathRecipient!", __func__);
+        CODEC_LOGE("RemoteService had been added deathRecipient!");
         comps->second.insert(componentId);
         return false;
     }
@@ -59,14 +57,14 @@ int32_t CleanMapperOfDiedService(struct HdfRemoteService *remote, uint32_t *comp
     uint64_t *addr = reinterpret_cast<uint64_t *>(remote);
     auto addrPid = g_addrPidMap.find(addr);
     if (addrPid == g_addrPidMap.end()) {
-        HDF_LOGE("%{public}s: RemoteService no mapper in g_addrPidMap!", __func__);
+        CODEC_LOGE("RemoteService no mapper in g_addrPidMap!");
         return HDF_FAILURE;
     }
 
     uint32_t remotePid = addrPid->second;
     auto comps = g_pidCompsMap.find(remotePid);
     if (comps == g_pidCompsMap.end()) {
-        HDF_LOGE("%{public}s: RemoteService no mapper in g_pidCompsMap!", __func__);
+        CODEC_LOGE("RemoteService no mapper in g_pidCompsMap!");
         return HDF_FAILURE;
     }
     
@@ -79,7 +77,7 @@ int32_t CleanMapperOfDiedService(struct HdfRemoteService *remote, uint32_t *comp
 
     g_addrPidMap.erase(addrPid);
     g_pidCompsMap.erase(comps);
-    HDF_LOGI("%{public}s: clean service mapper success!", __func__);
+    CODEC_LOGE("clean service mapper success!");
     return HDF_SUCCESS;
 }
 

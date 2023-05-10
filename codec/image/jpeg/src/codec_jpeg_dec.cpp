@@ -14,7 +14,7 @@
  */
 
 #include <ashmem.h>
-#include "codec_image_log.h"
+#include "codec_log_wrapper.h"
 #include "codec_jpeg_dec.h"
 namespace OHOS {
 namespace HDI {

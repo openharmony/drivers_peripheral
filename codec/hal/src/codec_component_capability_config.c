@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,7 @@
  */
 
 #include "codec_component_capability_config.h"
-#include <hdf_log.h>
-
-#define HDF_LOG_TAG codec_hdi_server
+#include "codec_log_wrapper.h"
 
 static CodecCapablites g_codecCapabilites = {0};
 static const struct DeviceResourceNode *g_resourceNode = NULL;
@@ -24,7 +22,7 @@ static const struct DeviceResourceNode *g_resourceNode = NULL;
 int32_t InitDataNode(const struct DeviceResourceNode *node)
 {
     if (node == NULL) {
-        HDF_LOGE("%{public}s: data node is null!", __func__);
+        CODEC_LOGE("data node is null!");
         return HDF_FAILURE;
     }
     g_resourceNode = node;
@@ -44,7 +42,7 @@ int32_t LoadCapabilityData()
 int32_t GetComponentNum(int32_t *num)
 {
     if (!g_codecCapabilites.inited) {
-        HDF_LOGE("%{public}s: g_codecCapabilites not init!", __func__);
+        CODEC_LOGE("g_codecCapabilites not init!");
         return HDF_FAILURE;
     }
     *num = g_codecCapabilites.total;
@@ -54,7 +52,7 @@ int32_t GetComponentNum(int32_t *num)
 int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     if (!g_codecCapabilites.inited) {
-        HDF_LOGE("%{public}s: g_codecCapabilites not init!", __func__);
+        CODEC_LOGE("g_codecCapabilites not init!");
         return HDF_FAILURE;
     }
     int32_t groupIndex;

@@ -51,7 +51,7 @@ void CodecComponentService::ReleaseCache()
 #ifdef CONFIG_USE_JEMALLOC_DFX_INTF
     auto err = mallopt(M_FLUSH_THREAD_CACHE, 0);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s :release cache error, m_purge = %{public}d", __func__, err);
+        CODEC_LOGE("release cache error, m_purge = %{public}d", err);
     }
 #endif
 }
@@ -183,7 +183,7 @@ void CodecComponentService::SetComponentRole()
     OHOS::Codec::Omx::CodecOMXCore *core;
     auto err = mgr_->GetCoreOfComponent(core, name_);
     if (err != HDF_SUCCESS) {
-        CODEC_LOGE("%{public}s core is null", __func__);
+        CODEC_LOGE("core is null");
         return;
     }
 

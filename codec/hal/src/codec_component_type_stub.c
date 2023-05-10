@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,19 +17,12 @@
 #include <dlfcn.h>
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
 #include "codec_callback_if.h"
 #include "codec_component_capability_config.h"
+#include "codec_log_wrapper.h"
 
-#define HDF_LOG_TAG codec_hdi_server
-
-#ifdef __ARCH64__
-#define DRIVER_PATH "/vendor/lib64"
-#else
-#define DRIVER_PATH "/vendor/lib"
-#endif
 static void FreeMem(int8_t *mem, uint32_t memLen)
 {
     if (memLen > 0 && mem != NULL) {
@@ -45,11 +38,11 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl
     (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
     ret = serviceImpl->GetComponentVersion(serviceImpl, &verInfo);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetComponentVersion function failed!", __func__);
+        CODEC_LOGE("call GetComponentVersion function failed!");
         return ret;
     }
     if (!HdfSbufWriteUnpadBuffer(reply, (const uint8_t *)&verInfo, sizeof(struct CompVerInfo))) {
-        HDF_LOGE("%{public}s: write verInfo failed!", __func__);
+        CODEC_LOGE("write verInfo failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -65,30 +58,30 @@ static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct
     uint32_t cmdDataLen = 0;
 
     if (!HdfSbufReadUint32(data, (uint32_t*)&cmd)) {
-        HDF_LOGE("%{public}s: read &cmd failed!", __func__);
+        CODEC_LOGE("read &cmd failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &param)) {
-        HDF_LOGE("%{public}s: read &param failed!", __func__);
+        CODEC_LOGE("read &param failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &cmdDataLen)) {
-        HDF_LOGE("%{public}s: read cmdData size failed!", __func__);
+        CODEC_LOGE("read cmdData size failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (cmdDataLen > 0) {
         cmdData = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (cmdDataLen));
         if (cmdData == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+            CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
             return HDF_ERR_MALLOC_FAIL;
         }
 
         for (uint32_t i = 0; i < cmdDataLen; i++) {
             if (!HdfSbufReadInt8(data, &cmdData[i])) {
-                HDF_LOGE("%{public}s: read &cmdData[i] failed!", __func__);
+                CODEC_LOGE("read &cmdData[i] failed!");
                 FreeMem(cmdData, cmdDataLen);
                 return HDF_ERR_INVALID_PARAM;
             }
@@ -97,7 +90,7 @@ static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct
 
     ret = serviceImpl->SendCommand(serviceImpl, cmd, param, cmdData, cmdDataLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call SendCommand function failed!", __func__);
+        CODEC_LOGE("call SendCommand function failed!");
         FreeMem(cmdData, cmdDataLen);
         return ret;
     }
@@ -114,23 +107,23 @@ static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struc
     uint32_t paramStructLen = 0;
 
     if (!HdfSbufReadUint32(data, &paramIndex)) {
-        HDF_LOGE("%{public}s: read paramIndex failed!", __func__);
+        CODEC_LOGE("read paramIndex failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &paramStructLen)) {
-        HDF_LOGE("%{public}s: read paramStructLen failed!", __func__);
+        CODEC_LOGE("read paramStructLen failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     paramStruct = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (paramStructLen));
     if (paramStruct == NULL) {
-        HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+        CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
         return HDF_ERR_MALLOC_FAIL;
     }
 
     for (uint32_t i = 0; i < paramStructLen; i++) {
         if (!HdfSbufReadInt8(data, &paramStruct[i])) {
-            HDF_LOGE("%{public}s: read paramStruct[%{public}d] failed!", __func__, i);
+            CODEC_LOGE("read paramStruct[%{public}d] failed!", i);
             FreeMem(paramStruct, paramStructLen);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -138,14 +131,14 @@ static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struc
 
     ret = serviceImpl->GetParameter(serviceImpl, paramIndex, paramStruct, paramStructLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetParameter function failed!", __func__);
+        CODEC_LOGE("call GetParameter function failed!");
         FreeMem(paramStruct, paramStructLen);
         return ret;
     }
 
     for (uint32_t i = 0; i < paramStructLen; i++) {
         if (!HdfSbufWriteInt8(reply, paramStruct[i])) {
-            HDF_LOGE("%{public}s: write paramStruct[i] failed!", __func__);
+            CODEC_LOGE("write paramStruct[i] failed!");
             FreeMem(paramStruct, paramStructLen);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -163,25 +156,25 @@ static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struc
     uint32_t paramStructLen = 0;
 
     if (!HdfSbufReadUint32(data, &index)) {
-        HDF_LOGE("%{public}s: read &index failed!", __func__);
+        CODEC_LOGE("read &index failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &paramStructLen)) {
-        HDF_LOGE("%{public}s: read paramStruct size failed!", __func__);
+        CODEC_LOGE("read paramStruct size failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (paramStructLen > 0) {
         paramStruct = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (paramStructLen));
         if (paramStruct == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+            CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
             return HDF_ERR_MALLOC_FAIL;
         }
 
         for (uint32_t i = 0; i < paramStructLen; i++) {
             if (!HdfSbufReadInt8(data, &paramStruct[i])) {
-                HDF_LOGE("%{public}s: read &paramStruct[i] failed!", __func__);
+                CODEC_LOGE("read &paramStruct[i] failed!");
                 FreeMem(paramStruct, paramStructLen);
                 return HDF_ERR_INVALID_PARAM;
             }
@@ -190,7 +183,7 @@ static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struc
 
     ret = serviceImpl->SetParameter(serviceImpl, index, paramStruct, paramStructLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call SetParameter function failed!", __func__);
+        CODEC_LOGE("call SetParameter function failed!");
         FreeMem(paramStruct, paramStructLen);
         return ret;
     }
@@ -207,23 +200,23 @@ static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct H
     uint32_t cfgStructLen = 0;
 
     if (!HdfSbufReadUint32(data, &index)) {
-        HDF_LOGE("%{public}s: read &index failed!", __func__);
+        CODEC_LOGE("read &index failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &cfgStructLen)) {
-        HDF_LOGE("%{public}s: read cfgStructLen failed!", __func__);
+        CODEC_LOGE("read cfgStructLen failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     cfgStruct = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (cfgStructLen));
     if (cfgStruct == NULL) {
-        HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+        CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
         return HDF_ERR_MALLOC_FAIL;
     }
 
     for (uint32_t i = 0; i < cfgStructLen; i++) {
         if (!HdfSbufReadInt8(data, &cfgStruct[i])) {
-            HDF_LOGE("%{public}s: read cfgStruct[i] failed!", __func__);
+            CODEC_LOGE("read cfgStruct[i] failed!");
             FreeMem(cfgStruct, cfgStructLen);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -231,14 +224,14 @@ static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct H
 
     ret = serviceImpl->GetConfig(serviceImpl, index, cfgStruct, cfgStructLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetConfig function failed!", __func__);
+        CODEC_LOGE("call GetConfig function failed!");
         FreeMem(cfgStruct, cfgStructLen);
         return ret;
     }
 
     for (uint32_t i = 0; i < cfgStructLen; i++) {
         if (!HdfSbufWriteInt8(reply, cfgStruct[i])) {
-            HDF_LOGE("%{public}s: write cfgStruct[i] failed!", __func__);
+            CODEC_LOGE("write cfgStruct[i] failed!");
             FreeMem(cfgStruct, cfgStructLen);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -256,25 +249,25 @@ static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct H
     uint32_t cfgStructLen = 0;
 
     if (!HdfSbufReadUint32(data, &index)) {
-        HDF_LOGE("%{public}s: read &index failed!", __func__);
+        CODEC_LOGE("read &index failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &cfgStructLen)) {
-        HDF_LOGE("%{public}s: read cfgStruct size failed!", __func__);
+        CODEC_LOGE("read cfgStruct size failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (cfgStructLen > 0) {
         cfgStruct = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (cfgStructLen));
         if (cfgStruct == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+            CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
             return HDF_ERR_MALLOC_FAIL;
         }
 
         for (uint32_t i = 0; i < cfgStructLen; i++) {
             if (!HdfSbufReadInt8(data, &cfgStruct[i])) {
-                HDF_LOGE("%{public}s: read &cfgStruct[i] failed!", __func__);
+                CODEC_LOGE("read &cfgStruct[i] failed!");
                 FreeMem(cfgStruct, cfgStructLen);
                 return HDF_ERR_INVALID_PARAM;
             }
@@ -283,7 +276,7 @@ static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct H
 
     ret = serviceImpl->SetConfig(serviceImpl, index, cfgStruct, cfgStructLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call SetConfig function failed!", __func__);
+        CODEC_LOGE("call SetConfig function failed!");
         FreeMem(cfgStruct, cfgStructLen);
         return ret;
     }
@@ -301,7 +294,7 @@ static int32_t SerStubGetExtensionIndex(struct CodecComponentType *serviceImpl, 
 
     const char *paramNameCp = HdfSbufReadString(data);
     if (paramNameCp == NULL) {
-        HDF_LOGE("%{public}s: read paramNameCp failed!", __func__);
+        CODEC_LOGE("read paramNameCp failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     paramName = strdup(paramNameCp);
@@ -312,12 +305,12 @@ static int32_t SerStubGetExtensionIndex(struct CodecComponentType *serviceImpl, 
         paramName = NULL;
     }
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetExtensionIndex function failed!", __func__);
+        CODEC_LOGE("call GetExtensionIndex function failed!");
         return ret;
     }
 
     if (!HdfSbufWriteUint32(reply, indexType)) {
-        HDF_LOGE("%{public}s: write indexType failed!", __func__);
+        CODEC_LOGE("write indexType failed!");
         ret = HDF_ERR_INVALID_PARAM;
     }
 
@@ -331,12 +324,12 @@ static int32_t SerStubGetState(struct CodecComponentType *serviceImpl, struct Hd
 
     ret = serviceImpl->GetState(serviceImpl, &state);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call GetState function failed!", __func__);
+        CODEC_LOGE("call GetState function failed!");
         return ret;
     }
 
     if (!HdfSbufWriteUint32(reply, (uint32_t)state)) {
-        HDF_LOGE("%{public}s: write state failed!", __func__);
+        CODEC_LOGE("write state failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -353,33 +346,33 @@ static int32_t SerStubComponentTunnelRequest(struct CodecComponentType *serviceI
     struct OMX_TUNNELSETUPTYPE tunnelSetup;
 
     if (!HdfSbufReadUint32(data, &port)) {
-        HDF_LOGE("%{public}s: read &port failed!", __func__);
+        CODEC_LOGE("read &port failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadInt32(data, &tunneledComp)) {
-        HDF_LOGE("%{public}s: read &tunneledComp failed!", __func__);
+        CODEC_LOGE("read &tunneledComp failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &tunneledPort)) {
-        HDF_LOGE("%{public}s: read &tunneledPort failed!", __func__);
+        CODEC_LOGE("read &tunneledPort failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!OMX_TUNNELSETUPTYPEBlockUnmarshalling(data, &tunnelSetup)) {
-        HDF_LOGE("%{public}s: read tunnelSetup failed!", __func__);
+        CODEC_LOGE("read tunnelSetup failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->ComponentTunnelRequest(serviceImpl, port, tunneledComp, tunneledPort, &tunnelSetup);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call ComponentTunnelRequest function failed!", __func__);
+        CODEC_LOGE("call ComponentTunnelRequest function failed!");
         return ret;
     }
 
     if (!OMX_TUNNELSETUPTYPEBlockMarshalling(reply, &tunnelSetup)) {
-        HDF_LOGE("%{public}s: write tunnelSetup failed!", __func__);
+        CODEC_LOGE("write tunnelSetup failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -394,25 +387,25 @@ static int32_t SerStubUseBuffer(struct CodecComponentType *serviceImpl, struct H
     InitOmxCodecBuffer(&buffer);
 
     if (!HdfSbufReadUint32(data, &portIndex)) {
-        HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
+        CODEC_LOGE("read &portIndex failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->UseBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call UseBuffer function failed!", __func__);
+        CODEC_LOGE("call UseBuffer function failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     if (!OmxCodecBufferBlockMarshalling(reply, &buffer)) {
-        HDF_LOGE("%{public}s: write buffer failed!", __func__);
+        CODEC_LOGE("write buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -429,25 +422,25 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentType *serviceImpl, str
     InitOmxCodecBuffer(&buffer);
 
     if (!HdfSbufReadUint32(data, &portIndex)) {
-        HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
+        CODEC_LOGE("read &portIndex failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->AllocateBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call AllocateBuffer function failed!", __func__);
+        CODEC_LOGE("call AllocateBuffer function failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     if (!OmxCodecBufferBlockMarshalling(reply, &buffer)) {
-        HDF_LOGE("%{public}s: write buffer failed!", __func__);
+        CODEC_LOGE("write buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -462,19 +455,19 @@ static int32_t SerStubFreeBuffer(struct CodecComponentType *serviceImpl, struct 
     struct OmxCodecBuffer buffer;
     InitOmxCodecBuffer(&buffer);
     if (!HdfSbufReadUint32(data, &portIndex)) {
-        HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
+        CODEC_LOGE("read &portIndex failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->FreeBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call FreeBuffer function failed!", __func__);
+        CODEC_LOGE("call FreeBuffer function failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
@@ -489,14 +482,14 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentType *serviceImpl, st
     struct OmxCodecBuffer buffer;
     InitOmxCodecBuffer(&buffer);
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->EmptyThisBuffer(serviceImpl, &buffer);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call EmptyThisBuffer function failed!", __func__);
+        CODEC_LOGE("call EmptyThisBuffer function failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
@@ -511,14 +504,14 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentType *serviceImpl, str
     struct OmxCodecBuffer buffer;
     InitOmxCodecBuffer(&buffer);
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->FillThisBuffer(serviceImpl, &buffer);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call FillThisBuffer function failed!", __func__);
+        CODEC_LOGE("call FillThisBuffer function failed!");
         ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
@@ -534,19 +527,19 @@ static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struc
 
     struct HdfRemoteService *callbackRemote = HdfSbufReadRemoteService(data);
     if (callbackRemote == NULL) {
-        HDF_LOGE("%{public}s: read callbackRemote failed!", __func__);
+        CODEC_LOGE("read callbackRemote failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     callback = CodecCallbackTypeGet(callbackRemote);
 
     if (!HdfSbufReadInt64(data, &appData)) {
-        HDF_LOGE("%{public}s: read appData size failed!", __func__);
+        CODEC_LOGE("read appData size failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->SetCallbacks(serviceImpl, callback, appData);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call SetCallbacks function failed!", __func__);
+        CODEC_LOGE("call SetCallbacks function failed!");
         return ret;
     }
     return ret;
@@ -559,7 +552,7 @@ static int32_t SerStubComponentDeInit(struct CodecComponentType *serviceImpl, st
 
     ret = serviceImpl->ComponentDeInit(serviceImpl);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call ComponentDeInit function failed!", __func__);
+        CODEC_LOGE("call ComponentDeInit function failed!");
     }
 
     return ret;
@@ -574,30 +567,30 @@ static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct
     uint32_t eglImageLen = 0;
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        CODEC_LOGE("read buffer failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &portIndex)) {
-        HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
+        CODEC_LOGE("read &portIndex failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufReadUint32(data, &eglImageLen)) {
-        HDF_LOGE("%{public}s: read eglImage size failed!", __func__);
+        CODEC_LOGE("read eglImage size failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (eglImageLen > 0) {
         eglImage = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (eglImageLen));
         if (eglImage == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+            CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
             return HDF_ERR_MALLOC_FAIL;
         }
 
         for (uint32_t i = 0; i < eglImageLen; i++) {
             if (!HdfSbufReadInt8(data, &eglImage[i])) {
-                HDF_LOGE("%{public}s: read &eglImage[i] failed!", __func__);
+                CODEC_LOGE("read &eglImage[i] failed!");
                 FreeMem(eglImage, eglImageLen);
                 return HDF_ERR_INVALID_PARAM;
             }
@@ -606,13 +599,13 @@ static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct
 
     ret = serviceImpl->UseEglImage(serviceImpl, &buffer, portIndex, eglImage, eglImageLen);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call UseEglImage function failed!", __func__);
+        CODEC_LOGE("call UseEglImage function failed!");
         FreeMem(eglImage, eglImageLen);
         return ret;
     }
 
     if (!OmxCodecBufferBlockMarshalling(reply, &buffer)) {
-        HDF_LOGE("%{public}s: write buffer failed!", __func__);
+        CODEC_LOGE("write buffer failed!");
         FreeMem(eglImage, eglImageLen);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -630,32 +623,32 @@ static int32_t SerStubComponentRoleEnum(struct CodecComponentType *serviceImpl, 
     uint32_t index = 0;
 
     if (!HdfSbufReadUint32(data, &roleLen)) {
-        HDF_LOGE("%{public}s: read &roleLen failed!", __func__);
+        CODEC_LOGE("read &roleLen failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     role = (uint8_t*)OsalMemCalloc(sizeof(uint8_t) * (roleLen));
     if (role == NULL) {
-        HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
+        CODEC_LOGE("HDF_ERR_MALLOC_FAIL!");
         return HDF_ERR_MALLOC_FAIL;
     }
 
     if (!HdfSbufReadUint32(data, &index)) {
-        HDF_LOGE("%{public}s: read &index failed!", __func__);
+        CODEC_LOGE("read &index failed!");
         FreeMem((int8_t*)role, roleLen);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = serviceImpl->ComponentRoleEnum(serviceImpl, role, roleLen, index);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call ComponentRoleEnum function failed!", __func__);
+        CODEC_LOGE("call ComponentRoleEnum function failed!");
         FreeMem((int8_t*)role, roleLen);
         return ret;
     }
 
     for (uint32_t i = 0; i < roleLen; i++) {
         if (!HdfSbufWriteUint8(reply, role[i])) {
-            HDF_LOGE("%{public}s: write role[i] failed!", __func__);
+            CODEC_LOGE("write role[i] failed!");
             FreeMem((int8_t*)role, roleLen);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -670,7 +663,7 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
 {
     struct CodecComponentType *serviceImpl = (struct CodecComponentType *)remote;
     if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->AsObject(serviceImpl), data)) {
-        HDF_LOGE("%{public}s: interface token check failed", __func__);
+        CODEC_LOGE("interface token check failed");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -712,7 +705,7 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
         case CMD_COMPONENT_ROLE_ENUM:
             return SerStubComponentRoleEnum(serviceImpl, data, reply);
         default:
-            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
+            CODEC_LOGE("not support cmd %{public}d", cmdId);
             return HDF_ERR_INVALID_PARAM;
     }
 }
@@ -729,19 +722,19 @@ static struct HdfRemoteService *CodecComponentTypeAsObject(struct CodecComponent
 bool CodecComponentTypeStubConstruct(struct CodecComponentTypeStub *stub)
 {
     if (stub == NULL) {
-        HDF_LOGE("%{public}s: stub is null!", __func__);
+        CODEC_LOGE("stub is null!");
         return false;
     }
 
     stub->dispatcher.Dispatch = CodecComponentTypeServiceOnRemoteRequest;
     stub->remote = HdfRemoteServiceObtain((struct HdfObject *)stub, &(stub->dispatcher));
     if (stub->remote == NULL) {
-        HDF_LOGE("%{public}s: stub->remote is null", __func__);
+        CODEC_LOGE("stub->remote is null");
         return false;
     }
 
     if (!HdfRemoteServiceSetInterfaceDesc(stub->remote, CODEC_COMPONENT_INTERFACE_DESC)) {
-        HDF_LOGE("%{public}s: failed to set remote service interface descriptor", __func__);
+        CODEC_LOGE("failed to set remote service interface descriptor");
         CodecComponentTypeStubRelease(stub);
         return false;
     }
