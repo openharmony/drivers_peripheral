@@ -336,8 +336,7 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level1)
     struct AudioSceneDescriptor scene;
     scene.scene.id = AUDIO_IN_MEDIA;
     scene.desc.pins = PIN_OUT_HEADSET;
-    devDescriptorName_ = strdup("mic");
-    scene.desc.desc = devDescriptorName_;
+    scene.desc.desc = strdup("mic");
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
     scene.desc.pins = PIN_OUT_SPEAKER;
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
