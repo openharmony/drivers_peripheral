@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,20 +22,24 @@
 #include <memory>
 #include <string>
 #include <thread>
+
+#include "nocopyable.h"
 #include "thermal_hdf_config.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
-class ThermalDfx {
+class ThermalDfx : public NoCopyable {
 public:
-    ThermalDfx() {}
+    ThermalDfx();
     ~ThermalDfx();
 
-    int32_t Init();
+    void Init();
+    static ThermalDfx& GetInstance();
+    static void DestroyInstance();
+
 private:
-    void UpdateInterval();
     std::string CanonicalizeSpecPath(const char* src);
     bool Compress(const std::string& dataFile, const std::string& destFile);
     void StartThread();
@@ -44,12 +48,24 @@ private:
     void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime);
     void WriteToFile(std::ofstream& wStream, std::string& currentTime);
     void CompressFile();
-    static void InfoChangedCallback(const char* key, const char* value, void* context);
     bool PrepareWriteDfxLog();
     void LoopingThreadEntry();
     std::string GetFileNameIndex(const uint32_t index);
-    std::atomic_bool isRunning_ {true};
+    int32_t GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue);
+    bool GetBoolParameter(const std::string& key, const bool def);
+    void StopThread();
+    void WidthWatchCallback(const std::string& value);
+    void IntervalWatchCallback(const std::string& value);
+    void EnableWatchCallback(const std::string& value);
+    static void InfoChangedCallback(const char* key, const char* value, void* context);
+
+    std::atomic_uint8_t width_;
+    std::atomic_uint32_t interval_;
+    std::atomic_bool enable_;
     std::unique_ptr<std::thread> logThread_ {nullptr};
+    std::mutex mutex_;
+    static std::mutex mutexInstance_;
+    static std::shared_ptr<ThermalDfx> instance_;
 };
 } // V1_0
 } // Thermal
