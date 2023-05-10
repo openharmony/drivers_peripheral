@@ -23,8 +23,8 @@
       "standard",
       "small"
     ],
-    "rom": "820KB",
-    "ram": "12200KB",
+    "rom": "1800KB",
+    "ram": "1200KB",
     "deps": {
       "components": [
         "ipc",
