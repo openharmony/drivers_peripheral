@@ -15,7 +15,7 @@
 
 #include <array>
 #include "codec_image_config.h"
-#include "codec_image_log.h"
+#include "codec_log_wrapper.h"
 namespace {
     constexpr char NODE_IMAGE_HARDWARE_ENCODERS[] = "ImageHwEncoders";
     constexpr char NODE_IMAGE_HARDWARE_DECODERS[] = "ImageHwDecoders";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +15,10 @@
 
 #include "codec_handle_buffer.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <securec.h>
 #include <unistd.h>
+#include "codec_log_wrapper.h"
+
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -36,7 +37,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     auto bufferHandle = reinterpret_cast<BufferHandle *>(codecBuffer.buffer);
     if (bufferHandle == nullptr) {
-        HDF_LOGE("%{public}s error, bufferHandle is null", __func__);
+        CODEC_LOGE("bufferHandle is null");
         return nullptr;
     }
     codecBuffer.buffer = nullptr;
@@ -50,7 +51,7 @@ sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        HDF_LOGE("%{public}s :CheckInvalid return false or mem has no right to write ", __func__);
+        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
         return HDF_ERR_INVALID_PARAM;
     }
     ResetBuffer(codecBuffer, omxBuffer);
@@ -59,7 +60,7 @@ int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
     if (fenceFd >= 0) {
         auto ret = SyncWait(fenceFd, TIME_WAIT_MS);
         if (ret != EOK) {
-            HDF_LOGW("%{public}s : SyncWait ret err", __func__);
+            CODEC_LOGW("SyncWait ret err");
         }
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;
@@ -69,7 +70,7 @@ int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
 
 int32_t CodecHandleBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
-    HDF_LOGE("%{public}s : bufferHandle is not support in EmptyThisBuffer", __func__);
+    CODEC_LOGE(" bufferHandle is not support in EmptyThisBuffer");
     (void)codecBuffer;
     (void)omxBuffer;
     return HDF_ERR_INVALID_PARAM;
@@ -78,7 +79,7 @@ int32_t CodecHandleBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OM
 int32_t CodecHandleBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        HDF_LOGE("%{public}s :shMem_ is null or CheckInvalid return false", __func__);
+        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -99,7 +100,7 @@ int32_t CodecHandleBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
 
 int32_t CodecHandleBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 {
-    HDF_LOGE("%{public}s : bufferHandle is not support in EmptyThisBuffer", __func__);
+    CODEC_LOGE(" bufferHandle is not support in EmptyThisBuffer");
     (void)omxBuffer;
     return HDF_ERR_INVALID_PARAM;
 }
@@ -117,7 +118,7 @@ uint8_t *CodecHandleBuffer::GetBuffer()
 bool CodecHandleBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
 {
     if (!ICodecBuffer::CheckInvalid(codecBuffer) || bufferHandle_ == nullptr) {
-        HDF_LOGE("%{public}s :bufferHandle_ is null or CheckInvalid return false", __func__);
+        CODEC_LOGE("bufferHandle_ is null or CheckInvalid return false");
         return false;
     }
     return true;
