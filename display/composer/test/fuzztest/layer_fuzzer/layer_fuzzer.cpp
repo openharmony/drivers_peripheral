@@ -17,97 +17,125 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <securec.h>
 
 #include "display_common_fuzzer.h"
-#include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
-#include "v1_0/display_buffer_type.h"
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
 static std::shared_ptr<IDisplayComposerInterface> g_composerInterface = nullptr;
+static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
+
 static bool g_isInit = false;
+static const uint8_t* g_data = nullptr;
+static size_t g_dataSize = 0;
+static size_t g_pos;
 
-static int32_t GetLayerInfo(LayerInfo& layerInfo, uint8_t* data, size_t size)
+/*
+* describe: get data from outside untrusted data(g_data) which size is according to sizeof(T)
+* tips: only support basic type
+*/
+template<class T>
+T GetData()
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
+    T object {};
+    size_t objectSize = sizeof(object);
+    if (g_data == nullptr || objectSize > g_dataSize - g_pos) {
+        return object;
     }
+    errno_t ret = memcpy_s(&object, objectSize, g_data + g_pos, objectSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_pos += objectSize;
+    return object;
+}
 
-    // This will be read width, height, type, bpp and pixFormat of LayerInfo,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempWidth = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t tempHeight = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempWidth)));
-    uint32_t tempTypeIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight)));
+static int32_t GetLayerInfo(LayerInfo& layerInfo)
+{
     uint32_t lenLayerType = GetArrLength(CONVERT_TABLE_LAYER_TYPE);
     if (lenLayerType == 0) {
         HDF_LOGE("%{public}s: CONVERT_TABLE_LAYER_TYPE length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    uint32_t tempBpp = *reinterpret_cast<uint32_t*>(
-        ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight) + sizeof(tempTypeIndex)));
-    uint32_t tempFormatIndex = *reinterpret_cast<uint32_t*>(
-        ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight) + sizeof(tempTypeIndex) + sizeof(tempBpp)));
+
     uint32_t lenFormat = GetArrLength(CONVERT_TABLE_FORMAT);
     if (lenFormat == 0) {
         HDF_LOGE("%{public}s: CONVERT_TABLE_FORMAT length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    layerInfo.width = tempWidth % WIDTH;
-    layerInfo.height = tempHeight % HEIGHT;
-    layerInfo.type = CONVERT_TABLE_LAYER_TYPE[tempTypeIndex % lenLayerType];
-    layerInfo.bpp = tempBpp;
-    layerInfo.pixFormat = CONVERT_TABLE_FORMAT[tempFormatIndex % lenFormat];
+    layerInfo.width = GetData<uint32_t>() % WIDTH;
+    layerInfo.height = GetData<uint32_t>() % HEIGHT;
+    layerInfo.type = CONVERT_TABLE_LAYER_TYPE[GetData<uint32_t>() % lenLayerType];
+    layerInfo.bpp = GetData<uint32_t>();
+    layerInfo.pixFormat = CONVERT_TABLE_FORMAT[GetData<uint32_t>() % lenFormat];
     return DISPLAY_SUCCESS;
 }
 
-static int32_t GetLayerAlpha(LayerAlpha& alpha, uint8_t* data, size_t size)
+static int32_t GetLayerAlpha(LayerAlpha& alpha)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    // This will be read enGlobalAlpha, enPixelAlpha, alpha0, alpha1 and gAlpha of LayerAlpha,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempEnGlobalAlpha = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t tempEnPixelAlpha = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempEnGlobalAlpha)));
-    uint32_t tempAlpha0 = *reinterpret_cast<uint32_t*>(ShiftPointer(data,
-        sizeof(tempEnGlobalAlpha) + sizeof(tempEnPixelAlpha)));
-    uint32_t tempAlpha1 = *reinterpret_cast<uint32_t*>(ShiftPointer(data,
-        sizeof(tempEnGlobalAlpha) + sizeof(tempEnPixelAlpha) + sizeof(tempAlpha0)));
-    uint32_t tempGAlpha = *reinterpret_cast<uint32_t*>(ShiftPointer(data,
-        sizeof(tempEnGlobalAlpha) + sizeof(tempEnPixelAlpha) + sizeof(tempAlpha0) + sizeof(tempAlpha1)));
-    alpha.enGlobalAlpha = GetRandBoolValue(tempEnGlobalAlpha);
-    alpha.enPixelAlpha = GetRandBoolValue(tempEnPixelAlpha);
-    alpha.alpha0 = tempAlpha0 % ALPHAVALUERANGE;
-    alpha.alpha1 = tempAlpha1 % ALPHAVALUERANGE;
-    alpha.gAlpha = tempGAlpha % ALPHAVALUERANGE;
+    alpha.enGlobalAlpha = GetRandBoolValue(GetData<uint32_t>());
+    alpha.enPixelAlpha = GetRandBoolValue(GetData<uint32_t>());
+    alpha.alpha0 = GetData<uint32_t>() % ALPHAVALUERANGE;
+    alpha.alpha1 = GetData<uint32_t>() % ALPHAVALUERANGE;
+    alpha.gAlpha = GetData<uint32_t>() % ALPHAVALUERANGE;
     return DISPLAY_SUCCESS;
 }
 
-int32_t UsingCreateLayer(uint8_t* data, size_t size, uint32_t devId, uint32_t& layerId)
+static int32_t GetAllocInfo(AllocInfo& info)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
+    uint32_t lenUsage = GetArrLength(CONVERT_TABLE_USAGE);
+    if (lenUsage == 0) {
+        HDF_LOGE("%{public}s: CONVERT_TABLE_USAGE length is equal to 0", __func__);
+        return DISPLAY_FAILURE;
+    }
+    uint32_t lenFormat = GetArrLength(CONVERT_TABLE_FORMAT);
+    if (lenFormat == 0) {
+        HDF_LOGE("%{public}s: CONVERT_TABLE_FORMAT length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
 
+    info.width = GetData<uint32_t>() % WIDTH;
+    info.height = GetData<uint32_t>() % HEIGHT;
+    info.usage = CONVERT_TABLE_USAGE[GetData<uint32_t>() % lenUsage];
+    info.format = CONVERT_TABLE_FORMAT[GetData<uint32_t>() % lenFormat];
+    info.expectedSize = info.width * info.height;
+    return DISPLAY_SUCCESS;
+}
+
+static int32_t GetIRect(IRect& rect)
+{
+    rect.x = GetData<int32_t>();
+    rect.y = GetData<int32_t>();
+    rect.w = GetData<int32_t>();
+    rect.h = GetData<int32_t>();
+    return DISPLAY_SUCCESS;
+}
+
+BufferHandle* UsingAllocmem()
+{
+    AllocInfo info = { 0 };
+    int32_t ret = GetAllocInfo(info);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
+        return nullptr;
+    }
+
+    BufferHandle* handle = nullptr;
+    ret = g_bufferInterface->AllocMem(info, handle);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function AllocMem failed", __func__);
+        return nullptr;
+    }
+    return handle;
+}
+
+int32_t UsingCreateLayer(uint32_t devId, uint32_t& layerId)
+{
     LayerInfo layerInfo;
-    int32_t ret = GetLayerInfo(layerInfo, data, size);
+    int32_t ret = GetLayerInfo(layerInfo);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetLayerInfo failed", __func__);
         return DISPLAY_FAILURE;
@@ -130,15 +158,10 @@ int32_t UsingCloseLayer(uint32_t devId, uint32_t layerId)
     return ret;
 }
 
-int32_t TestSetLayerAlpha(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerAlpha(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     LayerAlpha alpha = {0};
-    int32_t ret = GetLayerAlpha(alpha, data, size);
+    int32_t ret = GetLayerAlpha(alpha);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetLayerAlpha failed", __func__);
         return DISPLAY_FAILURE;
@@ -151,15 +174,10 @@ int32_t TestSetLayerAlpha(uint8_t* data, size_t size, uint32_t devId, uint32_t l
     return ret;
 }
 
-int32_t TestSetLayerRegion(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerRegion(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     IRect rect;
-    int32_t ret = GetIRect(rect, data, size);
+    int32_t ret = GetIRect(rect);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -171,15 +189,10 @@ int32_t TestSetLayerRegion(uint8_t* data, size_t size, uint32_t devId, uint32_t 
     return ret;
 }
 
-int32_t TestSetLayerCrop(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerCrop(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     IRect rect;
-    int32_t ret = GetIRect(rect, data, size);
+    int32_t ret = GetIRect(rect);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -191,19 +204,9 @@ int32_t TestSetLayerCrop(uint8_t* data, size_t size, uint32_t devId, uint32_t la
     return ret;
 }
 
-int32_t TestSetLayerZorder(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerZorder(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t zorder = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
+    uint32_t zorder = GetData<uint32_t>();
     int32_t ret = g_composerInterface->SetLayerZorder(devId, layerId, zorder);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerZorder failed", __func__);
@@ -211,20 +214,9 @@ int32_t TestSetLayerZorder(uint8_t* data, size_t size, uint32_t devId, uint32_t 
     return ret;
 }
 
-int32_t TestSetLayerPreMulti(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerPreMulti(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t temPreMul = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    bool preMul = GetRandBoolValue(temPreMul);
+    bool preMul = GetRandBoolValue(GetData<uint32_t>());
     int32_t ret = g_composerInterface->SetLayerPreMulti(devId, layerId, preMul);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerPreMulti failed", __func__);
@@ -232,32 +224,14 @@ int32_t TestSetLayerPreMulti(uint8_t* data, size_t size, uint32_t devId, uint32_
     return ret;
 }
 
-int32_t TestSetLayerTransformMode(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerTransformMode(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    static const TransformType CONVERT_TABLE[] = {
-        ROTATE_NONE,
-        ROTATE_90,
-        ROTATE_180,
-        ROTATE_270,
-        ROTATE_BUTT,
-    };
-    uint32_t tableIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t len = GetArrLength(CONVERT_TABLE);
+    uint32_t len = GetArrLength(CONVERT_TABLE_ROTATE);
     if (len == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE length is equal to 0", __func__);
+        HDF_LOGE("%{public}s: CONVERT_TABLE_ROTATE length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    TransformType type = CONVERT_TABLE[tableIndex % len];
+    TransformType type = CONVERT_TABLE_ROTATE[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetLayerTransformMode(devId, layerId, type);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerTransformMode failed", __func__);
@@ -265,15 +239,10 @@ int32_t TestSetLayerTransformMode(uint8_t* data, size_t size, uint32_t devId, ui
     return ret;
 }
 
-int32_t TestSetLayerDirtyRegion(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerDirtyRegion(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     IRect region;
-    int32_t ret = GetIRect(region, data, size);
+    int32_t ret = GetIRect(region);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -287,20 +256,10 @@ int32_t TestSetLayerDirtyRegion(uint8_t* data, size_t size, uint32_t devId, uint
     return ret;
 }
 
-int32_t TestSetLayerVisibleRegion(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerVisibleRegion(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
     IRect rect;
-    int32_t ret = GetIRect(rect, data, size);
+    int32_t ret = GetIRect(rect);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -314,20 +273,10 @@ int32_t TestSetLayerVisibleRegion(uint8_t* data, size_t size, uint32_t devId, ui
     return ret;
 }
 
-int32_t TestSetLayerBuffer(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerBuffer(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    int32_t fence = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
-    BufferHandle* buffer = UsingAllocmem(data, size);
+    int32_t fence = GetData<int32_t>();
+    BufferHandle* buffer = UsingAllocmem();
     if (buffer == nullptr) {
         HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
         return DISPLAY_FAILURE;
@@ -336,38 +285,18 @@ int32_t TestSetLayerBuffer(uint8_t* data, size_t size, uint32_t devId, uint32_t 
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerBuffer failed", __func__);
     }
+    g_bufferInterface->FreeMem(*buffer);
     return ret;
 }
 
-int32_t TestSetLayerCompositionType(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerCompositionType(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    static const CompositionType CONVERT_TABLE[] = {
-        COMPOSITION_CLIENT,
-        COMPOSITION_DEVICE,
-        COMPOSITION_CURSOR,
-        COMPOSITION_VIDEO,
-        COMPOSITION_DEVICE_CLEAR,
-        COMPOSITION_CLIENT_CLEAR,
-        COMPOSITION_TUNNEL,
-        COMPOSITION_BUTT,
-    };
-    uint32_t tableIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t len = GetArrLength(CONVERT_TABLE);
+    uint32_t len = GetArrLength(CONVERT_TABLE_COMPOSITION);
     if (len == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE length is equal to 0", __func__);
+        HDF_LOGE("%{public}s: CONVERT_TABLE_COMPOSITION length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    CompositionType type = CONVERT_TABLE[tableIndex % len];
+    CompositionType type = CONVERT_TABLE_COMPOSITION[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetLayerCompositionType(devId, layerId, type);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerCompositionType failed", __func__);
@@ -375,44 +304,14 @@ int32_t TestSetLayerCompositionType(uint8_t* data, size_t size, uint32_t devId, 
     return ret;
 }
 
-int32_t TestSetLayerBlendType(uint8_t* data, size_t size, uint32_t devId, uint32_t layerId)
+int32_t TestSetLayerBlendType(uint32_t devId, uint32_t layerId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    static const BlendType CONVERT_TABLE[] = {
-        BLEND_NONE,
-        BLEND_CLEAR,
-        BLEND_SRC,
-        BLEND_SRCOVER,
-        BLEND_DSTOVER,
-        BLEND_SRCIN,
-        BLEND_DSTIN,
-        BLEND_SRCOUT,
-        BLEND_DSTOUT,
-        BLEND_SRCATOP,
-        BLEND_DSTATOP,
-        BLEND_ADD,
-        BLEND_XOR,
-        BLEND_DST,
-        BLEND_AKS,
-        BLEND_AKD,
-        BLEND_BUTT,
-    };
-    uint32_t tableIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t len = GetArrLength(CONVERT_TABLE);
+    uint32_t len = GetArrLength(CONVERT_TABLE_BLEND);
     if (len == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE length is equal to 0", __func__);
+        HDF_LOGE("%{public}s: CONVERT_TABLE_BLEND length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    BlendType type = CONVERT_TABLE[tableIndex % len];
+    BlendType type = CONVERT_TABLE_BLEND[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetLayerBlendType(devId, layerId, type);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerBlendType failed", __func__);
@@ -420,7 +319,7 @@ int32_t TestSetLayerBlendType(uint8_t* data, size_t size, uint32_t devId, uint32
     return ret;
 }
 
-typedef int32_t (*TestFuncs[])(uint8_t*, size_t, uint32_t, uint32_t);
+typedef int32_t (*TestFuncs[])(uint32_t, uint32_t);
 
 TestFuncs g_testFuncs = {
     TestSetLayerAlpha,
@@ -438,7 +337,7 @@ TestFuncs g_testFuncs = {
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
 {
-    if (rawData == nullptr || size < (OFFSET + OFFSET + OFFSET)) {
+    if (rawData == nullptr) {
         return false;
     }
 
@@ -449,35 +348,34 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;
         }
+        g_bufferInterface.reset(IDisplayBuffer::Get());
+        if (g_bufferInterface == nullptr) {
+            HDF_LOGE("%{public}s: get IDisplayBuffer failed", __func__);
+            return false;
+        }
     }
 
-    uint32_t code = Convert2Uint32(rawData, size);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
-    uint32_t devId = Convert2Uint32(rawData, size);
-    rawData = rawData + OFFSET;
-    uint32_t layerId = Convert2Uint32(rawData, size);
-    rawData = rawData + OFFSET;
+    // initialize data
+    g_data = rawData;
+    g_dataSize = size;
+    g_pos = 0;
 
-    uint8_t* data = const_cast<uint8_t*>(rawData);
-    if (data == nullptr) {
-        HDF_LOGE("%{public}s: can not get data", __func__);
-        return false;
-    }
-
-    int32_t ret = UsingCreateLayer(data, size, devId, layerId);
+    uint32_t code = GetData<uint32_t>();
+    uint32_t devId = GetData<uint32_t>();
+    uint32_t layerId = GetData<uint32_t>();
+    int32_t ret = UsingCreateLayer(devId, layerId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function UsingCreateLayer failed", __func__);
         return false;
     }
-
+    
     uint32_t len = GetArrLength(g_testFuncs);
     if (len == 0) {
         HDF_LOGE("%{public}s: g_testFuncs length is equal to 0", __func__);
         return false;
     }
 
-    ret = g_testFuncs[code % len](data, size, devId, layerId);
+    ret = g_testFuncs[code % len](devId, layerId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("function %{public}u failed", code % len);
         return false;
