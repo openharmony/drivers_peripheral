@@ -32,6 +32,7 @@ struct AudioRenderInfo {
     unsigned int channelCount;
     struct AudioHwiRender *hwiRender;
     uint32_t renderId;
+    unsigned int usrCount;
 };
 
 struct AudioHwiRenderPriv {
@@ -949,6 +950,7 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
             (renderPriv->renderInfos[index]->sampleRate == attrs->sampleRate) &&
             (renderPriv->renderInfos[index]->channelCount == attrs->channelCount)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
+            renderPriv->renderInfos[index]->usrCount++;
             return &renderPriv->renderInfos[index]->render;
         }
     }
@@ -1012,12 +1014,31 @@ struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->desc.pins = desc->pins;
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
     priv->renderInfos[*renderId]->renderId = *renderId;
+    priv->renderInfos[*renderId]->usrCount = 1;
     render = &(priv->renderInfos[*renderId]->render);
     AudioHwiInitRenderInstance(render);
 
     AUDIO_FUNC_LOGI("audio create render success");
     return render;
-};
+}
+
+uint32_t QueryRenderUsrCount(uint32_t renderId)
+{
+    uint32_t usrCnt = 0;
+    if (renderId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio check render index fail, descIndex=%{public}d", renderId);
+        return usrCnt;
+    }
+    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
+    if (priv->renderInfos[renderId] == NULL) {
+        AUDIO_FUNC_LOGE("audio check render index fail, descIndex=%{public}d", renderId);
+        return usrCnt;
+    }
+
+    priv->renderInfos[renderId]->usrCount--;
+    usrCnt = priv->renderInfos[renderId]->usrCount;
+    return usrCnt;
+}
 
 void AudioHwiDestroyRenderById(uint32_t renderId)
 {
