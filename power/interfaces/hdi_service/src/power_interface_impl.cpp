@@ -152,12 +152,9 @@ int32_t DoSuspend()
     if (suspendStateFd < 0) {
         return HDF_FAILURE;
     }
-    bool ret = false;
-    do {
-        ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
-    } while (!ret && (errno == EINTR || errno == EBUSY));
-
+    bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
+        HDF_LOGE("DoSuspend fail");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
