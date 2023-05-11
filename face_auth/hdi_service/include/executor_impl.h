@@ -18,12 +18,11 @@
 
 #include <vector>
 
-#include "v1_0/iexecutor.h"
+#include "face_auth_hdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
-namespace V1_0 {
 using BufferProducerSequenceable = OHOS::HDI::Camera::V1_0::BufferProducerSequenceable;
 class ExecutorImpl : public IExecutor {
 public:
@@ -56,10 +55,16 @@ public:
 
     int32_t SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer) override;
 
+    int32_t GetProperty(const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes,
+        Property &property) override;
+
+    int32_t SetCachedTemplates(const std::vector<uint64_t> &templateIdList) override;
+
+    int32_t RegisterSaCommandCallback(const sptr<ISaCommandCallback> &callbackObj) override;
+
 private:
-    struct ExecutorInfo executorInfo_;
+    ExecutorInfo executorInfo_;
 };
-} // namespace V1_0
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS

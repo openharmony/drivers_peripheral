@@ -19,7 +19,6 @@
 namespace OHOS {
 namespace HDI {
 namespace FingerprintAuth {
-namespace V1_0 {
 enum ResultCode : int32_t {
     SUCCESS = 0,
     FAIL = 1,
@@ -36,8 +35,7 @@ enum ResultCode : int32_t {
     FRAMEWORK_RESULT_CODE_MAX,
     VENDOR_RESULT_CODE_BEGIN = 10000,
 };
-} // namespace V1_0
 } // namespace FingerprintAuth
 } // namespace HDI
 } // namespace OHOS
-#endif  // FINGERPRINT_AUTH_DEFINES_H
+#endif // FINGERPRINT_AUTH_DEFINES_H

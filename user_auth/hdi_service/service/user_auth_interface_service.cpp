@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_0/user_auth_interface_service.h"
+#include "v1_1/user_auth_interface_service.h"
 
 #include <mutex>
 #include <hdf_base.h>
@@ -30,6 +30,7 @@
 #include "idm_database.h"
 #include "idm_session.h"
 #include "ed25519_key.h"
+#include "user_auth_hdi.h"
 #include "user_auth_funcs.h"
 #include "user_idm_funcs.h"
 #include "enroll_specification_check.h"
@@ -39,7 +40,6 @@
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 namespace {
 static std::mutex g_mutex;
 }
@@ -64,7 +64,7 @@ int32_t UserAuthInterfaceService::Init()
     return OHOS::UserIam::Common::Init();
 }
 
-static bool CopyScheduleInfo(const CoAuthSchedule *in, ScheduleInfo *out)
+static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out)
 {
     IAM_LOGI("start");
     if (in->executorSize == 0) {
@@ -98,11 +98,52 @@ static bool CopyScheduleInfo(const CoAuthSchedule *in, ScheduleInfo *out)
         }
         out->executors.push_back(temp);
     }
+    out->extraInfo = {};
     return true;
+}
+
+static void CopyScheduleInfoV1_1ToV1_0(const ScheduleInfoV1_1 &in, ScheduleInfo &out)
+{
+    out.scheduleId = in.scheduleId;
+    out.templateIds = in.templateIds;
+    out.authType = in.authType;
+    out.executorMatcher = in.executorMatcher;
+    out.scheduleMode = in.scheduleMode;
+    out.templateIds = in.templateIds;
+    for (auto &inInfo : in.executors) {
+        ExecutorInfo outInfo = {};
+        outInfo.executorIndex = inInfo.executorIndex;
+        outInfo.info.authType = inInfo.info.authType;
+        outInfo.info.executorRole = inInfo.info.executorRole;
+        outInfo.info.executorSensorHint = inInfo.info.executorSensorHint;
+        outInfo.info.executorMatcher = inInfo.info.executorMatcher;
+        outInfo.info.esl = inInfo.info.esl;
+        outInfo.info.publicKey = inInfo.info.publicKey;
+        out.executors.push_back(outInfo);
+    }
+}
+
+static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in, std::vector<ScheduleInfo> &out)
+{
+    for (auto &inInfo : in) {
+        ScheduleInfo outInfo;
+        CopyScheduleInfoV1_1ToV1_0(inInfo, outInfo);
+        out.push_back(outInfo);
+    }
 }
 
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
     std::vector<ScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    std::vector<ScheduleInfoV1_1> infosV1_1;
+    int32_t ret = BeginAuthenticationV1_1(contextId, param, infosV1_1);
+    CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
+    uint64_t contextId, const AuthSolution &param, std::vector<ScheduleInfoV1_1> &infos)
 {
     IAM_LOGI("start");
     infos.clear();
@@ -134,9 +175,9 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
             DestroyLinkedList(schedulesGet);
             return RESULT_UNKNOWN;
         }
-        ScheduleInfo temp = {};
+        ScheduleInfoV1_1 temp = {};
         auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
-        if (!CopyScheduleInfo(coAuthSchedule, &temp)) {
+        if (!CopyScheduleInfoV1_1(coAuthSchedule, &temp)) {
             infos.clear();
             ret = RESULT_GENERAL_ERROR;
             break;
@@ -262,6 +303,16 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, ScheduleInfo &scheduleInfo)
 {
     IAM_LOGI("start");
+    ScheduleInfoV1_1 infoV1_1;
+    int32_t ret = BeginIdentificationV1_1(contextId, authType, challenge, executorSensorHint, infoV1_1);
+    CopyScheduleInfoV1_1ToV1_0(infoV1_1, scheduleInfo);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginIdentificationV1_1(uint64_t contextId, AuthType authType,
+    const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, ScheduleInfoV1_1 &scheduleInfo)
+{
+    IAM_LOGI("start");
     if (authType == PIN) {
         IAM_LOGE("param is invalid");
         return RESULT_BAD_PARAM;
@@ -291,7 +342,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
         return RESULT_UNKNOWN;
     }
     auto data = static_cast<CoAuthSchedule *>(scheduleGet->head->data);
-    if (!CopyScheduleInfo(data, &scheduleInfo)) {
+    if (!CopyScheduleInfoV1_1(data, &scheduleInfo)) {
         IAM_LOGE("copy schedule failed");
         ret = RESULT_BAD_COPY;
     }
@@ -377,6 +428,16 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
     const EnrollParam &param, ScheduleInfo &info)
 {
     IAM_LOGI("start");
+    ScheduleInfoV1_1 infoV1_1;
+    int32_t ret = BeginEnrollmentV1_1(userId, authToken, param, infoV1_1);
+    CopyScheduleInfoV1_1ToV1_0(infoV1_1, info);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
+    int32_t userId, const std::vector<uint8_t> &authToken, const EnrollParam &param, ScheduleInfoV1_1 &info)
+{
+    IAM_LOGI("start");
     if (authToken.size() != sizeof(UserAuthTokenHal) && authToken.size() != 0) {
         IAM_LOGE("authToken len is invalid");
         return RESULT_BAD_PARAM;
@@ -410,7 +471,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
         IAM_LOGE("get schedule info failed");
         return RESULT_UNKNOWN;
     }
-    if (!CopyScheduleInfo(scheduleInfo, &info)) {
+    if (!CopyScheduleInfoV1_1(scheduleInfo, &info)) {
         IAM_LOGE("copy schedule info failed");
         return RESULT_BAD_COPY;
     }
@@ -683,7 +744,6 @@ int32_t UserAuthInterfaceService::DeleteExecutor(uint64_t index)
     std::lock_guard<std::mutex> lock(g_mutex);
     return UnRegisterExecutor(index);
 }
-} // V1_0
 } // Userauth
 } // HDI
 } // OHOS
