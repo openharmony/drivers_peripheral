@@ -18,11 +18,9 @@
 #include <hdf_sbuf_ipc.h>
 
 #include "iam_logger.h"
-#include "v1_0/fingerprint_auth_interface_stub.h"
+#include "v1_1/fingerprint_auth_interface_stub.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
-
-using namespace OHOS::HDI::FingerprintAuth::V1_0;
 
 struct HdfFingerprintAuthInterfaceHost {
     struct IDeviceIoService ioService;
@@ -30,6 +28,8 @@ struct HdfFingerprintAuthInterfaceHost {
 };
 
 namespace {
+using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface;
+
 int32_t FingerprintAuthInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -42,7 +42,7 @@ int32_t FingerprintAuthInterfaceDriverDispatch(
     auto *hdfFingerprintAuthInterfaceHost = CONTAINER_OF(client->device->service,
         struct HdfFingerprintAuthInterfaceHost, ioService);
     if (hdfFingerprintAuthInterfaceHost == nullptr || hdfFingerprintAuthInterfaceHost->stub == nullptr) {
-        IAM_LOGE("hdfFaceAuthInterfaceHost is invalid");
+        IAM_LOGE("hdfFingerprintAuthInterfaceHost is invalid");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -85,11 +85,11 @@ int HdfFingerprintAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
     auto *hdfFingerprintAuthInterfaceHost = new (std::nothrow) HdfFingerprintAuthInterfaceHost;
     if (hdfFingerprintAuthInterfaceHost == nullptr) {
-        IAM_LOGE("failed to create create HdfFingerprinteAuthInterfaceHost object");
+        IAM_LOGE("failed to create create HdfFingerprintAuthInterfaceHost object");
         return HDF_FAILURE;
     }
 
-    hdfFingerprintAuthInterfaceHost->ioService.Dispatch =FingerprintAuthInterfaceDriverDispatch;
+    hdfFingerprintAuthInterfaceHost->ioService.Dispatch = FingerprintAuthInterfaceDriverDispatch;
     hdfFingerprintAuthInterfaceHost->ioService.Open = NULL;
     hdfFingerprintAuthInterfaceHost->ioService.Release = NULL;
 
@@ -123,7 +123,7 @@ void HdfFingerprintAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
     auto *hdfFingerprintAuthInterfaceHost = CONTAINER_OF(deviceObject->service,
         struct HdfFingerprintAuthInterfaceHost, ioService);
     if (hdfFingerprintAuthInterfaceHost == nullptr) {
-        IAM_LOGE("hdfFaceAuthInterfaceHost is nullptr");
+        IAM_LOGE("hdfFingerprintAuthInterfaceHost is nullptr");
         return;
     }
     delete hdfFingerprintAuthInterfaceHost;
@@ -146,4 +146,3 @@ HDF_INIT(g_fingerprintAuthInterfaceDriverEntry);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-

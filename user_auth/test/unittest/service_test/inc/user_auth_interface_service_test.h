@@ -21,7 +21,6 @@
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 class UserAuthInterfaceServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -32,7 +31,6 @@ public:
 
     void TearDown() override;
 };
-} // namespace V1_0
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS
