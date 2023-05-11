@@ -27,13 +27,13 @@ namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
+const size_t THRESHOLD = 10;
+const size_t STR_LEN = 10;
 const uint32_t PARAM_VOIDPTR_LEN = 10;
 const int32_t ALPHAVALUERANGE = 256; // ranging from 0 to 255
 const uint32_t WIDTH = 128;
 const uint32_t HEIGHT = 128;
 const uint64_t RANDOM_BOOL = 2;
-const uint32_t OFFSET = 4; // Move the offset of the pointer to read the next data
-const size_t THRESHOLD = 10;
 
 const PixelFormat CONVERT_TABLE_FORMAT[] = {
     PIXEL_FMT_CLUT8, PIXEL_FMT_CLUT1,
@@ -84,6 +84,60 @@ const LayerType CONVERT_TABLE_LAYER_TYPE[] = {
     LAYER_TYPE_BUTT,
 };
 
+const DispPowerStatus CONVERT_TABLE_POWER_STATUS[] = {
+    POWER_STATUS_ON, POWER_STATUS_STANDBY,
+    POWER_STATUS_SUSPEND, POWER_STATUS_OFF,
+    POWER_STATUS_BUTT,
+};
+
+const InterfaceType CONVERT_TABLE_INTERFACE_TYPE[] = {
+    DISP_INTF_HDMI, DISP_INTF_LCD,
+    DISP_INTF_BT1120, DISP_INTF_BT656,
+    DISP_INTF_YPBPR, DISP_INTF_RGB,
+    DISP_INTF_CVBS, DISP_INTF_SVIDEO,
+    DISP_INTF_VGA, DISP_INTF_MIPI,
+    DISP_INTF_PANEL, DISP_INTF_BUTT,
+};
+
+const TransformType CONVERT_TABLE_ROTATE[] = {
+    ROTATE_NONE,
+    ROTATE_90,
+    ROTATE_180,
+    ROTATE_270,
+    ROTATE_BUTT,
+};
+
+const CompositionType CONVERT_TABLE_COMPOSITION[] = {
+    COMPOSITION_CLIENT,
+    COMPOSITION_DEVICE,
+    COMPOSITION_CURSOR,
+    COMPOSITION_VIDEO,
+    COMPOSITION_DEVICE_CLEAR,
+    COMPOSITION_CLIENT_CLEAR,
+    COMPOSITION_TUNNEL,
+    COMPOSITION_BUTT,
+};
+
+static const BlendType CONVERT_TABLE_BLEND[] = {
+    BLEND_NONE,
+    BLEND_CLEAR,
+    BLEND_SRC,
+    BLEND_SRCOVER,
+    BLEND_DSTOVER,
+    BLEND_SRCIN,
+    BLEND_DSTIN,
+    BLEND_SRCOUT,
+    BLEND_DSTOUT,
+    BLEND_SRCATOP,
+    BLEND_DSTATOP,
+    BLEND_ADD,
+    BLEND_XOR,
+    BLEND_DST,
+    BLEND_AKS,
+    BLEND_AKD,
+    BLEND_BUTT,
+};
+
 template<class T>
 uint32_t GetArrLength(T& arr)
 {
@@ -94,142 +148,9 @@ uint32_t GetArrLength(T& arr)
     return sizeof(arr) / sizeof(arr[0]);
 }
 
-bool GetRandBoolValue(uint8_t data)
-{
-    return data % RANDOM_BOOL == 0;
-}
-
 bool GetRandBoolValue(uint32_t data)
 {
     return data % RANDOM_BOOL == 0;
-}
-
-bool GetRandBoolValue(uint64_t data)
-{
-    return data % RANDOM_BOOL == 0;
-}
-
-inline void* ShiftPointer(uint8_t* data, int32_t offset)
-{
-    void* resultData = reinterpret_cast<void*>(data + offset);
-    if (resultData == nullptr) {
-        HDF_LOGE("function %{public}s failed", __func__);
-        return data;
-    }
-    return resultData;
-}
-
-uint32_t Convert2Uint32(const uint8_t* ptr, size_t size)
-{
-    if ((ptr == nullptr) || (OFFSET > size)) {
-        HDF_LOGE("function %{public}s failed", __func__);
-        return 0;
-    }
-
-    const uint32_t PTR_MOVE_24 = 24;
-    const uint32_t PTR_MOVE_16 = 16;
-    const uint32_t PTR_MOVE_8 = 8;
-    const uint32_t SECOND_PTR = 2;
-    const uint32_t THIRD_PTR = 3;
-
-    /*
-     * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
-     * and the third digit no left
-     */
-    return (ptr[0] << PTR_MOVE_24) | (ptr[1] << PTR_MOVE_16) | (ptr[SECOND_PTR] << PTR_MOVE_8) | (ptr[THIRD_PTR]);
-}
-
-int32_t GetAllocInfo(AllocInfo& info, uint8_t* data, size_t size)
-{
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    // This will be read width, height, usage and format of alloc info,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint64_t) + sizeof(PixelFormat);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempWidth = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t tempHeight = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempWidth)));
-    uint32_t tempUsageIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight)));
-    uint32_t lenUsage = GetArrLength(CONVERT_TABLE_USAGE);
-    if (lenUsage == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE_USAGE length is equal to 0", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempFormatIndex = *reinterpret_cast<uint32_t*>(
-        ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight) + sizeof(tempUsageIndex)));
-    uint32_t lenFormat = GetArrLength(CONVERT_TABLE_FORMAT);
-    if (lenFormat == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE_FORMAT length is equal to 0", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    info.width = tempWidth % WIDTH;
-    info.height = tempHeight % HEIGHT;
-    info.usage = CONVERT_TABLE_USAGE[tempUsageIndex % lenUsage];
-    info.format = CONVERT_TABLE_FORMAT[tempFormatIndex % lenFormat];
-    info.expectedSize = info.width * info.height;
-    return DISPLAY_SUCCESS;
-}
-
-BufferHandle* UsingAllocmem(uint8_t* data, size_t size)
-{
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return nullptr;
-    }
-
-    AllocInfo info = { 0 };
-    int32_t ret = GetAllocInfo(info, data, size);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
-        return nullptr;
-    }
-
-    std::shared_ptr<IDisplayBuffer> bufferInterface = nullptr;
-    bufferInterface.reset(IDisplayBuffer::Get());
-    if (bufferInterface == nullptr) {
-        HDF_LOGE("get bufferInterface is null");
-        return nullptr;
-    }
-
-    BufferHandle* handle = nullptr;
-    ret = bufferInterface->AllocMem(info, handle);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function AllocMem failed", __func__);
-        return nullptr;
-    }
-    return handle;
-}
-
-int32_t GetIRect(IRect& rect, uint8_t* data, size_t size)
-{
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    int32_t tempX = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
-    int32_t tempY = *reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(tempX)));
-    int32_t tempW = *reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(tempX) + sizeof(tempY)));
-    int32_t tempH = *reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(tempX) + sizeof(tempY) + sizeof(tempW)));
-
-    rect.x = tempX;
-    rect.y = tempY;
-    rect.w = tempW;
-    rect.h = tempH;
-    return DISPLAY_SUCCESS;
 }
 } // OHOS
 #endif // DISPLAY_COMMON_FUZZER_H
