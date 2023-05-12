@@ -12,7 +12,11 @@
     "component": {
       "name": "drivers_peripheral_nfc",
       "subsystem": "hdf",
-      "syscap": [ "" ],
+      "syscap": [
+          "SystemCapability.Communication.NFC.Core",
+          "SystemCapability.Communication.NFC.Tag",
+          "SystemCapability.Communication.NFC.CardEmulation"
+        ],
       "adapter_system_type": ["standard"],
       "rom": "1000KB",
       "ram": "1000KB",
@@ -21,7 +25,7 @@
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
-          "utils_base"
+          "c_utils"
         ],
         "third_party": [
           "nfc_hdiimpl"
