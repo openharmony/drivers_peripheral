@@ -51,6 +51,7 @@ ThermalHdfTimer::~ThermalHdfTimer()
     if (callbackThread_->joinable()) {
         callbackThread_->join();
     }
+    ThermalDfx::DestroyInstance();
 }
 
 void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
@@ -112,10 +113,7 @@ void ThermalHdfTimer::StartThread()
 
 int32_t ThermalHdfTimer::Init()
 {
-    std::unique_ptr<ThermalDfx> thermalDfx = std::make_unique<ThermalDfx>();
-    if (thermalDfx != nullptr) {
-        thermalDfx->Init();
-    }
+    ThermalDfx::GetInstance().Init();
     StartThread();
     return HDF_SUCCESS;
 }

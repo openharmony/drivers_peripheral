@@ -18,11 +18,9 @@
 #include <hdf_sbuf_ipc.h>
 
 #include "iam_logger.h"
-#include "v1_0/face_auth_interface_stub.h"
+#include "v1_1/face_auth_interface_stub.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
-
-using namespace OHOS::HDI::FaceAuth::V1_0;
 
 struct HdfFaceAuthInterfaceHost {
     struct IDeviceIoService ioService;
@@ -30,6 +28,8 @@ struct HdfFaceAuthInterfaceHost {
 };
 
 namespace {
+using IFaceAuthInterface = OHOS::HDI::FaceAuth::V1_1::IFaceAuthInterface;
+
 int32_t FaceAuthInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {

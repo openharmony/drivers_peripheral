@@ -11,4 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-vendor.hifi.watchdog.come = audio:audio:0777
+vendor.hifi.watchdog.come = audio_host:audio_host:0660

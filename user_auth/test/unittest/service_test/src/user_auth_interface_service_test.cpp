@@ -20,16 +20,14 @@
 #include "iam_ptr.h"
 #include "securec.h"
 
-#include "v1_0/user_auth_interface_service.h"
-#include "v1_0/user_auth_types.h"
 #include "executor_message.h"
+#include "user_auth_hdi.h"
 #include "user_sign_centre.h"
 #include "signature_operation.h"
 
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 using namespace testing;
 using namespace testing::ext;
 
@@ -70,8 +68,8 @@ int32_t DoOnceExecutorRegister(const std::shared_ptr<UserAuthInterfaceService> &
 {
     ExecutorRegisterInfo info = {};
     info.authType = authType;
-    info.executorRole = ALL_IN_ONE;
-    info.esl = ESL0;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
     EXPECT_EQ(GetExecutorPublicKey(info.publicKey), 0);
     std::vector<uint8_t> publicKey;
     std::vector<uint64_t> templateIds;
@@ -81,9 +79,9 @@ int32_t DoOnceExecutorRegister(const std::shared_ptr<UserAuthInterfaceService> &
 
 void RegisterAllExecutor(const std::shared_ptr<UserAuthInterfaceService> &service)
 {
-    EXPECT_EQ(DoOnceExecutorRegister(service, PIN, g_pinIndex), 0);
-    EXPECT_EQ(DoOnceExecutorRegister(service, FACE, g_faceIndex), 0);
-    EXPECT_EQ(DoOnceExecutorRegister(service, FINGERPRINT, g_fingerprintIndex), 0);
+    EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::PIN, g_pinIndex), 0);
+    EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::FACE, g_faceIndex), 0);
+    EXPECT_EQ(DoOnceExecutorRegister(service, AuthType::FINGERPRINT, g_fingerprintIndex), 0);
 }
 
 void DeleteAllExecutor(const std::shared_ptr<UserAuthInterfaceService> &service)
@@ -194,7 +192,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAddExecutor_002, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
     
     ExecutorRegisterInfo info = {};
-    info.authType = FACE;
+    info.authType = AuthType::FACE;
     info.publicKey.resize(32);
     uint64_t index = 0;
     std::vector<uint8_t> publicKey;
@@ -215,7 +213,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAddExecutor_003, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
     
     ExecutorRegisterInfo info = {};
-    info.authType = FACE;
+    info.authType = AuthType::FACE;
     info.publicKey.resize(32);
     uint64_t index = 0;
     std::vector<uint8_t> publicKey;
@@ -309,7 +307,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_004, TestSize.Level0)
 
     std::vector<uint8_t> authToken;
     EnrollParam param = {};
-    param.authType = PIN;
+    param.authType = AuthType::PIN;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginEnrollment(userId, authToken, param, scheduleInfo), 10004);
 
@@ -329,9 +327,9 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_005, TestSize.Level0)
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
     ExecutorRegisterInfo info = {};
-    info.authType = PIN;
-    info.executorRole = ALL_IN_ONE;
-    info.esl = ESL0;
+    info.authType = AuthType::PIN;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
     info.publicKey.resize(32);
     uint64_t index = 0;
     std::vector<uint8_t> publicKey;
@@ -343,9 +341,114 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_005, TestSize.Level0)
 
     std::vector<uint8_t> authToken;
     EnrollParam param = {};
-    param.authType = PIN;
+    param.authType = AuthType::PIN;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginEnrollment(userId, authToken, param, scheduleInfo), 0);
+    EXPECT_EQ(service->CancelEnrollment(userId), 0);
+
+    EXPECT_EQ(service->DeleteExecutor(index), 0);
+    EXPECT_EQ(service->CloseSession(userId), 0);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    int32_t userId = 123456;
+    std::vector<uint8_t> authToken(10, 1);
+    EnrollParam param = {};
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 8);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_002, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    int32_t userId = 123456;
+    std::vector<uint8_t> authToken;
+    EnrollParam param = {};
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 8);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_003, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    int32_t userId = 123456;
+
+    std::vector<uint8_t> challenge;
+    EXPECT_EQ(service->OpenSession(userId, challenge), 0);
+
+    std::vector<uint8_t> authToken;
+    EnrollParam param = {};
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 10018);
+
+    EXPECT_EQ(service->CloseSession(userId), 0);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_004, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    int32_t userId = 123456;
+
+    std::vector<uint8_t> challenge;
+    EXPECT_EQ(service->OpenSession(userId, challenge), 0);
+
+    std::vector<uint8_t> authToken;
+    EnrollParam param = {};
+    param.authType = AuthType::PIN;
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 10004);
+
+    EXPECT_EQ(service->CloseSession(userId), 0);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_005, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    int32_t userId = 123456;
+
+    std::vector<uint8_t> challenge;
+    EXPECT_EQ(service->OpenSession(userId, challenge), 0);
+
+    ExecutorRegisterInfo info = {};
+    info.authType = AuthType::PIN;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
+    info.publicKey.resize(32);
+    uint64_t index = 0;
+    std::vector<uint8_t> publicKey;
+    std::vector<uint64_t> templateIds;
+
+    EXPECT_EQ(service->AddExecutor(info, index, publicKey, templateIds), 0);
+    EXPECT_NE(index, 0);
+    EXPECT_FALSE(publicKey.empty());
+
+    std::vector<uint8_t> authToken;
+    EnrollParam param = {};
+    param.authType = AuthType::PIN;
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 0);
     EXPECT_EQ(service->CancelEnrollment(userId), 0);
 
     EXPECT_EQ(service->DeleteExecutor(index), 0);
@@ -421,9 +524,9 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_005, TestSize.
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
     ExecutorRegisterInfo info = {};
-    info.authType = PIN;
-    info.executorRole = ALL_IN_ONE;
-    info.esl = ESL0;
+    info.authType = AuthType::PIN;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
     info.publicKey.resize(32);
     uint64_t index = 0;
     std::vector<uint8_t> publicKey;
@@ -433,7 +536,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_005, TestSize.
 
     std::vector<uint8_t> authToken;
     EnrollParam param = {};
-    param.authType = PIN;
+    param.authType = AuthType::PIN;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginEnrollment(userId, authToken, param, scheduleInfo), 0);
 
@@ -458,7 +561,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_006, TestSize.
 
     RegisterAllExecutor(service);
 
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> authToken;
     EnrollResultTest enrollResultTest = {};
     DoOnceEnroll(service, userId, authType, authToken, enrollResultTest);
@@ -524,6 +627,33 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthentication_002, TestSize.Lev
     EXPECT_EQ(service->BeginAuthentication(contextId, param, scheduleInfos), 10);
 }
 
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthenticationV1_1_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    uint64_t contextId = 123456;
+    AuthSolution param = {};
+    param.challenge.resize(100);
+    std::vector<ScheduleInfoV1_1> scheduleInfos;
+    EXPECT_EQ(service->BeginAuthenticationV1_1(contextId, param, scheduleInfos), 10003);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthenticationV1_1_002, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    uint64_t contextId = 123456;
+    AuthSolution param = {};
+    std::vector<ScheduleInfoV1_1> scheduleInfos;
+    EXPECT_EQ(service->BeginAuthenticationV1_1(contextId, param, scheduleInfos), 10);
+}
+
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_001, TestSize.Level0)
 {
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
@@ -577,7 +707,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestS
 
     RegisterAllExecutor(service);
 
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> authToken;
     EnrollResultTest enrollResultTest = {};
     DoOnceEnroll(service, userId, authType, authToken, enrollResultTest);
@@ -619,7 +749,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelAuthentication_002, TestSize.Le
 
     RegisterAllExecutor(service);
 
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> authToken;
     EnrollResultTest enrollResultTest = {};
     DoOnceEnroll(service, userId, authType, authToken, enrollResultTest);
@@ -653,7 +783,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_001, TestSize.Lev
     EXPECT_EQ(service->Init(), 0);
 
     uint64_t contextId = 123456;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     uint32_t executorSensorHint = 0;
     ScheduleInfo scheduleInfo = {};
@@ -669,7 +799,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_002, TestSize.Lev
     EXPECT_EQ(service->Init(), 0);
 
     uint64_t contextId = 623159;
-    AuthType authType = FACE;
+    AuthType authType = AuthType::FACE;
     std::vector<uint8_t> challenge;
     uint32_t executorSensorHint = 0;
     ScheduleInfo scheduleInfo = {};
@@ -685,9 +815,9 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_003, TestSize.Lev
     EXPECT_EQ(service->Init(), 0);
 
     ExecutorRegisterInfo info = {};
-    info.authType = FACE;
-    info.executorRole = ALL_IN_ONE;
-    info.esl = ESL0;
+    info.authType = AuthType::FACE;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
     EXPECT_EQ(GetExecutorPublicKey(info.publicKey), 0);
     uint64_t index = 0;
     std::vector<uint8_t> publicKey;
@@ -695,11 +825,70 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_003, TestSize.Lev
     EXPECT_EQ(service->AddExecutor(info, index, publicKey, templateIds), 0);
 
     uint64_t contextId = 623159;
-    AuthType authType = FACE;
+    AuthType authType = AuthType::FACE;
     std::vector<uint8_t> challenge;
     uint32_t executorSensorHint = 0;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginIdentification(contextId, authType, challenge, executorSensorHint, scheduleInfo), 0);
+
+    EXPECT_EQ(service->DeleteExecutor(index), 0);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentificationV1_1_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    uint64_t contextId = 123456;
+    AuthType authType = AuthType::PIN;
+    std::vector<uint8_t> challenge;
+    uint32_t executorSensorHint = 0;
+    ScheduleInfoV1_1 scheduleInfo = {};
+
+    EXPECT_EQ(service->BeginIdentificationV1_1(contextId, authType, challenge, executorSensorHint, scheduleInfo), 8);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentificationV1_1_002, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    uint64_t contextId = 623159;
+    AuthType authType = AuthType::FACE;
+    std::vector<uint8_t> challenge;
+    uint32_t executorSensorHint = 0;
+    ScheduleInfoV1_1 scheduleInfo = {};
+
+    EXPECT_EQ(service->BeginIdentificationV1_1(contextId, authType, challenge, executorSensorHint, scheduleInfo), 2);
+}
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentificationV1_1_003, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    ExecutorRegisterInfo info = {};
+    info.authType = AuthType::FACE;
+    info.executorRole = ExecutorRole::ALL_IN_ONE;
+    info.esl = ExecutorSecureLevel::ESL0;
+    EXPECT_EQ(GetExecutorPublicKey(info.publicKey), 0);
+    uint64_t index = 0;
+    std::vector<uint8_t> publicKey;
+    std::vector<uint64_t> templateIds;
+    EXPECT_EQ(service->AddExecutor(info, index, publicKey, templateIds), 0);
+
+    uint64_t contextId = 623159;
+    AuthType authType = AuthType::FACE;
+    std::vector<uint8_t> challenge;
+    uint32_t executorSensorHint = 0;
+    ScheduleInfoV1_1 scheduleInfo = {};
+    EXPECT_EQ(service->BeginIdentificationV1_1(contextId, authType, challenge, executorSensorHint, scheduleInfo), 0);
 
     EXPECT_EQ(service->DeleteExecutor(index), 0);
 }
@@ -735,19 +924,19 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_002, TestS
 
     EnrollResultTest enrollPinResultTest = {};
     std::vector<uint8_t> authToken;
-    DoOnceEnroll(service, userId, PIN, authToken, enrollPinResultTest);
+    DoOnceEnroll(service, userId, AuthType::PIN, authToken, enrollPinResultTest);
     EXPECT_EQ(enrollPinResultTest.result, 0);
 
     AuthResultTest authResultTest = {};
-    DoOnceAuth(service, userId, PIN, challenge, authResultTest);
+    DoOnceAuth(service, userId, AuthType::PIN, challenge, authResultTest);
     EXPECT_EQ(authResultTest.result, 0);
 
     EnrollResultTest enrollFaceResultTest = {};
-    DoOnceEnroll(service, userId, FACE, authResultTest.token, enrollFaceResultTest);
+    DoOnceEnroll(service, userId, AuthType::FACE, authResultTest.token, enrollFaceResultTest);
     EXPECT_EQ(enrollFaceResultTest.result, 0);
 
     uint64_t contextId = 623159;
-    AuthType authType = FACE;
+    AuthType authType = AuthType::FACE;
     uint32_t executorSensorHint = 0;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginIdentification(contextId, authType, challenge, executorSensorHint, scheduleInfo), 0);
@@ -797,19 +986,19 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelIdentification_002, TestSize.Le
 
     EnrollResultTest enrollPinResultTest = {};
     std::vector<uint8_t> authToken;
-    DoOnceEnroll(service, userId, PIN, authToken, enrollPinResultTest);
+    DoOnceEnroll(service, userId, AuthType::PIN, authToken, enrollPinResultTest);
     EXPECT_EQ(enrollPinResultTest.result, 0);
 
     AuthResultTest authResultTest = {};
-    DoOnceAuth(service, userId, PIN, challenge, authResultTest);
+    DoOnceAuth(service, userId, AuthType::PIN, challenge, authResultTest);
     EXPECT_EQ(authResultTest.result, 0);
 
     EnrollResultTest enrollFaceResultTest = {};
-    DoOnceEnroll(service, userId, FACE, authResultTest.token, enrollFaceResultTest);
+    DoOnceEnroll(service, userId, AuthType::FACE, authResultTest.token, enrollFaceResultTest);
     EXPECT_EQ(enrollFaceResultTest.result, 0);
 
     uint64_t contextId = 623159;
-    AuthType authType = FACE;
+    AuthType authType = AuthType::FACE;
     uint32_t executorSensorHint = 0;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginIdentification(contextId, authType, challenge, executorSensorHint, scheduleInfo), 0);
@@ -832,7 +1021,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetCredential_001, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 635648;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<CredentialInfo> credInfos;
 
     EXPECT_EQ(service->GetCredential(userId, authType, credInfos), 0);
@@ -847,7 +1036,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetCredential_002, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 635648;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -878,7 +1067,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetUserInfo_001, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 635648;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -890,7 +1079,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetUserInfo_001, TestSize.Level0)
     EXPECT_EQ(enrollResultTest.result, 0);
 
     uint64_t secureUid = 0;
-    PinSubType subType = PIN_SIX;
+    PinSubType subType = PinSubType::PIN_SIX;
     std::vector<EnrolledInfo> enrolledInfos;
     EXPECT_EQ(service->GetUserInfo(userId, secureUid, subType, enrolledInfos), 0);
     EXPECT_TRUE(!enrolledInfos.empty());
@@ -927,7 +1116,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_002, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 321657;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -971,7 +1160,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnforceDeleteUser_002, TestSize.Level
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 635678;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -998,7 +1187,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_001, TestSize.Level
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 325614;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     uint32_t authTrustLevel = 0;
     EXPECT_EQ(service->GetAuthTrustLevel(userId, authType, authTrustLevel), 5);
 }
@@ -1011,7 +1200,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_002, TestSize.Level
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 325614;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1041,7 +1230,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdatePin, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 325678;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1075,7 +1264,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnrollTwice, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 363156;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1107,7 +1296,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestInitTwice, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 368635;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1135,7 +1324,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     EXPECT_EQ(service->Init(), 0);
 
     int32_t userId = 365861;
-    AuthType authType = PIN;
+    AuthType authType = AuthType::PIN;
     std::vector<uint8_t> challenge;
     EXPECT_EQ(service->OpenSession(userId, challenge), 0);
 
@@ -1175,7 +1364,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     DeleteAllExecutor(service);
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
-} // namespace V1_0
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

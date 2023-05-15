@@ -55,9 +55,6 @@ static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObj
     if (LoadCapabilityData() != HDF_SUCCESS) {
         ClearCapabilityData();
     }
-    if (DevHostRegisterDumpHost(DevCodecHostDump) != HDF_SUCCESS) {
-        CODEC_LOGE("DevHostRegisterDumpHost error!");
-    }
     return HDF_SUCCESS;
 }
 

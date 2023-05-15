@@ -350,8 +350,8 @@ static int32_t AudioHwiCommonSourceToHwiSource(const struct AudioRoute *route, s
 
 int32_t AudioHwiCommonRouteToHwiRoute(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute)
 {
-    int32_t sinkRet;
-    int32_t sourcesRet;
+    int32_t sinkRet = HDF_SUCCESS;
+    int32_t sourcesRet = HDF_SUCCESS;
 
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRoute, HDF_ERR_INVALID_PARAM);

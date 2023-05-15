@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "v1_0/user_auth_interface_service.h"
-
 #include <cstddef>
 #include <cstdint>
 
@@ -22,6 +20,9 @@
 
 #include "iam_fuzz_test.h"
 #include "iam_logger.h"
+
+#include "user_auth_hdi.h"
+#include "v1_1/user_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
@@ -33,7 +34,6 @@ using namespace OHOS::UserIam::Common;
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 namespace {
 const uint32_t MAX_FUZZ_STRUCT_LEN = 20;
 UserAuthInterfaceService g_service;
@@ -93,6 +93,28 @@ void FillFuzzScheduleInfoVector(Parcel &parcel, vector<ScheduleInfo> &vector)
     vector.resize(len);
     for (uint32_t i = 0; i < len; i++) {
         FillFuzzScheduleInfo(parcel, vector[i]);
+    }
+    IAM_LOGI("success");
+}
+
+void FillFuzzScheduleInfoV1_1(Parcel &parcel, ScheduleInfoV1_1 &scheduleInfo)
+{
+    scheduleInfo.scheduleId = parcel.ReadUint64();
+    FillFuzzUint64Vector(parcel, scheduleInfo.templateIds);
+    scheduleInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
+    scheduleInfo.executorMatcher = parcel.ReadUint32();
+    scheduleInfo.scheduleMode = static_cast<ScheduleMode>(parcel.ReadInt32());
+    FillFuzzExecutorInfoVector(parcel, scheduleInfo.executors);
+    FillFuzzUint8Vector(parcel, scheduleInfo.extraInfo);
+    IAM_LOGI("success");
+}
+
+void FillFuzzScheduleInfoV1_1Vector(Parcel &parcel, vector<ScheduleInfoV1_1> &vector)
+{
+    uint32_t len = parcel.ReadInt32() % MAX_FUZZ_STRUCT_LEN;
+    vector.resize(len);
+    for (uint32_t i = 0; i < len; i++) {
+        FillFuzzScheduleInfoV1_1(parcel, vector[i]);
     }
     IAM_LOGI("success");
 }
@@ -248,6 +270,21 @@ void FuzzBeginEnrollment(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzBeginEnrollmentV1_1(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    int32_t userId = parcel.ReadInt32();
+    std::vector<uint8_t> authToken;
+    FillFuzzUint8Vector(parcel, authToken);
+    EnrollParam param;
+    FillFuzzEnrollParam(parcel, param);
+    ScheduleInfoV1_1 info;
+    FillFuzzScheduleInfoV1_1(parcel, info);
+    g_service.BeginEnrollmentV1_1(userId, authToken, param, info);
+    IAM_LOGI("end");
+}
+
+
 void FuzzUpdateEnrollmentResult(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -340,6 +377,18 @@ void FuzzBeginAuthentication(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzBeginAuthenticationV1_1(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t contextId = parcel.ReadUint64();
+    AuthSolution param;
+    FillFuzzAuthSolution(parcel, param);
+    std::vector<ScheduleInfoV1_1> scheduleInfos;
+    FillFuzzScheduleInfoV1_1Vector(parcel, scheduleInfos);
+    g_service.BeginAuthenticationV1_1(contextId, param, scheduleInfos);
+    IAM_LOGI("end");
+}
+
 void FuzzUpdateAuthenticationResult(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -371,6 +420,20 @@ void FuzzBeginIdentification(Parcel &parcel)
     ScheduleInfo scheduleInfo;
     FillFuzzScheduleInfo(parcel, scheduleInfo);
     g_service.BeginIdentification(contextId, authType, challenge, executorId, scheduleInfo);
+    IAM_LOGI("end");
+}
+
+void FuzzBeginIdentificationV1_1(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t contextId = parcel.ReadUint64();
+    AuthType authType = static_cast<AuthType>(parcel.ReadInt32());
+    std::vector<uint8_t> challenge;
+    FillFuzzUint8Vector(parcel, challenge);
+    uint32_t executorId = parcel.ReadUint32();
+    ScheduleInfoV1_1 scheduleInfo;
+    FillFuzzScheduleInfoV1_1(parcel, scheduleInfo);
+    g_service.BeginIdentificationV1_1(contextId, authType, challenge, executorId, scheduleInfo);
     IAM_LOGI("end");
 }
 
@@ -422,7 +485,8 @@ FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOp
     FuzzBeginEnrollment, FuzzUpdateEnrollmentResult, FuzzCancelEnrollment, FuzzDeleteCredential, FuzzGetCredential,
     FuzzGetSecureInfo, FuzzDeleteUser, FuzzEnforceDeleteUser, FuzzBeginAuthentication, FuzzUpdateAuthenticationResult,
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
-    FuzzGetAuthTrustLevel, FuzzGetValidSolution};
+    FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzBeginEnrollmentV1_1, FuzzBeginAuthenticationV1_1,
+    FuzzBeginIdentificationV1_1 };
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {
@@ -435,7 +499,6 @@ void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
     return;
 }
 } // namespace
-} // namespace V1_0
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS
@@ -443,6 +506,6 @@ void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::HDI::UserAuth::V1_0::UserAuthHdiFuzzTest(data, size);
+    OHOS::HDI::UserAuth::UserAuthHdiFuzzTest(data, size);
     return 0;
 }

@@ -19,6 +19,8 @@
 #include "codec_component_config.h"
 #include "codec_log_wrapper.h"
 #include "v1_0/codec_component_manager_stub.h"
+#include "codec_dfx_service.h"
+#include <devhost_dump_reg.h>
 using namespace OHOS::HDI::Codec::V1_0;
 namespace {
     struct HdfCodecComponentManagerHost {
@@ -53,6 +55,9 @@ static int HdfCodecComponentManagerDriverInit(struct HdfDeviceObject *deviceObje
 {
     CODEC_LOGI("HdfCodecComponentManagerDriverInit enter");
     OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*deviceObject->property);
+    if (DevHostRegisterDumpHost(CodecDfxService::DevCodecHostDump) != HDF_SUCCESS) {
+        CODEC_LOGE("DevHostRegisterDumpHost error!");
+    }
     return HDF_SUCCESS;
 }
 

@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 struct TlvRequiredPara {
     uint32_t result;
     uint32_t remainAttempts;
@@ -35,7 +34,6 @@ struct TlvRequiredPara {
 ResultCode GenerateExecutorKeyPair();
 ResultCode GetExecutorResultTlv(const TlvRequiredPara &para, std::vector<uint8_t> &resultTlv);
 ResultCode GetExecutorPublicKey(std::vector<uint8_t> &vPubKey);
-} // namespace V1_0
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

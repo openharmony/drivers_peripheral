@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-namespace V1_0 {
 namespace {
     constexpr uint32_t EXECUTOR_TYPE = 0;
     constexpr uint32_t ENROLL_PIN = 0;
@@ -404,7 +403,34 @@ uint32_t ExecutorImpl::ScheduleMap::DeleteScheduleId(const uint64_t scheduleId)
     IAM_LOGE("Delete scheduleId fail");
     return HDF_FAILURE;
 }
-} // V1_0
+
+int32_t ExecutorImpl::GetProperty(
+    const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes, Property &property)
+{
+    IAM_LOGI("start");
+    if (pinHdi_ == nullptr) {
+        IAM_LOGE("pinHdi_ is nullptr");
+        return HDF_FAILURE;
+    }
+
+    if (templateIdList.size() != 1) {
+        IAM_LOGE("templateIdList size is not 1");
+        return HDF_FAILURE;
+    }
+
+    uint64_t templateId = templateIdList[0];
+    OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
+    int32_t result = pinHdi_->QueryPinInfo(templateId, infoRet);
+    if (result != SUCCESS) {
+        IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
+        return HDF_FAILURE;
+    }
+
+    property.authSubType = infoRet.subType;
+    property.remainAttempts = infoRet.remainTimes;
+    property.lockoutDuration = infoRet.freezingTime;
+    return HDF_SUCCESS;
+}
 } // PinAuth
 } // HDI
 } // OHOS

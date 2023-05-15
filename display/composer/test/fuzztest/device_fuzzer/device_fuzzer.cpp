@@ -17,77 +17,128 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <securec.h>
 #include <string>
 
 #include "display_common_fuzzer.h"
-#include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
-#include "v1_0/display_buffer_type.h"
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
 static std::shared_ptr<IDisplayComposerInterface> g_composerInterface = nullptr;
+static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
+
 static bool g_isInit = false;
+static const uint8_t* g_data = nullptr;
+static size_t g_dataSize = 0;
+static size_t g_pos;
 
-const InterfaceType CONVERT_TABLE_INTERFACE_TYPE[] = {
-    DISP_INTF_HDMI, DISP_INTF_LCD,
-    DISP_INTF_BT1120, DISP_INTF_BT656,
-    DISP_INTF_YPBPR, DISP_INTF_RGB,
-    DISP_INTF_CVBS, DISP_INTF_SVIDEO,
-    DISP_INTF_VGA, DISP_INTF_MIPI,
-    DISP_INTF_PANEL, DISP_INTF_BUTT,
-};
-
-static int32_t GetDisplayCapability(DisplayCapability& info, uint8_t* data, size_t size)
+/*
+* describe: get data from outside untrusted data(g_data) which size is according to sizeof(T)
+* tips: only support basic type
+*/
+template<class T>
+T GetData()
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
+    T object {};
+    size_t objectSize = sizeof(object);
+    if (g_data == nullptr || objectSize > g_dataSize - g_pos) {
+        return object;
     }
+    errno_t ret = memcpy_s(&object, objectSize, g_data + g_pos, objectSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_pos += objectSize;
+    return object;
+}
 
-    std::string tempName = reinterpret_cast<char*>(ShiftPointer(data, 0));
-    uint32_t tempType = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName)));
+/*
+* get a string from g_data
+*/
+std::string GetStringFromData(int strlen)
+{
+    char cstr[strlen];
+    cstr[strlen - 1] = '\0';
+    for (int i = 0; i < strlen - 1; i++) {
+        cstr[i] = GetData<char>();
+    }
+    std::string str(cstr);
+    return str;
+}
+
+static int32_t GetDisplayCapability(DisplayCapability& info)
+{
     uint32_t lenType = GetArrLength(CONVERT_TABLE_INTERFACE_TYPE);
     if (lenType == 0) {
         HDF_LOGE("%{public}s: CONVERT_TABLE_INTERFACE_TYPE length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    uint32_t tempPhyWidth = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) + sizeof(tempType)));
-    uint32_t tempPhyHeight = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) + sizeof(tempType) +
-        sizeof(tempPhyWidth)));
-    uint32_t tempSupportLayers = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) + sizeof(tempType) +
-        sizeof(tempPhyWidth) + sizeof(tempPhyHeight)));
-    uint32_t tempVirtualDispCount = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) +
-        sizeof(tempType) + sizeof(tempPhyWidth) + sizeof(tempPhyHeight) + sizeof(tempSupportLayers)));
-    uint32_t tempSupportWriteBack = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) +
-        sizeof(tempType) + sizeof(tempPhyWidth) + sizeof(tempPhyHeight) + sizeof(tempSupportLayers) +
-        sizeof(tempVirtualDispCount)));
-    uint32_t tempPropertyCount = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempName) + sizeof(tempType) +
-        sizeof(tempPhyWidth) + sizeof(tempPhyHeight) + sizeof(tempSupportLayers) + sizeof(tempVirtualDispCount) +
-        sizeof(tempSupportWriteBack)));
 
-    info.name = tempName;
-    info.type = CONVERT_TABLE_INTERFACE_TYPE[tempType % lenType];
-    info.phyWidth = tempPhyWidth;
-    info.phyHeight = tempPhyHeight;
-    info.supportLayers = tempSupportLayers;
-    info.virtualDispCount = tempVirtualDispCount;
-    info.supportWriteBack = tempSupportWriteBack;
-    info.propertyCount = tempPropertyCount;
+    info.name = GetStringFromData(STR_LEN);
+    info.type = CONVERT_TABLE_INTERFACE_TYPE[GetData<uint32_t>() % lenType];
+    info.phyWidth = GetData<uint32_t>();
+    info.phyHeight = GetData<uint32_t>();
+    info.supportLayers = GetData<uint32_t>();
+    info.virtualDispCount = GetData<uint32_t>();
+    info.supportWriteBack = GetData<uint32_t>();
+    info.propertyCount = GetData<uint32_t>();
     return DISPLAY_SUCCESS;
 }
 
-int32_t TestGetDisplayCapability(uint8_t* data, size_t size, uint32_t devId)
+static int32_t GetAllocInfo(AllocInfo& info)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
+    uint32_t lenUsage = GetArrLength(CONVERT_TABLE_USAGE);
+    if (lenUsage == 0) {
+        HDF_LOGE("%{public}s: CONVERT_TABLE_USAGE length is equal to 0", __func__);
+        return DISPLAY_FAILURE;
+    }
+    uint32_t lenFormat = GetArrLength(CONVERT_TABLE_FORMAT);
+    if (lenFormat == 0) {
+        HDF_LOGE("%{public}s: CONVERT_TABLE_FORMAT length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
 
+    info.width = GetData<uint32_t>() % WIDTH;
+    info.height = GetData<uint32_t>() % HEIGHT;
+    info.usage = CONVERT_TABLE_USAGE[GetData<uint32_t>() % lenUsage];
+    info.format = CONVERT_TABLE_FORMAT[GetData<uint32_t>() % lenFormat];
+    info.expectedSize = info.width * info.height;
+    return DISPLAY_SUCCESS;
+}
+
+static int32_t GetIRect(IRect& rect)
+{
+    rect.x = GetData<int32_t>();
+    rect.y = GetData<int32_t>();
+    rect.w = GetData<int32_t>();
+    rect.h = GetData<int32_t>();
+    return DISPLAY_SUCCESS;
+}
+
+BufferHandle* UsingAllocmem()
+{
+    AllocInfo info = { 0 };
+    int32_t ret = GetAllocInfo(info);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function GetAllocInfo failed", __func__);
+        return nullptr;
+    }
+
+    BufferHandle* handle = nullptr;
+    ret = g_bufferInterface->AllocMem(info, handle);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function AllocMem failed", __func__);
+        return nullptr;
+    }
+    return handle;
+}
+
+int32_t TestGetDisplayCapability(uint32_t devId)
+{
     DisplayCapability info = { 0 };
-    int32_t ret = GetDisplayCapability(info, data, size);
+    int32_t ret = GetDisplayCapability(info);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetDisplayCapability failed", __func__);
         return DISPLAY_FAILURE;
@@ -100,48 +151,17 @@ int32_t TestGetDisplayCapability(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-static int32_t GetDisplayModeInfo(DisplayModeInfo& info, uint8_t* data, size_t size)
+int32_t TestGetDisplaySupportedModes(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    // This will be read width, height, freshRate and id of display mode info,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(int32_t) + sizeof(int32_t) + sizeof(uint32_t) + sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    int32_t tempWidth = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
-    int32_t tempHeight = *reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(tempWidth)));
-    uint32_t tempFreshRate = *reinterpret_cast<uint32_t*>(ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight)));
-    int32_t tempId = *reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(tempWidth) + sizeof(tempHeight) +
-        sizeof(tempFreshRate)));
-    info.width = tempWidth % WIDTH;
-    info.height = tempHeight % HEIGHT;
-    info.freshRate = tempFreshRate;
-    info.id = tempId;
-    return DISPLAY_SUCCESS;
-}
-
-int32_t TestGetDisplaySupportedModes(uint8_t* data, size_t size, uint32_t devId)
-{
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     DisplayModeInfo info = { 0 };
-    int32_t ret = GetDisplayModeInfo(info, data, size);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function GetDisplayModeInfo failed", __func__);
-        return DISPLAY_FAILURE;
-    }
+    info.width = GetData<int32_t>() % WIDTH;
+    info.height = GetData<int32_t>() % HEIGHT;
+    info.freshRate = GetData<uint32_t>();
+    info.id = GetData<int32_t>();
+
     std::vector<DisplayModeInfo> infos;
     infos.push_back(info);
-    ret = g_composerInterface->GetDisplaySupportedModes(devId, infos);
+    int32_t ret = g_composerInterface->GetDisplaySupportedModes(devId, infos);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetDisplaySupportedModes failed", __func__);
         return DISPLAY_FAILURE;
@@ -149,19 +169,9 @@ int32_t TestGetDisplaySupportedModes(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetGetDisplayMode(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetGetDisplayMode(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t modeId = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
+    uint32_t modeId = GetData<uint32_t>();
     int32_t ret = g_composerInterface->SetDisplayMode(devId, modeId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayMode failed", __func__);
@@ -175,30 +185,14 @@ int32_t TestSetGetDisplayMode(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetGetDisplayPowerStatus(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetGetDisplayPowerStatus(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    static const DispPowerStatus CONVERT_TABLE[] = {
-        POWER_STATUS_ON, POWER_STATUS_STANDBY,
-        POWER_STATUS_SUSPEND, POWER_STATUS_OFF,
-        POWER_STATUS_BUTT,
-    };
-    uint32_t tableIndex = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint32_t len = GetArrLength(CONVERT_TABLE);
+    uint32_t len = GetArrLength(CONVERT_TABLE_POWER_STATUS);
     if (len == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE length is equal to 0", __func__);
+        HDF_LOGE("%{public}s: CONVERT_TABLE_POWER_STATUS length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    DispPowerStatus status = CONVERT_TABLE[tableIndex % len];
+    DispPowerStatus status = CONVERT_TABLE_POWER_STATUS[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetDisplayPowerStatus(devId, status);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayPowerStatus failed", __func__);
@@ -212,20 +206,9 @@ int32_t TestSetGetDisplayPowerStatus(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestPrepareDisplayLayers(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestPrepareDisplayLayers(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempNeedFlushFb = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    bool needFlushFb = GetRandBoolValue(tempNeedFlushFb);
+    bool needFlushFb = GetRandBoolValue(GetData<uint32_t>());
     int32_t ret = g_composerInterface->PrepareDisplayLayers(devId, needFlushFb);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function PrepareDisplayLayers failed", __func__);
@@ -234,19 +217,9 @@ int32_t TestPrepareDisplayLayers(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetGetDisplayBacklight(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetGetDisplayBacklight(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t level = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
+    uint32_t level = GetData<uint32_t>();
     int32_t ret = g_composerInterface->SetDisplayBacklight(devId, level);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayBacklight failed", __func__);
@@ -260,20 +233,10 @@ int32_t TestSetGetDisplayBacklight(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestGetDisplayProperty(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestGetDisplayProperty(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint64_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t id = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint64_t value = *reinterpret_cast<uint64_t*>(ShiftPointer(data, sizeof(id)));
+    uint32_t id = GetData<uint32_t>();
+    uint64_t value = GetData<uint32_t>();
     int32_t ret = g_composerInterface->GetDisplayProperty(devId, id, value);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetDisplayProperty failed", __func__);
@@ -282,24 +245,12 @@ int32_t TestGetDisplayProperty(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestGetDisplayCompChange(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestGetDisplayCompChange(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    // This will be read device id, layer id, and type,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
     std::vector<uint32_t> layers;
-    layers.push_back(*reinterpret_cast<uint32_t*>(ShiftPointer(data, 0)));
+    layers.push_back(GetData<uint32_t>());
     std::vector<int32_t> types;
-    types.push_back(*reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(layers))));
+    types.push_back(GetData<int32_t>());
 
     int32_t ret = g_composerInterface->GetDisplayCompChange(devId, layers, types);
     if (ret != DISPLAY_SUCCESS) {
@@ -309,15 +260,10 @@ int32_t TestGetDisplayCompChange(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetDisplayClientCrop(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetDisplayClientCrop(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     IRect rect;
-    int32_t ret = GetIRect(rect, data, size);
+    int32_t ret = GetIRect(rect);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -330,45 +276,26 @@ int32_t TestSetDisplayClientCrop(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetDisplayClientBuffer(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetDisplayClientBuffer(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    int32_t fence = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
-    const BufferHandle* BUFFER = UsingAllocmem(data, size);
-    if (BUFFER == nullptr) {
+    int32_t fence = GetData<int32_t>();
+    const BufferHandle* buffer = UsingAllocmem();
+    if (buffer == nullptr) {
         HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
         return DISPLAY_FAILURE;
     }
-    int32_t ret = g_composerInterface->SetDisplayClientBuffer(devId, *BUFFER, fence);
+    int32_t ret = g_composerInterface->SetDisplayClientBuffer(devId, *buffer, fence);
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function SetLayerBuffer failed", __func__);
+        HDF_LOGE("%{public}s: function TestSetDisplayClientBuffer failed", __func__);
     }
+    g_bufferInterface->FreeMem(*buffer);
     return ret;
 }
 
-int32_t TestSetDisplayClientDamage(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetDisplayClientDamage(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
     IRect rect;
-    int32_t ret = GetIRect(rect, data, size);
+    int32_t ret = GetIRect(rect);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function GetIRect failed", __func__);
         return DISPLAY_FAILURE;
@@ -382,20 +309,9 @@ int32_t TestSetDisplayClientDamage(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetDisplayVsyncEnabled(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetDisplayVsyncEnabled(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t tempEnabled = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    bool enabled = GetRandBoolValue(tempEnabled);
+    bool enabled = GetRandBoolValue(GetData<uint32_t>());
     int32_t ret = g_composerInterface->SetDisplayVsyncEnabled(devId, enabled);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayVsyncEnabled failed", __func__);
@@ -403,20 +319,10 @@ int32_t TestSetDisplayVsyncEnabled(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestRegDisplayVBlankCallback(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestRegDisplayVBlankCallback(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t) + sizeof(VBlankCallback);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t param1 = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    VBlankCallback param2 = reinterpret_cast<VBlankCallback>(ShiftPointer(data, sizeof(param1)));
+    uint32_t param1 = GetData<uint32_t>();
+    VBlankCallback param2 = GetData<VBlankCallback>();
     void* param3 = malloc(PARAM_VOIDPTR_LEN);
     if (param3 == nullptr) {
         HDF_LOGE("%{public}s: void* param3 malloc failed", __func__);
@@ -431,25 +337,12 @@ int32_t TestRegDisplayVBlankCallback(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestGetDisplayReleaseFence(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestGetDisplayReleaseFence(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    // This will be read device id, layer id, and fence,
-    // so we determine whether the size of the data is sufficient.
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     std::vector<uint32_t> layers;
-    layers.push_back(*reinterpret_cast<uint32_t*>(ShiftPointer(data, 0)));
+    layers.push_back(GetData<uint32_t>());
     std::vector<int32_t> fences;
-    fences.push_back(*reinterpret_cast<int32_t*>(ShiftPointer(data, sizeof(layers))));
+    fences.push_back(GetData<int32_t>());
 
     int32_t ret = g_composerInterface->GetDisplayReleaseFence(devId, layers, fences);
     if (ret != DISPLAY_SUCCESS) {
@@ -458,13 +351,8 @@ int32_t TestGetDisplayReleaseFence(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestDestroyVirtualDisplay(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestDestroyVirtualDisplay(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
     int32_t ret = g_composerInterface->DestroyVirtualDisplay(devId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function DestroyVirtualDisplay failed", __func__);
@@ -472,20 +360,10 @@ int32_t TestDestroyVirtualDisplay(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-int32_t TestSetVirtualDisplayBuffer(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetVirtualDisplayBuffer(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    int32_t fence = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
-    BufferHandle* buffer = UsingAllocmem(data, size);
+    int32_t fence = GetData<int32_t>();
+    BufferHandle* buffer = UsingAllocmem();
     if (buffer == nullptr) {
         HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
         return DISPLAY_FAILURE;
@@ -494,43 +372,24 @@ int32_t TestSetVirtualDisplayBuffer(uint8_t* data, size_t size, uint32_t devId)
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetVirtualDisplayBuffer failed", __func__);
     }
+    g_bufferInterface->FreeMem(*buffer);
     return ret;
 }
 
-int32_t TestSetDisplayProperty(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestSetDisplayProperty(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(uint32_t) + sizeof(uint64_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t id = *reinterpret_cast<uint32_t*>(ShiftPointer(data, 0));
-    uint64_t value = *reinterpret_cast<uint64_t*>(ShiftPointer(data, sizeof(id)));
+    uint32_t id = GetData<uint32_t>();
+    uint64_t value = GetData<uint64_t>();
     int32_t ret = g_composerInterface->SetDisplayProperty(devId, id, value);
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: SetDisplayProperty Commit failed", __func__);
+        HDF_LOGE("%{public}s: SetDisplayProperty failed", __func__);
     }
     return ret;
 }
 
-int32_t TestCommit(uint8_t* data, size_t size, uint32_t devId)
+int32_t TestCommit(uint32_t devId)
 {
-    if (data == nullptr) {
-        HDF_LOGE("function %{public}s data is null", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    size_t usedLen = sizeof(int32_t);
-    if (usedLen > size) {
-        HDF_LOGE("%{public}s: usedLen greater than size", __func__);
-        return DISPLAY_FAILURE;
-    }
-    int32_t fence = *reinterpret_cast<int32_t*>(ShiftPointer(data, 0));
+    int32_t fence = GetData<int32_t>();
     int32_t ret = g_composerInterface->Commit(devId, fence);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function Commit failed", __func__);
@@ -538,7 +397,7 @@ int32_t TestCommit(uint8_t* data, size_t size, uint32_t devId)
     return ret;
 }
 
-typedef int32_t (*TestFuncs[])(uint8_t*, size_t, uint32_t);
+typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
     TestGetDisplayCapability,
@@ -562,10 +421,11 @@ TestFuncs g_testFuncs = {
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
 {
-    if (rawData == nullptr || size < (OFFSET + OFFSET)) {
+    if (rawData == nullptr) {
         return false;
     }
 
+    // initialize service
     if (!g_isInit) {
         g_isInit = true;
         g_composerInterface.reset(IDisplayComposerInterface::Get());
@@ -573,27 +433,27 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;
         }
+        g_bufferInterface.reset(IDisplayBuffer::Get());
+        if (g_bufferInterface == nullptr) {
+            HDF_LOGE("%{public}s: get IDisplayBuffer failed", __func__);
+            return false;
+        }
     }
 
-    uint32_t code = Convert2Uint32(rawData, size);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
-    uint32_t devId = Convert2Uint32(rawData, size);
-    rawData = rawData + OFFSET;
+    // initialize data
+    g_data = rawData;
+    g_dataSize = size;
+    g_pos = 0;
 
-    uint8_t* data = const_cast<uint8_t*>(rawData);
-    if (data == nullptr) {
-        HDF_LOGE("%{public}s: can not get data", __func__);
-        return false;
-    }
-
+    uint32_t code = GetData<uint32_t>();
+    uint32_t devId = GetData<uint32_t>();
     uint32_t len = GetArrLength(g_testFuncs);
     if (len == 0) {
         HDF_LOGE("%{public}s: g_testFuncs length is equal to 0", __func__);
         return false;
     }
 
-    int32_t ret = g_testFuncs[code % len](data, size, devId);
+    int32_t ret = g_testFuncs[code % len](devId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("function %{public}u failed", code % len);
         return false;

@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-#include "v1_0/pin_auth_interface_service.h"
+#include "v1_1/pin_auth_interface_service.h"
+
 #include <hdf_base.h>
+
 #include "iam_logger.h"
 #include "iam_ptr.h"
+
+#include "pin_auth_hdi.h"
 #include "pin_auth.h"
 #include "executor_impl.h"
 
@@ -25,7 +29,6 @@
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-namespace V1_0 {
 extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
 {
     auto pinAuthInterfaceService = new (std::nothrow) PinAuthInterfaceService();
@@ -36,7 +39,17 @@ extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
     return pinAuthInterfaceService;
 }
 
-int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &executorList)
+int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList)
+{
+    std::vector<sptr<IExecutor>> executorListV1_1;
+    int32_t result = GetExecutorListV1_1(executorListV1_1);
+    for (auto &executor : executorListV1_1) {
+        executorList.push_back(executor);
+    }
+    return result;
+}
+
+int32_t PinAuthInterfaceService::GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList)
 {
     IAM_LOGI("start");
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi =
@@ -54,7 +67,6 @@ int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &e
     IAM_LOGI("end");
     return HDF_SUCCESS;
 }
-} // V1_0
 } // PinAuth
 } // HDI
 } // OHOS
