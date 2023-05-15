@@ -36,6 +36,7 @@ public:
     ~CodecComponentConfig() = default;
     static CodecComponentConfig *GetInstance();
     void Init(const DeviceResourceNode &node);
+    int32_t CodecCompCapabilityInit();
     int32_t GetComponentNum(int32_t &count);
     int32_t GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count);
 
