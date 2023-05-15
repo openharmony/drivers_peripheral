@@ -250,6 +250,11 @@ int32_t RilImpl::GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t 
     return TaskSchedule(&Telephony::HRilManager::GetLinkBandwidthInfo, slotId, serialId, cid);
 }
 
+int32_t RilImpl::GetLinkCapability(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetLinkCapability, slotId, serialId);
+}
+
 int32_t RilImpl::SetLinkBandwidthReportingRule(
     int32_t slotId, int32_t serialId, const DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule)
 {
