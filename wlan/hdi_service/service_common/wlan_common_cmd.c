@@ -808,8 +808,10 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         ret = g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
-            (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-            return ret;
+        }
+        ret = WlanInterfaceUnregisterHid2dCallback(HdfWlanNetlinkCallbackFun, ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Unregister Hid2dCallback failed!, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
