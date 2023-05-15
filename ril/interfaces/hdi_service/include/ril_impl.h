@@ -79,6 +79,7 @@ public:
     int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const UniInfo &uniInfo) override;
     int32_t SetInitApnInfo(int32_t slotId, int32_t serialId, const DataProfileDataInfo &dataProfileDataInfo) override;
     int32_t GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t cid) override;
+    int32_t GetLinkCapability(int32_t slotId, int32_t serialId) override;
     int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
         const DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule) override;
     int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted) override;
