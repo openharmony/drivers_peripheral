@@ -16,14 +16,22 @@
 #include <sys/time.h>
 #include <fstream>
 #include <sstream>
+#include <cstdio>
 #include "camera_dump.h"
 #include "v1_0/types.h"
 #include "camera.h"
 
+using namespace std;
+
 namespace OHOS::Camera {
-const std::string DUMP_PATH = "/data/log/hidumper/";
+const std::string DUMP_PATH = "/data/camera/";
 constexpr uint32_t ARGS_MAX_NUM = 5;
 constexpr uint32_t PATH_MAX_LEN = 200;
+constexpr int32_t READ_DISKINFO_NUM = 6;
+constexpr uint32_t MAX_USAGE_RATE = 70;
+constexpr int32_t CHECK_DISKINFO_TIME_MS = 10000;
+#define TITLEINFO_ARRAY_SIZE 200
+
 const char *g_cameraDumpHelp =
     " Camera manager dump options:\n"
     "     -h: camera dump help\n"
@@ -35,6 +43,20 @@ std::map<DumpType, bool> g_dumpInfoMap = {
     {MedataType, false},
     {BufferType, false}
 };
+
+struct DiskInfo {
+    char diskName[100];
+    uint32_t diskTotal;
+    uint32_t diskUse;
+    uint32_t canUse;
+    uint32_t diskUsePer;
+    char diskMountInfo[200];
+};
+
+CameraDumper::~CameraDumper()
+{
+    StopCheckDiskInfo();
+}
 
 bool CameraDumper::DumpBuffer(const std::shared_ptr<IBuffer>& buffer)
 {
@@ -107,20 +129,29 @@ bool CameraDumper::DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata,
 void CameraDumper::UpdateDumpMode(DumpType type, bool isDump, HdfSBuf *reply)
 {
     std::string upRetStr;
-
-    auto it = g_dumpInfoMap.find(type);
-    if (it != g_dumpInfoMap.end()) {
-        g_dumpInfoMap[type] = isDump;
-        upRetStr += " set dump mode success!\n";
+    {
+        std::lock_guard<std::mutex> l(dumpStateLock_);
+        auto it = g_dumpInfoMap.find(type);
+        if (it != g_dumpInfoMap.end()) {
+            g_dumpInfoMap[type] = isDump;
+            upRetStr += " set dump mode success!\n";
+        }
     }
 
     if (reply != nullptr) {
         (void)HdfSbufWriteString(reply, upRetStr.c_str());
     }
+
+    if (isDump) {
+        StartCheckDiskInfo();
+    } else {
+        StopCheckDiskInfo();
+    }
 }
 
 bool CameraDumper::IsDumpOpened(DumpType type)
 {
+    std::lock_guard<std::mutex> l(dumpStateLock_);
     if (g_dumpInfoMap.find(type) != g_dumpInfoMap.end() && g_dumpInfoMap[type]) {
         return true;
     }
@@ -129,6 +160,10 @@ bool CameraDumper::IsDumpOpened(DumpType type)
 
 bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32_t size)
 {
+    std::stringstream mkdirCmd;
+    mkdirCmd << "mkdir -p " << DUMP_PATH;
+    system(mkdirCmd.str().c_str());
+
     std::stringstream ss;
     ss << DUMP_PATH << fileName;
     std::ofstream ofs(ss.str(), std::ios::app);
@@ -198,8 +233,96 @@ void CameraDumper::CameraHostDumpProcess(HdfSBuf *data, HdfSBuf *reply)
 
 int32_t CameraDumpEvent(HdfSBuf *data, HdfSBuf *reply)
 {
-    CameraDumper::GetInstance().CameraHostDumpProcess(data, reply);
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.CameraHostDumpProcess(data, reply);
     return HDF_SUCCESS;
 }
 
+void CameraDumper::CheckDiskInfo()
+{
+    DiskInfo diskInfo;
+    auto ret = memset_s(&diskInfo, sizeof(DiskInfo), 0, sizeof(DiskInfo));
+    if (ret != EOK) {
+        CAMERA_LOGE("diskInfo memset failed!");
+        return;
+    }
+    stringstream ss;
+    ss << "df " << DUMP_PATH;
+
+    FILE *fp = popen(ss.str().c_str(), "r");
+    if (fp == NULL) {
+        CAMERA_LOGE("popen failed, cmd : %{public}s", ss.str().c_str());
+        return;
+    }
+
+    char titleInfo[TITLEINFO_ARRAY_SIZE] = {0};
+    fgets(titleInfo, sizeof(titleInfo) / sizeof(titleInfo[0]) - 1, fp);
+    int readNum = fscanf_s(fp, "%s %u %u %u %u%% %s\n", diskInfo.diskName, sizeof(diskInfo.diskName) - 1,
+        &diskInfo.diskTotal, &diskInfo.diskUse, &diskInfo.canUse, &diskInfo.diskUsePer, diskInfo.diskMountInfo,
+        sizeof(diskInfo.diskMountInfo) - 1);
+    pclose(fp);
+
+    if (readNum != READ_DISKINFO_NUM) {
+        CAMERA_LOGD("readNum != READ_DISKINFO_NUM readNum: %{public}d", readNum);
+        return;
+    }
+
+    if (diskInfo.diskUsePer >= MAX_USAGE_RATE) {
+        std::lock_guard<std::mutex> l(dumpStateLock_);
+        for (auto it = g_dumpInfoMap.begin(); it != g_dumpInfoMap.end(); it++) {
+            it->second = false;
+        }
+        CAMERA_LOGD("readNum: %{public}d, diskName: %{public}s, diskUsePer: %{public}u%% diskMountInfo: %{public}s",
+            readNum, diskInfo.diskName, diskInfo.diskUsePer, diskInfo.diskMountInfo);
+    }
+}
+
+void CameraDumper::ThreadWorkFun()
+{
+    while (true) {
+        CheckDiskInfo();
+
+        std::unique_lock<std::mutex> l(terminateLock_);
+        cv_.wait_for(l, std::chrono::milliseconds(CHECK_DISKINFO_TIME_MS),
+            [this]() {
+                return terminate_;
+            }
+        );
+
+        if (terminate_) {
+            break;
+        }
+    }
+}
+
+void CameraDumper::StartCheckDiskInfo()
+{
+    {
+        std::unique_lock<std::mutex> l(terminateLock_);
+        if (terminate_ == false) {
+            CAMERA_LOGD("thread is already start");
+            return;
+        }
+        terminate_ = false;
+    }
+
+    handleThread_ = std::make_unique<std::thread>(&CameraDumper::ThreadWorkFun, this);
+}
+
+void CameraDumper::StopCheckDiskInfo()
+{
+    {
+        std::unique_lock<std::mutex> l(terminateLock_);
+        if (terminate_ == true) {
+            CAMERA_LOGD("thread is already stop");
+            return;
+        }
+        terminate_ = true;
+        cv_.notify_one();
+    }
+    if (handleThread_ != nullptr && handleThread_->joinable()) {
+        handleThread_->join();
+        handleThread_ = nullptr;
+    }
+}
 } // namespace OHOS::Camera

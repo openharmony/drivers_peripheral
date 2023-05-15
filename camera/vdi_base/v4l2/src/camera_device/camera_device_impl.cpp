@@ -128,7 +128,8 @@ int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 
     std::shared_ptr<CameraMetadata> updateSettings;
     MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
-    CameraDumper::GetInstance().DumpMetadata(updateSettings, "updatesetting");
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpMetadata(updateSettings, "updatesetting");
     MetadataController& metaDataController = MetadataController::GetInstance();
     metaDataController.UpdateSettingsConfig(updateSettings);
     DFX_LOCAL_HITRACE_END;
@@ -386,7 +387,8 @@ void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &
     uint64_t timestamp = GetCurrentLocalTimeStamp();
     std::vector<uint8_t> result;
     MetadataUtils::ConvertMetadataToVec(metadata, result);
-    CameraDumper::GetInstance().DumpMetadata(metadata, "reportmeta");
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpMetadata(metadata, "reportmeta");
     cameraDeciceCallback_->OnResult(timestamp, result);
 }
 
