@@ -370,11 +370,6 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex, int bufferCo
         bufferInfo->avSharedPtr = sharedMem;
         bufferInfo->portIndex = portIndex;
         omxBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
-        if (portIndex == PortIndex::PORT_INDEX_INPUT) {
-            unUsedInBuffers_.push_back(omxBuffer->bufferId);
-        } else {
-            unUsedOutBuffers_.push_back(omxBuffer->bufferId);
-        }
     }
 
     return HDF_SUCCESS;

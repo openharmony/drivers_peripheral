@@ -861,7 +861,7 @@ static int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handl
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, instance)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)instance)) {
         HDF_LOGE("%{public}s: write input instance failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;

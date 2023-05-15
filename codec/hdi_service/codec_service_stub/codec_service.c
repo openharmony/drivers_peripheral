@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include "ashmem_wrapper.h"
 #ifndef CODEC_HAL_PASSTHROUGH
+#include "codec_callback_proxy.h"
 #include "codec_config_parser.h"
 #endif
 #include "codec_instance_manager.h"
@@ -37,26 +38,34 @@
 #define AUDIO_HARDWARE_DECODER_INDEX 5
 #define CODEC_OEM_INTERFACE_LIB_NAME "libcodec_oem_interface.z.so"
 
+struct CodecOemIf *g_codecOemIface = NULL;
+void *g_oemLibHandle = NULL;
 #ifndef CODEC_HAL_PASSTHROUGH
 struct OsalMutex g_oemIfaceLock;
 int g_oemIfaceRefCount = 0;     /** Client process reference count. */
 #endif
-struct CodecOemIf *g_codecOemIface = NULL;
-void *g_oemLibHandle = NULL;
-#ifdef CODEC_HAL_PASSTHROUGH
-const CodecCallback *g_codecCallback = NULL;
-UINTPTR g_userData;
-#endif
 
-static int32_t DefaultCbOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
+static int32_t CodecOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
 {
+    struct CodecInstance *instance = FindInCodecInstanceManager((CODEC_HANDLETYPE)userData);
+    if (instance == NULL) {
+        HDF_LOGE("%{public}s: instance is NULL!", __func__);
+        return HDF_FAILURE;
+    }
 #ifdef CODEC_HAL_PASSTHROUGH
-    g_codecCallback->OnEvent(g_userData, event, length, eventData);
+    if (instance->hasCustomerCallback && instance->codecCallback != NULL) {
+        instance->codecCallback->OnEvent(instance->callbackUserData, event, length, eventData);
+    }
+#else
+    if (instance->hasCustomerCallback && instance->callbackProxy != NULL) {
+        instance->callbackProxy->OnEvent(instance->callbackProxy, instance->callbackUserData,
+            event, length, eventData);
+    }
 #endif
     return HDF_SUCCESS;
 }
 
-static int32_t DefaultCbInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
+static int32_t CodecInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
 {
     struct CodecInstance *instance = FindInCodecInstanceManager((CODEC_HANDLETYPE)userData);
     if (instance == NULL) {
@@ -75,13 +84,10 @@ static int32_t DefaultCbInputBufferAvailable(UINTPTR userData, CodecBuffer *inBu
     CopyCodecBufferWithTypeSwitch(instance, inputInfo, inBuf, true);
     EmptyCodecBuffer(inputInfo);
     instance->bufferManagerWrapper->PutUsedInputDataBuffer(instance->bufferManagerWrapper, inputInfo);
-#ifdef CODEC_HAL_PASSTHROUGH
-    g_codecCallback->InputBufferAvailable(g_userData, inBuf, acquireFd);
-#endif
     return HDF_SUCCESS;
 }
 
-static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
+static int32_t CodecOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
 {
     struct CodecInstance *instance = FindInCodecInstanceManager((CODEC_HANDLETYPE)userData);
     if (instance == NULL) {
@@ -92,21 +98,18 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
         HDF_LOGE("%{public}s: outBuf Nullpoint or buf not assigned", __func__);
         return HDF_FAILURE;
     }
-    struct BufferManagerWrapper *bmWrapper = instance->bufferManagerWrapper;
     CodecBuffer *outputInfo = GetOutputInfo(instance, outBuf->bufferId);
     if (outputInfo == NULL || outputInfo->bufferCnt == 0) {
         HDF_LOGE("%{public}s: outputInfo Nullpoint or buf not assigned", __func__);
         return HDF_FAILURE;
     }
     CopyCodecBufferWithTypeSwitch(instance, outputInfo, outBuf, true);
-    bmWrapper->PutOutputDataBuffer(bmWrapper, outputInfo);
-#ifdef CODEC_HAL_PASSTHROUGH
-    g_codecCallback->OutputBufferAvailable(g_userData, outputInfo, acquireFd);
-#endif
+    instance->bufferManagerWrapper->PutOutputDataBuffer(instance->bufferManagerWrapper, outputInfo);
     // get a new OutputBuffer
     CodecBuffer *output = NULL;
     while (output == NULL && instance->codecStatus == CODEC_STATUS_STARTED) {
-        output = bmWrapper->GetUsedOutputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
+        output = instance->bufferManagerWrapper->GetUsedOutputDataBuffer(
+            instance->bufferManagerWrapper, QUEUE_TIME_OUT);
     }
     if (output == NULL) {
         HDF_LOGE("%{public}s: output is NULL", __func__);
@@ -316,6 +319,9 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
     struct CodecInstance *instance = FindInCodecInstanceManager(handle);
     int32_t destroyInstanceResult;
     if (instance != NULL) {
+#ifndef CODEC_HAL_PASSTHROUGH
+        CodecProxyCallbackRelease(instance->callbackProxy);
+#endif
         destroyInstanceResult = DestroyCodecInstance(instance);
         RemoveFromCodecInstanceManager(handle);
         OsalMemFree(instance);
@@ -397,24 +403,23 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
-    if (g_codecOemIface == NULL) {
-        HDF_LOGE("%{public}s: g_codecOemIface is NULL!", __func__);
-        return HDF_FAILURE;
-    }
-    if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: g_codecOemIface->codecStart(handle) is failed!", __func__);
-        return HDF_FAILURE;
-    }
     struct CodecInstance *instance = FindInCodecInstanceManager(handle);
     if (instance == NULL || g_codecOemIface == NULL) {
         HDF_LOGE("%{public}s: instance or g_codecOemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    if (!instance->hasCallback) {
-        instance->defaultCb.OnEvent = DefaultCbOnEvent;
-        instance->defaultCb.InputBufferAvailable = DefaultCbInputBufferAvailable;
-        instance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
-        g_codecOemIface->codecSetCallback(handle, &(instance->defaultCb), 0);
+
+    instance->defaultCb.OnEvent = CodecOnEvent;
+    instance->defaultCb.InputBufferAvailable = CodecInputBufferAvailable;
+    instance->defaultCb.OutputBufferAvailable = CodecOutputBufferAvailable;
+    if (g_codecOemIface->codecSetCallback(handle, &(instance->defaultCb), 0) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call oem codecSetCallback failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call oem codecStart failed!", __func__);
+        return HDF_FAILURE;
     }
     return RunCodecInstance(instance);
 }
@@ -476,6 +481,10 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
         CodecBuffer *info = GetInputInfo(instance, inputData->bufferId);
         CopyCodecBufferWithTypeSwitch(instance, info, inputData, true);
         instance->bufferManagerWrapper->PutInputDataBuffer(instance->bufferManagerWrapper, info);
+        if ((inputData->flag & STREAM_FLAG_EOS) != 0) {
+            instance->inputEos = true;
+            HDF_LOGI("%{public}s: input reach STREAM_FLAG_EOS!", __func__);
+        }
         return HDF_SUCCESS;
     }
     return HDF_SUCCESS;
@@ -497,9 +506,9 @@ int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *
         CopyCodecBufferWithTypeSwitch(instance, inputData, info, false);
         // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
         if (inputData->buffer[0].type == BUFFER_TYPE_FD) {
-            inputData->buffer[0].buf = -1;
+            inputData->buffer[0].buf = NO_TRANSMIT_FD;
         } else if (inputData->buffer[0].type == BUFFER_TYPE_HANDLE) {
-            inputData->buffer[0].buf = 0;
+            inputData->buffer[0].buf = NO_TRANSMIT_BUFFERHANDLE;
         }
     } else {
         return HDF_ERR_TIMEOUT;
@@ -534,7 +543,8 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
         }
         instance->bufferManagerWrapper->PutUsedOutputDataBuffer(instance->bufferManagerWrapper, dup);
         return HDF_SUCCESS;
-    } else if (instance->codecStatus == CODEC_STATUS_STARTED) {
+    } else if (instance->codecStatus == CODEC_STATUS_STARTED ||
+        instance->codecCallbackStatus == CODEC_STATUS_STARTED) {
         CodecBuffer *info = GetOutputInfo(instance, outInfo->bufferId);
         CopyCodecBufferWithTypeSwitch(instance, info, outInfo, true);
         EmptyCodecBuffer(info);
@@ -563,9 +573,9 @@ int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t 
         CopyCodecBufferWithTypeSwitch(instance, outInfo, info, false);
         // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
         if (outInfo->buffer[0].type == BUFFER_TYPE_FD) {
-            outInfo->buffer[0].buf = -1;
+            outInfo->buffer[0].buf = NO_TRANSMIT_FD;
         } else if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
-            outInfo->buffer[0].buf = 0;
+            outInfo->buffer[0].buf = NO_TRANSMIT_BUFFERHANDLE;
         }
     } else {
         return HDF_ERR_TIMEOUT;
@@ -574,25 +584,33 @@ int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t 
     return HDF_SUCCESS;
 }
 
-int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTPTR instance)
+#ifndef CODEC_HAL_PASSTHROUGH
+int32_t CodecSetCallbackProxy(CODEC_HANDLETYPE handle, struct ICodecCallbackProxy *cb, UINTPTR instance)
 {
     struct CodecInstance *codecInstance = FindInCodecInstanceManager(handle);
     if (codecInstance == NULL || g_codecOemIface == NULL) {
         HDF_LOGE("%{public}s: instance or g_codecOemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-#ifndef CODEC_HAL_PASSTHROUGH
-    int32_t ret = g_codecOemIface->codecSetCallback(handle, cb, instance);
-#else
-    codecInstance->defaultCb.OnEvent = DefaultCbOnEvent;
-    codecInstance->defaultCb.InputBufferAvailable = DefaultCbInputBufferAvailable;
-    codecInstance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
-    int32_t ret = codecInstance->codecOemIface->codecSetCallback(handle, &(codecInstance->defaultCb), 0);
-    g_codecCallback = cb;
-    g_userData = instance;
-#endif
-    if (ret == HDF_SUCCESS) {
-        codecInstance->hasCallback = true;
-    }
-    return ret;
+
+    codecInstance->callbackUserData = instance;
+    codecInstance->callbackProxy = cb;
+    codecInstance->hasCustomerCallback = true;
+    return HDF_SUCCESS;
 }
+#else
+int32_t CodecSetCallback(CODEC_HANDLETYPE handle, CodecCallback *cb, UINTPTR instance)
+{
+    struct CodecInstance *codecInstance = FindInCodecInstanceManager(handle);
+    if (codecInstance == NULL || g_codecOemIface == NULL) {
+        HDF_LOGE("%{public}s: instance or g_codecOemIface is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+
+    codecInstance->callbackUserData = instance;
+    codecInstance->codecCallback = cb;
+    codecInstance->hasCustomerCallback = true;
+    return HDF_SUCCESS;
+}
+#endif
+

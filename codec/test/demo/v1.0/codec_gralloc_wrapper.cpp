@@ -49,7 +49,7 @@ static int32_t GrMemCreate(OHOS::HDI::Display::Buffer::V1_0::AllocInfo alloc, Bu
     }
     int32_t err = g_gralloc->AllocMem(alloc, *bufferHandle);
     if (err != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s AllocMem fail", __func__);
+        HDF_LOGE("%{public}s AllocMem fail, ret:%{public}d", __func__, err);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -100,9 +100,9 @@ int32_t CreateGrShareMemory(BufferHandle **bufferHandle, CodecCmd cmd, ShareMemo
         .format = cmd.pixFmt};
 
     int32_t ret = GrMemCreate(alloc, bufferHandle);
-    if (ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS || *bufferHandle == NULL) {
         HDF_LOGE("%{public}s: Failed to create buffer handle!", __func__);
-        return ret;
+        return HDF_FAILURE;
     }
     ret = GrMemMap(*bufferHandle);
     if (ret != HDF_SUCCESS) {

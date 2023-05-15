@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,9 +23,14 @@
 #include "codec_oem_if.h"
 #include "osal_mutex.h"
 #include "share_mem.h"
+#ifndef CODEC_HAL_PASSTHROUGH
+#include "codec_callback.h"
+#endif
 
-#define MAX_BUFFER_NUM  64
-#define QUEUE_TIME_OUT  10
+#define MAX_BUFFER_NUM              64
+#define QUEUE_TIME_OUT              10
+#define NO_TRANSMIT_FD              -1
+#define NO_TRANSMIT_BUFFERHANDLE    0
 
 #ifdef __cplusplus
 extern "C"
@@ -40,7 +45,10 @@ typedef enum {
 } CodecStatus;
 
 struct CodecInstance {
-    pthread_t task;
+    pthread_attr_t codecTaskAttr;
+    pthread_t codecTask;
+    pthread_attr_t codecCallbackTaskAttr;
+    pthread_t codecCallbackTask;
     ShareMemory inputBuffers[MAX_BUFFER_NUM];
     ShareMemory outputBuffers[MAX_BUFFER_NUM];
     int32_t inputBuffersCount;
@@ -49,6 +57,7 @@ struct CodecInstance {
     CodecBuffer *outputInfos[MAX_BUFFER_NUM];
     int32_t inputInfoCount;
     int32_t outputInfoCount;
+    volatile bool inputEos;
 
     void *oemLibHandle;
     struct CodecOemIf *codecOemIface;
@@ -60,8 +69,18 @@ struct CodecInstance {
     volatile CodecStatus codecStatus;
     struct OsalMutex codecStatusLock;
     pthread_cond_t codecStatusCond;
+    volatile CodecStatus codecCallbackStatus;
+    struct OsalMutex codecCallbackStatusLock;
+    pthread_cond_t codecCallbackStatusCond;
+#ifndef CODEC_HAL_PASSTHROUGH
+    struct ICodecCallbackProxy *callbackProxy;
+#else
+    CodecCallback *codecCallback;
+#endif
     CodecCallback defaultCb;
-    bool hasCallback;
+    CodecCallback customerCb;
+    bool hasCustomerCallback;
+    UINTPTR callbackUserData;
 };
 
 struct CodecInstance* GetCodecInstance(void);
