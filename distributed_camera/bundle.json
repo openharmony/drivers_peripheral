@@ -2,6 +2,7 @@
     "name":"@ohos/drivers_peripheral_distributed_camera",
     "description":"drivers peripheral distributed camera",
     "version":"3.2",
+    "repository":"https://gitee.com/openharmony/drivers_peripheral",
     "license":"Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {
@@ -15,8 +16,8 @@
         "adapted_system_type":[
             "standard"
         ],
-        "rom":"2440KB",
-        "ram":"8500KB",
+        "rom":"1024KB",
+        "ram":"5120KB",
         "deps":{
             "components":[
                 "ipc",
