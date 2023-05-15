@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#define HDF_LOG_TAG IamBase
+#define HDF_LOG_TAG USER_AUTH_HDI
 
 #ifndef OHOS_DEBUG
 #define DECORATOR_HDFLOG(op, fmt, args...)             \

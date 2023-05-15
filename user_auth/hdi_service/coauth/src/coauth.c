@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,9 +43,9 @@ void DestroyScheduleNode(void *data)
         return;
     }
     CoAuthSchedule *schedule = (CoAuthSchedule *)data;
-    if (schedule->templateIds.value != NULL) {
-        Free(schedule->templateIds.value);
-        schedule->templateIds.value = NULL;
+    if (schedule->templateIds.data != NULL) {
+        Free(schedule->templateIds.data);
+        schedule->templateIds.data = NULL;
     }
     Free(schedule);
 }
@@ -66,8 +66,8 @@ CoAuthSchedule *CopyCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
         Free(schedule);
         return NULL;
     }
-    schedule->templateIds.value = NULL;
-    schedule->templateIds.num = 0;
+    schedule->templateIds.data = NULL;
+    schedule->templateIds.len = 0;
     ResultCode ret = CopyTemplateArrays(&(coAuthSchedule->templateIds), &(schedule->templateIds));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("copy templateIds failed");
@@ -338,41 +338,41 @@ FAIL:
     return NULL;
 }
 
-bool IsTemplateArraysValid(const TemplateIdArrays *templateIds)
+bool IsTemplateArraysValid(const Uint64Array *templateIds)
 {
     if (templateIds == NULL) {
         LOG_ERROR("templateIds is null");
         return false;
     }
-    if (templateIds->num > MAX_TEMPLATE_OF_SCHEDULE || (templateIds->num != 0 && templateIds->value == NULL)) {
+    if (templateIds->len > MAX_TEMPLATE_OF_SCHEDULE || (templateIds->len != 0 && templateIds->data == NULL)) {
         LOG_ERROR("templateIds's content is invalid");
         return false;
     }
     return true;
 }
 
-ResultCode CopyTemplateArrays(const TemplateIdArrays *in, TemplateIdArrays *out)
+ResultCode CopyTemplateArrays(const Uint64Array *in, Uint64Array *out)
 {
-    if (!IsTemplateArraysValid(in) || out == NULL || out->value != NULL) {
+    if (!IsTemplateArraysValid(in) || out == NULL || out->data != NULL) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    if (in->num == 0) {
-        out->num = 0;
+    if (in->len == 0) {
+        out->len = 0;
         return RESULT_SUCCESS;
     }
-    out->num = in->num;
-    out->value = (uint64_t *)Malloc(sizeof(uint64_t) * out->num);
-    if (out->value == NULL) {
-        LOG_ERROR("out value is null");
-        out->num = 0;
+    out->len = in->len;
+    out->data = (uint64_t *)Malloc(sizeof(uint64_t) * out->len);
+    if (out->data == NULL) {
+        LOG_ERROR("out data is null");
+        out->len = 0;
         return RESULT_NO_MEMORY;
     }
-    if (memcpy_s(out->value, (sizeof(uint64_t) * out->num), in->value, (sizeof(uint64_t) * in->num)) != EOK) {
+    if (memcpy_s(out->data, (sizeof(uint64_t) * out->len), in->data, (sizeof(uint64_t) * in->len)) != EOK) {
         LOG_ERROR("copy failed");
-        Free(out->value);
-        out->value = NULL;
-        out->num = 0;
+        Free(out->data);
+        out->data = NULL;
+        out->len = 0;
         return RESULT_BAD_COPY;
     }
     return RESULT_SUCCESS;
