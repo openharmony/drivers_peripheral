@@ -32,7 +32,7 @@ extern "C" {
     extern void DestroyContextNode(void *data);
     extern LinkedList *GetAuthCredentialList(const UserAuthContext *context);
     extern ResultCode CheckCredentialSize(LinkedList *credList);
-    extern ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArrays *templateIds,
+    extern ResultCode QueryAuthTempletaInfo(UserAuthContext *context, Uint64Array *templateIds,
         uint32_t *sensorHint, uint32_t *matcher, uint32_t *acl);
     extern bool IsContextDuplicate(uint64_t contextId);
     extern bool MatchSchedule(const void *data, const void *condition);
@@ -148,7 +148,7 @@ HWTEST_F(ContextManagerTest, TestQueryAuthTempletaInfo, TestSize.Level0)
     context.authType = 2;
     context.contextId = 21245;
     context.userId = 76256;
-    TemplateIdArrays array = {};
+    Uint64Array array = {};
     uint32_t hint = 0;
     uint32_t matcher = 0;
     uint32_t acl = 0;
@@ -223,7 +223,7 @@ HWTEST_F(ContextManagerTest, TestCopySchedules_005, TestSize.Level0)
     context.scheduleList = CreateLinkedList(DestroyScheduleNode);
     EXPECT_NE(context.scheduleList, nullptr);
     CoAuthSchedule schedule = {};
-    schedule.templateIds.num = 12;
+    schedule.templateIds.len = 12;
     context.scheduleList->insert(context.scheduleList, static_cast<void *>(&schedule));
     LinkedList *getSchedule = nullptr;
     EXPECT_EQ(CopySchedules(&context, &getSchedule), RESULT_GENERAL_ERROR);

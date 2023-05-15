@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -284,7 +284,7 @@ IAM_STATIC ResultCode CheckCredentialSize(LinkedList *credList)
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArrays *templateIds,
+IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, Uint64Array *templateIds,
     uint32_t *sensorHint, uint32_t *matcher, uint32_t *acl)
 {
     LinkedList *credList = GetAuthCredentialList(context);
@@ -298,13 +298,13 @@ IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateId
         DestroyLinkedList(credList);
         return checkResult;
     }
-    templateIds->value = (uint64_t *)Malloc(sizeof(uint64_t) * credList->getSize(credList));
-    if (templateIds->value == NULL) {
+    templateIds->data = (uint64_t *)Malloc(sizeof(uint64_t) * credList->getSize(credList));
+    if (templateIds->data == NULL) {
         LOG_ERROR("value malloc failed");
         DestroyLinkedList(credList);
         return RESULT_NO_MEMORY;
     }
-    templateIds->num = 0;
+    templateIds->len = 0;
     LinkedListNode *temp = credList->head;
     if (temp == NULL || temp->data == NULL) {
         LOG_ERROR("link node is invalid");
@@ -321,8 +321,8 @@ IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateId
         }
         credentialHal = (CredentialInfoHal *)temp->data;
         if (credentialHal->executorSensorHint == *sensorHint) {
-            templateIds->value[templateIds->num] = credentialHal->templateId;
-            ++(templateIds->num);
+            templateIds->data[templateIds->len] = credentialHal->templateId;
+            ++(templateIds->len);
         }
         temp = temp->next;
     }
@@ -330,15 +330,15 @@ IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateId
     return RESULT_SUCCESS;
 
 FAIL:
-    Free(templateIds->value);
-    templateIds->value = NULL;
+    Free(templateIds->data);
+    templateIds->data = NULL;
     DestroyLinkedList(credList);
     return RESULT_UNKNOWN;
 }
 
 IAM_STATIC ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule)
 {
-    TemplateIdArrays templateIds;
+    Uint64Array templateIds = {};
     uint32_t verifierSensorHint;
     uint32_t executorMatcher;
     uint32_t acl;
@@ -358,18 +358,18 @@ IAM_STATIC ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedul
     *schedule = GenerateSchedule(&scheduleParam);
     if (*schedule == NULL) {
         LOG_ERROR("schedule is null");
-        Free(templateIds.value);
+        Free(templateIds.data);
         return RESULT_GENERAL_ERROR;
     }
     uint32_t scheduleAtl;
     ret = QueryScheduleAtl(*schedule, acl, &scheduleAtl);
     if (ret != RESULT_SUCCESS || context->authTrustLevel > scheduleAtl) {
-        Free(templateIds.value);
+        Free(templateIds.data);
         DestroyCoAuthSchedule(*schedule);
         *schedule = NULL;
         return ret;
     }
-    Free(templateIds.value);
+    Free(templateIds.data);
     return RESULT_SUCCESS;
 }
 

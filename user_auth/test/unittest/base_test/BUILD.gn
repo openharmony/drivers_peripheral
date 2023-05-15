@@ -17,6 +17,8 @@ import("//build/test.gni")
 ohos_unittest("UserAuthBaseTest") {
   module_out_path = "useriam/user_auth_hdi"
 
+  cflags = [ "-DIAM_TEST_ENABLE" ]
+
   include_dirs = [
     "inc",
     "../../../hdi_service/adaptor/inc",
@@ -32,13 +34,14 @@ ohos_unittest("UserAuthBaseTest") {
   ]
 
   sources = [
+    "//drivers/peripheral/user_auth/hdi_service/common/src/attribute.c",
     "src/adaptor_algorithm_test.cpp",
     "src/adaptor_file_test.cpp",
     "src/adaptor_memory_test.cpp",
     "src/adaptor_time_test.cpp",
+    "src/attribute_test.cpp",
     "src/buffer_test.cpp",
     "src/key_mgr_test.cpp",
-    "src/tlv_base_test.cpp",
   ]
 
   deps = [ "../../../hdi_service:libuser_auth_interface_service_1.1" ]
