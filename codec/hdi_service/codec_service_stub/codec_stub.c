@@ -15,6 +15,7 @@
 #include "codec_stub.h"
 #include <hdf_device_object.h>
 #include <hdf_log.h>
+#include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include "codec_callback_proxy.h"
 #include "codec_config_parser.h"
@@ -625,8 +626,9 @@ static int32_t SerCodecDequeueOutput(struct HdfDeviceIoClient *client, struct Hd
 static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint64_t handle = 0;
-    UINTPTR instance;
-    struct ICodecCallback *cb = NULL;
+    uint64_t instance = 0;
+    struct ICodecCallbackProxy *cb = NULL;
+
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -636,14 +638,21 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
         HDF_LOGE("%{public}s: read cbRemote failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    cb = CodecProxyCallbackObtain(cbRemote);
-    if (!HdfSbufReadUint32(data, (uint32_t *)&instance)) {
+    cb = CodecCallbackProxyObtain(cbRemote);
+    if (cb == NULL) {
+        HDF_LOGE("%{public}s: CodecCallbackProxyObtain failed!", __func__);
+        HdfRemoteServiceRecycle(cbRemote);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadUint64(data, &instance)) {
         HDF_LOGE("%{public}s: read instance data failed!", __func__);
+        HdfRemoteServiceRecycle(cbRemote);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t errNum = CodecSetCallback((CODEC_HANDLETYPE)(uintptr_t)handle, &cb->callback, instance);
+    int32_t errNum = CodecSetCallbackProxy((CODEC_HANDLETYPE)(uintptr_t)handle, cb, (UINTPTR)instance);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecSetCallback fuc failed!", __func__);
+        HdfRemoteServiceRecycle(cbRemote);
         return errNum;
     }
     return errNum;

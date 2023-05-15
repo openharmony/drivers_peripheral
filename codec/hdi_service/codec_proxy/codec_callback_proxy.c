@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 #include "codec_callback_proxy.h"
 #include <hdf_log.h>
+#include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include <servmgr_hdi.h>
 #include "proxy_msgproc.h"
@@ -22,16 +23,17 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct ICodecCallback *g_callback = NULL;
+#define HDF_LOG_TAG codec_callback_proxy
 
-static int32_t CodecCallbackProxyCall(int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t CodecCallbackProxyCall(struct ICodecCallbackProxy *self, int32_t id,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    if (g_callback->remote == NULL || g_callback->remote->dispatcher == NULL ||
-        g_callback->remote->dispatcher->Dispatch == NULL) {
+    if (self->remote == NULL || self->remote->dispatcher == NULL ||
+        self->remote->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%{public}s: obj is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    return g_callback->remote->dispatcher->Dispatch(g_callback->remote, id, data, reply);
+    return self->remote->dispatcher->Dispatch(self->remote, id, data, reply);
 }
 
 static int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
@@ -61,16 +63,26 @@ static void CodecCallbackProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *
     return;
 }
 
-static int CodecCallbackProxyOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
+static int CodecCallbackProxyOnEvent(struct ICodecCallbackProxy *self, UINTPTR userData,
+    EventType event, uint32_t length, int32_t eventData[])
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
+    if (self == NULL) {
+        HDF_LOGE("%{public}s: self is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (CodecCallbackProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecCallbackProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint64(data, (uint64_t)userData)) {
         HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -88,10 +100,11 @@ static int CodecCallbackProxyOnEvent(UINTPTR userData, EventType event, uint32_t
     for (uint32_t i = 0; i < length; i++) {
         if (!HdfSbufWriteInt32(data, eventData[i])) {
             HDF_LOGE("%{public}s: write eventData failed!", __func__);
+            CodecCallbackProxySBufRecycle(data, reply);
             return HDF_ERR_INVALID_PARAM;
         }
     }
-    ret = CodecCallbackProxyCall(CMD_CODEC_ON_EVENT, data, reply);
+    ret = CodecCallbackProxyCall(self, CMD_CODEC_ON_EVENT, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
         CodecCallbackProxySBufRecycle(data, reply);
@@ -101,19 +114,26 @@ static int CodecCallbackProxyOnEvent(UINTPTR userData, EventType event, uint32_t
     return ret;
 }
 
-static int CodecCallbackProxyInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
+static int CodecCallbackProxyInputBufferAvailable(struct ICodecCallbackProxy *self, UINTPTR userData,
+    CodecBuffer *inBuf, int32_t *acquireFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (inBuf == NULL) {
+    if (inBuf == NULL || self == NULL) {
+        HDF_LOGE("%{public}s: self or inBuf is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (CodecCallbackProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecCallbackProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint64(data, (uint64_t)userData)) {
         HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -123,7 +143,7 @@ static int CodecCallbackProxyInputBufferAvailable(UINTPTR userData, CodecBuffer 
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = CodecCallbackProxyCall(CMD_CODEC_INPUT_BUFFER_AVAILABLE, data, reply);
+    ret = CodecCallbackProxyCall(self, CMD_CODEC_INPUT_BUFFER_AVAILABLE, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
         CodecCallbackProxySBufRecycle(data, reply);
@@ -133,19 +153,26 @@ static int CodecCallbackProxyInputBufferAvailable(UINTPTR userData, CodecBuffer 
     return ret;
 }
 
-static int CodecCallbackProxyOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
+static int CodecCallbackProxyOutputBufferAvailable(struct ICodecCallbackProxy *self, UINTPTR userData,
+    CodecBuffer *outBuf, int32_t *acquireFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (outBuf == NULL) {
+    if (outBuf == NULL || self == NULL) {
+        HDF_LOGE("%{public}s: self or outBuf is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (CodecCallbackProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecCallbackProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint64(data, (uint64_t)userData)) {
         HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -155,7 +182,7 @@ static int CodecCallbackProxyOutputBufferAvailable(UINTPTR userData, CodecBuffer
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = CodecCallbackProxyCall(CMD_CODEC_OUTPUT_BUFFER_AVAILABLE, data, reply);
+    ret = CodecCallbackProxyCall(self, CMD_CODEC_OUTPUT_BUFFER_AVAILABLE, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
         CodecCallbackProxySBufRecycle(data, reply);
@@ -165,29 +192,43 @@ static int CodecCallbackProxyOutputBufferAvailable(UINTPTR userData, CodecBuffer
     return ret;
 }
 
-static void CodecCallbackProxyConstruct(struct ICodecCallback *callback)
+static void CodecCallbackProxyConstruct(struct ICodecCallbackProxy *callback)
 {
-    callback->callback.OnEvent = CodecCallbackProxyOnEvent;
-    callback->callback.InputBufferAvailable = CodecCallbackProxyInputBufferAvailable;
-    callback->callback.OutputBufferAvailable = CodecCallbackProxyOutputBufferAvailable;
+    callback->OnEvent = CodecCallbackProxyOnEvent;
+    callback->InputBufferAvailable = CodecCallbackProxyInputBufferAvailable;
+    callback->OutputBufferAvailable = CodecCallbackProxyOutputBufferAvailable;
 }
 
-struct ICodecCallback *CodecProxyCallbackObtain(struct HdfRemoteService *remote)
+struct ICodecCallbackProxy *CodecCallbackProxyObtain(struct HdfRemoteService *remote)
 {
-    g_callback = (struct ICodecCallback *)OsalMemAlloc(sizeof(struct ICodecCallback));
-    if (g_callback == NULL) {
+    if (remote == NULL) {
+        HDF_LOGE("%{public}s: remote is null", __func__);
+        return NULL;
+    }
+    
+    if (!HdfRemoteServiceSetInterfaceDesc(remote, CODEC_CALLBACK_DESC)) {
+        HDF_LOGE("%{public}s: set interface token failed!", __func__);
+        return NULL;
+    }
+
+    struct ICodecCallbackProxy *callback =
+        (struct ICodecCallbackProxy *)OsalMemAlloc(sizeof(struct ICodecCallbackProxy));
+    if (callback == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
         return NULL;
     }
-    g_callback->remote = remote;
-    CodecCallbackProxyConstruct(g_callback);
-    return g_callback;
+    callback->remote = remote;
+    CodecCallbackProxyConstruct(callback);
+    return callback;
 }
 
-void CodecProxyCallbackRelease(struct ICodecCallback *callback)
+void CodecProxyCallbackRelease(struct ICodecCallbackProxy *callback)
 {
     if (callback == NULL) {
         return;
+    }
+    if (callback->remote != NULL) {
+        HdfRemoteServiceRecycle(callback->remote);
     }
     OsalMemFree(callback);
 }
