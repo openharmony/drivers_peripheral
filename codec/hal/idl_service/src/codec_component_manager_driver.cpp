@@ -54,7 +54,6 @@ static int32_t CodecComponentManagerDriverDispatch(struct HdfDeviceIoClient *cli
 static int HdfCodecComponentManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
     CODEC_LOGI("HdfCodecComponentManagerDriverInit enter");
-    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*deviceObject->property);
     if (DevHostRegisterDumpHost(CodecDfxService::DevCodecHostDump) != HDF_SUCCESS) {
         CODEC_LOGE("DevHostRegisterDumpHost error!");
     }
