@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace HDI {
 namespace UserAuth {
-namespace V1_0 {
 namespace {
     KeyPair *g_keyPair = nullptr;
     const uint32_t TAG_AND_LEN_BYTE = 8;
@@ -241,7 +240,6 @@ ResultCode GetExecutorPublicKey(std::vector<uint8_t> &vPubKey)
     }
     return RESULT_SUCCESS;
 }
-} // namespace V1_0
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

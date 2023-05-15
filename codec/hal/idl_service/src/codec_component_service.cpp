@@ -209,6 +209,17 @@ void CodecComponentService::SetComponentRole()
         CODEC_LOGE("OMX_IndexParamStandardComponentRole err [%{public}d]", ret);
     }
 }
+
+std::string &CodecComponentService::GetComponentCompName()
+{
+    return name_;
+}
+
+void CodecComponentService::GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode_)
+{
+    dumpNode_ = node_;
+}
+
 }  // namespace V1_0
 }  // namespace Codec
 }  // namespace HDI

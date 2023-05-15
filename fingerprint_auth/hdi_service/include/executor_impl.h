@@ -18,12 +18,11 @@
 
 #include <vector>
 
-#include "v1_0/iexecutor.h"
+#include "fingerprint_auth_hdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace FingerprintAuth {
-namespace V1_0 {
 class ExecutorImpl : public IExecutor {
 public:
     ExecutorImpl();
@@ -43,6 +42,9 @@ public:
     int32_t Authenticate(uint64_t scheduleId, const std::vector<uint64_t> &templateIdList,
         const std::vector<uint8_t> &extraInfo, const sptr<IExecutorCallback> &callbackObj) override;
 
+    int32_t AuthenticateV1_1(uint64_t scheduleId, const std::vector<uint64_t> &templateIdList, bool endAfterFirstFail,
+        const std::vector<uint8_t> &extraInfo, const sptr<IExecutorCallback> &callbackObj) override;
+
     int32_t Identify(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
 
@@ -53,10 +55,16 @@ public:
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
 
+    int32_t GetProperty(const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes,
+        Property &property) override;
+
+    int32_t SetCachedTemplates(const std::vector<uint64_t> &templateIdList) override;
+
+    int32_t RegisterSaCommandCallback(const sptr<ISaCommandCallback> &callbackObj) override;
+
 private:
-    struct ExecutorInfo executorInfo_;
+    ExecutorInfo executorInfo_;
 };
-} // namespace V1_0
 } // namespace FingerprintAuth
 } // namespace HDI
 } // namespace OHOS

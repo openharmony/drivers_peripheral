@@ -26,7 +26,6 @@ using OHOS::HDI::Codec::V1_0::CodecEventType;
 using OHOS::HDI::Codec::V1_0::CodecStateType;
 using OHOS::HDI::Codec::V1_0::CodecCommandType;
 #define FD_SIZE sizeof(int)
-
 namespace {
     constexpr int NAME_LENGTH = 32;
     constexpr int ROLE_MAX_LEN = 256;
@@ -76,6 +75,7 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
     comp_ = nullptr;
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
+    portIndexMap_.clear();
     bufferIdCount_ = 0;
     mgr_ = mgr;
 }
@@ -86,6 +86,7 @@ ComponentNode::~ComponentNode()
 
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
+    portIndexMap_.clear();
     bufferIdCount_ = 0;
     comp_ = nullptr;
     mgr_ = nullptr;
@@ -364,7 +365,6 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     }
     // for test
     buffer.fenceFd = 0;
-
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
@@ -373,7 +373,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
     }
-
+    portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return err;
 }
 
@@ -402,6 +402,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
     }
+    portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return OMX_ErrorNone;
 }
 
@@ -538,6 +539,11 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBu
     bufferHdrType = iterHead->first;
     codecBuffer = iter->second;
     return true;
+}
+
+std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
+{
+    return portIndexMap_;
 }
 }  // namespace Omx
 }  // namespace Codec

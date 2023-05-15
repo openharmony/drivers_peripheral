@@ -17,15 +17,17 @@
 
 #include <gtest/gtest.h>
 
-#include "executor_impl.h"
 #include "securec.h"
+
+#include "pin_auth_hdi.h"
+#include "executor_impl.h"
 
 namespace OHOS {
 namespace UserIam {
 namespace PinAuth {
 using namespace testing;
-using namespace HDI::PinAuth::V1_0;
 using namespace testing::ext;
+using namespace HDI::PinAuth;
 
 void ExecutorImplTest::SetUpTestCase()
 {
@@ -88,6 +90,12 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
     int32_t commandId = 0;
     result = impl->SendCommand(commandId, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_SUCCESS);
+
+    std::vector<GetPropertyType> propertyTypes;
+    Property property;
+    result = impl->GetProperty(templateIdList, propertyTypes, property);
+    EXPECT_EQ(result, HDF_FAILURE);
+
     delete impl;
 }
 
@@ -133,6 +141,15 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     EXPECT_EQ(result, 2);
 
     result = impl->Cancel(scheduleId);
+    EXPECT_EQ(result, HDF_FAILURE);
+
+    std::vector<GetPropertyType> propertyTypes;
+    Property property;
+    result = impl->GetProperty(templateIdList, propertyTypes, property);
+    EXPECT_EQ(result, HDF_FAILURE);
+
+    templateIdList.push_back(1);
+    result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_FAILURE);
     delete impl;
 }

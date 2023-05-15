@@ -18,23 +18,23 @@
 
 #include <vector>
 
-#include "v1_0/ifingerprint_auth_interface.h"
+#include "fingerprint_auth_hdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace FingerprintAuth {
-namespace V1_0 {
 class FingerprintAuthInterfaceService : public IFingerprintAuthInterface {
 public:
     FingerprintAuthInterfaceService();
     ~FingerprintAuthInterfaceService() override = default;
 
-    int32_t GetExecutorList(std::vector<sptr<IExecutor>> &executorList) override;
+    int32_t GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList) override;
+
+    int32_t GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList) override;
 
 private:
     std::vector<sptr<IExecutor>> executorList_;
 };
-} // namespace V1_0
 } // namespace FingerprintAuth
 } // namespace HDI
 } // namespace OHOS

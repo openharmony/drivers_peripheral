@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
-namespace V1_0 {
 extern "C" IFaceAuthInterface *FaceAuthInterfaceImplGetInstance(void)
 {
     auto faceAuthInterfaceService = new (std::nothrow) FaceAuthInterfaceService();
@@ -46,14 +45,23 @@ FaceAuthInterfaceService::FaceAuthInterfaceService()
     executorList_.push_back(sptr<IExecutor>(executor));
 }
 
-int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &executorList)
+int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList)
+{
+    IAM_LOGI("interface mock start");
+    for (auto executor : executorList_) {
+        executorList.push_back(executor);
+    }
+    IAM_LOGI("interface mock success");
+    return HDF_SUCCESS;
+}
+
+int32_t FaceAuthInterfaceService::GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList)
 {
     IAM_LOGI("interface mock start");
     executorList = executorList_;
     IAM_LOGI("interface mock success");
     return HDF_SUCCESS;
 }
-} // namespace V1_0
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS
