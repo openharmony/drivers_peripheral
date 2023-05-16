@@ -109,7 +109,6 @@ static void CopyScheduleInfoV1_1ToV1_0(const ScheduleInfoV1_1 &in, ScheduleInfo 
     out.authType = in.authType;
     out.executorMatcher = in.executorMatcher;
     out.scheduleMode = in.scheduleMode;
-    out.templateIds = in.templateIds;
     for (auto &inInfo : in.executors) {
         ExecutorInfo outInfo = {};
         outInfo.executorIndex = inInfo.executorIndex;

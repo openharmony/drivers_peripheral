@@ -130,9 +130,9 @@ void FillFuzzGetPropertyTypeVector(Parcel &parcel, std::vector<GetPropertyType> 
 {
     std::vector<uint32_t> propertyTypeUint32;
     FillFuzzUint32Vector(parcel, propertyTypeUint32);
-    for (const auto& val : propertyTypeUint32) {
-        types.push_back(static_cast<GetPropertyType>(val));
-    }
+    std::transform(propertyTypeUint32.begin(), propertyTypeUint32.end(), types.begin(), [](uint32_t val) {
+        return static_cast<GetPropertyType>(val);
+    });
 
     IAM_LOGI("success");
 }
