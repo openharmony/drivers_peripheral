@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef DEVICE_ABILITY_UTTEST_H
+#define DEVICE_ABILITY_UTTEST_H
+
 #include "ut_common.h"
 
 class DeviceAbilityUtTest : public testing::Test {
@@ -22,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
 };
+#endif

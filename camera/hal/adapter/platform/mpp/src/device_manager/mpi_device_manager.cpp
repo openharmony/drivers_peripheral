@@ -187,20 +187,20 @@ RetCode MpiDeviceManager::CreateController(std::shared_ptr<IManager> manager, Ma
         if ((*iter).managerId == managerId) {
             switch (managerId) {
                 case DM_M_VENC:
-                    rc = (std::static_pointer_cast<VencManager>(manager))
-                             ->CreateController((*iter).controllerId, (*iter).hardwareName);
+                    rc = (std::static_pointer_cast<VencManager>(manager))->CreateController((*iter).controllerId,
+                        (*iter).hardwareName);
                     break;
                 case DM_M_VI:
-                    rc = (std::static_pointer_cast<ViManager>(manager))
-                             ->CreateController((*iter).controllerId, (*iter).hardwareName);
+                    rc = (std::static_pointer_cast<ViManager>(manager))->CreateController((*iter).controllerId,
+                        (*iter).hardwareName);
                     break;
                 case DM_M_VO:
-                    rc = (std::static_pointer_cast<VoManager>(manager))
-                             ->CreateController((*iter).controllerId, (*iter).hardwareName);
+                    rc = (std::static_pointer_cast<VoManager>(manager))->CreateController((*iter).controllerId,
+                        (*iter).hardwareName);
                     break;
                 case DM_M_VPSS:
-                    rc = (std::static_pointer_cast<VpssManager>(manager))
-                             ->CreateController((*iter).controllerId, (*iter).hardwareName);
+                    rc = (std::static_pointer_cast<VpssManager>(manager))->CreateController((*iter).controllerId,
+                        (*iter).hardwareName);
                     break;
                 default:
                     break;

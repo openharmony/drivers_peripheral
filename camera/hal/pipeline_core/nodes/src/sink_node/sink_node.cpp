@@ -45,4 +45,4 @@ void SinkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 }
 
 REGISTERNODE(SinkNode, {"sink"})
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
