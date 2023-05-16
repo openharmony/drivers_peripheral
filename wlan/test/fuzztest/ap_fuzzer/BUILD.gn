@@ -18,10 +18,10 @@ TEST_ROOT_DIR = "../../.."
 
 module_output_path = "drivers_peripheral_wlan/wlan"
 
-ohos_fuzztest("WlanApFuzzTest") {
+ohos_fuzztest("ApFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/wlan_ap_fuzzer"
+  fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/ap_fuzzer"
 
   include_dirs = [
     "$TEST_ROOT_DIR/interfaces/include",
@@ -49,11 +49,11 @@ ohos_fuzztest("WlanApFuzzTest") {
   sources = [
     "$TEST_ROOT_DIR/test/fuzztest/wlan_common_fuzzer.cpp",
     "$TEST_ROOT_DIR/test/hdi_service/wlan_callback_impl.c",
-    "wlan_ap_fuzzer.cpp",
+    "ap_fuzzer.cpp",
   ]
 }
 
-group("wlan_ap_fuzztest") {
+group("ap_fuzztest") {
   testonly = true
-  deps = [ ":WlanApFuzzTest" ]
+  deps = [ ":ApFuzzTest" ]
 }
