@@ -785,12 +785,14 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice()
 {
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGW("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        return HDF_FAILURE;
     }
     const char *udcName = nullptr;
     if (deviceObject_ != nullptr) {
         if (iface->GetString(deviceObject_->property, "udc_name", &udcName, UDC_NAME) != HDF_SUCCESS) {
-            HDF_LOGW("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
+            HDF_LOGE("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
+            return HDF_ERR_INVALID_PARAM;
         }
     }
     struct UsbFnDevice *fnDev = nullptr;
