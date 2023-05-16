@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wlan_ap_fuzzer.h"
+#include "ap_fuzzer.h"
 #include "wlan_common_fuzzer.h"
 
 namespace OHOS {
