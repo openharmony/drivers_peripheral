@@ -26,6 +26,7 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
     "../../hal/v1.0/share_mem/include",
     "../../hal/v1.0/oem_interface/include",
     "../../hal/v1.0/buffer_manager/include",
+    "../../utils/include",
     "//third_party/openmax/api/1.1.2",
   ]
 
@@ -51,7 +52,10 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
     "src/codec_component_if.c",
     "src/codec_component_manager.c",
   ]
-  defines = [ "CODEC_HAL_PASSTHROUGH" ]
+  defines = [
+    "CODEC_HAL_PASSTHROUGH",
+    "LOG_TAG_PASSTHROUGH",
+  ]
 
   if (is_standard_system) {
     external_deps = [

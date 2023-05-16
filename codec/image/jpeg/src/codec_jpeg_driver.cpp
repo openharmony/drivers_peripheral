@@ -15,7 +15,7 @@
 
 
 #include "codec_image_config.h"
-#include "codec_image_log.h"
+#include "codec_log_wrapper.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"

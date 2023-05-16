@@ -119,7 +119,7 @@ int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const std::string 
 {
     auto iter = compoentsCore_.find(compName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
-        CODEC_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, compName.c_str());
+        CODEC_LOGE("can not find component[%{public}s] in core", compName.c_str());
         return HDF_FAILURE;
     }
     core = iter->second.get();

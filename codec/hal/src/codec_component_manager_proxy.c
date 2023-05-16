@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,14 +13,12 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include <servmgr_hdi.h>
 #include "codec_component_manager.h"
 #include "codec_internal.h"
+#include "codec_log_wrapper.h"
 #include "codec_types.h"
-
-#define HDF_LOG_TAG codec_hdi_client
 
 struct CodecComponentManagerProxy {
     struct CodecComponentManager instance;
@@ -53,31 +51,31 @@ static int32_t GetComponentNum()
     int32_t num = 0;
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL) {
-        HDF_LOGE("%{public}s: Failed to obtain", __func__);
+        CODEC_LOGE("Failed to obtain");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (reply == NULL) {
-        HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
+        CODEC_LOGE("Failed to obtain reply");
         HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
-        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        CODEC_LOGE("write interface token failed");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 
     if (g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(
         g_codecComponentManagerProxy.remoteOmx, CMD_CODEC_GET_COMPONENT_NUM, data, reply) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: dispatch request failed!", __func__);
+        CODEC_LOGE("dispatch request failed!");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufReadInt32(reply, &num)) {
-        HDF_LOGE("%{public}s: read dataBlock->role failed!", __func__);
+        CODEC_LOGE("read dataBlock->role failed!");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
@@ -91,23 +89,23 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     int32_t num = GetComponentNum();
     if (data == NULL || count <= 0 || count > num) {
-        HDF_LOGE("%{public}s: Failed to obtain", __func__);
+        CODEC_LOGE("Failed to obtain");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (reply == NULL) {
-        HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
+        CODEC_LOGE("Failed to obtain reply");
         HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
-        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        CODEC_LOGE("write interface token failed");
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(data, count)) {
-        HDF_LOGE("%{public}s: write count failed!", __func__);
+        CODEC_LOGE("write count failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -115,14 +113,14 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     if (g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                      CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST, data,
                                                                      reply) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: dispatch request failed!", __func__);
+        CODEC_LOGE("dispatch request failed!");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 
     for (int32_t i = 0; i < count; i++) {
         if (!CodecCompCapabilityBlockUnmarshalling(reply, &(capList)[i])) {
-            HDF_LOGE("%{public}s: read capbility %{public}d from sbuf failed!", __func__, i);
+            CODEC_LOGE("read capbility %{public}d from sbuf failed!", i);
             ReleaseSbuf(data, reply);
             return HDF_FAILURE;
         }
@@ -138,47 +136,47 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL || componentId == NULL) {
-        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        CODEC_LOGE("HdfSubf malloc failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
-        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        CODEC_LOGE("write interface token failed");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(data, compName)) {
-        HDF_LOGE("%{public}s: write paramName failed!", __func__);
+        CODEC_LOGE("write paramName failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteInt64(data, appData)) {
-        HDF_LOGE("%{public}s: write appData failed!", __func__);
+        CODEC_LOGE("write appData failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (HdfSbufWriteRemoteService(data, callback->remote) != 0) {
-        HDF_LOGE("%{public}s: write callback failed!", __func__);
+        CODEC_LOGE("write callback failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                        CMD_CREATE_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        CODEC_LOGE("call failed! error code is %{public}d", ret);
         ReleaseSbuf(data, reply);
         return ret;
     }
 
     struct HdfRemoteService *componentRemote = HdfSbufReadRemoteService(reply);
     if (componentRemote == NULL) {
-        HDF_LOGE("%{public}s: read componentRemote failed!", __func__);
+        CODEC_LOGE("read componentRemote failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(reply, componentId)) {
-        HDF_LOGE("%{public}s: read componentId failed!", __func__);
+        CODEC_LOGE("read componentId failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -194,19 +192,19 @@ static int32_t DestroyComponent(uint32_t componentId)
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
-        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        CODEC_LOGE("HdfSubf malloc failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
-        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        CODEC_LOGE("write interface token failed");
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, componentId)) {
-        HDF_LOGE("%{public}s: write componentId failed!", __func__);
+        CODEC_LOGE("write componentId failed!");
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -214,7 +212,7 @@ static int32_t DestroyComponent(uint32_t componentId)
     ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                        CMD_DESTROY_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        CODEC_LOGE("call failed! error code is %{public}d", ret);
         ReleaseSbuf(data, reply);
         return ret;
     }
@@ -230,18 +228,18 @@ static int32_t InitCodecComponentManagerProxy(void)
 
     struct HDIServiceManager *serviceMgr = HDIServiceManagerGet();
     if (serviceMgr == NULL) {
-        HDF_LOGE("%{public}s: HDIServiceManager not found!", __func__);
+        CODEC_LOGE("HDIServiceManager not found!");
         return HDF_FAILURE;
     }
 
     struct HdfRemoteService *remoteOmx = serviceMgr->GetService(serviceMgr, CODEC_HDI_OMX_SERVICE_NAME);
     HDIServiceManagerRelease(serviceMgr);
     if (remoteOmx == NULL) {
-        HDF_LOGE("%{public}s: CodecComponentTypeService not found!", __func__);
+        CODEC_LOGE("CodecComponentTypeService not found!");
         return HDF_FAILURE;
     }
     if (!HdfRemoteServiceSetInterfaceDesc(remoteOmx, "ohos.hdi.codec_service")) {
-        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        CODEC_LOGE("failed to init interface desc");
         HdfRemoteServiceRecycle(remoteOmx);
         return HDF_FAILURE;
     }

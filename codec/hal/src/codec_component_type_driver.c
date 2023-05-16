@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,12 @@
 #include <devhost_dump_reg.h>
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_component_capability_config.h"
 #include "codec_component_manager_service.h"
 #include "codec_component_type_stub.h"
 #include "codec_dfx_service.h"
-
-#define HDF_LOG_TAG codec_hdi_server
+#include "codec_log_wrapper.h"
 
 struct HdfCodecComponentTypeHost {
     struct IDeviceIoService ioservice;
@@ -36,11 +34,11 @@ static int32_t CodecComponentTypeDriverDispatch(struct HdfDeviceIoClient *client
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         CONTAINER_OF(client->device->service, struct HdfCodecComponentTypeHost, ioservice);
     if (omxcomponenttypeHost->service == NULL || omxcomponenttypeHost->service->stub.OnRemoteRequest == NULL) {
-        HDF_LOGE("%{public}s: invalid service obj", __func__);
+        CODEC_LOGE("invalid service obj");
         return HDF_ERR_INVALID_OBJECT;
     }
     if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        HDF_LOGE("%{public}s: check interface desc failed!", __func__);
+        CODEC_LOGE("check interface desc failed!");
         return HDF_ERR_INVALID_PARAM;
     }
     return omxcomponenttypeHost->service->stub.OnRemoteRequest(&omxcomponenttypeHost->service->stub.interface, cmdId,
@@ -49,7 +47,7 @@ static int32_t CodecComponentTypeDriverDispatch(struct HdfDeviceIoClient *client
 
 static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfCodecComponentTypeDriverInit enter.");
+    CODEC_LOGI("HdfCodecComponentTypeDriverInit enter.");
     if (deviceObject == NULL) {
         return HDF_FAILURE;
     }
@@ -62,7 +60,7 @@ static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObj
 
 static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfCodecComponentTypeDriverBind enter.");
+    CODEC_LOGI("HdfCodecComponentTypeDriverBind enter.");
 
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         (struct HdfCodecComponentTypeHost *)OsalMemAlloc(sizeof(struct HdfCodecComponentTypeHost));
@@ -91,7 +89,7 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
 
 static void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfCodecComponentTypeDriverRelease enter.");
+    CODEC_LOGI("HdfCodecComponentTypeDriverRelease enter.");
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         CONTAINER_OF(deviceObject->service, struct HdfCodecComponentTypeHost, ioservice);
     OmxComponentManagerSeriveRelease(omxcomponenttypeHost->service);

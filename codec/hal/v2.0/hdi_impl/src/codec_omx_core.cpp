@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,8 @@
 #include <OMX_Core.h>
 #include <dlfcn.h>
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <securec.h>
-
-#define HDF_LOG_TAG codec_hdi_server
+#include "codec_log_wrapper.h"
 
 namespace OHOS {
 namespace Codec {
@@ -35,13 +33,13 @@ int32_t CodecOMXCore::Init(const std::string &libName)
 {
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(libName.c_str(), pathBuf) == nullptr) {
-        HDF_LOGE("%{public}s: realpath failed!", __func__);
+        CODEC_LOGE("realpath failed!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     libHandle_ = dlopen(pathBuf, RTLD_LAZY);
     if (libHandle_ == nullptr) {
-        HDF_LOGE("%{public}s:failed to dlopen %{public}s.", __func__, libName.c_str());
+        CODEC_LOGE("failed to dlopen %{public}s.", libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -69,7 +67,7 @@ int32_t CodecOMXCore::GetHandle(OMX_HANDLETYPE &handle, std::string &compName, O
                                 const OMX_CALLBACKTYPE &callbacks)
 {
     if (getHandle_ == nullptr) {
-        HDF_LOGE("%{public}s: getHandle is null.", __func__);
+        CODEC_LOGE("getHandle is null.");
         return HDF_ERR_INVALID_PARAM;
     }
     return (*getHandle_)(&handle, const_cast<char *>(compName.c_str()), appData, (OMX_CALLBACKTYPE *)&callbacks);
@@ -78,7 +76,7 @@ int32_t CodecOMXCore::GetHandle(OMX_HANDLETYPE &handle, std::string &compName, O
 int32_t CodecOMXCore::FreeHandle(OMX_HANDLETYPE handle)
 {
     if (freeHandle_ == nullptr) {
-        HDF_LOGE("%{public}s: freeHandle_ is null.", __func__);
+        CODEC_LOGE("freeHandle_ is null.");
         return HDF_ERR_INVALID_PARAM;
     }
     return (*freeHandle_)(handle);
@@ -87,7 +85,7 @@ int32_t CodecOMXCore::FreeHandle(OMX_HANDLETYPE handle)
 int32_t CodecOMXCore::ComponentNameEnum(std::string &name, uint32_t index)
 {
     if (componentNameEnum_ == nullptr) {
-        HDF_LOGE("%{public}s: componentNameEnum is null.", __func__);
+        CODEC_LOGE("componentNameEnum is null.");
         return HDF_ERR_INVALID_PARAM;
     }
     char tmpComponentName[OMX_MAX_STRINGNAME_SIZE] = {0};
@@ -101,17 +99,17 @@ int32_t CodecOMXCore::ComponentNameEnum(std::string &name, uint32_t index)
 int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::string> &roles)
 {
     if (getRoles_ == nullptr) {
-        HDF_LOGE("%{public}s: getRoles is null.", __func__);
+        CODEC_LOGE("getRoles is null.");
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t roleCount = 0;
     int32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: getRoles_ nullptr return err [%{public}x].", __func__, err);
+        CODEC_LOGE("getRoles_ nullptr return err [%{public}x].", err);
         return err;
     }
     if (roleCount == 0) {
-        HDF_LOGE("%{public}s: roleCount = 0 ", __func__);
+        CODEC_LOGE("roleCount = 0 ");
         return err;
     }
 
@@ -120,7 +118,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
     for (uint32_t i = 0; i < roleCount; i++) {
         int32_t ret = memset_s(array[i], OMX_MAX_STRINGNAME_SIZE, 0, OMX_MAX_STRINGNAME_SIZE);
         if (ret != EOK) {
-            HDF_LOGE("%{public}s: memset_s array err [%{public}x].", __func__, ret);
+            CODEC_LOGE("memset_s array err [%{public}x].", ret);
             return ret;
         }
         role[i] = array[i];
@@ -129,7 +127,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
     uint32_t roleLen = roleCount;
     err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, reinterpret_cast<OMX_U8 **>(role));
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: getRoles_ pRole return err [%{public}x].", __func__, err);
+        CODEC_LOGE("getRoles_ pRole return err [%{public}x].", err);
         return err;
     }
     for (uint32_t i = 0; i < roleLen; i++) {

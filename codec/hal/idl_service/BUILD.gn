@@ -16,6 +16,7 @@ import("../..//codec.gni")
 ohos_shared_library("libcodec_component_manager_service_1.0") {
   include_dirs = [
     "../../interfaces/include/",
+    "../../utils/include/",
     "//third_party/openmax/api/1.1.2",
     "include",
   ]
@@ -66,6 +67,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
     "../../interfaces/include/",
+    "../../utils/include/",
     "//third_party/openmax/api/1.1.2",
     "include",
   ]

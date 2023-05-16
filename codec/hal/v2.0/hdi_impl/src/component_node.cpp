@@ -15,12 +15,11 @@
 
 #include "component_node.h"
 #include <ashmem.h>
-#include <hdf_log.h>
 #include <securec.h>
 #include <unistd.h>
 #include "icodec_buffer.h"
+#include "codec_log_wrapper.h"
 
-#define HDF_LOG_TAG codec_hdi_server
 #define FD_SIZE     sizeof(int)
 namespace {
     constexpr int ROLE_MAX_LEN = 256;
@@ -95,13 +94,13 @@ ComponentNode::~ComponentNode()
 int32_t ComponentNode::GetComponentVersion(struct CompVerInfo &verInfo)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     int32_t err =
         OMX_GetComponentVersion(comp_, verInfo.compName, &verInfo.compVersion, &verInfo.specVersion, &verInfo.compUUID);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, OMX_GetComponentVersion err = %{public}d ", __func__, err);
+        CODEC_LOGE("OMX_GetComponentVersion err = %{public}d", err);
         return err;
     }
     return err;
@@ -110,7 +109,7 @@ int32_t ComponentNode::GetComponentVersion(struct CompVerInfo &verInfo)
 int32_t ComponentNode::SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     (void)cmdDataLen;
@@ -120,7 +119,7 @@ int32_t ComponentNode::SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, int8_t *
 int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     (void)paramLen;
@@ -130,7 +129,7 @@ int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
 int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
 {
     if (comp_ == nullptr || param == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null or param is null ", __func__);
+        CODEC_LOGE("comp_ is null or param is null");
         return OMX_ErrorInvalidComponent;
     }
     (void)paramLen;
@@ -140,7 +139,7 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
 int32_t ComponentNode::GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     (void)configLen;
@@ -150,7 +149,7 @@ int32_t ComponentNode::GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t c
 int32_t ComponentNode::SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     (void)configLen;
@@ -160,7 +159,7 @@ int32_t ComponentNode::SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t c
 int32_t ComponentNode::GetExtensionIndex(const char *parameterName, OMX_INDEXTYPE *indexType)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     // change name
@@ -170,7 +169,7 @@ int32_t ComponentNode::GetExtensionIndex(const char *parameterName, OMX_INDEXTYP
 int32_t ComponentNode::GetState(OMX_STATETYPE *state)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
 
@@ -181,7 +180,7 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
                                               struct OMX_TUNNELSETUPTYPE *tunnelSetup)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -209,7 +208,7 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 
     auto err = OMX_UseEGLImage(comp_, &pBufferHdrType, portIndex, nullptr, eglImage);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s OMX_UseEGLImage error[0x%{public}x]", __func__, err);
+        CODEC_LOGE("OMX_UseEGLImage error[0x%{public}x]", err);
         return err;
     }
     (void)buffer;
@@ -220,24 +219,24 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 int32_t ComponentNode::ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32_t index)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null ");
         return OMX_ErrorInvalidComponent;
     }
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, ComponentRoleEnum ret err [0x%{public}x] ", __func__, err);
+        CODEC_LOGE("ComponentRoleEnum ret err [0x%{public}x]", err);
         return err;
     }
 
     size_t omxRoleLen = strlen(reinterpret_cast<const char *>(omxRole));
     if (omxRoleLen == 0) {
-        HDF_LOGW("%{public}s error, omxRoleLen is 0", __func__);
+        CODEC_LOGW("omxRoleLen is 0");
     } else {
         int32_t ret = memcpy_s(role, roleLen, omxRole, omxRoleLen);
         if (ret != EOK) {
-            HDF_LOGE("%{public}s error, memcpy_s ret [%{public}d]", __func__, ret);
+            CODEC_LOGE("memcpy_s ret [%{public}d]", ret);
             return HDF_ERR_INVALID_PARAM;
         }
     }
@@ -248,7 +247,7 @@ int32_t ComponentNode::ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32
 int32_t ComponentNode::DeInit()
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null ", __func__);
+        CODEC_LOGE("comp_ is null ");
         return OMX_ErrorInvalidComponent;
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -259,10 +258,10 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
 {
     std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if (omxCallback_ == nullptr) {
-        HDF_LOGE("%{public}s omxCallback_ is null", __func__);
+        CODEC_LOGE("omxCallback_ is null");
         return OMX_ErrorNone;
     }
-    HDF_LOGI("%{public}s, event [%{public}d], data1 [%{public}x], data2 [%{public}x]", __func__, event, data1, data2);
+    CODEC_LOGD("event [%d], data1 [%d],data2 [%d]", event, data1, data2);
     struct EventInfo info = {.appData = appData_,
                              .data1 = data1,
                              .data2 = data2,
@@ -277,12 +276,12 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
     std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
-        HDF_LOGE("%{public}s error, omxCallback_ or buffer is null", __func__);
+        CODEC_LOGE("omxCallback_ or buffer is null");
         return OMX_ErrorNone;
     }
     sptr<ICodecBuffer> codecBuffer = GetBufferInfoByHeader(buffer);
     if (codecBuffer == nullptr || codecBuffer->EmptyOmxBufferDone(*buffer) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s codecBuffer is null or EmptyOmxBufferDone error", __func__);
+        CODEC_LOGE("codecBuffer is null or EmptyOmxBufferDone error");
         return OMX_ErrorNone;
     }
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
@@ -294,13 +293,13 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
     std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
-        HDF_LOGE("%{public}s error, omxCallback_ or buffer is null", __func__);
+        CODEC_LOGE("omxCallback_ or buffer is null");
         return OMX_ErrorNone;
     }
 
     sptr<ICodecBuffer> codecBuffer = GetBufferInfoByHeader(buffer);
     if (codecBuffer == nullptr || codecBuffer->FillOmxBufferDone(*buffer) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s codecBuffer is null or FillOmxBufferDone error", __func__);
+        CODEC_LOGE("codecBuffer is null or FillOmxBufferDone error");
         return OMX_ErrorNone;
     }
 
@@ -312,7 +311,7 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     if (buffer.fenceFd >= 0) {
@@ -323,7 +322,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     int32_t err = OMX_ErrorBadParameter;
     sptr<ICodecBuffer> codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
     if (codecBuffer == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
@@ -335,8 +334,8 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     }
 
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s : type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret err[%{public}x]", __func__,
-                 buffer.bufferType, err);
+        CODEC_LOGE("type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret err[%{public}x]",
+            buffer.bufferType, err);
         codecBuffer = nullptr;
         return err;
     }
@@ -355,20 +354,20 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
 int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        CODEC_LOGE("comp_ is null");
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
     int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s ,OMX_AllocateBuffer error, err = %{public}x", __func__, err);
+        CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return err;
     }
 
     buffer.allocLen = bufferHdrType->nAllocLen;
     sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
     if (codecBuffer == nullptr) {
-        HDF_LOGE("%{public}s error, codecBuffer is null", __func__);
+        CODEC_LOGE("codecBuffer is null");
         (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
         return OMX_ErrorInvalidComponent;
     }
@@ -387,7 +386,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
 int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
+        CODEC_LOGE("comp_ is nullptr");
         return OMX_ErrorInvalidComponent;
     }
 
@@ -395,13 +394,13 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
     sptr<ICodecBuffer> codecBufer = nullptr;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     if (!GetBufferById(buffer.bufferId, codecBufer, bufferHdrType)) {
-        HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
+        CODEC_LOGE("GetBufferById return false");
         return err;
     }
 
     err = OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, OMX_FreeBuffer err [%{public}x]", __func__, err);
+        CODEC_LOGE("OMX_FreeBuffer err [%{public}x]", err);
         return err;
     }
 
@@ -435,19 +434,19 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
 int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
+        CODEC_LOGE("comp_ is nullptr");
         return OMX_ErrorInvalidComponent;
     }
     int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     sptr<ICodecBuffer> codecBuffer = nullptr;
     if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
-        HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
+        CODEC_LOGE("GetBufferById return false");
         return err;
     }
     err = codecBuffer->EmptyOmxBuffer(buffer, *bufferHdrType);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s EmptyOmxBuffer err [%{public}d]", __func__, err);
+        CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
         return err;
     }
 
@@ -458,20 +457,20 @@ int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
 int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
+        CODEC_LOGE("comp_ is nullptr");
         return OMX_ErrorInvalidComponent;
     }
     int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     sptr<ICodecBuffer> codecBuffer = nullptr;
     if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
-        HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
+        CODEC_LOGE("GetBufferById return false");
         return err;
     }
 
     err = codecBuffer->FillOmxBuffer(buffer, *bufferHdrType);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s FillOmxBuffer err [%{public}d]", __func__, err);
+        CODEC_LOGE("FillOmxBuffer err [%{public}d]", err);
         return err;
     }
 
@@ -494,20 +493,20 @@ uint32_t ComponentNode::GenerateBufferId()
 sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer)
 {
     if (buffer == nullptr) {
-        HDF_LOGE("%{public}s buffer is null", __func__);
+        CODEC_LOGE("buffer is null");
         return nullptr;
     }
 
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
-        HDF_LOGE("%{public}s can not find bufferID", __func__);
+        CODEC_LOGE("can not find bufferID");
         return nullptr;
     }
 
     uint32_t nBufferID = iterHead->second;
     auto iter = codecBufferMap_.find(nBufferID);
     if (iter == codecBufferMap_.end()) {
-        HDF_LOGE("%{public}s can not find bufferInfo by nBufferID = %{public}d", __func__, nBufferID);
+        CODEC_LOGE("can not find bufferInfo by nBufferID = %{public}d", nBufferID);
         return nullptr;
     }
     return iter->second;
@@ -519,7 +518,7 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBu
     std::lock_guard<std::mutex> lk(mutex_);
     auto iter = codecBufferMap_.find(bufferId);
     if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
-        HDF_LOGE("%{public}s error, can not find bufferIndo by bufferID [%{public}d]", __func__, bufferId);
+        CODEC_LOGE("can not find bufferIndo by bufferID [%{public}d]", bufferId);
         return false;
     }
 
@@ -530,8 +529,7 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBu
         }
     }
     if ((iterHead == bufferHeaderMap_.end()) || (iterHead->first == nullptr)) {
-        HDF_LOGE("%{public}s error, can not find bufferHeaderType by bufferID [%{public}d] or iterHead->first is null",
-                 __func__, bufferId);
+        CODEC_LOGE("can not find bufferHeaderType by bufferID [%{public}d] or iterHead->first is null", bufferId);
         return false;
     }
     bufferHdrType = iterHead->first;
@@ -543,7 +541,7 @@ void ComponentNode::WaitStateChange(uint32_t objState, OMX_STATETYPE *status)
 {
     int32_t ret = GetState(status);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: GetState error [%{public}x]", __func__, ret);
+        CODEC_LOGE("GetState error [%{public}x]", ret);
         return;
     }
     uint32_t count = 0;
@@ -551,7 +549,7 @@ void ComponentNode::WaitStateChange(uint32_t objState, OMX_STATETYPE *status)
         usleep(maxStateWaitTime);
         ret = GetState(status);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: GetState error [%{public}x]", __func__, ret);
+            CODEC_LOGE("GetState error [%{public}x]", ret);
             return;
         }
     }
@@ -562,7 +560,7 @@ void ComponentNode::ReleaseOMXResource()
     OMX_STATETYPE status = OMX_StateInvalid;
     int32_t ret = GetState(&status);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("ReleaseOMXResource GetState error [%{public}x]", ret);
+        CODEC_LOGE("ReleaseOMXResource GetState error [%{public}x]", ret);
         return;
     }
     if (status == OMX_StateExecuting) {
@@ -573,12 +571,12 @@ void ComponentNode::ReleaseOMXResource()
         SendCommand(OMX_CommandStateSet, OMX_StateLoaded, NULL, 0);
         auto err = ReleaseAllBuffer();
         if (err != HDF_SUCCESS) {
-            HDF_LOGE("ReleaseAllBuffer err [%{public}x]", err);
+            CODEC_LOGE("ReleaseAllBuffer err [%{public}x]", err);
             return;
         }
         WaitStateChange(OMX_StateLoaded, &status);
     }
-    HDF_LOGI("%{public}s: Release OMX Resource success!", __func__);
+    CODEC_LOGI("Release OMX Resource success!");
 }
 
 int32_t ComponentNode::ReleaseAllBuffer()
@@ -589,11 +587,11 @@ int32_t ComponentNode::ReleaseAllBuffer()
         uint32_t protIndex = bufferHeaderPortMap_.find(bufferHdrType)->second;
         auto ret = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, protIndex, bufferHdrType);
         if (ret != OMX_ErrorNone) {
-            HDF_LOGE("OMX_FreeBuffer err [%{public}x]", ret);
+            CODEC_LOGE("OMX_FreeBuffer err [%{public}x]", ret);
             return ret;
         }
     }
-    HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
+    CODEC_LOGI("Release OMXBuffer and CodecBuffer success!");
     return HDF_SUCCESS;
 }
 }  // namespace Omx
