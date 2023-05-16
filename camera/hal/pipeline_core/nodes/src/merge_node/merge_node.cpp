@@ -124,4 +124,4 @@ void MergeNode::MergeBuffers()
     return;
 }
 REGISTERNODE(MergeNode, {"merge"})
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera

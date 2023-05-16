@@ -164,4 +164,4 @@ HWTEST_F(UtestV4l2DeviceManager, GetCameraId_Success, TestSize.Level0)
         EXPECT_EQ(true, (*iter) != CAMERA_MAX);
     }
 }
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera

@@ -99,7 +99,7 @@ void StreamStatistics::DumpStats(int interval)
         CalculateFps(timestamp_.tv_sec - lastOutputTime_);
         std::stringstream ss;
         ss << "streamId:" << streamId_ << ", buf status(suc/fail) req:" << requestBufferSuccessCount_ <<
-            "/" << requestBufferFailCount_ << ", flush:" <<flushBufferSuccessCount_ << "/" << 
+            "/" << requestBufferFailCount_ << ", flush:" <<flushBufferSuccessCount_ << "/" <<
             flushBufferFailCount_ <<", cancel:" << cancelBufferSuccessCount_ << "/" <<
             cancelBufferFailCount_ << ", fps:" << fpsValue_;
         streamInfo_ = ss.str();

@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef BENCHMARK_COMMON_H
+#define BENCHMARK_COMMON_H
+
 #include <stdlib.h>
 #include <thread>
 #include <iostream>
@@ -186,3 +190,4 @@ public:
     };
 };
 }
+#endif

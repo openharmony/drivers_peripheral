@@ -26,4 +26,4 @@ SensorNode::~SensorNode()
 }
 
 REGISTERNODE(SensorNode, {"sensor"})
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
