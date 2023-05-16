@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 ohos_shared_library("libcodec_image_jpeg_service_1.0") {
   include_dirs = [
+    "../../utils/include",
     "../config/",
     "../vdi",
     "include",
@@ -24,7 +25,7 @@ ohos_shared_library("libcodec_image_jpeg_service_1.0") {
     "src/codec_jpeg_core.cpp",
     "src/codec_jpeg_dec.cpp",
   ]
-
+  defines = [ "LOG_TAG_IMAGE" ]
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -46,6 +47,7 @@ ohos_shared_library("libcodec_image_jpeg_service_1.0") {
 
 ohos_shared_library("libcodec_jpeg_driver") {
   include_dirs = [
+    "../../utils/include",
     "../config/",
     "include",
   ]
@@ -53,6 +55,8 @@ ohos_shared_library("libcodec_jpeg_driver") {
   sources = [ "src/codec_jpeg_driver.cpp" ]
 
   deps = [ ":libcodec_image_jpeg_service_1.0" ]
+
+  defines = [ "LOG_TAG_IMAGE" ]
 
   if (is_standard_system) {
     external_deps = [

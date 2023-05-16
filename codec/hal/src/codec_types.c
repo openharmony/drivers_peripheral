@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,15 +15,16 @@
 #include "codec_types.h"
 #include <buffer_handle.h>
 #include <buffer_handle_utils.h>
-#include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
 #include <unistd.h>
 #include "codec_omx_ext.h"
+#include "codec_log_wrapper.h"
+
 static bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
 {
     if (handle == NULL) {
-        HDF_LOGE("%{public}s: handle is NULL!", __func__);
+        CODEC_LOGE("handle is NULL!");
         return false;
     }
 
@@ -33,31 +34,31 @@ static bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
         !HdfSbufWriteInt32(data, handle->height) || !HdfSbufWriteInt32(data, handle->size) ||
         !HdfSbufWriteInt32(data, handle->format) || !HdfSbufWriteInt64(data, handle->usage) ||
         !HdfSbufWriteUint64(data, handle->phyAddr) || !HdfSbufWriteInt32(data, handle->key)) {
-        HDF_LOGE("%{public}s: write handle failed!", __func__);
+        CODEC_LOGE("write handle failed!");
         return false;
     }
     if (handle->fd >= 0) {
         validFd = 1;
     }
     if (!HdfSbufWriteUint8(data, validFd)) {
-        HDF_LOGE("%{public}s: write uint8_t failed!", __func__);
+        CODEC_LOGE("write uint8_t failed!");
         return false;
     }
     if ((validFd != 0) && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
-        HDF_LOGE("%{public}s: write fd failed!", __func__);
+        CODEC_LOGE("write fd failed!");
         return false;
     }
 
     for (uint32_t i = 0; i < handle->reserveFds; i++) {
         if (!HdfSbufWriteFileDescriptor(data, handle->reserve[i])) {
-            HDF_LOGE("%{public}s: write handle->reserve[%{public}d] failed!", __func__, i);
+            CODEC_LOGE("write handle->reserve[%{public}d] failed!", i);
             return false;
         }
     }
 
     for (uint32_t i = 0; i < handle->reserveInts; i++) {
         if (!HdfSbufWriteInt32(data, handle->reserve[i + handle->reserveFds])) {
-            HDF_LOGE("%{public}s: write handle->reserve[%{public}d] failed!", __func__, i + handle->reserveFds);
+            CODEC_LOGE("write handle->reserve[%{public}d] failed!", i + handle->reserveFds);
             return false;
         }
     }
@@ -71,13 +72,13 @@ static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handl
     uint32_t reserveFds = 0;
     uint32_t reserveInts = 0;
     if (!HdfSbufReadUint32(data, &reserveFds) || !HdfSbufReadUint32(data, &reserveInts)) {
-        HDF_LOGE("%{public}s: read reserveFds or reserveInts failed!", __func__);
+        CODEC_LOGE("read reserveFds or reserveInts failed!");
         return false;
     }
 
     BufferHandle *tmpHandle = AllocateBufferHandle(reserveFds, reserveInts);
     if (tmpHandle == NULL) {
-        HDF_LOGE("%{public}s: allocate buffer handle failed!", __func__);
+        CODEC_LOGE("allocate buffer handle failed!");
         return false;
     }
 
@@ -85,13 +86,13 @@ static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handl
         !HdfSbufReadInt32(data, &tmpHandle->height) || !HdfSbufReadInt32(data, &tmpHandle->size) ||
         !HdfSbufReadInt32(data, &tmpHandle->format) || !HdfSbufReadUint64(data, &tmpHandle->usage) ||
         !HdfSbufReadUint64(data, &tmpHandle->phyAddr) || !HdfSbufReadInt32(data, &tmpHandle->key)) {
-        HDF_LOGE("%{public}s: read handle failed!", __func__);
+        CODEC_LOGE("read handle failed!");
         FreeBufferHandle(tmpHandle);
         return false;
     }
 
     if (!HdfSbufReadUint8(data, &validFd)) {
-        HDF_LOGE("%{public}s: read handle bool value failed!", __func__);
+        CODEC_LOGE("read handle bool value failed!");
         FreeBufferHandle(tmpHandle);
         return false;
     }
@@ -106,7 +107,7 @@ static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handl
 
     for (uint32_t i = 0; i < tmpHandle->reserveInts; i++) {
         if (!HdfSbufReadInt32(data, &tmpHandle->reserve[tmpHandle->reserveFds + i])) {
-            HDF_LOGE("%{public}s: read reserve bool value failed!", __func__);
+            CODEC_LOGE("read reserve bool value failed!");
             FreeBufferHandle(tmpHandle);
             return false;
         }
@@ -118,12 +119,12 @@ static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handl
 bool OMX_TUNNELSETUPTYPEBlockMarshalling(struct HdfSBuf *data, const struct OMX_TUNNELSETUPTYPE *dataBlock)
 {
     if (!HdfSbufWriteUint32(data, dataBlock->nTunnelFlags)) {
-        HDF_LOGE("%{public}s: write dataBlock->nTunnelFlags failed!", __func__);
+        CODEC_LOGE("write dataBlock->nTunnelFlags failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->eSupplier)) {
-        HDF_LOGE("%{public}s: write dataBlock->eSupplier failed!", __func__);
+        CODEC_LOGE("write dataBlock->eSupplier failed!");
         return false;
     }
 
@@ -136,12 +137,12 @@ bool OMX_TUNNELSETUPTYPEBlockUnmarshalling(struct HdfSBuf *data, struct OMX_TUNN
         return false;
     }
     if (!HdfSbufReadUint32(data, &dataBlock->nTunnelFlags)) {
-        HDF_LOGE("%{public}s: read dataBlock->nTunnelFlags failed!", __func__);
+        CODEC_LOGE("read dataBlock->nTunnelFlags failed!");
         return false;
     }
 
     if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->eSupplier)) {
-        HDF_LOGE("%{public}s: read dataBlock->eSupplier failed!", __func__);
+        CODEC_LOGE("read dataBlock->eSupplier failed!");
         return false;
     }
 
@@ -162,12 +163,12 @@ void OMX_TUNNELSETUPTYPEFree(struct OMX_TUNNELSETUPTYPE *dataBlock, bool freeSel
 static bool CodecBufferMarshalling(struct HdfSBuf *data, const struct OmxCodecBuffer *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->bufferType)) {
-        HDF_LOGE("%{public}s: write dataBlock->bufferType failed!", __func__);
+        CODEC_LOGE("write dataBlock->bufferType failed!");
         return false;
     }
 
     if (!HdfSbufWriteUint32(data, dataBlock->bufferLen)) {
-        HDF_LOGE("%{public}s: write dataBlock->bufferLen failed!", __func__);
+        CODEC_LOGE("write dataBlock->bufferLen failed!");
         return false;
     }
     if (dataBlock->bufferLen <= 0) {
@@ -175,25 +176,25 @@ static bool CodecBufferMarshalling(struct HdfSBuf *data, const struct OmxCodecBu
     }
 
     if (dataBlock->buffer == NULL) {
-        HDF_LOGE("%{public}s: dataBlock->buffer is null", __func__);
+        CODEC_LOGE("dataBlock->buffer is null");
         return false;
     }
 
     if (dataBlock->bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         int fd = (int)(uintptr_t)dataBlock->buffer;
         if (!HdfSbufWriteFileDescriptor(data, fd)) {
-            HDF_LOGE("%{public}s: write fd failed!", __func__);
+            CODEC_LOGE("write fd failed!");
             return false;
         }
     } else if (dataBlock->bufferType == CODEC_BUFFER_TYPE_HANDLE ||
                dataBlock->bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
         BufferHandle *handle = (BufferHandle *)dataBlock->buffer;
         if (!BufferHandleMarshalling(data, handle)) {
-            HDF_LOGE("%{public}s: write handle failed!", __func__);
+            CODEC_LOGE("write handle failed!");
             return false;
         }
     } else {
-        HDF_LOGE("%{public}s:unsupported bufferType %{public}d!", __func__, dataBlock->bufferType);
+        CODEC_LOGE("unsupported bufferType %{public}d!", dataBlock->bufferType);
         return false;
     }
     return true;
@@ -203,17 +204,17 @@ bool OmxCodecBufferBlockMarshalling(struct HdfSBuf *data, const struct OmxCodecB
 {
     uint8_t validFd = 0;
     if (dataBlock == NULL) {
-        HDF_LOGE("%{public}s: dataBlock is NULL!", __func__);
+        CODEC_LOGE("dataBlock is NULL!");
         return false;
     }
 
     if (!HdfSbufWriteUint32(data, dataBlock->bufferId) || !HdfSbufWriteUint32(data, dataBlock->size)) {
-        HDF_LOGE("%{public}s: write dataBlock:bufferId or size failed!", __func__);
+        CODEC_LOGE("write dataBlock:bufferId or size failed!");
         return false;
     }
 
     if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->version, sizeof(union OMX_VERSIONTYPE))) {
-        HDF_LOGE("%{public}s: write dataBlock->version failed!", __func__);
+        CODEC_LOGE("write dataBlock->version failed!");
         return false;
     }
 
@@ -223,23 +224,23 @@ bool OmxCodecBufferBlockMarshalling(struct HdfSBuf *data, const struct OmxCodecB
 
     if (!HdfSbufWriteUint32(data, dataBlock->allocLen) || !HdfSbufWriteUint32(data, dataBlock->filledLen) ||
         !HdfSbufWriteUint32(data, dataBlock->offset)) {
-        HDF_LOGE("%{public}s: write dataBlock:allocLen, filledLen or offset failed!", __func__);
+        CODEC_LOGE("write dataBlock:allocLen, filledLen or offset failed!");
         return false;
     }
 
     validFd = dataBlock->fenceFd >= 0;
     if (!HdfSbufWriteUint8(data, validFd)) {
-        HDF_LOGE("%{public}s: write validFd failed!", __func__);
+        CODEC_LOGE("write validFd failed!");
         return false;
     }
     if (validFd != 0 && !HdfSbufWriteFileDescriptor(data, dataBlock->fenceFd)) {
-        HDF_LOGE("%{public}s: write dataBlock->fenceFd failed!", __func__);
+        CODEC_LOGE("write dataBlock->fenceFd failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->type) || !HdfSbufWriteInt64(data, dataBlock->pts) ||
         !HdfSbufWriteUint32(data, dataBlock->flag)) {
-        HDF_LOGE("%{public}s: write dataBlock:type, pts or flag failed!", __func__);
+        CODEC_LOGE("write dataBlock:type, pts or flag failed!");
         return false;
     }
     return true;
@@ -248,17 +249,17 @@ bool OmxCodecBufferBlockMarshalling(struct HdfSBuf *data, const struct OmxCodecB
 static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer *dataBlock)
 {
     if (dataBlock == NULL) {
-        HDF_LOGE("%{public}s: dataBlock is NULL!", __func__);
+        CODEC_LOGE("dataBlock is NULL!");
         return false;
     }
     if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->bufferType)) {
-        HDF_LOGE("%{public}s: read dataBlock->bufferType failed!", __func__);
+        CODEC_LOGE("read dataBlock->bufferType failed!");
         return false;
     }
 
     uint32_t bufferCpLen = 0;
     if (!HdfSbufReadUint32(data, &bufferCpLen)) {
-        HDF_LOGE("%{public}s: read bufferCpLen failed!", __func__);
+        CODEC_LOGE("read bufferCpLen failed!");
         return false;
     }
     dataBlock->bufferLen = bufferCpLen;
@@ -269,7 +270,7 @@ static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer
     if (dataBlock->bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         int fd = HdfSbufReadFileDescriptor(data);
         if (fd < 0) {
-            HDF_LOGE("%{public}s: read fd failed!", __func__);
+            CODEC_LOGE("read fd failed!");
             return false;
         }
         dataBlock->buffer = (uint8_t *)(unsigned long)fd;
@@ -277,12 +278,12 @@ static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer
                dataBlock->bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
         BufferHandle *handle = NULL;
         if (!BufferHandleUnmarshalling(data, &handle)) {
-            HDF_LOGE("%{public}s: read bufferhandle failed!", __func__);
+            CODEC_LOGE("read bufferhandle failed!");
             return false;
         }
         dataBlock->buffer = (uint8_t *)handle;
     } else {
-        HDF_LOGE("%{public}s: unsupported bufferType %{public}d", __func__, dataBlock->bufferType);
+        CODEC_LOGE("unsupported bufferType %{public}d", dataBlock->bufferType);
         return false;
     }
     return true;
@@ -326,17 +327,17 @@ bool OmxCodecBufferBlockUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffe
 {
     uint8_t validFd = 0;
     if (dataBlock == NULL || data == NULL) {
-        HDF_LOGE("%{public}s: dataBlock or data is NULL!", __func__);
+        CODEC_LOGE("dataBlock or data is NULL!");
         return false;
     }
     if (!HdfSbufReadUint32(data, &dataBlock->bufferId) || !HdfSbufReadUint32(data, &dataBlock->size)) {
-        HDF_LOGE("%{public}s: read dataBlock:bufferId or size failed!", __func__);
+        CODEC_LOGE("read dataBlock:bufferId or size failed!");
         return false;
     }
     const union OMX_VERSIONTYPE *versionCp =
         (const union OMX_VERSIONTYPE *)HdfSbufReadUnpadBuffer(data, sizeof(union OMX_VERSIONTYPE));
     if (versionCp == NULL) {
-        HDF_LOGE("%{public}s: read versionCp failed!", __func__);
+        CODEC_LOGE("read versionCp failed!");
         return false;
     }
     (void)memcpy_s(&dataBlock->version, sizeof(union OMX_VERSIONTYPE), versionCp, sizeof(union OMX_VERSIONTYPE));
@@ -345,12 +346,12 @@ bool OmxCodecBufferBlockUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffe
     }
     if (!HdfSbufReadUint32(data, &dataBlock->allocLen) || !HdfSbufReadUint32(data, &dataBlock->filledLen) ||
         !HdfSbufReadUint32(data, &dataBlock->offset)) {
-        HDF_LOGE("%{public}s: read dataBlock:allocLen, filledLen or offset failed!", __func__);
+        CODEC_LOGE("read dataBlock:allocLen, filledLen or offset failed!");
         return false;
     }
 
     if (!HdfSbufReadUint8(data, &validFd)) {
-        HDF_LOGE("%{public}s: read validFd failed!", __func__);
+        CODEC_LOGE("read validFd failed!");
         return false;
     }
 
@@ -360,7 +361,7 @@ bool OmxCodecBufferBlockUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffe
 
     if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->type) || !HdfSbufReadInt64(data, &dataBlock->pts) ||
         !HdfSbufReadUint32(data, &dataBlock->flag)) {
-        HDF_LOGE("%{public}s: read dataBlock:type, pts or flag failed!", __func__);
+        CODEC_LOGE("read dataBlock:type, pts or flag failed!");
         return false;
     }
     return true;
@@ -369,12 +370,12 @@ bool OmxCodecBufferBlockUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffe
 bool RangeValueBlockMarshalling(struct HdfSBuf *data, const RangeValue *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, dataBlock->min)) {
-        HDF_LOGE("%{public}s: write dataBlock->min failed!", __func__);
+        CODEC_LOGE("write dataBlock->min failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, dataBlock->max)) {
-        HDF_LOGE("%{public}s: write dataBlock->max failed!", __func__);
+        CODEC_LOGE("write dataBlock->max failed!");
         return false;
     }
 
@@ -387,12 +388,12 @@ bool RangeValueBlockUnmarshalling(struct HdfSBuf *data, RangeValue *dataBlock)
         return false;
     }
     if (!HdfSbufReadInt32(data, &dataBlock->min)) {
-        HDF_LOGE("%{public}s: read dataBlock->min failed!", __func__);
+        CODEC_LOGE("read dataBlock->min failed!");
         return false;
     }
 
     if (!HdfSbufReadInt32(data, &dataBlock->max)) {
-        HDF_LOGE("%{public}s: read dataBlock->max failed!", __func__);
+        CODEC_LOGE("read dataBlock->max failed!");
         return false;
     }
 
@@ -413,12 +414,12 @@ void RangeValueFree(RangeValue *dataBlock, bool freeSelf)
 bool RectBlockMarshalling(struct HdfSBuf *data, const Rect *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, dataBlock->width)) {
-        HDF_LOGE("%{public}s: write dataBlock->width failed!", __func__);
+        CODEC_LOGE("write dataBlock->width failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, dataBlock->height)) {
-        HDF_LOGE("%{public}s: write dataBlock->height failed!", __func__);
+        CODEC_LOGE("write dataBlock->height failed!");
         return false;
     }
 
@@ -431,12 +432,12 @@ bool RectBlockUnmarshalling(struct HdfSBuf *data, Rect *dataBlock)
         return false;
     }
     if (!HdfSbufReadInt32(data, &dataBlock->width)) {
-        HDF_LOGE("%{public}s: read dataBlock->width failed!", __func__);
+        CODEC_LOGE("read dataBlock->width failed!");
         return false;
     }
 
     if (!HdfSbufReadInt32(data, &dataBlock->height)) {
-        HDF_LOGE("%{public}s: read dataBlock->height failed!", __func__);
+        CODEC_LOGE("read dataBlock->height failed!");
         return false;
     }
 
@@ -446,12 +447,12 @@ bool RectBlockUnmarshalling(struct HdfSBuf *data, Rect *dataBlock)
 bool AlignmentBlockMarshalling(struct HdfSBuf *data, const Alignment *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, dataBlock->widthAlignment)) {
-        HDF_LOGE("%{public}s: write dataBlock->widthAlignment failed!", __func__);
+        CODEC_LOGE("write dataBlock->widthAlignment failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, dataBlock->heightAlignment)) {
-        HDF_LOGE("%{public}s: write dataBlock->heightAlignment failed!", __func__);
+        CODEC_LOGE("write dataBlock->heightAlignment failed!");
         return false;
     }
 
@@ -464,12 +465,12 @@ bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock)
         return false;
     }
     if (!HdfSbufReadInt32(data, &dataBlock->widthAlignment)) {
-        HDF_LOGE("%{public}s: read dataBlock->widthAlignment failed!", __func__);
+        CODEC_LOGE("read dataBlock->widthAlignment failed!");
         return false;
     }
 
     if (!HdfSbufReadInt32(data, &dataBlock->heightAlignment)) {
-        HDF_LOGE("%{public}s: read dataBlock->heightAlignment failed!", __func__);
+        CODEC_LOGE("read dataBlock->heightAlignment failed!");
         return false;
     }
 
@@ -479,38 +480,38 @@ bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock)
 bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const CodecVideoPortCap *dataBlock)
 {
     if (!RectBlockMarshalling(data, &dataBlock->minSize)) {
-        HDF_LOGE("%{public}s: write dataBlock->minSize failed!", __func__);
+        CODEC_LOGE("write dataBlock->minSize failed!");
         return false;
     }
 
     if (!RectBlockMarshalling(data, &dataBlock->maxSize)) {
-        HDF_LOGE("%{public}s: write dataBlock->maxSize failed!", __func__);
+        CODEC_LOGE("write dataBlock->maxSize failed!");
         return false;
     }
 
     if (!AlignmentBlockMarshalling(data, &dataBlock->whAlignment)) {
-        HDF_LOGE("%{public}s: write dataBlock->whAlignment failed!", __func__);
+        CODEC_LOGE("write dataBlock->whAlignment failed!");
         return false;
     }
 
     if (!RangeValueBlockMarshalling(data, &dataBlock->blockCount)) {
-        HDF_LOGE("%{public}s: write dataBlock->blockCount failed!", __func__);
+        CODEC_LOGE("write dataBlock->blockCount failed!");
         return false;
     }
 
     if (!RangeValueBlockMarshalling(data, &dataBlock->blocksPerSecond)) {
-        HDF_LOGE("%{public}s: write dataBlock->blocksPerSecond failed!", __func__);
+        CODEC_LOGE("write dataBlock->blocksPerSecond failed!");
         return false;
     }
 
     if (!RectBlockMarshalling(data, &dataBlock->blockSize)) {
-        HDF_LOGE("%{public}s: write dataBlock->blockSize failed!", __func__);
+        CODEC_LOGE("write dataBlock->blockSize failed!");
         return false;
     }
 
     for (uint32_t i = 0; i < PIX_FORMAT_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->supportPixFmts)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->supportPixFmts)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->supportPixFmts)[i] failed!");
             return false;
         }
     }
@@ -524,38 +525,38 @@ bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecVideoPortCap *dat
         return false;
     }
     if (!RectBlockUnmarshalling(data, &dataBlock->minSize)) {
-        HDF_LOGE("%{public}s: read &dataBlock->minSize failed!", __func__);
+        CODEC_LOGE("read &dataBlock->minSize failed!");
         return false;
     }
 
     if (!RectBlockUnmarshalling(data, &dataBlock->maxSize)) {
-        HDF_LOGE("%{public}s: read &dataBlock->maxSize failed!", __func__);
+        CODEC_LOGE("read &dataBlock->maxSize failed!");
         return false;
     }
 
     if (!AlignmentBlockUnmarshalling(data, &dataBlock->whAlignment)) {
-        HDF_LOGE("%{public}s: read &dataBlock->whAlignment failed!", __func__);
+        CODEC_LOGE("read &dataBlock->whAlignment failed!");
         return false;
     }
 
     if (!RangeValueBlockUnmarshalling(data, &dataBlock->blockCount)) {
-        HDF_LOGE("%{public}s: read &dataBlock->blockCount failed!", __func__);
+        CODEC_LOGE("read &dataBlock->blockCount failed!");
         return false;
     }
 
     if (!RangeValueBlockUnmarshalling(data, &dataBlock->blocksPerSecond)) {
-        HDF_LOGE("%{public}s: read &dataBlock->blocksPerSecond failed!", __func__);
+        CODEC_LOGE("read &dataBlock->blocksPerSecond failed!");
         return false;
     }
 
     if (!RectBlockUnmarshalling(data, &dataBlock->blockSize)) {
-        HDF_LOGE("%{public}s: read &dataBlock->blockSize failed!", __func__);
+        CODEC_LOGE("read &dataBlock->blockSize failed!");
         return false;
     }
 
     for (uint32_t i = 0; i < PIX_FORMAT_NUM; i++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->supportPixFmts)[i])) {
-            HDF_LOGE("%{public}s: read supportPixFmts[i] failed!", __func__);
+            CODEC_LOGE("read supportPixFmts[i] failed!");
             return false;
         }
     }
@@ -567,28 +568,28 @@ bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const CodecAudioPortCap 
 {
     for (uint32_t i = 0; i < SAMPLE_FORMAT_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->sampleFormats)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->sampleFormats)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->sampleFormats)[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < SAMPLE_RATE_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->sampleRate)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->sampleRate)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->sampleRate)[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < CHANNEL_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->channelLayouts)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->channelLayouts)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->channelLayouts)[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < CHANNEL_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->channelCount)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->channelCount)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->channelCount)[i] failed!");
             return false;
         }
     }
@@ -604,28 +605,28 @@ bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecAudioPortCap *dat
 
     for (uint32_t i = 0; i < SAMPLE_FORMAT_NUM; i++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->sampleFormats)[i])) {
-            HDF_LOGE("%{public}s: read sampleFormats[i] failed!", __func__);
+            CODEC_LOGE("read sampleFormats[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < SAMPLE_RATE_NUM; i++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->sampleRate)[i])) {
-            HDF_LOGE("%{public}s: read sampleRate[i] failed!", __func__);
+            CODEC_LOGE("read sampleRate[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < CHANNEL_NUM; i++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->channelLayouts)[i])) {
-            HDF_LOGE("%{public}s: read channelLayouts[i] failed!", __func__);
+            CODEC_LOGE("read channelLayouts[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < CHANNEL_NUM; i++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->channelCount)[i])) {
-            HDF_LOGE("%{public}s: read channelCount[i] failed!", __func__);
+            CODEC_LOGE("read channelCount[i] failed!");
             return false;
         }
     }
@@ -647,64 +648,64 @@ void AudioPortCapFree(CodecAudioPortCap *dataBlock, bool freeSelf)
 bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCapability *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->role)) {
-        HDF_LOGE("%{public}s: write dataBlock->role failed!", __func__);
+        CODEC_LOGE("write dataBlock->role failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->type)) {
-        HDF_LOGE("%{public}s: write dataBlock->type failed!", __func__);
+        CODEC_LOGE("write dataBlock->type failed!");
         return false;
     }
 
     for (uint32_t i = 0; i < NAME_LENGTH; i++) {
         if (!HdfSbufWriteUint8(data, (uint8_t)(dataBlock->compName)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->compName)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->compName)[i] failed!");
             return false;
         }
     }
 
     for (uint32_t i = 0; i < PROFILE_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->supportProfiles)[i])) {
-            HDF_LOGE("%{public}s: write (dataBlock->supportProfiles)[i] failed!", __func__);
+            CODEC_LOGE("write (dataBlock->supportProfiles)[i] failed!");
             return false;
         }
     }
 
     if (!HdfSbufWriteInt32(data, dataBlock->maxInst)) {
-        HDF_LOGE("%{public}s: write dataBlock->maxInst failed!", __func__);
+        CODEC_LOGE("write dataBlock->maxInst failed!");
         return false;
     }
 
     int8_t isSoftwareCodec = dataBlock->isSoftwareCodec ? 1 : 0;
     bool ret = HdfSbufWriteInt8(data, isSoftwareCodec);
     if (!ret) {
-        HDF_LOGE("%{public}s: write dataBlock->isSoftwareCodec failed!", __func__);
+        CODEC_LOGE("write dataBlock->isSoftwareCodec failed!");
         return false;
     }
 
     if (!HdfSbufWriteInt32(data, dataBlock->processModeMask)) {
-        HDF_LOGE("%{public}s: write dataBlock->processModeMask failed!", __func__);
+        CODEC_LOGE("write dataBlock->processModeMask failed!");
         return false;
     }
 
     if (!HdfSbufWriteUint32(data, dataBlock->capsMask)) {
-        HDF_LOGE("%{public}s: write dataBlock->capsMask failed!", __func__);
+        CODEC_LOGE("write dataBlock->capsMask failed!");
         return false;
     }
 
     if (!RangeValueBlockMarshalling(data, &dataBlock->bitRate)) {
-        HDF_LOGE("%{public}s: write dataBlock->bitRate failed!", __func__);
+        CODEC_LOGE("write dataBlock->bitRate failed!");
         return false;
     }
 
     if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap))) {
-        HDF_LOGE("%{public}s: write dataBlock->port failed!", __func__);
+        CODEC_LOGE("write dataBlock->port failed!");
         return false;
     }
     int8_t canSwapWidthHeight = dataBlock->canSwapWidthHeight ? 1 : 0;
     ret = HdfSbufWriteInt8(data, canSwapWidthHeight);
     if (!ret) {
-        HDF_LOGE("%{public}s: write dataBlock->canSwapWidthHeight failed!", __func__);
+        CODEC_LOGE("write dataBlock->canSwapWidthHeight failed!");
         return false;
     }
 
@@ -719,62 +720,62 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
 
     if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role) ||
         !HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
-        HDF_LOGE("%{public}s: read dataBlock->role or dataBlock->type failed!", __func__);
+        CODEC_LOGE("read dataBlock->role or dataBlock->type failed!");
         return false;
     }
 
     for (uint32_t i = 0; i < NAME_LENGTH; i++) {
         if (!HdfSbufReadUint8(data, (uint8_t *)&(dataBlock->compName)[i])) {
-            HDF_LOGE("%{public}s: read compName[i] failed!", __func__);
+            CODEC_LOGE("read compName[i] failed!");
             return false;
         }
     }
 
     for (uint32_t j = 0; j < PROFILE_NUM; j++) {
         if (!HdfSbufReadInt32(data, &(dataBlock->supportProfiles)[j])) {
-            HDF_LOGE("%{public}s: read supportProfiles[i] failed!", __func__);
+            CODEC_LOGE("read supportProfiles[i] failed!");
             return false;
         }
     }
 
     if (!HdfSbufReadInt32(data, &dataBlock->maxInst)) {
-        HDF_LOGE("%{public}s: read dataBlock->maxInst failed!", __func__);
+        CODEC_LOGE("read dataBlock->maxInst failed!");
         return false;
     }
 
     if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->isSoftwareCodec)) {
-        HDF_LOGE("%{public}s: read dataBlock->isSoftwareCodec failed!", __func__);
+        CODEC_LOGE("read dataBlock->isSoftwareCodec failed!");
         return false;
     }
 
     if (!HdfSbufReadInt32(data, &dataBlock->processModeMask)) {
-        HDF_LOGE("%{public}s: read dataBlock->processModeMask failed!", __func__);
+        CODEC_LOGE("read dataBlock->processModeMask failed!");
         return false;
     }
 
     if (!HdfSbufReadUint32(data, &dataBlock->capsMask)) {
-        HDF_LOGE("%{public}s: read dataBlock->capsMask failed!", __func__);
+        CODEC_LOGE("read dataBlock->capsMask failed!");
         return false;
     }
 
     if (!RangeValueBlockUnmarshalling(data, &dataBlock->bitRate)) {
-        HDF_LOGE("%{public}s: read &dataBlock->bitRate failed!", __func__);
+        CODEC_LOGE("read &dataBlock->bitRate failed!");
         return false;
     }
 
     const PortCap *portCp = (const PortCap *)HdfSbufReadUnpadBuffer(data, sizeof(PortCap));
     if (portCp == NULL) {
-        HDF_LOGE("%{public}s: read portCp failed!", __func__);
+        CODEC_LOGE("read portCp failed!");
         return false;
     }
 
     if (memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap)) != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s dataBlock->port failed!", __func__);
+        CODEC_LOGE("memcpy_s dataBlock->port failed!");
         return false;
     }
 
     if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight)) {
-        HDF_LOGE("%{public}s: read dataBlock->canSwapWidthHeight failed!", __func__);
+        CODEC_LOGE("read dataBlock->canSwapWidthHeight failed!");
         return false;
     }
 
