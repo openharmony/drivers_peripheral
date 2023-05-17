@@ -34,4 +34,4 @@ void TransformNode::AllocateBuffers()
 {
 }
 REGISTERNODE(TransformNode, {"transform"})
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera

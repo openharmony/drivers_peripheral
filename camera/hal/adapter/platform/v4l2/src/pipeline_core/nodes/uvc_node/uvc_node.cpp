@@ -201,9 +201,11 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         return;
     }
 
-    uint8_t* jBuf = (uint8_t *)malloc(buffer->GetSize());
-    YUV422To420((uint8_t *)buffer->GetVirAddress(), (uint8_t *)jBuf, buffer->GetWidth(), buffer->GetHeight());
-    int ret = memcpy_s((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), (uint8_t *)jBuf, buffer->GetSize());
+    uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
+    YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
+        buffer->GetWidth(), buffer->GetHeight());
+    int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),
+        static_cast<uint8_t *>(jBuf), buffer->GetSize());
     if (ret == 0) {
         buffer->SetEsFrameSize(buffer->GetSize());
     } else {

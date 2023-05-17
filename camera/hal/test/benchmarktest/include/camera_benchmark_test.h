@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef CAMERA_BENCHMARK_TEST_H
+#define CAMERA_BENCHMARK_TEST_H
+
 #include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
 #include <string>
@@ -24,3 +28,4 @@ public:
     void TearDown(const ::benchmark::State &state);
     std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
 };
+#endif
