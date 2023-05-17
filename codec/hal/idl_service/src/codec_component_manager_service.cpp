@@ -29,6 +29,7 @@ extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
     sptr<CodecComponentManagerService> manager = new (std::nothrow) CodecComponentManagerService();
     CodecDfxService::GetInstance().SetComponentManager(manager);
+    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->CodecCompCapabilityInit();
     return manager;
 }
 
