@@ -656,8 +656,8 @@ void CodecHdiDecode::Run()
             continue;
         }
         auto bufferInfo = iter->second;
-        void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
-        eosFlag = this->ReadOnePacket(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
+        eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
         bufferInfo->omxBuffer->offset = 0;
         if (eosFlag) {
             bufferInfo->omxBuffer->flag = OMX_BUFFERFLAG_EOS;
@@ -671,7 +671,6 @@ void CodecHdiDecode::Run()
     // wait
     while (!this->exit_) {
         usleep(10000);  // 10000 for wait 10ms
-        continue;
     }
     auto t2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = t2 - t1;
@@ -751,8 +750,16 @@ void CodecHdiDecode::HandleEventPortSettingsChanged(uint32_t data1, uint32_t dat
     uint32_t port = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     if (data2 == OMX_IndexParamPortDefinition) {
         auto err = client_->SendCommand(CODEC_COMMAND_PORT_DISABLE, port, {});
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s error", __func__);
+            return;
+        }
         FreeOutBuffer();
         err = client_->SendCommand(CODEC_COMMAND_PORT_ENABLE, port, {});
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s error", __func__);
+            return;
+        }
         UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
         FillAllTheBuffer();
     }
