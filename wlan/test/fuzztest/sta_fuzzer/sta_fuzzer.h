@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef WLAN_AP_FUZZER_H
-#define WLAN_AP_FUZZER_H
+#ifndef STA_FUZZER_H
+#define STA_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "wlan_ap_fuzzer"
+#define FUZZ_PROJECT_NAME "sta_fuzzer"
 
-#endif // WLAN_AP_FUZZER_H
+#endif // STA_FUZZER_H
