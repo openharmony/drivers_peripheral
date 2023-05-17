@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,7 +20,9 @@ group("hdf_dcamera_fuzztest") {
     "dcameraconfigurestreams_fuzzer:fuzztest",
     "dcameracreatestreams_fuzzer:fuzztest",
     "dcameradisabledcameradevice_fuzzer:fuzztest",
+    "dcameradisableresult_fuzzer:fuzztest",
     "dcameraenabledcameradevice_fuzzer:fuzztest",
+    "dcameraenableresult_fuzzer:fuzztest",
     "dcameragetcameraIds_fuzzer:fuzztest",
     "dcameragetcameraability_fuzzer:fuzztest",
     "dcameragetdevicebydhbase_fuzzer:fuzztest",
@@ -41,5 +43,9 @@ group("hdf_dcamera_fuzztest") {
     "dstreamcancelcapture_fuzzer:fuzztest",
     "dstreamcapture_fuzzer:fuzztest",
     "dstreamchangetoofflinestream_fuzzer:fuzztest",
+    "dstreamcommitstreams_fuzzer:fuzztest",
+    "dstreamdetachbufferqueue_fuzzer:fuzztest",
+    "dstreamgetstreamattributes_fuzzer:fuzztest",
+    "dstreamreleasestreams_fuzzer:fuzztest",
   ]
 }
