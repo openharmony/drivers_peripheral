@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "wlan_sta_fuzzer.h"
+#include "sta_fuzzer.h"
 #include "wlan_common_fuzzer.h"
 
 namespace OHOS {
