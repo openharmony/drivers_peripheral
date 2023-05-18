@@ -32,6 +32,7 @@ struct AudioCaptureInfo {
     unsigned int channelCount;
     struct AudioHwiCapture *hwiCapture;
     uint32_t captureId;
+    unsigned int usrCount;
 };
 
 struct AudioHwiCapturePriv {
@@ -773,6 +774,7 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct Aud
             (capturePriv->captureInfos[index]->sampleRate == attrs->sampleRate) &&
             (capturePriv->captureInfos[index]->channelCount == attrs->channelCount)) {
             *captureId = capturePriv->captureInfos[index]->captureId;
+            capturePriv->captureInfos[index]->usrCount++;
             return &capturePriv->captureInfos[index]->capture;
         }
     }
@@ -836,12 +838,31 @@ struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttribut
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
     priv->captureInfos[*captureId]->captureId = *captureId;
+    priv->captureInfos[*captureId]->usrCount = 1;
     capture = &(priv->captureInfos[*captureId]->capture);
     AudioHwiInitCaptureInstance(capture);
 
     AUDIO_FUNC_LOGI("audio create capture success");
     return capture;
 };
+
+uint32_t QueryCaptureUsrCount(uint32_t captureId)
+{
+    uint32_t usrCnt = 0;
+    if (captureId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio check capture index fail, descIndex=%{public}d", captureId);
+        return usrCnt;
+    }
+    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
+    if (priv->captureInfos[captureId] == NULL) {
+        AUDIO_FUNC_LOGE("audio check capture index fail, descIndex=%{public}d", captureId);
+        return usrCnt;
+    }
+
+    priv->captureInfos[captureId]->usrCount--;
+    usrCnt = priv->captureInfos[captureId]->usrCount;
+    return usrCnt;
+}
 
 void AudioHwiDestroyCaptureById(uint32_t captureId)
 {
