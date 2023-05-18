@@ -40,8 +40,8 @@ static int32_t StartInner(const struct IWiFi *iwifi)
         return HDF_ERR_INVALID_PARAM;
     }
     if (g_wifiIsStarted) {
-        HDF_LOGE("%s: wifi has started already, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
+        HDF_LOGI("%s: wifi has started already, line: %d", __FUNCTION__, __LINE__);
+        return HDF_SUCCESS;
     }
     ret = WifiDriverClientInit();
     if (ret != HDF_SUCCESS) {
@@ -66,8 +66,8 @@ static int32_t StopInner(const struct IWiFi *iwifi)
         return HDF_ERR_INVALID_PARAM;
     }
     if (!g_wifiIsStarted) {
-        HDF_LOGE("%s: wifi has stopped already, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
+        HDF_LOGI("%s: wifi has stopped already, line: %d", __FUNCTION__, __LINE__);
+        return HDF_SUCCESS;
     }
     WifiDriverClientDeinit();
     ClearIWiFiList();
