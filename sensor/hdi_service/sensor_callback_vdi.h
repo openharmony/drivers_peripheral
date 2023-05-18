@@ -29,7 +29,7 @@ class SensorCallbackVdi : public ISensorCallbackVdi {
 public:
     SensorCallbackVdi() = default;
     virtual ~SensorCallbackVdi() = default;
-    SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
+    explicit SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
     int32_t OnDataEventVdi(const HdfSensorEventsVdi& eventVdi) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
