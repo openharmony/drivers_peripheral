@@ -72,7 +72,7 @@ union HdfEffectVdi {
 
 struct HdfCompositeEffectVdi {
     int32_t type;
-    union HdfEffectVdi effects[];
+    std::vector<HdfEffectVdi> effects;
 };
 
 struct HdfEffectInfoVdi {
