@@ -195,6 +195,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
 
 RetCode SourceNode::PortHandler::StopCollectBuffers()
 {
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
     CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers enter");
     cltRun = false;
     pool->NotifyStop();
@@ -202,7 +203,6 @@ RetCode SourceNode::PortHandler::StopCollectBuffers()
         collector->join();
     }
 
-    CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
     auto node = port->GetNode();
     if (node != nullptr) {
         uint32_t n = pool->GetIdleBufferCount();
