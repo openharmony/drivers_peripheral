@@ -147,7 +147,8 @@ int32_t CameraHostImpl::GetCameraAbility(const std::string &cameraId,
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
-
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpMetadata(ability, "cameraAbility");
     MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
