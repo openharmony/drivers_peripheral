@@ -223,6 +223,11 @@ int32_t RilImpl::SetBarringPassword(
     return TaskSchedule(&Telephony::HRilManager::SetBarringPassword, slotId, serialId, setBarringInfo);
 }
 
+int32_t RilImpl::SetVonrSwitch(int32_t slotId, int32_t serialId, int32_t status)
+{
+  return TaskSchedule(&Telephony::HRilManager::SetVonrSwitch, slotId, serialId, status);
+}
+
 // Data
 int32_t RilImpl::ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo)
 {

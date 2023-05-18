@@ -72,6 +72,7 @@ public:
     int32_t StartDtmf(int32_t slotId, int32_t serialId, const DtmfInfo &dtmfInfo) override;
     int32_t StopDtmf(int32_t slotId, int32_t serialId, const DtmfInfo &dtmfInfo) override;
     int32_t SetBarringPassword(int32_t slotId, int32_t serialId, const SetBarringInfo &setBarringInfo) override;
+    int32_t SetVonrSwitch(int32_t slotId, int32_t serialId, int32_t status) override;
 
     // Data
     int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) override;
