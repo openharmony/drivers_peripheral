@@ -591,6 +591,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
 }
 #endif
 
+#ifdef SUPPORT_OMX_EXTEND
 // Test SendCommand
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToExecutingTest_001, TestSize.Level1)
 {
@@ -599,6 +600,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToExecutingTest_001, TestSize.Level1)
     auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_001, TestSize.Level1)
 {
@@ -640,6 +642,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_004, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX_EXTEND
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -674,6 +677,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_006, TestSize.Level1)
     err = component_->FreeBuffer(outputIndex, outBuffer);
     ASSERT_EQ(err, HDF_SUCCESS);
 }
+#endif
 
 // Test UseBuffer
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_001, TestSize.Level1)
