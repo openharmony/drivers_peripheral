@@ -26,7 +26,7 @@
 
 #define STRING_LEN    1024
 
-static const char *DUMP_HELP =
+static const char *g_dumpHelp =
     " usage:\n"
     " -h, --help: dump help\n"
     " -c, --channel: dump the light channel info\n";
@@ -152,7 +152,7 @@ static int32_t LightDriverDump(struct HdfSBuf *data, struct HdfSBuf *reply)
     }
 
     if (argv == 0) {
-        if (!HdfSbufWriteString(reply, DUMP_HELP)) {
+        if (!HdfSbufWriteString(reply, g_dumpHelp)) {
             HDF_LOGE("%{public}s: write -h failed", __func__);
             return HDF_FAILURE;
         }
@@ -166,7 +166,7 @@ static int32_t LightDriverDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         }
 
         if (strcmp(value, "-h") == HDF_SUCCESS) {
-            if (!HdfSbufWriteString(reply, DUMP_HELP)) {
+            if (!HdfSbufWriteString(reply, g_dumpHelp)) {
                 HDF_LOGE("%{public}s: write -h failed", __func__);
                 return HDF_FAILURE;
             }

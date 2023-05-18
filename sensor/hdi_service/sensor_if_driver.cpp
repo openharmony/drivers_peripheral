@@ -102,7 +102,7 @@ static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
 
-struct HdfDriverEntry g_sensorinterfaceDriverEntry = {
+static struct HdfDriverEntry g_sensorinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "sensor_service",
     .Bind = HdfSensorInterfaceDriverBind,

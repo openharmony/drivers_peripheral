@@ -30,25 +30,25 @@ using namespace testing::ext;
 using namespace std;
 
 namespace {
-    constexpr uint32_t g_sleepTime = 3;
-    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
-    constexpr int32_t g_onTime = 500;
-    constexpr int32_t g_offTime = 500;
+    constexpr uint32_t SLEEP_TIME = 3;
+    constexpr int32_t MIN_LIGHT_ID = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t MAX_LIGHT_ID = HDF_LIGHT_ID_ATTENTION;
+    constexpr int32_t ON_TIME = 500;
+    constexpr int32_t OFF_TIME = 500;
     sptr<ILightInterface> g_lightInterface = nullptr;
 
-class lightBenchmarkTest : public benchmark::Fixture {
+class LightBenchmarkTest : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state);
     void TearDown(const ::benchmark::State &state);
 };
 
-void lightBenchmarkTest::SetUp(const ::benchmark::State &state)
+void LightBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     g_lightInterface = ILightInterface::Get();
 }
 
-void lightBenchmarkTest::TearDown(const ::benchmark::State &state)
+void LightBenchmarkTest::TearDown(const ::benchmark::State &state)
 {
 }
 
@@ -57,7 +57,7 @@ void lightBenchmarkTest::TearDown(const ::benchmark::State &state)
   * @tc.desc: Benchmarktest for interface GetLightInfo.
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -69,12 +69,12 @@ BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)(benchmark:
     }
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 
 /**
@@ -82,7 +82,7 @@ BENCHMARK_REGISTER_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0010)->
   * @tc.desc: Benchmarktest for interface TurnOnLight.
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -91,8 +91,8 @@ BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)(benchmark:
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
@@ -104,13 +104,13 @@ BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)(benchmark:
             ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         }
         EXPECT_EQ(HDF_SUCCESS, ret);
-        OsalMSleep(g_sleepTime);
+        OsalMSleep(SLEEP_TIME);
         ret = g_lightInterface->TurnOffLight(iter.lightId);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)->
     Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
 
 /**
@@ -118,7 +118,7 @@ BENCHMARK_REGISTER_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0020)->
   * @tc.desc: Benchmarktest for interface TurnOffLight.
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -128,19 +128,19 @@ BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)(benchmark:
     printf("get light list num[%zu]\n\r", info.size());
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = 255;
         effect.lightColor.colorValue.rgbColor.g = 0;
         effect.lightColor.colorValue.rgbColor.b = 0;
         effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
-        effect.flashEffect.onTime = g_onTime;
-        effect.flashEffect.offTime = g_offTime;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        OsalMSleep(g_sleepTime);
+        OsalMSleep(SLEEP_TIME);
         for (auto _ : st) {
             ret = g_lightInterface->TurnOffLight(iter.lightId);
         }
@@ -148,7 +148,7 @@ BENCHMARK_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)(benchmark:
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, SUB_DriverSystem_LightBenchmark_0030)->
     Iterations(100)-> Repetitions(3)->ReportAggregatesOnly();
 }
 
