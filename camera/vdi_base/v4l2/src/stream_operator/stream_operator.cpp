@@ -490,7 +490,8 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
-    CameraDumper::GetInstance().DumpMetadata(captureSetting, "capturesetting");
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpMetadata(captureSetting, "capturesetting");
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
                                          info.enableShutterCallback_, isStreaming);
