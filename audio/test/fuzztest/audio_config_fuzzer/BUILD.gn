@@ -11,18 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import("//build/config/features.gni")
+import("//build/test.gni")
 import("//build/test.gni")
 
-group("fuzztest") {
+group("audio_config_fuzzer") {
   testonly = true
   deps = []
 
   deps += [
-    "adm_fuzzer:adm_fuzzer",
-    "audio_config_fuzzer:audio_config_fuzzer",
-    "audio_hdi_fuzzer:audio_hdi_fuzzer",
-
-    #"hdi_fuzzer:hdi_fuzzer",
+    "audiocardconfig_fuzzer:AudioCardConfigFuzzTest",
+    "pathselectconfig_fuzzer:PathSelectConfigFuzzTest",
   ]
 }
