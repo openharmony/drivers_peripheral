@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ typedef struct ScheduleParam {
     uint32_t authType;
     ScheduleMode scheduleMode;
     AssociateId associateId;
-    TemplateIdArrays *templateIds;
+    Uint64Array *templateIds;
     uint32_t collectorSensorHint;
     uint32_t verifierSensorHint;
     uint32_t executorMatcher;
@@ -46,7 +46,7 @@ typedef struct CoAuthSchedule {
     uint32_t authType;
     ScheduleMode scheduleMode;
     AssociateId associateId;
-    TemplateIdArrays templateIds;
+    Uint64Array templateIds;
     uint32_t executorSize;
     ExecutorInfoHal executors[MAX_EXECUTOR_SIZE];
 } CoAuthSchedule;
@@ -63,8 +63,8 @@ uint32_t GetScheduleVeriferSensorHint(const CoAuthSchedule *coAuthSchedule);
 void DestroyCoAuthSchedule(CoAuthSchedule *coAuthSchedule);
 CoAuthSchedule *CopyCoAuthSchedule(const CoAuthSchedule *coAuthSchedule);
 void DestroyScheduleNode(void *data);
-bool IsTemplateArraysValid(const TemplateIdArrays *templateIds);
-ResultCode CopyTemplateArrays(const TemplateIdArrays *in, TemplateIdArrays *out);
+bool IsTemplateArraysValid(const Uint64Array *templateIds);
+ResultCode CopyTemplateArrays(const Uint64Array *in, Uint64Array *out);
 
 #ifdef __cplusplus
 }

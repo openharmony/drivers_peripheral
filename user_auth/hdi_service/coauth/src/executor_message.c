@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,11 +19,12 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "coauth.h"
-#include "tlv_wrapper.h"
 #include "adaptor_memory.h"
 #include "adaptor_time.h"
 #include "ed25519_key.h"
 #include "idm_database.h"
+
+#define ROOT_SECRET_LEN 32
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -31,197 +32,324 @@
 #define IAM_STATIC static
 #endif
 
-IAM_STATIC bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data,
-    const Buffer *sign);
-IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode,
-    const TemplateIdArrays *templateIds);
-
-IAM_STATIC ResultCode ParseExecutorResultRemainTime(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv)
 {
-    int32_t ret = GetInt32Para(body, AUTH_REMAIN_COUNT, &result->remainTimes);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse remainTimes failed, ret is %{public}d", ret);
+    Buffer data = GetTmpBuffer(dataTlv->data, dataTlv->len, dataTlv->len);
+    if (!IsBufferValid(&data)) {
+        LOG_ERROR("data is invalid");
         return RESULT_GENERAL_ERROR;
     }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultFreezingTime(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetInt32Para(body, AUTH_REMAIN_TIME, &result->freezingTime);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse freezingTime failed, ret is %{public}d", ret);
+    ResultCode result = RESULT_SUCCESS;
+    Buffer *signData = ExecutorMsgSign(&data);
+    if (!IsBufferValid(signData)) {
+        LOG_ERROR("signData is invalid");
         return RESULT_GENERAL_ERROR;
     }
+    if (signData->contentSize != ED25519_FIX_SIGN_BUFFER_SIZE) {
+        LOG_ERROR("sign data len invalid");
+        result = RESULT_GENERAL_ERROR;
+        goto FAIL;
+    }
+
+    if (memcpy_s(signDataTlv->data, signDataTlv->len, signData->buf, signData->contentSize) != EOK) {
+        LOG_ERROR("copy sign to signDtaTlv failed");
+        result = RESULT_GENERAL_ERROR;
+        goto FAIL;
+    }
+    signDataTlv->len = signData->contentSize;
+    LOG_INFO("sign data success");
+
+FAIL:
+    DestoryBuffer(signData);
+    return result;
+}
+
+IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
+    Uint8Array *retDataAndSignTlv)
+{
+    Attribute *dataAndSignAttribute = CreateEmptyAttribute();
+    Uint8Array dataTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    Uint8Array signTlv = { Malloc(ED25519_FIX_SIGN_BUFFER_SIZE), ED25519_FIX_SIGN_BUFFER_SIZE };
+
+    ResultCode result = RESULT_GENERAL_ERROR;
+    do {
+        if (dataAndSignAttribute == NULL || IS_ARRAY_NULL(dataTlv) || IS_ARRAY_NULL(signTlv)) {
+            LOG_ERROR("dataAndSignAttribute or dataTlv or signTlv is NULL");
+            break;
+        }
+        result = GetAttributeSerializedMsg(attribute, &dataTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeSerializedMsg for data fail");
+            break;
+        }
+
+        result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, dataTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("SetAttributeUint8Array for data fail");
+            break;
+        }
+        if (needSignature) {
+            result = SignData(&dataTlv, &signTlv);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("SignData fail");
+                break;
+            }
+            result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_SIGNATURE, signTlv);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("SetAttributeUint8Array for signature fail");
+                break;
+            }
+        }
+        result = GetAttributeSerializedMsg(dataAndSignAttribute, retDataAndSignTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeSerializedMsg fail");
+            break;
+        }
+    } while (0);
+
+    Free(signTlv.data);
+    Free(dataTlv.data);
+    FreeAttribute(&dataAndSignAttribute);
+    return result;
+}
+
+ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg)
+{
+    IF_TRUE_LOGE_AND_RETURN_VAL(attribute == NULL, RESULT_GENERAL_ERROR);
+    IF_TRUE_LOGE_AND_RETURN_VAL(retMsg == NULL, RESULT_GENERAL_ERROR);
+    IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(*retMsg), RESULT_GENERAL_ERROR);
+
+    Attribute *rootAttribute = CreateEmptyAttribute();
+    Uint8Array dataAndSignTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+
+    ResultCode result = RESULT_GENERAL_ERROR;
+    do {
+        if (rootAttribute == NULL || IS_ARRAY_NULL(dataAndSignTlv)) {
+            LOG_ERROR("rootAttribute or dataAndSignTlv is NULL");
+            break;
+        }
+
+        result = GetAttributeDataAndSignTlv(attribute, needSignature, &dataAndSignTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeDataAndSignTlv fail");
+            break;
+        }
+        result = SetAttributeUint8Array(rootAttribute, AUTH_ROOT, dataAndSignTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("SetAttributeUint8Array fail");
+            break;
+        }
+        result = GetAttributeSerializedMsg(rootAttribute, retMsg);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeSerializedMsg fail");
+            break;
+        }
+    } while (0);
+
+    Free(dataAndSignTlv.data);
+    FreeAttribute(&rootAttribute);
+    return result;
+}
+
+IAM_STATIC ResultCode Ed25519VerifyData(uint64_t scheduleId, Uint8Array dataTlv, Uint8Array signTlv)
+{
+    ResultCode result = RESULT_GENERAL_ERROR;
+    const CoAuthSchedule *currentSchedule = GetCoAuthSchedule(scheduleId);
+    IF_TRUE_LOGE_AND_RETURN_VAL(currentSchedule == NULL, result);
+    Buffer *publicKey = NULL;
+    for (uint32_t index = 0; index < currentSchedule->executorSize; ++index) {
+        const ExecutorInfoHal *executor = &((currentSchedule->executors)[index]);
+        if (executor->executorRole == VERIFIER || executor->executorRole == ALL_IN_ONE) {
+            publicKey = CreateBufferByData(executor->pubKey, PUBLIC_KEY_LEN);
+            break;
+        }
+    }
+    Buffer data = GetTmpBuffer(dataTlv.data, dataTlv.len, dataTlv.len);
+    Buffer sign = GetTmpBuffer(signTlv.data, signTlv.len, signTlv.len);
+    if (!IsBufferValid(publicKey) || !IsBufferValid(&data) || !IsBufferValid(&sign)) {
+        LOG_ERROR("data or sign is invalid");
+        goto FAIL;
+    }
+    result = Ed25519Verify(publicKey, &data, &sign);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("verify sign failed");
+        goto FAIL;
+    }
+    LOG_INFO("Ed25519 verify success");
+
+FAIL:
+    DestoryBuffer(publicKey);
+    return result;
+}
+
+IAM_STATIC ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv)
+{
+    Attribute *dataAttribute = CreateAttributeFromSerializedMsg(dataTlv);
+    Uint8Array signTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+
+    ResultCode result = RESULT_GENERAL_ERROR;
+    do {
+        if (dataAttribute == NULL || IS_ARRAY_NULL(signTlv)) {
+            LOG_ERROR("dataAttribute or signTlv is null");
+            break;
+        }
+        result = GetAttributeUint8Array(dataAndSignAttribute, AUTH_SIGNATURE, &signTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeUint8Array fail");
+            break;
+        }
+
+        uint64_t scheduleId;
+        result = GetAttributeUint64(dataAttribute, AUTH_SCHEDULE_ID, &scheduleId);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeUint64 scheduleId fail");
+            break;
+        }
+        result = Ed25519VerifyData(scheduleId, dataTlv, signTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("Ed25519VerifyData fail");
+            break;
+        }
+    } while (0);
+
+    Free(signTlv.data);
+    FreeAttribute(&dataAttribute);
+    return result;
+}
+
+IAM_STATIC Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, bool needVerifySignature)
+{
+    Attribute *dataAndSignAttribute = CreateAttributeFromSerializedMsg(dataAndSignTlv);
+    Uint8Array dataTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+
+    Attribute *attribute = NULL;
+    do {
+        if (dataAndSignAttribute == NULL || IS_ARRAY_NULL(dataTlv)) {
+            LOG_ERROR("dataAndSignAttribute or dataTlv is null");
+            break;
+        }
+        if (GetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, &dataTlv) != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeUint8Array fail");
+            break;
+        }
+        if (needVerifySignature) {
+            if (VerifyDataTlvSignature(dataAndSignAttribute, dataTlv) != RESULT_SUCCESS) {
+                LOG_ERROR("VerifyDataTlvSignature fail");
+                break;
+            }
+        }
+        attribute = CreateAttributeFromSerializedMsg(dataTlv);
+        if (attribute == NULL) {
+            LOG_ERROR("CreateAttributeFromSerializedMsg fail");
+            break;
+        }
+    } while (0);
+
+    Free(dataTlv.data);
+    FreeAttribute(&dataAndSignAttribute);
+    return attribute;
+}
+
+IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, bool needVerifySignature)
+{
+    IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(msg), NULL);
+
+    Attribute *msgAttribute = CreateAttributeFromSerializedMsg(msg);
+    Uint8Array dataAndSignTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+
+    Attribute *attribute = NULL;
+    do {
+        if (msgAttribute == NULL || IS_ARRAY_NULL(dataAndSignTlv)) {
+            LOG_ERROR("msgAttribute or dataAndSignTlv is null");
+            break;
+        }
+
+        ResultCode result = GetAttributeUint8Array(msgAttribute, AUTH_ROOT, &dataAndSignTlv);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeUint8Array fail");
+            break;
+        }
+
+        attribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, needVerifySignature);
+        if (attribute == NULL) {
+            LOG_ERROR("CreateAttributeFromDataAndSignTlv fail");
+            break;
+        }
+    } while (0);
+
+    Free(dataAndSignTlv.data);
+    FreeAttribute(&msgAttribute);
+    return attribute;
+}
+
+IAM_STATIC void GetRootSecretFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo)
+{
+    Uint8Array array = { Malloc(ROOT_SECRET_LEN), ROOT_SECRET_LEN };
+    IF_TRUE_LOGE_AND_RETURN(IS_ARRAY_NULL(array));
+    ResultCode result = GetAttributeUint8Array(attribute, AUTH_ROOT_SECRET, &(array));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("There is no rootSecret in this attribute");
+        Free(array.data);
+        return;
+    }
+    if (array.len != ROOT_SECRET_LEN) {
+        LOG_ERROR("rootSecret len is invalid");
+        Free(array.data);
+        return;
+    }
+    resultInfo->rootSecret = CreateBufferByData(array.data, array.len);
+    if (!IsBufferValid(resultInfo->rootSecret)) {
+        LOG_ERROR("Generate rootSecret buffer failed");
+        Free(array.data);
+        return;
+    }
+
+    LOG_INFO("get rootSecret success");
+    Free(array.data);
+}
+
+IAM_STATIC ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo)
+{
+    ResultCode result = RESULT_GENERAL_ERROR;
+    result = GetAttributeInt32(attribute, AUTH_RESULT_CODE, &(resultInfo->result));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 result failed");
+        return result;
+    }
+    result = GetAttributeUint64(attribute, AUTH_TEMPLATE_ID, &(resultInfo->templateId));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint64 templateId failed");
+        return result;
+    }
+    result = GetAttributeUint64(attribute, AUTH_SCHEDULE_ID, &(resultInfo->scheduleId));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint64 scheduleId failed");
+        return result;
+    }
+    result = GetAttributeUint64(attribute, AUTH_SUB_TYPE, &(resultInfo->authSubType));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint64 authSubType failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, AUTH_REMAIN_COUNT, &(resultInfo->remainTimes));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 remainTimes failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, AUTH_REMAIN_TIME, &(resultInfo->freezingTime));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 freezingTime failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, &(resultInfo->capabilityLevel));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 capabilityLevel failed");
+        return result;
+    }
+
+    // Only pin auth has rootSecret
+    GetRootSecretFromAttribute(attribute, resultInfo);
     return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultAcl(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetUint32Para(body, AUTH_CAPABILITY_LEVEL, &result->capabilityLevel);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse capabilityLevel failed, ret is %{public}d", ret);
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultTemplateId(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetUint64Para(body, AUTH_TEMPLATE_ID, &result->templateId);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse templateId failed, ret is %{public}d", ret);
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultScheduleId(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetUint64Para(body, AUTH_SCHEDULE_ID, &result->scheduleId);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse scheduleId failed, ret is %{public}d", ret);
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultCode(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetInt32Para(body, AUTH_RESULT_CODE, &result->result);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse resultCode failed, ret is %{public}d", ret);
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultAuthSubType(ExecutorResultInfo *result, TlvListNode *body)
-{
-    int32_t ret = GetUint64Para(body, AUTH_SUBTYPE, &result->authSubType);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("parse authSubType failed, ret is %{public}d", ret);
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode ParseExecutorResultInfo(const Buffer *data, ExecutorResultInfo *result)
-{
-    TlvListNode *parseBody = CreateTlvList();
-    if (parseBody == NULL) {
-        LOG_ERROR("parseBody is null");
-        return false;
-    }
-    int ret = ParseTlvWrapper(data->buf, data->contentSize, parseBody);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("ParseTlvWrapper failed");
-        goto EXIT;
-    }
-    ret = ParseExecutorResultAcl(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultTemplateId(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultAuthSubType(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultCode(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultScheduleId(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultRemainTime(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-    ret = ParseExecutorResultFreezingTime(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        goto EXIT;
-    }
-
-    // Only pin auth can have rootsecret
-    result->rootSecret = GetBuffPara(parseBody->next, AUTH_ROOT_SECRET);
-
-EXIT:
-    DestroyTlvList(parseBody);
-    return ret;
-}
-
-IAM_STATIC Buffer *ParseExecutorResultData(TlvListNode *body)
-{
-    Buffer *data = GetBuffPara(body, AUTH_DATA);
-    if (!IsBufferValid(data)) {
-        LOG_ERROR("ParseCoAuthPara data failed");
-        return NULL;
-    }
-    return data;
-}
-
-IAM_STATIC Buffer *ParseExecutorResultSign(TlvListNode *body)
-{
-    Buffer *sign = GetBuffPara(body, AUTH_SIGNATURE);
-    if (!IsBufferValid(sign)) {
-        LOG_ERROR("ParseCoAuthPara sign failed");
-        return NULL;
-    }
-    return sign;
-}
-
-IAM_STATIC ResultCode ParseRoot(ExecutorResultInfo *result, TlvListNode *body)
-{
-    Buffer *msg = GetBuffPara(body, AUTH_ROOT);
-    if (!IsBufferValid(msg)) {
-        LOG_ERROR("parse msg failed");
-        return RESULT_BAD_PARAM;
-    }
-    Buffer *data = NULL;
-    Buffer *sign = NULL;
-    TlvListNode *parseBody = CreateTlvList();
-    if (parseBody == NULL) {
-        LOG_ERROR("parseBody is null");
-        DestoryBuffer(msg);
-        return RESULT_NO_MEMORY;
-    }
-    int32_t ret = ParseTlvWrapper(msg->buf, msg->contentSize, parseBody);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("parse failed");
-        goto EXIT;
-    }
-    data = ParseExecutorResultData(parseBody->next);
-    if (!IsBufferValid(data)) {
-        LOG_ERROR("parse data failed");
-        ret = RESULT_GENERAL_ERROR;
-        goto EXIT;
-    }
-    ret = ParseExecutorResultInfo(data, result);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("parse info failed");
-        goto EXIT;
-    }
-    sign = ParseExecutorResultSign(parseBody->next);
-    if (!IsBufferValid(sign)) {
-        LOG_ERROR("parse sign failed");
-        ret = RESULT_GENERAL_ERROR;
-        goto EXIT;
-    }
-    if (!IsExecutorInfoValid(result, data, sign)) {
-        LOG_ERROR("executor info is invalid");
-        ret = RESULT_GENERAL_ERROR;
-    }
-EXIT:
-    DestoryBuffer(data);
-    DestoryBuffer(sign);
-    DestoryBuffer(msg);
-    DestroyTlvList(parseBody);
-    return ret;
 }
 
 ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv)
@@ -230,40 +358,31 @@ ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv)
         LOG_ERROR("param is invalid");
         return NULL;
     }
-    TlvListNode *parseBody = CreateTlvList();
-    if (parseBody == NULL) {
-        LOG_ERROR("parseBody is null");
-        return NULL;
-    }
 
-    int ret = ParseTlvWrapper(tlv->buf, tlv->contentSize, parseBody);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("ParseTlvWrapper failed");
-        DestroyTlvList(parseBody);
+    Uint8Array msg = { tlv->buf, tlv->contentSize };
+    Attribute *attribute = CreateAttributeFromExecutorMsg(msg, true);
+    if (attribute == NULL) {
+        LOG_ERROR("CreateAttributeFromExecutorMsg failed");
         return NULL;
     }
 
     ExecutorResultInfo *result = Malloc(sizeof(ExecutorResultInfo));
     if (result == NULL) {
         LOG_ERROR("malloc failed");
-        goto FAIL;
+        FreeAttribute(&attribute);
+        return result;
     }
-    if (memset_s(result, sizeof(ExecutorResultInfo), 0, sizeof(ExecutorResultInfo)) != EOK) {
-        LOG_ERROR("set result failed");
-        goto FAIL;
-    }
-    ret = ParseRoot(result, parseBody->next);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("ParseExecutorResult failed");
-        goto FAIL;
-    }
-    DestroyTlvList(parseBody);
-    return result;
+    (void)memset_s(result, sizeof(ExecutorResultInfo), 0, sizeof(ExecutorResultInfo));
 
-FAIL:
-    DestroyTlvList(parseBody);
-    DestoryExecutorResultInfo(result);
-    return NULL;
+    if (GetExecutorResultInfoFromAttribute(attribute, result) != RESULT_SUCCESS) {
+        LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
+        FreeAttribute(&attribute);
+        DestoryExecutorResultInfo(result);
+        return NULL;
+    }
+
+    FreeAttribute(&attribute);
+    return result;
 }
 
 void DestoryExecutorResultInfo(ExecutorResultInfo *result)
@@ -277,193 +396,77 @@ void DestoryExecutorResultInfo(ExecutorResultInfo *result)
     Free(result);
 }
 
-IAM_STATIC bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data,
-    const Buffer *sign)
+IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t authType, uint32_t authPropertyMode,
+    const Uint64Array *templateIds, Attribute *attribute)
 {
-    if (executorResultInfo == NULL) {
-        LOG_ERROR("there is a problem with the data content");
-        return false;
+    int32_t result = SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, authPropertyMode);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 propertyMode failed");
+        return RESULT_GENERAL_ERROR;
     }
-    const CoAuthSchedule *currentSchedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
-    if (currentSchedule == NULL) {
-        LOG_ERROR("get schedule info failed");
-        return false;
+    result = SetAttributeUint32(attribute, AUTH_TYPE, authType);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 authType failed");
+        return RESULT_GENERAL_ERROR;
     }
-    Buffer *publicKey = NULL;
-    for (uint32_t index = 0; index < currentSchedule->executorSize; ++index) {
-        const ExecutorInfoHal *executor = &((currentSchedule->executors)[index]);
-        if (executor->executorRole == VERIFIER || executor->executorRole == ALL_IN_ONE) {
-            publicKey = CreateBufferByData(executor->pubKey, PUBLIC_KEY_LEN);
-            break;
-        }
-    }
-    if (!IsBufferValid(publicKey)) {
-        LOG_ERROR("get publicKey failed");
-        return false;
-    }
-    ResultCode ret = Ed25519Verify(publicKey, data, sign);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("verify sign failed");
-        DestoryBuffer(publicKey);
-        return false;
-    }
-    DestoryBuffer(publicKey);
-    return true;
-}
-
-IAM_STATIC Buffer *SerializeExecutorMsgData(uint32_t authType, uint32_t propertyMode,
-    const TemplateIdArrays *templateIds)
-{
-    if ((propertyMode != PROPERMODE_UNLOCK && propertyMode != PROPERMODE_LOCK) ||
-        templateIds->num > MAX_TEMPLATE_OF_SCHEDULE) {
-        LOG_ERROR("param is invalid");
-        return NULL;
-    }
-    TlvListNode *parseBody = CreateTlvList();
-    if (parseBody == NULL) {
-        LOG_ERROR("parseBody is null");
-        return NULL;
-    }
-    int32_t ret = TlvAppendObject(parseBody, AUTH_PROPERTY_MODE, (uint8_t *)&propertyMode, sizeof(uint32_t));
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append propertyMode failed");
-        goto FAIL;
-    }
-    ret = TlvAppendObject(parseBody, AUTH_TYPE, (uint8_t *)&authType, sizeof(authType));
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append authType failed");
-        goto FAIL;
-    }
-    ret = TlvAppendObject(parseBody, AUTH_TEMPLATE_ID_LIST,
-        (uint8_t *)templateIds->value, templateIds->num * sizeof(uint64_t));
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append template list failed");
-        goto FAIL;
+    Uint64Array templateIdsIn = { templateIds->data, templateIds->len };
+    result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, templateIdsIn);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint64Array templateIdsIn failed");
+        return RESULT_GENERAL_ERROR;
     }
     uint64_t time = GetSystemTime();
-    ret = TlvAppendObject(parseBody, AUTH_TIME_STAMP, (uint8_t *)&time, sizeof(uint64_t));
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append time failed");
-        goto FAIL;
+    result = SetAttributeUint64(attribute, AUTH_TIME_STAMP, time);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint64 time failed");
+        return RESULT_GENERAL_ERROR;
     }
-    Buffer *data = CreateBufferBySize(BUFFER_SIZE);
-    if (!IsBufferValid(data)) {
-        LOG_ERROR("buf is null");
-        goto FAIL;
-    }
-    ret = SerializeTlvWrapper(parseBody, data->buf, data->maxSize, &data->contentSize);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("serialize tlv failed");
-        DestoryBuffer(data);
-        goto FAIL;
-    }
-    DestroyTlvList(parseBody);
-    return data;
 
-FAIL:
-    DestroyTlvList(parseBody);
-    return NULL;
+    return RESULT_SUCCESS;
 }
 
-IAM_STATIC Buffer *SerializeExecutorMsg(const Buffer *data, const Buffer *signatrue)
-{
-    TlvListNode *parseBody = CreateTlvList();
-    if (parseBody == NULL) {
-        LOG_ERROR("data parseBody is null");
-        return NULL;
-    }
-    int32_t ret = TlvAppendObject(parseBody, AUTH_DATA, data->buf, data->contentSize);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append auth data failed");
-        goto FAIL;
-    }
-    if (signatrue != NULL) {
-        ret = TlvAppendObject(parseBody, AUTH_SIGNATURE, signatrue->buf, signatrue->contentSize);
-        if (ret != OPERA_SUCC) {
-            LOG_ERROR("append signature failed");
-            goto FAIL;
-        }
-    }
-    Buffer *msgTlvData = CreateBufferBySize(BUFFER_SIZE);
-    if (!IsBufferValid(msgTlvData)) {
-        LOG_ERROR("buf is null");
-        goto FAIL;
-    }
-    ret = SerializeTlvWrapper(parseBody, msgTlvData->buf, msgTlvData->maxSize, &msgTlvData->contentSize);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("serialize tlv failed");
-        DestoryBuffer(msgTlvData);
-        goto FAIL;
-    }
-    return msgTlvData;
 
-FAIL:
-    DestroyTlvList(parseBody);
-    return NULL;
-}
-
-IAM_STATIC Buffer *SerializeRootMsg(const Buffer *msg)
-{
-    TlvListNode *rootParseBody = CreateTlvList();
-    if (rootParseBody == NULL) {
-        LOG_ERROR("rootParseBody is null");
-        return NULL;
-    }
-    int32_t ret = TlvAppendObject(rootParseBody, AUTH_ROOT, msg->buf, msg->contentSize);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("append msg failed");
-        DestroyTlvList(rootParseBody);
-        return NULL;
-    }
-    Buffer *rootMsg = CreateBufferBySize(BUFFER_SIZE);
-    if (!IsBufferValid(rootMsg)) {
-        LOG_ERROR("buf is null");
-        DestroyTlvList(rootParseBody);
-        return NULL;
-    }
-    ret = SerializeTlvWrapper(rootParseBody, rootMsg->buf, rootMsg->maxSize, &rootMsg->contentSize);
-    if (ret != OPERA_SUCC) {
-        LOG_ERROR("serialize tlv failed");
-        DestroyTlvList(rootParseBody);
-        DestoryBuffer(rootMsg);
-        return NULL;
-    }
-    DestroyTlvList(rootParseBody);
-    return rootMsg;
-}
-
-IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const TemplateIdArrays *templateIds)
+IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const Uint64Array *templateIds)
 {
     if (templateIds == NULL) {
         LOG_ERROR("templateIds is null");
         return NULL;
     }
-
-    Buffer *data = SerializeExecutorMsgData(authType, authPropertyMode, templateIds);
-    if (!IsBufferValid(data)) {
-        LOG_ERROR("data is null");
-        return NULL;
+    Buffer *retBuffer = NULL;
+    Uint8Array retInfo = { Malloc(MAX_EXECUTOR_SIZE), MAX_EXECUTOR_SIZE };
+    Attribute *attribute = CreateEmptyAttribute();
+    if (attribute == NULL || IS_ARRAY_NULL(retInfo)) {
+        LOG_ERROR("generate attribute or retInfo failed");
+        goto FAIL;
     }
-    Buffer *signatrue = NULL;
+
+    ResultCode result = SetExecutorMsgToAttribute(authType, authPropertyMode, templateIds, attribute);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg to attribute failed");
+        goto FAIL;
+    }
+
     if (authPropertyMode == PROPERMODE_UNLOCK) {
-        signatrue = ExecutorMsgSign(data);
-        if (!IsBufferValid(signatrue)) {
-            LOG_ERROR("signature is invalid");
-            DestoryBuffer(data);
-            return NULL;
-        }
+        result = GetAttributeExecutorMsg(attribute, true, &retInfo);
+    } else {
+        result = GetAttributeExecutorMsg(attribute, false, &retInfo);
+    }
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeExecutorMsg failed");
+        goto FAIL;
     }
 
-    Buffer *msg = SerializeExecutorMsg(data, signatrue);
-    DestoryBuffer(data);
-    DestoryBuffer(signatrue);
-    if (!IsBufferValid(msg)) {
-        LOG_ERROR("msg is invalid");
-        return NULL;
+    retBuffer = CreateBufferByData(retInfo.data, retInfo.len);
+    if (!IsBufferValid(retBuffer)) {
+        LOG_ERROR("generate result buffer failed");
+        goto FAIL;
     }
-    Buffer *rootMsg = SerializeRootMsg(msg);
-    DestoryBuffer(msg);
-    return rootMsg;
+    LOG_INFO("CreateExecutorMsg success");
+
+FAIL:
+    FreeAttribute(&attribute);
+    Free(retInfo.data);
+    return retBuffer;
 }
 
 IAM_STATIC void DestoryExecutorMsg(void *data)
@@ -476,7 +479,7 @@ IAM_STATIC void DestoryExecutorMsg(void *data)
     Free(msg);
 }
 
-IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, TemplateIdArrays *templateIds)
+IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, Uint64Array *templateIds)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, executorNode->authType);
@@ -494,30 +497,30 @@ IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNod
         return RESULT_REACH_LIMIT;
     }
     if (credListNum == 0) {
-        templateIds->value = NULL;
-        templateIds->num = 0;
+        templateIds->data = NULL;
+        templateIds->len = 0;
         DestroyLinkedList(credList);
         return RESULT_SUCCESS;
     }
-    templateIds->value = (uint64_t *)Malloc(sizeof(uint64_t) * credListNum);
-    if (templateIds->value == NULL) {
-        LOG_ERROR("value malloc failed");
+    templateIds->data = (uint64_t *)Malloc(sizeof(uint64_t) * credListNum);
+    if (templateIds->data == NULL) {
+        LOG_ERROR("data malloc failed");
         DestroyLinkedList(credList);
         return RESULT_NO_MEMORY;
     }
-    templateIds->num = 0;
+    templateIds->len = 0;
     LinkedListNode *temp = credList->head;
     while (temp != NULL) {
         if (temp->data == NULL) {
             LOG_ERROR("link node is invalid");
             DestroyLinkedList(credList);
-            Free(templateIds->value);
-            templateIds->value = NULL;
+            Free(templateIds->data);
+            templateIds->data = NULL;
             return RESULT_UNKNOWN;
         }
         CredentialInfoHal *credentialHal = (CredentialInfoHal *)temp->data;
-        templateIds->value[templateIds->num] = credentialHal->templateId;
-        ++(templateIds->num);
+        templateIds->data[templateIds->len] = credentialHal->templateId;
+        ++(templateIds->len);
         temp = temp->next;
     }
     DestroyLinkedList(credList);
@@ -527,26 +530,26 @@ IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNod
 IAM_STATIC ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t authPropertyMode,
     LinkedList *executorMsg)
 {
-    TemplateIdArrays templateIds;
+    Uint64Array templateIds;
     ResultCode ret = GetExecutorTemplateList(executorNode, &templateIds);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get template list failed");
         return ret;
     }
-    if (templateIds.num == 0) {
+    if (templateIds.len == 0) {
         return RESULT_SUCCESS;
     }
     ExecutorMsg *msg = (ExecutorMsg *)Malloc(sizeof(ExecutorMsg));
     if (msg == NULL) {
         LOG_ERROR("msg is null");
-        Free(templateIds.value);
+        Free(templateIds.data);
         return RESULT_NO_MEMORY;
     }
     msg->executorIndex = executorNode->executorIndex;
     msg->msg = CreateExecutorMsg(executorNode->authType, authPropertyMode, &templateIds);
     if (msg->msg == NULL) {
         LOG_ERROR("msg's msg is null");
-        Free(templateIds.value);
+        Free(templateIds.data);
         DestoryExecutorMsg(msg);
         return RESULT_NO_MEMORY;
     }
@@ -555,7 +558,7 @@ IAM_STATIC ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint3
         LOG_ERROR("insert msg failed");
         DestoryExecutorMsg(msg);
     }
-    Free(templateIds.value);
+    Free(templateIds.data);
     return ret;
 }
 
