@@ -58,7 +58,7 @@ void HdfLightHdiTest::TearDown()
 {
 }
 
-void InitConfig(HdfLightEffect &effect)
+static void InitConfig(HdfLightEffect &effect)
 {
     effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
     effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
