@@ -50,6 +50,10 @@ static void WriteBuffer(const BufferHandle& handle)
     int strSize = strlen(VERIFY_MSG) + 1;
     int i = 0;
     char* ptr = reinterpret_cast<char *>(handle.virAddr);
+    if (ptr == nullptr) {
+        HDF_LOGE("cast ptr failed");
+        return;
+    }
 
     for (; i < handle.size - strSize;) {
         errno_t ret = memcpy_s(&ptr[i], sizeof(VERIFY_MSG), VERIFY_MSG, sizeof(VERIFY_MSG));
@@ -161,6 +165,11 @@ int main()
     info.format = PIXEL_FMT_RGBA_8888;
 
     IDisplayBuffer* dispbuf = IDisplayBuffer::Get();
+    if (dispbuf == nullptr) {
+        HDF_LOGE("get IDisplayBuffer failed");
+        return 0;
+    }
+
     for (int i = 0; i < LOOP_COUNT; i++) {
         RunOnce(info, dispbuf);
     }

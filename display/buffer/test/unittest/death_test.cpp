@@ -17,9 +17,7 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "gtest/gtest.h"
-#include "v1_0/display_buffer_type.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
 namespace HDI {
@@ -29,40 +27,40 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace testing::ext;
 
-void DeathTest::SetUp()
-{
-}
-
-void DeathTest::TearDown()
-{
-}
+static bool g_isServiceDead = false;
 
 void BufferDiedRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject>& remote)
 {
     if (remote == nullptr) {
         return;
     }
-    HDF_LOGI("allocator service is dead");
+    EXPECT_EQ(g_isServiceDead, true);
 }
 
 HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 {
-    displayBuffer_ = IDisplayBuffer::Get();
+    displayBuffer_.reset(IDisplayBuffer::Get());
+    ASSERT_TRUE(displayBuffer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new BufferDiedRecipient();
+    ASSERT_TRUE(recipient != nullptr);
     auto ret = displayBuffer_->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
+    g_isServiceDead = true;
     system("killall allocator_host");
 }
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    displayBuffer_ = IDisplayBuffer::Get();
+    displayBuffer_.reset(IDisplayBuffer::Get());
+    ASSERT_TRUE(displayBuffer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new BufferDiedRecipient();
+    ASSERT_TRUE(recipient != nullptr);
     auto ret = displayBuffer_->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
 
     ret = displayBuffer_->RemoveDeathRecipient();
     EXPECT_EQ(ret, true);
+    g_isServiceDead = true;
     system("killall allocator_host");
 }
 } // OHOS

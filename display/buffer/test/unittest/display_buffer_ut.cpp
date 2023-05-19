@@ -232,6 +232,7 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
         void *vAddr = displayBuffer_->Mmap(*buffer);
         if (vAddr == nullptr) {
             HDF_LOGE("Mmap failed");
+            displayBuffer_->FreeMem(*buffer);
             return DISPLAY_FAILURE;
         }
 
@@ -239,11 +240,15 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             ret = displayBuffer_->InvalidateCache(*buffer);
             if (ret != DISPLAY_SUCCESS) {
                 HDF_LOGE("InvalidateCache failed");
+                displayBuffer_->Unmap(*buffer);
+                displayBuffer_->FreeMem(*buffer);
                 return ret;
             }
         }
         if (memset_s(vAddr, buffer->size, 0, buffer->size) != EOK) {
             HDF_LOGE("Insufficient memory");
+            displayBuffer_->Unmap(*buffer);
+            displayBuffer_->FreeMem(*buffer);
             return DISPLAY_NOMEM;
         }
 
@@ -251,6 +256,8 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             ret = displayBuffer_->FlushCache(*buffer);
             if (ret != DISPLAY_SUCCESS) {
                 HDF_LOGE("FlushCache failed");
+                displayBuffer_->Unmap(*buffer);
+                displayBuffer_->FreeMem(*buffer);
                 return ret;
             }
         }

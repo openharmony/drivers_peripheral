@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,8 @@
  */
 
 
-#ifndef _HDI_DISPLAY_REGISTER_CALLBACK_STUB_H_
-#define _HDI_DISPLAY_REGISTER_CALLBACK_STUB_H_
+#ifndef HDI_DISPLAY_REGISTER_CALLBACK_STUB_H
+#define HDI_DISPLAY_REGISTER_CALLBACK_STUB_H
 
 #include "idisplay_device_callback.h"
 #include "iremote_stub.h"
@@ -28,4 +28,4 @@ public:
                 OHOS::MessageParcel& reply,
                 OHOS::MessageOption& option) override;
 };
-#endif // _HDI_DISPLAY_REGISTER_CALLBACK_STUB_H_
+#endif // HDI_DISPLAY_REGISTER_CALLBACK_STUB_H

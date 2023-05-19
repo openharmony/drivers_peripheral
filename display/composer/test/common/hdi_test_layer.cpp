@@ -49,7 +49,7 @@ HdiGrallocBuffer::~HdiGrallocBuffer()
 {
     if (mBufferHandle != nullptr) {
         std::shared_ptr<IDisplayBuffer> gralloc = HdiTestDevice::GetInstance().GetGrallocInterface();
-        if (mBufferHandle->virAddr != nullptr) {
+        if ((mBufferHandle->virAddr != nullptr) && (gralloc != nullptr)) {
             int ret = gralloc->Unmap(*mBufferHandle);
             if (ret != DISPLAY_SUCCESS) {
                 DISPLAY_TEST_LOGE("can not ummap buffer handle");
