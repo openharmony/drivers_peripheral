@@ -100,7 +100,7 @@ static void HdfVibratorInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
     delete hdfVibratorInterfaceHost;
 }
 
-struct HdfDriverEntry g_vibratorInterfaceDriverEntry = {
+static struct HdfDriverEntry g_vibratorInterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "vibrator_service",
     .Bind = HdfVibratorInterfaceDriverBind,

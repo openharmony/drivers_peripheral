@@ -24,7 +24,7 @@
 #define HDF_LOG_TAG    uhdf_sensor_service
 #define STRING_LEN    2048
 
-static const char *HELP_COMMENT =
+static const char *g_helpComment =
     " Sensor manager dump options:\n"
     "     -h: [sensor command help]\n"
     "     -l: [show sensor list]\n"
@@ -182,7 +182,7 @@ static int32_t DevHostSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply)
     }
 
     if (argv == 0) {
-        (void)HdfSbufWriteString(reply, HELP_COMMENT);
+        (void)HdfSbufWriteString(reply, g_helpComment);
         return HDF_SUCCESS;
     }
 
@@ -193,7 +193,7 @@ static int32_t DevHostSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply)
             return HDF_FAILURE;
         }
         if (strcmp(value, "-h") == 0) {
-            (void)HdfSbufWriteString(reply, HELP_COMMENT);
+            (void)HdfSbufWriteString(reply, g_helpComment);
             return HDF_SUCCESS;
         } else if (strcmp(value, "-l") == 0) {
             SensorShowList(reply);
