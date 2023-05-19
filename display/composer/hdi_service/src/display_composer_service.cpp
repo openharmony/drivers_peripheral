@@ -19,11 +19,15 @@
 #include <hdf_base.h>
 #include "display_log.h"
 #include "hdf_log.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002500
+
+#undef DISPLAY_TRACE
+#define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
 
 namespace OHOS {
 namespace HDI {
@@ -129,6 +133,8 @@ void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void* 
 
 int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback>& cb)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     hotPlugCb_ = cb;
     int32_t ret = vdiImpl_->RegHotPlugCallback(OnHotPlug, this);
@@ -138,6 +144,8 @@ int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback>&
 
 int32_t DisplayComposerService::GetDisplayCapability(uint32_t devId, DisplayCapability& info)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret =  vdiImpl_->GetDisplayCapability(devId, info);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -146,6 +154,8 @@ int32_t DisplayComposerService::GetDisplayCapability(uint32_t devId, DisplayCapa
 
 int32_t DisplayComposerService::GetDisplaySupportedModes(uint32_t devId, std::vector<DisplayModeInfo>& modes)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret =  vdiImpl_->GetDisplaySupportedModes(devId, modes);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -154,6 +164,8 @@ int32_t DisplayComposerService::GetDisplaySupportedModes(uint32_t devId, std::ve
 
 int32_t DisplayComposerService::GetDisplayMode(uint32_t devId, uint32_t& modeId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret =  vdiImpl_->GetDisplayMode(devId, modeId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -162,6 +174,8 @@ int32_t DisplayComposerService::GetDisplayMode(uint32_t devId, uint32_t& modeId)
 
 int32_t DisplayComposerService::SetDisplayMode(uint32_t devId, uint32_t modeId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret =  vdiImpl_->SetDisplayMode(devId, modeId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -170,6 +184,8 @@ int32_t DisplayComposerService::SetDisplayMode(uint32_t devId, uint32_t modeId)
 
 int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerStatus& status)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -178,6 +194,8 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerS
 
 int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, DispPowerStatus status)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayPowerStatus(devId, status);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -186,6 +204,8 @@ int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, DispPowerS
 
 int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t& level)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayBacklight(devId, level);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_SUCCESS, level = currentBacklightLevel_);
@@ -194,6 +214,8 @@ int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t& le
 
 int32_t DisplayComposerService::SetDisplayBacklight(uint32_t devId, uint32_t level)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayBacklight(devId, level);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -203,6 +225,8 @@ int32_t DisplayComposerService::SetDisplayBacklight(uint32_t devId, uint32_t lev
 
 int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayProperty(devId, id, value);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -212,6 +236,8 @@ int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, 
 int32_t DisplayComposerService::GetDisplayCompChange(
     uint32_t devId, std::vector<uint32_t>& layers, std::vector<int32_t>& type)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayCompChange(devId, layers, type);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -220,6 +246,8 @@ int32_t DisplayComposerService::GetDisplayCompChange(
 
 int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect& rect)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayClientCrop(devId, rect);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -228,6 +256,8 @@ int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect
 
 int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enabled)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayVsyncEnabled(devId, enabled);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -236,6 +266,8 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
 
 int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->RegDisplayVBlankCallback(devId, OnVBlank, cb.GetRefPtr());
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -246,6 +278,8 @@ int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const s
 int32_t DisplayComposerService::GetDisplayReleaseFence(
     uint32_t devId, std::vector<uint32_t>& layers, std::vector<sptr<HdifdParcelable>>& fences)
 {
+    DISPLAY_TRACE;
+
     std::vector<int32_t> outFences;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayReleaseFence(devId, layers, outFences);
@@ -260,6 +294,8 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(
 
 int32_t DisplayComposerService::CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t& format, uint32_t& devId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->CreateVirtualDisplay(width, height, format, devId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -268,6 +304,8 @@ int32_t DisplayComposerService::CreateVirtualDisplay(uint32_t width, uint32_t he
 
 int32_t DisplayComposerService::DestroyVirtualDisplay(uint32_t devId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->DestroyVirtualDisplay(devId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -277,6 +315,8 @@ int32_t DisplayComposerService::DestroyVirtualDisplay(uint32_t devId)
 int32_t DisplayComposerService::SetVirtualDisplayBuffer(
     uint32_t devId, const sptr<NativeBuffer>& buffer, const sptr<HdifdParcelable>& fence)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(fence, HDF_FAILURE);
     BufferHandle* handle = buffer->GetBufferHandle();
     int32_t inFence = fence->GetFd();
@@ -288,6 +328,8 @@ int32_t DisplayComposerService::SetVirtualDisplayBuffer(
 
 int32_t DisplayComposerService::SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetDisplayProperty(devId, id, value);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -296,6 +338,8 @@ int32_t DisplayComposerService::SetDisplayProperty(uint32_t devId, uint32_t id, 
 
 int32_t DisplayComposerService::CreateLayer(uint32_t devId, const LayerInfo& layerInfo, uint32_t& layerId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->CreateLayer(devId, layerInfo, layerId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -304,6 +348,8 @@ int32_t DisplayComposerService::CreateLayer(uint32_t devId, const LayerInfo& lay
 
 int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
 {
+    DISPLAY_TRACE;
+
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->DestroyLayer(devId, layerId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
