@@ -1,0 +1,50 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+hdf_audio_path = "../../../../"
+import("$hdf_audio_path/audio.gni")
+
+module_output_path = "drivers_peripheral_audio/audio"
+
+ohos_fuzztest("PathSelectConfigFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "../pathselectconfig_fuzzer"
+
+  sources = [
+    "$hdf_audio_path/hal/pathselect/src/audio_pathselect.c",
+    "pathselectconfig_fuzzer.cpp",
+  ]
+  include_dirs = [
+    "$hdf_audio_path/hal/pathselect/include",
+    "$hdf_audio_path/hal/hdi_passthrough/include",
+    "$hdf_audio_path/interfaces/include",
+    "//third_party/cJSON/",
+  ]
+
+  deps = [ "//third_party/cJSON:cjson" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  defines = []
+
+  if (drivers_peripheral_audio_feature_alsa_lib) {
+    defines += [ "ALSA_LIB_MODE" ]
+  }
+}
