@@ -20,7 +20,7 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_0;
-void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &points) const
+static void GetCheckPoints(Point center, std::vector<Point> &points)
 {
     const uint32_t STEP = 3;
     points.push_back(center);
@@ -34,7 +34,7 @@ void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &point
     points.push_back({center.x, center.y - STEP});
 }
 // simple hande the alpha it may not compatible with all scenarios
-void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_t& color) const
+static void SimpleHandleAlpha(const LayerSettings& layers, uint32_t& color)
 {
     const float INV = 1.0f / 255.0f;
     const uint32_t WHITE_TRANSPARENT = 0xffffff00;
@@ -54,8 +54,7 @@ void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_
     }
 }
 
-std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(const std::vector<LayerSettings> &layers,
-    const std::vector<Point> &points) const
+static std::vector<uint32_t> GetCheckColors(const std::vector<LayerSettings> &layers, const std::vector<Point> &points)
 {
     std::vector<uint32_t> colors;
     for (auto point : points) {
@@ -79,7 +78,7 @@ std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(const std::vector<Laye
 }
 
 int32_t HdiCompositionCheck::Check(const std::vector<LayerSettings> &layers,
-    const BufferHandle& clientBuffer, uint32_t checkType)
+    const BufferHandle& clientBuffer, uint32_t checkType) const
 {
     int ret = DISPLAY_SUCCESS;
     const int MID_POS = 2;

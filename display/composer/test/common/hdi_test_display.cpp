@@ -70,7 +70,7 @@ int32_t HdiTestDisplay::Init()
 int32_t HdiTestDisplay::GetModeInfoFromId(int32_t id, DisplayModeInfo& modeInfo) const
 {
     DISPLAY_TEST_LOGD();
-    auto iter = std::find_if (std::begin(modes_), std::end(modes_),[id](const auto& mode) {
+    auto iter = std::find_if (std::begin(modes_), std::end(modes_), [id](const auto& mode) {
         return mode.id == id;
     });
     if (iter != std::end(modes_)) {
