@@ -216,7 +216,7 @@ static int32_t SetModulationParameter(uint16_t intensity, int16_t frequency)
     return HDF_SUCCESS;
 }
 
-static int32_t StartModulationParameter()
+static int32_t StartModulationParameter(void)
 {
     uint8_t value[DRV2605L_VALUE_BUTT];
     struct Drv2605lDriverData *drvData = NULL;
@@ -234,7 +234,7 @@ static int32_t StartModulationParameter()
     return HDF_SUCCESS;
 }
 
-static int32_t StopModulationParameter()
+static int32_t StopModulationParameter(void)
 {
     uint8_t value[DRV2605L_VALUE_BUTT];
     struct Drv2605lDriverData *drvData = NULL;

@@ -29,6 +29,8 @@ using namespace testing::ext;
 using namespace std;
 
 namespace {
+    constexpr int32_t ITERATION_FREQUENCY = 100;
+    constexpr int32_t REPETITION_FREQUENCY = 3;
     uint32_t g_duration = 100;
     int32_t g_intensity1 = 30;
     int32_t g_frequency1 = 200;
@@ -53,12 +55,12 @@ void VibratorBenchmarkTest::TearDown(const ::benchmark::State &state)
 }
 
 /**
-  * @tc.name: DriverSystem_VibratorBenchmark_001
+  * @tc.name: DriverSystem_VibratorBenchmark_StartOnce
   * @tc.desc: Benchmarktest for interface StartOnce
-  * Controls this vibrator to perform a one-shot vibrator at a given duration.
+  * Controls this vibrator to perform a one-shot vibrator at a given duration
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_001)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, StartOnce)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -73,16 +75,16 @@ BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_001)(benchmark
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_001)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, StartOnce)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
-  * @tc.name: DriverSystem_VibratorBenchmark_002
+  * @tc.name: DriverSystem_VibratorBenchmark_Start
   * @tc.desc: Benchmarktest for interface Start
-  * Controls this Performing Time Series Vibrator Effects.
+  * Controls this Performing Time Series Vibrator Effects
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_002)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, Start)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -97,16 +99,16 @@ BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_002)(benchmark
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_002)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, Start)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
-  * @tc.name: DriverSystem_VibratorBenchmark_003
+  * @tc.name: DriverSystem_VibratorBenchmark_Stop
   * @tc.desc: Benchmarktest for interface Stop
-  * Controls this Performing built-in Vibrator Effects.
+  * Controls this Performing built-in Vibrator Effects
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_003)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, Stop)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
     int32_t startRet;
@@ -121,16 +123,16 @@ BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_003)(benchmark
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_003)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, Stop)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
-  * @tc.name: DriverSystem_VibratorBenchmark_004
-  * @tc.desc: Benchmarktest for interface GetVibratorInfo.
-  * Controls this Performing Time Series Vibrator Effects.
+  * @tc.name: DriverSystem_VibratorBenchmark_GetVibratorInfo
+  * @tc.desc: Benchmarktest for interface GetVibratorInfo
+  * Controls this Performing Time Series Vibrator Effects
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_004)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, GetVibratorInfo)(benchmark::State &state)
 {
     uint32_t majorVer;
     uint32_t minorVer;
@@ -152,19 +154,20 @@ BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_004)(benchmark
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_004)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetVibratorInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
-  * @tc.name: DriverSystem_VibratorBenchmark_005
-  * @tc.desc: Benchmarktest for interface EnableVibratorModulation.
-  * Controls this Performing built-in Vibrator Effects.
+  * @tc.name: DriverSystem_VibratorBenchmark_EnableVibratorModulation
+  * @tc.desc: Benchmarktest for interface EnableVibratorModulation
+  * Controls this Performing built-in Vibrator Effects
   * @tc.type: FUNC
   */
-BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_005)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, EnableVibratorModulation)(benchmark::State &state)
 {
     uint32_t majorVer;
     uint32_t minorVer;
+
     if (g_vibratorInterface->GetVersion(majorVer, minorVer) != HDF_SUCCESS) {
         return;
     }
@@ -197,8 +200,86 @@ BENCHMARK_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_005)(benchmark
     }
 }
 
-BENCHMARK_REGISTER_F(VibratorBenchmarkTest, DriverSystem_VibratorBenchmark_005)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, EnableVibratorModulation)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SUB_DriverSystem_VibratorBenchmark_EnableCompositeEffect
+  * @tc.desc: Start periodic vibration with custom composite effect
+  * @tc.type: FUNC
+  */
+ BENCHMARK_F(VibratorBenchmarkTest, EnableCompositeEffect)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    PrimitiveEffect primitiveEffect1 {0, 60007, 0};
+    PrimitiveEffect primitiveEffect2 {1000, 60007, 0};
+    PrimitiveEffect primitiveEffect3 {1000, 60007, 0};
+    CompositeEffect effect1 = {
+        .primitiveEffect = primitiveEffect1
+    };
+    CompositeEffect effect2 = {
+        .primitiveEffect = primitiveEffect2
+    };
+    CompositeEffect effect3 = {
+        .primitiveEffect = primitiveEffect3
+    };
+    std::vector<CompositeEffect> vec;
+    vec.push_back(effect1);
+    vec.push_back(effect2);
+    vec.push_back(effect3);
+    HdfCompositeEffect effect;
+    effect.type = HDF_EFFECT_TYPE_PRIMITIVE;
+    effect.compositeEffects = vec;
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_vibratorInterface->EnableCompositeEffect(effect);
+    }
+    EXPECT_NE(HDF_SUCCESS, ret);
+
+    OsalMSleep(2);
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, EnableCompositeEffect)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SUB_DriverSystem_VibratorBenchmark_GetEffectInfo
+  * @tc.desc: Get effect information with the given effect type
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, GetEffectInfo)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+    HdfEffectInfo effectInfo;
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_vibratorInterface->GetEffectInfo("haptic.pattern.type1", effectInfo);
+    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SUB_DriverSystem_VibratorBenchmark_IsVibratorRunning
+  * @tc.desc: Get vibration status.
+  * @tc.type: FUNC
+  */
+BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface); 
+    bool stat {false};
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_vibratorInterface->IsVibratorRunning(stat);
+    }
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(VibratorBenchmarkTest, IsVibratorRunning)->
+    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
 
 BENCHMARK_MAIN();
