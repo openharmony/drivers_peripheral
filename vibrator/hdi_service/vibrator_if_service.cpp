@@ -208,22 +208,27 @@ int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effec
         return HDF_FAILURE;
     }
 
-    HdfCompositeEffectVdi effectVdi;
-    effectVdi.type = effect.type;
+    std::vector<HdfEffectVdi> effectVdi;
     for (const auto &compositeEffects : effect.compositeEffects) {
-        if (effectVdi.type == HDF_EFFECT_TYPE_TIME) {
-            effectVdi.effects[effectVdi.type].timeEffect.delay = compositeEffects.timeEffect.delay;
-            effectVdi.effects[effectVdi.type].timeEffect.time = compositeEffects.timeEffect.time;
-            effectVdi.effects[effectVdi.type].timeEffect.intensity = compositeEffects.timeEffect.intensity;
-            effectVdi.effects[effectVdi.type].timeEffect.frequency = compositeEffects.timeEffect.frequency;
-        } else if (effectVdi.type == HDF_EFFECT_TYPE_PRIMITIVE) {
-            effectVdi.effects[effectVdi.type].primitiveEffect.delay = compositeEffects.primitiveEffect.delay;
-            effectVdi.effects[effectVdi.type].primitiveEffect.effectId = compositeEffects.primitiveEffect.effectId;
-            effectVdi.effects[effectVdi.type].primitiveEffect.intensity = compositeEffects.primitiveEffect.intensity;
+        HdfEffectVdi hdfEffectVdi;
+        if (effect.type == HDF_EFFECT_TYPE_TIME) {
+            hdfEffectVdi.timeEffect.delay = compositeEffects.timeEffect.delay;
+            hdfEffectVdi.timeEffect.time = compositeEffects.timeEffect.time;
+            hdfEffectVdi.timeEffect.intensity = compositeEffects.timeEffect.intensity;
+            hdfEffectVdi.timeEffect.frequency = compositeEffects.timeEffect.frequency;
+        } else if (effect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
+            hdfEffectVdi.primitiveEffect.delay = compositeEffects.primitiveEffect.delay;
+            hdfEffectVdi.primitiveEffect.effectId = compositeEffects.primitiveEffect.effectId;
+            hdfEffectVdi.primitiveEffect.intensity = compositeEffects.primitiveEffect.intensity;
         }
+        effectVdi.push_back(std::move(hdfEffectVdi));
     }
+
+    HdfCompositeEffectVdi compositeEffectVdi;
+    compositeEffectVdi.type = effect.type;
+    compositeEffectVdi.effects = effectVdi;
     StartTrace(HITRACE_TAG_HDF, "EnableCompositeEffect");
-    int32_t ret = vibratorVdiImpl_->EnableCompositeEffect(effectVdi);
+    int32_t ret = vibratorVdiImpl_->EnableCompositeEffect(compositeEffectVdi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s  EnableCompositeEffect failed, error code is %{public}d", __func__, ret);
     }
