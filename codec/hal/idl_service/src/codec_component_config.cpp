@@ -16,8 +16,9 @@
 #include <cinttypes>
 #include <osal_mem.h>
 #include "codec_log_wrapper.h"
-#include <hcs_dm_parser.h>
-#define CONFIG_PATH_NAME HDF_CONFIG_DIR "/codec_component_capabilities.hcb"
+#include "codec_hcb_util.h"
+
+#define CODEC_CONFIG_NAME "media_codec_capabilities"
 
 namespace {
     constexpr int32_t MASK_NUM_LIMIT = 32;
@@ -99,24 +100,17 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
 
 int32_t CodecComponentConfig::CodecCompCapabilityInit()
 {
-    const struct DeviceResourceIface *pDevResIns = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (pDevResIns == nullptr) {
-        CODEC_LOGE("get hcs interface failed.");
+    const struct DeviceResourceNode *rootNode = HdfGetHcsRootNode();
+    if (rootNode == nullptr) {
+        CODEC_LOGE("GetRootNode failed");
         return HDF_FAILURE;
     }
-
-    SetHcsBlobPath(CONFIG_PATH_NAME);
-    const struct DeviceResourceNode *pRootNode = pDevResIns->GetRootNode();
-    if (pRootNode == nullptr) {
-        CODEC_LOGD("GetRootNode failed");
+    const struct DeviceResourceNode *codecNode = HcsGetNodeByMatchAttr(rootNode, CODEC_CONFIG_NAME);
+    if (codecNode == nullptr) {
+        CODEC_LOGE("codecNode is nullptr");
         return HDF_FAILURE;
     }
-    const struct DeviceResourceNode *node = pDevResIns->GetChildNode(pRootNode, "codec_config");
-    if (node == nullptr) {
-        HDF_LOGE("node is nullptr");
-        return HDF_FAILURE;
-    }
-    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*node);
+    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*codecNode);
     return HDF_SUCCESS;
 }
 
