@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef PARSE_EFFECT_CONFIG_H
+#define PARSE_EFFECT_CONFIG_H
+
 #include <stdint.h>
 
 #define HDF_EFFECT_LIB_NUM_MAX 32
@@ -59,3 +62,5 @@ int32_t AudioEffectGetConfigDescriptor(const char *path, struct ConfigDescriptor
  * @version 1.0
  */
 void AudioEffectReleaseCfgDesc(struct ConfigDescriptor *cfgDesc);
+
+#endif

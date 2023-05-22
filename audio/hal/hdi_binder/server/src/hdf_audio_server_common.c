@@ -1189,7 +1189,7 @@ int32_t HdiServiceGetFuncs()
     return AUDIO_HAL_SUCCESS;
 }
 
-void AudioHdiServerRelease()
+void AudioHdiServerRelease(void)
 {
     AUDIO_FUNC_LOGI("enter to %{public}s!", __func__);
 
