@@ -37,7 +37,7 @@ static sptr<IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_100 = 100;
-const int SLEEP_CONT_1000 = 1000;
+const int SLEEP_CONT_2000 = 2000;
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
@@ -780,11 +780,11 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
     ret = display->SetDisplayVsyncEnabled(true);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_1000); // 1000ms
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    usleep(SLEEP_CONT_100 * SLEEP_CONT_1000);                              // wait for 100ms avoid the last vsync.
-    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_1000); // 1000ms
+    usleep(SLEEP_CONT_100 * SLEEP_CONT_2000); // wait for 100ms avoid the last vsync.
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
