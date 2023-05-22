@@ -129,20 +129,20 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest005, TestSize.Level1)
     runinglockInfo.type = setLockType;
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
     uint32_t originCount = RunningLockImpl::GetCount(runinglockInfo.type);
-    
+
     ASSERT_EQ(false, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
@@ -188,14 +188,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest006, TestSize.Level1)
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
@@ -241,14 +241,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest007, TestSize.Level1)
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
@@ -294,14 +294,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest008, TestSize.Level1)
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
@@ -347,14 +347,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest009, TestSize.Level1)
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
@@ -400,14 +400,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest010, TestSize.Level1)
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
     EXPECT_EQ(true, MockWakeLockName::FindWakeLockName(RunningLockImpl::GetRunningLockTag(runinglockInfo.type)));
 
-    //runninglock type and same & timeoutMs < 0, hold lock failed 
+    // runninglock type and same & timeoutMs < 0, hold lock failed
     EXPECT_EQ(HDF_FAILURE, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.name = setLockNameTwo;
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 2, RunningLockImpl::GetCount(runinglockInfo.type));
 
-    //unhold a non-existent lock, return success
+    // unhold a non-existent lock, return success
     runinglockInfo.type = errorLockType;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, RunningLockImpl::Unhold(runinglockInfo));
     runinglockInfo.type = setLockType;
