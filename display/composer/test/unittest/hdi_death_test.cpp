@@ -29,11 +29,11 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-std::shared_ptr<IDisplayComposerInterface> g_composerDevice {};
+sptr<IDisplayComposerInterface> g_composerDevice {};
 
 void DeathTest::SetUp()
 {
-    g_composerDevice.reset(IDisplayComposerInterface::Get());
+    g_composerDevice = IDisplayComposerInterface::Get();
 }
 
 void ComposerDiedRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
@@ -46,7 +46,7 @@ void ComposerDiedRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 
 HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 {
-    g_composerDevice.reset(IDisplayComposerInterface::Get());
+    g_composerDevice = IDisplayComposerInterface::Get();
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
     auto ret = g_composerDevice->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
@@ -55,7 +55,7 @@ HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    g_composerDevice.reset(IDisplayComposerInterface::Get());
+    g_composerDevice = IDisplayComposerInterface::Get();
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
     auto ret = g_composerDevice->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
