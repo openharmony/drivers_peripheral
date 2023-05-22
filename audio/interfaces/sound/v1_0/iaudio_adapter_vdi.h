@@ -18,10 +18,10 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "v1_0/audio_types_vdi.h"
-#include "v1_0/iaudio_callback_vdi.h"
-#include "v1_0/iaudio_capture_vdi.h"
-#include "v1_0/iaudio_render_vdi.h"
+#include "audio_types_vdi.h"
+#include "iaudio_callback_vdi.h"
+#include "iaudio_capture_vdi.h"
+#include "iaudio_render_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,10 +34,10 @@ struct IAudioAdapterVdi {
     int32_t (*InitAllPorts)(struct IAudioAdapterVdi *self);
     int32_t (*CreateRender)(struct IAudioAdapterVdi *self, const struct AudioDeviceDescriptorVdi *desc,
         const struct AudioSampleAttributesVdi *attrs, struct IAudioRenderVdi **render);
-    int32_t (*DestroyRender)(struct IAudioAdapterVdi *self, const struct AudioDeviceDescriptorVdi *desc);
+    int32_t (*DestroyRender)(struct IAudioAdapterVdi *self, struct IAudioRenderVdi *render);
     int32_t (*CreateCapture)(struct IAudioAdapterVdi *self, const struct AudioDeviceDescriptorVdi *desc,
         const struct AudioSampleAttributesVdi *attrs, struct IAudioCaptureVdi **capture);
-    int32_t (*DestroyCapture)(struct IAudioAdapterVdi *self, const struct AudioDeviceDescriptorVdi *desc);
+    int32_t (*DestroyCapture)(struct IAudioAdapterVdi *self, struct IAudioCaptureVdi *capture);
     int32_t (*GetPortCapability)(struct IAudioAdapterVdi *self, const struct AudioPortVdi *port,
         struct AudioPortCapabilityVdi *capability);
     int32_t (*SetPassthroughMode)(struct IAudioAdapterVdi *self, const struct AudioPortVdi *port,
@@ -55,7 +55,6 @@ struct IAudioAdapterVdi {
     int32_t (*GetExtraParams)(struct IAudioAdapterVdi *self, enum AudioExtParamKeyVdi key, const char *condition,
         char *value, uint32_t valueLen);
     int32_t (*RegExtraParamObserver)(struct IAudioAdapterVdi *self, struct IAudioCallbackVdi *audioCallback, int8_t cookie);
-    int32_t (*GetVersion)(struct IAudioAdapterVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus
