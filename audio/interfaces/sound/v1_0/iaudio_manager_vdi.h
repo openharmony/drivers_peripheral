@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_AUDIO_V1_0_IAUDIOMANAGER_H
-#define OHOS_HDI_AUDIO_V1_0_IAUDIOMANAGER_H
+#ifndef OHOS_VDI_AUDIO_V1_0_IAUDIOMANAGER_H
+#define OHOS_VDI_AUDIO_V1_0_IAUDIOMANAGER_H
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "v1_0/audio_types_vdi.h"
-#include "v1_0/iaudio_adapter_vdi.h"
+#include "audio_types_vdi.h"
+#include "iaudio_adapter_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,9 +32,8 @@ struct IAudioManagerVdi {
     int32_t (*GetAllAdapters)(struct IAudioManagerVdi *self, struct AudioAdapterDescriptorVdi *descs, uint32_t *descsLen);
     int32_t (*LoadAdapter)(struct IAudioManagerVdi *self, const struct AudioAdapterDescriptorVdi *desc,
         struct IAudioAdapterVdi **adapter);
-    int32_t (*UnloadAdapter)(struct IAudioManagerVdi *self, const char *adapterName);
+    int32_t (*UnloadAdapter)(struct IAudioManagerVdi *self, struct IAudioAdapterVdi *adapter);
     int32_t (*ReleaseAudioManagerObject)(struct IAudioManagerVdi *self);
-    int32_t (*GetVersion)(struct IAudioManagerVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus

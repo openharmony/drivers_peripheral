@@ -32,7 +32,6 @@ struct IEffectControlVdi {
     int32_t (*SendCommand)(struct IEffectControlVdi *self, uint32_t cmdId, const int8_t *cmdData, uint32_t cmdDataLen,
         int8_t *replyData, uint32_t *replyDataLen);
     int32_t (*GetEffectDescriptor)(struct IEffectControlVdi *self, struct EffectControllerDescriptorVdi *desc);
-    int32_t (*GetVersion)(struct IEffectControlVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus
