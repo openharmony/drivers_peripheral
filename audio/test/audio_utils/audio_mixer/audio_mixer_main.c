@@ -54,7 +54,7 @@ static char g_serviceName[CARD_SRV_NAME_LEN] = DEFAULT_CARD_NAME;
 static char g_card[SND_CARD_NAME_LEN] = "primary0";
 static char g_dev[SND_CARD_NAME_LEN] = "default";
 static AudioPcmType g_pcm = PCM_RENDER;
-static bool debugFlag = false;
+static bool g_debugFlag = false;
 #ifdef CHANNEL_MAP
 static bool chnmapFlag = false;
 #endif
@@ -457,7 +457,7 @@ static int32_t MixerESet(unsigned int argc, char *argv[], int32_t roflag)
         printf("Wrong scontrol identifier: %s\n", argv[0]);
         return U_FAILURE;
     }
-    if (debugFlag) {
+    if (g_debugFlag) {
         printf("index=%u, iface=%s, name='%s'\n", ctlInfo.edx.index, STRING(MIXER), ctlInfo.edx.eId.name);
     }
 
@@ -641,7 +641,7 @@ int main(int argc, char *argv[])
                 printf("Reserved Parameters. [level %i]\n", level);
                 return 0;
             case 'd':
-                debugFlag = true;
+                g_debugFlag = true;
                 break;
             case 'v':
                 printf("audio_mixer version %s\n", ShowVersion());
@@ -673,7 +673,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    DebugLog(debugFlag);
+    DebugLog(g_debugFlag);
     ret = ServiceHandleInit();
     if (ret != U_SUCCESS) {
         goto FINISH;
