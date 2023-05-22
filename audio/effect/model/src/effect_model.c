@@ -278,7 +278,7 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
     return HDF_SUCCESS;
 }
 
-void ModelInit()
+void ModelInit(void)
 {
     struct ConfigDescriptor *cfgDesc = NULL;
     if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {

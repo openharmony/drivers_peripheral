@@ -59,7 +59,7 @@ int32_t RegisterEffectLibToList(void *handle, struct EffectFactory *factLib)
 }
 
 // release the effect lib using at the release process
-void ReleaseLibFromList()
+void ReleaseLibFromList(void)
 {
     struct EffectFactoryLibListNode *targetNode;
     struct EffectFactoryLibListNode *tmpNode;
@@ -99,7 +99,7 @@ struct EffectFactory *GetEffectLibFromList(const char *effectLibName)
     return NULL;
 }
 
-bool IsEffectLibExist()
+bool IsEffectLibExist(void)
 {
     bool isSupply = true;
 
@@ -149,7 +149,7 @@ struct ControllerManager *GetControllerFromList(char *effectId)
         return NULL;
     }
     // get the ctrlMgr and remove it from the list and release the node
-    DLIST_FOR_EACH_ENTRY_SAFE(getNode, tmpNode, &g_controllerList ,struct ControllerManagerNode, list) {
+    DLIST_FOR_EACH_ENTRY_SAFE(getNode, tmpNode, &g_controllerList, struct ControllerManagerNode, list) {
         if (getNode->ctrlMgr != NULL && getNode->ctrlMgr->effectId != NULL) {
             if (strcmp(getNode->ctrlMgr->effectId, effectId) == 0) {
                 ctrlMgr = getNode->ctrlMgr;

@@ -1046,7 +1046,7 @@ void AudioHwiDestroyRenderById(uint32_t renderId)
         AUDIO_FUNC_LOGE("audio hwiRender destroy render index fail, descIndex=%{public}d", renderId);
         return;
     }
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();    
+    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
     if (priv->renderInfos[renderId] == NULL) {
         AUDIO_FUNC_LOGE("audio hwiRender destroy render index fail, descIndex=%{public}d", renderId);
         return;
