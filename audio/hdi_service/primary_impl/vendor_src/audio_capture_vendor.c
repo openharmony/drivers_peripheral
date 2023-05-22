@@ -846,7 +846,7 @@ struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttribut
     return capture;
 };
 
-uint32_t QueryCaptureUsrCount(uint32_t captureId)
+uint32_t DecreaseCaptureUsrCount(uint32_t captureId)
 {
     uint32_t usrCnt = 0;
     if (captureId >= AUDIO_HW_STREAM_NUM_MAX) {
