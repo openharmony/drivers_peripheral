@@ -179,7 +179,6 @@ void SystemInputFail(void)
 {
     printf("please ENTER to go on...\n");
     while (getchar() != '\n') {
-        continue;
     }
 }
 
