@@ -1,0 +1,39 @@
+{
+    "name": "@ohos/drivers_peripheral_huks",
+    "description": "huks device driver",
+    "version": "4.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/huks"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "drivers_peripheral_huks",
+      "subsystem": "hdf",
+      "syscap": [""],
+      "adapter_system_type": ["standard"],
+      "rom": "675KB",
+      "ram": "7400KB",
+      "deps": {
+        "components": [
+          "hdf_core",
+          "hiviewdfx_hilog_native",
+          "c_utils"
+        ],
+        "third_party": [
+        ]
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/huks:huks_entry"
+        ],
+        "test": [
+        ],
+        "inner_kits": [
+        ]
+      }
+    }
+  }
+  
