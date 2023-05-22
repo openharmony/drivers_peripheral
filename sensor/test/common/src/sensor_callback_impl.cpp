@@ -106,7 +106,7 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
 
     for (int32_t i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
-            float *data = (float*)eventData;
+            float *data = reinterpret_cast<float*>(eventData);
             SensorDataVerification(*data, g_sensorList[i]);
         }
     }

@@ -433,11 +433,14 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
     for (p = InfoBuf; p < InfoBuf + result;) {
         event = (struct inotify_event *)(p);
         auto nodePath = devPath_ + "/" + string(event->name);
-        if (realpath(nodePath.c_str(), nodeRealPath) == nullptr) {
-            HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
-            return INPUT_FAILURE;
+        if (nodePath.find("event") == std::string::npos) {
+            break;
         }
         if (event->mask & IN_CREATE) {
+            if (realpath(nodePath.c_str(), nodeRealPath) == nullptr) {
+                HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
+                return INPUT_FAILURE;
+            }
             tmpFd = open(nodeRealPath, O_RDWR);
             if (tmpFd == INPUT_FAILURE) {
                 HDF_LOGE("%{public}s: open file failure: %{public}s", __func__, nodeRealPath);
@@ -482,7 +485,7 @@ void InputDeviceManager::RemoveEpoll(int32_t epollFd, int32_t fileFd)
 int32_t InputDeviceManager::FindIndexFromFd(int32_t &fd, uint32_t *index)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    for (auto &inputDev : inputDevList_) {
+    for (const auto &inputDev : inputDevList_) {
         if (fd == inputDev.second.fd) {
             *index = inputDev.first;
             return INPUT_SUCCESS;
@@ -494,7 +497,7 @@ int32_t InputDeviceManager::FindIndexFromFd(int32_t &fd, uint32_t *index)
 int32_t InputDeviceManager::FindIndexFromDevName(string devName, uint32_t *index)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    for (auto &inputDev : inputDevList_) {
+    for (const auto &inputDev : inputDevList_) {
         if (!strcmp(devName.c_str(), inputDev.second.detailInfo.attrSet.devName)) {
             *index =  inputDev.first;
             return INPUT_SUCCESS;

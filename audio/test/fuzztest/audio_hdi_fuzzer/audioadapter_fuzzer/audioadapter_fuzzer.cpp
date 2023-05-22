@@ -105,7 +105,6 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     }
     uint32_t cmd = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
-    size = size - OFFSET;
     struct IAudioManager *manager = IAudioManagerGet(true);
     if (manager == nullptr) {
         return false;

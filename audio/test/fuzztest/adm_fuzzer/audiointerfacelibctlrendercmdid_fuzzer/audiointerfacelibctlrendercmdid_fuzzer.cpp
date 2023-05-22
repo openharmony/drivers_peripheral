@@ -54,7 +54,7 @@ namespace Audio {
         (void)BindServiceAndHwRender(hwRender);
         hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
         int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
-        ret = InterfaceLibCtlRender(handle, cmdId, &hwRender->renderParam);
+        int32_t ret = InterfaceLibCtlRender(handle, cmdId, &hwRender->renderParam);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
