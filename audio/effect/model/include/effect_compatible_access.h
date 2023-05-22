@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef EFFECT_COMPATIBLE_ACCESS_H
+#define EFFECT_COMPATIBLE_ACCESS_H
+
 #include "v1_0/effect_types.h"
 
 typedef int32_t (*ComandProccess)(int8_t *commandData, uint32_t commandSize, int8_t *replyData, uint32_t *replySize);
@@ -23,9 +26,9 @@ struct EffectCommandTable {
 
 struct EffectControl {
     /**
-     * @brief Process the audio raw data. 
+     * @brief Process the audio raw data.
      * the input and output buffer have to be specificed, if they are not specified，the process have to use the
-     * data process function which is provided by the command 
+     * data process function which is provided by the command
      *
      * @param self Indicates the pointer to the effect interfaces to operate.
      * @param input Indicates the pointer to the buffer for original data.
@@ -39,9 +42,9 @@ struct EffectControl {
     int32_t (*EffectProcess)(struct EffectControl *self, const struct AudioEffectBuffer *input,
                              struct AudioEffectBuffer *output);
     /**
-     * @brief Effect process command which is used 
+     * @brief Effect process command which is used
      * the input and output buffer have to be specificed, if they are not specified，the process have to use the
-     * data process function which is provided by the command 
+     * data process function which is provided by the command
      *
      * @param self Indicates the pointer to the effect interfaces to operate.
      * @param cmdId Command index used to match command options in the command table.
@@ -80,10 +83,10 @@ struct EffectFactory {
     char *effectLibName; /**< To identify the effect library name for knowing which effect library it is */
     char *supplier;      /**< To identify who supply the effect library, it can be assigned as the EOM/ISV name */
     /**
-     * 
-     * @brief 
+     *
+     * @brief
      * the input and output buffer have to be specificed, if they are not specified，the process have to use the
-     * data process function which is provided by the command 
+     * data process function which is provided by the command
      *
      * @param self Indicates the pointer to the effect interfaces to operate.
      * @param EffectInfo Indicates the information of the effect control.
@@ -94,10 +97,10 @@ struct EffectFactory {
      * @since 4.0
      * @version 1.0
      */
-    int32_t (*CreateController)(struct EffectFactory *self, const struct EffectInfo *info, 
+    int32_t (*CreateController)(struct EffectFactory *self, const struct EffectInfo *info,
                                       struct EffectControl **handle);
     /**
-     * 
+     *
      * @brief Destroy the effect controller specified by the controllerId
      *
      * @param self Indicates the pointer to the effect interfaces to operate.
@@ -126,4 +129,6 @@ struct EffectFactory {
 };
 
 /* this name is going to get effect lib, it has to be realized */
-struct EffectFactory *GetEffectoyFactoryLib();
+struct EffectFactory *GetEffectoyFactoryLib(void);
+
+#endif

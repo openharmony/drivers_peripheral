@@ -34,7 +34,7 @@
 
 #define DEBUG_LOG(fmt, arg...)                                                    \
     do {                                                                          \
-        if (debugFlag) {                                                          \
+        if (g_debugFlag) {                                                          \
             printf("[%s]: [%s]-[%d]: " fmt, __FILE__, __func__, __LINE__, ##arg); \
         }                                                                         \
     } while (0)

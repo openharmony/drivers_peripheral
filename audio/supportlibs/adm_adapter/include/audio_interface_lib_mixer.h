@@ -71,11 +71,11 @@ typedef enum AudioMixerCtrlCmdList {
 } OpCode;
 
 struct HdfIoService;
-typedef int32_t (*audioMixer)(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
+typedef int32_t (*AudioMixer)(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
 
 struct AudioMixerOps {
     int32_t cmdId;
-    audioMixer func;
+    AudioMixer func;
 };
 
 struct AudioCardId {

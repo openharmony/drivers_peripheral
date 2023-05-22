@@ -1079,7 +1079,7 @@ static int32_t PrintRenderSelectPinThird(struct AudioSceneDescriptor *scene)
     return HDF_SUCCESS;
 }
 
-static void SelectSceneMenu()
+static void SelectSceneMenu(void)
 {
     printf(" =================== Select Scene ======================== \n");
     printf("0 is Midea.                                               |\n");

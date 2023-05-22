@@ -197,7 +197,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
     portCap->deviceType = hwiPortCap->deviceType;
     portCap->deviceId = hwiPortCap->deviceId;
     portCap->hardwareMode = hwiPortCap->hardwareMode;
-    portCap->sampleRateMasks= hwiPortCap->sampleRateMasks;
+    portCap->sampleRateMasks = hwiPortCap->sampleRateMasks;
     portCap->channelMasks = (enum AudioChannelMask)hwiPortCap->channelMasks;
     portCap->channelCount = hwiPortCap->channelCount;
 
