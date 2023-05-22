@@ -33,7 +33,7 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-std::shared_ptr<IDisplayComposerInterface> g_composerDevice {};
+sptr<IDisplayComposerInterface> g_composerDevice {};
 static std::shared_ptr<HdiTestLayer> g_testFreshLayer;
 const int SLEEP_CONT_100 = 100;
 const int SLEEP_CONT_1000 = 1000;
