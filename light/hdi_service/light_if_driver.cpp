@@ -102,7 +102,7 @@ static void HdfLightInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     delete hdfLightInterfaceHost;
 }
 
-struct HdfDriverEntry g_lightinterfaceDriverEntry = {
+static struct HdfDriverEntry g_lightinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "light_service",
     .Bind = HdfLightInterfaceDriverBind,
