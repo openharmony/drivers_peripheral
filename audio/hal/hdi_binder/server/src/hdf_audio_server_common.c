@@ -2084,6 +2084,7 @@ static int32_t HdiSerStubUpdateAudioRoute(const struct HdfDeviceIoClient *client
     if (route == NULL) {
         HDF_LOGE("%{public}s: malloc route failed", __func__);
         audioAdapterRet = HDF_ERR_MALLOC_FAIL;
+        goto FINISHED;
     }
 
     if (!AudioRouteBlockUnmarshalling(audioAdapterData, route)) {
