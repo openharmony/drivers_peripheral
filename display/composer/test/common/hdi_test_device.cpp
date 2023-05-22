@@ -44,7 +44,7 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void* data)
 int32_t HdiTestDevice::InitDevice()
 {
     int ret = DISPLAY_SUCCESS;
-    displayDevice_.reset(IDisplayComposerInterface::Get());
+    displayDevice_ = IDisplayComposerInterface::Get();
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("DeviceInitialize Failed"));
     DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("device funcs is null"));
 
