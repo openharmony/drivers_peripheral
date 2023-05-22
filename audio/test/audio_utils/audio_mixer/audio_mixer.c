@@ -858,7 +858,7 @@ static int32_t FillChnmap(struct AudioMixerCtlElemInfo *info, uint32_t chns, uin
     AudioMixerChannelIdType chn;
 
     /* Matches the specified channel. */
-    for (chn = AMIXER_CHN_FRONT_LEFT; chn <= AMIXER_CHN_LAST; chn++) {
+    for (chn = AMIXER_CHN_FRONT_LEFT; chn < AMIXER_CHN_LAST; chn++) {
         sp = NULL;
         if (!(chns & (1 << (uint32_t)chn))) {
             continue;
