@@ -72,6 +72,8 @@ public:
     virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, const BufferHandle& buffer, int32_t fence) = 0;
     virtual int32_t SetLayerCompositionType(uint32_t devId, uint32_t layerId, CompositionType type) = 0;
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) = 0;
+    virtual int32_t SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo) = 0;
+    virtual int32_t SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor) = 0;
 };
 
 using CreateComposerVdiFunc = IDisplayComposerVdi* (*)();

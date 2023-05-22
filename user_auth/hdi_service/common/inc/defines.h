@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,32 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return (retVal); \
+        } \
+    } while (0)
+
+#define IF_TRUE_LOGE_AND_RETURN(cond) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return; \
+        } \
+    } while (0)
+
+typedef struct Uint8Array {
+    uint8_t *data;
+    uint32_t len;
+} Uint8Array;
+
+typedef struct Uint64Array {
+    uint64_t *data;
+    uint32_t len;
+} Uint64Array;
 
 enum InnerKitResultCode {
     INNER_RESULT_SUCCESS = 0,
@@ -88,12 +114,6 @@ typedef enum ScheduleMode {
 typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
 } AuthSubType;
-
-typedef struct TemplateIdArrays {
-    uint64_t *value;
-    uint32_t num;
-} TemplateIdArrays;
-
 typedef enum AuthPropertyMode {
     PROPERMODE_DELETE = 0,
     PROPERMODE_GET = 1,

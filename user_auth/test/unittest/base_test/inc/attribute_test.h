@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef IAM_USER_AUTH_TLV_BASE_TEST_H
-#define IAM_USER_AUTH_TLV_BASE_TEST_H
+#ifndef IAM_USER_AUTH_ATTRIBUTE_TEST_H
+#define IAM_USER_AUTH_ATTRIBUTE_TEST_H
 
 #include <gtest/gtest.h>
 
 namespace OHOS {
 namespace UserIam {
 namespace UserAuth {
-class TlvBaseTest : public testing::Test {
+class AttributeTest : public testing::Test {
 public:
     static void SetUpTestCase();
 
@@ -34,4 +34,4 @@ public:
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS
-#endif // IAM_USER_AUTH_TLV_BASE_TEST_H
+#endif // IAM_USER_AUTH_ATTRIBUTE_TEST_H

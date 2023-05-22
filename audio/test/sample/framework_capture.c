@@ -547,7 +547,8 @@ static int32_t CaptureChoiceModeAndRecording(
         return HDF_FAILURE;
 #endif
     } else {
-        if (StartRecordThread(recordModeFlag) < 0) {
+        ret = StartRecordThread(recordModeFlag);
+        if (ret < 0) {
             AUDIO_FUNC_LOGE("Create Thread Fail");
             return HDF_FAILURE;
         }
