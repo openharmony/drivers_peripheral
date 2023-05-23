@@ -197,7 +197,7 @@ int32_t VibratorIfService::EnableVibratorModulation(uint32_t duration, uint16_t 
     }
     FinishTrace(HITRACE_TAG_HDF);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effect)

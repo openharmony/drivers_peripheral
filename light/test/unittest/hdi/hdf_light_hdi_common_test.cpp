@@ -33,7 +33,7 @@ namespace {
     sptr<ILightInterface> g_lightInterface = nullptr;
 }
 
-class HdfLightHdiTest : public testing::Test {
+class HdfLightHdiCommonTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -41,20 +41,20 @@ public:
     void TearDown();
 };
 
-void HdfLightHdiTest::SetUpTestCase()
+void HdfLightHdiCommonTest::SetUpTestCase()
 {
     g_lightInterface = ILightInterface::Get();
 }
 
-void HdfLightHdiTest::TearDownTestCase()
+void HdfLightHdiCommonTest::TearDownTestCase()
 {
 }
 
-void HdfLightHdiTest::SetUp()
+void HdfLightHdiCommonTest::SetUp()
 {
 }
 
-void HdfLightHdiTest::TearDown()
+void HdfLightHdiCommonTest::TearDown()
 {
 }
 
@@ -72,7 +72,7 @@ static void InitConfig(HdfLightEffect &effect)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, CheckLightInstanceIsEmpty, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, CheckLightInstanceIsEmpty, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 }
@@ -83,7 +83,7 @@ HWTEST_F(HdfLightHdiTest, CheckLightInstanceIsEmpty, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, GetLightInfo_001, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, GetLightInfo_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -104,7 +104,7 @@ HWTEST_F(HdfLightHdiTest, GetLightInfo_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightRed_001, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRed_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -127,7 +127,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightRed_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightGreen_001, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightGreen_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -149,7 +149,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightGreen_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightBlue_001, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightBlue_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -172,7 +172,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightBlue_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_001, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -196,7 +196,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_002, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -220,7 +220,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_002, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_003, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -240,7 +240,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_003, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfLightHdiTest, TurnOnLightAbnormal_004, TestSize.Level1)
+HWTEST_F(HdfLightHdiCommonTest, TurnOnLightAbnormal_004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
