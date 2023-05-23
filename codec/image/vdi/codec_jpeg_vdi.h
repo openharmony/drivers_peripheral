@@ -87,7 +87,7 @@ struct CodecJpegDecInfo {
     unsigned int compressPos;
 };
 
-struct ICodecJpegHwi *GetCodecJpegHwi();
+struct ICodecJpegHwi *GetCodecJpegHwi(void);
 
 #ifdef __cplusplus
 }

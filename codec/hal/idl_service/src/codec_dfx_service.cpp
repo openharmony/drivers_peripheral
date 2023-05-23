@@ -21,23 +21,21 @@ namespace HDI {
 namespace Codec {
 namespace V1_0 {
 #define ARGV_FLAG 1
+#define INPUT_PORT_INDEX 0
+#define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
-uint32_t CodecDfxService::BuffCount_i;
-uint32_t CodecDfxService::BuffCount_j;
-uint32_t CodecDfxService::portIndex_i;
-uint32_t CodecDfxService::portIndex_j;
+uint32_t CodecDfxService::inputBuffCount;
+uint32_t CodecDfxService::outputBuffCount;
 std::shared_ptr<OHOS::Codec::Omx::ComponentNode> CodecDfxService::dumpNode;
 
 void CodecDfxService::GetBuffCount()
 {
     auto iter = dumpNode->GetBufferMapCount().begin();
-    portIndex_i = iter->second;
     while (iter != dumpNode->GetBufferMapCount().end()) {
-        if (iter->second == portIndex_i) {
-            BuffCount_i++;
+        if (iter->second == INPUT_PORT_INDEX) {
+            inputBuffCount++;
         } else {
-            portIndex_j = iter->second;
-            BuffCount_j++;
+            outputBuffCount++;
         }
         iter++;
     }
@@ -46,7 +44,6 @@ void CodecDfxService::GetBuffCount()
 int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
 {
     CodecStateType state;
-    CodecComponentService *componentService;
     std::map<uint32_t, sptr<ICodecComponent>> dumpMap = {};
 
     GetInstance().managerService_->GetManagerMap(dumpMap);
@@ -56,7 +53,7 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
     }
     for (auto it : dumpMap) {
         std::string dump = "compName = ";
-        componentService = reinterpret_cast<CodecComponentService *>(it.second.GetRefPtr());
+        CodecComponentService *componentService = reinterpret_cast<CodecComponentService *>(it.second.GetRefPtr());
         dump.append(componentService->GetComponentCompName())
             .append(", compId = ")
             .append(std::to_string(it.first))
@@ -65,14 +62,14 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
         dumpNode->GetState(state);
         dump.append(std::to_string(state));
         GetInstance().GetBuffCount();
-        dump.append(", portIndex = ")
-            .append(std::to_string(portIndex_i))
-            .append(", BufferCount = ")
-            .append(std::to_string(BuffCount_i))
-            .append(", portIndex = ")
-            .append(std::to_string(portIndex_j))
-            .append(", BufferCount = ")
-            .append(std::to_string(BuffCount_j))
+        dump.append(", inputPortIndex = ")
+            .append(std::to_string(INPUT_PORT_INDEX))
+            .append(", inputBuffCount = ")
+            .append(std::to_string(inputBuffCount))
+            .append(", outputPortIndex = ")
+            .append(std::to_string(OUTPUT_PORT_INDEX))
+            .append(", outputBuffCount = ")
+            .append(std::to_string(outputBuffCount))
             .append("\n");
         if (!HdfSbufWriteString(reply, dump.c_str())) {
             CODEC_LOGE("dump write Fail!");
@@ -82,8 +79,8 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
             CODEC_LOGE("Split symbol write Fail!");
             return HDF_ERR_INVALID_PARAM;
         }
-        BuffCount_i = 0;
-        BuffCount_j = 0;
+        inputBuffCount = 0;
+        outputBuffCount = 0;
         componentService = nullptr;
     }
     return HDF_SUCCESS;

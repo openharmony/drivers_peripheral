@@ -28,7 +28,6 @@ namespace {
         OHOS::sptr<OHOS::IRemoteObject> stub;
     };
 }
-
 static int32_t CodecJpegDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
                                        struct HdfSBuf *reply)
 {

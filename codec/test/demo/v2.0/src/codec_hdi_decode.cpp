@@ -382,7 +382,7 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
 
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)portIndex;
+    param.nPortIndex = static_cast<OMX_U32>(portIndex);
     auto err =
         client_->GetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (err != HDF_SUCCESS) {
