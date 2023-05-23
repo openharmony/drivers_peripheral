@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef OHOS_HDI_HUKS_V1_0_IHUKS_H
 #define OHOS_HDI_HUKS_V1_0_IHUKS_H
 
@@ -19,18 +34,18 @@ struct IHuks {
     int32_t (*ModuleInit)(struct IHuks *self);
 
     int32_t (*GenerateKey)(struct IHuks *self, const struct HuksBlob* keyAlias, const struct HuksParamSet* paramSet,
-         const struct HuksBlob* keyIn, struct HuksBlob* keyOut);
+         const struct HuksBlob* keyIn, struct HuksBlob* encKeyOut);
 
     int32_t (*ImportKey)(struct IHuks *self, const struct HuksBlob* keyAlias, const struct HuksBlob* key,
-         const struct HuksParamSet* paramSet, struct HuksBlob* keyOut);
+         const struct HuksParamSet* paramSet, struct HuksBlob* encKeyOut);
 
-    int32_t (*ImportWrappedKey)(struct IHuks *self, const struct HuksBlob* wrappingKeyAlias, const struct HuksBlob* key,
-         const struct HuksBlob* wrappedKeyData, const struct HuksParamSet* paramSet, struct HuksBlob* keyOut);
+    int32_t (*ImportWrappedKey)(struct IHuks *self, const struct HuksBlob* wrappingKeyAlias,
+         const struct HuksBlob* wrappingEncKey, const struct HuksBlob* wrappedKeyData, const struct HuksParamSet* paramSet, struct HuksBlob* encKeyOut);
 
-    int32_t (*ExportPublicKey)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*ExportPublicKey)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          struct HuksBlob* keyOut);
 
-    int32_t (*Init)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Init)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          struct HuksBlob* handle, struct HuksBlob* token);
 
     int32_t (*Update)(struct IHuks *self, const struct HuksBlob* handle, const struct HuksParamSet* paramSet,
@@ -41,36 +56,36 @@ struct IHuks {
 
     int32_t (*Abort)(struct IHuks *self, const struct HuksBlob* handle, const struct HuksParamSet* paramSet);
 
-    int32_t (*GetKeyProperties)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* key);
+    int32_t (*CheckKeyValidity)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* encKey);
 
-    int32_t (*AttestKey)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*AttestKey)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          struct HuksBlob* certChain);
 
     int32_t (*GenerateRandom)(struct IHuks *self, const struct HuksParamSet* paramSet, struct HuksBlob* random);
 
-    int32_t (*Sign)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Sign)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          const struct HuksBlob* srcData, struct HuksBlob* signature);
 
-    int32_t (*Verify)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Verify)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          const struct HuksBlob* srcData, const struct HuksBlob* signature);
 
-    int32_t (*Encrypt)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Encrypt)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          const struct HuksBlob* plainText, struct HuksBlob* cipherText);
 
-    int32_t (*Decrypt)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Decrypt)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          const struct HuksBlob* cipherText, struct HuksBlob* plainText);
 
-    int32_t (*AgreeKey)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* privateKey,
+    int32_t (*AgreeKey)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* encPrivateKey,
          const struct HuksBlob* peerPublicKey, struct HuksBlob* agreedKey);
 
-    int32_t (*DeriveKey)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* kdfKey,
+    int32_t (*DeriveKey)(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* encKdfKey,
          struct HuksBlob* derivedKey);
 
-    int32_t (*Mac)(struct IHuks *self, const struct HuksBlob* key, const struct HuksParamSet* paramSet,
+    int32_t (*Mac)(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
          const struct HuksBlob* srcData, struct HuksBlob* mac);
 
-    int32_t (*UpgradeKey)(struct IHuks *self, const struct HuksBlob* oldKey, const struct HuksParamSet* paramSet,
-         struct HuksBlob* newKey);
+    int32_t (*UpgradeKey)(struct IHuks *self, const struct HuksBlob* encOldKey, const struct HuksParamSet* paramSet,
+         struct HuksBlob* encNewKey);
 
     int32_t (*ExportChipsetPlatformPublicKey)(struct IHuks *self, const struct HuksBlob* salt,
          enum HuksChipsetPlatformDecryptScene scene, struct HuksBlob* publicKey);
