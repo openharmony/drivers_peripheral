@@ -48,7 +48,6 @@ constexpr uint32_t WAIT_UDC_TIME = 100000;
 /* mtp and ptp use same driver and same service */
 static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 #define UDC_PATH "/config/usb_gadget/g1/UDC"
-
 int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
 {
     auto servMgr = IServiceManager::Get();
