@@ -59,6 +59,10 @@ extern "C" ICameraHost *CameraHostImplGetInstance(void);
 static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCameraHostDriverBind enter");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: device object is NULL!", __func__);
+        return HDF_FAILURE;
+    }
 
     auto *hdfCameraHostHost = new (std::nothrow) HdfCameraHostHost;
     if (hdfCameraHostHost == nullptr) {
@@ -92,6 +96,11 @@ static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfCameraHostDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCameraHostDriverRelease enter");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: device object is NULL!", __func__);
+        return;
+    }
+
     if (deviceObject->service == nullptr) {
         HDF_LOGE("HdfCameraHostDriverRelease not initted");
         return;
