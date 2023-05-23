@@ -78,9 +78,9 @@ static int32_t GetLayerAlpha(LayerAlpha& alpha)
 {
     alpha.enGlobalAlpha = GetRandBoolValue(GetData<uint32_t>());
     alpha.enPixelAlpha = GetRandBoolValue(GetData<uint32_t>());
-    alpha.alpha0 = GetData<uint32_t>() % ALPHAVALUERANGE;
-    alpha.alpha1 = GetData<uint32_t>() % ALPHAVALUERANGE;
-    alpha.gAlpha = GetData<uint32_t>() % ALPHAVALUERANGE;
+    alpha.alpha0 = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
+    alpha.alpha1 = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
+    alpha.gAlpha = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
     return DISPLAY_SUCCESS;
 }
 

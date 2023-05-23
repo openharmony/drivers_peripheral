@@ -17,8 +17,6 @@
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
 #include "hdi_test_device.h"
@@ -29,37 +27,38 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-sptr<IDisplayComposerInterface> g_composerDevice {};
-
-void DeathTest::SetUp()
-{
-    g_composerDevice = IDisplayComposerInterface::Get();
-}
+static bool g_isServiceDead = false;
 
 void ComposerDiedRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    if (remote == nullptr) { 
+    if (remote == nullptr) {
         return;
     }
-    DISPLAY_TEST_LOGD("display composer service dead");
+    EXPECT_EQ(g_isServiceDead, true);
 }
 
 HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 {
-    g_composerDevice = IDisplayComposerInterface::Get();
+    displayComposer_ = IDisplayComposerInterface::Get();
+    ASSERT_TRUE(displayComposer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
-    auto ret = g_composerDevice->AddDeathRecipient(recipient);
+    ASSERT_TRUE(recipient != nullptr);
+    auto ret = displayComposer_->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
+    g_isServiceDead = true;
     system("killall composer_host");
 }
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    g_composerDevice = IDisplayComposerInterface::Get();
+    displayComposer_ = IDisplayComposerInterface::Get();
+    ASSERT_TRUE(displayComposer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new ComposerDiedRecipient();
-    auto ret = g_composerDevice->AddDeathRecipient(recipient);
+    ASSERT_TRUE(recipient != nullptr);
+    auto ret = displayComposer_->AddDeathRecipient(recipient);
     EXPECT_EQ(ret, true);
-    ret = g_composerDevice->RemoveDeathRecipient();
+    ret = displayComposer_->RemoveDeathRecipient();
     EXPECT_EQ(ret, true);
+    g_isServiceDead = true;
     system("killall composer_host");
 }

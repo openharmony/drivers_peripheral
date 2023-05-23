@@ -33,12 +33,11 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-sptr<IDisplayComposerInterface> g_composerDevice {};
-static std::shared_ptr<HdiTestLayer> g_testFreshLayer;
+static sptr<IDisplayComposerInterface> g_composerDevice = nullptr;
+static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
+static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_100 = 100;
 const int SLEEP_CONT_1000 = 1000;
-std::vector<uint32_t> g_displayIds;
-std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
@@ -120,8 +119,8 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
             setting.displayRect.x = static_cast<uint32_t>(setting.rectRatio.x * w);
             setting.displayRect.y = static_cast<uint32_t>(setting.rectRatio.y * h);
             DISPLAY_TEST_LOGD("display rect adust form %f %f %f %f to %{public}d %{public}d %{public}d %{public}d ",
-            setting.rectRatio.x, setting.rectRatio.y, setting.rectRatio.w, setting.rectRatio.h, setting.displayRect.x,
-                setting.displayRect.y, setting.displayRect.w, setting.displayRect.h);
+                setting.rectRatio.x, setting.rectRatio.y, setting.rectRatio.w, setting.rectRatio.h,
+                setting.displayRect.x, setting.displayRect.y, setting.displayRect.w, setting.displayRect.h);
         }
 
         if ((setting.bufferRatio.h > 0.0f) || (setting.bufferRatio.w > 0.0f)) {
@@ -686,6 +685,7 @@ HWTEST_F(VblankTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     int ret;
     DISPLAY_TEST_LOGD();
     std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
+    ASSERT_TRUE(display != nullptr) << "get display failed";
     ret = display->RegDisplayVBlankCallback(TestVBlankCallback, nullptr);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
     ret = display->SetDisplayVsyncEnabled(true);
@@ -705,7 +705,11 @@ int main(int argc, char **argv)
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Init Device Failed"));
     ::testing::InitGoogleTest(&argc, argv);
     g_composerDevice = HdiTestDevice::GetInstance().GetDeviceInterface();
+    DISPLAY_TEST_CHK_RETURN((g_composerDevice == nullptr), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("get composer interface failed"));
     g_gralloc.reset(IDisplayBuffer::Get());
+    DISPLAY_TEST_CHK_RETURN((g_gralloc == nullptr), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("get buffer interface failed"));
     auto display = HdiTestDevice::GetInstance().GetFirstDisplay();
     if (display != nullptr) {
         g_displayIds = HdiTestDevice::GetInstance().GetDevIds();

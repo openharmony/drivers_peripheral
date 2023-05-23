@@ -43,12 +43,13 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void* data)
 
 int32_t HdiTestDevice::InitDevice()
 {
-    int ret = DISPLAY_SUCCESS;
     displayDevice_ = IDisplayComposerInterface::Get();
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("DeviceInitialize Failed"));
-    DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("device funcs is null"));
+    DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("get IDisplayComposerInterface failed"));
 
     gralloc_.reset(IDisplayBuffer::Get());
+    DISPLAY_TEST_CHK_RETURN((gralloc_ == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("get IDisplayBuffer failed"));
+
     displayDevice_->RegHotPlugCallback(HotPlug, static_cast<void *>(this));
 
     return DISPLAY_SUCCESS;

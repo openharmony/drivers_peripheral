@@ -36,9 +36,9 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-sptr<IDisplayComposerInterface> g_composerDevice {};
-std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
-std::vector<uint32_t> g_displayIds;
+static sptr<IDisplayComposerInterface> g_composerDevice = nullptr;
+static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
+static std::vector<uint32_t> g_displayIds;
 
 namespace {
 class DisplayBenchmarkTest : public benchmark::Fixture {
@@ -198,7 +198,11 @@ int main(int argc, char** argv)
         return 1;
     }
     g_composerDevice = HdiTestDevice::GetInstance().GetDeviceInterface();
+    DISPLAY_TEST_CHK_RETURN((g_composerDevice == nullptr), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("get composer interface failed"));
     g_gralloc.reset(IDisplayBuffer::Get());
+    DISPLAY_TEST_CHK_RETURN((g_gralloc == nullptr), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("get buffer interface failed"));
     auto display = HdiTestDevice::GetInstance().GetFirstDisplay();
     if (display != nullptr) {
         g_displayIds = HdiTestDevice::GetInstance().GetDevIds();
