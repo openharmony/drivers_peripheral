@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,11 +40,11 @@ static int32_t NfcInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int 
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        HDF_LOGE("NfcInterfaceDriverDispatc, invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        HDF_LOGE("NfcInterfaceDriverDispatch, invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -63,7 +63,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost;
     if (hdfNfcInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create HdfNfcInterfaceDriverBind Object!", __func__);
+        HDF_LOGE("HdfNfcInterfaceDriverBind, failed to create HdfNfcInterfaceDriverBind Object!");
         return HDF_FAILURE;
     }
 
@@ -73,7 +73,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = INfcInterface::Get(true);
     if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        HDF_LOGE("HdfNfcInterfaceDriverBind, failed to get of implement service");
         delete hdfNfcInterfaceHost;
         return HDF_FAILURE;
     }
@@ -81,7 +81,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfNfcInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         INfcInterface::GetDescriptor());
     if (hdfNfcInterfaceHost->stub == nullptr) {
-        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        HDF_LOGE("HdfNfcInterfaceDriverBind, failed to get stub object");
         delete hdfNfcInterfaceHost;
         return HDF_FAILURE;
     }
