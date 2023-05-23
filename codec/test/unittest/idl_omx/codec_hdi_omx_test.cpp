@@ -41,21 +41,40 @@ using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 namespace {
 constexpr int32_t WIDTH = 640;
-#ifdef SUPPORT_OMX_EXTEND
-constexpr uint32_t MAX_ROLE_INDEX = 1000;
-#endif
+constexpr uint32_t MAX_ROLE_INDEX = 256;
 constexpr int FD_DEFAULT = -1;
 constexpr int64_t APP_DATA = 3;
 constexpr int32_t HEIGHT = 480;
 constexpr int32_t BUFFER_SIZE = WIDTH * HEIGHT * 3;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
+constexpr uint32_t WAIT_TIME = 1000;
+constexpr uint32_t MAX_WAIT = 50;
 static IDisplayBuffer *gralloc_ = nullptr;
 static sptr<ICodecComponent> component_ = nullptr;
 static sptr<ICodecCallback> callback_ = nullptr;
 static sptr<ICodecComponentManager> manager_ = nullptr;
 static OHOS::HDI::Codec::V1_0::OMX_VERSIONTYPE version_;
 static inline std::string compName_ = "";
+
+template <typename T>
+void ObjectToVector(T &param, std::vector<int8_t> &vec)
+{
+    int8_t *paramPointer = (int8_t *)&param;
+    vec.insert(vec.end(), paramPointer, paramPointer + sizeof(param));
+}
+
+template <typename T>
+int32_t VectorToObject(std::vector<int8_t> &vec, T &param)
+{
+    auto ret = memcpy_s(&param, sizeof(param), vec.data(), vec.size());
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s error, memset_s ret [%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    vec.clear();
+    return HDF_SUCCESS;
+}
 
 class CodecHdiOmxTest : public testing::Test {
 public:
@@ -184,6 +203,46 @@ public:
         buffer.clear();
         return true;
     }
+
+    int32_t GetPortParameter(PortIndex index, OMX_PARAM_PORTDEFINITIONTYPE &param)
+    {
+        InitParam(param);
+        param.nPortIndex = static_cast<OMX_U32>(index);
+        std::vector<int8_t> inParam;
+        ObjectToVector(param, inParam);
+
+        std::vector<int8_t> outParam;
+        auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+        VectorToObject(outParam, param);
+        return ret;
+    }
+
+    void FillAndEmptyAllBuffer()
+    {
+        auto iter = outputBuffers_.begin();
+        if (iter != outputBuffers_.end()) {
+            auto ret = component_->FillThisBuffer(*iter->second->omxBuffer.get());
+            ASSERT_EQ(ret, HDF_SUCCESS);
+        }
+        iter = inputBuffers_.begin();
+        if (iter != inputBuffers_.end()) {
+            auto ret = component_->EmptyThisBuffer(*iter->second->omxBuffer.get());
+            ASSERT_EQ(ret, HDF_SUCCESS);
+        }
+    }
+
+    void WaitState(CodecStateType objState)
+    {
+        CodecStateType state = CODEC_STATE_INVALID;
+        uint32_t count = 0;
+        do {
+            usleep(WAIT_TIME);
+            auto ret = component_->GetState(state);
+            ASSERT_EQ(ret, HDF_SUCCESS);
+            count++;
+        } while (state != objState && count <= MAX_WAIT);
+    }
+
     static void SetUpTestCase()
     {
         manager_ = ICodecComponentManager::Get();
@@ -233,6 +292,11 @@ public:
     }
     void TearDown()
     {
+        std::vector<int8_t> cmdData;
+        auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
+        if (ret != HDF_SUCCESS) {
+            std::cout<<"SendCommand CODEC_STATE_LOADED error"<<std::endl;
+        }
         if (manager_ != nullptr && component_ != nullptr) {
             manager_->DestoryComponent(componentId_);
         }
@@ -247,13 +311,6 @@ public:
     const static uint32_t inputIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     const static uint32_t outputIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
 };
-
-template <typename T>
-void ObjectToVector(T &param, std::vector<int8_t> &vec)
-{
-    int8_t *paramPointer = (int8_t *)&param;
-    vec.insert(vec.end(), paramPointer, paramPointer + sizeof(param));
-}
 
 // Test GetComponentVersion
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_001, TestSize.Level1)
@@ -420,7 +477,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_005, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-#ifdef SUPPORT_OMX_EXTEND
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -435,13 +491,12 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
     auto ret = component_->GetParameter(OMX_IndexCodecVideoPortFormat, inParam, outParam);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    pixFormat.codecColorFormat = PIXEL_FMT_RGB_555;
+    pixFormat.codecColorFormat = PIXEL_FMT_YCBCR_420_SP;
     std::vector<int8_t> paramVec;
     ObjectToVector(pixFormat, paramVec);
     ret = component_->SetParameter(OMX_IndexCodecVideoPortFormat, paramVec);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
-#endif
 
 // Test GetConfig
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetConfigTest_001, TestSize.Level1)
@@ -593,7 +648,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
 
 #ifdef SUPPORT_OMX_EXTEND
 // Test SendCommand
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToExecutingTest_001, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     std::vector<int8_t> cmdData;
@@ -643,7 +698,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_004, TestSize.Level1)
 }
 
 #ifdef SUPPORT_OMX_EXTEND
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferAndFreeBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     std::vector<int8_t> cmdData;
@@ -722,27 +777,23 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_004, TestSize.Level1)
 
 #ifdef SUPPORT_OMX_EXTEND
 // Use buffer on input index
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_005, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    int32_t bufferSize = param.nBufferSize;
-    int32_t bufferCount = param.nBufferCountActual;
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, bufferCount, bufferSize);
-    ASSERT_TRUE(ret);
-    FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_INPUT, param);
+
+    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ASSERT_TRUE(err);
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_006, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     std::vector<int8_t> cmdData;
@@ -761,100 +812,124 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_006, TestSize.Level1)
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
     size_t handleSize =
         sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
-    InitOmxCodecBuffer(* omxBuffer.get(), CODEC_BUFFER_TYPE_HANDLE);
+    InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_HANDLE);
     omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
     omxBuffer->allocLen = handleSize;
     OmxCodecBuffer outBuffer;
+
     ret = component_->UseBuffer(inputIndex, *omxBuffer.get(), outBuffer);
     omxBuffer->bufferId = outBuffer.bufferId;
     ASSERT_EQ(ret, HDF_SUCCESS);
-
-    std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
-    ASSERT_TRUE(bufferInfo != nullptr);
-    bufferInfo->omxBuffer = omxBuffer;
-    bufferInfo->bufferHandle = bufferHandle;
-    inputBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
-    FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ret = component_->FreeBuffer(inputIndex, outBuffer);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 // Use Buffer on output index
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_007, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferSize, param.nBufferCountActual);
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_OUTPUT, param);
+
+    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
     ASSERT_TRUE(err);
     err = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
     ASSERT_TRUE(err);
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_008, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_004, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     std::vector<int8_t> cmdData;
-    auto err = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
-    ASSERT_EQ(err, HDF_SUCCESS);
-
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
     InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
 
     OmxCodecBuffer outBuffer;
-    err = component_->UseBuffer((uint32_t)PortIndex::PORT_INDEX_INPUT, *omxBuffer.get(), outBuffer);
-    ASSERT_EQ(err, HDF_SUCCESS);
-    std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
-    ASSERT_TRUE(bufferInfo != nullptr);
-    bufferInfo->omxBuffer = omxBuffer;
-    outputBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
-    FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
+    ret = component_->UseBuffer(outputIndex, *omxBuffer.get(), outBuffer);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ret = component_->FreeBuffer(outputIndex, outBuffer);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 // Use buffer on input index error when OMX_ErrorInsufficientResources
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_009, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_005, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
-    ASSERT_TRUE(ret);
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, 1, param.nBufferSize);
-    FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
-    ASSERT_FALSE(ret);
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_INPUT, param);
+
+    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+    err = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, 1, param.nBufferSize);
+    ASSERT_FALSE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ASSERT_TRUE(err);
 }
+
 // Use buffer on output index error when OMX_ErrorInsufficientResources
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_006, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
-    ASSERT_TRUE(ret);
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, 1, param.nBufferSize);
-    FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
-    ASSERT_FALSE(ret);
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_OUTPUT, param);
+
+    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+    err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, 1, param.nBufferSize);
+    ASSERT_FALSE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
+    ASSERT_TRUE(err);
 }
 #endif
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_INPUT, param);
+    auto err = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    GetPortParameter(PortIndex::PORT_INDEX_OUTPUT, param);
+    err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_EXECUTING, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_EXECUTING);
+
+    FillAndEmptyAllBuffer();
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ASSERT_TRUE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
+    ASSERT_TRUE(err);
+    WaitState(CODEC_STATE_LOADED);
+}
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
 {
@@ -871,7 +946,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
     eglImage = nullptr;
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_002, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     struct OmxCodecBuffer omxBuffer;
@@ -881,7 +956,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyThisBufferTest_002, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyThisBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     struct OmxCodecBuffer omxBuffer;
@@ -900,6 +975,13 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    auto ret = component_->SetCallbacks(nullptr, APP_DATA);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
 #ifdef SUPPORT_OMX_EXTEND
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
 {
@@ -910,7 +992,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
 }
 #endif
 
-#ifdef SUPPORT_OMX_EXTEND
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -918,16 +999,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_002, TestSize.Level1)
     auto ret = component_->ComponentRoleEnum(role, MAX_ROLE_INDEX);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
-
-// Executing to Idle
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
-{
-    ASSERT_TRUE(component_ != nullptr);
-    std::vector<int8_t> cmdData;
-    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-}
-#endif
 
 // Release input buffer
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_001, TestSize.Level1)
@@ -940,29 +1011,8 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_001, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-#ifdef SUPPORT_OMX_EXTEND
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
-{
-    ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferSize, param.nBufferCountActual);
-    ASSERT_TRUE(ret);
-    ret = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
-    ASSERT_TRUE(ret);
-}
-#endif
-
 // Release input buffer
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_003, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     struct OmxCodecBuffer omxBuffer;
@@ -973,25 +1023,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_003, TestSize.Level1)
 }
 
 #ifdef SUPPORT_OMX_EXTEND
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_004, TestSize.Level1)
-{
-    ASSERT_TRUE(component_ != nullptr);
-    OMX_PARAM_PORTDEFINITIONTYPE param;
-    InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
-    std::vector<int8_t> inParam;
-    ObjectToVector(param, inParam);
-
-    std::vector<int8_t> outParam;
-    auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-
-    ret = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferSize, param.nBufferCountActual);
-    ASSERT_TRUE(ret);
-    ret = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
-    ASSERT_TRUE(ret);
-}
-
 // When ComponentDeInit, must change to Loaded State
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
 {
@@ -1000,12 +1031,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
     auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
     // State changed OMX_StateIdle when release all this buffer
-    CodecStateType state = CODEC_STATE_INVALID;
-    do {
-        usleep(100);
-        ret = component_->GetState(state);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-    } while (state != CODEC_STATE_LOADED);
+    WaitState(CODEC_STATE_LOADED);
     ret = component_->ComponentDeInit();
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
