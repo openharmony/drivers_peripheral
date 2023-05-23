@@ -60,6 +60,7 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
                                                       const sptr<ICodecCallback> &callbacks)
 {
     CODEC_LOGD("compName[%{public}s]", compName.c_str());
+    CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
     std::shared_ptr<ComponentNode> node = std::make_shared<ComponentNode>(callbacks, appData, mgr_);
     auto err = node->OpenHandle(compName);
     if (err != HDF_SUCCESS) {
