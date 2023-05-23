@@ -105,6 +105,7 @@ void EmptyCodecBuffer(CodecBuffer *buf);
 bool CopyCodecBufferWithTypeSwitch(struct CodecInstance *instance, CodecBuffer *dst,
     const CodecBuffer *src, bool ignoreBuf);
 CodecBuffer* DupCodecBuffer(const CodecBuffer *src);
+void ReleaseCodecBuffer(CodecBuffer *info);
 
 #ifdef __cplusplus
 }
