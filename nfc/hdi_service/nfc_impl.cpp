@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,7 +55,7 @@ extern "C" INfcInterface *NfcInterfaceImplGetInstance(void)
 int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
 {
     if (callbackObj == nullptr) {
-        HDF_LOGE("%{public}s: callback is nullptr!", __func__);
+        HDF_LOGE("Open, callback is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
     g_callbackV1_0 = callbackObj;
@@ -72,7 +72,7 @@ int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
 int32_t NfcImpl::CoreInitialized(const std::vector<uint8_t> &data, NfcStatus &status)
 {
     if (data.empty()) {
-        HDF_LOGE("%{public}s: data is nullptr!", __func__);
+        HDF_LOGE("CoreInitialized, data is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = adaptor_.VendorCoreInitialized(data.size(), (uint8_t *)&data[0]);
@@ -98,7 +98,7 @@ int32_t NfcImpl::Prediscover(NfcStatus &status)
 int32_t NfcImpl::Write(const std::vector<uint8_t> &data, NfcStatus &status)
 {
     if (data.empty()) {
-        HDF_LOGE("%{public}s: data is nullptr!", __func__);
+        HDF_LOGE("Write, data is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = adaptor_.VendorWrite(data.size(), (uint8_t *)&data[0]);
@@ -147,7 +147,7 @@ int32_t NfcImpl::Close(NfcStatus &status)
 int32_t NfcImpl::Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStatus &status)
 {
     if (data.empty()) {
-        HDF_LOGE("%{public}s: data is nullptr!", __func__);
+        HDF_LOGE("Ioctl, data is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = adaptor_.VendorIoctl(data.size(), (uint8_t *)&data[0]);
