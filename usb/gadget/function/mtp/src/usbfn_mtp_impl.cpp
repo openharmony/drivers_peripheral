@@ -56,7 +56,7 @@ struct UsbMtpExtConfigDescFunction {
 };
 
 /* Compatible: MTP Extended Configuration Descriptor */
-struct {
+static struct {
     struct UsbMtpExtConfigDescHeader header;
     struct UsbMtpExtConfigDescFunction function;
 } g_mtpExtConfigDesc = {

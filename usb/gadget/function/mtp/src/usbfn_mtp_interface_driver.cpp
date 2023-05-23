@@ -115,7 +115,7 @@ static void HdfUsbfnMtpInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
     }
 }
 
-struct HdfDriverEntry g_usbfnmtpinterfaceDriverEntry = {
+static struct HdfDriverEntry g_usbfnmtpinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "usbfn_mtp",
     .Bind = HdfUsbfnMtpInterfaceDriverBind,
