@@ -45,7 +45,7 @@ struct RemoteServiceDeathRecipient {
 
 struct CodecComponentManagerSerivce *CodecComponentManagerSerivceGet(void);
 void OmxComponentManagerSeriveRelease(struct CodecComponentManagerSerivce *instance);
-void cleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote);
+void CleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

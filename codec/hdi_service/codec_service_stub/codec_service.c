@@ -375,7 +375,7 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int32_t 
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < paramCnt; i++) {
-       if (params[i].key != KEY_CODEC_TYPE) {
+        if (params[i].key != KEY_CODEC_TYPE) {
             continue;
         }
         int32_t codecType = 0;
@@ -472,6 +472,7 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
         }
         CodecBuffer *dup = DupCodecBuffer(inputData);
         if (AddInputInfo(instance, dup) != HDF_SUCCESS) {
+            ReleaseCodecBuffer(dup);
             HDF_LOGE("%{public}s: AddInputInfo failed, queue input buffer failed!", __func__);
             return HDF_FAILURE;
         }
@@ -538,6 +539,7 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
         }
         CodecBuffer *dup = DupCodecBuffer(outInfo);
         if (AddOutputInfo(instance, dup) != HDF_SUCCESS) {
+            ReleaseCodecBuffer(dup);
             HDF_LOGE("%{public}s: AddOutputInfo failed, queue output buffer failed!", __func__);
             return HDF_FAILURE;
         }
