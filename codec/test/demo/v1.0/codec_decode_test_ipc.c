@@ -71,7 +71,7 @@ static uint32_t inline AlignUp(uint32_t width, uint32_t alignment)
     return (((width) + alignment - 1) & (~(alignment - 1)));
 }
 
-static int32_t GetFrameSize()
+static int32_t GetFrameSize(void)
 {
     int32_t frameSize = 0;
     int32_t wStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
@@ -276,7 +276,7 @@ static void ReleaseCodecBuffers(void)
     }
 }
 
-static int32_t CalcFrameParams()
+static int32_t CalcFrameParams(void)
 {
     g_frameSize = GetFrameSize();
     g_frameStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
@@ -721,14 +721,13 @@ static int32_t Decode(void)
 {
     pthread_t thd;
     pthread_attr_t attr;
-    int32_t ret = 0;
 
     if (OpenFile() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Failed to open file!", __func__);
         return HDF_FAILURE;
     }
 
-    ret = g_codecProxy->CodecInit(g_codecProxy);
+    int32_t ret = g_codecProxy->CodecInit(g_codecProxy);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecInit failed, ret:%{public}d", __func__, ret);
         RevertDecodeStep1();

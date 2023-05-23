@@ -52,7 +52,7 @@ private:
 private:
     void *libHandle_ = nullptr;
     GetCodecJpegHwi getCodecJpegHwi_ = nullptr;
-    ICodecJpegHwi *JpegHwi_;
+    ICodecJpegHwi *JpegHwi_ = nullptr;
     struct CodecJpegCallbackHwi vdiCallback_;
     static int fence_;
     static OHOS::sptr<V1_0::ICodecImageCallback> callback_;

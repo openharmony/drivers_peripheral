@@ -37,6 +37,10 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 
     if (strcmp(para, "-l") == 0) {
         struct CodecComponentManagerSerivce *managerService = CodecComponentManagerSerivceGet();
+        if (managerService == NULL) {
+            CODEC_LOGE("managerService is NULL");
+            return HDF_FAILURE;
+        }
         struct ComponentTypeNode *pos = NULL;
         struct ComponentTypeNode *next = NULL;
         DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &managerService->head, struct ComponentTypeNode, node)
