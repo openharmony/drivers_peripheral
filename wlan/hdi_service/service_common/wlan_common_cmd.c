@@ -198,10 +198,6 @@ int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct
 
 static int32_t GetBasefeature(const struct HdfFeatureInfo *ifeature, struct IWiFiBaseFeature **baseFeature)
 {
-    if (ifeature == NULL || baseFeature == NULL) {
-        HDF_LOGE("%{public}s ifeature or baseFeature is NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
         if (g_apFeature == NULL) {
             HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
@@ -994,14 +990,11 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
 
 static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *scan)
 {
-    if (wifiScan == NULL || scan == NULL) {
-        HDF_LOGE("%{public}s wifiScan or scan is NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if ((scan->ssids != NULL) && (scan->ssidsLen != 0)) {
         wifiScan->ssids = (WifiDriverScanSsid *)OsalMemCalloc(sizeof(WifiDriverScanSsid) * scan->ssidsLen);
         if (wifiScan->ssids != NULL) {
-            if (memcpy_s(wifiScan->ssids, scan->ssidsLen, scan->ssids, scan->ssidsLen) != EOK) {
+            if (memcpy_s(wifiScan->ssids, sizeof(WifiDriverScanSsid) * (scan->ssidsLen), scan->ssids,
+                sizeof(WifiDriverScanSsid) * (scan->ssidsLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
                 OsalMemFree(wifiScan->ssids);
                 return HDF_FAILURE;
@@ -1013,7 +1006,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->freqs != NULL) && (scan->freqsLen != 0)) {
         wifiScan->freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t) * scan->freqsLen);
         if (wifiScan->freqs != NULL) {
-            if (memcpy_s(wifiScan->freqs, scan->freqsLen, scan->freqs, scan->freqsLen) != EOK) {
+            if (memcpy_s(wifiScan->freqs, sizeof(int32_t) * (scan->freqsLen), scan->freqs,
+                sizeof(int32_t) * (scan->freqsLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
                 OsalMemFree(wifiScan->freqs);
                 return HDF_FAILURE;
@@ -1025,7 +1019,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->bssid != NULL) && (scan->bssidLen != 0)) {
         wifiScan->bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * scan->bssidLen);
         if (wifiScan->bssid != NULL) {
-            if (memcpy_s(wifiScan->bssid, scan->bssidLen, scan->bssid, scan->bssidLen) != EOK) {
+            if (memcpy_s(wifiScan->bssid, sizeof(uint8_t) * (scan->bssidLen), scan->bssid,
+                sizeof(uint8_t) * (scan->bssidLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s bssid fail!", __func__);
                 OsalMemFree(wifiScan->bssid);
                 return HDF_FAILURE;
@@ -1035,7 +1030,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->extraIes != NULL) && (scan->extraIesLen != 0)) {
         wifiScan->extraIes = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * scan->extraIesLen);
         if (wifiScan->extraIes != NULL) {
-            if (memcpy_s(wifiScan->extraIes, scan->extraIesLen, scan->extraIes, scan->extraIesLen) != EOK) {
+            if (memcpy_s(wifiScan->extraIes, sizeof(uint8_t) * (scan->extraIesLen), scan->extraIes,
+                sizeof(uint8_t) * (scan->extraIesLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s extraIes fail!", __func__);
                 OsalMemFree(wifiScan->extraIes);
                 return HDF_FAILURE;
@@ -1234,18 +1230,20 @@ static int32_t FillPnoSettings(WifiPnoSettings *wifiPnoSettings, const struct Pn
             HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
             return HDF_FAILURE;
         }
-        wifiPnoSettings->pnoNetworks[i].freqs =
-            (int32_t *)OsalMemCalloc(sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen));
-        if (wifiPnoSettings->pnoNetworks[i].freqs == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
-            return HDF_FAILURE;
-        }
-        wifiPnoSettings->pnoNetworks[i].freqsLen = pnoSettings->pnoNetworks[i].freqsLen;
-        if (memcpy_s(wifiPnoSettings->pnoNetworks[i].freqs,
-                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen), pnoSettings->pnoNetworks[i].freqs,
-                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen)) != EOK) {
-            HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
-            return HDF_FAILURE;
+        if (pnoSettings->pnoNetworks[i].freqsLen != 0) {
+            wifiPnoSettings->pnoNetworks[i].freqs =
+                (int32_t *)OsalMemCalloc(sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen));
+            if (wifiPnoSettings->pnoNetworks[i].freqs == NULL) {
+                HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+                return HDF_FAILURE;
+            }
+            wifiPnoSettings->pnoNetworks[i].freqsLen = pnoSettings->pnoNetworks[i].freqsLen;
+            if (memcpy_s(wifiPnoSettings->pnoNetworks[i].freqs,
+                    sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen), pnoSettings->pnoNetworks[i].freqs,
+                    sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen)) != EOK) {
+                HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
+                return HDF_FAILURE;
+            }
         }
     }
     return HDF_SUCCESS;
