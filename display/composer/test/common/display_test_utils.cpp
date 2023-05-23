@@ -65,14 +65,19 @@ static int32_t GetPixelFormatBpp(PixelFormat format)
 
 void SaveFile(const char *fileName, uint8_t *data, int size)
 {
-    int fileFd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-    if (fileFd <= 0) {
-        DISPLAY_TEST_LOGE("Open file failed %{public}d", fileFd);
-        return;
+    if (fileName != nullptr && data != nullptr) {
+        int fileFd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+        if (fileFd <= 0) {
+            DISPLAY_TEST_LOGE("Open file failed %{public}d", fileFd);
+            return;
+        }
+
+        int hasWriten = write(fileFd, data, size);
+        DISPLAY_TEST_LOGD("SaveFile hasWriten %{public}d", hasWriten);
+        close(fileFd);
+    } else {
+        DISPLAY_TEST_LOGE("SaveFile failed");
     }
-    int hasWriten = write(fileFd, data, size);
-    DISPLAY_TEST_LOGD("SaveFile hasWriten %{public}d", hasWriten);
-    close(fileFd);
 }
 
 static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
@@ -106,6 +111,8 @@ uint32_t GetPixelValue(const BufferHandle &handle, int x, int y)
         DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
+    DISPLAY_TEST_CHK_RETURN((pixel == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("get pixel failed"));
+
     return *pixel;
 }
 
@@ -137,6 +144,8 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
         DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
+    DISPLAY_TEST_CHK_RETURN((pixel == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("get pixel failed"));
+
     uint32_t checkColor = ConverToRGBA(static_cast<PixelFormat>(handle.format), GetUint32(*pixel));
     if (checkColor != color) {
         DISPLAY_TEST_LOGD("x:%{public}d y:%{public}d width:%{public}d", x, y, handle.width);
@@ -149,8 +158,12 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 void SetUint32(uint32_t &dst, uint32_t value)
 {
     uint8_t *data = reinterpret_cast<uint8_t *>(&dst);
-    for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
-        *(data + i) = (value >> ((sizeof(uint32_t) - i - 1) * BITS_PER_BYTE)) & 0xff;
+    if (data != nullptr) {
+        for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
+            *(data + i) = (value >> ((sizeof(uint32_t) - i - 1) * BITS_PER_BYTE)) & 0xff;
+        }
+    } else {
+        DISPLAY_TEST_LOGE("SetUint32 failed");
     }
 }
 
@@ -172,6 +185,8 @@ void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
         DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
+    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((pixel == nullptr), DISPLAY_TEST_LOGE("get pixel failed"));
+
     SetUint32(*pixel, color);
 }
 

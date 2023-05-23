@@ -44,6 +44,7 @@ void SetPixel(const BufferHandle& handle, int x, int y, uint32_t color)
         DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t* pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
+    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((pixel == nullptr), DISPLAY_TEST_LOGE("get pixel failed"));
     SetUint32(*pixel, color);
 }
 
