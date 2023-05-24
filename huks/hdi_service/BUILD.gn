@@ -23,7 +23,7 @@ config("huks_config") {
 }
 
 
-ohos_shared_library("libhuks_hdi_service") {
+ohos_shared_library("libhuks_hdi_service_1.0") {
   subsystem_name = "security"
   part_name = "huks"
   public_configs = [ ":huks_config" ]
@@ -52,7 +52,6 @@ ohos_shared_library("libhuks_hdi_service") {
     "//base/security/huks/frameworks/huks_standard/main:huks_standard_frameworks",
     "//base/security/huks/services/huks_standard/huks_engine/main/core_dependency:libhuks_core_hal_api_static",
     "//base/security/huks/utils/crypto_adapter:libhuks_utils_client_service_adapter_static",
-    "//base/security/huks/utils/file_operator:libhuks_utils_file_operator_static",
     "//base/security/huks/utils/list:libhuks_utils_list_static",
     "//base/security/huks/utils/mutex:libhuks_utils_mutex_static",
   ]
@@ -62,7 +61,6 @@ ohos_shared_library("libhuks_hdi_service") {
   ]
 
   sources += [ "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_upgrade_key.c" ]
-  
 
   configs = [
     "//base/security/huks/frameworks/config/build:l2_standard_common_config",
@@ -91,5 +89,5 @@ ohos_shared_library("libhuks_hdi_service") {
 }
 
 group("huks_hdi_service") {
-  deps = [ ":libhuks_hdi_service" ]
+  deps = [ ":libhuks_hdi_service_1.0" ]
 }
