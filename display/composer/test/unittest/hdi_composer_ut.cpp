@@ -168,10 +168,25 @@ static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
     }
 }
 
-void DeviceTest::TearDown()
+void DeviceTest::SetUpTestCase()
 {
-    DISPLAY_TEST_LOGD();
+    int ret = HdiTestDevice::GetInstance().InitDevice();
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS);
+
+    g_composerDevice = HdiTestDevice::GetInstance().GetDeviceInterface();
+    ASSERT_TRUE(g_composerDevice != nullptr);
+
+    g_gralloc.reset(IDisplayBuffer::Get());
+    ASSERT_TRUE(g_gralloc != nullptr);
+
+    g_displayIds = HdiTestDevice::GetInstance().GetDevIds();
+    ASSERT_TRUE(g_displayIds.size() > 0);
+}
+
+void DeviceTest::TearDownTestCase()
+{
     HdiTestDevice::GetInstance().Clear();
+    HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
 }
 
 void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void* data)
@@ -201,18 +216,6 @@ int32_t VblankCtr::WaitVblank(uint32_t ms)
     }
     return DISPLAY_SUCCESS;
 }
-
-void VblankTest::TearDown()
-{
-    auto display = HdiTestDevice::GetInstance().GetFirstDisplay();
-    int32_t ret = display->SetDisplayVsyncEnabled(false);
-    if (ret != DISPLAY_SUCCESS) {
-        DISPLAY_TEST_LOGE("vsync disable failed");
-    }
-    VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // wait for last vsync 100ms.
-    HdiTestDevice::GetInstance().Clear();
-}
-
 
 HWTEST_F(DeviceTest, test_GetDisplayCapability, TestSize.Level1)
 {
@@ -274,12 +277,31 @@ HWTEST_F(DeviceTest, test_SetDisplayBacklight, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
+HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
+{
+    const uint32_t PROPERTY_ID = 1;
+    uint64_t propertyValue = 0;
+    auto ret = g_composerDevice->GetDisplayProperty(g_displayIds[0], PROPERTY_ID, propertyValue);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
 HWTEST_F(DeviceTest, test_GetDisplayCompChange, TestSize.Level1)
 {
     std::vector<uint32_t> layers {};
     std::vector<int32_t> type {};
     auto ret = g_composerDevice->GetDisplayCompChange(g_displayIds[0], layers, type);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayClientCrop, TestSize.Level1)
+{
+    const int32_t WIDTH = 1920;
+    const int32_t HEIGHT = 1080;
+    IRect rect = {0, 0, WIDTH, HEIGHT};
+    auto ret = g_composerDevice->SetDisplayClientCrop(g_displayIds[0], rect);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 HWTEST_F(DeviceTest, test_GetDisplayReleaseFence, TestSize.Level1)
@@ -293,10 +315,12 @@ HWTEST_F(DeviceTest, test_GetDisplayReleaseFence, TestSize.Level1)
 HWTEST_F(DeviceTest, test_SetDisplayClientBuffer, TestSize.Level1)
 {
     BufferHandle* buffer = nullptr;
+    const int32_t WIDTH = 800;
+    const int32_t HEIGHT = 600;
 
     AllocInfo info;
-    info.width  = 800;
-    info.height = 600;
+    info.width  = WIDTH;
+    info.height = HEIGHT;
     info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
@@ -306,7 +330,72 @@ HWTEST_F(DeviceTest, test_SetDisplayClientBuffer, TestSize.Level1)
     ASSERT_TRUE(buffer != nullptr);
 
     auto ret = g_composerDevice->SetDisplayClientBuffer(g_displayIds[0], *buffer, -1);
+    g_gralloc->FreeMem(*buffer);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayClientDamage, TestSize.Level1)
+{
+    const int32_t WIDTH = 1920;
+    const int32_t HEIGHT = 1080;
+    IRect rect = {0, 0, WIDTH, HEIGHT};
+    std::vector<IRect> vRects;
+    vRects.push_back(rect);
+    auto ret = g_composerDevice->SetDisplayClientDamage(g_displayIds[0], vRects);
+    // not support
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_CreateVirtualDisplay, TestSize.Level1)
+{
+    const uint32_t WIDTH = 1920;
+    const uint32_t HEIGHT = 1080;
+    int32_t format = 0;
+    uint32_t devId = 0;
+    auto ret = g_composerDevice->CreateVirtualDisplay(WIDTH, HEIGHT, format, devId);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+HWTEST_F(DeviceTest, test_DestroyVirtualDisplay, TestSize.Level1)
+{
+    uint32_t devId = 0;
+    auto ret = g_composerDevice->DestroyVirtualDisplay(devId);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetVirtualDisplayBuffer, TestSize.Level1)
+{
+    BufferHandle* buffer = nullptr;
+    int32_t fence = -1;
+    const int32_t WIDTH = 800;
+    const int32_t HEIGHT = 600;
+
+    AllocInfo info;
+    info.width  = WIDTH;
+    info.height = HEIGHT;
+    info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
+    info.format = PIXEL_FMT_RGBA_8888;
+
+    g_gralloc->AllocMem(info, buffer);
+    ASSERT_TRUE(buffer != nullptr);
+
+    auto ret = g_composerDevice->SetVirtualDisplayBuffer(g_displayIds[0], *buffer, fence);
+    g_gralloc->FreeMem(*buffer);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayProperty, TestSize.Level1)
+{
+    const uint32_t PROPERTY_ID = 1;
+    const uint64_t PROPERTY_VALUE = 0;
+    auto ret = g_composerDevice->SetDisplayProperty(g_displayIds[0], PROPERTY_ID, PROPERTY_VALUE);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerCrop, TestSize.Level1)
@@ -539,9 +628,9 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
     auto layer = layers[0];
 
     BufferHandle* buffer = nullptr;
-
     const int32_t WIDTH = 800;
     const int32_t HEIGHT = 600;
+
     AllocInfo info;
     info.width  = WIDTH;
     info.height = HEIGHT;
@@ -556,6 +645,7 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
     auto ret = g_composerDevice->SetLayerBuffer(g_displayIds[0], layer->GetId(), *buffer, -1);
 
     PrepareAndPrensent();
+    g_gralloc->FreeMem(*buffer);
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
@@ -680,7 +770,7 @@ HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
-HWTEST_F(VblankTest, test_RegDisplayVBlankCallback, TestSize.Level1)
+HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
 {
     int ret;
     DISPLAY_TEST_LOGD();
@@ -697,27 +787,4 @@ HWTEST_F(VblankTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     usleep(SLEEP_CONT_100 * SLEEP_CONT_1000);                              // wait for 100ms avoid the last vsync.
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_1000); // 1000ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
-}
-
-int main(int argc, char **argv)
-{
-    int ret = HdiTestDevice::GetInstance().InitDevice();
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Init Device Failed"));
-    ::testing::InitGoogleTest(&argc, argv);
-    g_composerDevice = HdiTestDevice::GetInstance().GetDeviceInterface();
-    DISPLAY_TEST_CHK_RETURN((g_composerDevice == nullptr), DISPLAY_FAILURE,
-        DISPLAY_TEST_LOGE("get composer interface failed"));
-    g_gralloc.reset(IDisplayBuffer::Get());
-    DISPLAY_TEST_CHK_RETURN((g_gralloc == nullptr), DISPLAY_FAILURE,
-        DISPLAY_TEST_LOGE("get buffer interface failed"));
-    auto display = HdiTestDevice::GetInstance().GetFirstDisplay();
-    if (display != nullptr) {
-        g_displayIds = HdiTestDevice::GetInstance().GetDevIds();
-        // avoid vsync call back affer the destruction of VblankCtr
-        display->SetDisplayVsyncEnabled(false);
-        VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100);
-    }
-    ret = RUN_ALL_TESTS();
-    HdiTestDevice::GetInstance().GetFirstDisplay()->ResetClientLayer();
-    return ret;
 }
