@@ -278,8 +278,9 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
         auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
         if (!CopyScheduleInfoV1_1(coAuthSchedule, &temp)) {
             infos.clear();
-            ret = RESULT_GENERAL_ERROR;
-            break;
+            IAM_LOGE("copy schedule info failed");
+            DestroyLinkedList(schedulesGet);
+            return RESULT_GENERAL_ERROR;
         }
         infos.push_back(temp);
         tempNode = tempNode->next;
