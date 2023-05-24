@@ -53,7 +53,7 @@ public:
         }
         outBuffer.buffer = new NativeBuffer(bufferHandle);
     }
-    
+
     static void SetUpTestCase()
     {
         hdiJpeg_ = ICodecImageJpeg::Get();
@@ -181,7 +181,7 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_004, TestSize.Level1)
     ASSERT_TRUE(hdiBuffer_ != nullptr);
     struct CodecImageBuffer outBuffer;
     InitOutBuffer(outBuffer);
-    
+
     struct CodecJpegDecInfo decInfo;
     OHOS::sptr<ICodecImageCallback> callback = new CodecImageCallback;
     ret = hdiJpeg_->DoJpegDecode(inBuffer, outBuffer, callback, decInfo);
