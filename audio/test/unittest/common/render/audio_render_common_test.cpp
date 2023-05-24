@@ -320,6 +320,15 @@ HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityNull003, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->CheckSceneCapability(render_, &scene, nullptr));
 }
 
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid001, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc = devDescRender_;
+    EXPECT_EQ(HDF_SUCCESS, render_->CheckSceneCapability(render_, &scene, &supported));
+}
+
 HWTEST_F(AudioUtRenderTest, RenderSelectSceneNull001, TestSize.Level1)
 {
     struct AudioSceneDescriptor scene;
@@ -383,6 +392,8 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid001, TestSize.Level1)
 {
     uint64_t frames = 0;
     struct AudioTimeStamp time;
+    time.tvSec = 0;
+    time.tvNSec = 0;
     int32_t ret = render_->GetRenderPosition(render_, &frames, &time);
 
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
@@ -422,8 +433,9 @@ HWTEST_F(AudioUtRenderTest, RenderGetExtraParamsNull002, TestSize.Level1)
 HWTEST_F(AudioUtRenderTest, RenderGetExtraParamsIsValid001, TestSize.Level1)
 {
     char keyValueList[AUDIO_RENDER_BUF_TEST] = {};
-    uint32_t keyValueListLen = 0;
-    EXPECT_NE(HDF_SUCCESS, render_->GetExtraParams(render_, keyValueList, keyValueListLen));
+    uint32_t keyValueListLen = BUFFER_LENTH;
+    int32_t ret = render_->GetExtraParams(render_, keyValueList, keyValueListLen);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeNull001, TestSize.Level1)
