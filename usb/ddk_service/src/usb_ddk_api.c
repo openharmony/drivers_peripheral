@@ -23,7 +23,7 @@
 
 struct IUsbDdk *g_ddk = NULL;
 
-int32_t OH_Usb_Init()
+int32_t OH_Usb_Init(void)
 {
     g_ddk = IUsbDdkGet(false);
     if (g_ddk == NULL) {
@@ -34,7 +34,7 @@ int32_t OH_Usb_Init()
     return g_ddk->init(g_ddk);
 }
 
-void OH_Usb_Release()
+void OH_Usb_Release(void)
 {
     if (g_ddk == NULL) {
         HDF_LOGE("%{public}s ddk is null", __func__);
