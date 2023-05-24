@@ -57,18 +57,11 @@ ohos_shared_library("libhuks_hdi_service") {
     "//base/security/huks/utils/mutex:libhuks_utils_mutex_static",
   ]
 
-  sanitize = {
-    integer_overflow = true
-    cfi = true
-    debug = false
-  }
   sources += [
     "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_secure_access.c",
   ]
 
   sources += [ "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_upgrade_key.c" ]
-
-  deps += [ "//base/security/huks/services/huks_standard/huks_service/main/systemapi_wrap/useridm:libhuks_service_systemapi_wrap_static" ]
   
 
   configs = [
