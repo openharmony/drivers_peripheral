@@ -36,8 +36,8 @@ int32_t SeVendorAdaptions::isSecureElementPresent(bool& present)
     return HDF_SUCCESS;
 }
 
-int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, uint8_t p2, std::vector<uint8_t>& response,
-    uint8_t& channelNumber, SecureElementStatus& status)
+int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, uint8_t p2,
+    std::vector<uint8_t>& response, uint8_t& channelNumber, SecureElementStatus& status)
 {
     return HDF_SUCCESS;
 }
