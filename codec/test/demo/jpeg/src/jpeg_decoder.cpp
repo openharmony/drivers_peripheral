@@ -205,7 +205,7 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     if (ret != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    
+
     HDF_LOGI("write jpeg data to inBuffer !");
     BufferHandle *bufferHandle = inBuffer_.buffer->GetBufferHandle();
     hdiBuffer_->Mmap(*bufferHandle);
@@ -224,7 +224,7 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     }
     return HDF_SUCCESS;
 }
-    
+
 int main(int argc, char *argv[])
 {
     CommandOpt opt;

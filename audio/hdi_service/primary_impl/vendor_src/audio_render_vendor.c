@@ -656,12 +656,7 @@ int32_t AudioHwiRenderAddAudioEffect(struct IAudioRender *render, uint64_t effec
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
-    int32_t ret = hwiRender->attr.AddAudioEffect(hwiRender, effectid);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render AddAudioEffect fail, ret=%{public}d", ret);
-    }
-
-    return ret;
+    return hwiRender->attr.AddAudioEffect(hwiRender, effectid);
 }
 
 int32_t AudioHwiRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t effectid)
@@ -673,12 +668,7 @@ int32_t AudioHwiRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t ef
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
-    int32_t ret = hwiRender->attr.RemoveAudioEffect(hwiRender, effectid);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render RemoveAudioEffect fail, ret=%{public}d", ret);
-    }
-
-    return ret;
+    return hwiRender->attr.RemoveAudioEffect(hwiRender, effectid);
 }
 
 int32_t AudioHwiRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t *bufferSize)
@@ -691,12 +681,7 @@ int32_t AudioHwiRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t *
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
-    int32_t ret = hwiRender->attr.GetFrameBufferSize(hwiRender, bufferSize);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render GetFrameBufferSize fail, ret=%{public}d", ret);
-    }
-
-    return ret;
+    return hwiRender->attr.GetFrameBufferSize(hwiRender, bufferSize);
 }
 
 int32_t AudioHwiRenderStart(struct IAudioRender *render)
@@ -829,12 +814,7 @@ int32_t AudioHwiRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 
-    int32_t ret = hwiRender->control.IsSupportsPauseAndResume(hwiRender, supportPause, supportResume);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render IsSupportsPauseAndResume fail, ret=%{public}d", ret);
-    }
-
-    return ret;
+    return hwiRender->control.IsSupportsPauseAndResume(hwiRender, supportPause, supportResume);
 }
 
 int32_t AudioHwiRenderGetVersion(struct IAudioRender *render, uint32_t *majorVer, uint32_t *minorVer)
@@ -987,7 +967,7 @@ struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes
     return render;
 }
 
-uint32_t QueryRenderUsrCount(uint32_t renderId)
+uint32_t DecreaseRenderUsrCount(uint32_t renderId)
 {
     uint32_t usrCnt = 0;
     if (renderId >= AUDIO_HW_STREAM_NUM_MAX) {

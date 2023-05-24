@@ -35,11 +35,11 @@ namespace {
     constexpr int32_t COLORVALUE_RED = 255;
     constexpr int32_t COLORVALUE_GREEN = 0;
     constexpr int32_t COLORVALUE_BLUE = 0;
-    constexpr uint32_t g_sleepTime = 3;
-    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
-    constexpr int32_t g_onTime = 500;
-    constexpr int32_t g_offTime = 500;
+    constexpr uint32_t SLEEP_TIME = 3;
+    constexpr int32_t MIN_LIGHT_ID = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t MAX_LIGHT_ID = HDF_LIGHT_ID_ATTENTION;
+    constexpr int32_t ON_TIME = 500;
+    constexpr int32_t OFF_TIME = 500;
     sptr<ILightInterface> g_lightInterface = nullptr;
 
 class lightBenchmarkTest : public benchmark::Fixture {
@@ -75,8 +75,8 @@ BENCHMARK_F(lightBenchmarkTest, GetLightInfo)(benchmark::State &st)
     }
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
     }
 }
 
@@ -99,8 +99,8 @@ BENCHMARK_F(lightBenchmarkTest, TurnOnLight)(benchmark::State &st)
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = COLORVALUE_RED;
@@ -112,7 +112,7 @@ BENCHMARK_F(lightBenchmarkTest, TurnOnLight)(benchmark::State &st)
             ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
             EXPECT_EQ(HDF_SUCCESS, ret);
         }
-        OsalMSleep(g_sleepTime);
+        OsalMSleep(SLEEP_TIME);
         ret = g_lightInterface->TurnOffLight(iter.lightId);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
@@ -137,19 +137,19 @@ BENCHMARK_F(lightBenchmarkTest, TurnOffLight)(benchmark::State &st)
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
         effect.lightColor.colorValue.rgbColor.r = COLORVALUE_RED;
         effect.lightColor.colorValue.rgbColor.g = COLORVALUE_GREEN;
         effect.lightColor.colorValue.rgbColor.b = COLORVALUE_BLUE;
         effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
-        effect.flashEffect.onTime = g_onTime;
-        effect.flashEffect.offTime = g_offTime;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
         ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        OsalMSleep(g_sleepTime);
+        OsalMSleep(SLEEP_TIME);
         for (auto _ : st) {
             ret = g_lightInterface->TurnOffLight(iter.lightId);
             EXPECT_EQ(HDF_SUCCESS, ret);
@@ -176,8 +176,8 @@ BENCHMARK_F(lightBenchmarkTest, TurnOnMultiLights)(benchmark::State &st)
     EXPECT_EQ(0, ret);
 
     for (auto iter : info) {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
         std::vector<HdfLightColor> lightColor;
         struct HdfLightColor light;
         light.colorValue.rgbColor.b = COLORVALUE_BLUE;

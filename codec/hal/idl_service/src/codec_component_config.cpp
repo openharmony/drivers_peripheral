@@ -139,31 +139,6 @@ int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCa
     return HDF_SUCCESS;
 }
 
-int32_t CodecComponentConfig::GetGroupCapabilitiesNumber(const std::string &nodeName, int32_t &num)
-{
-    int32_t result = 0;
-
-    const struct DeviceResourceNode *codecGroupNode = NULL;
-    struct DeviceResourceNode *childNode = NULL;
-    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface == NULL) {
-        CODEC_LOGE("failed, iface NULL!");
-        return HDF_FAILURE;
-    }
-
-    codecGroupNode = iface->GetChildNode(&node_, nodeName.c_str());
-    if (codecGroupNode == NULL) {
-        CODEC_LOGE("failed to get child node %{public}s,!", nodeName.c_str());
-        return HDF_FAILURE;
-    }
-    DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode)
-    {
-        result++;
-    }
-    num = result;
-    return HDF_SUCCESS;
-}
-
 int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 {
     bool isVideoGroup = true;

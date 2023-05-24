@@ -14,10 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_executable("usb_dev_test") {
-  include_dirs = [
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
+  include_dirs = [ "//third_party/bounds_checking_function/include" ]
 
   sources = [
     "acm_speed_read.c",
@@ -30,10 +27,12 @@ ohos_executable("usb_dev_test") {
   public_deps = [
     "./../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     "./../../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [
+    "hdf_core:libhdf_utils",
+    "hilog_featured_lite:hilog_shared",
+  ]
   defines = [ "__USER__" ]
 
   cflags = [

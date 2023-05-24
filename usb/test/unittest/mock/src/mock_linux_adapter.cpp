@@ -30,12 +30,12 @@ constexpr uint8_t I_PRODUCT = 2;
 constexpr uint8_t I_SERIAL_NUMBER = 3;
 constexpr uint32_t CFG_LEN = 93;
 
-UsbDeviceHandle *g_usbHandle = nullptr;
-UsbDevice *g_dev = nullptr;
-UsbHostRequest *g_sprq = nullptr;
-OsalSem g_completeSem;
+static UsbDeviceHandle *g_usbHandle = nullptr;
+static UsbDevice *g_dev = nullptr;
+static UsbHostRequest *g_sprq = nullptr;
+static OsalSem g_completeSem;
 
-std::array<uint8_t, DESCRIPTORSLENGTH> g_buf = {
+static std::array<uint8_t, DESCRIPTORSLENGTH> g_buf = {
     0x12, 0x01, 0x20, 0x03, 0x00, 0x00, 0x00, 0x09, 0x07, 0x22, 0x18, 0x00, 0x23, 0x02, 0x01, 0x02,
     0x03, 0x01, 0x09, 0x02, 0x5D, 0x00, 0x02, 0x01, 0x04, 0xC0, 0x3E, 0x08, 0x0B, 0x00, 0x02, 0x02,
     0x02, 0x01, 0x07, 0x09, 0x04, 0x00, 0x00, 0x01, 0x02, 0x02, 0x01, 0x05, 0x05, 0x24, 0x00, 0x10,
@@ -45,7 +45,7 @@ std::array<uint8_t, DESCRIPTORSLENGTH> g_buf = {
     0x00, 0x00, 0x07, 0x05, 0x01, 0x02, 0x00, 0x04, 0x00, 0x06, 0x30, 0x00, 0x00, 0x00, 0x00
 };
 
-int32_t FillUsbDeviceHandle(UsbDeviceHandle *handle)
+static int32_t FillUsbDeviceHandle(UsbDeviceHandle *handle)
 {
     UsbDeviceDescriptor dec = {BLENGTH, 1, BCDUSB, 0, 0, 0, MAX_PACKET_SIZE, ID_VENDOR,
         ID_PRODUCT, BCD_DEVICE, 1, I_PRODUCT, I_SERIAL_NUMBER, 1};
@@ -449,7 +449,7 @@ int32_t FuncAdapterCancelRequest(UsbHostRequest * const request)
     return HDF_SUCCESS;
 }
 
-int32_t RequestCompletion(UsbHostRequest *request, UsbRequestStatus status)
+static int32_t RequestCompletion(UsbHostRequest *request, UsbRequestStatus status)
 {
     if (request == nullptr) {
         HDF_LOGE("%{public}s: request is nullptr!", __func__);

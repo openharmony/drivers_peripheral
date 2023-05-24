@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef USB_DDK_HASH_H
+#define USB_DDK_HASH_H
 #include <stdint.h>
 #include <stddef.h>
 
@@ -24,3 +26,4 @@ void UsbDdkDelHashRecord(uint64_t hashVal);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif // USB_DDK_IMPL_H

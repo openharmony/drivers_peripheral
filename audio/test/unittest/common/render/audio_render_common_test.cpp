@@ -445,8 +445,14 @@ HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeNull001, TestSize.Level1)
 
 HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeIsValid001, TestSize.Level1)
 {
-    EXPECT_EQ(HDF_SUCCESS, render_->Start(render_));
-    EXPECT_EQ(HDF_SUCCESS, render_->TurnStandbyMode(render_));
+    int32_t ret = render_->Start(render_);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    ret = render_->TurnStandbyMode(render_);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = render_->Stop(render_);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderAudioDevDumpNull001, TestSize.Level1)
@@ -558,6 +564,11 @@ HWTEST_F(AudioUtRenderTest, RenderPauseNull001, TestSize.Level1)
 HWTEST_F(AudioUtRenderTest, RenderResumeNull001, TestSize.Level1)
 {
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Resume(nullptr));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderResumeInvalid001, TestSize.Level1)
+{
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->Resume(render_));
 }
 
 HWTEST_F(AudioUtRenderTest, RenderPauseResumeIsValid001, TestSize.Level1)
@@ -685,6 +696,150 @@ HWTEST_F(AudioUtRenderTest, RenderSetVolumeIsValid001, TestSize.Level1)
     int32_t ret = render_->SetVolume(render_, volume);
 
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level1)
+{
+    float speed = 0.0;
+    ASSERT_EQ(HDF_SUCCESS, render_->Start(render_));
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetRenderSpeed(nullptr, &speed));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->GetRenderSpeed(render_, nullptr));
+    EXPECT_EQ(HDF_SUCCESS, render_->Stop(render_));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsValid001, TestSize.Level1)
+{
+    float speed = 0.0;
+    ASSERT_EQ(HDF_SUCCESS, render_->Start(render_));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->GetRenderSpeed(render_, &speed));
+    EXPECT_EQ(HDF_SUCCESS, render_->Stop(render_));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsInValid001, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_NORMAL;
+    int32_t ret = render_->GetChannelMode(nullptr, &channelMode);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetChannelMode(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetChannelModeIsValid001, TestSize.Level1)
+{
+    enum AudioChannelMode channelMode = AUDIO_CHANNEL_NORMAL;
+    int32_t ret = render_->GetChannelMode(render_, &channelMode);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderRegCallbackIsInValid001, TestSize.Level1)
+{
+    int8_t cookie = 0;
+    struct IAudioCallback *audioCallback = nullptr;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->RegCallback(nullptr, audioCallback, cookie));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->RegCallback(render_, nullptr, cookie));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderRegCallbackIsValid001, TestSize.Level1)
+{
+    int8_t cookie = 0;
+    struct IAudioCallback *audioCallback = nullptr;
+    int32_t ret = render_->RegCallback(render_, audioCallback, cookie);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderDrainBufferIsInValid001, TestSize.Level1)
+{
+    enum AudioDrainNotifyType type = AUDIO_DRAIN_NORMAL_MODE;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->DrainBuffer(nullptr, &type));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->DrainBuffer(render_, nullptr));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderDrainBufferIsValid001, TestSize.Level1)
+{
+    enum AudioDrainNotifyType type = AUDIO_DRAIN_NORMAL_MODE;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, render_->DrainBuffer(render_, &type));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderIsSupportsDrainIsInValid001, TestSize.Level1)
+{
+    bool support = false;
+    int32_t ret = render_->IsSupportsDrain(nullptr, &support);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+    ret = render_->IsSupportsDrain(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderIsSupportsDrainIsValid001, TestSize.Level1)
+{
+    bool support = false;
+    int32_t ret = render_->IsSupportsDrain(render_, &support);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderAddAudioEffectIsInValid001, TestSize.Level1)
+{
+    uint64_t effectId = 0;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->AddAudioEffect(nullptr, effectId));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderAddAudioEffectIsValid001, TestSize.Level1)
+{
+    uint64_t effectId = 0;
+    int32_t ret = render_->AddAudioEffect(render_, effectId);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderRemoveAudioEffectIsInValid001, TestSize.Level1)
+{
+    uint64_t effectId = 0;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->RemoveAudioEffect(nullptr, effectId));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderRemoveAudioEffectIsValid001, TestSize.Level1)
+{
+    uint64_t effectId = 0;
+    int32_t ret = render_->RemoveAudioEffect(render_, effectId);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetFrameBufferSizeIsInValid001, TestSize.Level1)
+{
+    uint64_t bufferSize = BUFFER_LENTH;
+    int32_t ret = render_->GetFrameBufferSize(nullptr, &bufferSize);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->GetFrameBufferSize(render_, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetFrameBufferSizeIsValid001, TestSize.Level1)
+{
+    uint64_t bufferSize = BUFFER_LENTH;
+    int32_t ret = render_->GetFrameBufferSize(render_, &bufferSize);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderIsSupportsPauseAndResumeIsInValid001, TestSize.Level1)
+{
+    bool supportPause = false;
+    bool supportResume = false;
+    int32_t ret = render_->IsSupportsPauseAndResume(nullptr, &supportPause, &supportResume);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+
+    ret = render_->IsSupportsPauseAndResume(render_, nullptr, &supportResume);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+
+    ret = render_->IsSupportsPauseAndResume(render_, &supportPause, nullptr);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderIsSupportsPauseAndResumeIsValid001, TestSize.Level1)
+{
+    bool supportPause = false;
+    bool supportResume = false;
+    int32_t ret = render_->IsSupportsPauseAndResume(render_, &supportPause, &supportResume);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 }
 
 } // end of namespace
