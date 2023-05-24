@@ -208,7 +208,7 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, EnableVibratorModulation)->
   * @tc.desc: Start periodic vibration with custom composite effect
   * @tc.type: FUNC
   */
- BENCHMARK_F(VibratorBenchmarkTest, EnableCompositeEffect)(benchmark::State &state)
+BENCHMARK_F(VibratorBenchmarkTest, EnableCompositeEffect)(benchmark::State &state)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -269,7 +269,7 @@ BENCHMARK_REGISTER_F(VibratorBenchmarkTest, GetEffectInfo)->
   */
 BENCHMARK_F(VibratorBenchmarkTest, IsVibratorRunning)(benchmark::State &state)
 {
-    ASSERT_NE(nullptr, g_vibratorInterface); 
+    ASSERT_NE(nullptr, g_vibratorInterface);
     bool stat {false};
     int32_t ret;
     for (auto _ : state) {
