@@ -207,6 +207,13 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull001, TestSize.Le
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyRender(nullptr, renderId_));
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull002, TestSize.Level1)
+{
+    uint32_t renderId = 9;
+    int32_t ret = adapter_->DestroyRender(adapter_, renderId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(nullptr, nullptr, nullptr, nullptr, &captureId_));
