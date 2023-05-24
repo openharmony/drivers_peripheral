@@ -1324,7 +1324,7 @@ static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
             return RET_CODE_FAILURE;
         }
         for (i = 0; i < scan->numSsids; i++) {
-            nla_put(msg, i + 1, scan->ssids->ssidLen, scan->ssids->ssid);
+            nla_put(msg, i + 1, scan->ssids[i].ssidLen, scan->ssids[i].ssid);
         }
         nla_nest_end(msg, nest);
     }

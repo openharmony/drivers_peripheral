@@ -458,4 +458,58 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetExtraParamsNull002, TestSize.L
     uint32_t valueLen = AUDIO_ADAPTER_BUF_TEST;
     EXPECT_NE(HDF_SUCCESS, adapter_->GetExtraParams(nullptr, key, condition, value, valueLen));
 }
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetExtraParamsIsvalid001, TestSize.Level1)
+{
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    char condition[AUDIO_ADAPTER_BUF_TEST];
+    char value[AUDIO_ADAPTER_BUF_TEST] = "sup_sampling_rates=4800;sup_channels=1;sup_formats=2;";
+    uint32_t valueLen = AUDIO_ADAPTER_BUF_TEST;
+
+    int32_t ret = adapter_->GetExtraParams(adapter_, key, condition, value, valueLen);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteNull001, TestSize.Level1)
+{
+    struct AudioRoute route = {};
+    int32_t routeHandle = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->UpdateAudioRoute(nullptr, &route, &routeHandle));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteIsvalid001, TestSize.Level1)
+{
+    struct AudioRoute route = {};
+    int32_t routeHandle = 0;
+    int32_t ret = adapter_->UpdateAudioRoute(adapter_, &route, &routeHandle);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterReleaseAudioRouteNull001, TestSize.Level1)
+{
+    int32_t routeHandle = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->ReleaseAudioRoute(nullptr, routeHandle));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterReleaseAudioRouteIsvalid001, TestSize.Level1)
+{
+    int32_t routeHandle = 0;
+    int32_t ret = adapter_->ReleaseAudioRoute(adapter_, routeHandle);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetVersionNull001, TestSize.Level1)
+{
+    uint32_t majorVer = 0;
+    uint32_t minorVer = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->GetVersion(nullptr, &majorVer, &minorVer));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetVersionIsvalid001, TestSize.Level1)
+{
+    uint32_t majorVer = 0;
+    uint32_t minorVer = 0;
+    int32_t ret = adapter_->GetVersion(adapter_, &majorVer, &minorVer);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
+}
 }

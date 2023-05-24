@@ -27,20 +27,19 @@ enum class MyOptIndex {
 };
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
-    int c = 0;
     while (1) {
         int optionIndex = 0;
         static struct option long_options[] = {
-            {"width", required_argument, 0, (int)MyOptIndex::OPT_INDEX_WIDTH},
-            {"height", required_argument, 0, (int)MyOptIndex::OPT_INDEX_HEIGHT},
-            {"in", required_argument, 0, (int)MyOptIndex::OPT_INDEX_INPUT},
-            {"out", required_argument, 0, (int)MyOptIndex::OPT_INDEX_OUTPUT},
-            {"nocopy", no_argument, nullptr, (int)MyOptIndex::OPT_INDEX_BUFFER_HANDLE},
-            {"HEVC", no_argument, nullptr, (int)MyOptIndex::OPT_INDEX_HEVC},
-            {"help", no_argument, nullptr, (int)MyOptIndex::OPT_INDEX_HELP},
-            {0, 0, 0, (int)MyOptIndex::OPT_INDEX_UNKONWN}
+            {"width", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_WIDTH)},
+            {"height", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_HEIGHT)},
+            {"in", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_INPUT)},
+            {"out", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_OUTPUT)},
+            {"nocopy", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_BUFFER_HANDLE)},
+            {"HEVC", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEVC)},
+            {"help", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HELP)},
+            {0, 0, 0, static_cast<int>(MyOptIndex::OPT_INDEX_UNKONWN)}
         };
-        c = getopt_long(argc, argv, "i:o:w:h:", long_options, &optionIndex);
+        int c = getopt_long(argc, argv, "i:o:w:h:", long_options, &optionIndex);
         if (c == -1) {
             break;
         }

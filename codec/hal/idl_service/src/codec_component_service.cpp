@@ -151,6 +151,7 @@ int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
 {
     CODEC_LOGI("service impl!");
+    CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
     return node_->SetCallbacks(callbacks, appData);
 }
 

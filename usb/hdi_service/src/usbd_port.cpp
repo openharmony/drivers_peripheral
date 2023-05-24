@@ -73,6 +73,13 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
     if (path_.empty()) {
         return HDF_FAILURE;
     }
+
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(path_.c_str(), pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return HDF_FAILURE;
+    }
+
     int32_t fd = open(path_.c_str(), O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);

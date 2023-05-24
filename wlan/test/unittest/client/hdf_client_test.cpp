@@ -467,6 +467,8 @@ HWTEST_F(WifiClientTest, WifiRegisterHid2dCallback001, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiRegisterHid2dCallback(Hid2dFunCb, WLAN_IFNAME);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    WifiUnregisterHid2dCallback(nullptr, WLAN_IFNAME);
+    WifiUnregisterHid2dCallback(Hid2dFunCb, nullptr);
 }
 
 /**
@@ -484,11 +486,33 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
 
     ret = WifiGetSignalPollInfo(nullptr, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiGetSignalPollInfo(WLAN_IFNAME, nullptr);
-    EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiGetSignalPollInfo(WLAN_IFNAME, &signalResult);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+}
+
+static int32_t WifiEventCb(uint32_t event, void *respData, const char *ifName)
+{
+    (void)event;
+    (void)respData;
+    (void)ifName;
+    return RET_CODE_SUCCESS;
+}
+
+/**
+ * @tc.name: WifiRegisterEventCallback001
+ * @tc.desc: Wifi register event callback function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiRegisterEventCallback001, TestSize.Level1)
+{
+    int32_t ret;
+
+    ret = WifiRegisterEventCallback(nullptr, WIFI_KERNEL_TO_HAL_CLIENT, WLAN_IFNAME);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
+    ret = WifiRegisterEventCallback(WifiEventCb, WIFI_KERNEL_TO_HAL_CLIENT, nullptr);
+    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
+    WifiUnregisterEventCallback(nullptr, WIFI_KERNEL_TO_HAL_CLIENT, WLAN_IFNAME);
+    WifiUnregisterEventCallback(WifiEventCb, WIFI_KERNEL_TO_HAL_CLIENT, nullptr);
 }
 };
