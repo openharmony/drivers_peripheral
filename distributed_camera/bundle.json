@@ -23,10 +23,12 @@
                 "ipc",
                 "hdf_core",
                 "hiviewdfx_hilog_native",
-                "c_utils"
-            ],
-            "third_party":[
-                "bounds_checking_function"
+                "c_utils",
+                "jsoncpp",
+                "samgr",
+                "drivers_interface_distributed_camera",
+                "graphic_chipsetsdk",
+                "drivers_interface_camera"
             ]
         },
         "build":{
