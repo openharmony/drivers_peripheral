@@ -15,11 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 config("huks_config") {
-  include_dirs = [
-    "//base/security/huks/interfaces/inner_api/huks_standard/main/include",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/include",
-    "//base/security/huks/services/huks_standard/huks_engine/main/device_cert_manager/include",
-   ]
+  include_dirs = []
 }
 
 
@@ -28,48 +24,9 @@ ohos_shared_library("libhuks_hdi_service_1.0") {
   part_name = "huks"
   public_configs = [ ":huks_config" ]
   defines = []
-  defines += [ "HUKS_HDI_SERVICE_CONVERT" ]
-  include_dirs = [
-    "//base/security/huks/utils/crypto_adapter",
-    "//base/security/huks/utils/list",
-    "//base/security/huks/utils/mutex",
-  ]
   sources = [
-    "//base/security/huks/services/huks_standard/huks_engine/main/device_cert_manager/src/dcm_asn1.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/device_cert_manager/src/dcm_attest.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/device_cert_manager/src/dcm_attest_utils.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_auth.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_chipset_platform_decrypt.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_core_interfaces.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_core_service.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_core_service_three_stage.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_keyblob.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_keynode.c",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_sm_import_wrap_key.c",
-  ]
-
-  deps = [
-    "//base/security/huks/frameworks/huks_standard/main:huks_standard_frameworks",
-    "//base/security/huks/services/huks_standard/huks_engine/main/core_dependency:libhuks_core_hal_api_static",
-    "//base/security/huks/utils/crypto_adapter:libhuks_utils_client_service_adapter_static",
-    "//base/security/huks/utils/list:libhuks_utils_list_static",
-    "//base/security/huks/utils/mutex:libhuks_utils_mutex_static",
-  ]
-
-  sources += [
-    "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_secure_access.c",
-  ]
-
-  sources += [ "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_upgrade_key.c" ]
-
-
-  configs = [
-    "//base/security/huks/frameworks/config/build:l2_standard_common_config",
-  ]
-  
-  
-  sources += [
-    "huks_service.c",
+    "huks_hdi_service.c",
+    "huks_hdi_passthrough_adapter.c",
   ]
   if (is_standard_system) {
     external_deps = [
