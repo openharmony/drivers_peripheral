@@ -32,22 +32,19 @@ ohos_shared_library("def_display_gralloc") {
   ]
   include_dirs = [
     "include",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/base",
+    "../../interfaces/include",
     "src/utils/",
   ]
 
   output_name = "display_gralloc"
   cflags = [ "-Wno-macro-redefined" ]
-  deps = [
-    "//commonlibrary/memory_utils/libdmabufheap:libdmabufheap",
-    "//third_party/libdrm:libdrm",
-  ]
+  deps = [ "//third_party/libdrm:libdrm" ]
 
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "memory_utils:libdmabufheap",
   ]
 
   install_enable = true
@@ -61,9 +58,8 @@ config("def_display_device_pub_config") {
 
   include_dirs = [
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/hal/default_standard/src/display_device",
-    "//drivers/peripheral/display/hal/default_standard/include",
+    "./src/display_device",
+    "./include",
   ]
 }
 
@@ -98,8 +94,7 @@ ohos_shared_library("def_display_device") {
   include_dirs = [
     "src/display_device",
     "include",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/base",
+    "../../interfaces/include",
     "src/display_device/drm",
     "src/display_device/fbdev",
     "src/display_device/core",
@@ -109,7 +104,7 @@ ohos_shared_library("def_display_device") {
 
   deps = [
     ":def_display_layer_video",
-    "//drivers/peripheral/display/hal:hdi_display_gralloc",
+    "../:hdi_display_gralloc",
     "//third_party/libdrm:libdrm",
   ]
 
@@ -137,9 +132,8 @@ ohos_shared_library("def_display_layer_video") {
 
   output_name = "display_layer_video"
   include_dirs = [
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/hdi_service/video_layer/client",
+    "../../interfaces/include",
+    "../../hdi_service/video_layer/client",
   ]
 
   external_deps = [
@@ -152,7 +146,7 @@ ohos_shared_library("def_display_layer_video") {
     "ipc:ipc_single",
   ]
 
-  public_deps = [ "//drivers/peripheral/display/hdi_service/video_layer/client:video_layer_client" ]
+  public_deps = [ "../../hdi_service/video_layer/client:video_layer_client" ]
 
   install_enable = true
   install_images = [ chipset_base_dir ]

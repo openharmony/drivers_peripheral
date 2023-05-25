@@ -12,13 +12,11 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 config("gralloc_client_public_config") {
   include_dirs = [
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
+    "../../../interfaces/include",
+    "../include",
   ]
 }
 if (defined(ohos_lite)) {
@@ -37,16 +35,15 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("libhdi_display_gralloc_client") {
     include_dirs = [
-      "//drivers/peripheral/base",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/display/hdi_service/gralloc/include",
+      "../../../interfaces/include",
+      "../include",
     ]
     sources = [
       "allocator_proxy.cpp",
       "display_gralloc_client.cpp",
       "mapper_adapter.cpp",
     ]
-    deps = [ "//drivers/interface/display/v1_0:libdisplay_gralloc" ]
+    deps = [ "../../../../../interface/display/v1_0:libdisplay_gralloc" ]
 
     if (is_standard_system) {
       external_deps = [
