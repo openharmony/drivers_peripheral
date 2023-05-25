@@ -12,7 +12,6 @@
 # limitations under the License.
 
 HDF_CORE_PATH = "../../../hdf_core"
-DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
@@ -64,8 +63,6 @@ if (defined(ohos_lite)) {
     include_dirs = [ "../interfaces/include/" ]
     sources = [ "vibrator_if_driver.cpp" ]
 
-    deps = [ "$DRIVERS_INTERFACE_PATH/vibrator/v1_1:libvibrator_stub_1.1" ]
-
     cflags = [
       "-Wall",
       "-Wextra",
@@ -78,6 +75,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_vibrator:libvibrator_stub_1.1",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
