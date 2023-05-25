@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ void CameraHostCallback::OnFlashlightStatus(const std::string &cameraId, Flashli
 
 void CameraHostCallback::OnCameraEvent(const std::string &cameraId, CameraEvent event)
 {
-    HDF_LOGV("%{public}s, enter. cameraId = %s, event = %d",
+    HDF_LOGV("%{public}s, enter. cameraId = %{public}s, event = %{public}d",
         __func__, cameraId.c_str(), static_cast<int>(event));
 }
 }

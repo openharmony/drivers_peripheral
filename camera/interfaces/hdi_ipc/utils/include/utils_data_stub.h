@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public:
     static void DecodeStreamInfo(MessageParcel &parcel, std::shared_ptr<StreamInfo> &pInfo);
     static bool ConvertMetadataToVec(const std::shared_ptr<CameraMetadata> &metadata,
         std::vector<uint8_t>& cameraAbility);
-    static void ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbility,
+    static void ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbility,
         std::shared_ptr<CameraMetadata> &metadata);
 
 private:
@@ -43,15 +43,16 @@ private:
     static bool WriteMetadata(const camera_metadata_item_t &entry, MessageParcel &data);
     static bool ReadMetadata(camera_metadata_item_t &entry, MessageParcel &data);
     static void EntryDataToBuffer(const camera_metadata_item_t &entry, void **buffer);
-    static bool WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t>& cameraAbility);
+    static bool WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t> &cameraAbility);
     static bool ReadMetadataDataFromVec(int32_t &index, camera_metadata_item_t &entry,
         const std::vector<uint8_t>& cameraAbility);
-    template <class T> static void WriteData(T data, std::vector<uint8_t>& cameraAbility);
-    template <class T> static void ReadData(T &data, int32_t &index, const std::vector<uint8_t>& cameraAbility);
+    template <class T> std::enable_if_t<std::is_pod<T>, void> WriteData(T data, std::vector<uint8_t> &cameraAbility);
+    template <class T> std::enable_if_t<std::is_pod<T>, void> ReadData(T &data, int32_t &index,
+        const std::vector<uint8_t> &cameraAbility);
 };
 
 template <class T>
-void UtilsDataStub::WriteData(T data, std::vector<uint8_t>& cameraAbility)
+static std::enable_if_t<std::is_pod<T>, void> UtilsDataStub::WriteData(T data, std::vector<uint8_t> &cameraAbility)
 {
     T dataTemp = data;
     uint8_t *dataPtr = (uint8_t *)&dataTemp;
@@ -61,7 +62,8 @@ void UtilsDataStub::WriteData(T data, std::vector<uint8_t>& cameraAbility)
 }
 
 template <class T>
-void UtilsDataStub::ReadData(T &data, int32_t &index, const std::vector<uint8_t>& cameraAbility)
+static std::enable_if_t<std::is_pod<T>, void> UtilsDataStub::ReadData(T &data, int32_t &index,
+    const std::vector<uint8_t> &cameraAbility)
 {
     constexpr uint32_t typeLen = sizeof(T);
     uint8_t array[typeLen] = {0};
