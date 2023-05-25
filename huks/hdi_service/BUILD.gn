@@ -62,13 +62,13 @@ ohos_shared_library("libhuks_hdi_service_1.0") {
 
   sources += [ "//base/security/huks/services/huks_standard/huks_engine/main/core/src/hks_upgrade_key.c" ]
 
+
   configs = [
     "//base/security/huks/frameworks/config/build:l2_standard_common_config",
   ]
   
   
   sources += [
-    "huks_proxy.c",
     "huks_service.c",
   ]
   if (is_standard_system) {

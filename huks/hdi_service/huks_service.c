@@ -18,10 +18,10 @@
 #include <osal_mem.h>
 #include <securec.h>
 #include "v1_0/ihuks.h"
+#include "v1_0/ihuks_types.h"
 
 #include "hks_core_service.h"
 #include "huks_hdi.h"
-#include "ihuks_types.h"
 
 #define HDF_LOG_TAG    huks_service
 
