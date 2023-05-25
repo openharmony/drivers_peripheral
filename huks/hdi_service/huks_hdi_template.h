@@ -30,10 +30,10 @@ typedef struct HksParamSet TargetParamSet;
         (toHksBlobPtr)->size = (fromHuksBlobPtr)->dataLen;          \
     }
 
-#define HDI_CONVERTER_PARAM_IN_PARAMSET(fromHuksParamSetPtr, toHksParamSetPtr)               \
-    if ((fromHuksParamSetPtr) != NULL && (fromHuksParamSetPtr)->data != NULL &&              \
-        (fromHuksParamSetPtr)->dataLen >= sizeof(struct HksParamSet) && (toHksParamSetPtr) != NULL) {   \
-        (toHksParamSetPtr) = (struct HksParamSet *)(fromHuksParamSetPtr)->data;  \
+#define HDI_CONVERTER_PARAM_IN_PARAMSET(fromHuksParamSetPtr, toHksParamSetPtr)   \
+    if ((fromHuksParamSetPtr) != NULL && (fromHuksParamSetPtr)->data != NULL &&  \
+        (fromHuksParamSetPtr)->dataLen >= sizeof(TargetParamSet)) {              \
+        (toHksParamSetPtr) = (TargetParamSet *)(fromHuksParamSetPtr)->data;      \
     }
 
 #define HDI_CONVERTER_PARAM_OUT_BLOB(fromHksBlobPtr, toHuksBlobPtr) \
