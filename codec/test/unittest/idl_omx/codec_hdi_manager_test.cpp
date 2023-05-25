@@ -22,7 +22,7 @@ using namespace testing::ext;
 using OHOS::sptr;
 using namespace OHOS::HDI::Codec::V1_0;
 constexpr int64_t APP_DATA = 3;
-constexpr uint32_t INVALID_COMPONENT_ID = 0;
+constexpr uint32_t INVALID_COMPONENT_ID = -1;
 namespace {
 class CodecHdiManagerTest : public testing::Test {
 public:
