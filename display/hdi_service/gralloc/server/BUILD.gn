@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 group("hdi_gralloc_stub") {
   deps = [ ":libhdi_display_gralloc_stub" ]
@@ -20,9 +19,8 @@ group("hdi_gralloc_stub") {
 
 ohos_shared_library("libhdi_display_gralloc_stub") {
   include_dirs = [
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
-    "//drivers/peripheral/base",
+    "../../../interfaces/include",
+    "../include",
   ]
 
   sources = [
@@ -31,7 +29,7 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
     "allocator_service_stub.cpp",
   ]
 
-  deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
+  deps = [ "../../../hal:hdi_display_gralloc" ]
 
   if (is_standard_system) {
     external_deps = [
