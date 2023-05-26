@@ -70,7 +70,7 @@ private:
     DestroyComposerVdiFunc destroyVdiFunc_;
 
     uint32_t currentBacklightLevel_;
-    std::shared_ptr<IDisplayComposerVdi> vdiImpl_;
+    IDisplayComposerVdi* vdiImpl_;
     std::unique_ptr<HdiDisplayCmdResponser> cmdResponser_;
     sptr<IHotPlugCallback> hotPlugCb_;
     sptr<IVBlankCallback> vBlankCb_;
