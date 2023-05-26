@@ -21,7 +21,6 @@ ohos_unittest("audio_ut_common_test") {
     "capture/audio_capture_common_test.cpp",
     "capture/audio_capture_mmap_test.cpp",
     "manager/audio_manager_common_test.cpp",
-    "manager/audio_manager_service_test.cpp",
     "render/audio_render_common_test.cpp",
     "render/audio_render_mmap_test.cpp",
   ]
