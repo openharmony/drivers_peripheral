@@ -24,7 +24,7 @@ void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc,
 void AudioHwiCommonAttrsToHwiAttrs(const struct AudioSampleAttributes *attrs,
     struct AudioHwiSampleAttributes *hwiAttrs);
 int32_t AudioHwiCommonPortToHwiPort(const struct AudioPort *port, struct AudioHwiPort *hwiPort);
-int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *hwiPortCap,
+void AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *hwiPortCap,
     struct AudioPortCapability *portCap);
 int32_t AudioHwiCommonRouteToHwiRoute(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute);
 void AudioHwiCommonFreeHwiRoute(struct AudioHwiRoute *hwiRoute);

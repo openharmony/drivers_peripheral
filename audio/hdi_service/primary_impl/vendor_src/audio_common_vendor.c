@@ -76,7 +76,7 @@ static int32_t AudioHwiFormatsToFormats(const enum AudioHwiFormat *hwiFormats, u
     CHECK_NULL_PTR_RETURN_VALUE(formats, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(formatsLen, HDF_ERR_INVALID_PARAM);
 
-    if (hwiFormatNum >= AUDIO_FORMAT_NUM_MAX) {
+    if (hwiFormatNum >= AUDIO_FORMAT_NUM_MAX || hwiFormatNum == 0) {
         AUDIO_FUNC_LOGE("HwiFormats to formats len fail");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -131,7 +131,7 @@ static int32_t AudioHwiSubPortsToSubPorts(const struct AudioHwiSubPortCapability
     CHECK_NULL_PTR_RETURN_VALUE(subPorts, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(subPortsLen, HDF_ERR_INVALID_PARAM);
 
-    if (hwiSubPortsNum >= AUDIO_SUB_PORT_NUM_MAX) {
+    if (hwiSubPortsNum >= AUDIO_SUB_PORT_NUM_MAX || hwiSubPortsNum == 0) {
         AUDIO_FUNC_LOGE("HwiSubPorts to subPorts len fail");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -162,7 +162,7 @@ static int32_t AudioHwiSampleFormatToSampleFormats(const enum AudioHwiSampleForm
     CHECK_NULL_PTR_RETURN_VALUE(sampleFormat, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(sampleFormatsLen, HDF_ERR_INVALID_PARAM);
 
-    if (hwiSupportSampleFormatNum >= AUDIO_SAMPLE_FORMAT_NUM_MAX) {
+    if (hwiSupportSampleFormatNum >= AUDIO_SAMPLE_FORMAT_NUM_MAX || hwiSupportSampleFormatNum == 0) {
         AUDIO_FUNC_LOGE("hwiSampleFormat to sampleFormats len fail");
         return HDF_ERR_INVALID_PARAM;
     }
@@ -188,11 +188,11 @@ static int32_t AudioHwiSampleFormatToSampleFormats(const enum AudioHwiSampleForm
     return HDF_SUCCESS;
 }
 
-int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *hwiPortCap,
+void AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *hwiPortCap,
     struct AudioPortCapability *portCap)
 {
-    CHECK_NULL_PTR_RETURN_VALUE(portCap, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(hwiPortCap, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN(portCap);
+    CHECK_NULL_PTR_RETURN(hwiPortCap);
 
     portCap->deviceType = hwiPortCap->deviceType;
     portCap->deviceId = hwiPortCap->deviceId;
@@ -205,7 +205,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
         &portCap->formatsLen);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioHwiFormatsToFormats fail");
-        return ret;
+        return;
     }
 
     ret = AudioHwiSubPortsToSubPorts(hwiPortCap->subPorts, hwiPortCap->subPortsNum,
@@ -214,7 +214,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
         OsalMemFree((void *)portCap->formats);
         portCap->formats = NULL;
         AUDIO_FUNC_LOGE("HwiSubPortsToSubPorts fail");
-        return ret;
+        return;
     }
 
     ret = AudioHwiSampleFormatToSampleFormats(hwiPortCap->supportSampleFormats, hwiPortCap->supportSampleFormatNum,
@@ -224,10 +224,8 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
         AudioHwiReleaseSubPorts(&portCap->subPorts, &portCap->subPortsLen);
         portCap->formats = NULL;
         AUDIO_FUNC_LOGE("HwiSampleFormatToSampleFormats fail");
-        return ret;
+        return;
     }
-
-    return ret;
 }
 
 void AudioHwiCommonFreeHwiRoute(struct AudioHwiRoute *hwiRoute)
