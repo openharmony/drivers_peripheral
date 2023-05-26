@@ -462,9 +462,8 @@ int32_t CodecJpegHelper::DessambleCompressData(int8_t *buffer, std::unique_ptr<i
                                                uint32_t &comBufLen)
 {
     int8_t *dataStart = buffer;
-    int32_t v = 0xff;
     do {
-        v = GetInt8(buffer);
+        int32_t v = GetInt8(buffer);
         buffer++;
         if (v != 0xff) {
             continue;
