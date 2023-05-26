@@ -513,8 +513,10 @@ static int32_t DestorySensorVdiInstance(struct HdfVdiBase *vdiBase)
 
     struct WrapperSensorVdi *sensorVdi = reinterpret_cast<struct WrapperSensorVdi *>(vdiBase);
     SensorImpl *impl = reinterpret_cast<SensorImpl *>(sensorVdi->sensorModule);
-    delete impl;
-    sensorVdi->sensorModule = nullptr;
+    if (impl != nullptr) {
+        delete impl;
+        sensorVdi->sensorModule = nullptr;
+    }
     return HDF_SUCCESS;
 }
 

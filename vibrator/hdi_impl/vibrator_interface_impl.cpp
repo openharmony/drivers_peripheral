@@ -218,8 +218,10 @@ static int32_t DestoryLightVdiInstance(struct HdfVdiBase *vdiBase)
 
     struct VdiWrapperVibrator *vibratorVdi = reinterpret_cast<VdiWrapperVibrator *>(vdiBase);
     VibratorInterfaceImpl *vibratorImpl = reinterpret_cast<VibratorInterfaceImpl *>(vibratorVdi->vibratorModule);
-    delete vibratorImpl;
-    vibratorVdi->vibratorModule = nullptr;
+    if (vibratorImpl != nullptr) {
+        delete vibratorImpl;
+        vibratorVdi->vibratorModule = nullptr;
+    }
     return HDF_SUCCESS;
 }
 

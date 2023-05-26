@@ -59,7 +59,7 @@ int32_t SensorIfService::GetSensorVdiImpl()
     }
 
     wrapperSensorVdi = reinterpret_cast<struct WrapperSensorVdi *>(vdi_->vdiBase);
-    sensorVdiImpl_.reset(wrapperSensorVdi->sensorModule);
+    sensorVdiImpl_ = wrapperSensorVdi->sensorModule;
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor impl failed", __func__);
         return HDF_FAILURE;

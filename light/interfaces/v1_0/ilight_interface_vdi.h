@@ -41,7 +41,7 @@ public:
 
 struct VdiWrapperLight {
     struct HdfVdiBase base;
-    class ILightInterfaceVdi *lightModule;
+    ILightInterfaceVdi *lightModule;
 };
 } // namespace V1_0
 } // namespace Light
