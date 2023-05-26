@@ -44,7 +44,7 @@ public:
 };
 struct VdiWrapperVibrator {
     struct HdfVdiBase base;
-    class IVibratorInterfaceVdi *vibratorModule;
+    IVibratorInterfaceVdi *vibratorModule;
 };
 } // V1_1
 } // Vibrator

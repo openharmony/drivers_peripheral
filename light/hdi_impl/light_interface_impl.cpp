@@ -173,8 +173,10 @@ static int32_t DestoryLightVdiInstance(struct HdfVdiBase *vdiBase)
 
     struct VdiWrapperLight *lightVdi = reinterpret_cast<VdiWrapperLight *>(vdiBase);
     LightInterfaceImpl *lightImpl = reinterpret_cast<LightInterfaceImpl *>(lightVdi->lightModule);
-    delete lightImpl;
-    lightVdi->lightModule = nullptr;
+    if (lightImpl != nullptr) {
+        delete lightImpl;
+        lightVdi->lightModule = nullptr;
+    }
     return HDF_SUCCESS;
 }
 
