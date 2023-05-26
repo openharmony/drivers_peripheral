@@ -57,10 +57,9 @@ JpegDecoder::~JpegDecoder()
 static std::string GetArrayStr(const std::vector<uint32_t> &vec, std::string &arrayStr)
 {
     arrayStr = ("[");
-    int ret = 0;
     for (size_t i = 0; i < vec.size(); i++) {
         char value[32] = {0};
-        ret = sprintf_s(value, sizeof(value) - 1, "0x0%X, ", vec[i]);
+        int ret = sprintf_s(value, sizeof(value) - 1, "0x0%X, ", vec[i]);
         if (ret < 0) {
             HDF_LOGE("sprintf_s value failed, error [%{public}d]", ret);
             break;

@@ -58,7 +58,7 @@ ohos_shared_library("hdi_cif") {
     "$camera_path/hdi_cif/src/include",
   ]
 
-  deps += [ "drivers_interface_camera:metadata" ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
@@ -73,7 +73,10 @@ ohos_shared_library("hdi_cif") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
+  external_deps += [
+    "drivers_interface_camera:metadata",
+    "ipc:ipc_single",
+  ]
 
   public_configs = [ ":hdi_cif_config" ]
   install_images = [ chipset_base_dir ]

@@ -50,6 +50,12 @@ constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
 constexpr uint32_t WAIT_TIME = 1000;
 constexpr uint32_t MAX_WAIT = 50;
+constexpr uint32_t DENOMINATOR = 2;
+constexpr uint32_t NUMERATOR = 3;
+constexpr uint32_t ALIGNMENT = 16;
+constexpr uint32_t ERROR_FENCEFD = 1;
+constexpr AvCodecRole ROLE = MEDIA_ROLETYPE_VIDEO_AVC;
+
 static IDisplayBuffer *gralloc_ = nullptr;
 static sptr<ICodecComponent> component_ = nullptr;
 static sptr<ICodecCallback> callback_ = nullptr;
@@ -119,10 +125,10 @@ public:
         param.version.nVersion = 1;
     }
 
-    void InitOmxCodecBuffer(OmxCodecBuffer& buffer, CodecBufferType type)
+    void InitOmxCodecBuffer(OmxCodecBuffer &buffer, CodecBufferType type)
     {
         buffer.bufferType = type;
-        buffer.fenceFd = -1;
+        buffer.fenceFd = ERROR_FENCEFD;
         buffer.version = version_;
         buffer.allocLen = BUFFER_SIZE;
         buffer.fd = FD_DEFAULT;
@@ -147,6 +153,81 @@ public:
         }
     }
 
+    uint32_t AlignUp(uint32_t width)
+    {
+        return (((width) + ALIGNMENT - 1) & (~(ALIGNMENT - 1)));
+    }
+
+    void InitBufferHandleParameter(OMX_PARAM_PORTDEFINITIONTYPE &param)
+    {
+        InitParam(param);
+        param.nPortIndex = inputIndex;
+        std::vector<int8_t> inParam, outParam;
+        ObjectToVector(param, inParam);
+        auto ret = component_->GetParameter(OMX_IndexParamPortDefinition, inParam, outParam);
+        ASSERT_EQ(ret, HDF_SUCCESS);
+
+        VectorToObject(outParam, param);
+        param.format.video.nFrameWidth = WIDTH;
+        param.format.video.nFrameHeight = HEIGHT;
+        param.format.video.nStride = AlignUp(WIDTH);
+        param.format.video.nSliceHeight = HEIGHT;
+        param.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+        std::vector<int8_t> enc;
+        ObjectToVector(param, enc);
+        ret = component_->SetParameter(OMX_IndexParamPortDefinition, enc);
+        ASSERT_EQ(ret, HDF_SUCCESS);
+
+        std::vector<int8_t> data;
+        UseBufferType type;
+        type.size = sizeof(UseBufferType);
+        type.version.s.nVersionMajor = 1;
+        type.portIndex = inputIndex;
+        type.bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
+        ObjectToVector(type, data);
+        ret = component_->SetParameter(OMX_IndexParamUseBufferType, data);
+        ASSERT_EQ(ret, HDF_SUCCESS);
+    }
+
+    void FillCodecBufferWithBufferHandle(shared_ptr<OmxCodecBuffer> omxBuffer)
+    {
+        AllocInfo alloc = {.width = WIDTH,
+                           .height = HEIGHT,
+                           .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
+                           .format = PIXEL_FMT_YCBCR_420_SP};
+
+        BufferHandle *bufferHandle = nullptr;
+        ASSERT_TRUE(gralloc_ != nullptr);
+        auto ret = gralloc_->AllocMem(alloc, bufferHandle);
+        ASSERT_EQ(ret, HDF_SUCCESS);
+        omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
+    }
+
+    bool UseDynaBuffer(enum PortIndex port, int bufferCount, int bufferSize)
+    {
+        if (bufferCount <= 0 || bufferSize <= 0) {
+            return false;
+        }
+
+        for (int i = 0; i < bufferCount; i++) {
+            auto omxBuffer = std::make_shared<OmxCodecBuffer>();
+            InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
+            omxBuffer->allocLen = WIDTH * HEIGHT * NUMERATOR / DENOMINATOR;
+
+            OmxCodecBuffer outBuffer;
+            auto ret = component_->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
+            if (ret != HDF_SUCCESS) {
+                return false;
+            }
+
+            omxBuffer->bufferId = outBuffer.bufferId;
+            auto bufferInfo = std::make_shared<BufferInfo>();
+            bufferInfo->omxBuffer = omxBuffer;
+            inputBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
+        }
+        return true;
+    }
+
     bool UseBufferOnPort(enum PortIndex port, int32_t bufferCount, int32_t bufferSize)
     {
         for (int i = 0; i < bufferCount; i++) {
@@ -167,6 +248,47 @@ public:
             InitCodecBufferWithAshMem(port, bufferSize, omxBuffer, sharedMem);
             OmxCodecBuffer outBuffer;
             auto err = component_->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
+            if (err != HDF_SUCCESS) {
+                sharedMem->UnmapAshmem();
+                sharedMem->CloseAshmem();
+                sharedMem = nullptr;
+                omxBuffer = nullptr;
+                return false;
+            }
+            omxBuffer->bufferId = outBuffer.bufferId;
+            omxBuffer->fd = FD_DEFAULT;
+            std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
+            bufferInfo->omxBuffer = omxBuffer;
+            bufferInfo->sharedMem = sharedMem;
+            if (port == PortIndex::PORT_INDEX_INPUT) {
+                inputBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
+            } else {
+                outputBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
+            }
+        }
+        return true;
+    }
+
+    bool AllocateBufferOnPort(enum PortIndex port, int32_t bufferCount, int32_t bufferSize)
+    {
+        for (int i = 0; i < bufferCount; i++) {
+            std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+            if (omxBuffer == nullptr) {
+                return false;
+            }
+
+            int fd = OHOS::AshmemCreate(0, bufferSize);
+            shared_ptr<OHOS::Ashmem> sharedMem = make_shared<OHOS::Ashmem>(fd, bufferSize);
+            if (sharedMem == nullptr) {
+                if (fd >= 0) {
+                    close(fd);
+                    fd = -1;
+                }
+                return false;
+            }
+            InitCodecBufferWithAshMem(port, bufferSize, omxBuffer, sharedMem);
+            OmxCodecBuffer outBuffer;
+            auto err = component_->AllocateBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
             if (err != HDF_SUCCESS) {
                 sharedMem->UnmapAshmem();
                 sharedMem->CloseAshmem();
@@ -217,7 +339,7 @@ public:
         return ret;
     }
 
-    void FillAndEmptyAllBuffer()
+    void FillAndEmptyAllBuffer(CodecBufferType type)
     {
         auto iter = outputBuffers_.begin();
         if (iter != outputBuffers_.end()) {
@@ -226,6 +348,9 @@ public:
         }
         iter = inputBuffers_.begin();
         if (iter != inputBuffers_.end()) {
+            if (type == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
+                FillCodecBufferWithBufferHandle(iter->second->omxBuffer);
+            }
             auto ret = component_->EmptyThisBuffer(*iter->second->omxBuffer.get());
             ASSERT_EQ(ret, HDF_SUCCESS);
         }
@@ -257,7 +382,12 @@ public:
             std::vector<CodecCompCapability> capList;
             auto err = manager_->GetComponentCapabilityList(capList, count);
             ASSERT_TRUE(err == HDF_SUCCESS);
-            compName_ = capList[0].compName;
+            for (auto cap : capList) {
+                if (cap.type == CodecType::VIDEO_ENCODER && cap.role == ROLE) {
+                    compName_ = cap.compName;
+                    break;
+                }
+            }
         }
     }
     static void TearDownTestCase()
@@ -800,21 +930,9 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferAndFreeBufferTest_002, TestSize.Le
     auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    AllocInfo alloc = {.width = WIDTH,
-                       .height = HEIGHT,
-                       .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
-                       .format = PIXEL_FMT_YCBCR_420_SP};
-    BufferHandle *bufferHandle = nullptr;
-    ASSERT_TRUE(gralloc_ != nullptr);
-    ret = gralloc_->AllocMem(alloc, bufferHandle);
-    ASSERT_EQ(ret, DISPLAY_SUCCESS);
-
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
-    size_t handleSize =
-        sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
     InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_HANDLE);
-    omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
-    omxBuffer->allocLen = handleSize;
+    FillCodecBufferWithBufferHandle(omxBuffer);
     OmxCodecBuffer outBuffer;
 
     ret = component_->UseBuffer(inputIndex, *omxBuffer.get(), outBuffer);
@@ -916,7 +1034,78 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Level1
     ASSERT_EQ(ret, HDF_SUCCESS);
     WaitState(CODEC_STATE_EXECUTING);
 
-    FillAndEmptyAllBuffer();
+    FillAndEmptyAllBuffer(CODEC_BUFFER_TYPE_AVSHARE_MEM_FD);
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ASSERT_TRUE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
+    ASSERT_TRUE(err);
+    WaitState(CODEC_STATE_LOADED);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyAndFillBufferTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    InitBufferHandleParameter(param);
+    GetPortParameter(PortIndex::PORT_INDEX_INPUT, param);
+    auto err = UseDynaBuffer(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    GetPortParameter(PortIndex::PORT_INDEX_OUTPUT, param);
+    err = UseBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_EXECUTING, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_EXECUTING);
+
+    FillAndEmptyAllBuffer(CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_IDLE);
+
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
+    ASSERT_TRUE(err);
+    err = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
+    ASSERT_TRUE(err);
+    WaitState(CODEC_STATE_LOADED);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyAndFillBufferTest_003, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::vector<int8_t> cmdData;
+    auto ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    GetPortParameter(PortIndex::PORT_INDEX_INPUT, param);
+    auto err = AllocateBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    GetPortParameter(PortIndex::PORT_INDEX_OUTPUT, param);
+    err = AllocateBufferOnPort(PortIndex::PORT_INDEX_OUTPUT, param.nBufferCountActual, param.nBufferSize);
+    ASSERT_TRUE(err);
+
+    ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_EXECUTING, cmdData);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    WaitState(CODEC_STATE_EXECUTING);
+
+    FillAndEmptyAllBuffer(CODEC_BUFFER_TYPE_AVSHARE_MEM_FD);
     ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
     WaitState(CODEC_STATE_IDLE);
