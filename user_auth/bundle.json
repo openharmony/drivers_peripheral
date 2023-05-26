@@ -21,7 +21,7 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "c_utils",
-        "user_auth_framework",
+        "hilog_native",
         "drivers_interface_user_auth"
       ],
       "third_party": [
