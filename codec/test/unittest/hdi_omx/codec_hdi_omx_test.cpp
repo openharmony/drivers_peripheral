@@ -50,6 +50,8 @@ constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
 constexpr uint32_t WAIT_TIME = 1000;
 constexpr uint32_t MAX_WAIT = 50;
+constexpr uint32_t ERROR_FENCEFD = 1;
+constexpr uint32_t BUFFER_LEN = 1024;
 static IDisplayBuffer *gralloc_ = nullptr;
 
 static void InitCodecBuffer(OmxCodecBuffer& buffer, CodecBufferType type, OMX_VERSIONTYPE& version)
@@ -884,6 +886,40 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_011, TestSize.Level1)
     InitBufferHandle(omxBuffer, &bufferHandle);
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_INVALID;
     auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_012, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+    ASSERT_TRUE(omxBuffer != nullptr);
+    BufferHandle *bufferHandle = nullptr;
+    InitBufferHandle(omxBuffer, &bufferHandle);
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
+    omxBuffer->fenceFd = ERROR_FENCEFD;
+    auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_013, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+    ASSERT_TRUE(omxBuffer != nullptr);
+    auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->bufferLen = BUFFER_LEN;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->fenceFd = ERROR_FENCEFD;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
