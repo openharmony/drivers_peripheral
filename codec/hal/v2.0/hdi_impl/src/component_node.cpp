@@ -322,7 +322,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     int32_t err = OMX_ErrorBadParameter;
     sptr<ICodecBuffer> codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
     if (codecBuffer == nullptr) {
-        CODEC_LOGE("comp_ is null");
+        CODEC_LOGE("codecBuffer is null");
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
