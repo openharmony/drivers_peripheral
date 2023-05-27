@@ -189,49 +189,6 @@ int32_t AudioHwiRenderGetChannelMode(struct IAudioRender *render, enum AudioChan
     return ret;
 }
 
-static int32_t AudioHwiRenderHwiCallback(enum AudioHwiCallbackType type, void *reserved, void *cookie)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(reserved, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(cookie, HDF_ERR_INVALID_PARAM);
-
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    struct IAudioCallback *cb = priv->callback;
-    int32_t ret = cb->RenderCallback(cb, (enum AudioCallbackType)type, reserved, cookie);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render call RenderCallback fail, ret=%{public}d", ret);
-    }
-
-    return ret;
-}
-
-int32_t AudioHwiRenderRegCallback(struct IAudioRender *render, struct IAudioCallback *audioCallback, int8_t cookie)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(audioCallback, HDF_ERR_INVALID_PARAM);
-
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    if (priv->isRegCb) {
-        AUDIO_FUNC_LOGI("audio render call RegCallback have registered");
-        return HDF_SUCCESS;
-    }
-
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
-    CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(hwiRender->RegCallback, HDF_ERR_INVALID_PARAM);
-
-    int32_t ret = hwiRender->RegCallback(hwiRender, AudioHwiRenderHwiCallback, &cookie);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render call RegCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;
-    }
-
-    priv->callback = audioCallback;
-    priv->isRegCb = true;
-
-    return HDF_SUCCESS;
-}
-
 int32_t AudioHwiRenderDrainBuffer(struct IAudioRender *render, enum AudioDrainNotifyType *type)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
@@ -838,7 +795,6 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetRenderSpeed = AudioHwiGetRenderSpeed;
     render->SetChannelMode = AudioHwiRenderSetChannelMode;
     render->GetChannelMode = AudioHwiRenderGetChannelMode;
-    render->RegCallback = AudioHwiRenderRegCallback;
     render->DrainBuffer = AudioHwiRenderDrainBuffer;
     render->IsSupportsDrain = AudioHwiRenderIsSupportsDrain;
     render->CheckSceneCapability = AudioHwiRenderCheckSceneCapability;

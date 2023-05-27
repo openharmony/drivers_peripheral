@@ -216,6 +216,12 @@ HWTEST_F(AudioUtRenderTest, RenderStopNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Stop(nullptr));
 }
 
+HWTEST_F(AudioUtRenderTest, RenderStopInvalid001, TestSize.Level1)
+{
+    int32_t ret = render_->Stop(render_);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderGetFrameSizeNull001, TestSize.Level1)
 {
     uint64_t frameSize = 0;
