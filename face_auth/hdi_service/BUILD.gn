@@ -46,10 +46,10 @@ ohos_shared_library("libface_auth_driver") {
     "../common/logs",
   ]
   sources = [ "src/face_auth_interface_driver.cpp" ]
-  deps = [ "../../../interface/face_auth/v1_1:libface_auth_stub_1.1" ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_face_auth:libface_auth_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
