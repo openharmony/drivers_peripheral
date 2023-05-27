@@ -31,7 +31,7 @@
 #include "securec.h"
 
 #define HDF_LOG_TAG usb_ddk_dev_mgr
-#define USB_GADGET_STATE_PATH "/sys/class"
+#define USB_GADGET_STATE_PATH "/sys/devices/virtual/"
 
 struct UsbDdkDeviceInfo {
     struct OsalMutex deviceMutex;
