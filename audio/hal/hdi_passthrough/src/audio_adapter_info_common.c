@@ -164,6 +164,7 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
                 AUDIO_FUNC_LOGE("portId is invalid!");
                 return HDF_FAILURE;
             }
+            break;
         case AUDIO_ADAPTER_HDMI:
             if (portId < AUDIO_HDMI_ID_MIN || portId > AUDIO_HDMI_ID_MAX) {
                 AUDIO_FUNC_LOGE("portId is invalid!");
