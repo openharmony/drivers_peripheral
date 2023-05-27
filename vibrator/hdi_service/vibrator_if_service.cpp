@@ -56,7 +56,7 @@ int32_t VibratorIfService::GetVibratorVdiImpl()
     }
 
     vdiWrapperVibrator = reinterpret_cast<struct VdiWrapperVibrator *>(vdi_->vdiBase);
-    vibratorVdiImpl_.reset(vdiWrapperVibrator->vibratorModule);
+    vibratorVdiImpl_ = vdiWrapperVibrator->vibratorModule;
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get vibrator impl failed", __func__);
         return HDF_FAILURE;
