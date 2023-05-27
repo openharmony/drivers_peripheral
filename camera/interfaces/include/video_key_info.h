@@ -32,6 +32,8 @@ namespace OHOS::Camera {
  * @brief Indicates the data length. The value type is int32_t.
  */
 const std::string dataSize = "dataSize";
+const std::string dataWidth = "dataWidth";
+const std::string dataHeight = "dataHeight";
 const int32_t VIDEO_KEY_INFO_DATA_SIZE = 0x01;
 
 /**
