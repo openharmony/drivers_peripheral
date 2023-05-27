@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-hdf_interface_path = "../../../../../interface"
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -29,10 +28,9 @@ ohos_fuzztest("MotionFuzzTest") {
 
   sources = [ "motion_fuzzer.cpp" ]
 
-  deps = [ "$hdf_interface_path/motion/v1_0:libmotion_stub_1.0" ]
-
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_motion:libmotion_stub_1.0",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
