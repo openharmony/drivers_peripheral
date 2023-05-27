@@ -94,11 +94,10 @@ namespace V1_0 {
 extern "C" IUsbfnMtpInterface *UsbfnMtpInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Usb::Gadget::Mtp::V1_0::UsbfnMtpImpl;
-    UsbfnMtpImpl *service = new (std::nothrow) UsbfnMtpImpl();
+    static UsbfnMtpImpl *service = new (std::nothrow) UsbfnMtpImpl();
     if (service == nullptr) {
         return nullptr;
     }
-    service->Init();
     return service;
 }
 
