@@ -56,7 +56,7 @@ int32_t LightIfService::GetLightVdiImpl()
     }
 
     vdiWrapperLight = reinterpret_cast<struct VdiWrapperLight *>(vdi_->vdiBase);
-    lightVdiImpl_.reset(vdiWrapperLight->lightModule);
+    lightVdiImpl_ = vdiWrapperLight->lightModule;
     if (lightVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get light impl failed", __func__);
         return HDF_FAILURE;

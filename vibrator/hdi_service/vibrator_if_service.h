@@ -40,7 +40,7 @@ public:
     int32_t GetVibratorVdiImpl();
 
 private:
-    std::shared_ptr<IVibratorInterfaceVdi> vibratorVdiImpl_;
+    IVibratorInterfaceVdi *vibratorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };
 } // V1_1
