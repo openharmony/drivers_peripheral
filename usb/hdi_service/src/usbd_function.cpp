@@ -92,6 +92,16 @@ int32_t UsbdFunction::InitMtp()
         HDF_LOGE("%{public}s: register mtp device failed: %{public}d", __func__, ret);
         return ret;
     }
+    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+    ret = serviceImpl->Init();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: init mtp device failed: %{public}d", __func__, ret);
+    }
+    HDF_LOGI("%{public}s: start Init done", __func__);
     return ret;
 }
 
