@@ -34,7 +34,7 @@ ohos_shared_library("libwlan_interface_service_1.1") {
   external_deps = [ "drivers_interface_wlan:libwlan_stub_1.1" ]
 
   if (HAVE_WLAN_DAL_SERVICE) {
-    deps += [ "${HDI_WLAN_SERVICE_PATH}:service_extend" ]
+    external_deps += [ "hidl_adapter:service_extend" ]
     include_dirs += [ "../../adapter/wlan" ]
   } else {
     deps += [ "service_extend:libwlan_service_extend" ]
@@ -80,7 +80,7 @@ ohos_shared_library("libwifi_hdi_c_device") {
   external_deps = [ "drivers_interface_wlan:libwlan_stub_1.1" ]
 
   if (HAVE_WLAN_DAL_SERVICE) {
-    deps += [ "${HDI_WLAN_SERVICE_PATH}:service_extend" ]
+    external_deps += [ "hidl_adapter:service_extend" ]
     include_dirs += [ "../../adapter/wlan" ]
   } else {
     deps += [ "service_extend:libwlan_service_extend" ]
