@@ -81,10 +81,10 @@ ohos_shared_library("libuser_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
-  deps = [ "../../../interface/user_auth/v1_1:libuser_auth_stub_1.1" ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_user_auth:libuser_auth_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

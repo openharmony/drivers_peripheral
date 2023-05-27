@@ -40,18 +40,6 @@ static struct AudioManagerPriv *GetAudioManagerPriv(void)
     return &priv;
 }
 
-static int32_t AudioManagerGetVersion(struct IAudioManager *manager, uint32_t *majorVer, uint32_t *minorVer)
-{
-    if (manager == NULL || majorVer == NULL || minorVer == NULL) {
-        HDF_LOGE("%{public}s:para is null", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    *majorVer = IAUDIO_MANAGER_MAJOR_VERSION;
-    *minorVer = IAUDIO_MANAGER_MINOR_VERSION;
-    return HDF_SUCCESS;
-}
-
 static int32_t AudioManagerLoadPrimaryLib(struct AudioManagerPriv *priv)
 {
     char *error = NULL;
@@ -121,8 +109,6 @@ struct IAudioManager *AudioManagerImplGetInstance(void)
         priv->handle = NULL;
         return NULL;
     }
-
-    interface->GetVersion = AudioManagerGetVersion;
 
     return interface;
 }

@@ -33,7 +33,10 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
     "iam_fuzz_test.cpp",
   ]
 
-  deps = [ "../../../../hdi_service:libface_auth_interface_service_1.1" ]
+  deps = [
+    "../../../../../../hdf_core/adapter/uhdf2/model/camera/sequenceable/buffer_producer:libbuffer_producer_sequenceable_1.0",
+    "../../../../hdi_service:libface_auth_interface_service_1.1",
+  ]
 
   external_deps = [
     "c_utils:utils",
@@ -43,13 +46,6 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
-
-  if (defined(global_parts_info.graphic_graphic_standard)) {
-    external_deps += [
-      "graphic_chipsetsdk:surface",
-      "graphic_standard:surface",
-    ]
-  }
 
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_face_auth"
