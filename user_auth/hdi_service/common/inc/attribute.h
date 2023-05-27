@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef ATTRIBUTE_H
-#define ATTRIBUTE_H
+#ifndef IAM_ATTRIBUTE_H
+#define IAM_ATTRIBUTE_H
 
+#include "c_array.h"
 #include "defines.h"
-#include "buffer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,7 +80,6 @@ typedef enum {
 
 typedef void Attribute;
 
-#define IS_ARRAY_NULL(array) ((array).data == NULL || (array).len == 0)
 #define MAX_EXECUTOR_MSG_LEN 2048
 
 Attribute *CreateEmptyAttribute(void);
@@ -104,4 +103,4 @@ ResultCode SetAttributeUint64Array(Attribute *attribute, AttributeKey key, const
 }
 #endif
 
-#endif // ATTRIBUTE_H
+#endif // IAM_ATTRIBUTE_H

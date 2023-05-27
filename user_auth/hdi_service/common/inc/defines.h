@@ -16,7 +16,9 @@
 #ifndef COMMON_DEFINES_H
 #define COMMON_DEFINES_H
 
-#include "stdint.h"
+#include <stdint.h>
+
+#include "adaptor_log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,16 +39,6 @@ extern "C" {
             return; \
         } \
     } while (0)
-
-typedef struct Uint8Array {
-    uint8_t *data;
-    uint32_t len;
-} Uint8Array;
-
-typedef struct Uint64Array {
-    uint64_t *data;
-    uint32_t len;
-} Uint64Array;
 
 enum InnerKitResultCode {
     INNER_RESULT_SUCCESS = 0,

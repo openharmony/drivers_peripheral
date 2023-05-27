@@ -44,6 +44,7 @@ ohos_unittest("UserAuthIdmTest") {
     "../../../hdi_service/coauth/src/pool.c",
     "../../../hdi_service/common/src/attribute.c",
     "../../../hdi_service/common/src/buffer.c",
+    "../../../hdi_service/common/src/c_array.c",
     "../../../hdi_service/common/src/linked_list.c",
     "../../../hdi_service/database/src/idm_common.c",
     "../../../hdi_service/database/src/idm_database.c",

@@ -103,57 +103,40 @@ static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out
     return true;
 }
 
-static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabilityLevel)
+static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabilityLevel, uint64_t scheduleId)
 {
-    if (info.templateIds.empty()) {
-        IAM_LOGI("ScheduleInfo templateIds len is 0");
-        return RESULT_SUCCESS;
-    }
-
     Attribute *attribute = CreateEmptyAttribute();
-    if (attribute == nullptr) {
-        IAM_LOGE("generate attribute failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
-    int32_t result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, templateIdsIn);
-    if (result != RESULT_SUCCESS) {
-        IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
-        FreeAttribute(&attribute);
-        return RESULT_GENERAL_ERROR;
-    }
-    if (capabilityLevel != INVALID_CAPABILITY_LEVEL) {
-        result = SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel);
-        if (result != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
-            FreeAttribute(&attribute);
-            return RESULT_GENERAL_ERROR;
+    IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
+
+    ResultCode ret = RESULT_GENERAL_ERROR;
+    do {
+        Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
+        if (SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, templateIdsIn) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
+            break;
         }
-    }
+        if (capabilityLevel != INVALID_CAPABILITY_LEVEL &&
+            SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
+            break;
+        }
+        if (SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint64 scheduleId failed");
+            break;
+        }
+        info.extraInfo.resize(MAX_EXECUTOR_MSG_LEN);
+        Uint8Array retExtraInfo = { info.extraInfo.data(), MAX_EXECUTOR_MSG_LEN };
+        if (GetAttributeExecutorMsg(attribute, true, &retExtraInfo) != RESULT_SUCCESS) {
+            IAM_LOGE("GetAttributeExecutorMsg failed");
+            info.extraInfo.clear();
+            break;
+        }
+        info.extraInfo.resize(retExtraInfo.len);
+        ret = RESULT_SUCCESS;
+    } while (0);
 
-    Uint8Array retExtraInfo = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
-    if (IS_ARRAY_NULL(retExtraInfo)) {
-        IAM_LOGE("malloc retExtraInfo failed");
-        FreeAttribute(&attribute);
-        return RESULT_GENERAL_ERROR;
-    }
-    result = GetAttributeExecutorMsg(attribute, true, &retExtraInfo);
-    if (result != RESULT_SUCCESS) {
-        IAM_LOGE("GetAttributeExecutorMsg failed");
-        Free(retExtraInfo.data);
-        FreeAttribute(&attribute);
-        return result;
-    }
-    IAM_LOGI("retExtraInfo len is %{public}u", retExtraInfo.len);
-    info.extraInfo.resize(retExtraInfo.len);
-    if (memcpy_s(info.extraInfo.data(), info.extraInfo.size(), retExtraInfo.data, retExtraInfo.len) != EOK) {
-        IAM_LOGE("memcpy_s retExtraInfo to info failed");
-        result = RESULT_GENERAL_ERROR;
-    }
-
-    Free(retExtraInfo.data);
     FreeAttribute(&attribute);
-    return result;
+    return ret;
 }
 
 static int32_t GetCapabilityLevel(int32_t userId, ScheduleInfoV1_1 &info, uint32_t &capabilityLevel)
@@ -185,14 +168,14 @@ static int32_t GetCapabilityLevel(int32_t userId, ScheduleInfoV1_1 &info, uint32
 
 static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<ScheduleInfoV1_1> &infos)
 {
-    for (auto info : infos) {
+    for (auto &info : infos) {
         uint32_t capabilityLevel = INVALID_CAPABILITY_LEVEL;
         int32_t result = GetCapabilityLevel(userId, info, capabilityLevel);
         if (result != RESULT_SUCCESS) {
             IAM_LOGE("GetCapabilityLevel fail");
             return result;
         }
-        result = SetAttributeToExtraInfo(info, capabilityLevel);
+        result = SetAttributeToExtraInfo(info, capabilityLevel, info.scheduleId);
         if (result != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeToExtraInfo fail");
             return result;
@@ -579,7 +562,7 @@ int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
         IAM_LOGE("copy schedule info failed");
         return RESULT_BAD_COPY;
     }
-    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL);
+    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleId);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetAttributeToExtraInfo failed");
     }
