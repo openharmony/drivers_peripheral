@@ -284,7 +284,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityInvalid002, Test
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, adapter_->GetPortCapability(adapter_, &port, nullptr));
 }
 
-HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityInvalid003, TestSize.Level1)
 {
     struct AudioPort port = {};
     struct AudioPortCapability capability = {};
@@ -293,6 +293,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, Test
     port.portName = const_cast<char*>("primary");
     int32_t ret = adapter_->GetPortCapability(adapter_, &port, &capability);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, TestSize.Level1)
+{
+    struct AudioPort port = adapterDescs_[0].ports[0];
+    struct AudioPortCapability capability = {};
+    int32_t ret = adapter_->GetPortCapability(adapter_, &port, &capability);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetPassthroughModeNull001, TestSize.Level1)
