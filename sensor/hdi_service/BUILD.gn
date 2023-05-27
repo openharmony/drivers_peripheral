@@ -12,7 +12,6 @@
 # limitations under the License.
 
 HDF_CORE_PATH = "../../../hdf_core"
-DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
@@ -64,8 +63,6 @@ ohos_shared_library("libsensor_driver") {
   include_dirs = [ "../interfaces/include/" ]
   sources = [ "sensor_if_driver.cpp" ]
 
-  deps = [ "$DRIVERS_INTERFACE_PATH/sensor/v1_0:libsensor_stub_1.0" ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -78,6 +75,7 @@ ohos_shared_library("libsensor_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_sensor:libsensor_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
