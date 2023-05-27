@@ -31,8 +31,8 @@ RunningLockTimerHandler::~RunningLockTimerHandler()
     }
 }
 
-bool RunningLockTimerHandler::RegisterRunningLockTimer(const RunningLockInfo &info,
-    const std::function<void()> &callback, bool once)
+bool RunningLockTimerHandler::RegisterRunningLockTimer(
+    const RunningLockInfo &info, const std::function<void()> &callback, bool once)
 {
     if (handlerTimer_ == nullptr) {
         handlerTimer_ = std::make_unique<OHOS::Utils::Timer>(RUNNINGLOCK_TIMER_HANDLER_NAME);
@@ -94,7 +94,7 @@ void RunningLockTimerHandler::AddRunningLockTimerMap(RunningLockType type, std::
         return;
     }
     auto nameIter = typeIter->second.find(name);
-    if(nameIter == typeIter->second.end()) {
+    if (nameIter == typeIter->second.end()) {
         typeIter->second.emplace(name, timerId);
         return;
     }
@@ -106,7 +106,7 @@ void RunningLockTimerHandler::RemoveRunningLockTimerMap(RunningLockType type, st
     auto typeIter = runninglockTimerMap_.find(type);
     if (typeIter != runninglockTimerMap_.end()) {
         auto nameIter = typeIter->second.find(name);
-        if(nameIter != typeIter->second.end()) {
+        if (nameIter != typeIter->second.end()) {
             typeIter->second.erase(name);
             if (typeIter->second.size() == 0) {
                 runninglockTimerMap_.erase(type);
