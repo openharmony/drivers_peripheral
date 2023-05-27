@@ -265,12 +265,7 @@ int32_t AudioHwiGetPortCapability(struct IAudioAdapter *adapter, const struct Au
         return ret;
     }
 
-    ret = AudioHwiCommonHwiPortCapToPortCap(&hwiCap, capability);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio hwiAdapter call PortCapToHwiPortCap fail, ret=%{public}d", ret);
-        return ret;
-    }
-
+    AudioHwiCommonHwiPortCapToPortCap(&hwiCap, capability);
     return HDF_SUCCESS;
 }
 
