@@ -25,14 +25,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void DstreamCommitStreamsFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
 
     OperationMode mode = NORMAL;
     std::vector<uint8_t> modeSetting;
-    uint8_t modeset = *data;
-    modeSetting.push_back(modeset);
 
     std::string abilityInfo(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();

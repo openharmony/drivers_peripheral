@@ -26,7 +26,7 @@ namespace DistributedHardware {
 
 class MockDCameraProviderCallbackImpl : public IDCameraProviderCallback {
 public:
-    MockDCameraProviderCallbackImpl(const std::string devId, const std::string dhId) : devId_(devId), dhId_(dhId)
+    MockDCameraProviderCallbackImpl(const std::string& devId, const std::string& dhId) : devId_(devId), dhId_(dhId)
     {
     }
     ~MockDCameraProviderCallbackImpl() = default;
