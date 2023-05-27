@@ -51,11 +51,11 @@ ohos_shared_library("libusbfn_mtp_driver") {
     "${usb_driver_path}/gadget/function/mtp/include",
   ]
 
-  deps =
-      [ "./../../../../../interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0" ]
+  deps = []
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_usb:libusbfn_mtp_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
