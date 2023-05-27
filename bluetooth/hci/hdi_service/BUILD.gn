@@ -54,8 +54,6 @@ ohos_shared_library("libbluetooth_hci_hdi_driver") {
 
   sources = [ "$root_path/hci_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/bluetooth/hci/v1_0:libbluetooth_hci_stub_1.0" ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -72,6 +70,10 @@ ohos_shared_library("libbluetooth_hci_hdi_driver") {
       "ipc:ipc_single",
     ]
   }
+
+  external_deps += [
+    "drivers_interface_bluetooth:libbluetooth_hci_stub_1.0"
+  ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
