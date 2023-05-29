@@ -23,6 +23,7 @@ ohos_shared_library("libdistributed_camera_provider_config") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.0",
+    "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
