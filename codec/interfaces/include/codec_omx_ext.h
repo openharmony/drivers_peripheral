@@ -270,7 +270,7 @@ struct ColorAspects {
     enum MatrixCoeffs matrixCoeffs;
 };
 
-/** 
+/**
  * @brief Structure for controlling color space
 */
 struct CodecVideoColorspace {
