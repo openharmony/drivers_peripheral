@@ -42,7 +42,7 @@ DisplayComposerService::DisplayComposerService()
     vdiImpl_(nullptr),
     cmdResponser_(nullptr),
     hotPlugCb_(nullptr),
-    vBlankCb_(nullptr)
+    vBlankCb_(nullptr),
     currentBacklightLevel_(0)
 {
     int32_t ret = LoadVdi();
