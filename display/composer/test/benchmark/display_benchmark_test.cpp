@@ -249,11 +249,11 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayReleaseFenceTest)->
 BENCHMARK_F(DisplayBenchmarkTest, CreateAndDestroyVirtualDisplayTest)(benchmark::State &state)
 {
     int32_t ret;
-    const uint32_t width = 100;
-    const uint32_t height = 100;
+    const uint32_t WIDTH = 100;
+    const uint32_t HEIGHT = 100;
     int32_t format = 0;
     for (auto _ : state) {
-        ret = g_composerDevice->CreateVirtualDisplay(width, height, format, g_displayIds[0]);
+        ret = g_composerDevice->CreateVirtualDisplay(WIDTH, HEIGHT, format, g_displayIds[0]);
         EXPECT_EQ(DISPLAY_FAILURE, ret);
         ret = g_composerDevice->DestroyVirtualDisplay(g_displayIds[0]);
     }
