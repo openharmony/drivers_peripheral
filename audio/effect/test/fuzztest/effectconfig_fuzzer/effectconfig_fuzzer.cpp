@@ -25,7 +25,7 @@ extern "C" {
 }
 #endif
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
+static bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
 {
     if (rawData == NULL) {
         return false;

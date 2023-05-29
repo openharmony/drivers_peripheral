@@ -98,7 +98,7 @@ struct EffectFactory {
      * @version 1.0
      */
     int32_t (*CreateController)(struct EffectFactory *self, const struct EffectInfo *info,
-                                      struct EffectControl **handle);
+                                struct EffectControl **handle);
     /**
      *
      * @brief Destroy the effect controller specified by the controllerId
