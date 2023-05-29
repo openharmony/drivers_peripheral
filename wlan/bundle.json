@@ -26,7 +26,9 @@
         "c_utils",
         "drivers_interface_wlan"
       ],
-      "third_party": []
+      "third_party": [
+        "thirdparty_libnl"
+      ]
     },
     "build": {
       "sub_component": [
