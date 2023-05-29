@@ -39,11 +39,11 @@ DisplayComposerService::DisplayComposerService()
     : libHandle_(nullptr),
     createVdiFunc_(nullptr),
     destroyVdiFunc_(nullptr),
+    currentBacklightLevel_(0),
     vdiImpl_(nullptr),
     cmdResponser_(nullptr),
     hotPlugCb_(nullptr),
-    vBlankCb_(nullptr),
-    currentBacklightLevel_(0)
+    vBlankCb_(nullptr)
 {
     int32_t ret = LoadVdi();
     if (ret == HDF_SUCCESS) {
