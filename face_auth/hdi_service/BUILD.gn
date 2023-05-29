@@ -25,10 +25,9 @@ ohos_shared_library("libface_auth_interface_service_1.1") {
     "src/face_auth_interface_service.cpp",
   ]
 
-  deps = [ "../../../hdf_core/adapter/uhdf2/model/camera/sequenceable/buffer_producer:libbuffer_producer_sequenceable_1.0" ]
-
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:face_auth_idl_headers",
     "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
@@ -50,6 +49,7 @@ ohos_shared_library("libface_auth_driver") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_face_auth:libface_auth_stub_1.1",
+    "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
