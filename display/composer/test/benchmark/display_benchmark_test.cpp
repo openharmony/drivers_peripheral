@@ -186,6 +186,170 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayBacklightTest)(benchmark::State &sta
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayBacklightTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: CreateAndDestroyLayerTest
+  * @tc.desc: Benchmarktest for interface CreateLayer And DestroyLayer.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, CreateAndDestroyLayerTest)(benchmark::State &state)
+{
+    int32_t ret;
+    LayerInfo layerInfo;
+    uint32_t layerId;
+    for (auto _ : state) {
+        ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, layerId);
+        EXPECT_EQ(DISPLAY_SUCCESS, ret);
+        ret = g_composerDevice->DestroyLayer(g_displayIds[0], layerId);
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, CreateAndDestroyLayerTest)->
+    Iterations(10)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplayCompChangeTest
+  * @tc.desc: Benchmarktest for interface GetDisplayCompChange.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayCompChangeTest)(benchmark::State &state)
+{
+    std::vector<uint32_t> layers {};
+    std::vector<int32_t> type {};
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayCompChange(g_displayIds[0], layers, type);
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayCompChangeTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplayReleaseFenceTest
+  * @tc.desc: Benchmarktest for interface GetDisplayReleaseFence.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayReleaseFenceTest)(benchmark::State &state)
+{
+    std::vector<uint32_t> layers {};
+    std::vector<int32_t> fences {};
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayReleaseFence(g_displayIds[0], layers, fences);
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayReleaseFenceTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: CreateAndDestroyVirtualDisplayTest
+  * @tc.desc: Benchmarktest for interface CreateVirtualDisplay and DestroyVirtualDisplay.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, CreateAndDestroyVirtualDisplayTest)(benchmark::State &state)
+{
+    int32_t ret;
+    const uint32_t WIDTH = 100;
+    const uint32_t HEIGHT = 100;
+    int32_t format = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->CreateVirtualDisplay(WIDTH, HEIGHT, format, g_displayIds[0]);
+        EXPECT_EQ(DISPLAY_FAILURE, ret);
+        ret = g_composerDevice->DestroyVirtualDisplay(g_displayIds[0]);
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, CreateAndDestroyVirtualDisplayTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetVirtualDisplayBufferTest
+  * @tc.desc: Benchmarktest for interface SetVirtualDisplayBuffer.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetVirtualDisplayBufferTest)(benchmark::State &state)
+{
+    BufferHandle* buffer = nullptr;
+    int32_t ret;
+    int32_t fence = -1;
+
+    AllocInfo info;
+    info.width  = 100;
+    info.height = 100;
+    info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
+            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
+    info.format = PIXEL_FMT_RGBA_8888;
+
+    g_gralloc->AllocMem(info, buffer);
+    ASSERT_TRUE(buffer != nullptr);
+
+    for (auto _ : state) {
+        ret = g_composerDevice->SetVirtualDisplayBuffer(g_displayIds[0], *buffer, fence);
+    }
+    g_gralloc->FreeMem(*buffer);
+    // not support
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetVirtualDisplayBufferTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetDisplayPropertyTest
+  * @tc.desc: Benchmarktest for interface SetDisplayProperty.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetDisplayPropertyTest)(benchmark::State &state)
+{
+    int32_t ret;
+    uint32_t id = 1;
+    uint64_t value = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetDisplayProperty(g_displayIds[0], id, value);
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayPropertyTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplayPropertyTest
+  * @tc.desc: Benchmarktest for interface GetDisplayProperty.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplayPropertyTest)(benchmark::State &state)
+{
+    int32_t ret;
+    uint32_t id = 1;
+    uint64_t value = 0;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplayProperty(g_displayIds[0], id, value);
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayPropertyTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetDisplayClientCropTest
+  * @tc.desc: Benchmarktest for interface SetDisplayClientCrop.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetDisplayClientCropTest)(benchmark::State &state)
+{
+    int32_t ret;
+    int32_t width = 100;
+    int32_t height = 100;
+    IRect rect = {0, 0, width, height};
+    for (auto _ : state) {
+        ret = g_composerDevice->SetDisplayClientCrop(g_displayIds[0], rect);
+    }
+    EXPECT_EQ(DISPLAY_FAILURE, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayClientCropTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
 } // namespace
 
 int main(int argc, char** argv)
