@@ -37,7 +37,7 @@ static void Usage(FILE* fp)
             "-q | --quit          stop preview and quit this app\n");
 }
 
-const static struct option LongOptions[] = {
+const static struct option LONG_OPTIONS[] = {
     {"help", no_argument, nullptr, 'h'}, {"capture", no_argument, nullptr, 'c'},
     {"WB", no_argument, nullptr, 'w'}, {"video", no_argument, nullptr, 'v'},
     {"quit", no_argument, nullptr, 'q'}, {"AE", no_argument, nullptr, 'a'},
@@ -208,7 +208,7 @@ static void ManuList(const std::shared_ptr<DcameraHdfDemo>& mainDemo, const int 
     int idx, c;
     int awb = 1;
     const char *shortOptions = "h:cwvaeqof:";
-    c = getopt_long(argc, argv, shortOptions, LongOptions, &idx);
+    c = getopt_long(argc, argv, shortOptions, LONG_OPTIONS, &idx);
     while (1) {
         switch (c) {
             case 'h':
