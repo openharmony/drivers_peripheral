@@ -26,7 +26,8 @@ ohos_unittest("audio_ut_common_test") {
     "service/audio_manager_service_test.cpp",
   ]
 
-  include_dirs = []
+  include_dirs =
+      [ "./../../../hdi_service/primary_impl/vendor_include/include" ]
 
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   external_deps = [
