@@ -179,7 +179,7 @@ HWTEST_F(BufferManagerTest, TestHeapBuffer, TestSize.Level0)
         char src[4] = {'t', 'e', 's', 't'};
         char* dest = reinterpret_cast<char*>(buffer->GetVirAddress());
         EXPECT_EQ(true, dest != nullptr);
-        EXPECT_EQ(true, 0 == memcpy_s(dest, sizeof(char) * 4, src, sizeof(char) * 4));
+        EXPECT_EQ(true, memcpy_s(dest, sizeof(char) * 4, src, sizeof(char) * 4) == 0);
         EXPECT_EQ(true, 0 == ::memcmp(src, dest, 4));
 
         EXPECT_EQ(true, RC_OK == bufferPool->ReturnBuffer(buffer));
