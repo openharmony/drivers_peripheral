@@ -25,5 +25,6 @@ void AudioHwiDestroyRenderById(uint32_t renderId);
 struct AudioHwiRender *AudioHwiGetHwiRenderById(uint32_t renderId);
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
     uint32_t *rendrId);
+uint32_t DecreaseRenderUsrCount(uint32_t renderId);
 
 #endif // AUDIO_RENDER_VENDOR_H

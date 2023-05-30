@@ -64,7 +64,7 @@ static uint32_t inline AlignUp(uint32_t width, uint32_t alignment)
     return (((width) + alignment - 1) & (~(alignment - 1)));
 }
 
-static int32_t GetFrameSize()
+static int32_t GetFrameSize(void)
 {
     int32_t frameSize = 0;
     int32_t wStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
@@ -161,7 +161,7 @@ static void ReleaseCodecBuffers(void)
     }
 }
 
-static int32_t CalcFrameParams()
+static int32_t CalcFrameParams(void)
 {
     g_frameSize = GetFrameSize();
     g_frameStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
@@ -383,7 +383,7 @@ static int32_t SetupBasicEncParams(Param *params)
     return paramCount;
 }
 
-static int32_t SetupEncParams()
+static int32_t SetupEncParams(void)
 {
     Param params[PARAM_ARRAY_LEN] = {0};
     Param *param = NULL;

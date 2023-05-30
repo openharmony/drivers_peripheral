@@ -50,11 +50,11 @@ static int g_frameStatus = 1;
 static int g_writeCompleted = 0;
 static int g_renderFull = 0;
 static int g_flushCompleted = 0;
-const int32_t AUDIO_CAPTURE_CHANNELCOUNT = 1;
-const int32_t SILENCE_THRESHOLD = 16 * 1024;
+static const int32_t AUDIO_CAPTURE_CHANNELCOUNT = 1;
+static const int32_t SILENCE_THRESHOLD = 16 * 1024;
 namespace OHOS {
 namespace Audio {
-	
+
 void InitAttrsCommon(struct AudioSampleAttributes &attrs)
 {
     /* Initialization of audio parameters for playback */

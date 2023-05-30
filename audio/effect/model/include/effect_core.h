@@ -16,6 +16,10 @@
 /*
  * supply the fuction delaration of the audio effect model, which maybe used by the ISV/OEM.
  */
+
+#ifndef EFFECT_CORE_H
+#define EFFECT_CORE_H
+
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -24,7 +28,7 @@
 /* define the struct here */
 struct EffectFactoryLibListNode {
     struct EffectFactory *factLib;
-    struct DListHead list;  /**< Factory library list */ 
+    struct DListHead list;  /**< Factory library list */
     void *handle;
 };
 
@@ -34,9 +38,11 @@ struct ControllerManagerNode {
 };
 
 /* declare the function here */
-bool IsEffectLibExist();
+bool IsEffectLibExist(void);
 int32_t RegisterEffectLibToList(void *handle, struct EffectFactory *factLib);
 struct EffectFactory *GetEffectLibFromList(const char *effectLibName);
-void ReleaseLibFromList();
+void ReleaseLibFromList(void);
 int32_t RegisterControllerToList(struct ControllerManager *ctrlMgr);
 struct ControllerManager *GetControllerFromList(char *effectId);
+
+#endif

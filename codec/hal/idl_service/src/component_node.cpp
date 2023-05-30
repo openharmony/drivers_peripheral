@@ -266,6 +266,7 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
+    CHECK_AND_RETURN_RET_LOG(index < ROLE_MAX_LEN, HDF_ERR_INVALID_PARAM, "index is too large");
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);

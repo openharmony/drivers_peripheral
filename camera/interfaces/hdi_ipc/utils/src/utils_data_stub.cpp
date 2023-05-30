@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include "utils_data_stub.h"
 
 namespace OHOS::Camera {
-bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t>& cameraAbility)
+bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t> &cameraAbility)
 {
     if (entry.data_type == META_TYPE_BYTE) {
         for (size_t i = 0; i < entry.count; i++) {
@@ -49,7 +49,7 @@ bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, 
 }
 
 bool UtilsDataStub::ConvertMetadataToVec(const std::shared_ptr<CameraMetadata> &metadata,
-    std::vector<uint8_t>& cameraAbility)
+    std::vector<uint8_t> &cameraAbility)
 {
     if (metadata == nullptr) {
         return false;
@@ -118,7 +118,7 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &
 }
 
 bool UtilsDataStub::ReadMetadataDataFromVec(int32_t &index, camera_metadata_item_t &entry,
-    const std::vector<uint8_t>& cameraAbility)
+    const std::vector<uint8_t> &cameraAbility)
 {
     if (entry.data_type == META_TYPE_BYTE) {
         entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
@@ -168,7 +168,7 @@ bool UtilsDataStub::ReadMetadataDataFromVec(int32_t &index, camera_metadata_item
     return true;
 }
 
-void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbility,
+void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbility,
     std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t index = 0;

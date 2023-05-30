@@ -431,6 +431,10 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
 
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->StartScan(g_wlanObj, nullptr, &scan);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
     rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
@@ -1108,5 +1112,124 @@ HWTEST_F(HdfWifiServiceCTest, GetSignalPollInfo_048, TestSize.Level1)
     ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: StartPnoScan_049
+ * @tc.desc: Wifi hdi start pno scan
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, StartPnoScan_049, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    const char *ifName = "wlan0";
+    string ssid1 = "xa-hw";
+    string ssid2 = "xa-hw-03";
+    struct PnoSettings pnoSettings;
+    (void)memset_s(&pnoSettings, sizeof(struct PnoSettings), 0, sizeof(struct PnoSettings));
+    pnoSettings.min2gRssi = -100;
+    pnoSettings.min5gRssi = -120;
+    pnoSettings.scanIntervalMs = 60000;
+    pnoSettings.scanIterations = 3;
+
+    pnoSettings.pnoNetworksLen = 2;
+    pnoSettings.pnoNetworks = (struct PnoNetwork *)OsalMemCalloc(sizeof(struct PnoNetwork) * 2);
+    pnoSettings.pnoNetworks[0].isHidden = 1;
+    pnoSettings.pnoNetworks[0].ssid.ssid = const_cast<char*>(ssid1.c_str());
+    pnoSettings.pnoNetworks[0].ssid.ssidLen = ssid1.length();
+    pnoSettings.pnoNetworks[0].freqsLen = 2;
+    pnoSettings.pnoNetworks[0].freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t) * 2);
+    pnoSettings.pnoNetworks[0].freqs[0] = 2412;
+    pnoSettings.pnoNetworks[0].freqs[1] = 2447;
+    pnoSettings.pnoNetworks[1].isHidden = 0;
+    pnoSettings.pnoNetworks[1].ssid.ssid = const_cast<char*>(ssid2.c_str());
+    pnoSettings.pnoNetworks[1].ssid.ssidLen = ssid2.length();
+
+    int32_t rc = g_wlanObj->RegisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->StartPnoScan(g_wlanObj, nullptr, &pnoSettings);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, &pnoSettings);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->UnregisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    OsalMemFree(pnoSettings.pnoNetworks[0].freqs);
+    OsalMemFree(pnoSettings.pnoNetworks);
+}
+
+/**
+ * @tc.name: StopPnoScan_050
+ * @tc.desc: Wifi hdi stop pno scan
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, StopPnoScan_050, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    const char *ifName = "wlan0";
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->StopPnoScan(g_wlanObj, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->StopPnoScan(g_wlanObj, ifName);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: StartScanTest_051
+ * @tc.desc: Wifi hdi start scan function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, StartScanTest_051, TestSize.Level1)
+{
+    int32_t rc;
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    string ssid1 = "xa-hw";
+    struct HdfFeatureInfo ifeature;
+    struct HdfWifiScan scan;
+
+    (void)memset_s(&scan, sizeof(struct HdfWifiScan), 0, sizeof(struct HdfWifiScan));
+    scan.ssidsLen = 1;
+    scan.ssids = (HdfWifiDriverScanSsid *)OsalMemCalloc(sizeof(HdfWifiDriverScanSsid) * (scan.ssidsLen));
+    scan.ssids[0].ssid = const_cast<char*>(ssid1.c_str());
+    scan.ssids[0].ssidLen = ssid1.length();
+    scan.freqsLen = 2;
+    scan.freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t) * (scan.freqsLen));
+    scan.freqs[0] = 2412;
+    scan.freqs[1] = 2447;
+    scan.bssidLen = 6;
+    scan.bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (scan.bssidLen));
+    scan.bssid[0] = 0x12;
+    scan.bssid[1] = 0x34;
+    scan.bssid[2] = 0x56;
+    scan.bssid[3] = 0x78;
+    scan.bssid[4] = 0x9A;
+    scan.bssid[5] = 0xBC;
+
+    rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    sleep(SCAN_TIME);
+    OsalMemFree(scan.bssid);
+    OsalMemFree(scan.freqs);
+    OsalMemFree(scan.ssids);
 }
 };

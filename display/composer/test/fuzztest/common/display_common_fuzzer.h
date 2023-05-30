@@ -30,7 +30,7 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 const size_t THRESHOLD = 10;
 const size_t STR_LEN = 10;
 const uint32_t PARAM_VOIDPTR_LEN = 10;
-const int32_t ALPHAVALUERANGE = 256; // ranging from 0 to 255
+const int32_t ALPHA_VALUE_RANGE = 256; // ranging from 0 to 255
 const uint32_t WIDTH = 128;
 const uint32_t HEIGHT = 128;
 const uint64_t RANDOM_BOOL = 2;

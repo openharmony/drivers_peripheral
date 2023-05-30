@@ -21,7 +21,8 @@
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
-          "utils_base"
+          "c_utils",
+          "drivers_interface_memorytracker"
         ],
         "third_party": []
       },

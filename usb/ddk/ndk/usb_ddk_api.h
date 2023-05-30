@@ -22,9 +22,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t OH_Usb_Init();
+int32_t OH_Usb_Init(void);
 
-void OH_Usb_Release();
+void OH_Usb_Release(void);
 
 int32_t OH_Usb_RegisterNotification(struct INotificationCallback *cb);
 

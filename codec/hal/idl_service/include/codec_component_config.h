@@ -44,7 +44,6 @@ protected:
     CodecComponentConfig();
 
 private:
-    int32_t GetGroupCapabilitiesNumber(const std::string &nodeName, int32_t &num);
     int32_t GetGroupCapabilities(const std::string &nodeName);
     int32_t GetOneCapability(const struct DeviceResourceIface &iface, const struct DeviceResourceNode &childNode,
                              CodecCompCapability &cap, bool isVideoGroup);

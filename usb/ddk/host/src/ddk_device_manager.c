@@ -31,6 +31,7 @@
 #include "securec.h"
 
 #define HDF_LOG_TAG usb_ddk_dev_mgr
+#define USB_GADGET_STATE_PATH "/sys/devices/virtual/"
 
 struct UsbDdkDeviceInfo {
     struct OsalMutex deviceMutex;
@@ -250,7 +251,19 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
         HDF_LOGE("%{public}s: invalid param.", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    int32_t fd = open(g_gadgetStatePath, O_RDONLY | O_CLOEXEC);
+
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_gadgetStatePath, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (strncmp(USB_GADGET_STATE_PATH, pathBuf, strlen(USB_GADGET_STATE_PATH)) != 0) {
+        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        return HDF_FAILURE;
+    }
+
+    int32_t fd = open(pathBuf, O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
         HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, g_gadgetStatePath, errno);
         return HDF_ERR_IO;

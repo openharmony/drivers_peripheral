@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -280,8 +280,8 @@ RetCode DcameraHdfDemo::InitSensors()
         return RC_OK;
     }
 
-    constexpr const char *DEMO_SERVICE_NAME = "distributed_camera_service";
-    demoCameraHost_ = ICameraHost::Get(DEMO_SERVICE_NAME, false);
+    constexpr const char *demoServiceName = "distributed_camera_service";
+    demoCameraHost_ = ICameraHost::Get(demoServiceName, false);
     if (demoCameraHost_ == nullptr) {
         DHLOGE("demo test: ICameraHost::Get error");
         return RC_ERROR;
@@ -574,7 +574,7 @@ RetCode DcameraHdfDemo::StartPreviewStream()
 
 RetCode DcameraHdfDemo::ReleaseAllStream()
 {
-    std::vector<int> streamIds = {};
+    std::vector<int> streamIds;
 
     DHLOGI("demo test: ReleaseAllStream enter");
 
@@ -626,10 +626,10 @@ void DcameraHdfDemo::SetAwbMode(const int mode) const
 {
     DHLOGI("demo test: SetAwbMode enter");
 
-    constexpr size_t ENTRYCAPACITY = 100;
-    constexpr size_t DATACAPACITY = 2000;
+    constexpr size_t entryCapacity = 100;
+    constexpr size_t dataCapacity = 2000;
 
-    std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRYCAPACITY, DATACAPACITY);
+    std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
     std::vector<uint8_t> result;
 
     const uint8_t awbMode = mode;

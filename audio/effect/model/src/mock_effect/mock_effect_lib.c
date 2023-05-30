@@ -31,7 +31,8 @@ struct EffectControllerDescriptor g_mockEffectDescriptor = {
     .supplier = "mock"
 };
 
-static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen,
+    int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -247,7 +248,7 @@ int32_t MockGetEffectDescriptor(struct EffectControl *self, struct EffectControl
     return HDF_SUCCESS;
 }
 
-static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfo *info, 
+static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfo *info,
                                     struct EffectControl **handle)
 {
     if (self == NULL || info == NULL || handle == NULL) {
@@ -312,7 +313,7 @@ struct EffectFactory g_mockFactoryLib = {
     .GetDescriptor = MockGetDescriptor,
 };
 
-struct EffectFactory *GetEffectoyFactoryLib()
+struct EffectFactory *GetEffectoyFactoryLib(void)
 {
     return &g_mockFactoryLib;
 }

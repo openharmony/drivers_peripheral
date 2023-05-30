@@ -42,6 +42,7 @@ namespace HDI {
 namespace UserAuth {
 namespace {
 static std::mutex g_mutex;
+constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -67,7 +68,7 @@ int32_t UserAuthInterfaceService::Init()
 static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out)
 {
     IAM_LOGI("start");
-    if (in->executorSize == 0) {
+    if (in->executorSize == 0 || (in->templateIds.data == NULL && in->templateIds.len != 0)) {
         IAM_LOGE("executorSize is zero");
         return false;
     }
@@ -75,8 +76,8 @@ static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out
     out->templateIds.clear();
     out->scheduleId = in->scheduleId;
     out->authType = static_cast<AuthType>(in->authType);
-    for (uint32_t i = 0; i < in->templateIds.num; ++i) {
-        out->templateIds.push_back(in->templateIds.value[i]);
+    for (uint32_t i = 0; i < in->templateIds.len; ++i) {
+        out->templateIds.push_back(in->templateIds.data[i]);
     }
     out->executorMatcher = static_cast<uint32_t>(in->executors[0].executorMatcher);
     out->scheduleMode = static_cast<ScheduleMode>(in->scheduleMode);
@@ -102,6 +103,105 @@ static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out
     return true;
 }
 
+static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabilityLevel)
+{
+    if (info.templateIds.empty()) {
+        IAM_LOGI("ScheduleInfo templateIds len is 0");
+        return RESULT_SUCCESS;
+    }
+
+    Attribute *attribute = CreateEmptyAttribute();
+    if (attribute == nullptr) {
+        IAM_LOGE("generate attribute failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    Uint64Array templateIdsIn = {info.templateIds.data(), info.templateIds.size()};
+    int32_t result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, templateIdsIn);
+    if (result != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeUint64Array templateIdsIn failed");
+        FreeAttribute(&attribute);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (capabilityLevel != INVALID_CAPABILITY_LEVEL) {
+        result = SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel);
+        if (result != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeUint32 capabilityLevel failed");
+            FreeAttribute(&attribute);
+            return RESULT_GENERAL_ERROR;
+        }
+    }
+
+    Uint8Array retExtraInfo = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    if (IS_ARRAY_NULL(retExtraInfo)) {
+        IAM_LOGE("malloc retExtraInfo failed");
+        FreeAttribute(&attribute);
+        return RESULT_GENERAL_ERROR;
+    }
+    result = GetAttributeExecutorMsg(attribute, true, &retExtraInfo);
+    if (result != RESULT_SUCCESS) {
+        IAM_LOGE("GetAttributeExecutorMsg failed");
+        Free(retExtraInfo.data);
+        FreeAttribute(&attribute);
+        return result;
+    }
+    IAM_LOGI("retExtraInfo len is %{public}u", retExtraInfo.len);
+    info.extraInfo.resize(retExtraInfo.len);
+    if (memcpy_s(info.extraInfo.data(), info.extraInfo.size(), retExtraInfo.data, retExtraInfo.len) != EOK) {
+        IAM_LOGE("memcpy_s retExtraInfo to info failed");
+        result = RESULT_GENERAL_ERROR;
+    }
+
+    Free(retExtraInfo.data);
+    FreeAttribute(&attribute);
+    return result;
+}
+
+static int32_t GetCapabilityLevel(int32_t userId, ScheduleInfoV1_1 &info, uint32_t &capabilityLevel)
+{
+    capabilityLevel = INVALID_CAPABILITY_LEVEL;
+    LinkedList *credList = nullptr;
+    int32_t ret = QueryCredentialFunc(userId, info.authType, &credList);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("query credential failed");
+        return ret;
+    }
+    LinkedListNode *temp = credList->head;
+    while (temp != nullptr) {
+        if (temp->data == nullptr) {
+            IAM_LOGE("list node is invalid");
+            DestroyLinkedList(credList);
+            return RESULT_UNKNOWN;
+        }
+        auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
+        // Only the lowest acl is returned
+        capabilityLevel = (capabilityLevel < credentialHal->capabilityLevel) ?
+            capabilityLevel : credentialHal->capabilityLevel;
+        temp = temp->next;
+    }
+
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
+}
+
+static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<ScheduleInfoV1_1> &infos)
+{
+    for (auto info : infos) {
+        uint32_t capabilityLevel = INVALID_CAPABILITY_LEVEL;
+        int32_t result = GetCapabilityLevel(userId, info, capabilityLevel);
+        if (result != RESULT_SUCCESS) {
+            IAM_LOGE("GetCapabilityLevel fail");
+            return result;
+        }
+        result = SetAttributeToExtraInfo(info, capabilityLevel);
+        if (result != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeToExtraInfo fail");
+            return result;
+        }
+    }
+
+    return RESULT_SUCCESS;
+}
+
 static void CopyScheduleInfoV1_1ToV1_0(const ScheduleInfoV1_1 &in, ScheduleInfo &out)
 {
     out.scheduleId = in.scheduleId;
@@ -109,7 +209,6 @@ static void CopyScheduleInfoV1_1ToV1_0(const ScheduleInfoV1_1 &in, ScheduleInfo 
     out.authType = in.authType;
     out.executorMatcher = in.executorMatcher;
     out.scheduleMode = in.scheduleMode;
-    out.templateIds = in.templateIds;
     for (auto &inInfo : in.executors) {
         ExecutorInfo outInfo = {};
         outInfo.executorIndex = inInfo.executorIndex;
@@ -179,11 +278,16 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
         auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
         if (!CopyScheduleInfoV1_1(coAuthSchedule, &temp)) {
             infos.clear();
-            ret = RESULT_GENERAL_ERROR;
-            break;
+            IAM_LOGE("copy schedule info failed");
+            DestroyLinkedList(schedulesGet);
+            return RESULT_GENERAL_ERROR;
         }
         infos.push_back(temp);
         tempNode = tempNode->next;
+    }
+    ret = SetArrayAttributeToExtraInfo(solutionIn.userId, infos);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("SetArrayAttributeToExtraInfo fail");
     }
     DestroyLinkedList(schedulesGet);
     return ret;
@@ -475,6 +579,12 @@ int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
         IAM_LOGE("copy schedule info failed");
         return RESULT_BAD_COPY;
     }
+    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("SetAttributeToExtraInfo failed");
+    }
+
+    IAM_LOGI("end");
     return ret;
 }
 
