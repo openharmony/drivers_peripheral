@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ static void Usage(FILE* fp)
             "-q | --quit          stop preview and quit this app\n");
 }
 
-const static struct option longOptions[] = {
+const static struct option LONG_OPTIONS[] = {
     {"help", no_argument, nullptr, 'h'}, {"capture", no_argument, nullptr, 'c'},
     {"WB", no_argument, nullptr, 'w'}, {"video", no_argument, nullptr, 'v'},
     {"quit", no_argument, nullptr, 'q'}, {"AE", no_argument, nullptr, 'a'},
@@ -92,6 +92,10 @@ static RetCode PreviewOn(int mode, const std::shared_ptr<DcameraHdfDemo>& mainDe
         DHLOGI("main test: StartVideoStream enter");
     }
     rc = mainDemo->CreateStream();
+    if (rc != RC_OK) {
+        DHLOGE("main test: CreateStream error");
+        return RC_ERROR;
+    }
     rc = mainDemo->CaptureON(STREAM_ID_PREVIEW, CAPTURE_ID_PREVIEW, CAPTURE_PREVIEW);
     if (rc != RC_OK) {
         DHLOGE("main test: PreviewOn mainDemo->CaptureON() preview error");
@@ -129,7 +133,7 @@ static void FlashLightTest(const std::shared_ptr<DcameraHdfDemo>& mainDemo)
 static void OfflineTest(const std::shared_ptr<DcameraHdfDemo>& mainDemo)
 {
     RetCode rc = RC_OK;
-
+    constexpr uint32_t delayTime = 5;
     PreviewOff(mainDemo);
 
     mainDemo->StartDualStreams(STREAM_ID_CAPTURE);
@@ -141,7 +145,7 @@ static void OfflineTest(const std::shared_ptr<DcameraHdfDemo>& mainDemo)
         DHLOGE("main test: mainDemo->StreamOffline error");
     }
 
-    sleep(5);
+    sleep(delayTime);
     mainDemo->InitCameraDevice();
     rc = PreviewOn(0, mainDemo);
     if (rc != RC_OK) {
@@ -189,7 +193,7 @@ static void VideoTest(const std::shared_ptr<DcameraHdfDemo>& mainDemo)
     }
 }
 
-static void SetAwb(const std::shared_ptr<DcameraHdfDemo>& mainDemo, int awb)
+static void SetAwb(const std::shared_ptr<DcameraHdfDemo>& mainDemo, int& awb)
 {
     if (awb) {
         mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_INCANDESCENT);
@@ -204,7 +208,7 @@ static void ManuList(const std::shared_ptr<DcameraHdfDemo>& mainDemo, const int 
     int idx, c;
     int awb = 1;
     const char *shortOptions = "h:cwvaeqof:";
-    c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
+    c = getopt_long(argc, argv, shortOptions, LONG_OPTIONS, &idx);
     while (1) {
         switch (c) {
             case 'h':

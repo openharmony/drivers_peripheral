@@ -55,7 +55,7 @@ static const char *g_capLibPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_
 static const char *g_renLibPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
 static void *g_soHandle = NULL;
 static AudioPcmType g_pcmT = PCM_RENDER;
-static bool debugFlag = false;
+static bool g_debugFlag = false;
 
 static const char * const ctlEIfNames[] = {
     IFACE(CARD),
@@ -73,7 +73,7 @@ static const char * const ctlElemTypeNames[] = {
 
 void DebugLog(bool flag)
 {
-    debugFlag = flag;
+    g_debugFlag = flag;
 }
 
 static void *CallLibFunction(const char *funcName)
@@ -772,7 +772,7 @@ int32_t MctlGetElem(const struct HdfIoService *service, struct MixerCardCtlInfo 
     return U_SUCCESS;
 }
 
-static const struct ChannelMask g_ChnMask[] = {
+static const struct ChannelMask g_chnMask[] = {
     {"frontleft",   1 << AMIXER_CHN_FRONT_LEFT                                    },
     {"frontright",  1 << AMIXER_CHN_FRONT_RIGHT                                   },
     {"frontcenter", 1 << AMIXER_CHN_FRONT_CENTER                                  },
@@ -789,7 +789,7 @@ static uint32_t ChannelsMask(char **ptr, unsigned int chns)
 {
     const struct ChannelMask *msk;
 
-    for (msk = g_ChnMask; msk->name != NULL; msk++) {
+    for (msk = g_chnMask; msk->name != NULL; msk++) {
         if (strncasecmp(*ptr, msk->name, strlen(msk->name)) == 0) {
             /* Stop loop at specified character. */
             while (**ptr != '\0' && **ptr != ',' && **ptr != ' ' && **ptr != '\t') {
@@ -858,7 +858,7 @@ static int32_t FillChnmap(struct AudioMixerCtlElemInfo *info, uint32_t chns, uin
     AudioMixerChannelIdType chn;
 
     /* Matches the specified channel. */
-    for (chn = AMIXER_CHN_FRONT_LEFT; chn <= AMIXER_CHN_LAST; chn++) {
+    for (chn = AMIXER_CHN_FRONT_LEFT; chn < AMIXER_CHN_LAST; chn++) {
         sp = NULL;
         if (!(chns & (1 << (uint32_t)chn))) {
             continue;
@@ -978,7 +978,7 @@ int32_t SetChannels(const struct HdfIoService *srv, const char *cardSrv, unsigne
     return g_audioMixer.SetElemProp(srv, &infoData);
 }
 
-static int32_t fillIntVal(struct AudioMixerCtlElemInfo *info, unsigned int argc, char *argv[])
+static int32_t FillIntVal(struct AudioMixerCtlElemInfo *info, unsigned int argc, char *argv[])
 {
     char *vals, *minPtr, *maxPtr, *stepPtr;
     char *ptr = NULL;
@@ -1024,7 +1024,7 @@ static int32_t fillIntVal(struct AudioMixerCtlElemInfo *info, unsigned int argc,
     return U_SUCCESS;
 }
 
-static int32_t fillEnumVal(struct AudioMixerCtlElemInfo *info, unsigned int argc, char *argv[])
+static int32_t FillEnumVal(struct AudioMixerCtlElemInfo *info, unsigned int argc, char *argv[])
 {
     int32_t ret;
     unsigned int idx;
@@ -1046,7 +1046,7 @@ static int32_t fillEnumVal(struct AudioMixerCtlElemInfo *info, unsigned int argc
     return U_SUCCESS;
 }
 
-static int32_t fillBytesVal(unsigned char *buf, unsigned int argc, char *argv[])
+static int32_t FillBytesVal(unsigned char *buf, unsigned int argc, char *argv[])
 {
     int32_t ret;
     size_t len;
@@ -1114,13 +1114,13 @@ int32_t MctlSetElem(const struct HdfIoService *srv,
     switch (infoData.type) {
         case AUDIO_CTL_ELEM_TYPE_INTEGER:
         case AUDIO_CTL_ELEM_TYPE_BOOLEAN:
-            ret = fillIntVal(&infoData, argc, argv);
+            ret = FillIntVal(&infoData, argc, argv);
             break;
         case AUDIO_CTL_ELEM_TYPE_ENUMERATED:
-            ret = fillEnumVal(&infoData, argc, argv);
+            ret = FillEnumVal(&infoData, argc, argv);
             break;
         case AUDIO_CTL_ELEM_TYPE_BYTES:
-            ret = fillBytesVal(infoData.value.reserved, argc, argv);
+            ret = FillBytesVal(infoData.value.reserved, argc, argv);
             break;
         default:
             ret = U_FAILURE;
@@ -1312,7 +1312,7 @@ void UpdateCardSname(int card, const struct HdfIoService *srv, char * const snam
         DEBUG_LOG("Update failed: memcpy_s fail!\n");
     }
     sname[snameLen - 1] = '\0';
-    if (debugFlag) {
+    if (g_debugFlag) {
         printf("|--> [%s]\n", sname);
     }
 

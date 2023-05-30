@@ -56,7 +56,7 @@ public:
 
 struct WrapperSensorVdi {
     struct HdfVdiBase base;
-    class ISensorInterfaceVdi *sensorModule;
+    ISensorInterfaceVdi *sensorModule;
 };
 } // V1_0
 } // Sensor

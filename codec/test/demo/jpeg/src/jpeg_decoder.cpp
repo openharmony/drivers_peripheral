@@ -57,10 +57,9 @@ JpegDecoder::~JpegDecoder()
 static std::string GetArrayStr(const std::vector<uint32_t> &vec, std::string &arrayStr)
 {
     arrayStr = ("[");
-    int ret = 0;
     for (size_t i = 0; i < vec.size(); i++) {
         char value[32] = {0};
-        ret = sprintf_s(value, sizeof(value) - 1, "0x0%X, ", vec[i]);
+        int ret = sprintf_s(value, sizeof(value) - 1, "0x0%X, ", vec[i]);
         if (ret < 0) {
             HDF_LOGE("sprintf_s value failed, error [%{public}d]", ret);
             break;
@@ -205,7 +204,7 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     if (ret != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    
+
     HDF_LOGI("write jpeg data to inBuffer !");
     BufferHandle *bufferHandle = inBuffer_.buffer->GetBufferHandle();
     hdiBuffer_->Mmap(*bufferHandle);
@@ -224,7 +223,7 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     }
     return HDF_SUCCESS;
 }
-    
+
 int main(int argc, char *argv[])
 {
     CommandOpt opt;

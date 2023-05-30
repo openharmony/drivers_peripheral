@@ -39,10 +39,9 @@ ohos_shared_library("libuser_auth_interface_service_1.1") {
     "coauth/src/coauth_funcs.c",
     "coauth/src/executor_message.c",
     "coauth/src/pool.c",
+    "common/src/attribute.c",
     "common/src/buffer.c",
     "common/src/linked_list.c",
-    "common/src/tlv_base.c",
-    "common/src/tlv_wrapper.c",
     "database/src/idm_common.c",
     "database/src/idm_database.c",
     "database/src/idm_file_manager.c",
@@ -82,10 +81,10 @@ ohos_shared_library("libuser_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
-  deps = [ "../../../interface/user_auth/v1_1:libuser_auth_stub_1.1" ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_user_auth:libuser_auth_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,10 +56,10 @@ HWTEST_F(CoAuthTest, TestDestroyScheduleNode, TestSize.Level0)
     EXPECT_NE(schedule, nullptr);
     ASSERT_NE(schedule, nullptr);
     (void)memset_s(schedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule));
-    schedule->templateIds.value = (uint64_t *)Malloc(sizeof(uint64_t));
-    EXPECT_NE(schedule->templateIds.value, nullptr);
-    ASSERT_NE(schedule->templateIds.value, nullptr);
-    schedule->templateIds.num = 1;
+    schedule->templateIds.data = (uint64_t *)Malloc(sizeof(uint64_t));
+    EXPECT_NE(schedule->templateIds.data, nullptr);
+    ASSERT_NE(schedule->templateIds.data, nullptr);
+    schedule->templateIds.len = 1;
     DestroyScheduleNode(schedule);
 }
 
@@ -67,8 +67,8 @@ HWTEST_F(CoAuthTest, TestCopyCoAuthSchedule, TestSize.Level0)
 {
     EXPECT_EQ(CopyCoAuthSchedule(nullptr), nullptr);
     CoAuthSchedule schedule = {};
-    schedule.templateIds.num = 1;
-    schedule.templateIds.value = nullptr;
+    schedule.templateIds.len = 1;
+    schedule.templateIds.data = nullptr;
     EXPECT_EQ(CopyCoAuthSchedule(&schedule), nullptr);
 }
 
@@ -79,10 +79,10 @@ HWTEST_F(CoAuthTest, TestDestroyCoAuthSchedule, TestSize.Level0)
     EXPECT_NE(schedule, nullptr);
     ASSERT_NE(schedule, nullptr);
     (void)memset_s(schedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule));
-    schedule->templateIds.value = (uint64_t *)Malloc(sizeof(uint64_t));
-    EXPECT_NE(schedule->templateIds.value, nullptr);
-    ASSERT_NE(schedule->templateIds.value, nullptr);
-    schedule->templateIds.num = 1;
+    schedule->templateIds.data = (uint64_t *)Malloc(sizeof(uint64_t));
+    EXPECT_NE(schedule->templateIds.data, nullptr);
+    ASSERT_NE(schedule->templateIds.data, nullptr);
+    schedule->templateIds.len = 1;
     DestroyCoAuthSchedule(schedule);
 }
 
@@ -100,8 +100,8 @@ HWTEST_F(CoAuthTest, TestAddCoAuthSchedule, TestSize.Level0)
     InitCoAuth();
     EXPECT_EQ(AddCoAuthSchedule(nullptr), RESULT_BAD_PARAM);
     CoAuthSchedule schedule = {};
-    schedule.templateIds.num = 1;
-    schedule.templateIds.value = nullptr;
+    schedule.templateIds.len = 1;
+    schedule.templateIds.data = nullptr;
     EXPECT_EQ(AddCoAuthSchedule(&schedule), RESULT_NO_MEMORY);
     DestoryCoAuth();
 }
@@ -316,48 +316,48 @@ HWTEST_F(CoAuthTest, TestGenerateSchedule_002, TestSize.Level0)
     ScheduleParam param = {};
     param.templateIds = nullptr;
     EXPECT_EQ(GenerateSchedule(&param), nullptr);
-    TemplateIdArrays array = {};
-    array.num = 1;
-    array.value = nullptr;
+    Uint64Array array = {};
+    array.len = 1;
+    array.data = nullptr;
     param.templateIds = &array;
     EXPECT_EQ(GenerateSchedule(&param), nullptr);
     uint64_t temp = 1024;
-    array.value = &temp;
+    array.data = &temp;
     EXPECT_EQ(GenerateSchedule(&param), nullptr);
 }
 
 HWTEST_F(CoAuthTest, TestIsTemplateArraysValid, TestSize.Level0)
 {
     EXPECT_FALSE(IsTemplateArraysValid(nullptr));
-    TemplateIdArrays array = {};
-    array.num = 200;
-    array.value = nullptr;
+    Uint64Array array = {};
+    array.len = 200;
+    array.data = nullptr;
     EXPECT_FALSE(IsTemplateArraysValid(&array));
-    array.num = 1;
+    array.len = 1;
     EXPECT_FALSE(IsTemplateArraysValid(&array));
     uint64_t temp = 1024;
-    array.value = &temp;
+    array.data = &temp;
     EXPECT_TRUE(IsTemplateArraysValid(&array));
-    array.num = 0;
+    array.len = 0;
     EXPECT_TRUE(IsTemplateArraysValid(&array));
 }
 
 HWTEST_F(CoAuthTest, TestCopyTemplateArrays, TestSize.Level0)
 {
     EXPECT_EQ(CopyTemplateArrays(nullptr, nullptr), RESULT_BAD_PARAM);
-    TemplateIdArrays inArray = {};
-    inArray.num = 1;
+    Uint64Array inArray = {};
+    inArray.len = 1;
     uint64_t temp = 1024;
-    inArray.value = &temp;
+    inArray.data = &temp;
     EXPECT_EQ(CopyTemplateArrays(&inArray, nullptr), RESULT_BAD_PARAM);
-    TemplateIdArrays outArray = {};
+    Uint64Array outArray = {};
     uint64_t num = 0;
-    outArray.value = &num;
+    outArray.data = &num;
     EXPECT_EQ(CopyTemplateArrays(&inArray, &outArray), RESULT_BAD_PARAM);
-    outArray.value = nullptr;
+    outArray.data = nullptr;
     EXPECT_EQ(CopyTemplateArrays(&inArray, &outArray), RESULT_SUCCESS);
-    inArray.num = 0;
-    outArray.value = nullptr;
+    inArray.len = 0;
+    outArray.data = nullptr;
     EXPECT_EQ(CopyTemplateArrays(&inArray, &outArray), RESULT_SUCCESS);
 }
 } // namespace UserAuth

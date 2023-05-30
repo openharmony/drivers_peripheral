@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifndef USB_DDK_INNER_TYPES_H
+#define USB_DDK_INNER_TYPES_H
 #include "usb_ddk_types.h"
 #ifndef HDI_BUFF_MAX_SIZE
 #define HDI_BUFF_MAX_SIZE (1024 * 200)
@@ -38,3 +39,4 @@ bool UsbRequestPipeBlockMarshalling(struct HdfSBuf *data, const struct UsbReques
 bool UsbRequestPipeBlockUnmarshalling(struct HdfSBuf *data, struct UsbRequestPipe *dataBlock);
 
 void UsbRequestPipeFree(struct UsbRequestPipe *dataBlock, bool freeSelf);
+#endif

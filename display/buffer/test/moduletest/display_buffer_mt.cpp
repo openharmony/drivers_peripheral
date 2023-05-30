@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "display_buffer_mt.h"
+
 #include <unistd.h>
 #include <vector>
 #include <thread>
@@ -22,24 +24,25 @@
 
 #include "gtest/gtest.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/display_buffer_type.h"
-#include "v1_0/include/idisplay_buffer.h"
-
 #include "hdf_base.h"
 #include "hdf_log.h"
 
+namespace OHOS {
+namespace HDI {
+namespace Display {
+namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS;
+using namespace testing::ext;
 
-namespace {
-    const int SIZE_TIMES = 3;
-    const int HANDLE_NUM_1 = 2;
-    const int HANDLE_NUM_2 = 32;
-    const int LOOP_COUNT = 10;
-    const int INFO_WIDTH = 1024;
-    const int INFO_HEIGHT = 1024;
-}
+static IDisplayBuffer* g_dispbuf = nullptr;
+static const int SIZE_TIMES = 3;
+static const int HANDLE_NUM_1 = 2;
+static const int HANDLE_NUM_2 = 32;
+static const int LOOP_COUNT = 10;
+static const int INFO_WIDTH = 1024;
+static const int INFO_HEIGHT = 1024;
 
 #define HDF_LOG_TAG display_buffer_module_test
 
@@ -50,6 +53,10 @@ static void WriteBuffer(const BufferHandle& handle)
     int strSize = strlen(VERIFY_MSG) + 1;
     int i = 0;
     char* ptr = reinterpret_cast<char *>(handle.virAddr);
+    if (ptr == nullptr) {
+        HDF_LOGE("cast ptr failed");
+        return;
+    }
 
     for (; i < handle.size - strSize;) {
         errno_t ret = memcpy_s(&ptr[i], sizeof(VERIFY_MSG), VERIFY_MSG, sizeof(VERIFY_MSG));
@@ -98,28 +105,23 @@ static void DumpBufferHandle(const BufferHandle& handle)
     HDF_LOGD("-------------------------------------");
 }
 
-static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
+int32_t DisplayBufferMt::RunTest(const AllocInfo& info)
 {
-    static int32_t count = 0;
-    if (dispbuf == nullptr) {
-        HDF_LOGE("Can't get IDisplayBuffer interface.");
-        return;
-    }
     BufferHandle* bHandle = nullptr;
     // AllocMem
-    int32_t ec = dispbuf->AllocMem(info, bHandle);
+    int32_t ec = g_dispbuf->AllocMem(info, bHandle);
     if (ec != HDF_SUCCESS || bHandle == nullptr) {
         HDF_LOGE("%{public}s, line=%{public}d, AllocMem failed. ec=0x%{public}x",
                  __func__, __LINE__, ec);
-        return;
+        return HDF_FAILURE;
     }
 
     // Mmap
-    void* buffer = dispbuf->Mmap(*bHandle);
+    void* buffer = g_dispbuf->Mmap(*bHandle);
     if (buffer == nullptr) {
         HDF_LOGE("Mmap failed.");
-        dispbuf->FreeMem(*bHandle);
-        return;
+        g_dispbuf->FreeMem(*bHandle);
+        return HDF_FAILURE;
     }
     HDF_LOGD("Mmap successful");
 
@@ -127,31 +129,36 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
     WriteBuffer(*bHandle);
 
     // InvalidateCache
-    ec = dispbuf->InvalidateCache(*bHandle);
+    ec = g_dispbuf->InvalidateCache(*bHandle);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("InvalidateCache failed.");
-        dispbuf->Unmap(*bHandle);
-        dispbuf->FreeMem(*bHandle);
-        return;
+        g_dispbuf->Unmap(*bHandle);
+        g_dispbuf->FreeMem(*bHandle);
+        return HDF_FAILURE;
     }
     // InvalidateCache
-    ec = dispbuf->FlushCache(*bHandle);
+    ec = g_dispbuf->FlushCache(*bHandle);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("flushCache failed.");
-        dispbuf->Unmap(*bHandle);
-        dispbuf->FreeMem(*bHandle);
-        return;
+        g_dispbuf->Unmap(*bHandle);
+        g_dispbuf->FreeMem(*bHandle);
+        return HDF_FAILURE;
     }
     HDF_LOGD("flush Cache success.");
     // free buffer
-    dispbuf->Unmap(*bHandle);
-    dispbuf->FreeMem(*bHandle);
-    HDF_LOGD("FreeMem, finished count = %{public}d", ++count);
+    g_dispbuf->Unmap(*bHandle);
+    g_dispbuf->FreeMem(*bHandle);
+    return HDF_SUCCESS;
 }
 
-int main()
+void DisplayBufferMt::SetUpTestCase()
 {
-    HDF_LOGD("Main process start.");
+    g_dispbuf = IDisplayBuffer::Get();
+    ASSERT_TRUE(g_dispbuf != nullptr);
+}
+
+HWTEST_F(DisplayBufferMt, test_DisplayBuffer, TestSize.Level1)
+{
     AllocInfo info;
     info.width  = INFO_WIDTH;
     info.height = INFO_HEIGHT;
@@ -160,10 +167,12 @@ int main()
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
     info.format = PIXEL_FMT_RGBA_8888;
 
-    IDisplayBuffer* dispbuf = IDisplayBuffer::Get();
     for (int i = 0; i < LOOP_COUNT; i++) {
-        RunOnce(info, dispbuf);
+        int32_t ret = RunTest(info);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    HDF_LOGD("Main process end.");
-    return 0;
 }
+} // OHOS
+} // HDI
+} // DISPLAY
+} // TEST

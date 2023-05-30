@@ -31,13 +31,13 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/camera/hal:camera_hal"
+        "//drivers/peripheral/camera:camera_hal"
       ],
       "test": [
-        "//drivers/peripheral/camera/hal/test/demo:ohos_camera_demo",
-        "//drivers/peripheral/camera/hal/test/at:camera_test_at",
-        "//drivers/peripheral/camera/hal/test/ut:camera_test_ut",
-        "//drivers/peripheral/camera/hal/test/benchmarktest:hdf_camera_benchmark_test"
+        "//drivers/peripheral/camera/test/demo:ohos_camera_demo",
+        "//drivers/peripheral/camera/test/at:camera_test_at",
+        "//drivers/peripheral/camera/test/ut:camera_test_ut",
+        "//drivers/peripheral/camera/test/benchmarktest:hdf_camera_benchmark_test"
       ],
       "inner_kits": []
     }

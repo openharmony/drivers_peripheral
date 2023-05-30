@@ -127,6 +127,13 @@ static void ParseScanResults(WifiScanResults *scanResults)
     }
 }
 
+static int32_t Hid2dFunCb(const uint8_t *recvMsg, uint32_t recvMsgLen)
+{
+    (void)recvMsg;
+    (void)recvMsgLen;
+    return HDF_SUCCESS;
+}
+
 /**
  * @tc.name: WifiHalCreateAndDestroyFeature001
  * @tc.desc: Wifi hal create and destroy feature function test
@@ -1918,6 +1925,7 @@ HWTEST_F(WifiHalTest, GetStationInfo001, TestSize.Level1)
     uint8_t mac[ETH_ADDR_LEN] = {0};
     struct IWiFiAp *apFeature = nullptr;
     const char *ifName = "wlan0";
+    const char *ifNameInvalid = "wlanTest";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -1934,6 +1942,8 @@ HWTEST_F(WifiHalTest, GetStationInfo001, TestSize.Level1)
     ret = g_wifi->getStationInfo(nullptr, &info, mac, ETH_ADDR_LEN);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->getStationInfo(ifName, nullptr, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifNameInvalid, &info, mac, ETH_ADDR_LEN);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->getStationInfo(ifName, &info, mac, ETH_ADDR_LEN);
     flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
@@ -2003,6 +2013,169 @@ HWTEST_F(WifiHalTest, GetSignalPollInfo001, TestSize.Level1)
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
 
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiStartChannelMeas001
+ * @tc.desc: Wifi start channel meas and get meas result test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, StartChannelMeasTest001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifName = "wlan0";
+    struct MeasParam measChannelParam;
+    struct MeasResult measChannelResult = {0};
+    measChannelParam.channelId = 1;
+    measChannelParam.measTime = 15;
+
+    ret = g_wifi->startChannelMeas(nullptr, &measChannelParam);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->startChannelMeas(ifName, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->startChannelMeas(ifName, &measChannelParam);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+
+    ret = g_wifi->getChannelMeasResult(nullptr, &measChannelResult);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->getChannelMeasResult(ifName, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->getChannelMeasResult(ifName, &measChannelResult);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+}
+
+/**
+ * @tc.name: HalRegisterHid2dCallback001
+ * @tc.desc: Hal register hid2d callback test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, HalRegisterHid2dCallback001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->registerHid2dCallback(nullptr, ifName);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->registerHid2dCallback(Hid2dFunCb, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->registerHid2dCallback(Hid2dFunCb, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: HalUnregisterHid2dCallback001
+ * @tc.desc: Hal unregister hid2d callback test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, HalUnregisterHid2dCallback001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->unregisterHid2dCallback(nullptr, ifName);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->unregisterHid2dCallback(Hid2dFunCb, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->unregisterHid2dCallback(Hid2dFunCb, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiHalStartPnoScan001
+ * @tc.desc: Wifi hal Start Scan function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, WifiHalStartPnoScan001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+    WifiPnoSettings pnoSettings;
+    (void)memset_s(&pnoSettings, sizeof(pnoSettings), 0, sizeof(pnoSettings));
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(staFeature, nullptr);
+    ret = staFeature->startPnoScan(nullptr, &pnoSettings);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    ret = staFeature->startPnoScan(ifName, nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+/**
+ * @tc.name: WifiHalStartPnoScan002
+ * @tc.desc: Wifi hal Start Scan function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, WifiHalStartPnoScan002, TestSize.Level1)
+{
+    int32_t ret;
+    bool flag;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+    string ssid1 = "xa-hw";
+    string ssid2 = "xa-hw-03";
+    WifiPnoSettings pnoSettings;
+    (void)memset_s(&pnoSettings, sizeof(pnoSettings), 0, sizeof(pnoSettings));
+    pnoSettings.min2gRssi = -120;
+    pnoSettings.min5gRssi = -130;
+    pnoSettings.scanIntervalMs = 60000;
+    pnoSettings.scanIterations = 3;
+
+    pnoSettings.pnoNetworksLen = 2;
+    pnoSettings.pnoNetworks = (WifiPnoNetwork *)OsalMemCalloc(sizeof(WifiPnoNetwork) * 2);
+    pnoSettings.pnoNetworks[0].isHidden = 1;
+    memcpy_s(pnoSettings.pnoNetworks[0].ssid.ssid, MAX_SSID_LEN, ssid1.c_str(), ssid1.length());
+    pnoSettings.pnoNetworks[0].ssid.ssidLen = ssid1.length();
+    pnoSettings.pnoNetworks[1].isHidden = 0;
+    memcpy_s(pnoSettings.pnoNetworks[1].ssid.ssid, MAX_SSID_LEN, ssid2.c_str(), ssid2.length());
+    pnoSettings.pnoNetworks[1].ssid.ssidLen = ssid2.length();
+
+    ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(staFeature, nullptr);
+    ret = staFeature->startPnoScan(ifName, &pnoSettings);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    printf("ret = %d.\n", ret);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = g_wifi->unregisterEventCallback(HalCallbackEvent, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalMemFree(pnoSettings.pnoNetworks);
+}
+
+/**
+ * @tc.name: WifiHalStopPnoScan001
+ * @tc.desc: Wifi hal stop pno scan
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, WifiHalStopPnoScan001, TestSize.Level1)
+{
+    int32_t ret;
+    bool flag;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+    ret = staFeature->stopPnoScan(nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    ret = staFeature->stopPnoScan(ifName);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }

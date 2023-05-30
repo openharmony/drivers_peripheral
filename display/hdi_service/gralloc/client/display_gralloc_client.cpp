@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ namespace V1_0 {
 class GrallocDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     GrallocDeathRecipient(AllocatorDeathCallback func, void *data) : deathCbFun_(func), data_(data) {};
-    void OnRemoteDied(const wptr<IRemoteObject> &object) override 
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override
     {
         HDF_LOGI("%{public}s: allocator service is dead", __func__);
         if (deathCbFun_ != nullptr) {

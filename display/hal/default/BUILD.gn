@@ -16,12 +16,12 @@ import("//build/ohos.gni")
 ohos_static_library("def_display_layer") {
   output_name = "display_layer"
   sources = [
-    "//drivers/peripheral/display/hal/disp_hal.c",
+    "../disp_hal.c",
     "display_layer.c",
   ]
   include_dirs = [
-    "//drivers/peripheral/display/hal",
-    "//drivers/peripheral/display/interfaces/include",
+    "../",
+    "../../interfaces/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
@@ -43,9 +43,8 @@ ohos_shared_library("def_display_gralloc") {
   output_name = "display_gralloc"
   sources = [ "display_gralloc.c" ]
   include_dirs = [
-    "//drivers/peripheral/display/hal",
-    "//drivers/drivers/peripheral/display/hal",
-    "//drivers/peripheral/display/interfaces/include",
+    "../",
+    "../../interfaces/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
 
@@ -67,8 +66,8 @@ ohos_shared_library("def_display_gfx") {
   output_name = "display_gfx"
   sources = [ "display_gfx.c" ]
   include_dirs = [
-    "//drivers/peripheral/display/hal",
-    "//drivers/peripheral/display/interfaces/include",
+    "../",
+    "../../interfaces/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
 

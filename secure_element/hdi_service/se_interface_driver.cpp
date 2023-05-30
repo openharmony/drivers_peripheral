@@ -98,7 +98,7 @@ static void HdfSeInterfaceDriverRelease(struct HdfDeviceObject* deviceObject)
     delete hdfSeInterfaceHost;
 }
 
-struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
+static struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "secure_element_service",
     .Bind = HdfSeInterfaceDriverBind,

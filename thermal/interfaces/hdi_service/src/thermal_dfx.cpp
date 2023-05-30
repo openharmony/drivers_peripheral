@@ -380,15 +380,13 @@ void ThermalDfx::InfoChangedCallback(const char* key, const char* value, void* c
 
 void ThermalDfx::WidthWatchCallback(const std::string& value)
 {
-    int32_t width;
-    width = OHOS::StrToInt(value, width) ? width : DEFAULT_WIDTH;
+    int32_t width = OHOS::StrToInt(value, width) ? width : DEFAULT_WIDTH;
     width_ = static_cast<uint8_t>((width < DEFAULT_WIDTH) ? DEFAULT_WIDTH : width);
 }
 
 void ThermalDfx::IntervalWatchCallback(const std::string& value)
 {
-    int32_t interval;
-    interval = OHOS::StrToInt(value, interval) ? interval : DEFAULT_INTERVAL;
+    int32_t interval = OHOS::StrToInt(value, interval) ? interval : DEFAULT_INTERVAL;
     interval_ = static_cast<uint32_t>((interval < MIN_INTERVAL) ? MIN_INTERVAL : interval);
 }
 

@@ -42,7 +42,7 @@ public:
         return gralloc_;
     }
 
-    std::shared_ptr<IDisplayComposerInterface> &GetDeviceInterface()
+    sptr<IDisplayComposerInterface> &GetDeviceInterface()
     {
         return displayDevice_;
     }
@@ -55,7 +55,7 @@ private:
     std::shared_ptr<HdiTestDisplay> FindDisplayOrCreate(uint32_t id);
 
     std::map<uint32_t, std::shared_ptr<HdiTestDisplay>> displays_;
-    std::shared_ptr<IDisplayComposerInterface> displayDevice_;
+    sptr<IDisplayComposerInterface> displayDevice_;
     std::shared_ptr<IDisplayBuffer> gralloc_ = nullptr;
     std::vector<uint32_t> displayIds_;
 };

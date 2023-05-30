@@ -169,6 +169,17 @@ HWTEST_F(AudioUtRenderMmapTest, RenderReqMmapBufferIsValid001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
 }
 
+HWTEST_F(AudioUtRenderMmapTest, RenderReqMmapBufferInValid001, TestSize.Level1)
+{
+    int32_t reqSize = MMAP_SUGGEST_BUFFER_SIZE;
+    struct AudioMmapBufferDescriptor desc;
+
+    int32_t ret = render_->ReqMmapBuffer(render_, reqSize, &desc);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+    ret = render_->ReqMmapBuffer(render_, reqSize, &desc);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM);
+}
+
 HWTEST_F(AudioUtRenderMmapTest, RenderGetMmapPositionNull001, TestSize.Level1)
 {
     uint64_t frames = 0;

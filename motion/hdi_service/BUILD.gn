@@ -12,7 +12,6 @@
 # limitations under the License.
 
 HDF_CORE_PATH = "../../../hdf_core"
-hdf_interface_path = "../../../interface"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
@@ -48,8 +47,6 @@ ohos_shared_library("libmotion_driver") {
 
   sources = [ "motion_interface_driver.cpp" ]
 
-  deps = [ "$hdf_interface_path/motion/v1_0:libmotion_stub_1.0" ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -62,6 +59,7 @@ ohos_shared_library("libmotion_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_motion:libmotion_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

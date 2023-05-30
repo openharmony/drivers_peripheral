@@ -23,6 +23,7 @@ ohos_unittest("WlanHdiServiceTestC") {
   module_out_path = module_output_path
   sources = [
     "wlan_callback_impl.c",
+    "wlan_hdi_direct_test.cpp",
     "wlan_hdi_hal_services_c_test.cpp",
   ]
 

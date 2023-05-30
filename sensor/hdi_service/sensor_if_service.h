@@ -43,7 +43,7 @@ public:
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
     int32_t GetSensorVdiImpl();
 private:
-    std::shared_ptr<ISensorInterfaceVdi> sensorVdiImpl_ = nullptr;
+    ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
     GroupIdCallBackMap callbackMap = {};
 };

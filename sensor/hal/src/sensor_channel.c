@@ -91,7 +91,7 @@ void CopyEventData(struct SensorEvents *event)
     g_dumpDate.option = event->option;
     g_dumpDate.mode = event->mode;
 
-    if (g_listDump.pos < 0 || g_listDump.pos > MAX_DUMP_DATA_SIZE) {
+    if (g_listDump.pos < 0 || g_listDump.pos >= MAX_DUMP_DATA_SIZE) {
         HDF_LOGE("%{public}s: g_listDump is invalid", __func__);
         return;
     }

@@ -95,8 +95,30 @@ HWTEST_F(HdfMotionTest, RegisterMotionDataCb_003, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
+    sptr<IMotionCallback> motionCallback = nullptr;
+    int32_t ret = g_motionInterface->Register(motionCallback);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfMotionTest, RegisterMotionDataCb_004, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
     int32_t ret = g_motionInterface->Unregister(g_motionCallbackUnregistered);
     EXPECT_EQ(HDF_FAILURE, ret);
+}
+
+HWTEST_F(HdfMotionTest, RegisterMotionDataCb_005, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    sptr<IMotionCallback> motionCallback = nullptr;
+    int32_t ret = g_motionInterface->Unregister(motionCallback);
+    EXPECT_NE(HDF_SUCCESS, ret);
 }
 
 HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
@@ -167,6 +189,21 @@ HWTEST_F(HdfMotionTest, EnableMotion_003, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
+HWTEST_F(HdfMotionTest, EnableMotion_004, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = -1;
+    int32_t ret = g_motionInterface->EnableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    OsalSleep(2);
+
+    ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
 HWTEST_F(HdfMotionTest, DisableMotion_001, TestSize.Level1)
 {
     if (g_motionInterface == nullptr) {
@@ -193,4 +230,25 @@ HWTEST_F(HdfMotionTest, DisableMotion_002, TestSize.Level1)
     }
     int32_t ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_MAX);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+}
+
+HWTEST_F(HdfMotionTest, DisableMotion_003, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfMotionTest, DisableMotion_004, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = -1;
+    int32_t ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
 }

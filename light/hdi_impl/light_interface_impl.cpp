@@ -58,13 +58,13 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfoVdi>& info)
 
     while (count--) {
         HdfLightInfoVdi hdfLightInfo;
-        hdfLightInfo.lightId = lightInfo->lightId;
+        hdfLightInfo.lightId = static_cast<int32_t>(lightInfo->lightId);
         hdfLightInfo.lightType = lightInfo->lightType;
         if (strcpy_s(hdfLightInfo.lightName, LIGHT_NAME_MAX_LEN, lightInfo->lightName) != EOK) {
             HDF_LOGE("%{public}s: Light name cpy faild", __func__);
             return HDF_FAILURE;
         }
-        hdfLightInfo.lightNumber = lightInfo->lightNumber;
+        hdfLightInfo.lightNumber = static_cast<int32_t>(lightInfo->lightNumber);
         info.push_back(hdfLightInfo);
         lightInfo++;
     }
@@ -173,8 +173,10 @@ static int32_t DestoryLightVdiInstance(struct HdfVdiBase *vdiBase)
 
     struct VdiWrapperLight *lightVdi = reinterpret_cast<VdiWrapperLight *>(vdiBase);
     LightInterfaceImpl *lightImpl = reinterpret_cast<LightInterfaceImpl *>(lightVdi->lightModule);
-    delete lightImpl;
-    lightVdi->lightModule = nullptr;
+    if (lightImpl != nullptr) {
+        delete lightImpl;
+        lightVdi->lightModule = nullptr;
+    }
     return HDF_SUCCESS;
 }
 

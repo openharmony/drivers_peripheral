@@ -48,6 +48,10 @@ constexpr int32_t HEIGHT = 480;
 constexpr int32_t BUFFER_SIZE = WIDTH * HEIGHT * 3;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
+constexpr uint32_t WAIT_TIME = 1000;
+constexpr uint32_t MAX_WAIT = 50;
+constexpr uint32_t ERROR_FENCEFD = 1;
+constexpr uint32_t BUFFER_LEN = 1024;
 static IDisplayBuffer *gralloc_ = nullptr;
 
 static void InitCodecBuffer(OmxCodecBuffer& buffer, CodecBufferType type, OMX_VERSIONTYPE& version)
@@ -181,6 +185,40 @@ public:
         buffer.clear();
         return true;
     }
+
+    void waitState(OMX_STATETYPE objState)
+    {
+        OMX_STATETYPE state = OMX_StateInvalid;
+        uint32_t count = 0;
+        do {
+            usleep(WAIT_TIME);
+            auto ret = component_->GetState(component_, &state);
+            ASSERT_EQ(ret, HDF_SUCCESS);
+            count++;
+        } while (state != objState && count <= MAX_WAIT);
+    }
+
+    void InitBufferHandle(std::shared_ptr<OmxCodecBuffer> &omxBuffer, BufferHandle **bufferHandle)
+    {
+        ASSERT_TRUE(gralloc_ != nullptr);
+        AllocInfo alloc = {.width = WIDTH,
+            .height = HEIGHT,
+            .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
+            .format = PIXEL_FMT_YCBCR_420_SP};
+
+        auto err = gralloc_->AllocMem(alloc, *bufferHandle);
+        ASSERT_EQ(err, DISPLAY_SUCCESS);
+
+        omxBuffer->size = static_cast<uint32_t>(sizeof(OmxCodecBuffer));
+        omxBuffer->version = version_;
+        omxBuffer->bufferLen = static_cast<uint32_t>(sizeof(BufferHandle));
+        omxBuffer->buffer = reinterpret_cast<uint8_t *>(*bufferHandle);
+        omxBuffer->allocLen = static_cast<uint32_t>(sizeof(BufferHandle));
+        omxBuffer->fenceFd = -1;
+        omxBuffer->pts = 0;
+        omxBuffer->flag = 0;
+    }
+
     static void SetUpTestCase()
     {
         manager_ = GetCodecComponentManager();
@@ -710,25 +748,12 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_006, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     auto err = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
     ASSERT_EQ(err, HDF_SUCCESS);
-    AllocInfo alloc = {.width = WIDTH,
-                       .height = HEIGHT,
-                       .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
-                       .format = PIXEL_FMT_YCBCR_420_SP};
-    ASSERT_TRUE(gralloc_ != nullptr);
-    BufferHandle *bufferHandle = nullptr;
-    err = gralloc_->AllocMem(alloc, bufferHandle);
-    ASSERT_EQ(err, DISPLAY_SUCCESS);
+
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
     ASSERT_TRUE(omxBuffer != nullptr);
-    omxBuffer->size = sizeof(OmxCodecBuffer);
-    omxBuffer->version = version_;
+    BufferHandle *bufferHandle = nullptr;
+    InitBufferHandle(omxBuffer, &bufferHandle);
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
-    omxBuffer->bufferLen = sizeof(BufferHandle);
-    omxBuffer->buffer = reinterpret_cast<uint8_t *>(bufferHandle);
-    omxBuffer->allocLen = sizeof(BufferHandle);
-    omxBuffer->fenceFd = -1;
-    omxBuffer->pts = 0;
-    omxBuffer->flag = 0;
 
     err = component_->UseBuffer(component_, (uint32_t)PortIndex::PORT_INDEX_INPUT, omxBuffer.get());
     if (err != HDF_SUCCESS) {
@@ -852,6 +877,52 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_006, TestSize.Level1)
 }
 #endif
 
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_011, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+    ASSERT_TRUE(omxBuffer != nullptr);
+    BufferHandle *bufferHandle = nullptr;
+    InitBufferHandle(omxBuffer, &bufferHandle);
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_INVALID;
+    auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_012, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+    ASSERT_TRUE(omxBuffer != nullptr);
+    BufferHandle *bufferHandle = nullptr;
+    InitBufferHandle(omxBuffer, &bufferHandle);
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
+    omxBuffer->fenceFd = ERROR_FENCEFD;
+    auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_013, TestSize.Level1)
+{
+    ASSERT_TRUE(component_ != nullptr);
+    std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+    ASSERT_TRUE(omxBuffer != nullptr);
+    auto err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->bufferLen = BUFFER_LEN;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+
+    omxBuffer->fenceFd = ERROR_FENCEFD;
+    err = component_->UseBuffer(component_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
+    ASSERT_NE(err, HDF_SUCCESS);
+}
+
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -873,7 +944,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
     eglImage = nullptr;
 }
 
-#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -895,13 +965,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1
     ASSERT_TRUE(ret);
     err = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateExecuting, NULL, 0);
 
-    OMX_STATETYPE state = OMX_StateInvalid;
-    do {
-        usleep(10);
-        auto ret = component_->GetState(component_, &state);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-    } while (state != OMX_StateExecuting);
-
+    waitState(OMX_StateExecuting);
     auto iter = outputBuffers_.begin();
     if (iter != outputBuffers_.end()) {
         auto ret = component_->FillThisBuffer(component_, iter->second->omxBuffer.get());
@@ -914,18 +978,14 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1
     }
 
     err = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
+    waitState(OMX_StateIdle);
+
+    err = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateLoaded, nullptr, 0);
     FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
     FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
-    
-    err = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateLoaded, nullptr, 0);
-    do {
-        usleep(10);
-        auto ret = component_->GetState(component_, &state);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-    } while (state != OMX_StateLoaded);
-    component_->ComponentDeInit(component_);
+
+    waitState(OMX_StateLoaded);
 }
-#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_002, TestSize.Level1)
 {

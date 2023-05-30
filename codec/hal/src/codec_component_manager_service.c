@@ -30,7 +30,7 @@ uint32_t g_componentId = 0;
 
 static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
-    cleanRemoteServiceResource(deathRecipient, remote);
+    CleanRemoteServiceResource(deathRecipient, remote);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
@@ -225,7 +225,7 @@ void OmxComponentManagerSeriveRelease(struct CodecComponentManagerSerivce *insta
     OsalMemFree(instance);
 }
 
-void cleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+void CleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
     uint32_t compIds[MAX_COMPONENT_SIZE];
     uint32_t size = 0;

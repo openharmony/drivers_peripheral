@@ -26,15 +26,14 @@ namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_1 {
-class RunningLockTimerHandler
-{
+class RunningLockTimerHandler {
 public:
     RunningLockTimerHandler() = default;
     ~RunningLockTimerHandler();
 
-    bool RegisterRunningLockTimer(const RunningLockInfo &info, const std::function<void()> &callback,
-        bool once = true);
+    bool RegisterRunningLockTimer(const RunningLockInfo &info, const std::function<void()> &callback, bool once = true);
     bool UnregisterRunningLockTimer(const RunningLockInfo &info);
+
 private:
     uint32_t GetRunningLockTimerId(RunningLockType type, std::string name);
     void AddRunningLockTimerMap(RunningLockType type, std::string name, uint32_t timerId);
