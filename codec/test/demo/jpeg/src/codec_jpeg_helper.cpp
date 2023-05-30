@@ -498,10 +498,8 @@ int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &d
         buffer++;
         int32_t tableId = data & 0x000f;
         (void)tableId;
-        int32_t dqtbufferSize = 64;     // dqt base size
         int32_t size = 32;     // size
         if (((data >> 4) & 0x0f) == 1) { // 4: low 4 bits, 1: for 16 bits
-            dqtbufferSize *= 2;  // 2: 16bits has double size
             size *= 2;  // 2: 16bits has double size
         }
         CodecJpegQuantTable table;
