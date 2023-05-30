@@ -19,16 +19,11 @@
       "components": [
         "ipc",
         "c_utils",
-        "base",
         "hdf_core",
-        "libhilog",
-        "ipc_single",
-        "init"
-      ],
-      "third_party": [
-        "gmock_main",
-        "gtest_main",
-        "jsoncpp"
+        "init",
+        "hiviewdfx_hilog_native",
+        "common",
+        "drivers_interface_partitionslot"
       ]
     },
     "build": {
