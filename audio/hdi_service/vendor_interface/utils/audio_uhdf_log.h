@@ -70,3 +70,14 @@
         }                                                     \
     } while (0)
 #endif
+
+#ifndef CHECK_VALID_RANGE_RETURN
+#define CHECK_VALID_RANGE_RETURN(value, minValue, maxValue, ret)          \
+    do {                                                      \
+        if (value < minValue || value > maxValue) {                              \
+            AUDIO_FUNC_LOGE("value is invalid and return ret=%{public}d", ret); \
+            return (ret);                                     \
+        }                                                     \
+    } while (0)
+#endif
+
