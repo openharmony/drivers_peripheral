@@ -71,6 +71,7 @@ if (defined(ohos_lite)) {
 
     deps = [ "$camera_path/../v4l2:camera_host_service_1.0" ]
     external_deps = [
+      "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
@@ -142,7 +143,6 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "graphic_chipsetsdk:surface",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
@@ -155,8 +155,10 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
+      "graphic_chipsetsdk:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
