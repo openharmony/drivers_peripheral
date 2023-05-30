@@ -18,6 +18,9 @@
 
 #include <string>
 #include <map>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "camera_metadata_operator.h"
 #include "camera_metadata_info.h"
 #include "devhost_dump_reg.h"
@@ -32,13 +35,14 @@ enum DumpType {
 
 class CameraDumper {
 public:
-    ~CameraDumper () {}
+    ~CameraDumper ();
     bool DumpBuffer(const std::shared_ptr<IBuffer>& buffer);
     bool DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata, std::string tag = "camera");
     void ShowDumpMenu(struct HdfSBuf *reply);
     void CameraHostDumpProcess(struct HdfSBuf *data, struct HdfSBuf *reply);
-    static CameraDumper GetInstance()
+    static CameraDumper& GetInstance()
     {
+        static CameraDumper instance_;
         return instance_;
     }
 
@@ -48,9 +52,17 @@ private:
     uint64_t GetCurrentLocalTimeStamp();
     void UpdateDumpMode(DumpType type, bool isDump, struct HdfSBuf *reply);
     bool SaveDataToFile(const char *fileName, const void *data, uint32_t size);
+    void CheckDiskInfo();
+    void ThreadWorkFun();
+    void StartCheckDiskInfo();
+    void StopCheckDiskInfo();
 
 private:
-    static CameraDumper instance_;
+    std::mutex dumpStateLock_;
+    std::condition_variable cv_;
+    std::mutex terminateLock_;
+    bool terminate_ = true;
+    std::unique_ptr<std::thread> handleThread_ = nullptr;
 };
 
 int32_t CameraDumpEvent(struct HdfSBuf *data, struct HdfSBuf *reply);
