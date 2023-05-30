@@ -30,6 +30,7 @@ struct AudioCaptureInfo {
     enum AudioCategory streamType;
     unsigned int sampleRate;
     unsigned int channelCount;
+    int sourceType;
     struct AudioHwiCapture *hwiCapture;
     uint32_t captureId;
     unsigned int usrCount;
@@ -746,11 +747,34 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
+static int32_t JudgmentParameter(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    struct AudioCaptureInfo *captureInfos)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(captureInfos, HDF_ERR_INVALID_PARAM);
+
+    if (captureInfos->desc.pins != pin) {
+        return HDF_FAILURE;
+    }
+    if (captureInfos->streamType != attrs->type) {
+        return HDF_FAILURE;
+    }
+    if (captureInfos->sampleRate != attrs->sampleRate) {
+        return HDF_FAILURE;
+    }
+    if (captureInfos->channelCount != attrs->channelCount) {
+        return HDF_FAILURE;
+    }
+    if (captureInfos->sourceType != attrs->sourceType) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
     uint32_t *captureId)
 {
     uint32_t index = 0;
-
     if (captureId == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("audio params is null");
         return NULL;
@@ -768,17 +792,19 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct Aud
     }
 
     for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
-        if ((capturePriv->captureInfos[index] != NULL) &&
-            (capturePriv->captureInfos[index]->desc.pins == pin) &&
-            (capturePriv->captureInfos[index]->streamType == attrs->type) &&
-            (capturePriv->captureInfos[index]->sampleRate == attrs->sampleRate) &&
-            (capturePriv->captureInfos[index]->channelCount == attrs->channelCount)) {
-            *captureId = capturePriv->captureInfos[index]->captureId;
-            capturePriv->captureInfos[index]->usrCount++;
-            return &capturePriv->captureInfos[index]->capture;
+        if (capturePriv->captureInfos[index] == NULL) {
+            continue;
         }
-    }
 
+        int32_t ret = JudgmentParameter(pin, attrs, capturePriv->captureInfos[index]);
+        if (ret != HDF_SUCCESS) {
+            continue;
+        }
+
+        *captureId = capturePriv->captureInfos[index]->captureId;
+        capturePriv->captureInfos[index]->usrCount++;
+        return &capturePriv->captureInfos[index]->capture;
+    }
     return NULL;
 }
 
@@ -834,6 +860,7 @@ struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttribut
     priv->captureInfos[*captureId]->streamType = attrs->type;
     priv->captureInfos[*captureId]->sampleRate = attrs->sampleRate;
     priv->captureInfos[*captureId]->channelCount = attrs->channelCount;
+    priv->captureInfos[*captureId]->sourceType = attrs->sourceType;
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
