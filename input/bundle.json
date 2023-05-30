@@ -39,7 +39,7 @@
       ],
       "inner_kits": [
         {
-          "name":  "//drivers/peripheral/input/hal:hdi_input",
+          "name": "//drivers/peripheral/input/hal:hdi_input",
           "header": {
             "header_files": [
               "input_controller.h",
@@ -48,6 +48,15 @@
               "input_type.h"
             ],
             "header_base": "//drivers/peripheral/input/interfaces/include"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/input/udriver:hdi_input_udriver",
+          "header": {
+            "header_files": [
+              "input_device_manager.h"
+            ],
+            "header_base": "//drivers/peripheral/input/udriver/include"
           }
         }
       ]
