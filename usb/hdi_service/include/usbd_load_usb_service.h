@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <sys/time.h>
 #include "system_ability_definition.h"
 #include "system_ability_load_callback_stub.h"
 
@@ -55,9 +56,10 @@ private:
     static void DecreaseUsbLoadRemoveCount();
     static int32_t UsbLoadWorkEntry(void *para);
     static int32_t StartThreadUsbLoad();
-    static void UsbRemoveWorkEntry(int32_t sig);
+    static void UsbRemoveWorkEntry(union sigval v);
     static bool alarmRunning_;
     static uint32_t count_;
+    static timer_t timer_;
 };
 } // namespace V1_0
 } // namespace Usb
