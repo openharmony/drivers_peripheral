@@ -48,7 +48,7 @@ ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &n
 ThermalHdfTimer::~ThermalHdfTimer()
 {
     isRunning_ = false;
-    if (callbackThread_->joinable()) {
+    if (callbackThread_ != nullptr && callbackThread_->joinable()) {
         callbackThread_->join();
     }
     ThermalDfx::DestroyInstance();
