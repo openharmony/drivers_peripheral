@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 config("exported_header_files") {
   visibility = [ ":*" ]
-  include_dirs = [ "//drivers/peripheral/partitionslot/hal/include" ]
+  include_dirs = [ "../../../../drivers/peripheral/partitionslot/hal/include" ]
 }
 
 ohos_source_set("partitionslot_source") {
@@ -26,6 +26,8 @@ ohos_source_set("partitionslot_source") {
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
   ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_partitionslot"
 }
 
 ohos_shared_library("libpartition_slot_manager") {
