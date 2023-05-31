@@ -33,12 +33,12 @@ namespace Bluetooth {
 namespace Hci {
 namespace V1_0 {
 constexpr size_t BT_VENDOR_INVALID_DATA_LEN = 0;
-bt_vendor_callbacks_t VendorInterface::vendorCallbacks_ = {
-    .size = sizeof(bt_vendor_callbacks_t),
+BtVendorCallbacksT VendorInterface::vendorCallbacks_ = {
+    .size = sizeof(BtVendorCallbacksT),
     .init_cb = VendorInterface::OnInitCallback,
     .alloc = VendorInterface::OnMallocCallback,
     .dealloc = VendorInterface::OnFreeCallback,
-    .xmit_cb = VendorInterface::OnCmdXmitCallback,
+    .xmitCb = VendorInterface::OnCmdXmitCallback,
 };
 
 VendorInterface::VendorInterface()
@@ -52,7 +52,7 @@ VendorInterface::~VendorInterface()
 bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
     int channel[HCI_MAX_CHANNEL] = {0};
-    int channelCount = vendorInterface_->op(bt_opcode_t::BT_OP_HCI_CHANNEL_OPEN, channel);
+    int channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
     if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
         HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
         return false;
@@ -94,7 +94,7 @@ bool VendorInterface::Initialize(
     }
 
     vendorInterface_ =
-        reinterpret_cast<bt_vendor_interface_t *>(dlsym(vendorHandle_, BT_VENDOR_INTERFACE_SYMBOL_NAME));
+        reinterpret_cast<BtVendorInterfaceT *>(dlsym(vendorHandle_, BT_VENDOR_INTERFACE_SYMBOL_NAME));
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
         return false;
@@ -112,7 +112,7 @@ bool VendorInterface::Initialize(
         return false;
     }
 
-    result = vendorInterface_->op(bt_opcode_t::BT_OP_POWER_ON, nullptr);
+    result = vendorInterface_->op(BtOpcodeT::BT_OP_POWER_ON, nullptr);
     if (result != 0) {
         HDF_LOGE("vendorInterface_->op BT_OP_POWER_ON failed.");
         return false;
@@ -127,7 +127,7 @@ bool VendorInterface::Initialize(
         return false;
     }
 
-    vendorInterface_->op(bt_opcode_t::BT_OP_INIT, nullptr);
+    vendorInterface_->op(BtOpcodeT::BT_OP_INIT, nullptr);
 
     return true;
 }
@@ -141,9 +141,9 @@ void VendorInterface::CleanUp()
 
     watcher_.Stop();
 
-    vendorInterface_->op(bt_opcode_t::BT_OP_LPM_DISABLE, nullptr);
-    vendorInterface_->op(bt_opcode_t::BT_OP_HCI_CHANNEL_CLOSE, nullptr);
-    vendorInterface_->op(bt_opcode_t::BT_OP_POWER_OFF, nullptr);
+    vendorInterface_->op(BtOpcodeT::BT_OP_LPM_DISABLE, nullptr);
+    vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_CLOSE, nullptr);
+    vendorInterface_->op(BtOpcodeT::BT_OP_POWER_OFF, nullptr);
     vendorInterface_->close();
 
     hci_ = nullptr;
@@ -165,7 +165,7 @@ size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<ui
         activity_ = true;
         watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
         if (!wakeupLock_) {
-            vendorInterface_->op(bt_opcode_t::BT_OP_WAKEUP_LOCK, nullptr);
+            vendorInterface_->op(BtOpcodeT::BT_OP_WAKEUP_LOCK, nullptr);
             wakeupLock_ = true;
         }
     }
@@ -173,7 +173,7 @@ size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<ui
     return hci_->SendPacket(type, packet);
 }
 
-void VendorInterface::OnInitCallback(bt_op_result_t result)
+void VendorInterface::OnInitCallback(BtOpResultT result)
 {
     HDF_LOGI("%{public}s, ", __func__);
     if (VendorInterface::GetInstance()->initializeCompleteCallback_) {
@@ -182,12 +182,12 @@ void VendorInterface::OnInitCallback(bt_op_result_t result)
     }
 
     uint32_t lpmTimer = 0;
-    if (VendorInterface::GetInstance()->vendorInterface_->op(bt_opcode_t::BT_OP_GET_LPM_TIMER, &lpmTimer) != 0) {
+    if (VendorInterface::GetInstance()->vendorInterface_->op(BtOpcodeT::BT_OP_GET_LPM_TIMER, &lpmTimer) != 0) {
         HDF_LOGE("Vector interface BT_OP_GET_LPM_TIMER failed");
     }
     VendorInterface::GetInstance()->lpmTimer_ = lpmTimer;
 
-    VendorInterface::GetInstance()->vendorInterface_->op(bt_opcode_t::BT_OP_LPM_ENABLE, nullptr);
+    VendorInterface::GetInstance()->vendorInterface_->op(BtOpcodeT::BT_OP_LPM_ENABLE, nullptr);
 
     VendorInterface::GetInstance()->watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer),
         std::bind(&VendorInterface::WatcherTimeout, VendorInterface::GetInstance()));
@@ -231,7 +231,7 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
         buff->layer_specific = 0;
         (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
         if (vendorInterface_ && vendorInterface_->op) {
-            vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+            vendorInterface_->op(BtOpcodeT::BT_OP_EVENT_CALLBACK, buff);
         }
         delete[] buff;
     } else if (vendorSentOpcode_ != 0 && data[0] == Hci::HCI_EVENT_CODE_COMMAND_COMPLETE) {
@@ -247,7 +247,7 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
             (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
             vendorSentOpcode_ = 0;
             if (vendorInterface_ && vendorInterface_->op) {
-                vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+                vendorInterface_->op(BtOpcodeT::BT_OP_EVENT_CALLBACK, buff);
             }
             delete[] buff;
         }
@@ -260,7 +260,7 @@ void VendorInterface::WatcherTimeout()
 {
     std::lock_guard<std::mutex> lock(wakeupMutex_);
     if (!activity_ && wakeupLock_ && vendorInterface_ && vendorInterface_->op) {
-        vendorInterface_->op(bt_opcode_t::BT_OP_WAKEUP_UNLOCK, nullptr);
+        vendorInterface_->op(BtOpcodeT::BT_OP_WAKEUP_UNLOCK, nullptr);
         wakeupLock_ = false;
     }
     activity_ = false;
