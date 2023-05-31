@@ -993,7 +993,7 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
         mExtraParams->sampleRate = sampleRate;
     }
 #ifdef A2DP_HDI_SERVICE
-      else if (strcmp(key, A2DP_SUSPEND) == 0) {
+    else if (strcmp(key, A2DP_SUSPEND) == 0) {
         uint32_t result = 0;
         ret = TransferA2dpSuspended(value, &result);
         if (ret < 0) {
