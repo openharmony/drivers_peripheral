@@ -55,6 +55,10 @@ int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
         CODEC_LOGE("g_codecCapabilites not init!");
         return HDF_FAILURE;
     }
+    if (count != g_codecCapabilites.total) {
+        CODEC_LOGE("The length does not match!");
+        return HDF_FAILURE;
+    }
     int32_t groupIndex;
     int32_t capIndex;
     int32_t curCount = 0;
