@@ -48,7 +48,7 @@ public:
     int32_t GetExtensionIndex(const char *parameterName, uint32_t& index);
     int32_t GetState(HDI::Codec::V1_0::CodecStateType &state);
     int32_t ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                   OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE &tunnelSetup);
+                                   OHOS::HDI::Codec::V1_0::CodecTunnelSetupType &tunnelSetup);
     int32_t UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer);

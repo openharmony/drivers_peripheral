@@ -35,7 +35,7 @@ constexpr AvCodecRole ROLE = MEDIA_ROLETYPE_VIDEO_AVC;
 static sptr<ICodecComponent> g_component = nullptr;
 static sptr<ICodecCallback> g_callback = nullptr;
 static sptr<ICodecComponentManager> g_manager = nullptr;
-static OHOS::HDI::Codec::V1_0::OMX_VERSIONTYPE g_version;
+static OHOS::HDI::Codec::V1_0::CodecVersionType g_version;
 static std::string g_compName = "";
 
 class CodecHdiOmxDecTest : public testing::Test {
@@ -90,7 +90,7 @@ public:
             g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
         }
         if (g_manager != nullptr && g_component != nullptr) {
-            g_manager->DestoryComponent(componentId_);
+            g_manager->DestroyComponent(componentId_);
         }
         g_component = nullptr;
         g_callback = nullptr;

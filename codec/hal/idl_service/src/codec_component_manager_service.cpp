@@ -78,7 +78,7 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
     return HDF_SUCCESS;
 }
 
-int32_t CodecComponentManagerService::DestoryComponent(uint32_t componentId)
+int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
 {
     std::unique_lock<std::mutex> autoLock(mutex_);
     CODEC_LOGI("componentId[%{public}d]", componentId);

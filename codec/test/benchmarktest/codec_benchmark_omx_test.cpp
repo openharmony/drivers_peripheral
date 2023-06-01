@@ -57,7 +57,7 @@ static IDisplayBuffer *gralloc_ = nullptr;
 static sptr<ICodecComponent> component_ = nullptr;
 static sptr<ICodecCallback> callback_ = nullptr;
 static sptr<ICodecComponentManager> manager_ = nullptr;
-static OHOS::HDI::Codec::V1_0::OMX_VERSIONTYPE version_;
+static OHOS::HDI::Codec::V1_0::CodecVersionType version_;
 static inline std::string compName_ = "";
 
 class CodecBenchmarkOmxTest : public benchmark::Fixture {
@@ -240,7 +240,7 @@ public:
     void TearDown(benchmark::State &state)
     {
         if (manager_ != nullptr && component_ != nullptr) {
-            manager_->DestoryComponent(componentId_);
+            manager_->DestroyComponent(componentId_);
         }
         component_ = nullptr;
         callback_ = nullptr;
@@ -394,8 +394,8 @@ BENCHMARK_F(CodecBenchmarkOmxTest, ComponentTunnelRequest)(benchmark::State &sta
     int32_t ret;
     const int32_t tunneledComp = TUNNELE_COMP;
     const uint32_t tunneledPort = TUNNELED_PORT;
-    OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE tunnelSetup;
-    tunnelSetup.eSupplier = OHOS::HDI::Codec::V1_0::OMX_BufferSupplyInput;
+    OHOS::HDI::Codec::V1_0::CodecTunnelSetupType tunnelSetup;
+    tunnelSetup.supplier = OHOS::HDI::Codec::V1_0::CODEC_BUFFER_SUPPLY_INPUT;
     for (auto _ : state) {
     ret = component_->ComponentTunnelRequest(outputIndex, tunneledComp, tunneledPort,
         tunnelSetup, tunnelSetup);
@@ -415,7 +415,7 @@ BENCHMARK_F(CodecBenchmarkOmxTest, SendCommand)(benchmark::State &state)
             InitComponent();
         }
         ret = component_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
-        manager_->DestoryComponent(componentId_);
+        manager_->DestroyComponent(componentId_);
         ASSERT_EQ(ret, HDF_SUCCESS);
         component_ = nullptr;
     }
@@ -604,7 +604,7 @@ BENCHMARK_F(CodecBenchmarkOmxTest, ComponentDeInit)(benchmark::State &state)
         } while (state != CODEC_STATE_LOADED);
         ret = component_->ComponentDeInit();
         if (manager_ != nullptr && component_ != nullptr) {
-            manager_->DestoryComponent(componentId_);
+            manager_->DestroyComponent(componentId_);
         }
         component_ = nullptr;
         ASSERT_EQ(ret, HDF_SUCCESS);

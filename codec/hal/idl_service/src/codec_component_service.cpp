@@ -107,8 +107,8 @@ int32_t CodecComponentService::GetState(CodecStateType &state)
 }
 
 int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
-                                                      const OMX_TUNNELSETUPTYPE &inTunnelSetup,
-                                                      OMX_TUNNELSETUPTYPE &outTunnelSetup)
+                                                      const CodecTunnelSetupType &inTunnelSetup,
+                                                      CodecTunnelSetupType &outTunnelSetup)
 {
     CODEC_LOGI("port [%{public}d]", port);
     outTunnelSetup = inTunnelSetup;
