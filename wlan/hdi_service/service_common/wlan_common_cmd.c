@@ -43,8 +43,8 @@ int32_t WlanInterfaceStart(struct IWlanInterface *self)
     int32_t ret;
 
     (void)self;
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->start == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->start is NULL", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->start(g_wifi);
@@ -59,8 +59,8 @@ int32_t WlanInterfaceStop(struct IWlanInterface *self)
     int32_t ret;
 
     (void)self;
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->stop == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->stop is NULL", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->stop(g_wifi);
@@ -79,8 +79,8 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->createFeature == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->createFeature is NULL", __func__);
         return HDF_FAILURE;
     }
     if (type == PROTOCOL_80211_IFTYPE_AP) {
@@ -118,8 +118,8 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->destroyFeature == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->destroyFeature is NULL", __func__);
         return HDF_FAILURE;
     }
     if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
@@ -160,8 +160,8 @@ int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct
         HDF_LOGE("%{public}s:input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    if (g_apFeature == NULL || g_apFeature->getAssociatedStas == NULL) {
+        HDF_LOGE("%{public}s g_apFeature or g_apFeature->getAssociatedStas is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -278,8 +278,8 @@ int32_t WlanInterfaceGetFeatureByIfName(struct IWlanInterface *self, const char 
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s gwifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getFeatureByIfName == NULL) {
+        HDF_LOGE("%{public}s gwifi or g_wifi->getFeatureByIfName is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getFeatureByIfName(ifName, (struct IWiFiBaseFeature **)&baseFeature);
@@ -424,8 +424,8 @@ int32_t WlanInterfaceGetSupportCombo(struct IWlanInterface *self, uint64_t *comb
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getSupportCombo == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getSupportCombo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getSupportCombo(combo, DEFAULT_COMBO_SIZE);
@@ -444,8 +444,8 @@ int32_t WlanInterfaceGetSupportFeature(struct IWlanInterface *self, uint8_t *sup
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getSupportFeature == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getSupportFeature is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getSupportFeature(supType, *supTypeLen);
@@ -754,8 +754,8 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->registerEventCallback == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->registerEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
@@ -794,8 +794,8 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->unregisterEventCallback == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->unregisterEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
@@ -823,8 +823,8 @@ int32_t WlanInterfaceResetDriver(struct IWlanInterface *self, uint8_t chipId, co
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->resetDriver == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->resetDriver is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->resetDriver(chipId, ifName);
@@ -846,8 +846,8 @@ int32_t WlanInterfaceSetCountryCode(struct IWlanInterface *self, const struct Hd
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    if (g_apFeature == NULL || g_apFeature->setCountryCode == NULL) {
+        HDF_LOGE("%{public}s g_apFeature or g_apFeature->setCountryCode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -896,8 +896,8 @@ int32_t WlanInterfaceSetScanningMacAddress(struct IWlanInterface *self, const st
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->setScanningMacAddress == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->setScanningMacAddress is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -939,7 +939,7 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
     int32_t ret = HDF_FAILURE;
 
     (void)self;
-    if (g_wifi == NULL || netDeviceInfoResult == NULL) {
+    if (g_wifi == NULL || g_wifi->getNetDevInfo == NULL ||netDeviceInfoResult == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1092,14 +1092,14 @@ int32_t WlanInterfaceStartScan(struct IWlanInterface *self, const struct HdfFeat
         WifiScanFree(wifiScan);
         return HDF_FAILURE;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->startScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->startScan is NULL!", __func__);
         WifiScanFree(wifiScan);
         return HDF_FAILURE;
     }
     ret = g_staFeature->startScan(ifeature->ifName, wifiScan);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get netdev info failed!, error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s start scan failed!, error code: %{public}d", __func__, ret);
     }
     WifiScanFree(wifiScan);
     return ret;
@@ -1114,8 +1114,8 @@ int32_t WlanInterfaceGetPowerMode(struct IWlanInterface *self, const struct HdfF
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getPowerMode == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getPowerMode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getPowerMode(ifeature->ifName, mode);
@@ -1134,8 +1134,8 @@ int32_t WlanInterfaceSetPowerMode(struct IWlanInterface *self, const struct HdfF
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->setPowerMode == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setPowerMode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->setPowerMode(ifeature->ifName, mode);
@@ -1156,8 +1156,8 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->setProjectionScreenParam == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setProjectionScreenParam is NULL!", __func__);
         return HDF_FAILURE;
     }
 
@@ -1194,8 +1194,8 @@ int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName,
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getStationInfo == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getStationInfo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getStationInfo(ifName, (StationInfo *)info, mac, macLen);
@@ -1278,8 +1278,8 @@ int32_t WlanInterfaceStartPnoScan(struct IWlanInterface *self, const char *ifNam
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->startPnoScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->startPnoScan is NULL!", __func__);
         return HDF_FAILURE;
     }
     WifiPnoSettings *wifiPnoSettings = (WifiPnoSettings *)OsalMemCalloc(sizeof(WifiPnoSettings));
@@ -1316,8 +1316,8 @@ int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->stopPnoScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->stopPnoScan is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
@@ -1342,8 +1342,8 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->getSignalPollInfo == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->getSignalPollInfo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
