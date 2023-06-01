@@ -964,7 +964,7 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
         }
         mExtraParams->audioStreamCtl = result;
     }
-#endif    
+#endif
     if (strcmp(key, AUDIO_ATTR_PARAM_ROUTE) == 0) {
         int32_t route = 0;
         ret = TransferRoute(value, &route);
