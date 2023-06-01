@@ -25,5 +25,8 @@ group("systemtest") {
 
 group("fuzzer") {
   testonly = true
-  deps = [ "fuzztest/batteryhdi_fuzzer:hdf_battery_fuzztest" ]
+  deps = [
+    "fuzztest/batteryhdi_fuzzer:hdf_battery_fuzztest",
+    "fuzztest/batteryhdistub_fuzzer:hdf_battery_stub_fuzztest",
+  ]
 }
