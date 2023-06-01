@@ -97,7 +97,7 @@ BENCHMARK_F(CodecBenchmarkManagerTest, CreateComponent)(benchmark::State &state)
         ret = manager_->CreateComponent(component, componentId, compName, APP_DATA, callback_);
         ASSERT_EQ(ret, HDF_SUCCESS);
         if (componentId != 0) {
-            manager_->DestoryComponent(componentId);
+            manager_->DestroyComponent(componentId);
         }
     }
 }
@@ -105,7 +105,7 @@ BENCHMARK_F(CodecBenchmarkManagerTest, CreateComponent)(benchmark::State &state)
 BENCHMARK_REGISTER_F(CodecBenchmarkManagerTest, CreateComponent)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(CodecBenchmarkManagerTest, DestoryComponent)(benchmark::State &state)
+BENCHMARK_F(CodecBenchmarkManagerTest, DestroyComponent)(benchmark::State &state)
 {
     ASSERT_TRUE(manager_ != nullptr);
     std::string compName("");
@@ -126,11 +126,11 @@ BENCHMARK_F(CodecBenchmarkManagerTest, DestoryComponent)(benchmark::State &state
         ret = manager_->CreateComponent(component, componentId, compName, APP_DATA, callback_);
         ASSERT_EQ(ret, HDF_SUCCESS);
         if (componentId != 0) {
-            manager_->DestoryComponent(componentId);
+            manager_->DestroyComponent(componentId);
         }
     }
 }
 
-BENCHMARK_REGISTER_F(CodecBenchmarkManagerTest, DestoryComponent)->
+BENCHMARK_REGISTER_F(CodecBenchmarkManagerTest, DestroyComponent)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }  // namespace

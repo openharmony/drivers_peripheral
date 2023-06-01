@@ -34,7 +34,7 @@ constexpr AvCodecRole ROLE = MEDIA_ROLETYPE_VIDEO_AVC;
 static sptr<ICodecComponent> g_component = nullptr;
 static sptr<ICodecCallback> g_callback = nullptr;
 static sptr<ICodecComponentManager> g_manager = nullptr;
-static OHOS::HDI::Codec::V1_0::OMX_VERSIONTYPE g_version;
+static OHOS::HDI::Codec::V1_0::CodecVersionType g_version;
 static std::string g_compName = "";
 
 class CodecHdiOmxEncTest : public testing::Test {
@@ -89,7 +89,7 @@ public:
             g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, cmdData);
         }
         if (g_manager != nullptr && g_component != nullptr) {
-            g_manager->DestoryComponent(componentId_);
+            g_manager->DestroyComponent(componentId_);
         }
         g_component = nullptr;
         g_callback = nullptr;
@@ -428,8 +428,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
     ASSERT_TRUE(g_component != nullptr);
     const int32_t tunneledComp = 1002;
     const uint32_t tunneledPort = 101;
-    OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE tunnelSetup;
-    tunnelSetup.eSupplier = OHOS::HDI::Codec::V1_0::OMX_BufferSupplyInput;
+    OHOS::HDI::Codec::V1_0::CodecTunnelSetupType tunnelSetup;
+    tunnelSetup.supplier = OHOS::HDI::Codec::V1_0::CODEC_BUFFER_SUPPLY_INPUT;
 
     auto ret = g_component->ComponentTunnelRequest(outputIndex, tunneledComp, tunneledPort,
         tunnelSetup, tunnelSetup);

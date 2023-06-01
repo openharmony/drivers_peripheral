@@ -79,7 +79,7 @@ class FunctionUtil : public RefBase {
     };
 
 public:
-    explicit FunctionUtil(OMX_VERSIONTYPE version);
+    explicit FunctionUtil(CodecVersionType version);
 
     ~FunctionUtil();
 
@@ -150,7 +150,7 @@ public:
 
 private:
     static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *buffer_;
-    OMX_VERSIONTYPE version_;
+    CodecVersionType version_;
     std::map<int32_t, std::shared_ptr<BufferInfo>> inputBuffers_;
     std::map<int32_t, std::shared_ptr<BufferInfo>> outputBuffers_;
 };

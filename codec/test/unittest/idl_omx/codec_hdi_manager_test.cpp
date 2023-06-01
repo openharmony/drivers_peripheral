@@ -120,7 +120,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_003, TestSize.Level
     ret = manager_->CreateComponent(component, componentId, compName, APP_DATA, callback_);
     ASSERT_EQ(ret, HDF_SUCCESS);
     if (componentId != 0) {
-        ret = manager_->DestoryComponent(componentId);
+        ret = manager_->DestroyComponent(componentId);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
 }
@@ -128,7 +128,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_003, TestSize.Level
 HWTEST_F(CodecHdiManagerTest, HdfCodecHdiDestroyComponentTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(manager_ != nullptr);
-    auto ret = manager_->DestoryComponent(INVALID_COMPONENT_ID);
+    auto ret = manager_->DestroyComponent(INVALID_COMPONENT_ID);
     ASSERT_EQ(ret, HDF_ERR_INVALID_PARAM);
 }
 }  // namespace
