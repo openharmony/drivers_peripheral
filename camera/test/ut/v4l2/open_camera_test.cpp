@@ -62,11 +62,10 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
 TEST_F(UtestOpenCameraTest, camera_open_0010)
 {
     CAMERA_LOGD("OpenCamera, cameraID is not found.");
-    sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
     OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
     CAMERA_LOGD("opencamera begin");
-    display_->rc = (CamRetCode)cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
     CAMERA_LOGD("opencamera end");
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
@@ -129,7 +128,6 @@ TEST_F(UtestOpenCameraTest, camera_open_0020)
 TEST_F(UtestOpenCameraTest, camera_open_0030)
 {
     CAMERA_LOGD("OpenCamera, cameraID is not found, callback is null.");
-    sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
     OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
     CAMERA_LOGD("opencamera begin");

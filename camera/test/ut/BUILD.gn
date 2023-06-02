@@ -176,13 +176,10 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config",
       "$camera_path/pipeline_core/ipp/include",
 
-      # hdi impl includes
-      "$camera_path/../v4l2",
-      "$camera_path/../v4l2/include",
-      "$camera_path/../v4l2/include/camera_host",
-      "$camera_path/../v4l2/include/camera_device",
-      "$camera_path/../v4l2/include/stream_operator",
-      "$camera_path/../v4l2/include/offline_stream_operator",
+      # hdi service includes
+      "$camera_path/../../hdi_service/v1_0/include",
+
+      # vdi impl includes
       "$camera_path/../v4l2/src/stream_operator/stream_tunnel/standard",
 
       # metadata manager includes
@@ -190,7 +187,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$camera_path/../v4l2:camera_host_service_1.0_static",
+      "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0_static",
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",

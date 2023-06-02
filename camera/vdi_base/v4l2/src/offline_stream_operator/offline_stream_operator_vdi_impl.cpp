@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#include "offline_stream_operator.h"
+#include "offline_stream_operator_vdi_impl.h"
 #include "watchdog.h"
 
 namespace OHOS::Camera {
-OfflineStreamOperator::OfflineStreamOperator()
+OfflineStreamOperatorVdiImpl::OfflineStreamOperatorVdiImpl()
 {
     CAMERA_LOGV("ctor, instance");
 }
 
-OfflineStreamOperator::~OfflineStreamOperator()
+OfflineStreamOperatorVdiImpl::~OfflineStreamOperatorVdiImpl()
 {
     CAMERA_LOGV("dtor, instance");
     offlineStreamMap_.clear();
 }
 
-int32_t OfflineStreamOperator::CancelCapture(int32_t captureId)
+int32_t OfflineStreamOperatorVdiImpl::CancelCapture(int32_t captureId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
 
@@ -50,7 +50,7 @@ int32_t OfflineStreamOperator::CancelCapture(int32_t captureId)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t OfflineStreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
+int32_t OfflineStreamOperatorVdiImpl::ReleaseStreams(const std::vector<int32_t> &streamIds)
 {
     PLACE_A_SELFKILL_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -71,7 +71,7 @@ int32_t OfflineStreamOperator::ReleaseStreams(const std::vector<int32_t>& stream
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t OfflineStreamOperator::Release()
+int32_t OfflineStreamOperatorVdiImpl::Release()
 {
     PLACE_A_SELFKILL_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -89,7 +89,7 @@ int32_t OfflineStreamOperator::Release()
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-RetCode OfflineStreamOperator::CommitOfflineStream(const std::shared_ptr<OfflineStream>& of)
+RetCode OfflineStreamOperatorVdiImpl::CommitOfflineStream(const std::shared_ptr<OfflineStream> &of)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(of, RC_ERROR);
     {
@@ -99,7 +99,7 @@ RetCode OfflineStreamOperator::CommitOfflineStream(const std::shared_ptr<Offline
     return RC_OK;
 }
 
-std::shared_ptr<OfflineStream> OfflineStreamOperator::FindStreamByCaptureId(int32_t captureId)
+std::shared_ptr<OfflineStream> OfflineStreamOperatorVdiImpl::FindStreamByCaptureId(int32_t captureId)
 {
     std::shared_ptr<OfflineStream> stream = nullptr;
     {

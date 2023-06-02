@@ -37,19 +37,6 @@ TestDisplay::TestDisplay()
 {
 }
 
-sptr<ICameraHost> TestDisplay::CameraHostImplGetInstance(void)
-{
-    using OHOS::Camera::CameraHostImpl;
-    CameraHostImpl *service = new (std::nothrow) CameraHostImpl();
-    if (service == nullptr) {
-        return nullptr;
-    }
-
-    service->Init();
-    sleep(3); // 3:sleep three second
-    return service;
-}
-
 uint64_t TestDisplay::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
