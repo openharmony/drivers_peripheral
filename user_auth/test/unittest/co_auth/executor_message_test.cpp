@@ -83,7 +83,7 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
     ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData);
-    EXPECT_EQ(result, RESULT_GENERAL_ERROR);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     uint32_t testUint32 = 123;
     int32_t testInt32 = 123;
@@ -207,7 +207,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromDataAndSignTlv, TestSize.Le
     Attribute *msgAttribute = CreateAttributeFromSerializedMsg(retInfo);
     EXPECT_EQ(msgAttribute, nullptr);
     result = GetAttributeUint8Array(msgAttribute, AUTH_ROOT, &dataAndSignTlv);
-    EXPECT_EQ(result, RESULT_GENERAL_ERROR);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
     retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, true);
     EXPECT_EQ(retAttribute, nullptr);
     retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, false);

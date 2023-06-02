@@ -14,45 +14,33 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-ohos_unittest("UserAuthBaseTest") {
+ohos_unittest("UserAuthAttributeTest") {
   module_out_path = "useriam/user_auth_hdi"
 
-  cflags = [ "-DIAM_TEST_ENABLE" ]
-
   include_dirs = [
-    "inc",
     "../../../hdi_service/adaptor/inc",
-    "../../../hdi_service/coauth/inc",
     "../../../hdi_service/common/inc",
-    "../../../hdi_service/database/inc",
-    "../../../hdi_service/idm/inc",
-    "../../../hdi_service/interface/inc",
-    "../../../hdi_service/key_mgr/inc",
-    "../../../hdi_service/user_auth/inc",
     "../../../common/logs",
     "../../../common/utils",
+    "../mocks/inc",
   ]
 
   sources = [
-    "src/adaptor_algorithm_test.cpp",
-    "src/adaptor_file_test.cpp",
-    "src/adaptor_memory_test.cpp",
-    "src/adaptor_time_test.cpp",
-    "src/buffer_test.cpp",
-    "src/key_mgr_test.cpp",
+    "../../../hdi_service/common/src/attribute.c",
+    "../../../hdi_service/common/src/c_array.c",
+    "../mocks/src/mock_adaptor_memory.cpp",
+    "attribute_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libuser_auth_interface_service_1.1" ]
+  deps = [ "//third_party/googletest:gmock" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_proxy_1.1",
     "hdf_core:libhdf_utils",
     "hilog_native:libhilog",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
   ]
 
   subsystem_name = "hdf"

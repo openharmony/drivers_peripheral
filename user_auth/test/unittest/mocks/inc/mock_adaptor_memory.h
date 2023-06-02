@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,25 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef IAM_USER_AUTH_ATTRIBUTE_TEST_H
-#define IAM_USER_AUTH_ATTRIBUTE_TEST_H
+#ifndef IAM_MOCK_ADAPTOR_MEMORY_H
+#define IAM_MOCK_ADAPTOR_MEMORY_H
 
-#include <gtest/gtest.h>
+#include "c_mocker.h"
+
+#include "adaptor_memory.h"
 
 namespace OHOS {
 namespace UserIam {
 namespace UserAuth {
-class AttributeTest : public testing::Test {
+class MockMemMgr final : public CMocker<MockMemMgr> {
 public:
-    static void SetUpTestCase();
+    static void *MallocTest(const size_t size);
+    static void FreeTest(void *ptr);
 
-    static void TearDownTestCase();
-
-    void SetUp() override;
-
-    void TearDown() override;
+    DECLARE_METHOD(void *, Malloc, (const size_t size));
+    DECLARE_METHOD(void, Free, (void *ptr));
 };
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS
-#endif // IAM_USER_AUTH_ATTRIBUTE_TEST_H
+
+#endif // IAM_MOCK_ADAPTOR_MEMORY_H
