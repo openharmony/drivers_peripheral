@@ -17,6 +17,7 @@ import("//build/test.gni")
 group("driver_userauth_unittest") {
   testonly = true
   deps = [
+    "attribute_test:UserAuthAttributeTest",
     "base_test:UserAuthBaseTest",
     "co_auth:UserAuthCoAuthTest",
     "database:UserAuthDatabaseTest",

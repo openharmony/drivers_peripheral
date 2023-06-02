@@ -41,6 +41,7 @@ ohos_shared_library("libuser_auth_interface_service_1.1") {
     "coauth/src/pool.c",
     "common/src/attribute.c",
     "common/src/buffer.c",
+    "common/src/c_array.c",
     "common/src/linked_list.c",
     "database/src/idm_common.c",
     "database/src/idm_database.c",

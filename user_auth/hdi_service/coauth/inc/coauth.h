@@ -16,6 +16,7 @@
 #ifndef USERIAM_COAUTH_H
 #define USERIAM_COAUTH_H
 
+#include "c_array.h"
 #include "defines.h"
 #include "pool.h"
 
