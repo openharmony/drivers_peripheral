@@ -187,6 +187,18 @@ enum OmxIndexCodecExType {
     OMX_IndexColorAspects,
 };
 
+/**
+ * @brief Enumerates the Other extended codec indexes.
+ */
+enum OmxIndexCodecOtherExtType {
+    /** Extended Config AutoFramerate Conversion */
+    OMX_IndexCodecExtConfigAutoFramerateConversion = OMX_IndexOtherStartUnused + 0x1,
+    /** Extended Config Priority */
+    OMX_IndexCodecExtConfigPriority,
+    /** Extended Config OperatingRate index */
+    OMX_IndexCodecExtConfigOperatingRate,
+};
+
 enum OmxIndexCodecVendorExtType {
     /** Extended Channel Attributes index */
     OMX_IndexCodecExtChannelAttributes = OMX_IndexVendorStartUnused + 0x1,
