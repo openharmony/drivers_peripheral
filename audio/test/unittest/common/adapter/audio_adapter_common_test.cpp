@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "osal_mem.h"
+#include "i_audio_types.h"
 #include "v1_0/iaudio_adapter.h"
 #include "v1_0/iaudio_manager.h"
 
@@ -209,7 +210,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull001, TestSize.Le
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull002, TestSize.Level1)
 {
-    uint32_t renderId = 9;
+    uint32_t renderId = AUDIO_HW_STREAM_NUM_MAX - 1;
+    int32_t ret = adapter_->DestroyRender(adapter_, renderId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderInvalid001, TestSize.Level1)
+{
+    uint32_t renderId = AUDIO_HW_STREAM_NUM_MAX;
     int32_t ret = adapter_->DestroyRender(adapter_, renderId);
     ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
@@ -258,6 +266,13 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureIsvalid001, TestSize
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyCapture(nullptr, captureId_));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureInvalid001, TestSize.Level1)
+{
+    uint32_t captureId = AUDIO_HW_STREAM_NUM_MAX;
+    int32_t ret = adapter_->DestroyCapture(adapter_, captureId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityNull001, TestSize.Level1)
