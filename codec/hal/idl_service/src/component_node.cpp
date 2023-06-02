@@ -364,8 +364,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         codecBuffer = nullptr;
         return err;
     }
-    // for test
-    buffer.fenceFd = 0;
+
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
