@@ -106,6 +106,7 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
+    CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_HW_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
     *render = FindRenderCreated(desc->pins, attrs, renderId);
     if (*render != NULL) {
@@ -141,6 +142,7 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
 int32_t AudioHwiDestroyRender(struct IAudioAdapter *adapter, uint32_t renderId)
 {
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
+    CHECK_VALID_RANGE_RETURN(renderId, 0, AUDIO_HW_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
     if (DecreaseRenderUsrCount(renderId) > 0) {
         AUDIO_FUNC_LOGE("render destroy: more than one usr");
         return HDF_SUCCESS;
@@ -174,6 +176,7 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(captureId, HDF_ERR_INVALID_PARAM);
+    CHECK_VALID_RANGE_RETURN(*captureId, 0, AUDIO_HW_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
     *capture = FindCaptureCreated(desc->pins, attrs, captureId);
     if (*capture != NULL) {
@@ -213,6 +216,7 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
 int32_t AudioHwiDestroyCapture(struct IAudioAdapter *adapter, uint32_t captureId)
 {
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
+    CHECK_VALID_RANGE_RETURN(captureId, 0, AUDIO_HW_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
     if (DecreaseCaptureUsrCount(captureId) > 0) {
         AUDIO_FUNC_LOGE("capture destroy: more than one usr");
         return HDF_SUCCESS;
