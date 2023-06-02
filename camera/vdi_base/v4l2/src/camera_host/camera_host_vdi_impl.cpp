@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,42 +13,30 @@
  * limitations under the License.
  */
 
-#include "camera_host_impl.h"
 #include <algorithm>
+#include "camera_host_vdi_impl.h"
 #include "idevice_manager.h"
 #include "camera_host_config.h"
 #include "metadata_utils.h"
 
 #include "v1_0/icamera_host_callback.h"
-#include "v1_0/icamera_device.h"
 #include "camera_dump.h"
 #include "hdf_trace.h"
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
-extern "C" ICameraHost *CameraHostImplGetInstance(void)
-{
-    using OHOS::Camera::CameraHostImpl;
-    CameraHostImpl *service = new (std::nothrow) CameraHostImpl();
-    if (service == nullptr) {
-        return nullptr;
-    }
 
-    service->Init();
-    return service;
-}
-
-CameraHostImpl::CameraHostImpl()
+CameraHostVdiImpl::CameraHostVdiImpl()
 {
     CAMERA_LOGD("ctor, instance");
 }
 
-CameraHostImpl::~CameraHostImpl()
+CameraHostVdiImpl::~CameraHostVdiImpl()
 {
     CAMERA_LOGD("dtor, instance");
 }
 
-CamRetCode CameraHostImpl::Init()
+CamRetCode CameraHostVdiImpl::Init()
 {
     std::shared_ptr<IDeviceManager> deviceManager =
         IDeviceManager::GetInstance();
@@ -80,8 +68,8 @@ CamRetCode CameraHostImpl::Init()
         if (rc != RC_OK) {
             continue;
         }
-        std::shared_ptr<CameraDeviceImpl> cameraDevice =
-            CameraDeviceImpl::CreateCameraDevice(cameraId);
+        std::shared_ptr<CameraDeviceVdiImpl> cameraDevice =
+            CameraDeviceVdiImpl::CreateCameraDevice(cameraId);
         if (cameraDevice != nullptr) {
             cameraDeviceMap_.insert(std::make_pair(cameraId, cameraDevice));
         } else {
@@ -99,7 +87,7 @@ CamRetCode CameraHostImpl::Init()
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
+int32_t CameraHostVdiImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
@@ -115,7 +103,7 @@ int32_t CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callb
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
+int32_t CameraHostVdiImpl::GetCameraIds(std::vector<std::string> &cameraIds)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
@@ -133,8 +121,8 @@ int32_t CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostImpl::GetCameraAbility(const std::string &cameraId,
-    std::vector<uint8_t>& cameraAbility)
+int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
+    std::vector<uint8_t> &cameraAbility)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
@@ -147,15 +135,15 @@ int32_t CameraHostImpl::GetCameraAbility(const std::string &cameraId,
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
-    CameraDumper& dumper = CameraDumper::GetInstance();
+    CameraDumper &dumper = CameraDumper::GetInstance();
     dumper.DumpMetadata(ability, "cameraAbility");
     MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     DFX_LOCAL_HITRACE_END;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostImpl::OpenCamera(const std::string& cameraId, const sptr<ICameraDeviceCallback>& callbackObj,
-    sptr<ICameraDevice>& device)
+int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<ICameraDeviceVdi> &device)
 {
     CAMERA_LOGD("OpenCamera entry");
     DFX_LOCAL_HITRACE_BEGIN;
@@ -172,7 +160,7 @@ int32_t CameraHostImpl::OpenCamera(const std::string& cameraId, const sptr<ICame
     }
     CAMERA_LOGD("OpenCamera cameraId find success.");
 
-    std::shared_ptr<CameraDeviceImpl> cameraDevice = itr->second;
+    std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = itr->second;
     if (cameraDevice == nullptr) {
         CAMERA_LOGE("camera device is null.");
         return INSUFFICIENT_RESOURCES;
@@ -211,7 +199,7 @@ int32_t CameraHostImpl::OpenCamera(const std::string& cameraId, const sptr<ICame
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-RetCode CameraHostImpl::CameraIdInvalid(const std::string &cameraId)
+RetCode CameraHostVdiImpl::CameraIdInvalid(const std::string &cameraId)
 {
     if (cameraId.empty()) {
         return RC_ERROR;
@@ -235,7 +223,7 @@ RetCode CameraHostImpl::CameraIdInvalid(const std::string &cameraId)
     return RC_OK;
 }
 
-RetCode CameraHostImpl::CameraPowerUp(const std::string &cameraId,
+RetCode CameraHostVdiImpl::CameraPowerUp(const std::string &cameraId,
     const std::vector<std::string> &phyCameraIds)
 {
     FlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
@@ -270,7 +258,7 @@ RetCode CameraHostImpl::CameraPowerUp(const std::string &cameraId,
     return RC_OK;
 }
 
-void CameraHostImpl::CameraPowerDown(const std::vector<std::string> &phyCameraIds)
+void CameraHostVdiImpl::CameraPowerDown(const std::vector<std::string> &phyCameraIds)
 {
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     if (deviceManager == nullptr) {
@@ -295,7 +283,7 @@ void CameraHostImpl::CameraPowerDown(const std::vector<std::string> &phyCameraId
     }
 }
 
-int32_t CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool isEnable)
+int32_t CameraHostVdiImpl::SetFlashlight(const std::string &cameraId,  bool isEnable)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
@@ -305,7 +293,7 @@ int32_t CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool isEnabl
     }
 
     for (auto &itr : cameraDeviceMap_) {
-        std::shared_ptr<CameraDeviceImpl> cameraDevice = itr.second;
+        std::shared_ptr<CameraDeviceVdiImpl> cameraDevice = itr.second;
         if (cameraDevice->IsOpened()) {
             CAMERA_LOGE("camera id opend [cameraId = %{public}s].", itr.first.c_str());
             return METHOD_NOT_SUPPORTED;
@@ -336,7 +324,7 @@ int32_t CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool isEnabl
     DFX_LOCAL_HITRACE_END;
 }
 
-RetCode CameraHostImpl::SetFlashlight(const std::vector<std::string> &phyCameraIds,
+RetCode CameraHostVdiImpl::SetFlashlight(const std::vector<std::string> &phyCameraIds,
     bool isEnable, FlashlightStatus &flashlightStatus)
 {
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
@@ -358,7 +346,7 @@ RetCode CameraHostImpl::SetFlashlight(const std::vector<std::string> &phyCameraI
     return rc;
 }
 
-void CameraHostImpl::OnCameraStatus(CameraId cameraId,
+void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
     CameraStatus status, const std::shared_ptr<CameraAbility> ability)
 {
     CameraHostConfig *config = CameraHostConfig::GetInstance();
@@ -389,8 +377,8 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
         }
-        std::shared_ptr<CameraDeviceImpl> cameraDevice =
-            CameraDeviceImpl::CreateCameraDevice(logicalCameraId);
+        std::shared_ptr<CameraDeviceVdiImpl> cameraDevice =
+            CameraDeviceVdiImpl::CreateCameraDevice(logicalCameraId);
         if (cameraDevice != nullptr) {
             cameraDeviceMap_[logicalCameraId] = cameraDevice;
         }
@@ -406,4 +394,42 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
         }
     }
 }
+
+static int CreateCameraHostVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    using OHOS::Camera::CameraHostVdiImpl;
+    struct VdiWrapperCameraHost *vdiWrapperCameraHost = reinterpret_cast<struct VdiWrapperCameraHost *>(vdiBase);
+    CameraHostVdiImpl *cameraHostVdiImpl = new (std::nothrow) CameraHostVdiImpl();
+    if (cameraHostVdiImpl == nullptr) {
+        CAMERA_LOGE("Create camera host vdi instance error, cameraHostVdiImpl is nullptr");
+        return HDI::Camera::V1_0::NO_ERROR;
+    }
+    cameraHostVdiImpl->Init();
+    vdiWrapperCameraHost->module = cameraHostVdiImpl;
+
+    return HDF_SUCCESS;
+}
+
+static int DestoryCameraHostVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    using OHOS::Camera::CameraHostVdiImpl;
+    struct VdiWrapperCameraHost *vdiWrapperCameraHost = reinterpret_cast<struct VdiWrapperCameraHost *>(vdiBase);
+    CameraHostVdiImpl *cameraHostVdiImpl = reinterpret_cast<CameraHostVdiImpl *>(vdiWrapperCameraHost->module);
+    delete cameraHostVdiImpl;
+    vdiWrapperCameraHost->module = nullptr;
+    return HDF_SUCCESS;
+}
+
+static struct VdiWrapperCameraHost g_vdiCameraHost = {
+    .base = {
+        .moduleVersion = 1,
+        .moduleName = "CameraHostVdiImplement",
+        .CreateVdiInstance = CreateCameraHostVdiInstance,
+        .DestoryVdiInstance = DestoryCameraHostVdiInstance,
+    },
+    .module = nullptr,
+};
+
 } // end namespace OHOS::Camera
+
+HDF_VDI_INIT(OHOS::Camera::g_vdiCameraHost);

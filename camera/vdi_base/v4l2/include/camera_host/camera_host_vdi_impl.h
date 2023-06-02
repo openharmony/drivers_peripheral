@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,36 +13,36 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_HOST_CAMERA_HOST_IMPL_H
-#define CAMERA_HOST_CAMERA_HOST_IMPL_H
+#ifndef CAMERA_HOST_CAMERA_HOST_VDI_IMPL_H
+#define CAMERA_HOST_CAMERA_HOST_VDI_IMPL_H
 
 #include <map>
-#include "v1_0/icamera_device.h"
-#include "v1_0/icamera_host.h"
+#include "v1_0/icamera_host_vdi.h"
+#include "v1_0/icamera_device_vdi.h"
+#include "camera_device_vdi_impl.h"
 #include "utils.h"
-#include "camera_device_impl.h"
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::VDI::Camera::V1_0;
 
-class CameraHostImpl : public ICameraHost {
+class CameraHostVdiImpl : public ICameraHostVdi {
 public:
     CamRetCode Init();
-    int32_t SetCallback(const sptr<ICameraHostCallback>& callbackObj) override;
+    int32_t SetCallback(const sptr<ICameraHostCallback> &callbackObj) override;
     int32_t GetCameraIds(std::vector<std::string> &cameraIds) override;
     int32_t GetCameraAbility(const std::string &cameraId,
-        std::vector<uint8_t>& cameraAbility) override;
-    int32_t OpenCamera(const std::string& cameraId, const sptr<ICameraDeviceCallback>& callbackObj,
-        sptr<ICameraDevice>& device) override;
+        std::vector<uint8_t> &cameraAbility) override;
+    int32_t OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+        sptr<ICameraDeviceVdi> &device) override;
     int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
 
 public:
-    CameraHostImpl();
-    virtual ~CameraHostImpl();
-    CameraHostImpl(const CameraHostImpl &other) = delete;
-    CameraHostImpl(CameraHostImpl &&other) = delete;
-    CameraHostImpl& operator=(const CameraHostImpl &other) = delete;
-    CameraHostImpl& operator=(CameraHostImpl &&other) = delete;
+    CameraHostVdiImpl();
+    virtual ~CameraHostVdiImpl();
+    CameraHostVdiImpl(const CameraHostVdiImpl &other) = delete;
+    CameraHostVdiImpl(CameraHostVdiImpl &&other) = delete;
+    CameraHostVdiImpl &operator=(const CameraHostVdiImpl &other) = delete;
+    CameraHostVdiImpl &operator=(CameraHostVdiImpl &&other) = delete;
 
 private:
     RetCode CameraPowerUp(const std::string &cameraId,
@@ -55,11 +55,11 @@ private:
 
 private:
     // key: cameraId, value: CameraDevice
-    using CameraDeviceMap = std::map<std::string, std::shared_ptr<CameraDeviceImpl>>;
+    using CameraDeviceMap = std::map<std::string, std::shared_ptr<CameraDeviceVdiImpl>>;
     CameraDeviceMap cameraDeviceMap_;
     OHOS::sptr<ICameraHostCallback> cameraHostCallback_;
-    // to keep remote object OHOS::sptr<ICameraDevice> alive
-    std::map<std::string, OHOS::sptr<ICameraDevice>> deviceBackup_ = {};
+    // to keep remote object OHOS::sptr<ICameraDeviceVdi> alive
+    std::map<std::string, OHOS::sptr<ICameraDeviceVdi>> deviceBackup_ = {};
 };
 } // end namespace OHOS::Camera
-#endif // CAMERA_HOST_CAMERA_HOST_IMPL_H
+#endif // CAMERA_HOST_CAMERA_HOST_VDI_IMPL_H

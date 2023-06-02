@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,36 +13,36 @@
  * limitations under the License.
  */
 
-#include "watchdog.h"
-#include "stream_operator.h"
-#include "buffer_adapter.h"
-#include "camera_device_impl.h"
-#include "camera_host_config.h"
-#include "metadata_utils.h"
 #include <algorithm>
 #include <iterator>
+#include "watchdog.h"
+#include "stream_operator_vdi_impl.h"
+#include "buffer_adapter.h"
+#include "camera_device_vdi_impl.h"
+#include "camera_host_config.h"
+#include "metadata_utils.h"
 #include "camera_dump.h"
 #include "hdf_trace.h"
 
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
-StreamOperator::StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
-                               const std::weak_ptr<ICameraDevice>& device)
+StreamOperatorVdiImpl::StreamOperatorVdiImpl(const OHOS::sptr<IStreamOperatorCallback> &callback,
+    const std::weak_ptr<ICameraDeviceVdi> &device)
 {
     CAMERA_LOGV("enter");
     callback_ = callback;
     device_ = device;
 }
 
-StreamOperator::~StreamOperator()
+StreamOperatorVdiImpl::~StreamOperatorVdiImpl()
 {
     CAMERA_LOGV("enter");
 }
 
-RetCode StreamOperator::Init()
+RetCode StreamOperatorVdiImpl::Init()
 {
-    auto dev = std::static_pointer_cast<CameraDeviceImpl>(device_.lock());
+    auto dev = std::static_pointer_cast<CameraDeviceVdiImpl>(device_.lock());
     CHECK_IF_PTR_NULL_RETURN_VALUE(dev, RC_ERROR);
     pipelineCore_ = dev->GetPipelineCore();
     if (pipelineCore_ == nullptr) {
@@ -50,7 +50,7 @@ RetCode StreamOperator::Init()
         return RC_ERROR;
     }
 
-    requestTimeoutCB_ = std::bind(&CameraDeviceImpl::OnRequestTimeout, dev);
+    requestTimeoutCB_ = std::bind(&CameraDeviceVdiImpl::OnRequestTimeout, dev);
     streamPipeline_ = pipelineCore_->GetStreamPipelineCore();
     if (streamPipeline_ == nullptr) {
         CAMERA_LOGE("get stream pipeline core failed.");
@@ -63,7 +63,7 @@ RetCode StreamOperator::Init()
         return RC_ERROR;
     }
 
-    auto cb = [this](MessageGroup& m) { HandleCallbackMessage(m); };
+    auto cb = [this](MessageGroup &m) { HandleCallbackMessage(m); };
     messenger_ = std::make_shared<CaptureMessageOperator>(cb);
     CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     messenger_->StartProcess();
@@ -71,14 +71,13 @@ RetCode StreamOperator::Init()
     return RC_OK;
 }
 
-void StreamOperator::GetStreamSupportType(std::set<int32_t> inputIDSet,
-                                          DynamicStreamSwitchMode method,
-                                          StreamSupportType& type)
+void StreamOperatorVdiImpl::GetStreamSupportType(std::set<int32_t> inputIDSet,
+    DynamicStreamSwitchMode method, StreamSupportType &type)
 {
     std::set<int32_t> currentIDSet = {};
     {
         std::lock_guard<std::mutex> l(streamLock_);
-        for (auto& it : streamMap_) {
+        for (auto &it : streamMap_) {
             currentIDSet.emplace(it.first);
         }
     }
@@ -123,8 +122,8 @@ void StreamOperator::GetStreamSupportType(std::set<int32_t> inputIDSet,
     return;
 }
 
-int32_t StreamOperator::IsStreamsSupported(OperationMode mode, const std::vector<uint8_t>& modeSetting,
-                                           const std::vector<StreamInfo>& infos, StreamSupportType& type)
+int32_t StreamOperatorVdiImpl::IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
+    const std::vector<StreamInfo> &infos, StreamSupportType &type)
 {
     HDF_CAMERA_TRACE;
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DEVICE_ERROR);
@@ -182,14 +181,14 @@ int32_t StreamOperator::IsStreamsSupported(OperationMode mode, const std::vector
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(
+DynamicStreamSwitchMode StreamOperatorVdiImpl::CheckStreamsSupported(
     OperationMode mode,
-    const std::shared_ptr<CameraMetadata>& modeSetting,
-    const std::vector<StreamInfo>& infos)
+    const std::shared_ptr<CameraMetadata> &modeSetting,
+    const std::vector<StreamInfo> &infos)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
     std::vector<StreamConfiguration> configs = {};
-    for (auto& it : infos) {
+    for (auto &it : infos) {
         StreamConfiguration config = {};
         config.type = it.intent_;
         config.width = it.width_;
@@ -206,7 +205,7 @@ DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(
     return streamPipeline_->CheckStreamsSupported(mode, modeSetting, configs);
 }
 
-void StreamOperator::StreamInfoToStreamConfiguration(StreamConfiguration &scg, const StreamInfo info)
+void StreamOperatorVdiImpl::StreamInfoToStreamConfiguration(StreamConfiguration &scg, const StreamInfo info)
 {
     scg.id = info.streamId_;
     scg.type = info.intent_;
@@ -220,12 +219,12 @@ void StreamOperator::StreamInfoToStreamConfiguration(StreamConfiguration &scg, c
     scg.encodeType = info.encodeType_;
 }
 
-int32_t StreamOperator::CreateStreams(const std::vector<StreamInfo>& streamInfos)
+int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<StreamInfo> &streamInfos)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
-    for (const auto& it : streamInfos) {
+    for (const auto &it : streamInfos) {
         CHECK_IF_NOT_EQUAL_RETURN_VALUE(CheckStreamInfo(it), true, INVALID_ARGUMENT);
         CAMERA_LOGI("streamId:%{public}d and format:%{public}d and width:%{public}d and height:%{public}d",
             it.streamId_, it.format_, it.width_, it.height_);
@@ -271,7 +270,7 @@ int32_t StreamOperator::CreateStreams(const std::vector<StreamInfo>& streamInfos
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
+int32_t StreamOperatorVdiImpl::ReleaseStreams(const std::vector<int32_t> &streamIds)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -298,7 +297,7 @@ int32_t StreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
 }
 
 
-RetCode StreamOperator::ReleaseStreams()
+RetCode StreamOperatorVdiImpl::ReleaseStreams()
 {
     std::vector<int32_t> ids = {};
     for (auto it : streamMap_) {
@@ -308,7 +307,7 @@ RetCode StreamOperator::ReleaseStreams()
     return RC_OK;
 }
 
-int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint8_t>& modeSetting)
+int32_t StreamOperatorVdiImpl::CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting)
 {
     HDF_CAMERA_TRACE;
     CAMERA_LOGV("enter");
@@ -353,7 +352,7 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
         CAMERA_LOGE("prepare mode settings failed");
         return DEVICE_ERROR;
     }
-    auto dev = std::static_pointer_cast<CameraDeviceImpl>(device_.lock());
+    auto dev = std::static_pointer_cast<CameraDeviceVdiImpl>(device_.lock());
     CHECK_IF_PTR_NULL_RETURN_VALUE(dev, RC_ERROR);
     std::string cameraId;
     dev->GetCameraId(cameraId);
@@ -372,7 +371,7 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::GetStreamAttributes(std::vector<StreamAttribute>& attributes)
+int32_t StreamOperatorVdiImpl::GetStreamAttributes(std::vector<StreamAttribute> &attributes)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -397,7 +396,8 @@ int32_t StreamOperator::GetStreamAttributes(std::vector<StreamAttribute>& attrib
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::AttachBufferQueue(int32_t streamId, const sptr<BufferProducerSequenceable>& bufferProducer)
+int32_t StreamOperatorVdiImpl::AttachBufferQueue(int32_t streamId,
+    const sptr<BufferProducerSequenceable> &bufferProducer)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(streamId < 0, true, INVALID_ARGUMENT);
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferProducer, INVALID_ARGUMENT);
@@ -433,7 +433,7 @@ int32_t StreamOperator::AttachBufferQueue(int32_t streamId, const sptr<BufferPro
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::DetachBufferQueue(int32_t streamId)
+int32_t StreamOperatorVdiImpl::DetachBufferQueue(int32_t streamId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(streamId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
@@ -465,7 +465,7 @@ int32_t StreamOperator::DetachBufferQueue(int32_t streamId)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool isStreaming)
+int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
@@ -490,7 +490,7 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
-    CameraDumper& dumper = CameraDumper::GetInstance();
+    CameraDumper &dumper = CameraDumper::GetInstance();
     dumper.DumpMetadata(captureSetting, "capturesetting");
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
@@ -509,7 +509,7 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::CancelCapture(int32_t captureId)
+int32_t StreamOperatorVdiImpl::CancelCapture(int32_t captureId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
@@ -533,8 +533,8 @@ int32_t StreamOperator::CancelCapture(int32_t captureId)
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t StreamOperator::ChangeToOfflineStream(const std::vector<int32_t>& streamIds,
-    const sptr<IStreamOperatorCallback>& callbackObj, sptr<IOfflineStreamOperator>& offlineOperator)
+int32_t StreamOperatorVdiImpl::ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
+    const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperatorVdi> &offlineOperator)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -545,9 +545,9 @@ int32_t StreamOperator::ChangeToOfflineStream(const std::vector<int32_t>& stream
     CHECK_IF_EQUAL_RETURN_VALUE(streamIds.empty(), true, INVALID_ARGUMENT);
 
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-    oflstor_ = std::make_shared<OfflineStreamOperator>();
+    oflstor_ = std::make_shared<OfflineStreamOperatorVdiImpl>();
 #else
-    oflstor_ = new (std::nothrow) OfflineStreamOperator();
+    oflstor_ = new (std::nothrow) OfflineStreamOperatorVdiImpl();
 #endif
     CHECK_IF_PTR_NULL_RETURN_VALUE(oflstor_, INSUFFICIENT_RESOURCES);
 
@@ -585,7 +585,7 @@ int32_t StreamOperator::ChangeToOfflineStream(const std::vector<int32_t>& stream
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-bool StreamOperator::CheckStreamInfo(const StreamInfo streamInfo)
+bool StreamOperatorVdiImpl::CheckStreamInfo(const StreamInfo streamInfo)
 {
     if (streamInfo.streamId_ < 0 || streamInfo.width_ < 0 || streamInfo.height_ < 0 || streamInfo.format_ < 0 ||
         streamInfo.dataspace_ < 0 || streamInfo.intent_ > CUSTOM || streamInfo.intent_ < PREVIEW ||
@@ -595,7 +595,7 @@ bool StreamOperator::CheckStreamInfo(const StreamInfo streamInfo)
     return true;
 }
 
-void StreamOperator::HandleCallbackMessage(MessageGroup& message)
+void StreamOperatorVdiImpl::HandleCallbackMessage(MessageGroup &message)
 {
     if (message.empty()) {
         return;
@@ -655,13 +655,13 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
     return;
 }
 
-void StreamOperator::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
+void StreamOperatorVdiImpl::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureStarted(captureId, streamIds);
 }
 
-void StreamOperator::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
+void StreamOperatorVdiImpl::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureEnded(captureId, infos);
@@ -674,13 +674,14 @@ void StreamOperator::OnCaptureEnded(int32_t captureId, const std::vector<Capture
     requestMap_.erase(itr);
 }
 
-void StreamOperator::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
+void StreamOperatorVdiImpl::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureError(captureId, infos);
 }
 
-void StreamOperator::OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp)
+void StreamOperatorVdiImpl::OnFrameShutter(int32_t captureId,
+    const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnFrameShutter(captureId, streamIds, timestamp);

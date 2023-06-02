@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,42 +13,43 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_DEVICE_CAMERA_DEVICE_IMPL_H
-#define CAMERA_DEVICE_CAMERA_DEVICE_IMPL_H
+#ifndef CAMERA_DEVICE_CAMERA_DEVICE_VDI_IMPL_H
+#define CAMERA_DEVICE_CAMERA_DEVICE_VDI_IMPL_H
 
-#include "v1_0/icamera_device.h"
+#include <mutex>
+#include "v1_0/icamera_device_vdi.h"
 #include "v1_0/icamera_device_callback.h"
 #include "camera.h"
 #include "camera_metadata_info.h"
-#include "stream_operator.h"
-#include <mutex>
+#include "stream_operator_vdi_impl.h"
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::VDI::Camera::V1_0;
 class IPipelineCore;
-class CameraDeviceImpl : public ICameraDevice, public std::enable_shared_from_this<CameraDeviceImpl> {
+
+class CameraDeviceVdiImpl : public ICameraDeviceVdi, public std::enable_shared_from_this<CameraDeviceVdiImpl> {
 public:
-    CameraDeviceImpl(const std::string &cameraId,
+    CameraDeviceVdiImpl(const std::string &cameraId,
         const std::shared_ptr<IPipelineCore> &pipelineCore);
-    CameraDeviceImpl() = default;
-    virtual ~CameraDeviceImpl() = default;
-    CameraDeviceImpl(const CameraDeviceImpl& other) = delete;
-    CameraDeviceImpl(CameraDeviceImpl &&other) = delete;
-    CameraDeviceImpl& operator=(const CameraDeviceImpl &other) = delete;
-    CameraDeviceImpl& operator=(CameraDeviceImpl &&other) = delete;
+    CameraDeviceVdiImpl() = default;
+    virtual ~CameraDeviceVdiImpl() = default;
+    CameraDeviceVdiImpl(const CameraDeviceVdiImpl &other) = delete;
+    CameraDeviceVdiImpl(CameraDeviceVdiImpl &&other) = delete;
+    CameraDeviceVdiImpl &operator=(const CameraDeviceVdiImpl &other) = delete;
+    CameraDeviceVdiImpl &operator=(CameraDeviceVdiImpl &&other) = delete;
 
 public:
-    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
-        sptr<IStreamOperator>& streamOperator) override;
-    int32_t UpdateSettings(const std::vector<uint8_t>& settings) override;
+    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+        sptr<IStreamOperatorVdi> &streamOperator) override;
+    int32_t UpdateSettings(const std::vector<uint8_t> &settings) override;
     int32_t GetSettings(std::vector<uint8_t> &settings);
     int32_t SetResultMode(ResultCallbackMode mode) override;
-    int32_t GetEnabledResults(std::vector<int32_t>& results) override;
-    int32_t EnableResult(const std::vector<int32_t>& results) override;
-    int32_t DisableResult(const std::vector<int32_t>& results) override;
+    int32_t GetEnabledResults(std::vector<int32_t> &results) override;
+    int32_t EnableResult(const std::vector<int32_t> &results) override;
+    int32_t DisableResult(const std::vector<int32_t> &results) override;
     int32_t Close() override;
 
-    static std::shared_ptr<CameraDeviceImpl> CreateCameraDevice(const std::string &cameraId);
+    static std::shared_ptr<CameraDeviceVdiImpl> CreateCameraDevice(const std::string &cameraId);
     std::shared_ptr<IPipelineCore> GetPipelineCore() const;
     CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback);
     ResultCallbackMode GetMetaResultMode() const;
@@ -68,15 +69,15 @@ private:
     std::string cameraId_;
     std::shared_ptr<IPipelineCore> pipelineCore_;
     OHOS::sptr<ICameraDeviceCallback> cameraDeciceCallback_;
-    OHOS::sptr<StreamOperator> spStreamOperator_;
+    OHOS::sptr<StreamOperatorVdiImpl> spStreamOperator_;
     ResultCallbackMode metaResultMode_;
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;
     std::vector<MetaType> enabledResults_;
     std::shared_ptr<CameraMetadata> metadataResults_;
 
-    // to keep OHOS::sptr<IStreamOperator> alive
-    OHOS::sptr<IStreamOperator> ismOperator_ = nullptr;
+    // to keep OHOS::sptr<IStreamOperatorVdi> alive
+    OHOS::sptr<IStreamOperatorVdi> ismOperator_ = nullptr;
 };
 } // end namespace OHOS::Camera
-#endif // CAMERA_DEVICE_CAMERA_DEVICE_IMPL_H
+#endif // CAMERA_DEVICE_CAMERA_DEVICE_VDI_IMPL_H

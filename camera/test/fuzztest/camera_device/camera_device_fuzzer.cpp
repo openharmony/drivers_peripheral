@@ -14,7 +14,7 @@
  */
 
 #include "common.h"
-#include "camera_device_impl.h"
+#include "camera_device_vdi_impl.h"
 
 namespace OHOS {
 bool CameraDeviceFuzzTest(const uint8_t *rawData, size_t size)
@@ -34,7 +34,7 @@ bool CameraDeviceFuzzTest(const uint8_t *rawData, size_t size)
     MessageParcel reply;
     MessageOption option;
 
-    sptr<ICameraDevice> cameraDevice = new OHOS::Camera::CameraDeviceImpl();
+    sptr<ICameraDevice> cameraDevice = new OHOS::Camera::CameraDeviceVdiImpl();
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDevice, false);
     sptr<CameraDeviceStub> IpcDevice = new CameraDeviceStub(cameraDevice);
     CHECK_IF_PTR_NULL_RETURN_VALUE(IpcDevice, false);

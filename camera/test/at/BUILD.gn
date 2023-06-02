@@ -42,13 +42,7 @@ if (defined(ohos_lite)) {
       "$camera_path/../../interfaces/hdi_passthrough",
       "$camera_path/../../test/common/callback/include",
       "$camera_path/include",
-      "$camera_path/../v4l2",
-      "$camera_path/../v4l2/test",
-      "$camera_path/../v4l2/include",
-      "$camera_path/../v4l2/include/camera_host",
-      "$camera_path/../v4l2/include/camera_device",
-      "$camera_path/../v4l2/include/stream_operator",
-      "$camera_path/../v4l2/include/offline_stream_operator",
+      "$camera_path/../../hdi_service/v1_0/include",
       "$camera_path/../v4l2/src/stream_operator/stream_tunnel/lite",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
@@ -74,7 +68,7 @@ if (defined(ohos_lite)) {
     ]
 
     public_deps = [
-      "$camera_path/../v4l2:camera_host_service_1.0",
+      "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",

@@ -29,20 +29,20 @@ class OfflineStream {
 public:
     OfflineStream() = default;
     virtual ~OfflineStream();
-    OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorCallback>& callback);
+    OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorCallback> &callback);
 
-    RetCode Init(std::shared_ptr<OfflineStreamContext>& context);
+    RetCode Init(std::shared_ptr<OfflineStreamContext> &context);
     RetCode CancelCapture(int32_t captureId);
     RetCode Release();
     bool CheckCaptureIdExist(int32_t captureId);
-    void ReceiveOfflineBuffer(std::shared_ptr<IBuffer>& buffer);
+    void ReceiveOfflineBuffer(std::shared_ptr<IBuffer> &buffer);
     int32_t GetStreamId() const;
 
 private:
-    RetCode ReturnBuffer(std::shared_ptr<IBuffer>& buffer);
+    RetCode ReturnBuffer(std::shared_ptr<IBuffer> &buffer);
     void HandleMessage(MessageGroup& message);
-    void OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos);
-    void OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos);
+    void OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos);
+    void OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos);
 
 private:
     int32_t streamId_ = -1;
