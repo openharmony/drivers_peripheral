@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libse_interface_service_1.0") {
+ohos_shared_library("libsecure_element_interface_service_1.0") {
   include_dirs = [ "../vendor_adaptor" ]
   sources = [ "se_impl.cpp" ]
   public_deps = [ "../vendor_adaptor:se_vendor_adaptor" ]
@@ -61,7 +61,7 @@ ohos_shared_library("se_hdi_driver") {
 
 group("hdi_se_service") {
   deps = [
-    ":libse_interface_service_1.0",
+    ":libsecure_element_interface_service_1.0",
     ":se_hdi_driver",
   ]
 }
