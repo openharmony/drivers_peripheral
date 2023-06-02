@@ -23,9 +23,8 @@
 namespace OHOS {
 namespace HDI {
 namespace SecureElement {
-static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
 
-extern "C" ISecureElementInterface* SeImplGetInstance(void)
+extern "C" ISecureElementInterface *SecureElementInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::SecureElement::SeImpl;
     SeImpl* service = new (std::nothrow) SeImpl();
@@ -37,52 +36,46 @@ extern "C" ISecureElementInterface* SeImplGetInstance(void)
 
 int32_t SeImpl::init(const sptr<ISecureElementCallback>& clientCallback, SecureElementStatus& status)
 {
-    if (clientCallback == nullptr) {
-        HDF_LOGE("%{public}s: clientCallback is nullptr!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    g_callbackV1_0 = clientCallback;
-    return HDF_SUCCESS;
+    return adaptor_.init(clientCallback, status);
 }
 
 int32_t SeImpl::getAtr(std::vector<uint8_t>& response)
 {
-    return HDF_SUCCESS;
+    return adaptor_.getAtr(response);
 }
 
 int32_t SeImpl::isSecureElementPresent(bool& present)
 {
-    return HDF_SUCCESS;
+    return adaptor_.isSecureElementPresent(present);
 }
 
 int32_t SeImpl::openLogicalChannel(const std::vector<uint8_t>& aid, uint8_t p2, std::vector<uint8_t>& response,
     uint8_t& channelNumber, SecureElementStatus& status)
 {
-    return HDF_SUCCESS;
+    return adaptor_.openLogicalChannel(aid, p2, response, channelNumber, status);
 }
 
 int32_t SeImpl::openBasicChannel(const std::vector<uint8_t>& aid, uint8_t p2, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    return HDF_SUCCESS;
+    return adaptor_.openBasicChannel(aid, p2, response, status);
 }
 
 int32_t SeImpl::closeChannel(uint8_t channelNumber, SecureElementStatus& status)
 {
-    return HDF_SUCCESS;
+    return adaptor_.closeChannel(channelNumber, status);
 }
 
 int32_t SeImpl::transmit(const std::vector<uint8_t>& command, std::vector<uint8_t>& response,
     SecureElementStatus& status)
 {
-    return HDF_SUCCESS;
+    return adaptor_.transmit(command, response, status);
 }
 
 int32_t SeImpl::reset(SecureElementStatus& status)
 {
-    return HDF_SUCCESS;
+    return adaptor_.reset(status);
 }
-
 } // SecureElement
 } // HDI
 } // OHOS

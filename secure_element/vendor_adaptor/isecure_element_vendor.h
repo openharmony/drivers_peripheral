@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef I_SECURE_ELEMENT_VENDOR_H
 #define I_SECURE_ELEMENT_VENDOR_H
 
