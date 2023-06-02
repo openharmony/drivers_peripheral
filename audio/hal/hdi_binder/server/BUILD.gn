@@ -132,42 +132,4 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
   }
-
-  ohos_shared_library("hdi_audio_pnp_server") {
-    include_dirs = [
-      "include",
-      "$hdf_hal_path/hdi_passthrough/include",
-      "$hdf_audio_path/interfaces/include",
-      "//third_party/bounds_checking_function/include",
-    ]
-
-    sources = [
-      "src/hdf_audio_input_event.c",
-      "src/hdf_audio_pnp_server.c",
-      "src/hdf_audio_pnp_uevent.c",
-      "src/hdf_audio_pnp_uevent_hdmi.c",
-    ]
-
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_host",
-        "hdf_core:libhdf_ipc_adapter",
-        "hdf_core:libhdf_utils",
-        "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
-    defines = []
-    if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HDF_LOG" ]
-    }
-
-    shlib_type = "hdi"
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
 }
