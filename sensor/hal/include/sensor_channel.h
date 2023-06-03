@@ -68,5 +68,6 @@ int32_t Unregister(int32_t groupId, RecordDataCallback cb);
 struct HdfDevEventlistener *GetSensorListener(void);
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId);
 struct SensorDatePack *GetEventData(void);
+void ConvertSensorData(struct SensorEvents *event);
 
 #endif /* HDI_SENSOR_CHANNEL_H */

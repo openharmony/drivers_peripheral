@@ -164,6 +164,21 @@ struct SensorInterface {
      * @version 1.0
      */
     int32_t (*Unregister)(int32_t groupId, RecordDataCallback cb);
+
+    /**
+     * @brief Obtain the sensor event data in the small system.
+     *
+     * @param sensorId Indicates the sensor ID. For details, see {@link SensorTypeTag}.
+     * @param event Indicates the vector of the sensor event data in the system.
+     * The sensor event data includes the sensor ID, sensor algorithm version, data generation time,
+     * data options (such as the measurement range and accuracy), data reporting mode, data address, and data length.
+     * For details, see {@link HdfSensorEvents}.
+     * @return Returns <b>0</b> if the event data is obtained; returns a negative value otherwise.
+     *
+     * @since 2.2
+     * @version 1.0
+     */
+    int32_t (*ReadData)(int32_t sensorId, struct SensorEvents *event);
 };
 
 /**

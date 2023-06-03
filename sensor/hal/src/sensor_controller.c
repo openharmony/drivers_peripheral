@@ -30,6 +30,7 @@
 #define HDF_SENSOR_INFO_MAX_SIZE (4 * 1024) // 4kB
 #define SENSOR_STATUS_ENABLE 1
 #define SENSOR_STATUS_DISENABLE 0
+#define HDF_SENSOR_EVENT_MAX_SIZE (4 * 1024) // 4kB
 
 static int32_t sensorStatusList[SENSOR_TYPE_MAX] = { 0 };
 int32_t *GetSensorStatus(void)
@@ -390,6 +391,83 @@ static int32_t SetSensorOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
+static int32_t GetSensorEvent(struct HdfSBuf *reply, struct SensorEvents *sensorEvent)
+{
+    struct SensorEvents *events = NULL;
+    uint8_t *buf = NULL;
+    uint32_t len = 0;
+    uint32_t length = 0;
+
+    if (!HdfSbufReadBuffer(reply, (const void **)&events, &len) || sensorEvent == NULL) {
+        HDF_LOGE("%{public}s: Read sensor event fail!", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len) || buf == NULL) {
+        HDF_LOGE("%{public}s: Read sensor data fail!", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    length = sensorEvent->dataLen > len ? len : sensorEvent->dataLen;
+    if (memcpy_s(sensorEvent->data, sensorEvent->dataLen, buf, length) != EOK) {
+        HDF_LOGE("%{public}s: sensor memcpy data fail!", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    sensorEvent->dataLen = length;
+    sensorEvent->sensorId = events->sensorId;
+    sensorEvent->version = events->version;
+    sensorEvent->timestamp = events->timestamp;
+    sensorEvent->option = events->option;
+    sensorEvent->mode = events->mode;
+
+    ConvertSensorData(sensorEvent);
+    return SENSOR_SUCCESS;
+}
+
+static int32_t ReadData(int32_t sensorId, struct SensorEvents *event)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(event, SENSOR_NULL_PTR);
+    CHECK_NULL_PTR_RETURN_VALUE(event->data, SENSOR_NULL_PTR);
+    struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
+    CHECK_NULL_PTR_RETURN_VALUE(msg, SENSOR_NULL_PTR);
+    struct HdfSBuf *reply = HdfSbufObtain(HDF_SENSOR_EVENT_MAX_SIZE);
+    CHECK_NULL_PTR_RETURN_VALUE(reply, SENSOR_NULL_PTR);
+
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%{public}s: Sensor write id failed", __func__);
+        goto ERROR;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_READ_DATA)) {
+        HDF_LOGE("%{public}s: Sensor write readData failed", __func__);
+        goto ERROR;
+    }
+
+    int32_t ret = SendSensorMsg(sensorId, msg, reply);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: Sensor read data failed, ret[%{public}d]", __func__, ret);
+        HdfSbufRecycle(reply);
+        HdfSbufRecycle(msg);
+        return ret;
+    }
+
+    ret = GetSensorEvent(reply, event);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s: Sensor get data from reply failed", __func__);
+        goto ERROR;
+    }
+
+    HdfSbufRecycle(reply);
+    HdfSbufRecycle(msg);
+    return HDF_SUCCESS;
+
+ERROR:
+    HdfSbufRecycle(reply);
+    HdfSbufRecycle(msg);
+    return HDF_FAILURE;
+}
+
 void GetSensorDeviceMethods(struct SensorInterface *device)
 {
     CHECK_NULL_PTR_RETURN(device);
@@ -399,6 +477,7 @@ void GetSensorDeviceMethods(struct SensorInterface *device)
     device->SetBatch = SetSensorBatch;
     device->SetMode = SetSensorMode;
     device->SetOption = SetSensorOption;
+    device->ReadData = ReadData;
     device->Register = Register;
     device->Unregister = Unregister;
 }
