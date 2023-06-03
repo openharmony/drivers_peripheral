@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "benchmark_common.h"
+#include "ut_common.h"
 #include "camera.h"
 #include "video_key_info.h"
 
