@@ -374,6 +374,7 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
             CAMERA_LOGI("add physicalCameraIds %{public}d logicalCameraId %{public}s",
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
+                cameraHostCallback_->OnCameraEvent(logicalCameraId, CAMERA_EVENT_DEVICE_ADD);
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
         }
@@ -389,6 +390,7 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
+                cameraHostCallback_->OnCameraEvent(logicalCameraId, CAMERA_EVENT_DEVICE_RMV);
             }
             cameraDeviceMap_.erase(logicalCameraId);
         }

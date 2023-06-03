@@ -183,6 +183,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealZoomRationRange(node, metadata);
     DealJpegOrientation(node, metadata);
     DealAvaliableExtendConfigurations(node, metadata);
+    DealJpegQuality(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -914,6 +915,37 @@ RetCode HcsDeal::DealJpegOrientation(
         return RC_ERROR;
     }
     CAMERA_LOGI("jpegOrientation add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealJpegQuality(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t jpegQuality;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "jpegQuality", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get jpegQuality failed");
+        return RC_ERROR;
+    }
+
+    jpegQuality = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
+    CAMERA_LOGI("jpegQuality  = %{public}d", jpegQuality);
+
+    if (jpegQuality != OHOS_CAMERA_JPEG_LEVEL_LOW && jpegQuality != OHOS_CAMERA_JPEG_LEVEL_MIDDLE &&
+        jpegQuality != OHOS_CAMERA_JPEG_LEVEL_HIGH) {
+        CAMERA_LOGE("jpegQuality invalid argument");
+        return RC_ERROR;
+    }
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_JPEG_QUALITY, static_cast<const void *>(&jpegQuality), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("jpegQuality add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("jpegQuality add success");
     return RC_OK;
 }
 
