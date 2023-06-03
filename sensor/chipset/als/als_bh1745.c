@@ -248,24 +248,22 @@ static int32_t ReadBh1745RawData(struct SensorCfgData *data, struct AlsData *raw
     return HDF_SUCCESS;
 }
 
-int32_t ReadBh1745Data(struct SensorCfgData *data)
+int32_t ReadBh1745Data(struct SensorCfgData *data, struct SensorReportEvent *event)
 {
     int32_t ret;
     struct AlsData rawData = { 0, 0, 0, 0 };
     uint32_t tmp[ALS_LIGHT_NUM];
-    struct SensorReportEvent event;
-    struct AlsReportData reportData;
+    static struct AlsReportData reportData;
 
-    (void)memset_s(&event, sizeof(event), 0, sizeof(event));
-    ret = ReadBh1745RawData(data, &rawData, &event.timestamp);
+    ret = ReadBh1745RawData(data, &rawData, &event->timestamp);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: BH1745 read raw data failed", __func__);
         return HDF_FAILURE;
     }
 
-    event.sensorId = SENSOR_TAG_AMBIENT_LIGHT;
-    event.option = 0;
-    event.mode = SENSOR_WORK_MODE_REALTIME;
+    event->sensorId = SENSOR_TAG_AMBIENT_LIGHT;
+    event->option = 0;
+    event->mode = SENSOR_WORK_MODE_REALTIME;
 
     tmp[ALS_R] = rawData.red;
     tmp[ALS_G] = rawData.green;
@@ -275,13 +273,9 @@ int32_t ReadBh1745Data(struct SensorCfgData *data)
     ret = RawDataConvert(data, &reportData, tmp);
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "RawDataConvert");
 
-    event.dataLen = sizeof(reportData.als);
-    event.data = (uint8_t *)&reportData.als;
+    event->dataLen = sizeof(reportData.als);
+    event->data = (uint8_t *)&reportData.als;
 
-    ret = ReportSensorEvent(&event);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: BH1745 report data failed", __func__);
-    }
     return ret;
 }
 

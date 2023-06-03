@@ -33,14 +33,15 @@ public:
     SensorIfService();
     ~SensorIfService();
     int32_t Init(void);
-    int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
+    int32_t GetAllSensorInfo(std::vector<HdfSensorInformation> &info) override;
     int32_t Enable(int32_t sensorId) override;
     int32_t Disable(int32_t sensorId) override;
     int32_t SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval) override;
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
-    int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
-    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
+    int32_t Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
+    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
+    int32_t ReadData(int32_t groupId, std::vector<HdfSensorEvents> &event) override;
     int32_t GetSensorVdiImpl();
 private:
     ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;

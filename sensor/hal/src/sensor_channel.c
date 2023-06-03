@@ -107,7 +107,7 @@ void CopyEventData(struct SensorEvents *event)
     }
 }
 
-static void ConvertSensorData(struct SensorEvents *event)
+void ConvertSensorData(struct SensorEvents *event)
 {
     uint32_t dataLen;
     uint32_t axis;
