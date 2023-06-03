@@ -254,6 +254,17 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     return ret;
 }
 
+int32_t SensorIfService::ReadData(int32_t groupId, std::vector<HdfSensorEvents> &event)
+{
+    HDF_LOGI("%{public}s: Enter the ReadData function, groupId is %{public}d", __func__, groupId);
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
 {
     SensorIfService *impl = new (std::nothrow) SensorIfService();
