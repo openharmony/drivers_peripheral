@@ -56,6 +56,7 @@ Note:If the text contains special characters, please escape them according to th
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
                 <policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
                 <policyitem type="copyright" name="Chipsea Technologies (Shenzhen) Corp., Ltd." path=".*" rule="may" group="defaultGroup"/>
+                <policyitem type="copyright" name="Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Developed By Xiaoxiongpai"/>
             </policy>
         </policylist>
         <filefilterlist>
