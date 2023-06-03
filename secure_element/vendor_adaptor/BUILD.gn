@@ -14,7 +14,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("se_vendor_adaptor") {
-  include_dirs = [ "//vendor/huawei/base/communication/CaNfc" ]
+  include_dirs = []
   sources = [ "se_vendor_adaptions.cpp" ]
 
   public_deps = []
@@ -29,7 +29,6 @@ ohos_shared_library("se_vendor_adaptor") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "nfc_ca:secure_element_ca",
-    "teec_client:libteec_vendor",
   ]
 
   install_images = [ chipset_base_dir ]
