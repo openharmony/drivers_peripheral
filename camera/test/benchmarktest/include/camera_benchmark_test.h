@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include "benchmark_common.h"
+#include "ut_common.h"
 
 class CameraBenchmarkTest : public benchmark::Fixture {
 public:
