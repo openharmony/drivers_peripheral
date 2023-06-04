@@ -17,14 +17,17 @@
     "ram": "7500KB",
     "deps": {
       "components": [
+        "c_utils",
+        "config_policy",
+        "drivers_interface_thermal",
+        "init",
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
-        "utils_base"
+        "hiviewdfx_hilog_native"
       ],
       "third_party": [
-        "bounds_checking_function",
-        "libxml2"
+        "libxml2",
+        "zlib"
       ]
     },
     "build": {
