@@ -12,6 +12,9 @@
   "component": {
     "name": "drivers_peripheral_camera",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_camera_feature_usb"
+    ],
     "adapted_system_type": ["standard"],
     "rom": "22212KB",
     "ram": "78517KB",
@@ -34,10 +37,7 @@
         "//drivers/peripheral/camera:camera_hal"
       ],
       "test": [
-        "//drivers/peripheral/camera/test/demo:ohos_camera_demo",
-        "//drivers/peripheral/camera/test/at:camera_test_at",
-        "//drivers/peripheral/camera/test/ut:camera_test_ut",
-        "//drivers/peripheral/camera/test/benchmarktest:hdf_camera_benchmark_test"
+        "//drivers/peripheral/camera/test:camera_hal_test"
       ],
       "inner_kits": []
     }

@@ -426,7 +426,7 @@ std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
             std::cout << "==========[test log]camera device list is empty." << std::endl;
             return ability;
         }
-        if (cameraIds.size() > 1) {
+        if (cameraIds.size() > 0) {
             ret = cameraHost->GetCameraAbility(cameraIds.back(), ability_);
             if (ret != HDI::Camera::V1_0::NO_ERROR) {
                 std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
@@ -441,7 +441,7 @@ void TestDisplay::OpenUsbCamera()
 {
     if (cameraDevice == nullptr) {
         cameraHost->GetCameraIds(cameraIds);
-        if (cameraIds.size() > 1) {
+        if (cameraIds.size() > 0) {
             cameraHost->GetCameraAbility(cameraIds.back(), ability_);
             MetadataUtils::ConvertVecToMetadata(ability_, ability);
             const OHOS::sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();

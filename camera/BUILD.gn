@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("./camera.gni")
+import("./usb_hal/camera_usb.gni")
 
 if (defined(ohos_lite)) {
   group("camera_hal") {
@@ -33,15 +34,26 @@ if (defined(ohos_lite)) {
     if (target_cpu == "x86_64") {
       deps = []
     } else {
-      deps = [
-        "hdi_service/v1_0:camera_host_service_1.0",
-        "vdi_base/common/buffer_manager:camera_buffer_manager",
-        "vdi_base/common/device_manager:camera_device_manager",
-        "vdi_base/common/pipeline_core:camera_pipeline_core",
-        "vdi_base/common/utils:camera_utils",
-        "vdi_base/v4l2:camera_host_vdi_impl_1.0",
-      ]
-      deps += [ "${chipset_build_deps}" ]
+      if (drivers_peripheral_camera_feature_usb == true) {
+        deps = [
+          "${chipset_usb_build_deps}",
+          "usb_hal/buffer_manager:camera_buffer_manager",
+          "usb_hal/device_manager:camera_device_manager",
+          "usb_hal/hdi_impl:camera_daemon",
+          "usb_hal/pipeline_core:camera_pipeline_core",
+          "usb_hal/utils:camera_utils",
+        ]
+      } else {
+        deps = [
+          "${chipset_build_deps}",
+          "hdi_service/v1_0:camera_host_service_1.0",
+          "vdi_base/common/buffer_manager:camera_buffer_manager",
+          "vdi_base/common/device_manager:camera_device_manager",
+          "vdi_base/common/pipeline_core:camera_pipeline_core",
+          "vdi_base/common/utils:camera_utils",
+          "vdi_base/v4l2:camera_host_vdi_impl_1.0",
+        ]
+      }
     }
   }
   group("camera_hal_unittest") {
@@ -49,20 +61,24 @@ if (defined(ohos_lite)) {
       deps = []
     } else {
       testonly = true
-      deps = [
-        #benchmark test
-        "test/benchmarktest:hdf_camera_benchmark_test",
+      if (drivers_peripheral_camera_feature_usb == true) {
+        deps = [ "usb_hal/test/ut:camera_test_ut" ]
+      } else {
+        deps = [
+          #benchmark test
+          "test/benchmarktest:hdf_camera_benchmark_test",
 
-        # acceptance unit test
-        "test/at:camera_test_at",
-        "vdi_base/common/device_manager/test:camera_hal_device_manager_unittest",
+          # acceptance unit test
+          "test/at:camera_test_at",
+          "vdi_base/common/device_manager/test:camera_hal_device_manager_unittest",
 
-        # fuzz test
-        "test/fuzztest:camera_hdi_fuzztest",
+          # fuzz test
+          "test/fuzztest:camera_hdi_fuzztest",
 
-        # function unit test
-        "test/ut:camera_test_ut",
-      ]
+          # function unit test
+          "test/ut:camera_test_ut",
+        ]
+      }
     }
   }
 }
