@@ -119,9 +119,9 @@ namespace Codec {
             return false;
         }
 
-        int32_t ret = g_manager->DestoryComponent(g_componentId);
+        int32_t ret = g_manager->DestroyComponent(g_componentId);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+            HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             Release();
             return false;
         }

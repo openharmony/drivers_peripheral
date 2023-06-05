@@ -381,7 +381,7 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
     for (int i = 0; i < bufferCount; i++) {
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
-        omxBuffer->version.s.nVersionMajor = 1;
+        omxBuffer->version.version.majorVersion = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
         int fd = AshmemCreate(0, bufferSize);
         shared_ptr<Ashmem> sharedMem = make_shared<Ashmem>(fd, bufferSize);
@@ -490,7 +490,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
     for (int i = 0; i < bufferCount; i++) {
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
-        omxBuffer->version.s.nVersionMajor = 1;
+        omxBuffer->version.version.majorVersion = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
         err = gralloc_->AllocMem(alloc, bufferHandle);
@@ -561,7 +561,7 @@ void CodecHdiDecode::FreeBuffers()
 
 void CodecHdiDecode::Release()
 {
-    omxMgr_->DestoryComponent(componentId_);
+    omxMgr_->DestroyComponent(componentId_);
     client_ = nullptr;
     callback_ = nullptr;
     omxMgr_ = nullptr;

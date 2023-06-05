@@ -23,7 +23,7 @@ namespace {
         uint32_t port;
         int32_t tunneledComp;
         uint32_t tunneledPort;
-        struct OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE *tunnelSetup;
+        struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *tunnelSetup;
     };
 }
 
@@ -38,19 +38,19 @@ namespace Codec {
 
         uint8_t *rawData = const_cast<uint8_t *>(data);
         if (size > sizeof(uint32_t) + sizeof(int32_t) + sizeof(uint32_t) +
-                sizeof(OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE *)) {
+                sizeof(OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *)) {
             params.port = Convert2Uint32(rawData);
             rawData = rawData + sizeof(uint32_t);
             params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
             rawData = rawData + sizeof(int32_t);
             params.tunneledPort = Convert2Uint32(rawData);
             rawData = rawData + sizeof(uint32_t);
-            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE *>(rawData);
+            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *>(rawData);
         } else {
             params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
             params.port = Convert2Uint32(rawData);
             params.tunneledPort = Convert2Uint32(rawData);
-            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE *>(rawData);
+            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *>(rawData);
         }
 
         bool result = Preconditions();
@@ -59,8 +59,8 @@ namespace Codec {
             return false;
         }
 
-        const struct OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE inTunnelSetup = *(params.tunnelSetup);
-        struct  OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE outTunnelSetup = inTunnelSetup;
+        const struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType inTunnelSetup = *(params.tunnelSetup);
+        struct  OHOS::HDI::Codec::V1_0::CodecTunnelSetupType outTunnelSetup = inTunnelSetup;
 
         int32_t ret = g_component->ComponentTunnelRequest(params.port, params.tunneledComp,
             params.tunneledPort, inTunnelSetup, outTunnelSetup);
