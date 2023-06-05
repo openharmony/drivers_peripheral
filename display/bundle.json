@@ -25,7 +25,13 @@
         "c_utils",
         "ipc",
         "drivers_interface_display",
-        "graphic_chipsetsdk"
+        "graphic_chipsetsdk",
+        "hilog",
+        "init",
+        "memory_utils",
+        "hitrace_native",
+        "thirdparty_googletest",
+        "thirdparty_benchmark"
       ]
     },
     "build": {
