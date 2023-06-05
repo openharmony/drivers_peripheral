@@ -1,0 +1,349 @@
+/*
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "v1_0/usb_ddk_service.h"
+
+#include <hdf_base.h>
+#include <iproxy_broker.h>
+
+#include "usb_ddk_hash.h"
+#include "usb_ddk_interface.h"
+#include "usb_raw_api.h"
+#define HDF_LOG_TAG usb_ddk_service
+
+namespace OHOS {
+namespace HDI {
+namespace Usb {
+namespace Ddk {
+namespace V1_0 {
+// 32 means size of uint32_t
+#define GET_BUS_NUM(devHandle)          ((uint8_t)((devHandle) >> 32))
+#define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xf))
+#define USB_RECIP_MASK                  0x1F
+#define GET_CTRL_REQ_RECIP(requestType) ((requestType)&USB_RECIP_MASK)
+#define TRANS_DIRECTION_OFFSET          7
+#define GET_CTRL_REQ_DIR(requestType)   ((requestType) >> TRANS_DIRECTION_OFFSET)
+#define REQ_TYPE_OFFERT                 5
+#define REQ_TYPE_MASK                   0x3
+#define GET_CTRL_REQ_TYPE(requestType)  (((requestType) >> REQ_TYPE_OFFERT) & REQ_TYPE_MASK)
+
+#define MAX_BUFF_SIZE         16384
+#define MAX_CONTROL_BUFF_SIZE 1024
+
+extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
+{
+    return new (std::nothrow) UsbDdkService();
+}
+
+int32_t UsbDdkService::Init()
+{
+    HDF_LOGI("usb ddk init");
+    return UsbInitHostSdk(nullptr);
+}
+
+int32_t UsbDdkService::Release()
+{
+    HDF_LOGI("usb ddk exit");
+    return UsbExitHostSdk(nullptr);
+}
+
+int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescriptor &desc)
+{
+    UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
+    if (rawHandle == nullptr) {
+        HDF_LOGE("%{public}s open device failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    UsbRawDevice *rawDevice = UsbRawGetDevice(rawHandle);
+    if (rawDevice == nullptr) {
+        HDF_LOGE("%{public}s get device failed", __func__);
+        (void)UsbRawCloseDevice(rawHandle);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = UsbRawGetDeviceDescriptor(rawDevice, reinterpret_cast<::UsbDeviceDescriptor *>(&desc));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s get desc failed %{public}d", __func__, ret);
+    }
+    (void)UsbRawCloseDevice(rawHandle);
+    return ret;
+}
+
+int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configIndex, std::vector<uint8_t> &configDesc)
+{
+    UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
+    if (rawHandle == nullptr) {
+        HDF_LOGE("%{public}s open device failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct UsbConfigDescriptor tmpDesc {};
+    int32_t ret = GetRawConfigDescriptor(
+        rawHandle, configIndex, reinterpret_cast<uint8_t *>(&tmpDesc), sizeof(struct UsbConfigDescriptor));
+    if (ret <= 0) {
+        HDF_LOGW("%{public}s get config desc failed %{public}d", __func__, ret);
+        (void)UsbRawCloseDevice(rawHandle);
+        return ret;
+    }
+
+    std::vector<uint8_t> tmpBuffer(tmpDesc.wTotalLength);
+    ret = GetRawConfigDescriptor(rawHandle, configIndex, tmpBuffer.data(), tmpDesc.wTotalLength);
+    if (ret <= 0) {
+        HDF_LOGW("%{public}s get config desc failed %{public}d", __func__, ret);
+        (void)UsbRawCloseDevice(rawHandle);
+        return ret;
+    }
+
+    if (static_cast<size_t>(ret) != tmpBuffer.size()) {
+        HDF_LOGE("%{public}s config desc invalid length : %{public}d, bufferSize:%{public}zu", __func__, ret,
+            tmpBuffer.size());
+        return HDF_FAILURE;
+    }
+
+    configDesc = tmpBuffer;
+
+    (void)UsbRawCloseDevice(rawHandle);
+    return HDF_SUCCESS;
+}
+
+int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex, uint64_t &interfaceHandle)
+{
+    struct UsbInterface *interface =
+        UsbClaimInterface(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId), interfaceIndex);
+    if (interface == nullptr) {
+        HDF_LOGE("%{public}s claim failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    UsbInterfaceHandle *handle = UsbOpenInterface(interface);
+    if (handle == nullptr) {
+        HDF_LOGE("%{public}s open failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = UsbDdkHash((uint64_t)handle, interfaceHandle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    struct UsbInterface *interface = nullptr;
+    ret = GetInterfaceByHandle((const UsbInterfaceHandle *)handle, &interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbCloseInterface((const UsbInterfaceHandle *)handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    UsbDdkDelHashRecord(interfaceHandle);
+
+    return UsbReleaseInterface(interface);
+}
+
+int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t settingIndex)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    struct UsbInterface *interface = nullptr;
+    return UsbSelectInterfaceSetting((const UsbInterfaceHandle *)handle, settingIndex, &interface);
+}
+
+int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint8_t &settingIndex)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    return UsbGetInterfaceSetting((const UsbInterfaceHandle *)handle, &settingIndex);
+}
+
+int32_t UsbDdkService::SendControlReadRequest(
+    uint64_t interfaceHandle, const UsbControlRequestSetup &setup, uint32_t timeout, std::vector<uint8_t> &data)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    struct UsbRequest *request = UsbAllocRequest((const UsbInterfaceHandle *)handle, 0, MAX_CONTROL_BUFF_SIZE);
+    if (request == nullptr) {
+        HDF_LOGE("%{public}s alloc request failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    struct UsbRequestParams params;
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.interfaceId = USB_CTRL_INTERFACE_ID;
+    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
+    params.timeout = timeout;
+    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
+    params.ctrlReq.reqType = static_cast<UsbControlRequestType>(GET_CTRL_REQ_TYPE(setup.requestType));
+    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
+    params.ctrlReq.request = setup.requestCmd;
+    params.ctrlReq.value = setup.value;
+    params.ctrlReq.index = setup.index;
+    params.ctrlReq.length = MAX_CONTROL_BUFF_SIZE;
+
+    ret = UsbFillRequest(request, (const UsbInterfaceHandle *)handle, &params);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    ret = UsbSubmitRequestSync(request);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    data.assign(request->compInfo.buffer, request->compInfo.buffer + request->compInfo.actualLength);
+FINISHED:
+    (void)UsbFreeRequest(request);
+    return ret;
+}
+
+int32_t UsbDdkService::SendControlWriteRequest(
+    uint64_t interfaceHandle, const UsbControlRequestSetup &setup, uint32_t timeout, const std::vector<uint8_t> &data)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    struct UsbRequest *request = UsbAllocRequest((const UsbInterfaceHandle *)handle, 0, MAX_CONTROL_BUFF_SIZE);
+    if (request == nullptr) {
+        HDF_LOGE("%{public}s alloc request failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    struct UsbRequestParams params;
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.interfaceId = USB_CTRL_INTERFACE_ID;
+    params.pipeAddress = 0;
+    params.pipeId = 0;
+    params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
+    params.timeout = timeout;
+    params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
+    params.ctrlReq.reqType = static_cast<UsbControlRequestType>(GET_CTRL_REQ_TYPE(setup.requestType));
+    params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
+    params.ctrlReq.request = setup.requestCmd;
+    params.ctrlReq.value = setup.value;
+    params.ctrlReq.index = setup.index;
+    params.ctrlReq.buffer = (void *)data.data();
+    params.ctrlReq.length = data.size();
+
+    ret = UsbFillRequest(request, (const UsbInterfaceHandle *)handle, &params);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    ret = UsbSubmitRequestSync(request);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+FINISHED:
+    (void)UsbFreeRequest(request);
+    return ret;
+}
+
+int32_t UsbDdkService::SendPipeRequest(
+    const UsbRequestPipe &pipe, uint32_t size, uint32_t offset, uint32_t length, uint32_t &transferedLength)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    struct UsbRequest *request = UsbAllocRequestByMmap((const UsbInterfaceHandle *)handle, 0, size);
+    if (request == nullptr) {
+        HDF_LOGE("%{public}s alloc request failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    struct UsbRequestParams params;
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.pipeId = pipe.endpoint;
+    params.pipeAddress = pipe.endpoint;
+    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
+    params.timeout = pipe.timeout;
+    params.dataReq.length = length;
+
+    ret = UsbFillRequestByMmap(request, (const UsbInterfaceHandle *)handle, &params);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    ret = UsbSubmitRequestSync(request);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    transferedLength = request->compInfo.actualLength;
+FINISHED:
+    (void)UsbFreeRequestByMmap(request);
+    return ret;
+}
+
+int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
+{
+    int32_t ret = UsbGetDeviceMemMapFd(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
+    if (ret < 0) {
+        HDF_LOGE("%{public}s UsbGetDeviceMemMapFd failed %{public}d", __func__, ret);
+        return ret;
+    }
+    fd = ret;
+    HDF_LOGI("%{public}s:%{public}d fd:%{public}d", __func__, __LINE__, fd);
+    return HDF_SUCCESS;
+}
+} // namespace V1_0
+} // namespace Ddk
+} // namespace Usb
+} // namespace HDI
+} // namespace OHOS
