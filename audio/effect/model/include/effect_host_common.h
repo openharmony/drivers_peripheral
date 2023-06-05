@@ -64,5 +64,7 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
 int32_t EffectControlSendCommand(struct IEffectControl *self, uint32_t cmdId, const int8_t *cmdData,
     uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen);
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc);
+int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
+                                   struct AudioEffectBuffer *output);
 
 #endif
