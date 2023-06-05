@@ -91,13 +91,13 @@ int32_t LightIfService::GetLightInfo(std::vector<HdfLightInfo>& info)
     StartTrace(HITRACE_TAG_HDF, "GetLightInfo");
     int32_t ret = lightVdiImpl_->GetLightInfo(lightInfoVdi);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s GetLightInfo failed, error code is %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: GetLightInfo failed, error code is %{public}d", __func__, ret);
         return ret;
     }
     FinishTrace(HITRACE_TAG_HDF);
 
     if (lightInfoVdi.empty()) {
-        HDF_LOGE("%{public}s no sensor info in list", __func__);
+        HDF_LOGE("%{public}s: no sensor info in list", __func__);
         return HDF_FAILURE;
     }
 
@@ -194,6 +194,7 @@ extern "C" ILightInterface *LightInterfaceImplGetInstance(void)
 {
     LightIfService *impl = new (std::nothrow) LightIfService();
     if (impl == nullptr) {
+        HDF_LOGE("%{public}s: impl nullptr", __func__);
         return nullptr;
     }
 
