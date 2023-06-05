@@ -26,7 +26,7 @@
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
-extern "C" ICameraHost *CameraHostImplGetInstance(void)
+extern "C" ICameraHost *CameraHostServiceGetInstance(void)
 {
     using OHOS::Camera::CameraHostImpl;
     CameraHostImpl *service = new (std::nothrow) CameraHostImpl();
