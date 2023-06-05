@@ -575,7 +575,7 @@ HWTEST_F(HdfSensorTest, SetSensorOption002, TestSize.Level1)
 
 /**
   * @tc.name: ReadSensorData001
-  * @tc.desc: Read data for the specified sensor
+  * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: AR000HQ6N4
   */
@@ -612,7 +612,7 @@ HWTEST_F(HdfSensorTest, ReadSensorData001, TestSize.Level1)
 
 /**
   * @tc.name: ReadSensorData002
-  * @tc.desc: Read data for the specified sensor
+  * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: AR000HQ6N4
   */
@@ -626,7 +626,7 @@ HWTEST_F(HdfSensorTest, ReadSensorData002, TestSize.Level1)
 
 /**
   * @tc.name: ReadSensorData003
-  * @tc.desc: Read data for the specified sensor
+  * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: AR000HQ6N4
   */
