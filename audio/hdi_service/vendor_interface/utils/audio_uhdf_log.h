@@ -74,7 +74,7 @@
 #ifndef CHECK_VALID_RANGE_RETURN
 #define CHECK_VALID_RANGE_RETURN(value, minValue, maxValue, ret)          \
     do {                                                      \
-        if (value < minValue || value > maxValue) {                              \
+        if ((value) < (minValue) || (value) > (maxValue)) {                              \
             AUDIO_FUNC_LOGE("value is invalid and return ret=%{public}d", ret); \
             return (ret);                                     \
         }                                                     \

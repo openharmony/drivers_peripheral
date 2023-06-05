@@ -33,7 +33,7 @@ static int32_t EffectModelDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || client->device == NULL || client->device->service == NULL) {
-        HDF_LOGE("%{public}s:Param is NULL!", __func__);
+        HDF_LOGE("%{public}s:param is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -59,7 +59,7 @@ static int32_t HdfEffectDriverInit(struct HdfDeviceObject *deviceObject)
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        HDF_LOGE("%{public}s:Set Primary DEVICE_CLASS_AUDIO fail!", __func__);
+        HDF_LOGE("%{public}s:set primary DEVICE_CLASS_AUDIO fail!", __func__);
     }
 
     return HDF_SUCCESS;
@@ -67,15 +67,15 @@ static int32_t HdfEffectDriverInit(struct HdfDeviceObject *deviceObject)
 
 static int32_t HdfEffectModelDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("enter to %{public}s.", __func__);
+    HDF_LOGD("enter to %{public}s.", __func__);
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s:Param is NULL!", __func__);
+        HDF_LOGE("%{public}s:param is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     int32_t ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, IEFFECTMODEL_INTERFACE_DESC);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGI("failed to set interface descriptor object! ret = %{public}d", ret);
+        HDF_LOGE("failed to set interface descriptor object! ret = %{public}d", ret);
         return HDF_FAILURE;
     }
 
@@ -112,9 +112,9 @@ static int32_t HdfEffectModelDriverBind(struct HdfDeviceObject *deviceObject)
 
 static void HdfEffectModelDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("enter to %{public}s.", __func__);
+    HDF_LOGD("enter to %{public}s.", __func__);
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s:Param is NULL!", __func__);
+        HDF_LOGE("%{public}s:param is NULL!", __func__);
         return;
     }
 
