@@ -95,6 +95,8 @@ int32_t RawFillControlRequest(struct UsbHostRequest *request, const struct UsbDe
     const struct UsbFillRequestData *fillRequestData);
 int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData);
+int32_t RawFillInterruptRequestByMmap(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
+    const struct UsbFillRequestData *fillRequestData);
 int32_t RawFillIsoRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData);
 int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
@@ -104,7 +106,10 @@ int32_t RawSendBulkRequest(const struct UsbHostRequest *request, const struct Us
 int32_t RawSendInterruptRequest(const struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbRequestData *requestData);
 struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, int32_t length);
+struct UsbHostRequest *RawAllocRequestByMmap(
+    const struct UsbDeviceHandle *devHandle, int32_t isoPackets, int32_t length);
 int32_t RawFreeRequest(const struct UsbHostRequest *request);
+int32_t RawFreeRequestByMmap(const struct UsbHostRequest *request);
 int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
     struct UsbRawConfigDescriptor ** const config);
 void RawClearConfiguration(struct UsbRawConfigDescriptor *config);
@@ -133,6 +138,7 @@ void *RawUsbMemCalloc(size_t size);
 void RawUsbMemFree(void *mem);
 int32_t RawUsbMemTestTrigger(bool enable);
 int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
+void RawAttachKernelDriver(struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
 
 #ifdef __cplusplus
 }

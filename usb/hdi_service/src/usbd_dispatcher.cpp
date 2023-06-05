@@ -134,14 +134,12 @@ int32_t UsbdDispatcher::GetInterfacePipe(
         return HDF_FAILURE;
     }
 
-    for (uint8_t i = 1; i <= info->pipeNum; ++i) {
-        int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &pipeTmp);
-        if (ret == HDF_SUCCESS && ((pipeTmp.pipeAddress | static_cast<uint8_t>(pipeTmp.pipeDirection)) == pipeAddr)) {
-            if (pipe) {
-                *pipe = pipeTmp;
-            }
-            return HDF_SUCCESS;
+    int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, pipeAddr, &pipeTmp);
+    if (ret == HDF_SUCCESS && ((pipeTmp.pipeAddress | static_cast<uint8_t>(pipeTmp.pipeDirection)) == pipeAddr)) {
+        if (pipe) {
+            *pipe = pipeTmp;
         }
+        return HDF_SUCCESS;
     }
     return HDF_FAILURE;
 }

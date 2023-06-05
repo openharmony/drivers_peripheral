@@ -14,21 +14,17 @@
  */
 #include "usb_ddk_hash.h"
 #include <functional>
-#include <unordered_map>
 #include <mutex>
+#include <unordered_map>
 
 #include "hdf_base.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 std::unordered_map<uint64_t, uint64_t> g_hashMap;
 std::mutex g_mapMutex;
 
 constexpr size_t MAX_HASH_RECORD = 1000;
 
-int32_t UsbDdkHash(uint64_t param, uint64_t *hashVal)
+int32_t UsbDdkHash(uint64_t param, uint64_t &hashVal)
 {
     std::lock_guard<std::mutex> lock(g_mapMutex);
 
@@ -36,12 +32,12 @@ int32_t UsbDdkHash(uint64_t param, uint64_t *hashVal)
         return HDF_ERR_OUT_OF_RANGE;
     }
 
-    *hashVal = static_cast<uint64_t>(std::hash<uint64_t> {}(param));
-    g_hashMap.emplace(*hashVal, param);
+    hashVal = static_cast<uint64_t>(std::hash<uint64_t> {}(param));
+    g_hashMap.emplace(hashVal, param);
     return HDF_SUCCESS;
 }
 
-int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t *param)
+int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &param)
 {
     std::lock_guard<std::mutex> lock(g_mapMutex);
     auto mappedVal = g_hashMap[hashVal];
@@ -49,7 +45,7 @@ int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t *param)
         g_hashMap.erase(hashVal);
         return HDF_ERR_INVALID_PARAM;
     }
-    *param = mappedVal;
+    param = mappedVal;
     return HDF_SUCCESS;
 }
 
@@ -58,7 +54,3 @@ void UsbDdkDelHashRecord(uint64_t hashVal)
     std::lock_guard<std::mutex> lock(g_mapMutex);
     g_hashMap.erase(hashVal);
 }
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
