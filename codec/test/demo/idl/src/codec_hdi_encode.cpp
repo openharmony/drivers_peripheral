@@ -326,7 +326,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
     for (int i = 0; i < bufferCount; i++) {
         auto omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
-        omxBuffer->version.s.nVersionMajor = 1;
+        omxBuffer->version.version.majorVersion = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
         int fd = AshmemCreate(0, bufferSize);
         shared_ptr<Ashmem> spSharedMem = make_shared<Ashmem>(fd, bufferSize);
@@ -379,7 +379,7 @@ int32_t CodecHdiEncode::UseDynaBuffer(int bufferCount, int bufferSize)
     for (int i = 0; i < bufferCount; i++) {
         auto omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
-        omxBuffer->version.s.nVersionMajor = 1;
+        omxBuffer->version.version.majorVersion = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
         omxBuffer->fd = -1;
         omxBuffer->bufferhandle = nullptr;
@@ -440,7 +440,7 @@ void CodecHdiEncode::FreeBuffers()
 
 void CodecHdiEncode::Release()
 {
-    omxMgr_->DestoryComponent(componentId_);
+    omxMgr_->DestroyComponent(componentId_);
     client_ = nullptr;
     callback_ = nullptr;
     omxMgr_ = nullptr;

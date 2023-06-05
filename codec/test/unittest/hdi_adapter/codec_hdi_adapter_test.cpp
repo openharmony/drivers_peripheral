@@ -985,7 +985,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiDeInitUnsupportedTest_001, TestSize.Lev
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiDestoryComponentSuccessTest_001, TestSize.Level1)
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiDestroyComponentSuccessTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     ASSERT_TRUE(g_manager != nullptr);

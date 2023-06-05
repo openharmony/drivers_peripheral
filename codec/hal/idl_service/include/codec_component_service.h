@@ -38,8 +38,8 @@ public:
     int32_t GetExtensionIndex(const std::string &paramName, uint32_t &indexType) override;
     int32_t GetState(CodecStateType &state) override;
     int32_t ComponentTunnelRequest(uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
-                                   const OMX_TUNNELSETUPTYPE &inTunnelSetup,
-                                   OMX_TUNNELSETUPTYPE &outTunnelSetup) override;
+                                   const CodecTunnelSetupType &inTunnelSetup,
+                                   CodecTunnelSetupType &outTunnelSetup) override;
     int32_t UseBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer) override;
     int32_t AllocateBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer) override;
     int32_t FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer) override;

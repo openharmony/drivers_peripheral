@@ -58,9 +58,9 @@ namespace Codec {
             return false;
         }
 
-        int32_t result = omxMgr_->DestoryComponent(g_componentId);
+        int32_t result = omxMgr_->DestroyComponent(g_componentId);
         if (result != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+            HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
         }
 
