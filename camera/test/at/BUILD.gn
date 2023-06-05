@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("../../camera.gni")
-camera_test_path = "."
+camera_test_path = "//drivers/peripheral/camera/test/at/"
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
@@ -104,17 +104,17 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
-      "$camera_test_path/src/camera_3a_uttest.cpp",
-      "$camera_test_path/src/device_ability_uttest.cpp",
-      "$camera_test_path/src/hdi_device_uttest.cpp",
-      "$camera_test_path/src/hdi_host_uttest.cpp",
-      "$camera_test_path/src/hdi_stream_uttest.cpp",
-      "$camera_test_path/src/ut_common.cpp",
+      "$camera_test_path/hdi/v1_0/src/camera_3a_uttest.cpp",
+      "$camera_test_path/hdi/v1_0/src/device_ability_uttest.cpp",
+      "$camera_test_path/hdi/v1_0/src/hdi_device_uttest.cpp",
+      "$camera_test_path/hdi/v1_0/src/hdi_host_uttest.cpp",
+      "$camera_test_path/hdi/v1_0/src/hdi_stream_uttest.cpp",
+      "$camera_test_path/hdi/v1_0/src/ut_common.cpp",
     ]
 
     include_dirs = [
       # common includes
-      "./include",
+      "$camera_test_path/hdi/v1_0/include",
       "//third_party/googletest/googletest/include",
       "$camera_path/../../../display/interfaces/include",
       "$camera_path/../../../display/hdi_service/gralloc/include",
