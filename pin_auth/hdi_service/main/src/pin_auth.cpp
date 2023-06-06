@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,8 @@ std::map<int32_t, ResultCodeForCoAuth> g_convertResult = {
     {RESULT_COMPARE_FAIL, ResultCodeForCoAuth::FAIL},
     {RESULT_BUSY, ResultCodeForCoAuth::BUSY},
     {RESULT_PIN_FREEZE, ResultCodeForCoAuth::LOCKED},
+    {RESULT_BAD_COPY, ResultCodeForCoAuth::GENERAL_ERROR},
+    {RESULT_GENERAL_ERROR, ResultCodeForCoAuth::GENERAL_ERROR},
 };
 }
 
@@ -91,11 +93,11 @@ int32_t PinAuth::EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<ui
     pinEnrollParam.subType = subType;
     if (memcpy_s(&(pinEnrollParam.salt[0]), CONST_SALT_LEN, salt.data(), CONST_SALT_LEN) != EOK) {
         LOG_ERROR("copy salt to pinEnrollParam fail!");
-        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+        return PinResultToCoAuthResult(RESULT_BAD_COPY);
     }
     if (memcpy_s(&(pinEnrollParam.pinData[0]), CONST_PIN_DATA_LEN, pinData.data(), CONST_PIN_DATA_LEN) != EOK) {
         LOG_ERROR("copy pinData to pinEnrollParam fail!");
-        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+        return PinResultToCoAuthResult(RESULT_BAD_COPY);
     }
     Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
     if (!IsBufferValid(retTlv)) {
@@ -111,7 +113,7 @@ int32_t PinAuth::EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<ui
     resultTlv.resize(retTlv->contentSize);
     if (memcpy_s(resultTlv.data(), retTlv->contentSize, retTlv->buf, retTlv->contentSize) != EOK) {
         LOG_ERROR("copy retTlv to resultTlv fail!");
-        result = RESULT_GENERAL_ERROR;
+        result = RESULT_BAD_COPY;
         goto ERROR;
     }
 
@@ -152,7 +154,7 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
     pinAuthParam.templateId = templateId;
     if (memcpy_s(&(pinAuthParam.pinData[0]), CONST_PIN_DATA_LEN, pinData.data(), pinData.size()) != EOK) {
         LOG_ERROR("mem copy pinData to pinAuthParam fail!");
-        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+        return PinResultToCoAuthResult(RESULT_BAD_COPY);
     }
     Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
     if (!IsBufferValid(retTlv)) {

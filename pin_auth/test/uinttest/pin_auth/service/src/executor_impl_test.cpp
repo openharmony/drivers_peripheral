@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,10 +71,10 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
 
     uint64_t scheduleId = 0;
     result = impl->Enroll(scheduleId, extraInfo, nullptr);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     result = impl->Authenticate(scheduleId, templateId, extraInfo, nullptr);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     uint64_t authSubType = 10010;
     std::vector<uint8_t> pinData(32, 1);
@@ -127,10 +127,10 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
 
     uint64_t scheduleId = 0;
     result = impl->Enroll(scheduleId, extraInfo, nullptr);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     result = impl->Authenticate(scheduleId, templateId, extraInfo, nullptr);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     uint64_t authSubType = 10010;
     std::vector<uint8_t> pinData(32, 1);
@@ -146,7 +146,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     std::vector<GetPropertyType> propertyTypes;
     Property property;
     result = impl->GetProperty(templateIdList, propertyTypes, property);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     templateIdList.push_back(1);
     result = impl->GetProperty(templateIdList, propertyTypes, property);
