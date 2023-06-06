@@ -39,7 +39,7 @@ void BufferDiedRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject>& re
 
 HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 {
-    displayBuffer_.reset(IDisplayBuffer::Get());
+    displayBuffer_ = IDisplayBuffer::Get();
     ASSERT_TRUE(displayBuffer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new BufferDiedRecipient();
     ASSERT_TRUE(recipient != nullptr);
@@ -51,7 +51,7 @@ HWTEST_F(DeathTest, test_AddDeathRecipient, TestSize.Level1)
 
 HWTEST_F(DeathTest, test_RemoveDeathRecipient, TestSize.Level1)
 {
-    displayBuffer_.reset(IDisplayBuffer::Get());
+    displayBuffer_ = IDisplayBuffer::Get();
     ASSERT_TRUE(displayBuffer_ != nullptr);
     sptr<IRemoteObject::DeathRecipient> recipient = new BufferDiedRecipient();
     ASSERT_TRUE(recipient != nullptr);
