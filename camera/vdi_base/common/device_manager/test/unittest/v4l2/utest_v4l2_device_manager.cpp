@@ -18,6 +18,8 @@
 #include <gtest/gtest.h>
 #include "v4l2_device_manager.h"
 
+using namespace testing::ext;
+
 namespace OHOS::Camera {
 std::shared_ptr<IDeviceManager> DM = nullptr;
 void UtestV4l2DeviceManager::SetUpTestCase(void)

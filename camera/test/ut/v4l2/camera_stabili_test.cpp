@@ -22,14 +22,14 @@ void CameraStabiliTest::TearDownTestCase(void)
 {}
 void CameraStabiliTest::SetUp(void)
 {
-    if (display_ == nullptr) {
-        display_ = std::make_shared<TestDisplay>();
+    if (cameraBase_ == nullptr) {
+        cameraBase_ = std::make_shared<TestCameraBase>();
     }
-    display_->Init();
+    cameraBase_->Init();
 }
 void CameraStabiliTest::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 void CameraStabiliTest::GetAvalialbleVideoStabilizationModes(
@@ -61,18 +61,18 @@ void CameraStabiliTest::GetAvalialbleVideoStabilizationModes(
 static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
 {
     // get camera ability
-    if (display_->ability == nullptr) {
+    if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
         return;
     }
-    GetAvalialbleVideoStabilizationModes(display_->ability);
+    GetAvalialbleVideoStabilizationModes(cameraBase_->ability);
 
     // get the stream manager
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
 
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
     constexpr uint32_t ITEM_CAPACITY = 100;
@@ -82,24 +82,24 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
         ITEM_CAPACITY, DATA_CAPACITY);
     uint8_t videoStabiliMode = videoStabilizationAvailableModes_[0];
     meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
-    const int32_t deviceStreamId = display_->STREAM_ID_VIDEO;
+    const int32_t deviceStreamId = cameraBase_->STREAM_ID_VIDEO;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
 
-    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("UpdateSettings success");
     } else {
-        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
 
     // get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }

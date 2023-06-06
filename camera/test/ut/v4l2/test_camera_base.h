@@ -82,7 +82,7 @@ constexpr int INVALID_VALUE_TEST = 2147483647;
 
 using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::Camera;
-class TestDisplay {
+class TestCameraBase {
 public:
     // This should get the size setting according to the bottom layer
     unsigned int bufSize_ = 614400; // 614400:bufSize
@@ -142,7 +142,7 @@ public:
     bool status = false;
 
 public:
-    TestDisplay();
+    TestCameraBase();
     uint64_t GetCurrentLocalTimeStamp();
     int32_t SaveYUV(char* type, unsigned char* buffer, int32_t size);
     int DoFbMunmap(unsigned char* addr);

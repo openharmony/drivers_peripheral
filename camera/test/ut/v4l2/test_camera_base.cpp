@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "test_display.h"
+#include "test_camera_base.h"
 using namespace std;
 
 const std::vector<int32_t> DATA_BASE = {
@@ -33,11 +33,11 @@ const std::vector<int32_t> DATA_BASE = {
     OHOS_CONTROL_EXPOSURE_STATE,
 };
 
-TestDisplay::TestDisplay()
+TestCameraBase::TestCameraBase()
 {
 }
 
-uint64_t TestDisplay::GetCurrentLocalTimeStamp()
+uint64_t TestCameraBase::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
         std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
@@ -45,7 +45,7 @@ uint64_t TestDisplay::GetCurrentLocalTimeStamp()
     return tmp.count();
 }
 
-void TestDisplay::StoreImage(const unsigned char *bufStart, const uint32_t size) const
+void TestCameraBase::StoreImage(const unsigned char *bufStart, const uint32_t size) const
 {
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
@@ -81,7 +81,7 @@ void TestDisplay::StoreImage(const unsigned char *bufStart, const uint32_t size)
     close(imgFD);
 }
 
-void TestDisplay::StoreVideo(const unsigned char *bufStart, const uint32_t size) const
+void TestCameraBase::StoreVideo(const unsigned char *bufStart, const uint32_t size) const
 {
     int ret = 0;
 
@@ -92,7 +92,7 @@ void TestDisplay::StoreVideo(const unsigned char *bufStart, const uint32_t size)
     CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
 }
 
-void TestDisplay::OpenVideoFile()
+void TestCameraBase::OpenVideoFile()
 {
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
@@ -112,13 +112,13 @@ void TestDisplay::OpenVideoFile()
     }
 }
 
-void TestDisplay::CloseFd()
+void TestCameraBase::CloseFd()
 {
     close(videoFd_);
     videoFd_ = -1;
 }
 
-void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint32_t size) const
+void TestCameraBase::PrintFaceDetectInfo(const unsigned char *bufStart, const uint32_t size) const
 {
     common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>(
         const_cast<unsigned char*>(bufStart));
@@ -167,7 +167,7 @@ void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint3
     }
 }
 
-int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
+int32_t TestCameraBase::SaveYUV(char* type, unsigned char* buffer, int32_t size)
 {
     int ret;
     char path[PATH_MAX] = {0};
@@ -193,7 +193,7 @@ int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
     return 0;
 }
 
-int TestDisplay::DoFbMunmap(unsigned char* addr)
+int TestCameraBase::DoFbMunmap(unsigned char* addr)
 {
     int ret;
     unsigned int size = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size;
@@ -202,7 +202,7 @@ int TestDisplay::DoFbMunmap(unsigned char* addr)
     return ret;
 }
 
-unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
+unsigned char* TestCameraBase::DoFbMmap(int* pmemfd)
 {
     unsigned char* ret;
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
@@ -215,7 +215,7 @@ unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
     return ret;
 }
 
-void TestDisplay::FBLog()
+void TestCameraBase::FBLog()
 {
     CAMERA_LOGI("the fixed information is as follow:\n");
     CAMERA_LOGI("id=%s\n", finfo_.id);
@@ -250,7 +250,7 @@ void TestDisplay::FBLog()
     CAMERA_LOGI("height=%x\n", vinfo_.height);
 }
 
-OHOS::Camera::RetCode TestDisplay::FBInit()
+OHOS::Camera::RetCode TestCameraBase::FBInit()
 {
     fbFd_ = open("/dev/fb0", O_RDWR);
     if (fbFd_ < 0) {
@@ -282,7 +282,7 @@ OHOS::Camera::RetCode TestDisplay::FBInit()
     return RC_OK;
 }
 
-void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
+void TestCameraBase::ProcessImage(unsigned char* p, unsigned char* fbp)
 {
     unsigned char* in = p;
     int width = 640; // 640:Displays the size of the width
@@ -334,12 +334,12 @@ void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
     }
 }
 
-void TestDisplay::LcdDrawScreen(unsigned char* displayBuf, unsigned char* addr)
+void TestCameraBase::LcdDrawScreen(unsigned char* displayBuf, unsigned char* addr)
 {
     ProcessImage(addr, displayBuf);
 }
 
-void TestDisplay::BufferCallback(unsigned char* addr, int choice)
+void TestCameraBase::BufferCallback(unsigned char* addr, int choice)
 {
     if (choice == PREVIEW_MODE) {
         LcdDrawScreen(displayBuf_, addr);
@@ -353,12 +353,12 @@ void TestDisplay::BufferCallback(unsigned char* addr, int choice)
     }
 }
 
-void TestDisplay::Init()
+void TestCameraBase::Init()
 {
-    CAMERA_LOGD("TestDisplay::Init().");
+    CAMERA_LOGD("TestCameraBase::Init().");
     if (cameraHost == nullptr) {
-        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
-        cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
+        constexpr const char *demoServiceName = "camera_service";
+        cameraHost = ICameraHost::Get(demoServiceName, false);
         CAMERA_LOGI("Camera::CameraHost::CreateCameraHost()");
         if (cameraHost == nullptr) {
             CAMERA_LOGE("CreateCameraHost failed.");
@@ -390,11 +390,11 @@ void TestDisplay::Init()
     }
 }
 
-void TestDisplay::UsbInit()
+void TestCameraBase::UsbInit()
 {
     if (cameraHost == nullptr) {
-        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
-        cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
+        constexpr const char *demoServiceName = "camera_service";
+        cameraHost = ICameraHost::Get(demoServiceName, false);
         if (cameraHost == nullptr) {
             std::cout << "==========[test log] CreateCameraHost failed." << std::endl;
             return;
@@ -412,7 +412,7 @@ void TestDisplay::UsbInit()
     }
 }
 
-std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
+std::shared_ptr<CameraAbility> TestCameraBase::GetCameraAbility()
 {
     if (cameraDevice == nullptr) {
         OHOS::Camera::RetCode ret = cameraHost->GetCameraIds(cameraIds);
@@ -437,7 +437,7 @@ std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
     return ability;
 }
 
-void TestDisplay::OpenUsbCamera()
+void TestCameraBase::OpenUsbCamera()
 {
     if (cameraDevice == nullptr) {
         cameraHost->GetCameraIds(cameraIds);
@@ -457,7 +457,7 @@ void TestDisplay::OpenUsbCamera()
     }
 }
 
-void TestDisplay::Close()
+void TestCameraBase::Close()
 {
     CAMERA_LOGD("cameraDevice->Close().");
     if (cameraDevice != nullptr) {
@@ -466,7 +466,7 @@ void TestDisplay::Close()
     }
 }
 
-void TestDisplay::OpenCamera()
+void TestCameraBase::OpenCamera()
 {
     if (cameraDevice == nullptr) {
         cameraHost->GetCameraIds(cameraIds);
@@ -480,14 +480,14 @@ void TestDisplay::OpenCamera()
     }
 }
 
-float TestDisplay::CalTime(struct timeval start, struct timeval end)
+float TestCameraBase::CalTime(struct timeval start, struct timeval end)
 {
     float timeUse = 0;
     timeUse = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec); // 1000000:time
     return timeUse;
 }
 
-void TestDisplay::AchieveStreamOperator()
+void TestCameraBase::AchieveStreamOperator()
 {
     // Create and get streamOperator information
     OHOS::sptr<DemoStreamOperatorCallback> streamOperatorCallback_ = new DemoStreamOperatorCallback();
@@ -500,7 +500,7 @@ void TestDisplay::AchieveStreamOperator()
     }
 }
 
-void TestDisplay::StartStream(std::vector<StreamIntent> intents)
+void TestCameraBase::StartStream(std::vector<StreamIntent> intents)
 {
     for (auto& intent : intents) {
         if (intent == PREVIEW) {
@@ -592,7 +592,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
     }
 }
 
-void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming)
+void TestCameraBase::StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming)
 {
     // Get preview
     captureInfo.streamIds_ = {streamId};
@@ -624,10 +624,10 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
     sleep(2); // 2:sleep two second
 }
 
-void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
+void TestCameraBase::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    constexpr uint32_t TIME_FOR_WAIT_CANCEL_CAPTURE = 2;
-    sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+    constexpr uint32_t timeForWaitCancelCapture = 2;
+    sleep(timeForWaitCancelCapture);
     if (sizeof(captureIds) > 0) {
         for (const auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW) {
@@ -645,7 +645,7 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
         for (const auto &captureId : captureIds) {
             CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
             rc = (CamRetCode)streamOperator->CancelCapture(captureId);
-            sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+            sleep(timeForWaitCancelCapture);
             EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
             if (rc == HDI::Camera::V1_0::NO_ERROR) {
                 CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
@@ -675,12 +675,12 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::vector<uint8_t>& resu
     MetadataUtils::ConvertVecToMetadata(result, metaData);
 
     if (metaData == nullptr) {
-        CAMERA_LOGE("TestDisplay: result is null");
+        CAMERA_LOGE("TestCameraBase: result is null");
         return;
     }
     common_metadata_header_t* data = metaData->get();
     if (data == nullptr) {
-        CAMERA_LOGE("TestDisplay: data is null");
+        CAMERA_LOGE("TestCameraBase: data is null");
         return;
     }
     uint8_t videoStabiliMode;
@@ -700,12 +700,12 @@ void DemoCameraDeviceCallback::PrintFpsInfo(const std::vector<uint8_t>& result)
     MetadataUtils::ConvertVecToMetadata(result, metaData);
 
     if (metaData == nullptr) {
-        CAMERA_LOGE("TestDisplay: result is null");
+        CAMERA_LOGE("TestCameraBase: result is null");
         return;
     }
     common_metadata_header_t* data = metaData->get();
     if (data == nullptr) {
-        CAMERA_LOGE("TestDisplay: data is null");
+        CAMERA_LOGE("TestCameraBase: data is null");
         return;
     }
     std::vector<int32_t> fpsRange;
@@ -776,7 +776,7 @@ void DemoCameraDeviceCallback::DealCameraMetadata(const std::vector<uint8_t> &se
     std::shared_ptr<CameraMetadata> result;
     MetadataUtils::ConvertVecToMetadata(settings, result);
     if (result == nullptr) {
-        CAMERA_LOGE("TestDisplay: result is null");
+        CAMERA_LOGE("TestCameraBase: result is null");
         return;
     }
     common_metadata_header_t *data = result->get();
