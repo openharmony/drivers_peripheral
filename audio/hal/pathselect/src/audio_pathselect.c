@@ -142,6 +142,10 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
 
     renderDevNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     int32_t renderPathNum = cJSON_GetArraySize(renderSwObj);
+    if (renderPathNum < 0) {
+        AUDIO_FUNC_LOGE("renderPathNum is less than zero!");
+        return HDF_FAILURE;
+    }
     for (int32_t i = 0; i < renderPathNum; i++) {
         cJSON *tmpValue = cJSON_GetArrayItem(renderSwObj, i);
         cJSON *renderSwName = tmpValue->child;
@@ -179,6 +183,10 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
 
     int32_t devNum = captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     int32_t pathNum = cJSON_GetArraySize(captureSwObj);
+    if (pathNum < 0) {
+        AUDIO_FUNC_LOGE("pathNum is less than zero!");
+        return HDF_FAILURE;
+    }
     for (int32_t i = 0; i < pathNum; i++) {
         cJSON *tmpValue = cJSON_GetArrayItem(captureSwObj, i);
         cJSON *captureSwName = tmpValue->child;
@@ -224,6 +232,10 @@ static int32_t SetRenderPathValue(
     /* pins = 0, parse default value */
     if (strcasecmp(renderDeviceType, renderObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(renderObj);
+        if (pathNum < 0) {
+            AUDIO_FUNC_LOGE("pathNum is less than zero!");
+            return HDF_FAILURE;
+        }
         for (int32_t i = 0; i < pathNum; i++) {
             cJSON *tmpValue = cJSON_GetArrayItem(renderObj, i);
             cJSON *swName = tmpValue->child;
@@ -400,6 +412,10 @@ static int32_t AudioRenderParseUsecase(struct AudioHwRenderParam *renderParam, c
     }
 
     int32_t len = cJSON_GetArraySize(useCaseList);
+    if (len < 0) {
+        AUDIO_FUNC_LOGE("len is less than zero!");
+        return HDF_FAILURE;
+    }
     for (int32_t i = 0; i < len; i++) {
         cJSON *tmpValue = cJSON_GetArrayItem(useCaseList, i);
         /* Each device in the incoming scene */
@@ -441,6 +457,10 @@ static int32_t SetCapturePathValue(
     int32_t devNum = captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     if (strcasecmp(captureDeviceType, captureSwitchObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(captureSwitchObj);
+        if (pathNum < 0) {
+            AUDIO_FUNC_LOGE("pathNum is less than zero!");
+            return HDF_FAILURE;
+        }
         for (int32_t i = 0; i < pathNum; i++) {
             cJSON *captureTmpValue = cJSON_GetArrayItem(captureSwitchObj, i);
             cJSON *swName = captureTmpValue->child;
@@ -622,6 +642,10 @@ static int32_t AudioCaptureParseUsecase(struct AudioHwCaptureParam *captureParam
     }
 
     int32_t len = cJSON_GetArraySize(useCaseList);
+    if (len < 0) {
+        AUDIO_FUNC_LOGE("len is less than zero!");
+        return HDF_FAILURE;
+    }
     for (int32_t i = 0; i < len; i++) {
         cJSON *tmpValue = cJSON_GetArrayItem(useCaseList, i);
         int32_t ret = AudioCaptureParseDevice(captureParam, tmpValue);

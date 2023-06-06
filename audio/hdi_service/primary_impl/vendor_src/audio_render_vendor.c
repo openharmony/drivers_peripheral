@@ -38,8 +38,6 @@ struct AudioRenderInfo {
 struct AudioHwiRenderPriv {
     struct AudioRenderInfo *renderInfos[AUDIO_HW_STREAM_NUM_MAX];
     uint32_t renderCnt;
-    struct IAudioCallback *callback;
-    bool isRegCb;
 };
 
 static struct AudioHwiRenderPriv g_audioHwiRenderPriv;
