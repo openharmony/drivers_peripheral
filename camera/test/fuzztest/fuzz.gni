@@ -52,10 +52,10 @@ cflags = [
 ]
 
 deps = [
+  "$board_camera_path/device_manager:camera_device_manager",
+  "$board_camera_path/pipeline_core:camera_pipeline_core",
   "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
   "$camera_path/buffer_manager:camera_buffer_manager",
-  "$camera_path/device_manager:camera_device_manager",
-  "$camera_path/pipeline_core:camera_pipeline_core",
   "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
   "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
 ]

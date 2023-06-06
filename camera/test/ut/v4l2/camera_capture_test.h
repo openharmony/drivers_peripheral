@@ -16,7 +16,7 @@
 #ifndef CAMERA_CAPTURE_TEST_H
 #define CAMERA_CAPTURE_TEST_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class CameraCaptureTest : public testing::Test {
 public:
@@ -24,6 +24,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
 };
 #endif /* CAMERA_CAPTURE_TEST_H */

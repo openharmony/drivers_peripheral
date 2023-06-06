@@ -16,7 +16,7 @@
 #ifndef CAMERA_ABILITY_TEST_H
 #define CAMERA_ABILITY_TEST_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class CameraAbilityTest : public testing::Test {
 public:
@@ -30,6 +30,6 @@ public:
     OHOS::Camera::RetCode GetZoomRatioRange(std::shared_ptr<CameraAbility> &ability);
     OHOS::Camera::RetCode GetJpegOrientation(std::shared_ptr<CameraAbility> &ability);
 
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
 };
 #endif /* CAMERA_ABILITY_TEST_H */

@@ -16,7 +16,7 @@
 #ifndef CAMERA_FPS_TEST_H
 #define CAMERA_FPS_TEST_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class CameraFpsTest : public testing::Test {
 public:
@@ -25,7 +25,7 @@ public:
     void SetUp(void);
     void TearDown(void);
     void GetFpsRange(std::shared_ptr<CameraAbility> &ability);
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
     std::vector<int32_t> fpsRange_;
 };
 #endif /* CAMERA_FPS_TEST_H */

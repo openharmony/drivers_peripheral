@@ -22,13 +22,13 @@ void CameraVideoTest::TearDownTestCase(void)
 {}
 void CameraVideoTest::SetUp(void)
 {
-    if (display_ == nullptr)
-    display_ = std::make_shared<TestDisplay>();
-    display_->Init();
+    if (cameraBase_ == nullptr)
+    cameraBase_ = std::make_shared<TestCameraBase>();
+    cameraBase_->Init();
 }
 void CameraVideoTest::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 void CameraVideoTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<StreamCustomer> &streamCustomer,
@@ -67,7 +67,7 @@ void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
 {
     StreamInfo streamInfo = {};
     if (intent == PREVIEW) {
-        if (streamId == display_->STREAM_ID_PREVIEW) {
+        if (streamId == cameraBase_->STREAM_ID_PREVIEW) {
             if (streamCustomerPreview_ == nullptr) {
                 streamCustomerPreview_ = std::make_shared<StreamCustomer>();
                 SetStreamInfo(streamInfo, streamCustomerPreview_, streamId, intent);
@@ -86,7 +86,7 @@ void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
     }
     std::vector<StreamInfo>().swap(streamInfos_);
     streamInfos_.push_back(streamInfo);
-    CamRetCode result = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos_);
+    CamRetCode result = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos_);
     EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
     if (result == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("CreateStreams success.");
@@ -97,7 +97,7 @@ void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
 
 void CameraVideoTest::CommitStream()
 {
-    CamRetCode result = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, display_->ability_);
+    CamRetCode result = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
     EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
     if (result == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("CommitStreams success.");
@@ -109,13 +109,13 @@ void CameraVideoTest::StartCapture(
     int streamId, int captureId, bool shutterCallback, bool isStreaming, const CaptureInfo captureInfo)
 {
     captureInfo_.streamIds_ = {streamId};
-    captureInfo_.captureSetting_ = display_->ability_;
+    captureInfo_.captureSetting_ = cameraBase_->ability_;
     captureInfo_.enableShutterCallback_ = shutterCallback;
     CamRetCode result;
     if (captureInfo.captureSetting_.size() != 0) {
-        result = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
+        result = (CamRetCode)cameraBase_->streamOperator->Capture(captureId, captureInfo, isStreaming);
     } else {
-        result = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
+        result = (CamRetCode)cameraBase_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
     }
 
     EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
@@ -125,15 +125,15 @@ void CameraVideoTest::StartCapture(
         CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, result = %{public}d", captureId, result);
     }
 
-    if (captureId == display_->CAPTURE_ID_PREVIEW) {
+    if (captureId == cameraBase_->CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("preview size = %{public}u", size);
         });
-    } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+    } else if (captureId == cameraBase_->CAPTURE_ID_CAPTURE) {
         streamCustomerSnapshot_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("snapshot size = %{public}u", size);
         });
-    } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+    } else if (captureId == cameraBase_->CAPTURE_ID_VIDEO) {
         streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("video size = %{public}u", size);
         });
@@ -149,11 +149,11 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
     sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
     if (sizeof(captureIds) > 0) {
         for (const auto &captureId : captureIds) {
-            if (captureId == display_->CAPTURE_ID_PREVIEW) {
+            if (captureId == cameraBase_->CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
-            } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+            } else if (captureId == cameraBase_->CAPTURE_ID_CAPTURE) {
                 streamCustomerSnapshot_->ReceiveFrameOff();
-            } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+            } else if (captureId == cameraBase_->CAPTURE_ID_VIDEO) {
                 streamCustomerVideo_->ReceiveFrameOff();
                 sleep(TIME_FOR_RECEIVE_FRAME_OFF);
             } else {
@@ -162,7 +162,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
         }
 
         for (auto &captureId : captureIds) {
-            CamRetCode result = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
+            CamRetCode result = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureId);
             sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
             EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
             if (result == HDI::Camera::V1_0::NO_ERROR) {
@@ -186,17 +186,17 @@ HWTEST_F(CameraVideoTest, camera_video_001, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + video, commit together, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -210,19 +210,19 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + video, commit together, set 3A, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
 
     std::vector<int32_t> resultsList;
     resultsList.push_back(OHOS_CAMERA_STREAM_ID);
     resultsList.push_back(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION);
-    display_->cameraDevice->EnableResult(resultsList);
+    cameraBase_->cameraDevice->EnableResult(resultsList);
 
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // Issue 3A parameters to increase exposure
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
@@ -231,18 +231,18 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("UpdateSettings success, for 5s.");
     } else {
-        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
     sleep(3);
 
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -256,36 +256,36 @@ HWTEST_F(CameraVideoTest, camera_video_003, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + video, commit together, then close device, and preview + video again.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 
     // Turn off the device
-    display_->Close();
+    cameraBase_->Close();
     // Turn on the device
-    display_->Init();
+    cameraBase_->Init();
     CAMERA_LOGD("The 2nd time.");
 
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -299,36 +299,36 @@ HWTEST_F(CameraVideoTest, camera_video_004, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + video, commit together, then close device, and preview + capture.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 
     // Turn off the device
-    display_->Close();
+    cameraBase_->Close();
     CAMERA_LOGD("cameraDevice->Close");
     // Turn on the device
-    display_->Init();
+    cameraBase_->Init();
 
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, STILL_CAPTURE};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -342,17 +342,17 @@ HWTEST_F(CameraVideoTest, camera_video_005, TestSize.Level1)
 {
     CAMERA_LOGD("Preview + video, commit together, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -366,18 +366,18 @@ HWTEST_F(CameraVideoTest, camera_video_010, TestSize.Level2)
 {
     CAMERA_LOGD("Video start&stop, for 5 times, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     for (int i = 0; i < 5; i++) {
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 }
 
@@ -392,21 +392,21 @@ HWTEST_F(CameraVideoTest, camera_video_011, TestSize.Level2)
 {
     CAMERA_LOGD("Video start&stop, for 5 times, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     for (int i = 0; i < 5; i++) {
         // start stream
-        display_->intents = {PREVIEW, VIDEO};
-        display_->StartStream(display_->intents);
+        cameraBase_->intents = {PREVIEW, VIDEO};
+        cameraBase_->StartStream(cameraBase_->intents);
 
         // Start capture preview
-        display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
         // Start capture recording
-        display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
         // post-processing
-        display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-        display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-        display_->StopStream(display_->captureIds, display_->streamIds);
+        cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+        cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+        cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
     }
 }
 
@@ -421,52 +421,52 @@ HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
 {
     CAMERA_LOGD("Video mode, preview, success.");
     // Create and get streamOperator information
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {PREVIEW};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW};
+    cameraBase_->StartStream(cameraBase_->intents);
     // capture
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     // Create video stream
-    display_->intents = {VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Start capture preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     // Start capture recording
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
 
     // post-processing
-    display_->streamCustomerPreview_->ReceiveFrameOff();
-    display_->streamCustomerVideo_->ReceiveFrameOff();
-    display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_VIDEO);
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", display_->CAPTURE_ID_VIDEO);
+    cameraBase_->streamCustomerPreview_->ReceiveFrameOff();
+    cameraBase_->streamCustomerVideo_->ReceiveFrameOff();
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(cameraBase_->CAPTURE_ID_VIDEO);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", cameraBase_->CAPTURE_ID_VIDEO);
     } else {
-        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", cameraBase_->rc);
     }
-    display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_PREVIEW);
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", display_->CAPTURE_ID_PREVIEW);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(cameraBase_->CAPTURE_ID_PREVIEW);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", cameraBase_->CAPTURE_ID_PREVIEW);
     } else {
-        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", cameraBase_->rc);
     }
-    display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
-        {display_->STREAM_ID_VIDEO});
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams(
+        {cameraBase_->STREAM_ID_VIDEO});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", cameraBase_->rc);
     }
-    display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
-        {display_->STREAM_ID_PREVIEW});
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams(
+        {cameraBase_->STREAM_ID_PREVIEW});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", cameraBase_->rc);
     }
 }
 
@@ -480,19 +480,19 @@ HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
 HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
 {
     CAMERA_LOGD("Video mode, preview, set 3A, success.");
-    EXPECT_EQ(true, display_->cameraDevice != nullptr);
-    display_->AchieveStreamOperator();
+    EXPECT_EQ(true, cameraBase_->cameraDevice != nullptr);
+    cameraBase_->AchieveStreamOperator();
 
     std::vector<int32_t> resultsList;
     resultsList.push_back(OHOS_CAMERA_STREAM_ID);
     resultsList.push_back(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION);
-    display_->cameraDevice->EnableResult(resultsList);
+    cameraBase_->cameraDevice->EnableResult(resultsList);
     // start stream
-    display_->intents = {PREVIEW, VIDEO};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
     // capture
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
     // Issue 3A parameters to increase exposure
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
@@ -501,18 +501,18 @@ HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("UpdateSettings success, for 5s.");
     } else {
-        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
     sleep(3);
 
     // post-processing
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -526,8 +526,8 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
 {
     CAMERA_LOGD("Video mode without preview, system not support, expected return fail.");
 
-    EXPECT_EQ(true, display_->cameraDevice != nullptr);
-    display_->AchieveStreamOperator();
+    EXPECT_EQ(true, cameraBase_->cameraDevice != nullptr);
+    cameraBase_->AchieveStreamOperator();
     // Create video stream
     std::shared_ptr<StreamCustomer> streamCustomer = std::make_shared<StreamCustomer>();
     OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomer->CreateProducer();
@@ -537,30 +537,30 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     }
 
     std::vector<StreamInfo> streamInfos;
-    display_->streamInfo.streamId_ = display_->STREAM_ID_VIDEO;
-    display_->streamInfo.width_ = 1280; // 1280:picture width
-    display_->streamInfo.height_ = 960; // 960:picture height
-    display_->streamInfo.format_ = PIXEL_FMT_RGBA_8888;
-    display_->streamInfo.dataspace_ = 10;
-    display_->streamInfo.intent_ = VIDEO;
-    display_->streamInfo.tunneledMode_ = 5; // 5:tunnel mode
-    display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
-    ASSERT_NE(display_->streamInfo.bufferQueue_, nullptr);
-    streamInfos.push_back(display_->streamInfo);
-    display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
-    EXPECT_EQ(false, display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED);
-    if (display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED) {
-        CAMERA_LOGI("CreateStreams METHOD_NOT_SUPPORTED, streamId = %{public}d", display_->STREAM_ID_VIDEO);
+    cameraBase_->streamInfo.streamId_ = cameraBase_->STREAM_ID_VIDEO;
+    cameraBase_->streamInfo.width_ = 1280; // 1280:picture width
+    cameraBase_->streamInfo.height_ = 960; // 960:picture height
+    cameraBase_->streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    cameraBase_->streamInfo.dataspace_ = 10;
+    cameraBase_->streamInfo.intent_ = VIDEO;
+    cameraBase_->streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    cameraBase_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(cameraBase_->streamInfo.bufferQueue_, nullptr);
+    streamInfos.push_back(cameraBase_->streamInfo);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(false, cameraBase_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED);
+    if (cameraBase_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED) {
+        CAMERA_LOGI("CreateStreams METHOD_NOT_SUPPORTED, streamId = %{public}d", cameraBase_->STREAM_ID_VIDEO);
     } else {
-        CAMERA_LOGE("CreateStreams fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("CreateStreams fail, rc = %{public}d", cameraBase_->rc);
     }
     std::vector<uint8_t> modeSetting = {};
-    display_->rc = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, modeSetting);
-    EXPECT_EQ(false, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, modeSetting);
+    EXPECT_EQ(false, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("CommitStreams success.");
     } else {
-        CAMERA_LOGE("CommitStreams fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("CommitStreams fail, rc = %{public}d", cameraBase_->rc);
     }
 }
 
@@ -573,17 +573,17 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
  */
 HWTEST_F(CameraVideoTest, camera_video_031, TestSize.Level1)
 {
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
 
-    CreateStream(display_->STREAM_ID_PREVIEW, PREVIEW);
-    CreateStream(display_->STREAM_ID_CAPTURE, STILL_CAPTURE);
-    CreateStream(display_->STREAM_ID_VIDEO, VIDEO);
+    CreateStream(cameraBase_->STREAM_ID_PREVIEW, PREVIEW);
+    CreateStream(cameraBase_->STREAM_ID_CAPTURE, STILL_CAPTURE);
+    CreateStream(cameraBase_->STREAM_ID_VIDEO, VIDEO);
 
     CommitStream();
 
     CaptureInfo captureInfo = {};
-    StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
-    StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true, captureInfo);
 
     constexpr double latitude = 27.987500;  // dummy data: Qomolangma latitde
     constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
@@ -599,17 +599,18 @@ HWTEST_F(CameraVideoTest, camera_video_031, TestSize.Level1)
     gps.push_back(altitude);
     captureSetting->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
 
-    captureInfo.streamIds_ = {display_->STREAM_ID_CAPTURE};
+    captureInfo.streamIds_ = {cameraBase_->STREAM_ID_CAPTURE};
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(captureSetting, setting);
     captureInfo.captureSetting_ = setting;
     captureInfo.enableShutterCallback_ = false;
-    StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
 
     constexpr uint32_t TIME_FOR_WAIT_INIT_CAPTUREIDS = 5;
     sleep(TIME_FOR_WAIT_INIT_CAPTUREIDS);
-    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO,
-        display_->CAPTURE_ID_CAPTURE};
-    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO, display_->STREAM_ID_CAPTURE};
+    std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO,
+        cameraBase_->CAPTURE_ID_CAPTURE};
+    std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO,
+        cameraBase_->STREAM_ID_CAPTURE};
     StopStream(captureIds, streamIds);
 }

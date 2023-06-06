@@ -16,7 +16,7 @@
 #ifndef META_DATA_H
 #define META_DATA_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 #define PREVIEW_WIDTH  640
 #define PREVIEW_HEIGHT 480
 
@@ -45,7 +45,7 @@ public:
 
 public:
     CamRetCode result_;
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerSnapshot_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;

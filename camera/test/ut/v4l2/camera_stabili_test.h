@@ -16,7 +16,7 @@
 #ifndef CAMERA_STABILI_TEST_H
 #define CAMERA_STABILI_TEST_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class CameraStabiliTest : public testing::Test {
 public:
@@ -25,7 +25,7 @@ public:
     void SetUp(void);
     void TearDown(void);
     void GetAvalialbleVideoStabilizationModes(std::shared_ptr<CameraAbility> &ability);
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
     std::vector<uint8_t> videoStabilizationAvailableModes_;
 };
 #endif /* CAMERA_STABILI_TEST_H */

@@ -84,10 +84,10 @@ if (defined(ohos_lite)) {
     ]
 
     public_deps = [
+      "$board_camera_path/device_manager:camera_device_manager",
+      "$board_camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
       "$camera_path/buffer_manager:camera_buffer_manager",
-      "$camera_path/device_manager:camera_device_manager",
-      "$camera_path/pipeline_core:camera_pipeline_core",
       "../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     ]
     external_deps = [
@@ -172,10 +172,10 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$board_camera_path/device_manager:camera_device_manager",
+      "$board_camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0_static",
       "$camera_path/buffer_manager:camera_buffer_manager",
-      "$camera_path/device_manager:camera_device_manager",
-      "$camera_path/pipeline_core:camera_pipeline_core",
       "//third_party/googletest:gmock",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
