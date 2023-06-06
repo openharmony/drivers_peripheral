@@ -24,7 +24,6 @@
 #include <sys/timerfd.h>
 #include <linux/netlink.h>
 #include "thermal_log.h"
-#include "thermal_dfx.h"
 
 namespace OHOS {
 namespace HDI {
@@ -45,7 +44,7 @@ ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &n
 ThermalHdfTimer::~ThermalHdfTimer()
 {
     isRunning_ = false;
-    if (callbackThread_->joinable()) {
+    if (callbackThread_ != nullptr && callbackThread_->joinable()) {
         callbackThread_->join();
     }
 }
@@ -109,9 +108,9 @@ void ThermalHdfTimer::StartThread()
 
 int32_t ThermalHdfTimer::Init()
 {
-    std::unique_ptr<ThermalDfx> thermalDfx = std::make_unique<ThermalDfx>();
-    if (thermalDfx != nullptr) {
-        thermalDfx->Init();
+    thermalDfx_ = std::make_unique<ThermalDfx>();
+    if (thermalDfx_ != nullptr) {
+        thermalDfx_->Init();
     }
     StartThread();
     return HDF_SUCCESS;
