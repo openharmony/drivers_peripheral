@@ -140,12 +140,30 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_006, TestSize.Level0)
 }
 
 /**
+ * @tc.name: OpenCamera cameraID & Callback input error
+ * @tc.desc: OpenCamera, cameraID is illegal, callback is null.
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_007, TestSize.Level0)
+{
+    EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
+    if (cameraTest->cameraDevice == nullptr) {
+        std::string testCameraId = "1";
+        cameraTest->deviceCallback = nullptr;
+        cameraTest->rc = cameraTest->service->OpenCamera(testCameraId, cameraTest->deviceCallback,
+            cameraTest->cameraDevice);
+        EXPECT_EQ(true, cameraTest->rc == INVALID_ARGUMENT);
+    }
+}
+
+/**
  * @tc.name: OpenCamera
  * @tc.desc: OpenCamera, cameraId is empty
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_007, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_008, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -158,12 +176,30 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_007, TestSize.Level0)
 }
 
 /**
+ * @tc.name: OpenCamera cameraID & Callback input error
+ * @tc.desc: OpenCamera, cameraID is Empty, callback is null.
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_009, TestSize.Level0)
+{
+    EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
+    if (cameraTest->cameraDevice == nullptr) {
+        std::string testCameraId = "";
+        cameraTest->deviceCallback = nullptr;
+        cameraTest->rc = cameraTest->service->OpenCamera(testCameraId, cameraTest->deviceCallback,
+            cameraTest->cameraDevice);
+        EXPECT_EQ(true, cameraTest->rc == INVALID_ARGUMENT);
+    }
+}
+
+/**
  * @tc.name: OpenCamera
  * @tc.desc: OpenCamera, callback is null
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_008, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_010, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -181,7 +217,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_008, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_009, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_011, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -199,7 +235,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_009, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_010, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_012, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -216,7 +252,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_010, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_011, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_013, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -229,11 +265,11 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_011, TestSize.Level0)
 
 /**
  * @tc.name: SetFlashlight
- * @tc.desc: SetFlashlight, cameraId is not found
+ * @tc.desc: SetFlashlight, cameraId null
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_012, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_014, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -250,7 +286,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_012, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_014, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_015, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
@@ -262,12 +298,12 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_014, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetCameraAbility
- * @tc.desc: GetCameraAbility, normal cameraId
+ * @tc.name: Open all Cameras
+ * @tc.desc: Open every Cameras what the getCameraId get.
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_0015, TestSize.Level0)
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_0016, TestSize.Level0)
 {
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     if (cameraTest->cameraDevice == nullptr) {
