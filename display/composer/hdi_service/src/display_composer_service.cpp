@@ -47,7 +47,7 @@ DisplayComposerService::DisplayComposerService()
 {
     int32_t ret = LoadVdi();
     if (ret == HDF_SUCCESS) {
-        vdiImpl_.reset(createVdiFunc_());
+        vdiImpl_ = createVdiFunc_();
         CHECK_NULLPOINTER_RETURN(vdiImpl_);
         cmdResponser_ = HdiDisplayCmdResponser::Create(vdiImpl_);
         CHECK_NULLPOINTER_RETURN(cmdResponser_);
@@ -58,9 +58,9 @@ DisplayComposerService::DisplayComposerService()
 
 DisplayComposerService::~DisplayComposerService()
 {
+    cmdResponser_ = nullptr;
     if ((destroyVdiFunc_ != nullptr) && (vdiImpl_ != nullptr)) {
-        destroyVdiFunc_(vdiImpl_.get());
-        vdiImpl_.reset();
+        destroyVdiFunc_(vdiImpl_);
     }
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
