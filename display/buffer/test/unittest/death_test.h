@@ -33,7 +33,7 @@ using OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer;
 
 class DeathTest : public::testing::Test {
 public:
-    std::shared_ptr<IDisplayBuffer> displayBuffer_;
+    IDisplayBuffer* displayBuffer_;
 };
 
 class BufferDiedRecipient : public OHOS::IRemoteObject::DeathRecipient {
