@@ -595,7 +595,7 @@ HWTEST_F(HdfWifiDirectTest, SetProjectionScreenParam_024, TestSize.Level1)
     const char *ifName = "wlan0";
     int32_t rc;
     struct ProjectionScreenCmdParam param;
-    
+
     (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
     rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, nullptr, &param);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
