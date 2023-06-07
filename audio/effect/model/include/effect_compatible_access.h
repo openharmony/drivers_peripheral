@@ -70,6 +70,22 @@ struct EffectControl {
      * @version 1.0
      */
     int32_t (*GetEffectDescriptor)(struct EffectControl *self, struct EffectControllerDescriptor *desc);
+
+    /**
+     * @brief Reverse the audio processed data.
+     * the input and output buffer have to be specificed, if they are not specified，the reverse have to use the
+     * data reverse function which is provided by the command.
+     *
+     * @param input Indicates the buffer for input data.
+     * @param output Indicates the buffer for output data.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     *
+     * @since 4.0
+     * @version 1.0
+     */
+    int32_t (*EffectReverse)(struct EffectControl *self, const struct AudioEffectBuffer *input,
+                             struct AudioEffectBuffer *output);
 };
 
 /**

@@ -151,7 +151,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommand001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandInit001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_INIT_CONTOLLER.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_INIT_CONTOLLER.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -168,7 +168,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandInit001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandSetConf001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_SET_CONFIG.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_SET_CONFIG.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -185,7 +185,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandSetConf001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandGetConf001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_GET_CONFIG.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_GET_CONFIG.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -202,7 +202,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandGetConf001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandRest001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_RESET.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_RESET.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -219,7 +219,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandRest001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandEnable001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_ENABLE.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_ENABLE.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -236,7 +236,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandEnable001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandDisable001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_DISABLE.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_DISABLE.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -252,7 +252,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandDisable001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandSetParam001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_SET_PARAM.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_SET_PARAM.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -269,7 +269,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandSetParam001, TestSize.Level1)
 
 /**
  * @tc.name: HdfAudioSendCommandGetParam001
- * @tc.desc: Verify the EffectControlEffectProcess function when cmdId is AUDIO_EFFECT_COMMAND_GET_PARAM.
+ * @tc.desc: Verify the EffectControlSendCommand function when cmdId is AUDIO_EFFECT_COMMAND_GET_PARAM.
  * @tc.type: FUNC
  * @tc.require: I6I658
  */
@@ -314,5 +314,36 @@ HWTEST_F(EffectControlTest, HdfAudioGetDescriptor002, TestSize.Level1)
     EXPECT_STREQ(desc.libName, libName_);
     EXPECT_STREQ(desc.supplier, "mock");
     EffectControllerReleaseDesc(&desc);
+}
+
+/**
+ * @tc.name: HdfAudioEffectReverse001
+ * @tc.desc: Verify the EffectControlEffectReverse function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I7ASKC
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectReverse001, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0};
+    struct AudioEffectBuffer output = {0};
+
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, controller_->EffectReverse(nullptr, &input, &output));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, controller_->EffectReverse(controller_, nullptr, &output));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, controller_->EffectReverse(controller_, &input, nullptr));
+}
+
+/**
+ * @tc.name: HdfAudioEffectReverse002
+ * @tc.desc: Verify the EffectControlEffectReverse function.
+ * @tc.type: FUNC
+ * @tc.require: I7ASKC
+ */
+HWTEST_F(EffectControlTest, HdfAudioEffectReverse002, TestSize.Level1)
+{
+    struct AudioEffectBuffer input = {0};
+    struct AudioEffectBuffer output = {0};
+
+    int32_t ret = controller_->EffectReverse(controller_, &input, &output);
+    EXPECT_EQ(ret, HDF_SUCCESS);
 }
 } // end of namespace
