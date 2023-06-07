@@ -281,9 +281,13 @@ static ResultCode CoverData(const char *fileName, const FileOperator *fileOp)
     uint32_t fileLen = 0;
     ResultCode ret = (ResultCode)fileOp->getFileLen(fileName, &fileLen);
     /* The maximum length of the fileName is CONST_PIN_DATA_EXPAND_LEN */
-    if (ret != RESULT_SUCCESS || fileLen > CONST_PIN_DATA_EXPAND_LEN) {
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("getFileLen fail.");
         return ret;
+    }
+    if (fileLen > CONST_PIN_DATA_EXPAND_LEN) {
+        LOG_ERROR("Filelen is larger than pin data expand len");
+        return RESULT_GENERAL_ERROR;
     }
     uint8_t *data = Malloc(fileLen);
     if (data == NULL) {
