@@ -27,8 +27,6 @@ namespace Thermal {
 namespace V1_0 {
 namespace {
 const int32_t DEFAULT_POLLING_INTERVAL = 30000;
-const int32_t DEFAULT_TRACING_INTERVAL = 5000;
-const int32_t DEFAULT_TRACING_WIDTH = 20;
 }
 
 ThermalHdfConfig& ThermalHdfConfig::GetInsance()
@@ -188,26 +186,6 @@ void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& 
 
 void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
-    xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
-    if (xmlInterval != nullptr) {
-        std::string strInterval = reinterpret_cast<char *>(xmlInterval);
-        int32_t interval = DEFAULT_TRACING_INTERVAL;
-        StrToInt(TrimStr(strInterval), interval);
-        this->traceConfig_.interval = static_cast<uint32_t>(interval);
-        xmlFree(xmlInterval);
-        THERMAL_HILOGD(COMP_HDI, "interval: %{public}d", this->traceConfig_.interval);
-    }
-
-    xmlChar* xmlWidth = xmlGetProp(node, BAD_CAST"width");
-    if (xmlWidth != nullptr) {
-        std::string strWidth = reinterpret_cast<char *>(xmlWidth);
-        int32_t width = DEFAULT_TRACING_WIDTH;
-        StrToInt(TrimStr(strWidth), width);
-        this->traceConfig_.width = static_cast<uint8_t>(width);
-        xmlFree(xmlWidth);
-        THERMAL_HILOGD(COMP_HDI, "width: %{public}d", this->traceConfig_.width);
-    }
-
     xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
     if (xmlOutpath != nullptr) {
         this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
