@@ -258,7 +258,7 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
             } else if ((sDevName.find("_gpio_key") != std::string::npos) ||
                 (sDevName.find("ponkey_on") != std::string::npos)) {
                 type = INDEV_TYPE_KEY;
-            } else if ((sDevName.find("Touchpad") != std::string::npos) {
+            } else if (sDevName.find("Touchpad") != std::string::npos) {
                 type = INDEV_TYPE_TOUCHPAD;
             } else {
                 continue;
