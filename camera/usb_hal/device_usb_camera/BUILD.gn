@@ -17,8 +17,8 @@ import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
 
 hc_gen_c("generate_source") {
   sources = [
-    "$product_usb_config_path/hdf_config/uhdf/camera/pipeline_core/config.hcs",
-    "$product_usb_config_path/hdf_config/uhdf/camera/pipeline_core/params.hcs",
+    "./camera_config/pipeline_core/config.hcs",
+    "./camera_config/pipeline_core/params.hcs",
   ]
 }
 
@@ -64,8 +64,7 @@ ohos_prebuilt_etc("params.c") {
 }
 
 hc_gen("build_ipp_algo_config") {
-  sources = [ rebase_path(
-          "$product_usb_config_path/hdf_config/uhdf/camera/pipeline_core/ipp_algo_config.hcs") ]
+  sources = [ rebase_path("./camera_config/pipeline_core/ipp_algo_config.hcs") ]
 }
 
 ohos_prebuilt_etc("ipp_algo_config.hcb") {
