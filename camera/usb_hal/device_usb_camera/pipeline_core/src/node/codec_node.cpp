@@ -167,6 +167,10 @@ RetCode RKCodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
     }
 
     RetCode rc = ConfigJpegOrientation(data);
+    if (rc != RC_OK) {
+        CAMERA_LOGE("config jpeg orientation failed");
+        return RC_ERROR;
+    }
 
     rc = ConfigJpegQuality(data);
     return rc;
