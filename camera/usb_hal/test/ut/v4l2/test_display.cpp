@@ -96,13 +96,13 @@ void TestDisplay::StoreVideo(const unsigned char *bufStart, const uint32_t size)
         CAMERA_LOGE("%{public}s: sprintf  failed", __func__);
         return;
     }
-    videoFd_ = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
-    if (videoFd_ < 0) {
+    int videoFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+    if (videoFd < 0) {
         CAMERA_LOGE("demo test: StartVideo open %s %{public}s failed", path, strerror(errno));
     }
     int ret = 0;
 
-    ret = write(videoFd_, bufStart, size);
+    ret = write(videoFd, bufStart, size);
     if (ret == -1) {
         CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
     }
