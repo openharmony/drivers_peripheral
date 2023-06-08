@@ -52,8 +52,6 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path_vdi/pipeline_core/src/pipeline_core.cpp",
   ]
   include_dirs = [
-    "$common_utils_path/base/include",
-    "$base_path/interfaces/innerkits/libhilog/include",
     "$camera_path_vdi/utils/exif",
     "$camera_path_usb/../interfaces/include",
     "$camera_path_usb/../interfaces/hdi_ipc",
@@ -92,14 +90,9 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path_usb/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path_usb/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/include/",
-    "$foundation_path/communication/ipc/ipc/native/src/core/include",
-    "$common_utils_path/base/include",
     "src/node",
     "$third_path/libexif",
     "$third_path/ffmpeg",
-
-    # hcs parser
-    "#system_path/include/cutils",
   ]
 
   deps = [
