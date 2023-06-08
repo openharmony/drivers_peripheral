@@ -1,0 +1,39 @@
+ root {
+    module = "";
+    template stream_info {
+        id = 0;
+        name = "";
+    }
+    template scene_info {
+        id = 0;
+        name = "";
+    }
+    priview :: stream_info {
+        id = 0;
+        name = "preview";
+    }
+    video :: stream_info {
+        id = 1;
+        name = "video";
+    }
+    snapshot :: stream_info {
+        id = 2;
+        name = "snapshot";
+    }
+    analyze :: stream_info {
+        id = 4;
+        name = "analyze";
+    }
+    normal :: scene_info {
+        id = 0;
+        name = "normal";
+    }
+    dual :: scene_info {
+        id = 1;
+        name = "dual";
+    }
+    uvc :: scene_info {
+        id = 2;
+        name = "uvc";
+    }
+}

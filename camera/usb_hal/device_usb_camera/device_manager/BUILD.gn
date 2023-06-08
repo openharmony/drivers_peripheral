@@ -59,14 +59,12 @@ ohos_shared_library("camera_device_manager") {
   ]
 
   include_dirs = [
-    "$base_path/innerkits/libhilog/include",
     "$camera_path_vdi/include",
     "$camera_path_vdi/utils/event",
     "$camera_path_vdi/device_manager/include",
     "include",
     "$camera_path_vdi/adapter/platform/v4l2/src/device_manager/include",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/include/",
-    "$common_utils_path/base/include",
   ]
 
   deps = [ "$camera_path_usb/adapter/platform/v4l2/src/driver_adapter:camera_v4l2_adapter" ]

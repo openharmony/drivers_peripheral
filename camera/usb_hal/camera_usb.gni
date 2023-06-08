@@ -12,22 +12,16 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//vendor/$product_company/$product_name/product.gni")
 
 camera_path_usb = "//drivers/peripheral/camera/usb_hal"
 camera_path_vdi = "//drivers/peripheral/camera/vdi_base/common/"
 camera_path_vdi_test = "//drivers/peripheral/camera/test"
 current_path = "."
 usb_hal_test_path = "//drivers/peripheral/camera/test"
-base_path = "//base/hiviewdfx/interfaces"
-foundation_path = "//foundation"
-system_path = "//system/core"
 third_path = "//third_party"
 drivers_path = "//drivers"
-common_utils_path = "//commonlibrary/c_utils"
 enable_camera_device_utest = false
 board_usb_camera_path = "$camera_path_usb/device_usb_camera"
-product_usb_config_path = "//vendor/huawei/prebuilt/odm/hisi/baltimore/KLVV"
 chipset_usb_build_deps = "$board_usb_camera_path:chipset_build"
 camera_device_usb_manager_deps =
     "$board_usb_camera_path/device_manager:camera_device_manager"
