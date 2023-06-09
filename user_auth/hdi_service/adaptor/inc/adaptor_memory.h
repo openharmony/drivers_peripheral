@@ -27,9 +27,9 @@ void *Malloc(const size_t size);
 void Free(void *ptr);
 
 #define IAM_FREE_AND_SET_NULL(ptr)    \
-    do {                                 \
+    do {                              \
         Free(ptr);                    \
-        ptr = NULL;                   \
+        (ptr) = NULL;                 \
     } while (0)
 
 #ifdef __cplusplus
