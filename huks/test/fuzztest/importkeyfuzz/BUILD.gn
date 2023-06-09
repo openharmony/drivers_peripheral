@@ -1,0 +1,47 @@
+# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import("//build/config/features.gni")
+import("//build/test.gni")
+
+ohos_fuzztest("huks_hdi_importkey_fuzz") {
+  module_out_path = "hdf/huks"
+  fuzz_config_file = "../importkeyfuzz"
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  include_dirs = [
+    "../../../hdi_service",
+    "../"
+  ]
+
+  sources = [
+    "huks_hdi_fuzzer.cpp",
+    "../huks_hdi_fuzz_common.cpp"
+  ]
+
+  deps = [ "../../../hdi_service:libhuks_hdi_service_1.0" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_huks:huks_idl_headers",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_huks"
+}
