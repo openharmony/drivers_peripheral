@@ -128,7 +128,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         CameraDumper::GetInstance().DumpBuffer(buffer);
         BufferHandle* pHandle = sb->GetBufferHandle();
         memcpy_s(pHandle->virAddr, static_cast<uint32_t>(pHandle->size), buffer->GetVirAddress(), buffer->GetSize());
-        auto* add = (uint8_t*)sb->GetVirAddr();
+        CAMERA_LOGD("surfaceBuffer->GetVirAddr() = %{public}p", (uint8_t*)sb->GetVirAddr());
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         stats_.FlushBufferResult(ret);
         frameCount_++;

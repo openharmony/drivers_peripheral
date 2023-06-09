@@ -629,7 +629,7 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
     constexpr uint32_t TIME_FOR_WAIT_CANCEL_CAPTURE = 2;
     sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
     if (sizeof(captureIds) > 0) {
-        for (auto &captureId : captureIds) {
+        for (const auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
             } else if (captureId == CAPTURE_ID_CAPTURE) {
