@@ -223,7 +223,7 @@ static int32_t HuksExportChipsetPlatformPublicKey(struct IHuks *self, const stru
     return ret;
 }
 
-static int32_t HuksGetVersion(struct IHuks *self, uint32_t* majorVer, uint32_t* minorVer)
+static int32_t HuksGetVersion(struct IHuks *self, uint32_t *majorVer, uint32_t *minorVer)
 {
     *majorVer = IHUKS_MAJOR_VERSION;
     *minorVer = IHUKS_MINOR_VERSION;
