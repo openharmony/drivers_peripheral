@@ -30,6 +30,7 @@
           "//drivers/peripheral/huks:huks_entry"
         ],
         "test": [
+            "//drivers/peripheral/huks/test:huks_hdi_test"
         ],
         "inner_kits": [
         ]

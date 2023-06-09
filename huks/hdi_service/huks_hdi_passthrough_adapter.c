@@ -38,6 +38,16 @@ int32_t HuksHdiAdapterModuleInit(void)
     return g_coreEngine->HuksHdiModuleInit();
 }
 
+int32_t HuksHdiAdapterModuleDestroy(void)
+{
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiModuleDestroy, HUKS_ERROR_NULL_POINTER,
+        "Module Destroy function is null pointer")
+
+    return g_coreEngine->HuksHdiModuleDestroy();
+}
+
 int32_t HuksHdiAdapterRefresh(void)
 {
     HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
@@ -266,6 +276,8 @@ int32_t HuksInitHuksCoreEngine()
         return HUKS_SUCCESS;
     }
 
+    // libhuks_engine_core_standard is a software implementation version of huks driver, built-in system image
+    // by the source code at security_huks/services/huks_standard/huks_engine/main
     g_coreEngineHandle = dlopen("libhuks_engine_core_standard.z.so", RTLD_NOW);
 
     if (g_coreEngineHandle == NULL) {
@@ -310,4 +322,9 @@ int32_t HuksReleaseCoreEngine()
     dlclose(g_coreEngineHandle);
     g_coreEngineHandle = NULL;
     return HUKS_SUCCESS;
+}
+
+struct HuksHdi *HuksGetCoreEngine()
+{
+    return g_coreEngine;
 }

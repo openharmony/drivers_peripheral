@@ -26,6 +26,12 @@ struct HuksHdi {
     int32_t (*HuksHdiModuleInit)(void);
 
     /**
+     * @brief HUKS destroy
+     * @return error code, see huks_sa_type.h
+     */
+    int32_t (*HuksHdiModuleDestroy)(void);
+
+    /**
      * @brief HUKS fresh key info
      * @return error code, see huks_sa_type.h
      */

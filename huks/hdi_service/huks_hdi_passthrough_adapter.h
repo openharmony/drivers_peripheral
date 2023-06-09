@@ -58,6 +58,8 @@ int32_t HuksHdiAdapterMac(const struct HksBlob *key, const struct HksParamSet *p
 
 int32_t HuksHdiAdapterModuleInit(void);
 
+int32_t HuksHdiAdapterModuleDestroy(void);
+
 int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *keyAlias, const struct HksBlob *wrappingKey,
     const struct HksBlob *wrappedKeyData, const struct HksParamSet *paramSet, struct HksBlob *keyOut);
 
@@ -86,6 +88,8 @@ int32_t HuksHdiAdapterExportChipsetPlatformPublicKey(const struct HksBlob *salt,
 int32_t HuksInitHuksCoreEngine();
 
 int32_t HuksReleaseCoreEngine();
+
+struct HuksHdi *HuksGetCoreEngine();
 
 #ifdef __cplusplus
 }
