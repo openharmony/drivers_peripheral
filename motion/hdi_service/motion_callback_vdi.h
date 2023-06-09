@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_MOTION_V1_0_MOTIONIMPL_H
-#define OHOS_HDI_MOTION_V1_0_MOTIONIMPL_H
+#ifndef HDI_MOTION_CALLBACK_VDI_H
+#define HDI_MOTION_CALLBACK_VDI_H
 
 #include "v1_0/imotion_interface.h"
+#include "imotion_callback_vdi.h"
+#include "hdf_log.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Motion {
 namespace V1_0 {
-class MotionImpl : public IMotionInterface {
+class MotionCallbackVdi : public IMotionCallbackVdi {
 public:
-    MotionImpl() = default;
-    virtual ~MotionImpl() = default;
-    int32_t EnableMotion(int32_t motionType) override;
-    int32_t DisableMotion(int32_t motionType) override;
-    int32_t Register(const sptr<IMotionCallback> &callbackObj) override;
-    int32_t Unregister(const sptr<IMotionCallback> &callbackObj) override;
+    MotionCallbackVdi() = default;
+    ~MotionCallbackVdi() = default;
+    explicit MotionCallbackVdi(sptr<IMotionCallback> motionCallback) : motionCallback_(motionCallback) {}
+    int32_t OnDataEventVdi(const HdfMotionEventVdi& eventVdi) override;
+    sptr<IRemoteObject> HandleCallbackDeath() override;
+private:
+    sptr<IMotionCallback> motionCallback_;
 };
-} // namespace V1_0
-} // namespace Motion
-} // namespace HDI
-} // namespace OHOS
+} // V1_0
+} // Motion
+} // HDI
+} // OHOS
 
-#endif // OHOS_HDI_MOTION_V1_0_MOTIONIMPL_H
+#endif // HDI_MOTION_CALLBACK_VDI_H

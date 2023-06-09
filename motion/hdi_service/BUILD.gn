@@ -16,8 +16,14 @@ import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libmotion_interface_service_1.0") {
-  include_dirs = [ "../interfaces/include/" ]
-  sources = [ "motion_impl.cpp" ]
+  include_dirs = [
+    ".",
+    "../interfaces/v1_0",
+  ]
+  sources = [
+    "motion_callback_vdi.cpp",
+    "motion_if_service.cpp",
+  ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -30,8 +36,11 @@ ohos_shared_library("libmotion_interface_service_1.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_motion:motion_idl_headers",
+      "drivers_interface_motion:libmotion_stub_1.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
@@ -43,9 +52,7 @@ ohos_shared_library("libmotion_interface_service_1.0") {
 }
 
 ohos_shared_library("libmotion_driver") {
-  include_dirs = [ "../interfaces/include/" ]
-
-  sources = [ "motion_interface_driver.cpp" ]
+  sources = [ "motion_if_driver.cpp" ]
 
   cflags = [
     "-Wall",
@@ -69,6 +76,7 @@ ohos_shared_library("libmotion_driver") {
     ]
   }
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_motion"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,39 +13,38 @@
  * limitations under the License.
  */
 
-#include "motion_impl.h"
+#ifndef OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
+#define OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
+
 #include <hdf_base.h>
+#include <hdi_base.h>
+#include <vector>
+#include <iproxy_broker.h>
+#include "refbase.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Motion {
 namespace V1_0 {
-extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
-{
-    using OHOS::HDI::Motion::V1_0::MotionImpl;
-    return new (std::nothrow) MotionImpl();
-}
 
-int32_t MotionImpl::EnableMotion(int32_t motionType)
-{
-    return HDF_SUCCESS;
-}
+struct HdfMotionEventVdi {
+    int32_t motion;
+    int32_t result;
+    int32_t status;
+    int32_t datalen;
+    std::vector<int32_t> data;
+};
 
-int32_t MotionImpl::DisableMotion(int32_t motionType)
-{
-    return HDF_SUCCESS;
-}
+class IMotionCallbackVdi : public HdiBase {
+public:
+    virtual ~IMotionCallbackVdi() = default;
+    virtual int32_t OnDataEventVdi(const HdfMotionEventVdi& eventVdi) = 0;
+    virtual sptr<IRemoteObject> HandleCallbackDeath() = 0;
+};
 
-int32_t MotionImpl::Register(const sptr<IMotionCallback> &callbackObj)
-{
-    return HDF_SUCCESS;
-}
-
-int32_t MotionImpl::Unregister(const sptr<IMotionCallback> &callbackObj)
-{
-    return HDF_SUCCESS;
-}
 } // V1_0
 } // Motion
 } // HDI
 } // OHOS
+
+#endif // OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
