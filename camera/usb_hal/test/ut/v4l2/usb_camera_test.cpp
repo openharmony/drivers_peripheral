@@ -912,3 +912,32 @@ TEST_F(UtestUSBCameraTest, camera_usb_0028)
     display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Commit 3 streams together, Preview,Video and still_capture streams, isStreaming is true.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0029)
+{
+    // Get the device manager
+    display_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    // Get the stream manager
+    display_->AchieveStreamOperator();
+    // start stream
+    display_->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    display_->StartStream(display_->intents);
+    // Get preview
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
+    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
+    // release stream
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE, display_->CAPTURE_ID_VIDEO};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE, display_->STREAM_ID_VIDEO};
+    display_->StopStream(display_->captureIds, display_->streamIds);
+}
