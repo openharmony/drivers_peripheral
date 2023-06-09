@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 SensorIfService::SensorIfService()
 {
     int32_t ret = GetSensorVdiImpl();
@@ -281,7 +281,7 @@ extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Sensor
 } // namespace HDI
 } // namespace OHOS
