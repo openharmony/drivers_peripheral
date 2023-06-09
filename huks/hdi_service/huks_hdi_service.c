@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+  *Copyright (c) 2023 Huawei Device Co., Ltd.
+  *Licensed under the Apache License, Version 2.0 (the "License");
+  *you may not use this file except in compliance with the License.
+  *You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+  *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  *Unless required by applicable law or agreed to in writing, software
+  *distributed under the License is distributed on an "AS IS" BASIS,
+  *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  *See the License for the specific language governing permissions and
+  *limitations under the License.
  */
 
 #include <hdf_base.h>
@@ -43,8 +43,8 @@ static int32_t HuksModuleDestroy(struct IHuks *self)
     return HuksHdiAdapterModuleDestroy();
 }
 
-static int32_t HuksGenerateKey(struct IHuks *self, const struct HuksBlob* keyAlias, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* keyIn, struct HuksBlob* encKeyOut)
+static int32_t HuksGenerateKey(struct IHuks *self, const struct HuksBlob *keyAlias, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *keyIn, struct HuksBlob *encKeyOut)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -52,8 +52,8 @@ static int32_t HuksGenerateKey(struct IHuks *self, const struct HuksBlob* keyAli
     return ret;
 }
 
-static int32_t HuksImportKey(struct IHuks *self, const struct HuksBlob* keyAlias, const struct HuksBlob* key,
-     const struct HuksParamSet* paramSet, struct HuksBlob* encKeyOut)
+static int32_t HuksImportKey(struct IHuks *self, const struct HuksBlob *keyAlias, const struct HuksBlob *key,
+    const struct HuksParamSet *paramSet, struct HuksBlob *encKeyOut)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -61,8 +61,9 @@ static int32_t HuksImportKey(struct IHuks *self, const struct HuksBlob* keyAlias
     return ret;
 }
 
-static int32_t HuksImportWrappedKey(struct IHuks *self, const struct HuksBlob* wrappingKeyAlias,
-     const struct HuksBlob* wrappingEncKey, const struct HuksBlob* wrappedKeyData, const struct HuksParamSet* paramSet, struct HuksBlob* encKeyOut)
+static int32_t HuksImportWrappedKey(struct IHuks *self, const struct HuksBlob *wrappingKeyAlias,
+    const struct HuksBlob *wrappingEncKey, const struct HuksBlob *wrappedKeyData, const struct HuksParamSet *paramSet,
+    struct HuksBlob *encKeyOut)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -71,8 +72,8 @@ static int32_t HuksImportWrappedKey(struct IHuks *self, const struct HuksBlob* w
     return ret;
 }
 
-static int32_t HuksExportPublicKey(struct IHuks *self, const struct HuksBlob* encKey,
-     const struct HuksParamSet* paramSet, struct HuksBlob* keyOut)
+static int32_t HuksExportPublicKey(struct IHuks *self, const struct HuksBlob *encKey,
+    const struct HuksParamSet *paramSet, struct HuksBlob *keyOut)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -80,8 +81,8 @@ static int32_t HuksExportPublicKey(struct IHuks *self, const struct HuksBlob* en
     return ret;
 }
 
-static int32_t HuksInit(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     struct HuksBlob* handle, struct HuksBlob* token)
+static int32_t HuksInit(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+    struct HuksBlob *handle, struct HuksBlob *token)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -89,8 +90,8 @@ static int32_t HuksInit(struct IHuks *self, const struct HuksBlob* encKey, const
     return ret;
 }
 
-static int32_t HuksUpdate(struct IHuks *self, const struct HuksBlob* handle, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* inData, struct HuksBlob* outData)
+static int32_t HuksUpdate(struct IHuks *self, const struct HuksBlob *handle, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *inData, struct HuksBlob *outData)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -98,8 +99,8 @@ static int32_t HuksUpdate(struct IHuks *self, const struct HuksBlob* handle, con
     return ret;
 }
 
-static int32_t HuksFinish(struct IHuks *self, const struct HuksBlob* handle, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* inData, struct HuksBlob* outData)
+static int32_t HuksFinish(struct IHuks *self, const struct HuksBlob *handle, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *inData, struct HuksBlob *outData)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -107,7 +108,7 @@ static int32_t HuksFinish(struct IHuks *self, const struct HuksBlob* handle, con
     return ret;
 }
 
-static int32_t HuksAbort(struct IHuks *self, const struct HuksBlob* handle, const struct HuksParamSet* paramSet)
+static int32_t HuksAbort(struct IHuks *self, const struct HuksBlob *handle, const struct HuksParamSet *paramSet)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -115,8 +116,8 @@ static int32_t HuksAbort(struct IHuks *self, const struct HuksBlob* handle, cons
     return ret;
 }
 
-static int32_t HuksCheckKeyValidity(struct IHuks *self, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* encKey)
+static int32_t HuksCheckKeyValidity(struct IHuks *self, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *encKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -124,8 +125,8 @@ static int32_t HuksCheckKeyValidity(struct IHuks *self, const struct HuksParamSe
     return ret;
 }
 
-static int32_t HuksAttestKey(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     struct HuksBlob* certChain)
+static int32_t HuksAttestKey(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+    struct HuksBlob *certChain)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -133,7 +134,7 @@ static int32_t HuksAttestKey(struct IHuks *self, const struct HuksBlob* encKey, 
     return ret;
 }
 
-static int32_t HuksGenerateRandom(struct IHuks *self, const struct HuksParamSet* paramSet, struct HuksBlob* random)
+static int32_t HuksGenerateRandom(struct IHuks *self, const struct HuksParamSet *paramSet, struct HuksBlob *random)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -141,8 +142,8 @@ static int32_t HuksGenerateRandom(struct IHuks *self, const struct HuksParamSet*
     return ret;
 }
 
-static int32_t HuksSign(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* srcData, struct HuksBlob* signature)
+static int32_t HuksSign(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *srcData, struct HuksBlob *signature)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -150,8 +151,8 @@ static int32_t HuksSign(struct IHuks *self, const struct HuksBlob* encKey, const
     return ret;
 }
 
-static int32_t HuksVerify(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* srcData, const struct HuksBlob* signature)
+static int32_t HuksVerify(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *srcData, const struct HuksBlob *signature)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -159,8 +160,8 @@ static int32_t HuksVerify(struct IHuks *self, const struct HuksBlob* encKey, con
     return ret;
 }
 
-static int32_t HuksEncrypt(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* plainText, struct HuksBlob* cipherText)
+static int32_t HuksEncrypt(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+     const struct HuksBlob *plainText, struct HuksBlob *cipherText)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -168,8 +169,8 @@ static int32_t HuksEncrypt(struct IHuks *self, const struct HuksBlob* encKey, co
     return ret;
 }
 
-static int32_t HuksDecrypt(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* cipherText, struct HuksBlob* plainText)
+static int32_t HuksDecrypt(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *cipherText, struct HuksBlob *plainText)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -177,8 +178,8 @@ static int32_t HuksDecrypt(struct IHuks *self, const struct HuksBlob* encKey, co
     return ret;
 }
 
-static int32_t HuksAgreeKey(struct IHuks *self, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* encPrivateKey, const struct HuksBlob* peerPublicKey, struct HuksBlob* agreedKey)
+static int32_t HuksAgreeKey(struct IHuks *self, const struct HuksParamSet *paramSet,
+    const struct HuksBlob *encPrivateKey, const struct HuksBlob *peerPublicKey, struct HuksBlob *agreedKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -186,8 +187,8 @@ static int32_t HuksAgreeKey(struct IHuks *self, const struct HuksParamSet* param
     return ret;
 }
 
-static int32_t HuksDeriveKey(struct IHuks *self, const struct HuksParamSet* paramSet, const struct HuksBlob* encKdfKey,
-     struct HuksBlob* derivedKey)
+static int32_t HuksDeriveKey(struct IHuks *self, const struct HuksParamSet *paramSet, const struct HuksBlob *encKdfKey,
+     struct HuksBlob *derivedKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -195,8 +196,8 @@ static int32_t HuksDeriveKey(struct IHuks *self, const struct HuksParamSet* para
     return ret;
 }
 
-static int32_t HuksMac(struct IHuks *self, const struct HuksBlob* encKey, const struct HuksParamSet* paramSet,
-     const struct HuksBlob* srcData, struct HuksBlob* mac)
+static int32_t HuksMac(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
+     const struct HuksBlob *srcData, struct HuksBlob *mac)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -204,8 +205,8 @@ static int32_t HuksMac(struct IHuks *self, const struct HuksBlob* encKey, const 
     return ret;
 }
 
-static int32_t HuksUpgradeKey(struct IHuks *self, const struct HuksBlob* encOldKey, const struct HuksParamSet* paramSet,
-     struct HuksBlob* encNewKey)
+static int32_t HuksUpgradeKey(struct IHuks *self, const struct HuksBlob *encOldKey, const struct HuksParamSet *paramSet,
+    struct HuksBlob *encNewKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -213,8 +214,8 @@ static int32_t HuksUpgradeKey(struct IHuks *self, const struct HuksBlob* encOldK
     return ret;
 }
 
-static int32_t HuksExportChipsetPlatformPublicKey(struct IHuks *self, const struct HuksBlob* salt,
-     enum HuksChipsetPlatformDecryptScene scene, struct HuksBlob* publicKey)
+static int32_t HuksExportChipsetPlatformPublicKey(struct IHuks *self, const struct HuksBlob *salt,
+    enum HuksChipsetPlatformDecryptScene scene, struct HuksBlob *publicKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
