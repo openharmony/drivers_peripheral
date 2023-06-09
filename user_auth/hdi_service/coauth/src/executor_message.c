@@ -433,7 +433,7 @@ IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMod
         return NULL;
     }
     Buffer *retBuffer = NULL;
-    Uint8Array retInfo = { Malloc(MAX_EXECUTOR_SIZE), MAX_EXECUTOR_SIZE };
+    Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
     if (attribute == NULL || IS_ARRAY_NULL(retInfo)) {
         LOG_ERROR("generate attribute or retInfo failed");
@@ -446,7 +446,7 @@ IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMod
         goto FAIL;
     }
 
-    if (authPropertyMode == PROPERMODE_UNLOCK) {
+    if (authPropertyMode == PROPERTY_MODE_UNFREEZE) {
         result = GetAttributeExecutorMsg(attribute, true, &retInfo);
     } else {
         result = GetAttributeExecutorMsg(attribute, false, &retInfo);
