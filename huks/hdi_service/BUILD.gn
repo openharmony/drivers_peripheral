@@ -14,15 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-config("huks_config") {
-  include_dirs = []
-}
-
-
 ohos_shared_library("libhuks_hdi_service_1.0") {
-  subsystem_name = "security"
-  part_name = "huks"
-  public_configs = [ ":huks_config" ]
   defines = []
   sources = [
     "huks_hdi_service.c",
