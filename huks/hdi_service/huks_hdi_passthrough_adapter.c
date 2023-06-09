@@ -283,7 +283,6 @@ int32_t HuksInitHuksCoreEngine()
     // libhuks_engine_core_standard is a software implementation version of huks driver, built-in system image
     // by the source code at security_huks/services/huks_standard/huks_engine/main
     g_coreEngineHandle = dlopen("libhuks_engine_core_standard.z.so", RTLD_NOW);
-
     if (g_coreEngineHandle == NULL) {
         HDF_LOGE("HUKS dlopen failed, %{public}s!", dlerror());
         return HUKS_ERROR_NULL_POINTER;

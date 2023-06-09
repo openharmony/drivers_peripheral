@@ -77,7 +77,7 @@ int32_t HuksHdiAdapterAbort(const struct HksBlob *handle, const struct HksParamS
 int32_t HuksHdiAdapterGetKeyProperties(const struct HksParamSet *paramSet, const struct HksBlob *key);
 
 int32_t HuksHdiAdapterAttestKey(const struct HksBlob *key, const  struct HksParamSet *paramSet,
-     struct HksBlob *certChain);
+    struct HksBlob *certChain);
 
 int32_t HuksHdiAdapterUpgradeKey(const struct HksBlob *oldKey, const struct HksParamSet *paramSet,
     struct HksBlob *newKey);

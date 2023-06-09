@@ -60,7 +60,6 @@ void HuksHdiApiCompatTest::TearDown()
 {
 }
 
-
 /**
  * @tc.name: HuksHdiApiCompatTest.HdiFuncCompatibilityTest001
  * @tc.desc: Test hdi func pointer params compatibility;
@@ -75,7 +74,6 @@ HWTEST_F(HuksHdiApiCompatTest, HdiFuncCompatibilityTest001, TestSize.Level0)
     ASSERT_EQ((int32_t)HUKS_ERROR_MALLOC_FAIL, -21);
     ASSERT_EQ((int32_t)HKS_CHIPSET_PLATFORM_DECRYPT_SCENE_TA_TO_TA, 1);
 }
-
 
 /**
  * @tc.name: HuksHdiApiCompatTest.HdiFuncCompatibilityTest002
@@ -120,5 +118,4 @@ HWTEST_F(HuksHdiApiCompatTest, HdiFuncCompatibilityTest004, TestSize.Level0)
     ASSERT_EQ(paramSet.paramSetSize, 0);
     ASSERT_EQ(paramSet.paramsCnt, 0);
 }
-
 }
