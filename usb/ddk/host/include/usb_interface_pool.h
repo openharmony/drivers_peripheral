@@ -59,6 +59,7 @@ struct UsbSdkInterface {
     uint8_t altSettingId;
     struct UsbSession *session;
     OsalAtomic refCount;
+    bool forceDetachKernelDriver;
 };
 
 struct UsbInterfacePool {

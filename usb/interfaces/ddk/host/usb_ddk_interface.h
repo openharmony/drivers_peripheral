@@ -434,7 +434,7 @@ int32_t UsbClearInterfaceHalt(const UsbInterfaceHandle *interfaceHandle, uint8_t
  * otherwise.
  */
 struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length);
-
+struct UsbRequest *UsbAllocRequestByMmap(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length);
 /**
  * @brief Releases a request object.
  *
@@ -444,6 +444,7 @@ struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, in
  * otherwise.
  */
 int32_t UsbFreeRequest(const struct UsbRequest *request);
+int32_t UsbFreeRequestByMmap(const struct UsbRequest *request);
 
 /**
  * @brief Sends an asynchronous request.
@@ -467,7 +468,8 @@ int32_t UsbSubmitRequestAsync(const struct UsbRequest *const request);
  */
 int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle,
     const struct UsbRequestParams *params);
-
+int32_t UsbFillRequestByMmap(
+    const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle, const struct UsbRequestParams *params);
 /**
  * @brief Cancels an asynchronous USB request.
  
@@ -487,7 +489,9 @@ int32_t UsbCancelRequest(const struct UsbRequest *request);
  */
 int32_t UsbSubmitRequestSync(const struct UsbRequest *request);
 int32_t UsbMemTestTrigger(bool enable);
-
+int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct UsbInterface **interface);
+int32_t UsbGetInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t *settingIndex);
+int32_t UsbGetDeviceMemMapFd(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
 #ifdef __cplusplus
 }
 #endif
