@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
-#define OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
+#ifndef OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL_H
 
 #include <hdf_base.h>
-#include "v1_0/isensor_callback.h"
+#include "v1_1/isensor_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 class SensorCallbackImpl : public ISensorCallback {
 public:
     virtual ~SensorCallbackImpl() {}
@@ -30,9 +30,9 @@ public:
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
     static uint32_t sensorDataFlag;
 };
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
+#endif // OHOS_HDI_SENSOR_V1_1_SENSORCALLBACKIMPL_H

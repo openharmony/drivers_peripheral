@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_0/sensor_interface_stub.h"
+#include "v1_1/sensor_interface_stub.h"
 
-using namespace OHOS::HDI::Sensor::V1_0;
+using namespace OHOS::HDI::Sensor::V1_1;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-const std::u16string SENSOR_INTERFACE_TOKEN = u"ohos.hdi.sensor.v1_0.ISensorInterface";
+const std::u16string SENSOR_INTERFACE_TOKEN = u"ohos.hdi.sensor.v1_1.ISensorInterface";
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
 {
