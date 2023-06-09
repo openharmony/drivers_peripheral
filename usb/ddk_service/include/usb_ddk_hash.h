@@ -14,16 +14,10 @@
  */
 #ifndef USB_DDK_HASH_H
 #define USB_DDK_HASH_H
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif /* __cplusplus */
-int32_t UsbDdkHash(uint64_t param, uint64_t *hashVal);
-int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t *param);
+int32_t UsbDdkHash(uint64_t param, uint64_t &hashVal);
+int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &param);
 void UsbDdkDelHashRecord(uint64_t hashVal);
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 #endif // USB_DDK_IMPL_H

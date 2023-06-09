@@ -158,7 +158,7 @@ struct UsbDescriptorHeader {
     uint8_t bDescriptorType;
 } __attribute__((packed));
 
-struct UsbDeviceDescriptor {
+typedef struct UsbDeviceDescriptor {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t bcdUSB;
@@ -173,7 +173,7 @@ struct UsbDeviceDescriptor {
     uint8_t iProduct;
     uint8_t iSerialNumber;
     uint8_t bNumConfigurations;
-} __attribute__((packed));
+} __attribute__((packed)) UsbDeviceDescriptor;
 
 struct UsbConfigDescriptor {
     uint8_t bLength;
