@@ -11,8 +11,7 @@
     "scripts": {},
     "component": {
       "name": "drivers_peripheral_huks",
-      "subsystem": "hdf",
-      "syscap": [""],
+      "subsystem": "drivers",
       "adapter_system_type": ["standard"],
       "rom": "675KB",
       "ram": "7400KB",
