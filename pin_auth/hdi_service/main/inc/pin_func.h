@@ -114,6 +114,7 @@ ResultCode DoDeleteTemplate(uint64_t templateId);
 ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv,
     Buffer *rootSecret);
 ResultCode GenerateKeyPair(void);
+void DestoryGlobalKeyPair(void);
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templateIdListLen);
 ResultCode DoWriteAntiBruteInfoToFile(uint64_t templateId);

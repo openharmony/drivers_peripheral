@@ -161,6 +161,13 @@ ResultCode GenerateKeyPair(void)
     return RESULT_SUCCESS;
 }
 
+void DestoryGlobalKeyPair(void)
+{
+    DestoryKeyPair(g_keyPair);
+    g_keyPair = NULL;
+    LOG_INFO("DestoryKeyPair success");
+}
+
 /* This is for example only, Should be implemented in trusted environment. */
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo)
 {
