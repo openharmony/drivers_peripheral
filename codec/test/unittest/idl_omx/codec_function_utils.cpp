@@ -33,9 +33,7 @@ FunctionUtil::FunctionUtil(CodecVersionType version)
 
 FunctionUtil::~FunctionUtil()
 {
-    if (buffer_ != nullptr) {
-        buffer_ = nullptr;
-    }
+    buffer_ = nullptr;
 }
 
 uint32_t FunctionUtil::AlignUp(uint32_t width)
@@ -199,13 +197,6 @@ bool FunctionUtil::UseBufferOnPort(sptr<ICodecComponent> component, enum PortInd
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         int fd = OHOS::AshmemCreate(0, bufferSize);
         shared_ptr<OHOS::Ashmem> sharedMem = make_shared<OHOS::Ashmem>(fd, bufferSize);
-        if (sharedMem == nullptr) {
-            HDF_LOGE("sharedMem is nullptr");
-            if (fd >= 0) {
-                close(fd);
-            }
-            return false;
-        }
         InitCodecBufferWithAshMem(port, bufferSize, omxBuffer, sharedMem);
         OmxCodecBuffer outBuffer;
         auto err = component->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
@@ -254,13 +245,6 @@ bool FunctionUtil::AllocateBufferOnPort(sptr<ICodecComponent> component, enum Po
 
         int fd = outBuffer.fd;
         shared_ptr<OHOS::Ashmem> sharedMem = make_shared<OHOS::Ashmem>(fd, bufferSize);
-        if (sharedMem == nullptr) {
-            HDF_LOGE("sharedMem is nullptr");
-            if (fd >= 0) {
-                close(fd);
-            }
-            return false;
-        }
 
         std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
         bufferInfo->omxBuffer = omxBuffer;
