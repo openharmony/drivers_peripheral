@@ -442,6 +442,8 @@ void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> camera
     AddDefaultJpegOrientation(cameraMetadata);
     AddDefaultJpegQuality(cameraMetadata);
     AddDefaultAbilityStreamAvailableBasicConfigurations(cameraMetadata);
+    AddDefaultSensorOrientation(cameraMetadata);
+    AddDefaultFocalLength(cameraMetadata);
 }
 
 int V4L2DeviceManager::GetOhosMetaTag(uint32_t v4l2Tag)
@@ -737,5 +739,21 @@ void V4L2DeviceManager::AddDefaultAbilityStreamAvailableBasicConfigurations(std:
     abilityStreamAvailableBasicConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS,
                        abilityStreamAvailableBasicConfigurationsVector);
+}
+
+void V4L2DeviceManager::AddDefaultSensorOrientation(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> sensorOrientationVector;
+    const uint8_t sensorOrientation = 0;
+    sensorOrientationVector.push_back(sensorOrientation);
+    AddOrUpdateOhosTag(metadata, OHOS_SENSOR_ORIENTATION, sensorOrientationVector);
+}
+
+void V4L2DeviceManager::AddDefaultFocalLength(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<float> cameraFocalLength;
+    const float focalLength = 24.0;
+    cameraFocalLength.push_back(focalLength);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FOCAL_LENGTH, cameraFocalLength);
 }
 } // namespace OHOS::Camera

@@ -942,3 +942,49 @@ TEST_F(UtestUSBCameraTest, camera_usb_0029)
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_SENSOR_ORIENTATION
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0030)
+{
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
+    EXPECT_EQ(ret, CAM_META_SUCCESS);
+    std::cout << "OHOS_SENSOR_ORIENTATION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
+    EXPECT_TRUE(entry.data.u8[0] == 0);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_FOCAL_LENGTH
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0031)
+{
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCAL_LENGTH, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "log OHOS_ABILITY_FOCAL_LENGTH: count is " << (int)entry.count << std::endl;
+        std::cout << "log focal length value: " << entry.data.f[0] << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "log OHOS_ABILITY_FOCAL_LENGTH is not support" << std::endl;
+    }
+}
