@@ -267,6 +267,10 @@ int32_t HuksHdiAdapterGenerateRandom(const struct HksParamSet *paramSet, struct 
 int32_t HuksHdiAdapterExportChipsetPlatformPublicKey(const struct HksBlob *salt,
     enum HksChipsetPlatformDecryptScene scene, struct HksBlob *publicKey)
 {
+    HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
+
+    HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiExportChipsetPlatformPublicKey, HUKS_ERROR_NULL_POINTER,
+        "ExportChipsetPlatformPublicKey function is null pointer")
     return g_coreEngine->HuksHdiExportChipsetPlatformPublicKey(salt, scene, publicKey);
 }
 
