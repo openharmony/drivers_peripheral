@@ -21,7 +21,6 @@
 namespace {
     struct AllParameters {
         uint8_t *role;
-        uint32_t roleLen;
         uint32_t index;
     };
 }
@@ -41,10 +40,8 @@ namespace Codec {
             rawData = rawData + sizeof(uint32_t);
             size = size - sizeof(uint32_t);
             params.role = reinterpret_cast<uint8_t *>(rawData);
-            params.roleLen = size;
         } else {
             params.role = reinterpret_cast<uint8_t *>(rawData);
-            params.roleLen = size;
         }
 
         bool result = Preconditions();
