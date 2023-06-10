@@ -140,6 +140,8 @@ private:
     void AddDefaultJpegOrientation(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultJpegQuality(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultAbilityStreamAvailableBasicConfigurations(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultSensorOrientation(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultFocalLength(std::shared_ptr<CameraMetadata> metadata);
 
 private:
     HotplugDevCb uvcCb_ = nullptr;
