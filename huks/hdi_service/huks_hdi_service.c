@@ -13,9 +13,6 @@
   *limitations under the License.
  */
 
-#include <hdf_base.h>
-#include <hdf_log.h>
-#include <osal_mem.h>
 #include <securec.h>
 
 #include "v1_0/ihuks.h"
@@ -233,9 +230,8 @@ static int32_t HuksGetVersion(struct IHuks *self, uint32_t *majorVer, uint32_t *
 
 struct IHuks *HuksImplGetInstance(void)
 {
-    struct HuksService *service = (struct HuksService *)OsalMemCalloc(sizeof(struct HuksService));
+    struct HuksService *service = (struct HuksService *)malloc(sizeof(struct HuksService));
     if (service == NULL) {
-        HDF_LOGE("%{public}s: malloc HuksService obj failed!", __func__);
         return NULL;
     }
 
@@ -271,5 +267,5 @@ void HuksImplRelease(struct IHuks *instance)
         return;
     }
     (void)HuksReleaseCoreEngine();
-    OsalMemFree(instance);
+    free(instance);
 }

@@ -25,8 +25,6 @@ ohos_shared_library("libhuks_hdi_service_1.0") {
       "c_utils:utils",
       "hiviewdfx_hilog_native:libhilog",
       "drivers_interface_huks:huks_idl_headers",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
