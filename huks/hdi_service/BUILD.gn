@@ -17,14 +17,14 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libhuks_hdi_service_1.0") {
   defines = []
   sources = [
-    "huks_hdi_service.c",
     "huks_hdi_passthrough_adapter.c",
+    "huks_hdi_service.c",
   ]
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
       "drivers_interface_huks:huks_idl_headers",
+      "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

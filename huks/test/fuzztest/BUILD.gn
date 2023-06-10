@@ -17,11 +17,11 @@ group("huks_hdi_fuzztest") {
   testonly = true
   if (os_level == "standard") {
     deps = [
-        "generatekeyfuzz:huks_hdi_generatekey_fuzz",
-        "importkeyfuzz:huks_hdi_importkey_fuzz",
-        "initfuzz:huks_hdi_init_fuzz",
-        "importwrappedkeyfuzz:huks_hdi_importwrappedkey_fuzz",
-        "agreekeyfuzz:huks_hdi_agreekey_fuzz",
-      ]
+      "agreekeyfuzz:huks_hdi_agreekey_fuzz",
+      "generatekeyfuzz:huks_hdi_generatekey_fuzz",
+      "importkeyfuzz:huks_hdi_importkey_fuzz",
+      "importwrappedkeyfuzz:huks_hdi_importwrappedkey_fuzz",
+      "initfuzz:huks_hdi_init_fuzz",
+    ]
   }
 }
