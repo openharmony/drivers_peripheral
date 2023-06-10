@@ -17,7 +17,6 @@
       "ram": "7400KB",
       "deps": {
         "components": [
-          "hdf_core",
           "hiviewdfx_hilog_native",
           "c_utils"
         ],
