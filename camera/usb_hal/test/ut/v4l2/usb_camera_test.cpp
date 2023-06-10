@@ -730,7 +730,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0024)
     display_->AchieveStreamOperator();
     std::vector<int32_t> jpegOrientationVector;
     jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_0);
-    display_->ability->updateEntry(OHOS_JPEG_ORIENTATION, jpegOrientationVector.data(), jpegOrientationVector.size());
+    display_->ability->updateEntry(OHOS_JPEG_ORIENTATION, jpegOrientationVector.data(),
+        jpegOrientationVector.size());
     display_->ability_.clear();
     MetadataUtils::ConvertMetadataToVec(display_->ability, display_->ability_);
     // start stream

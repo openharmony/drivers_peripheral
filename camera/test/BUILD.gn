@@ -21,8 +21,8 @@ group("camera_hal_test") {
     deps = [
       "$test_path/at:camera_test_at",
       "$test_path/benchmarktest:hdf_camera_benchmark_test",
-      "$test_path/demo:ohos_camera_demo",
-      "$test_path/ut:camera_test_ut",
+      "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
+      "$test_path/ut/v4l2:camera_test_v4l2_ut",
     ]
   }
 }

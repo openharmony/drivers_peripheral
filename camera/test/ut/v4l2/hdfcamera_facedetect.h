@@ -16,7 +16,7 @@
 #ifndef HDF_CAMERA_FACE_DETECT_H
 #define HDF_CAMERA_FACE_DETECT_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class HdfCameraFaceDetect : public testing::Test {
 public:
@@ -24,6 +24,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
 };
 #endif /* HDF_CAMERA_FACE_DETECT_H */

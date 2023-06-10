@@ -16,7 +16,7 @@
 #ifndef DOUBLE_PREVIEW_H
 #define DOUBLE_PREVIEW_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 #define PREVIEW_WIDTH 640
 #define PREVIEW_HEIGHT 480
 
@@ -40,7 +40,7 @@ public:
     void StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds);
 
     CamRetCode result_;
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerPreviewDouble_ = nullptr;
     std::vector<StreamInfo> streamInfos_;

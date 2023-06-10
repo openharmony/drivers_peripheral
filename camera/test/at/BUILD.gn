@@ -69,9 +69,6 @@ if (defined(ohos_lite)) {
 
     public_deps = [
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
-      "$camera_path/buffer_manager:camera_buffer_manager",
-      "$camera_path/device_manager:camera_device_manager",
-      "$camera_path/pipeline_core:camera_pipeline_core",
       "$hdf_uhdf_path/utils:libhdf_utils",
       "../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     ]

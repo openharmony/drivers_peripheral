@@ -19,7 +19,11 @@ if (defined(ohos_lite)) {
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
-    cflags_cc = [ "-std=c++17" ]
+
+    cflags_cc = [
+      "-Wno-error",
+      "-std=c++17",
+    ]
   }
 
   ohos_executable("ohos_camera_demo") {
@@ -88,6 +92,10 @@ if (defined(ohos_lite)) {
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
+    cflags_cc = [
+      "-Wno-error",
+      "-std=c++17",
+    ]
   }
 
   ohos_executable("ohos_camera_demo") {
@@ -127,11 +135,7 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
     ]
 
-    deps = [
-      "$camera_path/buffer_manager:camera_buffer_manager",
-      "$camera_path/device_manager:camera_device_manager",
-      "$camera_path/pipeline_core:camera_pipeline_core",
-    ]
+    deps = [ "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0" ]
 
     if (is_standard_system) {
       external_deps = [
