@@ -41,7 +41,6 @@ private:
     void encodeJpegToMemory(uint8_t* image, int width, int height,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
     void Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer);
-    void Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer);
     void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);
 
     static uint32_t                       previewWidth_;

@@ -235,8 +235,6 @@ void RKCodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
     AVFrame *pFrameYUV = nullptr;
     pFrameYUV = av_frame_alloc();
     pFrameRGBA = av_frame_alloc();
-    previewWidth_ = buffer->GetWidth();
-    previewHeight_ = buffer->GetHeight();
 
     void* temp = malloc(buffer->GetSize());
     if (temp == nullptr) {
@@ -271,54 +269,6 @@ void RKCodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
     }
     av_frame_free(&pFrameYUV);
     av_frame_free(&pFrameRGBA);
-    free(temp);
-}
-
-void RKCodecNode::Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer)
-{
-    if (buffer == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToYuv420 buffer == nullptr");
-        return;
-    }
-
-    AVFrame *pFrameY420 = nullptr;
-    AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    pFrameY420 = av_frame_alloc();
-
-    void* temp = malloc(buffer->GetSize());
-    if (temp == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToYuv420 malloc buffer == nullptr");
-        return;
-    }
-    int ret = memcpy_s((uint8_t *)temp, buffer->GetSize(), (uint8_t *)buffer->GetVirAddress(), buffer->GetSize());
-    if (ret == 0) {
-        buffer->SetEsFrameSize(buffer->GetSize());
-    } else {
-        printf("memcpy_s failed!\n");
-        buffer->SetEsFrameSize(0);
-    }
-
-    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)temp, AV_PIX_FMT_YUYV422, previewWidth_, previewHeight_);
-    avpicture_fill((AVPicture *)pFrameY420, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUV420P,
-                   previewWidth_, previewHeight_);
-
-    struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
-                                               previewHeight_, AV_PIX_FMT_YUV420P, SWS_BILINEAR, 0, 0, 0);
-
-    if (imgCtx != nullptr) {
-        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
-                  pFrameY420->data, pFrameY420->linesize);
-        if (imgCtx) {
-            sws_freeContext(imgCtx);
-            imgCtx = nullptr;
-        }
-    } else {
-        sws_freeContext(imgCtx);
-        imgCtx = nullptr;
-    }
-    av_frame_free(&pFrameYUV);
-    av_frame_free(&pFrameY420);
     free(temp);
 }
 
@@ -385,8 +335,10 @@ void RKCodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
     } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
-        Yuv422ToYuv420(buffer);
+        Yuv422ToRGBA8888(buffer);
     } else {
+        previewWidth_ = buffer->GetWidth();
+        previewHeight_ = buffer->GetHeight();
         Yuv422ToRGBA8888(buffer);
     }
 
