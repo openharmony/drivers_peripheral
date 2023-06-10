@@ -17,8 +17,8 @@ if (os_level == "standard") {
   group("huks_hdi_test") {
     testonly = true
     deps = [
-        "fuzztest:huks_hdi_fuzztest",
-        "unittest:huks_hdi_unittest",
+      "fuzztest:huks_hdi_fuzztest",
+      "unittest:huks_hdi_unittest",
     ]
   }
 }

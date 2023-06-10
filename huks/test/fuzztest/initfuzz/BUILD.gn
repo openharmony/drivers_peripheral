@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import("//build/config/features.gni")
 import("//build/test.gni")
 
@@ -26,12 +25,12 @@ ohos_fuzztest("huks_hdi_init_fuzz") {
   ]
   include_dirs = [
     "../../../hdi_service",
-    "../"
+    "../",
   ]
 
   sources = [
+    "../huks_hdi_fuzz_common.cpp",
     "huks_hdi_fuzzer.cpp",
-    "../huks_hdi_fuzz_common.cpp"
   ]
 
   deps = [ "../../../hdi_service:libhuks_hdi_service_1.0" ]
