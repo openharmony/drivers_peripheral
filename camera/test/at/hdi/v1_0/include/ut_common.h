@@ -78,6 +78,8 @@ public:
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
     int streamIdPreview = 1000;
     int streamIdCapture = 1010;
+    int captureWidth = 1280;
+    int captureHeight = 960;
     int captureIdPreview = 2000;
     int previewWidth = 1920;
     int previewHeight = 1080;
