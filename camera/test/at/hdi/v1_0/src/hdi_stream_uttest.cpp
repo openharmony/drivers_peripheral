@@ -38,7 +38,7 @@ void HdiStreamUtTest::TearDown(void)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(false, cameraTest->cameraDevice == nullptr);
@@ -85,7 +85,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_001, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -125,7 +125,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -160,7 +160,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_004, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_004, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -198,7 +198,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_004, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -233,7 +233,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -272,7 +272,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -308,7 +308,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -347,7 +347,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -386,7 +386,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -425,7 +425,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -463,7 +463,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -502,7 +502,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -541,7 +541,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -580,7 +580,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -619,7 +619,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_016, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_016, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -658,7 +658,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_016, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_019, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_019, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -674,7 +674,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_019, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_020, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_020, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -693,7 +693,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_020, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_021, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_021, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -710,7 +710,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_021, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_022, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_022, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -736,7 +736,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_022, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_023, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_023, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -789,7 +789,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_023, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_024, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_024, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -815,7 +815,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_024, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_025, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_025, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -833,7 +833,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_025, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_026, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_026, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->intents = {PREVIEW};
@@ -852,7 +852,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_026, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level0)
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -917,4 +917,57 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level0)
     std::vector<int> streamIds = {cameraTest->streamInfo->streamId_, cameraTest->streamInfoSnapshot->streamId_};
     cameraTest->rc = cameraTest->streamOperator->ReleaseStreams(streamIds);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: CreateStreams
+ * @tc.desc: CreateStreams, StreamInfo->format = -1, success
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_029, TestSize.Level1)
+{
+    cameraTest->Open();
+    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator);
+    EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
+
+    cameraTest->streamInfo = std::make_shared<StreamInfo>();
+    cameraTest->streamInfo->streamId_ = 1001;
+    cameraTest->streamInfo->width_ = 1920;
+    cameraTest->streamInfo->height_ = 1080;
+    cameraTest->streamInfo->format_ = -1;
+    cameraTest->streamInfo->dataspace_ = 8;
+    cameraTest->streamInfo->intent_ = PREVIEW;
+    cameraTest->streamInfo->tunneledMode_ = 5;
+
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
+        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
+    });
+
+    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
+    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
+    cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
+    EXPECT_EQ(cameraTest->rc, INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: capture
+ * @tc.desc: capture, input normal
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_030, TestSize.Level1)
+{
+    cameraTest->Open();
+    cameraTest->intents = {PREVIEW};
+    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, true, true);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }

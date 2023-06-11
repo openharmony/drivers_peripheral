@@ -204,9 +204,9 @@ void Test::StartStream(std::vector<StreamIntent> intents)
             consumerMap_[intent] = consumer_analyze;
             streamInfos.push_back(*streamInfoAnalyze);
         } else {
-            streamInfoCapture->streamId_ = streamIdAnalyze;
-            streamInfoCapture->width_ = analyzeWidth;
-            streamInfoCapture->height_ = analyzeHeight;
+            streamInfoCapture->streamId_ = streamIdCapture;
+            streamInfoCapture->width_ = captureWidth;
+            streamInfoCapture->height_ = captureHeight;
             streamInfoCapture->format_ = analyzeFormat;
             streamInfoCapture->dataspace_ = UT_DATA_SIZE;
             streamInfoCapture->intent_ = intent;
