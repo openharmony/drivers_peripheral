@@ -38,7 +38,7 @@ void HdiDeviceUtTest::TearDown(void)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_001, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_001, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
@@ -53,7 +53,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_001, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_002, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_002, TestSize.Level1)
 {
     cameraTest->Open();
     cameraTest->streamOperatorCallback = nullptr;
@@ -68,7 +68,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_002, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_003, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_003, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
@@ -88,7 +88,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_003, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_004, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_004, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
@@ -108,7 +108,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_004, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_005, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_005, TestSize.Level1)
 {
     cameraTest->Open();
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -126,7 +126,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_005, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_006, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_006, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
@@ -146,7 +146,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_006, TestSize.Level0)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_007, TestSize.Level0)
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_007, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
@@ -158,4 +158,20 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_007, TestSize.Level0)
     }
     cameraTest->rc = cameraTest->cameraDevice->SetResultMode(ON_CHANGED);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: Close
+ * @tc.desc: close the device
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_008, TestSize.Level1)
+{
+    cameraTest->Open();
+    EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
+    if (cameraTest->cameraDevice == nullptr) {
+        cameraTest->cameraDevice->Close();
+        cameraTest->cameraDevice = nullptr;
+    }
 }
