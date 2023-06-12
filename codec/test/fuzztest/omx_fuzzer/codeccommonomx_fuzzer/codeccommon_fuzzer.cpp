@@ -87,6 +87,7 @@ namespace Codec {
         std::string compName("OMX.rk.video_encoder.avc");
         int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, compName.data(), g_appData, g_callback);
         if (ret != HDF_SUCCESS) {
+            CodecCallbackTypeRelease(g_callback);
             HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
             return false;
         }
@@ -101,6 +102,7 @@ namespace Codec {
             HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
         }
+        CodecCallbackTypeRelease(g_callback);
         CodecComponentTypeRelease(g_component);
         CodecComponentManagerRelease();
         return true;

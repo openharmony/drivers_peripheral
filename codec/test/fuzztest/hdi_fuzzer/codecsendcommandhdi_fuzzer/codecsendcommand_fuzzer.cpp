@@ -28,7 +28,6 @@ namespace {
         enum CodecCommandType cmd;
         uint32_t param;
         int8_t *cmdData;
-        uint32_t cmdDataLen;
     };
     constexpr uint32_t WAIT_TIME = 1000;
     constexpr uint32_t MAX_WAIT = 50;
@@ -60,12 +59,10 @@ namespace Codec {
             rawData = rawData + sizeof(uint32_t);
             size = size - sizeof(uint32_t);
             params.cmdData = reinterpret_cast<int8_t *>(rawData);
-            params.cmdDataLen = size;
             rawData = rawData + sizeof(int8_t *);
             params.cmd = static_cast<CodecCommandType>(*rawData);
         } else {
             params.cmdData = reinterpret_cast<int8_t *>(rawData);
-            params.cmdDataLen = size;
             params.cmd = static_cast<CodecCommandType>(*rawData);
         }
 
