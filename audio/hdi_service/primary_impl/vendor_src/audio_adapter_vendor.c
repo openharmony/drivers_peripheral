@@ -539,17 +539,6 @@ int32_t AudioHwiRegExtraParamObserver(struct IAudioAdapter *adapter, struct IAud
     return HDF_SUCCESS;
 }
 
-int32_t AudioHwiAdapterGetVersion(struct IAudioAdapter *adapter, uint32_t *majorVer, uint32_t *minorVer)
-{
-    (void)adapter;
-    CHECK_NULL_PTR_RETURN_VALUE(majorVer, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(minorVer, HDF_ERR_INVALID_PARAM);
-    *majorVer = IAUDIO_ADAPTER_MAJOR_VERSION;
-    *minorVer = IAUDIO_ADAPTER_MINOR_VERSION;
-
-    return HDF_SUCCESS;
-}
-
 static void AudioHwiInitAdapterInstance(struct IAudioAdapter *adapter)
 {
     adapter->InitAllPorts = AudioHwiInitAllPorts;
@@ -572,7 +561,6 @@ static void AudioHwiInitAdapterInstance(struct IAudioAdapter *adapter)
 
     adapter->GetExtraParams = AudioHwiGetExtraParams;
     adapter->RegExtraParamObserver = AudioHwiRegExtraParamObserver;
-    adapter->GetVersion = AudioHwiAdapterGetVersion;
 }
 
 uint32_t AudioHwiGetAdapterRefCnt(uint32_t descIndex)
