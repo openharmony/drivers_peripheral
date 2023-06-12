@@ -68,7 +68,7 @@ typedef enum {
 
     /**
      * initialization the BT Controller. it will be called after BT_OP_HCI_CHANNEL_OPEN.
-     * Controller Must call init_cb to notify the host once it has been done.
+     * Controller Must call initCb to notify the host once it has been done.
      */
     BT_OP_INIT,
 
@@ -130,7 +130,7 @@ typedef void (*FreeCallback)(void* buf);
  *  HCI Command packet. For example, opcode = 0x0c03 for the HCI_RESET command
  *  packet.
  */
-typedef size_t (*CmdXmitCallback)(uint16_t opcode, void* p_buf);
+typedef size_t (*CmdXmitCallback)(uint16_t opcode, void* pBuf);
 
 typedef struct {
     /**
@@ -139,7 +139,7 @@ typedef struct {
     size_t size;
 
     /* notifies caller result of init request */
-    InitCallback init_cb;
+    InitCallback initCb;
 
     /* buffer allocation request */
     MallocCallback alloc;
@@ -164,7 +164,7 @@ typedef struct {
      * Caller will open the interface and pass in the callback routines
      * to the implementation of this interface.
      */
-    int (*init)(const BtVendorCallbacksT* p_cb, unsigned char* local_bdaddr);
+    int (*init)(const BtVendorCallbacksT* pCb, unsigned char* localBdaddr);
 
     /**
      * Vendor specific operations
