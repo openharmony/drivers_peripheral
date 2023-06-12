@@ -42,8 +42,6 @@ struct DfxTraceInfo {
 };
 
 struct XmlTraceConfig {
-    uint32_t interval = 0;
-    uint8_t width = 0;
     std::string outPath;
 };
 
