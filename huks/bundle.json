@@ -19,7 +19,8 @@
         "components": [
           "hiviewdfx_hilog_native",
           "c_utils",
-          "hdf_core"
+          "hdf_core",
+          "drivers_interface_huks"
         ],
         "third_party": [
         ]
