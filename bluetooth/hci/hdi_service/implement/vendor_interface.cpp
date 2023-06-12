@@ -35,7 +35,7 @@ namespace V1_0 {
 constexpr size_t BT_VENDOR_INVALID_DATA_LEN = 0;
 BtVendorCallbacksT VendorInterface::vendorCallbacks_ = {
     .size = sizeof(BtVendorCallbacksT),
-    .init_cb = VendorInterface::OnInitCallback,
+    .initCb = VendorInterface::OnInitCallback,
     .alloc = VendorInterface::OnMallocCallback,
     .dealloc = VendorInterface::OnFreeCallback,
     .xmitCb = VendorInterface::OnCmdXmitCallback,
