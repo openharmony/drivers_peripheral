@@ -265,8 +265,8 @@ typedef struct HksParamSet TargetParamSet;
     TargetBlob kdfKeyCore = {0};  \
     TargetBlob derivedKeyCore = {0};  \
     HDI_CONVERTER_PARAM_IN_PARAMSET(paramSet, paramSetCore)  \
-    HDI_CONVERTER_PARAM_IN_BLOB(kdfKeyCore, &kdfKeyCore)  \
-    HDI_CONVERTER_PARAM_IN_BLOB(derivedKeyCore, &derivedKey)  \
+    HDI_CONVERTER_PARAM_IN_BLOB(kdfKey, &kdfKeyCore)  \
+    HDI_CONVERTER_PARAM_IN_BLOB(derivedKey, &derivedKeyCore)  \
     ret = (func)(HDI_ADAPTER_PARAM(paramSet, paramSetCore),  \
                  HDI_ADAPTER_PARAM(kdfKey, &kdfKeyCore),  \
                  HDI_ADAPTER_PARAM(derivedKey, &derivedKeyCore));  \
