@@ -18,7 +18,8 @@
       "deps": {
         "components": [
           "hiviewdfx_hilog_native",
-          "c_utils"
+          "c_utils",
+          "hdf_core"
         ],
         "third_party": [
         ]
