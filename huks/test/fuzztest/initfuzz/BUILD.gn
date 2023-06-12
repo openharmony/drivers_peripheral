@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/security/huks/build/config.gni")
 import("//build/config/features.gni")
 import("//build/test.gni")
 
@@ -27,6 +28,10 @@ ohos_fuzztest("huks_hdi_init_fuzz") {
     "../../../hdi_service",
     "../",
   ]
+
+  if (huks_security_level == "software") {
+    defines = [ "HUKS_HDI_SOFTWARE" ]
+  }
 
   sources = [
     "../huks_hdi_fuzz_common.cpp",

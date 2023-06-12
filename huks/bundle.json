@@ -12,7 +12,7 @@
     "component": {
       "name": "drivers_peripheral_huks",
       "subsystem": "hdf",
-      "adapter_system_type": ["standard"],
+      "adapted_system_type": ["standard"],
       "rom": "675KB",
       "ram": "7400KB",
       "deps": {

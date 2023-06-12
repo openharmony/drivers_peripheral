@@ -13,7 +13,12 @@
  * limitations under the License.
  */
 
+#include <securec.h>
+
 #include "huks_hdi_fuzz_common.h"
+
+#define HKS_TAG_TYPE_MASK (0xF << 28)
+#define HKS_TAG_TYPE_BYTES (5 << 28)
 
 int32_t InitHuksCoreEngine(struct HuksHdi **coreEngine)
 {
@@ -32,4 +37,43 @@ int32_t InitHuksCoreEngine(struct HuksHdi **coreEngine)
         }
     }
     return -1;
+}
+
+static uint32_t GetTagType(uint32_t tag)
+{
+    return (tag & (uint32_t)HKS_TAG_TYPE_MASK);
+}
+
+static inline bool IsAdditionOverflow(uint32_t a, uint32_t b)
+{
+    return (UINT32_MAX - a) < b;
+}
+
+int32_t HuksFreshParamSet(struct HksParamSet *paramSet, bool isCopy)
+{
+    uint32_t size = paramSet->paramSetSize;
+    uint32_t offset = sizeof(struct HksParamSet) + sizeof(struct HksParam) * paramSet->paramsCnt;
+
+    for (uint32_t i = 0; i < paramSet->paramsCnt; i++) {
+        if (offset > size) {
+            return HUKS_FAILURE;
+        }
+        if (GetTagType(paramSet->params[i].tag) == HKS_TAG_TYPE_BYTES) {
+            if (IsAdditionOverflow(offset, paramSet->params[i].blob.size)) {
+                return HUKS_FAILURE;
+            }
+
+            if (isCopy && (memcpy_s((uint8_t *)paramSet + offset, size - offset,
+                paramSet->params[i].blob.data, paramSet->params[i].blob.size) != EOK)) {
+                return HUKS_FAILURE;
+            }
+            paramSet->params[i].blob.data = (uint8_t *)paramSet + offset;
+            offset += paramSet->params[i].blob.size;
+        }
+    }
+
+    if (paramSet->paramSetSize != offset) {
+        return HUKS_FAILURE;
+    }
+    return HUKS_SUCCESS;
 }

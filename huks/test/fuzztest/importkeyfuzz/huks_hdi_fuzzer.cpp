@@ -42,9 +42,14 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     struct HksBlob keyAlias = { SIZE_ALIAS, myData };
     struct HksBlob aesKey = { SIZE_KEY, static_cast<uint8_t *>(myData + SIZE_ALIAS) };
     struct HksParamSet *paramSet = reinterpret_cast<struct HksParamSet *>(myData + SIZE_ALIAS + SIZE_KEY);
-
     paramSet->paramSetSize = size - (SIZE_ALIAS + SIZE_KEY);
 
+#ifdef HUKS_HDI_SOFTWARE
+    if (HuksFreshParamSet(paramSet, false) != 0) {
+        free(myData);
+        return false;
+    }
+#endif
     uint8_t buffer[1024];
     struct HksBlob out = {
         .data = buffer,
