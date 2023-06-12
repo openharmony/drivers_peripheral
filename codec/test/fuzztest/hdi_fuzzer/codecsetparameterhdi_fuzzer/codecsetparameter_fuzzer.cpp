@@ -22,7 +22,6 @@ namespace {
     struct AllParameters {
         uint32_t index;
         int8_t *paramStruct;
-        uint32_t paramStructLen;
     };
 }
 
@@ -42,10 +41,8 @@ namespace Codec {
             rawData = rawData + sizeof(uint32_t);
             size = size - sizeof(uint32_t);
             params.paramStruct = reinterpret_cast<int8_t *>(rawData);
-            params.paramStructLen = size;
         } else {
             params.paramStruct = reinterpret_cast<int8_t *>(rawData);
-            params.paramStructLen = size;
         }
 
         bool result = Preconditions();

@@ -230,11 +230,11 @@ public:
     {
         manager_ = ICodecComponentManager::Get();
         gralloc_ = IDisplayBuffer::Get();
-        InitComponent();
-        if (manager_ == nullptr) {
-            std::cout<<"GetCodecComponentManager ret nullptr"<<std::endl;
+        if (manager_ == nullptr || gralloc_ == nullptr) {
+            std::cout << "GetCodecComponentManager  or GetDisplayBuffer ret nullptr" << std::endl;
             return;
         }
+        InitComponent();
     }
 
     void TearDown(benchmark::State &state)

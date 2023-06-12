@@ -60,14 +60,22 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
 int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDestroyComponent");
-    if (codecNode == nullptr || codecNode->node == nullptr) {
+    if (codecNode == nullptr) {
         CODEC_LOGE("codecNode is null");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (codecNode->node == nullptr) {
+        delete codecNode;
+        codecNode = nullptr;
+        CODEC_LOGE("node is null");
         return HDF_ERR_INVALID_PARAM;
     }
     OMX_HANDLETYPE comp = codecNode->node->GetHandle();
     codecNode->node = nullptr;
     auto err = g_mgr.DeleteComponentInstance(static_cast<OMX_COMPONENTTYPE*>(comp));
     if (err != OMX_ErrorNone) {
+        delete codecNode;
+        codecNode = nullptr;
         CODEC_LOGE("DeleteComponentInstance err[%{public}d]", err);
         return err;
     }

@@ -52,6 +52,7 @@ static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *se
     }
     err = serviceImpl->GetComponentCapabilityList(caps, count);
     if (err != HDF_SUCCESS) {
+        OsalMemFree(caps);
         CODEC_LOGE("call GetComponentCapabilityList function failed!");
         return err;
     }
