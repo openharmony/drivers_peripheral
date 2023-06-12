@@ -40,6 +40,13 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     struct HksBlob wrappedKeyData = { WRAPPED_KEY_DATA, myData };
     struct HksParamSet *paramSetIn = reinterpret_cast<struct HksParamSet *>(myData + WRAPPED_KEY_DATA);
     paramSetIn->paramSetSize = PARAMSET_SIZE;
+
+#ifdef HUKS_HDI_SOFTWARE
+    if (HuksFreshParamSet(paramSetIn, false) != 0) {
+        free(myData);
+        return false;
+    }
+#endif
     struct HksBlob key = {
         .data = myData + WRAPPED_KEY_DATA + PARAMSET_SIZE,
         .size = size - (WRAPPED_KEY_DATA + PARAMSET_SIZE)

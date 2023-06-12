@@ -26,8 +26,6 @@ ohos_shared_library("libhuks_hdi_service_1.0") {
       "drivers_interface_huks:huks_idl_headers",
       "hiviewdfx_hilog_native:libhilog",
     ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]

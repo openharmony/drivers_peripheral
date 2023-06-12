@@ -25,6 +25,8 @@ extern "C" {
 
 int32_t InitHuksCoreEngine(struct HuksHdi **coreEngine);
 
+int32_t HuksFreshParamSet(struct HksParamSet *paramSet, bool isCopy);
+
 #ifdef __cplusplus
 }
 #endif

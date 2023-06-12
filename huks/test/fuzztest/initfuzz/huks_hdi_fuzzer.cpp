@@ -59,6 +59,13 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     struct HksParamSet *paramSetFinish = reinterpret_cast<struct HksParamSet *>(myData + SIZE_KEY + SIZE_PARAMSET_INIT +
         SIZE_PARAMSET_UPDATE);
     paramSetFinish->paramSetSize = SIZE_PARAMSET_FINISH;
+    
+#ifdef HUKS_HDI_SOFTWARE
+    if (HuksFreshParamSet(paramSetUpdate, false) != 0 || HuksFreshParamSet(paramSetFinish, false) != 0) {
+        free(myData);
+        return false;
+    }
+#endif
     uint8_t buffer2[1024];
     struct HksBlob out = {
         .data = buffer2,

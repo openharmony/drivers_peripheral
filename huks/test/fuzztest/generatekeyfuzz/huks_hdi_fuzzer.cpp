@@ -38,6 +38,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     struct HksBlob keyAlias = { INIT_KEY_ALIAS_SIZE, myData };
     struct HksParamSet *paramSetIn = reinterpret_cast<struct HksParamSet *>(myData + INIT_KEY_ALIAS_SIZE);
     paramSetIn->paramSetSize = size - INIT_KEY_ALIAS_SIZE;
+#ifdef HUKS_HDI_SOFTWARE
+    if (HuksFreshParamSet(paramSetIn, false) != 0) {
+        free(myData);
+        return false;
+    }
+#endif
     uint8_t keyBuff[1] = {0};
     struct HksBlob key = {
         .data = keyBuff,
