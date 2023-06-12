@@ -15,7 +15,7 @@
 
 #include "mock_adaptor_memory.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "securec.h"
 

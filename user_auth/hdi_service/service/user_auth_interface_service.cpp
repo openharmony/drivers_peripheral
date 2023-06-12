@@ -279,22 +279,20 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
 static int32_t CreateExecutorCommand(AuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
-    int32_t ret = RESULT_GENERAL_ERROR;
+    AuthPropertyMode authPropMode;
     if (info.result == RESULT_SUCCESS) {
-        ret = GetExecutorMsgList(PROPERMODE_UNLOCK, &executorSendMsg);
-        if (ret != RESULT_SUCCESS) {
-            IAM_LOGE("get unlock msg failed");
-            return ret;
-        }
+        authPropMode = PROPERTY_MODE_UNFREEZE;
     } else if (info.remainAttempts == 0) {
-        ret = GetExecutorMsgList(PROPERMODE_LOCK, &executorSendMsg);
-        if (ret != RESULT_SUCCESS) {
-            IAM_LOGE("get lock msg failed");
-            return ret;
-        }
+        authPropMode = PROPERTY_MODE_FREEZE;
     } else {
         return RESULT_SUCCESS;
     }
+    ResultCode ret = GetExecutorMsgList(authPropMode, &executorSendMsg);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("get executor msg failed");
+        return ret;
+    }
+
     LinkedListNode *temp = executorSendMsg->head;
     while (temp != nullptr) {
         if (temp->data == nullptr) {
@@ -311,6 +309,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
         }
         ExecutorSendMsg msg = {};
         msg.executorIndex = nodeData->executorIndex;
+        msg.commandId = static_cast<int32_t>(authPropMode);
         msg.msg.resize(nodeMsgBuffer->contentSize);
         if (memcpy_s(msg.msg.data(), msg.msg.size(), nodeMsgBuffer->buf, nodeMsgBuffer->contentSize) != EOK) {
             IAM_LOGE("copy failed");
