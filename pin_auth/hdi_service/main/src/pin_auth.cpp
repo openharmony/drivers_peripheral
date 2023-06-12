@@ -60,6 +60,7 @@ int32_t PinAuth::Close()
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
+    DestoryGlobalKeyPair();
     DestroyPinDb();
     LOG_INFO("Close pinAuth succ");
 
