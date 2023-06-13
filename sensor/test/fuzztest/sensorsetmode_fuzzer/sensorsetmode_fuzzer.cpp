@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 #include "sensorsetmode_fuzzer.h"
 #include "hdf_base.h"
 #include "sensor_impl.h"
-#include "v1_0/sensor_interface_proxy.h"
+#include "v1_1/sensor_interface_proxy.h"
 
-using namespace OHOS::HDI::Sensor::V1_0;
+using namespace OHOS::HDI::Sensor::V1_1;
 
 namespace OHOS {
     bool SensorSetModeFuzzTest(const uint8_t* data, size_t size)
