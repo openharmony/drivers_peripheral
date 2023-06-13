@@ -38,6 +38,7 @@ BluetoothAddress::BluetoothAddress()
 
 constexpr int START_POS = 6;
 constexpr int END_POS = 13;
+constexpr int ADDR_BYTE = 18;
 std::string GetEncryptAddr(std::string addr)
 {
     if (addr.empty() || addr.length() != ADDRESS_STR_LEN) {
@@ -54,7 +55,7 @@ std::string GetEncryptAddr(std::string addr)
 
 void BluetoothAddress::ParseAddressToString(std::vector<uint8_t> &address, std::string &outString)
 {
-    char temp[18] = {0};
+    char temp[ADDR_BYTE] = {0};
     int ret = sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
         address[0], address[1], address[2], address[3], address[4], address[5]);
     if (ret == -1) {
