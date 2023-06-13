@@ -100,6 +100,7 @@ int32_t PowerInterfaceImpl::UnRegister()
     HDF_LOGI("UnRegister");
     RemovePowerDeathRecipient(g_callback);
     g_callback = nullptr;
+    g_isHdiStart = false;
     return HDF_SUCCESS;
 }
 
