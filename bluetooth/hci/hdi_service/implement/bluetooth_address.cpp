@@ -36,6 +36,33 @@ BluetoothAddress::BluetoothAddress()
     address_.resize(ADDRESS_SIZE);
 }
 
+constexpr int START_POS = 6;
+constexpr int END_POS = 13;
+std::string GetEncryptAddr(std::string addr)
+{
+    if (addr.empty() || addr.length() != ADDRESS_STR_LEN) {
+        HDF_LOGE("addr is invalid.");
+        return std::string("");
+    }
+    std::string tmp = "**:**:**:**:**:**";
+    std::string out = addr;
+    for (int i = START_POS; i <= END_POS; i++) {
+        out[i] = tmp[i];
+    }
+    return out;
+}
+
+void BluetoothAddress::ParseAddressToString(std::vector<uint8_t> &address, std::string &outString)
+{
+    char temp[18] = {0};
+    int ret = sprintf_s(temp, sizeof(temp), "%02X:%02X:%02X:%02X:%02X:%02X",
+        address[0], address[1], address[2], address[3], address[4], address[5]);
+    if (ret == -1) {
+        HDF_LOGE("ConvertAddr sprintf_s return error, ret -1");
+    }
+    outString = temp;
+}
+
 int BluetoothAddress::ParseAddressFromString(const std::string &string) const
 {
     size_t offset = 0;
@@ -60,8 +87,25 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
 {
     int addrFd = open(path.c_str(), O_RDONLY);
     if (addrFd < 0) {
-        HDF_LOGI("open %{public}s failed err:%{public}s.", path.c_str(), strerror(errno));
+        HDF_LOGI("GetDeviceAddress open %{public}s failed err:%{public}s.", path.c_str(), strerror(errno));
+        int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00766);
+        HDF_LOGI("GetDeviceAddress open newFd %{public}d ,failed err:%{public}s.", newFd, strerror(errno));
         char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
+        auto tmpPtr = GenerateDeviceAddress();
+        std::string strAddress;
+        ParseAddressToString(tmpPtr->address_, strAddress);
+        HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
+        int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
+        if (ret != 0) {
+            HDF_LOGI("ParseAddressToString strcpy_s err!");
+        }
+        if (newFd >= 0) {
+            int fdRet = write(newFd, addressStr, ADDRESS_STR_LEN);
+            if (fdRet < 0) {
+                HDF_LOGI("GetDeviceAddress addr write failed, err:%{public}s.", strerror(errno));
+            }
+            close(newFd);
+        }
         auto ptr = std::make_shared<BluetoothAddress>();
         if (ptr->ParseAddressFromString(addressStr) != ADDRESS_SIZE) {
             return nullptr;
@@ -71,7 +115,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
 
     char addressStr[ADDRESS_STR_LEN + 1] = {0};
     if (read(addrFd, addressStr, ADDRESS_STR_LEN) != ADDRESS_STR_LEN) {
-        HDF_LOGE("read %s failed.", path.c_str());
+        HDF_LOGE("read %{public}s failed.", path.c_str());
         close(addrFd);
         return nullptr;
     }
@@ -88,22 +132,20 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddress(const std::string &prefix)
 {
     auto ptr = std::make_shared<BluetoothAddress>();
+    char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
+    ptr->ParseAddressFromString(addressStr);
     int prefixCount = ptr->ParseAddressFromString(prefix);
     if (prefixCount < ADDRESS_SIZE) {
         int fd = open("/dev/urandom", O_RDONLY);
         if (fd < 0) {
-            HDF_LOGE("open /dev/urandom failed err:%s.", strerror(errno));
-            return nullptr;
+            HDF_LOGE("open /dev/urandom failed err:%{public}s.", strerror(errno));
+            return ptr;
         }
-
         if (read(fd, &ptr->address_[prefixCount], ADDRESS_SIZE - prefixCount) != ADDRESS_SIZE - prefixCount) {
-            HDF_LOGE("read /dev/urandom failed.");
-            close(fd);
-            return nullptr;
+            HDF_LOGE("read /dev/urandom failed err:%{public}s.", strerror(errno));
         }
         close(fd);
     }
-
     return ptr;
 }
 
