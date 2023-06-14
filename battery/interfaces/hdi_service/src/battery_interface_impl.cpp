@@ -103,6 +103,7 @@ int32_t BatteryInterfaceImpl::UnRegister()
 {
     RemoveBatteryDeathRecipient(batteryCallback_);
     batteryCallback_ = nullptr;
+    g_isHdiStart = false;
     return HDF_SUCCESS;
 }
 
