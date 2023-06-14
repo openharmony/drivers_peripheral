@@ -772,18 +772,6 @@ int32_t AudioHwiRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool
     return hwiRender->control.IsSupportsPauseAndResume(hwiRender, supportPause, supportResume);
 }
 
-int32_t AudioHwiRenderGetVersion(struct IAudioRender *render, uint32_t *majorVer, uint32_t *minorVer)
-{
-    (void)render;
-    CHECK_NULL_PTR_RETURN_VALUE(majorVer, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(minorVer, HDF_ERR_INVALID_PARAM);
-
-    *majorVer = IAUDIO_RENDER_MAJOR_VERSION;
-    *minorVer = IAUDIO_RENDER_MINOR_VERSION;
-
-    return HDF_SUCCESS;
-}
-
 static void AudioHwiInitRenderInstance(struct IAudioRender *render)
 {
     render->GetLatency = AudioHwiGetLatency;
@@ -824,7 +812,6 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->TurnStandbyMode = AudioHwiRenderTurnStandbyMode;
     render->AudioDevDump = AudioHwiRenderAudioDevDump;
     render->IsSupportsPauseAndResume = AudioHwiRenderIsSupportsPauseAndResume;
-    render->GetVersion = AudioHwiRenderGetVersion;
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,

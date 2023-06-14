@@ -699,18 +699,6 @@ int32_t AudioHwiCaptureIsSupportsPauseAndResume(struct IAudioCapture *capture, b
     return HDF_SUCCESS;
 }
 
-int32_t AudioHwiCaptureGetVersion(struct IAudioCapture *capture, uint32_t *majorVer, uint32_t *minorVer)
-{
-    (void)capture;
-    CHECK_NULL_PTR_RETURN_VALUE(majorVer, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(minorVer, HDF_ERR_INVALID_PARAM);
-
-    *majorVer = IAUDIO_CAPTURE_MAJOR_VERSION;
-    *minorVer = IAUDIO_CAPTURE_MINOR_VERSION;
-
-    return HDF_SUCCESS;
-}
-
 static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioHwiCaptureFrame;
@@ -744,10 +732,9 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->TurnStandbyMode = AudioHwiCaptureTurnStandbyMode;
     capture->AudioDevDump = AudioHwiCaptureAudioDevDump;
     capture->IsSupportsPauseAndResume = AudioHwiCaptureIsSupportsPauseAndResume;
-    capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
-static int32_t JudgmentParameter(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+static int32_t JudgeParameters(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
     struct AudioCaptureInfo *captureInfos)
 {
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
@@ -796,7 +783,7 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct Aud
             continue;
         }
 
-        int32_t ret = JudgmentParameter(pin, attrs, capturePriv->captureInfos[index]);
+        int32_t ret = JudgeParameters(pin, attrs, capturePriv->captureInfos[index]);
         if (ret != HDF_SUCCESS) {
             continue;
         }
