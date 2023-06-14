@@ -175,6 +175,7 @@ int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj
 int32_t ThermalInterfaceImpl::Unregister()
 {
     theramalCb_ = nullptr;
+    g_isHdiStart = false;
     return HDF_SUCCESS;
 }
 } // V1_0
