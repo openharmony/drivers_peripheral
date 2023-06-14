@@ -26,6 +26,7 @@ extern "C" {
     extern LinkedList *g_poolList;
     extern LinkedList *g_scheduleList;
     extern LinkedList *g_userInfoList;
+    extern void DestroyUserInfoList(void);
     extern ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv);
     extern ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
         Uint8Array *retDataAndSignTlv);
@@ -83,7 +84,7 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
     ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData);
-    EXPECT_EQ(result, RESULT_GENERAL_ERROR);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     uint32_t testUint32 = 123;
     int32_t testInt32 = 123;
@@ -207,7 +208,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromDataAndSignTlv, TestSize.Le
     Attribute *msgAttribute = CreateAttributeFromSerializedMsg(retInfo);
     EXPECT_EQ(msgAttribute, nullptr);
     result = GetAttributeUint8Array(msgAttribute, AUTH_ROOT, &dataAndSignTlv);
-    EXPECT_EQ(result, RESULT_GENERAL_ERROR);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
     retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, true);
     EXPECT_EQ(retAttribute, nullptr);
     retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, false);
@@ -424,21 +425,31 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
 {
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.authType = 1;
-    credInfo.executorSensorHint = 10;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
+    EXPECT_NE(userInfo, nullptr);
+    static_cast<void>(memset_s(userInfo, sizeof(UserInfo), 0, sizeof(UserInfo)));
+    userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    EXPECT_NE(userInfo->credentialInfoList, nullptr);
+    CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
+    EXPECT_NE(credInfo, nullptr);
+    static_cast<void>(memset_s(credInfo, sizeof(CredentialInfoHal), 0, sizeof(CredentialInfoHal)));
+    credInfo->authType = 1;
+    credInfo->executorSensorHint = 10;
+    userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
 
     ExecutorInfoHal info = {};
     info.authType = 1;
     info.executorSensorHint = 20;
-    EXPECT_EQ(AssemblyMessage(&info, 2, nullptr), RESULT_SUCCESS);
+    LinkedList *executorMsg = CreateLinkedList(DestoryExecutorMsg);
+    EXPECT_EQ(AssemblyMessage(&info, 2, executorMsg), RESULT_SUCCESS);
+    DestroyLinkedList(executorMsg);
+
+    executorMsg = CreateLinkedList(DestoryExecutorMsg);
     info.executorSensorHint = 10;
-    EXPECT_EQ(AssemblyMessage(&info, 2, nullptr), RESULT_NO_MEMORY);
+    EXPECT_EQ(AssemblyMessage(&info, 2, executorMsg), RESULT_SUCCESS);
+    DestroyLinkedList(executorMsg);
+    DestroyUserInfoList();
 }
 
 HWTEST_F(ExecutorMessageTest, TestTraverseExecutor, TestSize.Level0)

@@ -17,14 +17,15 @@
     "ram": "7400KB",
     "deps": {
       "components": [
-        "base",
+        "c_utils",
+        "config_policy",
+        "drivers_interface_battery",
+        "drivers_interface_light",
         "hdf_core",
-        "libhilog",
-        "ipc_single"
+        "hiviewdfx_hilog_native",
+        "ipc"
       ],
       "third_party": [
-        "gmock_main",
-        "gtest_main",
         "jsoncpp"
       ]
     },

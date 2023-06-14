@@ -22,14 +22,14 @@ void CameraFpsTest::TearDownTestCase(void)
 {}
 void CameraFpsTest::SetUp(void)
 {
-    if (display_ == nullptr) {
-        display_ = std::make_shared<TestDisplay>();
+    if (cameraBase_ == nullptr) {
+        cameraBase_ = std::make_shared<TestCameraBase>();
     }
-    display_->Init();
+    cameraBase_->Init();
 }
 void CameraFpsTest::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 void CameraFpsTest::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
@@ -62,24 +62,24 @@ void CameraFpsTest::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
 static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
 {
     // get camera ability
-    if (display_->ability == nullptr) {
+    if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
         return;
     }
-    GetFpsRange(display_->ability);
+    GetFpsRange(cameraBase_->ability);
 
     // get the stream manager
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
 
     // enable result
     std::vector<int32_t> resultsList;
     resultsList.push_back(OHOS_CAMERA_STREAM_ID);
     resultsList.push_back(OHOS_CONTROL_FPS_RANGES);
-    display_->cameraDevice->EnableResult(resultsList);
+    cameraBase_->cameraDevice->EnableResult(resultsList);
 
     // start stream
-    display_->intents = {PREVIEW};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW};
+    cameraBase_->StartStream(cameraBase_->intents);
 
     // updateSettings
     constexpr uint32_t ITEM_CAPACITY = 100;
@@ -94,18 +94,18 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("UpdateSettings success.");
     } else {
-        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", cameraBase_->rc);
     }
 
     // get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
 
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }

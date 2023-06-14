@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,44 +11,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-
 INPUT_ROOT_DIR = "./.."
+import("//build/ohos.gni")
+import("$INPUT_ROOT_DIR/input.gni")
 
-ohos_shared_library("hdi_input_udriver") {
-  sources = [
-    "src/input_device_manager.cpp",
-    "src/input_manager.cpp",
-  ]
-
-  include_dirs = [
-    "$INPUT_ROOT_DIR/udriver/include",
-    "$INPUT_ROOT_DIR/interfaces/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
-  ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-inconsistent-missing-override",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+if (drivers_peripheral_input_feature_udriver) {
+  ohos_shared_library("hdi_input_udriver") {
+    sources = [
+      "src/input_device_manager.cpp",
+      "src/input_manager.cpp",
     ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
 
-  install_images = [
-    chipset_base_dir,
-    updater_base_dir,
-  ]
-  install_enable = true
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_input"
+    include_dirs = [
+      "$INPUT_ROOT_DIR/udriver/include",
+      "$INPUT_ROOT_DIR/interfaces/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
+    ]
+
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-inconsistent-missing-override",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "hdf_core:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_images = [
+      chipset_base_dir,
+      updater_base_dir,
+    ]
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_input"
+  }
+} else {
+  group("hdi_input_udriver") {
+    deps = []
+  }
 }

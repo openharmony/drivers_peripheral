@@ -56,7 +56,7 @@ struct UsbMtpExtConfigDescFunction {
 };
 
 /* Compatible: MTP Extended Configuration Descriptor */
-struct {
+static struct {
     struct UsbMtpExtConfigDescHeader header;
     struct UsbMtpExtConfigDescFunction function;
 } g_mtpExtConfigDesc = {
@@ -91,15 +91,17 @@ namespace Usb {
 namespace Gadget {
 namespace Mtp {
 namespace V1_0 {
-extern "C" IUsbfnMtpInterface *UsbfnMtpInterfaceImplGetInstance(void)
+sptr<IUsbfnMtpInterface> g_instance = nullptr;
+std::mutex g_instanceLock;
+extern "C" void *UsbfnMtpInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Usb::Gadget::Mtp::V1_0::UsbfnMtpImpl;
-    UsbfnMtpImpl *service = new (std::nothrow) UsbfnMtpImpl();
-    if (service == nullptr) {
-        return nullptr;
+    std::lock_guard<std::mutex> guard(g_instanceLock);
+    if (g_instance == nullptr) {
+        sptr<IUsbfnMtpInterface> tmp(new (std::nothrow) UsbfnMtpImpl);
+        g_instance = tmp;
     }
-    service->Init();
-    return service;
+
+    return g_instance;
 }
 
 struct UsbMtpDevice *UsbfnMtpImpl::mtpDev_ = nullptr;

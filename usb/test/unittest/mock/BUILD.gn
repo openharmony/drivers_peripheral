@@ -23,10 +23,8 @@ config("module_private_config") {
     "include",
     "./../../../hdi_service/include",
     "./../../../ddk/host/include",
-    "//third_party/googletest/googlemock/include",
-    "./include",
     "./../../../gadget/function/include",
-    "//utils/system/safwk/native/include",
+    "//third_party/googletest/googlemock/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
   ]
 }

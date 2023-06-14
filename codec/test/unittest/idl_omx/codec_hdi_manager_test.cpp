@@ -22,6 +22,7 @@ using namespace testing::ext;
 using OHOS::sptr;
 using namespace OHOS::HDI::Codec::V1_0;
 constexpr int64_t APP_DATA = 3;
+constexpr uint32_t INVALID_COMPONENT_ID = -1;
 namespace {
 class CodecHdiManagerTest : public testing::Test {
 public:
@@ -77,8 +78,29 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_001, TestSize.Level
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_EQ(component, nullptr);
 }
-
 HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(manager_ != nullptr);
+    sptr<ICodecComponent> component;
+    uint32_t componentId = 0;
+    std::string compName("");
+
+    int32_t count = 0;
+    auto ret = manager_->GetComponentNum(count);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(count > 0);
+
+    std::vector<CodecCompCapability> capList;;
+    ret = manager_->GetComponentCapabilityList(capList, count);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    compName = capList[0].compName;
+    ret = manager_->CreateComponent(component, componentId, compName, APP_DATA, nullptr);
+    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_EQ(component, nullptr);
+}
+
+HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(manager_ != nullptr);
     std::string compName("");
@@ -98,14 +120,15 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level
     ret = manager_->CreateComponent(component, componentId, compName, APP_DATA, callback_);
     ASSERT_EQ(ret, HDF_SUCCESS);
     if (componentId != 0) {
-        manager_->DestoryComponent(componentId);
+        ret = manager_->DestroyComponent(componentId);
+        ASSERT_EQ(ret, HDF_SUCCESS);
     }
 }
 
 HWTEST_F(CodecHdiManagerTest, HdfCodecHdiDestroyComponentTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(manager_ != nullptr);
-    auto ret = manager_->DestoryComponent(0);
+    auto ret = manager_->DestroyComponent(INVALID_COMPONENT_ID);
     ASSERT_EQ(ret, HDF_ERR_INVALID_PARAM);
 }
 }  // namespace

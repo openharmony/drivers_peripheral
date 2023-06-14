@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef _HDI_DISPLAY_HOST_PROXY_H_
-#define _HDI_DISPLAY_HOST_PROXY_H_
+#ifndef HDI_DISPLAY_HOST_PROXY_H
+#define HDI_DISPLAY_HOST_PROXY_H
 
 #include "idisplay_device.h"
 
@@ -114,4 +114,4 @@ private:
 } // namespace Device
 } // namespace Display
 } // namespace OHOS
-#endif // _HDI_DISPLAY_HOST_PROXY_H_
+#endif // HDI_DISPLAY_HOST_PROXY_H

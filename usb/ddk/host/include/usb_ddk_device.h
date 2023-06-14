@@ -19,8 +19,8 @@
 #include "usb_ddk.h"
 #include "usb_session.h"
 
-#define USB_MAXENDPOINTS    32
-#define USB_MAXALTSETTING   128
+#define USB_MAXENDPOINTS  32
+#define USB_MAXALTSETTING 128
 
 struct UsbDeviceConfigDescriptor {
     struct UsbConfigDescriptor *desc;
@@ -55,6 +55,7 @@ struct UsbDeviceHandle {
     struct UsbSession *session;
     uint32_t caps;
     int32_t fd;
+    int32_t mmapFd;
 };
 
 #endif /* USB_DDK_DEVICE_H */

@@ -17,6 +17,9 @@ import("../../audio.gni")
 group("effect_test") {
   if (!defined(ohos_lite) && drivers_peripheral_audio_feature_effect) {
     testonly = true
-    deps = [ "unittest:hdf_effect_hdi_ut" ]
+    deps = [
+      "fuzztest:fuzztest",
+      "unittest:hdf_effect_hdi_ut",
+    ]
   }
 }

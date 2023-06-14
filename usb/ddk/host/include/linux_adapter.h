@@ -76,6 +76,7 @@ static inline pid_t gettid()
 #define USBDEVFS_RESET              _IO('U', 20)
 #define USBDEVFS_CLEAR_HALT         _IOR('U', 21, unsigned int)
 #define USBDEVFS_DISCONNECT         _IO('U', 22)
+#define USBDEVFS_CONNECT            _IO('U', 23)
 #define USBDEVFS_GET_CAPABILITIES   _IOR('U', 26, unsigned int)
 #define USBDEVFS_DISCONNECT_CLAIM   _IOR('U', 27, struct UsbAdapterDisconnectClaim)
 #define USBDEVFS_ALLOC_STREAMS      _IOR('U', 28, struct UsbAdapterStreams)
@@ -124,11 +125,14 @@ struct UsbOsAdapterOps {
     int32_t (*clearHalt)(const struct UsbDeviceHandle *devHandle, unsigned int endpoint);
     int32_t (*resetDevice)(const struct UsbDeviceHandle *devHandle);
     struct UsbHostRequest *(*allocRequest)(const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t len);
+    struct UsbHostRequest *(*allocRequestByMmap)(const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t len);
     int32_t (*freeRequest)(struct UsbHostRequest *request);
+    int32_t (*freeRequestByMmap)(struct UsbHostRequest *request);
     int32_t (*submitRequest)(struct UsbHostRequest *request);
     int32_t (*cancelRequest)(struct UsbHostRequest *request);
     int32_t (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
     int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
+    void (*attachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
 };
 #ifdef __cplusplus
 extern "C" {

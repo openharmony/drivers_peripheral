@@ -56,7 +56,7 @@ int32_t VibratorIfService::GetVibratorVdiImpl()
     }
 
     vdiWrapperVibrator = reinterpret_cast<struct VdiWrapperVibrator *>(vdi_->vdiBase);
-    vibratorVdiImpl_.reset(vdiWrapperVibrator->vibratorModule);
+    vibratorVdiImpl_ = vdiWrapperVibrator->vibratorModule;
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get vibrator impl failed", __func__);
         return HDF_FAILURE;
@@ -197,7 +197,7 @@ int32_t VibratorIfService::EnableVibratorModulation(uint32_t duration, uint16_t 
     }
     FinishTrace(HITRACE_TAG_HDF);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effect)

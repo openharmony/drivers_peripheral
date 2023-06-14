@@ -41,8 +41,8 @@ enum HdfLightTypeVdi {
 
 struct HdfLightInfoVdi {
     char lightName[LIGHT_NAME_MAX_LEN];
-    uint32_t lightId;
-    uint32_t lightNumber;
+    int32_t lightId;
+    int32_t lightNumber;
     int32_t lightType;
 };
 

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V1_0_ISENSORCALLBACK_VDI_H
-#define OHOS_HDI_SENSOR_V1_0_ISENSORCALLBACK_VDI_H
+#ifndef OHOS_HDI_SENSOR_V1_1_ISENSORCALLBACK_VDI_H
+#define OHOS_HDI_SENSOR_V1_1_ISENSORCALLBACK_VDI_H
 
 #include <stdint.h>
 #include <vector>
@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 
 struct HdfSensorEventsVdi {
     int32_t sensorId;
@@ -44,9 +44,9 @@ public:
     virtual sptr<IRemoteObject> HandleCallbackDeath() = 0;
 };
 
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_0_ISENSORCALLBACK_VDI_H
+#endif // OHOS_HDI_SENSOR_V1_1_ISENSORCALLBACK_VDI_H

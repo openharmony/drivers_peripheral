@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "osal_mem.h"
+#include "i_audio_types.h"
 #include "v1_0/iaudio_adapter.h"
 #include "v1_0/iaudio_manager.h"
 
@@ -207,6 +208,20 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull001, TestSize.Le
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyRender(nullptr, renderId_));
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderNull002, TestSize.Level1)
+{
+    uint32_t renderId = AUDIO_HW_STREAM_NUM_MAX - 1;
+    int32_t ret = adapter_->DestroyRender(adapter_, renderId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyRenderInvalid001, TestSize.Level1)
+{
+    uint32_t renderId = AUDIO_HW_STREAM_NUM_MAX;
+    int32_t ret = adapter_->DestroyRender(adapter_, renderId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterCreateCaptureNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->CreateCapture(nullptr, nullptr, nullptr, nullptr, &captureId_));
@@ -253,6 +268,13 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureNull001, TestSize.L
     EXPECT_NE(HDF_SUCCESS, adapter_->DestroyCapture(nullptr, captureId_));
 }
 
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterDestroyCaptureInvalid001, TestSize.Level1)
+{
+    uint32_t captureId = AUDIO_HW_STREAM_NUM_MAX;
+    int32_t ret = adapter_->DestroyCapture(adapter_, captureId);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
+}
+
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityNull001, TestSize.Level1)
 {
     EXPECT_NE(HDF_SUCCESS, adapter_->GetPortCapability(nullptr, nullptr, nullptr));
@@ -277,7 +299,7 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityInvalid002, Test
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, adapter_->GetPortCapability(adapter_, &port, nullptr));
 }
 
-HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityInvalid003, TestSize.Level1)
 {
     struct AudioPort port = {};
     struct AudioPortCapability capability = {};
@@ -286,6 +308,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, Test
     port.portName = const_cast<char*>("primary");
     int32_t ret = adapter_->GetPortCapability(adapter_, &port, &capability);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetPortCapabilityIsvalid001, TestSize.Level1)
+{
+    struct AudioPort port = adapterDescs_[0].ports[0];
+    struct AudioPortCapability capability = {};
+    int32_t ret = adapter_->GetPortCapability(adapter_, &port, &capability);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterSetPassthroughModeNull001, TestSize.Level1)
@@ -450,5 +480,59 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetExtraParamsNull002, TestSize.L
     char value[AUDIO_ADAPTER_BUF_TEST];
     uint32_t valueLen = AUDIO_ADAPTER_BUF_TEST;
     EXPECT_NE(HDF_SUCCESS, adapter_->GetExtraParams(nullptr, key, condition, value, valueLen));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetExtraParamsIsvalid001, TestSize.Level1)
+{
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    char condition[AUDIO_ADAPTER_BUF_TEST];
+    char value[AUDIO_ADAPTER_BUF_TEST] = "sup_sampling_rates=4800;sup_channels=1;sup_formats=2;";
+    uint32_t valueLen = AUDIO_ADAPTER_BUF_TEST;
+
+    int32_t ret = adapter_->GetExtraParams(adapter_, key, condition, value, valueLen);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteNull001, TestSize.Level1)
+{
+    struct AudioRoute route = {};
+    int32_t routeHandle = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->UpdateAudioRoute(nullptr, &route, &routeHandle));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterUpdateAudioRouteIsvalid001, TestSize.Level1)
+{
+    struct AudioRoute route = {};
+    int32_t routeHandle = 0;
+    int32_t ret = adapter_->UpdateAudioRoute(adapter_, &route, &routeHandle);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterReleaseAudioRouteNull001, TestSize.Level1)
+{
+    int32_t routeHandle = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->ReleaseAudioRoute(nullptr, routeHandle));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterReleaseAudioRouteIsvalid001, TestSize.Level1)
+{
+    int32_t routeHandle = 0;
+    int32_t ret = adapter_->ReleaseAudioRoute(adapter_, routeHandle);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetVersionNull001, TestSize.Level1)
+{
+    uint32_t majorVer = 0;
+    uint32_t minorVer = 0;
+    EXPECT_NE(HDF_SUCCESS, adapter_->GetVersion(nullptr, &majorVer, &minorVer));
+}
+
+HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterGetVersionIsvalid001, TestSize.Level1)
+{
+    uint32_t majorVer = 0;
+    uint32_t minorVer = 0;
+    int32_t ret = adapter_->GetVersion(adapter_, &majorVer, &minorVer);
+    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
 }
 }

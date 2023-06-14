@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,15 +52,15 @@ ExecutorImpl::~ExecutorImpl()
 int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
 {
     IAM_LOGI("start");
+    if (pinHdi_ == nullptr) {
+        IAM_LOGE("pinHdi_ is nullptr");
+        return HDF_FAILURE;
+    }
     constexpr unsigned short SENSOR_ID = 1;
     info.sensorId = SENSOR_ID;
     info.executorType = EXECUTOR_TYPE;
     info.executorRole = ExecutorRole::ALL_IN_ONE;
     info.authType = AuthType::PIN;
-    if (pinHdi_ == nullptr) {
-        IAM_LOGE("pinHdi_ is nullptr");
-        return HDF_FAILURE;
-    }
     uint32_t eslRet = 0;
     int32_t result = pinHdi_->GetExecutorInfo(info.publicKey, eslRet);
     if (result != SUCCESS) {
@@ -133,7 +133,7 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
         IAM_LOGE("callbackObj is nullptr");
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     static_cast<void>(extraInfo);
     std::vector<uint8_t> salt;
@@ -167,7 +167,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
         IAM_LOGE("callbackObj is nullptr");
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     if (pinHdi_ == nullptr) {
         IAM_LOGE("pinHdi_ is nullptr");
@@ -362,7 +362,7 @@ uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, c
     std::lock_guard<std::mutex> guard(mutex_);
     if (callback == nullptr) {
         IAM_LOGE("callback is nullptr");
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
     struct ExecutorImpl::ScheduleMap::ScheduleInfo info {
         .commandId = commandId,
@@ -415,7 +415,7 @@ int32_t ExecutorImpl::GetProperty(
 
     if (templateIdList.size() != 1) {
         IAM_LOGE("templateIdList size is not 1");
-        return HDF_FAILURE;
+        return HDF_ERR_INVALID_PARAM;
     }
 
     uint64_t templateId = templateIdList[0];

@@ -32,12 +32,8 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 
 class DeviceTest : public ::testing::Test {
 protected:
-    void TearDown();
-};
-
-class VblankTest : public ::testing::Test {
-protected:
-    void TearDown();
+    static void SetUpTestCase();
+    static void TearDownTestCase();
 };
 
 class VblankCtr {
@@ -49,10 +45,6 @@ public:
     }
     void NotifyVblank(unsigned int sequence, uint64_t ns, const void* data);
     int32_t WaitVblank(uint32_t ms);
-
-protected:
-    void TearDown();
-
 private:
     std::mutex vblankMutex_;
     std::condition_variable vblankCondition_;

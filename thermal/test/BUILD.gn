@@ -16,5 +16,8 @@ import("//build/test.gni")
 
 group("hdf_test_thermal") {
   testonly = true
-  deps = [ "unittest:hdi_unittest_thermal" ]
+  deps = [
+    "fuzztest/thermalhdistub_fuzzer:hdf_thermal_stub_fuzztest",
+    "unittest:hdi_unittest_thermal",
+  ]
 }

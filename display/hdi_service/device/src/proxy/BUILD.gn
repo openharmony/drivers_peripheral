@@ -12,15 +12,14 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-display_device_base_path = "//drivers/peripheral/display/hdi_service/device"
+display_device_base_path = "../../"
 
 config("libdisplay_device_proxy_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//drivers/peripheral/display/interfaces/include",
+    "../../../../interfaces/include",
     "$display_device_base_path/include/interfaces",
     "$display_device_base_path/include/proxy",
     "$display_device_base_path/include/util",

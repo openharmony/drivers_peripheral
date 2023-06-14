@@ -12,7 +12,9 @@
   "component": {
     "name": "drivers_peripheral_connected_nfc_tag",
     "subsystem": "hdf",
-    "syscap": [ "" ],
+    "syscap": [
+      "SystemCapability.Communication.ConnectedTag"
+    ],
     "adapter_system_type": ["standard"],
     "rom": "1000KB",
     "ram": "1000KB",

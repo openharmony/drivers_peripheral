@@ -49,12 +49,13 @@ ohos_shared_library("nfc_hdi_driver") {
 
   sources = [ "nfc_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/nfc/v1_0:libnfc_stub_1.0" ]
+  deps = []
 
   cflags = []
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nfc:libnfc_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

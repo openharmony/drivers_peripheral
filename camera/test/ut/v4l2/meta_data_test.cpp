@@ -46,14 +46,14 @@ void MetaDataTest::SetUpTestCase(void) {}
 void MetaDataTest::TearDownTestCase(void) {}
 void MetaDataTest::SetUp(void)
 {
-    if (display_ == nullptr) {
-        display_ = std::make_shared<TestDisplay>();
+    if (cameraBase_ == nullptr) {
+        cameraBase_ = std::make_shared<TestCameraBase>();
     }
-    display_->Init();
+    cameraBase_->Init();
 }
 void MetaDataTest::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 void MetaDataTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<StreamCustomer> &streamCustomer,
@@ -86,7 +86,7 @@ void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
     StreamInfo streamInfo = {};
 
     if (intent == PREVIEW) {
-        if (streamId == display_->STREAM_ID_PREVIEW) {
+        if (streamId == cameraBase_->STREAM_ID_PREVIEW) {
             if (streamCustomerPreview_ == nullptr) {
                 streamCustomerPreview_ = std::make_shared<StreamCustomer>();
                 SetStreamInfo(streamInfo, streamCustomerPreview_, streamId, intent);
@@ -106,7 +106,7 @@ void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
 
     std::vector<StreamInfo>().swap(streamInfos_);
     streamInfos_.push_back(streamInfo);
-    result_ = static_cast<CamRetCode>(display_->streamOperator->CreateStreams(streamInfos_));
+    result_ = static_cast<CamRetCode>(cameraBase_->streamOperator->CreateStreams(streamInfos_));
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
 
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
@@ -118,7 +118,7 @@ void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
 
 void MetaDataTest::CommitStream()
 {
-    result_ = static_cast<CamRetCode>(display_->streamOperator->CommitStreams(NORMAL, display_->ability_));
+    result_ = static_cast<CamRetCode>(cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_));
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("CommitStreams preview success.");
@@ -131,12 +131,12 @@ void MetaDataTest::StartCapture(
     int streamId, int captureId, bool shutterCallback, bool isStreaming, const CaptureInfo captureInfo)
 {
     captureInfo_.streamIds_ = {streamId};
-    captureInfo_.captureSetting_ = display_->ability_;
+    captureInfo_.captureSetting_ = cameraBase_->ability_;
     captureInfo_.enableShutterCallback_ = shutterCallback;
     if (captureInfo.captureSetting_.size() != 0) {
-        result_ = static_cast<CamRetCode>(display_->streamOperator->Capture(captureId, captureInfo, isStreaming));
+        result_ = static_cast<CamRetCode>(cameraBase_->streamOperator->Capture(captureId, captureInfo, isStreaming));
     } else {
-        result_ = static_cast<CamRetCode>(display_->streamOperator->Capture(captureId, captureInfo_, isStreaming));
+        result_ = static_cast<CamRetCode>(cameraBase_->streamOperator->Capture(captureId, captureInfo_, isStreaming));
     }
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
@@ -144,15 +144,15 @@ void MetaDataTest::StartCapture(
     } else {
         CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, result_ = %{public}d", captureId, result_);
     }
-    if (captureId == display_->CAPTURE_ID_PREVIEW) {
+    if (captureId == cameraBase_->CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("preview size = %{public}u", size);
         });
-    } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+    } else if (captureId == cameraBase_->CAPTURE_ID_CAPTURE) {
         streamCustomerSnapshot_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("snapshot size = %{public}u", size);
         });
-    } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+    } else if (captureId == cameraBase_->CAPTURE_ID_VIDEO) {
         streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             CAMERA_LOGI("video size = %{public}u", size);
         });
@@ -168,11 +168,11 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
         return;
     }
     for (const auto &captureId : captureIds) {
-        if (captureId == display_->CAPTURE_ID_PREVIEW) {
+        if (captureId == cameraBase_->CAPTURE_ID_PREVIEW) {
             streamCustomerPreview_->ReceiveFrameOff();
-        } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+        } else if (captureId == cameraBase_->CAPTURE_ID_CAPTURE) {
             streamCustomerSnapshot_->ReceiveFrameOff();
-        } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+        } else if (captureId == cameraBase_->CAPTURE_ID_VIDEO) {
             streamCustomerVideo_->ReceiveFrameOff();
             sleep(SLEEP_SECOND_ONE);
         } else {
@@ -180,7 +180,7 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
         }
     }
     for (auto &captureId : captureIds) {
-        result_ = static_cast<CamRetCode>(display_->streamOperator->CancelCapture(captureId));
+        result_ = static_cast<CamRetCode>(cameraBase_->streamOperator->CancelCapture(captureId));
         sleep(SLEEP_SECOND_TWO);
         EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
         if (result_ == HDI::Camera::V1_0::NO_ERROR) {
@@ -196,7 +196,7 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
 void MetaDataTest::StartCustomCapture()
 {
     CaptureInfo captureInfo = {};
-    StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
     constexpr double latitude = 27.987500;  // dummy data: Qomolangma latitde
     constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
     constexpr double altitude = 8848.86;    // dummy data: Qomolangma altitude
@@ -207,41 +207,41 @@ void MetaDataTest::StartCustomCapture()
     gps.push_back(altitude);
     captureSetting->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
 
-    captureInfo.streamIds_ = {display_->STREAM_ID_CAPTURE};
+    captureInfo.streamIds_ = {cameraBase_->STREAM_ID_CAPTURE};
     std::vector<uint8_t> snapshotSetting;
     MetadataUtils::ConvertMetadataToVec(captureSetting, snapshotSetting);
     captureInfo.captureSetting_ = snapshotSetting;
     captureInfo.enableShutterCallback_ = false;
-    StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
 }
 
 void MetaDataTest::StartPreviewVideoStream()
 {
-    CreateStream(display_->STREAM_ID_PREVIEW, PREVIEW);
-    CreateStream(display_->STREAM_ID_VIDEO, VIDEO);
+    CreateStream(cameraBase_->STREAM_ID_PREVIEW, PREVIEW);
+    CreateStream(cameraBase_->STREAM_ID_VIDEO, VIDEO);
     CommitStream();
 }
 
 void MetaDataTest::StartPreviewCaptureStream()
 {
-    CreateStream(display_->STREAM_ID_PREVIEW, PREVIEW);
-    CreateStream(display_->STREAM_ID_CAPTURE, STILL_CAPTURE);
+    CreateStream(cameraBase_->STREAM_ID_PREVIEW, PREVIEW);
+    CreateStream(cameraBase_->STREAM_ID_CAPTURE, STILL_CAPTURE);
     CommitStream();
 }
 
 void MetaDataTest::StopPreviewVideoStream()
 {
     sleep(SLEEP_SECOND_TWO);
-    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
-    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
+    std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
+    std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
     StopStream(captureIds, streamIds);
 }
 
 void MetaDataTest::StopPreviewCaptureStream()
 {
     sleep(SLEEP_SECOND_TWO);
-    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
-    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
+    std::vector<int> captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    std::vector<int> streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     StopStream(captureIds, streamIds);
 }
 
@@ -260,34 +260,34 @@ void MetaDataTest::SetFps(std::shared_ptr<CameraSetting> &metaData, int32_t fps,
 
 void MetaDataTest::Prepare(ResultCallbackMode mode, std::vector<MetaType> &results)
 {
-    display_->AchieveStreamOperator();
-    display_->cameraDevice->SetResultMode(mode);
+    cameraBase_->AchieveStreamOperator();
+    cameraBase_->cameraDevice->SetResultMode(mode);
 
     if (results.size() == 0) {
         CAMERA_LOGE("results size is null");
         return;
     }
-    display_->cameraDevice->EnableResult(results);
+    cameraBase_->cameraDevice->EnableResult(results);
 }
 
 void MetaDataTest::UpdateSettings(std::shared_ptr<CameraSetting> &metaData)
 {
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(metaData, setting);
-    display_->rc = static_cast<CamRetCode>(display_->cameraDevice->UpdateSettings(setting));
-    if (display_->rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("UpdateSettings error, rc = %{public}d", display_->rc);
+    cameraBase_->rc = static_cast<CamRetCode>(cameraBase_->cameraDevice->UpdateSettings(setting));
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGE("UpdateSettings error, rc = %{public}d", cameraBase_->rc);
         return;
     } else {
-        CAMERA_LOGI("UpdateSettings ok, rc = %{public}d", display_->rc);
+        CAMERA_LOGI("UpdateSettings ok, rc = %{public}d", cameraBase_->rc);
     }
 }
 
 void MetaDataTest::StartPreviewVideoCapture()
 {
     CaptureInfo captureInfo = {};
-    StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
-    StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
+    StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true, captureInfo);
 }
 
 /**
@@ -405,7 +405,7 @@ static HWTEST_F(MetaDataTest, meta_data_004, TestSize.Level1)
     Prepare(ResultCallbackMode::PER_FRAME, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->STREAM_ID_VIDEO;
+    const int32_t streamId = cameraBase_->STREAM_ID_VIDEO;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t videoStabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_LOW;
@@ -435,7 +435,7 @@ static HWTEST_F(MetaDataTest, meta_data_005, TestSize.Level1)
     Prepare(ResultCallbackMode::ON_CHANGED, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->STREAM_ID_VIDEO;
+    const int32_t streamId = cameraBase_->STREAM_ID_VIDEO;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t videoStabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_LOW;
@@ -550,7 +550,7 @@ static HWTEST_F(MetaDataTest, meta_data_008, TestSize.Level1)
     Prepare(ResultCallbackMode::ON_CHANGED, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t deviceStreamId = display_->STREAM_ID_CAPTURE;
+    const int32_t deviceStreamId = cameraBase_->STREAM_ID_CAPTURE;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, DATA_COUNT);
 
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
@@ -594,7 +594,7 @@ static HWTEST_F(MetaDataTest, meta_data_009, TestSize.Level1)
     SetFps(metaDataDevice, FPS_RANGE, false);
 
     std::shared_ptr<CameraSetting> metaDataStream = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->STREAM_ID_CAPTURE;
+    const int32_t streamId = cameraBase_->STREAM_ID_CAPTURE;
     metaDataStream->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;

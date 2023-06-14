@@ -107,8 +107,8 @@ int32_t CodecComponentService::GetState(CodecStateType &state)
 }
 
 int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
-                                                      const OMX_TUNNELSETUPTYPE &inTunnelSetup,
-                                                      OMX_TUNNELSETUPTYPE &outTunnelSetup)
+                                                      const CodecTunnelSetupType &inTunnelSetup,
+                                                      CodecTunnelSetupType &outTunnelSetup)
 {
     CODEC_LOGI("port [%{public}d]", port);
     outTunnelSetup = inTunnelSetup;
@@ -151,6 +151,7 @@ int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
 {
     CODEC_LOGI("service impl!");
+    CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
     return node_->SetCallbacks(callbacks, appData);
 }
 

@@ -17,14 +17,14 @@
 #define HDI_SENSOR_IF_SERVICE_H
 
 #include <map>
-#include "v1_0/isensor_interface.h"
+#include "v1_1/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_callback_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 
 using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
 
@@ -33,21 +33,22 @@ public:
     SensorIfService();
     ~SensorIfService();
     int32_t Init(void);
-    int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
+    int32_t GetAllSensorInfo(std::vector<HdfSensorInformation> &info) override;
     int32_t Enable(int32_t sensorId) override;
     int32_t Disable(int32_t sensorId) override;
     int32_t SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval) override;
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
-    int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
-    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
+    int32_t Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
+    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
+    int32_t ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event) override;
     int32_t GetSensorVdiImpl();
 private:
-    std::shared_ptr<ISensorInterfaceVdi> sensorVdiImpl_ = nullptr;
+    ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
     GroupIdCallBackMap callbackMap = {};
 };
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS

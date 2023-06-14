@@ -22,14 +22,14 @@ void HdfCameraFaceDetect::TearDownTestCase(void)
 {}
 void HdfCameraFaceDetect::SetUp(void)
 {
-    if (display_ == nullptr) {
-        display_ = std::make_shared<TestDisplay>();
+    if (cameraBase_ == nullptr) {
+        cameraBase_ = std::make_shared<TestCameraBase>();
     }
-    display_->Init();
+    cameraBase_->Init();
 }
 void HdfCameraFaceDetect::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 /**
@@ -42,13 +42,13 @@ void HdfCameraFaceDetect::TearDown(void)
 static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
 {
     // Get the stream manager
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, STILL_CAPTURE, ANALYZE};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE, ANALYZE};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_ANALYZE, display_->CAPTURE_ID_ANALYZE, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_ANALYZE, cameraBase_->CAPTURE_ID_ANALYZE, false, true);
 
     // add dumy exif info
     constexpr double latitude = 27.987500; // dummy data: Qomolangma latitde
@@ -76,25 +76,28 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(captureSetting, setting);
 
     CaptureInfo captureInfo = {};
-    captureInfo.streamIds_ = {display_->STREAM_ID_CAPTURE};
+    captureInfo.streamIds_ = {cameraBase_->STREAM_ID_CAPTURE};
     captureInfo.captureSetting_ = setting;
     captureInfo.enableShutterCallback_ = false;
-    display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGI("check Capture: Capture success, captureId = %{public}d", display_->CAPTURE_ID_CAPTURE);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(cameraBase_->CAPTURE_ID_CAPTURE,
+        captureInfo, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("check Capture: Capture success, captureId = %{public}d", cameraBase_->CAPTURE_ID_CAPTURE);
     } else {
         CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, rc = %{public}d",
-            display_->CAPTURE_ID_CAPTURE, display_->rc);
+            cameraBase_->CAPTURE_ID_CAPTURE, cameraBase_->rc);
     }
-    display_->streamCustomerCapture_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-        display_->StoreImage(addr, size);
+    cameraBase_->streamCustomerCapture_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        cameraBase_->StoreImage(addr, size);
     });
     sleep(2);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_ANALYZE, display_->CAPTURE_ID_CAPTURE};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_ANALYZE, display_->STREAM_ID_CAPTURE};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_ANALYZE,
+        cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_ANALYZE,
+        cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
 /**
@@ -107,16 +110,16 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
 static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_002, TestSize.Level1)
 {
     // Get the stream manager
-    display_->AchieveStreamOperator();
+    cameraBase_->AchieveStreamOperator();
     // start stream
-    display_->intents = {PREVIEW, ANALYZE};
-    display_->StartStream(display_->intents);
+    cameraBase_->intents = {PREVIEW, ANALYZE};
+    cameraBase_->StartStream(cameraBase_->intents);
     // Get preview
-    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_ANALYZE, display_->CAPTURE_ID_ANALYZE, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_ANALYZE, cameraBase_->CAPTURE_ID_ANALYZE, false, true);
     sleep(2);
     // release stream
-    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_ANALYZE};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_ANALYZE};
-    display_->StopStream(display_->captureIds, display_->streamIds);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_ANALYZE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_ANALYZE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }

@@ -653,7 +653,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
 {
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL) {
+    if (hwAdapter == NULL || renderId >= MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
     }
@@ -1019,7 +1019,7 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captu
 {
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL) {
+    if (hwAdapter == NULL || captureId >= MAX_AUDIO_STREAM_NUM) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }

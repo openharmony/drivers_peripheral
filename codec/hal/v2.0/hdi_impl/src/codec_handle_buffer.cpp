@@ -45,7 +45,8 @@ sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 
     CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer);
     buffer->bufferHandle_ = bufferHandle;
-    return sptr<ICodecBuffer>(buffer);
+    sptr<ICodecBuffer> pBuffer = sptr<ICodecBuffer>(buffer);
+    return pBuffer;
 }
 
 int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)

@@ -69,3 +69,20 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
 
     return manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, desc);
 }
+
+int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
+     struct AudioEffectBuffer *output)
+{
+    if (self == NULL || input == NULL || output == NULL) {
+        HDF_LOGE("%{public}s: invailid input params", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct ControllerManager *manager = (struct ControllerManager *)self;
+    if (manager->ctrlOps == NULL || manager->ctrlOps->EffectReverse == NULL) {
+        HDF_LOGE("%{public}s: controller has no options", __func__);
+        return HDF_FAILURE;
+    }
+
+    return manager->ctrlOps->EffectReverse(manager->ctrlOps, input, output);
+}

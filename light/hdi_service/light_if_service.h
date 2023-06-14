@@ -36,7 +36,7 @@ public:
     int32_t GetLightVdiImpl();
 
 private:
-    std::shared_ptr<ILightInterfaceVdi> lightVdiImpl_ = nullptr;
+    ILightInterfaceVdi *lightVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };
 } // V1_0

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,11 +20,11 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/isensor_interface.h"
+#include "v1_1/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 
-using namespace OHOS::HDI::Sensor::V1_0;
+using namespace OHOS::HDI::Sensor::V1_1;
 using namespace testing::ext;
 
 namespace {
@@ -32,6 +32,7 @@ namespace {
     sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
     sptr<ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
     std::vector<HdfSensorInformation> g_info;
+    std::vector<HdfSensorEvents> g_events;
     struct SensorValueRange {
         float highThreshold;
         float lowThreshold;
@@ -417,4 +418,26 @@ HWTEST_F(HdfSensorHdiTest, SetSensorOption0002, TestSize.Level1)
     }
     int32_t ret = g_sensorInterface->SetOption(ABNORMAL_SENSORID, 0);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+}
+
+/**
+  * @tc.name: ReadSensorData0001
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->Enable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(SENSOR_WAIT_TIME);
+        ret = g_sensorInterface->ReadData(iter.sensorId, g_events);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        ret = g_sensorInterface->Disable(iter.sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
 }

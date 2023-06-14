@@ -13,14 +13,13 @@
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
-  import("//device/board/hisilicon/hispark_taurus/device.gni")
 } else {
   import("//build/ohos.gni")
-  import("//vendor/$product_company/$product_name/product.gni")
 }
 
 camera_path = "//drivers/peripheral/camera/vdi_base/common/"
 current_path = "."
+test_path = "//drivers/peripheral/camera/test"
 enable_camera_device_utest = false
 
 use_hitrace = false
@@ -30,4 +29,8 @@ if (use_hitrace) {
 
 if (defined(ohos_lite)) {
   defines += [ "CAMERA_BUILT_ON_OHOS_LITE" ]
+}
+
+declare_args() {
+  drivers_peripheral_camera_feature_usb = false
 }

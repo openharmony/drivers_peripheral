@@ -318,7 +318,6 @@ int32_t PowerInterfaceImpl::PowerDump(std::string &info)
 {
     std::string dumpInfo("");
     LoadSystemInfo(SUSPEND_STATE_PATH, dumpInfo);
-    LoadSystemInfo(WAKEUP_COUNT_PATH, dumpInfo);
     LoadSystemInfo(LOCK_PATH, dumpInfo);
     LoadSystemInfo(UNLOCK_PATH, dumpInfo);
     info = dumpInfo;

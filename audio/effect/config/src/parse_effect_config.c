@@ -216,7 +216,7 @@ static void AudioEffectReleaseDescs(struct EffectConfigDescriptor *effectDescs, 
 
 static int32_t AudioEffectGetEffectCfgDescs(cJSON *cJsonObj, const char *item, struct ConfigDescriptor *cfgDesc)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     uint32_t effectNum;
     uint32_t i;
     cJSON *effectObj = NULL;
@@ -262,7 +262,7 @@ static int32_t AudioEffectGetEffectCfgDescs(cJSON *cJsonObj, const char *item, s
     }
     cfgDesc->effectNum = effectNum;
     cfgDesc->effectCfgDescs = effectDescs;
-    HDF_LOGI("%{public}s success", __func__);
+    HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
 
@@ -304,7 +304,7 @@ static void AudioEffectLibraryReleaseDescs(struct LibraryConfigDescriptor *libDe
 
 static int32_t AudioEffectGetLibraryCfgDescs(cJSON *cJsonObj, const char *item, struct ConfigDescriptor *cfgDesc)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     int32_t ret;
     uint32_t i;
     uint32_t libNum;
@@ -349,7 +349,7 @@ static int32_t AudioEffectGetLibraryCfgDescs(cJSON *cJsonObj, const char *item, 
     }
     cfgDesc->libNum = libNum;
     cfgDesc->libCfgDescs = libDescs;
-    HDF_LOGI("%{public}s success", __func__);
+    HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
 
@@ -412,6 +412,6 @@ int32_t AudioEffectGetConfigDescriptor(const char *path, struct ConfigDescriptor
 
     cJSON_Delete(cJsonObj);
     cJsonObj = NULL;
-    HDF_LOGE("%{public}s success", __func__);
+    HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }

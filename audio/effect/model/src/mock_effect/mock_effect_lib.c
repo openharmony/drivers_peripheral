@@ -31,7 +31,8 @@ struct EffectControllerDescriptor g_mockEffectDescriptor = {
     .supplier = "mock"
 };
 
-static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen,
+    int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -156,6 +157,17 @@ static int32_t MockSendCommand(struct EffectControl *self, uint32_t cmdId, int8_
     return cmdTable[cmdId].func(commandData, cmdDataLen, replyData, replyDataLen);
 }
 
+static int32_t MockEffectReverse(struct EffectControl *self, const struct AudioEffectBuffer *input,
+                                 struct AudioEffectBuffer *output)
+{
+    if (self == NULL || input == NULL || output == NULL) {
+        HDF_LOGE("%{public}s: invailid input params", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static void MockEffectReleaseDesc(struct EffectControllerDescriptor *desc)
 {
     if (desc == NULL) {
@@ -232,7 +244,7 @@ static int32_t MockGetEffectDescriptorSub(struct EffectControllerDescriptor *des
 
 int32_t MockGetEffectDescriptor(struct EffectControl *self, struct EffectControllerDescriptor *desc)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     if (self == NULL || desc == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -243,11 +255,11 @@ int32_t MockGetEffectDescriptor(struct EffectControl *self, struct EffectControl
         return HDF_FAILURE;
     }
 
-    HDF_LOGE("%{public}s: succ", __func__);
+    HDF_LOGD("%{public}s: succ", __func__);
     return HDF_SUCCESS;
 }
 
-static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfo *info, 
+static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfo *info,
                                     struct EffectControl **handle)
 {
     if (self == NULL || info == NULL || handle == NULL) {
@@ -263,6 +275,7 @@ static int32_t MockCreateController(struct EffectFactory *self, const struct Eff
 
     hwCtrl->impls.EffectProcess = MockEffectProcess;
     hwCtrl->impls.SendCommand = MockSendCommand;
+    hwCtrl->impls.EffectReverse = MockEffectReverse;
     hwCtrl->impls.GetEffectDescriptor = MockGetEffectDescriptor,
     *handle = &hwCtrl->impls;
 
@@ -285,7 +298,7 @@ static int32_t MockDestroyController(struct EffectFactory *self, struct EffectCo
 
 static int32_t MockGetDescriptor(struct EffectFactory *self, const char *uuid, struct EffectControllerDescriptor *desc)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     if (self == NULL || uuid == NULL || desc == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -312,7 +325,7 @@ struct EffectFactory g_mockFactoryLib = {
     .GetDescriptor = MockGetDescriptor,
 };
 
-struct EffectFactory *GetEffectoyFactoryLib()
+struct EffectFactory *GetEffectoyFactoryLib(void)
 {
     return &g_mockFactoryLib;
 }
