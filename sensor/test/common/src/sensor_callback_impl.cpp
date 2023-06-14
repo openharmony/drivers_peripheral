@@ -47,6 +47,8 @@ namespace {
     struct SensorValueRange g_magneticRange[] = {{2000.0, -2000.0}, {2000.0, -2000.0}, {2000.0, -2000.0}};
     struct SensorValueRange g_gyroscopeRange[] = {{35.0, -35.0}, {35.0, -35.0}, {35.0, -35.0}};
     struct SensorValueRange g_gravityRange[] = {{78.0, -78.0}, {78.0, -78.0}, {78.0, -78.0}};
+    struct SensorValueRange g_humidityRange[] = {{100, 0}};
+    struct SensorValueRange g_temperatureRange[] = {{125, -40}};
 
     struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test",  1, 1, g_testRange},
@@ -58,7 +60,9 @@ namespace {
         {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 1, g_alsRange},
         {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer",  1, 3, g_magneticRange},
         {SENSOR_TYPE_GYROSCOPE, "gyroscope", 1, 3, g_gyroscopeRange},
-        {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
+        {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange},
+        {SENSOR_TYPE_HUMIDITY, "humidity", 1, 1, g_humidityRange},
+        {SENSOR_TYPE_TEMPERATURE, "tenperature", 1, 1, g_temperatureRange}
     };
 
     constexpr int32_t g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
