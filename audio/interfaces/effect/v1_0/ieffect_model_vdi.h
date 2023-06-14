@@ -36,7 +36,6 @@ struct IEffectModelVdi {
     int32_t (*DestroyEffectController)(struct IEffectModelVdi *self, const struct ControllerIdVdi *id);
     int32_t (*GetEffectDescriptor)(struct IEffectModelVdi *self, const char *effectId,
         struct EffectControllerDescriptorVdi *desc);
-    int32_t (*GetVersion)(struct IEffectModelVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus

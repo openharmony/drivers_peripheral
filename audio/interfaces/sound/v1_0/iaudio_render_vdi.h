@@ -18,8 +18,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "v1_0/audio_types_vdi.h"
-#include "v1_0/iaudio_callback_vdi.h"
+#include "audio_types_vdi.h"
+#include "iaudio_callback_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +69,6 @@ struct IAudioRenderVdi {
     int32_t (*TurnStandbyMode)(struct IAudioRenderVdi *self);
     int32_t (*AudioDevDump)(struct IAudioRenderVdi *self, int32_t range, int32_t fd);
     int32_t (*IsSupportsPauseAndResume)(struct IAudioRenderVdi *self, bool *supportPause, bool *supportResume);
-    int32_t (*GetVersion)(struct IAudioRenderVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus

@@ -18,7 +18,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "v1_0/audio_types_vdi.h"
+#include "audio_types_vdi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +32,6 @@ struct IAudioCallbackVdi {
         int8_t *cookie);
     int32_t (*ParamCallback)(struct IAudioCallbackVdi *self, enum AudioExtParamKeyVdi key, const char *condition,
         const char *value, int8_t *reserved, int8_t cookie);
-    int32_t (*GetVersion)(struct IAudioCallbackVdi *self, uint32_t *majorVer, uint32_t *minorVer);
 };
 
 #ifdef __cplusplus
