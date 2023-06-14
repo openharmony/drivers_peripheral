@@ -759,7 +759,7 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
-    
+
     do {
         ret = HdfWlanAddRemoteObj(cbFunc);
         if (ret != HDF_SUCCESS) {
@@ -1337,7 +1337,7 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
 {
     int32_t ret;
     (void)self;
-    
+
     if (ifName == NULL || signalResult == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
