@@ -25,7 +25,7 @@ namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
-static std::shared_ptr<IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -78,9 +78,9 @@ static int32_t GetLayerAlpha(LayerAlpha& alpha)
 {
     alpha.enGlobalAlpha = GetRandBoolValue(GetData<uint32_t>());
     alpha.enPixelAlpha = GetRandBoolValue(GetData<uint32_t>());
-    alpha.alpha0 = GetData<uint32_t>() % ALPHAVALUERANGE;
-    alpha.alpha1 = GetData<uint32_t>() % ALPHAVALUERANGE;
-    alpha.gAlpha = GetData<uint32_t>() % ALPHAVALUERANGE;
+    alpha.alpha0 = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
+    alpha.alpha1 = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
+    alpha.gAlpha = GetData<uint32_t>() % ALPHA_VALUE_RANGE;
     return DISPLAY_SUCCESS;
 }
 
@@ -343,7 +343,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
 
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface.reset(IDisplayComposerInterface::Get());
+        g_composerInterface = IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;

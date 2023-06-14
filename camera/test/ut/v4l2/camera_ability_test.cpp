@@ -22,15 +22,15 @@ void CameraAbilityTest::TearDownTestCase(void) {}
 
 void CameraAbilityTest::SetUp(void)
 {
-    if (display_ == nullptr) {
-        display_ = std::make_shared<TestDisplay>();
+    if (cameraBase_ == nullptr) {
+        cameraBase_ = std::make_shared<TestCameraBase>();
     }
-    display_->Init();
+    cameraBase_->Init();
 }
 
 OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<CameraAbility> &ability)
 {
-    common_metadata_header_t *data = display_->ability->get();
+    common_metadata_header_t *data = cameraBase_->ability->get();
     int32_t sensorOrientation;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
@@ -45,7 +45,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<Ca
 
 OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<CameraAbility> &ability)
 {
-    common_metadata_header_t *data = display_->ability->get();
+    common_metadata_header_t *data = cameraBase_->ability->get();
     uint8_t flashAvailable;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_AVAILABLE, &entry);
@@ -60,7 +60,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<Camer
 
 OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<CameraAbility> &ability)
 {
-    common_metadata_header_t *data = display_->ability->get();
+    common_metadata_header_t *data = cameraBase_->ability->get();
     std::vector<uint8_t> afAvailable;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AF_AVAILABLE_MODES, &entry);
@@ -83,7 +83,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<CameraAb
 
 OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<CameraAbility> &ability)
 {
-    common_metadata_header_t *data = display_->ability->get();
+    common_metadata_header_t *data = cameraBase_->ability->get();
     std::vector<float> zoomRatioRange;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_ZOOM_RATIO_RANGE, &entry);
@@ -106,7 +106,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<Camer
 
 OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<CameraAbility> &ability)
 {
-    common_metadata_header_t *data = display_->ability->get();
+    common_metadata_header_t *data = cameraBase_->ability->get();
     int32_t jpegOrientation;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
@@ -121,7 +121,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<Came
 
 void CameraAbilityTest::TearDown(void)
 {
-    display_->Close();
+    cameraBase_->Close();
 }
 
 /**
@@ -133,14 +133,14 @@ void CameraAbilityTest::TearDown(void)
  */
 static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
 {
-    EXPECT_EQ(true, display_->ability != nullptr);
-    if (display_->ability == nullptr) {
+    EXPECT_EQ(true, cameraBase_->ability != nullptr);
+    if (cameraBase_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
         return;
     }
-    GetSensorOrientation(display_->ability);
-    GetFlashAvailable(display_->ability);
-    GetAfAvailable(display_->ability);
-    GetZoomRatioRange(display_->ability);
-    GetJpegOrientation(display_->ability);
+    GetSensorOrientation(cameraBase_->ability);
+    GetFlashAvailable(cameraBase_->ability);
+    GetAfAvailable(cameraBase_->ability);
+    GetZoomRatioRange(cameraBase_->ability);
+    GetJpegOrientation(cameraBase_->ability);
 }

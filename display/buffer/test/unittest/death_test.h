@@ -15,10 +15,11 @@
 
 #ifndef DISPLAY_BUFFER_UT_H
 #define DISPLAY_BUFFER_UT_H
+
 #include "gtest/gtest.h"
+#include "v1_0/display_buffer_type.h"
 #include "v1_0/iallocator.h"
 #include "v1_0/imapper.h"
-#include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
@@ -31,11 +32,8 @@ using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 using OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer;
 
 class DeathTest : public::testing::Test {
-protected:
-    virtual void SetUp();
-    virtual void TearDown();
 public:
-    IDisplayBuffer* displayBuffer_{ nullptr };
+    IDisplayBuffer* displayBuffer_;
 };
 
 class BufferDiedRecipient : public OHOS::IRemoteObject::DeathRecipient {

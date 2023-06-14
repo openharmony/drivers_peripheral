@@ -216,20 +216,21 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrame001, TestSize.Level1)
 
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameExceptions001, TestSize.Level1)
 {
-    uint32_t frameLen = (uint64_t)GetCaptureBufferSize();
-    uint64_t requestBytes = frameLen;
+    uint32_t invalidLen = -1;
+    uint64_t requestBytes = invalidLen;
     ASSERT_NE(capture_->CaptureFrame, nullptr);
 
     int32_t ret = capture_->Start(capture_);
     EXPECT_EQ(ret, HDF_SUCCESS);
 
-    int8_t *frame = (int8_t *)calloc(1, frameLen);
+    int8_t *frame = (int8_t *)calloc(1, sizeof(int));
     EXPECT_NE(nullptr, frame);
 
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(nullptr, nullptr, nullptr, nullptr));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, nullptr, nullptr));
-    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, &frameLen, nullptr));
-    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(nullptr, frame, &frameLen, &requestBytes));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, &invalidLen, nullptr));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(nullptr, frame, &invalidLen, &requestBytes));
+    EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, &invalidLen, &requestBytes));
 
     if (frame != nullptr) {
         free(frame);
@@ -646,6 +647,47 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetGainThresholdException002, TestSi
     EXPECT_NE(ret, HDF_SUCCESS);
 }
 
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetGain001, TestSize.Level1)
+{
+    EXPECT_NE(capture_->SetGain, nullptr);
+
+    int32_t ret = capture_->SetGain(capture_, HALF_OF_MAX_VOLUME);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetGainException001, TestSize.Level1)
+{
+    EXPECT_NE(capture_->SetGain, nullptr);
+    float exceptionGain = -3.0;
+
+    int32_t ret = capture_->SetGain(capture_, exceptionGain);
+    EXPECT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->SetGain(nullptr, HALF_OF_MAX_VOLUME);
+    EXPECT_NE(ret, HDF_SUCCESS);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetGain001, TestSize.Level1)
+{
+    EXPECT_NE(capture_->GetGain, nullptr);
+    float getGain;
+
+    int32_t ret = capture_->GetGain(capture_, &getGain);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetGainException001, TestSize.Level1)
+{
+    EXPECT_NE(capture_->SetGain, nullptr);
+    float exceptionGain = 2.0;
+
+    int32_t ret = capture_->GetGain(capture_, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->GetGain(nullptr, &exceptionGain);
+    EXPECT_NE(ret, HDF_SUCCESS);
+}
+
 /**
  * @brief here starts the attributes cases
  */
@@ -671,7 +713,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetSampleAttributesException001, Tes
     EXPECT_NE(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetSampleAttributesException001, TestSize.Level1)
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetSampleAttributes001, TestSize.Level1)
 {
     struct AudioSampleAttributes attrs = {
         .format = AUDIO_FORMAT_TYPE_PCM_16_BIT,
@@ -680,7 +722,10 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetSampleAttributesException001, Tes
     };
     EXPECT_NE(capture_->SetSampleAttributes, nullptr);
 
-    int32_t ret = capture_->SetSampleAttributes(capture_, nullptr);
+    int32_t ret = capture_->SetSampleAttributes(capture_, &attrs);
+    EXPECT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->SetSampleAttributes(capture_, nullptr);
     EXPECT_NE(ret, HDF_SUCCESS);
 
     ret = capture_->SetSampleAttributes(nullptr, &attrs);
@@ -770,6 +815,177 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetExtraParamsException001, TestSize
 
     ret = capture_->GetExtraParams(capture_, nullptr, listLenth);
     EXPECT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture selectsene cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectScene001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_MIC;
+    sceneDesc.desc.desc = strdup("mic");
+    sceneDesc.scene.id = AUDIO_IN_CALL;
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = AUDIO_IN_CALL;
+
+    int32_t ret = capture_->SelectScene(capture_, nullptr);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->SelectScene(nullptr, &sceneDesc);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture get version cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersion001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->GetVersion, nullptr);
+    uint32_t majorVer;
+    uint32_t minorVer;
+    ASSERT_EQ(HDF_SUCCESS, capture_->GetVersion(capture_, &majorVer, &minorVer));
+    EXPECT_EQ(IAUDIO_MANAGER_MAJOR_VERSION, majorVer);
+    EXPECT_EQ(IAUDIO_MANAGER_MINOR_VERSION, minorVer);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersionException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->GetVersion, nullptr);
+    uint32_t majorVer;
+    uint32_t minorVer;
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, capture_->GetVersion(nullptr, &majorVer, &minorVer));
+}
+
+/* capture support pause and resume cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureIsSupportsPauseAndResume001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->GetVersion, nullptr);
+    bool supportPause = false;
+    bool supportResume = false;
+
+    int32_t ret = capture_->IsSupportsPauseAndResume(capture_, &supportPause, &supportResume);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureIsSupportsPauseAndResumeException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->IsSupportsPauseAndResume, nullptr);
+    bool supportPause = false;
+    bool supportResume = false;
+
+    int32_t ret = capture_->IsSupportsPauseAndResume(nullptr, &supportPause, &supportResume);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->IsSupportsPauseAndResume(capture_, nullptr, &supportResume);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->IsSupportsPauseAndResume(capture_, &supportPause, nullptr);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture GetFrameBufferSize cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetFrameBufferSize001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->GetFrameBufferSize, nullptr);
+    uint64_t bufferSize = 0;
+
+    int32_t ret = capture_->GetFrameBufferSize(capture_, &bufferSize);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetFrameBufferSizeException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->GetFrameBufferSize, nullptr);
+    uint64_t bufferSize = 0;
+
+    int32_t ret = capture_->GetFrameBufferSize(nullptr, &bufferSize);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->GetFrameBufferSize(capture_, nullptr);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture AddAudioEffect cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureAddAudioEffect001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->AddAudioEffect, nullptr);
+    uint64_t effectId = 0;
+
+    int32_t ret = capture_->AddAudioEffect(capture_, effectId);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureAddAudioEffectException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->AddAudioEffect, nullptr);
+    uint64_t effectId = -1;
+
+    int32_t ret = capture_->AddAudioEffect(nullptr, effectId);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->AddAudioEffect(capture_, effectId);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture RemoveAudioEffect cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureRemoveAudioEffect001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->RemoveAudioEffect, nullptr);
+    uint64_t effectId = 0;
+
+    int32_t ret = capture_->RemoveAudioEffect(capture_, effectId);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureRemoveAudioEffectException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->RemoveAudioEffect, nullptr);
+    uint64_t effectId = -1;
+
+    int32_t ret = capture_->RemoveAudioEffect(nullptr, effectId);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->RemoveAudioEffect(capture_, effectId);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+/* capture CheckSceneCapability cases */
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_MIC;
+    sceneDesc.desc.desc = strdup("mic");
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapability001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = AUDIO_IN_COMMUNICATION;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(nullptr, &sceneDesc, &isSupport);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->CheckSceneCapability(capture_, nullptr, &isSupport);
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    ret = capture_->CheckSceneCapability(capture_, &sceneDesc, nullptr);
+    ASSERT_NE(ret, HDF_SUCCESS);
 }
 
 } // end of name space

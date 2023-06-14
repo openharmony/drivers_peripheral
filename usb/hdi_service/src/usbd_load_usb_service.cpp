@@ -36,6 +36,7 @@ namespace V1_0 {
 uint32_t UsbdLoadUsbService::count_ = 0;
 bool UsbdLoadUsbService::alarmRunning_ = false;
 bool OnDemandLoadCallback::loading_ = false;
+timer_t UsbdLoadUsbService::timer_ = nullptr;
 
 OnDemandLoadCallback::OnDemandLoadCallback() {}
 
@@ -130,8 +131,9 @@ int32_t UsbdLoadUsbService::StartThreadUsbLoad()
     return HDF_SUCCESS;
 }
 
-void UsbdLoadUsbService::UsbRemoveWorkEntry(int32_t sig)
+void UsbdLoadUsbService::UsbRemoveWorkEntry(union sigval v)
 {
+    timer_delete(timer_);
     if (GetUsbLoadRemoveCount() == 0) {
         sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (sm == nullptr) {
@@ -176,8 +178,33 @@ int32_t UsbdLoadUsbService::RemoveUsbService()
 {
     if (GetUsbLoadRemoveCount() == 1 && alarmRunning_ == false) {
         alarmRunning_ = true;
-        signal(SIGALRM, UsbRemoveWorkEntry);
-        alarm(CHECK_TIME);
+        struct sigevent evp;
+        struct itimerspec ts;
+        timer_t timer;
+        errno_t retSafe = memset_s(&evp, sizeof(sigevent), 0, sizeof(sigevent));
+        if (retSafe != EOK) {
+            HDF_LOGE("memset_s failed");
+            return HDF_FAILURE;
+        }
+        evp.sigev_value.sival_ptr = &timer;
+        evp.sigev_notify = SIGEV_THREAD;
+        evp.sigev_notify_function = UsbRemoveWorkEntry;
+        int32_t ret = timer_create(CLOCK_REALTIME, &evp, &timer);
+        if (ret != 0) {
+            HDF_LOGE("timer_create failed");
+            return HDF_FAILURE;
+        }
+        ts.it_interval.tv_sec = 0;
+        ts.it_interval.tv_nsec = 0;
+        ts.it_value.tv_sec = CHECK_TIME;
+        ts.it_value.tv_nsec = 0;
+        ret = timer_settime(timer, TIMER_ABSTIME, &ts, NULL);
+        if (ret != 0) {
+            HDF_LOGE("timer_settime failed");
+            timer_delete(timer);
+            return HDF_FAILURE;
+        }
+        timer_ = timer;
     }
     DecreaseUsbLoadRemoveCount();
     return HDF_SUCCESS;

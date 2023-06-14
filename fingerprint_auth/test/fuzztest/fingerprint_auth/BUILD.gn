@@ -13,5 +13,8 @@
 
 group("fuzztest") {
   testonly = true
-  deps = [ "fingerprintauthhdi_fuzzer:FingerprintAuthHdiFuzzTest" ]
+  deps = [
+    "fingerprintauthhdi_fuzzer:FingerprintAuthHdiFuzzTest",
+    "fingerprintinterfaceservice_fuzzer:FingerprintInterfaceServiceFuzzTest",
+  ]
 }

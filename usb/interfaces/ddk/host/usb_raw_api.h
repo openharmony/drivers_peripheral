@@ -513,7 +513,8 @@ int32_t UsbRawCancelRequest(const struct UsbRawRequest *request);
  * otherwise.
  */
 int32_t UsbRawHandleRequests(const UsbRawHandle *devHandle);
-
+int32_t GetRawConfigDescriptor(
+    const UsbRawHandle *rawHandle, uint8_t configIndex, uint8_t *configDesc, uint32_t configDescLen);
 #ifdef __cplusplus
 }
 #endif

@@ -232,6 +232,18 @@ static int32_t GetConfigDescriptor(const struct UsbDevice *dev, uint8_t configId
     return ret;
 }
 
+int32_t GetRawConfigDescriptor(
+    const UsbRawHandle *rawHandle, uint8_t configIndex, uint8_t *configDesc, uint32_t configDescLen)
+{
+    if (rawHandle == NULL || configDesc == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbDeviceHandle *devHandle = (struct UsbDeviceHandle *)rawHandle;
+    return GetConfigDescriptor(devHandle->dev, configIndex, configDesc, configDescLen);
+}
+
 static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescriptorType, void *dest)
 {
     int32_t ret;
@@ -866,6 +878,17 @@ struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle, int
     return osAdapterOps->allocRequest(devHandle, isoPackets, length);
 }
 
+struct UsbHostRequest *AllocRequestByMmap(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, size_t length)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+
+    if (osAdapterOps->allocRequestByMmap == NULL) {
+        return NULL;
+    }
+
+    return osAdapterOps->allocRequestByMmap(devHandle, isoPackets, length);
+}
+
 int32_t FreeRequest(const struct UsbHostRequest *request)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
@@ -874,6 +897,16 @@ int32_t FreeRequest(const struct UsbHostRequest *request)
     }
 
     return osAdapterOps->freeRequest((struct UsbHostRequest *)request);
+}
+
+int32_t FreeRequestByMmap(const struct UsbHostRequest *request)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (osAdapterOps->freeRequestByMmap == NULL) {
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    return osAdapterOps->freeRequestByMmap((struct UsbHostRequest *)request);
 }
 
 int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
@@ -958,6 +991,26 @@ int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct Usb
             return HDF_FAILURE;
         }
     }
+    request->devHandle = (struct UsbDeviceHandle *)devHandle;
+    request->endPoint = fillRequestData->endPoint;
+    request->requestType = USB_PIPE_TYPE_INTERRUPT;
+    request->timeout = fillRequestData->timeout;
+    request->length = fillRequestData->length;
+    request->userData = fillRequestData->userData;
+    request->callback = fillRequestData->callback;
+    request->userCallback = fillRequestData->userCallback;
+
+    return HDF_SUCCESS;
+}
+
+int32_t RawFillInterruptRequestByMmap(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
+    const struct UsbFillRequestData *fillRequestData)
+{
+    if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
+        HDF_LOGE("%{public}s:%d param is null!", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     request->devHandle = (struct UsbDeviceHandle *)devHandle;
     request->endPoint = fillRequestData->endPoint;
     request->requestType = USB_PIPE_TYPE_INTERRUPT;
@@ -1082,6 +1135,18 @@ struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, 
     return request;
 }
 
+struct UsbHostRequest *RawAllocRequestByMmap(
+    const struct UsbDeviceHandle *devHandle, int32_t isoPackets, int32_t length)
+{
+    struct UsbHostRequest *request = NULL;
+    request = (struct UsbHostRequest *)AllocRequestByMmap(devHandle, isoPackets, length);
+    if (request == NULL) {
+        HDF_LOGE("%{public}s:%d RawMemAlloc failed", __func__, __LINE__);
+        return NULL;
+    }
+    return request;
+}
+
 int32_t RawFreeRequest(const struct UsbHostRequest *request)
 {
     if (request == NULL) {
@@ -1089,6 +1154,15 @@ int32_t RawFreeRequest(const struct UsbHostRequest *request)
         return HDF_ERR_INVALID_PARAM;
     }
     return FreeRequest(request);
+}
+
+int32_t RawFreeRequestByMmap(const struct UsbHostRequest *request)
+{
+    if (request == NULL) {
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return FreeRequestByMmap(request);
 }
 
 int32_t RawGetConfigDescriptor(
@@ -1230,6 +1304,25 @@ int32_t RawGetDeviceDescriptor(const struct UsbDevice *dev, struct UsbDeviceDesc
 
     *desc = dev->deviceDescriptor;
     return HDF_SUCCESS;
+}
+
+void RawAttachKernelDriver(struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber)
+{
+    if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES) {
+        HDF_LOGE("%{public}s param is NULL or interfaceNumber = %d is out of range", __func__, interfaceNumber);
+        return;
+    }
+
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (osAdapterOps->attachKernelDriver == NULL) {
+        HDF_LOGE("%{public}s: releaseInterface not support", __func__);
+        return;
+    }
+
+    OsalMutexLock(&devHandle->lock);
+    osAdapterOps->attachKernelDriver(devHandle, interfaceNumber);
+    OsalMutexUnlock(&devHandle->lock);
+    return;
 }
 
 int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int32_t interfaceNumber)

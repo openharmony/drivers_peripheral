@@ -29,7 +29,8 @@ extern "C" {
 #define IAUDIO_VDI_MANAGER_MINOR_VERSION 0
 
 struct IAudioManagerVdi {
-    int32_t (*GetAllAdapters)(struct IAudioManagerVdi *self, struct AudioAdapterDescriptorVdi *descs, uint32_t *descsLen);
+    int32_t (*GetAllAdapters)(struct IAudioManagerVdi *self,
+        struct AudioAdapterDescriptorVdi *descs, uint32_t *descsLen);
     int32_t (*LoadAdapter)(struct IAudioManagerVdi *self, const struct AudioAdapterDescriptorVdi *desc,
         struct IAudioAdapterVdi **adapter);
     int32_t (*UnloadAdapter)(struct IAudioManagerVdi *self, struct IAudioAdapterVdi *adapter);

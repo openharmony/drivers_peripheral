@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V1_0_ISENSORINTERFACE_VDI_H
-#define OHOS_HDI_SENSOR_V1_0_ISENSORINTERFACE_VDI_H
+#ifndef OHOS_HDI_SENSOR_V1_1_ISENSORINTERFACE_VDI_H
+#define OHOS_HDI_SENSOR_V1_1_ISENSORINTERFACE_VDI_H
 
 #include "hdf_load_vdi.h"
 #include "isensor_callback_vdi.h"
@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 
 #define HDI_SENSOR_VDI_LIBNAME "libhdi_sensor_impl.z.so"
 
@@ -56,11 +56,11 @@ public:
 
 struct WrapperSensorVdi {
     struct HdfVdiBase base;
-    class ISensorInterfaceVdi *sensorModule;
+    ISensorInterfaceVdi *sensorModule;
 };
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_0_ISENSORINTERFACE_VDI_H
+#endif // OHOS_HDI_SENSOR_V1_1_ISENSORINTERFACE_VDI_H

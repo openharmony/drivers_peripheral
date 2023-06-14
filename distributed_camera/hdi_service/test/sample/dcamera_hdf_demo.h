@@ -72,7 +72,7 @@ enum DemoActionID {
     CAPTURE_ID_VIDEO,
 };
 
-typedef enum camera_awb_mode {
+typedef enum CameraAwbMode {
     OHOS_CAMERA_AWB_MODE_OFF,
     OHOS_CAMERA_AWB_MODE_AUTO,
     OHOS_CAMERA_AWB_MODE_INCANDESCENT,
@@ -82,7 +82,7 @@ typedef enum camera_awb_mode {
     OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT,
     OHOS_CAMERA_AWB_MODE_TWILIGHT,
     OHOS_CAMERA_AWB_MODE_SHADE,
-} camera_awb_mode_t;
+} CameraAwbMode;
 
 class DemoCameraHostCallback;
 class DcameraHdfDemo {

@@ -230,7 +230,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE &tunnelSetup)
+                                              OHOS::HDI::Codec::V1_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -266,6 +266,7 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
+    CHECK_AND_RETURN_RET_LOG(index < ROLE_MAX_LEN, HDF_ERR_INVALID_PARAM, "index is too large");
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);
@@ -363,8 +364,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         codecBuffer = nullptr;
         return err;
     }
-    // for test
-    buffer.fenceFd = 0;
+
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);

@@ -16,6 +16,7 @@ import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../camera.gni")
 module_output_path = "drivers_peripheral_camera/camera"
+camera_include_path = "//drivers/peripheral/camera/test/at/"
 
 config("hdf_camera_benchmark_test_config") {
   visibility = [ ":*" ]
@@ -37,6 +38,7 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
 
   include_dirs = [
     "./include/",
+    "$camera_include_path/hdi/v1_0/include/",
     "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
@@ -63,7 +65,9 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
     external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
+    "graphic_chipsetsdk:surface",
     "samgr:samgr_proxy",
   ]
   public_configs = [ ":hdf_camera_benchmark_test_config" ]

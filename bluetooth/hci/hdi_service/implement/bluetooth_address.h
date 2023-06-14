@@ -36,6 +36,7 @@ public:
     void ReadAddress(std::string &address) const;
 
 private:
+    static void ParseAddressToString(std::vector<uint8_t> &address, std::string &outString);
     int ParseAddressFromString(const std::string &string) const;
 
 private:

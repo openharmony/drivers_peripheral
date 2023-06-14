@@ -16,7 +16,7 @@
 #ifndef CAMERA_VIDEO_TEST_H
 #define CAMERA_VIDEO_TEST_H
 
-#include "test_display.h"
+#include "test_camera_base.h"
 
 class CameraVideoTest : public testing::Test {
 public:
@@ -36,6 +36,6 @@ public:
     std::shared_ptr<StreamCustomer> streamCustomerSnapshot_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
     std::vector<StreamInfo> streamInfos_;
-    std::shared_ptr<TestDisplay> display_ = nullptr;
+    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
 };
 #endif /* CAMERA_VIDEO_TEST_H */

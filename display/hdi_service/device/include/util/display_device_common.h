@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef _DISPLAY_DEVICE_COMMON_H_
-#define _DISPLAY_DEVICE_COMMON_H_
+#ifndef DISPLAY_DEVICE_COMMON_H
+#define DISPLAY_DEVICE_COMMON_H
 
 #include <buffer_handle_parcel.h>
 #include <display_type.h>
@@ -220,4 +220,4 @@ bool DisplayDeviceReadData(T *data, OHOS::MessageParcel *parcel, uint32_t num = 
     return true;
 }
 
-#endif // _DISPLAY_DEVICE_COMMON_H_
+#endif // DISPLAY_DEVICE_COMMON_H

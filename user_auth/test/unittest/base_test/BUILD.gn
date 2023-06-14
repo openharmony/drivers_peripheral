@@ -34,12 +34,10 @@ ohos_unittest("UserAuthBaseTest") {
   ]
 
   sources = [
-    "//drivers/peripheral/user_auth/hdi_service/common/src/attribute.c",
     "src/adaptor_algorithm_test.cpp",
     "src/adaptor_file_test.cpp",
     "src/adaptor_memory_test.cpp",
     "src/adaptor_time_test.cpp",
-    "src/attribute_test.cpp",
     "src/buffer_test.cpp",
     "src/key_mgr_test.cpp",
   ]

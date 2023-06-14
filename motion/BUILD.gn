@@ -14,5 +14,5 @@
 import("motion.gni")
 
 group("motion_entry") {
-  deps = []
+  deps = [ "hdi_service:hdi_motion_service" ]
 }

@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 SensorIfService::SensorIfService()
 {
     int32_t ret = GetSensorVdiImpl();
@@ -59,7 +59,7 @@ int32_t SensorIfService::GetSensorVdiImpl()
     }
 
     wrapperSensorVdi = reinterpret_cast<struct WrapperSensorVdi *>(vdi_->vdiBase);
-    sensorVdiImpl_.reset(wrapperSensorVdi->sensorModule);
+    sensorVdiImpl_ = wrapperSensorVdi->sensorModule;
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor impl failed", __func__);
         return HDF_FAILURE;
@@ -254,6 +254,17 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     return ret;
 }
 
+int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event)
+{
+    HDF_LOGI("%{public}s: Enter the ReadData function", __func__);
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
 {
     SensorIfService *impl = new (std::nothrow) SensorIfService();
@@ -270,7 +281,7 @@ extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Sensor
 } // namespace HDI
 } // namespace OHOS

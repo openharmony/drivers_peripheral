@@ -45,6 +45,36 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
             return NULL;
         }
     }
+
+    LinkedList *credList = NULL;
+    if (QueryCredentialFunc(param->userId, param->authType, &credList) != RESULT_SUCCESS) {
+        LOG_ERROR("QueryCredentialFunc failed");
+        return NULL;
+    }
+    uint64_t templateIdsBuffer[MAX_CREDENTIAL];
+    uint32_t len = 0;
+    LinkedListNode *temp = credList->head;
+    while (temp != NULL) {
+        if (temp->data == NULL) {
+            LOG_ERROR("list node is invalid");
+            DestroyLinkedList(credList);
+            return NULL;
+        }
+        CredentialInfoHal *credentialHal = (CredentialInfoHal *)(temp->data);
+        if (len >= MAX_CREDENTIAL) {
+            LOG_ERROR("len out of bound");
+            DestroyLinkedList(credList);
+            return NULL;
+        }
+        templateIdsBuffer[len] = credentialHal->templateId;
+        ++len;
+        temp = temp->next;
+    }
+
+    Uint64Array templateIds = { templateIdsBuffer, len };
+    scheduleParam.templateIds = &templateIds;
+
+    DestroyLinkedList(credList);
     return GenerateSchedule(&scheduleParam);
 }
 

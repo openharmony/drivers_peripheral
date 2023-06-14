@@ -1,0 +1,38 @@
+{
+    "hdf_audio_codec_primary_dev0": [
+        {
+            "deep-buffer-playback": [
+                {
+                    "Headphones": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 0
+                        }
+                    ],
+                    "Speaker": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 1
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "MIC": [
+                        {
+                            "name": "RPGA MIC Switch",
+                            "value": 1
+                        }
+                    ],
+                    "micHs": [
+                        {
+                            "name": "LPGA MIC Switch",
+                            "value": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

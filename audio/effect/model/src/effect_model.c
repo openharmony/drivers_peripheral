@@ -37,7 +37,7 @@ static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *su
 static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
                                                   struct EffectControllerDescriptor *descs, uint32_t *descsLen)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     int32_t ret;
     uint32_t i;
     uint32_t descNum = 0;
@@ -68,14 +68,14 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
     }
     *descsLen = descNum;
 
-    HDF_LOGI("%{public}s success", __func__);
+    HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const char *uuid,
      struct EffectControllerDescriptor *desc)
 {
-    HDF_LOGI("enter to %{public}s", __func__);
+    HDF_LOGD("enter to %{public}s", __func__);
     uint32_t i;
     struct EffectFactory *factLib = NULL;
     if (self == NULL || uuid == NULL || desc == NULL) {
@@ -98,7 +98,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
             return HDF_FAILURE;
         }
-        HDF_LOGI("%{public}s success", __func__);
+        HDF_LOGD("%{public}s success", __func__);
         return HDF_SUCCESS;
     }
 
@@ -147,6 +147,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     ctrlMgr->ctrlImpls.EffectProcess = EffectControlEffectProcess;
     ctrlMgr->ctrlImpls.SendCommand = EffectControlSendCommand;
     ctrlMgr->ctrlImpls.GetEffectDescriptor = EffectGetOwnDescriptor;
+    ctrlMgr->ctrlImpls.EffectReverse = EffectControlEffectReverse;
     *contoller = &ctrlMgr->ctrlImpls;
     if (RegisterControllerToList(ctrlMgr) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register ctroller to list failed.", __func__);
@@ -278,7 +279,7 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
     return HDF_SUCCESS;
 }
 
-void ModelInit()
+void ModelInit(void)
 {
     struct ConfigDescriptor *cfgDesc = NULL;
     if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {
@@ -298,7 +299,7 @@ void ModelInit()
         return;
     }
 
-    HDF_LOGI("%{public}s end!", __func__);
+    HDF_LOGD("%{public}s end!", __func__);
 }
 
 struct IEffectModel *EffectModelImplGetInstance(void)

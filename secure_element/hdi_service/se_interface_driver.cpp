@@ -98,7 +98,7 @@ static void HdfSeInterfaceDriverRelease(struct HdfDeviceObject* deviceObject)
     delete hdfSeInterfaceHost;
 }
 
-struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
+static struct HdfDriverEntry g_seInterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "secure_element_service",
     .Bind = HdfSeInterfaceDriverBind,
@@ -109,7 +109,7 @@ struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-HDF_INIT(g_nfcinterfaceDriverEntry);
+HDF_INIT(g_seInterfaceDriverEntry);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

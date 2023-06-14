@@ -40,10 +40,8 @@ protected:
     CodecDfxService() = default;
 
 private:
-    static uint32_t BuffCount_i;
-    static uint32_t BuffCount_j;
-    static uint32_t portIndex_i;
-    static uint32_t portIndex_j;
+    static uint32_t inputBuffCount;
+    static uint32_t outputBuffCount;
     sptr<CodecComponentManagerService> managerService_;
     static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode;
     static CodecDfxService dfxInstance_;

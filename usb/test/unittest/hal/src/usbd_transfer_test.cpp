@@ -35,12 +35,12 @@ const uint8_t INTERFACEID_OK = 1;
 const uint8_t PIPE_ENDPOINTID_INVALID = 244;
 const uint8_t PIPE_INTERFACEID_INVALID = 244;
 // data interface have 2 point : 1->bulk_out 2->bulk_in
-const uint8_t POINTID_BULK_IN = USB_ENDPOINT_DIR_IN | 2;
-const uint8_t POINTID_BULK_OUT = USB_ENDPOINT_DIR_OUT | 1;
+static const uint8_t POINTID_BULK_IN = USB_ENDPOINT_DIR_IN | 2;
+static const uint8_t POINTID_BULK_OUT = USB_ENDPOINT_DIR_OUT | 1;
 const int32_t ASHMEM_MAX_SIZE = 1024;
 const uint8_t SAMPLE_DATA_1 = 1;
-const uint8_t SAMPLE_DATA_2 = 2;
-const uint8_t SAMPLE_DATA_3 = 3;
+static const uint8_t SAMPLE_DATA_2 = 2;
+static const uint8_t SAMPLE_DATA_3 = 3;
 const int32_t TRANSFER_TIME_OUT = 1000;
 const int32_t CTL_VALUE = 0x100;
 UsbDev UsbdTransferTest::dev_ = {0, 0};

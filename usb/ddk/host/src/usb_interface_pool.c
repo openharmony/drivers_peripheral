@@ -517,6 +517,23 @@ static int32_t IfFillBulkRequest(
     return HDF_SUCCESS;
 }
 
+static int32_t IfFillBulkRequestByMmap(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+{
+    struct UsbRequestParamsData requestData = params->dataReq;
+    uint8_t pipeAddress = params->pipeAddress;
+    hostRequest->devHandle = (struct UsbDeviceHandle *)devHandle;
+    hostRequest->endPoint = pipeAddress;
+    hostRequest->requestType = USB_PIPE_TYPE_BULK;
+    hostRequest->timeout = params->timeout;
+    hostRequest->length = requestData.length;
+    hostRequest->userData = params->userData;
+    hostRequest->callback = UsbIoSetRequestCompletionInfo;
+    hostRequest->userCallback = params->callback;
+
+    return HDF_SUCCESS;
+}
+
 static int32_t IfFillInterrupteRequest(
     struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
@@ -534,6 +551,24 @@ static int32_t IfFillInterrupteRequest(
     fillRequestData.timeout = params->timeout;
 
     return RawFillInterruptRequest(hostRequest, devHandle, &fillRequestData);
+}
+
+static int32_t IfFillInterrupteRequestByMmap(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+{
+    struct UsbFillRequestData fillRequestData;
+    uint8_t pipeAddress = params->pipeAddress;
+    struct UsbRequestParamsData requestData = params->dataReq;
+
+    fillRequestData.endPoint = pipeAddress;
+    fillRequestData.buffer = requestData.buffer;
+    fillRequestData.length = requestData.length;
+    fillRequestData.userCallback = params->callback;
+    fillRequestData.callback = UsbIoSetRequestCompletionInfo;
+    fillRequestData.userData = params->userData;
+    fillRequestData.timeout = params->timeout;
+
+    return RawFillInterruptRequestByMmap(hostRequest, devHandle, &fillRequestData);
 }
 
 static int32_t IfSubmitRequestToQueue(const struct UsbIfRequest *requestObj)
@@ -610,6 +645,58 @@ static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeT
             }
 
             ret = IfFillInterrupteRequest(hostRequest, devHandle, params);
+            break;
+        default:
+            ret = HDF_FAILURE;
+            break;
+    }
+
+    return ret;
+}
+
+static int32_t IfFillRequestByPipeTypeByMmap(struct UsbIfRequest *requestObj, UsbPipeType pipeType,
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+{
+    int32_t ret;
+
+    switch (pipeType) {
+        case USB_PIPE_TYPE_CONTROL:
+            if (params->requestType != USB_REQUEST_PARAMS_CTRL_TYPE) {
+                ret = HDF_ERR_INVALID_PARAM;
+                HDF_LOGE("%{public}s:%d params is not CTRL_TYPE", __func__, __LINE__);
+                break;
+            }
+
+            requestObj->request.compInfo.type = USB_REQUEST_TYPE_DEVICE_CONTROL;
+
+            ret = IfFillControlRequest(hostRequest, devHandle, params);
+            break;
+        case USB_PIPE_TYPE_ISOCHRONOUS:
+            if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
+                ret = HDF_ERR_INVALID_PARAM;
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
+                break;
+            }
+
+            ret = IfFillIsoRequest(hostRequest, devHandle, params);
+            break;
+        case USB_PIPE_TYPE_BULK:
+            if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
+                ret = HDF_ERR_INVALID_PARAM;
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
+                break;
+            }
+
+            ret = IfFillBulkRequestByMmap(hostRequest, devHandle, params);
+            break;
+        case USB_PIPE_TYPE_INTERRUPT:
+            if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
+                ret = HDF_ERR_INVALID_PARAM;
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
+                break;
+            }
+
+            ret = IfFillInterrupteRequestByMmap(hostRequest, devHandle, params);
             break;
         default:
             ret = HDF_FAILURE;
@@ -858,6 +945,29 @@ static void SetPoolQueryPara(struct UsbPoolQueryPara *poolQueryPara, uint8_t bus
     poolQueryPara->usbAddr = usbAddr;
 }
 
+int32_t UsbGetDeviceMemMapFd(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr)
+{
+    struct UsbPoolQueryPara poolQueryPara = {0};
+    struct UsbSession *realSession = RawGetSession(session);
+
+    if (realSession == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfacePoolList is empty", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+    SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
+    struct UsbDeviceHandle *devHandle = NULL;
+    struct UsbInterfacePool *interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    if (interfacePool == NULL || interfacePool->device == NULL) {
+        interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
+        if (interfacePool == NULL || interfacePool->device == NULL) {
+            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+    }
+
+    return interfacePool->device->devHandle->mmapFd;
+}
+
 static struct UsbInterface *ClaimInterface(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex, bool force)
 {
@@ -894,6 +1004,7 @@ static struct UsbInterface *ClaimInterface(
     if (interfaceIndex != USB_CTRL_INTERFACE_ID && claimFlag) {
         OsalMutexLock(&interfacePool->interfaceLock);
         devHandle = interfacePool->device->devHandle;
+        interfaceObj->forceDetachKernelDriver = force;
         if (force) {
             ret = RawClaimInterfaceForce(devHandle, interfaceIndex);
         } else {
@@ -941,6 +1052,16 @@ struct UsbInterface *UsbClaimInterface(
     return ClaimInterface(session, busNum, usbAddr, interfaceIndex, true);
 }
 
+static void UsbAttachKernelDriver(struct UsbDeviceHandle *devHandle, const struct UsbSdkInterface *interfaceObj)
+{
+    if (!interfaceObj->forceDetachKernelDriver) {
+        HDF_LOGI("%{public}s not force", __func__);
+        return;
+    }
+
+    RawAttachKernelDriver(devHandle, interfaceObj->interface.info.interfaceIndex);
+}
+
 int32_t UsbReleaseInterface(const struct UsbInterface *interfaceObj)
 {
     struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
@@ -969,6 +1090,7 @@ int32_t UsbReleaseInterface(const struct UsbInterface *interfaceObj)
             OsalMutexUnlock(&interfacePool->interfaceLock);
             return ret;
         }
+        UsbAttachKernelDriver(devHandle, interfaceSdk);
     }
     OsalMutexUnlock(&interfacePool->interfaceLock);
 
@@ -1084,6 +1206,33 @@ OUT:
     return NULL;
 }
 
+int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct UsbInterface **interface)
+{
+    if (interfaceHandle == NULL) {
+        HDF_LOGE("%{public}s handle is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    if (ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL ||
+        ifaceHdl->devHandle->dev->privateObject == NULL) {
+        HDF_LOGE("%{public}s ifaceHdl is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)ifaceHdl->devHandle->dev->privateObject;
+    /* Find interface object */
+    struct UsbInterfaceQueryPara interfaceQueryPara = {
+        .type = USB_INTERFACE_INTERFACE_INDEX_TYPE, .interfaceIndex = ifaceHdl->interfaceIndex};
+    struct UsbSdkInterface *interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, false);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s interfaceObj is null", __func__);
+        return HDF_ERR_BAD_FD;
+    }
+    *interface = (struct UsbInterface *)interfaceObj;
+    return HDF_SUCCESS;
+}
+
 int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle)
 {
     HDF_STATUS ret;
@@ -1180,6 +1329,36 @@ int32_t UsbSelectInterfaceSetting(
 
     *interfaceObj = &interfaceTemp->interface;
 
+    return HDF_SUCCESS;
+}
+
+int32_t UsbGetInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t *settingIndex)
+{
+    if (interfaceHandle == NULL || settingIndex == NULL) {
+        HDF_LOGE("%{public}s invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbInterfaceHandleEntity *handleEntity = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    if (handleEntity->devHandle == NULL || handleEntity->devHandle->dev == NULL) {
+        HDF_LOGE("%{public}s invalid handle entity", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)handleEntity->devHandle->dev->privateObject;
+    if (interfacePool == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfacePool is null", __func__, __LINE__);
+        return HDF_ERR_BAD_FD;
+    }
+
+    struct UsbInterfaceQueryPara interfaceQueryPara = {0};
+    interfaceQueryPara.type = USB_INTERFACE_INTERFACE_INDEX_TYPE;
+    interfaceQueryPara.interfaceIndex = handleEntity->interfaceIndex;
+    struct UsbSdkInterface *interfaceTemp = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, true);
+    if (interfaceTemp == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceTemp is null", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+    *settingIndex = interfaceTemp->interface.info.curAltSetting;
     return HDF_SUCCESS;
 }
 
@@ -1281,6 +1460,45 @@ struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, in
     return (struct UsbRequest *)requestObj;
 }
 
+struct UsbRequest *UsbAllocRequestByMmap(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length)
+{
+    struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    struct UsbIfRequest *requestObj = NULL;
+    struct UsbHostRequest *hostRequest = NULL;
+
+    if (ifaceHdl == NULL || ifaceHdl->devHandle == NULL) {
+        HDF_LOGE("%{public}s: handle is null", __func__);
+        return NULL;
+    }
+
+    requestObj = (struct UsbIfRequest *)RawUsbMemCalloc(sizeof(struct UsbIfRequest));
+    if (requestObj == NULL) {
+        HDF_LOGE("%{public}s: RawUsbMemCalloc UsbRequest error", __func__);
+        return NULL;
+    }
+
+    hostRequest = RawAllocRequestByMmap(ifaceHdl->devHandle, isoPackets, length);
+    if (hostRequest == NULL) {
+        HDF_LOGE("%{public}s: RawAllocRequest error", __func__);
+        RawUsbMemFree(requestObj);
+        return NULL;
+    }
+    hostRequest->devHandle = ifaceHdl->devHandle;
+
+    ++g_usbRequestObjectId;
+    g_usbRequestObjectId %= MAX_OBJECT_ID;
+    requestObj->request.object.objectId = g_usbRequestObjectId;
+    DListHeadInit(&requestObj->request.object.entry);
+    requestObj->request.compInfo.type = USB_REQUEST_TYPE_INVALID;
+    requestObj->request.compInfo.buffer = hostRequest->buffer;
+    requestObj->request.compInfo.length = (uint32_t)hostRequest->length;
+    requestObj->hostRequest = hostRequest;
+    requestObj->isSyncReq = false;
+    hostRequest->privateObj = requestObj;
+
+    return (struct UsbRequest *)requestObj;
+}
+
 int32_t UsbFreeRequest(const struct UsbRequest *request)
 {
     struct UsbHostRequest *hostRequest = NULL;
@@ -1299,6 +1517,34 @@ int32_t UsbFreeRequest(const struct UsbRequest *request)
     }
 
     ret = RawFreeRequest(hostRequest);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d RawFreeRequest failed", __func__, __LINE__);
+        return ret;
+    }
+
+    RawUsbMemFree(requestObj);
+
+    return ret;
+}
+
+int32_t UsbFreeRequestByMmap(const struct UsbRequest *request)
+{
+    struct UsbHostRequest *hostRequest = NULL;
+    struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
+    int32_t ret;
+
+    if (requestObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d request is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    hostRequest = requestObj->hostRequest;
+    if (hostRequest == NULL) {
+        HDF_LOGE("%{public}s:%{public}d hostRequest is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    ret = RawFreeRequestByMmap(hostRequest);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d RawFreeRequest failed", __func__, __LINE__);
         return ret;
@@ -1345,13 +1591,64 @@ int32_t UsbFillRequest(
         HDF_LOGE("%{public}s:%{public}d hostRequest is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = IfGetRequestPipeType(ifaceHdl->devHandle, params->interfaceId, params->pipeId, &pipeType);
+
+    uint8_t interfaceId = ifaceHdl->interfaceIndex;
+    if (params->requestType == USB_REQUEST_PARAMS_CTRL_TYPE) {
+        interfaceId = USB_CTRL_INTERFACE_ID;
+    }
+
+    ret = IfGetRequestPipeType(ifaceHdl->devHandle, interfaceId, params->pipeId, &pipeType);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d IfGetRequestPipeType error, ret = %d", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = IfFillRequestByPipeType(requestObj, pipeType, hostRequest, ifaceHdl->devHandle, params);
+    if (params->requestType == USB_REQUEST_PARAMS_DATA_TYPE) {
+        directon = (params->pipeAddress >> USB_DIR_OFFSET) & 0x01;
+        if (directon == USB_REQUEST_DIR_TO_DEVICE) {
+            requestObj->request.compInfo.type = USB_REQUEST_TYPE_PIPE_WRITE;
+        } else if (directon == USB_REQUEST_DIR_FROM_DEVICE) {
+            requestObj->request.compInfo.type = USB_REQUEST_TYPE_PIPE_READ;
+        }
+    }
+
+    return ret;
+}
+
+int32_t UsbFillRequestByMmap(
+    const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle, const struct UsbRequestParams *params)
+{
+    struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
+    struct UsbHostRequest *hostRequest = NULL;
+    UsbPipeType pipeType;
+    UsbRequestDirection directon;
+    int32_t ret;
+
+    if (requestObj == NULL || params == NULL || ifaceHdl == NULL || ifaceHdl->devHandle == NULL) {
+        HDF_LOGE("%{public}s:%{public}d params or request is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    hostRequest = requestObj->hostRequest;
+    if (hostRequest == NULL) {
+        HDF_LOGE("%{public}s:%{public}d hostRequest is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    uint8_t interfaceId = ifaceHdl->interfaceIndex;
+    if (params->requestType == USB_REQUEST_PARAMS_CTRL_TYPE) {
+        interfaceId = USB_CTRL_INTERFACE_ID;
+    }
+
+    ret = IfGetRequestPipeType(ifaceHdl->devHandle, interfaceId, params->pipeId, &pipeType);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d IfGetRequestPipeType error, ret = %d", __func__, __LINE__, ret);
+        return ret;
+    }
+
+    ret = IfFillRequestByPipeTypeByMmap(requestObj, pipeType, hostRequest, ifaceHdl->devHandle, params);
     if (params->requestType == USB_REQUEST_PARAMS_DATA_TYPE) {
         directon = (params->pipeAddress >> USB_DIR_OFFSET) & 0x01;
         if (directon == USB_REQUEST_DIR_TO_DEVICE) {

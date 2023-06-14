@@ -50,13 +50,13 @@ ohos_shared_library("libusb_interface_service_1.0") {
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
     "${usb_driver_path}/ddk:libusb_pnp_manager",
-    "./../../../interface/usb/gadget/mtp/v1_0:libusbfn_mtp_stub_1.0",
     "./../gadget/function/mtp:libusbfn_mtp_interface_service_1.0",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
       "drivers_interface_usb:usb_idl_headers",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
       "hdf_core:libhdf_host",
@@ -72,6 +72,7 @@ ohos_shared_library("libusb_interface_service_1.0") {
     ]
   } else {
     external_deps = [
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
@@ -85,10 +86,7 @@ ohos_shared_library("libusb_interface_service_1.0") {
 ohos_shared_library("libusb_driver") {
   sources = [ "src/usb_interface_driver.cpp" ]
 
-  public_deps = [
-    ":libusb_interface_service_1.0",
-    "./../../../interface/usb/v1_0:libusb_stub_1.0",
-  ]
+  public_deps = [ ":libusb_interface_service_1.0" ]
 
   shlib_type = "hdi"
 
@@ -99,6 +97,7 @@ ohos_shared_library("libusb_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_usb:libusb_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -108,6 +107,7 @@ ohos_shared_library("libusb_driver") {
     ]
   } else {
     external_deps = [
+      "drivers_interface_usb:libusb_stub_1.0",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]

@@ -36,15 +36,9 @@
 #include "stream_customer.h"
 #include "securec.h"
 #include "project_camera_demo.h"
-#ifdef CAMERA_BUILT_ON_OHOS_LITE
-#include "camera_device.h"
-#include "camera_host.h"
-#include "stream_operator.h"
-#else
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "v1_0/camera_host_proxy.h"
-#endif
 
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;

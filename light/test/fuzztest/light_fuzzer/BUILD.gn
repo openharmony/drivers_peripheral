@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DRIVERS_INTERFACE_PATH = "../../../../../interface"
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -26,13 +25,11 @@ ohos_fuzztest("LightFuzzTest") {
 
   sources = [ "light_fuzzer.cpp" ]
 
-  deps = [
-    "$DRIVERS_INTERFACE_PATH/light/v1_0:liblight_stub_1.0",
-    "../../../hal:hdi_light",
-  ]
+  deps = [ "../../../hal:hdi_light" ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_light:liblight_stub_1.0",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

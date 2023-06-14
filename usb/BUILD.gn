@@ -23,6 +23,7 @@ if (defined(ohos_lite)) {
     deps = [
       "./cfg:usb_etc_files",
       "./ddk:libusb_core",
+      "./ddk_service:usb_ddk_target",
       "./gadget/function/acm:libusbfn_cdcacm",
       "./gadget/function/ecm:libusbfn_cdcecm",
       "./gadget/function/mtp:hdi_usbfn_mtp_service",

@@ -32,6 +32,9 @@
  * @version 1.0
  */
 
+#ifndef EFFECT_HOST_COMMON_H
+#define EFFECT_HOST_COMMON_H
+
 #include "effect_compatible_access.h"
 #include "v1_0/effect_types.h"
 #include "v1_0/ieffect_control.h"
@@ -59,5 +62,9 @@ struct ControllerManager {
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
                                    struct AudioEffectBuffer *output);
 int32_t EffectControlSendCommand(struct IEffectControl *self, uint32_t cmdId, const int8_t *cmdData,
-     uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen);
+    uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen);
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc);
+int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
+                                   struct AudioEffectBuffer *output);
+
+#endif

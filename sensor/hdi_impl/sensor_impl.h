@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
-#define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
+#ifndef OHOS_HDI_SENSOR_V1_1_SENSORIMPL_H
+#define OHOS_HDI_SENSOR_V1_1_SENSORIMPL_H
 
 #include <iproxy_broker.h>
 #include "refbase.h"
@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 class SensorImpl : public ISensorInterfaceVdi, public RefBase {
 public:
     SensorImpl(): sensorInterface(NULL) {}
@@ -49,9 +49,9 @@ private:
     int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
     void RemoveDeathNotice(int32_t sensorType);
 };
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
+#endif // OHOS_HDI_SENSOR_V1_1_SENSORIMPL_H

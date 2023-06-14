@@ -28,6 +28,7 @@ ohos_shared_library("se_vendor_adaptor") {
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "nfc_ca:secure_element_ca",
   ]
 
   install_images = [ chipset_base_dir ]

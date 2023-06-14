@@ -19,12 +19,12 @@
 #include <iproxy_broker.h>
 #include "hdf_log.h"
 #include "isensor_callback_vdi.h"
-#include "v1_0/isensor_interface.h"
+#include "v1_1/isensor_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 class SensorCallbackVdi : public ISensorCallbackVdi {
 public:
     SensorCallbackVdi() = default;
@@ -35,7 +35,7 @@ public:
 private:
     sptr<ISensorCallback> sensorCallback_;
 };
-} // V1_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS

@@ -109,14 +109,14 @@ static int32_t UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
     return HDF_SUCCESS;
 }
 
-static int32_t UsbPipeInit(struct UsbPipe *pipe, const struct UsbRawEndpointDescriptor *ep, uint8_t id)
+static int32_t UsbPipeInit(struct UsbPipe *pipe, const struct UsbRawEndpointDescriptor *ep)
 {
     if ((pipe == NULL) || (ep == NULL)) {
         HDF_LOGE("%{public}s: invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    pipe->info.pipeId = id;
+    pipe->info.pipeId = ep->endpointDescriptor.bEndpointAddress;
     pipe->info.maxPacketSize = ep->endpointDescriptor.wMaxPacketSize;
     pipe->info.interval = ep->endpointDescriptor.bInterval;
     pipe->info.pipeType =  ep->endpointDescriptor.bmAttributes & USB_DDK_ENDPOINT_XFERTYPE_MASK;
@@ -172,7 +172,6 @@ static int32_t UsbProtocalCreatePipeObj(
     const struct UsbRawInterfaceDescriptor *ifDes, const struct UsbSdkInterface *interfaceObj)
 {
     int32_t ret = HDF_SUCCESS;
-    uint8_t id = 0;
     const struct UsbRawEndpointDescriptor *ep = NULL;
     struct UsbPipe *pipe = NULL;
 
@@ -192,7 +191,7 @@ static int32_t UsbProtocalCreatePipeObj(
         if (ret != HDF_SUCCESS) {
             break;
         }
-        ret = UsbPipeInit(pipe, ep, ++id);
+        ret = UsbPipeInit(pipe, ep);
         if (ret != HDF_SUCCESS) {
             break;
         }

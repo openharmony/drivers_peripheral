@@ -16,8 +16,9 @@
 #include <cinttypes>
 #include <osal_mem.h>
 #include "codec_log_wrapper.h"
-#include <hcs_dm_parser.h>
-#define CONFIG_PATH_NAME HDF_CONFIG_DIR "/codec_component_capabilities.hcb"
+#include "codec_hcb_util.h"
+
+#define CODEC_CONFIG_NAME "media_codec_capabilities"
 
 namespace {
     constexpr int32_t MASK_NUM_LIMIT = 32;
@@ -99,24 +100,17 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
 
 int32_t CodecComponentConfig::CodecCompCapabilityInit()
 {
-    const struct DeviceResourceIface *pDevResIns = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (pDevResIns == nullptr) {
-        CODEC_LOGE("get hcs interface failed.");
+    const struct DeviceResourceNode *rootNode = HdfGetHcsRootNode();
+    if (rootNode == nullptr) {
+        CODEC_LOGE("GetRootNode failed");
         return HDF_FAILURE;
     }
-
-    SetHcsBlobPath(CONFIG_PATH_NAME);
-    const struct DeviceResourceNode *pRootNode = pDevResIns->GetRootNode();
-    if (pRootNode == nullptr) {
-        CODEC_LOGD("GetRootNode failed");
+    const struct DeviceResourceNode *codecNode = HcsGetNodeByMatchAttr(rootNode, CODEC_CONFIG_NAME);
+    if (codecNode == nullptr) {
+        CODEC_LOGE("codecNode is nullptr");
         return HDF_FAILURE;
     }
-    const struct DeviceResourceNode *node = pDevResIns->GetChildNode(pRootNode, "codec_config");
-    if (node == nullptr) {
-        HDF_LOGE("node is nullptr");
-        return HDF_FAILURE;
-    }
-    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*node);
+    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*codecNode);
     return HDF_SUCCESS;
 }
 
@@ -142,31 +136,6 @@ int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCa
     auto first = capList_.begin();
     auto last = capList_.begin() + count;
     capList.assign(first, last);
-    return HDF_SUCCESS;
-}
-
-int32_t CodecComponentConfig::GetGroupCapabilitiesNumber(const std::string &nodeName, int32_t &num)
-{
-    int32_t result = 0;
-
-    const struct DeviceResourceNode *codecGroupNode = NULL;
-    struct DeviceResourceNode *childNode = NULL;
-    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface == NULL) {
-        CODEC_LOGE("failed, iface NULL!");
-        return HDF_FAILURE;
-    }
-
-    codecGroupNode = iface->GetChildNode(&node_, nodeName.c_str());
-    if (codecGroupNode == NULL) {
-        CODEC_LOGE("failed to get child node %{public}s,!", nodeName.c_str());
-        return HDF_FAILURE;
-    }
-    DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode)
-    {
-        result++;
-    }
-    num = result;
     return HDF_SUCCESS;
 }
 

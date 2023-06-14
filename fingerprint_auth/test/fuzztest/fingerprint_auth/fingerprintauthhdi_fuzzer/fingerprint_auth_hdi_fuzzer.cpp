@@ -206,6 +206,21 @@ void FuzzAuthenticate(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzAuthenticateV1_1(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t scheduleId = parcel.ReadUint64();
+    std::vector<uint64_t> templateIdList;
+    FillFuzzUint64Vector(parcel, templateIdList);
+    bool endAfterFirstFail = parcel.ReadBool();
+    std::vector<uint8_t> extraInfo;
+    FillFuzzUint8Vector(parcel, extraInfo);
+    sptr<IExecutorCallback> callbackObj;
+    FillFuzzIExecutorCallback(parcel, callbackObj);
+    g_executorImpl.AuthenticateV1_1(scheduleId, templateIdList, endAfterFirstFail, extraInfo, callbackObj);
+    IAM_LOGI("end");
+}
+
 void FuzzIdentify(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -289,6 +304,7 @@ FuzzFunc *g_fuzzFuncs[] = {
     FuzzOnRegisterFinish,
     FuzzEnroll,
     FuzzAuthenticate,
+    FuzzAuthenticateV1_1,
     FuzzIdentify,
     FuzzDelete,
     FuzzCancel,

@@ -16,7 +16,9 @@
 #ifndef COMMON_DEFINES_H
 #define COMMON_DEFINES_H
 
-#include "stdint.h"
+#include <stdint.h>
+
+#include "adaptor_log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,16 +39,6 @@ extern "C" {
             return; \
         } \
     } while (0)
-
-typedef struct Uint8Array {
-    uint8_t *data;
-    uint32_t len;
-} Uint8Array;
-
-typedef struct Uint64Array {
-    uint64_t *data;
-    uint32_t len;
-} Uint64Array;
 
 enum InnerKitResultCode {
     INNER_RESULT_SUCCESS = 0,
@@ -114,15 +106,15 @@ typedef enum ScheduleMode {
 typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
 } AuthSubType;
+
 typedef enum AuthPropertyMode {
-    PROPERMODE_DELETE = 0,
-    PROPERMODE_GET = 1,
-    PROPERMODE_SET = 2,
-    PROPERMODE_LOCK = 3,
-    PROPERMODE_UNLOCK = 4,
-    PROPERMODE_INIT_ALGORITHM = 5,
-    PROPERMODE_RELEASE_ALGORITHM = 6,
-    PROPERMODE_SET_SURFACE_ID = 100,
+    PROPERTY_INIT_ALGORITHM = 1,
+    PROPERTY_MODE_DEL = 2,
+    PROPERTY_MODE_GET = 3,
+    PROPERTY_MODE_SET = 4,
+    PROPERTY_MODE_FREEZE = 5,
+    PROPERTY_MODE_UNFREEZE = 6,
+    PROPERTY_MODE_SET_CACHED_TEMPLATES = 7,
 } AuthPropertyMode;
 
 #define MAX_DUPLICATE_CHECK 100

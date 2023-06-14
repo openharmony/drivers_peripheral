@@ -43,8 +43,8 @@ int32_t WlanInterfaceStart(struct IWlanInterface *self)
     int32_t ret;
 
     (void)self;
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->start == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->start is NULL", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->start(g_wifi);
@@ -59,8 +59,8 @@ int32_t WlanInterfaceStop(struct IWlanInterface *self)
     int32_t ret;
 
     (void)self;
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->stop == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->stop is NULL", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->stop(g_wifi);
@@ -79,8 +79,8 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->createFeature == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->createFeature is NULL", __func__);
         return HDF_FAILURE;
     }
     if (type == PROTOCOL_80211_IFTYPE_AP) {
@@ -118,8 +118,8 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s: g_wifi is NULL", __func__);
+    if (g_wifi == NULL || g_wifi->destroyFeature == NULL) {
+        HDF_LOGE("%{public}s: g_wifi or g_wifi->destroyFeature is NULL", __func__);
         return HDF_FAILURE;
     }
     if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
@@ -160,8 +160,8 @@ int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct
         HDF_LOGE("%{public}s:input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    if (g_apFeature == NULL || g_apFeature->getAssociatedStas == NULL) {
+        HDF_LOGE("%{public}s g_apFeature or g_apFeature->getAssociatedStas is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -198,10 +198,6 @@ int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct
 
 static int32_t GetBasefeature(const struct HdfFeatureInfo *ifeature, struct IWiFiBaseFeature **baseFeature)
 {
-    if (ifeature == NULL || baseFeature == NULL) {
-        HDF_LOGE("%{public}s ifeature or baseFeature is NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
         if (g_apFeature == NULL) {
             HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
@@ -282,8 +278,8 @@ int32_t WlanInterfaceGetFeatureByIfName(struct IWlanInterface *self, const char 
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s gwifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getFeatureByIfName == NULL) {
+        HDF_LOGE("%{public}s gwifi or g_wifi->getFeatureByIfName is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getFeatureByIfName(ifName, (struct IWiFiBaseFeature **)&baseFeature);
@@ -428,8 +424,8 @@ int32_t WlanInterfaceGetSupportCombo(struct IWlanInterface *self, uint64_t *comb
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getSupportCombo == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getSupportCombo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getSupportCombo(combo, DEFAULT_COMBO_SIZE);
@@ -448,8 +444,8 @@ int32_t WlanInterfaceGetSupportFeature(struct IWlanInterface *self, uint8_t *sup
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getSupportFeature == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getSupportFeature is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getSupportFeature(supType, *supTypeLen);
@@ -758,8 +754,8 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->registerEventCallback == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->registerEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
@@ -798,8 +794,8 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->unregisterEventCallback == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->unregisterEventCallback is NULL!", __func__);
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
@@ -808,8 +804,10 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         ret = g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
-            (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-            return ret;
+        }
+        ret = WlanInterfaceUnregisterHid2dCallback(HdfWlanNetlinkCallbackFun, ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Unregister Hid2dCallback failed!, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
@@ -825,8 +823,8 @@ int32_t WlanInterfaceResetDriver(struct IWlanInterface *self, uint8_t chipId, co
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->resetDriver == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->resetDriver is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->resetDriver(chipId, ifName);
@@ -848,8 +846,8 @@ int32_t WlanInterfaceSetCountryCode(struct IWlanInterface *self, const struct Hd
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    if (g_apFeature == NULL || g_apFeature->setCountryCode == NULL) {
+        HDF_LOGE("%{public}s g_apFeature or g_apFeature->setCountryCode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -898,8 +896,8 @@ int32_t WlanInterfaceSetScanningMacAddress(struct IWlanInterface *self, const st
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->setScanningMacAddress == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->setScanningMacAddress is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
@@ -941,7 +939,7 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
     int32_t ret = HDF_FAILURE;
 
     (void)self;
-    if (g_wifi == NULL || netDeviceInfoResult == NULL) {
+    if (g_wifi == NULL || g_wifi->getNetDevInfo == NULL ||netDeviceInfoResult == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -994,14 +992,11 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
 
 static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *scan)
 {
-    if (wifiScan == NULL || scan == NULL) {
-        HDF_LOGE("%{public}s wifiScan or scan is NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if ((scan->ssids != NULL) && (scan->ssidsLen != 0)) {
         wifiScan->ssids = (WifiDriverScanSsid *)OsalMemCalloc(sizeof(WifiDriverScanSsid) * scan->ssidsLen);
         if (wifiScan->ssids != NULL) {
-            if (memcpy_s(wifiScan->ssids, scan->ssidsLen, scan->ssids, scan->ssidsLen) != EOK) {
+            if (memcpy_s(wifiScan->ssids, sizeof(WifiDriverScanSsid) * (scan->ssidsLen), scan->ssids,
+                sizeof(WifiDriverScanSsid) * (scan->ssidsLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
                 OsalMemFree(wifiScan->ssids);
                 return HDF_FAILURE;
@@ -1013,7 +1008,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->freqs != NULL) && (scan->freqsLen != 0)) {
         wifiScan->freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t) * scan->freqsLen);
         if (wifiScan->freqs != NULL) {
-            if (memcpy_s(wifiScan->freqs, scan->freqsLen, scan->freqs, scan->freqsLen) != EOK) {
+            if (memcpy_s(wifiScan->freqs, sizeof(int32_t) * (scan->freqsLen), scan->freqs,
+                sizeof(int32_t) * (scan->freqsLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
                 OsalMemFree(wifiScan->freqs);
                 return HDF_FAILURE;
@@ -1025,7 +1021,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->bssid != NULL) && (scan->bssidLen != 0)) {
         wifiScan->bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * scan->bssidLen);
         if (wifiScan->bssid != NULL) {
-            if (memcpy_s(wifiScan->bssid, scan->bssidLen, scan->bssid, scan->bssidLen) != EOK) {
+            if (memcpy_s(wifiScan->bssid, sizeof(uint8_t) * (scan->bssidLen), scan->bssid,
+                sizeof(uint8_t) * (scan->bssidLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s bssid fail!", __func__);
                 OsalMemFree(wifiScan->bssid);
                 return HDF_FAILURE;
@@ -1035,7 +1032,8 @@ static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *sc
     if ((scan->extraIes != NULL) && (scan->extraIesLen != 0)) {
         wifiScan->extraIes = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * scan->extraIesLen);
         if (wifiScan->extraIes != NULL) {
-            if (memcpy_s(wifiScan->extraIes, scan->extraIesLen, scan->extraIes, scan->extraIesLen) != EOK) {
+            if (memcpy_s(wifiScan->extraIes, sizeof(uint8_t) * (scan->extraIesLen), scan->extraIes,
+                sizeof(uint8_t) * (scan->extraIesLen)) != EOK) {
                 HDF_LOGE("%{public}s fail : memcpy_s extraIes fail!", __func__);
                 OsalMemFree(wifiScan->extraIes);
                 return HDF_FAILURE;
@@ -1094,14 +1092,14 @@ int32_t WlanInterfaceStartScan(struct IWlanInterface *self, const struct HdfFeat
         WifiScanFree(wifiScan);
         return HDF_FAILURE;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->startScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->startScan is NULL!", __func__);
         WifiScanFree(wifiScan);
         return HDF_FAILURE;
     }
     ret = g_staFeature->startScan(ifeature->ifName, wifiScan);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get netdev info failed!, error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s start scan failed!, error code: %{public}d", __func__, ret);
     }
     WifiScanFree(wifiScan);
     return ret;
@@ -1116,8 +1114,8 @@ int32_t WlanInterfaceGetPowerMode(struct IWlanInterface *self, const struct HdfF
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getPowerMode == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getPowerMode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getPowerMode(ifeature->ifName, mode);
@@ -1136,8 +1134,8 @@ int32_t WlanInterfaceSetPowerMode(struct IWlanInterface *self, const struct HdfF
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->setPowerMode == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setPowerMode is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->setPowerMode(ifeature->ifName, mode);
@@ -1158,8 +1156,8 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->setProjectionScreenParam == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setProjectionScreenParam is NULL!", __func__);
         return HDF_FAILURE;
     }
 
@@ -1196,8 +1194,8 @@ int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName,
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_wifi == NULL) {
-        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+    if (g_wifi == NULL || g_wifi->getStationInfo == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->getStationInfo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = g_wifi->getStationInfo(ifName, (StationInfo *)info, mac, macLen);
@@ -1234,18 +1232,20 @@ static int32_t FillPnoSettings(WifiPnoSettings *wifiPnoSettings, const struct Pn
             HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
             return HDF_FAILURE;
         }
-        wifiPnoSettings->pnoNetworks[i].freqs =
-            (int32_t *)OsalMemCalloc(sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen));
-        if (wifiPnoSettings->pnoNetworks[i].freqs == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
-            return HDF_FAILURE;
-        }
-        wifiPnoSettings->pnoNetworks[i].freqsLen = pnoSettings->pnoNetworks[i].freqsLen;
-        if (memcpy_s(wifiPnoSettings->pnoNetworks[i].freqs,
-                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen), pnoSettings->pnoNetworks[i].freqs,
-                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen)) != EOK) {
-            HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
-            return HDF_FAILURE;
+        if (pnoSettings->pnoNetworks[i].freqsLen != 0) {
+            wifiPnoSettings->pnoNetworks[i].freqs =
+                (int32_t *)OsalMemCalloc(sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen));
+            if (wifiPnoSettings->pnoNetworks[i].freqs == NULL) {
+                HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+                return HDF_FAILURE;
+            }
+            wifiPnoSettings->pnoNetworks[i].freqsLen = pnoSettings->pnoNetworks[i].freqsLen;
+            if (memcpy_s(wifiPnoSettings->pnoNetworks[i].freqs,
+                    sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen), pnoSettings->pnoNetworks[i].freqs,
+                    sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen)) != EOK) {
+                HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
+                return HDF_FAILURE;
+            }
         }
     }
     return HDF_SUCCESS;
@@ -1278,8 +1278,8 @@ int32_t WlanInterfaceStartPnoScan(struct IWlanInterface *self, const char *ifNam
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->startPnoScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->startPnoScan is NULL!", __func__);
         return HDF_FAILURE;
     }
     WifiPnoSettings *wifiPnoSettings = (WifiPnoSettings *)OsalMemCalloc(sizeof(WifiPnoSettings));
@@ -1316,8 +1316,8 @@ int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->stopPnoScan == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->stopPnoScan is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
@@ -1342,8 +1342,8 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+    if (g_staFeature == NULL || g_staFeature->getSignalPollInfo == NULL) {
+        HDF_LOGE("%{public}s g_staFeature or g_staFeature->getSignalPollInfo is NULL!", __func__);
         return HDF_FAILURE;
     }
     ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);

@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallbackVdi>>>;
@@ -513,8 +513,10 @@ static int32_t DestorySensorVdiInstance(struct HdfVdiBase *vdiBase)
 
     struct WrapperSensorVdi *sensorVdi = reinterpret_cast<struct WrapperSensorVdi *>(vdiBase);
     SensorImpl *impl = reinterpret_cast<SensorImpl *>(sensorVdi->sensorModule);
-    delete impl;
-    sensorVdi->sensorModule = nullptr;
+    if (impl != nullptr) {
+        delete impl;
+        sensorVdi->sensorModule = nullptr;
+    }
     return HDF_SUCCESS;
 }
 
@@ -530,7 +532,7 @@ static struct WrapperSensorVdi g_sensorVdi = {
 
 extern "C" HDF_VDI_INIT(g_sensorVdi);
 
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Sensor
 } // namespace HDI
 } // namespace OHOS

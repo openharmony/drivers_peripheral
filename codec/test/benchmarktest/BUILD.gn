@@ -13,15 +13,18 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("../../codec.gni")
 
 ohos_benchmarktest("hdf_codec_benchmark_test") {
   module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [
     "./include",
+    "../../interfaces/include",
     "//third_party/openmax/api/1.1.2",
   ]
   sources = [
-    "codec_benchmark_test.cpp",
+    "codec_benchmark_manager_test.cpp",
+    "codec_benchmark_omx_test.cpp",
     "codec_callback_service.cpp",
   ]
 
@@ -49,6 +52,10 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+  defines = []
+  if (drivers_peripheral_codec_feature_support_omx_extend_test) {
+    defines += [ "SUPPORT_OMX_EXTEND" ]
   }
 }
 

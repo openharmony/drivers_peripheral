@@ -54,7 +54,8 @@ struct IAudioAdapterVdi {
         const char *value);
     int32_t (*GetExtraParams)(struct IAudioAdapterVdi *self, enum AudioExtParamKeyVdi key, const char *condition,
         char *value, uint32_t valueLen);
-    int32_t (*RegExtraParamObserver)(struct IAudioAdapterVdi *self, struct IAudioCallbackVdi *audioCallback, int8_t cookie);
+    int32_t (*RegExtraParamObserver)(struct IAudioAdapterVdi *self,
+        struct IAudioCallbackVdi *audioCallback, int8_t cookie);
 };
 
 #ifdef __cplusplus

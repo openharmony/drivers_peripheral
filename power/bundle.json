@@ -17,12 +17,14 @@
       "ram": "6000KB",
       "deps": {
         "components": [
+          "c_utils",
+          "drivers_interface_power",
           "hdf_core",
-          "hiviewdfx_hilog_native",
+          "hiviewdfx_hilog_native", 
           "ipc"
         ],
         "third_party": [
-          "xml2"
+          "libxml2"
         ]
       },
       "build": {

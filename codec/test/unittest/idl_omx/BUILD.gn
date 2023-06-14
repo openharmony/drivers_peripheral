@@ -18,13 +18,16 @@ import("../../../codec.gni")
 ohos_unittest("codec_idl_omx_test") {
   module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [
+    "./",
     "../../../interfaces/include",
     "//third_party/openmax/api/1.1.2",
   ]
   sources = [
     "codec_callback_service.cpp",
+    "codec_function_utils.cpp",
     "codec_hdi_manager_test.cpp",
-    "codec_hdi_omx_test.cpp",
+    "codec_hdi_omx_dec_test.cpp",
+    "codec_hdi_omx_enc_test.cpp",
   ]
 
   if (is_standard_system) {
