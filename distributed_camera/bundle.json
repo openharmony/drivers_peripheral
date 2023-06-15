@@ -24,11 +24,13 @@
                 "hdf_core",
                 "hiviewdfx_hilog_native",
                 "c_utils",
-                "jsoncpp",
                 "samgr",
                 "drivers_interface_distributed_camera",
                 "graphic_chipsetsdk",
                 "drivers_interface_camera"
+            ],
+            "third_party":[
+                "jsoncpp"
             ]
         },
         "build":{
