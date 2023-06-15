@@ -196,8 +196,11 @@ int32_t UsbdLoadUsbService::RemoveUsbService()
         }
         ts.it_interval.tv_sec = 0;
         ts.it_interval.tv_nsec = 0;
-        ts.it_value.tv_sec = CHECK_TIME;
+        ts.it_value.tv_sec = 0;
         ts.it_value.tv_nsec = 0;
+        struct timespec res;
+        clock_gettime(CLOCK_REALTIME, &res);
+        ts.it_value.tv_sec = res.tv_sec + CHECK_TIME;
         ret = timer_settime(timer, TIMER_ABSTIME, &ts, NULL);
         if (ret != 0) {
             HDF_LOGE("timer_settime failed");
