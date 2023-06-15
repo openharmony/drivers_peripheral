@@ -95,7 +95,7 @@ static void HdfMotionInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
     hdfMotionInterfaceHost = nullptr;
 }
 
-struct HdfDriverEntry g_motioninterfaceDriverEntry = {
+static struct HdfDriverEntry g_motioninterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "motion_service",
     .Bind = HdfMotionInterfaceDriverBind,
