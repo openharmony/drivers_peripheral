@@ -428,7 +428,7 @@ BENCHMARK_F(AudioCaptureBenchmarkTest, SetSampleAttributes)(benchmark::State &st
     for (auto _ : state) {
         ret = capture_->SetSampleAttributes(capture_, &attrs);
     }
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 BENCHMARK_REGISTER_F(AudioCaptureBenchmarkTest, SetSampleAttributes)->

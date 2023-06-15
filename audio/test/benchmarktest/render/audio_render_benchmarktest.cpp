@@ -209,6 +209,9 @@ BENCHMARK_F(AudioRenderBenchmarkTest, Pause)(benchmark::State &state)
         ret = render_->Pause(render_);
     }
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+
+    ret = render_->Stop(render_);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, Pause)->
@@ -254,6 +257,7 @@ BENCHMARK_F(AudioRenderBenchmarkTest, TurnStandbyMode)(benchmark::State &state)
         ret = render_->TurnStandbyMode(render_);
     }
     EXPECT_EQ(ret, HDF_SUCCESS);
+    render_->Stop(render_);
 }
 
 BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, TurnStandbyMode)->
