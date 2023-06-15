@@ -27,7 +27,6 @@
 #include <unistd.h>
 #include "audio_uhdf_log.h"
 #include "hdf_audio_pnp_server.h"
-#include "hdf_audio_server_common.h"
 #include "hdf_base.h"
 #include "hdf_io_service.h"
 #include "osal_time.h"
@@ -60,13 +59,13 @@ static int32_t AudioHdmiPnpUeventStatus(const char *statusStr, bool isPnp)
 
     struct AudioEvent audioEvent;
     if (strncmp(statusStr, UEVENT_HDMI_STATE_PLUG, strlen(UEVENT_HDMI_STATE_PLUG)) == 0) {
-        audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+        audioEvent.eventType = AUDIO_DEVICE_ADD;
         if (AudioUhdfLoadDriver(AUDIO_HDMI_CARD_NAME) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGW("AudioUhdfLoadDriver Failed");
         }
         AUDIO_FUNC_LOGI("An HDMI device is plugged in");
     } else if (strncmp(statusStr, UEVENT_HDMI_STATE_REMV, strlen(UEVENT_HDMI_STATE_REMV)) == 0) {
-        audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+        audioEvent.eventType = AUDIO_DEVICE_REMOVE;
         if (AudioUhdfUnloadDriver(AUDIO_HDMI_CARD_NAME) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGW("AudioUhdfUnloadDriver Failed");
         }
@@ -76,7 +75,7 @@ static int32_t AudioHdmiPnpUeventStatus(const char *statusStr, bool isPnp)
         return HDF_FAILURE;
     }
 
-    audioEvent.deviceType = HDF_AUDIO_HDMI_DEVICE;
+    audioEvent.deviceType = AUDIO_HDMI_DEVICE;
     if (isPnp) {
         return AudioPnpUpdateInfoOnly(audioEvent);
     }

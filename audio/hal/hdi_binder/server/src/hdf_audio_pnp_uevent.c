@@ -103,8 +103,8 @@ struct AudioPnpUevent {
 };
 
 struct AudioEvent g_audioPnpDeviceState = {
-    .eventType = HDF_AUDIO_EVENT_UNKOWN,
-    .deviceType = HDF_AUDIO_DEVICE_UNKOWN,
+    .eventType = AUDIO_EVENT_UNKNOWN,
+    .deviceType = AUDIO_DEVICE_UNKNOWN,
 };
 
 static bool IsUpdatePnpDeviceState(struct AudioEvent *pnpDeviceEvent)
@@ -230,11 +230,11 @@ static int32_t DetectAnalogHeadsetState(struct AudioEvent *audioEvent)
 
     AUDIO_FUNC_LOGI("audio switch state = %{public}c", state);
     if (state == '0') {
-        audioEvent->eventType = HDF_AUDIO_DEVICE_REMOVE;
-        audioEvent->deviceType = HDF_AUDIO_HEADSET;
+        audioEvent->eventType = AUDIO_DEVICE_REMOVE;
+        audioEvent->deviceType = AUDIO_HEADSET;
     } else {
-        audioEvent->eventType = HDF_AUDIO_DEVICE_ADD;
-        audioEvent->deviceType = HDF_AUDIO_HEADSET;
+        audioEvent->eventType = AUDIO_DEVICE_ADD;
+        audioEvent->deviceType = AUDIO_HEADSET;
     }
 
     (void)fclose(fp);
@@ -419,8 +419,8 @@ static int32_t DetectUsbHeadsetState(struct AudioEvent *audioEvent)
 
         state = ScanUsbBusSubDir(subDir);
         if (state == AUDIO_DEVICE_ONLINE) {
-            audioEvent->eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent->deviceType = HDF_AUDIO_USB_HEADSET;
+            audioEvent->eventType = AUDIO_DEVICE_ADD;
+            audioEvent->deviceType = AUDIO_USB_HEADSET;
             closedir(busDir);
             return HDF_SUCCESS;
         }
@@ -456,19 +456,19 @@ static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent
             AUDIO_FUNC_LOGW("check audio usb device not exist, not add");
             return HDF_ERR_INVALID_PARAM;
         }
-        audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+        audioEvent.eventType = AUDIO_DEVICE_ADD;
     } else if (strcmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE) == 0) {
         if (!DeleteAudioUsbDevice(audioPnpUevent->devName)) {
             AUDIO_FUNC_LOGW("check audio usb device[%{public}s] not exist, not delete", audioPnpUevent->devName);
             return HDF_ERR_INVALID_PARAM;
         }
-        audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+        audioEvent.eventType = AUDIO_DEVICE_REMOVE;
     } else {
         return HDF_FAILURE;
     }
 
-    audioEvent.deviceType = HDF_AUDIO_USB_HEADSET;
-    AUDIO_FUNC_LOGI("audio usb headset [%{public}s]", audioEvent.eventType == HDF_AUDIO_DEVICE_ADD ? "add" : "removed");
+    audioEvent.deviceType = AUDIO_USB_HEADSET;
+    AUDIO_FUNC_LOGI("audio usb headset [%{public}s]", audioEvent.eventType == AUDIO_DEVICE_ADD ? "add" : "removed");
 
     if (!IsUpdatePnpDeviceState(&audioEvent)) {
         AUDIO_FUNC_LOGI("audio usb device[%{public}u] state[%{public}u] not need flush !", audioEvent.deviceType,
@@ -489,20 +489,23 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
     }
 
     if (strncmp(audioPnpUevent->subSystem, UEVENT_SUBSYSTEM_SWITCH, strlen(UEVENT_SUBSYSTEM_SWITCH)) == 0) {
-        static uint32_t h2wTypeLast = HDF_AUDIO_HEADSET;
+        static uint32_t h2wTypeLast = AUDIO_HEADSET;
         if (strncmp(audioPnpUevent->switchName, UEVENT_SWITCH_NAME_H2W, strlen(UEVENT_SWITCH_NAME_H2W)) != 0) {
             AUDIO_FUNC_LOGE("the switch name of 'h2w' not found!");
             return HDF_FAILURE;
         }
         if (audioPnpUevent->switchState[0] == '0') {
-            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+            audioEvent.eventType = AUDIO_DEVICE_REMOVE;
             audioEvent.deviceType = h2wTypeLast;
         } else if ((audioPnpUevent->switchState[0] == '1') || (audioPnpUevent->switchState[0] == '2')) {
-            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = HDF_AUDIO_HEADSET;
+            audioEvent.eventType = AUDIO_DEVICE_ADD;
+            audioEvent.deviceType = AUDIO_HEADSET;
+        } else if (audioPnpUevent->switchState[0] == '4'){
+            audioEvent.eventType = AUDIO_DEVICE_ADD;
+            audioEvent.deviceType = AUDIO_ADAPTER_DEVICE;
         } else {
-            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
+            audioEvent.eventType = AUDIO_DEVICE_ADD;
+            audioEvent.deviceType = AUDIO_DEVICE_UNKNOWN;
         }
         h2wTypeLast = audioEvent.deviceType;
     } else {
@@ -516,18 +519,18 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
             return HDF_FAILURE;
         }
         if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS0) != NULL) {
-            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+            audioEvent.eventType = AUDIO_DEVICE_REMOVE;
         } else if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS1) != NULL) {
-            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+            audioEvent.eventType = AUDIO_DEVICE_ADD;
         } else {
             return HDF_FAILURE;
         }
-        audioEvent.deviceType = HDF_AUDIO_HEADSET;
+        audioEvent.deviceType = AUDIO_HEADSET;
     }
 
     AUDIO_FUNC_LOGI("audio analog [%{public}s][%{public}s]",
-        audioEvent.deviceType == HDF_AUDIO_HEADSET ? "headset" : "headphone",
-        audioEvent.eventType == HDF_AUDIO_DEVICE_ADD ? "add" : "removed");
+        audioEvent.deviceType == AUDIO_HEADSET ? "headset" : "headphone",
+        audioEvent.eventType == AUDIO_DEVICE_ADD ? "add" : "removed");
 
     if (!IsUpdatePnpDeviceState(&audioEvent)) {
         AUDIO_FUNC_LOGI("audio analog device[%{public}u] state[%{public}u] not need flush !", audioEvent.deviceType,
@@ -683,15 +686,15 @@ void DetectAudioDevice(struct HdfDeviceObject *device)
 
     OsalMSleep(AUDIO_DEVICE_WAIT_USB_ONLINE); // Wait until the usb node is successfully created
     ret = DetectAnalogHeadsetState(&audioEvent);
-    if ((ret == HDF_SUCCESS) && (audioEvent.eventType == HDF_AUDIO_DEVICE_ADD)) {
+    if ((ret == HDF_SUCCESS) && (audioEvent.eventType == AUDIO_DEVICE_ADD)) {
         AUDIO_FUNC_LOGI("audio detect analog headset");
         goto FINISH;
     }
 
-    audioEvent.eventType = HDF_AUDIO_EVENT_UNKOWN;
-    audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
+    audioEvent.eventType = AUDIO_EVENT_UNKNOWN;
+    audioEvent.deviceType = AUDIO_DEVICE_UNKNOWN;
     ret = DetectUsbHeadsetState(&audioEvent);
-    if ((ret == HDF_SUCCESS) && (audioEvent.eventType == HDF_AUDIO_DEVICE_ADD)) {
+    if ((ret == HDF_SUCCESS) && (audioEvent.eventType == AUDIO_DEVICE_ADD)) {
         AUDIO_FUNC_LOGI("audio detect usb headset");
         goto FINISH;
     }

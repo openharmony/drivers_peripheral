@@ -16,19 +16,16 @@
 #ifndef HDF_AUDIO_PNP_SERVER_H
 #define HDF_AUDIO_PNP_SERVER_H
 
-#include "audio_events.h"
+#include "v1_0/audio_types.h"
 #include "hdf_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int32_t AudioPnpStatusSend(const char *serverName,
-    const char *tokenServerName, const char *pnpInfo, const int cmd);
 /* statusInfo is update new info */
 int32_t AudioPnpUpdateInfo(const char *statusInfo);
 int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
-int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent);
 int32_t AudioUhdfUnloadDriver(const char *driverName);
 int32_t AudioUhdfLoadDriver(const char *driverName);
 
