@@ -141,6 +141,9 @@ public:
     int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const RilRegNotifyMode mode) override;
     int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter) override;
     int32_t SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn) override;
+    int32_t SetNrOptionMode(int32_t slotId, int32_t serialId, int32_t mode) override;
+    int32_t GetNrOptionMode(int32_t slotId, int32_t serialId) override;
+    int32_t GetRrcConnectionState(int32_t slotId, int32_t serialId) override;
 
     // Sms
     int32_t SendGsmSms(int32_t slotId, int32_t serialId, const GsmSmsMessageInfo &gsmSmsMessageInfo) override;
