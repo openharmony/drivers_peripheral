@@ -25,6 +25,7 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
+        "hitrace_native",
         "c_utils",
         "drivers_interface_motion"
       ]
