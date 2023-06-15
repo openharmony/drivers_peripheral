@@ -31,10 +31,12 @@ class CodecDfxService : public RefBase {
 public:
     ~CodecDfxService() = default;
     static CodecDfxService &GetInstance();
+    static HdfSBuf* GetReply();
     void SetComponentManager(sptr<CodecComponentManagerService> manager);
     static void GetBuffCount();
     static int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply);
     static int32_t GetCodecComponentListInfo(struct HdfSBuf *reply);
+    static void GetCodecMemoryInfo();
 
 protected:
     CodecDfxService() = default;
@@ -45,6 +47,7 @@ private:
     sptr<CodecComponentManagerService> managerService_;
     static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode;
     static CodecDfxService dfxInstance_;
+    static HdfSBuf *reply_;
 };
 
 }  // namespace V1_0
