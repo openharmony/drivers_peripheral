@@ -28,9 +28,9 @@ group("hdi_audio") {
       deps += [
         "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_a2dp_server",
-        "hal/hdi_binder/server:hdi_audio_pnp_server",
         "hal/hdi_binder/server:hdi_audio_primary_server",
         "hal/hdi_binder/server:hdi_audio_usb_server",
+        "hdi_service/event:hdi_audio_pnp_server",
       ]
     }
     deps += [ "hdi_service:idl_audio" ]

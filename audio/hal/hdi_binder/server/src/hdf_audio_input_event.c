@@ -36,17 +36,17 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct input_event evt)
     struct AudioEvent audioEvent;
 
     AUDIO_FUNC_LOGI("enter.");
-    audioEvent.eventType = (evt.value == 0) ? HDF_AUDIO_DEVICE_REMOVE : HDF_AUDIO_DEVICE_ADD;
-    audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
+    audioEvent.eventType = (evt.value == 0) ? AUDIO_DEVICE_REMOVE : AUDIO_DEVICE_ADD;
+    audioEvent.deviceType = AUDIO_DEVICE_UNKNOWN;
     switch (evt.code) {
         case SW_HEADPHONE_INSERT:
-            audioEvent.deviceType = HDF_AUDIO_HEADPHONE;
+            audioEvent.deviceType = AUDIO_HEADPHONE;
             break;
         case SW_MICROPHONE_INSERT:
-            audioEvent.deviceType = HDF_AUDIO_HEADSET;
+            audioEvent.deviceType = AUDIO_HEADSET;
             break;
         case SW_LINEOUT_INSERT:
-            audioEvent.deviceType = HDF_AUDIO_LINEOUT;
+            audioEvent.deviceType = AUDIO_LINEOUT;
             break;
         default: // SW_JACK_PHYSICAL_INSERT = 0x7, SW_LINEIN_INSERT = 0xd and other.
             AUDIO_FUNC_LOGE("n't surpport code =0x%{public}x\n", evt.code);
