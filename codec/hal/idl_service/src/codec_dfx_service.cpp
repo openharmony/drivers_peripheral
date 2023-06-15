@@ -15,7 +15,7 @@
 
 #include "codec_log_wrapper.h"
 #include "codec_dfx_service.h"
-
+#include "malloc.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -27,7 +27,7 @@ CodecDfxService CodecDfxService::dfxInstance_;
 uint32_t CodecDfxService::inputBuffCount;
 uint32_t CodecDfxService::outputBuffCount;
 std::shared_ptr<OHOS::Codec::Omx::ComponentNode> CodecDfxService::dumpNode;
-
+HdfSBuf *CodecDfxService::reply_;
 void CodecDfxService::GetBuffCount()
 {
     auto iter = dumpNode->GetBufferMapCount().begin();
@@ -96,9 +96,30 @@ CodecDfxService& CodecDfxService::GetInstance()
     return dfxInstance_;
 }
 
+HdfSBuf* CodecDfxService::GetReply()
+{
+    return reply_;
+}
+
+static void WriteMemoryInfo(void *fp, const char *memInfo)
+{
+    if (memInfo == nullptr) {
+        return;
+    }
+    if (!HdfSbufWriteString(CodecDfxService::GetReply(), memInfo)) {
+        CODEC_LOGE("write memory info error!");
+    }
+}
+
+void CodecDfxService::GetCodecMemoryInfo()
+{
+    malloc_stats_print(WriteMemoryInfo, nullptr, nullptr);
+}
+
 int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argv = 0;
+    reply_ = reply;
     (void)HdfSbufReadUint32(data, &argv);
     if (argv != ARGV_FLAG) {
         if (!HdfSbufWriteString(reply, "please enter -h for help! \n")) {
@@ -121,6 +142,8 @@ int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *
         return HDF_SUCCESS;
     } else if (strcmp(para, "-l") == EOK) {
         GetInstance().GetCodecComponentListInfo(reply);
+    } else if (strcmp(para, "-m") == EOK) {
+        GetInstance().GetCodecMemoryInfo();
     } else {
         HdfSbufWriteString(reply, "unknow param, please enter -h for help! \n");
     }
