@@ -343,7 +343,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
     {
-        std::lock_guard<std::mutex> lk(mutex_);
+        std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
         bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
@@ -375,7 +375,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     {
-        std::lock_guard<std::mutex> lk(mutex_);
+        std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
         bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
@@ -404,28 +404,32 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
         return err;
     }
 
-    auto iterOmxBuffer = bufferHeaderMap_.begin();
-    while (iterOmxBuffer != bufferHeaderMap_.end()) {
-        if (iterOmxBuffer->first == bufferHdrType) {
-            bufferHeaderMap_.erase(iterOmxBuffer);
-            break;
+    {
+        std::unique_lock<std::shared_mutex> lk(mapMutex_);
+        auto iterOmxBuffer = bufferHeaderMap_.begin();
+        while (iterOmxBuffer != bufferHeaderMap_.end()) {
+            if (iterOmxBuffer->first == bufferHdrType) {
+                bufferHeaderMap_.erase(iterOmxBuffer);
+                break;
+            }
+            iterOmxBuffer++;
         }
-        iterOmxBuffer++;
+
+        iterOmxBuffer = bufferHeaderPortMap_.begin();
+        while (iterOmxBuffer != bufferHeaderPortMap_.end()) {
+            if (iterOmxBuffer->first == bufferHdrType) {
+                bufferHeaderPortMap_.erase(iterOmxBuffer);
+                break;
+            }
+            iterOmxBuffer++;
+        }
+
+        auto iter = codecBufferMap_.find(buffer.bufferId);
+        if (iter != codecBufferMap_.end()) {
+            codecBufferMap_.erase(iter);
+        }
     }
 
-    iterOmxBuffer = bufferHeaderPortMap_.begin();
-    while (iterOmxBuffer != bufferHeaderPortMap_.end()) {
-        if (iterOmxBuffer->first == bufferHdrType) {
-            bufferHeaderPortMap_.erase(iterOmxBuffer);
-            break;
-        }
-        iterOmxBuffer++;
-    }
-
-    auto iter = codecBufferMap_.find(buffer.bufferId);
-    if (iter != codecBufferMap_.end()) {
-        codecBufferMap_.erase(iter);
-    }
     (void)codecBufer->FreeBuffer(buffer);
 
     return err;
@@ -496,7 +500,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
         CODEC_LOGE("buffer is null");
         return nullptr;
     }
-
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
         CODEC_LOGE("can not find bufferID");
@@ -515,7 +519,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer,
                                   OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
-    std::lock_guard<std::mutex> lk(mutex_);
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iter = codecBufferMap_.find(bufferId);
     if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
         CODEC_LOGE("can not find bufferIndo by bufferID [%{public}d]", bufferId);
