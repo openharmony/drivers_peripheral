@@ -22,6 +22,7 @@ namespace {
     struct AllParameters {
         uint32_t index;
         int8_t *cfgStruct;
+        uint32_t cfgStructLen;
     };
 }
 
@@ -34,18 +35,13 @@ namespace Codec {
         }
 
         struct AllParameters params;
-        if (data == nullptr) {
+        if (size < sizeof(params)) {
             return false;
         }
-
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        params.index = Convert2Uint32(rawData);
-        if (size > sizeof(uint32_t) + sizeof(int8_t *) + sizeof(uint32_t)) {
-            rawData = rawData + sizeof(uint32_t);
-            size = size - sizeof(uint32_t);
-            params.cfgStruct = reinterpret_cast<int8_t *>(rawData);
-        } else {
-            params.cfgStruct = reinterpret_cast<int8_t *>(rawData);
+        
+        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return false;
         }
 
         bool result = Preconditions();

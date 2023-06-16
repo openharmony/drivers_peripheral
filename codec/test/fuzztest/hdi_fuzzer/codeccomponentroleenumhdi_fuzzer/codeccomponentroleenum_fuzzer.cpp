@@ -21,6 +21,7 @@
 namespace {
     struct AllParameters {
         uint8_t *role;
+        uint32_t roleLen;
         uint32_t index;
     };
 }
@@ -34,14 +35,13 @@ namespace Codec {
             return false;
         }
 
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        params.index = Convert2Uint32(rawData);
-        if (size > sizeof(uint32_t) + sizeof(int8_t *)) {
-            rawData = rawData + sizeof(uint32_t);
-            size = size - sizeof(uint32_t);
-            params.role = reinterpret_cast<uint8_t *>(rawData);
-        } else {
-            params.role = reinterpret_cast<uint8_t *>(rawData);
+        if (size < sizeof(params)) {
+            return false;
+        }
+        
+        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return false;
         }
 
         bool result = Preconditions();
