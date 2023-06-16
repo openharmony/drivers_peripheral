@@ -22,6 +22,7 @@ namespace {
     struct AllParameters {
         uint32_t portIndex;
         int8_t *eglImage;
+        uint32_t eglImageLen;
     };
 }
 
@@ -34,7 +35,12 @@ namespace Codec {
             return false;
         }
 
+        if (size < sizeof(params)) {
+            return false;
+        }
+        
         if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return false;
         }
 

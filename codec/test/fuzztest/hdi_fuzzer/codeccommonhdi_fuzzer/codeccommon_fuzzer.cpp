@@ -35,18 +35,6 @@ namespace Codec {
     uint32_t g_componentId = 0;
     static int32_t g_appData = TESTING_APP_DATA;
 
-    uint32_t Convert2Uint32(const uint8_t* ptr)
-    {
-        if (ptr == nullptr) {
-            return 0;
-        }
-        /*
-         * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
-         * and the third digit no left
-         */
-        return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
-    }
-
     void Release()
     {
         g_component = nullptr;

@@ -34,7 +34,6 @@ namespace Codec {
     void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz);
     bool Preconditions();
     bool Destroy();
-    uint32_t Convert2Uint32(const uint8_t* ptr);
     void Release();
 
     template <typename T>
