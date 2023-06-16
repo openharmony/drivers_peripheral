@@ -747,7 +747,7 @@ void V4L2DeviceManager::AddDefaultFlashAvailable(std::shared_ptr<CameraMetadata>
 void V4L2DeviceManager::AddDefaultJpegOrientation(std::shared_ptr<CameraMetadata> metadata)
 {
     std::vector<int32_t> jpegOrientationVector;
-    jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_270);
+    jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_0);
     AddOrUpdateOhosTag(metadata, OHOS_JPEG_ORIENTATION, jpegOrientationVector);
 }
 
