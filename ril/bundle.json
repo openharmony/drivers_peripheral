@@ -22,6 +22,7 @@
         "c_utils",
         "drivers_interface_power",
         "drivers_interface_ril",
+        "drivers_interface_usb",
         "hdf_core",
         "hiviewdfx_hilog_native",
         "ipc",
