@@ -730,7 +730,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0024)
     // Get the stream manager
     cameraBase_->AchieveStreamOperator();
     std::vector<int32_t> jpegOrientationVector;
-    jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_0);
+    jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_270);
     cameraBase_->ability->updateEntry(OHOS_JPEG_ORIENTATION, jpegOrientationVector.data(),
         jpegOrientationVector.size());
     cameraBase_->ability_.clear();
