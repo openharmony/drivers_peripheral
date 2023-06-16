@@ -51,7 +51,7 @@ ohos_shared_library("libril_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_usb:libusb_stub_1.0",
+      "drivers_interface_ril:libril_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
