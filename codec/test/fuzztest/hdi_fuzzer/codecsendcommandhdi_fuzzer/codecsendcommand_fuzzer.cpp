@@ -28,6 +28,7 @@ namespace {
         enum CodecCommandType cmd;
         uint32_t param;
         int8_t *cmdData;
+        uint32_t cmdDataLen;
     };
     constexpr uint32_t WAIT_TIME = 1000;
     constexpr uint32_t MAX_WAIT = 50;
@@ -53,17 +54,13 @@ namespace Codec {
             return false;
         }
 
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        params.param = Convert2Uint32(rawData);
-        if (size > sizeof(CodecCommandType) + sizeof(uint32_t) + sizeof(int8_t *)) {
-            rawData = rawData + sizeof(uint32_t);
-            size = size - sizeof(uint32_t);
-            params.cmdData = reinterpret_cast<int8_t *>(rawData);
-            rawData = rawData + sizeof(int8_t *);
-            params.cmd = static_cast<CodecCommandType>(*rawData);
-        } else {
-            params.cmdData = reinterpret_cast<int8_t *>(rawData);
-            params.cmd = static_cast<CodecCommandType>(*rawData);
+        if (size < sizeof(params)) {
+            return false;
+        }
+        
+        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return false;
         }
 
         bool result = Preconditions();

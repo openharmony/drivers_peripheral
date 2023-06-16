@@ -33,7 +33,7 @@ namespace Codec {
         struct OmxCodecBuffer inbuffer, outBuffer;
         FillDataOmxCodecBuffer(&inbuffer);
 
-        int32_t ret = g_component->AllocateBuffer(*(reinterpret_cast<uint32_t *>(const_cast<uint8_t *>(data))),
+        int32_t ret = g_component->AllocateBuffer(static_cast<uint32_t>(*(const_cast<uint8_t *>(data))),
             inbuffer, outBuffer);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: AllocateBuffer failed, ret is [%{public}x]\n", __func__, ret);

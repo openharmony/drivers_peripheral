@@ -36,21 +36,13 @@ namespace Codec {
             return false;
         }
 
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        if (size > sizeof(uint32_t) + sizeof(int32_t) + sizeof(uint32_t) +
-                sizeof(OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *)) {
-            params.port = Convert2Uint32(rawData);
-            rawData = rawData + sizeof(uint32_t);
-            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
-            rawData = rawData + sizeof(int32_t);
-            params.tunneledPort = Convert2Uint32(rawData);
-            rawData = rawData + sizeof(uint32_t);
-            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *>(rawData);
-        } else {
-            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
-            params.port = Convert2Uint32(rawData);
-            params.tunneledPort = Convert2Uint32(rawData);
-            params.tunnelSetup = reinterpret_cast<OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *>(rawData);
+        if (size < sizeof(params)) {
+            return false;
+        }
+        
+        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return false;
         }
 
         bool result = Preconditions();
