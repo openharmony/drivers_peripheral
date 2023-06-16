@@ -10,7 +10,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DRIVERS_DIR = "../../../.."
 import("//build/ohos.gni")
 
 ohos_shared_library("libril_service_1.1") {
@@ -49,11 +48,10 @@ ohos_shared_library("libril_driver") {
   include_dirs = [ "include" ]
   sources = [ "src/ril_driver.cpp" ]
 
-  deps = [ "$DRIVERS_DIR/interface/ril/v1_1:libril_stub_1.1" ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_usb:libusb_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
