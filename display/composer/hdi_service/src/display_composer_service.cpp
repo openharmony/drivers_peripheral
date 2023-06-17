@@ -234,17 +234,6 @@ int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, 
     return ret;
 }
 
-int32_t DisplayComposerService::GetDisplayCompChange(
-    uint32_t devId, std::vector<uint32_t>& layers, std::vector<int32_t>& type)
-{
-    DISPLAY_TRACE;
-
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->GetDisplayCompChange(devId, layers, type);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
-}
-
 int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect& rect)
 {
     DISPLAY_TRACE;

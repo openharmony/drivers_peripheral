@@ -32,6 +32,9 @@ using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::TEST;
 
+const int SLEEP_CONT_100 = 100;
+const int SLEEP_CONT_2000 = 2000;
+
 static const std::vector<std::vector<LayerSettings>> TEST_SINGLE_LAYER = {
     // one layer display test
     {
@@ -529,12 +532,12 @@ TEST_F(DeviceTest, CtrlTest)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
     ret = display->SetDisplayVsyncEnabled(true);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    ret = VblankCtr::GetInstance().WaitVblank(1000); // 1000ms
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    usleep(100 * 1000);                              // wait for 100ms avoid the last vsync.
-    ret = VblankCtr::GetInstance().WaitVblank(1000); // 1000ms
+    usleep(SLEEP_CONT_100 * SLEEP_CONT_2000); // wait for 100ms avoid the last vsync.
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
 
