@@ -82,12 +82,6 @@ int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
 
     delete codecNode;
     codecNode = nullptr;
-#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
-    err = mallopt(M_FLUSH_THREAD_CACHE, 0);
-    if (err != HDF_SUCCESS) {
-        CODEC_LOGE(":release cache error, m_purge = %{public}d", err);
-    }
-#endif
     return HDF_SUCCESS;
 }
 
@@ -210,12 +204,6 @@ int32_t OmxAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t port
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = codecNode->node->FreeBuffer(portIndex, *omxBuffer);
-#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
-    int32_t err = mallopt(M_FLUSH_THREAD_CACHE, 0);
-    if (err != HDF_SUCCESS) {
-        CODEC_LOGE(":release cache error, m_purge = %{public}d", err);
-    }
-#endif
     return ret;
 }
 
