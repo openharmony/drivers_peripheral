@@ -18,6 +18,7 @@
 #include "codec_component_manager.h"
 #include "codec_internal.h"
 #include "codec_log_wrapper.h"
+#include "codec_util.h"
 #include "codec_types.h"
 
 struct CodecComponentManagerProxy {
@@ -182,6 +183,9 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
     }
     *component = CodecComponentTypeGet(componentRemote);
     ReleaseSbuf(data, reply);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -217,6 +221,9 @@ static int32_t DestroyComponent(uint32_t componentId)
         return ret;
     }
     ReleaseSbuf(data, reply);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 

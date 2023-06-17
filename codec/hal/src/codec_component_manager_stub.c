@@ -20,6 +20,7 @@
 #include <securec.h>
 #include "codec_component_capability_config.h"
 #include "codec_component_manager_service.h"
+#include "codec_util.h"
 #include "codec_log_wrapper.h"
 
 #define CODEC_SERVICE_IMPL "libcodec_hdi_omx_service_impl"
@@ -129,6 +130,9 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
         CODEC_LOGE("write componentId failed!");
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -144,6 +148,9 @@ static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("call DestroyComponent function failed!");
     }
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
