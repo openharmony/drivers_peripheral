@@ -11,12 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("fuzztest") {
-  testonly = true
-  deps = [
-    "faceauthhdi_fuzzer:FaceAuthHdiFuzzTest",
-    "faceauthhdistub_fuzzer:FaceAuthHdiStubFuzzTest",
-    "faceauthinterfaceservice_fuzzer:FaceAuthInterfaceServiceFuzzTest",
-    "faceauthinterfacestub_fuzzer:FaceAuthInterfaceStubFuzzTest",
-  ]
-}
+FUZZ
