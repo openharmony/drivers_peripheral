@@ -138,6 +138,11 @@ static const BlendType CONVERT_TABLE_BLEND[] = {
     BLEND_BUTT,
 };
 
+static const MaskInfo CONVERT_TABLE_MASK[] = {
+    LAYER_NORAML,
+    LAYER_HBM_SYNC,
+};
+
 template<class T>
 uint32_t GetArrLength(T& arr)
 {

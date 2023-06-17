@@ -319,6 +319,36 @@ int32_t TestSetLayerBlendType(uint32_t devId, uint32_t layerId)
     return ret;
 }
 
+int32_t TestSetLayerMaskInfo(uint32_t devId, uint32_t layerId)
+{
+    uint32_t len = GetArrLength(CONVERT_TABLE_MASK);
+    if (len == 0) {
+        HDF_LOGE("%{public}s: CONVERT_TABLE_MASK length is equal to 0", __func__);
+        return DISPLAY_FAILURE;
+    }
+    MaskInfo maskInfo = CONVERT_TABLE_MASK[GetData<uint32_t>() % len];
+    int32_t ret = g_composerInterface->SetLayerMaskInfo(devId, layerId, maskInfo);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function SetLayerMaskInfo failed", __func__);
+    }
+    return ret;
+}
+
+int32_t TestSetLayerColor(uint32_t devId, uint32_t layerId)
+{
+    LayerColor layerColor = {
+        .r = GetData<uint32_t>() % ALPHA_VALUE_RANGE,
+        .g = GetData<uint32_t>() % ALPHA_VALUE_RANGE,
+        .b = GetData<uint32_t>() % ALPHA_VALUE_RANGE,
+        .a = GetData<uint32_t>() % ALPHA_VALUE_RANGE
+    };
+    int32_t ret = g_composerInterface->SetLayerColor(devId, layerId, layerColor);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function SetLayerColor failed", __func__);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t, uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -332,7 +362,9 @@ TestFuncs g_testFuncs = {
     TestSetLayerVisibleRegion,
     TestSetLayerBuffer,
     TestSetLayerCompositionType,
-    TestSetLayerBlendType
+    TestSetLayerBlendType,
+    TestSetLayerColor,
+    TestSetLayerMaskInfo
 };
 
 bool FuzzTest(const uint8_t* rawData, size_t size)
