@@ -34,7 +34,6 @@ StreamStillCapture::~StreamStillCapture()
 void StreamStillCapture::HandleResult(std::shared_ptr<IBuffer>& buffer)
 {
     if (state_ == STREAM_STATE_OFFLINE) {
-        std::lock_guard<std::mutex> l(offlineLock_);
         auto stream = offlineStream.lock();
         if (stream == nullptr) {
             return;
@@ -48,7 +47,6 @@ void StreamStillCapture::HandleResult(std::shared_ptr<IBuffer>& buffer)
 
 RetCode StreamStillCapture::Capture(const std::shared_ptr<CaptureRequest>& request)
 {
-    std::lock_guard<std::mutex> l(offlineLock_);
     if (state_ == STREAM_STATE_OFFLINE) {
         return RC_OK;
     }
@@ -73,7 +71,6 @@ RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream>
         waitingList_.clear();
     }
 
-    std::lock_guard<std::mutex> offlineStreamLock(offlineLock_);
     {
         std::lock_guard<std::mutex> inTransitListLock(tsLock_);
         context->restRequests = inTransitList_;
