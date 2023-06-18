@@ -25,7 +25,6 @@
 #include <map>
 #include <vector>
 #include <fcntl.h>
-#include <surface.h>
 #include "camera.h"
 #include "v1_0/types.h"
 #include "metadata_utils.h"
