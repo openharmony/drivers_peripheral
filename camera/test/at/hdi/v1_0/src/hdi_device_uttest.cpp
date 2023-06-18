@@ -170,7 +170,7 @@ HWTEST_F(HdiDeviceUtTest, Camera_Device_Hdi_008, TestSize.Level1)
 {
     cameraTest->Open();
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
-    if (cameraTest->cameraDevice == nullptr) {
+    if (cameraTest->cameraDevice != nullptr) {
         cameraTest->cameraDevice->Close();
         cameraTest->cameraDevice = nullptr;
     }
