@@ -78,7 +78,6 @@ struct CodecInstance {
     CodecCallback *codecCallback;
 #endif
     CodecCallback defaultCb;
-    CodecCallback customerCb;
     bool hasCustomerCallback;
     UINTPTR callbackUserData;
 };
