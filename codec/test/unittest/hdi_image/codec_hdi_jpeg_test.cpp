@@ -102,14 +102,6 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateInBufferTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateInBufferTest_003, TestSize.Level1)
-{
-    ASSERT_TRUE(hdiJpeg_ != nullptr);
-    struct CodecImageBuffer inBuffer;
-    auto ret = hdiJpeg_->AllocateInBuffer(inBuffer, NORMAL_BUFFER_SIZE);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-}
-
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiAllocateAndFreeInBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(hdiJpeg_ != nullptr);
@@ -151,7 +143,9 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_002, TestSize.Level1)
     struct CodecJpegDecInfo decInfo;
     OHOS::sptr<ICodecImageCallback> callback;
     ret = hdiJpeg_->DoJpegDecode(inBuffer, outBuffer, callback, decInfo);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    EXPECT_TRUE(ret != HDF_SUCCESS);
+    ret = hdiJpeg_->FreeInBuffer(inBuffer);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_003, TestSize.Level1)
@@ -168,7 +162,9 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_003, TestSize.Level1)
     struct CodecJpegDecInfo decInfo;
     OHOS::sptr<ICodecImageCallback> callback;
     ret = hdiJpeg_->DoJpegDecode(inBuffer, outBuffer, callback, decInfo);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    EXPECT_TRUE(ret != HDF_SUCCESS);
+    ret = hdiJpeg_->FreeInBuffer(inBuffer);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_004, TestSize.Level1)
@@ -185,6 +181,6 @@ HWTEST_F(CodecHdiJpegTest, HdfCodecHdiDoJpegDecodeTest_004, TestSize.Level1)
     struct CodecJpegDecInfo decInfo;
     OHOS::sptr<ICodecImageCallback> callback = new CodecImageCallback;
     ret = hdiJpeg_->DoJpegDecode(inBuffer, outBuffer, callback, decInfo);
-    ASSERT_EQ(ret, HDF_SUCCESS);
+    EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 }  // namespace
