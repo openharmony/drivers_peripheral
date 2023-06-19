@@ -409,12 +409,14 @@ int32_t CodecStart(CODEC_HANDLETYPE handle)
         return HDF_FAILURE;
     }
 
-    instance->defaultCb.OnEvent = CodecOnEvent;
-    instance->defaultCb.InputBufferAvailable = CodecInputBufferAvailable;
-    instance->defaultCb.OutputBufferAvailable = CodecOutputBufferAvailable;
-    if (g_codecOemIface->codecSetCallback(handle, &(instance->defaultCb), 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call oem codecSetCallback failed!", __func__);
-        return HDF_FAILURE;
+    if (!instance->hasCustomerCallback) {
+        instance->defaultCb.OnEvent = CodecOnEvent;
+        instance->defaultCb.InputBufferAvailable = CodecInputBufferAvailable;
+        instance->defaultCb.OutputBufferAvailable = CodecOutputBufferAvailable;
+        if (g_codecOemIface->codecSetCallback(handle, &(instance->defaultCb), 0) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: call oem codecSetCallback failed!", __func__);
+            return HDF_FAILURE;
+        }
     }
 
     if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
@@ -598,6 +600,15 @@ int32_t CodecSetCallbackProxy(CODEC_HANDLETYPE handle, struct ICodecCallbackProx
     codecInstance->callbackUserData = instance;
     codecInstance->callbackProxy = cb;
     codecInstance->hasCustomerCallback = true;
+
+    codecInstance->defaultCb.OnEvent = CodecOnEvent;
+    codecInstance->defaultCb.InputBufferAvailable = CodecInputBufferAvailable;
+    codecInstance->defaultCb.OutputBufferAvailable = CodecOutputBufferAvailable;
+    if (g_codecOemIface->codecSetCallback(handle, &(codecInstance->defaultCb), 0) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call oem codecSetCallback failed!", __func__);
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 #else
@@ -612,6 +623,15 @@ int32_t CodecSetCallback(CODEC_HANDLETYPE handle, CodecCallback *cb, UINTPTR ins
     codecInstance->callbackUserData = instance;
     codecInstance->codecCallback = cb;
     codecInstance->hasCustomerCallback = true;
+
+    codecInstance->defaultCb.OnEvent = CodecOnEvent;
+    codecInstance->defaultCb.InputBufferAvailable = CodecInputBufferAvailable;
+    codecInstance->defaultCb.OutputBufferAvailable = CodecOutputBufferAvailable;
+    if (g_codecOemIface->codecSetCallback(handle, &(codecInstance->defaultCb), 0) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call oem codecSetCallback failed!", __func__);
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 #endif
