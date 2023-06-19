@@ -55,8 +55,6 @@ ohos_shared_library("liblocation_gnss_hdi_driver") {
 
   sources = [ "gnss_interface_driver.cpp" ]
 
-  deps = [ "${location_interface_path}/gnss/v1_0:liblocation_gnss_stub_1.0" ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -82,6 +80,9 @@ ohos_shared_library("liblocation_gnss_hdi_driver") {
       "ipc:ipc_single",
     ]
   }
+
+  external_deps +=
+      [ "drivers_interface_location_gnss:liblocation_gnss_stub_1.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]

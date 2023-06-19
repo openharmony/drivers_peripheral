@@ -12,7 +12,6 @@
     "component": {
       "name": "drivers_peripheral_location_geofence",
       "subsystem": "hdf",
-      "syscap": [ "SystemCapability.Location.Location.Geofence" ],
       "adapted_system_type": [
         "standard"
       ],
@@ -20,6 +19,8 @@
       "ram": "1000KB",
       "deps": {
         "components": [
+          "c_utils",
+          "drivers_interface_location_geofence",
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
