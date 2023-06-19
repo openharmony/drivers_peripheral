@@ -26,7 +26,7 @@ group("hdi_audio") {
   } else {
     if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       deps += [
-        "hal/hdi_binder/proxy:hdi_audio_client",
+        # "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_a2dp_server",
         "hal/hdi_binder/server:hdi_audio_primary_server",
         "hal/hdi_binder/server:hdi_audio_usb_server",
