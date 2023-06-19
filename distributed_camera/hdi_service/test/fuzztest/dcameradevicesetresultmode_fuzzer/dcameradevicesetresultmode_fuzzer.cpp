@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DcameraDeviceSetResultModeFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint8_t))) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
     std::string deviceId(reinterpret_cast<const char*>(data), size);
