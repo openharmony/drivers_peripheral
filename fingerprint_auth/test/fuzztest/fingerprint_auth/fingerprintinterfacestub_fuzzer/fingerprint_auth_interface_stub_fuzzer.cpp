@@ -39,9 +39,9 @@ bool FingerprintAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
     if (rawData == nullptr) {
         return false;
     }
-    sptr<OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface> fingerprintAuthInterface = 
+    sptr<OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface> fingerprintAuth =
         OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface::Get(true);
-    OHOS::HDI::FingerprintAuth::V1_1::FingerprintAuthInterfaceStub fingerprintAuthInterfaceStub(fingerprintAuthInterface);
+    OHOS::HDI::FingerprintAuth::V1_1::FingerprintAuthInterfaceStub fingerprintAuthInterfaceStub(fingerprintAuth);
     for (uint32_t code = HDI_FINGERPRINT_AUTH_CODE_MIN; code <= HDI_FINGERPRINT_AUTH_CODE_MAX; code++) {
         MessageParcel data;
         MessageParcel reply;
