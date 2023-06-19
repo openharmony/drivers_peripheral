@@ -20,7 +20,8 @@ if (defined(ohos_lite)) {
       deps = [
         "adm:adm",
         "audio_function:function",
-        "hdi:hdi",
+
+        # "hdi:hdi",
         "supportlibs:supportlibs",
       ]
     }
@@ -35,7 +36,7 @@ if (defined(ohos_lite)) {
     }
     if (drivers_peripheral_audio_feature_full_test_suite) {
       deps += [
-        "hdi:hdi",
+        # "hdi:hdi",
         "hdi_service:hdi_service_st",
         "supportlibs:supportlibs",
 
@@ -45,7 +46,7 @@ if (defined(ohos_lite)) {
           drivers_peripheral_audio_feature_alsa_lib == false) {
         deps += [
           #"adm:adm",
-          "audio_function:function",
+          # "audio_function:function",
         ]
       }
     }
