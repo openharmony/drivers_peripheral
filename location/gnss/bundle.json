@@ -12,7 +12,6 @@
     "component": {
       "name": "drivers_peripheral_location_gnss",
       "subsystem": "hdf",
-      "syscap": [ "SystemCapability.Location.Location.Gnss" ],
       "adapted_system_type": [
         "standard"
       ],
@@ -20,6 +19,8 @@
       "ram": "1000KB",
       "deps": {
         "components": [
+          "c_utils",
+          "drivers_interface_location_gnss",
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
@@ -30,6 +31,19 @@
       "build": {
         "sub_component": [
           "//drivers/peripheral/location/gnss:location_gnss_entry"
+        ],
+        "inner_kits": [
+          {
+            "name": "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0",
+            "header": {
+              "header_files": [
+                "gnss_interface_impl.h",
+                "location_vendor_interface.h",
+                "location_vendor_lib.h"
+              ],
+              "header_base": "//drivers/peripheral/location/gnss/hdi_service"
+            }
+          }
         ]
       }
     }

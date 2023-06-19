@@ -56,10 +56,6 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
 
   sources = [ "geofence_interface_driver.cpp" ]
 
-  deps = [
-    "${location_interface_path}/geofence/v1_0:liblocation_geofence_stub_1.0",
-  ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -85,6 +81,9 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
       "ipc:ipc_single",
     ]
   }
+
+  external_deps +=
+      [ "drivers_interface_location_geofence:liblocation_geofence_stub_1.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
