@@ -26,15 +26,14 @@
 #include "device_resource_if.h"
 #include "hdf_slist.h"
 #include "hisysevent.h"
+#include "hitrace_meter.h"
 #include "osal_mutex.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usb_interface_pool.h"
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
-#include "usbd_load_usb_service.h"
 #include "usbd_port.h"
-#include "hitrace_meter.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 
@@ -43,6 +42,8 @@ namespace HDI {
 namespace Usb {
 namespace V1_0 {
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {nullptr};
+UsbdLoadService UsbImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
+UsbdLoadService UsbImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
 UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
 uint32_t UsbImpl::attachCount_ = 0;
@@ -824,15 +825,16 @@ void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoT
         attachFailedCount_++;
         attachCount_++;
         HDF_LOGI("%{public}s: UsbdDeviceCreateAndAttach failed", __func__);
-        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT,
-            "DEVICE_NAME", std::to_string(infoTable->busNum) + "-" + std::to_string(infoTable->devNum),
-            "DEVICE_PROTOCOL", infoTable->deviceInfo.deviceProtocol, "DEVICE_CLASS", infoTable->deviceInfo.deviceClass,
-            "VENDOR_ID", infoTable->deviceInfo.vendorId, "PRODUCT_ID", infoTable->deviceInfo.productId,
-            "VERSION", "1.0.0", "FAIL_REASON", 0, "FAIL_INFO", "USB device recognition failed");
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT, "DEVICE_NAME",
+            std::to_string(infoTable->busNum) + "-" + std::to_string(infoTable->devNum), "DEVICE_PROTOCOL",
+            infoTable->deviceInfo.deviceProtocol, "DEVICE_CLASS", infoTable->deviceInfo.deviceClass, "VENDOR_ID",
+            infoTable->deviceInfo.vendorId, "PRODUCT_ID", infoTable->deviceInfo.productId, "VERSION", "1.0.0",
+            "FAIL_REASON", 0, "FAIL_INFO", "USB device recognition failed");
         HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL_STATISTICS", HiSysEvent::EventType::FAULT,
-            "EXCEPTION_CNT", attachFailedCount_, "TOTAL_CNT", attachCount_,
-            "FAIL_RATE", (static_cast<double>(attachFailedCount_)) / (static_cast<double>(attachCount_)
-            * USB_RECOGNITION_FAIL_RATE_BASE), "QUALITY_STATISTICAL", "Failure rate statistics");
+            "EXCEPTION_CNT", attachFailedCount_, "TOTAL_CNT", attachCount_, "FAIL_RATE",
+            (static_cast<double>(attachFailedCount_)) /
+                (static_cast<double>(attachCount_) * USB_RECOGNITION_FAIL_RATE_BASE),
+            "QUALITY_STATISTICAL", "Failure rate statistics");
     } else {
         HDF_LOGI("%{public}s:device already add", __func__);
     }
@@ -855,8 +857,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
     UsbPnpNotifyMatchInfoTable *infoTable = nullptr;
     bool flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
     if (!flag || infoTable == nullptr) {
-        HDF_LOGE(
-            "%{public}s: HdfSbufReadBuffer failed, flag=%{public}d", __func__, flag);
+        HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d", __func__, flag);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -930,14 +931,15 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
     (void)priv;
     (void)data;
     if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
-        if (UsbdLoadUsbService::LoadUsbService() != 0) {
+        if (loadUsbService_.LoadService() != 0) {
             HDF_LOGE("usbdev LoadUsbServer error");
             return HDF_FAILURE;
         }
-    } else if (id == USB_PNP_DRIVER_GADGET_REMOVE || id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
-        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
-            HDF_LOGE("usbdev RemoveUsbServer error");
-            return HDF_FAILURE;
+        if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
+            if (loadHdfEdm_.LoadService() != 0) {
+                HDF_LOGE("usbdev LoadUsbServer error");
+                return HDF_FAILURE;
+            }
         }
     }
     return HDF_SUCCESS;
@@ -945,8 +947,6 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
-    (void)UsbdLoadUsbService::CloseUsbService();
-
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
@@ -1779,7 +1779,6 @@ void UsbImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
     if (DdkListenerMgrRemove(&UsbImpl::subscribers_[i].usbPnpListener) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove listerer failed", __func__);
     }
-    UsbdLoadUsbService::SetUsbLoadRemoveCount(UsbdLoadUsbService::GetUsbLoadRemoveCount());
 }
 
 int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
