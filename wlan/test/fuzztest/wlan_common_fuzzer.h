@@ -21,13 +21,16 @@
 #include "wlan_callback_impl.h"
 #include "wifi_hal_base_feature.h"
 #include "securec.h"
+#include <osal_mem.h>
 
 #define HDF_LOG_TAG HDF_WIFI_CORE
 #define IFNAMSIZ 16
+constexpr int32_t OFFSET = 4;
 
 uint32_t SetWlanDataSize(const uint32_t *dataSize);
 uint32_t GetWlanDataSize(uint32_t *dataSize);
 uint32_t Convert2Uint32(const uint8_t *ptr);
+bool PreProcessRawData(const uint8_t *rawData, size_t size, uint8_t *tmpRawData, size_t tmpRawDataSize);
 void FuzzGetChipId(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzGetDeviceMacAddress(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzGetFeatureType(struct IWlanInterface *interface, const uint8_t *rawData);

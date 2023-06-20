@@ -54,6 +54,24 @@ uint32_t Convert2Uint32(const uint8_t *ptr)
     return (ptr[0] << BITS_NUM_24) | (ptr[1] << BITS_NUM_16) | (ptr[2] << BITS_NUM_8) | (ptr[3]);
 }
 
+bool PreProcessRawData(const uint8_t *rawData, size_t size, uint8_t *tmpRawData, size_t tmpRawDataSize)
+{
+    if (rawData == nullptr || tmpRawData == nullptr) {
+        HDF_LOGE("%{public}s: rawData or tmpRawData is nullptr!", __FUNCTION__);
+        return false;
+    }
+    uint32_t dataSize = size - OFFSET;
+    if (memcpy_s(tmpRawData, tmpRawDataSize, rawData + OFFSET, dataSize) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed!", __FUNCTION__);
+        return false;
+    }
+    if (SetWlanDataSize(&dataSize) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: set data size failed!", __FUNCTION__);
+        return false;
+    }
+    return true;
+}
+
 void FuzzGetChipId(struct IWlanInterface *interface, const uint8_t *rawData)
 {
     uint8_t chipId = 0;
@@ -173,12 +191,7 @@ void FuzzGetIfNamesByChipId(struct IWlanInterface *interface, const uint8_t *raw
 void FuzzResetDriver(struct IWlanInterface *interface, const uint8_t *rawData)
 {
     uint8_t chipId = *const_cast<uint8_t *>(rawData);
-    char ifName[IFNAMSIZ] = {0};
-
-    if (memcpy_s(ifName, sizeof(ifName) - 1, rawData, sizeof(ifName) - 1) != EOK) {
-        HDF_LOGE("%{public}s: ifName memcpy_s failed!", __FUNCTION__);
-        return;
-    }
+    const char *ifName = reinterpret_cast<const char *>(rawData);
 
     interface->ResetDriver(interface, chipId, ifName);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
