@@ -42,18 +42,18 @@ namespace {
     constexpr int32_t OFF_TIME = 500;
     sptr<ILightInterface> g_lightInterface = nullptr;
 
-class lightBenchmarkTest : public benchmark::Fixture {
+class LightBenchmarkTest : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state);
     void TearDown(const ::benchmark::State &state);
 };
 
-void lightBenchmarkTest::SetUp(const ::benchmark::State &state)
+void LightBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     g_lightInterface = ILightInterface::Get();
 }
 
-void lightBenchmarkTest::TearDown(const ::benchmark::State &state)
+void LightBenchmarkTest::TearDown(const ::benchmark::State &state)
 {
 }
 
@@ -62,7 +62,7 @@ void lightBenchmarkTest::TearDown(const ::benchmark::State &state)
   * @tc.desc: Benchmarktest for interface GetLightInfo
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, GetLightInfo)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, GetLightInfo)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -80,7 +80,7 @@ BENCHMARK_F(lightBenchmarkTest, GetLightInfo)(benchmark::State &st)
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, GetLightInfo)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, GetLightInfo)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -88,7 +88,7 @@ BENCHMARK_REGISTER_F(lightBenchmarkTest, GetLightInfo)->
   * @tc.desc: Benchmarktest for interface TurnOnLight
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, TurnOnLight)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, TurnOnLight)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -118,7 +118,7 @@ BENCHMARK_F(lightBenchmarkTest, TurnOnLight)(benchmark::State &st)
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, TurnOnLight)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, TurnOnLight)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -126,7 +126,7 @@ BENCHMARK_REGISTER_F(lightBenchmarkTest, TurnOnLight)->
   * @tc.desc: Benchmarktest for interface TurnOffLight
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, TurnOffLight)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, TurnOffLight)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -157,7 +157,7 @@ BENCHMARK_F(lightBenchmarkTest, TurnOffLight)(benchmark::State &st)
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, TurnOffLight)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, TurnOffLight)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 /**
@@ -165,7 +165,7 @@ BENCHMARK_REGISTER_F(lightBenchmarkTest, TurnOffLight)->
   * @tc.desc: Benchmarktest for interface TurnOnMultiLights
   * @tc.type: FUNC
   */
-BENCHMARK_F(lightBenchmarkTest, TurnOnMultiLights)(benchmark::State &st)
+BENCHMARK_F(LightBenchmarkTest, TurnOnMultiLights)(benchmark::State &st)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -189,7 +189,7 @@ BENCHMARK_F(lightBenchmarkTest, TurnOnMultiLights)(benchmark::State &st)
     }
 }
 
-BENCHMARK_REGISTER_F(lightBenchmarkTest, TurnOnMultiLights)->
+BENCHMARK_REGISTER_F(LightBenchmarkTest, TurnOnMultiLights)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
 
