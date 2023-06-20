@@ -25,7 +25,11 @@
 #include "codec_log_wrapper.h"
 #include "codec_types.h"
 
-#define OMX_CALLBACK_IMPLEMENT  "libcodec_hdi_omx_callback_type_service_impl"
+#ifdef __aarch64__
+#define CODEC_CALLBACK_SO_PATH "/vendor/lib64/chipset-sdk/libcodec_hdi_omx_callback_type_service_impl.z.so"
+#else
+#define CODEC_CALLBACK_SO_PATH "/vendor/lib/chipset-sdk/libcodec_hdi_omx_callback_type_service_impl.z.so"
+#endif
 
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct CodecCallbackType *);
 
@@ -217,7 +221,7 @@ static void *LoadServiceHandler(void)
     void *handler = NULL;
 
     char pathBuf[PATH_MAX] = {'\0'};
-    libPath = HDF_LIBRARY_FULL_PATH(OMX_CALLBACK_IMPLEMENT);
+    libPath = CODEC_CALLBACK_SO_PATH;
     if (realpath(libPath, pathBuf) == NULL) {
         CODEC_LOGE("realpath failed!");
         return NULL;
