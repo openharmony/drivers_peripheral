@@ -23,6 +23,7 @@
 #include "osal_mutex.h"
 #include "usb_session.h"
 #include "usbd.h"
+#include "usbd_load_usb_service.h"
 #include "v1_0/iusb_interface.h"
 
 #define BASE_CLASS_HUB 0x09
@@ -149,6 +150,8 @@ private:
     static bool isGadgetConnected_;
     static uint32_t attachCount_;
     static uint32_t attachFailedCount_;
+    static UsbdLoadService loadUsbService_;
+    static UsbdLoadService loadHdfEdm_;
 };
 } // namespace V1_0
 } // namespace Usb
