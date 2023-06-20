@@ -19,7 +19,11 @@
         "components": [
           "ipc",
           "hdf_core",
-          "hiviewdfx_hilog_native"
+          "hiviewdfx_hilog_native",
+          "c_utils",
+          "drivers_interface_secure_element",
+          "nfc_ca",
+          "nfc"
         ],
         "third_party": [
         ]
