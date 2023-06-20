@@ -48,7 +48,6 @@ void StreamStillCapture::HandleResult(std::shared_ptr<IBuffer>& buffer)
 
 RetCode StreamStillCapture::Capture(const std::shared_ptr<CaptureRequest>& request)
 {
-    std::lock_guard<std::mutex> l(offlineLock_);
     if (state_ == STREAM_STATE_OFFLINE) {
         return RC_OK;
     }
@@ -73,7 +72,6 @@ RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream>
         waitingList_.clear();
     }
 
-    std::lock_guard<std::mutex> offlineStreamLock(offlineLock_);
     {
         std::lock_guard<std::mutex> inTransitListLock(tsLock_);
         context->restRequests = inTransitList_;
@@ -82,6 +80,7 @@ RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream>
             context->restRequests.size(), streamId_);
     }
 
+    std::lock_guard<std::mutex> offlineStreamLock(offlineLock_);
     RetCode rc = offlineStream->Init(context);
     if (rc != RC_OK) {
         CAMERA_LOGE("offline stream [id:%{public}d] init failed", streamId_);
