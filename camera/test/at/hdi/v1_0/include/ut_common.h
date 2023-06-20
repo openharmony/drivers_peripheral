@@ -32,6 +32,7 @@
 #include "v1_0/icamera_device.h"
 #include "v1_0/istream_operator.h"
 #include "v1_0/camera_host_proxy.h"
+#include "v1_0/ioffline_stream_operator.h"
 #include "iconsumer_surface.h"
 
 namespace OHOS::Camera {
@@ -144,6 +145,10 @@ public:
         ~StreamConsumer()
         {
             running_ = false;
+            if (consumerThread_ != nullptr) {
+                consumerThread_->join();
+                delete consumerThread_;
+            }
         }
     public:
         std::atomic<uint64_t> shotCount_ = 0;
