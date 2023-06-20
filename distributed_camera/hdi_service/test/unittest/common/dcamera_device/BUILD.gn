@@ -52,6 +52,7 @@ ohos_unittest("HdfDcameraDeviceTest") {
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
+    "drivers_interface_display:libdisplay_composer_stub_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.0",
     "graphic_chipsetsdk:buffer_handle",
     "graphic_chipsetsdk:surface",
