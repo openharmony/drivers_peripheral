@@ -18,7 +18,6 @@
 namespace OHOS {
 namespace WIFI {
 constexpr size_t THRESHOLD = 10;
-constexpr int32_t OFFSET = 4;
 const char *g_wlanServiceName = "wlan_interface_service";
 const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
 struct IWlanInterface *g_wlanObj = nullptr;
@@ -84,18 +83,13 @@ static void FuncToOptimal(struct IWlanInterface *interface, uint32_t cmdId, cons
 bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
 {
     struct HdfFeatureInfo ifeature;
+    bool result = false;
 
-    if (rawData == nullptr) {
+    if (rawData == nullptr || size == 0) {
         return false;
     }
-    bool result = false;
+    
     uint32_t cmdId = Convert2Uint32(rawData) % ((sizeof(g_fuzzWlanFuncs) / sizeof(g_fuzzWlanFuncs[0])));
-    rawData = rawData + OFFSET;
-    uint32_t dataSize = size - OFFSET;
-    if (SetWlanDataSize(&dataSize) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: set data size failed!", __FUNCTION__);
-        return result;
-    }
     g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
     if (g_wlanObj == nullptr) {
         HDF_LOGE("%{public}s: g_wlanObj is null", __FUNCTION__);
@@ -106,13 +100,24 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         HDF_LOGE("%{public}s: Start failed! ret=%{public}d", __FUNCTION__, ret);
         return result;
     }
+    uint32_t dataSize = size - OFFSET;
+    uint8_t *tmpRawData = (uint8_t *)OsalMemCalloc(dataSize + 1);
+    if (tmpRawData == nullptr) {
+        HDF_LOGE("%{public}s: OsalMemCalloc failed!", __FUNCTION__);
+        return result;
+    }
+    if (PreProcessRawData(rawData, size, tmpRawData, dataSize + 1) != true) {
+        HDF_LOGE("%{public}s: PreProcessRawData failed!", __FUNCTION__);
+        OsalMemFree(tmpRawData);
+        return result;
+    }
     do {
         ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: CreateFeature failed! ret=%{public}d", __FUNCTION__, ret);
             break;
         }
-        FuncToOptimal(g_wlanObj, cmdId, rawData);
+        FuncToOptimal(g_wlanObj, cmdId, tmpRawData);
         ret = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestroyFeature failed! ret=%{public}d", __FUNCTION__, ret);
@@ -126,6 +131,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         result = false;
     }
     IWlanInterfaceReleaseInstance(g_wlanServiceName, g_wlanObj, false);
+    OsalMemFree(tmpRawData);
     return result;
 }
 } // namespace WIFI
