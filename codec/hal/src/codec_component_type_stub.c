@@ -21,6 +21,7 @@
 #include <securec.h>
 #include "codec_callback_if.h"
 #include "codec_component_capability_config.h"
+#include "codec_util.h"
 #include "codec_log_wrapper.h"
 
 static void FreeMem(int8_t *mem, uint32_t memLen)
@@ -96,6 +97,9 @@ static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct
     }
 
     FreeMem(cmdData, cmdDataLen);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return HDF_SUCCESS;
 }
 
@@ -145,6 +149,9 @@ static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struc
     }
 
     FreeMem(paramStruct, paramStructLen);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return HDF_SUCCESS;
 }
 
@@ -189,6 +196,9 @@ static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struc
     }
 
     FreeMem(paramStruct, paramStructLen);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return HDF_SUCCESS;
 }
 
@@ -238,6 +248,9 @@ static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct H
     }
 
     FreeMem(cfgStruct, cfgStructLen);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -282,6 +295,9 @@ static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct H
     }
 
     FreeMem(cfgStruct, cfgStructLen);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -410,6 +426,9 @@ static int32_t SerStubUseBuffer(struct CodecComponentType *serviceImpl, struct H
         return HDF_ERR_INVALID_PARAM;
     }
     ReleaseOmxCodecBuffer(&buffer);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -472,6 +491,9 @@ static int32_t SerStubFreeBuffer(struct CodecComponentType *serviceImpl, struct 
         return ret;
     }
     ReleaseOmxCodecBuffer(&buffer);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -494,6 +516,9 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentType *serviceImpl, st
         return ret;
     }
     ReleaseOmxCodecBuffer(&buffer);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
@@ -516,6 +541,9 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentType *serviceImpl, str
         return ret;
     }
     ReleaseOmxCodecBuffer(&buffer);
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    ReleaseCodecCache();
+#endif
     return ret;
 }
 
