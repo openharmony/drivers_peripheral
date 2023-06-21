@@ -24,7 +24,8 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "c_utils",
-        "drivers_interface_wlan"
+        "drivers_interface_wlan",
+        "hidl_adapter"
       ],
       "third_party": [
         "libnl"
