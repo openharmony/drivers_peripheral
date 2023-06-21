@@ -4,20 +4,13 @@
     "version": "1.0",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
-    "segment": {
-      "destPath": "drivers/peripheral/nfc"
-    },
+    "segment": {},
     "dirs": {},
     "scripts": {},
     "component": {
       "name": "drivers_peripheral_nfc",
       "subsystem": "hdf",
-      "syscap": [
-          "SystemCapability.Communication.NFC.Core",
-          "SystemCapability.Communication.NFC.Tag",
-          "SystemCapability.Communication.NFC.CardEmulation"
-        ],
-      "adapter_system_type": ["standard"],
+      "adapted_system_type": ["standard"],
       "rom": "1000KB",
       "ram": "1000KB",
       "deps": {
@@ -25,7 +18,9 @@
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
-          "c_utils"
+          "c_utils",
+          "drivers_interface_nfc",
+          "init"
         ],
         "third_party": [
           "nfc_hdiimpl"
