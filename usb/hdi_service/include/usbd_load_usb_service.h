@@ -15,18 +15,15 @@
 
 #ifndef USBD_LOAD_USB_SERVICE_H
 #define USBD_LOAD_USB_SERVICE_H
+#include <atomic>
 #include <csignal>
 #include <cstdlib>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <sys/time.h>
+
 #include "system_ability_definition.h"
 #include "system_ability_load_callback_stub.h"
-
-#define HDF_PROCESS_STACK_SIZE 100000
-#define SLEEP_DELAY  100
-#define CHECK_CNT    20
-#define CHECK_TIME    30
 
 namespace OHOS {
 namespace HDI {
@@ -34,32 +31,24 @@ namespace Usb {
 namespace V1_0 {
 class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
 public:
-    static bool loading_;
+    std::atomic_bool loading_ {false};
     explicit OnDemandLoadCallback();
 
-    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject);
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject);
     void OnLoadSystemAbilityFail(int32_t systemAbilityId);
+
 private:
 };
 
-class UsbdLoadUsbService {
+class UsbdLoadService {
 public:
-    UsbdLoadUsbService() = default;
-    ~UsbdLoadUsbService() = default;
-    static int32_t LoadUsbService();
-    static int32_t RemoveUsbService();
-    static void SetUsbLoadRemoveCount(uint32_t count);
-    static uint32_t GetUsbLoadRemoveCount();
-    static void CloseUsbService();
+    UsbdLoadService(int32_t saId) : saId_(saId) {};
+    ~UsbdLoadService() = default;
+    int32_t LoadService();
+
 private:
-    static void IncreaseUsbLoadRemoveCount();
-    static void DecreaseUsbLoadRemoveCount();
-    static int32_t UsbLoadWorkEntry(void *para);
-    static int32_t StartThreadUsbLoad();
-    static void UsbRemoveWorkEntry(union sigval v);
-    static bool alarmRunning_;
-    static uint32_t count_;
-    static timer_t timer_;
+    sptr<OnDemandLoadCallback> loadCallback_ {nullptr};
+    int32_t saId_ {0};
 };
 } // namespace V1_0
 } // namespace Usb
