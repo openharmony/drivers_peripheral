@@ -63,8 +63,6 @@ if (!drivers_peripheral_input_feature_passthrough) {
 
     sources = [ "input_interfaces_driver.cpp" ]
 
-    deps = [ "$INPUT_ROOT_DIR/../../interface/input/v1_0:libinput_stub_1.0" ]
-
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
