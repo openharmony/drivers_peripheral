@@ -181,7 +181,7 @@ void NotifyCallback(int code)
 int32_t PowerInterfaceImpl::StopSuspend()
 {
     g_suspendRetry = false;
-
+    g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
 }
 
