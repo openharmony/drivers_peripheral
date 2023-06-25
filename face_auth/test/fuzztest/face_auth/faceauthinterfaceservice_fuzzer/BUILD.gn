@@ -36,8 +36,7 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:face_auth_idl_headers",
     "graphic_chipsetsdk:surface",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "hdf"
