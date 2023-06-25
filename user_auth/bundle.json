@@ -19,9 +19,8 @@
       "components": [
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
         "c_utils",
-        "hilog_native",
+        "hilog",
         "drivers_interface_user_auth"
       ],
       "third_party": [
