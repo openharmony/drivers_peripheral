@@ -37,8 +37,7 @@ ohos_fuzztest("FaceAuthHdiStubFuzzTest") {
     "drivers_interface_face_auth:libface_auth_stub_1.1",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdi",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 

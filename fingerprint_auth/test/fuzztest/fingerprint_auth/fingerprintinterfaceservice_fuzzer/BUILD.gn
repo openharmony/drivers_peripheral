@@ -35,7 +35,7 @@ ohos_fuzztest("FingerprintInterfaceServiceFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "hdf"

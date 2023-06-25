@@ -37,7 +37,7 @@ ohos_fuzztest("FingerprintInterfaceStubFuzzTest") {
     "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
     "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_1.1",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 

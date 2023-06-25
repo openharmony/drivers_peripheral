@@ -48,7 +48,7 @@ ohos_unittest("PinAuthHdiUtTest") {
     "c_utils:utils",
     "drivers_interface_pin_auth:libpin_auth_proxy_1.1",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 
