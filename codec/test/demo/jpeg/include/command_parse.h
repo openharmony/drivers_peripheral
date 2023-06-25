@@ -20,6 +20,8 @@
 enum class CodecMime { AVC, HEVC, MPEG4, VP9 };
 enum class ColorFormat { YUV420SP = 0, RGBA8888, BGRA8888 };
 enum class MyOptIndex {
+    OPT_INDEX_UNKONWN = 0,
+    OPT_INDEX_HELP,
     OPT_INDEX_HEIGHT = 'h',
     OPT_INDEX_INPUT = 'i',
     OPT_INDEX_OUTPUT = 'o',
