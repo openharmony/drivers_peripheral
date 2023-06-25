@@ -35,7 +35,7 @@ public:
     void SetUp(const ::benchmark::State &state);
     void TearDown(const ::benchmark::State &state);
     void AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf);
-    void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen);
+    void ReleaseAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen);
 };
 
 void AudioManagerBenchmarkTest::AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
@@ -58,14 +58,14 @@ void AudioManagerBenchmarkTest::AudioAdapterDescriptorFree(struct AudioAdapterDe
     }
 }
 
-void AudioManagerBenchmarkTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
+void AudioManagerBenchmarkTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen)
 {
-    if ((descsLen > 0) && (descs != nullptr) && ((*descs) != nullptr)) {
-        for (uint32_t i = 0; i < descsLen; i++) {
-            AudioAdapterDescriptorFree(&(*descs)[i], false);
-        }
-        OsalMemFree(*descs);
-        *descs = nullptr;
+    if ((descs == nullptr) || (descsLen == 0)) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < descsLen; i++) {
+        AudioAdapterDescriptorFree(&descs[i], false);
     }
 }
 
@@ -82,6 +82,7 @@ void AudioManagerBenchmarkTest::TearDown(const ::benchmark::State &state)
 
 BENCHMARK_F(AudioManagerBenchmarkTest, GetAllAdapters)(benchmark::State &state)
 {
+    ASSERT_NE(manager_, nullptr);
     int32_t ret;
     uint32_t size = g_audioAdapterNumMax;
     adapterDescs_ = (struct AudioAdapterDescriptor *)OsalMemCalloc(
@@ -90,9 +91,9 @@ BENCHMARK_F(AudioManagerBenchmarkTest, GetAllAdapters)(benchmark::State &state)
 
     for (auto _ : state) {
         ret = manager_->GetAllAdapters(manager_, adapterDescs_, &size);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
+    ReleaseAdapterDescs(adapterDescs_, g_audioAdapterNumMax);
 }
 
 BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, GetAllAdapters)->
@@ -100,6 +101,7 @@ BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, GetAllAdapters)->
 
 BENCHMARK_F(AudioManagerBenchmarkTest, LoadAdapterAndUnloadAdapter)(benchmark::State &state)
 {
+    ASSERT_NE(manager_, nullptr);
     int32_t ret;
     uint32_t size = g_audioAdapterNumMax;
     struct IAudioAdapter *adapter = nullptr;
@@ -111,14 +113,14 @@ BENCHMARK_F(AudioManagerBenchmarkTest, LoadAdapterAndUnloadAdapter)(benchmark::S
 
     for (auto _ : state) {
         ret = manager_->LoadAdapter(manager_, &adapterDescs_[0], &adapter);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (auto _ : state) {
         ret = manager_->UnloadAdapter(manager_, adapterDescs_[0].adapterName);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ReleaseAdapterDescs(&adapterDescs_, g_audioAdapterNumMax);
+    ReleaseAdapterDescs(adapterDescs_, g_audioAdapterNumMax);
 }
 
 BENCHMARK_REGISTER_F(AudioManagerBenchmarkTest, LoadAdapterAndUnloadAdapter)->
