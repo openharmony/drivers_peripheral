@@ -18,6 +18,7 @@ group("effect_test") {
   if (!defined(ohos_lite) && drivers_peripheral_audio_feature_effect) {
     testonly = true
     deps = [
+      "benchmarktest:hdf_audio_effect_benchmark_test",
       "fuzztest:fuzztest",
       "unittest:hdf_effect_hdi_ut",
     ]
