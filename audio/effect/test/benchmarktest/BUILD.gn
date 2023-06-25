@@ -13,22 +13,14 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../../drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
 
-ohos_benchmarktest("hdf_audio_benchmark_test") {
+ohos_unittest("hdf_audio_effect_benchmark_test") {
   module_out_path = module_output_path
-
-  include_dirs = []
-
   sources = [
-    "adapter/audio_adapter_benchmarktest.cpp",
-    "capture/audio_capture_benchmarktest.cpp",
-    "capture/audio_capture_mmap_benchmarktest.cpp",
-    "manager/audio_manager_benchmarktest.cpp",
-    "render/audio_render_benchmarktest.cpp",
-    "render/audio_render_mmap_benchmarktest.cpp",
+    "audio_effectcontrol_benchmarktest.cpp",
+    "audio_effectmodel_benchmarktest.cpp",
   ]
   cflags = [
     "-Wall",
@@ -45,16 +37,14 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "drivers_interface_audio:audio_idl_headers",
-      "drivers_interface_audio:libaudio_proxy_1.0",
-      "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
+  include_dirs = []
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_audio:effect_idl_headers",
+    "drivers_interface_audio:libeffect_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   external_deps += [ "ipc:ipc_single" ]
 }
