@@ -19,9 +19,12 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("input_entry") {
-    deps = [ "hdi_service:hdi_input_service" ]
+    deps = []
     if (drivers_peripheral_input_feature_model) {
-      deps += [ "hal:hdi_input" ]
+      deps += [
+        "hal:hdi_input",
+        "hdi_service:hdi_input_service",
+      ]
     }
     if (drivers_peripheral_input_feature_udriver) {
       deps += [ "udriver:hdi_input_udriver" ]
