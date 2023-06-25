@@ -225,7 +225,7 @@ int32_t RilImpl::SetBarringPassword(
 
 int32_t RilImpl::SetVonrSwitch(int32_t slotId, int32_t serialId, int32_t status)
 {
-  return TaskSchedule(&Telephony::HRilManager::SetVonrSwitch, slotId, serialId, status);
+    return TaskSchedule(&Telephony::HRilManager::SetVonrSwitch, slotId, serialId, status);
 }
 
 // Data
