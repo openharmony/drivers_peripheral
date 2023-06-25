@@ -33,7 +33,6 @@ ohos_shared_library("libthermal_interface_service_1.0") {
   ]
 
   deps = [
-    "../../../../interface/thermal/v1_0:thermal_idl_headers",
     "//third_party/libxml2:xml2",
     "//third_party/zlib:libz",
   ]
@@ -68,11 +67,10 @@ ohos_shared_library("libthermal_driver") {
   include_dirs = [ "include" ]
   sources = [ "src/thermal_interface_driver.cpp" ]
 
-  deps = [ "../../../../interface/thermal/v1_0:libthermal_stub_1.0" ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_thermal:libthermal_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
