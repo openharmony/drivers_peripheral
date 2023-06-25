@@ -44,8 +44,7 @@ ohos_unittest("UserAuthHdiTest") {
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_proxy_1.1",
     "hdf_core:libhdf_utils",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 

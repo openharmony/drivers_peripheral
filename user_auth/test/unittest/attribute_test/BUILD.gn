@@ -39,8 +39,7 @@ ohos_unittest("UserAuthAttributeTest") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "hdf"

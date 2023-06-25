@@ -35,8 +35,7 @@ ohos_fuzztest("UserAuthHdiStubFuzzTest") {
     "drivers_interface_user_auth:libuser_auth_stub_1.1",
     "drivers_interface_user_auth:user_auth_idl_headers",
     "hdf_core:libhdi",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 

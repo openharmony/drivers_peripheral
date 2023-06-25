@@ -75,8 +75,7 @@ ohos_unittest("UserAuthCoAuthTest") {
     "c_utils:utils",
     "drivers_interface_user_auth:user_auth_idl_headers",
     "hdf_core:libhdf_utils",
-    "hilog_native:libhilog",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "ipc:ipc_single",
   ]
