@@ -22,6 +22,7 @@ group("uinttest") {
 group("fuzztest") {
   testonly = true
   deps = [
+    "fuzztest/pin_auth/pinauthexecutorstub_fuzzer:PinAuthExecutorStubFuzzTest",
     "fuzztest/pin_auth/pinauthhdi_fuzzer:PinAuthHdiFuzzTest",
     "fuzztest/pin_auth/pinauthinterfaceservice_fuzzer:PinAuthInterfaceServiceFuzzTest",
     "fuzztest/pin_auth/pinauthinterfacestub_fuzzer:PinAuthInterfaceStubFuzzTest",
