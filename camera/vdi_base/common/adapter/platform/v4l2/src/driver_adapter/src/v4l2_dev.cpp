@@ -368,6 +368,12 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
         return RC_ERROR;
     }
 
+    fd = GetCurrentFd(cameraID);
+    if (fd < 0) {
+        CAMERA_LOGE("error: StopStream: GetCurrentFd error\n");
+        return RC_ERROR;
+    }
+
     streamNumber_ -= 1;
     CAMERA_LOGD("HosV4L2Dev::StopStream streamNumber_ = %d\n", streamNumber_);
 
@@ -377,12 +383,6 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
         write(eventFd_, &one, sizeof(one));
         streamThread_->join();
         close(eventFd_);
-    }
-
-    fd = GetCurrentFd(cameraID);
-    if (fd < 0) {
-        CAMERA_LOGE("error: ReqBuffers: GetCurrentFd error\n");
-        return RC_ERROR;
     }
 
     rc = myStreams_->V4L2StreamOff(fd);
