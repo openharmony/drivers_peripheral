@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 MotionIfService::MotionIfService()
 {
     int32_t ret = GetMotionVdiImpl();
@@ -160,6 +160,17 @@ int32_t MotionIfService::Unregister(const sptr<IMotionCallback> &callbackObj)
     return ret;
 }
 
+int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::string& data, int32_t len)
+{
+    HDF_LOGI("%{public}s: Enter the SetMotionConfig function.", __func__);
+    if (motionVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
 {
     MotionIfService *impl = new (std::nothrow) MotionIfService();
@@ -176,7 +187,7 @@ extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // V1_0
+} // V1_1
 } //Motion
 } //HDI
 } //OHOS

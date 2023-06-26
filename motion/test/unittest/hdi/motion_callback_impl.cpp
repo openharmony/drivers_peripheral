@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "v1_0/motion_callback_service.h"
+#include "motion_callback_impl.h"
 #include <hdf_base.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Motion {
 namespace V1_0 {
-int32_t MotionCallbackService::OnDataEvent(const HdfMotionEvent &event)
+int32_t MotionCallbackImpl::OnDataEvent(const HdfMotionEvent &event)
 {
     printf("moton :[%d], result[%d]:, status[%d]\n\r", event.motion, event.result, event.status);
     return HDF_SUCCESS;
