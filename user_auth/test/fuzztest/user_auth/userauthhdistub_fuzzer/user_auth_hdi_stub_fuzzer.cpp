@@ -34,8 +34,10 @@ namespace UserIam {
 namespace UserAuth {
 namespace {
 constexpr uint32_t USER_AUTH_HDI_CODE_MIN = 0;
-constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 14;
-const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v1_1.IUserAuthInterface";
+constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 25;
+constexpr uint32_t USER_AUTH_HDI_CODE_MIN_V1_1 = 22;
+const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN_V1_0 = u"ohos.hdi.user_auth.v1_0.IUserAuthInterface";
+const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN_V1_1 = u"ohos.hdi.user_auth.v1_1.IUserAuthInterface";
 
 bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
 {
@@ -62,6 +64,12 @@ bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
         MessageParcel reply;
         MessageOption optionSync = MessageOption::TF_SYNC;
         MessageOption optionAsync = MessageOption::TF_ASYNC;
+        std::u16string USER_AUTH_HDI_INTERFACE_TOKEN;
+        if (code < USER_AUTH_HDI_CODE_MIN_V1_1) {
+            USER_AUTH_HDI_INTERFACE_TOKEN = USER_AUTH_HDI_INTERFACE_TOKEN_V1_0;
+        } else {
+            USER_AUTH_HDI_INTERFACE_TOKEN = USER_AUTH_HDI_INTERFACE_TOKEN_V1_1;
+        }
         // Sync
         data.WriteInterfaceToken(USER_AUTH_HDI_INTERFACE_TOKEN);
         data.WriteBuffer(rawData, size);
