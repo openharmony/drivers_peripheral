@@ -194,7 +194,7 @@ const AllocInfo DISPLAY_BUFFER_TEST_SETS[] = {
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRX_5551
     },
-#elif
+#else
     // num21
     {
         .width = ALLOC_SIZE_1080,
