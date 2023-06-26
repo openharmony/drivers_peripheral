@@ -25,6 +25,10 @@ void DestroyUint8Array(Uint8Array **array)
     if (*array == NULL) {
         return;
     }
+    if ((*array)->len != 0 && ((*array)->len < UINT32_MAX / sizeof(uint8_t))) {
+        uint32_t arraySize = sizeof(uint8_t) * (*array)->len;
+        (void)memset_s((*array)->data, arraySize, 0, arraySize);
+    }
     IAM_FREE_AND_SET_NULL((*array)->data);
     IAM_FREE_AND_SET_NULL(*array);
 }
@@ -34,6 +38,10 @@ void DestroyUint64Array(Uint64Array **array)
     IF_TRUE_LOGE_AND_RETURN(array == NULL);
     if (*array == NULL) {
         return;
+    }
+    if ((*array)->len != 0 && ((*array)->len < UINT32_MAX / sizeof(uint64_t))) {
+        uint32_t arraySize = sizeof(uint64_t) * (*array)->len;
+        (void)memset_s((*array)->data, arraySize, 0, arraySize);
     }
     IAM_FREE_AND_SET_NULL((*array)->data);
     IAM_FREE_AND_SET_NULL(*array);

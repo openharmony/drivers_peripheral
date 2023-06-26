@@ -109,6 +109,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
 {
     std::shared_ptr<PinAuth> pinHdi = std::make_shared<PinAuth>();
     EXPECT_NE(pinHdi, nullptr);
+    pinHdi->Init();
     ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
     ExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
