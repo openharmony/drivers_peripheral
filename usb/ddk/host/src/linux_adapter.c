@@ -1228,7 +1228,7 @@ static struct UsbHostRequest *AdapterAllocRequestByMmap(
 
     request->numIsoPackets = isoPackets;
     request->buffer = memBuf;
-    request->bufLen = len;
+    request->bufLen = (int32_t)len;
     request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
         HDF_LOGE("%{public}s RawUsbMemAlloc fail", __func__);
