@@ -262,4 +262,13 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionException001, Tes
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
+HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionInValid001, TestSize.Level1)
+{
+    uint64_t frames = 0;
+    struct AudioTimeStamp time = {0};
+
+    int32_t ret = mmapCapture_->GetMmapPosition(mmapCapture_, &frames, &time);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+}
+
 } // end of namespace

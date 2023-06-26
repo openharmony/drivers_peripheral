@@ -30,6 +30,7 @@ const float HALF_OF_MAX_VOLUME = 0.5;
 const int MOVE_LEFT_NUM = 8;
 const int TEST_SAMPLE_RATE_MASK_48000 = 48000;
 const int TEST_CHANNEL_COUNT = 2;
+const uint32_t INVALID_SCENE_ID = -1;
 
 class AudioUtCaptureTest : public testing::Test {
 public:
@@ -844,6 +845,19 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneException001, TestSize.Le
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSelectSceneInValid001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->SelectScene, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    sceneDesc.desc.pins = PIN_IN_MIC;
+    sceneDesc.desc.desc = strdup("mic");
+
+    int32_t ret = capture_->SelectScene(capture_, &sceneDesc);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(sceneDesc.desc.desc);
+}
+
 /* capture get version cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetVersion001, TestSize.Level1)
 {
@@ -968,6 +982,20 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityException001, Te
 
     int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
     EXPECT_EQ(ret, HDF_SUCCESS);
+    free(sceneDesc.desc.desc);
+}
+
+HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureCheckSceneCapabilityInValid001, TestSize.Level1)
+{
+    ASSERT_NE(capture_->CheckSceneCapability, nullptr);
+    struct AudioSceneDescriptor sceneDesc = {};
+    sceneDesc.desc.pins = PIN_IN_MIC;
+    sceneDesc.desc.desc = strdup("mic");
+    sceneDesc.scene.id = INVALID_SCENE_ID;
+    bool isSupport = false;
+
+    int32_t ret = capture_->CheckSceneCapability(capture_, &sceneDesc, &isSupport);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
     free(sceneDesc.desc.desc);
 }
 

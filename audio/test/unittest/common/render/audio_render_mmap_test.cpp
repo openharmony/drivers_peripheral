@@ -189,6 +189,17 @@ HWTEST_F(AudioUtRenderMmapTest, RenderGetMmapPositionNull001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetMmapPosition(nullptr, &frames, &time));
 }
 
+HWTEST_F(AudioUtRenderMmapTest, RenderGetMmapPositionInValid001, TestSize.Level1)
+{
+    uint64_t frames = 0;
+    struct AudioTimeStamp time;
+    time.tvNSec = 0;
+    time.tvSec = 0;
+
+    int32_t ret = render_->GetMmapPosition(render_, &frames, &time);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+}
+
 HWTEST_F(AudioUtRenderMmapTest, RenderGetMmapPositionIsValid001, TestSize.Level1)
 {
     uint64_t frames = 0;

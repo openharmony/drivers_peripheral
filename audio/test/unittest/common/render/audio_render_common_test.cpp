@@ -33,6 +33,7 @@ const int32_t AUDIO_RENDER_BUF_TEST = 1024;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
+const uint32_t INVALID_SCENE_ID = -1;
 const uint64_t DEFAULT_BUFFER_SIZE = 16384;
 
 class AudioUtRenderTest : public testing::Test {
@@ -326,6 +327,16 @@ HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityNull003, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->CheckSceneCapability(render_, &scene, nullptr));
 }
 
+HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityInValid001, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    bool supported = false;
+    scene.scene.id = INVALID_SCENE_ID;
+    scene.desc = devDescRender_;
+    int32_t ret = render_->CheckSceneCapability(render_, &scene, &supported);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+}
+
 HWTEST_F(AudioUtRenderTest, RenderCheckSceneCapabilityIsValid001, TestSize.Level1)
 {
     struct AudioSceneDescriptor scene;
@@ -344,6 +355,17 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneNull001, TestSize.Level1)
 HWTEST_F(AudioUtRenderTest, RenderSelectSceneNull002, TestSize.Level1)
 {
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, render_->SelectScene(render_, nullptr));
+}
+
+HWTEST_F(AudioUtRenderTest, RenderSelectSceneInValid001, TestSize.Level1)
+{
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = INVALID_SCENE_ID;
+    scene.desc.pins = PIN_OUT_HEADSET;
+    scene.desc.desc = strdup("mic");
+    int32_t ret = render_->SelectScene(render_, &scene);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    free(scene.desc.desc);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level1)
@@ -403,6 +425,32 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid001, TestSize.Level1)
     int32_t ret = render_->GetRenderPosition(render_, &frames, &time);
 
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid002, TestSize.Level1)
+{
+    uint64_t frames;
+    struct AudioTimeStamp time;
+    uint32_t frameLen = (uint64_t)GetRenderBufferSize();
+    uint64_t requestBytes = frameLen;
+
+    int32_t ret = render_->Start(render_);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+
+    int8_t *frame = (int8_t *)calloc(1, frameLen);
+    EXPECT_NE(nullptr, frame);
+
+    ret = render_->RenderFrame(render_, frame, frameLen, &requestBytes);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+
+    ret = render_->GetRenderPosition(render_, &frames, &time);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+
+    render_->Stop(render_);
+    if (frame != nullptr) {
+        free(frame);
+        frame = nullptr;
+    }
 }
 
 HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsNull001, TestSize.Level1)
