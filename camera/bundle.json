@@ -30,10 +30,7 @@
         "c_utils",
         "hitrace_native"
       ],
-      "third_party": [
-        "ffmpeg",
-        "libjpeg-turbo"
-      ]
+      "third_party": []
     },
     "build": {
       "sub_component": [

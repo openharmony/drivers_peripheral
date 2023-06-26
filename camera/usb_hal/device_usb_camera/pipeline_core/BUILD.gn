@@ -96,19 +96,19 @@ ohos_shared_library("camera_pipeline_core") {
   ]
 
   deps = [
-    "$../../../../../hdf_core/adapter/uhdf2/utils:libhdf_utils",
     "$board_usb_camera_path:config.c",
     "$board_usb_camera_path:params.c",
     "$camera_path_usb/buffer_manager:camera_buffer_manager",
     "$camera_path_usb/device_manager:camera_device_manager",
     "$camera_path_usb/metadata_manager:camera_metadata_manager",
+    "$drivers_path/interface/camera/v1_0:libcamera_stub_1.0",
     "$drivers_path/peripheral/camera/usb_hal/utils:camera_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "$third_path/ffmpeg:libohosffmpeg",
     "$third_path/libjpeg-turbo:turbojpeg_static",
   ]
 
   external_deps = [
-    "drivers_interface_camera:libcamera_stub_1.0",
     "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_utils",
