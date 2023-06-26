@@ -50,11 +50,14 @@ ssize_t MctProtocol::SendPacket(HciPacketType packetType, const std::vector<uint
 
 void MctProtocol::ReadEventData(int fd)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     ssize_t readLen;
     if (eventPacket_.size() == header_[HCI_PACKET_TYPE_EVENT].headerSize) {
         readLen = Read(fd, eventPacket_.data() + eventReadLength_, eventPacket_.size() - eventReadLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -70,7 +73,8 @@ void MctProtocol::ReadEventData(int fd)
     } else {
         readLen = Read(fd, eventPacket_.data() + eventReadLength_, eventPacket_.size() - eventReadLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -88,13 +92,18 @@ void MctProtocol::ReadEventData(int fd)
     }
 }
 
+MctProtocol::~MctProtocol() {}
+
 void MctProtocol::ReadAclData(int fd)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     ssize_t readLen;
     if (aclPacket_.size() == header_[HCI_PACKET_TYPE_ACL_DATA].headerSize) {
         readLen = Read(fd, aclPacket_.data() + aclReadLength_, aclPacket_.size() - aclReadLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -110,7 +119,8 @@ void MctProtocol::ReadAclData(int fd)
     } else {
         readLen = Read(fd, aclPacket_.data() + aclReadLength_, aclPacket_.size() - aclReadLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);

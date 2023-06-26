@@ -53,11 +53,13 @@ ssize_t H4Protocol::SendPacket(HciPacketType packetType, const std::vector<uint8
 
 void H4Protocol::ReadData(int fd)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     ssize_t readLen;
     if (hciPacket_.size() == 0) {
         readLen = Read(fd, &packetType_, sizeof(packetType_));
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            HDF_LOGE("read fd[%d]", fd);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -70,7 +72,8 @@ void H4Protocol::ReadData(int fd)
     } else if (hciPacket_.size() == header_[packetType_].headerSize) {
         readLen = Read(fd, hciPacket_.data() + readLength_, hciPacket_.size() - readLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -88,7 +91,8 @@ void H4Protocol::ReadData(int fd)
     } else {
         readLen = Read(fd, hciPacket_.data() + readLength_, hciPacket_.size() - readLength_);
         if (readLen < 0) {
-            HDF_LOGE("read fd[%d] err:%s", fd, strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read fd[%d] err:%s", fd, buf);
             return;
         } else if (readLen == 0) {
             HDF_LOGE("read fd[%d] readLen = 0.", fd);
@@ -103,6 +107,8 @@ void H4Protocol::ReadData(int fd)
         }
     }
 }
+
+H4Protocol::~H4Protocol() {}
 
 void H4Protocol::PacketCallback()
 {
