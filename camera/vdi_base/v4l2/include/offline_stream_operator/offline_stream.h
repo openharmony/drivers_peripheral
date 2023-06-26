@@ -18,18 +18,18 @@
 
 #include "camera.h"
 #include "offline_stream_context.h"
-#include "v1_0/istream_operator_callback.h"
+#include "v1_0/istream_operator_vdi_callback.h"
 #include <condition_variable>
 #include <mutex>
 #include "capture_message.h"
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::VDI::Camera::V1_0;
 class OfflineStream {
 public:
     OfflineStream() = default;
     virtual ~OfflineStream();
-    OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorCallback> &callback);
+    OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorVdiCallback> &callback);
 
     RetCode Init(std::shared_ptr<OfflineStreamContext> &context);
     RetCode CancelCapture(int32_t captureId);
@@ -41,13 +41,13 @@ public:
 private:
     RetCode ReturnBuffer(std::shared_ptr<IBuffer> &buffer);
     void HandleMessage(MessageGroup& message);
-    void OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos);
-    void OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos);
+    void OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo> &infos);
+    void OnCaptureError(int32_t captureId, const std::vector<VdiCaptureErrorInfo> &infos);
 
 private:
     int32_t streamId_ = -1;
     std::shared_ptr<OfflineStreamContext> context_ = {};
-    OHOS::sptr<IStreamOperatorCallback> callback_ = nullptr;
+    OHOS::sptr<IStreamOperatorVdiCallback> callback_ = nullptr;
     std::mutex lock_;
     std::shared_ptr<CaptureMessageOperator> messenger_ = nullptr;
 };

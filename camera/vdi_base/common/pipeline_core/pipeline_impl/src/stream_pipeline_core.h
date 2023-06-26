@@ -39,13 +39,13 @@ public:
     RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) override;
     RetCode CancelCapture(const std::vector<int>& streamIds) override;
     std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) override;
-    OperationMode GetCurrentMode() const override;
-    DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
+    VdiOperationMode GetCurrentMode() const override;
+    DynamicStreamSwitchMode CheckStreamsSupported(VdiOperationMode mode,
         const ModeMeta& meta, const std::vector<StreamConfiguration>& configs) override;
 
 protected:
     std::recursive_mutex mutex_;
-    OperationMode mode_ = NORMAL;
+    VdiOperationMode mode_ = NORMAL;
     std::shared_ptr<NodeContext> context_ = nullptr;
     std::unique_ptr<StreamPipelineStrategy> strategy_ = nullptr;
     std::unique_ptr<StreamPipelineBuilder> builder_ = nullptr;

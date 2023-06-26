@@ -13,18 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CAMERA_V1_0_ICAMERADEVICEVDI_H
-#define OHOS_HDI_CAMERA_V1_0_ICAMERADEVICEVDI_H
+#ifndef OHOS_VDI_CAMERA_V1_0_ICAMERADEVICEVDI_H
+#define OHOS_VDI_CAMERA_V1_0_ICAMERADEVICEVDI_H
 
 #include <stdint.h>
 #include <vector>
 #include <hdf_base.h>
 #include <hdi_base.h>
-#include "istream_operator_vdi.h"
-#include "v1_0/istream_operator_callback.h"
+#include "v1_0/istream_operator_vdi.h"
+#include "v1_0/istream_operator_vdi_callback.h"
 
-#define ICAMERA_DEVICE_VDI_MAJOR_VERSION 1
-#define ICAMERA_DEVICE_VDI_MINOR_VERSION 0
 
 namespace OHOS {
 namespace VDI {
@@ -32,18 +30,17 @@ namespace Camera {
 namespace V1_0 {
 using namespace OHOS;
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Camera::V1_0;
 
 class ICameraDeviceVdi : public HdiBase {
 public:
     virtual ~ICameraDeviceVdi() = default;
 
-    virtual int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+    virtual int32_t GetStreamOperator(const sptr<IStreamOperatorVdiCallback> &callbackObj,
          sptr<IStreamOperatorVdi> &streamOperator) = 0;
 
     virtual int32_t UpdateSettings(const std::vector<uint8_t> &settings) = 0;
 
-    virtual int32_t SetResultMode(ResultCallbackMode mode) = 0;
+    virtual int32_t SetResultMode(VdiResultCallbackMode mode) = 0;
 
     virtual int32_t GetEnabledResults(std::vector<int32_t> &results) = 0;
 
@@ -52,17 +49,10 @@ public:
     virtual int32_t DisableResult(const std::vector<int32_t> &results) = 0;
 
     virtual int32_t Close() = 0;
-
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
-    {
-        majorVer = ICAMERA_DEVICE_VDI_MAJOR_VERSION;
-        minorVer = ICAMERA_DEVICE_VDI_MINOR_VERSION;
-        return HDF_SUCCESS;
-    }
 };
 } // V1_0
 } // Camera
 } // VDI
 } // OHOS
 
-#endif // OHOS_HDI_CAMERA_V1_0_ICAMERADEVICEVDI_H
+#endif // OHOS_VDI_CAMERA_V1_0_ICAMERADEVICEVDI_H

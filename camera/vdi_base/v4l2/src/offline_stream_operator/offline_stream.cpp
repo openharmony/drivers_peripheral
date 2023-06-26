@@ -17,7 +17,7 @@
 #include "offline_pipeline_manager.h"
 
 namespace OHOS::Camera {
-OfflineStream::OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorCallback>& callback)
+OfflineStream::OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorVdiCallback>& callback)
 {
     streamId_ = id;
     callback_ = callback;
@@ -144,7 +144,7 @@ RetCode OfflineStream::ReturnBuffer(std::shared_ptr<IBuffer>& buffer)
         if (status != CAMERA_BUFFER_STATUS_DROP) {
             std::shared_ptr<ICaptureMessage> errorMessage =
                 std::make_shared<CaptureErrorMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
-                                                      request->GetOwnerCount(), static_cast<StreamError>(status));
+                                                      request->GetOwnerCount(), static_cast<VdiStreamError>(status));
             messenger_->SendMessage(errorMessage);
         }
     }
@@ -189,11 +189,11 @@ void OfflineStream::HandleMessage(MessageGroup& message)
     CaptureMessageType type = message[0]->GetMessageType();
     switch (type) {
         case CAPTURE_MESSAGE_TYPE_ON_ERROR: {
-            std::vector<CaptureErrorInfo> info = {};
+            std::vector<VdiCaptureErrorInfo> info = {};
             for (const auto& cm : message) {
                 auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
                 CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                CaptureErrorInfo edi = {0};
+                VdiCaptureErrorInfo edi = {0};
                 edi.streamId_ = m->GetStreamId();
                 edi.error_ = m->GetStreamError();
                 info.push_back(edi);
@@ -202,11 +202,11 @@ void OfflineStream::HandleMessage(MessageGroup& message)
             break;
         }
         case CAPTURE_MESSAGE_TYPE_ON_ENDED: {
-            std::vector<CaptureEndedInfo> info = {};
+            std::vector<VdiCaptureEndedInfo> info = {};
             for (const auto& cm : message) {
                 auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
                 CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                CaptureEndedInfo edi = {0};
+                VdiCaptureEndedInfo edi = {0};
                 edi.streamId_ = m->GetStreamId();
                 edi.frameCount_ = (int32_t)(m->GetFrameCount());
                 info.push_back(edi);
@@ -220,13 +220,13 @@ void OfflineStream::HandleMessage(MessageGroup& message)
     return;
 }
 
-void OfflineStream::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
+void OfflineStream::OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo>& infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureEnded(captureId, infos);
 }
 
-void OfflineStream::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
+void OfflineStream::OnCaptureError(int32_t captureId, const std::vector<VdiCaptureErrorInfo>& infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureError(captureId, infos);

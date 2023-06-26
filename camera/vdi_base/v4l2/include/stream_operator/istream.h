@@ -32,7 +32,7 @@ namespace OHOS::Camera {
 class CaptureRequest;
 class OfflineStream;
 
-static std::map<StreamIntent, std::string> g_availableStreamType;
+static std::map<VdiStreamIntent, std::string> g_availableStreamType;
 
 class IStream {
 public:
@@ -55,12 +55,12 @@ public:
     virtual void DumpStatsInfo() const = 0;
 
 public:
-    static std::map<StreamIntent, std::string> g_availableStreamType;
+    static std::map<VdiStreamIntent, std::string> g_availableStreamType;
 };
 
 using StreamFactory = RegisterFactoty<IStream,
                                       const int32_t,
-                                      const StreamIntent,
+                                      const VdiStreamIntent,
                                       std::shared_ptr<IPipelineCore>&,
                                       std::shared_ptr<CaptureMessageOperator>&>;
 #define REGISTERSTREAM(cls, ...)                                                                           \
@@ -68,7 +68,7 @@ using StreamFactory = RegisterFactoty<IStream,
     static std::string g_##cls = StreamFactory::Instance().DoRegister<cls>(                                \
         __VA_ARGS__,                                                                                       \
         [](const int32_t id,                                                                               \
-           const StreamIntent type,                                                                        \
+           const VdiStreamIntent type,                                                                        \
            std::shared_ptr<IPipelineCore>& p,                                                              \
            std::shared_ptr<CaptureMessageOperator>& m) { return std::make_shared<cls>(id, type, p, m); }); \
     }

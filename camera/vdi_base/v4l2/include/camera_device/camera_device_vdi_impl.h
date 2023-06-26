@@ -18,7 +18,7 @@
 
 #include <mutex>
 #include "v1_0/icamera_device_vdi.h"
-#include "v1_0/icamera_device_callback.h"
+#include "v1_0/icamera_device_vdi_callback.h"
 #include "camera.h"
 #include "camera_metadata_info.h"
 #include "stream_operator_vdi_impl.h"
@@ -39,11 +39,11 @@ public:
     CameraDeviceVdiImpl &operator=(CameraDeviceVdiImpl &&other) = delete;
 
 public:
-    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+    int32_t GetStreamOperator(const sptr<IStreamOperatorVdiCallback> &callbackObj,
         sptr<IStreamOperatorVdi> &streamOperator) override;
     int32_t UpdateSettings(const std::vector<uint8_t> &settings) override;
     int32_t GetSettings(std::vector<uint8_t> &settings);
-    int32_t SetResultMode(ResultCallbackMode mode) override;
+    int32_t SetResultMode(VdiResultCallbackMode mode) override;
     int32_t GetEnabledResults(std::vector<int32_t> &results) override;
     int32_t EnableResult(const std::vector<int32_t> &results) override;
     int32_t DisableResult(const std::vector<int32_t> &results) override;
@@ -51,8 +51,8 @@ public:
 
     static std::shared_ptr<CameraDeviceVdiImpl> CreateCameraDevice(const std::string &cameraId);
     std::shared_ptr<IPipelineCore> GetPipelineCore() const;
-    CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback);
-    ResultCallbackMode GetMetaResultMode() const;
+    VdiCamRetCode SetCallback(const OHOS::sptr<ICameraDeviceVdiCallback> &callback);
+    VdiResultCallbackMode GetMetaResultMode() const;
     void GetCameraId(std::string &cameraId) const;
     void SetStatus(bool isOpened);
     void OnRequestTimeout();
@@ -68,9 +68,9 @@ private:
     bool isOpened_;
     std::string cameraId_;
     std::shared_ptr<IPipelineCore> pipelineCore_;
-    OHOS::sptr<ICameraDeviceCallback> cameraDeciceCallback_;
+    OHOS::sptr<ICameraDeviceVdiCallback> cameraDeciceCallback_;
     OHOS::sptr<StreamOperatorVdiImpl> spStreamOperator_;
-    ResultCallbackMode metaResultMode_;
+    VdiResultCallbackMode metaResultMode_;
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;
     std::vector<MetaType> enabledResults_;
