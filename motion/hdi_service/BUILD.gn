@@ -15,7 +15,7 @@ HDF_CORE_PATH = "../../../hdf_core"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libmotion_interface_service_1.0") {
+ohos_shared_library("libmotion_interface_service_1.1") {
   include_dirs = [
     ".",
     "../interfaces/v1_0",
@@ -36,7 +36,7 @@ ohos_shared_library("libmotion_interface_service_1.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_motion:libmotion_stub_1.0",
+      "drivers_interface_motion:libmotion_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -66,7 +66,7 @@ ohos_shared_library("libmotion_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_motion:libmotion_stub_1.0",
+      "drivers_interface_motion:libmotion_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -85,6 +85,6 @@ ohos_shared_library("libmotion_driver") {
 group("hdi_motion_service") {
   deps = [
     ":libmotion_driver",
-    ":libmotion_interface_service_1.0",
+    ":libmotion_interface_service_1.1",
   ]
 }

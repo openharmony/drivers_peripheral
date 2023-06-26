@@ -30,7 +30,7 @@ ohos_fuzztest("MotionFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_motion:libmotion_stub_1.0",
+    "drivers_interface_motion:libmotion_stub_1.1",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

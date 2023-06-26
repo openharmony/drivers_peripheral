@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_MOTION_V1_0_IMOTIONINTERFACE_VDI_H
-#define OHOS_HDI_MOTION_V1_0_IMOTIONINTERFACE_VDI_H
+#ifndef OHOS_HDI_MOTION_V1_1_IMOTIONINTERFACE_VDI_H
+#define OHOS_HDI_MOTION_V1_1_IMOTIONINTERFACE_VDI_H
 
 #include "hdf_load_vdi.h"
 #include "imotion_callback_vdi.h"
@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 
 #define HDI_MOTION_VDI_LIBNAME "libhdi_motion_impl.z.so"
 
@@ -40,9 +40,9 @@ struct WrapperMotionVdi {
     struct HdfVdiBase base;
     IMotionInterfaceVdi *motionModule;
 };
-} // V1_0
+} // V1_1
 } // Motion
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_MOTION_V1_0_IMOTIONINTERFACE_VDI_H
+#endif // OHOS_HDI_MOTION_V1_1_IMOTIONINTERFACE_VDI_H

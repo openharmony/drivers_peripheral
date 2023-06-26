@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 
 int32_t MotionCallbackVdi::OnDataEventVdi(const HdfMotionEventVdi& eventVdi)
 {
@@ -49,7 +49,7 @@ sptr<IRemoteObject> MotionCallbackVdi::HandleCallbackDeath()
 
     return remote;
 }
-} // V1_0
+} // V1_1
 } // Motion
 } // HDI
 } // OHOS
