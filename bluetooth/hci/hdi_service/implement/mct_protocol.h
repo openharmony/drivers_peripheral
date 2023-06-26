@@ -31,6 +31,7 @@ public:
     ssize_t SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData) override;
     void ReadEventData(int fd);
     void ReadAclData(int fd);
+    ~MctProtocol();
 
 private:
     int hciFds_[HCI_MAX_CHANNEL] = {0};
