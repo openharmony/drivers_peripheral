@@ -17,8 +17,8 @@
 
 #include "iam_logger.h"
 
-#include "v1_1/executor_service.h"
 #include "v1_1/executor_stub.h"
+#include "executor_impl.h"
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
 
 #undef private
@@ -40,8 +40,7 @@ bool FaceAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::FaceAuth::V1_1::IExecutor> serviceImpl =
-        OHOS::HDI::FaceAuth::V1_1::IExecutor::Get(true);
+    ExecutorImpl *serviceImpl = new (std::nothrow) ExecutorImpl();
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;
@@ -65,12 +64,12 @@ bool FaceAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
             EXECUTOR_STUB_TOKEN = EXECUTOR_STUB_TOKEN_V1_1;
         }
         // Sync
-        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN_V1_1);
+        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN);
         data.WriteBuffer(rawData, size);
         data.RewindRead(0);
         (void)executorStub->OnRemoteRequest(code, data, reply, optionSync);
         // Async
-        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN_V1_1);
+        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN);
         data.WriteBuffer(rawData, size);
         data.RewindRead(0);
         (void)executorStub->OnRemoteRequest(code, data, reply, optionAsync);
