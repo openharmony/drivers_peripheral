@@ -289,22 +289,21 @@ IAM_STATIC void GetRootSecretFromAttribute(const Attribute *attribute, ExecutorR
     ResultCode result = GetAttributeUint8Array(attribute, AUTH_ROOT_SECRET, &(array));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("There is no rootSecret in this attribute");
-        Free(array.data);
-        return;
+        goto EXIT;
     }
     if (array.len != ROOT_SECRET_LEN) {
         LOG_ERROR("rootSecret len is invalid");
-        Free(array.data);
-        return;
+        goto EXIT;
     }
     resultInfo->rootSecret = CreateBufferByData(array.data, array.len);
     if (!IsBufferValid(resultInfo->rootSecret)) {
         LOG_ERROR("Generate rootSecret buffer failed");
-        Free(array.data);
-        return;
+        goto EXIT;
     }
-
     LOG_INFO("get rootSecret success");
+
+EXIT:
+    (void)memset_s(array.data, ROOT_SECRET_LEN, 0, ROOT_SECRET_LEN);
     Free(array.data);
 }
 
