@@ -990,14 +990,32 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
     return ret;
 }
 
+static int32_t WLanFillSsid(WifiScan *wifiScan, const struct HdfWifiScan *scan)
+{
+    uint32_t loop;
+
+    for (loop = 0; loop < scan->ssidsLen; loop++) {
+        if (scan->ssids[loop].ssidLen > MAX_SSID_LEN) {
+            HDF_LOGW("%{public}s fail : ssidLen is invalid!", __func__);
+            scan->ssids[loop].ssidLen = MAX_SSID_LEN - 1;
+        }
+        if (memcpy_s(wifiScan->ssids[loop].ssid, scan->ssids[loop].ssidLen, scan->ssids[loop].ssid,
+            scan->ssids[loop].ssidLen) != EOK) {
+            HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
+            return HDF_FAILURE;
+        }
+        wifiScan->ssids[loop].ssidLen = scan->ssids[loop].ssidLen;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t WLanFillScanData(WifiScan *wifiScan, const struct HdfWifiScan *scan)
 {
     if ((scan->ssids != NULL) && (scan->ssidsLen != 0)) {
         wifiScan->ssids = (WifiDriverScanSsid *)OsalMemCalloc(sizeof(WifiDriverScanSsid) * scan->ssidsLen);
         if (wifiScan->ssids != NULL) {
-            if (memcpy_s(wifiScan->ssids, sizeof(WifiDriverScanSsid) * (scan->ssidsLen), scan->ssids,
-                sizeof(WifiDriverScanSsid) * (scan->ssidsLen)) != EOK) {
-                HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
+            if (WLanFillSsid(wifiScan, scan) != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s fail : fill ssids fail!", __func__);
                 OsalMemFree(wifiScan->ssids);
                 return HDF_FAILURE;
             }
@@ -1088,7 +1106,7 @@ int32_t WlanInterfaceStartScan(struct IWlanInterface *self, const struct HdfFeat
         return HDF_FAILURE;
     }
     if (WLanFillScanData(wifiScan, scan) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
+        HDF_LOGE("%{public}s fail : fill scan data fail!", __func__);
         WifiScanFree(wifiScan);
         return HDF_FAILURE;
     }
