@@ -156,12 +156,12 @@ std::shared_ptr<OfflinePipeline> StreamPipelineCore::GetOfflinePipeline(const in
     return std::static_pointer_cast<IppNode>(node);
 }
 
-OperationMode StreamPipelineCore::GetCurrentMode() const
+VdiOperationMode StreamPipelineCore::GetCurrentMode() const
 {
     return mode_;
 }
 
-DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(OperationMode mode,
+DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(VdiOperationMode mode,
                                                                   const ModeMeta& meta,
                                                                   const std::vector<StreamConfiguration>& configs)
 {
@@ -175,7 +175,7 @@ DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(OperationMode 
 
     std::vector<int32_t> types = {};
     std::transform(configs.begin(), configs.end(), std::back_inserter(types),
-        [](auto &it) { return static_cast<std::underlying_type<StreamIntent>::type>(it.type); });
+        [](auto &it) { return static_cast<std::underlying_type<VdiStreamIntent>::type>(it.type); });
     std::sort(types.begin(), types.end(), [](const int32_t& f, const int32_t& n) { return f < n; });
 
     bool isSupport = strategy_->CheckPipelineSpecExist(mode, types) == RC_OK ? true : false;

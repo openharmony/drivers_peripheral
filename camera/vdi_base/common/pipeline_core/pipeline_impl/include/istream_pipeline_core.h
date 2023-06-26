@@ -45,8 +45,8 @@ public:
     virtual std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) = 0;
     virtual RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) = 0;
     virtual RetCode CancelCapture(const std::vector<int32_t>& ids) = 0;
-    virtual OperationMode GetCurrentMode() const = 0;
-    virtual DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
+    virtual VdiOperationMode GetCurrentMode() const = 0;
+    virtual DynamicStreamSwitchMode CheckStreamsSupported(VdiOperationMode mode,
         const ModeMeta& meta, const std::vector<StreamConfiguration>& configs) = 0;
 };
 }

@@ -25,7 +25,7 @@ namespace OHOS::Camera {
 class StreamBase : public IStream, public std::enable_shared_from_this<StreamBase> {
 public:
     StreamBase(const int32_t id,
-               const StreamIntent type,
+               const VdiStreamIntent type,
                std::shared_ptr<IPipelineCore>& p,
                std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamBase();

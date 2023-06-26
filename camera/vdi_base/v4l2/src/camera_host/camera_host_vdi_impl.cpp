@@ -19,7 +19,7 @@
 #include "camera_host_config.h"
 #include "metadata_utils.h"
 
-#include "v1_0/icamera_host_callback.h"
+#include "v1_0/icamera_host_vdi_callback.h"
 #include "camera_dump.h"
 #include "hdf_trace.h"
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
@@ -36,7 +36,7 @@ CameraHostVdiImpl::~CameraHostVdiImpl()
     CAMERA_LOGD("dtor, instance");
 }
 
-CamRetCode CameraHostVdiImpl::Init()
+VdiCamRetCode CameraHostVdiImpl::Init()
 {
     std::shared_ptr<IDeviceManager> deviceManager =
         IDeviceManager::GetInstance();
@@ -79,15 +79,15 @@ CamRetCode CameraHostVdiImpl::Init()
 
     deviceManager->SetHotplugDevCallBack([this](const std::shared_ptr<CameraAbility> &meta,
         const bool &status, const CameraId &cameraId) {
-            CameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
+            VdiCameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
             OnCameraStatus(cameraId, cameraStatus, meta);
         });
 
     (void)DevHostRegisterDumpHost(CameraDumpEvent);
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostVdiImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
+int32_t CameraHostVdiImpl::SetCallback(const OHOS::sptr<ICameraHostVdiCallback> &callbackObj)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     HDF_CAMERA_TRACE;
@@ -100,7 +100,7 @@ int32_t CameraHostVdiImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &ca
     cameraHostCallback_ = callbackObj;
 
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraHostVdiImpl::GetCameraIds(std::vector<std::string> &cameraIds)
@@ -118,7 +118,7 @@ int32_t CameraHostVdiImpl::GetCameraIds(std::vector<std::string> &cameraIds)
     }
 
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
@@ -139,10 +139,10 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
     dumper.DumpMetadata(ability, "cameraAbility");
     MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceVdiCallback> &callbackObj,
     sptr<ICameraDeviceVdi> &device)
 {
     CAMERA_LOGD("OpenCamera entry");
@@ -166,8 +166,8 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
         return INSUFFICIENT_RESOURCES;
     }
 
-    CamRetCode ret = cameraDevice->SetCallback(callbackObj);
-    CHECK_IF_NOT_EQUAL_RETURN_VALUE(ret, HDI::Camera::V1_0::NO_ERROR, ret);
+    VdiCamRetCode ret = cameraDevice->SetCallback(callbackObj);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(ret, VDI::Camera::V1_0::NO_ERROR, ret);
 
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     CHECK_IF_PTR_NULL_RETURN_VALUE(config, INVALID_ARGUMENT);
@@ -196,7 +196,7 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
     cameraDevice->SetStatus(true);
     CAMERA_LOGD("open camera success.");
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode CameraHostVdiImpl::CameraIdInvalid(const std::string &cameraId)
@@ -226,7 +226,7 @@ RetCode CameraHostVdiImpl::CameraIdInvalid(const std::string &cameraId)
 RetCode CameraHostVdiImpl::CameraPowerUp(const std::string &cameraId,
     const std::vector<std::string> &phyCameraIds)
 {
-    FlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
+    VdiFlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
     RetCode rc = SetFlashlight(phyCameraIds, false, flashlightStatus);
     if (rc != RC_OK) {
         CAMERA_LOGW("flash light close failed. [cameraId = %{public}s]", cameraId.c_str());
@@ -311,13 +311,13 @@ int32_t CameraHostVdiImpl::SetFlashlight(const std::string &cameraId,  bool isEn
         return DEVICE_ERROR;
     }
 
-    FlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
+    VdiFlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
     rc = SetFlashlight(phyCameraIds, isEnable, flashlightStatus);
     if (rc == RC_OK && flashlightStatus != FLASHLIGHT_UNAVAILABLE) {
         if (cameraHostCallback_ != nullptr) {
             cameraHostCallback_->OnFlashlightStatus(cameraId, flashlightStatus);
         }
-        return HDI::Camera::V1_0::NO_ERROR;
+        return VDI::Camera::V1_0::NO_ERROR;
     } else {
         return DEVICE_ERROR;
     }
@@ -325,7 +325,7 @@ int32_t CameraHostVdiImpl::SetFlashlight(const std::string &cameraId,  bool isEn
 }
 
 RetCode CameraHostVdiImpl::SetFlashlight(const std::vector<std::string> &phyCameraIds,
-    bool isEnable, FlashlightStatus &flashlightStatus)
+    bool isEnable, VdiFlashlightStatus &flashlightStatus)
 {
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     (void)phyCameraIds;
@@ -347,7 +347,7 @@ RetCode CameraHostVdiImpl::SetFlashlight(const std::vector<std::string> &phyCame
 }
 
 void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
-    CameraStatus status, const std::shared_ptr<CameraAbility> ability)
+    VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability)
 {
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
@@ -404,7 +404,7 @@ static int CreateCameraHostVdiInstance(struct HdfVdiBase *vdiBase)
     CameraHostVdiImpl *cameraHostVdiImpl = new (std::nothrow) CameraHostVdiImpl();
     if (cameraHostVdiImpl == nullptr) {
         CAMERA_LOGE("Create camera host vdi instance error, cameraHostVdiImpl is nullptr");
-        return HDI::Camera::V1_0::NO_ERROR;
+        return VDI::Camera::V1_0::NO_ERROR;
     }
     cameraHostVdiImpl->Init();
     vdiWrapperCameraHost->module = cameraHostVdiImpl;

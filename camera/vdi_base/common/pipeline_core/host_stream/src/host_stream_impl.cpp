@@ -16,7 +16,7 @@
 namespace OHOS::Camera {
 class HostStreamImpl : public HostStream {
 public:
-    StreamIntent GetStreamType() const override;
+    VdiStreamIntent GetStreamType() const override;
     HostStreamInfo GetStreamInfo() const override;
     int GetStreamId() const override;
     bool GetStreamState() const override;
@@ -33,7 +33,7 @@ HostStreamImpl::HostStreamImpl(const HostStreamInfo& info, BufferCb c) : info_(i
 {
 }
 
-StreamIntent HostStreamImpl::GetStreamType() const
+VdiStreamIntent HostStreamImpl::GetStreamType() const
 {
     return info_.type_;
 }

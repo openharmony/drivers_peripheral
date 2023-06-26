@@ -85,9 +85,13 @@ if (defined(ohos_lite)) {
   host_sources = [
     "$camera_path/../../interfaces/hdi_ipc/camera_host_driver.cpp",
     "./src/camera_device_service.cpp",
+    "./src/camera_device_service_callback.cpp",
     "./src/camera_host_service.cpp",
+    "./src/camera_host_service_callback.cpp",
+    "./src/camera_service_type_converter.cpp",
     "./src/offline_stream_operator_service.cpp",
     "./src/stream_operator_service.cpp",
+    "./src/stream_operator_service_callback.cpp",
   ]
 
   host_includes = [

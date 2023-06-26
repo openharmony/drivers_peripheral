@@ -18,7 +18,7 @@
 #include <sstream>
 #include <cstdio>
 #include "camera_dump.h"
-#include "v1_0/types.h"
+#include "v1_0/vdi_types.h"
 #include "camera.h"
 
 using namespace std;
@@ -84,11 +84,11 @@ bool CameraDumper::DumpBuffer(const std::shared_ptr<IBuffer>& buffer)
     ss << "captureId[" << captureId << "]_streamId[" << streamId <<
         "]_width[" << width << "]_height[" << height;
 
-    if (encodeType == HDI::Camera::V1_0::ENCODE_TYPE_JPEG) {
+    if (encodeType == VDI::Camera::V1_0::ENCODE_TYPE_JPEG) {
         ss << "]_" << GetCurrentLocalTimeStamp();
         ss >> fileName;
         fileName += ".jpeg";
-    } else if (encodeType == HDI::Camera::V1_0::ENCODE_TYPE_H264) {
+    } else if (encodeType == VDI::Camera::V1_0::ENCODE_TYPE_H264) {
         fileName = "cameraDumpVideo.h264";
     } else {
         ss << "]_" << GetCurrentLocalTimeStamp();

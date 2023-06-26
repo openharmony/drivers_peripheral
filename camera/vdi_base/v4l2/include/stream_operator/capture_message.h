@@ -17,7 +17,7 @@
 #define STREAM_OPERATOR_CAPTURE_MESSAGE_H
 
 #include "camera.h"
-#include "v1_0/types.h"
+#include "v1_0/vdi_types.h"
 #include <condition_variable>
 #include <list>
 #include <thread>
@@ -25,7 +25,7 @@
 #include <vector>
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::VDI::Camera::V1_0;
 enum CaptureMessageType {
     CAPTURE_MESSAGE_TYPE_INVALID = 0,
     CAPTURE_MESSAGE_TYPE_ON_STARTED,
@@ -94,13 +94,13 @@ private:
 class CaptureErrorMessage final : public ICaptureMessage {
 public:
     virtual ~CaptureErrorMessage() = default;
-    CaptureErrorMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t peerCount, StreamError errorCode)
-        : ICaptureMessage(streamId, captureId, time, peerCount)
+    CaptureErrorMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t peerCount,
+        VdiStreamError errorCode) : ICaptureMessage(streamId, captureId, time, peerCount)
     {
         errorCode_ = errorCode;
     }
 
-    StreamError GetStreamError() const
+    VdiStreamError GetStreamError() const
     {
         return errorCode_;
     }
@@ -111,7 +111,7 @@ public:
     }
 
 private:
-    StreamError errorCode_;
+    VdiStreamError errorCode_;
 };
 
 class FrameShutterMessage final : public ICaptureMessage {

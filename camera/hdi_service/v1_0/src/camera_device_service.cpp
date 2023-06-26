@@ -14,6 +14,7 @@
  */
 
 #include "camera_device_service.h"
+#include "stream_operator_service_callback.h"
 
 namespace OHOS::Camera {
 
@@ -28,7 +29,12 @@ int32_t CameraDeviceService::GetStreamOperator(const sptr<IStreamOperatorCallbac
 {
     OHOS::sptr<IStreamOperatorVdi> streamOperatorVdi = nullptr;
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    int32_t ret = cameraDeviceServiceVdi_->GetStreamOperator(callbackObj, streamOperatorVdi);
+    OHOS::sptr<IStreamOperatorVdiCallback> vdiCallbackObj = new StreamOperatorServiceCallback(callbackObj);
+    if (vdiCallbackObj == nullptr) {
+        CAMERA_LOGE("Get stream operator error, vdiCallbackObj is nullptr");
+        return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
+    }
+    int32_t ret = cameraDeviceServiceVdi_->GetStreamOperator(vdiCallbackObj, streamOperatorVdi);
     if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("Get stream operator error, ret=%{public}d", ret);
         return ret;
@@ -55,7 +61,7 @@ int32_t CameraDeviceService::UpdateSettings(const std::vector<uint8_t> &settings
 int32_t CameraDeviceService::SetResultMode(ResultCallbackMode mode)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDeviceServiceVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return cameraDeviceServiceVdi_->SetResultMode(mode);
+    return cameraDeviceServiceVdi_->SetResultMode(static_cast<VdiResultCallbackMode>(mode));
 }
 
 int32_t CameraDeviceService::GetEnabledResults(std::vector<int32_t> &results)
