@@ -141,7 +141,8 @@ int32_t UsingCreateLayer(uint32_t devId, uint32_t& layerId)
         return DISPLAY_FAILURE;
     }
 
-    ret = g_composerInterface->CreateLayer(devId, layerInfo, layerId);
+    uint32_t bufferCount = 3;
+    ret = g_composerInterface->CreateLayer(devId, layerInfo, bufferCount, layerId);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function CreateLayer failed", __func__);
     }
@@ -281,7 +282,9 @@ int32_t TestSetLayerBuffer(uint32_t devId, uint32_t layerId)
         HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
         return DISPLAY_FAILURE;
     }
-    int32_t ret = g_composerInterface->SetLayerBuffer(devId, layerId, *buffer, fence);
+    uint32_t seqNo = GetData<uint32_t>();
+    std::vector<uint32_t> deletingList;
+    int32_t ret = g_composerInterface->SetLayerBuffer(devId, layerId, buffer, seqNo, fence, deletingList);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerBuffer failed", __func__);
     }

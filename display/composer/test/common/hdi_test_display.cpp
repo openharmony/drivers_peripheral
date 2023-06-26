@@ -64,6 +64,10 @@ int32_t HdiTestDisplay::Init()
     ret = clientLayer_->Init();
     DISPLAY_TEST_CHK_RETURN(
         (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the client layer can not be created"));
+
+    ret = device_->SetClientBufferCacheCount(id_, clientLayer_->GetLayerBuffercount());
+    DISPLAY_TEST_CHK_RETURN(
+        (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("setClientBufferCount error"));
     return DISPLAY_SUCCESS;
 }
 
@@ -87,7 +91,7 @@ std::shared_ptr<HdiTestLayer> HdiTestDisplay::CreateHdiTestLayer(LayerInfo& info
 {
     DISPLAY_TEST_LOGD();
     uint32_t layerId = 0;
-    int ret = device_->CreateLayer(id_, info, layerId);
+    int ret = device_->CreateLayer(id_, info, HdiTestLayer::MAX_BUFFER_COUNT, layerId);
     DISPLAY_TEST_LOGD("CreateLayer layerId %{public}u", layerId);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("layer creat failed"));
     auto layer = std::make_shared<HdiTestLayer>(info, layerId, id_);
@@ -173,7 +177,13 @@ int32_t HdiTestDisplay::Commit()
         BufferHandle* handle = buffer->Get();
         DISPLAY_TEST_CHK_RETURN((handle == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("BufferHandle is null"));
         ClearColor(*handle, 0); // need clear the fb first
-        ret = device_->SetDisplayClientBuffer(id_, *handle, -1);
+
+        ret = buffer->SetGraphicBuffer([&](const BufferHandle* buffer, uint32_t seqNo) -> int32_t {
+            int32_t result = device_->SetDisplayClientBuffer(id_, buffer, seqNo, -1);
+            DISPLAY_TEST_CHK_RETURN(
+                (result != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set client buffer handle failed"));
+            return DISPLAY_SUCCESS;
+        });
         currentFb_ = handle;
         DISPLAY_TEST_CHK_RETURN(
             (ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set client buffer handle failed"));

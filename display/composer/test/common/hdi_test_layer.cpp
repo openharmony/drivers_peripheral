@@ -26,7 +26,7 @@ namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 
-HdiGrallocBuffer::HdiGrallocBuffer(uint32_t w, uint32_t h, PixelFormat fmt)
+HdiGrallocBuffer::HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, PixelFormat fmt)
 {
     std::shared_ptr<IDisplayBuffer> gralloc = HdiTestDevice::GetInstance().GetGrallocInterface();
     AllocInfo info = { 0 };
@@ -35,28 +35,31 @@ HdiGrallocBuffer::HdiGrallocBuffer(uint32_t w, uint32_t h, PixelFormat fmt)
     info.usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE;
     info.format = fmt;
 
-    int ret = gralloc->AllocMem(info, mBufferHandle);
+    BufferHandle* buffer = nullptr;
+    int ret = gralloc->AllocMem(info, buffer);
     if (ret != DISPLAY_SUCCESS) {
         DISPLAY_TEST_LOGE("can not alloc memory");
     }
-    void* vaddr = gralloc->Mmap(*mBufferHandle);
+    void* vaddr = gralloc->Mmap(*buffer);
     if (vaddr == nullptr) {
         DISPLAY_TEST_LOGE("mmap failed");
     }
+    buffer_ = buffer;
+    seqNo_ = seqNo;
 }
 
 HdiGrallocBuffer::~HdiGrallocBuffer()
 {
-    if (mBufferHandle != nullptr) {
+    if (buffer_ != nullptr) {
         std::shared_ptr<IDisplayBuffer> gralloc = HdiTestDevice::GetInstance().GetGrallocInterface();
-        if ((mBufferHandle->virAddr != nullptr) && (gralloc != nullptr)) {
-            int ret = gralloc->Unmap(*mBufferHandle);
+        if (buffer_->virAddr != nullptr) {
+            int ret = gralloc->Unmap(*buffer_);
             if (ret != DISPLAY_SUCCESS) {
                 DISPLAY_TEST_LOGE("can not ummap buffer handle");
             }
         }
-        gralloc->FreeMem(*mBufferHandle);
-        mBufferHandle = nullptr;
+        gralloc->FreeMem(*buffer_);
+        buffer_ = nullptr;
     }
     if (mReleaseFence != -1) {
         close(mReleaseFence);
@@ -76,6 +79,23 @@ void HdiGrallocBuffer::SetAcquirceFence(int fd)
 {
     DISPLAY_TEST_LOGD("the fd is %{public}d", fd);
     mAcquireFence = fd;
+}
+
+int32_t HdiGrallocBuffer::SetGraphicBuffer(std::function<int32_t (const BufferHandle*, uint32_t)> realFunc)
+{
+    DISPLAY_TEST_CHK_RETURN(buffer_ == nullptr, DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("buffer handle is null"));
+    DISPLAY_TEST_CHK_RETURN(seqNo_ == UINT32_MAX, DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("seqNo is invalid"));
+
+    int32_t ret = DISPLAY_SUCCESS;
+    if (cacheValid_ == false) {
+        ret = realFunc(buffer_, seqNo_);
+        cacheValid_ = (ret == DISPLAY_SUCCESS) ? true : false;
+    } else {
+        ret = realFunc(nullptr, seqNo_);
+    }
+    return ret;
 }
 
 HdiGrallocBuffer* HdiTestLayer::AcquireBackBuffer()
@@ -109,17 +129,18 @@ HdiGrallocBuffer* HdiTestLayer::GetBackBuffer() const
 }
 
 HdiTestLayer::HdiTestLayer(LayerInfo& info, uint32_t id, uint32_t displayId)
-    : id_(id), displayID_(displayId), layerInfo_(info)
+    : id_(id), displayID_(displayId), layerBufferCount_(MAX_BUFFER_COUNT), layerInfo_(info)
 {}
 
-int32_t HdiTestLayer::Init()
+int32_t HdiTestLayer::Init(uint32_t bufferCount)
 {
     // init the font queue
     DISPLAY_TEST_LOGD();
-    const int MAX_BUFFER_COUNT = 3;
-    for (int i = 0; i < MAX_BUFFER_COUNT; i++) {
+    layerBufferCount_ = bufferCount;
+    for (int i = 0; i < layerBufferCount_; i++) {
         std::unique_ptr<HdiGrallocBuffer> buffer =
-            std::make_unique<HdiGrallocBuffer>(layerInfo_.width, layerInfo_.height, layerInfo_.pixFormat);
+            std::make_unique<HdiGrallocBuffer>(GenerateSeq(),
+            layerInfo_.width, layerInfo_.height, layerInfo_.pixFormat);
         DISPLAY_TEST_CHK_RETURN((buffer->Get() == nullptr), DISPLAY_FAILURE,
             DISPLAY_TEST_LOGE("buffer handle is null"));
         frontBuffers_.emplace(std::move(buffer));
@@ -199,8 +220,15 @@ int32_t HdiTestLayer::PreparePresent()
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("SetLayerDirtyRegion failed"));
 
-    ret = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerBuffer(displayID_, id_, *handle, -1);
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set buffer handle failed"));
+    ret = buffer->SetGraphicBuffer([&](const BufferHandle* ptrBuffer, uint32_t seqNo) -> int32_t {
+        std::vector<uint32_t> deletingList;
+        int32_t result = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerBuffer(
+            displayID_, id_, ptrBuffer, seqNo, -1, deletingList);
+        DISPLAY_TEST_CHK_RETURN((result != DISPLAY_SUCCESS), DISPLAY_FAILURE,
+            DISPLAY_TEST_LOGE("set buffer handle failed"));
+        return DISPLAY_SUCCESS;
+    });
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), ret, DISPLAY_TEST_LOGE("set buffer handle failed"));
 
     ret = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerBlendType(displayID_, id_, blendType_);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set blend type failed"));
@@ -242,6 +270,11 @@ void HdiTestLayer::SetReleaseFence(int fd)
     if (currentBuffer_ != nullptr) {
         currentBuffer_->SetReleaseFence(fd);
     }
+}
+
+uint32_t HdiTestLayer::GetLayerBuffercount() const
+{
+    return layerBufferCount_;
 }
 
 HdiTestLayer::~HdiTestLayer() {}

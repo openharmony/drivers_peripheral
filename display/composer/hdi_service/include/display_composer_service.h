@@ -17,6 +17,7 @@
 #define OHOS_HDI_DISPLAY_V1_0_DISPLAY_COMPOSER_SERVICE_H
 
 #include "idisplay_composer_vdi.h"
+#include "v1_0/cache_manager/device_cache_manager.h"
 #include "v1_0/display_command/display_cmd_responser.h"
 #include "v1_0/idisplay_composer.h"
 
@@ -32,6 +33,7 @@ public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
     int32_t RegHotPlugCallback(const sptr<IHotPlugCallback>& cb) override;
+    int32_t SetClientBufferCacheCount(uint32_t devId, uint32_t count) override;
     int32_t GetDisplayCapability(uint32_t devId, DisplayCapability& info) override;
     int32_t GetDisplaySupportedModes(uint32_t devId, std::vector<DisplayModeInfo>& modes) override;
     int32_t GetDisplayMode(uint32_t devId, uint32_t& modeId) override;
@@ -51,7 +53,7 @@ public:
     int32_t SetVirtualDisplayBuffer(
         uint32_t devId, const sptr<NativeBuffer>& buffer, const sptr<HdifdParcelable>& fence) override;
     int32_t SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value) override;
-    int32_t CreateLayer(uint32_t devId, const LayerInfo& layerInfo, uint32_t& layerId) override;
+    int32_t CreateLayer(uint32_t devId, const LayerInfo& layerInfo, uint32_t cacheCount, uint32_t& layerId) override;
     int32_t DestroyLayer(uint32_t devId, uint32_t layerId) override;
     int32_t InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>>& request) override;
     int32_t CmdRequest(uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt,
@@ -65,6 +67,7 @@ private:
 
 private:
     void* libHandle_;
+    std::shared_ptr<DeviceCacheManager> cacheMgr_;
     CreateComposerVdiFunc createVdiFunc_;
     DestroyComposerVdiFunc destroyVdiFunc_;
 
