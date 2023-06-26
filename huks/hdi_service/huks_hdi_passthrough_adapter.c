@@ -88,7 +88,7 @@ int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *wrappingKeyAlias, c
     HUKS_HDI_IF_NULL_LOGE_RETURN(g_coreEngine->HuksHdiImportWrappedKey, HUKS_ERROR_NULL_POINTER,
         "ImportWrappedKey function is null pointer")
 
-    return g_coreEngine->HuksHdiImportWrappedKey(wrappingKeyAlias, key, wrappedKeyData, paramSet, keyOut);
+    return g_coreEngine->HuksHdiImportWrappedKey(wrappingKeyAlias, wrappingKey, wrappedKeyData, paramSet, keyOut);
 }
 
 int32_t HuksHdiAdapterExportPublicKey(const struct HksBlob *key, const struct HksParamSet *paramSet,
