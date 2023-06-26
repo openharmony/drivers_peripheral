@@ -86,11 +86,13 @@ int BluetoothAddress::ParseAddressFromString(const std::string &string) const
 
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::string &path)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     int addrFd = open(path.c_str(), O_RDONLY);
     if (addrFd < 0) {
-        HDF_LOGI("GetDeviceAddress open %{public}s failed err:%{public}s.", path.c_str(), strerror(errno));
+        HDF_LOGI("GetDeviceAddress open %{public}s.", path.c_str());
         int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00766);
-        HDF_LOGI("GetDeviceAddress open newFd %{public}d ,failed err:%{public}s.", newFd, strerror(errno));
+        HDF_LOGI("GetDeviceAddress open newFd %{public}d.", newFd);
         char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
         auto tmpPtr = GenerateDeviceAddress();
         std::string strAddress;
@@ -103,7 +105,8 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
         if (newFd >= 0) {
             int fdRet = write(newFd, addressStr, ADDRESS_STR_LEN);
             if (fdRet < 0) {
-                HDF_LOGI("GetDeviceAddress addr write failed, err:%{public}s.", strerror(errno));
+                strerror_r(errno, buf, sizeof(buf));
+                HDF_LOGI("GetDeviceAddress addr write failed, err:%{public}s.", buf);
             }
             close(newFd);
         }
@@ -132,6 +135,8 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
 
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddress(const std::string &prefix)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     auto ptr = std::make_shared<BluetoothAddress>();
     char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
     ptr->ParseAddressFromString(addressStr);
@@ -139,11 +144,13 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GenerateDeviceAddress(const 
     if (prefixCount < ADDRESS_SIZE) {
         int fd = open("/dev/urandom", O_RDONLY);
         if (fd < 0) {
-            HDF_LOGE("open /dev/urandom failed err:%{public}s.", strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("open /dev/urandom failed err:%{public}s.", buf);
             return ptr;
         }
         if (read(fd, &ptr->address_[prefixCount], ADDRESS_SIZE - prefixCount) != ADDRESS_SIZE - prefixCount) {
-            HDF_LOGE("read /dev/urandom failed err:%{public}s.", strerror(errno));
+            strerror_r(errno, buf, sizeof(buf));
+            HDF_LOGE("read /dev/urandom failed err:%{public}s.", buf);
         }
         close(fd);
     }

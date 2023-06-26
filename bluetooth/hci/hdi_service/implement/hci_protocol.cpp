@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 #include <hdf_log.h>
-
 namespace OHOS {
 namespace HDI {
 namespace Bluetooth {
@@ -44,9 +43,12 @@ const PacketHeader &HciProtocol::GetPacketHeaderInfo(HciPacketType packetType)
 
 ssize_t HciProtocol::Read(int fd, uint8_t *data, size_t length)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     ssize_t ret = TEMP_FAILURE_RETRY(read(fd, data, length));
     if (ret == -1) {
-        HDF_LOGE("read failed err:%s", strerror(errno));
+        strerror_r(errno, buf, sizeof(buf));
+        HDF_LOGE("read failed err:%s", buf);
         ret = 0;
     }
     return ret;
@@ -54,13 +56,16 @@ ssize_t HciProtocol::Read(int fd, uint8_t *data, size_t length)
 
 ssize_t HciProtocol::Write(int fd, const uint8_t *data, size_t length)
 {
+    const int bufsize = 256;
+    char buf[bufsize] = {0};
     ssize_t ret = 0;
     do {
         ret = TEMP_FAILURE_RETRY(write(fd, data, length));
     } while (ret == -1 && errno == EAGAIN);
 
     if (ret == -1) {
-        HDF_LOGE("write failed err:%s", strerror(errno));
+        strerror_r(errno, buf, sizeof(buf));
+        HDF_LOGE("write failed err:%s", buf);
     } else if (static_cast<size_t>(ret) != length) {
         HDF_LOGE("write data %zd less than %zu.", ret, length);
     }
