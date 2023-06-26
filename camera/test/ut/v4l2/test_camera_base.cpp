@@ -206,7 +206,7 @@ unsigned char* TestCameraBase::DoFbMmap(int* pmemfd)
 {
     unsigned char* ret;
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
-    ret = static_cast<unsigned char*>(mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0));
+    ret = static_cast<unsigned char*>(mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0));
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
         return nullptr;
