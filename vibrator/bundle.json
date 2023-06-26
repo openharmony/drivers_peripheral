@@ -25,9 +25,9 @@
       "components": [
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "c_utils",
-        "hitrace_native",
+        "hitrace",
         "drivers_interface_vibrator"
       ]
     },

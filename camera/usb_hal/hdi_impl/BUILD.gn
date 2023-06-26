@@ -124,12 +124,12 @@ ohos_shared_library("camera_daemon") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
   if (use_hitrace) {
-    external_deps += [ "hitrace_native:libhitracechain" ]
+    external_deps += [ "hitrace:libhitracechain" ]
   }
 
   shlib_type = "hdi"
@@ -169,12 +169,12 @@ ohos_static_library("camera_daemon_static") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
   if (use_hitrace) {
-    external_deps += [ "hitrace_native:libhitracechain" ]
+    external_deps += [ "hitrace:libhitracechain" ]
   }
 
   public_configs = [ ":camhdi_impl_config" ]

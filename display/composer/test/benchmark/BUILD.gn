@@ -41,7 +41,7 @@ ohos_benchmarktest("hdf_display_benchmark_test") {
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "thirdparty_benchmark:benchmark",
     "thirdparty_googletest:gtest",

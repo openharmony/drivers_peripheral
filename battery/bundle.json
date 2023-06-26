@@ -22,7 +22,7 @@
         "drivers_interface_battery",
         "drivers_interface_light",
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "ipc"
       ],
       "third_party": [

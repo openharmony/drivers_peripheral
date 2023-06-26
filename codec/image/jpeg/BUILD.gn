@@ -33,7 +33,7 @@ ohos_shared_library("libcodec_image_jpeg_service_1.0") {
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {
@@ -68,7 +68,7 @@ ohos_shared_library("libcodec_jpeg_driver") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {

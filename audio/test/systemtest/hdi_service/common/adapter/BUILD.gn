@@ -27,7 +27,7 @@ ohos_systemtest("hdf_audio_idlhdi_adapter_test") {
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   include_dirs = [ "./../../../common/hdi_service_common/include" ]
 

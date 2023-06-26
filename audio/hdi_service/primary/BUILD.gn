@@ -24,7 +24,7 @@ ohos_shared_library("audio_primary_driver") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -49,7 +49,7 @@ ohos_shared_library("audio_manager_service_1.0") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -29,7 +29,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     "drivers_interface_power:power_idl_headers",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 
@@ -51,7 +51,7 @@ ohos_shared_library("libpower_driver") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

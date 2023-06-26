@@ -35,7 +35,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_input:input_idl_headers",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {
@@ -70,7 +70,7 @@ if (!drivers_peripheral_input_feature_passthrough) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
         "ipc:ipc_single",
       ]
     } else {

@@ -1,52 +1,52 @@
 {
-  "name": "@ohos/drivers_peripheral_usb",
-  "description": "usb device driver",
-  "version": "3.1",
-  "license": "Apache License 2.0",
-  "publishAs": "code-segment",
-  "segment": {
-    "destPath": "drivers/peripheral/usb"
-  },
-  "dirs": {},
-  "scripts": {},
-  "component": {
-    "name": "drivers_peripheral_usb",
-    "subsystem": "hdf",
-    "features": [
-      "drivers_peripheral_usb_feature_linux_native_model"
-    ],
-    "hisysevent_config": [
-      "//drivers/peripheral/usb/hisysevent.yaml"
-    ],
-    "syscap": [],
-    "adapted_system_type": [
-      "standard",
-      "small"
-    ],
-    "rom": "1800KB",
-    "ram": "1200KB",
-    "deps": {
-      "components": [
-        "ipc",
-        "hdf_core",
-        "hiviewdfx_hilog_native",
-        "samgr",
-        "init",
-        "hitrace_native",
-        "c_utils",
-        "drivers_interface_usb",
-        "hisysevent_native"
-      ],
-      "third_party": []
+    "name": "@ohos/drivers_peripheral_usb",
+    "description": "usb device driver",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "drivers/peripheral/usb"
     },
-    "build": {
-      "sub_component": [
-        "//drivers/peripheral/usb:usb_entry"
-      ],
-      "test": [
-        "//drivers/peripheral/usb/test:hdf_test_usb"
-      ],
-      "inner_kits": []
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "drivers_peripheral_usb",
+        "subsystem": "hdf",
+        "features": [
+            "drivers_peripheral_usb_feature_linux_native_model"
+        ],
+        "hisysevent_config": [
+            "//drivers/peripheral/usb/hisysevent.yaml"
+        ],
+        "syscap": [],
+        "adapted_system_type": [
+            "standard",
+            "small"
+        ],
+        "rom": "1800KB",
+        "ram": "1200KB",
+        "deps": {
+            "components": [
+                "ipc",
+                "hdf_core",
+                "hilog",
+                "samgr",
+                "init",
+                "hitrace",
+                "c_utils",
+                "drivers_interface_usb",
+                "hisysevent"
+            ],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [
+                "//drivers/peripheral/usb:usb_entry"
+            ],
+            "test": [
+                "//drivers/peripheral/usb/test:hdf_test_usb"
+            ],
+            "inner_kits": []
+        }
     }
-  }
 }

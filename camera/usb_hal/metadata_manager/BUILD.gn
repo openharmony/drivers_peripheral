@@ -55,11 +55,11 @@ if (!defined(ohos_lite)) {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
     if (use_hitrace) {
-      external_deps += [ "hitrace_native:libhitrace" ]
+      external_deps += [ "hitrace:libhitrace" ]
     }
 
     public_configs = [ ":camera_metadata_manager_config" ]

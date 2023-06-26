@@ -41,7 +41,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -79,7 +79,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -117,7 +117,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
         "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

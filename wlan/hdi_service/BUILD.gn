@@ -56,7 +56,7 @@ ohos_shared_library("libwlan_interface_service_1.1") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps += [ "hilog:libhilog" ]
@@ -103,7 +103,7 @@ ohos_shared_library("libwifi_hdi_c_device") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps += [ "hilog:libhilog" ]

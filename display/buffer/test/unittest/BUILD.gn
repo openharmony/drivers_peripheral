@@ -30,7 +30,7 @@ ohos_unittest("hdf_disp_buffer_unittest") {
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "thirdparty_googletest:gtest",
   ]
@@ -52,7 +52,7 @@ ohos_unittest("buffer_death_test") {
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "thirdparty_googletest:gtest",
   ]

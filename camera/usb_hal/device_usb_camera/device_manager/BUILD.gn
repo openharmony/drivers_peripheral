@@ -73,7 +73,7 @@ ohos_shared_library("camera_device_manager") {
     "c_utils:utils",
     "drivers_interface_camera:metadata",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   public_configs = [ ":device_manager_config" ]
   install_images = [ chipset_base_dir ]
