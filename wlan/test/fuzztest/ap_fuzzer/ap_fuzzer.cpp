@@ -88,16 +88,10 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (rawData == nullptr || size == 0) {
         return false;
     }
-    
     uint32_t cmdId = Convert2Uint32(rawData) % ((sizeof(g_fuzzWlanFuncs) / sizeof(g_fuzzWlanFuncs[0])));
     g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
     if (g_wlanObj == nullptr) {
         HDF_LOGE("%{public}s: g_wlanObj is null", __FUNCTION__);
-        return result;
-    }
-    int32_t ret = g_wlanObj->Start(g_wlanObj);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Start failed! ret=%{public}d", __FUNCTION__, ret);
         return result;
     }
     uint32_t dataSize = size - OFFSET;
@@ -106,12 +100,16 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         HDF_LOGE("%{public}s: OsalMemCalloc failed!", __FUNCTION__);
         return result;
     }
-    if (PreProcessRawData(rawData, size, tmpRawData, dataSize + 1) != true) {
-        HDF_LOGE("%{public}s: PreProcessRawData failed!", __FUNCTION__);
+    int32_t ret = g_wlanObj->Start(g_wlanObj);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Start failed! ret=%{public}d", __FUNCTION__, ret);
         OsalMemFree(tmpRawData);
         return result;
     }
     do {
+        if (PreProcessRawData(rawData, size, tmpRawData, dataSize + 1) != true) {
+            break;
+        }
         ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: CreateFeature failed! ret=%{public}d", __FUNCTION__, ret);
