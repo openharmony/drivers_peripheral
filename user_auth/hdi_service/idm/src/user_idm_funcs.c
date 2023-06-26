@@ -98,7 +98,7 @@ int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
         ret = CheckIdmOperationToken(param.userId, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("a valid token is required");
-            return ret;
+            return RESULT_VERIFY_TOKEN_FAIL;
         }
     }
     CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(&param);
@@ -138,6 +138,12 @@ int32_t CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId)
     if (ret != RESULT_EXCEED_LIMIT) {
         LOG_ERROR("no pin or exception, authType is %{public}u, ret is %{public}d", param.authType, ret);
         return ret;
+    }
+    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
+    ret = CheckIdmOperationToken(param.userId, authToken);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("a valid token is required");
+        return RESULT_VERIFY_TOKEN_FAIL;
     }
     CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(&param);
     if (enrollSchedule == NULL) {
@@ -253,7 +259,7 @@ int32_t DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *cre
     int32_t ret = CheckIdmOperationToken(param.userId, &token);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("token is invalid");
-        return ret;
+        return RESULT_VERIFY_TOKEN_FAIL;
     }
 
     ret = DeleteCredentialInfo(param.userId, param.credentialId, credentialInfo);

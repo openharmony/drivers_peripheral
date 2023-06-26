@@ -27,7 +27,7 @@ extern "C" {
 
 #define MAX_NUMBER_OF_PIN_PER_USER 1
 #define MAX_NUMBER_OF_FACE_PER_USER 1
-#define MAX_NUMBER_OF_FINGERS_PER_USER 10
+#define MAX_NUMBER_OF_FINGERS_PER_USER 5
 #define INVALID_AUTH_TYPE_EROLL_NUMBER 0
 
 ResultCode CheckSpecification(int32_t userId, uint32_t authType);
