@@ -100,7 +100,7 @@ static void HdfUsbDdkDriverRelease(struct HdfDeviceObject *deviceObject)
     }
 }
 
-struct HdfDriverEntry g_usbddkDriverEntry = {
+static struct HdfDriverEntry g_usbddkDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "",
     .Bind = HdfUsbDdkDriverBind,
