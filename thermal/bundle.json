@@ -23,7 +23,7 @@
         "init",
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native"
+        "hilog"
       ],
       "third_party": [
         "libxml2",

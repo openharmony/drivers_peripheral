@@ -54,7 +54,7 @@ ohos_shared_library("libusb_ddk_host") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -95,8 +95,8 @@ ohos_shared_library("libusb_pnp_manager") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hisysevent_native:libhisysevent",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -128,7 +128,7 @@ ohos_shared_library("libusb_ddk_device") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

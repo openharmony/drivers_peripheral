@@ -21,7 +21,7 @@
     "deps": {
       "components": [
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "c_utils",
         "ipc",
         "drivers_interface_display",
@@ -29,7 +29,7 @@
         "hilog",
         "init",
         "memory_utils",
-        "hitrace_native",
+        "hitrace",
         "thirdparty_googletest",
         "thirdparty_benchmark"
       ]

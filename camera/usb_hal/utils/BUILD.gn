@@ -40,7 +40,7 @@ ohos_shared_library("camera_utils") {
     "c_utils:utils",
     "drivers_interface_camera:metadata",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   if (enable_camera_device_utest) {
     defines += [ "CAMERA_DEVICE_UTEST" ]

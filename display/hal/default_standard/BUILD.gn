@@ -43,7 +43,7 @@ ohos_shared_library("def_display_gralloc") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "memory_utils:libdmabufheap",
   ]
 
@@ -113,8 +113,8 @@ ohos_shared_library("def_display_device") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
   ]
 
   symlink_target_name = [ "libdisplay_layer.z.so" ]
@@ -142,7 +142,7 @@ ohos_shared_library("def_display_layer_video") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

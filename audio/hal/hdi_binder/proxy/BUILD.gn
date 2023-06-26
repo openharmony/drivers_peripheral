@@ -70,7 +70,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
           "hdf_core:libhdf_ipc_adapter",
           "hdf_core:libhdi",
           "hdf_core:libpub_utils",
-          "hiviewdfx_hilog_native:libhilog",
+          "hilog:libhilog",
         ]
       } else {
         external_deps = [ "hilog:libhilog" ]

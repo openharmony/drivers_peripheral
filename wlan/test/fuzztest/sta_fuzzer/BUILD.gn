@@ -36,7 +36,7 @@ ohos_fuzztest("StaFuzzTest") {
   external_deps = [
     "drivers_interface_wlan:libwlan_proxy_1.1",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   cflags = [

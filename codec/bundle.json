@@ -30,8 +30,8 @@
         "drivers_peripheral_display",
         "graphic_chipsetsdk",
         "hdf_core",
-        "hitrace_native",
-        "hiviewdfx_hilog_native",
+        "hitrace",
+        "hilog",
         "ipc"
       ],
       "third_party": []

@@ -25,8 +25,8 @@
       "components": [
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
-        "hitrace_native",
+        "hilog",
+        "hitrace",
         "c_utils",
         "drivers_interface_sensor"
       ]

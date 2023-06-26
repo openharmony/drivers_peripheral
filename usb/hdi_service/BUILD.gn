@@ -63,9 +63,9 @@ ohos_shared_library("libusb_interface_service_1.0") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hisysevent_native:libhisysevent",
-      "hitrace_native:hitrace_meter",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
+      "hitrace:hitrace_meter",
       "init:libbegetutil",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -102,7 +102,7 @@ ohos_shared_library("libusb_driver") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {

@@ -29,7 +29,7 @@ ohos_shared_library("libcodec_buffer_manager") {
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -40,8 +40,8 @@ ohos_shared_library("libmotion_interface_service_1.0") {
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hitrace_native:hitrace_meter",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
   }
@@ -71,7 +71,7 @@ ohos_shared_library("libmotion_driver") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   }

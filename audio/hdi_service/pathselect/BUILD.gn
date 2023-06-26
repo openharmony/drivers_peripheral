@@ -43,7 +43,7 @@ ohos_shared_library("audio_path_select") {
       "c_utils:utils",
       "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -41,7 +41,7 @@ ohos_fuzztest("CodecOmxFuzzTest") {
 
   external_deps = [
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }
 
