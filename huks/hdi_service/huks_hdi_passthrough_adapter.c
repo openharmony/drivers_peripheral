@@ -80,7 +80,7 @@ int32_t HuksHdiAdapterImportKey(const struct HksBlob *keyAlias, const struct Hks
     return g_coreEngine->HuksHdiImportKey(keyAlias, key, paramSet, keyOut);
 }
 
-int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *wrappingKeyAlias, const struct HksBlob *key,
+int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *wrappingKeyAlias, const struct HksBlob *wrappingKey,
     const struct HksBlob *wrappedKeyData, const struct HksParamSet *paramSet, struct HksBlob *keyOut)
 {
     HUKS_HDI_IF_NOT_SUCC_RETURN(HuksInitHuksCoreEngine(), HUKS_ERROR_NULL_POINTER)
@@ -274,7 +274,7 @@ int32_t HuksHdiAdapterExportChipsetPlatformPublicKey(const struct HksBlob *salt,
     return g_coreEngine->HuksHdiExportChipsetPlatformPublicKey(salt, scene, publicKey);
 }
 
-int32_t HuksInitHuksCoreEngine()
+int32_t HuksInitHuksCoreEngine(void)
 {
     if (g_coreEngine != NULL) {
         return HUKS_SUCCESS;
@@ -307,7 +307,7 @@ int32_t HuksInitHuksCoreEngine()
     return HUKS_SUCCESS;
 }
 
-int32_t HuksReleaseCoreEngine()
+int32_t HuksReleaseCoreEngine(void)
 {
     if (g_coreEngine == NULL) {
         return HUKS_SUCCESS;
@@ -327,7 +327,7 @@ int32_t HuksReleaseCoreEngine()
     return HUKS_SUCCESS;
 }
 
-struct HuksHdi *HuksGetCoreEngine()
+struct HuksHdi *HuksGetCoreEngine(void)
 {
     return g_coreEngine;
 }
