@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-int32_t HuksHdiAdapterGenerateKey(const struct HksBlob *keyAlias, const struct HksParamSet *paramSet,
+int32_t HuksHdiAdapterGenerateKey(const struct HksBlob *keyAlias, const struct HksParamSet *paramSetIn,
     const struct HksBlob *keyIn, struct HksBlob *keyOut);
 
 int32_t HuksHdiAdapterSign(const struct HksBlob *key, const struct HksParamSet *paramSet, const struct HksBlob *srcData,
@@ -50,7 +50,7 @@ int32_t HuksHdiAdapterExportPublicKey(const struct HksBlob *key, const struct Hk
 int32_t HuksHdiAdapterAgreeKey(const struct HksParamSet *paramSet, const struct HksBlob *privateKey,
     const struct HksBlob *peerPublicKey, struct HksBlob *agreedKey);
 
-int32_t HuksHdiAdapterDeriveKey(const struct HksParamSet *paramSet, const struct HksBlob *mainKey,
+int32_t HuksHdiAdapterDeriveKey(const struct HksParamSet *paramSet, const struct HksBlob *kdfKey,
     struct HksBlob *derivedKey);
 
 int32_t HuksHdiAdapterMac(const struct HksBlob *key, const struct HksParamSet *paramSet, const struct HksBlob *srcData,
@@ -60,7 +60,7 @@ int32_t HuksHdiAdapterModuleInit(void);
 
 int32_t HuksHdiAdapterModuleDestroy(void);
 
-int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *keyAlias, const struct HksBlob *wrappingKey,
+int32_t HuksHdiAdapterImportWrappedKey(const struct HksBlob *wrappingKeyAlias, const struct HksBlob *wrappingKey,
     const struct HksBlob *wrappedKeyData, const struct HksParamSet *paramSet, struct HksBlob *keyOut);
 
 int32_t HuksHdiAdapterInit(const struct  HksBlob *key, const struct HksParamSet *paramSet, struct HksBlob *handle,
@@ -85,11 +85,11 @@ int32_t HuksHdiAdapterUpgradeKey(const struct HksBlob *oldKey, const struct HksP
 int32_t HuksHdiAdapterExportChipsetPlatformPublicKey(const struct HksBlob *salt,
     enum HksChipsetPlatformDecryptScene scene, struct HksBlob *publicKey);
 
-int32_t HuksInitHuksCoreEngine();
+int32_t HuksInitHuksCoreEngine(void);
 
-int32_t HuksReleaseCoreEngine();
+int32_t HuksReleaseCoreEngine(void);
 
-struct HuksHdi *HuksGetCoreEngine();
+struct HuksHdi *HuksGetCoreEngine(void);
 
 #ifdef __cplusplus
 }
