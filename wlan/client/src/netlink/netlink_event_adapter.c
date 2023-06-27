@@ -292,6 +292,17 @@ static void WifiEventScanResultProcess(const char *ifName)
     nlmsg_free(msg);
 }
 
+static void WifiEventScanAbortedProcess(const char *ifName)
+{
+    WifiScanResults scanResults = {0};
+
+    if (ifName == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.", __func__);
+        return;
+    }
+    WifiEventReport(ifName, WIFI_EVENT_SCAN_ABORTED, &scanResults);
+}
+
 static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
 {
     switch (cmd) {
@@ -310,6 +321,13 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
             WifiEventScanResultProcess(ifName);
+            break;
+        case NL80211_CMD_SCAN_ABORTED:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCAN_ABORTED, cmd = %d", __FUNCTION__, cmd);
+            WifiEventScanAbortedProcess(ifName);
+            break;
+        case NL80211_CMD_TRIGGER_SCAN:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_TRIGGER_SCAN, cmd = %d", __FUNCTION__, cmd);
             break;
         default:
             HILOG_INFO(LOG_CORE, "%s: not supported cmd, cmd = %d", __FUNCTION__, cmd);

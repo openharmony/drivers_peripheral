@@ -666,6 +666,19 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
     return ret;
 }
 
+static int32_t ProcessEventScanAborted(struct HdfWlanRemoteNode *node, uint32_t event, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    struct HdfWifiScanResults scanResults = {0};
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->ScanResults == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = node->callbackObj->ScanResults(node->callbackObj, event, &scanResults, ifName);
+    return ret;
+}
+
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfWlanRemoteNode *pos = NULL;
@@ -692,6 +705,9 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
             case WIFI_EVENT_SCAN_RESULTS:
                 ret = ProcessEventScanResults(pos, event, (WifiScanResults *)data, ifName);
+                break;
+            case WIFI_EVENT_SCAN_ABORTED:
+                ret = ProcessEventScanAborted(pos, event, ifName);
                 break;
             default:
                 HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
