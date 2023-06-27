@@ -15,7 +15,7 @@
     "features": [
       "drivers_peripheral_camera_feature_usb"
     ],
-    "adapted_system_type": ["standard"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "22212KB",
     "ram": "78517KB",
     "deps": {
@@ -30,7 +30,11 @@
         "c_utils",
         "hitrace"
       ],
-      "third_party": []
+      "third_party": [
+      	"ffmpeg",
+	"libjpeg-turbo",
+	"libexif"
+      ]
     },
     "build": {
       "sub_component": [
