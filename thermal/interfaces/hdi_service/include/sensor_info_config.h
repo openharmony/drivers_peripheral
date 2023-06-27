@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 struct XMLThermalZoneInfo {
     std::string type;
     std::string replace;
@@ -68,7 +68,7 @@ private:
     std::vector<XMLThermalZoneInfo> xmlTzInfoList_;
     std::vector<XMLThermalNodeInfo> xmlTnInfoList_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

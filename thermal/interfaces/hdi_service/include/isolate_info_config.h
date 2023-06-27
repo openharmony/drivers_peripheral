@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,24 +12,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "base_info_config.h"
 
-#define HDF_LOG_TAG BaseInfoConfig
+#ifndef ISOLATE_INFO_CONFIG_H
+#define ISOLATE_INFO_CONFIG_H
+
+#include <string>
+#include <list>
+#include <vector>
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_1 {
-void BaseInfoConfig::SetBase(std::vector<BaseItem> &bastList)
-{
-    bastList_ = bastList;
-}
 
-std::vector<BaseItem> BaseInfoConfig::GetBaseItem()
-{
-    return bastList_;
-}
+struct IsolateNodeInfo {
+    std::string type;
+    std::string path;
+};
+
+class IsolateInfoConfig {
+public:
+    IsolateInfoConfig() = default;
+    ~IsolateInfoConfig() = default;
+
+    void SetGroupName(const std::string &groupName);
+    std::string GetGroupName();
+
+    void SetIsolateNodeInfo(std::vector<IsolateNodeInfo> &vXmlTn);
+    std::vector<IsolateNodeInfo> GetIsolateNodeInfo();
+
+private:
+    std::string groupName_;
+    std::vector<IsolateNodeInfo> nodeInfoList_;
+};
 } // V1_1
 } // Thermal
 } // HDI
 } // OHOS
+#endif

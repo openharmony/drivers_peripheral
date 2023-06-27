@@ -36,7 +36,7 @@ using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t MAX_SYSFS_SIZE = 128;
 const std::string THERMAL_SYSFS = "/sys/devices/virtual/thermal";
@@ -49,6 +49,13 @@ const std::string CDEV_DIR_NAME = "cooling_device";
 const std::string THERMAL_ZONE_TEMP_PATH_NAME = "/sys/class/thermal/thermal_zone%d/temp";
 const uint32_t ARG_0 = 0;
 const int32_t NUM_ZERO = 0;
+const int32_t MS_PER_SECOND = 1000;
+}
+
+void ThermalZoneManager::Init()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    pollingMap_ = ThermalHdfConfig::GetInstance().GetPollingConfig();
 }
 
 void ThermalZoneManager::FormatThermalPaths(char *path, size_t size, const char *format, const char* name)
@@ -163,67 +170,75 @@ void ThermalZoneManager::UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedTher
 int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap)
 {
     int32_t reportTime = 1;
-    std::vector<int32_t> multipleList;
     {
-        // Multi-threaded access to sensorTypeMap_ requires locking
+        // Multi-thread access to pollingMap_ require lock
         std::lock_guard<std::mutex> lock(mutex_);
-        for (auto sensorIter : sensorTypeMap_) {
-            auto tzInfoList = sensorIter.second->GetXMLThermalZoneInfo();
-            auto tnInfoList = sensorIter.second->GetXMLThermalNodeInfo();
-            sensorIter.second->thermalDataList_.clear();
-            for (auto tzIter : tzInfoList) {
-                if (tzPathMap.empty()) {
-                    break;
+        for (auto &polling : pollingMap_) {
+            for (auto &group : polling.second) {
+                auto tzInfoList = group.second->GetXMLThermalZoneInfo();
+                auto tnInfoList = group.second->GetXMLThermalNodeInfo();
+                group.second->thermalDataList_.clear();
+                for (auto tzIter : tzInfoList) {
+                    if (tzPathMap.empty()) {
+                        break;
+                    }
+                    auto typeIter = tzPathMap.find(tzIter.type);
+                    if (typeIter != tzPathMap.end()) {
+                        ReportedThermalData data;
+                        UpdateDataType(tzIter, data);
+                        data.tempPath = typeIter->second;
+                        group.second->thermalDataList_.push_back(data);
+                    }
                 }
-                auto typeIter = tzPathMap.find(tzIter.type);
-                if (typeIter != tzPathMap.end()) {
+                for (auto tnIter : tnInfoList) {
                     ReportedThermalData data;
-                    UpdateDataType(tzIter, data);
-                    data.tempPath = typeIter->second;
-                    sensorIter.second->thermalDataList_.push_back(data);
+                    data.type = tnIter.type;
+                    if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
+                        THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
+                        data.tempPath = tnIter.path;
+                    }
+                    group.second->thermalDataList_.push_back(data);
                 }
-            }
-            for (auto tnIter : tnInfoList) {
-                ReportedThermalData data;
-                data.type = tnIter.type;
-                if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
-                    THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
-                    data.tempPath = tnIter.path;
-                }
-                sensorIter.second->thermalDataList_.push_back(data);
             }
         }
     }
-    multipleList.push_back(reportTime);
     CalculateMaxCd();
-    ReportThermalZoneData(reportTime, multipleList);
+    ReportThermalZoneData(reportTime);
     return HDF_SUCCESS;
-}
-
-void ThermalZoneManager::ClearThermalZoneInfo()
-{
-    if (!tzInfoList_.empty()) {
-        tzInfoList_.clear();
-    } else {
-        return;
-    }
 }
 
 void ThermalZoneManager::CalculateMaxCd()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    sensorTypeMap_ = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
-    if (sensorTypeMap_.empty()) {
+
+    if (pollingMap_.empty()) {
         THERMAL_HILOGE(COMP_HDI, "configured sensor info is empty");
         return;
     }
-
     std::vector<int32_t> intervalList;
-    std::transform(sensorTypeMap_.begin(), sensorTypeMap_.end(), std::back_inserter(intervalList),
-        [](auto& sensorIter) { return sensorIter.second->GetInterval(); });
+    for (auto &polling : pollingMap_) {
+        for (auto &group : polling.second) {
+           intervalList.emplace_back(group.second->GetInterval());
+        }
+    }
 
     maxCd_ = GetIntervalCommonDivisor(intervalList);
-    THERMAL_HILOGI(COMP_HDI, "maxCd_ %{public}d", maxCd_);
+
+    if (maxCd_ == 0) {
+        return;
+    }
+
+    int32_t maxMultiple = 0;
+    for (auto &polling : pollingMap_) {
+        for (auto &group : polling.second) {
+            group.second->multiple_ = group.second->GetInterval() / maxCd_;
+            maxMultiple = std::max(maxMultiple, group.second->multiple_);
+        }
+    }
+    maxReportTime_ = maxMultiple;
+
+    THERMAL_HILOGI(COMP_HDI, "maxCd_ %{public}d maxReportTime_ %{public}d", maxCd_, maxReportTime_);
+    return;
 }
 
 int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
@@ -231,6 +246,9 @@ int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
     if (b == 0) {
         return NUM_ZERO;
     }
+
+    a = a / MS_PER_SECOND * MS_PER_SECOND;
+    b = b / MS_PER_SECOND * MS_PER_SECOND;
 
     if (a % b == 0) {
         return b;
@@ -253,45 +271,74 @@ int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> interv
     return commonDivisor;
 }
 
-void ThermalZoneManager::SetMultiples()
-{
-    if (maxCd_ == NUM_ZERO) {
-        return;
-    }
-    for (auto sensorIter : sensorTypeMap_) {
-        sensorIter.second->multiple_ = (sensorIter.second->GetInterval()) / maxCd_;
-    }
-    ThermalHdfConfig::GetInsance().SetSensorTypeMap(sensorTypeMap_);
-}
-
-void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList)
+void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (sensorTypeMap_.empty()) {
-        THERMAL_HILOGD(COMP_HDI, "sensorTypeMap is empty");
-        return;
-    }
 
-    tzInfoAcaualEvent_.info.clear();
-    multipleList.clear();
-    for (auto sensorIter : sensorTypeMap_) {
-        multipleList.push_back(sensorIter.second->multiple_);
-        if (sensorIter.second->multiple_ == NUM_ZERO) {
-            return;
-        }
-        THERMAL_HILOGD(COMP_HDI, "multiple %{public}d", sensorIter.second->multiple_);
-        if (reportTime % (sensorIter.second->multiple_) == NUM_ZERO) {
-            for (auto iter : sensorIter.second->thermalDataList_) {
-                ThermalZoneInfo info;
-                info.type = iter.type;
-                info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
-                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d", iter.type.c_str(), info.temp);
-                tzInfoAcaualEvent_.info.push_back(info);
+    for (auto &polling : pollingMap_) {
+        HdfThermalCallbackInfo callbackInfo;
+        for (auto &group : polling.second) {
+            if (group.second->multiple_ == NUM_ZERO) {
+                continue;
+            }
+
+            if (reportTime % (group.second->multiple_) == NUM_ZERO) {
+                for (auto iter : group.second->thermalDataList_) {
+                    ThermalZoneInfo info;
+                    info.type = iter.type;
+                    info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
+                    THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d", iter.type.c_str(), info.temp);
+                    callbackInfo.info.emplace_back(info);
+                }
             }
         }
+        if (!callbackInfo.info.empty()) {
+            CallbackOnEvent(polling.first, callbackInfo);
+        }
+    }
+
+    return;
+}
+
+void ThermalZoneManager::CallbackOnEvent(std::string name, HdfThermalCallbackInfo &info)
+{
+    if (name == "thermal") {
+        if (thermalCb_ != nullptr) {
+            thermalCb_->OnThermalDataEvent(info);
+        }
+    } else if (name == "fan") {
+        if (fanCb_ != nullptr) {
+            fanCb_->OnFanDataEvent(info);
+        }
+    }
+
+    return;
+}
+
+void ThermalZoneManager::DumpPollingInfo()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (auto &polling : pollingMap_) {
+        THERMAL_HILOGI(COMP_HDI, "pollingName %{public}s", polling.first.c_str());
+        for (auto &group : polling.second) {
+            THERMAL_HILOGI(COMP_HDI, "groupName %{public}s, interval %{public}d, multiple %{public}d",
+                group.first.c_str(), group.second->GetInterval(), group.second->multiple_);
+            for (auto tzIter : group.second->GetXMLThermalZoneInfo()) {
+                THERMAL_HILOGI(COMP_HDI, "type %{public}s, replace %{public}s", tzIter.type.c_str(),
+                    tzIter.replace.c_str());
+            }
+            for (auto tnIter : group.second->GetXMLThermalNodeInfo()) {
+                THERMAL_HILOGI(COMP_HDI, "type %{public}s", tnIter.type.c_str());
+            }
+            for (auto dataIter : group.second->thermalDataList_) {
+                THERMAL_HILOGI(COMP_HDI, "data type %{public}s", dataIter.type.c_str());
+            }
+        }
+
     }
 }
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

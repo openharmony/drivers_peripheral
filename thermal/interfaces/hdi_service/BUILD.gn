@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libthermal_interface_service_1.0") {
+ohos_shared_library("libthermal_interface_service_1.1") {
   include_dirs = [
     "../../../../../hiperf/include",
     "//third_party/libxml2/include",
@@ -22,6 +22,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
   sources = [
     "src/base_info_config.cpp",
     "src/sensor_info_config.cpp",
+    "src/isolate_info_config.cpp",
     "src/thermal_device_mitigation.cpp",
     "src/thermal_dfx.cpp",
     "src/thermal_hdf_config.cpp",
@@ -94,7 +95,7 @@ ohos_shared_library("libthermal_driver") {
 group("hdf_thermal") {
   deps = [
     ":libthermal_driver",
-    ":libthermal_interface_service_1.0",
+    ":libthermal_interface_service_1.1",
     "profile:thermal_hdf_config",
   ]
 }
