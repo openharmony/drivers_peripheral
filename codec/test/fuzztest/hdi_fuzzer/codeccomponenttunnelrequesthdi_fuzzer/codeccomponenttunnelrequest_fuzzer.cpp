@@ -23,7 +23,7 @@ namespace {
         uint32_t port;
         int32_t tunneledComp;
         uint32_t tunneledPort;
-        struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType *tunnelSetup;
+        struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType tunnelSetup;
     };
 }
 
@@ -39,7 +39,7 @@ namespace Codec {
         if (size < sizeof(params)) {
             return false;
         }
-        
+
         if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return false;
@@ -51,8 +51,8 @@ namespace Codec {
             return false;
         }
 
-        const struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType inTunnelSetup = *(params.tunnelSetup);
-        struct  OHOS::HDI::Codec::V1_0::CodecTunnelSetupType outTunnelSetup = inTunnelSetup;
+        const struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType inTunnelSetup = params.tunnelSetup;
+        struct OHOS::HDI::Codec::V1_0::CodecTunnelSetupType outTunnelSetup;
 
         int32_t ret = g_component->ComponentTunnelRequest(params.port, params.tunneledComp,
             params.tunneledPort, inTunnelSetup, outTunnelSetup);
