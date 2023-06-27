@@ -133,6 +133,11 @@ static int32_t FindValidNetwork(int32_t type, struct IWiFiBaseFeature **feature)
     struct IWiFiList *networkNode = NULL;
 
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
+        if (networkNode->ifeature != NULL && networkNode->ifeature->type == type) {
+            HDF_LOGI("%s: feature is existed. type: %d", __FUNCTION__, type);
+            *feature = networkNode->ifeature;
+            return HDF_SUCCESS;
+        }
         if (networkNode->ifeature == NULL && networkNode->supportMode[type] == 1) {
             if (memcpy_s((*feature)->ifName, IFNAME_MAX_LEN, networkNode->ifName, strlen(networkNode->ifName)) != EOK) {
                 HDF_LOGE("%s: memcpy_s failed, line: %d", __FUNCTION__, __LINE__);
