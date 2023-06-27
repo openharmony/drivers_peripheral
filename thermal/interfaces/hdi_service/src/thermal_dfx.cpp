@@ -38,7 +38,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MAX_FILE_NUM = 10;
@@ -320,7 +320,7 @@ void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTi
         wStream << " ";
     }
 
-    std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
+    std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInstance().GetTracingInfo();
     for (auto info : logInfo) {
         wStream << info.title;
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
@@ -342,7 +342,7 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
     for (uint8_t i = 0; i < width_ + TIMESTAMP_TITLE.length() - currentTime.length(); ++i) {
         wStream << " ";
     }
-    std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
+    std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInstance().GetTracingInfo();
     std::string value;
     for (auto info : logInfo) {
         ThermalHdfUtils::ReadNode(info.valuePath, value);
@@ -455,11 +455,11 @@ void ThermalDfx::Init()
         THERMAL_HILOGW(COMP_HDI, "thermal log watch parameters failed. error = %{public}d", code);
     }
 
-    XmlTraceConfig& config = ThermalHdfConfig::GetInsance().GetXmlTraceConfig();
+    XmlTraceConfig& config = ThermalHdfConfig::GetInstance().GetXmlTraceConfig();
     g_outPath = config.outPath;
     StartThread();
 }
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

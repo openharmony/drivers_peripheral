@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 class ThermalDeviceMitigation {
 public:
     ThermalDeviceMitigation() {};
@@ -30,6 +30,7 @@ public:
     int32_t ExecuteCpuRequest(uint32_t freq, const std::string &path);
     int32_t CpuRequest(uint32_t freq);
     int32_t GpuRequest(uint32_t freq);
+    int32_t IsolateCpu(int32_t num);
 
     int32_t ChargerRequest(uint32_t current);
     int32_t ExecuteChargerRequest(uint32_t current, const std::string &path);
@@ -43,7 +44,7 @@ private:
     bool flag_ {false};
     std::mutex mutex_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

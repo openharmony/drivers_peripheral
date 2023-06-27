@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
-#define HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
+#ifndef HDI_THERMAL_V1_1_THERMALINTERFACEIMPL_H
+#define HDI_THERMAL_V1_1_THERMALINTERFACEIMPL_H
 
-#include "v1_0/ithermal_interface.h"
+#include <mutex>
+#include "v1_1/ithermal_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 class ThermalInterfaceImpl : public IThermalInterface {
 public:
     ThermalInterfaceImpl();
@@ -35,14 +36,26 @@ public:
 
     int32_t GetThermalZoneInfo(HdfThermalCallbackInfo& event) override;
 
+    int32_t IsolateCpu(int32_t num) override;
+
     int32_t Register(const sptr<IThermalCallback>& callbackObj) override;
 
     int32_t Unregister() override;
+
+    int32_t RegisterFanCallback(const sptr<IFanCallback>& callbackObj) override;
+
+    int32_t UnregisterFanCallback() override;
+
+    void StartTimerThread();
+
     int32_t Init();
+
+private:
+    std::mutex mutex_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS
 
-#endif // HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
+#endif // HDI_THERMAL_V1_1_THERMALINTERFACEIMPL_H

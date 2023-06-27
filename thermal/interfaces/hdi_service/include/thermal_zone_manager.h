@@ -21,12 +21,14 @@
 #include <string>
 #include <mutex>
 #include "thermal_hdf_config.h"
-#include "v1_0/thermal_types.h"
+#include "v1_1/thermal_types.h"
+#include "v1_1/ithermal_callback.h"
+#include "v1_1/ifan_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 struct ThermalZoneSysfsPathInfo {
     char* name;
     char temperturePath[PATH_MAX];
@@ -71,12 +73,38 @@ public:
         return std::stoi(value.c_str());
     }
 
-    HdfThermalCallbackInfo GetCallbackInfo()
+    void SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        return tzInfoAcaualEvent_;
+        thermalCb_ = thermalCb;
     }
 
+    void DelThermalEventCb()
+    {
+        thermalCb_ = nullptr;
+    }
+
+    void SetFanEventCb(const sptr<IFanCallback> &fanCb)
+    {
+        fanCb_ = fanCb;
+    }
+
+    void DelFanEventCb()
+    {
+	fanCb_ = nullptr;
+    }
+
+    int32_t GetMaxReportTime()
+    {
+        return maxReportTime_;
+    }
+
+    int32_t GetMaxCd()
+    {
+        return maxCd_;
+    }
+
+    void Init();
+    void CallbackOnEvent(std::string name, HdfThermalCallbackInfo &info);
     int32_t InitThermalZoneSysfs();
     int32_t ParseThermalZoneInfo();
     void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
@@ -84,23 +112,26 @@ public:
     void ClearThermalZoneInfo();
     int32_t GetMaxCommonDivisor(int32_t a, int32_t b);
     int32_t GetIntervalCommonDivisor(std::vector<int32_t> intervalList);
-    void SetMultiples();
     void CalculateMaxCd();
     int32_t ReadFile(const char *path, char *buf, size_t size);
-    void ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList);
-    int32_t maxCd_;
+    void ReportThermalZoneData(int32_t reportTime);
+    void DumpPollingInfo();
+
 private:
     int32_t UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap);
     void UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data);
-    ThermalHdfConfig::ThermalTypeMap sensorTypeMap_;
-    HdfThermalCallbackInfo tzInfoAcaualEvent_;
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;
     std::vector<ThermalZoneInfo> tzInfoList_;
+    ThermalHdfConfig::PollingMap pollingMap_;
+    sptr<IThermalCallback> thermalCb_;
+    sptr<IFanCallback> fanCb_;
+    int32_t maxCd_;
+    int32_t maxReportTime_;
     std::mutex mutex_;
     bool flag_ {false};
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

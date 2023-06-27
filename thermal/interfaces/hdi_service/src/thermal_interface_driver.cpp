@@ -17,11 +17,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "v1_0/thermal_interface_stub.h"
+#include "v1_1/thermal_interface_stub.h"
 #include "thermal_log.h"
 
 
-using namespace OHOS::HDI::Thermal::V1_0;
+using namespace OHOS::HDI::Thermal::V1_1;
 
 namespace {
 struct HdfThermalInterfaceHost {

@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 class ThermalDfx : public NoCopyable {
 public:
     ThermalDfx();
@@ -67,7 +67,7 @@ private:
     static std::mutex mutexInstance_;
     static std::shared_ptr<ThermalDfx> instance_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

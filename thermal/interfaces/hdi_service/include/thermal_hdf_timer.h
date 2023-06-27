@@ -22,12 +22,12 @@
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
 #include "thermal_zone_manager.h"
-#include "v1_0/ithermal_callback.h"
+#include "v1_1/ithermal_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 enum EventType {
     EVENT_UEVENT_FD,
     EVENT_TIMER_FD,
@@ -49,7 +49,6 @@ public:
     void SetSimluationFlag();
     int32_t GetSimluationFlag();
     void SetSimFlag(int32_t flag);
-    void SetThermalEventCb(const sptr<IThermalCallback> &thermalCb);
     void DumpSensorConfigInfo();
 private:
     void TimerProviderCallback();
@@ -61,14 +60,13 @@ private:
     HdfThermalCallbackInfo tzInfoEventV1_;
     HdfThermalCallbackInfo tzInfoEventV2_;
     HdfThermalCallbackInfo tzInfoEvent_;
-    sptr<IThermalCallback> thermalCb_;
     std::vector<int32_t> multipleList_;
     int32_t reportTime_;
     int32_t isSim_;
     std::atomic_bool isRunning_ {true};
     std::unique_ptr<std::thread> callbackThread_ {nullptr};
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

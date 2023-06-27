@@ -26,11 +26,12 @@
 
 #include "base_info_config.h"
 #include "sensor_info_config.h"
+#include "isolate_info_config.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 struct XMLThermal {
     std::string version;
     std::string product;
@@ -47,12 +48,13 @@ struct XmlTraceConfig {
 
 class ThermalHdfConfig {
 public:
-    using ThermalTypeMap = std::map<std::string, std::shared_ptr<SensorInfoConfig>>;
+    using GroupMap = std::map<std::string, std::shared_ptr<SensorInfoConfig>>;
+    using PollingMap = std::map<std::string, GroupMap>;
     ThermalHdfConfig() {};
     ~ThermalHdfConfig() = default;
     ThermalHdfConfig(const ThermalHdfConfig&) = delete;
     ThermalHdfConfig& operator=(const ThermalHdfConfig&) = delete;
-    static ThermalHdfConfig& GetInsance();
+    static ThermalHdfConfig& GetInstance();
 
     int32_t ThermalHDIConfigInit(const std::string& path);
     int32_t ParseThermalHdiXMLConfig(const std::string& path);
@@ -63,11 +65,7 @@ public:
     void ParseTracingSubNode(xmlNodePtr node);
     void ParseConfigInfo(const xmlNode* cur, std::vector<XMLThermalZoneInfo>& tzInfoList,
         std::vector<XMLThermalNodeInfo>& tnInfoList);
-    ThermalTypeMap GetSensorTypeMap();
-    void SetSensorTypeMap(const ThermalTypeMap& typesMap)
-    {
-        typesMap_ = typesMap;
-    }
+    std::string GetXmlNodeName(xmlNodePtr node, std::string &defaultName);
     void GetThermalZoneNodeInfo(XMLThermalZoneInfo& tz, const xmlNode* node);
     std::shared_ptr<BaseInfoConfig> GetBaseConfig()
     {
@@ -81,14 +79,24 @@ public:
     {
         return traceConfig_;
     }
+    PollingMap& GetPollingConfig()
+    {
+        return pollingMap_;
+    }
+
+    using IsolateInfoMap = std::map<std::string, std::shared_ptr<IsolateInfoConfig>>;
+    void ParseIsolateNode(xmlNodePtr node);
+    void ParseIsolateSubNode(xmlNodePtr node, IsolateNodeInfo& tn);
+    int32_t GetIsolateCpuNodePath(bool isSim, const std::string &type, std::string &path);
 private:
     std::shared_ptr<BaseInfoConfig> baseConfig_;
-    ThermalTypeMap typesMap_;
+    PollingMap pollingMap_;
     XMLThermal thermal_;
     XmlTraceConfig traceConfig_;
     std::vector<DfxTraceInfo> traceInfo_;
+    IsolateInfoMap isolateInfoMap_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

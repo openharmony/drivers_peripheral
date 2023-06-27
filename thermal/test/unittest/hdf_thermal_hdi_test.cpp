@@ -24,13 +24,13 @@
 
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/ithermal_interface.h"
-#include "v1_0/ithermal_callback.h"
-#include "v1_0/thermal_types.h"
+#include "v1_1/ithermal_interface.h"
+#include "v1_1/ithermal_callback.h"
+#include "v1_1/thermal_types.h"
 #include "thermal_log.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Thermal::V1_0;
+using namespace OHOS::HDI::Thermal::V1_1;
 using namespace testing::ext;
 
 namespace {
@@ -57,6 +57,7 @@ const uint32_t MAX_PATH = 256;
 const std::string CPU_FREQ_PATH = "/data/service/el0/thermal/cooling/cpu/freq";
 const std::string GPU_FREQ_PATH = "/data/service/el0/thermal/cooling/gpu/freq";
 const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/service/el0/thermal/cooling/battery/current";
+const std::string ISOLATE_PATH = "/data/service/el0/thermal/sensor/soc/isolate";
 
 class HdfThermalHdiTest : public testing::Test {
 public:
@@ -253,5 +254,37 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest006, TestSize.Level1)
     ret = g_thermalInterface->Unregister();
     EXPECT_EQ(0, ret) << "HdfThermalHdiTest006 failed";
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest006: return.");
+}
+
+/**
+  * @tc.name: HdfThermalHdiTest007
+  * @tc.desc: isolate cpu num
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
+{
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: start.");
+    int32_t isolateNum = 2;
+    int32_t ret = g_thermalInterface->IsolateCpu(isolateNum);
+    EXPECT_EQ(0, ret);
+
+    char path[MAX_PATH] = {0};
+    char valueBuf[MAX_PATH] = {0};
+
+    if (snprintf_s(path, MAX_PATH, sizeof(path) - 1, ISOLATE_PATH.c_str()) < EOK) {
+        return;
+    }
+
+    ret = HdfThermalHdiTest::ReadFile(path, valueBuf, sizeof(valueBuf));
+    if (ret != HDF_SUCCESS) {
+        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest007: Failed to read file ");
+        return;
+    }
+
+    std::string isolateNumStr = valueBuf;
+    int32_t value = HdfThermalHdiTest::ConvertInt(isolateNumStr);
+    THERMAL_HILOGD(LABEL_TEST, "isolate cpu num is %{public}d", value);
+    EXPECT_EQ(value, isolateNum) << "HdfThermalHdiTest007 failed";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: return.");
 }
 }

@@ -19,19 +19,19 @@
 #include <memory>
 
 #include "thermal_interface_impl.h"
-#include "v1_0/ithermal_callback.h"
-#include "v1_0/ithermal_interface.h"
-#include "v1_0/thermal_interface_stub.h"
-#include "v1_0/thermal_types.h"
+#include "v1_1/ithermal_callback.h"
+#include "v1_1/ithermal_interface.h"
+#include "v1_1/thermal_interface_stub.h"
+#include "v1_1/thermal_types.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Thermal::V1_0;
+using namespace OHOS::HDI::Thermal::V1_1;
 using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<ThermalInterfaceStub> g_fuzzService = nullptr;
@@ -58,7 +58,7 @@ static void ThermalStubFuzzTest(const uint8_t *data, size_t size)
     }
     g_fuzzService->OnRemoteRequest(code, datas, reply, option);
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Thermal
 } // namespace HDI
 } // namespace OHOS
@@ -67,6 +67,6 @@ static void ThermalStubFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Thermal::V1_0::ThermalStubFuzzTest(data, size);
+    OHOS::HDI::Thermal::V1_1::ThermalStubFuzzTest(data, size);
     return 0;
 }

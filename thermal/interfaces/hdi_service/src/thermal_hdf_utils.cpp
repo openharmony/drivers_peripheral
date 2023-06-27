@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr int32_t INVALID_NUM = -100000;
 }
@@ -78,7 +78,7 @@ void ThermalHdfUtils::TrimStr(std::string& str)
     str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
     str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
 }
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

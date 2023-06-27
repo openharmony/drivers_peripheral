@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 class ThermalHdfUtils {
 public:
     ThermalHdfUtils() = default;
@@ -34,7 +34,7 @@ public:
     static int32_t WriteNode(const std::string& path, std::string& data);
     static void TrimStr(std::string& str);
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS
