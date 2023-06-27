@@ -19,12 +19,12 @@
 #include "hdf_log.h"
 #include "v1_0/motion_interface_stub.h"
 
-using namespace OHOS::HDI::Motion::V1_0;
+using namespace OHOS::HDI::Motion::V1_1;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-const std::u16string MOTION_INTERFACE_TOKEN = u"ohos.hdi.motion.v1_0.IMotionInterface";
+const std::u16string MOTION_INTERFACE_TOKEN = u"ohos.hdi.motion.v1_1.IMotionInterface";
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
 {
@@ -53,12 +53,14 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
     data.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    sptr<IMotionInterface> g_motionInterface = IMotionInterface::Get(false);
+    sptr<OHOS::HDI::Motion::V1_1::IMotionInterface> g_motionInterface =
+        OHOS::HDI::Motion::V1_1::IMotionInterface::Get(false);
     if (g_motionInterface == nullptr) {
         HDF_LOGE("%{public}s:IMotionInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<MotionInterfaceStub> motionInterface = new MotionInterfaceStub(g_motionInterface);
+    sptr<OHOS::HDI::Motion::V1_1::MotionInterfaceStub> motionInterface =
+        new OHOS::HDI::Motion::V1_1::MotionInterfaceStub(g_motionInterface);
     if (motionInterface == nullptr) {
         HDF_LOGE("%{public}s:new MotionInterfaceStub failed.", __func__);
         return false;

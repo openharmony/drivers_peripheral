@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_MOTION_V1_0_MOTIONIFSERVICE_H
-#define OHOS_HDI_MOTION_V1_0_MOTIONIFSERVICE_H
+#ifndef OHOS_HDI_MOTION_V1_1_MOTIONIFSERVICE_H
+#define OHOS_HDI_MOTION_V1_1_MOTIONIFSERVICE_H
 
 #include "imotion_interface_vdi.h"
 #include "hdf_log.h"
 #include "motion_callback_vdi.h"
+#include "v1_1/imotion_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 class MotionIfService : public IMotionInterface {
 public:
     MotionIfService();
@@ -33,15 +34,16 @@ public:
     int32_t DisableMotion(int32_t motionType) override;
     int32_t Register(const sptr<IMotionCallback> &callbackObj) override;
     int32_t Unregister(const sptr<IMotionCallback> &callbackObj) override;
+    int32_t SetMotionConfig(int32_t motionType, const std::string& data, int32_t len) override;
 
     int32_t GetMotionVdiImpl();
 private:
     IMotionInterfaceVdi *motionVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Motion
 } // namespace HDI
 } // namespcae OHOS
 
-#endif // OHOS_HDI_MOTION_V1_0_MOTIONIFSERVICE_H
+#endif // OHOS_HDI_MOTION_V1_1_MOTIONIFSERVICE_H

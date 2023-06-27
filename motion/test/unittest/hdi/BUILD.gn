@@ -25,7 +25,7 @@ ohos_unittest("hdi_unittest_motion") {
 
   sources = [
     "hdf_motion_hdi_test.cpp",
-    "motion_callback_service.cpp",
+    "motion_callback_impl.cpp",
   ]
   cflags = [
     "-Wall",
@@ -39,7 +39,7 @@ ohos_unittest("hdi_unittest_motion") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_motion:libmotion_proxy_1.0",
+      "drivers_interface_motion:libmotion_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",

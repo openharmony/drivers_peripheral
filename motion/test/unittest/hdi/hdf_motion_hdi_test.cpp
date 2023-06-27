@@ -21,16 +21,16 @@
 #include <vector>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/imotion_interface.h"
-#include "motion_callback_service.h"
+#include "v1_1/imotion_interface.h"
+#include "motion_callback_impl.h"
 
-using namespace OHOS::HDI::Motion::V1_0;
+using namespace OHOS::HDI::Motion::V1_1;
 using namespace testing::ext;
 
 namespace {
-    sptr<IMotionInterface> g_motionInterface = nullptr;
-    sptr<IMotionCallback> g_motionCallback = new MotionCallbackService();
-    sptr<IMotionCallback> g_motionCallbackUnregistered = new MotionCallbackService();
+    sptr<OHOS::HDI::Motion::V1_1::IMotionInterface> g_motionInterface = nullptr;
+    sptr<IMotionCallback> g_motionCallback = new MotionCallbackImpl();
+    sptr<IMotionCallback> g_motionCallbackUnregistered = new MotionCallbackImpl();
 }
 
 class HdfMotionTest : public testing::Test {
@@ -43,7 +43,7 @@ public:
 
 void HdfMotionTest::SetUpTestCase()
 {
-    g_motionInterface = IMotionInterface::Get();
+    g_motionInterface = OHOS::HDI::Motion::V1_1::IMotionInterface::Get();
 }
 
 void HdfMotionTest::TearDownTestCase()
