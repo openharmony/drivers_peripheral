@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
-#define OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
+#ifndef OHOS_HDI_MOTION_V1_1_IMOTIONCALLBACK_VDI_H
+#define OHOS_HDI_MOTION_V1_1_IMOTIONCALLBACK_VDI_H
 
 #include <hdf_base.h>
 #include <hdi_base.h>
@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 
 struct HdfMotionEventVdi {
     int32_t motion;
@@ -42,9 +42,9 @@ public:
     virtual sptr<IRemoteObject> HandleCallbackDeath() = 0;
 };
 
-} // V1_0
+} // V1_1
 } // Motion
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_MOTION_V1_0_IMOTIONCALLBACK_VDI_H
+#endif // OHOS_HDI_MOTION_V1_1_IMOTIONCALLBACK_VDI_H

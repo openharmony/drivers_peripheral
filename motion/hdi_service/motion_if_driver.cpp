@@ -17,9 +17,9 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/motion_interface_stub.h"
+#include "v1_1/motion_interface_stub.h"
 
-using namespace OHOS::HDI::Motion::V1_0;
+using namespace OHOS::HDI::Motion::V1_1;
 
 struct HdfMotionInterfaceHost {
     struct IDeviceIoService ioService;
@@ -68,7 +68,7 @@ static int32_t HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject
     hdfMotionInterfaceHost->ioService.Open = NULL;
     hdfMotionInterfaceHost->ioService.Release = NULL;
 
-    auto serviceImpl = IMotionInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::Motion::V1_1::IMotionInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfMotionInterfaceHost;
@@ -76,7 +76,7 @@ static int32_t HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject
     }
 
     hdfMotionInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IMotionInterface::GetDescriptor());
+        OHOS::HDI::Motion::V1_1::IMotionInterface::GetDescriptor());
     if (hdfMotionInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfMotionInterfaceHost;

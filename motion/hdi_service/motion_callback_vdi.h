@@ -16,7 +16,7 @@
 #ifndef HDI_MOTION_CALLBACK_VDI_H
 #define HDI_MOTION_CALLBACK_VDI_H
 
-#include "v1_0/imotion_interface.h"
+#include "v1_1/imotion_interface.h"
 #include "imotion_callback_vdi.h"
 #include "hdf_log.h"
 #include "refbase.h"
@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Motion {
-namespace V1_0 {
+namespace V1_1 {
 class MotionCallbackVdi : public IMotionCallbackVdi {
 public:
     MotionCallbackVdi() = default;
@@ -35,7 +35,7 @@ public:
 private:
     sptr<IMotionCallback> motionCallback_;
 };
-} // V1_0
+} // V1_1
 } // Motion
 } // HDI
 } // OHOS
