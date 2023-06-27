@@ -35,7 +35,7 @@ ohos_unittest("audio_ut_common_test") {
     "drivers_interface_audio:audio_idl_headers",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }
 

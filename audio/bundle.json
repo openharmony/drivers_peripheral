@@ -1,56 +1,56 @@
 {
-  "name": "@ohos/drivers_peripheral_audio",
-  "description": "audio device driver",
-  "version": "4.0",
-  "license": "Apache License 2.0",
-  "publishAs": "code-segment",
-  "segment": {
-    "destPath": "drivers/peripheral/audio"
-  },
-  "dirs": {},
-  "scripts": {},
-  "component": {
-    "name": "drivers_peripheral_audio",
-    "subsystem": "hdf",
-    "features": [
-      "drivers_peripheral_audio_feature_mono_to_stereo",
-      "drivers_peripheral_audio_feature_hal_notsupport_pathselect",
-      "drivers_peripheral_audio_feature_hdf_proxy_stub",
-      "drivers_peripheral_audio_feature_user_mode",
-      "drivers_peripheral_audio_feature_full_test_suite",
-      "drivers_peripheral_audio_feature_policy_config",
-      "drivers_peripheral_audio_feature_alsa_lib",
-      "drivers_peripheral_audio_feature_rich_device",
-      "drivers_peripheral_audio_feature_community",
-      "drivers_peripheral_audio_feature_effect"
-    ],
-    "adapted_system_type": ["standard", "small"],
-    "rom": "1035KB",
-    "ram": "8600KB",
-    "deps": {
-      "components": [
-        "c_utils",
-        "hiviewdfx_hilog_native",
-        "hdf_core",
-        "drivers_interface_audio"
-      ],
-      "third_party": [
-        "bounds_checking_function",
-        "cjson"
-      ]
+    "name": "@ohos/drivers_peripheral_audio",
+    "description": "audio device driver",
+    "version": "4.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "drivers/peripheral/audio"
     },
-    "build": {
-      "sub_component": [
-        "//drivers/peripheral/audio:hdi_audio",
-        "//drivers/peripheral/audio/effect:effect_model"
-      ],
-      "test": [
-        "//drivers/peripheral/audio/test:audio_test_entry",
-        "//drivers/peripheral/audio/test/sample:audio_sample",
-        "//drivers/peripheral/audio/test/sample:idl_audio_sample",
-        "//drivers/peripheral/audio/test/audio_utils/audio_mixer:audio_mixer",
-        "//drivers/peripheral/audio/effect/test:effect_test"
-      ]
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "drivers_peripheral_audio",
+        "subsystem": "hdf",
+        "features": [
+            "drivers_peripheral_audio_feature_mono_to_stereo",
+            "drivers_peripheral_audio_feature_hal_notsupport_pathselect",
+            "drivers_peripheral_audio_feature_hdf_proxy_stub",
+            "drivers_peripheral_audio_feature_user_mode",
+            "drivers_peripheral_audio_feature_full_test_suite",
+            "drivers_peripheral_audio_feature_policy_config",
+            "drivers_peripheral_audio_feature_alsa_lib",
+            "drivers_peripheral_audio_feature_rich_device",
+            "drivers_peripheral_audio_feature_community",
+            "drivers_peripheral_audio_feature_effect"
+        ],
+        "adapted_system_type": ["standard", "small"],
+        "rom": "1035KB",
+        "ram": "8600KB",
+        "deps": {
+            "components": [
+                "c_utils",
+                "hilog",
+                "hdf_core",
+                "drivers_interface_audio"
+            ],
+            "third_party": [
+                "bounds_checking_function",
+                "cjson"
+            ]
+        },
+        "build": {
+            "sub_component": [
+                "//drivers/peripheral/audio:hdi_audio",
+                "//drivers/peripheral/audio/effect:effect_model"
+            ],
+            "test": [
+                "//drivers/peripheral/audio/test:audio_test_entry",
+                "//drivers/peripheral/audio/test/sample:audio_sample",
+                "//drivers/peripheral/audio/test/sample:idl_audio_sample",
+                "//drivers/peripheral/audio/test/audio_utils/audio_mixer:audio_mixer",
+                "//drivers/peripheral/audio/effect/test:effect_test"
+            ]
+        }
     }
-  }
 }

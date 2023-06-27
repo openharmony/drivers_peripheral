@@ -65,6 +65,6 @@ external_deps = [
   "hdf_core:libhdf_ipc_adapter",
   "hdf_core:libhdf_utils",
   "hdf_core:libhdi",
-  "hiviewdfx_hilog_native:libhilog",
+  "hilog:libhilog",
   "ipc:ipc_core",
 ]

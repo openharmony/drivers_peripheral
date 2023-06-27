@@ -28,6 +28,6 @@ ohos_unittest("hdf_effect_hdi_ut") {
     "drivers_interface_audio:effect_idl_headers",
     "drivers_interface_audio:libeffect_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }

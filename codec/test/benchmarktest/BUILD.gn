@@ -47,7 +47,7 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {

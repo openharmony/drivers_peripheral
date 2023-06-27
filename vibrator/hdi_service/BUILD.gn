@@ -43,8 +43,8 @@ if (defined(ohos_lite)) {
         "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
         "hdf_core:libhdf_host",
-        "hitrace_native:hitrace_meter",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
+        "hitrace:hitrace_meter",
         "ipc:ipc_single",
       ]
     } else {
@@ -80,7 +80,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
         "ipc:ipc_single",
       ]
     } else {

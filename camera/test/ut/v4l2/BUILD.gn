@@ -183,7 +183,7 @@ if (defined(ohos_lite)) {
         "drivers_interface_camera:libcamera_proxy_1.0",
         "drivers_interface_camera:libcamera_stub_1.0",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
         "samgr:samgr_proxy",
       ]
     } else {

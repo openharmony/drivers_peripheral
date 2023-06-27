@@ -39,7 +39,7 @@ ohos_unittest("hdi_unittest_power") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 }
@@ -74,7 +74,7 @@ ohos_unittest("hdi_unittest_power_runninglock") {
     "c_utils:utils",
     "drivers_interface_power:power_idl_headers",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 }

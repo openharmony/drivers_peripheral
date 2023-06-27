@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -104,7 +104,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -130,7 +130,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -163,7 +163,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -196,7 +196,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -229,7 +229,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

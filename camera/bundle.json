@@ -21,14 +21,14 @@
     "deps": {
       "components": [
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "samgr",
         "ipc",
         "drivers_interface_camera",
         "graphic_chipsetsdk",
         "multimedia_image_framework",
         "c_utils",
-        "hitrace_native"
+        "hitrace"
       ],
       "third_party": []
     },
