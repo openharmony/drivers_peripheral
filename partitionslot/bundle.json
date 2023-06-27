@@ -21,7 +21,7 @@
         "c_utils",
         "hdf_core",
         "init",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "common",
         "drivers_interface_partitionslot"
       ]

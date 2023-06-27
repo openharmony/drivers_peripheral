@@ -40,8 +40,8 @@ ohos_shared_library("libhdi_sensor_impl") {
       "drivers_interface_sensor:sensor_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hitrace_native:hitrace_meter",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
   } else {

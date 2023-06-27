@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
         "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
         "hdf_core:libhdf_host",
-        "hiviewdfx_hilog_native:libhilog",
+        "hilog:libhilog",
         "ipc:ipc_single",
       ]
     } else {

@@ -30,7 +30,7 @@ ohos_systemtest("hdf_audio_idlhdi_render_hardware_dependence_test") {
   external_deps = [
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   deps = [

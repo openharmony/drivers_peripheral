@@ -67,7 +67,7 @@ ohos_shared_library("camera_buffer_manager") {
     "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   public_configs = [ ":buffer_manager_config" ]
   install_images = [ chipset_base_dir ]

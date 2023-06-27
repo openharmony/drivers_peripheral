@@ -44,7 +44,7 @@ ohos_unittest("hdf_audio_effect_benchmark_test") {
     "drivers_interface_audio:effect_idl_headers",
     "drivers_interface_audio:libeffect_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   external_deps += [ "ipc:ipc_single" ]
 }
