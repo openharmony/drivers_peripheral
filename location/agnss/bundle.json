@@ -21,6 +21,7 @@
         "components": [
           "c_utils",
           "drivers_interface_location_agnss",
+          "drivers_peripheral_location_gnss",
           "ipc",
           "hdf_core",
           "hiviewdfx_hilog_native",
