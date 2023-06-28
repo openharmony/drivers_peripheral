@@ -27,7 +27,7 @@
         "drivers_interface_wlan"
       ],
       "third_party": [
-        "thirdparty_libnl"
+        "libnl"
       ]
     },
     "build": {
@@ -37,7 +37,17 @@
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"
       ],
-      "inner_kits": []
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/wlan/client:wifi_driver_client",
+          "header": {
+            "header_files": [
+              "wifi_driver_client.h"
+            ],
+            "header_base": "//drivers/peripheral/wlan/client/include"
+          }
+        }
+      ]
     }
   }
 }
