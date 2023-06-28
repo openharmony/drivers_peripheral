@@ -24,7 +24,6 @@ namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_1 {
-
 struct IsolateNodeInfo {
     std::string type;
     std::string path;

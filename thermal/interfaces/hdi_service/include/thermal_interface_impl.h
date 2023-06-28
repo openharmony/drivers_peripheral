@@ -46,11 +46,9 @@ public:
 
     int32_t UnregisterFanCallback() override;
 
-    void StartTimerThread();
-
-    int32_t Init();
-
 private:
+    void StartTimerThread();
+    int32_t Init();
     std::mutex mutex_;
 };
 } // V1_1

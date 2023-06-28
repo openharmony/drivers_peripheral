@@ -90,7 +90,7 @@ public:
 
     void DelFanEventCb()
     {
-	fanCb_ = nullptr;
+        fanCb_ = nullptr;
     }
 
     int32_t GetMaxReportTime()
@@ -104,22 +104,23 @@ public:
     }
 
     void Init();
-    void CallbackOnEvent(std::string name, HdfThermalCallbackInfo &info);
-    int32_t InitThermalZoneSysfs();
     int32_t ParseThermalZoneInfo();
-    void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
-    void FormatThermalPaths(char *path, size_t size, const char *format, const char* name);
-    void ClearThermalZoneInfo();
-    int32_t GetMaxCommonDivisor(int32_t a, int32_t b);
-    int32_t GetIntervalCommonDivisor(std::vector<int32_t> intervalList);
     void CalculateMaxCd();
-    int32_t ReadFile(const char *path, char *buf, size_t size);
     void ReportThermalZoneData(int32_t reportTime);
+    HdfThermalCallbackInfo GetCallbackInfo();
     void DumpPollingInfo();
 
 private:
+    int32_t InitThermalZoneSysfs();
+    void CallbackOnEvent(std::string name, HdfThermalCallbackInfo &info);
+    void CollectCallbackInfo(
+        HdfThermalCallbackInfo &callbackInfo, const std::shared_ptr<SensorInfoConfig> &sensorInfo, int32_t reportTime);
     int32_t UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap);
     void UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data);
+    int32_t GetMaxCommonDivisor(int32_t a, int32_t b);
+    int32_t GetIntervalCommonDivisor(std::vector<int32_t> intervalList);
+    void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
+    void FormatThermalPaths(char *path, size_t size, const char *format, const char* name);
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;
     std::vector<ThermalZoneInfo> tzInfoList_;
@@ -129,7 +130,6 @@ private:
     int32_t maxCd_;
     int32_t maxReportTime_;
     std::mutex mutex_;
-    bool flag_ {false};
 };
 } // V1_1
 } // Thermal

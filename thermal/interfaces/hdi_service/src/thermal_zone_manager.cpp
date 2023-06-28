@@ -49,7 +49,6 @@ const std::string CDEV_DIR_NAME = "cooling_device";
 const std::string THERMAL_ZONE_TEMP_PATH_NAME = "/sys/class/thermal/thermal_zone%d/temp";
 const uint32_t ARG_0 = 0;
 const int32_t NUM_ZERO = 0;
-const int32_t MS_PER_SECOND = 1000;
 }
 
 void ThermalZoneManager::Init()
@@ -169,7 +168,6 @@ void ThermalZoneManager::UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedTher
 
 int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap)
 {
-    int32_t reportTime = 1;
     {
         // Multi-thread access to pollingMap_ require lock
         std::lock_guard<std::mutex> lock(mutex_);
@@ -203,7 +201,6 @@ int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::str
         }
     }
     CalculateMaxCd();
-    ReportThermalZoneData(reportTime);
     return HDF_SUCCESS;
 }
 
@@ -218,12 +215,11 @@ void ThermalZoneManager::CalculateMaxCd()
     std::vector<int32_t> intervalList;
     for (auto &polling : pollingMap_) {
         for (auto &group : polling.second) {
-           intervalList.emplace_back(group.second->GetInterval());
+            intervalList.emplace_back(group.second->GetInterval());
         }
     }
 
     maxCd_ = GetIntervalCommonDivisor(intervalList);
-
     if (maxCd_ == 0) {
         return;
     }
@@ -247,9 +243,6 @@ int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
         return NUM_ZERO;
     }
 
-    a = a / MS_PER_SECOND * MS_PER_SECOND;
-    b = b / MS_PER_SECOND * MS_PER_SECOND;
-
     if (a % b == 0) {
         return b;
     } else {
@@ -271,6 +264,26 @@ int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> interv
     return commonDivisor;
 }
 
+void ThermalZoneManager::CollectCallbackInfo(
+    HdfThermalCallbackInfo &callbackInfo, const std::shared_ptr<SensorInfoConfig> &sensorInfo, int32_t reportTime)
+{
+    if (sensorInfo->multiple_ == NUM_ZERO) {
+        return;
+    }
+
+    if (reportTime % (sensorInfo->multiple_) == NUM_ZERO) {
+        for (auto iter : sensorInfo->thermalDataList_) {
+            ThermalZoneInfo info;
+            info.type = iter.type;
+            info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
+            THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d", iter.type.c_str(), info.temp);
+            callbackInfo.info.emplace_back(info);
+        }
+    }
+
+    return;
+}
+
 void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -278,19 +291,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime)
     for (auto &polling : pollingMap_) {
         HdfThermalCallbackInfo callbackInfo;
         for (auto &group : polling.second) {
-            if (group.second->multiple_ == NUM_ZERO) {
-                continue;
-            }
-
-            if (reportTime % (group.second->multiple_) == NUM_ZERO) {
-                for (auto iter : group.second->thermalDataList_) {
-                    ThermalZoneInfo info;
-                    info.type = iter.type;
-                    info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
-                    THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d", iter.type.c_str(), info.temp);
-                    callbackInfo.info.emplace_back(info);
-                }
-            }
+            CollectCallbackInfo(callbackInfo, group.second, reportTime);
         }
         if (!callbackInfo.info.empty()) {
             CallbackOnEvent(polling.first, callbackInfo);
@@ -315,6 +316,28 @@ void ThermalZoneManager::CallbackOnEvent(std::string name, HdfThermalCallbackInf
     return;
 }
 
+HdfThermalCallbackInfo ThermalZoneManager::GetCallbackInfo()
+{
+    HdfThermalCallbackInfo callbackInfo;
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (auto &polling : pollingMap_) {
+        if (polling.first == "fan") {
+            continue;
+        }
+        for (auto &group : polling.second) {
+            for (auto iter : group.second->thermalDataList_) {
+                ThermalZoneInfo info;
+                info.type = iter.type;
+                info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
+                callbackInfo.info.emplace_back(info);
+            }
+        }
+    }
+
+    return callbackInfo;
+}
+
 void ThermalZoneManager::DumpPollingInfo()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -335,7 +358,6 @@ void ThermalZoneManager::DumpPollingInfo()
                 THERMAL_HILOGI(COMP_HDI, "data type %{public}s", dataIter.type.c_str());
             }
         }
-
     }
 }
 } // V1_1
