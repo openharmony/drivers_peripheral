@@ -11,19 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../camera.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
-group("camera_hal_test") {
-  testonly = true
+group("usb_camera_vdi_impl") {
   deps = [
-    "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
-    "$test_path/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
-    "$test_path/hdi/v1_0:camera_test_at",
-    "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
-    "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
-    "$test_path/ut/v4l2:camera_test_v4l2_ut",
+    "buffer_manager:usb_camera_buffer_manager",
+    "camera_config:chipset_build",
+    "device_manager:usb_camera_device_manager",
+    "pipeline_core:usb_camera_pipeline_core",
+    "vdi_impl:camera_daemon",
   ]
-  if (drivers_peripheral_camera_feature_usb == true) {
-    deps += [ "$test_path/ut/usb_camera:camera_usb_test_ut" ]
-  }
 }
