@@ -122,7 +122,6 @@ std::string ThermalHdfConfig::GetXmlNodeName(xmlNodePtr node, std::string &defau
 {
     std::string name;
     xmlChar* xmlName = xmlGetProp(node, BAD_CAST"name");
-
     if (xmlName == nullptr) {
         return defaultName;
     }
@@ -326,7 +325,7 @@ int32_t ThermalHdfConfig::GetIsolateCpuNodePath(bool isSim, const std::string &t
         THERMAL_HILOGE(COMP_HDI, "failed to get group %s config", groupName.c_str());
         return HDF_FAILURE;
     }
-    
+
     std::vector<IsolateNodeInfo> nodeVector = mapIter->second->GetIsolateNodeInfo();
     for (auto nodeIter : nodeVector) {
         if (type == nodeIter.type) {

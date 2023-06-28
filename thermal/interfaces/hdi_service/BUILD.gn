@@ -21,8 +21,8 @@ ohos_shared_library("libthermal_interface_service_1.1") {
   ]
   sources = [
     "src/base_info_config.cpp",
-    "src/sensor_info_config.cpp",
     "src/isolate_info_config.cpp",
+    "src/sensor_info_config.cpp",
     "src/thermal_device_mitigation.cpp",
     "src/thermal_dfx.cpp",
     "src/thermal_hdf_config.cpp",
@@ -71,7 +71,7 @@ ohos_shared_library("libthermal_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_thermal:libthermal_stub_1.0",
+      "drivers_interface_thermal:libthermal_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
