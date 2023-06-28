@@ -11,19 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../camera.gni")
+import("//build/ohos.gni")
 
-group("camera_hal_test") {
-  testonly = true
-  deps = [
-    "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
-    "$test_path/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
-    "$test_path/hdi/v1_0:camera_test_at",
-    "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
-    "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
-    "$test_path/ut/v4l2:camera_test_v4l2_ut",
-  ]
-  if (drivers_peripheral_camera_feature_usb == true) {
-    deps += [ "$test_path/ut/usb_camera:camera_usb_test_ut" ]
-  }
+camera_path_usb = "//drivers/peripheral/camera/vdi_base/usb_camera"
+camera_path_vdi = "//drivers/peripheral/camera/vdi_base/common/"
+camera_path_vdi_test = "//drivers/peripheral/camera/test"
+current_path = "."
+usb_hal_test_path = "//drivers/peripheral/camera/test"
+third_path = "//third_party"
+drivers_path = "//drivers"
+enable_camera_device_utest = false
+
+use_hitrace = false
+if (use_hitrace) {
+  defines += [ "HITRACE_LOG_ENABLED" ]
 }
