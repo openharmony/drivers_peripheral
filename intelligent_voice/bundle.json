@@ -1,0 +1,34 @@
+{
+  "name": "drivers_peripheral_intelligent_voice",
+  "description": "intelligent_voice device driver",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "component": {
+    "name": "drivers_peripheral_intelligent_voice",
+    "subsystem": "hdf",
+    "features": ["drivers_peripheral_intelligent_voice_feature_community"],
+    "syscap": [ "" ],
+    "adapter_system_type": ["standard"],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "ipc",
+        "hdf_core",
+        "hiviewdfx_hilog_native",
+        "utils_base"
+      ],
+      "third_part": [
+        "bounds_checking_function",
+        "googletest"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/intelligent_voice:intell_voice_engine_entry",
+        "//drivers/peripheral/intelligent_voice:intell_voice_trigger_entry"
+      ],
+      "test": []
+    }
+  }
+}
