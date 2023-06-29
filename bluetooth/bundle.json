@@ -20,7 +20,7 @@
         "c_utils",
         "drivers_peripheral_bluetooth",
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "ipc",
         "samgr",
         "drivers_interface_bluetooth",
