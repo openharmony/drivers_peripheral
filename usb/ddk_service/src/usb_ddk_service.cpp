@@ -151,13 +151,14 @@ int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
     }
 
     struct UsbInterface *interface = nullptr;
-    ret = GetInterfaceByHandle((const UsbInterfaceHandle *)handle, &interface);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    ret = GetInterfaceByHandle(handleConvert, &interface);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
         return ret;
     }
 
-    ret = UsbCloseInterface((const UsbInterfaceHandle *)handle);
+    ret = UsbCloseInterface(handleConvert);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
         return ret;
@@ -178,7 +179,8 @@ int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t 
     }
 
     struct UsbInterface *interface = nullptr;
-    return UsbSelectInterfaceSetting((const UsbInterfaceHandle *)handle, settingIndex, &interface);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    return UsbSelectInterfaceSetting(handleConvert, settingIndex, &interface);
 }
 
 int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint8_t &settingIndex)
@@ -190,7 +192,8 @@ int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint
         return ret;
     }
 
-    return UsbGetInterfaceSetting((const UsbInterfaceHandle *)handle, &settingIndex);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    return UsbGetInterfaceSetting(handleConvert, &settingIndex);
 }
 
 int32_t UsbDdkService::SendControlReadRequest(
@@ -203,7 +206,8 @@ int32_t UsbDdkService::SendControlReadRequest(
         return ret;
     }
 
-    struct UsbRequest *request = UsbAllocRequest((const UsbInterfaceHandle *)handle, 0, MAX_CONTROL_BUFF_SIZE);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, MAX_CONTROL_BUFF_SIZE);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
@@ -222,7 +226,7 @@ int32_t UsbDdkService::SendControlReadRequest(
     params.ctrlReq.index = setup.index;
     params.ctrlReq.length = MAX_CONTROL_BUFF_SIZE;
 
-    ret = UsbFillRequest(request, (const UsbInterfaceHandle *)handle, &params);
+    ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
         goto FINISHED;
@@ -250,7 +254,8 @@ int32_t UsbDdkService::SendControlWriteRequest(
         return ret;
     }
 
-    struct UsbRequest *request = UsbAllocRequest((const UsbInterfaceHandle *)handle, 0, MAX_CONTROL_BUFF_SIZE);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    struct UsbRequest *request = UsbAllocRequest(handleConvert, 0, MAX_CONTROL_BUFF_SIZE);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
@@ -272,7 +277,7 @@ int32_t UsbDdkService::SendControlWriteRequest(
     params.ctrlReq.buffer = (void *)data.data();
     params.ctrlReq.length = data.size();
 
-    ret = UsbFillRequest(request, (const UsbInterfaceHandle *)handle, &params);
+    ret = UsbFillRequest(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
         goto FINISHED;
@@ -299,7 +304,8 @@ int32_t UsbDdkService::SendPipeRequest(
         return ret;
     }
 
-    struct UsbRequest *request = UsbAllocRequestByMmap((const UsbInterfaceHandle *)handle, 0, size);
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    struct UsbRequest *request = UsbAllocRequestByMmap(handleConvert, 0, size);
     if (request == nullptr) {
         HDF_LOGE("%{public}s alloc request failed", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
@@ -313,7 +319,7 @@ int32_t UsbDdkService::SendPipeRequest(
     params.timeout = pipe.timeout;
     params.dataReq.length = length;
 
-    ret = UsbFillRequestByMmap(request, (const UsbInterfaceHandle *)handle, &params);
+    ret = UsbFillRequestByMmap(request, handleConvert, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
         goto FINISHED;

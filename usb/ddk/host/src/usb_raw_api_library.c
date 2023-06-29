@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1308,7 +1308,7 @@ int32_t RawGetDeviceDescriptor(const struct UsbDevice *dev, struct UsbDeviceDesc
 
 void RawAttachKernelDriver(struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber)
 {
-    if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES) {
+    if (devHandle == NULL || interfaceNumber >= USB_MAXINTERFACES) {
         HDF_LOGE("%{public}s param is NULL or interfaceNumber = %d is out of range", __func__, interfaceNumber);
         return;
     }
