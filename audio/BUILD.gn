@@ -34,11 +34,6 @@ group("hdi_audio") {
       ]
     }
     deps += [ "hdi_service:idl_audio" ]
-
-    deps += [
-      "../base:audio_hifi_watchdog.para",
-      "../base:audio_hifi_watchdog.para.dac",
-    ]
   }
 
   if (drivers_peripheral_audio_feature_user_mode == false) {
