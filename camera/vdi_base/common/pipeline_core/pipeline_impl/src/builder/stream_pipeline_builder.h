@@ -23,7 +23,8 @@ class StreamPipelineBuilder : public NoCopyable, ConfigParser {
 public:
     std::shared_ptr<Pipeline> BuildOperation(const std::shared_ptr<PipelineSpec>& pipelineSpec);
     static std::unique_ptr<StreamPipelineBuilder> Create(const std::shared_ptr<HostStreamMgr>& streamMgr);
-    virtual std::shared_ptr<Pipeline> Build(const std::shared_ptr<PipelineSpec>& pipelineSpec);
+    virtual std::shared_ptr<Pipeline> Build(const std::shared_ptr<PipelineSpec>& pipelineSpec,
+                                            const std::string &cameraId);
     virtual RetCode Destroy(int32_t streamType = -1);
     StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr>& streamMgr, const std::shared_ptr<Pipeline>& p);
     virtual ~StreamPipelineBuilder() = default;

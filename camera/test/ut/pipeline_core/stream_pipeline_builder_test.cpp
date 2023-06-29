@@ -31,6 +31,7 @@ public:
     void TearDown(void);
 protected:
     std::shared_ptr<PipelineSpec> spec_ = nullptr;
+    std::string cameraId_ = cameraId_;
 };
 
 void BuilderTest::SetUpTestCase(void)
@@ -70,7 +71,7 @@ HWTEST_F(BuilderTest, NormalTest, TestSize.Level0)
 
     std::unique_ptr<StreamPipelineBuilder> b = StreamPipelineBuilder::Create(streamMgr);
     EXPECT_TRUE(b != nullptr);
-    std::shared_ptr<Pipeline> pipeline = b->Build(spec_);
+    std::shared_ptr<Pipeline> pipeline = b->Build(spec_, cameraId_);
     EXPECT_TRUE(pipeline != nullptr);
 }
 
@@ -85,7 +86,7 @@ HWTEST_F(BuilderTest, AbNormalTest, TestSize.Level0)
                 }, nullptr);
     std::unique_ptr<StreamPipelineBuilder> b = StreamPipelineBuilder::Create(streamMgr);
     EXPECT_TRUE(b != nullptr);
-    std::shared_ptr<Pipeline> pipeline = b->Build(spec_);
+    std::shared_ptr<Pipeline> pipeline = b->Build(spec_, cameraId_);
     EXPECT_TRUE(pipeline == nullptr);
 }
 }

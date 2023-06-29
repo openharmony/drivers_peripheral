@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Camera {
 class StabilityNode : public NodeBase {
 public:
-    StabilityNode(const std::string &name, const std::string &type);
+    StabilityNode(const std::string &name, const std::string &type, const std::string &cameraId);
     ~StabilityNode() override;
     void DeliverBuffer(std::shared_ptr<IBuffer> &buffer) override;
     RetCode SetCallback() override;

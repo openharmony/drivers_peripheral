@@ -23,7 +23,7 @@
 namespace OHOS::Camera {
 class TransformNode : public NodeBase {
 public:
-    TransformNode(const std::string& name, const std::string& type);
+    TransformNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~TransformNode() override = default;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

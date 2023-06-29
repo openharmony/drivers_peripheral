@@ -474,6 +474,20 @@ void TestCameraBase::OpenUsbCamera()
     }
 }
 
+CamRetCode TestCameraBase::SelectOpenCamera(std::string cameraId)
+{
+    cameraHost->GetCameraAbility(cameraId, ability_);
+    MetadataUtils::ConvertVecToMetadata(ability_, ability);
+    const OHOS::sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+    rc = (CamRetCode)cameraHost->OpenCamera(cameraId, callback, cameraDevice);
+    if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDevice == nullptr) {
+        std::cout << "OpenCamera failed, rc = " << rc << std::endl;
+        return rc;
+    }
+    std::cout << "OpenCamera success." << std::endl;
+    return rc;
+}
+
 void TestCameraBase::Close()
 {
     CAMERA_LOGD("cameraDevice->Close().");

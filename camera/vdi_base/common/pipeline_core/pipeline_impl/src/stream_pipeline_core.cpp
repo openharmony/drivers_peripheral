@@ -16,11 +16,12 @@
 #include "ipp_node.h"
 
 namespace OHOS::Camera {
-RetCode StreamPipelineCore::Init()
+RetCode StreamPipelineCore::Init(const std::string &cameraId)
 {
     strategy_ = StreamPipelineStrategy::Create(context_->streamMgr_);
     builder_ = StreamPipelineBuilder::Create(context_->streamMgr_);
     dispatcher_ = StreamPipelineDispatcher::Create();
+    cameraId_ = cameraId;
     return RC_OK;
 }
 
@@ -48,7 +49,7 @@ RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
     if (spec == nullptr) {
         return RC_ERROR;
     }
-    std::shared_ptr<Pipeline> pipeline = builder_->Build(spec);
+    std::shared_ptr<Pipeline> pipeline = builder_->Build(spec, cameraId_);
     if (pipeline == nullptr) {
         return RC_ERROR;
     }
