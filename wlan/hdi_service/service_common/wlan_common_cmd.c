@@ -26,6 +26,8 @@ struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
 struct IWiFiSta *g_staFeature = NULL;
 struct IWiFiBaseFeature *g_baseFeature = NULL;
+static uint32_t g_apFeatureCount = 0;
+static uint32_t g_staFeatureCount = 0;
 const uint32_t RESET_TIME = 3;
 #define DEFAULT_COMBO_SIZE 10
 #define WLAN_FREQ_MAX_NUM 14
@@ -90,6 +92,7 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
             return HDF_FAILURE;
         }
         if (g_apFeature != NULL) {
+            g_apFeatureCount++;
             ifeature->type = g_apFeature->baseFeature.type;
             ifeature->ifName = strdup((g_apFeature->baseFeature).ifName);
         }
@@ -100,6 +103,7 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
             return HDF_FAILURE;
         }
         if (g_staFeature != NULL) {
+            g_staFeatureCount++;
             ifeature->type = g_staFeature->baseFeature.type;
             ifeature->ifName = strdup((g_staFeature->baseFeature).ifName);
         }
@@ -127,6 +131,11 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
             HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
             return HDF_FAILURE;
         }
+        g_apFeatureCount--;
+        if (g_apFeatureCount > 0) {
+            HDF_LOGI("%{public}s: apFeature is used!", __func__);
+            return HDF_SUCCESS;
+        }
         ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: strcpy_s apFeature ifName is failed!", __func__);
@@ -137,6 +146,11 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
         if (g_staFeature == NULL) {
             HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
             return HDF_FAILURE;
+        }
+        g_staFeatureCount--;
+        if (g_staFeatureCount > 0) {
+            HDF_LOGI("%{public}s: staFeature is used!", __func__);
+            return HDF_SUCCESS;
         }
         ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
         if (ret != HDF_SUCCESS) {
