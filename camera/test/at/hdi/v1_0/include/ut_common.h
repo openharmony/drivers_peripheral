@@ -77,8 +77,8 @@ public:
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
-    int streamIdPreview = 1000;
-    int streamIdCapture = 1010;
+    int streamIdPreview = 100;
+    int streamIdCapture = 101;
     int captureWidth = 1280;
     int captureHeight = 960;
     int captureIdPreview = 2000;
@@ -86,14 +86,14 @@ public:
     int previewHeight = 1080;
     int captureIdCapture = 2010;
     int captureIdVideo = 2020;
-    int streamIdVideo = 1020;
+    int streamIdVideo = 102;
     int videoHeight = 1080;
     int videoWidth = 1920;
     int analyzeWidth = 1920;
     int analyzeHeight = 1080;
     int snapshotWidth = 4160;
     int snapshotHeight = 3120;
-    int streamIdAnalyze = 1030;
+    int streamIdAnalyze = 103;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
     int32_t imageDataSaveSwitch = SWITCH_OFF;
