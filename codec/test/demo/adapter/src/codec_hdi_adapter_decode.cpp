@@ -15,9 +15,7 @@
 
 #include "codec_hdi_adapter_decode.h"
 #include <dlfcn.h>
-#include <hdf_log.h>
 #include <osal_time.h>
-#include <securec.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <chrono>
@@ -201,12 +199,17 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
         return HDF_FAILURE;
     }
     PassthroughParam param;
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    int32_t ret = memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+        return ret;
+    }
     CodecType ct = VIDEO_DECODER;
     param.key = KEY_CODEC_TYPE;
     param.val = &ct;
     param.size = sizeof(ct);
-    auto ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] key is KEY_CODEC_TYPE", __func__, ret);
         return ret;
@@ -224,7 +227,7 @@ int32_t CodecHdiAdapterDecode::ConfigPortDefine()
     // set width, height and color format on output port
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] to GetParameter OMX_IndexParamPortDefinition", __func__, ret);
@@ -262,8 +265,9 @@ bool CodecHdiAdapterDecode::Configure()
 
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = client_->GetParameter(client_, OMX_IndexParamVideoPortFormat, (int8_t *)&param, sizeof(param));
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
+    auto ret = client_->GetParameter(client_, OMX_IndexParamVideoPortFormat,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] to GetParameter OMX_IndexParamVideoPortFormat", __func__, ret);
         return false;
@@ -277,7 +281,8 @@ bool CodecHdiAdapterDecode::Configure()
         param.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;  // H265
     }
 
-    ret = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] to SetParameter OMX_IndexParamVideoPortFormat", __func__, ret);
         return false;
@@ -354,7 +359,7 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex, int bufferCo
             omxBuffer->type = READ_WRITE_TYPE;
             sharedMem->MapReadOnlyAshmem();
         }
-        auto ret = client_->AllocateBuffer(client_, (uint32_t)portIndex, omxBuffer.get());
+        auto ret = client_->AllocateBuffer(client_, static_cast<uint32_t>(portIndex), omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE(
                 "%{public}s errNo[%{public}d] to AllocateBuffer with portIndex[%{public}d]", __func__, ret, portIndex);
@@ -433,7 +438,7 @@ void CodecHdiAdapterDecode::FreeBuffers()
     while (iter != omxBuffers_.end()) {
         auto bufferInfo = iter->second;
         iter = omxBuffers_.erase(iter);
-        (void)client_->FreeBuffer(client_, (uint32_t)bufferInfo->portIndex, bufferInfo->omxBuffer.get());
+        (void)client_->FreeBuffer(client_, static_cast<uint32_t>(bufferInfo->portIndex), bufferInfo->omxBuffer.get());
         bufferInfo = nullptr;
     }
 

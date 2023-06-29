@@ -475,7 +475,11 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
         }
 
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
-        memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
+        int32_t ret = memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s sm->virAddr err %{public}d", __func__, ret);
+            return;
+        }
         inputData->buffer[0].length = readSize;
         g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
@@ -713,7 +717,12 @@ int32_t main(int32_t argc, char **argv)
         return ret;
     }
 
-    memset_s(&g_data, sizeof(g_data), 0, sizeof(g_data));
+    ret = memset_s(&g_data, sizeof(g_data), 0, sizeof(g_data));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s g_data err [%{public}d].", __func__, ret);
+        return ret;
+    }
+
     g_codecProxy = HdiCodecGet(TEST_SERVICE_NAME);
 
     g_data.codecName = g_cmd.codecName;
@@ -729,4 +738,3 @@ int32_t main(int32_t argc, char **argv)
     HDF_LOGI("%{public}s: test exit", __func__);
     return ret;
 }
-
