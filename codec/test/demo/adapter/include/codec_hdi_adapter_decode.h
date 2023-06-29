@@ -22,6 +22,8 @@
 #include <buffer_handle.h>
 #include <buffer_handle_utils.h>
 #include <condition_variable>
+#include <hdf_log.h>
+#include <securec.h>
 #include <deque>
 #include <list>
 #include <map>
@@ -79,14 +81,22 @@ public:
     template <typename T>
     inline void InitParam(T &param)
     {
-        memset_s(&param, sizeof(param), 0x0, sizeof(param));
+        int32_t ret = memset_s(&param, sizeof(param), 0x0, sizeof(param));
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+            return;
+        }
         param.nSize = sizeof(param);
         param.nVersion.s.nVersionMajor = 1;  // mVersion.s.nVersionMajor;
     }
     template <typename T>
     inline void InitParamInOhos(T &param)
     {
-        memset_s(&param, sizeof(param), 0x0, sizeof(param));
+        int32_t ret = memset_s(&param, sizeof(param), 0x0, sizeof(param));
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+            return;
+        }
         param.size = sizeof(param);
         param.version.s.nVersionMajor = 1;  // mVersion.s.nVersionMajor;
     }

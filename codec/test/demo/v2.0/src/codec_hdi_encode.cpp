@@ -15,8 +15,6 @@
 
 #include "codec_hdi_encode.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
-#include <securec.h>
 #include <unistd.h>
 #include "codec_component_manager.h"
 #include "codec_omx_ext.h"

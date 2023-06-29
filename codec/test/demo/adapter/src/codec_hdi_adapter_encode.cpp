@@ -17,7 +17,6 @@
 #include <dlfcn.h>
 #include <hdf_log.h>
 #include <osal_time.h>
-#include <securec.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <chrono>
@@ -225,8 +224,9 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex)
 
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)portIndex;
-    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    param.nPortIndex = static_cast<uint32_t>(portIndex);
+    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] GetParameter with OMX_IndexParamPortDefinition : portIndex[%{public}d]",
                  __func__, ret, portIndex);
@@ -285,7 +285,7 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex, int bufferCo
             omxBuffer->type = READ_WRITE_TYPE;
             spSharedMem->MapReadOnlyAshmem();
         }
-        auto ret = client_->UseBuffer(client_, (uint32_t)portIndex, omxBuffer.get());
+        auto ret = client_->UseBuffer(client_, static_cast<uint32_t>(portIndex), omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with portIndex[%{public}d]", __func__, ret, portIndex);
             spSharedMem->UnmapAshmem();
@@ -325,7 +325,7 @@ int32_t CodecHdiAdapterEncode::UseDynaBuffer(int bufferCount, int bufferSize)
         omxBuffer->pts = 0;
         omxBuffer->flag = 0;
 
-        auto ret = client_->UseBuffer(client_, (uint32_t)PortIndex::PORT_INDEX_INPUT, omxBuffer.get());
+        auto ret = client_->UseBuffer(client_, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with PORT_INDEX_INPUT", __func__, ret);
             return ret;
@@ -349,7 +349,7 @@ void CodecHdiAdapterEncode::FreeBuffers()
     auto iter = omxBuffers_.begin();
     while (iter != omxBuffers_.end()) {
         auto bufferInfo = iter->second;
-        (void)client_->FreeBuffer(client_, (uint32_t)bufferInfo->portIndex, bufferInfo->omxBuffer.get());
+        (void)client_->FreeBuffer(client_, static_cast<uint32_t>(bufferInfo->portIndex), bufferInfo->omxBuffer.get());
         iter = omxBuffers_.erase(iter);
     }
     unUsedInBuffers_.clear();
@@ -616,25 +616,33 @@ int32_t CodecHdiAdapterEncode::ConfigMppPassthrough()
         return HDF_FAILURE;
     }
     PassthroughParam param;
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    int32_t ret = memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+        return ret;
+    }
     CodecType ct = VIDEO_ENCODER;
     param.key = KEY_CODEC_TYPE;
     param.val = &ct;
     param.size = sizeof(ct);
 
-    auto ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_CODEC_TYPE", __func__, ret);
         return ret;
     }
 
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    ret = memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+        return ret;
+    }
     param.key = KEY_MIMETYPE;
     int32_t mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
     param.val = &mimeCodecType;
     param.size = sizeof(mimeCodecType);
 
-    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_MIMETYPE", __func__, ret);
         return ret;
@@ -656,25 +664,35 @@ int32_t CodecHdiAdapterEncode::ConfigMppExtPassthrough(int32_t codecType)
         return HDF_FAILURE;
     }
     PassthroughParam param;
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    int32_t ret = memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+        return ret;
+    }
     int32_t defaultFps = ENC_DEFAULT_FRAME_RATE;
     param.key = KEY_VIDEO_FRAME_RATE;
     param.val = &defaultFps;
     param.size = sizeof(defaultFps);
 
-    auto ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
-    if (ret != HDF_SUCCESS) {
+    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
+    if (ret != EOK) {
         HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_VIDEO_FRAME_RATE", __func__, ret);
         return ret;
     }
 
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    ret = memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: memset_s param err [%{public}d].", __func__, ret);
+        return ret;
+    }
     param.key = KEY_VIDEO_RC_MODE;
     int32_t rcMode = VID_CODEC_RC_VBR;
     param.val = &rcMode;
     param.size = sizeof(rcMode);
 
-    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_VIDEO_RC_MODE", __func__, ret);
         return ret;
@@ -691,8 +709,9 @@ int32_t CodecHdiAdapterEncode::ConfigPortDefine()
     }
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
+    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] GetParameter OMX_IndexParamPortDefinition", __func__, ret);
         return ret;
@@ -706,7 +725,8 @@ int32_t CodecHdiAdapterEncode::ConfigPortDefine()
     param.format.video.nSliceHeight = height_;
     param.format.video.eColorFormat = AV_COLOR_FORMAT;
 
-    ret = client_->SetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] SetParameter OMX_IndexParamPortDefinition", __func__, ret);
     }
@@ -721,8 +741,9 @@ int32_t CodecHdiAdapterEncode::ConfigBitMode()
     }
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    auto ret = client_->GetParameter(client_, OMX_IndexParamVideoPortFormat, (int8_t *)&param, sizeof(param));
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
+    auto ret = client_->GetParameter(client_, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] GetParameter OMX_IndexParamVideoPortFormat", __func__, ret);
         return ret;
@@ -733,7 +754,8 @@ int32_t CodecHdiAdapterEncode::ConfigBitMode()
     param.xFramerate = FRAME;
     param.eCompressionFormat = OMX_VIDEO_CodingAVC;
 
-    ret = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
+        sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] SetParameter OMX_IndexParamVideoPortFormat", __func__, ret);
     }

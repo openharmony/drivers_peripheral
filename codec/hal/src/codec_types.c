@@ -319,7 +319,11 @@ void ReleaseOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer)
 void InitOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer)
 {
     if (codecBuffer != NULL) {
-        (void)memset_s(codecBuffer, sizeof(struct OmxCodecBuffer), 0, sizeof(struct OmxCodecBuffer));
+        int32_t ret = memset_s(codecBuffer, sizeof(struct OmxCodecBuffer), 0, sizeof(struct OmxCodecBuffer));
+        if (ret != EOK) {
+            CODEC_LOGE("memset_s codecBuffer err [%{public}d].", ret);
+            return;
+        }
         codecBuffer->fenceFd = -1;
     }
 }

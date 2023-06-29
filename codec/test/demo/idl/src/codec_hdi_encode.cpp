@@ -122,7 +122,11 @@ bool CodecHdiEncode::Init(const CommandOpt &opt)
     }
     // get version
     struct OHOS::HDI::Codec::V1_0::CompVerInfo verInfo;
-    (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    err = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s verInfo err [%{public}d].", __func__, err);
+        return false;
+    }
     err = client_->GetComponentVersion(verInfo);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
@@ -164,7 +168,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     std::vector<int8_t> inVec, outVec;
     util_->ObjectToVector(param, inVec);
 
@@ -178,7 +182,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     util_->ObjectToVector(param, inVec);
     err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
     if (err != HDF_SUCCESS) {
@@ -191,7 +195,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     if (util_->InitParamInOhos(usage) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    usage.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    usage.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     util_->ObjectToVector(usage, inVec);
     err = client_->GetParameter(OMX_IndexParamGetBufferHandleUsage, inVec, outVec);
     if (err != HDF_SUCCESS) {
@@ -204,7 +208,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     if (util_->InitParamInOhos(type) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    type.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    type.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     type.bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
     util_->ObjectToVector(type, inVec);
     err = client_->SetParameter(OMX_IndexParamUseBufferType, inVec);
@@ -272,7 +276,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex)
     if (util_->InitParam(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.nPortIndex = (uint32_t)portIndex;
+    param.nPortIndex = static_cast<uint32_t>(portIndex);
     std::vector<int8_t> inVec, outVec;
     util_->ObjectToVector(param, inVec);
     auto err = client_->GetParameter(OMX_IndexParamPortDefinition, inVec, outVec);
@@ -307,7 +311,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex)
 
     // if port is disable, changed to enable
     if (!portEnable) {
-        err = client_->SendCommand(CODEC_COMMAND_PORT_ENABLE, (uint32_t)portIndex, {});
+        err = client_->SendCommand(CODEC_COMMAND_PORT_ENABLE, static_cast<uint32_t>(portIndex), {});
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s SendCommand OMX_CommandPortEnable::PORT_INDEX_INPUT error", __func__);
             return err;
@@ -344,7 +348,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
             spSharedMem->MapReadOnlyAshmem();
         }
         OmxCodecBuffer outBuffer;
-        auto err = client_->UseBuffer((uint32_t)portIndex, *omxBuffer.get(), outBuffer);
+        auto err = client_->UseBuffer(static_cast<uint32_t>(portIndex), *omxBuffer.get(), outBuffer);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with  portIndex[%{public}d]", __func__, portIndex);
             spSharedMem->UnmapAshmem();
@@ -389,7 +393,8 @@ int32_t CodecHdiEncode::UseDynaBuffer(int bufferCount, int bufferSize)
         omxBuffer->flag = 0;
 
         OmxCodecBuffer outBuffer;
-        auto err = client_->UseBuffer((uint32_t)PortIndex::PORT_INDEX_INPUT, *omxBuffer.get(), outBuffer);
+        auto err = client_->UseBuffer(static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+            *omxBuffer.get(), outBuffer);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with  PORT_INDEX_INPUT", __func__);
             return err;
@@ -416,7 +421,7 @@ void CodecHdiEncode::FreeBuffers()
     auto iter = omxBuffers_.begin();
     while (iter != omxBuffers_.end()) {
         auto bufferInfo = iter->second;
-        (void)client_->FreeBuffer((uint32_t)bufferInfo->portIndex, *bufferInfo->omxBuffer.get());
+        (void)client_->FreeBuffer(static_cast<uint32_t>(bufferInfo->portIndex), *bufferInfo->omxBuffer.get());
         iter = omxBuffers_.erase(iter);
     }
     unUsedInBuffers_.clear();
@@ -668,7 +673,7 @@ int32_t CodecHdiEncode::ConfigPortDefine()
     if (util_->InitParam(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     std::vector<int8_t> inVec, outVec;
     util_->ObjectToVector(param, inVec);
     auto err = client_->GetParameter(OMX_IndexParamPortDefinition, inVec, outVec);
@@ -693,7 +698,7 @@ int32_t CodecHdiEncode::ConfigPortDefine()
     if (util_->InitParam(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     util_->ObjectToVector(param, inVec);
     err = client_->GetParameter(OMX_IndexParamPortDefinition, inVec, outVec);
     if (err != HDF_SUCCESS) {
@@ -721,7 +726,7 @@ int32_t CodecHdiEncode::ConfigBitMode()
     if (util_->InitParam(param) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     std::vector<int8_t> inVec, outVec;
     util_->ObjectToVector(param, inVec);
     auto err = client_->GetParameter(OMX_IndexParamVideoPortFormat, inVec, outVec);
@@ -746,7 +751,7 @@ int32_t CodecHdiEncode::ConfigBitMode()
 
     OMX_VIDEO_PARAM_BITRATETYPE bitRate;
     util_->InitParam(bitRate);
-    bitRate.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    bitRate.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     util_->ObjectToVector(bitRate, inVec);
     err = client_->GetParameter(OMX_IndexParamVideoBitrate, inVec, outVec);
     if (err != OMX_ErrorNone) {

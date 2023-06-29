@@ -164,7 +164,11 @@ bool CodecHdiDecode::Init(const CommandOpt &opt)
         return false;
     }
     struct CompVerInfo verInfo;
-    (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    err = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s verInfo err [%{public}d].", __func__, err);
+        return false;
+    }
     err = client_->GetComponentVersion(verInfo);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
@@ -240,7 +244,7 @@ bool CodecHdiDecode::Configure()
     if (util_->InitParam(param) != HDF_SUCCESS) {
         return false;
     }
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     std::vector<int8_t> inVec, outVec;
     util_->ObjectToVector(param, inVec);
     auto err = client_->GetParameter(OMX_IndexParamVideoPortFormat, inVec, outVec);
@@ -256,7 +260,7 @@ bool CodecHdiDecode::Configure()
     if (codecMime_ == codecMime::AVC) {
         param.eCompressionFormat = OMX_VIDEO_CodingAVC;  // H264
     } else {
-        param.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;  // H265
+        param.eCompressionFormat = static_cast<OMX_VIDEO_CODINGTYPE>(CODEC_OMX_VIDEO_CodingHEVC);  // H265
     }
 
     util_->ObjectToVector(param, inVec);
@@ -400,7 +404,7 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
             sharedMem->MapReadOnlyAshmem();
         }
         OmxCodecBuffer outBuffer;
-        auto err = client_->UseBuffer((uint32_t)portIndex, *omxBuffer.get(), outBuffer);
+        auto err = client_->UseBuffer(static_cast<uint32_t>(portIndex), *omxBuffer.get(), outBuffer);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with  portIndex[%{public}d]", __func__, portIndex);
             sharedMem->UnmapAshmem();
@@ -506,7 +510,8 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
         omxBuffer->flag = 0;
         omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
         OmxCodecBuffer outBuffer;
-        auto err = client_->UseBuffer((uint32_t)PortIndex::PORT_INDEX_OUTPUT, *omxBuffer.get(), outBuffer);
+        auto err = client_->UseBuffer(static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+            *omxBuffer.get(), outBuffer);
         omxBuffer->bufferhandle = nullptr;
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with  output port]", __func__);
@@ -535,7 +540,7 @@ void CodecHdiDecode::FreeBuffers()
     while (iter != omxBuffers_.end()) {
         auto bufferInfo = iter->second;
         iter = omxBuffers_.erase(iter);
-        (void)client_->FreeBuffer((uint32_t)bufferInfo->portIndex, *bufferInfo->omxBuffer.get());
+        (void)client_->FreeBuffer(static_cast<uint32_t>(bufferInfo->portIndex), *bufferInfo->omxBuffer.get());
         bufferInfo = nullptr;
     }
 

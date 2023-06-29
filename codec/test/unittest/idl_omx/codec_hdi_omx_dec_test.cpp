@@ -112,7 +112,8 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
 
     OMX_PARAM_PORTDEFINITIONTYPE param;
     func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
-    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual,
+        param.nBufferSize);
     ASSERT_TRUE(err);
 
     err = func_->InitBufferHandleParameter(g_component, param, outputIndex, CODEC_BUFFER_TYPE_HANDLE);

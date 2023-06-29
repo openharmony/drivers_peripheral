@@ -129,7 +129,7 @@ static bool UseBufferOnPort(enum PortIndex portIndex, int bufferCount, int buffe
             return false;
         }
         InitCodecBufferWithAshMem(portIndex, bufferSize, omxBuffer, sharedMem);
-        auto err = g_component->UseBuffer(g_component, (uint32_t)portIndex, omxBuffer.get());
+        auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(portIndex), omxBuffer.get());
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with portIndex[%{public}d]", __func__, portIndex);
             sharedMem->UnmapAshmem();
@@ -349,8 +349,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentSuccessTest_006, TestSiz
 {
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret =
-        g_manager->CreateComponent(&g_component, &g_componentId, const_cast<char *>(ENCODER_AVC), APP_DATA, g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId,
+        const_cast<char *>(ENCODER_AVC), APP_DATA, g_callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component != nullptr);
 }
@@ -378,7 +378,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterSuccessTest_002, TestSize.L
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     param.eCompressionFormat = OMX_VIDEO_CodingAVC;
     auto ret = g_component->GetParameter(
         g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
@@ -390,7 +390,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterParamIndexNotMatchParamStru
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     auto ret = g_component->GetParameter(
         g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -401,7 +401,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterParamIndexUnusedTest_004, T
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     auto ret = g_component->GetParameter(
         g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -412,7 +412,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetPortDefineSuccessTest_001, TestSize.
     ASSERT_TRUE(g_component != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     auto ret = g_component->GetParameter(
         g_component, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_EQ(ret, HDF_SUCCESS);
@@ -430,7 +430,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterSuccessTest_001, TestSize.L
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
     param.xFramerate = FRAME_RATE;
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     int32_t ret = g_component->SetParameter(
         g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_EQ(ret, HDF_SUCCESS);
@@ -448,7 +448,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamIndexNotMatchParamStru
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     int32_t ret = g_component->SetParameter(
         g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -459,7 +459,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamIndexUnusedTest_004, T
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     int32_t ret = g_component->SetParameter(
         g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -470,7 +470,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterCodecComponentTypeNullptrTe
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     int32_t ret = g_component->SetParameter(
         nullptr, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -481,7 +481,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamStructLenNotMatchTest_
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     int32_t ret =
         g_component->SetParameter(g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), 0);
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -493,7 +493,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetConfigUnsupportedTest_001, TestSize.
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     int32_t ret = g_component->GetConfig(
         g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
@@ -505,7 +505,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetConfigUnsupportedTest_001, TestSize.
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
-    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
     param.nEncodeBitrate = FRAMERATE;
     int32_t ret = g_component->SetConfig(
         g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param), sizeof(param));
@@ -549,7 +549,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiTunnelRequestUnsupportedTest_001, TestS
     tunnelSetup.eSupplier = OMX_BufferSupplyInput;
 
     int32_t ret = g_component->ComponentTunnelRequest(
-        g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, tunneledComp, tunneledPort, &tunnelSetup);
+        g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT), tunneledComp, tunneledPort, &tunnelSetup);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -566,7 +566,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferInvalidInputBufferTypeTes
     allocBuffer.pts = 0;
     allocBuffer.flag = 0;
     allocBuffer.type = READ_ONLY_TYPE;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -574,7 +575,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferInputBufferNotInitTest_00
 {
     ASSERT_TRUE(g_component != nullptr);
     allocBuffer.bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -582,7 +584,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferInvalidOutputBufferTypeTe
 {
     ASSERT_TRUE(g_component != nullptr);
     allocBuffer.bufferType = CODEC_BUFFER_TYPE_INVALID;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -590,7 +593,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferOutputBufferNotInitTest_0
 {
     ASSERT_TRUE(g_component != nullptr);
     allocBuffer.bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -598,7 +602,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferAvshareMemFdInputNotInitT
 {
     ASSERT_TRUE(g_component != nullptr);
     allocBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -606,7 +611,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiAllocateBufferAvshareMemFdOutputNotInit
 {
     ASSERT_TRUE(g_component != nullptr);
     allocBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
-    int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
+    int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -626,7 +632,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferInvalidInputBufferTypeTest_001
     omxBuffer->pts = 0;
     omxBuffer->flag = 0;
 
-    auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, omxBuffer.get());
+    auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+        omxBuffer.get());
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
@@ -645,7 +652,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferInvalidOutputBufferTypeTest_00
     omxBuffer->pts = 0;
     omxBuffer->flag = 0;
 
-    auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
+    auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        omxBuffer.get());
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
@@ -664,7 +672,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferTestVirtualAddrInputTest_003, 
     omxBuffer->pts = 0;
     omxBuffer->flag = 0;
 
-    auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, omxBuffer.get());
+    auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT),
+        omxBuffer.get());
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
@@ -683,7 +692,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferTestVirtualAddrOutput_004, Tes
     omxBuffer->pts = 0;
     omxBuffer->flag = 0;
 
-    auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
+    auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        omxBuffer.get());
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
@@ -735,7 +745,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferDynamicHandleOutputTest_007, T
     omxBuffer->pts = 0;
     omxBuffer->flag = 0;
 
-    auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
+    auto err = g_component->UseBuffer(g_component, static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        omxBuffer.get());
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to UseBuffer with input port", __func__);
         omxBuffer = nullptr;
@@ -828,7 +839,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseEglImageUnsupportedTest_001, TestSiz
     auto eglImage = std::make_unique<int8_t[]>(BUFFER_SIZE);
     ASSERT_TRUE(eglImage != nullptr);
     int32_t ret = g_component->UseEglImage(
-        g_component, &buffer, (uint32_t)PortIndex::PORT_INDEX_INPUT, eglImage.get(), BUFFER_SIZE);
+        g_component, &buffer, static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), eglImage.get(), BUFFER_SIZE);
     ASSERT_NE(ret, HDF_SUCCESS);
     eglImage = nullptr;
 }
@@ -944,8 +955,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiFreeBufferPortIndexOutputUnsupportedTes
     ASSERT_TRUE(g_component != nullptr);
     auto iter = outputBuffers.begin();
     while (iter != outputBuffers.end()) {
-        int32_t ret =
-            g_component->FreeBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, iter->second->omxBuffer.get());
+        int32_t ret = g_component->FreeBuffer(g_component,
+            static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT), iter->second->omxBuffer.get());
         ASSERT_NE(ret, HDF_SUCCESS);
         iter = outputBuffers.erase(iter);
     }
@@ -956,8 +967,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiFreeBufferPortIndexInputUnsupportedTest
     ASSERT_TRUE(g_component != nullptr);
     auto iter = inputBuffers.begin();
     while (iter != inputBuffers.end()) {
-        int32_t ret =
-            g_component->FreeBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, iter->second->omxBuffer.get());
+        int32_t ret = g_component->FreeBuffer(g_component,
+            static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT), iter->second->omxBuffer.get());
         ASSERT_NE(ret, HDF_SUCCESS);
         iter = inputBuffers.erase(iter);
     }
