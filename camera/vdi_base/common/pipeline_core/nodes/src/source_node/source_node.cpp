@@ -15,10 +15,12 @@
 #include <unistd.h>
 
 namespace OHOS::Camera {
-SourceNode::SourceNode(const std::string& name, const std::string& type) : NodeBase(name, type)
+SourceNode::SourceNode(const std::string& name, const std::string& type, const std::string &cameraId)
+    : NodeBase(name, type, cameraId)
 {
     name_ = name;
     type_ = type;
+    cameraIds_ = cameraId;
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
@@ -62,6 +64,7 @@ RetCode SourceNode::Start(const int32_t streamId)
     CHECK_IF_PTR_NULL_RETURN_VALUE(ph, RC_ERROR);
     {
         std::lock_guard<std::mutex> l(hndl_);
+        ph->cameraIdsp_ = cameraIds_;
         handler_[streamId] = ph;
     }
     RetCode rc = handler_[streamId]->StartCollectBuffers();

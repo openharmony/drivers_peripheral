@@ -156,6 +156,7 @@ public:
     void UsbInit();
     std::shared_ptr<CameraAbility> GetCameraAbility();
     void OpenUsbCamera();
+    CamRetCode SelectOpenCamera(std::string cameraId);
     void Close();
     void OpenCamera();
     void AchieveStreamOperator();

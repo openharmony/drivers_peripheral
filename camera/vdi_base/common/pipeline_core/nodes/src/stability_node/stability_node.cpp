@@ -16,7 +16,8 @@
 
 namespace OHOS {
 namespace Camera {
-StabilityNode::StabilityNode(const std::string &name, const std::string &type) : NodeBase(name, type) {}
+StabilityNode::StabilityNode(const std::string &name, const std::string &type, const std::string &cameraId)
+    : NodeBase(name, type, cameraId) {}
 
 StabilityNode::~StabilityNode() {}
 

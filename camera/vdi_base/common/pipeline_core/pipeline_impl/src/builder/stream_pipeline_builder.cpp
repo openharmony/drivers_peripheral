@@ -19,7 +19,8 @@ StreamPipelineBuilder::StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr
     const std::shared_ptr<Pipeline>& p) : hostStreamMgr_(streamMgr), pipeline_(p)
 {
 }
-std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<PipelineSpec>& pipelineSpec)
+std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<PipelineSpec>& pipelineSpec,
+    const std::string &cameraId)
 {
     if (pipelineSpec == nullptr) {
         CAMERA_LOGI("pipelineSpec nullptr~ \n");
@@ -32,7 +33,8 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
             std::string nodeName;
             size_t pos = it.name_.find_first_of('#');
             nodeName = it.name_.substr(0, pos);
-            std::shared_ptr<INode> newNode = NodeFactory::Instance().CreateShared(nodeName, it.name_, it.type_);
+            std::shared_ptr<INode> newNode = NodeFactory::Instance().CreateShared(nodeName, it.name_,
+                                                                                  it.type_, cameraId);
             if (newNode == nullptr) {
                 CAMERA_LOGI("create node failed! \n");
                 return nullptr;

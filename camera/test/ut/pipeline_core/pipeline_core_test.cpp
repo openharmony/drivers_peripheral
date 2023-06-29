@@ -33,6 +33,7 @@ public:
 
     void SetUp(void);
     void TearDown(void);
+    std::string cameraId_ = "lcam001";
 };
 
 void PipelineCoreTest::SetUpTestCase(void)
@@ -69,7 +70,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewTest, TestSize.Level0)
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -89,7 +90,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalSnapshotTest, TestSize.Level0)
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -113,7 +114,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotTest, TestSize.Leve
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -133,7 +134,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewToSnapshotTest, TestSize.Le
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -164,7 +165,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalSnapshotPreviewTest, TestSize.Leve
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -188,7 +189,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewPreviewTest, TestSize.Level
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -203,7 +204,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalTest, TestSize.Level0)
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re != RC_OK);
@@ -222,7 +223,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_AbNormalPreviewTest, TestSize.Level0)
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(3); // unsupportted mode
     EXPECT_TRUE(re != RC_OK);
@@ -246,7 +247,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotSingleConfigTest, T
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -275,7 +276,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotConfigTest, TestSiz
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     CaptureMeta meta;
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
@@ -302,7 +303,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotDestroyTest, TestSi
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
-    re = s->Init();
+    re = s->Init(cameraId_);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);

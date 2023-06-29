@@ -25,7 +25,7 @@ namespace OHOS::Camera {
 class MergeNode : public NodeBase
 {
 public:
-    MergeNode(const std::string& name, const std::string& type);
+    MergeNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~MergeNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

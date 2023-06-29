@@ -992,3 +992,41 @@ TEST_F(UtestUSBCameraTest, camera_usb_0031)
         std::cout << "log OHOS_ABILITY_FOCAL_LENGTH is not support" << std::endl;
     }
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: USB Camera, Select the camera according to the cameraId
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0032)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 2) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[i]);
+        ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+        // Get the stream manager
+        cameraBase_->AchieveStreamOperator();
+        // start stream
+        cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+        cameraBase_->StartStream(cameraBase_->intents);
+        // Get preview
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+        // release stream
+        cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+        cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+        cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    }
+}

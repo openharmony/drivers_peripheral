@@ -16,7 +16,8 @@
 #include "metadata_controller.h"
 
 namespace OHOS::Camera {
-UvcNode::UvcNode(const std::string& name, const std::string& type) : SourceNode(name, type), NodeBase(name, type)
+UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
+    : SourceNode(name, type, cameraId), NodeBase(name, type, cameraId)
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
     RetCode rc = RC_OK;
@@ -40,9 +41,32 @@ UvcNode::~UvcNode()
     CAMERA_LOGI("~Uvc Node exit.");
 }
 
+struct MetadataTag {
+    std::string cameraId1 = "lcam001";
+    CameraId cameraId2 = CAMERA_FIRST;
+};
+
+const MetadataTag g_ohosMapCameraId[] = {
+    { "lcam001", CAMERA_FIRST },
+    { "lcam002", CAMERA_SECOND },
+    { "lcam003", CAMERA_THIRD },
+    { "lcam004", CAMERA_FOURTH },
+    { "lcam005", CAMERA_FIFTH },
+};
+
+CameraId UvcNode::ConvertCameraId(const std::string &cameraId)
+{
+    for (auto cameraID : g_ohosMapCameraId) {
+        if (cameraID.cameraId1 == cameraId) {
+            return cameraID.cameraId2;
+        }
+    }
+    return CAMERA_FIRST;
+}
+
 RetCode UvcNode::GetDeviceController()
 {
-    CameraId cameraId = CAMERA_FIRST;
+    CameraId cameraId = ConvertCameraId(cameraId_);
     sensorController_ = std::static_pointer_cast<SensorController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {

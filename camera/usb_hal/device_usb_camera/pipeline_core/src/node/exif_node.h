@@ -31,7 +31,7 @@ enum GpsIndex : int32_t {
 namespace OHOS::Camera {
 class RKExifNode : public NodeBase {
 public:
-    RKExifNode(const std::string &name, const std::string &type);
+    RKExifNode(const std::string &name, const std::string &type, const std::string &cameraId);
     ~RKExifNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
