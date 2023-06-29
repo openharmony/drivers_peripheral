@@ -682,9 +682,11 @@ static int32_t ProcessEventScanAborted(struct HdfWlanRemoteNode *node, uint32_t 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfWlanRemoteNode *pos = NULL;
-    struct DListHead *head = &HdfStubDriver()->remoteListHead;
+    struct DListHead *head = NULL;
     int32_t *code = NULL;
     int32_t ret = HDF_FAILURE;
+    (void)OsalMutexLock(&HdfStubDriver()->mutex);
+    head = &HdfStubDriver()->remoteListHead;
 
     if (data == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
@@ -717,14 +719,17 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
+    (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
 }
 
 static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMsgLen)
 {
     struct HdfWlanRemoteNode *pos = NULL;
-    struct DListHead *head = &HdfStubDriver()->remoteListHead;
+    struct DListHead *head = NULL;
     int32_t ret = HDF_FAILURE;
+    (void)OsalMutexLock(&HdfStubDriver()->mutex);
+    head = &HdfStubDriver()->remoteListHead;
 
     if (recvMsg == NULL) {
         HDF_LOGE("%{public}s: recvMsg or ifName is NULL!", __func__);
@@ -740,6 +745,7 @@ static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMs
             HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
+    (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
 }
 
