@@ -36,7 +36,11 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl
 {
     int32_t ret;
     struct CompVerInfo verInfo;
-    (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    ret = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    if (ret != EOK) {
+        CODEC_LOGE("memset_s verInfo err [%{public}d].", ret);
+        return ret;
+    }
     ret = serviceImpl->GetComponentVersion(serviceImpl, &verInfo);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("call GetComponentVersion function failed!");

@@ -116,7 +116,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
     for (uint32_t i = 0; i < roleCount; i++) {
         int32_t ret = memset_s(array[i], OMX_MAX_STRINGNAME_SIZE, 0, OMX_MAX_STRINGNAME_SIZE);
         if (ret != EOK) {
-            CODEC_LOGE("memset_s array err [%{public}x].", ret);
+            CODEC_LOGE("memset_s array err [%{public}d].", ret);
             return ret;
         }
         role[i] = array[i];

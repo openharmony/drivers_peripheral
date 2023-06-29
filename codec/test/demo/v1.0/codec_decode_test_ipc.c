@@ -565,7 +565,11 @@ static void DecodeLoopHandleInput(const CodecEnvData *decData)
         }
 
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
-        memcpy_s(sm->virAddr, readSize, (uint8_t*)g_readFileBuf, readSize);
+        ret = memcpy_s(sm->virAddr, readSize, (uint8_t*)g_readFileBuf, readSize);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s sm->virAddr err [%{public}d].", __func__, ret);
+            return;
+        }
         inputData->buffer[0].length = readSize;
         g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
