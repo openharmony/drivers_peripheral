@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_0/motion_interface_stub.h"
+#include "v1_1/motion_interface_stub.h"
 
 using namespace OHOS::HDI::Motion::V1_1;
 

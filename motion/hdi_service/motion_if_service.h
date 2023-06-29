@@ -34,7 +34,7 @@ public:
     int32_t DisableMotion(int32_t motionType) override;
     int32_t Register(const sptr<IMotionCallback> &callbackObj) override;
     int32_t Unregister(const sptr<IMotionCallback> &callbackObj) override;
-    int32_t SetMotionConfig(int32_t motionType, const std::string& data, int32_t len) override;
+    int32_t SetMotionConfig(int32_t motionType, const std::vector<uint8_t>& data) override;
 
     int32_t GetMotionVdiImpl();
 private:

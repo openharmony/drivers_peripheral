@@ -160,7 +160,7 @@ int32_t MotionIfService::Unregister(const sptr<IMotionCallback> &callbackObj)
     return ret;
 }
 
-int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::string& data, int32_t len)
+int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<uint8_t>& data)
 {
     HDF_LOGI("%{public}s: Enter the SetMotionConfig function.", __func__);
     if (motionVdiImpl_ == nullptr) {
