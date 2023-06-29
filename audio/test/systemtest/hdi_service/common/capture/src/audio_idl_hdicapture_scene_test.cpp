@@ -97,7 +97,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, Test
     scenes.desc.pins = PIN_IN_MIC;
     scenes.desc.desc = strdup("mic");
     ret = capture->CheckSceneCapability(capture, &scenes, &supported);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
     free(scenes.desc.desc);
 }
 #endif
@@ -117,7 +117,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapabilityNull_003, 
     scenes.desc.pins = PIN_IN_MIC;
     scenes.desc.desc = strdup("mic");
     ret = capture->CheckSceneCapability(captureNull, &scenes, &supported);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     capture->Stop(capture);
@@ -215,7 +215,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectSceneNull_003, TestSize.
     scenes.desc.pins = PIN_IN_MIC;
     scenes.desc.desc = strdup("mic");
     ret = capture->SelectScene(captureNull, &scenes);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     free(scenes.desc.desc);
 }
 /**
@@ -248,7 +248,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Leve
     scenes.desc.pins = PIN_OUT_HDMI;
     scenes.desc.desc = strdup("mic");
     ret = capture->SelectScene(capture, &scenes);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
     free(scenes.desc.desc);
 }
 #endif

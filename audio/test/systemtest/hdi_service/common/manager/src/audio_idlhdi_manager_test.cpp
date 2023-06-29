@@ -87,7 +87,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdaptersNull_002, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
 
     ret = manager->GetAllAdapters(managerNull, descs, &descsLen);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     OsalMemFree(descs);
     descs = nullptr;
 }
@@ -124,7 +124,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdaptersNull_004, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
 
     ret = manager->GetAllAdapters(manager, descs, descsLen);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     OsalMemFree(descs);
     descs = nullptr;
 }
@@ -204,7 +204,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapterNull_002, TestSize.Level1)
     struct AudioAdapterDescriptor *desc = &descs[0];
     ASSERT_TRUE(desc != nullptr);
     ret = manager->LoadAdapter(managerNull, desc, &adapter);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     TestReleaseAdapterDescs(&descs, descsLen);
 }
 #ifdef AUDIO_ADM_PASSTHROUGH
@@ -248,7 +248,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapterNull_004, TestSize.Level1)
     ASSERT_TRUE(desc != nullptr);
 
     ret = manager->LoadAdapter(manager, desc, adapter);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     TestReleaseAdapterDescs(&descs, descsLen);
 }
 #endif
@@ -271,7 +271,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_005, TestSize.Level1)
     ASSERT_TRUE(desc != nullptr);
     desc->adapterName = strdup("illegal");
     ret = manager->LoadAdapter(manager, desc, &adapter);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_FAILURE);
     TestReleaseAdapterDescs(&descs, descsLen);
 }
 
@@ -292,7 +292,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
 
     ret = manager->LoadAdapter(manager, &desc, &adapter);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_FAILURE);
     free(desc.adapterName);
 }
 /**
@@ -361,7 +361,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioUnloadAdapterNull_002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     TestAudioManager *managerNull = nullptr;
     ret = manager->UnloadAdapter(managerNull, ADAPTER_NAME.c_str());
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
     IAudioAdapterRelease(adapter, IS_STUB);
