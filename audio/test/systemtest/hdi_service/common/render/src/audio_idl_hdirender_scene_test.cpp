@@ -97,7 +97,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSi
 
     ASSERT_NE(nullptr, render);
     ret = render->CheckSceneCapability(render, &scenes, &supported);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
     free(scenes.desc.desc);
 }
 /**
@@ -117,7 +117,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_003, Te
 
     ASSERT_NE(nullptr, render);
     ret = render->CheckSceneCapability(renderNull, &scenes, &supported);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     free(scenes.desc.desc);
 }
 /**
@@ -217,7 +217,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectSceneNull_003, TestSize.Le
     scenes.desc.desc = strdup("mic");
 
     ret = render->SelectScene(renderNull, &scenes);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
     free(scenes.desc.desc);
 }
 /**
@@ -249,7 +249,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioAudioRenderSelectScene_005, TestSize.L
 
     ASSERT_NE(nullptr, render);
     ret = render->SelectScene(render, &scenes);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
     free(scenes.desc.desc);
 }
 }

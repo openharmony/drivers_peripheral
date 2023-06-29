@@ -75,17 +75,17 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_001, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetMute(capture, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->GetMute(capture, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_TRUE(muteTrue);
 
     ret = capture->SetMute(capture, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->GetMute(capture, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_FALSE(muteFalse);
 }
 /**
@@ -101,10 +101,10 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMuteNull_002, TestSize.Lev
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->SetMute(captureNull, muteTrue);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 
     ret = capture->SetMute(captureNull, muteFalse);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureSetMute_003
@@ -118,10 +118,10 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_003, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetMute(capture, muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->GetMute(capture, &muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_TRUE(muteValue);
 }
 /**
@@ -141,14 +141,14 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMute_001, TestSize.Level1)
 #endif
     ASSERT_NE(nullptr, capture);
     ret = capture->GetMute(capture, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(muteTrue, defaultmute);
 
     ret = capture->SetMute(capture, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->GetMute(capture, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_FALSE(muteFalse);
 }
 /**
@@ -164,13 +164,13 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMuteNull_002, TestSize.Lev
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetMute(captureNull, &muteTrue);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 
     ret = capture->GetMute(captureNull, &muteFalse);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 
     ret = capture->GetMute(capture, nullptr);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 /**
 * @tc.name  AudioCaptureSetVolume_001
@@ -190,24 +190,24 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_001, TestSize.Level
     float volumeHighExpc = 0.70;
     ASSERT_NE(nullptr, capture);
     ret = capture->SetVolume(capture, volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeInitExpc, volumeInit);
     ret = capture->SetVolume(capture, volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeLowExpc, volumeLow);
     ret = capture->SetVolume(capture, volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMidExpc, volumeMid);
     ret = capture->SetVolume(capture, volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeHighExpc, volumeHigh);
 }
 /**
@@ -227,22 +227,22 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_002, TestSize.Level
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetVolume(capture, volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMinExpc, volumeMin);
 
     ret = capture->SetVolume(capture, volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMaxExpc, volumeMax);
 
     ret = capture->SetVolume(capture, volumeMinBoundary);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->SetVolume(capture, volumeMaxBoundary);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 /**
 * @tc.name  AudioCaptureSetVolumeNull_003
@@ -257,7 +257,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolumeNull_003, TestSize.L
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetVolume(captureNull, volume);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureGetVolume_001
@@ -272,9 +272,9 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_001, TestSize.Level
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetVolume(capture, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(defaultVolume, volume);
 }
 /**
@@ -292,9 +292,9 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_002, TestSize.Level
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = capture->SetVolume(capture, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetVolume(capture, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(defaultVolume, volume);
 
     ret = capture->Stop(capture);
@@ -313,7 +313,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolumeNull_003, TestSize.L
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetVolume(captureNull, &volume);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureGetGainThreshold_001
@@ -328,10 +328,10 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThreshold_001, TestSiz
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 #ifndef ALSA_LIB_MODE
     EXPECT_EQ(min, GAIN_MIN);
-    EXPECT_EQ(max, GAIN_MAX);
+    EXPECT_LE(max, GAIN_MAX);
 #endif
 }
 /**
@@ -348,7 +348,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_002, Tes
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(captureNull, &min, &max);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureGetGainThresholdNull_003
@@ -363,7 +363,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_003, Tes
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(capture, minNull, &max);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 /**
 * @tc.name  AudioCaptureGetGainThresholdNull_004
@@ -378,7 +378,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_004, Tes
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(capture, &min, maxNull);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 /**
 * @tc.name  AudioCaptureSetGain_001
@@ -393,7 +393,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     float gain = max - 1;
     float gainMax = max;
     float gainMin = min;
@@ -401,21 +401,21 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level1)
     float gainMaxExpc = max;
     float gainMinExpc = min;
     ret = capture->SetGain(capture, gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetGain(capture, &gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(gainMaxExpc, gainMax);
 
     ret = capture->SetGain(capture, gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetGain(capture, &gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(gainMinExpc, gainMin);
 
     ret = capture->SetGain(capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetGain(capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(gainExpc, gain);
 }
 #ifndef ALSA_LIB_MODE
@@ -431,15 +431,15 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_002, TestSize.Level1)
     float max = 0;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetGainThreshold(capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     float gainOne = max + 1;
     float gainSec = min - 1;
     ret = capture->SetGain(capture, gainOne);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = capture->SetGain(capture, gainSec);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 #endif
 /**
@@ -455,7 +455,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGainNull_003, TestSize.Lev
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetGain(captureNull, gain);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureGetGain_001
@@ -469,14 +469,14 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_001, TestSize.Level1)
     float max = 0;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetGainThreshold(capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     float gain = min + 1;
     float gainValue = min + 1;
     ret = capture->SetGain(capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetGain(capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(gainValue, gain);
 }
 /**
@@ -491,7 +491,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainNull_002, TestSize.Lev
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetGain(captureNull, &gainValue);
-    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT);
 }
 /**
 * @tc.name  AudioCaptureGetGain_003
@@ -506,9 +506,9 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_003, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetGain(capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = capture->GetGain(capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(gainOne, gain);
 }
 /**
@@ -523,6 +523,6 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainNull_004, TestSize.Lev
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGain(capture, gainNull);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 }

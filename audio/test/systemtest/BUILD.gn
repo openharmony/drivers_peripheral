@@ -31,7 +31,10 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = []
     if (drivers_peripheral_audio_feature_rich_device) {
-      # deps += [ "hdi_advance:hdi_advance" ]
+      deps += [
+        # "hdi_advance:hdi_advance",
+        "hdi_service:hdi_service_st",
+      ]
     }
     if (drivers_peripheral_audio_feature_full_test_suite) {
       deps += [

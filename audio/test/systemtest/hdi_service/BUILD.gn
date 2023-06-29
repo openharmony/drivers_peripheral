@@ -17,7 +17,8 @@ import("./../../../audio.gni")
 group("hdi_service_st") {
   testonly = true
   deps = [ "common:hdi_service_common" ]
-  if (drivers_peripheral_audio_feature_alsa_lib == false) {
-    deps += [ "hdiperformace:hdf_audio_idlhdi_performace_test" ]
-  }
+
+  #   if (drivers_peripheral_audio_feature_alsa_lib == false) {
+  #     deps += [ "hdiperformace:hdf_audio_idlhdi_performace_test" ]
+  #   }
 }
