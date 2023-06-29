@@ -344,7 +344,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
     g_inputInfoData->buffer[0].buf = (intptr_t)g_inputBuffer.fd;
 
     int32_t errorCode = g_codecObj->CodecQueueInput(g_codecObj, g_handle, g_inputInfoData,
-        (uint32_t)QUEUE_TIME_OUT, -1);
+        static_cast<uint32_t>(QUEUE_TIME_OUT), -1);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
@@ -404,7 +404,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_001, TestSize.Level1)
     g_outputInfoData->buffer[0].capacity = TEST_FRAME_BUFFER_SIZE;
     g_outputInfoData->buffer[0].buf = (intptr_t)g_outputBuffer.fd;
 
-    int32_t errorCode = g_codecObj->CodecQueueOutput(g_codecObj, g_handle, g_outputInfoData, (uint32_t)0, -1);
+    int32_t errorCode = g_codecObj->CodecQueueOutput(g_codecObj, g_handle,
+        g_outputInfoData, static_cast<uint32_t>(0), -1);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
@@ -412,7 +413,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeueOutputTest_001, TestSize.Level1)
 {
     int32_t errorCode = 0;
     int32_t acquireFd;
-    CodecBuffer *outInfo = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
+    CodecBuffer *outInfo =
+        reinterpret_cast<CodecBuffer *>(OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1));
     ASSERT_TRUE(outInfo != nullptr);
     outInfo->bufferCnt = 1;
 

@@ -90,7 +90,8 @@ public:
     template <typename T>
     void InitParam(T &param)
     {
-        memset_s(&param, sizeof(param), 0, sizeof(param));
+        int32_t ret = memset_s(&param, sizeof(param), 0, sizeof(param));
+        ASSERT_EQ(ret, EOK);
         param.nSize = sizeof(param);
         param.nVersion.nVersion = 1;
     }
@@ -98,7 +99,8 @@ public:
     template <typename T>
     void InitExtParam(T &param)
     {
-        memset_s(&param, sizeof(param), 0, sizeof(param));
+        int32_t ret = memset_s(&param, sizeof(param), 0, sizeof(param));
+        ASSERT_EQ(ret, EOK);
         param.size = sizeof(param);
         param.version.nVersion = 1;
     }
@@ -199,9 +201,6 @@ public:
             compName_ = capList[0].compName;
         }
 
-        if (manager_ == nullptr) {
-            return;
-        }
         callback_ = new CodecCallbackService();
         if (callback_ == nullptr) {
             return;

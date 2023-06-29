@@ -173,14 +173,15 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiGetParameterTest_005, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
-    memset_s(&param, sizeof(param), 0, sizeof(param));
+    int32_t ret = memset_s(&param, sizeof(param), 0, sizeof(param));
+    ASSERT_EQ(ret, EOK);
     param.nPortIndex = inputIndex;
     param.eCompressionFormat = OMX_VIDEO_CodingAVC;
     std::vector<int8_t> inParam;
     func_->ObjectToVector(param, inParam);
 
     std::vector<int8_t> outParam;
-    auto ret = g_component->GetParameter(OMX_IndexCodecVideoPortFormat, inParam, outParam);
+    ret = g_component->GetParameter(OMX_IndexCodecVideoPortFormat, inParam, outParam);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -228,11 +229,12 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
-    memset_s(&param, sizeof(param), 0, sizeof(param));
+    int32_t ret = memset_s(&param, sizeof(param), 0, sizeof(param));
+    ASSERT_EQ(ret, EOK);
     param.nPortIndex = inputIndex;
     std::vector<int8_t> paramVec;
     func_->ObjectToVector(param, paramVec);
-    auto ret = g_component->SetParameter(OMX_IndexParamVideoPortFormat, paramVec);
+    ret = g_component->SetParameter(OMX_IndexParamVideoPortFormat, paramVec);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -579,7 +581,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiUseBufferAndFreeBufferTest_001, TestSize
     ret = func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual,
+        param.nBufferSize);
     ASSERT_TRUE(err);
     err = func_->FreeBufferOnPort(g_component, PortIndex::INDEX_INPUT);
     ASSERT_TRUE(err);
@@ -650,7 +653,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiUseBufferAndFreeBufferTest_005, TestSize
     OMX_PARAM_PORTDEFINITIONTYPE param;
     func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
 
-    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual,
+        param.nBufferSize);
     ASSERT_TRUE(err);
     err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, 1, param.nBufferSize);
     ASSERT_FALSE(err);
@@ -689,7 +693,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
     OMX_PARAM_PORTDEFINITIONTYPE param;
     ret = func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
     ASSERT_EQ(ret, HDF_SUCCESS);
-    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
+    auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual,
+        param.nBufferSize);
     ASSERT_TRUE(err);
 
     ret = func_->GetPortParameter(g_component, PortIndex::INDEX_OUTPUT, param);

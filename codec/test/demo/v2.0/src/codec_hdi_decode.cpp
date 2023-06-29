@@ -15,8 +15,6 @@
 
 #include "codec_hdi_decode.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
-#include <securec.h>
 #include <unistd.h>
 #include "codec_component_manager.h"
 #include "codec_omx_ext.h"
@@ -126,7 +124,11 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     }
 
     struct CompVerInfo verInfo;
-    (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    err = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memset_s verInfo err [%{public}d].", __func__, err);
+        return false;
+    }
     err = client_->GetComponentVersion(client_, &verInfo);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);

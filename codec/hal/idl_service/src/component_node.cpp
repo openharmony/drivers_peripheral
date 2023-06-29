@@ -140,13 +140,13 @@ int32_t ComponentNode::GetComponentVersion(CompVerInfo &verInfo)
     verInfo.compUUID.insert(verInfo.compUUID.end(), uuid, uuid + sizeof(OMX_UUIDTYPE));
     err = memcpy_s(&verInfo.compVersion, sizeof(verInfo.compVersion), &compVersion, sizeof(sepcVersion));
     if (err != HDF_SUCCESS) {
-        CODEC_LOGE("memset_s return err [%{public}x].", err);
+        CODEC_LOGE("memset_s return err [%{public}d].", err);
         return err;
     }
 
     err = memcpy_s(&verInfo.specVersion, sizeof(verInfo.specVersion), &sepcVersion, sizeof(sepcVersion));
     if (err != HDF_SUCCESS) {
-        CODEC_LOGE("memset_s return err [%{public}x].", err);
+        CODEC_LOGE("memset_s return err [%{public}d].", err);
         return err;
     }
     return err;
