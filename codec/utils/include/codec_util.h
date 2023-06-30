@@ -19,6 +19,6 @@
 #include <malloc.h>
 #include "hdf_base.h"
 
-void ReleaseCodecCache();
+void ReleaseCodecCache(void);
 
 #endif    // CODEC_UTIL_H

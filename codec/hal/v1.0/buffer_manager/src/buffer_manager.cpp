@@ -41,13 +41,13 @@ CodecBuffer* BufferManager::GetBuffer(uint32_t timeoutMs, bool isChecking)
     if (inputData == nullptr) {
         if (timeoutMs == HDF_WAIT_FOREVER) {
             // release lock and wait here, and check again later when notified
-            pthread_cond_wait(&inputCond, (pthread_mutex_t *)bufferQueueLock.realMutex);
+            pthread_cond_wait(&inputCond, reinterpret_cast<pthread_mutex_t *>(bufferQueueLock.realMutex));
             inputData = PollBufferQueue(isChecking);
         } else if (timeoutMs > 0) {
             struct timespec time = {0};
             ConstructTimespec(&time, timeoutMs);
             // release lock and wait here, and check again later when notified or timeout
-            pthread_cond_timedwait(&inputCond, (pthread_mutex_t *)bufferQueueLock.realMutex, &time);
+            pthread_cond_timedwait(&inputCond, reinterpret_cast<pthread_mutex_t *>(bufferQueueLock.realMutex), &time);
             inputData = PollBufferQueue(isChecking);
         }
     }
@@ -64,13 +64,13 @@ CodecBuffer* BufferManager::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
     if (outputData == nullptr) {
         if (timeoutMs == HDF_WAIT_FOREVER) {
             // release lock and wait here, and check again later when notified
-            pthread_cond_wait(&outputCond, (pthread_mutex_t *)usedBufferQueueLock.realMutex);
+            pthread_cond_wait(&outputCond, reinterpret_cast<pthread_mutex_t *>(usedBufferQueueLock.realMutex));
             outputData = PollUsedBufferQueue(isChecking);
         } else if (timeoutMs > 0) {
             struct timespec time = {0};
             ConstructTimespec(&time, timeoutMs);
             // release lock and wait here, and check again later when notified or timeout
-            pthread_cond_timedwait(&outputCond, (pthread_mutex_t *)usedBufferQueueLock.realMutex, &time);
+            pthread_cond_timedwait(&outputCond, reinterpret_cast<pthread_mutex_t *>(usedBufferQueueLock.realMutex), &time);
             outputData = PollUsedBufferQueue(isChecking);
         }
     }
