@@ -354,7 +354,7 @@ static bool InitOutputInfosData(int32_t inputBufferNum, BufferHandle *bufferHand
 static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
     int32_t outputBufferNum, int32_t outputBufferSize)
 {
-    int32_t queueRet = HDF_SUCCESS;
+    int32_t queueRet;
     if (!AllocateBuffer(inputBufferNum, outputBufferNum)) {
         return false;
     }
@@ -535,8 +535,7 @@ static int32_t GetDecParameter(void)
 
 static void DecodeLoopHandleInput(const CodecEnvData *decData)
 {
-    int32_t ret = 0;
-    int32_t readSize = 0;
+    int32_t readSize;
     int32_t acquireFd = 0;
 
     CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
@@ -547,7 +546,7 @@ static void DecodeLoopHandleInput(const CodecEnvData *decData)
     inputData->buffer[0].type = BUFFER_TYPE_FD;
     inputData->bufferCnt = 1;
     inputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
-    ret = g_codecProxy->CodecDequeueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
+    int32_t ret = g_codecProxy->CodecDequeueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
         &acquireFd, inputData);
     if (ret == HDF_SUCCESS) {
         if (g_autoSplit == 1) {
