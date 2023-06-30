@@ -20,10 +20,10 @@
     "deps": {
       "components": [
         "c_utils",
-        "ipc",
+        "drivers_interface_intelligent_voice",
         "hdf_core",
         "hilog",
-        "drivers_interface_intelligent_voice"
+        "ipc"
       ],
       "third_part": [
         "bounds_checking_function",
