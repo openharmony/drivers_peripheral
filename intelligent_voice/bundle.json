@@ -3,14 +3,20 @@
   "description": "intelligent_voice device driver",
   "version": "4.0",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/intelligent_voice"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_intelligent_voice",
     "subsystem": "hdf",
     "features": ["drivers_peripheral_intelligent_voice_feature_community"],
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
-    "rom": "",
-    "ram": "",
+    "rom": "675KB",
+    "ram": "2048KB",
     "deps": {
       "components": [
         "c_utils",
