@@ -178,5 +178,3 @@ BENCHMARK_F(AudioEffectControlBenchmarkTest, EffectReverse)(benchmark::State &st
 BENCHMARK_REGISTER_F(AudioEffectControlBenchmarkTest, EffectReverse)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 }
-
-BENCHMARK_MAIN();
