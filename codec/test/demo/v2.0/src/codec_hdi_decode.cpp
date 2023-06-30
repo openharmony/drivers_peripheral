@@ -378,9 +378,6 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
 int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
 {
     HDF_LOGI("%{public}s enter, portIndex = %{public}d", __func__, portIndex);
-    int bufferSize = 0;
-    int bufferCount = 0;
-    bool portEnable = false;
 
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
@@ -393,9 +390,9 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
         return err;
     }
 
-    bufferSize = param.nBufferSize;
-    bufferCount = param.nBufferCountActual;
-    portEnable = param.bEnabled;
+    int bufferSize = param.nBufferSize;
+    int bufferCount = param.nBufferCountActual;
+    bool portEnable = param.bEnabled;
     HDF_LOGI("buffer index [%{public}d], buffer size [%{public}d], "
              "buffer count [%{public}d], portEnable[%{public}d], err [%{public}d]",
              portIndex, bufferSize, bufferCount, portEnable, err);
@@ -503,10 +500,9 @@ void CodecHdiDecode::FreeBuffers()
 
     // wait loaded
     OMX_STATETYPE status = OMX_StateLoaded;
-    int32_t err = HDF_SUCCESS;
     int32_t tryCount = MAX_WAIT_COUNT;
     do {
-        err = client_->GetState(client_, &status);
+        int32_t err = client_->GetState(client_, &status);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
             break;
