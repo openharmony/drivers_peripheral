@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include "intell_voice_log.h"
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/intell_voice_engine_manager_stub.h"
 
-#define LOG_TAG "IntellVoiceEngineDriver"
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "IntellVoiceEngineDriver"
 
 using namespace OHOS::HDI::IntelligentVoice::Engine::V1_0;
 
@@ -28,21 +28,22 @@ struct HdfIntellVoiceEngineManagerHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t IntellVoiceEngineManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t IntellVoiceEngineManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfIntellVoiceEngineManagerHost = CONTAINER_OF(client->device->service, struct HdfIntellVoiceEngineManagerHost, ioService);
+    auto *hdfIntellVoiceEngineManagerHost = CONTAINER_OF(client->device->service,
+        struct HdfIntellVoiceEngineManagerHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: invalid data sbuf object to dispatch", __func__);
+        INTELLIGENT_VOICE_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: invalid reply sbuf object to dispatch", __func__);
+        INTELLIGENT_VOICE_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -51,16 +52,16 @@ static int32_t IntellVoiceEngineManagerDriverDispatch(struct HdfDeviceIoClient *
 
 static int HdfIntellVoiceEngineManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver init start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver init start");
     return HDF_SUCCESS;
 }
 
 static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver bind start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver bind start");
     auto *hdfIntellVoiceEngineManagerHost = new (std::nothrow) HdfIntellVoiceEngineManagerHost;
     if (hdfIntellVoiceEngineManagerHost == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to create create HdfIntellVoiceEngineManagerHost object", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to create create HdfIntellVoiceEngineManagerHost object");
         return HDF_FAILURE;
     }
 
@@ -70,7 +71,7 @@ static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceO
 
     auto serviceImpl = IIntellVoiceEngineManager::Get(true);
     if (serviceImpl == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to get of implement service", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to get of implement service");
         delete hdfIntellVoiceEngineManagerHost;
         return HDF_FAILURE;
     }
@@ -78,7 +79,7 @@ static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceO
     hdfIntellVoiceEngineManagerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IIntellVoiceEngineManager::GetDescriptor());
     if (hdfIntellVoiceEngineManagerHost->stub == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to get stub object", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to get stub object");
         delete hdfIntellVoiceEngineManagerHost;
         return HDF_FAILURE;
     }
@@ -89,12 +90,13 @@ static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceO
 
 static void HdfIntellVoiceEngineManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver release start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver release start");
     if (deviceObject->service == nullptr) {
         return;
     }
 
-    auto *hdfIntellVoiceEngineManagerHost = CONTAINER_OF(deviceObject->service, struct HdfIntellVoiceEngineManagerHost, ioService);
+    auto *hdfIntellVoiceEngineManagerHost = CONTAINER_OF(deviceObject->service,
+        struct HdfIntellVoiceEngineManagerHost, ioService);
     if (hdfIntellVoiceEngineManagerHost != nullptr) {
         delete hdfIntellVoiceEngineManagerHost;
     }

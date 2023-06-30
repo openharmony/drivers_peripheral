@@ -24,8 +24,8 @@
 #include "i_engine.h"
 
 namespace OHOS {
-namespace IntellVoiceEngine {
-
+namespace IntelligentVoice {
+namespace Engine {
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineCallback;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineCallBackEvent;
 
@@ -36,7 +36,7 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
 
 class EngineListener : public IEngineCallback {
 public:
-    EngineListener(const sptr<IIntellVoiceEngineCallback> &cb);
+    explicit EngineListener(const sptr<IIntellVoiceEngineCallback> &cb);
     ~EngineListener(){};
     void OnIntellVoiceEvent(const IntellVoiceEngineCallBackEvent &event) override;
 private:
@@ -45,7 +45,7 @@ private:
 
 class IntellVoiceEngineAdapterImpl : public IIntellVoiceEngineAdapter {
 public:
-    IntellVoiceEngineAdapterImpl(std::unique_ptr<IEngine> engine);
+    explicit IntellVoiceEngineAdapterImpl(std::unique_ptr<IEngine> engine);
     ~IntellVoiceEngineAdapterImpl();
 
     int32_t SetCallback(const sptr<IIntellVoiceEngineCallback>& engineCallback) override;
@@ -64,6 +64,7 @@ private:
 private:
     std::unique_ptr<IEngine> engine_ = nullptr;
 };
+}
 }
 }
 #endif

@@ -1,7 +1,7 @@
 {
-  "name": "drivers_peripheral_intelligent_voice",
+  "name": "@ohos/drivers_peripheral_intelligent_voice",
   "description": "intelligent_voice device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "component": {
     "name": "drivers_peripheral_intelligent_voice",
@@ -13,10 +13,11 @@
     "ram": "",
     "deps": {
       "components": [
+        "c_utils",
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
-        "utils_base"
+        "hilog",
+        "drivers_interface_intelligent_voice"
       ],
       "third_part": [
         "bounds_checking_function",

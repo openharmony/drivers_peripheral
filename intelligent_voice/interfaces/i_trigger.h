@@ -20,7 +20,8 @@
 #include "v1_0/intell_voice_trigger_types.h"
 
 namespace OHOS {
-namespace IntellVoiceTrigger {
+namespace IntelligentVoice {
+namespace Trigger {
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerAdapterDsecriptor;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerProperties;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModel;
@@ -57,9 +58,11 @@ public:
 
 class ITriggerManager {
 public:
-    virtual int32_t LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor, std::unique_ptr<ITrigger> &adapter) = 0;
+    virtual int32_t LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
+        std::unique_ptr<ITrigger> &adapter) = 0;
     virtual int32_t UnloadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor) = 0;
 };
+}
 }
 }
 #endif

@@ -12,18 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <dlfcn.h>
 #include "intell_voice_trigger_manager_impl.h"
+
+#include <dlfcn.h>
+
 #include "hdf_base.h"
 #include "intell_voice_log.h"
 #include "intell_voice_trigger_adapter_impl.h"
 
-#define LOG_TAG "TriggerManagerImpl"
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "TriggerManagerImpl"
 
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
 
 namespace OHOS {
-namespace IntellVoiceTrigger {
+namespace IntelligentVoice {
+namespace Trigger {
 extern "C" IIntellVoiceTriggerManager *IntellVoiceTriggerManagerImplGetInstance(void)
 {
     return new (std::nothrow) IntellVoiceTriggerManagerImpl();
@@ -31,12 +35,12 @@ extern "C" IIntellVoiceTriggerManager *IntellVoiceTriggerManagerImplGetInstance(
 
 int32_t IntellVoiceTriggerManagerImpl::LoadVendorLib()
 {
-    char *error = nullptr;
+    std::string error;
     const char *vendorLibPath = HDF_LIBRARY_FULL_PATH("libvendor_intell_voice_trigger");
     triggerManagerPriv_.handle = dlopen(vendorLibPath, RTLD_LAZY);
     if (triggerManagerPriv_.handle == nullptr) {
         error = dlerror();
-        INTELL_VOICE_LOG_ERROR("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error);
+        INTELLIGENT_VOICE_LOGE("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error.c_str());
         return -1;
     }
 
@@ -46,13 +50,13 @@ int32_t IntellVoiceTriggerManagerImpl::LoadVendorLib()
         triggerManagerPriv_.handle, "GetIntellVoiceTriggerHalInst"));
     if (triggerManagerPriv_.getTriggerManagerHalInst == nullptr) {
         error = dlerror();
-        INTELL_VOICE_LOG_ERROR("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error);
+        INTELLIGENT_VOICE_LOGE("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error.c_str());
         dlclose(triggerManagerPriv_.handle);
         triggerManagerPriv_.handle = nullptr;
         return -1;
     }
 
-    INTELL_VOICE_LOG_INFO("load vendor lib success");
+    INTELLIGENT_VOICE_LOGI("load vendor lib success");
     return 0;
 }
 
@@ -69,7 +73,7 @@ IntellVoiceTriggerManagerImpl::IntellVoiceTriggerManagerImpl()
     if (LoadVendorLib() == 0) {
         inst_ = triggerManagerPriv_.getTriggerManagerHalInst();
         if (inst_ == nullptr) {
-            INTELL_VOICE_LOG_ERROR("failed to get trigger manager hal inst");
+            INTELLIGENT_VOICE_LOGE("failed to get trigger manager hal inst");
         }
     }
 }
@@ -82,31 +86,31 @@ IntellVoiceTriggerManagerImpl::~IntellVoiceTriggerManagerImpl()
 }
 
 int32_t IntellVoiceTriggerManagerImpl::LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
-     sptr<IIntellVoiceTriggerAdapter> &adapter)
+    sptr<IIntellVoiceTriggerAdapter> &adapter)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (inst_ == nullptr) {
-        INTELL_VOICE_LOG_ERROR("inst is nullptr");
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
     }
 
     if (halAdapters_.find(descriptor.adapterName) != halAdapters_.end()) {
-        INTELL_VOICE_LOG_ERROR("adapter %{public}s already exist", descriptor.adapterName.c_str());
+        INTELLIGENT_VOICE_LOGE("adapter %{public}s already exist", descriptor.adapterName.c_str());
         return HDF_ERR_INVALID_OBJECT;
     }
 
     std::unique_ptr<ITrigger> triggerAdapterDevice = nullptr;
     int32_t ret = inst_->LoadAdapter(descriptor, triggerAdapterDevice);
     if (triggerAdapterDevice == nullptr) {
-        INTELL_VOICE_LOG_ERROR("get adapter device from hal failed, ret:%{public}d", ret);
+        INTELLIGENT_VOICE_LOGE("get adapter device from hal failed, ret:%{public}d", ret);
         return HDF_FAILURE;
     }
 
     adapter = sptr<IIntellVoiceTriggerAdapter>(new (std::nothrow) IntellVoiceTriggerAdapterImpl(
         std::move(triggerAdapterDevice)));
     if (adapter == nullptr) {
-        INTELL_VOICE_LOG_ERROR("new adapter failed");
+        INTELLIGENT_VOICE_LOGE("new adapter failed");
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -118,13 +122,13 @@ int32_t IntellVoiceTriggerManagerImpl::UnloadAdapter(const IntellVoiceTriggerAda
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (inst_ == nullptr) {
-        INTELL_VOICE_LOG_ERROR("inst is nullptr");
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
     }
 
     auto adapter = halAdapters_.find(descriptor.adapterName);
     if (adapter == halAdapters_.end()) {
-        INTELL_VOICE_LOG_ERROR("there is no %{public}s adapter", descriptor.adapterName.c_str());
+        INTELLIGENT_VOICE_LOGE("there is no %{public}s adapter", descriptor.adapterName.c_str());
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -133,5 +137,6 @@ int32_t IntellVoiceTriggerManagerImpl::UnloadAdapter(const IntellVoiceTriggerAda
     halAdapters_.erase(adapter);
     return ret;
 }
-} // IntellVoiceTrigger
-} // OHOS
+}
+}
+}

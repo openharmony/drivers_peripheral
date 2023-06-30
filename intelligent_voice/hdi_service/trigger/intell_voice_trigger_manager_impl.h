@@ -23,7 +23,8 @@
 #include "i_trigger.h"
 
 namespace OHOS {
-namespace IntellVoiceTrigger {
+namespace IntelligentVoice {
+namespace Trigger {
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerAdapterDsecriptor;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter;
 
@@ -52,9 +53,10 @@ private:
 private:
     std::mutex mutex_ {};
     IntellVoiceTriggerManagerPriv triggerManagerPriv_;
-    ITriggerManager *inst_ =nullptr;
+    ITriggerManager *inst_ = nullptr;
     std::unordered_map<std::string, sptr<IIntellVoiceTriggerAdapter>> halAdapters_;
 };
-} // IntellVoiceTrigger
-} // OHOS
+}
+}
+}
 #endif // HDI_DEVICE_INTELL_VOICE_TRIGGER_MANAGER_IMPL_H

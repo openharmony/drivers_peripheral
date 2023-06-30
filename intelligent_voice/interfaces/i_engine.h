@@ -20,8 +20,8 @@
 #include "v1_0/intell_voice_engine_types.h"
 
 namespace OHOS {
-namespace IntellVoiceEngine {
-
+namespace IntelligentVoice {
+namespace Engine {
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineCallBackEvent;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::StartInfo;
@@ -58,9 +58,11 @@ public:
 
 class IEngineManager {
 public:
-    virtual int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor, std::unique_ptr<IEngine> &engine) = 0;
+    virtual int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor,
+        std::unique_ptr<IEngine> &engine) = 0;
     virtual int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor) = 0;
 };
+}
 }
 }
 #endif

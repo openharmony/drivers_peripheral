@@ -25,7 +25,8 @@
 #include "i_engine.h"
 
 namespace OHOS {
-namespace IntellVoiceEngine {
+namespace IntelligentVoice {
+namespace Engine {
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineManager;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterType;
@@ -44,7 +45,8 @@ public:
     ~IntellVoiceEngineManagerImpl();
 
     int32_t GetAdapterDescriptors(std::vector<IntellVoiceEngineAdapterDescriptor>& descs) override;
-    int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor& descriptor, sptr<IIntellVoiceEngineAdapter>& adapter) override;
+    int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor& descriptor,
+        sptr<IIntellVoiceEngineAdapter>& adapter) override;
     int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor& descriptor) override;
 
 private:
@@ -57,6 +59,7 @@ private:
     IntellVoiceEngineManagerPriv engineManagerPriv_;
     IEngineManager *inst_ = nullptr;
 };
-}  // namespace IntellVoiceEngine
-}  // namespace OHOS
+}
+}
+}
 #endif

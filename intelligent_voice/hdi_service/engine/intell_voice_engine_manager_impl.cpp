@@ -12,19 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "intell_voice_engine_manager_impl.h"
+
 #include <dlfcn.h>
 #include <cinttypes>
 #include "hdf_base.h"
 #include "intell_voice_log.h"
-#include "intell_voice_engine_manager_impl.h"
 #include "intell_voice_engine_adapter_impl.h"
 
-#define LOG_TAG "IntelligentVoiceEngineManagerImpl"
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "IntelligentVoiceEngineManagerImpl"
 
 using namespace OHOS::HDI::IntelligentVoice::Engine::V1_0;
 
 namespace OHOS {
-namespace IntellVoiceEngine {
+namespace IntelligentVoice {
+namespace Engine {
 extern "C" IIntellVoiceEngineManager *IntellVoiceEngineManagerImplGetInstance(void)
 {
     return new (std::nothrow) IntellVoiceEngineManagerImpl();
@@ -32,12 +35,12 @@ extern "C" IIntellVoiceEngineManager *IntellVoiceEngineManagerImplGetInstance(vo
 
 int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
 {
-    char *error = nullptr;
+    std::string error;
     const char *vendorLibPath = HDF_LIBRARY_FULL_PATH("libvendor_intell_voice_engine");
     engineManagerPriv_.handle = dlopen(vendorLibPath, RTLD_LAZY);
     if (engineManagerPriv_.handle == nullptr) {
         error = dlerror();
-        INTELL_VOICE_LOG_ERROR("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error);
+        INTELLIGENT_VOICE_LOGE("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error.c_str());
         return -1;
     }
 
@@ -47,13 +50,13 @@ int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
         engineManagerPriv_.handle, "GetIntellVoiceEngineManagerHalInst"));
     if (engineManagerPriv_.getEngineManagerHalInst == nullptr) {
         error = dlerror();
-        INTELL_VOICE_LOG_ERROR("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error);
+        INTELLIGENT_VOICE_LOGE("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error.c_str());
         dlclose(engineManagerPriv_.handle);
         engineManagerPriv_.handle = nullptr;
         return -1;
     }
 
-    INTELL_VOICE_LOG_INFO("load vendor lib success");
+    INTELLIGENT_VOICE_LOGI("load vendor lib success");
 
     return 0;
 }
@@ -91,20 +94,20 @@ int32_t IntellVoiceEngineManagerImpl::CreateAdapter(
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (inst_ == nullptr) {
-        INTELL_VOICE_LOG_ERROR("inst is nullptr");
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
     }
 
     std::unique_ptr<IEngine> engine = nullptr;
     inst_->CreateAdapter(descriptor, engine);
     if (engine == nullptr) {
-        INTELL_VOICE_LOG_ERROR("get adapter device from hal failed");
+        INTELLIGENT_VOICE_LOGE("get adapter device from hal failed");
         return HDF_FAILURE;
     }
 
     adapter = sptr<IIntellVoiceEngineAdapter>(new (std::nothrow) IntellVoiceEngineAdapterImpl(std::move(engine)));
     if (adapter == nullptr) {
-        INTELL_VOICE_LOG_ERROR("malloc intell voice adapter server failed ");
+        INTELLIGENT_VOICE_LOGE("malloc intell voice adapter server failed ");
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -117,13 +120,13 @@ int32_t IntellVoiceEngineManagerImpl::ReleaseAdapter(const IntellVoiceEngineAdap
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (inst_ == nullptr) {
-        INTELL_VOICE_LOG_ERROR("inst is nullptr");
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
     }
 
     auto it = adapters_.find(descriptor.adapterType);
     if (it == adapters_.end()) {
-        INTELL_VOICE_LOG_WARN("can not find adapter, %{public}d", descriptor.adapterType);
+        INTELLIGENT_VOICE_LOGW("can not find adapter, %{public}d", descriptor.adapterType);
         return HDF_SUCCESS;
     }
 
@@ -133,5 +136,6 @@ int32_t IntellVoiceEngineManagerImpl::ReleaseAdapter(const IntellVoiceEngineAdap
     adapters_.erase(it);
     return HDF_SUCCESS;
 }
-}  // namespace IntellVoiceEngine
-}  // namespace OHOS
+}
+}
+}

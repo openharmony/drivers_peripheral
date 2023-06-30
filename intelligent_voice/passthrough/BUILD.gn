@@ -12,20 +12,19 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("vendor_intell_voice_trigger") {
   include_dirs = [
-    "//drivers/peripheral/intelligent_voice/interfaces",
-    "//foundation/ai/intelligent_voice_framework/utils",
+    "../interfaces",
+    "../utils",
   ]
-  sources = [ "intell_voice_trigger_stub.cpp" ]
+  sources = [ "intell_voice_trigger_manager.cpp" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "hilog:libhilog",
   ]
 
   install_enable = true
@@ -36,16 +35,16 @@ ohos_shared_library("vendor_intell_voice_trigger") {
 
 ohos_shared_library("vendor_intell_voice_engine") {
   include_dirs = [
-    "//drivers/peripheral/intelligent_voice/interfaces",
-    "//foundation/ai/intelligent_voice_framework/utils",
+    "../interfaces",
+    "../utils",
   ]
-  sources = [ "intell_voice_engine_stub.cpp" ]
+  sources = [ "intell_voice_engine_manager.cpp" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "hilog:libhilog",
   ]
 
   install_enable = true
