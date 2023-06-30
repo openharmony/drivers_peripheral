@@ -707,6 +707,10 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
         return HDF_ERR_INVALID_PARAM;
     }
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
+        if (pos == NULL) {
+            HDF_LOGE("%{public}s: pos is NULL", __func__);
+            break;
+        }
         if (pos->service == NULL || pos->callbackObj == NULL) {
             HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
             continue;

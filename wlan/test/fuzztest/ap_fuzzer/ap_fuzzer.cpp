@@ -95,7 +95,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         return result;
     }
     uint32_t dataSize = size - OFFSET;
-    uint8_t *tmpRawData = (uint8_t *)OsalMemCalloc(dataSize + 1);
+    uint8_t *tmpRawData = reinterpret_cast<uint8_t *>(OsalMemCalloc(dataSize + 1));
     if (tmpRawData == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed!", __FUNCTION__);
         return result;
