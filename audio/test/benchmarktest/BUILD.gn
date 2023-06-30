@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../../drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
 
@@ -30,6 +31,14 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
     "render/audio_render_benchmarktest.cpp",
     "render/audio_render_mmap_benchmarktest.cpp",
   ]
+
+  if (drivers_peripheral_audio_feature_effect) {
+    sources += [
+      "effect/audio_effectcontrol_benchmarktest.cpp",
+      "effect/audio_effectmodel_benchmarktest.cpp",
+    ]
+  }
+
   cflags = [
     "-Wall",
     "-Wextra",
@@ -49,7 +58,9 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_audio:audio_idl_headers",
+      "drivers_interface_audio:effect_idl_headers",
       "drivers_interface_audio:libaudio_proxy_1.0",
+      "drivers_interface_audio:libeffect_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
