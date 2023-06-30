@@ -60,7 +60,7 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
     int ret = HuaweiSecureElementCaGetAtr(res, &resLen);
-    for (uint32_t i = 0; i < RES_BUFFER_MAX_LENGTH; i++) {
+    for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
