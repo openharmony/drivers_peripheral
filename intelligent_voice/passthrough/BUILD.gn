@@ -23,8 +23,8 @@ ohos_shared_library("vendor_intell_voice_trigger") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_intelligent_voice:intell_voice_trigger_idl_headers",
-    "ipc:ipc_single",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   install_enable = true
@@ -43,8 +43,8 @@ ohos_shared_library("vendor_intell_voice_engine") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_intelligent_voice:intell_voice_engine_idl_headers",
-    "ipc:ipc_single",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   install_enable = true
