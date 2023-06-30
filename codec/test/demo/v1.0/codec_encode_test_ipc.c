@@ -241,7 +241,7 @@ static bool InitOutputInfosData(int32_t outputBufferSize, int32_t num)
 static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
     int32_t outputBufferNum, int32_t outputBufferSize)
 {
-    int32_t queueRet = HDF_SUCCESS;
+    int32_t queueRet;
     if (!AllocateBuffer(inputBufferNum, outputBufferNum)) {
         return false;
     }

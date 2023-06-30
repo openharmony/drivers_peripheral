@@ -116,7 +116,7 @@ static int32_t ComponentManagerCreateComponent(struct CodecComponentType **compo
     pthread_mutex_unlock(&g_list->listMute);
     node->componentId = *componentId;
     node->info = info;
-    node->comp = &*component;
+    node->comp = component;
     return HDF_SUCCESS;
 }
 

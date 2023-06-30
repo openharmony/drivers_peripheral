@@ -489,7 +489,7 @@ bool CodecHdiAdapterEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferIn
         }
     } else {
         // read data from ashmem
-        void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
+        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
         endFlag = this->ReadOneFrame(fpIn_, reinterpret_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
     }
     bufferInfo->omxBuffer->offset = 0;

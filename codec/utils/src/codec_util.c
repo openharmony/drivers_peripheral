@@ -16,7 +16,7 @@
 #include "codec_util.h"
 #include "codec_log_wrapper.h"
 
-void ReleaseCodecCache()
+void ReleaseCodecCache(void)
 {
     int err = mallopt(M_FLUSH_THREAD_CACHE, 0);
     if (err != HDF_SUCCESS) {

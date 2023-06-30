@@ -490,14 +490,13 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
                        .height = this->height_,
                        .usage =  HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
                        .format = PIXEL_FMT_YCBCR_420_SP};
-    int32_t err = HDF_SUCCESS;
     for (int i = 0; i < bufferCount; i++) {
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.version.majorVersion = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
-        err = gralloc_->AllocMem(alloc, bufferHandle);
+        int32_t err = gralloc_->AllocMem(alloc, bufferHandle);
         HDF_LOGI("%{public}s AlloceMem ret val ret[%{public}d]", __func__, err);
         if (DISPLAY_SUCCESS != err) {
             HDF_LOGE("%{public}s AllocMem error", __func__);
@@ -510,7 +509,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
         omxBuffer->flag = 0;
         omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
         OmxCodecBuffer outBuffer;
-        auto err = client_->UseBuffer(static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
+        err = client_->UseBuffer(static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT),
             *omxBuffer.get(), outBuffer);
         omxBuffer->bufferhandle = nullptr;
         if (err != HDF_SUCCESS) {
@@ -548,10 +547,9 @@ void CodecHdiDecode::FreeBuffers()
     unUsedOutBuffers_.clear();
 
     CodecStateType status = CODEC_STATE_INVALID;
-    int32_t err = HDF_SUCCESS;
     int32_t tryCount = 3;
     do {
-        err = client_->GetState(status);
+        int32_t err = client_->GetState(status);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
             break;
