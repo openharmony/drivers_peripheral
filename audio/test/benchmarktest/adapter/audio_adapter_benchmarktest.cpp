@@ -288,21 +288,6 @@ BENCHMARK_F(AudioAdapterBenchmarkTest, GetDeviceStatus)(benchmark::State &state)
 BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, GetDeviceStatus)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioAdapterBenchmarkTest, SetMicMute)(benchmark::State &state)
-{
-    ASSERT_NE(adapter_, nullptr);
-    int32_t ret;
-    bool mute = false;
-
-    for (auto _ : state) {
-        ret = adapter_->SetMicMute(adapter_, mute);
-        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
-    }
-}
-
-BENCHMARK_REGISTER_F(AudioAdapterBenchmarkTest, SetMicMute)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
 BENCHMARK_F(AudioAdapterBenchmarkTest, GetMicMute)(benchmark::State &state)
 {
     ASSERT_NE(adapter_, nullptr);

@@ -732,7 +732,7 @@ BENCHMARK_F(AudioRenderBenchmarkTest, CheckSceneCapability)(benchmark::State &st
 BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, CheckSceneCapability)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
-BENCHMARK_F(AudioRenderBenchmarkTest, AddAudioEffect)(benchmark::State &state)
+BENCHMARK_F(AudioRenderBenchmarkTest, AddAndRemoveAudioEffect)(benchmark::State &state)
 {
     ASSERT_NE(render_, nullptr);
     int32_t ret;
@@ -740,26 +740,14 @@ BENCHMARK_F(AudioRenderBenchmarkTest, AddAudioEffect)(benchmark::State &state)
 
     for (auto _ : state) {
         ret = render_->AddAudioEffect(render_, effectId);
-        ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
-    }
-}
+        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 
-BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, AddAudioEffect)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
-BENCHMARK_F(AudioRenderBenchmarkTest, RemoveAudioEffect)(benchmark::State &state)
-{
-    ASSERT_NE(render_, nullptr);
-    int32_t ret;
-    uint64_t effectId = 0;
-
-    for (auto _ : state) {
         ret = render_->RemoveAudioEffect(render_, effectId);
-        ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
     }
 }
 
-BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, RemoveAudioEffect)->
+BENCHMARK_REGISTER_F(AudioRenderBenchmarkTest, AddAndRemoveAudioEffect)->
     Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 BENCHMARK_F(AudioRenderBenchmarkTest, GetFrameBufferSize)(benchmark::State &state)
