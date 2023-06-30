@@ -29,7 +29,7 @@
 
 #define MAX_BUFFER_NUM              64
 #define QUEUE_TIME_OUT              10
-#define NO_TRANSMIT_FD              -1
+#define NO_TRANSMIT_FD              (-1)
 #define NO_TRANSMIT_BUFFERHANDLE    0
 
 #ifdef __cplusplus
