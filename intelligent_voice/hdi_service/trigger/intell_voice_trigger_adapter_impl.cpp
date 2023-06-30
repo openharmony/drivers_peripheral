@@ -12,19 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "intell_voice_trigger_adapter_impl.h"
 #include "hdf_base.h"
 #include "intell_voice_log.h"
 #include "securec.h"
 #include "scope_guard.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "TriggerAdapterImpl"
+
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
 
-#define LOG_TAG "TriggerAdapterImpl"
-
 namespace OHOS {
-namespace IntellVoiceTrigger {
+namespace IntelligentVoice {
+namespace Trigger {
 IntellVoiceTriggerCallbackDevice::IntellVoiceTriggerCallbackDevice(OHOS::sptr<IIntellVoiceTriggerCallback> callback)
     : callback_(callback)
 {
@@ -33,7 +34,7 @@ IntellVoiceTriggerCallbackDevice::IntellVoiceTriggerCallbackDevice(OHOS::sptr<II
 void IntellVoiceTriggerCallbackDevice::OnRecognitionHdiEvent(const IntellVoiceRecognitionEvent &event, int32_t cookie)
 {
     if (callback_ == nullptr) {
-        INTELL_VOICE_LOG_ERROR("callback_ is nullptr");
+        INTELLIGENT_VOICE_LOGE("callback_ is nullptr");
         return;
     }
     callback_->OnRecognitionHdiEvent(event, cookie);
@@ -55,21 +56,21 @@ int32_t IntellVoiceTriggerAdapterImpl::GetProperties(IntellVoiceTriggerPropertie
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &model,
-     const sptr<IIntellVoiceTriggerCallback> &triggerCallback, int32_t cookie, int32_t &handle)
+    const sptr<IIntellVoiceTriggerCallback> &triggerCallback, int32_t cookie, int32_t &handle)
 {
     std::shared_ptr<ITriggerCallback> cb = std::make_shared<IntellVoiceTriggerCallbackDevice>(triggerCallback);
     if (cb == nullptr) {
-        INTELL_VOICE_LOG_ERROR("callback is nullptr");
+        INTELLIGENT_VOICE_LOGE("callback is nullptr");
         return HDF_ERR_MALLOC_FAIL;
     }
 
     if (model.data == nullptr) {
-        INTELL_VOICE_LOG_ERROR("model data is nullptr");
+        INTELLIGENT_VOICE_LOGE("model data is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
 
     ON_SCOPE_EXIT {
-        INTELL_VOICE_LOG_INFO("close ashmem");
+        INTELLIGENT_VOICE_LOGI("close ashmem");
         model.data->UnmapAshmem();
         model.data->CloseAshmem();
     };
@@ -101,29 +102,30 @@ int32_t IntellVoiceTriggerAdapterImpl::Stop(int32_t handle)
 bool IntellVoiceTriggerAdapterImpl::GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData)
 {
     if (ashmem == nullptr) {
-        INTELL_VOICE_LOG_ERROR("ashmem is nullptr");
+        INTELLIGENT_VOICE_LOGE("ashmem is nullptr");
         return false;
     }
 
     uint32_t size = static_cast<uint32_t>(ashmem->GetAshmemSize());
     if (size == 0) {
-        INTELL_VOICE_LOG_ERROR("size is zero");
+        INTELLIGENT_VOICE_LOGE("size is zero");
         return false;
     }
 
     if (!ashmem->MapReadOnlyAshmem()) {
-        INTELL_VOICE_LOG_ERROR("map ashmem failed");
+        INTELLIGENT_VOICE_LOGE("map ashmem failed");
         return false;
     }
 
     const uint8_t *buffer = static_cast<const uint8_t *>(ashmem->ReadFromAshmem(size, 0));
     if (buffer == nullptr) {
-        INTELL_VOICE_LOG_ERROR("read from ashmem failed");
+        INTELLIGENT_VOICE_LOGE("read from ashmem failed");
         return false;
     }
 
     modelData.insert(modelData.begin(), buffer, buffer + size);
     return true;
 }
-} // IntellVoiceTrigger
-} // OHOS
+}
+}
+}

@@ -19,7 +19,8 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/intell_voice_trigger_manager_stub.h"
 
-#define LOG_TAG "IntellVoiceTriggerDriver"
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "IntellVoiceTriggerDriver"
 
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
 
@@ -28,21 +29,22 @@ struct HdfIntellVoiceTriggerManagerHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t IntellVoiceTriggerManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t IntellVoiceTriggerManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(client->device->service, struct HdfIntellVoiceTriggerManagerHost, ioService);
+    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(client->device->service,
+        struct HdfIntellVoiceTriggerManagerHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: invalid data sbuf object to dispatch", __func__);
+        INTELLIGENT_VOICE_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: invalid reply sbuf object to dispatch", __func__);
+        INTELLIGENT_VOICE_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -51,16 +53,16 @@ static int32_t IntellVoiceTriggerManagerDriverDispatch(struct HdfDeviceIoClient 
 
 static int HdfIntellVoiceTriggerManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver init start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver init start");
     return HDF_SUCCESS;
 }
 
 static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver bind start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver bind start");
     auto *hdfIntellVoiceTriggerManagerHost = new (std::nothrow) HdfIntellVoiceTriggerManagerHost;
     if (hdfIntellVoiceTriggerManagerHost == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to create create HdfIntellVoiceTriggerManagerHost object", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to create create HdfIntellVoiceTriggerManagerHost object");
         return HDF_FAILURE;
     }
 
@@ -70,7 +72,7 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
 
     auto serviceImpl = IIntellVoiceTriggerManager::Get(true);
     if (serviceImpl == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to get of implement service", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to get of implement service");
         delete hdfIntellVoiceTriggerManagerHost;
         return HDF_FAILURE;
     }
@@ -78,7 +80,7 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
     hdfIntellVoiceTriggerManagerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IIntellVoiceTriggerManager::GetDescriptor());
     if (hdfIntellVoiceTriggerManagerHost->stub == nullptr) {
-        INTELL_VOICE_LOG_ERROR("%{public}s: failed to get stub object", __func__);
+        INTELLIGENT_VOICE_LOGE("failed to get stub object");
         delete hdfIntellVoiceTriggerManagerHost;
         return HDF_FAILURE;
     }
@@ -89,12 +91,13 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
 
 static void HdfIntellVoiceTriggerManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    INTELL_VOICE_LOG_INFO("%{public}s: driver release start", __func__);
+    INTELLIGENT_VOICE_LOGD("driver release start");
     if (deviceObject->service == nullptr) {
         return;
     }
 
-    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(deviceObject->service, struct HdfIntellVoiceTriggerManagerHost, ioService);
+    auto *hdfIntellVoiceTriggerManagerHost = CONTAINER_OF(deviceObject->service,
+        struct HdfIntellVoiceTriggerManagerHost, ioService);
     if (hdfIntellVoiceTriggerManagerHost != nullptr) {
         delete hdfIntellVoiceTriggerManagerHost;
     }

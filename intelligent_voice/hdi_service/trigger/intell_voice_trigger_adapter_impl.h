@@ -22,7 +22,8 @@
 #include "i_trigger.h"
 
 namespace OHOS {
-namespace IntellVoiceTrigger {
+namespace IntelligentVoice {
+namespace Trigger {
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerProperties;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModel;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceRecognitionEvent;
@@ -30,7 +31,7 @@ using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerCallback;
 
 class IntellVoiceTriggerCallbackDevice : public ITriggerCallback {
 public:
-    IntellVoiceTriggerCallbackDevice(OHOS::sptr<IIntellVoiceTriggerCallback> callback);
+    explicit IntellVoiceTriggerCallbackDevice(OHOS::sptr<IIntellVoiceTriggerCallback> callback);
     void OnRecognitionHdiEvent(const IntellVoiceRecognitionEvent &event, int32_t cookie) override;
 
 private:
@@ -40,12 +41,12 @@ private:
 class IntellVoiceTriggerAdapterImpl :
     public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter {
 public:
-    IntellVoiceTriggerAdapterImpl(std::unique_ptr<ITrigger> adapter);
+    explicit IntellVoiceTriggerAdapterImpl(std::unique_ptr<ITrigger> adapter);
     ~IntellVoiceTriggerAdapterImpl();
 
     int32_t GetProperties(IntellVoiceTriggerProperties &properties) override;
     int32_t LoadModel(const IntellVoiceTriggerModel &model, const sptr<IIntellVoiceTriggerCallback> &triggerCallback,
-         int32_t cookie, int32_t &handle) override;
+        int32_t cookie, int32_t &handle) override;
     int32_t UnloadModel(int32_t handle) override;
     int32_t Start(int32_t handle) override;
     int32_t Stop(int32_t handle) override;
@@ -56,7 +57,7 @@ private:
 private:
     std::unique_ptr<ITrigger> adapter_ = nullptr;
 };
-} // IntellVoiceTrigger
-} // OHOS
-
+}
+}
+}
 #endif // HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
