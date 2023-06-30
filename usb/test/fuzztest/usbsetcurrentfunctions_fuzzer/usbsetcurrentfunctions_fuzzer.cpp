@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@ namespace USB {
 bool UsbSetCurrentFunctionsFuzzTest(const uint8_t *data, size_t size)
 {
     (void)size;
+    (void)data;
     sptr<IUsbInterface> usbInterface = IUsbInterface::Get();
     int32_t ret = usbInterface->SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_DEVICE, DEFAULT_ROLE_DEVICE);
     sleep(SLEEP_TIME);
@@ -33,10 +34,10 @@ bool UsbSetCurrentFunctionsFuzzTest(const uint8_t *data, size_t size)
         return ret;
     }
 
-    int32_t timeout = *(reinterpret_cast<int32_t *>(*data));
     ret = usbInterface->SetCurrentFunctions(func);
-    if (ret == HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: set interface succeed", __func__);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: set current function failed", __func__);
+        return false;
     }
     return true;
 }
