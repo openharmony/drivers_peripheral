@@ -695,7 +695,8 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_ChangeToOfflineStream_benchmark_021)(
     cameraTest->rc = (CamRetCode)cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
-    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->CommitStreams(OperationMode::NORMAL, cameraTest->abilityVec);
+    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->CommitStreams(OperationMode::NORMAL,
+        cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     int captureId = 2001;
