@@ -13,8 +13,7 @@
     "name": "drivers_peripheral_intelligent_voice",
     "subsystem": "hdf",
     "features": ["drivers_peripheral_intelligent_voice_feature_community"],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard"],
+    "adapted_system_type": ["standard"],
     "rom": "675KB",
     "ram": "2048KB",
     "deps": {

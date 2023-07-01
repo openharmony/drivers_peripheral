@@ -77,12 +77,13 @@ inline ScopeGuard<Func> operator+(ScopeGuardOnExit, Func &&fn)
 }
 }
 
-/*** ScopeGuard ensure the specified function which is created by ON_SCOPE_EXIT is executed no matter how the current
-**** scope exit.
-**** when use ON_SCOPE_EXIT macro, the format is:
-**** ON_SCOPE_EXIT {
-********your code
-**** };
+/*
+ * ScopeGuard ensure the specified function which is created by ON_SCOPE_EXIT is executed no matter how the current
+ * scope exit.
+ * when use ON_SCOPE_EXIT macro, the format is:
+ * ON_SCOPE_EXIT {
+ *     your code
+ * };
 */
 #define ON_SCOPE_EXIT \
     auto __onScopeGuardExit__ = OHOS::IntelligentVoice::Utils::ScopeGuardOnExit() + [&]()

@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 #include <cerrno>
-#include "i_engine.h"
 #include "hdf_base.h"
+#include "i_engine.h"
 #include "intell_voice_log.h"
 
 #undef HDF_LOG_TAG
-#define HDF_LOG_TAG "IntellVoiceEngineStub"
+#define HDF_LOG_TAG "IntellVoiceEngineMgr"
 
 using namespace OHOS::HDI::IntelligentVoice::Engine::V1_0;
 

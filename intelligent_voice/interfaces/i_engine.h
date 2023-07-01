@@ -50,7 +50,7 @@ public:
     virtual IntellVoiceStatus SetParameter(const std::string &keyValueList) = 0;
     virtual IntellVoiceStatus GetParameter(const std::string &keyList, getParameterCb cb) = 0;
     virtual IntellVoiceStatus Write(const uint8_t *buffer, uint32_t size) = 0;
-    virtual IntellVoiceStatus Start(const StartInfo& info) = 0;
+    virtual IntellVoiceStatus Start(const StartInfo &info) = 0;
     virtual IntellVoiceStatus Stop() = 0;
     virtual IntellVoiceStatus Cancel() = 0;
     virtual IntellVoiceStatus ReadFileData(ContentType type, getFileDataCb cb) = 0;
