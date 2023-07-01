@@ -377,7 +377,6 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
     } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
-        Yuv422ToRGBA8888(buffer);
     } else {
         previewWidth_ = buffer->GetWidth();
         previewHeight_ = buffer->GetHeight();
@@ -408,5 +407,5 @@ RetCode CodecNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-REGISTERNODE(CodecNode, {"Codec"})
+REGISTERNODE(CodecNode, {"RKCodec"})
 } // namespace OHOS::Camera
