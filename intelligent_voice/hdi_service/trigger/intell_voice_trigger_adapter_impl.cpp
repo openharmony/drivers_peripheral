@@ -31,6 +31,11 @@ IntellVoiceTriggerCallbackDevice::IntellVoiceTriggerCallbackDevice(OHOS::sptr<II
 {
 }
 
+IntellVoiceTriggerCallbackDevice::~IntellVoiceTriggerCallbackDevice()
+{
+    callback_ = nullptr;
+}
+
 void IntellVoiceTriggerCallbackDevice::OnRecognitionHdiEvent(const IntellVoiceRecognitionEvent &event, int32_t cookie)
 {
     if (callback_ == nullptr) {
