@@ -622,9 +622,8 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     const int END_SYMBOL = -1;
     const int MINIMUM_FPS = 5;
     const int PREVIEW_STREAM = 0;
-    const int CAPTURE_STREAM = 1;
-    const int VIDEO_STREAM = 2;
-    const int FORMAT = 1;
+    const int CAPTURE_STREAM = 2;
+    const int VIDEO_STREAM = 1;
     std::string name = "YUYV 4:2:2";
     std::vector<int32_t> formatVector;
     int32_t fpsValue = 0;
@@ -634,7 +633,6 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
         }
         fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
         if (fpsValue > MINIMUM_FPS) {
-            formatVector.push_back(FORMAT);
             formatVector.push_back(it.fmtdesc.width);
             formatVector.push_back(it.fmtdesc.height);
             formatVector.push_back(fpsValue);
@@ -645,12 +643,15 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     std::vector<int32_t> streamAvailableExtendConfigurationsVector;
     streamAvailableExtendConfigurationsVector.push_back(0);
     streamAvailableExtendConfigurationsVector.push_back(PREVIEW_STREAM);
+    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
     streamAvailableExtendConfigurationsVector.push_back(CAPTURE_STREAM);
+    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
     streamAvailableExtendConfigurationsVector.push_back(VIDEO_STREAM);
+    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
