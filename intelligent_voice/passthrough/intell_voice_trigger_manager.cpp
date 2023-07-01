@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 #include <cerrno>
-#include "i_trigger.h"
 #include "hdf_base.h"
+#include "i_trigger.h"
 #include "intell_voice_log.h"
 
 #undef HDF_LOG_TAG
-#define HDF_LOG_TAG "IntellVoiceTriggerStub"
+#define HDF_LOG_TAG "IntellVoiceTriggerMgr"
 
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
 

@@ -82,7 +82,7 @@ int32_t IntellVoiceEngineAdapterImpl::GetParameter(const std::string &keyList, s
     return engine_->GetParameter(keyList, [&](const std::string &retStr) { valueList = retStr; });
 }
 
-int32_t IntellVoiceEngineAdapterImpl::Start(const StartInfo& info)
+int32_t IntellVoiceEngineAdapterImpl::Start(const StartInfo &info)
 {
     INTELLIGENT_VOICE_LOGD("Start enter");
     return engine_->Start(info);
@@ -156,7 +156,13 @@ int32_t IntellVoiceEngineAdapterImpl::ReadFileDataInner(ContentType type, uint8_
 }
 
 EngineListener::EngineListener(const sptr<IIntellVoiceEngineCallback> &cb) : cb_(cb)
-{}
+{
+}
+
+EngineListener::~EngineListener()
+{
+    cb_ = nullptr;
+}
 
 void EngineListener::OnIntellVoiceEvent(const IntellVoiceEngineCallBackEvent &event)
 {

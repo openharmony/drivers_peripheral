@@ -37,7 +37,7 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
 class EngineListener : public IEngineCallback {
 public:
     explicit EngineListener(const sptr<IIntellVoiceEngineCallback> &cb);
-    ~EngineListener(){};
+    ~EngineListener();
     void OnIntellVoiceEvent(const IntellVoiceEngineCallBackEvent &event) override;
 private:
     sptr<IIntellVoiceEngineCallback> cb_;
@@ -53,7 +53,7 @@ public:
     int32_t Detach() override;
     int32_t SetParameter(const std::string& keyValueList) override;
     int32_t GetParameter(const std::string& keyList, std::string& valueList) override;
-    int32_t Start(const StartInfo& info) override;
+    int32_t Start(const StartInfo &info) override;
     int32_t Stop() override;
     int32_t WriteAudio(const std::vector<uint8_t>& buffer) override;
     int32_t Read(ContentType type, sptr<Ashmem>& buffer) override;
