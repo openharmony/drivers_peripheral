@@ -32,7 +32,6 @@ typedef struct {
     uint64_t usage;        /**< the usage of memory */
     void *virAddr;        /**< Virtual address of memory  */
     uint64_t phyAddr;     /**< Physical address */
-    int32_t key;          /**< Shared memory key */
     uint32_t reserveFds;  /**< the number of reserved fd value */
     uint32_t reserveInts; /**< the number of reserved integer value */
     int32_t reserve[0];   /**< the data */

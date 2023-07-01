@@ -33,7 +33,7 @@ static bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
         !HdfSbufWriteInt32(data, handle->width) || !HdfSbufWriteInt32(data, handle->stride) ||
         !HdfSbufWriteInt32(data, handle->height) || !HdfSbufWriteInt32(data, handle->size) ||
         !HdfSbufWriteInt32(data, handle->format) || !HdfSbufWriteInt64(data, handle->usage) ||
-        !HdfSbufWriteUint64(data, handle->phyAddr) || !HdfSbufWriteInt32(data, handle->key)) {
+        !HdfSbufWriteUint64(data, handle->phyAddr)) {
         CODEC_LOGE("write handle failed!");
         return false;
     }
@@ -85,7 +85,7 @@ static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handl
     if (!HdfSbufReadInt32(data, &tmpHandle->width) || !HdfSbufReadInt32(data, &tmpHandle->stride) ||
         !HdfSbufReadInt32(data, &tmpHandle->height) || !HdfSbufReadInt32(data, &tmpHandle->size) ||
         !HdfSbufReadInt32(data, &tmpHandle->format) || !HdfSbufReadUint64(data, &tmpHandle->usage) ||
-        !HdfSbufReadUint64(data, &tmpHandle->phyAddr) || !HdfSbufReadInt32(data, &tmpHandle->key)) {
+        !HdfSbufReadUint64(data, &tmpHandle->phyAddr)) {
         CODEC_LOGE("read handle failed!");
         FreeBufferHandle(tmpHandle);
         return false;
