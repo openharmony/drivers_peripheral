@@ -23,37 +23,37 @@ extern "C" {
 }
 
 namespace OHOS::Camera {
-uint32_t RKCodecNode::previewWidth_ = 640;
-uint32_t RKCodecNode::previewHeight_ = 480;
+uint32_t CodecNode::previewWidth_ = 640;
+uint32_t CodecNode::previewHeight_ = 480;
 const unsigned long long TIME_CONVERSION_NS_S = 1000000000ULL; /* ns to s */
 
-RKCodecNode::RKCodecNode(const std::string& name, const std::string& type) : NodeBase(name, type)
+CodecNode::CodecNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
     jpegRotation_ = static_cast<uint32_t>(JXFORM_ROT_270);
     jpegQuality_ = 100; // 100:jpeg quality
 }
 
-RKCodecNode::~RKCodecNode()
+CodecNode::~CodecNode()
 {
-    CAMERA_LOGI("~RKCodecNode Node exit.");
+    CAMERA_LOGI("~CodecNode Node exit.");
 }
 
-RetCode RKCodecNode::Start(const int32_t streamId)
+RetCode CodecNode::Start(const int32_t streamId)
 {
-    CAMERA_LOGI("RKCodecNode::Start streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("CodecNode::Start streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-RetCode RKCodecNode::Stop(const int32_t streamId)
+RetCode CodecNode::Stop(const int32_t streamId)
 {
-    CAMERA_LOGI("RKCodecNode::Stop streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("CodecNode::Stop streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-RetCode RKCodecNode::Flush(const int32_t streamId)
+RetCode CodecNode::Flush(const int32_t streamId)
 {
-    CAMERA_LOGI("RKCodecNode::Flush streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("CodecNode::Flush streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
@@ -103,7 +103,7 @@ static void RotJpegImg(
     jpeg_destroy_decompress(&inputInfo);
 }
 
-RetCode RKCodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
+RetCode CodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
 {
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
@@ -127,7 +127,7 @@ RetCode RKCodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
     return RC_OK;
 }
 
-RetCode RKCodecNode::ConfigJpegQuality(common_metadata_header_t* data)
+RetCode CodecNode::ConfigJpegQuality(common_metadata_header_t* data)
 {
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
@@ -153,7 +153,7 @@ RetCode RKCodecNode::ConfigJpegQuality(common_metadata_header_t* data)
     return RC_OK;
 }
 
-RetCode RKCodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
+RetCode CodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     if (meta == nullptr) {
         CAMERA_LOGE("meta is nullptr");
@@ -176,7 +176,7 @@ RetCode RKCodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
     return rc;
 }
 
-void RKCodecNode::encodeJpegToMemory(uint8_t* image, int width, int height,
+void CodecNode::encodeJpegToMemory(uint8_t* image, int width, int height,
     const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf)
 {
     struct jpeg_compress_struct cInfo;
@@ -195,7 +195,7 @@ void RKCodecNode::encodeJpegToMemory(uint8_t* image, int width, int height,
     cInfo.in_color_space = JCS_RGB;
 
     jpeg_set_defaults(&cInfo);
-    CAMERA_LOGE("RKCodecNode::encodeJpegToMemory jpegQuality_ is = %{public}d", jpegQuality_);
+    CAMERA_LOGE("CodecNode::encodeJpegToMemory jpegQuality_ is = %{public}d", jpegQuality_);
     jpeg_set_quality(&cInfo, jpegQuality_, TRUE);
     jpeg_mem_dest(&cInfo, jpegBuf, jpegSize);
     jpeg_start_compress(&cInfo, TRUE);
@@ -224,10 +224,10 @@ void RKCodecNode::encodeJpegToMemory(uint8_t* image, int width, int height,
     }
 }
 
-void RKCodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
+void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToRGBA8888 buffer == nullptr");
+        CAMERA_LOGI("CodecNode::Yuv422ToRGBA8888 buffer == nullptr");
         return;
     }
 
@@ -238,7 +238,7 @@ void RKCodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
 
     void* temp = malloc(buffer->GetSize());
     if (temp == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToRGBA8888 malloc buffer == nullptr");
+        CAMERA_LOGI("CodecNode::Yuv422ToRGBA8888 malloc buffer == nullptr");
         return;
     }
     int ret = memcpy_s((uint8_t *)temp, buffer->GetSize(), (uint8_t *)buffer->GetVirAddress(), buffer->GetSize());
@@ -272,12 +272,54 @@ void RKCodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
     free(temp);
 }
 
-void RKCodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
+void CodecNode::Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& bufferYuv420)
+{
+    if (buffer == nullptr) {
+        CAMERA_LOGI("CodecNode::Yuv422ToYuv420 buffer == nullptr");
+        return;
+    }
+
+    AVFrame *pFrameYUV420 = nullptr;
+    AVFrame *pFrameYUV = nullptr;
+    pFrameYUV = av_frame_alloc();
+    pFrameYUV420 = av_frame_alloc();
+
+    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
+                   previewWidth_, previewHeight_);
+    avpicture_fill((AVPicture *)pFrameYUV420, (uint8_t *)bufferYuv420->GetVirAddress(), AV_PIX_FMT_YUV420P,
+                   previewWidth_, previewHeight_);
+
+    struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
+                                               previewHeight_, AV_PIX_FMT_YUV420P, SWS_BILINEAR, 0, 0, 0);
+
+    if (imgCtx != nullptr) {
+        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
+                  pFrameYUV420->data, pFrameYUV420->linesize);
+        if (imgCtx) {
+            sws_freeContext(imgCtx);
+            imgCtx = nullptr;
+        }
+    } else {
+        sws_freeContext(imgCtx);
+        imgCtx = nullptr;
+    }
+    av_frame_free(&pFrameYUV);
+    av_frame_free(&pFrameYUV420);
+    struct timespec ts = {};
+    int64_t timestamp = 0;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    timestamp = ts.tv_nsec + ts.tv_sec * TIME_CONVERSION_NS_S;
+    bufferYuv420->SetEsTimestamp(timestamp);
+    bufferYuv420->SetEsFrameSize(bufferYuv420->GetSize());
+    bufferYuv420->SetEsKeyFrame(0);
+}
+
+void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 {
     constexpr uint32_t RGB24Width = 3;
 
     if (buffer == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToJpeg buffer == nullptr");
+        CAMERA_LOGI("CodecNode::Yuv422ToJpeg buffer == nullptr");
         return;
     }
 
@@ -286,7 +328,7 @@ void RKCodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     uint32_t tempSize = (previewWidth_ * previewHeight_ * RGB24Width);
     void* temp = malloc(tempSize);
     if (temp == nullptr) {
-        CAMERA_LOGI("RKCodecNode::Yuv422ToJpeg malloc buffer == nullptr");
+        CAMERA_LOGI("CodecNode::Yuv422ToJpeg malloc buffer == nullptr");
         return;
     }
 
@@ -320,18 +362,18 @@ void RKCodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 
     free(jBuf);
     free(temp);
-    CAMERA_LOGE("RKCodecNode::Yuv422ToJpeg jpegSize = %{public}d\n", jpegSize);
+    CAMERA_LOGE("CodecNode::Yuv422ToJpeg jpegSize = %{public}d\n", jpegSize);
 }
 
-void RKCodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGE("RKCodecNode::DeliverBuffer frameSpec is null");
+        CAMERA_LOGE("CodecNode::DeliverBuffer frameSpec is null");
         return;
     }
 
     int32_t id = buffer->GetStreamId();
-    CAMERA_LOGE("RKCodecNode::DeliverBuffer StreamId %{public}d", id);
+    CAMERA_LOGE("CodecNode::DeliverBuffer StreamId %{public}d", id);
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
     } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
@@ -347,24 +389,24 @@ void RKCodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     for (auto& it : outPutPorts_) {
         if (it->format_.streamId_ == id) {
             it->DeliverBuffer(buffer);
-            CAMERA_LOGI("RKCodecNode deliver buffer streamid = %{public}d", it->format_.streamId_);
+            CAMERA_LOGI("CodecNode deliver buffer streamid = %{public}d", it->format_.streamId_);
             return;
         }
     }
 }
 
-RetCode RKCodecNode::Capture(const int32_t streamId, const int32_t captureId)
+RetCode CodecNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("RKCodecNode::Capture");
+    CAMERA_LOGV("CodecNode::Capture");
     return RC_OK;
 }
 
-RetCode RKCodecNode::CancelCapture(const int32_t streamId)
+RetCode CodecNode::CancelCapture(const int32_t streamId)
 {
-    CAMERA_LOGI("RKCodecNode::CancelCapture streamid = %{public}d", streamId);
+    CAMERA_LOGI("CodecNode::CancelCapture streamid = %{public}d", streamId);
 
     return RC_OK;
 }
 
-REGISTERNODE(RKCodecNode, {"RKCodec"})
+REGISTERNODE(CodecNode, {"Codec"})
 } // namespace OHOS::Camera

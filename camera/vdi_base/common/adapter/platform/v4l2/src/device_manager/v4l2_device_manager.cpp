@@ -647,8 +647,8 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     const int END_SYMBOL = -1;
     const int MINIMUM_FPS = 5;
     const int PREVIEW_STREAM = 0;
-    const int CAPTURE_STREAM = 1;
-    const int VIDEO_STREAM = 2;
+    const int CAPTURE_STREAM = 2;
+    const int VIDEO_STREAM = 1;
     const int FORMAT = 1;
     std::string name = "YUYV 4:2:2";
     std::vector<int32_t> formatVector;
