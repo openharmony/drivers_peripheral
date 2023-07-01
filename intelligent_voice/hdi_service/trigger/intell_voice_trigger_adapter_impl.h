@@ -32,6 +32,7 @@ using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerCallback;
 class IntellVoiceTriggerCallbackDevice : public ITriggerCallback {
 public:
     explicit IntellVoiceTriggerCallbackDevice(OHOS::sptr<IIntellVoiceTriggerCallback> callback);
+    ~IntellVoiceTriggerCallbackDevice();
     void OnRecognitionHdiEvent(const IntellVoiceRecognitionEvent &event, int32_t cookie) override;
 
 private:
