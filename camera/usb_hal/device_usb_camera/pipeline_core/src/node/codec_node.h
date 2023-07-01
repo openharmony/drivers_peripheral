@@ -24,10 +24,10 @@
 
 
 namespace OHOS::Camera {
-class RKCodecNode : public NodeBase {
+class CodecNode : public NodeBase {
 public:
-    RKCodecNode(const std::string& name, const std::string& type);
-    ~RKCodecNode() override;
+    CodecNode(const std::string& name, const std::string& type);
+    ~CodecNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
@@ -37,6 +37,7 @@ public:
     RetCode ConfigJpegOrientation(common_metadata_header_t* data);
     RetCode ConfigJpegQuality(common_metadata_header_t* data);
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    static void Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& bufferYuv420);
 private:
     void encodeJpegToMemory(uint8_t* image, int width, int height,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
