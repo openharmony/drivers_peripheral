@@ -772,7 +772,6 @@ static BufferHandle *DupBufferHandle(const BufferHandle *handle)
     newHandle->usage = handle->usage;
     newHandle->virAddr = handle->virAddr;
     newHandle->phyAddr = handle->phyAddr;
-    newHandle->key = handle->key;
 
     return newHandle;
 }
