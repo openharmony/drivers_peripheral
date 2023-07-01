@@ -133,6 +133,10 @@ static int32_t FindValidNetwork(int32_t type, struct IWiFiBaseFeature **feature)
     struct IWiFiList *networkNode = NULL;
 
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
+        if (networkNode == NULL) {
+            HDF_LOGE("%s: networkNode is NULL, line: %d", __FUNCTION__, __LINE__);
+            break;
+        }
         if (networkNode->ifeature != NULL && networkNode->ifeature->type == type) {
             HDF_LOGI("%s: feature is existed. type: %d", __FUNCTION__, type);
             *feature = networkNode->ifeature;
