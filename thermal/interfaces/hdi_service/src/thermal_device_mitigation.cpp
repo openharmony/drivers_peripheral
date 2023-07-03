@@ -25,13 +25,14 @@
 #include "securec.h"
 #include "hdf_log.h"
 #include "thermal_log.h"
+#include "thermal_hdf_config.h"
 
 #define HDF_LOG_TAG ThermalDeviceMitigation
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t MAX_PATH = 256;
 const int32_t MAX_BUF_PATH = 256;
@@ -242,7 +243,42 @@ int32_t ThermalDeviceMitigation::BatteryVoltageRequest(uint32_t voltage)
     }
     return ret;
 }
-} // V1_0
+
+int32_t ThermalDeviceMitigation::IsolateCpu(int32_t num)
+{
+    int32_t ret = HDF_FAILURE;
+    char valueBuf[MAX_PATH] = {0};
+    char isolateCpuPath[MAX_BUF_PATH] = {0};
+    std::string type = "soc";
+    std::string path;
+
+    ret = ThermalHdfConfig::GetInstance().GetIsolateCpuNodePath(flag_, type, path);
+    if (ret != HDF_SUCCESS) {
+        THERMAL_HILOGE(COMP_HDI, "get Isolate Cpu config path is null");
+        return HDF_FAILURE;
+    }
+
+    ret = snprintf_s(isolateCpuPath, MAX_BUF_PATH, sizeof(isolateCpuPath) - 1, "%s", path.c_str());
+    if (ret < EOK) {
+        return ret;
+    }
+
+    ret = snprintf_s(valueBuf, MAX_PATH, sizeof(valueBuf) - 1, "%d", num);
+    if (ret < EOK) {
+        return ret;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (WriteSysfsFile(isolateCpuPath, valueBuf, strlen(valueBuf)) > NUM_ZERO) {
+        THERMAL_HILOGI(COMP_HDI, "isolate cpu %{public}d", num);
+        ret = HDF_SUCCESS;
+    } else {
+        THERMAL_HILOGE(COMP_HDI, "failed to isolate cpu");
+        ret = HDF_FAILURE;
+    }
+    return ret;
+}
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 void SensorInfoConfig::SetXMLThermalZoneInfo(std::vector<XMLThermalZoneInfo> &vXmlTz)
 {
     xmlTzInfoList_ = vXmlTz;
@@ -59,7 +59,7 @@ std::string SensorInfoConfig::GetGroupName()
 {
     return groupName_;
 }
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t MS_PER_SECOND = 1000;
 const std::string THERMAL_SIMULATION_TAG = "sim_tz";
@@ -54,14 +54,9 @@ ThermalHdfTimer::~ThermalHdfTimer()
     ThermalDfx::DestroyInstance();
 }
 
-void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
-{
-    thermalCb_ = thermalCb;
-}
-
 void ThermalHdfTimer::SetSimluationFlag()
 {
-    auto baseConfigList = ThermalHdfConfig::GetInsance().GetBaseConfig()->GetBaseItem();
+    auto baseConfigList = ThermalHdfConfig::GetInstance().GetBaseConfig()->GetBaseItem();
     if (baseConfigList.empty()) {
         THERMAL_HILOGE(COMP_HDI, "baseConfigList is empty");
         return;
@@ -96,7 +91,7 @@ void ThermalHdfTimer::TimerProviderCallback()
 void ThermalHdfTimer::LoopingThreadEntry()
 {
     while (isRunning_) {
-        std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->maxCd_ / MS_PER_SECOND));
+        std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->GetMaxCd() / MS_PER_SECOND));
         TimerProviderCallback();
     }
 }
@@ -120,49 +115,17 @@ int32_t ThermalHdfTimer::Init()
 
 void ThermalHdfTimer::ReportThermalData()
 {
-    if (thermalCb_ == nullptr) {
-        THERMAL_HILOGE(COMP_HDI, "check thermalCb_ failed");
-        return;
-    }
-
-    thermalZoneMgr_->ReportThermalZoneData(reportTime_, multipleList_);
-    tzInfoEvent_ = thermalZoneMgr_->GetCallbackInfo();
-    // callback thermal event
-    thermalCb_->OnThermalDataEvent(tzInfoEvent_);
+    thermalZoneMgr_->ReportThermalZoneData(reportTime_);
 }
 
 void ThermalHdfTimer::ResetCount()
 {
-    THERMAL_HILOGD(COMP_HDI, "multipleList_:%{public}zu", multipleList_.size());
-    if (multipleList_.empty()) return;
-
-    int32_t maxValue = *(std::max_element(multipleList_.begin(), multipleList_.end()));
-    if (reportTime_ == maxValue) {
+    if (reportTime_ == thermalZoneMgr_->GetMaxReportTime()) {
         THERMAL_HILOGD(COMP_HDI, "reportTime:%{public}d", reportTime_);
         reportTime_ = 0;
     }
-    tzInfoEvent_.info.clear();
 }
-
-void ThermalHdfTimer::DumpSensorConfigInfo()
-{
-    auto sensorTypeMap = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
-    for (auto sensorIter : sensorTypeMap) {
-        THERMAL_HILOGI(COMP_HDI, "groupName %{public}s, interval %{public}d, multiple %{public}d",
-            sensorIter.first.c_str(), sensorIter.second->GetInterval(), sensorIter.second->multiple_);
-        for (auto tzIter : sensorIter.second->GetXMLThermalZoneInfo()) {
-            THERMAL_HILOGI(COMP_HDI, "type %{public}s, replace %{public}s", tzIter.type.c_str(),
-                tzIter.replace.c_str());
-        }
-        for (auto tnIter : sensorIter.second->GetXMLThermalNodeInfo()) {
-            THERMAL_HILOGI(COMP_HDI, "type %{public}s", tnIter.type.c_str());
-        }
-        for (auto dataIter : sensorIter.second->thermalDataList_) {
-            THERMAL_HILOGI(COMP_HDI, "data type %{public}s", dataIter.type.c_str());
-        }
-    }
-}
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

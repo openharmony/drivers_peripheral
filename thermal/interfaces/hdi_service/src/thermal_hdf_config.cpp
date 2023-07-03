@@ -24,12 +24,12 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t DEFAULT_POLLING_INTERVAL = 30000;
 }
 
-ThermalHdfConfig& ThermalHdfConfig::GetInsance()
+ThermalHdfConfig& ThermalHdfConfig::GetInstance()
 {
     static ThermalHdfConfig instance;
     return instance;
@@ -41,11 +41,6 @@ int32_t ThermalHdfConfig::ThermalHDIConfigInit(const std::string& path)
         baseConfig_ = std::make_shared<BaseInfoConfig>();
     }
     return ParseThermalHdiXMLConfig(path);
-}
-
-ThermalHdfConfig::ThermalTypeMap ThermalHdfConfig::GetSensorTypeMap()
-{
-    return typesMap_;
 }
 
 int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
@@ -83,12 +78,15 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
         if (node == nullptr) {
             continue;
         }
+
         if (!xmlStrcmp(node->name, BAD_CAST"base")) {
             ParseBaseNode(node);
         } else if (!xmlStrcmp(node->name, BAD_CAST"polling")) {
             ParsePollingNode(node);
         } else if (!xmlStrcmp(node->name, BAD_CAST"tracing")) {
             ParseTracingNode(node);
+        } else if (!xmlStrcmp(node->name, BAD_CAST"isolate")) {
+            ParseIsolateNode(node);
         }
     }
     return HDF_SUCCESS;
@@ -120,19 +118,32 @@ void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
     baseConfig_->SetBase(vBase);
 }
 
+std::string ThermalHdfConfig::GetXmlNodeName(xmlNodePtr node, std::string &defaultName)
+{
+    std::string name;
+    xmlChar* xmlName = xmlGetProp(node, BAD_CAST"name");
+    if (xmlName == nullptr) {
+        return defaultName;
+    }
+    name = std::string(reinterpret_cast<char*>(xmlName));
+    xmlFree(xmlName);
+
+    return name;
+}
+
 void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
 {
+    std::string pollingDefaultName("thermal");
+    std::string pollingName = GetXmlNodeName(node, pollingDefaultName);
+    GroupMap groupMap;
+
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
         std::shared_ptr<SensorInfoConfig> sensorInfo = std::make_shared<SensorInfoConfig>();
-        std::string groupName;
-        xmlChar* xmlName = xmlGetProp(cur, BAD_CAST"name");
-        if (xmlName != nullptr) {
-            groupName = std::string(reinterpret_cast<char*>(xmlName));
-            xmlFree(xmlName);
-            sensorInfo->SetGroupName(groupName);
-            THERMAL_HILOGD(COMP_HDI, "ParsePollingNode groupName: %{public}s", groupName.c_str());
-        }
+        std::string groupDefaultName("actual");
+        std::string groupName = GetXmlNodeName(cur, groupDefaultName);
+        sensorInfo->SetGroupName(groupName);
+        THERMAL_HILOGD(COMP_HDI, "ParsePollingNode groupName: %{public}s", groupName.c_str());
 
         xmlChar* xmlInterval = xmlGetProp(cur, BAD_CAST"interval");
         if (xmlInterval != nullptr) {
@@ -162,9 +173,11 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
         }
         sensorInfo->SetXMLThermalZoneInfo(xmlTzInfoList);
         sensorInfo->SetXMLThermalNodeInfo(xmlTnInfoList);
-        typesMap_.insert(std::make_pair(groupName, sensorInfo));
+        groupMap.insert(std::make_pair(groupName, sensorInfo));
         cur = cur->next;
     }
+
+    pollingMap_.insert(std::make_pair(pollingName, groupMap));
 }
 
 void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& tn)
@@ -255,7 +268,77 @@ void ThermalHdfConfig::GetThermalZoneNodeInfo(XMLThermalZoneInfo& tz, const xmlN
         xmlFree(replace);
     }
 }
-} // V1_0
+
+void ThermalHdfConfig::ParseIsolateNode(xmlNodePtr node)
+{
+    THERMAL_HILOGD(COMP_HDI, "in");
+    auto cur = node->xmlChildrenNode;
+    while (cur != nullptr) {
+        std::shared_ptr<IsolateInfoConfig> isolateInfo = std::make_shared<IsolateInfoConfig>();
+        std::string groupName;
+        xmlChar* xmlName = xmlGetProp(cur, BAD_CAST"name");
+        if (xmlName != nullptr) {
+            groupName = std::string(reinterpret_cast<char*>(xmlName));
+            xmlFree(xmlName);
+            isolateInfo->SetGroupName(groupName);
+            THERMAL_HILOGD(COMP_HDI, "groupName: %{public}s", groupName.c_str());
+        }
+
+        std::vector<IsolateNodeInfo> xmlTnInfoList;
+        for (auto subNode = cur->children; subNode; subNode = subNode->next) {
+            if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
+                IsolateNodeInfo tn;
+                ParseIsolateSubNode(subNode, tn);
+                xmlTnInfoList.push_back(tn);
+            }
+        }
+        isolateInfo->SetIsolateNodeInfo(xmlTnInfoList);
+        isolateInfoMap_.insert(std::make_pair(groupName, isolateInfo));
+        cur = cur->next;
+    }
+}
+
+void ThermalHdfConfig::ParseIsolateSubNode(xmlNodePtr node, IsolateNodeInfo& tn)
+{
+    xmlChar* xmlType = xmlGetProp(node, BAD_CAST"type");
+    if (xmlType != nullptr) {
+        tn.type = std::string(reinterpret_cast<char*>(xmlType));
+        THERMAL_HILOGD(COMP_HDI, "type: %{public}s", tn.type.c_str());
+        xmlFree(xmlType);
+    }
+
+    xmlChar* xmlPath = xmlGetProp(node, BAD_CAST"path");
+    if (xmlPath != nullptr) {
+        tn.path = std::string(reinterpret_cast<char*>(xmlPath));
+        THERMAL_HILOGD(COMP_HDI, "path: %{public}s", tn.path.c_str());
+        xmlFree(xmlPath);
+    }
+}
+
+int32_t ThermalHdfConfig::GetIsolateCpuNodePath(bool isSim, const std::string &type, std::string &path)
+{
+    std::string groupName = isSim ? "sim" : "actual";
+    THERMAL_HILOGI(COMP_HDI, "isSim %d, type %{public}s, groupName %{public}s", isSim, type.c_str(), groupName.c_str());
+
+    auto mapIter = isolateInfoMap_.find(groupName);
+    if (mapIter == isolateInfoMap_.end()) {
+        THERMAL_HILOGE(COMP_HDI, "failed to get group %s config", groupName.c_str());
+        return HDF_FAILURE;
+    }
+
+    std::vector<IsolateNodeInfo> nodeVector = mapIter->second->GetIsolateNodeInfo();
+    for (auto nodeIter : nodeVector) {
+        if (type == nodeIter.type) {
+            path = nodeIter.path;
+            THERMAL_HILOGI(COMP_HDI, "path %{public}s", path.c_str());
+            return HDF_SUCCESS;
+        }
+    }
+
+    THERMAL_HILOGE(COMP_HDI, "failed to get type %{public}s path", type.c_str());
+    return HDF_FAILURE;
+}
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

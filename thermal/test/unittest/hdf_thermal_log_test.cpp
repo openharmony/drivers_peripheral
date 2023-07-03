@@ -24,7 +24,7 @@
 #include "thermal_log.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Thermal::V1_0;
+using namespace OHOS::HDI::Thermal::V1_1;
 using namespace testing::ext;
 
 class HdfThermalLogTest : public testing::Test {

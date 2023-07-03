@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 class ThermalSimulationNode {
 public:
     ThermalSimulationNode() = default;
@@ -34,10 +34,11 @@ private:
     int32_t CreateNodeDir(std::string dir);
     int32_t CreateNodeFile(std::string filePath);
     int32_t AddSensorTypeTemp();
+    int32_t AddFanSensorNode();
     int32_t AddMitigationDevice();
     int32_t WriteFile(std::string path, std::string buf, size_t size);
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

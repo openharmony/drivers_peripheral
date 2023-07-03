@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 
 const std::string HDI_XML_PATH = "etc/thermal_config/thermal_hdi_config.xml";
@@ -60,7 +60,7 @@ int32_t ThermalInterfaceImpl::Init()
     int32_t ret;
     char* path = GetOneCfgFile(HDI_XML_PATH.c_str(), buf, MAX_PATH_LEN);
     if (path != nullptr && *path != '\0') {
-        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(path);
+        ret = ThermalHdfConfig::GetInstance().ThermalHDIConfigInit(path);
         if (ret != HDF_SUCCESS) {
             THERMAL_HILOGE(COMP_HDI, "parse err pliocy thermal hdi XML");
             return HDF_FAILURE;
@@ -69,7 +69,7 @@ int32_t ThermalInterfaceImpl::Init()
     }
 
     if (!parseConfigSuc) {
-        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(VENDOR_HDI_XML_PATH);
+        ret = ThermalHdfConfig::GetInstance().ThermalHDIConfigInit(VENDOR_HDI_XML_PATH);
         if (ret != HDF_SUCCESS) {
             THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
             return HDF_FAILURE;
@@ -98,14 +98,14 @@ int32_t ThermalInterfaceImpl::Init()
         return HDF_FAILURE;
     }
 
+    thermalZoneMgr_->Init();
     thermalZoneMgr_->CalculateMaxCd();
-    thermalZoneMgr_->SetMultiples();
     ret = thermalZoneMgr_->ParseThermalZoneInfo();
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
-    hdfTimer_->DumpSensorConfigInfo();
+    thermalZoneMgr_->DumpPollingInfo();
     mitigation_->SetFlag(static_cast<bool>(hdfTimer_->GetSimluationFlag()));
     return HDF_SUCCESS;
 }
@@ -155,30 +155,81 @@ int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj)
+int32_t ThermalInterfaceImpl::IsolateCpu(int32_t num)
 {
-    int32_t ret;
-    theramalCb_ = callbackObj;
-    if (hdfTimer_ == nullptr) return HDF_FAILURE;
-    hdfTimer_->SetThermalEventCb(theramalCb_);
-
-    if (!g_isHdiStart) {
-        ret = hdfTimer_->Init();
+    if (mitigation_ != nullptr) {
+        int32_t ret = mitigation_->IsolateCpu(num);
         if (ret != HDF_SUCCESS) {
+            THERMAL_HILOGE(COMP_HDI, "failed to set isolate cpu num %{public}d", ret);
             return ret;
         }
-        g_isHdiStart = true;
     }
     return HDF_SUCCESS;
 }
 
+int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj)
+{
+    if (thermalZoneMgr_ == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    thermalZoneMgr_->SetThermalEventCb(callbackObj);
+    StartTimerThread();
+
+    return g_isHdiStart ? HDF_SUCCESS : HDF_FAILURE;
+}
+
 int32_t ThermalInterfaceImpl::Unregister()
 {
-    theramalCb_ = nullptr;
-    g_isHdiStart = false;
+    if (thermalZoneMgr_ == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    thermalZoneMgr_->DelThermalEventCb();
     return HDF_SUCCESS;
 }
-} // V1_0
+
+int32_t ThermalInterfaceImpl::RegisterFanCallback(const sptr<IFanCallback>& callbackObj)
+{
+    if (thermalZoneMgr_ == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    thermalZoneMgr_->SetFanEventCb(callbackObj);
+    StartTimerThread();
+
+    return g_isHdiStart ? HDF_SUCCESS : HDF_FAILURE;
+}
+
+int32_t ThermalInterfaceImpl::UnregisterFanCallback()
+{
+    if (thermalZoneMgr_ == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    thermalZoneMgr_->DelFanEventCb();
+    return HDF_SUCCESS;
+}
+
+void ThermalInterfaceImpl::StartTimerThread()
+{
+    if (hdfTimer_ == nullptr) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!g_isHdiStart) {
+        int32_t ret = hdfTimer_->Init();
+        if (ret != HDF_SUCCESS) {
+            return;
+        }
+        g_isHdiStart = true;
+    }
+
+    return;
+}
+
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS
