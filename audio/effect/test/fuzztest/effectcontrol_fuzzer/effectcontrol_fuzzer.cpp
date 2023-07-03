@@ -105,6 +105,9 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (ret != HDF_SUCCESS) {
         return false;
     }
+    if (controller == nullptr) {
+        return false;
+    }
 
     EffectControlFucSwitch(controller, cmd, rawData, size);
 
@@ -116,11 +119,10 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         free(effectId);
         effectId = nullptr;
     }
-    if (controller != nullptr && model != nullptr) {
-        ret = model->DestroyEffectController(model, &contollerId);
-        if (ret != HDF_SUCCESS) {
-            return false;
-        }
+
+    ret = model->DestroyEffectController(model, &contollerId);
+    if (ret != HDF_SUCCESS) {
+        return false;
     }
     if (model != nullptr) {
         IEffectModelRelease(model, true);
