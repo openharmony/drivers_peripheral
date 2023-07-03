@@ -26,6 +26,7 @@ struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
 struct IWiFiSta *g_staFeature = NULL;
 struct IWiFiBaseFeature *g_baseFeature = NULL;
+static uint32_t g_wifiCount = 0;
 static uint32_t g_apFeatureCount = 0;
 static uint32_t g_staFeatureCount = 0;
 const uint32_t RESET_TIME = 3;
@@ -52,6 +53,8 @@ int32_t WlanInterfaceStart(struct IWlanInterface *self)
     ret = g_wifi->start(g_wifi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s start WiFi failed! error code: %{public}d", __func__, ret);
+    } else {
+        g_wifiCount++;
     }
     return ret;
 }
@@ -64,6 +67,11 @@ int32_t WlanInterfaceStop(struct IWlanInterface *self)
     if (g_wifi == NULL || g_wifi->stop == NULL) {
         HDF_LOGE("%{public}s: g_wifi or g_wifi->stop is NULL", __func__);
         return HDF_FAILURE;
+    }
+    g_wifiCount--;
+    if (g_wifiCount > 0) {
+        HDF_LOGE("%{public}s: g_wifi is used!", __func__);
+        return HDF_SUCCESS;
     }
     ret = g_wifi->stop(g_wifi);
     if (ret != HDF_SUCCESS) {
