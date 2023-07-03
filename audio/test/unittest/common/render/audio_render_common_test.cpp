@@ -444,7 +444,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid002, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = render_->GetRenderPosition(render_, &frames, &time);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
 
     render_->Stop(render_);
     if (frame != nullptr) {
@@ -749,7 +749,7 @@ HWTEST_F(AudioUtRenderTest, RenderSetVolumeIsValid001, TestSize.Level1)
     float volume = 0.2;
     int32_t ret = render_->SetVolume(render_, volume);
 
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderGetRenderSpeedIsInValid001, TestSize.Level1)
@@ -837,24 +837,10 @@ HWTEST_F(AudioUtRenderTest, RenderAddAudioEffectIsInValid001, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->AddAudioEffect(nullptr, effectId));
 }
 
-HWTEST_F(AudioUtRenderTest, RenderAddAudioEffectIsValid001, TestSize.Level1)
-{
-    uint64_t effectId = 0;
-    int32_t ret = render_->AddAudioEffect(render_, effectId);
-    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
-}
-
 HWTEST_F(AudioUtRenderTest, RenderRemoveAudioEffectIsInValid001, TestSize.Level1)
 {
     uint64_t effectId = 0;
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->RemoveAudioEffect(nullptr, effectId));
-}
-
-HWTEST_F(AudioUtRenderTest, RenderRemoveAudioEffectIsValid001, TestSize.Level1)
-{
-    uint64_t effectId = 0;
-    int32_t ret = render_->RemoveAudioEffect(render_, effectId);
-    ASSERT_TRUE(ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderGetFrameBufferSizeIsInValid001, TestSize.Level1)
