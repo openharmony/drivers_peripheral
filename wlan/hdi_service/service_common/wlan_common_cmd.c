@@ -704,6 +704,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
 
     if (data == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         return HDF_ERR_INVALID_PARAM;
     }
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
@@ -751,6 +752,7 @@ static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMs
 
     if (recvMsg == NULL) {
         HDF_LOGE("%{public}s: recvMsg or ifName is NULL!", __func__);
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         return HDF_ERR_INVALID_PARAM;
     }
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
