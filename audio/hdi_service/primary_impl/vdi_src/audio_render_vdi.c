@@ -875,7 +875,6 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct Audio
 static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 {
     uint32_t renderId = AUDIO_VDI_STREAM_NUM_MAX;
-    uint32_t index = 0;
     if (renderPriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return renderId;
@@ -885,7 +884,7 @@ static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
         renderId = renderPriv->renderCnt;
         renderPriv->renderCnt++;
     } else {
-        for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
+        for (uint32_t index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
             if (renderPriv->renderInfos[index] == NULL) {
                 renderId = index;
                 break;

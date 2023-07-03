@@ -40,6 +40,8 @@
 #define AUDIO_DEV_ON  1
 #define AUDIO_DEV_OFF 0
 
+#define HDF_PATH_NUM_MAX 32
+
 static cJSON *g_cJsonObj = NULL;
 
 int32_t AudioPathSelGetConfToJsonObj(void)
@@ -142,8 +144,8 @@ static int32_t SetRenderPathDefaultValue(cJSON *renderSwObj, struct AudioHwRende
 
     renderDevNum = renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     int32_t renderPathNum = cJSON_GetArraySize(renderSwObj);
-    if (renderPathNum < 0) {
-        AUDIO_FUNC_LOGE("renderPathNum is less than zero!");
+    if (renderPathNum < 0 || renderPathNum > HDF_PATH_NUM_MAX) {
+        AUDIO_FUNC_LOGE("renderPathNum is invalid!");
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < renderPathNum; i++) {
@@ -183,8 +185,8 @@ static int32_t SetCapturePathDefaultValue(cJSON *captureSwObj, struct AudioHwCap
 
     int32_t devNum = captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     int32_t pathNum = cJSON_GetArraySize(captureSwObj);
-    if (pathNum < 0) {
-        AUDIO_FUNC_LOGE("pathNum is less than zero!");
+    if (pathNum < 0 || pathNum > HDF_PATH_NUM_MAX) {
+        AUDIO_FUNC_LOGE("pathNum is invalid!");
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < pathNum; i++) {
@@ -232,8 +234,8 @@ static int32_t SetRenderPathValue(
     /* pins = 0, parse default value */
     if (strcasecmp(renderDeviceType, renderObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(renderObj);
-        if (pathNum < 0) {
-            AUDIO_FUNC_LOGE("pathNum is less than zero!");
+        if (pathNum < 0 || pathNum > HDF_PATH_NUM_MAX) {
+            AUDIO_FUNC_LOGE("pathNum is invalid!");
             return HDF_FAILURE;
         }
         for (int32_t i = 0; i < pathNum; i++) {
@@ -412,8 +414,8 @@ static int32_t AudioRenderParseUsecase(struct AudioHwRenderParam *renderParam, c
     }
 
     int32_t len = cJSON_GetArraySize(useCaseList);
-    if (len < 0) {
-        AUDIO_FUNC_LOGE("len is less than zero!");
+    if (len < 0 || len > HDF_PATH_NUM_MAX) {
+        AUDIO_FUNC_LOGE("len is invalid!");
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < len; i++) {
@@ -457,8 +459,8 @@ static int32_t SetCapturePathValue(
     int32_t devNum = captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     if (strcasecmp(captureDeviceType, captureSwitchObj->string) == 0) {
         int32_t pathNum = cJSON_GetArraySize(captureSwitchObj);
-        if (pathNum < 0) {
-            AUDIO_FUNC_LOGE("pathNum is less than zero!");
+        if (pathNum < 0 || pathNum > HDF_PATH_NUM_MAX) {
+            AUDIO_FUNC_LOGE("pathNum is invalid!");
             return HDF_FAILURE;
         }
         for (int32_t i = 0; i < pathNum; i++) {
@@ -642,8 +644,8 @@ static int32_t AudioCaptureParseUsecase(struct AudioHwCaptureParam *captureParam
     }
 
     int32_t len = cJSON_GetArraySize(useCaseList);
-    if (len < 0) {
-        AUDIO_FUNC_LOGE("len is less than zero!");
+    if (len < 0 || len > HDF_PATH_NUM_MAX) {
+        AUDIO_FUNC_LOGE("len is invalid!");
         return HDF_FAILURE;
     }
     for (int32_t i = 0; i < len; i++) {
