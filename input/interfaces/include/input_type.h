@@ -103,6 +103,7 @@ enum InputDevType {
     INDEV_TYPE_KEYBOARD,            /**< Keyboard */
     INDEV_TYPE_ROCKER,              /**< ROCKER */
     INDEV_TYPE_TRACKBALL,           /**< TRACKBALL */
+    INDEV_TYPE_TOUCHPAD,            /**< Touchpad */
     INDEV_TYPE_UNKNOWN,             /**< Unknown input device type */
 };
 
