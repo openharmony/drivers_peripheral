@@ -1,0 +1,40 @@
+{
+  "name": "@ohos/drivers_peripheral_intelligent_voice",
+  "description": "intelligent_voice device driver",
+  "version": "4.0",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/intelligent_voice"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "drivers_peripheral_intelligent_voice",
+    "subsystem": "hdf",
+    "features": ["drivers_peripheral_intelligent_voice_feature_community"],
+    "adapted_system_type": ["standard"],
+    "rom": "675KB",
+    "ram": "2048KB",
+    "deps": {
+      "components": [
+        "c_utils",
+        "drivers_interface_intelligent_voice",
+        "hdf_core",
+        "hilog",
+        "ipc"
+      ],
+      "third_part": [
+        "bounds_checking_function",
+        "googletest"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/intelligent_voice:intell_voice_engine_entry",
+        "//drivers/peripheral/intelligent_voice:intell_voice_trigger_entry"
+      ],
+      "test": []
+    }
+  }
+}
