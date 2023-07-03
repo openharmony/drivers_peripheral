@@ -37,7 +37,7 @@ ohos_fuzztest("UsbDdkFuzzTest") {
     "drivers_interface_usb:usb_ddk_idl_headers",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 }

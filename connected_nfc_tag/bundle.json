@@ -22,7 +22,7 @@
       "components": [
         "ipc",
         "hdf_core",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "utils_base"
       ],
       "third_party": [
