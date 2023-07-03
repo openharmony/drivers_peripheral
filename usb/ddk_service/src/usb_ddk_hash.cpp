@@ -19,7 +19,7 @@
 
 #include "hdf_base.h"
 
-std::unordered_map<uint64_t, uint64_t> g_hashMap;
+static std::unordered_map<uint64_t, uint64_t> g_hashMap;
 std::mutex g_mapMutex;
 
 constexpr size_t MAX_HASH_RECORD = 1000;
