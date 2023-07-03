@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 struct BaseItem {
     std::string tag;
     std::string value;
@@ -41,7 +41,7 @@ public:
 private:
     std::vector<BaseItem> bastList_;
 };
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS

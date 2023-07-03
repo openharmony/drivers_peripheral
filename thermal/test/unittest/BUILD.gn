@@ -37,14 +37,14 @@ ohos_unittest("hdi_unittest_thermal") {
   ]
 
   deps = [
-    "../../interfaces/hdi_service:libthermal_interface_service_1.0",
+    "../../interfaces/hdi_service:libthermal_interface_service_1.1",
     "//third_party/libxml2:xml2",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_thermal:libthermal_proxy_1.0",
+      "drivers_interface_thermal:libthermal_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",

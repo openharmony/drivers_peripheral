@@ -5,7 +5,7 @@
         <item tag="sim_tz" value="1"/>
     </base>
 
-    <polling>
+    <polling name="thermal">
         <group name="actual" interval="30000">
             <thermal_zone type="soc-thermal"/>
             <thermal_zone type="gpu-thermal"/>
@@ -22,6 +22,19 @@
         </group>
     </polling>
 
+    <polling name="fan">
+        <group name="actual" interval="30000">
+            <thermal_zone type="soc-thermal"/>
+            <thermal_zone type="gpu-thermal"/>
+            <thermal_zone type="fan"/>
+        </group>
+        <group name="sim" interval="30000">
+            <thermal_node type="soc" path="data/service/el0/thermal/sensor/soc/temp"/>
+            <thermal_node type="gpu" path="data/service/el0/thermal/sensor/gpu/temp"/>
+            <thermal_node type="fan" path="data/service/el0/thermal/sensor/fan/speed"/>
+        </group>
+    </polling>
+
     <tracing outpath="/data/log/thermal/thermal-log">
         <node>
             <title path="sys/class/thermal/thermal_zone0/type"/>
@@ -32,4 +45,13 @@
             <value path="sys/class/thermal/thermal_zone1/temp"/>
         </node>
     </tracing>
+
+    <isolate>
+        <group name="actual">
+            <thermal_node type="soc" />
+        </group>
+        <group name="sim">
+            <thermal_node type="soc" path="/data/service/el0/thermal/sensor/soc/isolate"/>
+        </group>
+    </isolate>
 </thermal>

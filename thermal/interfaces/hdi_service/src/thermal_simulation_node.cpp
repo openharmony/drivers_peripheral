@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const int32_t MAX_PATH = 256;
 const int32_t ARG_0 = 0;
@@ -49,6 +49,10 @@ const std::string MITIGATION_NODE_FILE = "%s/%s";
 int32_t ThermalSimulationNode::NodeInit()
 {
     int32_t ret = AddSensorTypeTemp();
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+    ret = AddFanSensorNode();
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -106,6 +110,7 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     sensor["cpu"] = 0;
     sensor["soc"] = 0;
     sensor["shell"] = 0;
+    sensor["gpu"] = 0;
     CreateNodeDir(THERMAL_DIR);
     for (auto dir : sensor) {
         int32_t ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1,
@@ -136,6 +141,38 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
         std::string temp = std::to_string(dir.second);
         WriteFile(tempBuf, temp, temp.length());
     }
+    return HDF_SUCCESS;
+}
+
+int32_t ThermalSimulationNode::AddFanSensorNode()
+{
+    char nodePath[MAX_PATH] = {0};
+    char typePath[MAX_PATH] = {0};
+    char speedPath[MAX_PATH] = {0};
+
+    int32_t ret = snprintf_s(nodePath, MAX_PATH, sizeof(nodePath) - ARG_1,
+        THERMAL_NODE_DIR.c_str(), "fan");
+    if (ret < EOK) {
+        return HDF_FAILURE;
+    }
+    CreateNodeDir(static_cast<std::string>(nodePath));
+
+    ret = snprintf_s(typePath, MAX_PATH, sizeof(typePath) - ARG_1, "%s/%s", nodePath, "type");
+    if (ret < EOK) {
+        return HDF_FAILURE;
+    }
+    CreateNodeFile(static_cast<std::string>(typePath));
+    std::string type = "fan";
+    WriteFile(typePath, type, type.length());
+
+    ret = snprintf_s(speedPath, MAX_PATH, sizeof(speedPath) - ARG_1, "%s/%s", nodePath, "speed");
+    if (ret < EOK) {
+        return HDF_FAILURE;
+    }
+    CreateNodeFile(static_cast<std::string>(speedPath));
+    std::string speed = "0";
+    WriteFile(speedPath, speed, speed.length());
+
     return HDF_SUCCESS;
 }
 
@@ -200,7 +237,7 @@ int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size
     close(fd);
     return HDF_SUCCESS;
 }
-} // V1_0
+} // V1_1
 } // Thermal
 } // HDI
 } // OHOS
