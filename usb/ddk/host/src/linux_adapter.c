@@ -23,10 +23,11 @@
 
 #define HDF_LOG_TAG USB_LINUX_ADAPTER
 
-#define PATH_LEN      50
-#define DESC_READ_LEN 256
-#define EP_NUM_MAX    30
-#define SLEEP_TIME    500000
+#define PATH_LEN             50
+#define DESC_READ_LEN        256
+#define EP_NUM_MAX           30
+#define SLEEP_TIME           500000
+#define USB_DEVICE_MMAP_PATH "/data/service/el1/public/usb/"
 
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
@@ -118,36 +119,71 @@ static struct UsbDevice *OsAllocDevice(struct UsbSession *session, struct UsbDev
     return dev;
 }
 
+static int32_t GetMmapFd(struct UsbDevice *dev)
+{
+    char path[PATH_LEN] = {'\0'};
+    int32_t ret = sprintf_s(path, PATH_LEN, USB_DEVICE_MMAP_PATH "%03u_%03u", dev->busNum, dev->devAddr);
+    if (ret < HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%d path error", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
+    int32_t fd = HDF_FAILURE;
+    if ((fd = open(path, O_RDWR | O_CREAT | O_TRUNC)) < 0) {
+        HDF_LOGE("%{public}s: open error:%{public}s", __func__, path);
+        return HDF_FAILURE;
+    }
+    dev->devHandle->mmapFd = fd;
+    return HDF_SUCCESS;
+}
+
+static int32_t GetUsbDevicePath(struct UsbDevice *dev, char *pathBuf, size_t length)
+{
+    char path[PATH_LEN] = {'\0'};
+    int32_t ret = sprintf_s(path, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", dev->busNum, dev->devAddr);
+    if (ret < HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%d path error", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
+    if (realpath(path, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (length < strlen(USB_DEV_FS_PATH)) {
+        HDF_LOGE("%{public}s: invalid length", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (strncmp(USB_DEV_FS_PATH, pathBuf, strlen(USB_DEV_FS_PATH)) != 0) {
+        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
 {
-    char path[PATH_LEN];
-    int32_t fd = HDF_FAILURE;
-    int32_t ret;
-
     if (dev == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = sprintf_s(path, sizeof(path), "/data/service/el1/public/usb/%03u_%03u", dev->busNum, dev->devAddr);
-    if (ret < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%d path error", __func__, __LINE__);
-        return HDF_FAILURE;
+    int32_t ret = GetMmapFd(dev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get mmap fd failed:%{public}d", __func__, ret);
+        return ret;
     }
 
-    if ((fd = open(path, O_RDWR | O_CREAT | O_TRUNC)) < 0) {
-        HDF_LOGE("%{public}s: open error:%{public}s", __func__, path);
-        return HDF_FAILURE;
+    char pathBuf[PATH_LEN] = {'\0'};
+    ret = GetUsbDevicePath(dev, pathBuf, PATH_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get usb device path failed:%{public}d", __func__, ret);
+        return ret;
     }
 
-    dev->devHandle->mmapFd = fd;
-    ret = sprintf_s(path, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", dev->busNum, dev->devAddr);
-    if (ret < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%d path error", __func__, __LINE__);
-        return HDF_FAILURE;
-    }
-
-    fd = open(path, mode | O_CLOEXEC);
+    int32_t fd = open(pathBuf, mode | O_CLOEXEC);
     if (fd != HDF_FAILURE) {
         return fd;
     }
@@ -155,7 +191,7 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
     usleep(SLEEP_TIME);
     switch (errno) {
         case ENOENT:
-            fd = open(path, mode | O_CLOEXEC);
+            fd = open(pathBuf, mode | O_CLOEXEC);
             if (fd != HDF_FAILURE) {
                 return fd;
             }
