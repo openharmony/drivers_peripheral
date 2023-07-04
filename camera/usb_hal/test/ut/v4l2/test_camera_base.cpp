@@ -544,7 +544,7 @@ void TestCameraBase::StartStream(std::vector<StreamIntent> intents)
             streamInfoVideo.streamId_ = STREAM_ID_VIDEO;
             streamInfoVideo.width_ = VIDEO_WIDTH; // 1280:picture width
             streamInfoVideo.height_ = VIDEO_HEIGHT; // 960:picture height
-            streamInfoVideo.format_ = PIXEL_FMT_RGBA_8888;
+            streamInfoVideo.format_ = PIXEL_FMT_YCRCB_420_SP;
             streamInfoVideo.dataspace_ = 8; // 8:picture dataspace
             streamInfoVideo.intent_ = intent;
             streamInfoVideo.encodeType_ = ENCODE_TYPE_H264;

@@ -107,7 +107,6 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             } else if (memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
                 buffer->GetVirAddress(), buffer->GetSize()) != 0) {
                 forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                CAMERA_LOGW("memcpy_s failed.");
                 CAMERA_LOGW("PcForkNode::memcpy_s failed.");
             }
             for (auto& it : outPutPorts_) {
