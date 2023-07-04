@@ -38,14 +38,7 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
     buffer->SetFormat(format);
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
     buffer->SetSize(static_cast<uint32_t>(bufHandle->size));
-
-    CAMERA_LOGD("surfaceBuffer->GetVirAddr() = %{public}p", surfaceBuffer->GetVirAddr());
-    CAMERA_LOGD("bufHandle->virAddr = %{public}p", bufHandle->virAddr);
-    uint8_t* addr = reinterpret_cast<uint8_t*>(malloc(static_cast<uint32_t>(bufHandle->size)));
-    if (addr == nullptr) {
-        CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
-    }
-    buffer->SetVirAddress(addr);
+    buffer->SetVirAddress(surfaceBuffer->GetVirAddr());
 
     return RC_OK;
 }
