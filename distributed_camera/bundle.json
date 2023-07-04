@@ -22,7 +22,7 @@
             "components":[
                 "ipc",
                 "hdf_core",
-                "hiviewdfx_hilog_native",
+                "hilog",
                 "c_utils",
                 "samgr",
                 "drivers_interface_display",
