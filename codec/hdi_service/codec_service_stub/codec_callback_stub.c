@@ -178,7 +178,7 @@ static int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *serv
     }
 }
 
-struct CodecCallbackStub *CodecCallbackStubObtain(CodecCallback *callback)
+struct CodecCallbackStub *CodecCallbackStubObtain(const CodecCallback *callback)
 {
     if (callback == NULL) {
         HDF_LOGE("%{public}s: callback is null!", __func__);
