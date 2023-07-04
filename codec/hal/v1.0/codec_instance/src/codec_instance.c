@@ -360,7 +360,7 @@ int32_t RunCodecInstance(struct CodecInstance *instance)
         instance->codecCallbackStatus = CODEC_STATUS_STARTED;
         pthread_attr_init(&instance->codecCallbackTaskAttr);
         pthread_attr_setdetachstate(&instance->codecCallbackTaskAttr, PTHREAD_CREATE_JOINABLE);
-        int32_t ret = pthread_create(&instance->codecCallbackTask, NULL, CodecCallbackTaskThread, instance);
+        ret = pthread_create(&instance->codecCallbackTask, NULL, CodecCallbackTaskThread, instance);
         if (ret != 0) {
             HDF_LOGE("%{public}s: run codec callback task thread failed!", __func__);
             instance->codecStatus = CODEC_STATUS_STOPPING;
