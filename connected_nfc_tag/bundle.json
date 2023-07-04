@@ -15,7 +15,7 @@
     "syscap": [
       "SystemCapability.Communication.ConnectedTag"
     ],
-    "adapter_system_type": ["standard"],
+    "adapted_system_type": ["standard"],
     "rom": "1000KB",
     "ram": "1000KB",
     "deps": {
@@ -23,7 +23,9 @@
         "ipc",
         "hdf_core",
         "hilog",
-        "utils_base"
+        "utils_base",
+        "c_utils",
+        "drivers_interface_connected_nfc_tag"
       ],
       "third_party": [
         "bounds_checking_function"
