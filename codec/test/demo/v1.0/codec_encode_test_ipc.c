@@ -449,7 +449,7 @@ static int32_t GetEncParameter(void)
 
 static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData)
 {
-    int32_t ret = 0;
+    int32_t ret;
     int32_t acquireFd = 0;
 
     CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
@@ -475,7 +475,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
         }
 
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
-        int32_t ret = memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
+        ret = memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: memcpy_s sm->virAddr err %{public}d", __func__, ret);
             return;

@@ -28,7 +28,7 @@ struct CodecCallbackStub {
     struct HdfRemoteDispatcher dispatcher;
 };
 
-struct CodecCallbackStub *CodecCallbackStubObtain(CodecCallback *callback);
+struct CodecCallbackStub *CodecCallbackStubObtain(const CodecCallback *callback);
 void CodecCallbackStubRelease(struct CodecCallbackStub *stub);
 
 #ifdef __cplusplus
