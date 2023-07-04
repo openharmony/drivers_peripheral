@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,10 +25,12 @@
 #include "surface_buffer.h"
 
 #include "v1_0/dcamera_types.h"
+#include "v1_0/display_composer_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 class DBufferManager {
 public:
     DBufferManager() = default;

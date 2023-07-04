@@ -25,6 +25,7 @@
                 "hiviewdfx_hilog_native",
                 "c_utils",
                 "samgr",
+                "drivers_interface_display",
                 "drivers_interface_distributed_camera",
                 "graphic_chipsetsdk",
                 "drivers_interface_camera"
