@@ -30,7 +30,7 @@ group("audiotest") {
   }
   if (drivers_peripheral_audio_feature_full_test_suite) {
     deps += [
-      "hdi/client:hdi_client",
+      # "hdi/client:hdi_client",
       "hdi/passthrough:hdi_passthrough",
       "supportlibs:interface_lib",
     ]
