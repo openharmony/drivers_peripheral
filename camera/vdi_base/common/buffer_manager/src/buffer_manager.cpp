@@ -60,4 +60,14 @@ std::shared_ptr<IBufferPool> BufferManager::GetBufferPool(uint64_t id)
 
     return bufferPoolMap_[id].lock();
 }
+
+void BufferManager::EraseBufferPoolMapById(uint64_t id)
+{
+    std::lock_guard<std::mutex> l(lock_);
+    auto findIter = bufferPoolMap_.find(id);
+    if (findIter != bufferPoolMap_.end()) {
+        bufferPoolMap_.erase(findIter);
+        CAMERA_LOGI("erase bufferpool id : %{public}llu", id);
+    }
+}
 } // namespace OHOS::Camera
