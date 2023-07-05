@@ -798,7 +798,6 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct Aud
 static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
 {
     uint32_t captureId = AUDIO_VDI_STREAM_NUM_MAX;
-    uint32_t index = 0;
     if (capturePriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return captureId;
@@ -808,7 +807,7 @@ static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
         captureId = capturePriv->captureCnt;
         capturePriv->captureCnt++;
     } else {
-        for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
+        for (uint32_t index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
             if (capturePriv->captureInfos[index] == NULL) {
                 captureId = index;
                 break;
