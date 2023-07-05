@@ -23,7 +23,6 @@
         "ipc",
         "hdf_core",
         "hilog",
-        "utils_base",
         "c_utils",
         "drivers_interface_connected_nfc_tag"
       ],
