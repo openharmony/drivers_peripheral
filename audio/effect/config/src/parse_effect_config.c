@@ -234,7 +234,7 @@ static int32_t AudioEffectGetEffectCfgDescs(cJSON *cJsonObj, const char *item, s
     }
 
     effectNum = (uint32_t)cJSON_GetArraySize(effectsObj);
-    if (effectNum == 0) {
+    if (effectNum == 0 || effectNum > HDF_EFFECT_NUM_MAX) {
         HDF_LOGE("%{public}s: effectNum invalid, effectNum = %{public}d!", __func__, effectNum);
         return HDF_FAILURE;
     }
@@ -321,7 +321,7 @@ static int32_t AudioEffectGetLibraryCfgDescs(cJSON *cJsonObj, const char *item, 
     }
 
     libNum = (uint32_t)cJSON_GetArraySize(libsObj);
-    if (libNum == 0) {
+    if (libNum == 0 || libNum > HDF_EFFECT_NUM_MAX) {
         HDF_LOGE("%{public}s: libNum invalid, libNum = %{public}d!", __func__, libNum);
         return HDF_FAILURE;
     }

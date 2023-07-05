@@ -179,7 +179,7 @@ static int32_t AudioManagerDescToVdiDesc(const struct AudioAdapterDescriptor *de
 static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdiDescs, uint32_t vdiDescsCount,
     struct AudioAdapterDescriptor *descs, uint32_t *descsCount)
 {
-    if (vdiDescsCount <= 0 || vdiDescsCount > AUDIO_VDI_ADAPTER_NUM_MAX) {
+    if (vdiDescsCount == 0 || vdiDescsCount > AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio vdiDescsCount=%{public}d is error", vdiDescsCount);
         return HDF_ERR_NOT_SUPPORT;
     }
