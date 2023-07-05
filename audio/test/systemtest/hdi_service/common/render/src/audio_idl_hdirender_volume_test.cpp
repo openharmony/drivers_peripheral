@@ -426,7 +426,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_001, TestSize.Level1)
 
     ASSERT_NE(nullptr, render);
     ret = render->SetVolume(render, volumeInit);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeInit);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeInitExpc, volumeInit);
@@ -463,7 +463,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_002, TestSize.Level1)
 
     ASSERT_NE(nullptr, render);
     ret = render->SetVolume(render, volumeMin);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeMin);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMinExpc, volumeMin);
@@ -508,7 +508,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_001, TestSize.Level1)
 
     ASSERT_NE(nullptr, render);
     ret = render->SetVolume(render, volume);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volume);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeDefault, volume);
@@ -529,7 +529,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = render->SetVolume(render, volume);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volume);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(defaultVolume, volume);
