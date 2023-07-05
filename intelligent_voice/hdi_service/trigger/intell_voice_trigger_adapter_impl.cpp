@@ -81,7 +81,7 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
     };
 
     std::vector<uint8_t> modelData;
-    if (!GetModelDataFromAshmem(model.data, modelData)) {
+    if (GetModelDataFromAshmem(model.data, modelData) != static_cast<int32_t>(HDF_SUCCESS)) {
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -104,32 +104,32 @@ int32_t IntellVoiceTriggerAdapterImpl::Stop(int32_t handle)
     return adapter_->Stop(handle);
 }
 
-bool IntellVoiceTriggerAdapterImpl::GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData)
+int32_t IntellVoiceTriggerAdapterImpl::GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData)
 {
     if (ashmem == nullptr) {
         INTELLIGENT_VOICE_LOGE("ashmem is nullptr");
-        return false;
+        return HDF_ERR_INVALID_OBJECT;
     }
 
     uint32_t size = static_cast<uint32_t>(ashmem->GetAshmemSize());
     if (size == 0) {
         INTELLIGENT_VOICE_LOGE("size is zero");
-        return false;
+        return HDF_ERR_INVALID_PARAM;
     }
 
     if (!ashmem->MapReadOnlyAshmem()) {
         INTELLIGENT_VOICE_LOGE("map ashmem failed");
-        return false;
+        return HDF_FAILURE;
     }
 
     const uint8_t *buffer = static_cast<const uint8_t *>(ashmem->ReadFromAshmem(size, 0));
     if (buffer == nullptr) {
         INTELLIGENT_VOICE_LOGE("read from ashmem failed");
-        return false;
+        return HDF_ERR_MALLOC_FAIL;
     }
 
     modelData.insert(modelData.begin(), buffer, buffer + size);
-    return true;
+    return HDF_SUCCESS;
 }
 }
 }

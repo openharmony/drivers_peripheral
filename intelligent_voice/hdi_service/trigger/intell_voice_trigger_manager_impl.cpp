@@ -41,7 +41,7 @@ int32_t IntellVoiceTriggerManagerImpl::LoadVendorLib()
     if (triggerManagerPriv_.handle == nullptr) {
         error = dlerror();
         INTELLIGENT_VOICE_LOGE("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     (void)dlerror(); // clear existing error
@@ -53,11 +53,11 @@ int32_t IntellVoiceTriggerManagerImpl::LoadVendorLib()
         INTELLIGENT_VOICE_LOGE("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error.c_str());
         dlclose(triggerManagerPriv_.handle);
         triggerManagerPriv_.handle = nullptr;
-        return -1;
+        return HDF_FAILURE;
     }
 
     INTELLIGENT_VOICE_LOGI("load vendor lib success");
-    return 0;
+    return HDF_SUCCESS;
 }
 
 void IntellVoiceTriggerManagerImpl::UnloadVendorLib()
@@ -70,7 +70,7 @@ void IntellVoiceTriggerManagerImpl::UnloadVendorLib()
 
 IntellVoiceTriggerManagerImpl::IntellVoiceTriggerManagerImpl()
 {
-    if (LoadVendorLib() == 0) {
+    if (LoadVendorLib() == static_cast<int32_t>(HDF_SUCCESS)) {
         inst_ = triggerManagerPriv_.getTriggerManagerHalInst();
         if (inst_ == nullptr) {
             INTELLIGENT_VOICE_LOGE("failed to get trigger manager hal inst");
