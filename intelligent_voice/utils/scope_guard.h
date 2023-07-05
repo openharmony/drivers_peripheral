@@ -23,42 +23,42 @@ namespace Utils {
 template <typename Func>
 class ScopeGuard {
 public:
-    ScopeGuard(Func &&f) : mFunc(std::forward<Func>(f)), mActive(true)
+    ScopeGuard(Func &&f) : func_(std::forward<Func>(f)), active_(true)
     {
     }
 
-    ScopeGuard(ScopeGuard &&rhs) : mFunc(std::move(rhs.mFunc)), mActive(rhs.mActive)
+    ScopeGuard(ScopeGuard &&rhs) : func_(std::move(rhs.func)), active_(rhs.active_)
     {
         rhs.Disable();
     }
 
     ~ScopeGuard()
     {
-        if (mActive) {
-            mFunc();
+        if (active_) {
+            func_();
         }
     }
 
     void Disable()
     {
-        mActive = false;
+        active_ = false;
     }
 
     bool Active() const
     {
-        return mActive;
+        return active_;
     }
 
     void EarlyExit()
     {
-        if (mActive) {
-            mFunc();
+        if (active_) {
+            func_();
         }
-        mActive = false;
+        active_ = false;
     }
 private:
-    Func mFunc;
-    bool mActive;
+    Func func_;
+    bool active_;
     ScopeGuard() = delete;
     ScopeGuard(const ScopeGuard &) = delete;
     ScopeGuard &operator=(const ScopeGuard &) = delete;

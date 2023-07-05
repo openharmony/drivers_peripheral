@@ -14,8 +14,8 @@
  */
 #include <cerrno>
 #include "hdf_base.h"
-#include "i_engine.h"
 #include "intell_voice_log.h"
+#include "engine_factory.h"
 
 #undef HDF_LOG_TAG
 #define HDF_LOG_TAG "IntellVoiceEngineMgr"
@@ -29,14 +29,18 @@ class IntellVoiceEngineManager final : public IEngineManager {
 public:
     int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor, std::unique_ptr<IEngine> &engine)
     {
-        INTELLIGENT_VOICE_LOGD("create adapter stub");
-        return 0;
+        INTELLIGENT_VOICE_LOGD("create adapter");
+        engine = EngineFactory::CreateEngine(descriptor.adapterType);
+        if (engine == nullptr) {
+            INTELLIGENT_VOICE_LOGE("failed to create engine");
+        }
+        return HDF_SUCCESS;
     }
 
     int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor)
     {
-        INTELLIGENT_VOICE_LOGD("release adapter stub");
-        return 0;
+        INTELLIGENT_VOICE_LOGD("release adapter");
+        return HDF_SUCCESS;
     }
 
     static IntellVoiceEngineManager *GetInstance()

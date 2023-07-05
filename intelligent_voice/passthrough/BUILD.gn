@@ -18,7 +18,7 @@ ohos_shared_library("vendor_intell_voice_trigger") {
     "../interfaces",
     "../utils",
   ]
-  sources = [ "intell_voice_trigger_manager.cpp" ]
+  sources = [ "trigger/intell_voice_trigger_manager.cpp" ]
 
   external_deps = [
     "c_utils:utils",
@@ -37,8 +37,15 @@ ohos_shared_library("vendor_intell_voice_engine") {
   include_dirs = [
     "../interfaces",
     "../utils",
+    "engine",
   ]
-  sources = [ "intell_voice_engine_manager.cpp" ]
+  sources = [
+    "engine/engine_base.cpp",
+    "engine/engine_factory.cpp",
+    "engine/enroll_engine.cpp",
+    "engine/intell_voice_engine_manager.cpp",
+    "engine/wakeup_engine.cpp",
+  ]
 
   external_deps = [
     "c_utils:utils",

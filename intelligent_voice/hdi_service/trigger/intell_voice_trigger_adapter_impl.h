@@ -53,7 +53,7 @@ public:
     int32_t Stop(int32_t handle) override;
 
 private:
-    bool GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData);
+    int32_t GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData);
 
 private:
     std::unique_ptr<ITrigger> adapter_ = nullptr;
