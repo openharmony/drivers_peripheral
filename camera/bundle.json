@@ -26,7 +26,6 @@
         "ipc",
         "drivers_interface_camera",
         "graphic_chipsetsdk",
-        "multimedia_image_framework",
         "c_utils",
         "hitrace"
       ],
