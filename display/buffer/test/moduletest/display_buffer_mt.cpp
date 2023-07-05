@@ -99,7 +99,6 @@ static void DumpBufferHandle(const BufferHandle& handle)
     HDF_LOGD("size              =0x%{public}x", handle.size);
     HDF_LOGD("format            =%{public}d",   handle.format);
     HDF_LOGD("usage             =0x%{public}" PRIx64 "", handle.usage);
-    HDF_LOGD("key               =%{public}d",   handle.key);
     HDF_LOGD("reserveFds        =%{public}d",   handle.reserveFds);
     HDF_LOGD("reserveInts       =%{public}d",   handle.reserveInts);
     HDF_LOGD("-------------------------------------");
