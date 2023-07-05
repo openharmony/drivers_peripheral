@@ -558,7 +558,7 @@ BENCHMARK_F(AudioRenderBenchmarkTest, SetVolume)(benchmark::State &state)
 
     for (auto _ : state) {
         ret = render_->SetVolume(render_, volume);
-        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     }
 }
 
