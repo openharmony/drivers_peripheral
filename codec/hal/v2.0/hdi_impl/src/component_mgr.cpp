@@ -78,7 +78,7 @@ int32_t ComponentMgr::GetRolesForComponent(const char *componentName, std::vecto
 
 void ComponentMgr::AddVendorComponent()
 {
-    std::string path = HDF_LIBRARY_FULL_PATH("libOMX_Core");
+    std::string path = HDF_LIBRARY_NAME("libOMX_Core");
     AddComponentByLibName(path.c_str());
 }
 
