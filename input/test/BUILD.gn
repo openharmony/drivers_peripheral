@@ -31,10 +31,7 @@ if (defined(ohos_lite)) {
 
   group("hdf_test_input") {
     testonly = true
-    deps = []
-    if (!drivers_peripheral_input_feature_passthrough) {
-      deps += [ "fuzztest/input_fuzzer:hdf_fuzztest_input" ]
-    }
+    deps = [ "fuzztest/input_fuzzer:hdf_fuzztest_input" ]
     if (drivers_peripheral_input_feature_model) {
       deps += [
         "benchmarktest:hdf_input_benchmark_test",
