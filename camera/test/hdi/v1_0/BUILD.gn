@@ -11,12 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/at/"
+import("../../../camera.gni")
+camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("../../../../hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("camhdi_at_test_config") {
     visibility = [ ":*" ]
@@ -84,7 +84,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "drivers_peripheral_camera/camera"
 
@@ -101,17 +101,17 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
-      "$camera_test_path/hdi/v1_0/src/camera_3a_uttest.cpp",
-      "$camera_test_path/hdi/v1_0/src/device_ability_uttest.cpp",
-      "$camera_test_path/hdi/v1_0/src/hdi_device_uttest.cpp",
-      "$camera_test_path/hdi/v1_0/src/hdi_host_uttest.cpp",
-      "$camera_test_path/hdi/v1_0/src/hdi_stream_uttest.cpp",
-      "$camera_test_path/hdi/v1_0/src/ut_common.cpp",
+      "$camera_test_path/v1_0/src/camera_3a_uttest.cpp",
+      "$camera_test_path/v1_0/src/device_ability_uttest.cpp",
+      "$camera_test_path/v1_0/src/hdi_device_uttest.cpp",
+      "$camera_test_path/v1_0/src/hdi_host_uttest.cpp",
+      "$camera_test_path/v1_0/src/hdi_stream_uttest.cpp",
+      "$camera_test_path/v1_0/src/ut_common.cpp",
     ]
 
     include_dirs = [
       # common includes
-      "$camera_test_path/hdi/v1_0/include",
+      "$camera_test_path/v1_0/include",
       "//third_party/googletest/googletest/include",
       "$camera_path/../../../display/interfaces/include",
       "$camera_path/../../../display/hdi_service/gralloc/include",
