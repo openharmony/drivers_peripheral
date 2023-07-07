@@ -39,6 +39,7 @@
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
 #include "netlink_adapter.h"
+#include "hdf_dlist.h"
 
 #define VENDOR_ID 0x001A11
 
@@ -153,6 +154,43 @@ typedef struct {
     uint8_t *buf;
 #endif
 } WifiPrivCmd;
+
+#define SLOW_SCAN_INTERVAL_MULTIPLIER 3
+#define FAST_SCAN_ITERATIONS 3
+#define BITNUMS_OF_ONE_BYTE 8
+#define SCHED_SCAN_PLANS_ATTR_INDEX1 1
+#define SCHED_SCAN_PLANS_ATTR_INDEX2 2
+#define MS_PER_SECOND 1000
+
+typedef struct {
+    uint8_t maxNumScanSsids;
+    uint8_t maxNumSchedScanSsids;
+    uint8_t maxMatchSets;
+    uint32_t maxNumScanPlans;
+    uint32_t maxScanPlanInterval;
+    uint32_t maxScanPlanIterations;
+} ScanCapabilities;
+
+typedef struct {
+    bool supportsRandomMacSchedScan;
+    bool supportsLowPowerOneshotScan;
+    bool supportsExtSchedScanRelativeRssi;
+} WiphyFeatures;
+
+typedef struct {
+    ScanCapabilities scanCapabilities;
+    WiphyFeatures wiphyFeatures;
+} WiphyInfo;
+
+struct SsidListNode {
+    WifiDriverScanSsid ssidInfo;
+    struct DListHead entry;
+};
+
+struct FreqListNode {
+    int32_t freq;
+    struct DListHead entry;
+};
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
@@ -1952,17 +1990,474 @@ int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac
     return ret;
 }
 
+static bool SetExtFeatureFlag(uint8_t *extFeatureFlagsBytes, uint32_t extFeatureFlagsLen, uint32_t extFeatureFlag)
+{
+    uint32_t extFeatureFlagBytePos;
+    uint32_t extFeatureFlagBitPos;
+
+    if (extFeatureFlagsBytes == NULL || extFeatureFlagsLen == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return false;
+    }
+    extFeatureFlagBytePos = extFeatureFlag / BITNUMS_OF_ONE_BYTE;
+    extFeatureFlagBitPos = extFeatureFlag % BITNUMS_OF_ONE_BYTE;
+    if (extFeatureFlagBytePos >= extFeatureFlagsLen) {
+        return false;
+    }
+    return extFeatureFlagsBytes[extFeatureFlagBytePos] & (1U << extFeatureFlagBitPos);
+}
+
+static int32_t GetWiphyInfoHandler(struct nl_msg *msg, void *arg)
+{
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+    WiphyInfo *wiphyInfo = (WiphyInfo *)arg;
+    uint32_t featureFlags = 0;
+    uint8_t *extFeatureFlagsBytes = NULL;
+    uint32_t extFeatureFlagsLen = 0;
+
+    if (hdr == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
+        return NL_SKIP;
+    }
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
+    if (attr[NL80211_ATTR_MAX_NUM_SCAN_SSIDS] != NULL) {
+        wiphyInfo->scanCapabilities.maxNumScanSsids = nla_get_u8(attr[NL80211_ATTR_MAX_NUM_SCAN_SSIDS]);
+    }
+    if (attr[NL80211_ATTR_MAX_NUM_SCHED_SCAN_SSIDS] != NULL) {
+        wiphyInfo->scanCapabilities.maxNumSchedScanSsids = nla_get_u8(attr[NL80211_ATTR_MAX_NUM_SCHED_SCAN_SSIDS]);
+    }
+    if (attr[NL80211_ATTR_MAX_MATCH_SETS] != NULL) {
+        wiphyInfo->scanCapabilities.maxMatchSets = nla_get_u8(attr[NL80211_ATTR_MAX_MATCH_SETS]);
+    }
+    if (attr[NL80211_ATTR_MAX_NUM_SCHED_SCAN_PLANS] != NULL) {
+        wiphyInfo->scanCapabilities.maxNumScanPlans = nla_get_u32(attr[NL80211_ATTR_MAX_NUM_SCHED_SCAN_PLANS]);
+    }
+    if (attr[NL80211_ATTR_MAX_SCAN_PLAN_INTERVAL] != NULL) {
+        wiphyInfo->scanCapabilities.maxScanPlanInterval = nla_get_u32(attr[NL80211_ATTR_MAX_SCAN_PLAN_INTERVAL]);
+    }
+    if (attr[NL80211_ATTR_MAX_SCAN_PLAN_ITERATIONS] != NULL) {
+        wiphyInfo->scanCapabilities.maxScanPlanIterations = nla_get_u32(attr[NL80211_ATTR_MAX_SCAN_PLAN_ITERATIONS]);
+    }
+    if (attr[NL80211_ATTR_FEATURE_FLAGS] != NULL) {
+        featureFlags = nla_get_u32(attr[NL80211_ATTR_FEATURE_FLAGS]);
+    }
+    wiphyInfo->wiphyFeatures.supportsRandomMacSchedScan = featureFlags & NL80211_FEATURE_SCHED_SCAN_RANDOM_MAC_ADDR;
+    if (attr[NL80211_ATTR_EXT_FEATURES] != NULL) {
+        extFeatureFlagsBytes = nla_data(attr[NL80211_ATTR_EXT_FEATURES]);
+        extFeatureFlagsLen = nla_len(attr[NL80211_ATTR_EXT_FEATURES]);
+        wiphyInfo->wiphyFeatures.supportsLowPowerOneshotScan =
+            SetExtFeatureFlag(extFeatureFlagsBytes, extFeatureFlagsLen, NL80211_EXT_FEATURE_LOW_POWER_SCAN);
+        wiphyInfo->wiphyFeatures.supportsExtSchedScanRelativeRssi =
+            SetExtFeatureFlag(extFeatureFlagsBytes, extFeatureFlagsLen, NL80211_EXT_FEATURE_SCHED_SCAN_RELATIVE_RSSI);
+    }
+    return NL_SKIP;
+}
+
+static int32_t GetWiphyInfo(const uint32_t wiphyIndex, WiphyInfo *wiphyInfo)
+{
+    struct nl_msg *msg = NULL;
+    int32_t ret = RET_CODE_FAILURE;
+
+    if (wiphyInfo == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_GET_WIPHY, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_WIPHY, wiphyIndex) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 wiphyIndex failed.", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, GetWiphyInfoHandler, wiphyInfo);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
+static int32_t GetWiphyIndexHandler(struct nl_msg *msg, void *arg)
+{
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+    uint32_t *wiphyIndex = (uint32_t *)arg;
+
+    if (hdr == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
+        return NL_SKIP;
+    }
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
+    if (!attr[NL80211_ATTR_WIPHY]) {
+        HILOG_ERROR(LOG_CORE, "%s: wiphy info missing!", __FUNCTION__);
+        return NL_SKIP;
+    }
+    *wiphyIndex = nla_get_u32(attr[NL80211_ATTR_WIPHY]);
+    return NL_SKIP;
+}
+
+static int32_t GetWiphyIndex(const char *ifName, uint32_t *wiphyIndex)
+{
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    int32_t ret = RET_CODE_FAILURE;
+
+    if (ifName == NULL || wiphyIndex == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed.", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, GetWiphyIndexHandler, wiphyIndex);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
+static int32_t ProcessMatchSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
+{
+    struct nlattr *nestedMatchSsid = NULL;
+    struct nlattr *nest = NULL;
+    uint8_t matchSsidsCount = 0;
+
+    nestedMatchSsid = nla_nest_start(msg, NL80211_ATTR_SCHED_SCAN_MATCH);
+    if (nestedMatchSsid == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
+        if (matchSsidsCount + 1 > wiphyInfo->scanCapabilities.maxMatchSets) {
+            break;
+        }
+        nest = nla_nest_start(msg, i);
+        if (nest == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        nla_put(msg, NL80211_SCHED_SCAN_MATCH_ATTR_SSID, pnoSettings->pnoNetworks[i].ssid.ssidLen,
+            pnoSettings->pnoNetworks[i].ssid.ssid);
+        nla_put_u32(msg, NL80211_SCHED_SCAN_MATCH_ATTR_RSSI, pnoSettings->min5gRssi);
+        nla_nest_end(msg, nest);
+        matchSsidsCount++;
+    }
+    nla_nest_end(msg, nestedMatchSsid);
+    return RET_CODE_SUCCESS;
+}
+
+static void ClearSsidsList(struct DListHead *ssidsList)
+{
+    struct SsidListNode *ssidListNode = NULL;
+    struct SsidListNode *tmp = NULL;
+
+    DLIST_FOR_EACH_ENTRY_SAFE(ssidListNode, tmp, ssidsList, struct SsidListNode, entry) {
+        DListRemove(&ssidListNode->entry);
+        free(ssidListNode);
+        ssidListNode = NULL;
+    }
+    DListHeadInit(ssidsList);
+}
+
+static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
+{
+    uint8_t scanSsidsCount = 0;
+    struct SsidListNode *ssidListNode = NULL;
+    struct nlattr *nestedSsid = NULL;
+    uint32_t index = 0;
+    struct DListHead scanSsids = {0};
+
+    DListHeadInit(&scanSsids);
+    for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
+        if (!(pnoSettings->pnoNetworks[i].isHidden)) {
+            continue;
+        }
+        if (scanSsidsCount + 1 > wiphyInfo->scanCapabilities.maxNumSchedScanSsids) {
+            break;
+        }
+        struct SsidListNode *ssidNode = (struct SsidListNode *)malloc(sizeof(struct SsidListNode));
+        if (ssidNode == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: malloc failed.", __FUNCTION__);
+            ClearSsidsList(&scanSsids);
+            return RET_CODE_FAILURE;
+        }
+        (void)memset_s(ssidNode, sizeof(struct SsidListNode), 0, sizeof(struct SsidListNode));
+        ssidNode->ssidInfo.ssidLen = pnoSettings->pnoNetworks[i].ssid.ssidLen;
+        if (memcpy_s(ssidNode->ssidInfo.ssid, MAX_SSID_LEN, pnoSettings->pnoNetworks[i].ssid.ssid,
+                pnoSettings->pnoNetworks[i].ssid.ssidLen) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed.", __FUNCTION__);
+            ClearSsidsList(&scanSsids);
+            return RET_CODE_FAILURE;
+        }
+        DListInsertTail(&ssidNode->entry, &scanSsids);
+        scanSsidsCount++;
+    }
+    if (!DListIsEmpty(&scanSsids)) {
+        nestedSsid = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
+        if (nestedSsid == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            ClearSsidsList(&scanSsids);
+            return RET_CODE_FAILURE;
+        }
+        DLIST_FOR_EACH_ENTRY(ssidListNode, &scanSsids, struct SsidListNode, entry) {
+            nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid);
+            index++;
+        }
+        nla_nest_end(msg, nestedSsid);
+    }
+    ClearSsidsList(&scanSsids);
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t ProcessScanPlanToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
+{
+    struct nlattr *nestedPlan = NULL;
+    struct nlattr *plan = NULL;
+
+    bool supportNumScanPlans = (wiphyInfo->scanCapabilities.maxNumScanPlans >= 2);
+    bool supportScanPlanInterval = (wiphyInfo->scanCapabilities.maxScanPlanInterval * MS_PER_SECOND >=
+        (uint32_t)pnoSettings->scanIntervalMs * SLOW_SCAN_INTERVAL_MULTIPLIER);
+    bool supportScanPlanIterations = (wiphyInfo->scanCapabilities.maxScanPlanIterations >= FAST_SCAN_ITERATIONS);
+
+    if (supportNumScanPlans && supportScanPlanInterval && supportScanPlanIterations) {
+        nestedPlan = nla_nest_start(msg, NL80211_ATTR_SCHED_SCAN_PLANS);
+        if (nestedPlan == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        plan = nla_nest_start(msg, SCHED_SCAN_PLANS_ATTR_INDEX1);
+        nla_put_u32(msg, NL80211_SCHED_SCAN_PLAN_INTERVAL, pnoSettings->scanIntervalMs);
+        nla_put_u32(msg, NL80211_SCHED_SCAN_PLAN_ITERATIONS, pnoSettings->scanIterations);
+        nla_nest_end(msg, plan);
+        plan = nla_nest_start(msg, SCHED_SCAN_PLANS_ATTR_INDEX2);
+        nla_put_u32(msg, NL80211_SCHED_SCAN_PLAN_INTERVAL, pnoSettings->scanIntervalMs * SLOW_SCAN_INTERVAL_MULTIPLIER);
+        nla_nest_end(msg, plan);
+        nla_nest_end(msg, nestedPlan);
+    } else {
+        nla_put_u32(msg, NL80211_ATTR_SCHED_SCAN_INTERVAL, pnoSettings->scanIntervalMs * MS_PER_SECOND);
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static void ClearFreqsList(struct DListHead *freqsList)
+{
+    struct FreqListNode *freqListNode = NULL;
+    struct FreqListNode *tmp = NULL;
+
+    DLIST_FOR_EACH_ENTRY_SAFE(freqListNode, tmp, freqsList, struct FreqListNode, entry) {
+        DListRemove(&freqListNode->entry);
+        free(freqListNode);
+        freqListNode = NULL;
+    }
+    DListHeadInit(freqsList);
+}
+
+static int32_t InsertFreqToList(int32_t freq, struct DListHead *scanFreqs)
+{
+    bool isFreqExist = false;
+    struct FreqListNode *freqListNode = NULL;
+
+    DLIST_FOR_EACH_ENTRY(freqListNode, scanFreqs, struct FreqListNode, entry) {
+        if (freqListNode->freq == freq) {
+            isFreqExist = true;
+            break;
+        }
+    }
+    if (!isFreqExist) {
+        struct FreqListNode *freqNode = (struct FreqListNode *)malloc(sizeof(struct FreqListNode));
+        if (freqNode == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: malloc failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        (void)memset_s(freqNode, sizeof(struct FreqListNode), 0, sizeof(struct FreqListNode));
+        freqNode->freq = freq;
+        DListInsertTail(&freqNode->entry, scanFreqs);
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t ProcessFreqToMsg(struct nl_msg *msg, const WifiPnoSettings *pnoSettings)
+{
+    struct FreqListNode *freqListNode = NULL;
+    struct DListHead scanFreqs = {0};
+    struct nlattr *nestedFreq = NULL;
+    uint32_t index = 0;
+
+    DListHeadInit(&scanFreqs);
+    for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
+        for (uint32_t j = 0; j < pnoSettings->pnoNetworks[i].freqsLen; j++) {
+            if (InsertFreqToList(pnoSettings->pnoNetworks[i].freqs[j], &scanFreqs) != RET_CODE_SUCCESS) {
+                HILOG_ERROR(LOG_CORE, "%s: InsertFreqToList failed.", __FUNCTION__);
+                ClearFreqsList(&scanFreqs);
+                return RET_CODE_FAILURE;
+            }
+        }
+    }
+    if (!DListIsEmpty(&scanFreqs)) {
+        nestedFreq = nla_nest_start(msg, NL80211_ATTR_SCAN_FREQUENCIES);
+        if (nestedFreq == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
+            ClearFreqsList(&scanFreqs);
+            return RET_CODE_FAILURE;
+        }
+        DLIST_FOR_EACH_ENTRY(freqListNode, &scanFreqs, struct FreqListNode, entry) {
+            nla_put_s32(msg, index, freqListNode->freq);
+            index++;
+        }
+        nla_nest_end(msg, nestedFreq);
+    }
+    ClearFreqsList(&scanFreqs);
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t ProcessReqflagsToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, const WifiPnoSettings *pnoSettings)
+{
+    uint32_t scanFlag = 0;
+
+    if (wiphyInfo->wiphyFeatures.supportsExtSchedScanRelativeRssi) {
+        struct nl80211_bss_select_rssi_adjust rssiAdjust;
+        (void)memset_s(&rssiAdjust, sizeof(rssiAdjust), 0, sizeof(rssiAdjust));
+        rssiAdjust.band = NL80211_BAND_2GHZ;
+        rssiAdjust.delta = pnoSettings->min2gRssi - pnoSettings->min5gRssi;
+        nla_put(msg, NL80211_ATTR_SCHED_SCAN_RSSI_ADJUST, sizeof(rssiAdjust), &rssiAdjust);
+    }
+    if (wiphyInfo->wiphyFeatures.supportsRandomMacSchedScan) {
+        scanFlag |= NL80211_SCAN_FLAG_RANDOM_ADDR;
+    }
+    if (wiphyInfo->wiphyFeatures.supportsLowPowerOneshotScan) {
+        scanFlag |= NL80211_SCAN_FLAG_LOW_POWER;
+    }
+    if (scanFlag != 0) {
+        nla_put_u32(msg, NL80211_ATTR_SCAN_FLAGS, scanFlag);
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t ConvertSetsToNetlinkmsg(struct nl_msg *msg, const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    int32_t ret;
+    uint32_t wiphyIndex;
+    WiphyInfo wiphyInfo;
+
+    (void)memset_s(&wiphyInfo, sizeof(wiphyInfo), 0, sizeof(wiphyInfo));
+    ret = GetWiphyIndex(ifName, &wiphyIndex);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: GetWiphyIndex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    ret = GetWiphyInfo(wiphyIndex, &wiphyInfo);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: GetWiphyInfo failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (ProcessMatchSsidToMsg(msg, &wiphyInfo, pnoSettings) != RET_CODE_SUCCESS ||
+        ProcessSsidToMsg(msg, &wiphyInfo, pnoSettings) != RET_CODE_SUCCESS ||
+        ProcessScanPlanToMsg(msg, &wiphyInfo, pnoSettings) != RET_CODE_SUCCESS ||
+        ProcessReqflagsToMsg(msg, &wiphyInfo, pnoSettings) != RET_CODE_SUCCESS ||
+        ProcessFreqToMsg(msg, pnoSettings) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: Fill parameters to netlink failed.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    return RET_CODE_SUCCESS;
+}
+
 int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
 {
-    (void)ifName;
-    (void)pnoSettings;
-    return RET_CODE_SUCCESS;
+    uint32_t interfaceId;
+    struct nl_msg *msg = NULL;
+    int32_t ret = RET_CODE_FAILURE;
+
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_ACK, NL80211_CMD_START_SCHED_SCAN, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed.", __FUNCTION__);
+            break;
+        }
+        if (ConvertSetsToNetlinkmsg(msg, ifName, pnoSettings) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: ConvertSetsToNetlinkmsg failed.", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, NULL, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
 }
 
 int32_t WifiStopPnoScan(const char *ifName)
 {
-    (void)ifName;
-    return RET_CODE_SUCCESS;
+    uint32_t interfaceId;
+    struct nl_msg *msg = NULL;
+    int32_t ret = RET_CODE_FAILURE;
+
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_ACK, NL80211_CMD_STOP_SCHED_SCAN, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed.", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, NULL, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
 }
 
 static int32_t GetAssociatedInfoHandler(struct nl_msg *msg, void *arg)
