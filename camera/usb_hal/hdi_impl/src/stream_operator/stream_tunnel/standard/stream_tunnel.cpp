@@ -53,9 +53,6 @@ void StreamTunnel::CleanBuffers()
     waitCV_.notify_one();
 
     std::lock_guard<std::mutex> l(lock_);
-    for (auto iter : buffers) {
-        free(iter.first->GetVirAddress());
-    }
     buffers.clear();
     bufferQueue_->CleanCache();
     index = -1;
@@ -126,9 +123,6 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
             }
         }
         CameraDumper::GetInstance().DumpBuffer(buffer);
-        BufferHandle* pHandle = sb->GetBufferHandle();
-        memcpy_s(pHandle->virAddr, static_cast<uint32_t>(pHandle->size), buffer->GetVirAddress(), buffer->GetSize());
-        CAMERA_LOGD("surfaceBuffer->GetVirAddr() = %{public}p", (uint8_t*)sb->GetVirAddr());
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         stats_.FlushBufferResult(ret);
         frameCount_++;

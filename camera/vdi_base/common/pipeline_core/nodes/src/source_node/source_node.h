@@ -42,7 +42,7 @@ protected:
     public:
         PortHandler() = default;
         virtual ~PortHandler() = default;
-        explicit PortHandler(std::shared_ptr<IPort>& p);
+        explicit PortHandler(std::shared_ptr<IPort>& p, const std::string& name);
         RetCode StartCollectBuffers();
         RetCode StopCollectBuffers();
         RetCode StartDistributeBuffers();
@@ -68,6 +68,10 @@ protected:
         std::condition_variable rbcv;
         std::mutex rblock;
         std::list<std::shared_ptr<IBuffer>> respondBufferList = {};
+        int count_ = 0;
+        std::map<int32_t, uint8_t*> sfBuffer;
+        std::map<int32_t, uint8_t*> cBuffer;
+        std::string portName_;
     };
 
     std::mutex hndl_ = {};
