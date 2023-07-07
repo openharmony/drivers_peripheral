@@ -26,7 +26,7 @@
 namespace OHOS::Camera {
 class CodecNode : public NodeBase {
 public:
-    CodecNode(const std::string& name, const std::string& type);
+    CodecNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~CodecNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

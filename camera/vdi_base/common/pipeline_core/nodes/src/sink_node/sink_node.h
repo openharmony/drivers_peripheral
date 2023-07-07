@@ -23,7 +23,7 @@
 namespace OHOS::Camera {
 class SinkNode : virtual public NodeBase {
 public:
-    SinkNode(const std::string& name, const std::string& type);
+    SinkNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~SinkNode() override = default;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

@@ -17,8 +17,8 @@
 #include "ipp_node.h"
 
 namespace OHOS::Camera {
-IppNode::IppNode(const std::string& name, const std::string& type)
-    : NodeBase(name, type)
+IppNode::IppNode(const std::string& name, const std::string& type, const std::string &cameraId)
+    : NodeBase(name, type, cameraId)
 {
 }
 

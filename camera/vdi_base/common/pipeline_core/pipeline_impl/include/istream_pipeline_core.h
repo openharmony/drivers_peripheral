@@ -31,7 +31,7 @@ struct NodeContext {
 class IStreamPipelineCore : public NoCopyable {
 public:
     static std::shared_ptr<IStreamPipelineCore> Create(const std::shared_ptr<NodeContext>& c);
-    virtual RetCode Init() = 0;
+    virtual RetCode Init(const std::string &cameraId) = 0;
     virtual RetCode PreConfig(const ModeMeta& meta) = 0;
     virtual RetCode CreatePipeline(const int32_t& mode) = 0;
     virtual RetCode DestroyPipeline(const std::vector<int32_t>& ids) = 0;

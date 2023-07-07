@@ -38,7 +38,7 @@ std::vector<uint32_t> FaceDetectMetadataTag = {
 
 class RKFaceNode : public NodeBase {
 public:
-    RKFaceNode(const std::string &name, const std::string &type);
+    RKFaceNode(const std::string &name, const std::string &type, const std::string &cameraId);
     ~RKFaceNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

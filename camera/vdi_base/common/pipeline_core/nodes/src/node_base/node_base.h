@@ -46,7 +46,8 @@ protected:
 
 class NodeBase : public INode, public std::enable_shared_from_this<NodeBase> {
 public:
-    NodeBase(const std::string& name, const std::string& type) : name_(name), type_(type)
+    NodeBase(const std::string& name, const std::string& type, const std::string &cameraId)
+        : name_(name), type_(type), cameraId_(cameraId)
     {
     }
     ~NodeBase() override
@@ -84,6 +85,7 @@ public:
 protected:
     std::string name_;
     std::string type_;
+    std::string cameraId_;
     std::vector<std::shared_ptr<IPort>> portVec_;
 };
 }
