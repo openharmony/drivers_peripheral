@@ -338,7 +338,6 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
         } else {
             rc = streamOperator->ReleaseStreams(streamIds);
         }
-        //rc = streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGI("check Capture: ReleaseStream success");
