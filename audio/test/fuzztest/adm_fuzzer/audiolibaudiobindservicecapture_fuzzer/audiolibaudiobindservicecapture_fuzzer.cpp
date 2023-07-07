@@ -23,7 +23,7 @@ namespace Audio {
     {
         bool result = false;
         struct DevHandle *(*AudioBindService)(const char *) = nullptr;
-        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
+        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
         void *ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
         if (ptrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);

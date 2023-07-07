@@ -38,7 +38,7 @@ if (defined(ohos_lite)) {
     ]
 
     public_deps = [
-      "$hdf_audio_path/supportlibs:hdi_audio_interface_lib_render",
+      "$hdf_audio_path/hdi_service/supportlibs:audio_render_adapter",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/googletest:gmock_main",
@@ -74,7 +74,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$hdf_audio_path/supportlibs:hdi_audio_interface_lib_render",
+      "$hdf_audio_path/hdi_service/supportlibs:audio_render_adapter",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]

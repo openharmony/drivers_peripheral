@@ -22,7 +22,7 @@ namespace Audio {
     bool AudioInterfaceliboutputcaptureCmdidFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
+        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
         void *outputCapPtrHandle = dlopen(resolvedPath, RTLD_LAZY);
         if (outputCapPtrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);

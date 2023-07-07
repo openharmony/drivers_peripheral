@@ -35,7 +35,6 @@ ohos_fuzztest("AudioLibAudioBindserviceCaptureFuzzTest") {
 
   sources = [
     "../../common/src/audio_adm_fuzzer_common.cpp",
-    "../../common/src/audio_hdi_fuzzer_common.cpp",
     "audiolibaudiobindservicecapture_fuzzer.cpp",
   ]
   include_dirs = [

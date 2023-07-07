@@ -63,7 +63,7 @@ void *AudioLibCaptureHardwareDependenceTest::ptrHandle = nullptr;
 
 void AudioLibCaptureHardwareDependenceTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (ptrHandle == nullptr) {
         return;

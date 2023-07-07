@@ -36,14 +36,26 @@
 #ifndef AUDIO_ADM_FUZZER_COMMON_H
 #define AUDIO_ADM_FUZZER_COMMON_H
 
-#include "audio_hdi_fuzzer_common.h"
+
+#include <cstring>
+#include <cstdint>
+#include <iostream>
+
+#include "hdf_log.h"
+#include "audio_adapter.h"
+#include "audio_internal.h"
+#include "audio_types.h"
 
 namespace OHOS {
 namespace Audio {
 using namespace std;
+const string ADAPTER_NAME = "primary";
 const string BIND_CONTROL = "control";
 const string BIND_RENDER = "render";
 const string BIND_CAPTURE = "capture";
+const int BUFFER_LENTH = 1024 * 16;
+const int CHANNELCOUNT = 2;
+const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4096;
 const int G_PERIODSIZE = 4096;
 const int G_PERIODCOUNT = 8;
 const int G_BYTERATE = 48000;
@@ -51,8 +63,18 @@ const int G_BUFFERFRAMESIZE = 0;
 const int G_BUFFERSIZE1 = 128;
 const int G_SILENCETHRESHOLE = 0;
 const int G_PORTID = 0;
+const int MOVE_LEFT_NUM = 8;
+const int SAMPLERATE = 48000;
 const int STOP_THRESHOLD = 32;
 const int START_THRESHOLD = 8;
+const uint32_t INT_32_MAX = 0x7fffffff;
+
+enum AudioPCMBit {
+    PCM_8_BIT  = 8,
+    PCM_16_BIT = 16,
+    PCM_24_BIT = 24,
+    PCM_32_BIT = 32,
+};
 
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode);
 

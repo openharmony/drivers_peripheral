@@ -22,7 +22,5 @@ group("fuzztest") {
     "adm_fuzzer:adm_fuzzer",
     "audio_config_fuzzer:audio_config_fuzzer",
     "audio_hdi_fuzzer:audio_hdi_fuzzer",
-
-    #"hdi_fuzzer:hdi_fuzzer",
   ]
 }
