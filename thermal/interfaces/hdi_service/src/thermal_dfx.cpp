@@ -97,7 +97,7 @@ static std::string GetCurrentTime(const int32_t format)
 ThermalDfx::~ThermalDfx()
 {
     isRunning_ = false;
-    if (logThread_->joinable()) {
+    if (logThread_ != nullptr && logThread_->joinable()) {
         logThread_->join();
     }
 }
