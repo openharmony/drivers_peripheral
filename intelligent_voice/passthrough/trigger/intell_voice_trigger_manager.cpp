@@ -31,13 +31,13 @@ public:
         std::unique_ptr<ITrigger> &adapter) override
     {
         INTELLIGENT_VOICE_LOGD("load adapter stub");
-        return 0;
+        return HDF_SUCCESS;
     }
 
     int32_t UnloadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor) override
     {
         INTELLIGENT_VOICE_LOGD("unload adapter stub");
-        return 0;
+        return HDF_SUCCESS;
     }
 
     static IntellVoiceTriggerManager *GetInstance()
