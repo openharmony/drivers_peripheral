@@ -91,7 +91,7 @@ public:
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoPre = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
-	int previewFormat = PIXEL_FMT_YCRCB_420_SP;
+    int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
