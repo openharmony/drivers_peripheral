@@ -41,7 +41,7 @@ int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
     if (engineManagerPriv_.handle == nullptr) {
         error = dlerror();
         INTELLIGENT_VOICE_LOGE("load path%{public}s, dlopen err=%{public}s", vendorLibPath, error.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     (void)dlerror(); // clear existing error
@@ -53,12 +53,12 @@ int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
         INTELLIGENT_VOICE_LOGE("dlsym GetIntellVoiceEngineManagerHalInst err=%{public}s", error.c_str());
         dlclose(engineManagerPriv_.handle);
         engineManagerPriv_.handle = nullptr;
-        return -1;
+        return HDF_FAILURE;
     }
 
     INTELLIGENT_VOICE_LOGI("load vendor lib success");
 
-    return 0;
+    return HDF_SUCCESS;
 }
 
 void IntellVoiceEngineManagerImpl::UnloadVendorLib()
@@ -71,7 +71,7 @@ void IntellVoiceEngineManagerImpl::UnloadVendorLib()
 
 IntellVoiceEngineManagerImpl::IntellVoiceEngineManagerImpl()
 {
-    if (LoadVendorLib() == 0) {
+    if (LoadVendorLib() == static_cast<int32_t>(HDF_SUCCESS)) {
         inst_ = engineManagerPriv_.getEngineManagerHalInst();
     }
 }
