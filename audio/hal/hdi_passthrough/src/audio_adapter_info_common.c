@@ -17,12 +17,10 @@
 #include <ctype.h>
 #include <limits.h>
 #include "audio_uhdf_log.h"
-#include "cJSON.h"
 #include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
-#define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/audio_adapter.json"
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
 #define SUPPORT_PORT_NUM_MAX    10
@@ -35,7 +33,6 @@
 
 int32_t g_adapterNum = 0;
 struct AudioAdapterDescriptor *g_audioAdapterDescs = NULL;
-static const char *g_captureSoPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
 
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void)
 {
@@ -188,52 +185,6 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
             return HDF_ERR_NOT_SUPPORT;
     }
 
-    return HDF_SUCCESS;
-}
-
-static InterfaceLibGetCardInfoSo AudioGetCardInfoFunc(void)
-{
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(g_captureSoPath, pathBuf) == NULL) {
-        AUDIO_FUNC_LOGE("file path verification failed");
-        return NULL;
-    }
-    void *handle = dlopen(pathBuf, RTLD_LAZY);
-    if (handle == NULL) {
-        AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
-        return NULL;
-    }
-
-    InterfaceLibGetCardInfoSo cardInfo = dlsym(handle, "AudioGetAllCardInfo");
-    if (cardInfo == NULL) {
-        AUDIO_FUNC_LOGE("lib capture so func not found! %{public}s", dlerror());
-        AudioDlClose(&handle);
-        return NULL;
-    }
-
-    return cardInfo;
-}
-
-int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
-{
-    if (descs == NULL || size == NULL) {
-        AUDIO_FUNC_LOGE("param descs or size is null!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    InterfaceLibGetCardInfoSo getCardInfo = AudioGetCardInfoFunc();
-    if (getCardInfo == NULL) {
-        AUDIO_FUNC_LOGE("AudioGetCardInfoFunc is failed!");
-        return HDF_FAILURE;
-    }
-
-    if (getCardInfo(descs, size) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioSoGetInterfaceLibCardInfo is failed!");
-        return HDF_FAILURE;
-    }
-
-    g_audioAdapterDescs = *descs;
-    g_adapterNum = *size;
     return HDF_SUCCESS;
 }
 

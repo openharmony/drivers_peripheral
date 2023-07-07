@@ -48,7 +48,7 @@ struct DevHandle *(*AudioAlsaLibCaptureTest::AudioBindService)(const char *) = n
 void (*AudioAlsaLibCaptureTest::CloseServiceCapture)(struct DevHandle *) = nullptr;
 void AudioAlsaLibCaptureTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     ASSERT_NE(nullptr, ptrHandle);
     InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *, int,

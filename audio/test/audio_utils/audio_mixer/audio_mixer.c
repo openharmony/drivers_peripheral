@@ -51,8 +51,8 @@
 static struct AudioMixer g_audioMixer;
 static struct AudioMixerContents g_mixerCts;
 
-static const char *g_capLibPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-static const char *g_renLibPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
+static const char *g_capLibPath = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
+static const char *g_renLibPath = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
 static void *g_soHandle = NULL;
 static AudioPcmType g_pcmT = PCM_RENDER;
 static bool g_debugFlag = false;

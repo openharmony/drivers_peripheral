@@ -59,7 +59,6 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId);
 
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
 int32_t AudioAdapterGetAdapterNum(void);
-int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size);
 int32_t AudioAdapterExist(const char *adapterName);
 int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);

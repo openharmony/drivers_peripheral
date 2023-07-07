@@ -53,7 +53,7 @@ struct DevHandle *(*AudioAlsaLibRenderTest::BindServiceRender)(const char *serve
 void (*AudioAlsaLibRenderTest::CloseServiceRender)(struct DevHandle *handle) = nullptr;
 void AudioAlsaLibRenderTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     ASSERT_NE(nullptr, ptrHandle);
     InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *, int,
