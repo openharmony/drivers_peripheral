@@ -58,8 +58,6 @@ if (defined(ohos_lite)) {
       chipset_base_dir,
       "updater",
     ]
-    relative_install_dir = "chipset-sdk"
-    innerapi_tags = [ "chipsetsdk" ]
     part_name = "drivers_peripheral_input"
   }
 } else {
@@ -106,7 +104,7 @@ if (defined(ohos_lite)) {
       chipset_base_dir,
       "updater",
     ]
-    innerapi_tags = [ "chipsetsdk" ]
+    innerapi_tags = [ "passthrough_indirect" ]
     part_name = "drivers_peripheral_input"
   }
 }
