@@ -55,6 +55,12 @@ public:
     void Close();
     void GetCameraMetadata();
     void StartStream(std::vector<StreamIntent> intents);
+    void DefaultPreview(std::shared_ptr<StreamInfo> &infos);
+    void DefaultCapture(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosPreview(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosCapture(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosVideo(std::shared_ptr<StreamInfo> &infos);
+    void DefaultInfosAnalyze(std::shared_ptr<StreamInfo> &infos);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);

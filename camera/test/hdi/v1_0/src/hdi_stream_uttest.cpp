@@ -94,21 +94,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_002, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 640;
-    cameraTest->streamInfo->height_ = 480;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -134,21 +120,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_003, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->streamId_ = -1;
-    cameraTest->streamInfo->width_ = 640;
-    cameraTest->streamInfo->height_ = 480;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, INVALID_ARGUMENT);
@@ -169,21 +142,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_005, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->width_ = -1;
-    cameraTest->streamInfo->height_ = 640;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, INVALID_ARGUMENT);
@@ -204,22 +164,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_006, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->width_ = 2147483647;
-    cameraTest->streamInfo->height_ = 640;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -243,22 +189,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_007, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->height_ = -1;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, INVALID_ARGUMENT);
@@ -279,22 +211,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_008, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->height_ = 2147483647;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -318,22 +236,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_009, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->format_ = 2147483647;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -357,22 +261,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_010, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->dataspace_ = 2147483647;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -396,21 +286,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_011, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -434,22 +310,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_012, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = VIDEO;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosVideo(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -473,22 +334,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_013, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = STILL_CAPTURE;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -512,22 +358,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_014, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
+    cameraTest->DefaultInfosAnalyze(cameraTest->streamInfo);
     cameraTest->streamInfo->intent_ = POST_VIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -551,22 +383,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_015, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = StreamIntent::ANALYZE;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosAnalyze(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -590,22 +407,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_016, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -768,40 +570,11 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_028, TestSize.Level1)
         cameraTest->streamOperator);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101; // PREVIEW streamId
-    cameraTest->streamInfo->width_ = 720; // Pixel Width
-    cameraTest->streamInfo->height_ = 480; // Pixel height
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = UT_TUNNEL_MODE;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ = consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
 
     cameraTest->streamInfoSnapshot = std::make_shared<StreamInfo>();
-    cameraTest->streamInfoSnapshot->streamId_ = 102; // STILL_CAPTURE streamId
-    cameraTest->streamInfoSnapshot->width_ = 720; // Pixel Width
-    cameraTest->streamInfoSnapshot->height_ = 480; // Pixel height
-    cameraTest->streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfoSnapshot->dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfoSnapshot->intent_ = STILL_CAPTURE;
-    cameraTest->streamInfoSnapshot->tunneledMode_ = UT_TUNNEL_MODE;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> snapshotConsumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfoSnapshot->bufferQueue_ = snapshotConsumer->CreateProducerSeq([this](void* addr,
-        uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfoSnapshot->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfoSnapshot->intent_] = snapshotConsumer;
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
 
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
@@ -842,22 +615,8 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_029, TestSize.Level1)
     EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR || cameraTest->streamOperator == nullptr);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 1920;
-    cameraTest->streamInfo->height_ = 1080;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfo->format_ = -1;
-    cameraTest->streamInfo->dataspace_ = 8;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = 5;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ =  consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(8);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
     cameraTest->rc = cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
     EXPECT_EQ(cameraTest->rc, INVALID_ARGUMENT);
@@ -894,38 +653,11 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_031, TestSize.Level0)
         cameraTest->streamOperator);
 
     cameraTest->streamInfo = std::make_shared<StreamInfo>();
-    cameraTest->streamInfo->streamId_ = 101;
-    cameraTest->streamInfo->width_ = 720;
-    cameraTest->streamInfo->height_ = 480;
-    cameraTest->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfo->dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfo->intent_ = PREVIEW;
-    cameraTest->streamInfo->tunneledMode_ = UT_TUNNEL_MODE;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfo->bufferQueue_ = consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-    cameraTest->streamInfo->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfo->intent_] = consumer;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfo);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
 
     cameraTest->streamInfoSnapshot = std::make_shared<StreamInfo>();
-    cameraTest->streamInfoSnapshot->streamId_ = 102;
-    cameraTest->streamInfoSnapshot->width_ = 720;
-    cameraTest->streamInfoSnapshot->height_ = 480;
-    cameraTest->streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfoSnapshot->dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfoSnapshot->intent_ = STILL_CAPTURE;
-    cameraTest->streamInfoSnapshot->tunneledMode_ = UT_TUNNEL_MODE;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> snapshotConsumer =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfoSnapshot->bufferQueue_ = snapshotConsumer->CreateProducerSeq([this](void* addr,
-        uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-    cameraTest->streamInfoSnapshot->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfoSnapshot->intent_] = snapshotConsumer;
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
 
     cameraTest->rc = (CamRetCode)cameraTest->streamOperator->CreateStreams(cameraTest->streamInfos);
@@ -937,7 +669,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_031, TestSize.Level0)
 
     int captureId = 2001;
     cameraTest->captureInfo = std::make_shared<CaptureInfo>();
-    cameraTest->captureInfo->streamIds_ = {102};
+    cameraTest->captureInfo->streamIds_ = {101};
     cameraTest->captureInfo->captureSetting_ = cameraTest->abilityVec;
     cameraTest->captureInfo->enableShutterCallback_ = true;
     bool isStreaming = true;
@@ -958,7 +690,7 @@ HWTEST_F(HdiStreamUtTest, Camera_Stream_Hdi_031, TestSize.Level0)
     EXPECT_EQ(true, cameraTest->rc == HDI::Camera::V1_0::NO_ERROR
         || cameraTest->rc == HDI::Camera::V1_0::METHOD_NOT_SUPPORTED);
 
-    std::vector<int> streamIds = {102};
+    std::vector<int> streamIds = {101};
     cameraTest->rc = (CamRetCode)offlineStreamOperator->ReleaseStreams(streamIds);
     EXPECT_EQ(true, cameraTest->rc == HDI::Camera::V1_0::NO_ERROR
         || cameraTest->rc == HDI::Camera::V1_0::METHOD_NOT_SUPPORTED);

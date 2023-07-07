@@ -44,6 +44,9 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_001, TestSize.Level1)
         return;
     }
     cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
     cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
     cameraTest->prelaunchConfig->cameraId = {};
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
@@ -66,6 +69,9 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_002, TestSize.Level1)
         return;
     }
     cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
@@ -86,6 +92,9 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_003, TestSize.Level1)
         return;
     }
     cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
     EXPECT_EQ(true, cameraTest->cameraDevice != nullptr);
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetDefaultSettings(cameraTest->abilityVec);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -104,28 +113,17 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_004, TestSize.Level1)
         return;
     }
     cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator_V1_1);
-    
+
     // preview streamInfo
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
     cameraTest->streamInfoV1_1->v1_0.streamId_ = 1201;
-    cameraTest->streamInfoV1_1->v1_0.width_ = 720;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 480;
-    cameraTest->streamInfoV1_1->v1_0.format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfoV1_1->v1_0.intent_ = PREVIEW; // capture stream
-    cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
-
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer1 =
-        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    cameraTest->streamInfoV1_1->v1_0.bufferQueue_ = consumer1->CreateProducerSeq([this](void* addr, uint32_t size) {
-        cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
-    });
-
-    cameraTest->streamInfoV1_1->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfoV1_1->v1_0.intent_] = consumer1;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
     // capture streamInfo
@@ -151,17 +149,10 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_004, TestSize.Level1)
         cameraTest->DumpImageFile(102, "yuv", addr, size);
     });
 
-    cameraTest->streamInfoV1_1->v1_0.streamId_ = 103;
-    cameraTest->streamInfoV1_1->v1_0.width_ = 720;
-    cameraTest->streamInfoV1_1->v1_0.height_ = 480;
-    cameraTest->streamInfoV1_1->v1_0.format_ = PIXEL_FMT_YCRCB_420_SP;
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = UT_DATA_SIZE;
-    cameraTest->streamInfoV1_1->v1_0.intent_ = STILL_CAPTURE; // capture stream
-    cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
-
-    cameraTest->streamInfoV1_1->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    cameraTest->consumerMap_[cameraTest->streamInfoV1_1->v1_0.intent_] = consumer3;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoCapture->v1_0.streamId_ = 103;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
