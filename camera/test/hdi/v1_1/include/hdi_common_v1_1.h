@@ -54,6 +54,18 @@ public:
     void Open();
     void Close();
     void GetCameraMetadata();
+    void DefaultPreview(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultCapture(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosPreview(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosCapture(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosAnalyze(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosVideo(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void StartStream(std::vector<StreamIntent> intents);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
@@ -68,18 +80,18 @@ public:
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
     OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
-    std::vector<StreamInfo> streamInfos;
+    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfos;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::PrelaunchConfig> prelaunchConfig = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoV1_1 = nullptr;
-    std::shared_ptr<StreamInfo> streamInfo = nullptr;
-    std::shared_ptr<StreamInfo> streamInfoSnapshot = nullptr;
-    std::shared_ptr<StreamInfo> streamInfoCapture = nullptr;
-    std::shared_ptr<StreamInfo> streamInfoAnalyze = nullptr;
-    std::shared_ptr<StreamInfo> streamInfoPre = nullptr;
-    std::shared_ptr<StreamInfo> streamInfoVideo = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfo = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSnapshot = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoAnalyze = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoPre = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
-    int previewFormat = PIXEL_FMT_YCRCB_420_SP;
+	int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
