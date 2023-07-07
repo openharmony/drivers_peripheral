@@ -316,10 +316,11 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
             WifiEventScanResultProcess(ifName);
             break;
-        case NL80211_CMD_STOP_SCHED_SCAN:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_STOP_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+        case NL80211_CMD_SCHED_SCAN_STOPPED:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_STOPPED, cmd = %d", __FUNCTION__, cmd);
             break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_NEW_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
             WifiEventScanResultProcess(ifName);
             break;
         case NL80211_CMD_SCAN_ABORTED:
