@@ -24,7 +24,7 @@
 namespace OHOS::Camera {
 class ForkNode : public NodeBase {
 public:
-    ForkNode(const std::string& name, const std::string& type);
+    ForkNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~ForkNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

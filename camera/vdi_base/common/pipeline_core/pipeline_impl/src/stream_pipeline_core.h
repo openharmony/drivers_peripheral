@@ -26,7 +26,7 @@ class StreamPipelineCore : public IStreamPipelineCore {
 public:
     explicit StreamPipelineCore(const std::shared_ptr<NodeContext>& c) : context_(c) {}
     ~StreamPipelineCore() override = default;
-    RetCode Init() override;
+    RetCode Init(const std::string &cameraId) override;
     RetCode PreConfig(const ModeMeta& meta) override;
     RetCode CreatePipeline(const int32_t& mode) override;
     RetCode DestroyPipeline(const std::vector<int32_t>& ids) override;
@@ -50,6 +50,7 @@ protected:
     std::unique_ptr<StreamPipelineStrategy> strategy_ = nullptr;
     std::unique_ptr<StreamPipelineBuilder> builder_ = nullptr;
     std::unique_ptr<StreamPipelineDispatcher> dispatcher_ = nullptr;
+    std::string cameraId_;
 };
 } // namespace OHOS::Camera
 #endif

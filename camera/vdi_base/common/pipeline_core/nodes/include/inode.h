@@ -76,12 +76,13 @@ public:
 };
 
 
-using NodeFactory = RegisterFactoty<INode, const std::string&, const std::string&>;
+using NodeFactory = RegisterFactoty<INode, const std::string&, const std::string&, const std::string&>;
 
 #define REGISTERNODE(cls, ...) \
 namespace { \
     static std::string g_##cls = NodeFactory::Instance().DoRegister<cls>(__VA_ARGS__, \
-                [](const std::string& name, const std::string& type) {return std::make_shared<cls>(name, type);}); \
+                [](const std::string& name, const std::string& type, const std::string &cameraId) \
+                {return std::make_shared<cls>(name, type, cameraId);}); \
 }
 }
 #endif

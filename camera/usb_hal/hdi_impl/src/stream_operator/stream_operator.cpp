@@ -57,7 +57,9 @@ RetCode StreamOperator::Init()
         return RC_ERROR;
     }
 
-    RetCode rc = streamPipeline_->Init();
+    std::string cameraIds;
+    dev->GetCameraId(cameraIds);
+    RetCode rc = streamPipeline_->Init(cameraIds);
     if (rc != RC_OK) {
         CAMERA_LOGE("stream pipeline core init failed.");
         return RC_ERROR;

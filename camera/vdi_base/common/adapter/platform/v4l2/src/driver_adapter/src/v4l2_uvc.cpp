@@ -209,7 +209,6 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
         }
 
         close(fd);
-        break;
     }
 }
 

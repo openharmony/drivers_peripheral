@@ -25,12 +25,13 @@
 namespace OHOS::Camera {
 class UvcNode : public SourceNode {
 public:
-    UvcNode(const std::string& name, const std::string& type);
+    UvcNode(const std::string& name, const std::string& type, const std::string& cameraId);
     ~UvcNode() override;
     RetCode Init(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
+    CameraId ConvertCameraId(const std::string &cameraId);
     RetCode GetDeviceController();
     RetCode SetCallback() override;
     void SetBufferCallback() override;

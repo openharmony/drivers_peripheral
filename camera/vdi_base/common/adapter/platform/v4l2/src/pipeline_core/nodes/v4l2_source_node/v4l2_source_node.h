@@ -25,7 +25,7 @@
 namespace OHOS::Camera {
 class V4L2SourceNode : public SourceNode {
 public:
-    V4L2SourceNode(const std::string& name, const std::string& type);
+    V4L2SourceNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~V4L2SourceNode() override;
     RetCode Init(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;

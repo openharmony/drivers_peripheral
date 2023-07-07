@@ -25,7 +25,7 @@
 namespace OHOS::Camera {
 class IppNode : public NodeBase, public OfflinePipeline {
 public:
-    IppNode(const std::string& name, const std::string& type);
+    IppNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~IppNode();
     RetCode Init(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;

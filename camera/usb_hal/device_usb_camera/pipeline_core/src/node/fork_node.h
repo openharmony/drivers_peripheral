@@ -24,7 +24,7 @@
 namespace OHOS::Camera {
 class PcForkNode : public NodeBase {
 public:
-    PcForkNode(const std::string& name, const std::string& type);
+    PcForkNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~PcForkNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;

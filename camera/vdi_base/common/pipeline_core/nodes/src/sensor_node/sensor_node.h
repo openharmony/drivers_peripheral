@@ -23,7 +23,7 @@
 namespace OHOS::Camera {
 class SensorNode : public NodeBase {
 public:
-    SensorNode(const std::string& name, const std::string& type);
+    SensorNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~SensorNode() override;
 };
 } // namespace OHOS::Camera

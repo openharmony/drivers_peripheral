@@ -22,7 +22,7 @@
 namespace OHOS::Camera {
 class SourceNode : virtual public NodeBase {
 public:
-    SourceNode(const std::string& name, const std::string& type);
+    SourceNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~SourceNode() override;
     RetCode Init(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;
@@ -48,6 +48,7 @@ protected:
         RetCode StartDistributeBuffers();
         RetCode StopDistributeBuffers();
         void OnBuffer(std::shared_ptr<IBuffer>& buffer);
+        std::string cameraIdsp_;
 
     private:
         void CollectBuffers();
@@ -79,6 +80,7 @@ protected:
 
     std::mutex requestLock_;
     std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
+    std::string cameraIds_;
 };
 } // namespace OHOS::Camera
 #endif
