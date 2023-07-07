@@ -19,6 +19,7 @@
 #include <atomic>
 #include <map>
 #include <thread>
+#include "thermal_dfx.h"
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
 #include "thermal_zone_manager.h"
@@ -62,6 +63,7 @@ private:
     HdfThermalCallbackInfo tzInfoEventV2_;
     HdfThermalCallbackInfo tzInfoEvent_;
     sptr<IThermalCallback> thermalCb_;
+    std::unique_ptr<ThermalDfx> thermalDfx_ = nullptr;
     std::vector<int32_t> multipleList_;
     int32_t reportTime_;
     int32_t isSim_;
