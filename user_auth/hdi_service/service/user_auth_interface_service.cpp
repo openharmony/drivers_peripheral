@@ -43,6 +43,7 @@ namespace UserAuth {
 namespace {
 static std::mutex g_mutex;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
+constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -487,7 +488,24 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
     uint32_t authTrustLevel, std::vector<AuthType> &validTypes)
 {
     IAM_LOGI("start");
-    return RESULT_SUCCESS;
+    int32_t ret = RESULT_TYPE_NOT_SUPPORT;
+    std::lock_guard<std::mutex> lock(g_mutex);
+    for (auto authType : authTypes) {
+        uint32_t supportedAtl = AUTH_TRUST_LEVEL_SYS;
+        ret = SingleAuthTrustLevel(userId, authType, &supportedAtl);
+        if (ret != RESULT_SUCCESS) {
+            IAM_LOGE("the current authType does not support");
+            validTypes.clear();
+            return ret;
+        }
+        if (authTrustLevel > supportedAtl) {
+            IAM_LOGE("the current authTrustLevel does not support");
+            validTypes.clear();
+            return RESULT_TYPE_NOT_SUPPORT;
+        }
+        validTypes.push_back(authType);
+    }
+    return ret;
 }
 
 int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_t> &challenge)
