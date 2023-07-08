@@ -125,6 +125,107 @@ void Test::Close()
     }
 }
 
+void Test::DefaultPreview(std::shared_ptr<StreamInfo> &infos)
+{
+    infos->streamId_ = streamIdPreview;
+    infos->width_ = previewWidth;
+    infos->height_ = previewHeight;
+    infos->format_ = previewFormat;
+    infos->dataspace_ = UT_DATA_SIZE;
+    infos->intent_ = StreamIntent::PREVIEW;
+    infos->tunneledMode_ = UT_TUNNEL_MODE;
+}
+
+void Test::DefaultCapture(std::shared_ptr<StreamInfo> &infos)
+{
+    infos->streamId_ = streamIdCapture;
+    infos->width_ = captureWidth;
+    infos->height_ = captureHeight;
+    infos->format_ = snapshotFormat;
+    infos->dataspace_ = UT_DATA_SIZE;
+    infos->intent_ = StreamIntent::STILL_CAPTURE;
+    infos->tunneledMode_ = UT_TUNNEL_MODE;
+}
+
+void Test::DefaultInfosPreview(std::shared_ptr<StreamInfo> &infos)
+{
+    DefaultPreview(infos);
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_pre =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    infos->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdPreview, "yuv", addr, size);
+    });
+    infos->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
+}
+
+void Test::DefaultInfosCapture(std::shared_ptr<StreamInfo> &infos)
+{
+    DefaultCapture(infos);
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_capture =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    infos->bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdPreview, "yuv", addr, size);
+    });
+    infos->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::PREVIEW] = consumer_capture;
+}
+
+void Test::DefaultInfosVideo(std::shared_ptr<StreamInfo> &infos)
+{
+    infos->streamId_ = streamIdVideo;
+    infos->width_ = videoWidth;
+    infos->height_ = videoHeight;
+    infos->format_ = videoFormat;
+    infos->dataspace_ = UT_DATA_SIZE;
+    infos->intent_ = StreamIntent::VIDEO;
+    infos->encodeType_ = ENCODE_TYPE_H265;
+    infos->tunneledMode_ = UT_TUNNEL_MODE;
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_video =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    infos->bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdPreview, "yuv", addr, size);
+    });
+    infos->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::VIDEO] = consumer_video;
+}
+
+void Test::DefaultInfosAnalyze(std::shared_ptr<StreamInfo> &infos)
+{
+    infos->streamId_ = streamIdAnalyze;
+    infos->width_ = analyzeWidth;
+    infos->height_ = analyzeHeight;
+    infos->format_ = analyzeFormat;
+    infos->dataspace_ = UT_DATA_SIZE;
+    infos->intent_ = StreamIntent::ANALYZE;
+    infos->tunneledMode_ = UT_TUNNEL_MODE;
+    
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_analyze =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    infos->bufferQueue_ = consumer_analyze->CreateProducerSeq([this](void* addr, uint32_t size) {
+        common_metadata_header_t *data = static_cast<common_metadata_header_t *>(addr);
+        camera_metadata_item_t entry = {};
+
+        int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
+        if (ret == 0) {
+            for (size_t i = 0; i < entry.count; i++) {
+                int id = entry.data.i32[i];
+                CAMERA_LOGI("Face ids : %{public}d", id);
+            }
+        }
+
+        ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
+        if (ret == 0) {
+            for (size_t i = 0; i < entry.count; i++) {
+                int id = entry.data.i32[i];
+                CAMERA_LOGI("Face rectangles : %{public}d", id);
+            }
+        }
+    });
+    infos->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::ANALYZE] = consumer_analyze;
+}
+
 void Test::StartStream(std::vector<StreamIntent> intents)
 {
     streamOperatorCallback = new TestStreamOperatorCallback();
@@ -140,83 +241,16 @@ void Test::StartStream(std::vector<StreamIntent> intents)
     streamInfoAnalyze = std::make_shared<StreamInfo>();
     for (auto& intent : intents) {
         if (intent == StreamIntent::PREVIEW) {
-            streamInfoPre->streamId_ = streamIdPreview;
-            streamInfoPre->width_ = previewWidth;
-            streamInfoPre->height_ = previewHeight;
-            streamInfoPre->format_ = previewFormat;
-            streamInfoPre->dataspace_ = UT_DATA_SIZE;
-            streamInfoPre->intent_ = intent;
-            streamInfoPre->tunneledMode_ = UT_TUNNEL_MODE;
-            std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
-            streamInfoPre->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
-                DumpImageFile(streamIdPreview, "yuv", addr, size);
-            });
-            streamInfoPre->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-            consumerMap_[intent] = consumer_pre;
+            DefaultInfosPreview(streamInfoPre);
             streamInfos.push_back(*streamInfoPre);
         } else if (intent == StreamIntent::VIDEO) {
-            streamInfoVideo->streamId_ = streamIdVideo;
-            streamInfoVideo->width_ = videoWidth;
-            streamInfoVideo->height_ = videoHeight;
-            streamInfoVideo->format_ = videoFormat;
-            streamInfoVideo->dataspace_ = UT_DATA_SIZE;
-            streamInfoVideo->intent_ = intent;
-            streamInfoVideo->encodeType_ = ENCODE_TYPE_H265;
-            streamInfoVideo->tunneledMode_ = UT_TUNNEL_MODE;
-            std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
-            streamInfoVideo->bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-                DumpImageFile(streamIdPreview, "yuv", addr, size);
-            });
-            streamInfoVideo->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-            consumerMap_[intent] = consumer_video;
+            DefaultInfosVideo(streamInfoVideo);
             streamInfos.push_back(*streamInfoVideo);
         } else if (intent == StreamIntent::ANALYZE) {
-            streamInfoAnalyze->streamId_ = streamIdAnalyze;
-            streamInfoAnalyze->width_ = analyzeWidth;
-            streamInfoAnalyze->height_ = analyzeHeight;
-            streamInfoAnalyze->format_ = analyzeFormat;
-            streamInfoAnalyze->dataspace_ = UT_DATA_SIZE;
-            streamInfoAnalyze->intent_ = intent;
-            streamInfoAnalyze->tunneledMode_ = UT_TUNNEL_MODE;
-            
-            std::shared_ptr<StreamConsumer> consumer_analyze = std::make_shared<StreamConsumer>();
-            streamInfoAnalyze->bufferQueue_ = consumer_analyze->CreateProducerSeq([this](void* addr, uint32_t size) {
-                common_metadata_header_t *data = static_cast<common_metadata_header_t *>(addr);
-                camera_metadata_item_t entry = {};
-
-                int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
-                if (ret == 0) {
-                    for (size_t i = 0; i < entry.count; i++) {
-                        int id = entry.data.i32[i];
-                        CAMERA_LOGI("Face ids : %{public}d", id);
-                    }
-                }
-
-                ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
-                if (ret == 0) {
-                    for (size_t i = 0; i < entry.count; i++) {
-                        int id = entry.data.i32[i];
-                        CAMERA_LOGI("Face rectangles : %{public}d", id);
-                    }
-                }
-            });
-            streamInfoAnalyze->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-            consumerMap_[intent] = consumer_analyze;
+            DefaultInfosAnalyze(streamInfoAnalyze);
             streamInfos.push_back(*streamInfoAnalyze);
         } else {
-            streamInfoCapture->streamId_ = streamIdCapture;
-            streamInfoCapture->width_ = captureWidth;
-            streamInfoCapture->height_ = captureHeight;
-            streamInfoCapture->format_ = analyzeFormat;
-            streamInfoCapture->dataspace_ = UT_DATA_SIZE;
-            streamInfoCapture->intent_ = intent;
-            streamInfoCapture->tunneledMode_ = UT_TUNNEL_MODE;
-            std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
-            streamInfoCapture->bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
-                DumpImageFile(streamIdPreview, "yuv", addr, size);
-            });
-            streamInfoCapture->bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-            consumerMap_[intent] = consumer_capture;
+            DefaultInfosCapture(streamInfoCapture);
             streamInfos.push_back(*streamInfoCapture);
         }
     }
