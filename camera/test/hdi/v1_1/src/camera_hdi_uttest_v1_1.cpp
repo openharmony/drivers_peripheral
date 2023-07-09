@@ -150,7 +150,7 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_004, TestSize.Level1)
     });
 
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
     cameraTest->streamInfoCapture->v1_0.streamId_ = 103;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
