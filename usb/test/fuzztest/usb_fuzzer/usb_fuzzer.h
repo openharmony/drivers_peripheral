@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_USBDDK_FUZZER_H
-#define OHOS_USBDDK_FUZZER_H
+#ifndef OHOS_USB_FUZZER_H
+#define OHOS_USB_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "usbddk_fuzzer"
+#define FUZZ_PROJECT_NAME "usb_fuzzer"
 
-#endif
+#endif // OHOS_USB_FUZZER_H
