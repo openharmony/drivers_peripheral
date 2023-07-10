@@ -22,7 +22,7 @@ namespace Audio {
     bool AudioInterfacelibctlrenderCmdidFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
+        char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
         void *ctlRenFuzzPtrHandle = dlopen(resolvedPath, RTLD_LAZY);
         if (ctlRenFuzzPtrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);

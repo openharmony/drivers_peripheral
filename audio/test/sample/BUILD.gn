@@ -17,112 +17,7 @@ import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
-  ohos_executable("audio_sample_render") {
-    include_dirs = [
-      "$hdf_audio_path/interfaces/include",
-      "./",
-      "//third_party/bounds_checking_function/include",
-    ]
-
-    sources = [
-      "framework_common.c",
-      "framework_render.c",
-    ]
-
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
-    defines = []
-    install_enable = true
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
-
-  ohos_executable("audio_sample_capture") {
-    include_dirs = [
-      "$hdf_audio_path/interfaces/include",
-      "./",
-      "//third_party/bounds_checking_function/include",
-      "$hdf_audio_path/hal/hdi_binder/server/include",
-    ]
-
-    sources = [
-      "framework_capture.c",
-      "framework_common.c",
-    ]
-
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
-    defines = []
-    install_enable = true
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
 } else {
-  ohos_executable("audio_sample_render") {
-    include_dirs = [
-      "$hdf_audio_path/interfaces/include",
-      "./",
-    ]
-
-    sources = [
-      "framework_common.c",
-      "framework_render.c",
-    ]
-
-    defines = []
-
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_utils",
-        "hilog:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
-
-    install_enable = true
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
-
-  ohos_executable("audio_sample_capture") {
-    include_dirs = [
-      "$hdf_audio_path/interfaces/include",
-      "$hdf_audio_path/hal/hdi_binder/server/include",
-      "$hdf_audio_path/hal/hdi_passthrough/include",
-      "./",
-    ]
-
-    sources = [
-      "$hdf_audio_path/hal/hdi_binder/server/src/hdf_audio_events.c",
-      "framework_capture.c",
-      "framework_common.c",
-    ]
-
-    defines = []
-
-    if (drivers_peripheral_audio_feature_alsa_lib) {
-      defines += [ "ALSA_LIB_MODE" ]
-    }
-
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_ipc_adapter",
-        "hdf_core:libhdf_utils",
-        "hilog:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
-
-    install_enable = true
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
   ohos_executable("audio_sample_event") {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
@@ -215,15 +110,6 @@ if (defined(ohos_lite)) {
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
-  }
-}
-
-group("audio_sample") {
-  if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
-    deps = [
-      ":audio_sample_capture",
-      ":audio_sample_render",
-    ]
   }
 }
 

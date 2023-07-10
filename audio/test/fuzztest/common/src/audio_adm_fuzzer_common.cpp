@@ -37,6 +37,23 @@
 
 namespace OHOS {
 namespace Audio {
+int32_t InitAttrs(struct AudioSampleAttributes& attrs)
+{
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.channelCount = CHANNELCOUNT;
+    attrs.sampleRate = SAMPLERATE;
+    attrs.interleaved = 0;
+    attrs.type = AUDIO_IN_MEDIA;
+    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs.frameSize = PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.isBigEndian = false;
+    attrs.isSignedData = true;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (PCM_16_BIT * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.stopThreshold = INT_32_MAX;
+    attrs.silenceThreshold = BUFFER_LENTH;
+    return HDF_SUCCESS;
+}
+
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {
     InitAttrs(frameRenderMode.attrs);
