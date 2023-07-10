@@ -34,6 +34,7 @@ public:
     virtual int32_t DisableMotion(int32_t motionType) = 0;
     virtual int32_t RegisterMotionCallback(const sptr<IMotionCallbackVdi> cb) = 0;
     virtual int32_t UnregisterMotionCallback(const sptr<IMotionCallbackVdi> cb) = 0;
+    virtual int32_t SetMotionConfig(int32_t motionType, const std::vector<uint8_t>& data) = 0;
 };
 
 struct WrapperMotionVdi {
