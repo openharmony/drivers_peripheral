@@ -168,7 +168,14 @@ int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<u
         return HDF_FAILURE;
     }
 
-    return HDF_SUCCESS;
+    StartTrace(HITRACE_TAG_HDF, "SetMotionConfig");
+    int32_t ret = motionVdiImpl_->SetMotionConfig(motionType, data);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: SetMotionConfig failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
 }
 
 extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
