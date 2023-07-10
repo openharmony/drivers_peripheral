@@ -287,11 +287,11 @@ void CodecNode::Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer, std::shared_ptr
 
     avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
                    previewWidth_, previewHeight_);
-    avpicture_fill((AVPicture *)pFrameYUV420, (uint8_t *)bufferYuv420->GetVirAddress(), AV_PIX_FMT_YUV420P,
+    avpicture_fill((AVPicture *)pFrameYUV420, (uint8_t *)bufferYuv420->GetVirAddress(), AV_PIX_FMT_NV21,
                    previewWidth_, previewHeight_);
 
     struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
-                                               previewHeight_, AV_PIX_FMT_YUV420P, SWS_BILINEAR, 0, 0, 0);
+                                               previewHeight_, AV_PIX_FMT_NV21, SWS_BILINEAR, 0, 0, 0);
 
     if (imgCtx != nullptr) {
         sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
