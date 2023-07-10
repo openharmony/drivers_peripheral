@@ -16,15 +16,13 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "usbddk_fuzzer.h"
-#include "v1_0/usb_ddk_stub.h"
-#include "v1_0/iusb_ddk.h"
+#include "usb_fuzzer.h"
+#include "v1_0/usb_interface_stub.h"
 
-using namespace OHOS::HDI::Usb::Ddk::V1_0;
+using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
-constexpr int32_t OFFSET = 4;
 constexpr int32_t ZERO_BIT = 0;
 constexpr int32_t FIRST_BIT = 1;
 constexpr int32_t SECOND_BIT = 2;
@@ -32,7 +30,7 @@ constexpr int32_t THIRD_BIT = 3;
 constexpr int32_t ZERO_MOVE_LEN = 24;
 constexpr int32_t FIRST_MOVE_LEN = 16;
 constexpr int32_t SECOND_MOVE_LEN = 8;
-const std::u16string USB_INTERFACE_TOKEN = u"ohos.hdi.usb.ddk.v1_0.IUsbDdk";
+const std::u16string USB_INTERFACE_TOKEN = u"ohos.hdi.usb.v1_0.IUsbInterface";
 
 uint32_t Convert2Uint32(const uint8_t *ptr)
 {
@@ -64,17 +62,17 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     data.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    sptr<IUsbDdk> usbDdkInterface = IUsbDdk::Get(false);
-    if (usbDdkInterface == nullptr) {
-        HDF_LOGE("%{public}s: get usbDdkInterface failed", __func__);
+    sptr<IUsbInterface> usbInterface = IUsbInterface::Get(false);
+    if (usbInterface == nullptr) {
+        HDF_LOGE("%{public}s: get usbInterface failed", __func__);
         return false;
     }
-    sptr<UsbDdkStub> usbDdk = new UsbDdkStub(usbDdkInterface);
-    if (usbDdk == nullptr) {
-        HDF_LOGE("%{public}s: new usbDdk failed", __func__);
+    sptr<UsbInterfaceStub> interfaceStub = new UsbInterfaceStub(usbInterface);
+    if (interfaceStub == nullptr) {
+        HDF_LOGE("%{public}s: new interfaceStub failed", __func__);
         return false;
     }
-    usbDdk->OnRemoteRequest(code, data, reply, option);
+    interfaceStub->OnRemoteRequest(code, data, reply, option);
 
     return true;
 }
