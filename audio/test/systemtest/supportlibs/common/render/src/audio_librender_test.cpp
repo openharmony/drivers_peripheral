@@ -57,7 +57,7 @@ void *AudioLibRenderTest::ptrHandle = nullptr;
 
 void AudioLibRenderTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (ptrHandle == nullptr) {
         return;

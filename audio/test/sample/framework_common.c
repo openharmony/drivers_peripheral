@@ -20,17 +20,6 @@
 
 #define MOVE_LEFT_NUM        8
 #define WAV_HEAD_RIFF_OFFSET 8
-#define UHDF_PASSTHROUGH_LIB "libhdi_audio"
-
-#ifdef __LITEOS__
-#define UHDF_IPC_LIB "/usr/lib/libhdi_audio_client.z.so"
-#else
-#ifdef __aarch64__
-#define UHDF_IPC_LIB "/system/lib64/libhdi_audio_client.z.so"
-#else
-#define UHDF_IPC_LIB "/system/lib/libhdi_audio_client.z.so"
-#endif
-#endif
 
 int32_t SwitchAudioPort(
     struct AudioAdapterDescriptor *descs, enum AudioPortDirection portFlag, struct AudioPort *renderPort)
@@ -251,36 +240,3 @@ void FileClose(FILE **file)
     return;
 }
 
-int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, int choice)
-{
-    if (resolvedPath == NULL) {
-        AUDIO_FUNC_LOGE("The Parameter is NULL.");
-        return HDF_FAILURE;
-    }
-    char *uhdfLibPath = NULL;
-    switch (choice) {
-        case 1: // 1 is Passthrough Loading
-            uhdfLibPath = HDF_LIBRARY_FULL_PATH(UHDF_PASSTHROUGH_LIB);
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            break;
-        case 2: // 2 is IPC Loading
-            uhdfLibPath = UHDF_IPC_LIB;
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            break;
-        default:
-            uhdfLibPath = HDF_LIBRARY_FULL_PATH(UHDF_PASSTHROUGH_LIB);
-            printf("Input error,Switched to direct loading in for you,");
-            SystemInputFail();
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
-                return HDF_FAILURE;
-            }
-            break;
-    }
-    return HDF_SUCCESS;
-}

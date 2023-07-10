@@ -17,46 +17,6 @@ import("//build/ohos.gni")
 import("$hdf_audio_path/audio.gni")
 
 if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
-  ohos_shared_library("hdi_audio_primary_server") {
-    include_dirs = [
-      "$hdf_audio_path/interfaces/include",
-      "$hdf_hal_path/hdi_passthrough/include",
-      "include",
-      "//third_party/bounds_checking_function/include",
-    ]
-
-    sources = [
-      "src/hdf_audio_events.c",
-      "src/hdf_audio_primary_server.c",
-      "src/hdf_audio_server_capture.c",
-      "src/hdf_audio_server_common.c",
-      "src/hdf_audio_server_render.c",
-    ]
-
-    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
-
-    defines = []
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_host",
-        "hdf_core:libhdf_utils",
-        "hilog:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
-
-    if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HDF_LOG" ]
-    }
-
-    shlib_type = "hdi"
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_audio"
-  }
-
   ohos_shared_library("hdi_audio_usb_server") {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
@@ -66,6 +26,8 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     ]
 
     sources = [
+      "$hdf_hal_path/hdi_passthrough/src/audio_adapter_info_common.c",
+      "$hdf_hal_path/hdi_passthrough/src/audio_common.c",
       "src/hdf_audio_events.c",
       "src/hdf_audio_server_capture.c",
       "src/hdf_audio_server_common.c",
@@ -73,7 +35,6 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "src/hdf_audio_usb_server.c",
     ]
 
-    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
@@ -104,6 +65,8 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     ]
 
     sources = [
+      "$hdf_hal_path/hdi_passthrough/src/audio_adapter_info_common.c",
+      "$hdf_hal_path/hdi_passthrough/src/audio_common.c",
       "src/hdf_audio_a2dp_server.c",
       "src/hdf_audio_events.c",
       "src/hdf_audio_server_capture.c",
@@ -111,7 +74,6 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
-    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
