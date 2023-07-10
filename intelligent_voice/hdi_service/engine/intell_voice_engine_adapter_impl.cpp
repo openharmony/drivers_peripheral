@@ -38,14 +38,14 @@ IntellVoiceEngineAdapterImpl::~IntellVoiceEngineAdapterImpl()
     engine_ = nullptr;
 }
 
-int32_t IntellVoiceEngineAdapterImpl::SetCallback(const sptr<IIntellVoiceEngineCallback> &adapterCallback)
+int32_t IntellVoiceEngineAdapterImpl::SetCallback(const sptr<IIntellVoiceEngineCallback> &engineCallback)
 {
-    if (adapterCallback == nullptr) {
+    if (engineCallback == nullptr) {
         INTELLIGENT_VOICE_LOGE("callback is nullptr");
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    std::shared_ptr<EngineListener> listener = std::make_shared<EngineListener>(adapterCallback);
+    std::shared_ptr<EngineListener> listener = std::make_shared<EngineListener>(engineCallback);
     if (listener == nullptr) {
         INTELLIGENT_VOICE_LOGE("listener is nullptr");
         return HDF_ERR_MALLOC_FAIL;
