@@ -175,7 +175,7 @@ int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<u
     }
     FinishTrace(HITRACE_TAG_HDF);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 extern "C" IMotionInterface *MotionInterfaceImplGetInstance(void)
