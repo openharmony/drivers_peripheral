@@ -647,12 +647,14 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
     if (!HdfSbufReadUint64(data, &instance)) {
         HDF_LOGE("%{public}s: read instance data failed!", __func__);
         HdfRemoteServiceRecycle(cbRemote);
+        CodecProxyCallbackRelease(cb);
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t errNum = CodecSetCallbackProxy((CODEC_HANDLETYPE)(uintptr_t)handle, cb, (UINTPTR)instance);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecSetCallback fuc failed!", __func__);
         HdfRemoteServiceRecycle(cbRemote);
+        CodecProxyCallbackRelease(cb);
         return errNum;
     }
     return errNum;
