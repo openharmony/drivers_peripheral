@@ -25,9 +25,11 @@ if (defined(ohos_lite)) {
     cflags_cc = [ "-std=c++17" ]
     ldflags = [ "-Wl" ]
     ldflags += [ "--coverage" ]
+
+    include_dirs = [ "./include" ]
   }
 
-  ohos_shared_library("camera_buffer_manager") {
+  ohos_shared_library("peripheral_camera_buffer_manager") {
     sources = [
       "./src/buffer_adapter/lite/buffer_adapter.cpp",
       "./src/buffer_allocator.cpp",
@@ -83,9 +85,11 @@ if (defined(ohos_lite)) {
 
       ldflags += [ "--coverage" ]
     }
+
+    include_dirs = [ "./include" ]
   }
 
-  ohos_shared_library("camera_buffer_manager") {
+  ohos_shared_library("peripheral_camera_buffer_manager") {
     sources = [
       "./src/buffer_adapter/standard/buffer_adapter.cpp",
       "./src/buffer_allocator.cpp",
@@ -100,7 +104,6 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "./include",
       "./src/buffer_adapter/standard",
       "$camera_path/include",
     ]

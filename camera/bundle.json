@@ -43,7 +43,56 @@
       "test": [
         "//drivers/peripheral/camera/test:camera_hal_test"
       ],
-      "inner_kits": []
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/buffer_manager:peripheral_camera_buffer_manager",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/device_manager:peripheral_camera_device_manager",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/metadata_manager:peripheral_camera_metadata_manager",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/adapter/platform/v4l2/src/driver_adapter:peripheral_camera_v4l2_adapter",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/pipeline_core:peripheral_camera_pipeline_core",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/camera/vdi_base/common/utils:peripheral_camera_utils",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/camera/"
+          }
+        }
+      ]
     }
   }
 }
