@@ -17,8 +17,12 @@ if (defined(ohos_lite)) {
   group("camera_hal") {
     deps = [
       "hdi_service/v1_0:camera_host_service_1.0",
-      "vdi_base/common/buffer_manager:camera_buffer_manager",
-      "vdi_base/common/utils:camera_utils",
+      "vdi_base/common/adapter/platform/v4l2/src/driver_adapter:peripheral_camera_v4l2_adapter",
+      "vdi_base/common/buffer_manager:peripheral_camera_buffer_manager",
+      "vdi_base/common/device_manager:peripheral_camera_device_manager",
+      "vdi_base/common/metadata_manager:peripheral_camera_metadata_manager",
+      "vdi_base/common/pipeline_core:peripheral_camera_pipeline_core",
+      "vdi_base/common/utils:peripheral_camera_utils",
     ]
   }
   group("camera_hal_unittest") {
@@ -31,11 +35,17 @@ if (defined(ohos_lite)) {
     } else {
       deps = [
         "hdi_service/v1_0:camera_host_service_1.0",
-        "vdi_base/common/buffer_manager:camera_buffer_manager",
-        "vdi_base/common/utils:camera_utils",
+        "vdi_base/common/utils:peripheral_camera_utils",
+        "vdi_base/usb_camera:usb_camera_vdi_impl",
       ]
-      if (drivers_peripheral_camera_feature_usb == true) {
-        deps += [ "vdi_base/usb_camera:usb_camera_vdi_impl" ]
+      if (drivers_peripheral_camera_feature_usb == false) {
+        deps += [
+          "vdi_base/common/adapter/platform/v4l2/src/driver_adapter:peripheral_camera_v4l2_adapter",
+          "vdi_base/common/buffer_manager:peripheral_camera_buffer_manager",
+          "vdi_base/common/device_manager:peripheral_camera_device_manager",
+          "vdi_base/common/metadata_manager:peripheral_camera_metadata_manager",
+          "vdi_base/common/pipeline_core:peripheral_camera_pipeline_core",
+        ]
       }
     }
   }
@@ -44,23 +54,27 @@ if (defined(ohos_lite)) {
       deps = []
     } else {
       testonly = true
-      deps = [
-        # acceptance unit test
-        "test/hdi/v1_0:camera_test_at",
-        "test/hdi/v1_1:camera_test_hdi_V1_1",
-
-        # benchmark test
-        "test/benchmarktest/v1_0:hdf_camera_benchmark_test",
-        "test/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
-
-        # v4l2 unit test
-        "test/ut/v4l2:camera_test_v4l2_ut",
-
-        # buffer manager unit test
-        "test/ut/buffer_manager:camera_buffer_manager_ut",
-      ]
       if (drivers_peripheral_camera_feature_usb == true) {
-        deps += [ "test/ut/usb_camera:camera_usb_test_ut" ]
+        deps = [ "test/ut/usb_camera:camera_usb_test_ut" ]
+      } else {
+        deps = [
+          # acceptance unit test
+          "test/hdi/v1_0:camera_test_at",
+          "test/hdi/v1_1:camera_test_hdi_V1_1",
+
+          # benchmark test
+          "test/benchmarktest/v1_0:hdf_camera_benchmark_test",
+          "test/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
+
+          # v4l2 unit test
+          "test/ut/v4l2:camera_test_v4l2_ut",
+
+          # buffer manager unit test
+          "test/ut/buffer_manager:camera_buffer_manager_ut",
+
+          # usb camera unit test
+          "test/ut/usb_camera:camera_usb_test_ut",
+        ]
       }
     }
   }

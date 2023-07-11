@@ -48,7 +48,7 @@ if (defined(ohos_lite)) {
       "./include",
     ]
 
-    deps = [ "$camera_path/utils:camera_utils" ]
+    deps = [ "$camera_path/utils:peripheral_camera_utils" ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
@@ -111,7 +111,7 @@ if (defined(ohos_lite)) {
     sources = host_sources
     include_dirs = host_includes
 
-    deps = [ "$camera_path/utils:camera_utils" ]
+    deps = [ "$camera_path/utils:peripheral_camera_utils" ]
 
     defines = []
     if (enable_camera_device_utest) {
@@ -155,7 +155,7 @@ if (defined(ohos_lite)) {
     sources = host_sources
     include_dirs = host_includes
 
-    deps = [ "$camera_path/utils:camera_utils" ]
+    deps = [ "$camera_path/utils:peripheral_camera_utils" ]
 
     defines = []
     if (enable_camera_device_utest) {

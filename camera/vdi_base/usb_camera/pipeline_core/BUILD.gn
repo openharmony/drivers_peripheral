@@ -125,7 +125,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_usb/camera_config:params.c",
     "$camera_path_usb/device_manager:usb_camera_device_manager",
     "$camera_path_usb/metadata_manager:usb_camera_metadata_manager",
-    "$camera_path_vdi/utils:camera_utils",
+    "$camera_path_vdi/utils:peripheral_camera_utils",
     "$third_path/ffmpeg:libohosffmpeg",
     "$third_path/libjpeg-turbo:turbojpeg_static",
   ]
