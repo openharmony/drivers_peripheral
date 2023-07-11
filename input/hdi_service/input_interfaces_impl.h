@@ -28,7 +28,7 @@ public:
     InputInterfacesImpl(): inputInterface_(NULL) {}
     virtual ~InputInterfacesImpl()
     {
-        ReleaseInputInterface(inputInterface_);
+        ReleaseInputInterface(&inputInterface_);
     }
     void Init();
     int32_t ScanInputDevice(std::vector<DevDesc> &staArr) override;

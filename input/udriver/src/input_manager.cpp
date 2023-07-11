@@ -170,21 +170,25 @@ int32_t InstanceReporterHdi(InputReporter **reporter)
     return INPUT_SUCCESS;
 }
 
-static void FreeInputHdi(IInputInterface *hdi)
+static void FreeInputHdi(IInputInterface **hdi)
 {
-    if (hdi->iInputManager != nullptr) {
-        OsalMemFree(hdi->iInputManager);
-        hdi->iInputManager = nullptr;
+    if (hdi == nullptr || *hdi == nullptr) {
+        return;
     }
-    if (hdi->iInputController != nullptr) {
-        OsalMemFree(hdi->iInputController);
-        hdi->iInputController = nullptr;
+    if ((*hdi)->iInputManager != nullptr) {
+        OsalMemFree((*hdi)->iInputManager);
+        (*hdi)->iInputManager = nullptr;
     }
-    if (hdi->iInputReporter != nullptr) {
-        OsalMemFree(hdi->iInputReporter);
-        hdi->iInputReporter = nullptr;
+    if ((*hdi)->iInputController != nullptr) {
+        OsalMemFree((*hdi)->iInputController);
+        (*hdi)->iInputController = nullptr;
     }
-    OsalMemFree(hdi);
+    if ((*hdi)->iInputReporter != nullptr) {
+        OsalMemFree((*hdi)->iInputReporter);
+        (*hdi)->iInputReporter = nullptr;
+    }
+    OsalMemFree((*hdi));
+    *hdi = nullptr;
 }
 
 static IInputInterface *InstanceInputHdi(void)
@@ -199,17 +203,17 @@ static IInputInterface *InstanceInputHdi(void)
 
     ret = InstanceManagerHdi(&hdi->iInputManager);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return nullptr;
     }
     ret = InstanceControllerHdi(&hdi->iInputController);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return nullptr;
     }
     ret = InstanceReporterHdi(&hdi->iInputReporter);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return nullptr;
     }
     return hdi;
@@ -232,13 +236,12 @@ int32_t GetInputInterface(IInputInterface **inputInterface)
     return INPUT_SUCCESS;
 }
 
-void ReleaseInputInterface(IInputInterface *inputInterface)
+void ReleaseInputInterface(IInputInterface **inputInterface)
 {
-    if (inputInterface == nullptr) {
+    if (inputInterface == nullptr || *inputInterface == nullptr) {
         return;
     }
     FreeInputHdi(inputInterface);
-    inputInterface = nullptr;
 }
 #ifdef __cplusplus
 }
