@@ -522,7 +522,7 @@ RetStatus InputDeviceManager::ScanDevice(InputDevDesc *staArr, uint32_t arrLen)
         return INPUT_FAILURE;
     }
 
-    for (size_t i = 0; i <= scanCount; i++) {
+    for (size_t i = 0; i < scanCount; i++) {
         (staArr + i)->devIndex = inputDevList_[i].index;
         (staArr + i)->devType = inputDevList_[i].detailInfo.devType;
     }
