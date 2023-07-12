@@ -235,10 +235,7 @@ RetCode StreamBase::StopStream()
 
     CAMERA_LOGI("stop stream [id:%{public}d] end", streamId_);
     isFirstRequest = true;
-
-    inTransitList_.clear();
-    tunnel_->CleanBuffers();
-    bufferPool_->ClearBuffers();
+    ReleaseStreamDatas();
     return RC_OK;
 }
 
@@ -598,5 +595,17 @@ void StreamBase::DumpStatsInfo() const
     if (tunnel_ != nullptr) {
         tunnel_->DumpStats();
     }
+}
+
+void StreamBase::ReleaseStreamDatas()
+{
+    inTransitList_.clear();
+    tunnel_->CleanBuffers();
+    bufferPool_->ClearBuffers();
+    BufferManager* mgr = BufferManager::GetInstance();
+    if (mgr != nullptr) {
+        mgr->EraseBufferPoolMapById(poolId_);
+    }
+    bufferPool_ = nullptr;
 }
 } // namespace OHOS::Camera

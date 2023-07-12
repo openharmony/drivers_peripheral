@@ -68,6 +68,9 @@ public:
     };
 
 protected:
+    void ReleaseStreamDatas();
+
+protected:
     int32_t streamId_ = -1;
     int32_t streamType_ = -1;
     bool isFirstRequest = true;
