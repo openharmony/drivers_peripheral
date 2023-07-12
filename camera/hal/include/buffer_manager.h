@@ -32,6 +32,7 @@ public:
 
     // get a buffer pool from id.
     std::shared_ptr<IBufferPool> GetBufferPool(uint64_t id);
+    void EraseBufferPoolMapById(uint64_t id);
 
 private:
     BufferManager() = default;
