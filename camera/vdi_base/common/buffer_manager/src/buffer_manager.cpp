@@ -67,7 +67,6 @@ void BufferManager::EraseBufferPoolMapById(uint64_t id)
     auto findIter = bufferPoolMap_.find(id);
     if (findIter != bufferPoolMap_.end()) {
         bufferPoolMap_.erase(findIter);
-        CAMERA_LOGI("erase bufferpool id : %{public}llu", id);
     }
 }
 } // namespace OHOS::Camera
