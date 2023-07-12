@@ -311,23 +311,27 @@ static int32_t InitDevManager(void)
     return INPUT_SUCCESS;
 }
 
-static void FreeInputHdi(IInputInterface *hdi)
+static void FreeInputHdi(IInputInterface **hdi)
 {
-    if (hdi->iInputManager != NULL) {
-        free(hdi->iInputManager);
-        hdi->iInputManager = NULL;
+    if (hdi == NULL || *hdi == NULL) {
+        return;
+    }
+    if ((*hdi)->iInputManager != NULL) {
+        free((*hdi)->iInputManager);
+        (*hdi)->iInputManager = NULL;
     }
 
-    if (hdi->iInputController != NULL) {
-        free(hdi->iInputController);
-        hdi->iInputController = NULL;
+    if ((*hdi)->iInputController != NULL) {
+        free((*hdi)->iInputController);
+        (*hdi)->iInputController = NULL;
     }
 
-    if (hdi->iInputReporter != NULL) {
-        free(hdi->iInputReporter);
-        hdi->iInputReporter = NULL;
+    if ((*hdi)->iInputReporter != NULL) {
+        free((*hdi)->iInputReporter);
+        (*hdi)->iInputReporter = NULL;
     }
-    free(hdi);
+    free((*hdi));
+    *hdi = NULL;
 }
 
 static IInputInterface *InstanceInputHdi(void)
@@ -342,19 +346,19 @@ static IInputInterface *InstanceInputHdi(void)
 
     ret = InstanceManagerHdi(&hdi->iInputManager);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return NULL;
     }
 
     ret = InstanceControllerHdi(&hdi->iInputController);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return NULL;
     }
 
     ret = InstanceReporterHdi(&hdi->iInputReporter);
     if (ret != INPUT_SUCCESS) {
-        FreeInputHdi(hdi);
+        FreeInputHdi(&hdi);
         return NULL;
     }
     return hdi;
@@ -379,7 +383,7 @@ int32_t GetInputInterface(IInputInterface **inputInterface)
     ret = InitDevManager();
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: failed to initialize manager", __func__);
-        FreeInputHdi(inputHdi);
+        FreeInputHdi(&inputHdi);
         return INPUT_FAILURE;
     }
 
@@ -403,7 +407,7 @@ static void FreeDevManager(InputDevManager *manager)
     g_devManager = NULL;
 }
 
-void ReleaseInputInterface(IInputInterface *inputInterface)
+void ReleaseInputInterface(IInputInterface **inputInterface)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
