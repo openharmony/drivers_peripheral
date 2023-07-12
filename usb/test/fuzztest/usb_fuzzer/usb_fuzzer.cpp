@@ -23,6 +23,7 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
+constexpr int32_t OFFSET = 4;
 constexpr int32_t ZERO_BIT = 0;
 constexpr int32_t FIRST_BIT = 1;
 constexpr int32_t SECOND_BIT = 2;
