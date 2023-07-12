@@ -150,6 +150,7 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
             return HDF_FAILURE;
         }
         ret = g_wifi->destroyFeature(&(g_apFeature->baseFeature));
+        g_apFeature = NULL;
     } else if (ifeature->type == PROTOCOL_80211_IFTYPE_STATION) {
         if (g_staFeature == NULL) {
             HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
@@ -166,6 +167,7 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
             return HDF_FAILURE;
         }
         ret = g_wifi->destroyFeature(&(g_staFeature->baseFeature));
+        g_staFeature = NULL;
     } else {
         HDF_LOGE("%{public}s: wlan type is invalid", __func__);
     }
