@@ -88,12 +88,6 @@ public:
     uint32_t GetLayerBuffercount() const;
 
 private:
-    uint32_t GenerateSeq() const
-    {
-        static uint32_t originSeq = 0;
-        return originSeq++;
-    }
-
     uint32_t id_;
     uint32_t displayID_;
     uint32_t layerBufferCount_;
