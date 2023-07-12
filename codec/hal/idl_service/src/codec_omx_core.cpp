@@ -31,13 +31,12 @@ CodecOMXCore::~CodecOMXCore()
 }
 int32_t CodecOMXCore::Init(const std::string &libName)
 {
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(libName.c_str(), pathBuf) == nullptr) {
-        CODEC_LOGE("realpath failed! error code: %{public}d", errno);
+    if (libName.empty()) {
+        CODEC_LOGE("param is empty");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    libHandle_ = dlopen(pathBuf, RTLD_LAZY);
+    libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);
     if (libHandle_ == nullptr) {
         CODEC_LOGE("Failed to dlopen %{public}s.", libName.c_str());
         return HDF_ERR_INVALID_PARAM;
