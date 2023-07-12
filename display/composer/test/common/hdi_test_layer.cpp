@@ -40,12 +40,14 @@ HdiGrallocBuffer::HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, Pixel
     if (ret != DISPLAY_SUCCESS) {
         DISPLAY_TEST_LOGE("can not alloc memory");
     }
-    void* vaddr = gralloc->Mmap(*buffer);
-    if (vaddr == nullptr) {
-        DISPLAY_TEST_LOGE("mmap failed");
+    if (buffer != nullptr) {
+        void* vaddr = gralloc->Mmap(*buffer);
+        if (vaddr == nullptr) {
+            DISPLAY_TEST_LOGE("mmap failed");
+        }
+        buffer_ = buffer;
+        seqNo_ = seqNo;
     }
-    buffer_ = buffer;
-    seqNo_ = seqNo;
 }
 
 HdiGrallocBuffer::~HdiGrallocBuffer()
@@ -131,6 +133,12 @@ HdiGrallocBuffer* HdiTestLayer::GetBackBuffer() const
 HdiTestLayer::HdiTestLayer(LayerInfo& info, uint32_t id, uint32_t displayId)
     : id_(id), displayID_(displayId), layerBufferCount_(MAX_BUFFER_COUNT), layerInfo_(info)
 {}
+
+static uint32_t GenerateSeq()
+{
+    static uint32_t originSeq = 0;
+    return originSeq++;
+}
 
 int32_t HdiTestLayer::Init(uint32_t bufferCount)
 {
