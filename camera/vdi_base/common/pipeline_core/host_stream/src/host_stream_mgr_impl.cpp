@@ -37,7 +37,7 @@ RetCode HostStreamMgrImpl::CreateHostStream(const HostStreamInfo& info, BufferCb
                 });
     if (it != streams_.end()) {
         CAMERA_LOGE("host stream %{public}d exists.", info.streamId_);
-        return RC_OK;
+        DestroyHostStream({info.streamId_});
     }
     CAMERA_LOGI("bufferpool id = %{public}llu , stream id = %{public}d,stream type = %{public}d, encode = %{public}d",
         info.bufferPoolId_, info.streamId_, info.type_, info.encodeType_);
