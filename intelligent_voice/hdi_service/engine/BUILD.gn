@@ -80,6 +80,7 @@ group("hdi_intell_voice_engine_service") {
   deps = [
     ":intell_voice_engine_driver",
     ":intell_voice_engine_manager_service_1.0",
+    "etc:intelligent_voice_engine_cfg",
   ]
 
   if (drivers_peripheral_intelligent_voice_feature_community) {
