@@ -91,7 +91,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
     int addrFd = open(path.c_str(), O_RDONLY);
     if (addrFd < 0) {
         HDF_LOGI("GetDeviceAddress open %{public}s.", path.c_str());
-        int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00766);
+        int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00644);
         HDF_LOGI("GetDeviceAddress open newFd %{public}d.", newFd);
         char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
         auto tmpPtr = GenerateDeviceAddress();
