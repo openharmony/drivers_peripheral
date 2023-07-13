@@ -109,6 +109,9 @@ int32_t JpegDecoder::Init()
 
 int32_t JpegDecoder::DeInit()
 {
+    if (hdiDecoder_ == nullptr) {
+        return HDF_FAILURE;
+    }
     return hdiDecoder_->JpegDeInit();
 }
 
