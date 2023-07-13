@@ -66,6 +66,8 @@ int32_t CodecJpegDecoder::DoJpegDecode(const CodecImageBuffer& inBuffer, const C
     CODEC_LOGI("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
     CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
+    CHECK_AND_RETURN_RET_LOG(inBuffer.buffer != nullptr, HDF_ERR_INVALID_PARAM, "inBuffer.buffer is null");
+    CHECK_AND_RETURN_RET_LOG(outBuffer.buffer != nullptr, HDF_ERR_INVALID_PARAM, "outBuffer.buffer is null");
 
     BufferHandle *inHandle = inBuffer.buffer->Move();
     CHECK_AND_RETURN_RET_LOG(inHandle != nullptr, HDF_FAILURE, "inHandle is null");
