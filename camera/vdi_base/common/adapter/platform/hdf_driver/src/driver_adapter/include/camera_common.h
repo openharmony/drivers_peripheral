@@ -111,7 +111,7 @@ struct FlashInfo {
     uint8_t flashIntensity;
 };
 
-struct StreamInfo {
+struct VdiStreamInfo {
     uint8_t mode;
     char driverName[DRIVER_NAME_NUM];
     uint8_t id;
@@ -129,7 +129,7 @@ struct DeviceaInfo {
     struct VcmInfo vcm;
     struct LensInfo lens;
     struct FlashInfo flash;
-    struct StreamInfo stream;
+    struct VdiStreamInfo stream;
 };
 
 struct CameraFeature {

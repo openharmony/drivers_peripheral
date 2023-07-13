@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <iterator>
 #include "stream_operator_service.h"
+#include "stream_operator_service_callback.h"
+#include "camera_service_type_converter.h"
 
 namespace OHOS::Camera {
 
@@ -34,13 +36,29 @@ int32_t StreamOperatorService::IsStreamsSupported(OperationMode mode, const std:
     const std::vector<StreamInfo> &infos, StreamSupportType &type)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return streamOperatorVdi_->IsStreamsSupported(mode, modeSetting, infos, type);
+    std::vector<VdiStreamInfo> vdiInfos;
+    for (auto info : infos) {
+        VdiStreamInfo vdiInfo;
+        ConvertStreamInfoHdiToVdi(info, vdiInfo);
+        vdiInfos.push_back(vdiInfo);
+    }
+    VdiStreamSupportType vdiType = static_cast<VdiStreamSupportType>(type);
+    int32_t ret = streamOperatorVdi_->IsStreamsSupported(static_cast<VdiOperationMode>(mode),
+        modeSetting, vdiInfos, vdiType);
+    type = static_cast<StreamSupportType>(vdiType);
+    return ret;
 }
 
 int32_t StreamOperatorService::CreateStreams(const std::vector<StreamInfo> &streamInfos)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return streamOperatorVdi_->CreateStreams(streamInfos);
+    std::vector<VdiStreamInfo> vdiStreamInfos;
+    for (auto info : streamInfos) {
+        VdiStreamInfo vdiInfo;
+        ConvertStreamInfoHdiToVdi(info, vdiInfo);
+        vdiStreamInfos.push_back(vdiInfo);
+    }
+    return streamOperatorVdi_->CreateStreams(vdiStreamInfos);
 }
 
 int32_t StreamOperatorService::ReleaseStreams(const std::vector<int32_t> &streamIds)
@@ -52,13 +70,26 @@ int32_t StreamOperatorService::ReleaseStreams(const std::vector<int32_t> &stream
 int32_t StreamOperatorService::CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return streamOperatorVdi_->CommitStreams(mode, modeSetting);
+    return streamOperatorVdi_->CommitStreams(static_cast<VdiOperationMode>(mode), modeSetting);
 }
 
 int32_t StreamOperatorService::GetStreamAttributes(std::vector<StreamAttribute> &attributes)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return streamOperatorVdi_->GetStreamAttributes(attributes);
+    std::vector<VdiStreamAttribute> vdiAttributes;
+    for (auto attribute : attributes) {
+        VdiStreamAttribute vdiAttribute;
+        ConvertStreamAttributeHdiToVdi(attribute, vdiAttribute);
+        vdiAttributes.push_back(vdiAttribute);
+    }
+    int32_t ret = streamOperatorVdi_->GetStreamAttributes(vdiAttributes);
+    std::vector<StreamAttribute>().swap(attributes);
+    for (auto attribute : vdiAttributes) {
+        StreamAttribute hdiAttribute;
+        ConvertStreamAttributeVdiToHdi(attribute, hdiAttribute);
+        attributes.push_back(hdiAttribute);
+    }
+    return ret;
 }
 
 int32_t StreamOperatorService::AttachBufferQueue(int32_t streamId,
@@ -77,7 +108,9 @@ int32_t StreamOperatorService::DetachBufferQueue(int32_t streamId)
 int32_t StreamOperatorService::Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    return streamOperatorVdi_->Capture(captureId, info, isStreaming);
+    VdiCaptureInfo vdiInfo;
+    ConvertCaptureInfoHdiToVdi(info, vdiInfo);
+    return streamOperatorVdi_->Capture(captureId, vdiInfo, isStreaming);
 }
 
 int32_t StreamOperatorService::CancelCapture(int32_t captureId)
@@ -91,7 +124,12 @@ int32_t StreamOperatorService::ChangeToOfflineStream(const std::vector<int32_t> 
 {
     OHOS::sptr<IOfflineStreamOperatorVdi> offlineOperatorVdi = nullptr;
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-    int32_t ret = streamOperatorVdi_->ChangeToOfflineStream(streamIds, callbackObj, offlineOperatorVdi);
+    OHOS::sptr<IStreamOperatorVdiCallback> vdiCallbackObj = new StreamOperatorServiceCallback(callbackObj);
+    if (vdiCallbackObj == nullptr) {
+        CAMERA_LOGE("Change to offline stream error, vdiCallbackObj is nullptr");
+        return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
+    }
+    int32_t ret = streamOperatorVdi_->ChangeToOfflineStream(streamIds, vdiCallbackObj, offlineOperatorVdi);
     if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("Change to offline stream error, ret=%{public}d", ret);
         return ret;

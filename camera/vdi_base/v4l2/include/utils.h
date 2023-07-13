@@ -18,21 +18,23 @@
 
 #include <camera.h>
 #include <device_manager_adapter.h>
-#include "v1_0/types.h"
+#include "v1_0/vdi_types.h"
 #include "surface.h"
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::VDI::Camera::V1_0;
 using StreamSupported = struct _StreamSupported {
-    OperationMode operationMode_;
-    StreamSupportType streamSupportType_;
-    std::vector<std::shared_ptr<StreamInfo>> streamInfos_;
+    VdiOperationMode VdiOperationMode_;
+    VdiStreamSupportType streamSupportType_;
+    std::vector<std::shared_ptr<VdiStreamInfo>> streamInfos_;
 };
 
 using CaptureCallback = struct _CaptureCallback {
     std::function<void (int32_t captureId, const std::vector<int32_t> &streamId)> OnCaptureStarted;
-    std::function<void (int32_t captureId, const std::vector<std::shared_ptr<CaptureEndedInfo>> &info)> OnCaptureEnded;
-    std::function<void (int32_t captureId, const std::vector<std::shared_ptr<CaptureErrorInfo>> &info)> OnCaptureError;
+    std::function<void (int32_t captureId,
+        const std::vector<std::shared_ptr<VdiCaptureEndedInfo>> &info)> OnCaptureEnded;
+    std::function<void (int32_t captureId,
+        const std::vector<std::shared_ptr<VdiCaptureErrorInfo>> &info)> OnCaptureError;
     std::function<void (int32_t captureId, const std::vector<int> &streamIds)> OnFrameShutter;
 };
 

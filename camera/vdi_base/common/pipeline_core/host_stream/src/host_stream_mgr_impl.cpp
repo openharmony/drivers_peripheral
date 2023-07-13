@@ -70,7 +70,7 @@ RetCode HostStreamMgrImpl::DestroyHostStream(const std::vector<int>& streamIds)
 void HostStreamMgrImpl::GetStreamTypes(std::vector<int32_t>& s) const
 {
     std::transform(streams_.begin(), streams_.end(), std::back_inserter(s),
-        [](auto &iter) { return static_cast<std::underlying_type<StreamIntent>::type>(iter->GetStreamType()); });
+        [](auto &iter) { return static_cast<std::underlying_type<VdiStreamIntent>::type>(iter->GetStreamType()); });
     std::sort(s.begin(), s.end(), [](const int32_t& f, const int32_t& n) {
                     return f < n;
                 });

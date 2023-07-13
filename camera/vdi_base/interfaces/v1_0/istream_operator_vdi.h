@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H
-#define OHOS_HDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H
+#ifndef OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H
+#define OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H
 
 #include <stdint.h>
 #include <vector>
 #include <hdf_base.h>
 #include <hdi_base.h>
 #include "buffer_producer_sequenceable.h"
-#include "ioffline_stream_operator_vdi.h"
-#include "v1_0/istream_operator_callback.h"
-#include "v1_0/types.h"
-
-#define ISTREAM_OPERATOR_VDI_MAJOR_VERSION 1
-#define ISTREAM_OPERATOR_VDI_MINOR_VERSION 0
+#include "v1_0/ioffline_stream_operator_vdi.h"
+#include "v1_0/istream_operator_vdi_callback.h"
+#include "v1_0/vdi_types.h"
 
 namespace OHOS {
 namespace VDI {
@@ -40,38 +37,31 @@ class IStreamOperatorVdi : public HdiBase {
 public:
     virtual ~IStreamOperatorVdi() = default;
 
-    virtual int32_t IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
-         const std::vector<StreamInfo> &infos, StreamSupportType &type) = 0;
+    virtual int32_t IsStreamsSupported(VdiOperationMode mode, const std::vector<uint8_t> &modeSetting,
+         const std::vector<VdiStreamInfo> &infos, VdiStreamSupportType &type) = 0;
 
-    virtual int32_t CreateStreams(const std::vector<StreamInfo> &streamInfos) = 0;
+    virtual int32_t CreateStreams(const std::vector<VdiStreamInfo> &streamInfos) = 0;
 
     virtual int32_t ReleaseStreams(const std::vector<int32_t> &streamIds) = 0;
 
-    virtual int32_t CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting) = 0;
+    virtual int32_t CommitStreams(VdiOperationMode mode, const std::vector<uint8_t> &modeSetting) = 0;
 
-    virtual int32_t GetStreamAttributes(std::vector<StreamAttribute> &attributes) = 0;
+    virtual int32_t GetStreamAttributes(std::vector<VdiStreamAttribute> &attributes) = 0;
 
     virtual int32_t AttachBufferQueue(int32_t streamId, const sptr<BufferProducerSequenceable> &bufferProducer) = 0;
 
     virtual int32_t DetachBufferQueue(int32_t streamId) = 0;
 
-    virtual int32_t Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming) = 0;
+    virtual int32_t Capture(int32_t captureId, const VdiCaptureInfo &info, bool isStreaming) = 0;
 
     virtual int32_t CancelCapture(int32_t captureId) = 0;
 
     virtual int32_t ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
-         const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperatorVdi> &offlineOperator) = 0;
-
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
-    {
-        majorVer = ISTREAM_OPERATOR_VDI_MAJOR_VERSION;
-        minorVer = ISTREAM_OPERATOR_VDI_MINOR_VERSION;
-        return HDF_SUCCESS;
-    }
+         const sptr<IStreamOperatorVdiCallback> &callbackObj, sptr<IOfflineStreamOperatorVdi> &offlineOperator) = 0;
 };
 } // V1_0
 } // Camera
 } // VDI
 } // OHOS
 
-#endif // OHOS_HDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H
+#endif // OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDI_H

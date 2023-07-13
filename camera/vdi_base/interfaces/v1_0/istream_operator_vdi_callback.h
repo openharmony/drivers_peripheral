@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VDI_CAMERA_V1_0_IOFFLINESTREAMOPERATORVDI_H
-#define OHOS_VDI_CAMERA_V1_0_IOFFLINESTREAMOPERATORVDI_H
+#ifndef OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDICALLBACK_H
+#define OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDICALLBACK_H
 
 #include <stdint.h>
 #include <vector>
@@ -29,19 +29,22 @@ namespace V1_0 {
 using namespace OHOS;
 using namespace OHOS::HDI;
 
-class IOfflineStreamOperatorVdi : public HdiBase {
+class IStreamOperatorVdiCallback : public HdiBase {
 public:
-    virtual ~IOfflineStreamOperatorVdi() = default;
 
-    virtual int32_t CancelCapture(int32_t captureId) = 0;
+    virtual ~IStreamOperatorVdiCallback() = default;
 
-    virtual int32_t ReleaseStreams(const std::vector<int32_t> &streamIds) = 0;
+    virtual int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) = 0;
 
-    virtual int32_t Release() = 0;
+    virtual int32_t OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo> &infos) = 0;
+
+    virtual int32_t OnCaptureError(int32_t captureId, const std::vector<VdiCaptureErrorInfo> &infos) = 0;
+
+    virtual int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) = 0;
 };
 } // V1_0
 } // Camera
 } // VDI
 } // OHOS
 
-#endif // OHOS_VDI_CAMERA_V1_0_IOFFLINESTREAMOPERATORVDI_H
+#endif // OHOS_VDI_CAMERA_V1_0_ISTREAMOPERATORVDICALLBACK_H

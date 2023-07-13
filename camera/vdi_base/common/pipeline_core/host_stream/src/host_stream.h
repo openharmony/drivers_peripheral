@@ -21,7 +21,7 @@ namespace OHOS::Camera {
 class HostStream : public NoCopyable {
 public:
     static std::unique_ptr<HostStream> Create(const HostStreamInfo& info, BufferCb c = nullptr);
-    virtual StreamIntent GetStreamType() const = 0;
+    virtual VdiStreamIntent GetStreamType() const = 0;
     virtual int GetStreamId() const = 0;
     virtual bool GetStreamState() const = 0;
     virtual void SetStreamState(bool state) = 0;
