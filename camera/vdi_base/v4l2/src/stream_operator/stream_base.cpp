@@ -19,7 +19,7 @@
 #include "watchdog.h"
 
 namespace OHOS::Camera {
-std::map<StreamIntent, std::string> IStream::g_availableStreamType = {
+std::map<VdiStreamIntent, std::string> IStream::g_availableStreamType = {
     {PREVIEW, STREAM_INTENT_TO_STRING(PREVIEW)},
     {VIDEO, STREAM_INTENT_TO_STRING(VIDEO)},
     {STILL_CAPTURE, STREAM_INTENT_TO_STRING(STILL_CAPTURE)},
@@ -29,7 +29,7 @@ std::map<StreamIntent, std::string> IStream::g_availableStreamType = {
 };
 
 StreamBase::StreamBase(const int32_t id,
-                       const StreamIntent type,
+                       const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
                        std::shared_ptr<CaptureMessageOperator>& m)
 {
@@ -89,7 +89,7 @@ RetCode StreamBase::CommitStream()
     CHECK_IF_PTR_NULL_RETURN_VALUE(hostStreamMgr_, RC_ERROR);
 
     HostStreamInfo info;
-    info.type_ = static_cast<StreamIntent>(streamType_);
+    info.type_ = static_cast<VdiStreamIntent>(streamType_);
     info.streamId_ = streamId_;
     info.width_ = streamConfig_.width;
     info.height_ = streamConfig_.height;
@@ -156,7 +156,7 @@ RetCode StreamBase::StartStream()
 
     state_ = STREAM_STATE_BUSY;
     std::string threadName =
-        g_availableStreamType[static_cast<StreamIntent>(streamType_)] + "#" + std::to_string(streamId_);
+        g_availableStreamType[static_cast<VdiStreamIntent>(streamType_)] + "#" + std::to_string(streamId_);
     handler_ = std::make_unique<std::thread>([this, &threadName] {
         prctl(PR_SET_NAME, threadName.c_str());
         while (state_ == STREAM_STATE_BUSY) {
@@ -452,7 +452,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
         if (status != CAMERA_BUFFER_STATUS_DROP) {
             std::shared_ptr<ICaptureMessage> errorMessage =
                 std::make_shared<CaptureErrorMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
-                                                      request->GetOwnerCount(), static_cast<StreamError>(status));
+                                                      request->GetOwnerCount(), static_cast<VdiStreamError>(status));
             messenger_->SendMessage(errorMessage);
         } else {
             CAMERA_LOGE("stream [id:%{public}d] drop buffer index:%{public}d, status:%{public}d",

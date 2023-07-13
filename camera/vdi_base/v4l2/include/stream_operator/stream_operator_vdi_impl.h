@@ -29,22 +29,22 @@ namespace OHOS::Camera {
 using namespace OHOS::VDI::Camera::V1_0;
 class StreamOperatorVdiImpl : public IStreamOperatorVdi {
 public:
-    int32_t IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
-                               const std::vector<StreamInfo> &infos, StreamSupportType &type) override;
-    int32_t CreateStreams(const std::vector<StreamInfo> &streamInfos) override;
+    int32_t IsStreamsSupported(VdiOperationMode mode, const std::vector<uint8_t> &modeSetting,
+                               const std::vector<VdiStreamInfo> &infos, VdiStreamSupportType &type) override;
+    int32_t CreateStreams(const std::vector<VdiStreamInfo> &streamInfos) override;
     int32_t ReleaseStreams(const std::vector<int32_t> &streamIds) override;
-    int32_t CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting) override;
-    int32_t GetStreamAttributes(std::vector<StreamAttribute> &attributes) override;
+    int32_t CommitStreams(VdiOperationMode mode, const std::vector<uint8_t> &modeSetting) override;
+    int32_t GetStreamAttributes(std::vector<VdiStreamAttribute> &attributes) override;
     int32_t AttachBufferQueue(int32_t streamId, const sptr<BufferProducerSequenceable> &bufferProducer);
     int32_t DetachBufferQueue(int32_t streamId) override;
-    int32_t Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming) override;
+    int32_t Capture(int32_t captureId, const VdiCaptureInfo &info, bool isStreaming) override;
     int32_t CancelCapture(int32_t captureId) override;
     int32_t ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
-        const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperatorVdi> &offlineOperator) override;
+        const sptr<IStreamOperatorVdiCallback> &callbackObj, sptr<IOfflineStreamOperatorVdi> &offlineOperator) override;
 
 public:
     StreamOperatorVdiImpl() = default;
-    StreamOperatorVdiImpl(const OHOS::sptr<IStreamOperatorCallback> &callback,
+    StreamOperatorVdiImpl(const OHOS::sptr<IStreamOperatorVdiCallback> &callback,
         const std::weak_ptr<ICameraDeviceVdi> &device);
     virtual ~StreamOperatorVdiImpl();
     StreamOperatorVdiImpl(const StreamOperatorVdiImpl &other) = delete;
@@ -58,19 +58,19 @@ public:
 private:
     void HandleCallbackMessage(MessageGroup &message);
     void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds);
-    void OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos);
-    void OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos);
+    void OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo> &infos);
+    void OnCaptureError(int32_t captureId, const std::vector<VdiCaptureErrorInfo> &infos);
     void OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp);
-    bool CheckStreamInfo(const StreamInfo streamInfo);
-    DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
+    bool CheckStreamInfo(const VdiStreamInfo streamInfo);
+    DynamicStreamSwitchMode CheckStreamsSupported(VdiOperationMode mode,
                                                   const std::shared_ptr<CameraMetadata> &modeSetting,
-                                                  const std::vector<StreamInfo> &infos);
-    void StreamInfoToStreamConfiguration(StreamConfiguration &scg, const StreamInfo info);
+                                                  const std::vector<VdiStreamInfo> &infos);
+    void StreamInfoToStreamConfiguration(StreamConfiguration &scg, const VdiStreamInfo info);
     void GetStreamSupportType(std::set<int32_t> inputIDSet,
                               DynamicStreamSwitchMode method,
-                              StreamSupportType &type);
+                              VdiStreamSupportType &type);
 private:
-    OHOS::sptr<IStreamOperatorCallback> callback_ = nullptr;
+    OHOS::sptr<IStreamOperatorVdiCallback> callback_ = nullptr;
     std::weak_ptr<ICameraDeviceVdi> device_;
     std::shared_ptr<IPipelineCore> pipelineCore_ = nullptr;
     std::shared_ptr<IStreamPipelineCore> streamPipeline_ = nullptr;

@@ -22,7 +22,7 @@ namespace OHOS::Camera {
 class StreamVideo : public StreamBase {
 public:
     StreamVideo(const int32_t id,
-                       const StreamIntent type,
+                       const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
                        std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamVideo();

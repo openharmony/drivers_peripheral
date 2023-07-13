@@ -79,7 +79,7 @@ std::shared_ptr<CameraDeviceVdiImpl> CameraDeviceVdiImpl::CreateCameraDevice(con
     return device;
 }
 
-int32_t CameraDeviceVdiImpl::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+int32_t CameraDeviceVdiImpl::GetStreamOperator(const sptr<IStreamOperatorVdiCallback> &callbackObj,
     sptr<IStreamOperatorVdi> &streamOperator)
 {
     HDF_CAMERA_TRACE;
@@ -108,7 +108,7 @@ int32_t CameraDeviceVdiImpl::GetStreamOperator(const sptr<IStreamOperatorCallbac
     InitMetadataController();
 #endif
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraDeviceVdiImpl::UpdateSettings(const std::vector<uint8_t> &settings)
@@ -133,7 +133,7 @@ int32_t CameraDeviceVdiImpl::UpdateSettings(const std::vector<uint8_t> &settings
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.UpdateSettingsConfig(updateSettings);
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraDeviceVdiImpl::GetSettings(std::vector<uint8_t> &settings)
@@ -146,10 +146,10 @@ int32_t CameraDeviceVdiImpl::GetSettings(std::vector<uint8_t> &settings)
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.GetSettingsConfig(meta);
     MetadataUtils::ConvertMetadataToVec(meta, settings);
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraDeviceVdiImpl::SetResultMode(ResultCallbackMode mode)
+int32_t CameraDeviceVdiImpl::SetResultMode(VdiResultCallbackMode mode)
 {
     CAMERA_LOGD("entry.");
     MetadataController &metaDataController = MetadataController::GetInstance();
@@ -163,10 +163,10 @@ int32_t CameraDeviceVdiImpl::SetResultMode(ResultCallbackMode mode)
     }
 
     metaResultMode_ = mode;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
-ResultCallbackMode CameraDeviceVdiImpl::GetMetaResultMode() const
+VdiResultCallbackMode CameraDeviceVdiImpl::GetMetaResultMode() const
 {
     return metaResultMode_;
 }
@@ -188,7 +188,7 @@ int32_t CameraDeviceVdiImpl::GetEnabledResults(std::vector<int32_t> &results)
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.GetEnabledAbility(results);
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode CameraDeviceVdiImpl::GetEnabledFromCfg()
@@ -247,7 +247,7 @@ int32_t CameraDeviceVdiImpl::EnableResult(const std::vector<int32_t> &results)
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.AddEnabledAbility(enabledResults_);
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
@@ -255,7 +255,7 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
-    CamRetCode ret = HDI::Camera::V1_0::NO_ERROR;
+    VdiCamRetCode ret = VDI::Camera::V1_0::NO_ERROR;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     for (auto &metaType : results) {
         auto itr = std::find(enabledResults_.begin(), enabledResults_.end(), metaType);
@@ -269,7 +269,7 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.DelEnabledAbility(results);
     DFX_LOCAL_HITRACE_END;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraDeviceVdiImpl::Close()
@@ -325,16 +325,16 @@ int32_t CameraDeviceVdiImpl::Close()
     cameraDeciceCallback_ = nullptr;
     DFX_LOCAL_HITRACE_END;
     CAMERA_LOGD("camera close success.");
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraDeviceVdiImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback)
+VdiCamRetCode CameraDeviceVdiImpl::SetCallback(const OHOS::sptr<ICameraDeviceVdiCallback> &callback)
 {
     if (callback == nullptr) {
         return INVALID_ARGUMENT;
     }
     cameraDeciceCallback_ = callback;
-    return HDI::Camera::V1_0::NO_ERROR;
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 std::shared_ptr<IPipelineCore> CameraDeviceVdiImpl::GetPipelineCore() const

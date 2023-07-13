@@ -22,7 +22,7 @@ namespace OHOS::Camera {
 class StreamPreview : public StreamBase {
 public:
     StreamPreview(const int32_t id,
-                       const StreamIntent type,
+                       const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
                        std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamPreview();

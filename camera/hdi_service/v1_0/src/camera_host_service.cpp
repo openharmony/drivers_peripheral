@@ -17,8 +17,9 @@
 #include <algorithm>
 #include "camera_host_service.h"
 #include "camera_device_service.h"
-#include "v1_0/icamera_host_callback.h"
 #include "v1_0/icamera_device.h"
+#include "camera_host_service_callback.h"
+#include "camera_device_service_callback.h"
 
 namespace OHOS::Camera {
 OHOS::sptr<CameraHostService> CameraHostService::cameraHostService_ = nullptr;
@@ -147,9 +148,14 @@ CameraHostService::~CameraHostService()
 int32_t CameraHostService::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
 {
     int32_t ret = OHOS::HDI::Camera::V1_0::NO_ERROR;
+    OHOS::sptr<ICameraHostVdiCallback> vdiCallbackObj = new CameraHostServiceCallback(callbackObj);
+    if (vdiCallbackObj == nullptr) {
+        CAMERA_LOGE("Camera host service set callback failed, vdiCallbackObj is nullptr");
+        return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
+    }
     for (auto cameraHostVdi : cameraHostVdiList_) {
         CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-        ret = cameraHostVdi->SetCallback(callbackObj);
+        ret = cameraHostVdi->SetCallback(vdiCallbackObj);
         if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("Camera host service set callback failed");
             break;
@@ -201,7 +207,12 @@ int32_t CameraHostService::OpenCamera(const std::string &cameraId, const sptr<IC
     }
 
     OHOS::sptr<ICameraDeviceVdi> deviceVdi = nullptr;
-    int32_t ret = cameraHostVdi->OpenCamera(vdiCameraId, callbackObj, deviceVdi);
+    OHOS::sptr<ICameraDeviceVdiCallback> vdiCallbackObj = new CameraDeviceServiceCallback(callbackObj);
+    if (vdiCallbackObj == nullptr) {
+        CAMERA_LOGE("Open camera error, vdiCallbackObj is nullptr");
+        return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
+    }
+    int32_t ret = cameraHostVdi->OpenCamera(vdiCameraId, vdiCallbackObj, deviceVdi);
     if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("Open camera error, ret=%{public}d", ret);
         return ret;
