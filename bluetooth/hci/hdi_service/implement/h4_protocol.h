@@ -28,7 +28,7 @@ public:
 
     ssize_t SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData) override;
     void ReadData(int fd);
-    ~H4Protocol();
+    ~H4Protocol() override;
 
 private:
     void PacketCallback();
