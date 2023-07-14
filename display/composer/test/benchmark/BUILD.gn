@@ -43,7 +43,6 @@ ohos_benchmarktest("hdf_display_benchmark_test") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_benchmark:benchmark",
     "thirdparty_googletest:gtest",
   ]
   subsystem_name = "hdf"
