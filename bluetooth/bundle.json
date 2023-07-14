@@ -24,7 +24,7 @@
         "ipc",
         "samgr",
         "drivers_interface_bluetooth",
-        "btipc_static"
+        "bluetooth_service"
       ]
     },
     "build": {
