@@ -19,7 +19,8 @@ group("camera_hal_test") {
     deps = [ "$test_path/../usb_hal/test/ut:camera_test_ut" ]
   } else {
     deps = [
-      "$test_path/benchmarktest:hdf_camera_benchmark_test",
+      "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
+      "$test_path/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
       "$test_path/hdi/v1_0:camera_test_at",
       "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
       "$test_path/ut/buffer_manager:camera_buffer_manager_ut",
