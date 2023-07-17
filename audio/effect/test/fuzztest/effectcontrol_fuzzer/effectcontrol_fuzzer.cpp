@@ -124,9 +124,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (ret != HDF_SUCCESS) {
         return false;
     }
-    if (model != nullptr) {
-        IEffectModelRelease(model, true);
-    }
+    IEffectModelRelease(model, true);
     return true;
 }
 }
