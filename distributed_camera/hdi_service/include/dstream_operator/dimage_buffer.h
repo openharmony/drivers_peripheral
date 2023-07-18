@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <mutex>
 
 #include "constants.h"
+#include "sync_fence.h"
 #include "v1_0/dcamera_types.h"
 
 namespace OHOS {
@@ -41,7 +42,7 @@ public:
     uint64_t GetFrameNumber() const;
     int32_t GetCaptureId() const;
     bool GetValidFlag() const;
-    int32_t GetFenceId() const;
+    OHOS::sptr<OHOS::SyncFence> GetSyncFence() const;
     int32_t GetEncodeType() const;
     BufferHandle* GetBufferHandle() const;
 
@@ -58,7 +59,7 @@ public:
     void SetFrameNumber(const uint64_t frameNumber);
     void SetCaptureId(const int32_t id);
     void SetValidFlag(const bool flag);
-    void SetFenceId(const int32_t fence);
+    void SetSyncFence(const sptr<OHOS::SyncFence> &syncFence);
     void SetEncodeType(const int32_t type);
     void SetBufferHandle(const BufferHandle* bufHandle);
 
@@ -79,7 +80,7 @@ private:
     uint64_t timeStamp_ = 0;
     int32_t captureId_ = -1;
     bool valid_ = true;
-    int32_t fenceId_ = -1;
+    OHOS::sptr<OHOS::SyncFence> syncFence_ = nullptr;
     int32_t encodeType_ = 0;
     BufferHandle* bufHandle_ = nullptr;
 
