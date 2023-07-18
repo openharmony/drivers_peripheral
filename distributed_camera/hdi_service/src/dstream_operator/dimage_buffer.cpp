@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,9 +88,9 @@ bool DImageBuffer::GetValidFlag() const
     return valid_;
 }
 
-int32_t DImageBuffer::GetFenceId() const
+OHOS::sptr<OHOS::SyncFence> DImageBuffer::GetSyncFence() const
 {
-    return fenceId_;
+    return syncFence_;
 }
 
 int32_t DImageBuffer::GetEncodeType() const
@@ -194,10 +194,10 @@ void DImageBuffer::SetValidFlag(const bool flag)
     return;
 }
 
-void DImageBuffer::SetFenceId(const int32_t fence)
+void DImageBuffer::SetSyncFence(const OHOS::sptr<OHOS::SyncFence> &syncFence)
 {
     std::lock_guard<std::mutex> l(l_);
-    fenceId_ = fence;
+    syncFence_ = syncFence;
     return;
 }
 
@@ -227,6 +227,7 @@ void DImageBuffer::Free()
     bufHandle_ = nullptr;
     phyAddr_ = 0;
     fd_ = -1;
+    syncFence_ = nullptr;
 
     return;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,7 @@ const uint32_t DEGREE_240 = 240;
 const uint32_t INGNORE_STR_LEN = 2;
 
 const uint32_t WAIT_OPEN_TIMEOUT_SEC = 5;
+const uint32_t BUFFER_SYNC_FENCE_TIMEOUT = 100;
 
 const std::string ENCODE_TYPE_STR_H264 = "video/avc";
 const std::string ENCODE_TYPE_STR_H265 = "video/hevc";

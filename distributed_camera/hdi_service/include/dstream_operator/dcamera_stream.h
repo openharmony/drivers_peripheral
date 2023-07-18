@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,7 +66,7 @@ private:
     StreamAttribute dcStreamAttribute_;
     shared_ptr<DBufferManager> dcStreamBufferMgr_ = nullptr;
     OHOS::sptr<OHOS::Surface> dcStreamProducer_ = nullptr;
-    map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>> bufferConfigMap_;
+    map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int>> bufferConfigMap_;
     condition_variable cv_;
     int captureBufferCount_ = 0;
     bool isBufferMgrInited_ = false;
