@@ -70,7 +70,8 @@ CodecBuffer* BufferManager::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
             struct timespec time = {0};
             ConstructTimespec(&time, timeoutMs);
             // release lock and wait here, and check again later when notified or timeout
-            pthread_cond_timedwait(&outputCond, reinterpret_cast<pthread_mutex_t *>(usedBufferQueueLock.realMutex), &time);
+            pthread_cond_timedwait(&outputCond, reinterpret_cast<pthread_mutex_t *>(usedBufferQueueLock.realMutex),
+                &time);
             outputData = PollUsedBufferQueue(isChecking);
         }
     }
