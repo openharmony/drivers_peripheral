@@ -183,10 +183,10 @@ void Test::DefaultInfosCapture(
     DefaultCapture(infos);
     std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdCapture, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
-    consumerMap_[StreamIntent::PREVIEW] = consumer_capture;
+    consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
 }
 
 void Test::DefaultInfosVideo(
