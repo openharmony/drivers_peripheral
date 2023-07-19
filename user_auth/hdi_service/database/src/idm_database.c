@@ -588,7 +588,7 @@ ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, Credentia
     }
     credentialQuery = QueryCredentialByAuthType(credentialInfo->authType, credentialList);
     if (credentialQuery != NULL) {
-        return RESULT_SUCCESS;
+        return UpdateFileInfo(g_userInfoList);
     }
 
     LinkedList *enrolledInfoList = user->enrolledInfoList;

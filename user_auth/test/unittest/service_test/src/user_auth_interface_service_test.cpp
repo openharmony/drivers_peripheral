@@ -1105,7 +1105,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos), 8);
 
     authToken.resize(sizeof(UserAuthTokenHal));
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos), 10014);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos), 10017);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_002, TestSize.Level0)
