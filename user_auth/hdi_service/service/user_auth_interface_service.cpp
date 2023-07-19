@@ -742,7 +742,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
     int32_t ret = CheckIdmOperationToken(userId, &authTokenStruct);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("failed to verify token");
-        return RESULT_BAD_SIGN;
+        return RESULT_VERIFY_TOKEN_FAIL;
     }
     return EnforceDeleteUser(userId, deletedInfos);
 }

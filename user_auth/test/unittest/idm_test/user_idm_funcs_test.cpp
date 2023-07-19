@@ -107,7 +107,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
     uint64_t scheduleId = 0;
     EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_BAD_PARAM);
     param.userId = userId;
-    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_BAD_MATCH);
+    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
     DestroyLinkedList(g_userInfoList);
     g_userInfoList = nullptr;
     g_session = nullptr;
@@ -149,7 +149,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     param.executorSensorHint = 10;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_NO_MEMORY);
+    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
     g_userInfoList = nullptr;
     g_session = nullptr;
 }
@@ -206,7 +206,7 @@ HWTEST_F(UserIdmFuncsTest, TestDeleteCredentialFunc, TestSize.Level0)
     UserAuthTokenHal token = {};
     token.tokenDataPlain.authType = 4;
     EXPECT_EQ(memcpy_s(param.token, sizeof(UserAuthTokenHal), &token, sizeof(UserAuthTokenHal)), EOK);
-    EXPECT_EQ(DeleteCredentialFunc(param, &credInfo), RESULT_BAD_MATCH);
+    EXPECT_EQ(DeleteCredentialFunc(param, &credInfo), RESULT_VERIFY_TOKEN_FAIL);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestQueryCredentialFunc, TestSize.Level0)
