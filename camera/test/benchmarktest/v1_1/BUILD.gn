@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("../../camera.gni")
+import("../../../camera.gni")
 module_output_path = "drivers_peripheral_camera/camera"
 camera_include_path = "//drivers/peripheral/camera/test/hdi/"
 
@@ -28,7 +28,7 @@ config("hdf_camera_benchmark_test_config") {
   cflags_cc += [ "-std=c++17" ]
 }
 
-ohos_benchmarktest("hdf_camera_benchmark_test") {
+ohos_benchmarktest("hdf_camera_benchmark_test_v1_1") {
   module_out_path = module_output_path
 
   sources = [
@@ -38,7 +38,7 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
 
   include_dirs = [
     "./include/",
-    "$camera_include_path/v1_0/include/",
+    "$camera_include_path/v1_1/include/",
     "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
@@ -56,7 +56,7 @@ ohos_benchmarktest("hdf_camera_benchmark_test") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_camera:libcamera_proxy_1.0",
+      "drivers_interface_camera:libcamera_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
