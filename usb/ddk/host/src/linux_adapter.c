@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -128,8 +128,8 @@ static int32_t GetMmapFd(struct UsbDevice *dev)
         return HDF_FAILURE;
     }
 
-    int32_t fd = HDF_FAILURE;
-    if ((fd = open(path, O_RDWR | O_CREAT | O_TRUNC)) < 0) {
+    int32_t fd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (fd < 0) {
         HDF_LOGE("%{public}s: open error:%{public}s", __func__, path);
         return HDF_FAILURE;
     }
