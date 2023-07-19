@@ -21,5 +21,5 @@
     <max_total_time>300</max_total_time>
     <!-- memory usage limit in Mb -->
     <rss_limit_mb>4096</rss_limit_mb>
-  </fuzztest/omx_fuzzer>
+  </fuzztest>
 </fuzz_config>
