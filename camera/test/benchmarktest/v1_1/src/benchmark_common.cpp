@@ -205,7 +205,7 @@ void Test::StartStream(std::vector<StreamIntent> intents)
             streamInfoAnalyze->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
             
             std::shared_ptr<StreamConsumer> consumer_analyze = std::make_shared<StreamConsumer>();
-            streamInfoAnalyze->v1_0.bufferQueue_ = 
+            streamInfoAnalyze->v1_0.bufferQueue_ =
                 consumer_analyze->CreateProducerSeq([this](void* addr, uint32_t size) {
                 common_metadata_header_t *data = static_cast<common_metadata_header_t *>(addr);
                 camera_metadata_item_t entry = {};
@@ -238,7 +238,7 @@ void Test::StartStream(std::vector<StreamIntent> intents)
             streamInfoCapture->v1_0.intent_ = intent;
             streamInfoCapture->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
             std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
-            streamInfoCapture->v1_0.bufferQueue_ = 
+            streamInfoCapture->v1_0.bufferQueue_ =
                 consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
                 DumpImageFile(streamIdPreview, "yuv", addr, size);
             });
