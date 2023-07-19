@@ -22,6 +22,7 @@ group("hdf_codec_idl_fuzz_test") {
     "./codecgetcomponentcapabilitylisthdi_fuzzer:fuzztest",
     "./codecgetconfighdi_fuzzer:fuzztest",
     "./codecgetparameterhdi_fuzzer:fuzztest",
+    "./codechdi_fuzzer:fuzztest",
     "./codecsendcommandhdi_fuzzer:fuzztest",
     "./codecsetcallbackshdi_fuzzer:fuzztest",
     "./codecsetconfighdi_fuzzer:fuzztest",
