@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -184,7 +184,7 @@ DCamRetCode DCameraStream::GetNextRequest()
     }
 
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = nullptr;
-    int32_t fence = -1;
+    OHOS::sptr<OHOS::SyncFence> syncFence = nullptr;
     int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
     OHOS::BufferRequestConfig config = {
         .width = dcStreamInfo_->width_,
@@ -195,7 +195,7 @@ DCamRetCode DCameraStream::GetNextRequest()
         .timeout = 0
     };
 
-    OHOS::SurfaceError surfaceError = dcStreamProducer_->RequestBuffer(surfaceBuffer, fence, config);
+    OHOS::SurfaceError surfaceError = dcStreamProducer_->RequestBuffer(surfaceBuffer, syncFence, config);
     if (surfaceError == OHOS::SURFACE_ERROR_NO_BUFFER) {
         DHLOGE("No available buffer to request in surface.");
         return DCamRetCode::EXCEED_MAX_NUMBER;
@@ -215,18 +215,18 @@ DCamRetCode DCameraStream::GetNextRequest()
     }
 
     imageBuffer->SetIndex(++index_);
-    imageBuffer->SetFenceId(fence);
+    imageBuffer->SetSyncFence(syncFence);
     ret = dcStreamBufferMgr_->AddBuffer(imageBuffer);
     if (ret != RC_OK) {
         DHLOGE("Add buffer to buffer manager failed. [streamId = %d]", dcStreamInfo_->streamId_);
         dcStreamProducer_->CancelBuffer(surfaceBuffer);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
-    DHLOGD("Add new image buffer success: index = %d, fence = %d", imageBuffer->GetIndex(), fence);
+    DHLOGD("Add new image buffer success: index = %d, fenceFd = %d", imageBuffer->GetIndex(), syncFence->Get());
 
     auto itr = bufferConfigMap_.find(imageBuffer);
     if (itr == bufferConfigMap_.end()) {
-        auto bufferCfg = std::make_tuple(surfaceBuffer, fence, usage);
+        auto bufferCfg = std::make_tuple(surfaceBuffer, usage);
         bufferConfigMap_.insert(std::make_pair(imageBuffer, bufferCfg));
     }
 
@@ -256,6 +256,10 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
         if (imageBuffer == nullptr) {
             DHLOGE("Cannot get idle buffer.");
             return DCamRetCode::EXCEED_MAX_NUMBER;
+        }
+        auto syncFence = imageBuffer->GetSyncFence();
+        if (syncFence != nullptr) {
+            syncFence->Wait(BUFFER_SYNC_FENCE_TIMEOUT);
         }
         RetCode ret = DBufferManager::DImageBufferToDCameraBuffer(imageBuffer, buffer);
         if (ret != RC_OK) {
@@ -300,14 +304,14 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
         return DCamRetCode::INVALID_ARGUMENT;
     }
     auto surfaceBuffer = std::get<0>(bufCfg->second);
-    int32_t fence = std::get<1>(bufCfg->second);
     OHOS::BufferFlushConfig flushConf = {
         .damage = { .x = 0, .y = 0, .w = dcStreamInfo_->width_, .h = dcStreamInfo_->height_ },
         .timestamp = 0
     };
     if (dcStreamProducer_ != nullptr) {
         SetSurfaceBuffer(surfaceBuffer, buffer);
-        int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, fence, flushConf);
+        OHOS::sptr<OHOS::SyncFence> autoFence = new(std::nothrow) OHOS::SyncFence(-1);
+        int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, autoFence, flushConf);
         if (ret != 0) {
             DHLOGI("FlushBuffer error: %d", ret);
         }
