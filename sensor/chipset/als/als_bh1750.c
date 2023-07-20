@@ -25,13 +25,12 @@ static struct Bh1750DrvData *Bh1750GetDrvData(void)
 
 static int32_t ReadBh1750RawData(struct SensorCfgData *data, struct BH1750AlsData *rawData, uint64_t *timestamp)
 {
-    uint8_t status = 0;
     uint8_t reg[BH1750_TEMP_DATA_BUF_LEN] = { 0 };
     OsalTimespec time;
     int32_t ret = HDF_SUCCESS;
     uint8_t measureCmdValue[] = {BH1750_CONTINUOUS_H_RES_MODE};
     uint16_t tempValue;
-    
+
     (void)memset_s(&time, sizeof(time), 0, sizeof(time));
 
     CHECK_NULL_PTR_RETURN_VALUE(data, HDF_ERR_INVALID_PARAM);
@@ -52,7 +51,7 @@ static int32_t ReadBh1750RawData(struct SensorCfgData *data, struct BH1750AlsDat
     tempValue = reg[BH1750_TEMP_VALUE_IDX_ZERO];
     tempValue <<= SENSOR_DATA_WIDTH_8_BIT;
     tempValue |= reg[BH1750_TEMP_VALUE_IDX_ONE];
-    
+
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
     rawData->als = (tempValue * BH1750_TEMP_CONSATNT_1) / BH1750_TEMP_CONSATNT_2;
@@ -66,7 +65,6 @@ int32_t ReadBh1750Data(struct SensorCfgData *data)
     static int32_t als;
     struct BH1750AlsData rawData = { 0 };
     struct SensorReportEvent event;
-    struct AlsReportData reportData;
 
     (void)memset_s(&event, sizeof(event), 0, sizeof(event));
     ret = ReadBh1750RawData(data, &rawData, &event.timestamp);
