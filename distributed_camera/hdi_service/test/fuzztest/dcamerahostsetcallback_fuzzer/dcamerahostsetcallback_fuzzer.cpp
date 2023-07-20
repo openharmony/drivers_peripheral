@@ -48,7 +48,7 @@ void DcameraHostSetCallbackFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint8_t))) {
         return;
     }
-    sptr<ICameraHostCallback> callbackObj = new DemoCameraHostCallback();
+    sptr<ICameraHostCallback> callbackObj(new DemoCameraHostCallback());
     DCameraHost::GetInstance()->SetCallback(callbackObj);
 }
 }

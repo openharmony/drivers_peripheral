@@ -81,7 +81,7 @@ void DcameraHdfDemo::GetStreamOpt()
     int rc = 0;
 
     if (streamOperator_ == nullptr) {
-        const sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
+        const sptr<IStreamOperatorCallback> streamOperatorCallback(new DemoStreamOperatorCallback());
         rc = demoCameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
             DHLOGE("demo test: GetStreamOpt GetStreamOperator fail");
@@ -251,7 +251,7 @@ RetCode DcameraHdfDemo::InitCameraDevice()
     GetCameraConnectionType(ability_);
     GetFaceDetectMaxNum(ability_);
 
-    sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+    sptr<DemoCameraDeviceCallback> callback(new DemoCameraDeviceCallback());
     rc = demoCameraHost_->OpenCamera(cameraIds_.front(), callback, demoCameraDevice_);
     if (rc != HDI::Camera::V1_0::NO_ERROR || demoCameraDevice_ == nullptr) {
         DHLOGE("demo test: InitCameraDevice OpenCamera failed");
@@ -744,7 +744,7 @@ RetCode DcameraHdfDemo::StreamOffline(const int streamId)
     int rc = 0;
     constexpr size_t offlineDelayTime = 4;
     DHLOGI("demo test: StreamOffline enter");
-    sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
+    sptr<IStreamOperatorCallback> streamOperatorCallback(new DemoStreamOperatorCallback());
     sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
     std::vector<int> streamIds;
     streamIds.push_back(streamId);

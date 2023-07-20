@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,12 +29,12 @@ void DstreamAttachBufferQueueFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     int32_t streamId = *(reinterpret_cast<const int*>(data));
-    sptr<BufferProducerSequenceable> bufferProducer = new BufferProducerSequenceable();
+    sptr<BufferProducerSequenceable> bufferProducer(new BufferProducerSequenceable());
 
     std::string abilityInfo(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(abilityInfo);
-    OHOS::sptr<DStreamOperator> dCameraStreamOperator = new (std::nothrow) DStreamOperator(dMetadataProcessor);
+    OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));
 
     dCameraStreamOperator->AttachBufferQueue(streamId, bufferProducer);
 }
