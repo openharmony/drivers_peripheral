@@ -41,7 +41,7 @@ namespace {
     constexpr int32_t REPETITION_FREQUENCY = 3;
     constexpr int32_t SENSOR_INTERVAL1 = 20;
     constexpr int32_t SENSOR_INTERVAL2 = 2;
-    constexpr int32_t SENSOR_POLL_TIME = 1;
+    constexpr int32_t SENSOR_POLL_TIME = 3;
     constexpr int32_t SENSOR_WAIT_TIME = 10;
 
 class SensorBenchmarkTest : public benchmark::Fixture {
