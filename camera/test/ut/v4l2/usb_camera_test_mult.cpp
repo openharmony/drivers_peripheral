@@ -321,6 +321,9 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0001)
     } else {
         usbCameraExit_ = false;
     }
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
     ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraBase_->rc = SelectOpenCamera(usbCameraIds[1]);  // 1:second camera id
@@ -356,6 +359,9 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0002)
         usbCameraExit_ = true;
     } else {
         usbCameraExit_ = false;
+    }
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
     ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -394,6 +400,9 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0003)
         usbCameraExit_ = true;
     } else {
         usbCameraExit_ = false;
+    }
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
     cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]); // 0:first camera id
     ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
