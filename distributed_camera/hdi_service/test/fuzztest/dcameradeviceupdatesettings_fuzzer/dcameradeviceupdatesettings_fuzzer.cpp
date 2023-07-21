@@ -36,7 +36,7 @@ void DcameraDeviceUpdateSettingsFuzzTest(const uint8_t* data, size_t size)
     results.push_back(*(reinterpret_cast<const uint8_t*>(data)));
 
     const std::string abilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice = new DCameraDevice(dhBase, abilityInfo);
+    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, abilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }

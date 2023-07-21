@@ -45,7 +45,7 @@ void DstreamGetStreamAttributesFuzzTest(const uint8_t* data, size_t size)
     std::string abilityInfo(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
     dMetadataProcessor->InitDCameraAbility(abilityInfo);
-    OHOS::sptr<DStreamOperator> dCameraStreamOperator = new (std::nothrow) DStreamOperator(dMetadataProcessor);
+    OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));
 
     dCameraStreamOperator->GetStreamAttributes(attributes);
 }
