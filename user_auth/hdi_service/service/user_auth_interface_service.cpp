@@ -494,14 +494,15 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
         uint32_t supportedAtl = AUTH_TRUST_LEVEL_SYS;
         ret = SingleAuthTrustLevel(userId, authType, &supportedAtl);
         if (ret != RESULT_SUCCESS) {
-            IAM_LOGE("the current authType does not support");
+            IAM_LOGE("authType does not support，authType:%{public}d, ret:%{public}d", authType, ret);
             validTypes.clear();
-            return ret;
+            return RESULT_NOT_ENROLLED;
         }
         if (authTrustLevel > supportedAtl) {
-            IAM_LOGE("the current authTrustLevel does not support");
+            IAM_LOGE("authTrustLevel does not support，authType:%{public}d, supportedAtl:%{public}u",
+                authType, supportedAtl);
             validTypes.clear();
-            return RESULT_TYPE_NOT_SUPPORT;
+            return RESULT_TRUST_LEVEL_NOT_SUPPORT;
         }
         validTypes.push_back(authType);
     }
