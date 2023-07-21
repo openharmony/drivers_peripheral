@@ -32,7 +32,7 @@ ohos_moduletest("hdf_disp_buffer_moduletest") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"

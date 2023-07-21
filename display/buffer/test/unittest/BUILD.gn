@@ -32,7 +32,7 @@ ohos_unittest("hdf_disp_buffer_unittest") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
@@ -54,7 +54,7 @@ ohos_unittest("buffer_death_test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"

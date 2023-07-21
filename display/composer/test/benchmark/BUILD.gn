@@ -43,7 +43,7 @@ ohos_benchmarktest("hdf_display_benchmark_test") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
