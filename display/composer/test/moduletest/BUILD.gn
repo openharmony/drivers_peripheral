@@ -42,7 +42,7 @@ ohos_moduletest("composer_mt") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"

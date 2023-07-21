@@ -42,7 +42,7 @@ ohos_unittest("composer_ut") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"
@@ -65,7 +65,7 @@ ohos_unittest("composer_death_test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+    "googletest:gtest",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"
