@@ -310,7 +310,7 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
     };
     if (dcStreamProducer_ != nullptr) {
         SetSurfaceBuffer(surfaceBuffer, buffer);
-        OHOS::sptr<OHOS::SyncFence> autoFence = new(std::nothrow) OHOS::SyncFence(-1);
+        OHOS::sptr<OHOS::SyncFence> autoFence(new(std::nothrow) OHOS::SyncFence(-1));
         int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, autoFence, flushConf);
         if (ret != 0) {
             DHLOGI("FlushBuffer error: %d", ret);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -299,7 +299,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_007, TestSize.Level1)
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
-    sptr<BufferProducerSequenceable> bufferProducer = new BufferProducerSequenceable(producer);
+    sptr<BufferProducerSequenceable> bufferProducer(new BufferProducerSequenceable(producer));
     rc = dstreamOperator_->AttachBufferQueue(streamInfo.streamId_, bufferProducer);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
@@ -341,8 +341,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_008, TestSize.Level1)
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
     int32_t captureId = 1000;
-    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback =
-        new (std::nothrow) MockDStreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback(new (std::nothrow) MockDStreamOperatorCallback());
     std::vector<int> offlineIds;
     offlineIds.push_back(captureId);
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
