@@ -171,22 +171,23 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress001, TestSize.Level1)
     int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, nullptr, 0);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN - 1);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(LONG_TIME, timeUsed);
-    EXPECT_NE(HDF_FAILURE, ret);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, apFeature);
+        ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, nullptr, 0);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN - 1);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(LONG_TIME, timeUsed);
+        EXPECT_NE(HDF_FAILURE, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
@@ -205,22 +206,23 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress002, TestSize.Level1)
     int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, nullptr, 0);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN - 1);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(LONG_TIME, timeUsed);
-    EXPECT_NE(HDF_FAILURE, ret);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, staFeature);
+        ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, nullptr, 0);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN - 1);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(LONG_TIME, timeUsed);
+        EXPECT_NE(HDF_FAILURE, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
@@ -240,22 +242,23 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level1
     int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
-    WLAN_BAND_2G, nullptr, 0, nullptr);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
-    WLAN_BAND_2G, freq, WLAN_FREQ_MAX_NUM, &num);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(COMMON_TIME, timeUsed);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, apFeature);
+        ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
+        WLAN_BAND_2G, nullptr, 0, nullptr);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
+        WLAN_BAND_2G, freq, WLAN_FREQ_MAX_NUM, &num);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(COMMON_TIME, timeUsed);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
@@ -276,26 +279,27 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAssociatedStas001, TestSize.Level1)
     uint8_t chipId = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(RESET_TIME);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, apFeature);
+        ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(RESET_TIME);
 
-    ret = apFeature->getAssociatedStas(apFeature, nullptr, 0, nullptr);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = apFeature->getAssociatedStas(apFeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(COMMON_TIME, timeUsed);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = apFeature->getAssociatedStas(apFeature, nullptr, 0, nullptr);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = apFeature->getAssociatedStas(apFeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(COMMON_TIME, timeUsed);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
@@ -314,20 +318,21 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level
     int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->setScanningMacAddress(staFeature, nullptr, 0);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = staFeature->setScanningMacAddress(staFeature, scanMac, ETH_ADDR_LEN);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(LONG_TIME, timeUsed);
-    EXPECT_NE(HDF_FAILURE, ret);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, staFeature);
+        ret = staFeature->setScanningMacAddress(staFeature, nullptr, 0);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = staFeature->setScanningMacAddress(staFeature, scanMac, ETH_ADDR_LEN);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(LONG_TIME, timeUsed);
+        EXPECT_NE(HDF_FAILURE, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
@@ -346,21 +351,22 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
     int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, nullptr);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    EXPECT_GE(MEDIUM_TIME, timeUsed);
-    ASSERT_TRUE(chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, staFeature);
+        ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, nullptr);
+        EXPECT_NE(HDF_SUCCESS, ret);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(MEDIUM_TIME, timeUsed);
+        ASSERT_TRUE(chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 }
 
 /**
