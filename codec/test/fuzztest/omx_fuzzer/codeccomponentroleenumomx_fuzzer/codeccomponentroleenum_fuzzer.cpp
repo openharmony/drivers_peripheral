@@ -18,33 +18,12 @@
 
 #include <securec.h>
 
-namespace {
-    struct AllParameters {
-        uint8_t *role;
-        uint32_t roleLen;
-        uint32_t index;
-    };
-}
-
 namespace OHOS {
 namespace Codec {
     bool CodecComponentRoleEnum(const uint8_t *data, size_t size)
     {
-        struct AllParameters params;
         if (data == nullptr) {
             return false;
-        }
-
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        params.index = Convert2Uint32(rawData);
-        if (size > sizeof(uint32_t) + sizeof(int8_t *)) {
-            rawData = rawData + sizeof(uint32_t);
-            size = size - sizeof(uint32_t);
-            params.role = reinterpret_cast<uint8_t *>(rawData);
-            params.roleLen = size;
-        } else {
-            params.role = reinterpret_cast<uint8_t *>(rawData);
-            params.roleLen = size;
         }
 
         bool result = Preconditions();
@@ -53,7 +32,8 @@ namespace Codec {
             return false;
         }
 
-        int32_t ret = g_component->ComponentRoleEnum(g_component, params.role, params.roleLen, params.index);
+        int32_t ret = g_component->ComponentRoleEnum(g_component, const_cast<uint8_t *>(data),
+            static_cast<uint32_t>(*data), static_cast<uint32_t>(*data));
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: ComponentRoleEnum failed, ret is [%{public}x]\n", __func__, ret);
         }
