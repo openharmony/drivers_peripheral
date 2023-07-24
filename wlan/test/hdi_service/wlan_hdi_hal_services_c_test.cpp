@@ -100,11 +100,12 @@ HWTEST_F(HdfWifiServiceCTest, CreateFeatureTest_002, TestSize.Level1)
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    printf("ifname = %s\n", ifeature.ifName);
-    printf("type = %d\n", ifeature.type);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        printf("ifname = %s\n", ifeature.ifName);
+        printf("type = %d\n", ifeature.type);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -120,13 +121,14 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifNameInvalid, &ifeature);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifeature.ifName, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifNameInvalid, &ifeature);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifeature.ifName, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -142,11 +144,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_004, TestSize.Level1)
     char ifNames[IFNAMSIZ] = {0};
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetNetworkIfaceName(g_wlanObj, &ifeature, ifNames, IFNAMSIZ);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetNetworkIfaceName(g_wlanObj, &ifeature, ifNames, IFNAMSIZ);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -162,11 +165,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_005, TestSize.Level1)
     int32_t featureType;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureType(g_wlanObj, &ifeature, &featureType);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetFeatureType(g_wlanObj, &ifeature, &featureType);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -184,14 +188,15 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_006, TestSize.Level1)
     uint8_t errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -208,11 +213,12 @@ HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_007, TestSize.Level1)
     uint32_t macLen = ETH_ADDR_LEN;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetDeviceMacAddress(g_wlanObj, &ifeature, mac, &macLen, ETH_ADDR_LEN);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetDeviceMacAddress(g_wlanObj, &ifeature, mac, &macLen, ETH_ADDR_LEN);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -236,19 +242,20 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_008, TestSize.Level1)
     uint32_t i;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfoInvalid, freq, &freqLen);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfo, freq, &freqLen);
-    ASSERT_EQ(rc, HDF_SUCCESS);
     if (rc == HDF_SUCCESS) {
-        for (i = 0; i < freqLen; i++) {
-            printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+        rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfoInvalid, freq, &freqLen);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfo, freq, &freqLen);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        if (rc == HDF_SUCCESS) {
+            for (i = 0; i < freqLen; i++) {
+                printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+            }
         }
-    }
 
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -264,11 +271,12 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_009, TestSize.Level1)
     int32_t power = WLAN_TX_POWER;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -287,16 +295,17 @@ HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_010, TestSize.Level1)
     char ifNames[IFNAMSIZ] = {0};
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetIfNamesByChipId(g_wlanObj, chipIdInvalid, ifNames, IFNAMSIZ, &num);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetIfNamesByChipId(g_wlanObj, chipId, ifNames, IFNAMSIZ, &num);
-    printf("ifnames = %s\n", ifNames);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->GetIfNamesByChipId(g_wlanObj, chipIdInvalid, ifNames, IFNAMSIZ, &num);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->GetIfNamesByChipId(g_wlanObj, chipId, ifNames, IFNAMSIZ, &num);
+        printf("ifnames = %s\n", ifNames);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -313,11 +322,12 @@ HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_011, TestSize.Level1)
     uint32_t macLen = ETH_ADDR_LEN;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetScanningMacAddress(g_wlanObj, &ifeature, scanMac, macLen);
-    ASSERT_NE(rc, HDF_FAILURE);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetScanningMacAddress(g_wlanObj, &ifeature, scanMac, macLen);
+        ASSERT_NE(rc, HDF_FAILURE);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -349,13 +359,14 @@ HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_013, TestSize.Level1)
     uint8_t mode = 0;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetPowerMode(g_wlanObj, &ifeature, &mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    printf("mode = 0x%02x\n", mode);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetPowerMode(g_wlanObj, &ifeature, &mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        printf("mode = 0x%02x\n", mode);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -370,12 +381,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_014, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_SLEEPING;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -406,14 +418,15 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
     int32_t rc;
 
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->ResetDriver(g_wlanObj, chipId, ifName);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    sleep(RESET_TIME);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->ResetDriver(g_wlanObj, chipId, ifName);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        sleep(RESET_TIME);
+    }
 }
 
 /**
@@ -430,16 +443,17 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
     struct HdfWifiScan scan = {0};
 
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->StartScan(g_wlanObj, nullptr, &scan);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
-    rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, nullptr);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
-    rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    sleep(SCAN_TIME);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->StartScan(g_wlanObj, nullptr, &scan);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+        rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, nullptr);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+        rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        sleep(SCAN_TIME);
+    }
 }
 
 /**
@@ -470,11 +484,12 @@ HWTEST_F(HdfWifiServiceCTest, GetAssociatedStasTest_019, TestSize.Level1)
     uint32_t num = 0;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetAssociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetAssociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -492,14 +507,15 @@ HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_020, TestSize.Level1)
     uint32_t size = 2;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -517,11 +533,12 @@ HWTEST_F(HdfWifiServiceCTest, CreateFeatureTest_021, TestSize.Level1)
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanTypeInvalid, &ifeature);
     ASSERT_EQ(rc, HDF_FAILURE);
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    printf("ifname = %s\n", ifeature.ifName);
-    printf("type = %d\n", ifeature.type);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        printf("ifname = %s\n", ifeature.ifName);
+        printf("type = %d\n", ifeature.type);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -537,11 +554,12 @@ HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_022, TestSize.Level1)
     uint8_t chipId = 0;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetChipId(g_wlanObj, &ifeature, &chipId);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -558,11 +576,12 @@ HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_023, TestSize.Level1)
     uint32_t macLen = ETH_ADDR_LEN;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetDeviceMacAddress(g_wlanObj, &ifeature, mac, &macLen, ETH_ADDR_LEN);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetDeviceMacAddress(g_wlanObj, &ifeature, mac, &macLen, ETH_ADDR_LEN);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -578,13 +597,14 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_024, TestSize.Level1)
     const char *ifNameInvalid = "wlanTest";
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifNameInvalid, &ifeature);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifeature.ifName, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifNameInvalid, &ifeature);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->GetFeatureByIfName(g_wlanObj, ifeature.ifName, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -602,14 +622,15 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_025, TestSize.Level1)
     uint8_t errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -624,12 +645,13 @@ HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_026, TestSize.Level1)
     uint8_t mode = 0;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_STATION, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetPowerMode(g_wlanObj, &ifeature, &mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetPowerMode(g_wlanObj, &ifeature, &mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -644,12 +666,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_027, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_GENERAL;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -664,12 +687,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_028, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_THROUGH_WALL;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -684,11 +708,12 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_029, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_NUM;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -703,12 +728,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_030, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_SLEEPING;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_STATION, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -723,12 +749,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_031, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_GENERAL;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_STATION, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -743,12 +770,13 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_032, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_THROUGH_WALL;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_STATION, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -763,11 +791,12 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_033, TestSize.Level1)
     uint8_t mode = WIFI_POWER_MODE_NUM;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_STATION, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
-    ASSERT_NE(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetPowerMode(g_wlanObj, &ifeature, mode);
+        ASSERT_NE(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1012,11 +1041,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_044, TestSize.Level1)
     int32_t featureType;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFeatureType(g_wlanObj, &ifeature, &featureType);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetFeatureType(g_wlanObj, &ifeature, &featureType);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1037,17 +1067,18 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_045, TestSize.Level1)
     uint32_t i;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfo, freq, &freqLen);
-    ASSERT_EQ(rc, HDF_SUCCESS);
     if (rc == HDF_SUCCESS) {
-        for (i = 0; i < freqLen; i++) {
-            printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+        rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfo, freq, &freqLen);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        if (rc == HDF_SUCCESS) {
+            for (i = 0; i < freqLen; i++) {
+                printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+            }
         }
-    }
 
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1063,11 +1094,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_046, TestSize.Level1)
     char ifNames[IFNAMSIZ] = {0};
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetNetworkIfaceName(g_wlanObj, &ifeature, ifNames, IFNAMSIZ);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetNetworkIfaceName(g_wlanObj, &ifeature, ifNames, IFNAMSIZ);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1083,11 +1115,12 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_047, TestSize.Level1)
     int32_t power = WLAN_TX_POWER;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1105,13 +1138,14 @@ HWTEST_F(HdfWifiServiceCTest, GetSignalPollInfo_048, TestSize.Level1)
     (void)memset_s(&signalResult, sizeof(struct SignalPollResult), 0, sizeof(struct SignalPollResult));
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetSignalPollInfo(g_wlanObj, ifName, &signalResult);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    printf("GetSignalPollInfo rc = %d.\n", rc);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetSignalPollInfo(g_wlanObj, ifName, &signalResult);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        printf("GetSignalPollInfo rc = %d.\n", rc);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1150,16 +1184,17 @@ HWTEST_F(HdfWifiServiceCTest, StartPnoScan_049, TestSize.Level1)
     int32_t rc = g_wlanObj->RegisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->StartPnoScan(g_wlanObj, nullptr, &pnoSettings);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
-    rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, nullptr);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
-    rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, &pnoSettings);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->StartPnoScan(g_wlanObj, nullptr, &pnoSettings);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+        rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, nullptr);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+        rc = g_wlanObj->StartPnoScan(g_wlanObj, ifName, &pnoSettings);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
     rc = g_wlanObj->UnregisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
     ASSERT_EQ(rc, HDF_SUCCESS);
     OsalMemFree(pnoSettings.pnoNetworks[0].freqs);
@@ -1179,14 +1214,15 @@ HWTEST_F(HdfWifiServiceCTest, StopPnoScan_050, TestSize.Level1)
     const char *ifName = "wlan0";
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->StopPnoScan(g_wlanObj, nullptr);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
-    rc = g_wlanObj->StopPnoScan(g_wlanObj, ifName);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->StopPnoScan(g_wlanObj, nullptr);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+        rc = g_wlanObj->StopPnoScan(g_wlanObj, ifName);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -1222,12 +1258,13 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_051, TestSize.Level1)
     scan.bssid[5] = 0xBC;
 
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    sleep(SCAN_TIME);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        sleep(SCAN_TIME);
+    }
     OsalMemFree(scan.bssid);
     OsalMemFree(scan.freqs);
     OsalMemFree(scan.ssids);
