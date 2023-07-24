@@ -30,7 +30,7 @@
         "init",
         "memory_utils",
         "hitrace",
-        "thirdparty_googletest",
+        "googletest",
         "thirdparty_benchmark"
       ]
     },
