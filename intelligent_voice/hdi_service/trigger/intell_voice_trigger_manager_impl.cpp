@@ -95,9 +95,12 @@ int32_t IntellVoiceTriggerManagerImpl::LoadAdapter(const IntellVoiceTriggerAdapt
         return HDF_FAILURE;
     }
 
-    if (halAdapters_.find(descriptor.adapterName) != halAdapters_.end()) {
-        INTELLIGENT_VOICE_LOGE("adapter %{public}s already exist", descriptor.adapterName.c_str());
-        return HDF_ERR_INVALID_OBJECT;
+    auto it = halAdapters_.find(descriptor.adapterName);
+    if (it != halAdapters_.end()) {
+        INTELLIGENT_VOICE_LOGW("adapter %{public}s already exist", descriptor.adapterName.c_str());
+        inst_->UnloadAdapter(descriptor);
+        it->second = nullptr;
+        halAdapters_.erase(it);
     }
 
     std::unique_ptr<ITrigger> triggerAdapterDevice = nullptr;
