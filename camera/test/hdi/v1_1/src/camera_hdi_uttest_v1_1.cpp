@@ -238,3 +238,59 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_007, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name: GetStreamOperator_V1_1,defer_stream
+ * @tc.desc: GetStreamOperator_V1_1,defer_stream
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_008, TestSize.Level1)
+{
+    cameraTest->Init();
+    if (cameraTest->serviceV1_1 == nullptr) {
+        return;
+    }
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
+    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator_V1_1);
+
+    // Create stream
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(OperationMode::NORMAL, cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    // Attach bufferqueue
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    OHOS::sptr<BufferProducerSequenceable> bufferQueue =
+        consumer->CreateProducerSeq([this](void* addr, uint32_t size) {
+            cameraTest->DumpImageFile(111, "yuv", addr, size);
+    });
+    EXPECT_NE(bufferQueue, nullptr);
+    EXPECT_NE(bufferQueue->producer_, nullptr);
+    bufferQueue->producer_->SetQueueSize(UT_DATA_SIZE);
+    cameraTest->rc = cameraTest->streamOperator_V1_1->AttachBufferQueue(
+        cameraTest->streamInfoV1_1->v1_0.streamId_, bufferQueue);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // Capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    sleep(UT_SECOND_TIMES);
+
+    // Release
+    cameraTest->rc = cameraTest->streamOperator_V1_1->DetachBufferQueue(cameraTest->streamInfoV1_1->v1_0.streamId_);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    std::vector<int> streamIds = {cameraTest->streamInfoV1_1->v1_0.streamId_};
+    cameraTest->rc = cameraTest->streamOperator_V1_1->ReleaseStreams(streamIds);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
