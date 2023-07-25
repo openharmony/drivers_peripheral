@@ -37,17 +37,7 @@
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"
       ],
-      "inner_kits": [
-        {
-          "name": "//drivers/peripheral/wlan/client:wifi_driver_client",
-          "header": {
-            "header_files": [
-              "wifi_driver_client.h"
-            ],
-            "header_base": "//drivers/peripheral/wlan/client/include"
-          }
-        }
-      ]
+      "inner_kits": []
     }
   }
 }
