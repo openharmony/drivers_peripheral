@@ -15,6 +15,9 @@
 #include <securec.h>
 #include <string.h>
 #include "effect_core.h"
+#include "effect_host_common.h"
+#include "v1_0/effect_types_vdi.h"
+#include "v1_0/effect_factory.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
 #include "parse_effect_config.h"
@@ -52,14 +55,14 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
         HDF_LOGE("%{public}s: point is null!", __func__);
         return HDF_FAILURE;
     }
-
+    struct EffectControllerDescriptorVdi *descsVdi = (struct EffectControllerDescriptorVdi *)descs;
     for (i = 0; i < g_cfgDescs->effectNum; i++) {
         factLib = GetEffectLibFromList(g_cfgDescs->effectCfgDescs[i].library);
         if (factLib == NULL) {
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             continue;
         }
-        ret = factLib->GetDescriptor(factLib, g_cfgDescs->effectCfgDescs[i].effectId, &descs[descNum]);
+        ret = factLib->GetDescriptor(factLib, g_cfgDescs->effectCfgDescs[i].effectId, &descsVdi[descNum]);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
             continue;
@@ -67,7 +70,7 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
         descNum++;
     }
     *descsLen = descNum;
-
+    descs = (struct EffectControllerDescriptor *)descsVdi;
     HDF_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
@@ -82,7 +85,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
     for (i = 0; i < g_cfgDescs->effectNum; i++) {
         if (strcmp(uuid, g_cfgDescs->effectCfgDescs[i].effectId) != 0) {
             continue;
@@ -93,15 +96,15 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             return HDF_FAILURE;
         }
-
-        if (factLib->GetDescriptor(factLib, uuid, desc) != HDF_SUCCESS) {
+   
+        if (factLib->GetDescriptor(factLib, uuid, descVdi) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
             return HDF_FAILURE;
         }
         HDF_LOGD("%{public}s success", __func__);
         return HDF_SUCCESS;
     }
-
+    desc = (struct EffectControllerDescriptor *)descVdi;
     HDF_LOGE("%{public}s fail!", __func__);
     return HDF_FAILURE;
 }
@@ -116,7 +119,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
 
     struct EffectFactory *lib = NULL;
     struct ControllerManager *ctrlMgr = NULL;
-    struct EffectControl *ctrlOps = NULL;
+    struct IEffectControlVdi *ctrlOps = NULL;
 
     lib = GetEffectLibFromList(info->libName);
     if (lib == NULL) {
@@ -128,8 +131,9 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
         HDF_LOGE("%{public}s: lib has no create method", __func__);
         return HDF_FAILURE;
     }
-
-    lib->CreateController(lib, info, &ctrlOps);
+    
+    struct EffectInfoVdi *infoVdi = (struct EffectInfoVdi *)info;
+    lib->CreateController(lib, infoVdi, &ctrlOps);
     if (ctrlOps == NULL) {
         HDF_LOGE("%{public}s: lib create controller failed.", __func__);
         return HDF_FAILURE;

@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../.."
 import("//build/ohos.gni")
 
 if (!defined(ohos_lite)) {
@@ -24,6 +25,7 @@ if (!defined(ohos_lite)) {
 
     include_dirs = [
       "include",
+      "$hdf_audio_path/interfaces/effect",
       "//third_party/bounds_checking_function/include",
       "../config/include/",
       "//third_party/cJSON/",
