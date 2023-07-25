@@ -56,7 +56,6 @@ void AudioHwiCommonAttrsToHwiAttrs(const struct AudioSampleAttributes *attrs, st
     hwiAttrs->silenceThreshold = attrs->silenceThreshold;
     hwiAttrs->streamId = attrs->streamId;
     hwiAttrs->sourceType = attrs->sourceType;
-
 }
 
 int32_t AudioHwiCommonPortToHwiPort(const struct AudioPort *port, struct AudioHwiPort *hwiPort)
