@@ -13,25 +13,27 @@
  * limitations under the License.
  */
 
-#include "effect_compatible_access.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "v1_0/effect_types_vdi.h"
+#include "v1_0/ieffect_control_vdi.h"
+#include "v1_0/effect_factory.h"
 
 #define HDF_EFFECT_NAME_LEN      64
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 struct EffectHwControl {
-    struct EffectControl impls;
+    struct IEffectControlVdi impls;
 };
 
-struct EffectControllerDescriptor g_mockEffectDescriptor = {
+struct EffectControllerDescriptorVdi g_mockEffectDescriptor = {
     .effectId = "aaaabbbb-8888-9999-6666-aabbccdd9966ff",
     .effectName = "mock_effect",
     .libName = "libmock_effect_lib",
     .supplier = "mock"
 };
 
-static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen,
+static int32_t MockEffectInitController(const int8_t *commandData, uint32_t cmdDataLen,
     int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
@@ -42,7 +44,7 @@ static int32_t MockEffectInitController(int8_t *commandData, uint32_t cmdDataLen
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectSetConfig(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectSetConfig(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -52,7 +54,7 @@ static int32_t MockEffectSetConfig(int8_t *commandData, uint32_t cmdDataLen, int
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectGetCofig(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectGetCofig(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -62,7 +64,7 @@ static int32_t MockEffectGetCofig(int8_t *commandData, uint32_t cmdDataLen, int8
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectReset(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectReset(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -72,7 +74,7 @@ static int32_t MockEffectReset(int8_t *commandData, uint32_t cmdDataLen, int8_t 
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectEnable(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectEnable(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -82,7 +84,7 @@ static int32_t MockEffectEnable(int8_t *commandData, uint32_t cmdDataLen, int8_t
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectDisable(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectDisable(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -92,7 +94,7 @@ static int32_t MockEffectDisable(int8_t *commandData, uint32_t cmdDataLen, int8_
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectSetparams(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectSetparams(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -102,7 +104,7 @@ static int32_t MockEffectSetparams(int8_t *commandData, uint32_t cmdDataLen, int
     return HDF_SUCCESS;
 }
 
-static int32_t MockEffectGetParams(int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+static int32_t MockEffectGetParams(const int8_t *commandData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (commandData == NULL || replyData == NULL || replyDataLen == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -113,18 +115,18 @@ static int32_t MockEffectGetParams(int8_t *commandData, uint32_t cmdDataLen, int
 }
 
 static struct EffectCommandTable g_effectCommandTable[] = {
-    {AUDIO_EFFECT_COMMAND_INIT_CONTOLLER, MockEffectInitController},
-    {AUDIO_EFFECT_COMMAND_SET_CONFIG, MockEffectSetConfig},
-    {AUDIO_EFFECT_COMMAND_GET_CONFIG, MockEffectGetCofig},
-    {AUDIO_EFFECT_COMMAND_RESET, MockEffectReset},
-    {AUDIO_EFFECT_COMMAND_ENABLE, MockEffectEnable},
-    {AUDIO_EFFECT_COMMAND_DISABLE, MockEffectDisable},
-    {AUDIO_EFFECT_COMMAND_SET_PARAM, MockEffectSetparams},
-    {AUDIO_EFFECT_COMMAND_GET_PARAM, MockEffectGetParams},
+    {AUDIO_EFFECT_COMMAND_VDI_INIT_CONTOLLER, MockEffectInitController},
+    {AUDIO_EFFECT_COMMAND_VDI_SET_CONFIG, MockEffectSetConfig},
+    {AUDIO_EFFECT_COMMAND_VDI_GET_CONFIG, MockEffectGetCofig},
+    {AUDIO_EFFECT_COMMAND_VDI_RESET, MockEffectReset},
+    {AUDIO_EFFECT_COMMAND_VDI_ENABLE, MockEffectEnable},
+    {AUDIO_EFFECT_COMMAND_VDI_DISABLE, MockEffectDisable},
+    {AUDIO_EFFECT_COMMAND_VDI_SET_PARAM, MockEffectSetparams},
+    {AUDIO_EFFECT_COMMAND_VDI_GET_PARAM, MockEffectGetParams},
 };
 
-static int32_t MockEffectProcess(struct EffectControl *self, const struct AudioEffectBuffer *input,
-                                 struct AudioEffectBuffer *output)
+static int32_t MockEffectProcess(struct IEffectControlVdi *self, const struct AudioEffectBufferVdi *input,
+                                 struct AudioEffectBufferVdi *output)
 {
     if (self == NULL || input == NULL || output == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -134,7 +136,7 @@ static int32_t MockEffectProcess(struct EffectControl *self, const struct AudioE
     return HDF_SUCCESS;
 }
 
-static int32_t MockSendCommand(struct EffectControl *self, uint32_t cmdId, int8_t *commandData,
+static int32_t MockSendCommand(struct IEffectControlVdi *self, enum EffectCommandTableIndexVdi cmdId, const int8_t *commandData,
                                uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (self == NULL || commandData == NULL || replyData == NULL || replyDataLen == NULL) {
@@ -157,8 +159,8 @@ static int32_t MockSendCommand(struct EffectControl *self, uint32_t cmdId, int8_
     return cmdTable[cmdId].func(commandData, cmdDataLen, replyData, replyDataLen);
 }
 
-static int32_t MockEffectReverse(struct EffectControl *self, const struct AudioEffectBuffer *input,
-                                 struct AudioEffectBuffer *output)
+static int32_t MockEffectReverse(struct IEffectControlVdi *self, const struct AudioEffectBufferVdi *input,
+                                 struct AudioEffectBufferVdi *output)
 {
     if (self == NULL || input == NULL || output == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -168,7 +170,7 @@ static int32_t MockEffectReverse(struct EffectControl *self, const struct AudioE
     return HDF_SUCCESS;
 }
 
-static void MockEffectReleaseDesc(struct EffectControllerDescriptor *desc)
+static void MockEffectReleaseDesc(struct EffectControllerDescriptorVdi *desc)
 {
     if (desc == NULL) {
         return;
@@ -208,7 +210,7 @@ static int32_t MockCpyDesc(const char *src, char **dest)
     return HDF_SUCCESS;
 }
 
-static int32_t MockGetEffectDescriptorSub(struct EffectControllerDescriptor *desc)
+static int32_t MockGetEffectDescriptorSub(struct EffectControllerDescriptorVdi *desc)
 {
     if (desc == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -242,7 +244,7 @@ static int32_t MockGetEffectDescriptorSub(struct EffectControllerDescriptor *des
     return HDF_SUCCESS;
 }
 
-int32_t MockGetEffectDescriptor(struct EffectControl *self, struct EffectControllerDescriptor *desc)
+int32_t MockGetEffectDescriptor(struct IEffectControlVdi *self, struct EffectControllerDescriptorVdi *desc)
 {
     HDF_LOGD("enter to %{public}s", __func__);
     if (self == NULL || desc == NULL) {
@@ -259,8 +261,8 @@ int32_t MockGetEffectDescriptor(struct EffectControl *self, struct EffectControl
     return HDF_SUCCESS;
 }
 
-static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfo *info,
-                                    struct EffectControl **handle)
+static int32_t MockCreateController(struct EffectFactory *self, const struct EffectInfoVdi *info,
+                                    struct IEffectControlVdi **handle)
 {
     if (self == NULL || info == NULL || handle == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -282,7 +284,7 @@ static int32_t MockCreateController(struct EffectFactory *self, const struct Eff
     return HDF_SUCCESS;
 }
 
-static int32_t MockDestroyController(struct EffectFactory *self, struct EffectControl *handle)
+static int32_t MockDestroyController(struct EffectFactory *self, struct IEffectControlVdi *handle)
 {
     if (self == NULL || handle == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -296,7 +298,7 @@ static int32_t MockDestroyController(struct EffectFactory *self, struct EffectCo
     return HDF_SUCCESS;
 }
 
-static int32_t MockGetDescriptor(struct EffectFactory *self, const char *uuid, struct EffectControllerDescriptor *desc)
+static int32_t MockGetDescriptor(struct EffectFactory *self, const char *uuid, struct EffectControllerDescriptorVdi *desc)
 {
     HDF_LOGD("enter to %{public}s", __func__);
     if (self == NULL || uuid == NULL || desc == NULL) {
