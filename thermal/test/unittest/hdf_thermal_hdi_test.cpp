@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 
 #include "hdf_base.h"
 #include "osal_time.h"
+#include "v1_1/ifan_callback.h"
 #include "v1_1/ithermal_interface.h"
 #include "v1_1/ithermal_callback.h"
 #include "v1_1/thermal_types.h"
@@ -50,8 +51,25 @@ public:
     }
 };
 
+class FanCallbackMock : public IFanCallback {
+public:
+    virtual ~FanCallbackMock() {}
+    using FanEventCallback = std::function<int32_t(const HdfThermalCallbackInfo &event)>;
+    static int32_t RegisterFanEvent(const FanEventCallback &eventCb)
+    {
+        (void)eventCb;
+        return 0;
+    }
+    int32_t OnFanDataEvent(const HdfThermalCallbackInfo &event) override
+    {
+        (void)event;
+        return 0;
+    }
+};
+
 sptr<IThermalInterface> g_thermalInterface = nullptr;
 sptr<IThermalCallback> g_callback = new ThermalCallbackMock();
+sptr<IFanCallback> g_fanCallback = new FanCallbackMock();
 std::mutex g_mutex;
 const uint32_t MAX_PATH = 256;
 const std::string CPU_FREQ_PATH = "/data/service/el0/thermal/cooling/cpu/freq";
@@ -286,5 +304,20 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
     THERMAL_HILOGD(LABEL_TEST, "isolate cpu num is %{public}d", value);
     EXPECT_EQ(value, isolateNum) << "HdfThermalHdiTest007 failed";
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: return.");
+}
+
+/**
+  * @tc.name: HdfThermalHdiTest008
+  * @tc.desc: register fan callback
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest008, TestSize.Level1)
+{
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest008: start.");
+    int32_t ret = g_thermalInterface->RegisterFanCallback(g_fanCallback);
+    EXPECT_EQ(0, ret) << "HdfThermalHdiTest008 failed";
+    ret = g_thermalInterface->UnregisterFanCallback();
+    EXPECT_EQ(0, ret) << "HdfThermalHdiTest008 failed";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest008: return.");
 }
 }
