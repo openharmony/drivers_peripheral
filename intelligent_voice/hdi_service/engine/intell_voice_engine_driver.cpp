@@ -102,7 +102,7 @@ static void HdfIntellVoiceEngineManagerDriverRelease(struct HdfDeviceObject *dev
     }
 }
 
-struct HdfDriverEntry g_intellvoiceenginemanagerDriverEntry = {
+static struct HdfDriverEntry g_intellvoiceEngineManagerDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "intell_voice_engine_service",
     .Bind = HdfIntellVoiceEngineManagerDriverBind,
@@ -113,7 +113,7 @@ struct HdfDriverEntry g_intellvoiceenginemanagerDriverEntry = {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-HDF_INIT(g_intellvoiceenginemanagerDriverEntry);
+HDF_INIT(g_intellvoiceEngineManagerDriverEntry);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

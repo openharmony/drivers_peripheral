@@ -103,7 +103,7 @@ static void HdfIntellVoiceTriggerManagerDriverRelease(struct HdfDeviceObject *de
     }
 }
 
-struct HdfDriverEntry g_intellvoicetriggermanagerDriverEntry = {
+static struct HdfDriverEntry g_intellvoiceTriggerManagerDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "intell_voice_trigger_service",
     .Bind = HdfIntellVoiceTriggerManagerDriverBind,
@@ -114,7 +114,7 @@ struct HdfDriverEntry g_intellvoicetriggermanagerDriverEntry = {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-HDF_INIT(g_intellvoicetriggermanagerDriverEntry);
+HDF_INIT(g_intellvoiceTriggerManagerDriverEntry);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
