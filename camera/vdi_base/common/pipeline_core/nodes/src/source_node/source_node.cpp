@@ -278,7 +278,6 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
         std::string name = "collect#" + std::to_string(id);
         prctl(PR_SET_NAME, name.c_str());
 
-        std::unique_lock<std::mutex> l(rblock);
         while (dbtRun) {
             DistributeBuffers();
         }
