@@ -66,7 +66,7 @@ int32_t MapperService::LoadVdi()
     if (errStr != nullptr) {
         HDF_LOGI("%{public}s: mapper loadvid, clear earlier dlerror: %{public}s", __func__, errStr);
     }
-    libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY | RTLD_NODELETE);
+    libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
     createVdi_ = reinterpret_cast<CreateDisplayBufferVdiFunc>(dlsym(libHandle_, "CreateDisplayBufferVdi"));
