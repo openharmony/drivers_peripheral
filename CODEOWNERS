@@ -14,4 +14,19 @@
  */
 
 # Code reviewers for camera
-camera/* liudimin1@huawei.com yanghaizhou1@huawei.com
+camera/ @Danny_liuXu @haizhouyang
+wlan/ @Danny_liuXu
+usb/ @Danny_liuXu
+audio/ @whoselettlelion
+codec/ @whoselettlelion
+format/ @whoselettlelion
+display/ @whoselettlelion
+sensor/ @whoselettlelion
+vibrator/ @whoselettlelion
+light/ @whoselettlelion
+motion/ @whoselettlelion
+base/ @time_zhang
+battery/ @time_zhang
+input/ @time_zhang
+thermal/ @time_zhang
+power/ @time_zhang
