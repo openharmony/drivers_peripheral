@@ -107,7 +107,7 @@ ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challeng
         LOG_ERROR("failed to copy challenge");
         Free(g_session);
         g_session = NULL;
-        return ret;
+        return RESULT_BAD_COPY;
     }
     g_session->isScheduleValid = false;
     return RESULT_SUCCESS;
