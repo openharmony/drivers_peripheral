@@ -61,7 +61,7 @@ protected:
         bool cltRun = false;
         std::unique_ptr<std::thread> collector = nullptr;
 
-        bool dbtRun = false;
+        std::atomic<bool> dbtRun = false;
         std::unique_ptr<std::thread> distributor = nullptr;
 
         std::shared_ptr<IBufferPool> pool = nullptr;
