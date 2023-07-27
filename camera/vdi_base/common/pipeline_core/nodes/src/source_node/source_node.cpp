@@ -278,7 +278,9 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
         std::string name = "collect#" + std::to_string(id);
         prctl(PR_SET_NAME, name.c_str());
 
+        std::unique_lock<std::mutex> l(rblock);
         while (dbtRun) {
+            rbcv.wait(l, [this] { return !dbtRun || !respondBufferList.empty(); });
             DistributeBuffers();
         }
     });
@@ -306,8 +308,6 @@ void SourceNode::PortHandler::DistributeBuffers()
 {
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
-        std::unique_lock<std::mutex> l(rblock);
-        rbcv.wait(l, [this] { return !dbtRun || !respondBufferList.empty(); });
         if (!dbtRun) {
             return;
         }
