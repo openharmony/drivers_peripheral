@@ -403,6 +403,10 @@ int32_t UsbdFunction::UsbdRegisterDevice(const std::string &serviceName)
 {
     int32_t ret;
     OHOS::sptr<IDeviceManager> devMgr = IDeviceManager::Get();
+    if (devMgr == nullptr) {
+        HDF_LOGE("%{public}s: get IDeviceManager failed", __func__);
+        return HDF_FAILURE;
+    }
     ret = devMgr->LoadDevice(serviceName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, load %{public}s failed", __func__, serviceName.c_str());
@@ -415,6 +419,10 @@ void UsbdFunction::UsbdUnregisterDevice(const std::string &serviceName)
 {
     int32_t ret;
     OHOS::sptr<IDeviceManager> devMgr = IDeviceManager::Get();
+    if (devMgr == nullptr) {
+        HDF_LOGE("%{public}s: get devMgr object failed", __func__);
+        return;
+    }
     ret = devMgr->UnloadDevice(serviceName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s, %{public}s unload  failed", __func__, serviceName.c_str());
