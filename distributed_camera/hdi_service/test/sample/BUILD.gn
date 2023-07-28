@@ -52,6 +52,7 @@ ohos_executable("dcamera_hdf_demo") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
