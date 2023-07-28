@@ -135,6 +135,13 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
+
+    common_metadata_header_t *data = ability->get();
+    camera_metadata_item_t entry;
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry) == 0) {
+        (void)DeleteCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS);
+    }
+
     CameraDumper &dumper = CameraDumper::GetInstance();
     dumper.DumpMetadata(ability, "cameraAbility");
     MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
