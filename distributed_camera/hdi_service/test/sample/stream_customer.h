@@ -22,7 +22,6 @@
 #include <vector>
 #include <map>
 #include <surface.h>
-#include <display_type.h>
 #include "constants.h"
 #include "distributed_hardware_log.h"
 #include "iconsumer_surface.h"

@@ -93,6 +93,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "graphic_chipsetsdk:surface",
       "hdf_core:hdf_posix_osal",
       "hilog_featured_lite:hilog_shared",
@@ -199,6 +200,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "graphic_chipsetsdk:surface",
       "init:libbegetutil",
       "ipc:ipc_single",
