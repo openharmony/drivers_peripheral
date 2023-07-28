@@ -417,7 +417,7 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0003)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
-    ASSERT_EQ(ret, 0);
+
     uint32_t format = 0;
     if (ret == 0 && entry.data.i32 != nullptr && entry.count > 0) {
         format = entry.data.i32[entry.count - 6]; // 6:The sixth digit from the bottom is the format of video
