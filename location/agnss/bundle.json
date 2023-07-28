@@ -24,8 +24,7 @@
           "drivers_peripheral_location_gnss",
           "ipc",
           "hdf_core",
-          "hilog",
-          "utils_base"
+          "hilog"
         ],
         "third_party": []
       },

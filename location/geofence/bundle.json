@@ -23,8 +23,7 @@
           "drivers_interface_location_geofence",
           "ipc",
           "hdf_core",
-          "hilog",
-          "utils_base"
+          "hilog"
         ],
         "third_party": []
       },
