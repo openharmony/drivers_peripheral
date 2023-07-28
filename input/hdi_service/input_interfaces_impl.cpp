@@ -500,11 +500,7 @@ int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback> 
     }
 
     if (g_hotplugEventCallback != nullptr) {
-        sptr<IRemoteObject> lhs = OHOS::HDI::hdi_objcast<IInputCallback>(hotPlugCallback);
-        sptr<IRemoteObject> rhs = OHOS::HDI::hdi_objcast<IInputCallback>(g_hotplugEventCallback);
-        if (lhs == rhs) {
-            return HDF_SUCCESS;
-        }
+        return g_hotplugEventCallback == hotPlugCallback;
     }
 
     int32_t ret = HDF_FAILURE;
