@@ -30,7 +30,7 @@ namespace Ddk {
 namespace V1_0 {
 // 32 means size of uint32_t
 #define GET_BUS_NUM(devHandle)          ((uint8_t)((devHandle) >> 32))
-#define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xf))
+#define GET_DEV_NUM(devHandle)          ((uint8_t)((devHandle)&0xFFFFFFFF))
 #define USB_RECIP_MASK                  0x1F
 #define GET_CTRL_REQ_RECIP(requestType) ((requestType)&USB_RECIP_MASK)
 #define TRANS_DIRECTION_OFFSET          7
