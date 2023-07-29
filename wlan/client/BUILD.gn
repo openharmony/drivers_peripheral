@@ -17,7 +17,6 @@ import("../wlan.gni")
 if (defined(ohos_lite)) {
   ohos_shared_library("wifi_driver_client") {
     output_extension = "z.so"
-
     sources = [ "src/wifi_driver_client.c" ]
     sources += [
       "src/sbuf/sbuf_cmd_adapter.c",
