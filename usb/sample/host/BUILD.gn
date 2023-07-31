@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
       "./../../interfaces/ddk/common",
       "./../../interfaces/ddk/host",
       "./../../gadget/function/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     sources = [
@@ -54,6 +55,7 @@ if (defined(ohos_lite)) {
       "./../../interfaces/ddk/host",
       "./../../gadget/function/include",
       "./../../serial/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     sources = [
@@ -94,6 +96,7 @@ if (defined(ohos_lite)) {
       "./../../interfaces/ddk/host",
       "include",
       "./../../serial/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     deps = [ "./../../ddk:libusb_core" ]
@@ -119,6 +122,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "./../../serial/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     sources = [ "src/usbhost_pnp_test.c" ]
@@ -153,6 +157,7 @@ if (defined(ohos_lite)) {
       "./../../gadget/function/include",
       "include",
       "/./../../serial/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     deps = [ "./../../ddk:libusb_core" ]
@@ -186,6 +191,7 @@ if (defined(ohos_lite)) {
       "./../../interfaces/ddk/host",
       "include",
       "./../../serial/include",
+      "//drivers/hdf_core/framework/model/usb/include",
     ]
 
     deps = [ "./../../ddk:libusb_core" ]
