@@ -37,7 +37,7 @@ ohos_fuzztest("FingerprintAuthHdiFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
+    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers_1.1",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
