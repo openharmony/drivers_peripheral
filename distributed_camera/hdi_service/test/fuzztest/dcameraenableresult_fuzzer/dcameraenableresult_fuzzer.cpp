@@ -38,7 +38,8 @@ void DcameraEnableResultFuzzTest(const uint8_t* data, size_t size)
     std::vector<int32_t> results;
     results.push_back(*(reinterpret_cast<const int*>(data)));
 
-    OHOS::sptr<DCameraDevice> dcameraDevice = DCameraHost::GetInstance()->GetDCameraDeviceByDHBase(dhBase);
+    const std::string abilityInfo(reinterpret_cast<const char*>(data), size);
+    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, abilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }
