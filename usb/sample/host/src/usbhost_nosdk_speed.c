@@ -397,7 +397,7 @@ int32_t main(int32_t argc, char *argv[])
 
 ERR:
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not,
+        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
             remove it and test again! ret=%{public}d", __func__, ret);
     }
     CloseDevice();
