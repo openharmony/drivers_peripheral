@@ -54,6 +54,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     vdiAttrs->stopThreshold = attrs->stopThreshold;
     vdiAttrs->silenceThreshold = attrs->silenceThreshold;
     vdiAttrs->streamId = attrs->streamId;
+    vdiAttrs->sourceType = attrs->sourceType;
 }
 
 int32_t AudioCommonPortToVdiPortVdi(const struct AudioPort *port, struct AudioPortVdi *vdiPort)
