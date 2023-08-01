@@ -53,10 +53,15 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
     int32_t i;
 
     while (true) {
+        submitRequest = NULL;
         /* Get a request from curretn submit queue */
         ret = UsbIoGetRequest(&interfacePool->submitRequestQueue, &submitRequest);
 
         if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
+            if (submitRequest != NULL) {
+                submitRequest->status = USB_REQUEST_ERROR;
+                UsbIoSetRequestCompletionInfo(submitRequest);
+            }
             break;
         }
 
@@ -122,9 +127,15 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
 
-        int32_t ret = RawHandleRequest(interfacePool->device->devHandle);
-        if ((ret < 0) || (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING)) {
+        if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
             break;
+        }
+
+        int32_t ret = RawHandleRequest(interfacePool->device->devHandle);
+        if (ret < 0) {
+            HDF_LOGE("%{public}s RawHandleRequest failed ret: %{public}d", __func__, ret);
+            OsalMSleep(USB_IO_SLEEP_MS_TIME);
+            continue;
         }
     }
 
