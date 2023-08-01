@@ -182,11 +182,11 @@ HWTEST_F(HdfMotionTest, EnableMotion_003, TestSize.Level1)
         return;
     }
     int32_t ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_WRIST_UP);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     OsalSleep(2);
 
     ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_WRIST_UP);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 HWTEST_F(HdfMotionTest, EnableMotion_004, TestSize.Level1)
