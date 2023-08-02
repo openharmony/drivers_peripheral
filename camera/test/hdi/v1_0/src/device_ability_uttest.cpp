@@ -33,32 +33,3 @@ void DeviceAbilityUtTest::TearDown(void)
 {
     cameraTest->Close();
 }
-
-/**
- * @tc.name: Device_Ability_Hdi_0001
- * @tc.desc: OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(DeviceAbilityUtTest, Device_Ability_Hdi_0001, TestSize.Level1)
-{
-    EXPECT_NE(cameraTest->ability, nullptr);
-    common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
-    if (ret == 0 && entry.data.i32 != nullptr && entry.count > 0) {
-        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start.");
-        constexpr size_t step = 10; // print step
-        std::stringstream ss;
-        for (size_t i = 0; i < entry.count; i++) {
-            ss << entry.data.i32[i] << " ";
-            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
-                CAMERA_LOGE("%{public}s\n", ss.str().c_str());
-                ss.clear();
-                ss.str("");
-            }
-        }
-        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
-    }
-}

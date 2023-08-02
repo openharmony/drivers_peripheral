@@ -294,3 +294,42 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_008, TestSize.Level1)
     cameraTest->rc = cameraTest->streamOperator_V1_1->ReleaseStreams(streamIds);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_1_009
+ * @tc.desc: OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_009, TestSize.Level1)
+{
+    cameraTest->Init();
+    if (cameraTest->serviceV1_1 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return;
+    }
+
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start.");
+        constexpr size_t step = 10; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.i32[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGE("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
+    }
+}
