@@ -36,10 +36,10 @@ config("camhdi_impl_config") {
 }
 
 host_sources = [
+  "$camera_path_usb/vdi_impl/src/camera_dump.cpp",
   "$camera_path_usb/vdi_impl/src/camera_host/camera_host_usb_config.cpp",
   "$camera_path_usb/vdi_impl/src/camera_host/camera_host_usb_vdi_impl.cpp",
   "$camera_path_vdi/../v4l2/src/camera_device/camera_device_vdi_impl.cpp",
-  "$camera_path_vdi/../v4l2/src/camera_dump.cpp",
   "$camera_path_vdi/../v4l2/src/offline_stream_operator/offline_stream.cpp",
   "$camera_path_vdi/../v4l2/src/offline_stream_operator/offline_stream_operator_vdi_impl.cpp",
   "$camera_path_vdi/../v4l2/src/stream_operator/capture_message.cpp",
