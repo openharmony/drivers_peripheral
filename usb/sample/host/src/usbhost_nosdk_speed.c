@@ -132,7 +132,6 @@ static void SignalHandler(int32_t signo)
 {
     static uint32_t sigCnt = 0;
     struct itimerval new_value, old_value;
-    double speed = 0;
     switch (signo) {
         case SIGALRM:
             sigCnt++;
@@ -140,7 +139,6 @@ static void SignalHandler(int32_t signo)
                 g_speedFlag = 1;
                 break;
             }
-            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME * 1024 * 1024);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
             new_value.it_interval.tv_sec = TEST_PRINT_TIME;
