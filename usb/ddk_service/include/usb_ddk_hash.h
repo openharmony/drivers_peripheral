@@ -16,8 +16,14 @@
 #define USB_DDK_HASH_H
 #include <stddef.h>
 #include <stdint.h>
+struct InterfaceInfo {
+    uint64_t addr;
+    uint8_t busNum;
+    uint8_t devNum;
+};
 
-int32_t UsbDdkHash(uint64_t param, uint64_t &hashVal);
-int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &param);
+int32_t UsbDdkHash(const InterfaceInfo &info, uint64_t &hashVal);
+int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &addr);
 void UsbDdkDelHashRecord(uint64_t hashVal);
+uint64_t UsbDdkGetRecordByVal(const InterfaceInfo &info);
 #endif // USB_DDK_IMPL_H
