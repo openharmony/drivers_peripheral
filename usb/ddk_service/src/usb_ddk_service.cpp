@@ -18,6 +18,7 @@
 #include <hdf_base.h>
 #include <iproxy_broker.h>
 
+#include "ddk_pnp_listener_mgr.h"
 #include "usb_ddk_hash.h"
 #include "usb_ddk_interface.h"
 #include "usb_raw_api.h"
@@ -47,9 +48,68 @@ extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
     return new (std::nothrow) UsbDdkService();
 }
 
+int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+    UsbDdkDelHashRecord(interfaceHandle);
+
+    struct UsbInterface *interface = nullptr;
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    ret = GetInterfaceByHandle(handleConvert, &interface);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbCloseInterface(handleConvert);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    return UsbReleaseInterface(interface);
+}
+
+static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
+{
+    if (id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
+        uint32_t infoSize;
+        struct UsbPnpNotifyMatchInfoTable *infoTable = NULL;
+        auto flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
+        if ((!flag) || (infoTable == NULL)) {
+            HDF_LOGE("%{public}s: fail to read infoTable in event data, flag = %{public}d", __func__, flag);
+            return HDF_ERR_INVALID_PARAM;
+        }
+
+        HDF_LOGI("%{public}s: delete record success", __func__);
+        ReleaseUsbInterface(UsbDdkGetRecordByVal({0, infoTable->busNum, infoTable->devNum}));
+    }
+    return HDF_SUCCESS;
+}
+
+static HdfDevEventlistener *g_pnpListener = nullptr;
+
 int32_t UsbDdkService::Init()
 {
     HDF_LOGI("usb ddk init");
+    if (g_pnpListener == nullptr) {
+        g_pnpListener = new HdfDevEventlistener();
+        if (g_pnpListener == nullptr) {
+            HDF_LOGE("%{public}s: create listener failed", __func__);
+            return HDF_ERR_MALLOC_FAIL;
+        }
+        g_pnpListener->callBack = UsbdPnpEventHandler;
+        if (DdkListenerMgrAdd(g_pnpListener) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: add listener failed", __func__);
+            return HDF_FAILURE;
+        }
+    }
+
     return UsbInitHostSdk(nullptr);
 }
 
@@ -134,39 +194,14 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
         return HDF_FAILURE;
     }
 
-    int32_t ret = UsbDdkHash((uint64_t)handle, interfaceHandle);
+    int32_t ret = UsbDdkHash({(uint64_t)handle, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId)}, interfaceHandle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s hash failed %{public}d", __func__, ret);
     }
     return ret;
 }
-
-int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
-{
-    uint64_t handle = 0;
-    int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
-        return ret;
-    }
-
-    struct UsbInterface *interface = nullptr;
-    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
-    ret = GetInterfaceByHandle(handleConvert, &interface);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get interface failed %{public}d", __func__, ret);
-        return ret;
-    }
-
-    ret = UsbCloseInterface(handleConvert);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
-        return ret;
-    }
-
-    UsbDdkDelHashRecord(interfaceHandle);
-
-    return UsbReleaseInterface(interface);
+int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle) {
+    return ReleaseUsbInterface(interfaceHandle);
 }
 
 int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t settingIndex)
