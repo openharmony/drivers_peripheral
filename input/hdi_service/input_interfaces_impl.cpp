@@ -410,6 +410,10 @@ int32_t InputInterfacesImpl::RunCapacitanceTest(uint32_t devIndex, uint32_t test
         HDF_LOGE("%{public}s: get input device Module instance failed", __func__);
         return HDF_FAILURE;
     }
+    if (length == 0 || result.length() < length - 1) {
+        HDF_LOGE("%{public}s: input param invalid", __func__);
+        return HDF_FAILURE;
+    }
 
     int32_t ret = inputInterface_->iInputController->RunCapacitanceTest(devIndex, testType, result.data(), length);
     if (ret != INPUT_SUCCESS) {
