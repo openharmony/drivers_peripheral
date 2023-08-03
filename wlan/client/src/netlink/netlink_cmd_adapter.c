@@ -1990,7 +1990,7 @@ int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac
     return ret;
 }
 
-static bool SetExtFeatureFlag(uint8_t *extFeatureFlagsBytes, uint32_t extFeatureFlagsLen, uint32_t extFeatureFlag)
+static bool SetExtFeatureFlag(const uint8_t *extFeatureFlagsBytes, uint32_t extFeatureFlagsLen, uint32_t extFeatureFlag)
 {
     uint32_t extFeatureFlagBytePos;
     uint32_t extFeatureFlagBitPos;
@@ -2285,6 +2285,10 @@ static int32_t InsertFreqToList(int32_t freq, struct DListHead *scanFreqs)
     struct FreqListNode *freqListNode = NULL;
 
     DLIST_FOR_EACH_ENTRY(freqListNode, scanFreqs, struct FreqListNode, entry) {
+        if (freqListNode == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: freqListNode is NULL.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         if (freqListNode->freq == freq) {
             isFreqExist = true;
             break;
