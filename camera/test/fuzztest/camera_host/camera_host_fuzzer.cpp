@@ -13,36 +13,27 @@
  * limitations under the License.
  */
 
-#include "common.h"
-#include "camera_host_impl.h"
+#include "camera.h"
+#include "camera_host_fuzzer.h"
+#include "v1_1/icamera_host.h"
 
 namespace OHOS {
+
+const size_t THRESHOLD = 10;
 bool CameraHostFuzzTest(const uint8_t *rawData, size_t size)
 {
+    (void)size;
+    bool result = false;
     if (rawData == nullptr) {
         return false;
     }
-    constexpr uint32_t sleepTime = 2;
-    uint32_t code = U32_AT(rawData);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
 
-    MessageParcel data;
-    data.WriteInterfaceToken(ICameraHost::GetDescriptor());
-    data.WriteBuffer(rawData, size);
-    data.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
+    sptr<HDI::Camera::V1_1::ICameraHost> g_cameraHost = nullptr;
+    if (g_cameraHost->Prelaunch(reinterpret_cast<const HDI::Camera::V1_1::PrelaunchConfig&>(rawData))) {
+        result = true;
+    }
 
-    sptr<ICameraHost> cameraHost = new OHOS::Camera::CameraHostImpl();
-    CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHost, false);
-    sptr<CameraHostStub> IpcHost = new CameraHostStub(cameraHost);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcHost, false);
-    
-    sleep(sleepTime); // sleep two second
-    IpcHost->OnRemoteRequest(code, data, reply, option);
-
-    return true;
+    return result;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
