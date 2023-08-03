@@ -43,7 +43,6 @@ static const uint8_t SAMPLE_DATA_2 = 2;
 static const uint8_t SAMPLE_DATA_3 = 3;
 const int32_t TRANSFER_TIME_OUT = 1000;
 const int32_t CTL_VALUE = 0x100;
-UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -51,6 +50,8 @@ using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
+UsbDev UsbdTransferTest::dev_ = {0, 0};
+sptr<UsbSubscriberTest> UsbdTransferTest::subscriber_ = nullptr;
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
 
@@ -100,13 +101,13 @@ void UsbdTransferTest::SetUpTestCase(void)
         exit(0);
     }
 
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+    if (g_usbInterface->BindUsbdSubscriber(subscriber_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: bind usbd subscriber_ failed\n", __func__);
         exit(0);
     }
 
@@ -114,7 +115,7 @@ void UsbdTransferTest::SetUpTestCase(void)
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
 
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
     ret = g_usbInterface->OpenDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -122,16 +123,8 @@ void UsbdTransferTest::SetUpTestCase(void)
 
 void UsbdTransferTest::TearDownTestCase(void)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
-        exit(0);
-    }
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    g_usbInterface->UnbindUsbdSubscriber(subscriber_);
+    dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
     auto ret = g_usbInterface->CloseDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d Close=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -2347,63 +2340,63 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback005, TestSize.Level1)
 
 /**
  * @tc.name: UnbindUsbdSubscriber001
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber001, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: UnbindUsbdSubscriber002
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Negative test: no bind first
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber002, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber002 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
 }
 
 /**
  * @tc.name: UnbindUsbdSubscriber003
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: no bind first, unbind failed; then bind, unbind success
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber003, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI(
         "UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -2411,25 +2404,25 @@ HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber003, TestSize.Level1)
 
 /**
  * @tc.name: UnbindUsbdSubscriber004
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Negative test: call twice
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber004, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI(
         "UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d first UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI(
         "UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_NE(0, ret);
@@ -2437,28 +2430,28 @@ HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber004, TestSize.Level1)
 
 /**
  * @tc.name: UnbindUsbdSubscriber005
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: test repeatedly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber005, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI(
         "UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d first UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI(
         "UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -2466,40 +2459,40 @@ HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber005, TestSize.Level1)
 
 /**
  * @tc.name: BindUsbdSubscriber001
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BindUsbdSubscriber001, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber001 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: BindUsbdSubscriber002
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: bind different
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BindUsbdSubscriber002, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber002 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     sptr<UsbSubscriberTest> subscriber2 = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
@@ -2510,46 +2503,46 @@ HWTEST_F(UsbdTransferTest, BindUsbdSubscriber002, TestSize.Level1)
 
 /**
  * @tc.name: BindUsbdSubscriber003
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: bind same
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BindUsbdSubscriber003, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: BindUsbdSubscriber004
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: bind and unbind, then bind another
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BindUsbdSubscriber004, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber004 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     sptr<UsbSubscriberTest> subscriber2 = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
@@ -2560,24 +2553,24 @@ HWTEST_F(UsbdTransferTest, BindUsbdSubscriber004, TestSize.Level1)
 
 /**
  * @tc.name: BindUsbdSubscriber005
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber_)
  * @tc.desc: Positive test: bind again after unbind
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BindUsbdSubscriber005, TestSize.Level1)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
+    sptr<UsbSubscriberTest> subscriber_ = new UsbSubscriberTest();
+    if (subscriber_ == nullptr) {
         HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
         exit(0);
     }
-    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber005 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber_);
     HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
