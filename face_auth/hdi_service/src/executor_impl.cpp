@@ -174,6 +174,14 @@ int32_t ExecutorImpl::SendCommand(
                 return HDF_FAILURE;
             }
             break;
+        case CommandId::INIT_ALGORITHM:
+            IAM_LOGI("init algorithm, result is %{public}d", ResultCode::SUCCESS);
+            ret = callbackObj->OnResult(ResultCode::SUCCESS, {});
+            if (ret != HDF_SUCCESS) {
+                IAM_LOGE("callback result is %{public}d", ret);
+                return HDF_FAILURE;
+            }
+            break;
         default:
             IAM_LOGD("not support CommandId : %{public}d", commandId);
             ret = callbackObj->OnResult(ResultCode::OPERATION_NOT_SUPPORT, {});
