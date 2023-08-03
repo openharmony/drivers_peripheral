@@ -23,16 +23,17 @@
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
-const int SLEEP_TIME = 3;
-const uint8_t BUS_NUM_INVALID = 255;
-const uint8_t DEV_ADDR_INVALID = 255;
-UsbDev UsbdDeviceTest::dev_ = {0, 0};
-
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
+
+const int SLEEP_TIME = 3;
+const uint8_t BUS_NUM_INVALID = 255;
+const uint8_t DEV_ADDR_INVALID = 255;
+UsbDev UsbdDeviceTest::dev_ = {0, 0};
+sptr<UsbSubscriberTest> UsbdDeviceTest::subscriber_ = nullptr;
 
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
@@ -52,19 +53,22 @@ void UsbdDeviceTest::SetUpTestCase(void)
         exit(0);
     }
 
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+    subscriber_ = new UsbSubscriberTest();
+    if (g_usbInterface->BindUsbdSubscriber(subscriber_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: bind usbd subscriber_ failed\n", __func__);
         exit(0);
     }
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
 
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
 }
 
-void UsbdDeviceTest::TearDownTestCase(void) {}
+void UsbdDeviceTest::TearDownTestCase(void)
+{
+    g_usbInterface->UnbindUsbdSubscriber(subscriber_);
+}
 
 void UsbdDeviceTest::SetUp(void) {}
 
