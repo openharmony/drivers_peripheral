@@ -13,36 +13,36 @@
  * limitations under the License.
  */
 
-#include "common.h"
-#include "camera_device_vdi_impl.h"
+#include "camera.h"
+#include "camera_device_fuzzer.h"
+#include "v1_1/icamera_device.h"
+
 
 namespace OHOS {
+const size_t THRESHOLD = 10;
 bool CameraDeviceFuzzTest(const uint8_t *rawData, size_t size)
 {
     if (rawData == nullptr) {
         return false;
     }
-    constexpr uint32_t sleepTime = 2;
-    uint32_t code = U32_AT(rawData);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
 
-    MessageParcel data;
-    data.WriteInterfaceToken(ICameraDevice::GetDescriptor());
-    data.WriteBuffer(rawData, size);
-    data.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
+    bool result = false;
+    sptr<HDI::Camera::V1_1::ICameraDevice> g_cameraDevice = nullptr;
+    std::vector<uint8_t> abilityVec = {};
+    abilityVec.push_back(*rawData);
 
-    sptr<ICameraDevice> cameraDevice = new OHOS::Camera::CameraDeviceVdiImpl();
-    CHECK_IF_PTR_NULL_RETURN_VALUE(cameraDevice, false);
-    sptr<CameraDeviceStub> IpcDevice = new CameraDeviceStub(cameraDevice);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcDevice, false);
-    
-    sleep(sleepTime); // sleep two second
-    IpcDevice->OnRemoteRequest(code, data, reply, option);
+    if (g_cameraDevice->GetDefaultSettings(abilityVec)) {
+        result = true;
+    }
 
-    return true;
+    sptr<HDI::Camera::V1_1::ICameraDevice> g_streamOperator = nullptr;
+    sptr<HDI::Camera::V1_1::IStreamOperatorCallback> g_callback = nullptr;
+    sptr<HDI::Camera::V1_1::IStreamOperator> g_StreamOperator = nullptr;
+    if (g_streamOperator->GetStreamOperator_V1_1(g_callback, g_StreamOperator)) {
+        result = true;
+    }
+
+    return result;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

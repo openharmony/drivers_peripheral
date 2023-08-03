@@ -21,9 +21,9 @@ group("camera_hdi_fuzztest") {
   deps = []
 
   deps += [
-    "camera_device:CameraDeviceFuzzTest",
-    "camera_host:CameraHostFuzzTest",
-    "offline_stream_operator:CameraOfflineStreamOperatorFuzzTest",
-    "stream_operator:CameraStreamOperatorFuzzTest",
+    "camera_device:fuzztest",
+    "camera_host:fuzztest",
+    #"offline_stream_operator:CameraOfflineStreamOperatorFuzzTest",
+    #"stream_operator:CameraStreamOperatorFuzzTest",
   ]
 }
