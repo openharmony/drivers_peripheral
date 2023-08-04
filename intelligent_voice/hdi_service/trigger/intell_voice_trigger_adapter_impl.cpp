@@ -17,11 +17,13 @@
 #include "intell_voice_log.h"
 #include "securec.h"
 #include "scope_guard.h"
+#include "memory_guard.h"
 
 #undef HDF_LOG_TAG
 #define HDF_LOG_TAG "TriggerAdapterImpl"
 
 using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
+using namespace OHOS::IntelligentVoice::Utils;
 
 namespace OHOS {
 namespace IntelligentVoice {
@@ -63,6 +65,7 @@ int32_t IntellVoiceTriggerAdapterImpl::GetProperties(IntellVoiceTriggerPropertie
 int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &model,
     const sptr<IIntellVoiceTriggerCallback> &triggerCallback, int32_t cookie, int32_t &handle)
 {
+    MemoryGuard memoryGuard;
     std::shared_ptr<ITriggerCallback> cb = std::make_shared<IntellVoiceTriggerCallbackDevice>(triggerCallback);
     if (cb == nullptr) {
         INTELLIGENT_VOICE_LOGE("callback is nullptr");
@@ -91,16 +94,19 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
 
 int32_t IntellVoiceTriggerAdapterImpl::UnloadModel(int32_t handle)
 {
+    MemoryGuard memoryGuard;
     return adapter_->UnloadIntellVoiceTriggerModel(handle);
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::Start(int32_t handle)
 {
+    MemoryGuard memoryGuard;
     return adapter_->Start(handle);
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::Stop(int32_t handle)
 {
+    MemoryGuard memoryGuard;
     return adapter_->Stop(handle);
 }
 
