@@ -22,9 +22,9 @@ ohos_shared_library("intell_voice_trigger_manager_service_1.0") {
   ]
 
   sources = [
+    "../../utils/memory_guard.cpp",
     "intell_voice_trigger_adapter_impl.cpp",
     "intell_voice_trigger_manager_impl.cpp",
-    "../../utils/memory_guard.cpp",
   ]
 
   defines = []
