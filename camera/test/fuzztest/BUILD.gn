@@ -23,6 +23,7 @@ group("camera_hdi_fuzztest") {
   deps += [
     "camera_device:fuzztest",
     "camera_host:fuzztest",
+
     #"offline_stream_operator:CameraOfflineStreamOperatorFuzzTest",
     #"stream_operator:CameraStreamOperatorFuzzTest",
   ]
