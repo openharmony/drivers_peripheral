@@ -520,7 +520,8 @@ ResultCode DestoryContextbyId(uint64_t contextId)
     return RESULT_SUCCESS;
 }
 
-ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info)
+ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
+    uint32_t authMode)
 {
     if (context == NULL || credentialId == NULL  || info == NULL) {
         LOG_ERROR("param is null");
@@ -562,7 +563,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
     }
 
     if (userId != context->userId) {
-        LOG_ERROR("userId is not matched");
+        LOG_ERROR("userId is not matched, userId: %{public}d, %{public}d", userId, context->userId);
         DestroyLinkedList(credList);
         return RESULT_GENERAL_ERROR;
     } 

@@ -62,7 +62,8 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId);
 void DestoryContext(UserAuthContext *context);
 ResultCode DestoryContextbyId(uint64_t contextId);
 ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
-ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info);
+ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
+    uint32_t authMode);
 
 #ifdef __cplusplus
 }

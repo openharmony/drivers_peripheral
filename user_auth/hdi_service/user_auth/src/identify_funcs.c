@@ -71,7 +71,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
         goto EXIT;
     }
     uint64_t credentialId;
-    ret = FillInContext(identifyContext, &credentialId, executorResultInfo);
+    ret = FillInContext(identifyContext, &credentialId, executorResultInfo, SCHEDULE_MODE_IDENTIFY);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("FillInContext failed");
         goto EXIT;
