@@ -94,7 +94,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     }
 
     ResultCode ret = RESULT_GENERAL_ERROR;
-    if (executorResultInfo->result == RESULT_SUCCESS) {
+    if (executorResultInfo->result != RESULT_SUCCESS) {
         LOG_ERROR("executor result is not success, result:%{public}d", executorResultInfo->result);
         goto EXIT;
     }
