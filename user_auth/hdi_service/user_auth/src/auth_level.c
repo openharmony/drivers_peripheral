@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#include "auth_level.h"
-
 #include "adaptor_log.h"
+#include "auth_level.h"
 #include "defines.h"
 #include "idm_database.h"
 #include "pool.h"
@@ -25,29 +24,6 @@
 #else
 #define IAM_STATIC static
 #endif
-
-typedef enum Asl {
-    ASL0 = 0,
-    ASL1 = 1,
-    ASL2 = 2,
-    ASL3 = 3,
-    MAX_ASL = 4,
-} Asl;
-
-typedef enum Acl {
-    ACL0 = 0,
-    ACL1 = 1,
-    ACL2 = 2,
-    ACL3 = 3,
-} Acl;
-
-typedef enum Atl {
-    ATL0 = 0,
-    ATL1 = 10000,
-    ATL2 = 20000,
-    ATL3 = 30000,
-    ATL4 = 40000,
-} Atl;
 
 typedef struct {
     Atl atl;

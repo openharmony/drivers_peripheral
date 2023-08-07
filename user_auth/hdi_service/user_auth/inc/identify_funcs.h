@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-int32_t DoIdentify(const IdentifyParam param, LinkedList **schedule);
-int32_t DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, int32_t *userId, UserAuthTokenHal *token,
+ResultCode DoIdentify(const IdentifyParam param, LinkedList **schedule);
+ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, int32_t *userId, UserAuthTokenHal *token,
     int32_t *result);
 
 #ifdef __cplusplus

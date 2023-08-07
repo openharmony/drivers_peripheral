@@ -180,6 +180,24 @@ IAM_STATIC ResultCode StreamWriteUserInfo(Buffer *parcel, UserInfo *userInfo)
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC ResultCode WriteUserInfo(LinkedList *userInfoList, Buffer *parcel)
+{
+    LinkedListNode *temp = userInfoList->head;
+    uint32_t size = userInfoList->getSize(userInfoList);
+    for (uint32_t i = 0; i < size; ++i) {
+        if (temp == NULL || temp->data == NULL) {
+            LOG_ERROR("temp is null");
+            return RESULT_NEED_INIT;
+        }
+        if (StreamWriteUserInfo(parcel, (UserInfo *)temp->data) != RESULT_SUCCESS) {
+            LOG_ERROR("StreamWriteUserInfo failed");
+            return RESULT_GENERAL_ERROR;
+        }
+        temp = temp->next;
+    }
+    return RESULT_SUCCESS;
+}
+
 ResultCode UpdateFileInfo(LinkedList *userInfoList)
 {
     LOG_INFO("start");
@@ -206,19 +224,10 @@ ResultCode UpdateFileInfo(LinkedList *userInfoList)
         goto EXIT;
     }
 
-    LinkedListNode *temp = userInfoList->head;
-    for (uint32_t i = 0; i < size; ++i) {
-        if (temp == NULL || temp->data == NULL) {
-            LOG_ERROR("temp is null");
-            ret = RESULT_NEED_INIT;
-            goto EXIT;
-        }
-        if (StreamWriteUserInfo(parcel, (UserInfo *)temp->data) != RESULT_SUCCESS) {
-            LOG_ERROR("StreamWriteUserInfo failed");
-            ret = RESULT_GENERAL_ERROR;
-            goto EXIT;
-        }
-        temp = temp->next;
+    ret = WriteUserInfo(userInfoList, parcel);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WriteUserInfo failed");
+        goto EXIT;
     }
 
     FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
@@ -229,7 +238,7 @@ ResultCode UpdateFileInfo(LinkedList *userInfoList)
     }
 
     // This is for example only. Should be implemented in trusted environment.
-    ret = fileOperator->writeFile(IDM_USER_INFO, parcel->buf, parcel->contentSize);
+    ret = (ResultCode)fileOperator->writeFile(IDM_USER_INFO, parcel->buf, parcel->contentSize);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("write file failed, %{public}u", parcel->contentSize);
     }

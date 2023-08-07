@@ -31,7 +31,7 @@
 #define IAM_STATIC static
 #endif
 
-int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
+ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
 {
     if (schedules == NULL) {
         LOG_ERROR("schedules is null");
@@ -47,7 +47,7 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
     }
-    int32_t ret = CopySchedules(authContext, schedules);
+    ResultCode ret = CopySchedules(authContext, schedules);
     if (ret != RESULT_SUCCESS) {
         DestoryContext(authContext);
         return ret;
@@ -55,8 +55,9 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
     return ret;
 }
 
-IAM_STATIC int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
+IAM_STATIC ResultCode SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
 {
+    result->authType = authType;
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;
     result->result = info->result;
@@ -70,7 +71,7 @@ IAM_STATIC int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *in
     return RESULT_SUCCESS;
 }
 
-int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
+ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result)
 {
     if (!IsBufferValid(scheduleResult) || authToken == NULL || result == NULL || result->rootSecret != NULL) {
@@ -78,47 +79,45 @@ int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, 
         DestoryContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
-    ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
-    if (executorResultInfo == NULL) {
-        LOG_ERROR("executorResultInfo is null");
-        DestoryContextbyId(contextId);
-        return RESULT_UNKNOWN;
-    }
 
     UserAuthContext *userAuthContext = GetContext(contextId);
     if (userAuthContext == NULL) {
-        LOG_ERROR("userAuthContext is null");
-        DestoryExecutorResultInfo(executorResultInfo);
-        return RESULT_UNKNOWN;
+        LOG_ERROR("context is not found");
+        return RESULT_GENERAL_ERROR;
     }
-    uint64_t credentialId;
-    int32_t ret = FillInContext(userAuthContext, &credentialId, executorResultInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get info failed");
-        goto EXIT;
+
+    ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
+    if (executorResultInfo == NULL) {
+        LOG_ERROR("executorResultInfo is null");
+        DestoryContext(userAuthContext);
+        return RESULT_GENERAL_ERROR;
     }
-    ret = ScheduleOnceFinish(userAuthContext, executorResultInfo->scheduleId);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("failed to finish schedule");
-        goto EXIT;
-    }
+
+    ResultCode ret = RESULT_GENERAL_ERROR;
     if (executorResultInfo->result == RESULT_SUCCESS) {
-        ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
-        if (ret != RESULT_SUCCESS) {
-            LOG_ERROR("sign token failed");
-            (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
-            goto EXIT;
-        }
-    } else {
-        (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+        LOG_ERROR("executor result is not success, result:%{public}d", executorResultInfo->result);
+        goto EXIT;
     }
-    ret = SetAuthResult(userAuthContext->authType, executorResultInfo, result);
+
+    uint64_t credentialId;
+    ret = FillInContext(userAuthContext, &credentialId, executorResultInfo);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("set result failed");
-        (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+        LOG_ERROR("FillInContext fail");
+        goto EXIT;
+    }
+
+    ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("sign token failed");
+        goto EXIT;
     }
 
 EXIT:
+    ret = SetAuthResult(userAuthContext->authType, executorResultInfo, result);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("set result failed");
+    }
+
     DestoryExecutorResultInfo(executorResultInfo);
     DestoryContext(userAuthContext);
     return ret;

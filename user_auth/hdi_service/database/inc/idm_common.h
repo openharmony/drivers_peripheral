@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define MAX_USER 1000
+#define MAX_USER 32
 #define MAX_CREDENTIAL 100
 
 typedef struct {
