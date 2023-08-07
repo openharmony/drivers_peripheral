@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 
-#include "defines.h"
 #include "coauth.h"
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {

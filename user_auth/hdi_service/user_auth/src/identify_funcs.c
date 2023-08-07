@@ -18,12 +18,12 @@
 #include "securec.h"
 
 #include "adaptor_log.h"
+#include "auth_level.h"
 #include "context_manager.h"
 #include "executor_message.h"
 #include "idm_database.h"
-#include "auth_level.h"
 
-int32_t DoIdentify(const IdentifyParam param, LinkedList **schedule)
+ResultCode DoIdentify(const IdentifyParam param, LinkedList **schedule)
 {
     if (schedule == NULL) {
         LOG_ERROR("schedule is null");
@@ -34,7 +34,7 @@ int32_t DoIdentify(const IdentifyParam param, LinkedList **schedule)
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
     }
-    int32_t ret = CopySchedules(identifyContext, schedule);
+    ResultCode ret = CopySchedules(identifyContext, schedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get schedule failed");
         DestoryContext(identifyContext);
@@ -43,49 +43,48 @@ int32_t DoIdentify(const IdentifyParam param, LinkedList **schedule)
     return ret;
 }
 
-int32_t DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, int32_t *userId, UserAuthTokenHal *token,
-    int32_t *result)
+ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, int32_t *userId,
+    UserAuthTokenHal *token, int32_t *result)
 {
     if (!IsBufferValid(scheduleResult) || token == NULL || userId == NULL || result == NULL) {
         LOG_ERROR("param is null");
+        DestoryContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
 
     UserAuthContext *identifyContext = GetContext(contextId);
     if (identifyContext == NULL) {
         LOG_ERROR("identifyContext is null");
-        return RESULT_UNKNOWN;
+        return RESULT_GENERAL_ERROR;
     }
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
     if (executorResultInfo == NULL) {
         LOG_ERROR("executorResultInfo is null");
         DestoryContext(identifyContext);
-        return RESULT_UNKNOWN;
+        return RESULT_GENERAL_ERROR;
     }
+
+    ResultCode ret = RESULT_GENERAL_ERROR;
     *result = executorResultInfo->result;
     if (*result != RESULT_SUCCESS) {
-        DestoryContext(identifyContext);
-        DestoryExecutorResultInfo(executorResultInfo);
-        return RESULT_SUCCESS;
+        LOG_ERROR("executor result is not success, result: %{pubilc}d", executorResultInfo->result);
+        goto EXIT;
     }
     uint64_t credentialId;
-    int32_t ret = FillInContext(identifyContext, &credentialId, executorResultInfo);
+    ret = FillInContext(identifyContext, &credentialId, executorResultInfo);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get info failed");
-        DestoryContext(identifyContext);
-        DestoryExecutorResultInfo(executorResultInfo);
-        return ret;
+        LOG_ERROR("FillInContext failed");
+        goto EXIT;
     }
     ret = GetTokenDataAndSign(identifyContext, credentialId, SCHEDULE_MODE_IDENTIFY, token);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get token failed");
-        (void)memset_s(token, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
-        DestoryContext(identifyContext);
-        DestoryExecutorResultInfo(executorResultInfo);
-        return ret;
+        goto EXIT;
     }
     *userId = identifyContext->userId;
-    DestoryContext(identifyContext);
+
+EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
-    return RESULT_SUCCESS;
+    DestoryContext(identifyContext);
+    return ret;
 }

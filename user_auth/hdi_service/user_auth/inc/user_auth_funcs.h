@@ -18,22 +18,23 @@
 
 #include "buffer.h"
 
-#include "user_sign_centre.h"
 #include "context_manager.h"
+#include "user_sign_centre.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct AuthResult {
+    uint32_t authType;
     int32_t freezingTime;
     int32_t remainTimes;
     int32_t result;
     Buffer *rootSecret;
 } AuthResult;
 
-int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
-int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
+ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
+ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result);
 
 #ifdef __cplusplus

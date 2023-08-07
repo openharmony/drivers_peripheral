@@ -16,8 +16,8 @@
 #ifndef COMMON_LINKED_LIST_H
 #define COMMON_LINKED_LIST_H
 
-#include "stdbool.h"
-#include "stdint.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "defines.h"
 
 #ifdef __cplusplus
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 typedef void (*DestroyDataFunc)(void *data);
-typedef bool (*MatchFunc)(const void *data, const void *condition);
+typedef bool (*MatchFunc)(void *data, void *condition);
 
 typedef struct LinkedListNode {
     void *data;

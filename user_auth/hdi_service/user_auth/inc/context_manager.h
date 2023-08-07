@@ -17,8 +17,8 @@
 #define USERIAM_CONTEXT_MANAGER_H
 
 #include "coauth.h"
-#include "linked_list.h"
 #include "executor_message.h"
+#include "linked_list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,9 +60,9 @@ UserAuthContext *GenerateIdentifyContext(IdentifyParam params);
 UserAuthContext *GetContext(uint64_t contextId);
 ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId);
 void DestoryContext(UserAuthContext *context);
-int32_t DestoryContextbyId(uint64_t contextId);
+ResultCode DestoryContextbyId(uint64_t contextId);
 ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
-int32_t FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info);
+ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info);
 
 #ifdef __cplusplus
 }

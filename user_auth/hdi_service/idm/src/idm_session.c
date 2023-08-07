@@ -212,7 +212,7 @@ bool IsSessionTimeout(void)
     }
     uint64_t currentTime = GetSystemTime();
     if (currentTime < g_session->time || currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
-        LOG_ERROR("timeout, %{public}llu, %{public}llu",
+        LOG_ERROR("timeout, currentTime: %{public}llu, sessionTime: %{public}llu",
                   (unsigned long long)currentTime, (unsigned long long)g_session->time);
         return true;
     }

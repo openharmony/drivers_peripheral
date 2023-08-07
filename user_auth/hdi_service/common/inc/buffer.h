@@ -16,8 +16,8 @@
 #ifndef COMMON_BUFFER_H
 #define COMMON_BUFFER_H
 
-#include "stdbool.h"
-#include "stdint.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "defines.h"
 
 #ifdef __cplusplus

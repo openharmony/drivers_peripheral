@@ -45,11 +45,12 @@ IAM_STATIC ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInf
 IAM_STATIC ResultCode DeleteUser(int32_t userId);
 IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
 IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
-IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
+IAM_STATIC bool MatchCredentialById(void *data, void *condition);
 IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 
 ResultCode InitUserInfoList(void)
 {
+    LOG_INFO("InitUserInfoList start");
     if (g_userInfoList != NULL) {
         DestroyUserInfoList();
         g_userInfoList = NULL;
@@ -59,7 +60,7 @@ ResultCode InitUserInfoList(void)
         LOG_ERROR("load file info failed");
         return RESULT_NEED_INIT;
     }
-    LOG_INFO("InitUserInfoList done");
+    LOG_INFO("InitUserInfoList end");
     return RESULT_SUCCESS;
 }
 
@@ -69,7 +70,7 @@ void DestroyUserInfoList(void)
     g_userInfoList = NULL;
 }
 
-IAM_STATIC bool MatchUserInfo(const void *data, const void *condition)
+IAM_STATIC bool MatchUserInfo(void *data, void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("please check invalid node");
@@ -532,7 +533,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     return ret;
 }
 
-IAM_STATIC bool MatchCredentialById(const void *data, const void *condition)
+IAM_STATIC bool MatchCredentialById(void *data, void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
@@ -545,7 +546,7 @@ IAM_STATIC bool MatchCredentialById(const void *data, const void *condition)
     return false;
 }
 
-IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
+IAM_STATIC bool MatchEnrolledInfoByType(void *data, void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
