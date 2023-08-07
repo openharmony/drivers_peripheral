@@ -146,7 +146,7 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         return ret;
     }
     UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
-    ret= CheckIdmOperationToken(param.userId, authToken);
+    ret = CheckIdmOperationToken(param.userId, authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("a valid token is required");
         return RESULT_VERIFY_TOKEN_FAIL;
