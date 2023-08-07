@@ -37,8 +37,6 @@ class UsbdInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
 
     static UsbDev dev_;
     static OHOS::sptr<OHOS::USB::UsbSubscriberTest> subscriber_;
@@ -75,7 +73,6 @@ void UsbdInterfaceTest::SetUpTestCase(void)
         exit(0);
     }
 
-    std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
     dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
@@ -95,10 +92,6 @@ void UsbdInterfaceTest::TearDownTestCase(void)
     HDF_LOGI("UsbdInterfaceTest:: %{public}d Close=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
-
-void UsbdInterfaceTest::SetUp(void) {}
-
-void UsbdInterfaceTest::TearDown(void) {}
 
 /**
  * @tc.name: UsbdSetInterface001
