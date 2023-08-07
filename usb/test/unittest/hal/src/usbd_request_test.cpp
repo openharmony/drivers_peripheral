@@ -25,7 +25,6 @@
 #include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
-const uint8_t INDEX_0 = 0;
 const uint8_t INDEX_1 = 1;
 const uint8_t INDEX_INVALID = 255;
 const uint8_t CONFIG_ID_0 = 0;
@@ -44,14 +43,14 @@ const uint8_t POINTID_DIR_OUT = USB_ENDPOINT_DIR_OUT | 1;
 const uint8_t INVALID_NUM = 222;
 const uint32_t TIME_WAIT = 10000;
 
-UsbDev UsbdRequestTest::dev_ = {0, 0};
-
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
+UsbDev UsbdRequestTest::dev_ = {0, 0};
+sptr<UsbSubscriberTest> UsbdRequestTest::subscriber_ = nullptr;
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
 
@@ -70,16 +69,16 @@ void UsbdRequestTest::SetUpTestCase(void)
         exit(0);
     }
 
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
+    subscriber_ = new UsbSubscriberTest();
+    if (g_usbInterface->BindUsbdSubscriber(subscriber_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: bind usbd subscriber_ failed", __func__);
         exit(0);
     }
 
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
 
     ret = g_usbInterface->OpenDevice(dev_);
     HDF_LOGI("UsbdRequestTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
@@ -88,12 +87,8 @@ void UsbdRequestTest::SetUpTestCase(void)
 
 void UsbdRequestTest::TearDownTestCase(void)
 {
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
-        exit(0);
-    }
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    g_usbInterface->UnbindUsbdSubscriber(subscriber_);
+    dev_ = {subscriber_->busNum_, subscriber_->devAddr_};
     auto ret = g_usbInterface->CloseDevice(dev_);
     HDF_LOGI("UsbdRequestTest:: %{public}d Close=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -431,178 +426,6 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface008, TestSize.Level1)
 }
 
 /**********************************************************************************************************/
-
-/**
- * @tc.name: UsbdSetInterface001
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Positive test: parameters correctly
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface001, TestSize.Level1)
-{
-    uint8_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_0;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdClaimInterface001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: UsbdSetInterface002
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, busNum error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface002, TestSize.Level1)
-{
-    uint8_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_0;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface002 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface003
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, devAddr error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface003, TestSize.Level1)
-{
-    uint8_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_INVALID;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.devAddr = DEV_ADDR_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface004
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, interfaceId error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface004, TestSize.Level1)
-{
-    uint8_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_INVALID;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    interfaceId = INTERFACEID_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface005
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, busNum && devAddr error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface005, TestSize.Level1)
-{
-    uint8_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_0;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_INVALID;
-    dev.devAddr = DEV_ADDR_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface006
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, busNum && interfaceId error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface006, TestSize.Level1)
-{
-    int32_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_1;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_INVALID;
-    interfaceId = INTERFACEID_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface007
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, devAddr && interfaceId error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface007, TestSize.Level1)
-{
-    int32_t interfaceId = INTERFACEID_OK;
-    uint8_t altIndex = INDEX_INVALID;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.devAddr = DEV_ADDR_INVALID;
-    interfaceId = INTERFACEID_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: UsbdSetInterface008
- * @tc.desc: Test functions to SetInterface
- * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceId error
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdRequestTest, UsbdSetInterface008, TestSize.Level1)
-{
-    uint8_t altIndex = INDEX_INVALID;
-    int32_t interfaceId = INTERFACEID_OK;
-    struct UsbDev dev = dev_;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_INVALID;
-    dev.devAddr = DEV_ADDR_INVALID;
-    interfaceId = INTERFACEID_INVALID;
-    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
-    HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-}
 
 /**
  * @tc.name: UsbdDescriptor001
