@@ -281,13 +281,13 @@ HWTEST_F(ContextManagerTest, TestDestroyContextNode, TestSize.Level0)
 
 HWTEST_F(ContextManagerTest, TestFillInContext_001, TestSize.Level0)
 {
-    EXPECT_EQ(FillInContext(nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(FillInContext(nullptr, nullptr, nullptr, SCHEDULE_MODE_ENROLL), RESULT_BAD_PARAM);
     g_scheduleList = nullptr;
     UserAuthContext context = {};
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(ContextManagerTest, TestFillInContext_002, TestSize.Level0)
@@ -303,7 +303,7 @@ HWTEST_F(ContextManagerTest, TestFillInContext_002, TestSize.Level0)
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info), RESULT_BAD_PARAM);
+    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(ContextManagerTest, TestFillInContext_003, TestSize.Level0)
@@ -327,7 +327,7 @@ HWTEST_F(ContextManagerTest, TestFillInContext_003, TestSize.Level0)
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
 }
 
 HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
@@ -364,7 +364,7 @@ HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
     info.templateId = 20;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
 }
 } // namespace UserAuth
 } // namespace UserIam

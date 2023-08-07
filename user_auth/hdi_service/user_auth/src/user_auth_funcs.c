@@ -100,7 +100,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     }
 
     uint64_t credentialId;
-    ret = FillInContext(userAuthContext, &credentialId, executorResultInfo);
+    ret = FillInContext(userAuthContext, &credentialId, executorResultInfo, SCHEDULE_MODE_AUTH);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("FillInContext fail");
         goto EXIT;
