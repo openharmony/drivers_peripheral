@@ -76,8 +76,10 @@ static void AudioManagerReleaseHwiPort(struct AudioHwiPort **hwiPorts, uint32_t 
 
 static void AudioManagerReleaseDesc(struct AudioAdapterDescriptor *desc)
 {
-    OsalMemFree((void *)desc->adapterName);
-    desc->adapterName = NULL;
+    if (desc->adapterName != NULL) {
+        OsalMemFree((void *)desc->adapterName);
+        desc->adapterName = NULL;
+    }
     if (desc->ports != NULL) {
         AudioManagerReleasePort(&desc->ports, desc->portsLen);
         desc->portsLen = 0;
@@ -86,8 +88,10 @@ static void AudioManagerReleaseDesc(struct AudioAdapterDescriptor *desc)
 
 static void AudioManagerReleaseHwiDesc(struct AudioAdapterHwiDescriptor *hwiDesc)
 {
-    OsalMemFree((void *)hwiDesc->adapterName);
-    hwiDesc->adapterName = NULL;
+    if (hwiDesc->adapterName != NULL) {
+        OsalMemFree((void *)hwiDesc->adapterName);
+        hwiDesc->adapterName = NULL;
+    }
     if (hwiDesc->ports != NULL) {
         AudioManagerReleaseHwiPort(&hwiDesc->ports, hwiDesc->portNum);
         hwiDesc->portNum = 0;
