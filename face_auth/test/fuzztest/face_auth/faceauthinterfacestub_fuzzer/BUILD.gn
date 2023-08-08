@@ -31,6 +31,7 @@ ohos_fuzztest("FaceAuthInterfaceStubFuzzTest") {
   sources = [ "face_auth_interface_stub_fuzzer.cpp" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:face_auth_idl_headers",
     "drivers_interface_face_auth:libface_auth_proxy_1.1",
