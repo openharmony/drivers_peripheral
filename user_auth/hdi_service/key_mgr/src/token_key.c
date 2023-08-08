@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "securec.h"
+
 #include "token_key.h"
+#include "securec.h"
 
 #define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
 
@@ -23,7 +24,7 @@
  */
 ResultCode GetTokenKey(HksAuthTokenKey *key)
 {
-    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, 
+    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY,
         HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("macKey copy error");
         return RESULT_BAD_COPY;

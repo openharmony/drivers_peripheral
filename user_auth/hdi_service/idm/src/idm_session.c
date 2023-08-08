@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <inttypes.h>
+
 #include "idm_session.h"
 
 #include "securec.h"
@@ -212,8 +214,8 @@ bool IsSessionTimeout(void)
     }
     uint64_t currentTime = GetSystemTime();
     if (currentTime < g_session->time || currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
-        LOG_ERROR("timeout, currentTime: %{public}llu, sessionTime: %{public}llu",
-                  (unsigned long long)currentTime, (unsigned long long)g_session->time);
+        LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
+            currentTime, g_session->time);
         return true;
     }
     return false;

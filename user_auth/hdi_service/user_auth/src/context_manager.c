@@ -553,7 +553,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         goto EXIT;
     }
     CredentialInfoHal *credentialNode = (CredentialInfoHal *)credList->head->data;
-    int32_t userId;
+    int32_t userId = 0;
     ret = QueryCredentialUserId(credentialNode->credentialId, &userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("query userId failed");
@@ -566,7 +566,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         LOG_ERROR("userId is not matched");
         ret = RESULT_GENERAL_ERROR;
         goto EXIT;
-    } 
+    }
     *credentialId = credentialNode->credentialId;
 EXIT:
     DestroyLinkedList(credList);
