@@ -22,9 +22,17 @@ ohos_shared_library("intell_voice_trigger_manager_service_1.0") {
   ]
 
   sources = [
+    "../../utils/memory_guard.cpp",
     "intell_voice_trigger_adapter_impl.cpp",
     "intell_voice_trigger_manager_impl.cpp",
   ]
+
+  defines = []
+  if (use_musl) {
+    if (use_jemalloc && use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
 
   if (is_standard_system) {
     external_deps = [
