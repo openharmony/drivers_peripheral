@@ -347,6 +347,10 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
             rc = RET_CODE_NOT_SUPPORT;
         }
+        if (error == -EBUSY) {
+            HILOG_ERROR(LOG_CORE, "%s: Devcie is busy.", __FUNCTION__);
+            rc = RET_CODE_DEVICE_BUSY;
+        }
         nl_cb_put(cb);
     } while (0);
 
@@ -546,9 +550,14 @@ int32_t WifiDriverClientInit(void)
         return RET_CODE_FAILURE;
     }
 
+    if (InitEventcallbackMutex() != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: init callbackmutex failed.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
     if (pthread_mutex_init(&g_wifiHalInfo.mutex, NULL) != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: init mutex failed.", __FUNCTION__);
-        return RET_CODE_FAILURE;
+        goto err_mutex;
     }
 
     if (ConnectCmdSocket() != RET_CODE_SUCCESS) {
@@ -573,6 +582,8 @@ err_event:
     DisconnectCmdSocket();
 err_cmd:
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
+err_mutex:
+    DeinitEventcallbackMutex();
     return RET_CODE_FAILURE;
 }
 
@@ -593,6 +604,7 @@ void WifiDriverClientDeinit(void)
     }
 
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
+    DeinitEventcallbackMutex();
 }
 
 static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
