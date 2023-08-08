@@ -537,6 +537,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         LOG_ERROR("QueryScheduleAtl failed");
         return ret;
     }
+    ret = RESULT_UNKNOWN;
     uint32_t veriferSensorHint = GetScheduleVeriferSensorHint(schedule);
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, context->authType);
@@ -545,31 +546,29 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL || credList->getSize(credList) != 1) {
         LOG_ERROR("query credential failed");
-        DestroyLinkedList(credList);
-        return RESULT_UNKNOWN;
+        goto EXIT;
     }
     if (credList->head == NULL || credList->head->data == NULL) {
         LOG_ERROR("list node is invalid");
-        DestroyLinkedList(credList);
-        return RESULT_UNKNOWN;
+        goto EXIT;
     }
     CredentialInfoHal *credentialNode = (CredentialInfoHal *)credList->head->data;
     int32_t userId;
     ret = QueryCredentialUserId(credentialNode->credentialId, &userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("query userId failed");
-        DestroyLinkedList(credList);
-        return ret;
+        goto EXIT;
     }
     if (authMode == SCHEDULE_MODE_IDENTIFY) {
         context->userId = userId;
     }
     if (userId != context->userId) {
         LOG_ERROR("userId is not matched");
-        DestroyLinkedList(credList);
-        return RESULT_GENERAL_ERROR;
+        ret = RESULT_GENERAL_ERROR;
+        goto EXIT;
     } 
     *credentialId = credentialNode->credentialId;
+EXIT:
     DestroyLinkedList(credList);
     return ret;
 }
