@@ -110,6 +110,7 @@ ohos_unittest("test_function") {
 ohos_unittest("test_request") {
   sources = [
     "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
+    "src/usbd_interface_test.cpp",
     "src/usbd_request_test.cpp",
   ]
 
