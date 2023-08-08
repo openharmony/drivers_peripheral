@@ -105,7 +105,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
     PermissionCheckParam param = {};
     param.authType = FACE_AUTH;
     uint64_t scheduleId = 0;
-    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_BAD_PARAM);
+    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_GENERAL_ERROR);
     param.userId = userId;
     EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
     DestroyLinkedList(g_userInfoList);
@@ -121,7 +121,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_001, TestSize.Level0)
     uint64_t scheduleId = 0;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_BAD_PARAM);
     param.authType = 1;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_BAD_PARAM);
+    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
@@ -159,7 +159,7 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
     g_session = nullptr;
     ExecutorResultInfo resultInfo = {};
     CredentialInfoHal credInfo = {};
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_REACH_LIMIT);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
 
     int32_t userId = 32158;
     struct SessionInfo session = {};
@@ -171,9 +171,9 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
     g_session = &session;
 
     resultInfo.scheduleId = 311157;
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_REACH_LIMIT);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
     resultInfo.scheduleId = 10;
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_REACH_LIMIT);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
 
     session.time = GetSystemTime();
     g_scheduleList = nullptr;

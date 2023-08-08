@@ -561,9 +561,11 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         DestroyLinkedList(credList);
         return ret;
     }
-
+    if (authMode == SCHEDULE_MODE_IDENTIFY) {
+        context->userId = userId；
+    }
     if (userId != context->userId) {
-        LOG_ERROR("userId is not matched, userId: %{public}d, %{public}d", userId, context->userId);
+        LOG_ERROR("userId is not matched");
         DestroyLinkedList(credList);
         return RESULT_GENERAL_ERROR;
     } 
