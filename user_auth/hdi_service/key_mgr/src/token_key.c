@@ -12,55 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <string.h>
 
 #include "token_key.h"
+
+#define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
 
 /*
  * The key here is only for example.
  * The real scene key needs to be obtained from huks, and the key life cycle is consistent with huks key.
  */
-Buffer *GetTokenHmacKey(void)
-{
-    return CreateBufferByData((uint8_t *)HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN);
-}
-
-Buffer *GetTokenAesKey(void)
-{
-    return CreateBufferByData((uint8_t *)HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN);
-}
-
 ResultCode GetTokenKey(HksAuthTokenKey *key)
 {
-    ResultCode ret = RESULT_SUCCESS;
-    Buffer *macKey = GetTokenHmacKey();
-    if (!IsBufferValid(macKey)) {
-        LOG_ERROR("lack of memory");
-        ret =  RESULT_NO_MEMORY;
-        goto EXIT;
-    }
-
-    Buffer *cipherKey = GetTokenAesKey();
-    if (!IsBufferValid(cipherKey)) {
-        LOG_ERROR("lack of memory");
-        ret =  RESULT_NO_MEMORY;
-        goto EXIT;
-    }
-
-    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, macKey->buf, macKey->contentSize) != EOK) {
+    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("macKey copy error");
-        ret =  RESULT_BAD_COPY;
-        goto EXIT;
+        return RESULT_BAD_COPY;
     }
 
-    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, cipherKey->buf, cipherKey->contentSize) != EOK) {
+    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("cipherKey copy error");
-        ret =  RESULT_BAD_COPY;
-        goto EXIT;
+        return RESULT_BAD_COPY;
     }
 
-EXIT:
-    DestoryBuffer(macKey);
-    DestoryBuffer(cipherKey);
-    return ret;
+    return RESULT_SUCCESS;
 }

@@ -70,7 +70,6 @@ IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuth
     }
 
 EXIT:
-    DestoryBuffer(key);
     DestoryBuffer(sign);
     return ret;
 }
