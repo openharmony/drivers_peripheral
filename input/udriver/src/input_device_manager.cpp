@@ -128,7 +128,8 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t si
             evtPkg[i]->type = iEvent.type;
             evtPkg[i]->code = iEvent.code;
             evtPkg[i]->value = iEvent.value;
-            evtPkg[i]->timestamp = iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND + iEvent.time.tv_usec;
+            evtPkg[i]->timestamp = (uint64_t)iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND + 
+                                    (uint64_t)iEvent.time.tv_usec;
         }
         for (auto &callbackFunc : reportEventPkgCallback_) {
             uint32_t index {0};
@@ -269,10 +270,13 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
                 inputDevList.fd = fd;
                 detailInfo->devIndex = devIndex_;
                 detailInfo->devType = type;
-                (void)memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
-                    devPathNode.c_str(), devPathNode.length());
-                (void)memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
-                    sizeof(InputDeviceInfo));
+                if (memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
+                    devPathNode.c_str(), devPathNode.length()) != EOK ||
+                    memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
+                    sizeof(InputDeviceInfo)) != EOK) {
+                    HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+                    return;
+                }
                 inputDevList_.insert_or_assign(devIndex_, inputDevList);
                 devIndex_ += 1;
             }
@@ -352,8 +356,12 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
         inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
         inputDevList.fd = fd;
         detailInfo->devIndex = devIndex_;
-        (void)memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length());
-        (void)memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(), sizeof(InputDeviceInfo));
+        if (memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length()) != EOK ||
+            memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
+            sizeof(InputDeviceInfo)) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+            return;
+        }
         inputDevList_.insert_or_assign(devIndex_, inputDevList);
     }
     status = INPUT_DEVICE_STATUS_OPENED;
@@ -592,12 +600,15 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
 
     if (devInfo == nullptr || deviceIndex > MAX_SUPPORT_DEVS) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return INPUT_FAILURE;
+        return ret;
     }
     auto it = inputDevList_.find(deviceIndex);
     if (it != inputDevList_.end()) {
-        (void)memcpy_s(*devInfo, sizeof(InputDeviceInfo), &it->second.detailInfo, sizeof(InputDeviceInfo));
         ret = INPUT_SUCCESS;
+        if (memcpy_s(*devInfo, sizeof(InputDeviceInfo), &it->second.detailInfo, sizeof(InputDeviceInfo)) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+            ret = INPUT_FAILURE;
+        }
     }
     HDF_LOGD("%{public}s: devIndex: %{public}d ret: %{public}d", __func__, deviceIndex, ret);
     return ret;
@@ -617,8 +628,11 @@ int32_t InputDeviceManager::GetDeviceList(uint32_t *devNum, InputDeviceInfo **de
         return INPUT_FAILURE;
     }
     for (size_t i = 0; i < scanCount; i++) {
-        (void)memcpy_s((*deviceList) + i, sizeof(InputDeviceInfo), &inputDevList_[i].detailInfo,
-            sizeof(InputDeviceInfo));
+        if (memcpy_s((*deviceList) + i, sizeof(InputDeviceInfo), &inputDevList_[i].detailInfo,
+            sizeof(InputDeviceInfo)) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+            return INPUT_FAILURE;
+        }
     }
     *devNum = inputDevList_.size();
     HDF_LOGD("%{public}s: devNum: %{public}u devIndex_: %{public}d", __func__, *devNum, devIndex_);
@@ -652,7 +666,10 @@ RetStatus InputDeviceManager::GetChipInfo(uint32_t devIndex, char *chipInfo, uin
 {
     RetStatus rc = INPUT_SUCCESS;
 
-    (void)memcpy_s(chipInfo, length, inputDevList_[devIndex].detailInfo.chipInfo, length);
+    if (memcpy_s(chipInfo, length, inputDevList_[devIndex].detailInfo.chipInfo, length) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        rc = INPUT_FAILURE;
+    }
     HDF_LOGI("%{public}s: chipInfo: %{public}s", __func__, chipInfo);
     return rc;
 }
@@ -661,7 +678,10 @@ RetStatus InputDeviceManager::GetVendorName(uint32_t devIndex, char *vendorName,
 {
     RetStatus rc = INPUT_SUCCESS;
 
-    (void)memcpy_s(vendorName, length, inputDevList_[devIndex].detailInfo.vendorName, length);
+    if (memcpy_s(vendorName, length, inputDevList_[devIndex].detailInfo.vendorName, length) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        rc = INPUT_FAILURE;
+    }
     HDF_LOGI("%{public}s: vendorName: %{public}s", __func__, vendorName);
     return rc;
 }
@@ -670,7 +690,10 @@ RetStatus InputDeviceManager::GetChipName(uint32_t devIndex, char *chipName, uin
 {
     RetStatus rc = INPUT_SUCCESS;
 
-    (void)memcpy_s(chipName, length, inputDevList_[devIndex].detailInfo.chipName, length);
+    if (memcpy_s(chipName, length, inputDevList_[devIndex].detailInfo.chipName, length) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        rc = INPUT_FAILURE;
+    }
     HDF_LOGI("%{public}s: chipName: %{public}s", __func__, chipName);
     return rc;
 }
