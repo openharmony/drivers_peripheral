@@ -337,7 +337,7 @@ static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nam
         return HDF_ERR_IO;
     }
 
-    fnnew.nameLen = nameLen;
+    fnnew.nameLen = (int32_t)nameLen;
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
@@ -366,7 +366,7 @@ static int32_t UsbFnAdapterDelInterface(const char *interfaceName, int32_t nameL
         return HDF_ERR_IO;
     }
 
-    fnnew.nameLen = nameLen;
+    fnnew.nameLen = (uint32_t)nameLen;
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
