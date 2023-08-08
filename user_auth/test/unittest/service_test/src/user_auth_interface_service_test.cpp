@@ -375,7 +375,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_002, TestSize.Lev
     std::vector<uint8_t> authToken;
     EnrollParam param = {};
     ScheduleInfoV1_1 scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), 2);
+    EXPECT_EQ(service->BeginEnrollmentV1_1(userId, authToken, param, scheduleInfo), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_003, TestSize.Level0)
@@ -691,7 +691,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_003, TestS
     std::vector<uint8_t> scheduleResult;
     scheduleResult.resize(sizeof(ExecutorResultInfo));
     AuthResultInfo authResultInfo = {};
-    EXPECT_EQ(service->UpdateAuthenticationResult(contextId, scheduleResult, authResultInfo), 2);
+    EXPECT_EQ(service->UpdateAuthenticationResult(contextId, scheduleResult, authResultInfo), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestSize.Level0)
@@ -906,7 +906,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_001, TestS
     EXPECT_EQ(service->UpdateIdentificationResult(contextId, scheduleResult, identityResultInfo), 8);
 
     scheduleResult.resize(240);
-    EXPECT_EQ(service->UpdateIdentificationResult(contextId, scheduleResult, identityResultInfo), 2);
+    EXPECT_EQ(service->UpdateIdentificationResult(contextId, scheduleResult, identityResultInfo), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_002, TestSize.Level0)
