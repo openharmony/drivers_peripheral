@@ -32,7 +32,8 @@ using PinAuthInterfaceService = OHOS::HDI::PinAuth::V1_1::PinAuthInterfaceServic
 using IExecutorV1_0 = OHOS::HDI::PinAuth::V1_0::IExecutor;
 using IExecutor = OHOS::HDI::PinAuth::V1_1::IExecutor;
 
-using IExecutorCallback = OHOS::HDI::PinAuth::V1_1::IExecutorCallback;
+using IExecutorCallback = OHOS::HDI::PinAuth::V1_0::IExecutorCallback;
+using IExecutorCallbackV1_1 = OHOS::HDI::PinAuth::V1_1::IExecutorCallback;
 
 using AuthType = OHOS::HDI::PinAuth::V1_0::AuthType;
 using ExecutorRole = OHOS::HDI::PinAuth::V1_0::ExecutorRole;

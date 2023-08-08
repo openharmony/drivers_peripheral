@@ -161,6 +161,17 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
     return HDF_SUCCESS;
 }
 
+int32_t ExecutorImpl::EnrollV1_1(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
+    const sptr<IExecutorCallbackV1_1> &callbackObj)
+{
+    IAM_LOGI("interface mock start");
+    static_cast<void>(scheduleId);
+    static_cast<void>(extraInfo);
+    static_cast<void>(callbackObj);
+
+    return HDF_SUCCESS;
+}
+
 int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
     const sptr<IExecutorCallback> &callbackObj)
 {
@@ -209,6 +220,18 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
         }
         return result;
     }
+
+    return HDF_SUCCESS;
+}
+
+int32_t ExecutorImpl::AuthenticateV1_1(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+    const sptr<IExecutorCallbackV1_1> &callbackObj)
+{
+    IAM_LOGI("interface mock start");
+    static_cast<void>(scheduleId);
+    static_cast<void>(templateId);
+    static_cast<void>(extraInfo);
+    static_cast<void>(callbackObj);
 
     return HDF_SUCCESS;
 }

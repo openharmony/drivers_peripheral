@@ -41,8 +41,12 @@ public:
     int32_t OnSetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data) override;
     int32_t Enroll(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
+    int32_t EnrollV1_1(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
+        const sptr<IExecutorCallbackV1_1> &callbackObj) override;
     int32_t Authenticate(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
+    int32_t AuthenticateV1_1(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+        const sptr<IExecutorCallbackV1_1> &callbackObj) override;
     int32_t Delete(uint64_t templateId) override;
     int32_t Cancel(uint64_t scheduleId) override;
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
