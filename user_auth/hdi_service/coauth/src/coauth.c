@@ -119,7 +119,7 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
     }
 
     if (g_scheduleList->getSize(g_scheduleList) >= MAX_SCHEDULE_NUM) {
-        LOG_ERROR("to many schedules already");
+        LOG_ERROR("too many schedules already");
         DestroyCoAuthSchedule(schedule);
         return RESULT_GENERAL_ERROR;
     }
