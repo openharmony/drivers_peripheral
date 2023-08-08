@@ -562,7 +562,7 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         return ret;
     }
     if (authMode == SCHEDULE_MODE_IDENTIFY) {
-        context->userId = userId；
+        context->userId = userId;
     }
     if (userId != context->userId) {
         LOG_ERROR("userId is not matched");
