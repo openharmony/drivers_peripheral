@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #define HDF_LOG_TAG USB_LINUX_ADAPTER
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define PATH_LEN             50
 #define DESC_READ_LEN        256
@@ -417,7 +418,7 @@ static int32_t OsSubmitControlRequest(struct UsbHostRequest *request)
     urb->type = USB_ADAPTER_URB_TYPE_CONTROL;
     urb->endPoint = request->endPoint;
     urb->buffer = request->buffer;
-    urb->bufferLength = request->length;
+    urb->bufferLength = (int32_t)request->length;
     urb->userContext = request;
     request->urbs = urb;
     request->numUrbs = 1;
@@ -458,8 +459,8 @@ static int32_t OsSubmitBulkRequestHandleUrb(
     urb->endPoint = request->endPoint;
     urb->buffer = request->buffer + (number * bulkBufferLen);
     if (number == request->numUrbs - 1) {
-        uint32_t len = request->length % bulkBufferLen;
-        urb->bufferLength = (len == 0) ? bulkBufferLen : len;
+        uint32_t len = (uint32_t)(request->length % bulkBufferLen);
+        urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : len;
     } else {
         urb->bufferLength = bulkBufferLen;
     }
@@ -523,11 +524,13 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
     }
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {
-        bulkBufferLen = request->length ? request->length : 1;
+        // The 1 is to prevent division by zero errors
+        bulkBufferLen = (int32_t)request->length ? request->length : 1;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_CONTINUATION) {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     } else if (request->devHandle->caps & USB_ADAPTER_CAP_NO_PACKET_SIZE_LIM) {
-        bulkBufferLen = request->length ? request->length : 1;
+        // The 1 is to prevent division by zero errors
+        bulkBufferLen = (int32_t)request->length ? request->length : 1;
     } else {
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     }
@@ -578,7 +581,7 @@ static int32_t OsAllocIsoUrbs(struct UsbHostRequest *request, int32_t numUrbs, s
 
         for (j = 0; j < numPackets; j++) {
             unsigned int packetLen = request->isoPacketDesc[packetIdx++].length;
-            urb->bufferLength += packetLen;
+            urb->bufferLength += (int32_t)packetLen;
             urb->isoFrameDesc[j].length = packetLen;
         }
         urb->type = USB_ADAPTER_URB_TYPE_ISO;
@@ -1226,7 +1229,7 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
     request = (struct UsbHostRequest *)memBuf;
     request->numIsoPackets = isoPackets;
     request->buffer = (unsigned char *)memBuf + allocSize - len;
-    request->bufLen = len;
+    request->bufLen = (int32_t)len;
     request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
         HDF_LOGE("%{public}s RawUsbMemAlloc fail", __func__);
@@ -1309,7 +1312,7 @@ static int32_t AdapterFreeRequest(struct UsbHostRequest *request)
     RawUsbMemFree(request);
 #else
     size_t allocSize = sizeof(struct UsbHostRequest) +
-        (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets)) + request->bufLen;
+        (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets)) + (size_t)request->bufLen;
     if (munmap((void *)request, allocSize) != 0) {
         HDF_LOGE("%{public}s:%d munmap failed, errno=%d", __func__, __LINE__, errno);
         return HDF_ERR_IO;
