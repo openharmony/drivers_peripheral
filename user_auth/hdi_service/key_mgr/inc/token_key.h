@@ -22,15 +22,12 @@
 extern "C" {
 #endif
 
-#define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
 #define HKS_DEFAULT_USER_AT_KEY_LEN 32
 typedef struct HksAuthTokenKey {
     uint8_t macKey[HKS_DEFAULT_USER_AT_KEY_LEN];
     uint8_t cipherKey[HKS_DEFAULT_USER_AT_KEY_LEN];
 } HksAuthTokenKey;
 
-Buffer *GetTokenHmacKey(void);
-Buffer *GetTokenAesKey(void);
 ResultCode GetTokenKey(HksAuthTokenKey *key);
 
 #ifdef __cplusplus
