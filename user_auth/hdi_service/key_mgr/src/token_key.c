@@ -23,12 +23,14 @@
  */
 ResultCode GetTokenKey(HksAuthTokenKey *key)
 {
-    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
+    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, 
+        HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("macKey copy error");
         return RESULT_BAD_COPY;
     }
 
-    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
+    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY,
+        HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("cipherKey copy error");
         return RESULT_BAD_COPY;
     }
