@@ -88,7 +88,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
 
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
     if (executorResultInfo == NULL) {
-        LOG_ERROR("executorResultInfo is null");
+        LOG_ERROR("CreateExecutorResultInfo fail");
         DestoryContext(userAuthContext);
         return RESULT_GENERAL_ERROR;
     }

@@ -73,7 +73,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
     uint64_t credentialId;
     ret = FillInContext(identifyContext, &credentialId, executorResultInfo, SCHEDULE_MODE_IDENTIFY);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("FillInContext failed");
+        LOG_ERROR("FillInContext fail");
         goto EXIT;
     }
     ret = GetTokenDataAndSign(identifyContext, credentialId, SCHEDULE_MODE_IDENTIFY, token);

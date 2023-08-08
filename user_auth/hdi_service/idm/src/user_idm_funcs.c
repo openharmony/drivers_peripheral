@@ -78,9 +78,9 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
     return GenerateSchedule(&scheduleParam);
 }
 
-IAM_STATIC ResultCode GeneratCoAuthSchedule(PermissionCheckParam param, bool isUpdate, uint64_t *scheduleId)
+IAM_STATIC ResultCode GenerateCoAuthSchedule(PermissionCheckParam *param, bool isUpdate, uint64_t *scheduleId)
 {
-    CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(&param);
+    CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(param);
     if (enrollSchedule == NULL) {
         LOG_ERROR("enrollSchedule malloc failed");
         return RESULT_NO_MEMORY;
@@ -90,7 +90,7 @@ IAM_STATIC ResultCode GeneratCoAuthSchedule(PermissionCheckParam param, bool isU
         LOG_ERROR("add coauth schedule failed");
         goto EXIT;
     }
-    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param.authType, isUpdate);
+    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm associate coauth schedule failed");
         RemoveCoAuthSchedule(enrollSchedule->scheduleId);
@@ -127,7 +127,7 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
         }
     }
     
-    return GeneratCoAuthSchedule(param, false, scheduleId);
+    return GenerateCoAuthSchedule(&param, false, scheduleId);
 }
 
 ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId)
@@ -152,7 +152,7 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         return RESULT_VERIFY_TOKEN_FAIL;
     }
     
-    return GeneratCoAuthSchedule(param, true, scheduleId);
+    return GenerateCoAuthSchedule(&param, true, scheduleId);
 }
 
 IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const ExecutorResultInfo *result,

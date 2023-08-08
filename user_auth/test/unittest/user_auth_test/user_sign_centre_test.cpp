@@ -18,12 +18,13 @@
 #include <cstring>
 
 #include "adaptor_time.h"
+#include "token_key.h"
 #include "user_sign_centre.h"
 
 extern "C" {
     extern LinkedList *g_userInfoList;
     extern bool IsTimeValid(const UserAuthTokenHal *userAuthToken);
-    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken);
+    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
     extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken);
     extern ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
     extern ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken);
@@ -69,7 +70,8 @@ HWTEST_F(UserAuthSignTest, TestIsTimeValid, TestSize.Level0)
 HWTEST_F(UserAuthSignTest, TestUserAuthTokenSign, TestSize.Level0)
 {
     UserAuthTokenHal token = {};
-    EXPECT_EQ(UserAuthTokenSign(&token), RESULT_SUCCESS);
+    HksAuthTokenKey userAuthTokenKey = {};
+    EXPECT_EQ(UserAuthTokenSign(&token, &userAuthTokenKey), RESULT_SUCCESS);
 }
 
 HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
@@ -104,8 +106,10 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
         .enrolledId = testEnrolledId,
         .credentialId = testCredentialId,
     };
+    HksAuthTokenKey userAuthTokenKey = {};
+    EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(GetTokenDataCipherResult(&data, &token), RESULT_SUCCESS);
-    EXPECT_EQ(UserAuthTokenSign(&token), RESULT_SUCCESS);
+    EXPECT_EQ(UserAuthTokenSign(&token, &userAuthTokenKey), RESULT_SUCCESS);
     UserAuthTokenPlain userAuthTokenPlain = {};
     EXPECT_EQ(UserAuthTokenVerify(&token, &userAuthTokenPlain), RESULT_SUCCESS);
     EXPECT_EQ(memcmp(&(userAuthTokenPlain.tokenDataPlain), &(token.tokenDataPlain),
@@ -131,13 +135,15 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
 {
     UserAuthTokenHal userAuthToken = {};
     UserAuthTokenPlain userAuthTokenPlain = {};
+    HksAuthTokenKey userAuthTokenKey = {};
+    EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenVerify(nullptr, &userAuthTokenPlain), RESULT_BAD_PARAM);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, nullptr), RESULT_BAD_PARAM);
     userAuthToken.tokenDataPlain.time = UINT64_MAX;
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_TOKEN_TIMEOUT);
     userAuthToken.tokenDataPlain.time = GetSystemTime();
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_BAD_SIGN);
-    EXPECT_EQ(UserAuthTokenSign(&userAuthToken), RESULT_SUCCESS);
+    EXPECT_EQ(UserAuthTokenSign(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth

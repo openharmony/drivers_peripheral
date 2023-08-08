@@ -270,7 +270,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_002, TestSize.Level0)
     std::vector<uint8_t> authToken;
     EnrollParam param = {};
     ScheduleInfo scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollment(userId, authToken, param, scheduleInfo), 8);
+    EXPECT_EQ(service->BeginEnrollment(userId, authToken, param, scheduleInfo), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_003, TestSize.Level0)
