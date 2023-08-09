@@ -42,13 +42,12 @@ protected:
     public:
         PortHandler() = default;
         virtual ~PortHandler() = default;
-        explicit PortHandler(std::shared_ptr<IPort>& p, const std::string& name);
+        explicit PortHandler(std::shared_ptr<IPort>& p);
         RetCode StartCollectBuffers();
         RetCode StopCollectBuffers();
         RetCode StartDistributeBuffers();
         RetCode StopDistributeBuffers();
         void OnBuffer(std::shared_ptr<IBuffer>& buffer);
-        std::string cameraIdsp_;
 
     private:
         void CollectBuffers();
@@ -69,10 +68,6 @@ protected:
         std::condition_variable rbcv;
         std::mutex rblock;
         std::list<std::shared_ptr<IBuffer>> respondBufferList = {};
-        int count_ = 0;
-        std::map<int32_t, uint8_t*> sfBuffer;
-        std::map<int32_t, uint8_t*> cBuffer;
-        std::string portName_;
     };
 
     std::mutex hndl_ = {};

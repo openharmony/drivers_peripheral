@@ -119,7 +119,7 @@ private:
     std::shared_ptr<HosFileFormat> myFileFormat_ = nullptr;
     std::shared_ptr<HosV4L2Control> myControl_ = nullptr;
 
-    enum v4l2_memory memoryType_ = V4L2_MEMORY_USERPTR;
+    enum v4l2_memory memoryType_ = V4L2_MEMORY_MMAP;
     enum v4l2_buf_type bufferType_ = V4L2_BUF_TYPE_PRIVATE;
 };
 } // namespace OHOS::Camera
