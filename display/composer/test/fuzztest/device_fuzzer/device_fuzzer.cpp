@@ -33,6 +33,8 @@ static bool g_isInit = false;
 static const uint8_t* g_data = nullptr;
 static size_t g_dataSize = 0;
 static size_t g_pos;
+static bool g_isSetClientBufSuc = false;
+static const BufferHandle* g_buffer = nullptr;
 
 /*
 * describe: get data from outside untrusted data(g_data) which size is according to sizeof(T)
@@ -105,6 +107,7 @@ static int32_t GetAllocInfo(AllocInfo& info)
     info.usage = CONVERT_TABLE_USAGE[GetData<uint32_t>() % lenUsage];
     info.format = CONVERT_TABLE_FORMAT[GetData<uint32_t>() % lenFormat];
     info.expectedSize = info.width * info.height;
+
     return DISPLAY_SUCCESS;
 }
 
@@ -290,17 +293,29 @@ int32_t TestSetDisplayClientCrop(uint32_t devId)
 int32_t TestSetDisplayClientBuffer(uint32_t devId)
 {
     int32_t fence = GetData<int32_t>();
-    const BufferHandle* buffer = UsingAllocmem();
-    if (buffer == nullptr) {
-        HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
-        return DISPLAY_FAILURE;
+
+    if (g_buffer == nullptr) {
+        g_buffer = UsingAllocmem();
     }
-    uint32_t seqNo = GetData<uint32_t>();
-    int32_t ret = g_composerInterface->SetDisplayClientBuffer(devId, buffer, seqNo, fence);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function TestSetDisplayClientBuffer failed", __func__);
+
+    int32_t ret = DISPLAY_FAILURE;
+    if (g_buffer == nullptr) {
+        HDF_LOGE("%{public}s: g_buffer is nullptr", __func__);
+        return ret;
     }
-    g_bufferInterface->FreeMem(*buffer);
+
+    if (!g_isSetClientBufSuc) {
+        ret = g_composerInterface->SetDisplayClientBuffer(devId, g_buffer, 0, fence);
+    } else {
+        ret = g_composerInterface->SetDisplayClientBuffer(devId, nullptr, 0, fence);
+    }
+
+    if (ret == DISPLAY_SUCCESS) {
+        g_isSetClientBufSuc = true;
+    } else {
+        HDF_LOGE("%{public}s: function SetDisplayClientBuffer failed", __func__);
+    }
+
     return ret;
 }
 
