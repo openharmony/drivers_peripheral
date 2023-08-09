@@ -60,11 +60,10 @@ RetCode SourceNode::Start(const int32_t streamId)
     }
 
     SetBufferCallback();
-    std::shared_ptr<PortHandler> ph = std::make_shared<PortHandler>(port, name_);
+    std::shared_ptr<PortHandler> ph = std::make_shared<PortHandler>(port);
     CHECK_IF_PTR_NULL_RETURN_VALUE(ph, RC_ERROR);
     {
         std::lock_guard<std::mutex> l(hndl_);
-        ph->cameraIdsp_ = cameraIds_;
         handler_[streamId] = ph;
     }
     RetCode rc = handler_[streamId]->StartCollectBuffers();
@@ -168,7 +167,7 @@ RetCode SourceNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p, const std::string& name) : port(p), portName_(name)
+SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p) : port(p)
 {
 }
 
@@ -214,13 +213,6 @@ RetCode SourceNode::PortHandler::StopCollectBuffers()
             node->DeliverBuffer(buffer);
         }
     }
-    if (portName_ == "uvc#0") {
-        for (auto iter : cBuffer) {
-            free(iter.second);
-        }
-        cBuffer.clear();
-        sfBuffer.clear();
-    }
     CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers exit");
     return RC_OK;
 }
@@ -237,27 +229,6 @@ void SourceNode::PortHandler::CollectBuffers()
     std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
     frameSpec->bufferPoolId_ = format.bufferPoolId_;
     frameSpec->bufferCount_ = format.bufferCount_;
-    if (portName_ == "uvc#0") {
-        if (count_ < frameSpec->bufferCount_) {
-            uint8_t* addr = reinterpret_cast<uint8_t*>(malloc(static_cast<uint32_t>(buffer->GetSize())));
-            if (addr == nullptr) {
-                CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
-                return;
-            }
-            sfBuffer.insert(std::make_pair(buffer->GetIndex(), (uint8_t *)buffer->GetVirAddress()));
-            CAMERA_LOGD("surfaceBuffer->GetVirAddr() = %{public}p", buffer->GetVirAddress());
-            cBuffer.insert(std::make_pair(buffer->GetIndex(), (uint8_t *)addr));
-            buffer->SetVirAddress(addr);
-        } else {
-            auto iterMap = cBuffer.find(buffer->GetIndex());
-            if (iterMap == cBuffer.end()) {
-                CAMERA_LOGE("std::map cBuffer no buffer->GetIndex()\n");
-                return;
-            }
-            buffer->SetVirAddress(iterMap->second);
-        }
-        count_++;
-    }
     frameSpec->buffer_ = buffer;
 
     auto node = port->GetNode();
@@ -328,20 +299,6 @@ void SourceNode::PortHandler::OnBuffer(std::shared_ptr<IBuffer>& buffer)
     CAMERA_LOGV("SourceNode::PortHandler::OnBuffer enter");
     {
         std::unique_lock<std::mutex> l(rblock);
-        if (portName_ == "uvc#0") {
-            auto iterMap = sfBuffer.find(buffer->GetIndex());
-            if (iterMap == sfBuffer.end()) {
-                CAMERA_LOGE("std::map sfBuffer no buffer->GetIndex()\n");
-                return;
-            }
-            if (memcpy_s(iterMap->second, buffer->GetSize(), buffer->GetVirAddress(),
-                buffer->GetSize()) != 0) {
-                CAMERA_LOGE("SourceNode::memcpy_s failed");
-                return;
-            }
-            CAMERA_LOGE("surfaceBuffer->GetVirAddr() = %{public}p", iterMap->second);
-            buffer->SetVirAddress(iterMap->second);
-        }
         respondBufferList.emplace_back(buffer);
     }
     rbcv.notify_one();
