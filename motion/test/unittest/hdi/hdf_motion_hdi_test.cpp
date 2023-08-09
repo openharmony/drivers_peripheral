@@ -129,10 +129,10 @@ HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
     }
 
     vector<int32_t> vec;
-    vec.push_back(HDF_MOTION_TYPE_PICKUP);
-    vec.push_back(HDF_MOTION_TYPE_FLIP);
-    vec.push_back(HDF_MOTION_TYPE_SHAKE);
-    vec.push_back(HDF_MOTION_TYPE_ROTATION);
+    vec.push_back(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PICKUP);
+    vec.push_back(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_FLIP);
+    vec.push_back(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_SHAKE);
+    vec.push_back(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_ROTATION);
 
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -167,11 +167,11 @@ HWTEST_F(HdfMotionTest, EnableMotion_002, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_MAX);
+    int32_t ret = g_motionInterface->EnableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_MAX);
     EXPECT_NE(HDF_SUCCESS, ret);
     OsalSleep(2);
 
-    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_MAX);
+    ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_MAX);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
@@ -181,11 +181,11 @@ HWTEST_F(HdfMotionTest, EnableMotion_003, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_WRIST_UP);
+    int32_t ret = g_motionInterface->EnableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WRIST_UP);
     EXPECT_EQ(HDF_SUCCESS, ret);
     OsalSleep(2);
 
-    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_WRIST_UP);
+    ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_WRIST_UP);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -213,9 +213,9 @@ HWTEST_F(HdfMotionTest, DisableMotion_001, TestSize.Level1)
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_PICKUP);
+    ret = g_motionInterface->EnableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PICKUP);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PICKUP);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_motionInterface->Unregister(g_motionCallback);
@@ -228,7 +228,7 @@ HWTEST_F(HdfMotionTest, DisableMotion_002, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_MAX);
+    int32_t ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_MAX);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 
@@ -238,7 +238,7 @@ HWTEST_F(HdfMotionTest, DisableMotion_003, TestSize.Level1)
         ASSERT_NE(nullptr, g_motionInterface);
         return;
     }
-    int32_t ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    int32_t ret = g_motionInterface->DisableMotion(OHOS::HDI::Motion::V1_1::HDF_MOTION_TYPE_PICKUP);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
