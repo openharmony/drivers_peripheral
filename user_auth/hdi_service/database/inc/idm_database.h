@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 
-#include "defines.h"
 #include "adaptor_memory.h"
+#include "defines.h"
 #include "idm_common.h"
 #include "linked_list.h"
 

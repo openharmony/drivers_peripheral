@@ -18,10 +18,10 @@
 
 #include <stdint.h>
 
-#include "buffer.h"
-#include "defines.h"
-#include "context_manager.h"
 #include "adaptor_algorithm.h"
+#include "buffer.h"
+#include "context_manager.h"
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,9 +62,9 @@ typedef struct {
     TokenDataToEncrypt tokenDataToEncrypt;
 } __attribute__((__packed__)) UserAuthTokenPlain;
 
-ResultCode GetTokenDataAndSign(const UserAuthContext *context,
+ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
-ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
+ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
 
 #ifdef __cplusplus
 }

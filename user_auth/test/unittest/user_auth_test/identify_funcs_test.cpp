@@ -63,7 +63,7 @@ HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_002, TestSize.Level0)
     UserAuthContext context = {};
     context.contextId = contextId;
     g_contextList->insert(g_contextList, static_cast<void *>(&context));
-    EXPECT_EQ(DoUpdateIdentify(contextId, scheduleResult, &userId, &token, &result), RESULT_UNKNOWN);
+    EXPECT_EQ(DoUpdateIdentify(contextId, scheduleResult, &userId, &token, &result), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam

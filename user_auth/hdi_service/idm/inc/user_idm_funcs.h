@@ -37,14 +37,14 @@ typedef struct {
     uint64_t credentialId;
 } CredentialDeleteParam;
 
-int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId);
-int32_t CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId);
-int32_t AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret);
-int32_t DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *credentialInfo);
-int32_t QueryCredentialFunc(int32_t userId, uint32_t authType, LinkedList **creds);
-int32_t GetUserInfoFunc(int32_t userId, uint64_t *secureUid, uint64_t *pinSubType, EnrolledInfoHal **enrolledInfoArray,
-    uint32_t *enrolledNum);
-int32_t UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId,
+ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId);
+ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleId);
+ResultCode AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret);
+ResultCode DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *credentialInfo);
+ResultCode QueryCredentialFunc(int32_t userId, uint32_t authType, LinkedList **creds);
+ResultCode GetUserInfoFunc(int32_t userId, uint64_t *secureUid, uint64_t *pinSubType,
+    EnrolledInfoHal **enrolledInfoArray, uint32_t *enrolledNum);
+ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId,
     CredentialInfoHal *deletedCredential, Buffer **rootSecret);
 
 #ifdef __cplusplus

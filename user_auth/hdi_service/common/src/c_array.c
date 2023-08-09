@@ -17,6 +17,7 @@
 
 #include "securec.h"
 
+#include "adaptor_log.h"
 #include "adaptor_memory.h"
 
 void DestroyUint8Array(Uint8Array **array)

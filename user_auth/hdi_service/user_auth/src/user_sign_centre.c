@@ -20,8 +20,8 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
-#include "token_key.h"
 #include "idm_database.h"
+#include "token_key.h"
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
 
@@ -46,17 +46,14 @@ IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
     return true;
 }
 
-IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken)
+IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
 {
-    Buffer *key = GetTokenHmacKey();
     Buffer *sign = NULL;
     ResultCode ret = RESULT_GENERAL_ERROR;
-    if (!IsBufferValid(key)) {
-        LOG_ERROR("lack of member");
-        goto EXIT;
-    }
+
     const Buffer data = GetTmpBuffer((uint8_t *)userAuthToken, AUTH_TOKEN_DATA_LEN, AUTH_TOKEN_DATA_LEN);
-    ret = HmacSha256(key, &data, &sign);
+    const Buffer key = GetTmpBuffer(tokenKey->macKey, sizeof(tokenKey->macKey), sizeof(tokenKey->macKey));
+    ret = HmacSha256(&key, &data, &sign);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("HmacSha256 failed");
         goto EXIT;
@@ -73,7 +70,6 @@ IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken)
     }
 
 EXIT:
-    DestoryBuffer(key);
     DestoryBuffer(sign);
     return ret;
 }
@@ -86,10 +82,11 @@ IAM_STATIC void DeinitAesGcmParam(AesGcmParam *aesGcmParam)
     (void)memset_s(aesGcmParam, sizeof(AesGcmParam), 0, sizeof(AesGcmParam));
 }
 
-IAM_STATIC ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain)
+IAM_STATIC ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain,
+    HksAuthTokenKey *tokenKey)
 {
     AesGcmParam aesGcmParam = {
-        .key = GetTokenAesKey(),
+        .key = CreateBufferByData(tokenKey->cipherKey, sizeof(tokenKey->cipherKey)),
         .iv = CreateBufferByData(userAuthToken->iv, sizeof(userAuthToken->iv)),
         .aad = CreateBufferByData((uint8_t *)AES_GCM_TOKEN_AAD, AES_GCM_TOKEN_AAD_SIZE),
     };
@@ -126,18 +123,13 @@ EXIT:
     return ret;
 }
 
-IAM_STATIC ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken)
+IAM_STATIC ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
 {
-    Buffer *key = GetTokenHmacKey();
     Buffer *rightSign = NULL;
     ResultCode ret = RESULT_SUCCESS;
-    if (key == NULL) {
-        LOG_ERROR("lack of member");
-        ret = RESULT_NO_MEMORY;
-        goto EXIT;
-    }
     const Buffer data = GetTmpBuffer((uint8_t *)userAuthToken, AUTH_TOKEN_DATA_LEN, AUTH_TOKEN_DATA_LEN);
-    ret = HmacSha256(key, &data, &rightSign);
+    const Buffer key = GetTmpBuffer(tokenKey->macKey, sizeof(tokenKey->macKey), sizeof(tokenKey->macKey));
+    ret = HmacSha256(&key, &data, &rightSign);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("HmacSha256 failed");
         goto EXIT;
@@ -149,12 +141,11 @@ IAM_STATIC ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthTok
     }
 
 EXIT:
-    DestoryBuffer(key);
     DestoryBuffer(rightSign);
     return ret;
 }
 
-ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain)
+ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain)
 {
     if (userAuthToken == NULL || tokenPlain == NULL) {
         LOG_ERROR("userAuthToken is null");
@@ -164,21 +155,29 @@ ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, UserAuthTo
         LOG_ERROR("token timeout");
         return RESULT_TOKEN_TIMEOUT;
     }
-    ResultCode ret = CheckUserAuthTokenHmac(userAuthToken);
+    HksAuthTokenKey tokenKey = {};
+    ResultCode ret = GetTokenKey(&tokenKey);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetTokenKey fail");
+        (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
+        return ret;
+    }
+    ret = CheckUserAuthTokenHmac(userAuthToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("UserAuthTokenVerify fail");
+        (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
         return ret;
     }
     tokenPlain->tokenDataPlain = userAuthToken->tokenDataPlain;
-    ret = DecryptTokenCipher(userAuthToken, tokenPlain);
+    ret = DecryptTokenCipher(userAuthToken, tokenPlain, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("DecryptTokenCipher fail");
-        return ret;
     }
+    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataPlain(const UserAuthContext *context, uint32_t authMode, UserAuthTokenHal *authToken)
+IAM_STATIC ResultCode GetTokenDataPlain(UserAuthContext *context, uint32_t authMode, UserAuthTokenHal *authToken)
 {
     authToken->version = TOKEN_VERSION;
     if (memcpy_s(authToken->tokenDataPlain.challenge, CHALLENGE_LEN, context->challenge, CHALLENGE_LEN) != EOK) {
@@ -192,10 +191,10 @@ IAM_STATIC ResultCode GetTokenDataPlain(const UserAuthContext *context, uint32_t
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode InitAesGcmParam(AesGcmParam *aesGcmParam)
+IAM_STATIC ResultCode InitAesGcmParam(AesGcmParam *aesGcmParam, const HksAuthTokenKey *tokenKey)
 {
     int32_t ret = RESULT_GENERAL_ERROR;
-    aesGcmParam->key = GetTokenAesKey();
+    aesGcmParam->key = CreateBufferByData(tokenKey->cipherKey, sizeof(tokenKey->cipherKey));
     aesGcmParam->iv = CreateBufferBySize(AES_GCM_IV_SIZE);
     aesGcmParam->aad = CreateBufferByData((uint8_t *)AES_GCM_TOKEN_AAD, AES_GCM_TOKEN_AAD_SIZE);
     if (!IsBufferValid(aesGcmParam->key) || !IsBufferValid(aesGcmParam->iv) || !IsBufferValid(aesGcmParam->aad)) {
@@ -267,12 +266,13 @@ IAM_STATIC ResultCode GetTokenDataToEncrypt(const UserAuthContext *context, uint
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken)
+IAM_STATIC ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
+    const HksAuthTokenKey *tokenKey)
 {
     AesGcmParam aesGcmParam = {0};
     Buffer *ciphertext = NULL;
     Buffer *tag = NULL;
-    ResultCode ret = InitAesGcmParam(&aesGcmParam);
+    ResultCode ret = InitAesGcmParam(&aesGcmParam, tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("InitAesGcmParam failed");
         goto EXIT;
@@ -297,7 +297,7 @@ EXIT:
 }
 
 IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_t credentialId,
-    UserAuthTokenHal *authToken)
+    UserAuthTokenHal *authToken, const HksAuthTokenKey *tokenKey)
 {
     TokenDataToEncrypt data = {0};
     int32_t ret = GetTokenDataToEncrypt(context, credentialId, &data);
@@ -305,7 +305,7 @@ IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_
         LOG_ERROR("GetTokenDataToEncrypt failed");
         return ret;
     }
-    ret = GetTokenDataCipherResult(&data, authToken);
+    ret = GetTokenDataCipherResult(&data, authToken, tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetTokenDataCipherResult failed");
     }
@@ -313,7 +313,7 @@ IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_
     return ret;
 }
 
-ResultCode GetTokenDataAndSign(const UserAuthContext *context,
+ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken)
 {
     if (context == NULL || authToken == NULL) {
@@ -321,24 +321,32 @@ ResultCode GetTokenDataAndSign(const UserAuthContext *context,
         return RESULT_BAD_PARAM;
     }
     (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
-    ResultCode ret = GetTokenDataPlain(context, authMode, authToken);
+    HksAuthTokenKey tokenKey = {};
+    ResultCode ret = GetTokenKey(&tokenKey);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetTokenKey fail");
+        goto FAIL;
+    }
+    ret = GetTokenDataPlain(context, authMode, authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetTokenDataPlain fail");
         goto FAIL;
     }
-    ret = GetTokenDataCipher(context, credentialId, authToken);
+    ret = GetTokenDataCipher(context, credentialId, authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetTokenDataCipher fail");
         goto FAIL;
     }
-    ret = UserAuthTokenSign(authToken);
+    ret = UserAuthTokenSign(authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("UserAuthTokenSign fail");
         goto FAIL;
     }
+    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
     return RESULT_SUCCESS;
 
 FAIL:
+    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
     (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     return ret;
 }

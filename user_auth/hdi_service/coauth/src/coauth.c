@@ -117,6 +117,12 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
         LOG_ERROR("no memory");
         return RESULT_NO_MEMORY;
     }
+
+    if (g_scheduleList->getSize(g_scheduleList) >= MAX_SCHEDULE_NUM) {
+        LOG_ERROR("too many schedules already");
+        DestroyCoAuthSchedule(schedule);
+        return RESULT_GENERAL_ERROR;
+    }
     ResultCode result = g_scheduleList->insert(g_scheduleList, schedule);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("insert failed");
@@ -125,7 +131,7 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
     return result;
 }
 
-IAM_STATIC bool IsScheduleMatch(const void *data, const void *condition)
+IAM_STATIC bool IsScheduleMatch(void *data, void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");

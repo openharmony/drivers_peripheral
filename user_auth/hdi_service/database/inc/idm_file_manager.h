@@ -16,7 +16,7 @@
 #ifndef IDM_FILE_MANAGER_H
 #define IDM_FILE_MANAGER_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 #include "defines.h"
 #include "linked_list.h"

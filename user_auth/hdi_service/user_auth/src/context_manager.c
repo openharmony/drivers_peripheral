@@ -443,7 +443,7 @@ ERROR:
     return RESULT_GENERAL_ERROR;
 }
 
-IAM_STATIC bool MatchSchedule(const void *data, const void *condition)
+IAM_STATIC bool MatchSchedule(void *data, void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("param is null");
@@ -466,7 +466,7 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId)
     return context->scheduleList->remove(context->scheduleList, &scheduleId, MatchSchedule, true);
 }
 
-IAM_STATIC bool MatchContextSelf(const void *data, const void *condition)
+IAM_STATIC bool MatchContextSelf(void *data, void *condition)
 {
     return data == condition;
 }
@@ -509,7 +509,7 @@ IAM_STATIC void DestroyContextNode(void *data)
     Free(data);
 }
 
-int32_t DestoryContextbyId(uint64_t contextId)
+ResultCode DestoryContextbyId(uint64_t contextId)
 {
     UserAuthContext *authContext = GetContext(contextId);
     if (authContext == NULL) {
@@ -520,7 +520,8 @@ int32_t DestoryContextbyId(uint64_t contextId)
     return RESULT_SUCCESS;
 }
 
-int32_t FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info)
+ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
+    uint32_t authMode)
 {
     if (context == NULL || credentialId == NULL  || info == NULL) {
         LOG_ERROR("param is null");
@@ -531,11 +532,12 @@ int32_t FillInContext(UserAuthContext *context, uint64_t *credentialId, Executor
         LOG_ERROR("GetCoAuthSchedule failed");
         return RESULT_GENERAL_ERROR;
     }
-    int32_t ret = QueryScheduleAtl(schedule, info->capabilityLevel, &context->authTrustLevel);
+    ResultCode ret = QueryScheduleAtl(schedule, info->capabilityLevel, &context->authTrustLevel);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("QueryScheduleAtl failed");
         return ret;
     }
+    ret = RESULT_UNKNOWN;
     uint32_t veriferSensorHint = GetScheduleVeriferSensorHint(schedule);
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, context->authType);
@@ -544,23 +546,29 @@ int32_t FillInContext(UserAuthContext *context, uint64_t *credentialId, Executor
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL || credList->getSize(credList) != 1) {
         LOG_ERROR("query credential failed");
-        DestroyLinkedList(credList);
-        return RESULT_UNKNOWN;
+        goto EXIT;
     }
     if (credList->head == NULL || credList->head->data == NULL) {
         LOG_ERROR("list node is invalid");
-        DestroyLinkedList(credList);
-        return RESULT_UNKNOWN;
+        goto EXIT;
     }
     CredentialInfoHal *credentialNode = (CredentialInfoHal *)credList->head->data;
-    ret = QueryCredentialUserId(credentialNode->credentialId, &context->userId);
+    int32_t userId = 0;
+    ret = QueryCredentialUserId(credentialNode->credentialId, &userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("query userId failed");
-        DestroyLinkedList(credList);
-        return ret;
+        goto EXIT;
     }
-
+    if (authMode == SCHEDULE_MODE_IDENTIFY) {
+        context->userId = userId;
+    }
+    if (userId != context->userId) {
+        LOG_ERROR("userId is not matched");
+        ret = RESULT_GENERAL_ERROR;
+        goto EXIT;
+    }
     *credentialId = credentialNode->credentialId;
+EXIT:
     DestroyLinkedList(credList);
     return ret;
 }

@@ -18,9 +18,9 @@
 #include "securec.h"
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
-#include "coauth.h"
 #include "adaptor_memory.h"
 #include "adaptor_time.h"
+#include "coauth.h"
 #include "ed25519_key.h"
 #include "idm_database.h"
 
@@ -170,7 +170,7 @@ IAM_STATIC ResultCode Ed25519VerifyData(uint64_t scheduleId, Uint8Array dataTlv,
         LOG_ERROR("data or sign is invalid");
         goto FAIL;
     }
-    result = Ed25519Verify(publicKey, &data, &sign);
+    result = (ResultCode)Ed25519Verify(publicKey, &data, &sign);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("verify sign failed");
         goto FAIL;
@@ -277,6 +277,7 @@ IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, bool 
         }
     } while (0);
 
+    (void)memset_s(dataAndSignTlv.data, MAX_EXECUTOR_MSG_LEN, 0, MAX_EXECUTOR_MSG_LEN);
     Free(dataAndSignTlv.data);
     FreeAttribute(&msgAttribute);
     return attribute;
@@ -398,7 +399,7 @@ void DestoryExecutorResultInfo(ExecutorResultInfo *result)
 IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t authType, uint32_t authPropertyMode,
     const Uint64Array *templateIds, Attribute *attribute)
 {
-    int32_t result = SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, authPropertyMode);
+    ResultCode result = SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, authPropertyMode);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint32 propertyMode failed");
         return RESULT_GENERAL_ERROR;
