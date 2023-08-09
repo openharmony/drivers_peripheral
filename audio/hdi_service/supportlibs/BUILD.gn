@@ -93,13 +93,16 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
+    public_deps = []
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
       ]
-      public_deps += [ "//third_party/alsa-lib:libasound" ]
+      if (drivers_peripheral_audio_feature_alsa_lib_extra_modules != ""){
+        public_deps += [ drivers_peripheral_audio_feature_alsa_lib_extra_modules ]
+      }
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]
     }
@@ -149,13 +152,16 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
+    public_deps = []
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
       ]
-      public_deps += [ "//third_party/alsa-lib:libasound" ]
+      if (drivers_peripheral_audio_feature_alsa_lib_extra_modules != ""){
+        public_deps += [ drivers_peripheral_audio_feature_alsa_lib_extra_modules ]
+      }
     } else {
       include_dirs += [ "$hdf_audio_path/supportlibs/adm_adapter/include" ]
     }
