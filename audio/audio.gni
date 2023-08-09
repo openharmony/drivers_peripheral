@@ -17,10 +17,6 @@ declare_args() {
   drivers_peripheral_audio_feature_rich_device = false
   drivers_peripheral_audio_feature_community = true
   drivers_peripheral_audio_feature_effect = false
-
-  # alsa-lib extension module
-  drivers_peripheral_audio_alsa_lib_extra_modules =
-        "//third_party/alsa-lib:libasound"
 }
 
 if (defined(ohos_lite)) {
