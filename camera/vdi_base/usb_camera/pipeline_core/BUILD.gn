@@ -131,6 +131,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:surface",
