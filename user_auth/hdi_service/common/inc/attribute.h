@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IAM_ATTRIBUTE_H
-#define IAM_ATTRIBUTE_H
+#ifndef ATTRIBUTE_H
+#define ATTRIBUTE_H
 
 #include "c_array.h"
 #include "defines.h"
@@ -103,4 +103,4 @@ ResultCode SetAttributeUint64Array(Attribute *attribute, AttributeKey key, const
 }
 #endif
 
-#endif // IAM_ATTRIBUTE_H
+#endif // ATTRIBUTE_H

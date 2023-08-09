@@ -16,9 +16,10 @@
 #ifndef USER_IDM_SESSION_H
 #define USER_IDM_SESSION_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "defines.h"
-#include "stdint.h"
-#include "stdbool.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -25,7 +25,7 @@
 #include "executor_message.h"
 #include "pool.h"
 
-int32_t RegisterExecutor(const ExecutorInfoHal *registerInfo, uint64_t *executorIndex)
+ResultCode RegisterExecutor(const ExecutorInfoHal *registerInfo, uint64_t *executorIndex)
 {
     if (registerInfo == NULL || executorIndex == NULL) {
         LOG_ERROR("param is null");
@@ -33,7 +33,7 @@ int32_t RegisterExecutor(const ExecutorInfoHal *registerInfo, uint64_t *executor
     }
 
     ExecutorInfoHal executorInfo = *registerInfo;
-    int32_t ret = RegisterExecutorToPool(&executorInfo);
+    ResultCode ret = RegisterExecutorToPool(&executorInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("register failed");
         return ret;
@@ -42,9 +42,9 @@ int32_t RegisterExecutor(const ExecutorInfoHal *registerInfo, uint64_t *executor
     return RESULT_SUCCESS;
 }
 
-int32_t UnRegisterExecutor(uint64_t executorIndex)
+ResultCode UnRegisterExecutor(uint64_t executorIndex)
 {
-    int32_t ret = UnregisterExecutorToPool(executorIndex);
+    ResultCode ret = UnregisterExecutorToPool(executorIndex);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("unregister failed");
     }

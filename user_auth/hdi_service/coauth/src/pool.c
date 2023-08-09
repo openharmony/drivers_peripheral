@@ -40,7 +40,7 @@ IAM_STATIC void DestroyExecutorInfo(void *data)
     Free(data);
 }
 
-IAM_STATIC bool IsExecutorIdMatchById(const void *data, const void *condition)
+IAM_STATIC bool IsExecutorIdMatchById(void *data, void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("input para is null");
@@ -51,7 +51,7 @@ IAM_STATIC bool IsExecutorIdMatchById(const void *data, const void *condition)
     return (executorInfo->executorIndex == executorIndex);
 }
 
-IAM_STATIC bool IsExecutorNodeMatch(const void *data, const void *condition)
+IAM_STATIC bool IsExecutorNodeMatch(void *data, void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");

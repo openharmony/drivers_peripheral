@@ -24,22 +24,6 @@
 extern "C" {
 #endif
 
-#define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
-    do { \
-        if (cond) { \
-            LOG_ERROR("(" #cond ") check fail, return"); \
-            return (retVal); \
-        } \
-    } while (0)
-
-#define IF_TRUE_LOGE_AND_RETURN(cond) \
-    do { \
-        if (cond) { \
-            LOG_ERROR("(" #cond ") check fail, return"); \
-            return; \
-        } \
-    } while (0)
-
 enum InnerKitResultCode {
     INNER_RESULT_SUCCESS = 0,
     INNER_RESULT_FAIL = 1,
@@ -118,10 +102,50 @@ typedef enum AuthPropertyMode {
     PROPERTY_MODE_SET_CACHED_TEMPLATES = 7,
 } AuthPropertyMode;
 
+typedef enum Asl {
+    ASL0 = 0,
+    ASL1 = 1,
+    ASL2 = 2,
+    ASL3 = 3,
+    MAX_ASL = 4,
+} Asl;
+
+typedef enum Acl {
+    ACL0 = 0,
+    ACL1 = 1,
+    ACL2 = 2,
+    ACL3 = 3,
+} Acl;
+
+typedef enum Atl {
+    ATL0 = 0,
+    ATL1 = 10000,
+    ATL2 = 20000,
+    ATL3 = 30000,
+    ATL4 = 40000,
+} Atl;
+
+#define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return (retVal); \
+        } \
+    } while (0)
+
+#define IF_TRUE_LOGE_AND_RETURN(cond) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return; \
+        } \
+    } while (0)
+
 #define MAX_DUPLICATE_CHECK 100
 #define INVALID_SENSOR_HINT 0
 #define MAX_TEMPLATE_OF_SCHEDULE 10
 #define CHALLENGE_LEN 32
+#define MAX_CREDENTIAL_OUTPUT 10
 
 #ifdef __cplusplus
 }
