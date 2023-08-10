@@ -685,7 +685,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     readParmas.timeout = USB_CTRL_SET_TIMEOUT;
     readParmas.dataReq.numIsoPackets = 0;
     readParmas.dataReq.directon = (((uint8_t)acm->dataInPipe->pipeDirection) >> USB_DIR_OFFSET) & DIRECTION_MASK;
-    readParmas.dataReq.length = (int)acm->readSize;
+    readParmas.dataReq.length = acm->readSize;
     readParmas.callback = NULL;
     int32_t ret = UsbFillRequest(g_syncRequest, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
     if (ret != HDF_SUCCESS) {
@@ -1447,7 +1447,7 @@ static int32_t AcmAllocReadRequests(struct AcmDevice *acm)
         readParmas.timeout = USB_CTRL_SET_TIMEOUT;
         readParmas.dataReq.numIsoPackets = 0;
         readParmas.dataReq.directon = (((uint8_t)acm->dataInPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & 0x1;
-        readParmas.dataReq.length = (int)acm->readSize;
+        readParmas.dataReq.length = acm->readSize;
         ret = UsbFillRequest(acm->readReq[i], InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
@@ -1479,7 +1479,7 @@ static int32_t AcmAllocNotifyRequest(struct AcmDevice *acm)
     intParmas.timeout = USB_CTRL_SET_TIMEOUT;
     intParmas.dataReq.numIsoPackets = 0;
     intParmas.dataReq.directon = (((uint8_t)acm->intPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & DIRECTION_MASK;
-    intParmas.dataReq.length = (int)acm->intSize;
+    intParmas.dataReq.length = acm->intSize;
     ret = UsbFillRequest(acm->notifyReq, InterfaceIdToHandle(acm, acm->intPipe->interfaceId), &intParmas);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbFillRequest failed, ret = %d", __func__, ret);

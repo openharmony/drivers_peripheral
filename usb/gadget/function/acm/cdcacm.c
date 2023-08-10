@@ -1150,7 +1150,7 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
 OUT:
     ctrlInfo = (struct CtrlInfo *)req->context;
     ctrlInfo->request = setup->request;
-    req->length = ret;
+    req->length = (uint32_t)ret;
     ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: acm send setup response error", __func__);

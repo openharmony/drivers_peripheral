@@ -755,7 +755,7 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
             HDF_LOGE("%{public}s: memcpy_s fail", __func__);
         }
     }
-    wb->len = (int)size;
+    wb->len = (uint32_t)size;
 
     if (AcmStartWb(acm, wb) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AcmStartWb failed", __func__);
@@ -832,7 +832,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     if (memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size) != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
     }
-    wb->len = (int)size;
+    wb->len = (uint32_t)size;
 
     if (AcmStartWbSync(acm, wb) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AcmStartWbSync failed", __func__);
