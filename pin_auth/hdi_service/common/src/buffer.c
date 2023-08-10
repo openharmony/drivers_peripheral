@@ -31,6 +31,16 @@ bool IsBufferValid(const Buffer *buffer)
     return true;
 }
 
+Buffer GetTmpBuffer(uint8_t *buf, uint32_t contentSize, uint32_t maxSize)
+{
+    Buffer ret = {
+        .buf = buf,
+        .contentSize = contentSize,
+        .maxSize = maxSize,
+    };
+    return ret;
+}
+
 bool CheckBufferWithSize(const Buffer *buffer, const uint32_t size)
 {
     if ((!IsBufferValid(buffer)) || (buffer->contentSize != size)) {

@@ -15,8 +15,6 @@
 
 #include "pin_db_test.h"
 
-#include <gtest/gtest.h>
-
 #include "pin_db.h"
 #include "securec.h"
 
@@ -102,12 +100,12 @@ HWTEST_F(PinDataBaseTest, AddAndAuth_test, TestSize.Level1)
 }
 
 /**
- * @tc.name: DoGetSalt test
- * @tc.desc: verify DoGetSalt
+ * @tc.name: DoGetAlgoParameter test
+ * @tc.desc: verify DoGetAlgoParameter
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinDataBaseTest, DoGetSalt_test, TestSize.Level1)
+HWTEST_F(PinDataBaseTest, DoGetAlgoParameter_test, TestSize.Level1)
 {
     PinEnrollParam *pinEnrollParam = new (std::nothrow) PinEnrollParam();
     EXPECT_NE(pinEnrollParam, nullptr);
@@ -129,19 +127,21 @@ HWTEST_F(PinDataBaseTest, DoGetSalt_test, TestSize.Level1)
 
     uint32_t satLen = CONST_SALT_LEN;
     std::vector<uint8_t> saltRes(CONST_SALT_LEN, 0);
-    result = DoGetSalt(INVALID_TEMPLATE_ID, &(saltRes[0]), &satLen);
+    uint32_t algoVersion;
+    result = DoGetAlgoParameter(INVALID_TEMPLATE_ID, &(saltRes[0]), &satLen, &algoVersion);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = DoGetSalt(templateId, nullptr, &satLen);
+    result = DoGetAlgoParameter(templateId, nullptr, &satLen, &algoVersion);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = DoGetSalt(templateId, &(saltRes[0]), nullptr);
+    result = DoGetAlgoParameter(templateId, &(saltRes[0]), nullptr, &algoVersion);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = DoGetSalt(0, &(saltRes[0]), &satLen);
+    result = DoGetAlgoParameter(0, &(saltRes[0]), &satLen, &algoVersion);
     EXPECT_EQ(result, RESULT_BAD_MATCH);
 
-    result = DoGetSalt(templateId, &(saltRes[0]), &satLen);
+    result = DoGetAlgoParameter(templateId, &(saltRes[0]), &satLen, &algoVersion);
+    EXPECT_EQ(algoVersion, 0);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
     result = DelPinById(templateId);

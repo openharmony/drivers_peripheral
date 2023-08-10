@@ -72,20 +72,21 @@ HWTEST_F(PinAuthTest, EnrollPin_test, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetSalt test
- * @tc.desc: verify GetSalt
+ * @tc.name: GetAlgoParameter test
+ * @tc.desc: verify GetAlgoParameter
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinAuthTest, GetSalt_test, TestSize.Level1)
+HWTEST_F(PinAuthTest, GetAlgoParameter_test, TestSize.Level1)
 {
     std::vector<uint8_t> salt;
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
-    int32_t result = pinAuth->GetSalt(INVALID_TEMPLATE_ID, salt);
+    uint32_t algoVersion;
+    int32_t result = pinAuth->GetAlgoParameter(INVALID_TEMPLATE_ID, salt, algoVersion);
     EXPECT_EQ(result, INVALID_PARAMETERS);
 
-    result = pinAuth->GetSalt(0, salt);
+    result = pinAuth->GetAlgoParameter(0, salt, algoVersion);
     EXPECT_EQ(result, GENERAL_ERROR);
     delete pinAuth;
 }
@@ -203,7 +204,9 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
     EXPECT_EQ(result, SUCCESS);
 
     std::vector<uint8_t> saltRet;
-    result = pinAuth->GetSalt(templateId, saltRet);
+    uint32_t algoVersion;
+    result = pinAuth->GetAlgoParameter(templateId, saltRet, algoVersion);
+    EXPECT_EQ(algoVersion, 0);
     EXPECT_EQ(result, SUCCESS);
 
     PinCredentialInfo pinCredentialInfo = {};
