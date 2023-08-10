@@ -124,7 +124,7 @@ static int32_t EcmStartWb(struct EcmDevice *ecm, struct EcmWb *wb)
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.dataReq.numIsoPackets = 0;
     parmas.userData = (void *)wb;
-    parmas.dataReq.length = wb->len;
+    parmas.dataReq.length = (uint32_t)wb->len;
     parmas.dataReq.buffer = wb->buf;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(ecm, ecm->dataOutPipe->interfaceId), &parmas);
     if (rc != HDF_SUCCESS) {
@@ -883,7 +883,7 @@ static int32_t EcmAllocIntReq(struct EcmDevice *ecm)
     intParmas.timeout = USB_CTRL_SET_TIMEOUT;
     intParmas.dataReq.numIsoPackets = 0;
     intParmas.dataReq.directon = (((uint32_t)(ecm->intPipe->pipeDirection)) >> USB_DIR_OFFSET) & 0x1;
-    intParmas.dataReq.length = (int)ecm->intSize;
+    intParmas.dataReq.length = ecm->intSize;
     ret = UsbFillRequest(ecm->notifyReq, InterfaceIdToHandle(ecm, ecm->intPipe->interfaceId), &intParmas);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
@@ -910,7 +910,7 @@ static void EcmAllocReadReq(struct EcmDevice *ecm)
         readParmas.timeout = USB_CTRL_SET_TIMEOUT;
         readParmas.dataReq.numIsoPackets = 0;
         readParmas.dataReq.directon = (((uint32_t)(ecm->dataInPipe->pipeDirection)) >> USB_DIR_OFFSET) & 0x1;
-        readParmas.dataReq.length = (int)ecm->readSize;
+        readParmas.dataReq.length = ecm->readSize;
         int32_t ret =
             UsbFillRequest(ecm->readReq[i], InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), &readParmas);
         if (ret != HDF_SUCCESS) {
