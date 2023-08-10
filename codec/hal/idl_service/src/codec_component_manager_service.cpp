@@ -15,6 +15,7 @@
 
 #include "codec_component_manager_service.h"
 #include <hdf_base.h>
+#include <atomic>
 #include "codec_component_config.h"
 #include "codec_component_service.h"
 #include "codec_log_wrapper.h"
@@ -24,13 +25,17 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V1_0 {
+sptr<CodecComponentManagerService> g_codecManagerService = nullptr;
+std::once_flag m_serviceFlag;
 using OHOS::Codec::Omx::ComponentNode;
 extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
-    sptr<CodecComponentManagerService> manager = new (std::nothrow) CodecComponentManagerService();
-    CodecDfxService::GetInstance().SetComponentManager(manager);
-    OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->CodecCompCapabilityInit();
-    return manager;
+    std::call_once(m_serviceFlag, [] {
+        g_codecManagerService = new (std::nothrow) CodecComponentManagerService();
+        CodecDfxService::GetInstance().SetComponentManager(g_codecManagerService);
+        OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->CodecCompCapabilityInit();
+    });
+    return g_codecManagerService;
 }
 
 CodecComponentManagerService::CodecComponentManagerService() : componentId_(0)
