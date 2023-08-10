@@ -49,11 +49,10 @@ IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
 IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
 {
     Buffer *sign = NULL;
-    ResultCode ret = RESULT_GENERAL_ERROR;
 
     const Buffer data = GetTmpBuffer((uint8_t *)userAuthToken, AUTH_TOKEN_DATA_LEN, AUTH_TOKEN_DATA_LEN);
     const Buffer key = GetTmpBuffer(tokenKey->macKey, sizeof(tokenKey->macKey), sizeof(tokenKey->macKey));
-    ret = HmacSha256(&key, &data, &sign);
+    ResultCode ret = HmacSha256(&key, &data, &sign);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("HmacSha256 failed");
         goto EXIT;
@@ -126,10 +125,9 @@ EXIT:
 IAM_STATIC ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
 {
     Buffer *rightSign = NULL;
-    ResultCode ret = RESULT_SUCCESS;
     const Buffer data = GetTmpBuffer((uint8_t *)userAuthToken, AUTH_TOKEN_DATA_LEN, AUTH_TOKEN_DATA_LEN);
     const Buffer key = GetTmpBuffer(tokenKey->macKey, sizeof(tokenKey->macKey), sizeof(tokenKey->macKey));
-    ret = HmacSha256(&key, &data, &rightSign);
+    ResultCode ret = HmacSha256(&key, &data, &rightSign);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("HmacSha256 failed");
         goto EXIT;

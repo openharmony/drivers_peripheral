@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include <inttypes.h>
-
 #include "idm_session.h"
 
+#include <inttypes.h>
 #include "securec.h"
+
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
