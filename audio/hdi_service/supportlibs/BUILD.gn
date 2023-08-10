@@ -93,6 +93,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
+    public_deps = []
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
@@ -149,6 +150,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
+    public_deps = []
     if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",

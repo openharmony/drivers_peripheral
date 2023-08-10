@@ -36,7 +36,8 @@
             ],
             "third_party": [
                 "bounds_checking_function",
-                "cjson"
+                "cjson",
+                "alsa-lib"
             ]
         },
         "build": {
