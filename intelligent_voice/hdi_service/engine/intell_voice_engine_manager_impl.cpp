@@ -63,10 +63,7 @@ int32_t IntellVoiceEngineManagerImpl::LoadVendorLib()
 
 void IntellVoiceEngineManagerImpl::UnloadVendorLib()
 {
-    if (engineManagerPriv_.handle != nullptr) {
-        dlclose(engineManagerPriv_.handle);
-        engineManagerPriv_.handle = nullptr;
-    }
+    engineManagerPriv_.handle = nullptr;
 }
 
 IntellVoiceEngineManagerImpl::IntellVoiceEngineManagerImpl()
@@ -78,9 +75,9 @@ IntellVoiceEngineManagerImpl::IntellVoiceEngineManagerImpl()
 
 IntellVoiceEngineManagerImpl::~IntellVoiceEngineManagerImpl()
 {
-    UnloadVendorLib();
     adapters_.clear();
     inst_ = nullptr;
+    UnloadVendorLib();
 }
 
 int32_t IntellVoiceEngineManagerImpl::GetAdapterDescriptors(std::vector<IntellVoiceEngineAdapterDescriptor>& descs)
