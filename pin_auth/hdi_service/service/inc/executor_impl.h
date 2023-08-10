@@ -40,17 +40,17 @@ public:
         const std::vector<uint8_t> &frameworkPublicKey, const std::vector<uint8_t> &extraInfo) override;
     int32_t OnSetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data) override;
     int32_t Enroll(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-        const sptr<IExecutorCallback> &callbackObj) override;
+        const sptr<IExecutorCallbackV1_0> &callbackObj) override;
     int32_t EnrollV1_1(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-        const sptr<IExecutorCallbackV1_1> &callbackObj) override;
-    int32_t Authenticate(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
+    int32_t Authenticate(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
+        const sptr<IExecutorCallbackV1_0> &callbackObj) override;
     int32_t AuthenticateV1_1(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
-        const sptr<IExecutorCallbackV1_1> &callbackObj) override;
+        const sptr<IExecutorCallback> &callbackObj) override;
     int32_t Delete(uint64_t templateId) override;
     int32_t Cancel(uint64_t scheduleId) override;
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
-        const sptr<IExecutorCallback> &callbackObj) override;
+        const sptr<IExecutorCallbackV1_0> &callbackObj) override;
     int32_t GetProperty(const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes,
         Property &property) override;
 
@@ -58,17 +58,18 @@ private:
     class ScheduleMap {
     public:
         uint32_t AddScheduleInfo(const uint64_t scheduleId, const uint32_t commandId,
-            const sptr<IExecutorCallback> callback, const uint64_t templateId, const std::vector<uint8_t> salt);
-        uint32_t GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId, sptr<IExecutorCallback> &callback,
-            uint64_t &templateId, std::vector<uint8_t> &salt);
+            const sptr<IExecutorCallbackV1_0> callback, const uint64_t templateId,
+            const std::vector<uint8_t> algoParameter);
+        uint32_t GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId, sptr<IExecutorCallbackV1_0> &callback,
+            uint64_t &templateId, std::vector<uint8_t> &algoParameter);
         uint32_t DeleteScheduleId(const uint64_t scheduleId);
 
     private:
         struct ScheduleInfo {
             uint32_t commandId;
-            sptr<IExecutorCallback> callback;
+            sptr<IExecutorCallbackV1_0> callback;
             uint64_t templateId;
-            std::vector<uint8_t> salt;
+            std::vector<uint8_t> algoParameter;
         };
 
         std::mutex mutex_;
@@ -76,10 +77,13 @@ private:
     };
 
 private:
-    uint32_t NewSalt(std::vector<uint8_t> &salt);
-    void CallError(const sptr<IExecutorCallback> &callbackObj, uint32_t errorCode);
+    void CallError(const sptr<IExecutorCallbackV1_0> &callbackObj, uint32_t errorCode);
     int32_t AuthPin(uint64_t scheduleId, uint64_t templateId,
         const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv);
+    int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
+        const sptr<IExecutorCallbackV1_0> &callbackObj);
+    int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
+        const sptr<IExecutorCallbackV1_0> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
     ScheduleMap scheduleMap_;
     OHOS::ThreadPool threadPool_;

@@ -23,6 +23,8 @@
 #include "adaptor_log.h"
 #include "pin_func.h"
 #include "securec.h"
+#include "sysparam_errno.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace UserIam {
@@ -45,7 +47,10 @@ int32_t PinAuth::Init()
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    InitPinDb();
+    if (!LoadPinDb()) {
+        LOG_ERROR("LoadPinDb fail!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
     if (GenerateKeyPair() != RESULT_SUCCESS) {
         LOG_ERROR("GenerateKeyPair fail!");
         return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
@@ -124,16 +129,46 @@ ERROR:
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::GetSalt(uint64_t templateId, std::vector<uint8_t> &salt)
+int32_t PinAuth::GenerateAlgoParameter(std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
+{
+    LOG_INFO("start");
+    static constexpr uint32_t deviceUuidLength = 65;
+    char localDeviceId[deviceUuidLength] = {0};
+    if (GetDevUdid(localDeviceId, deviceUuidLength) != EC_SUCCESS) {
+        LOG_ERROR("GetDevUdid failed");
+        return GENERAL_ERROR;
+    }
+    uint32_t algoParameterLen = CONST_SALT_LEN;
+    algoParameter.resize(algoParameterLen);
+    int32_t result = DoGenerateAlgoParameter(algoParameter.data(), &algoParameterLen, &algoVersion,
+        (uint8_t *)&(localDeviceId[0]), deviceUuidLength);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoGenerateAlgoParameter fail!");
+        return PinResultToCoAuthResult(result);
+    }
+    if (algoParameterLen != CONST_SALT_LEN) {
+        LOG_ERROR("algoParameterLen is error!");
+        return PinResultToCoAuthResult(GENERAL_ERROR);
+    }
+
+    return SUCCESS;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::GetAlgoParameter(uint64_t templateId, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    salt.resize(CONST_SALT_LEN);
-    uint32_t satLen = CONST_SALT_LEN;
-    ResultCode result = DoGetSalt(templateId, &salt[0], &satLen);
+    uint32_t algoParameterLen = CONST_SALT_LEN;
+    algoParameter.resize(algoParameterLen);
+    ResultCode result = DoGetAlgoParameter(templateId, &(algoParameter[0]), &algoParameterLen, &algoVersion);
     if (result != RESULT_SUCCESS) {
-        LOG_ERROR("DoGetSalt fail!");
+        LOG_ERROR("DoGetAlgoParameter fail!");
         return PinResultToCoAuthResult(result);
+    }
+    if (algoParameterLen != CONST_SALT_LEN) {
+        LOG_ERROR("algoParameterLen is error!");
+        return PinResultToCoAuthResult(GENERAL_ERROR);
     }
 
     return RESULT_SUCCESS;
@@ -263,6 +298,7 @@ void PinAuth::WriteAntiBrute(uint64_t templateId)
         LOG_ERROR("DoWriteAntiBruteInfoToFile fail!");
     }
 }
+
 } // namespace PinAuth
 } // namespace UserIam
 } // namespace OHOS

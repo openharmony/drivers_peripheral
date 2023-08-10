@@ -33,6 +33,7 @@ typedef struct {
 } Buffer;
 
 bool IsBufferValid(const Buffer *buffer);
+Buffer GetTmpBuffer(uint8_t *buf, uint32_t contentSize, uint32_t maxSize);
 Buffer *CreateBufferBySize(const uint32_t size);
 ResultCode InitBuffer(Buffer *buffer, const uint8_t *buf, const uint32_t bufSize);
 void DestoryBuffer(Buffer *buffer);
