@@ -28,9 +28,9 @@ enum BitOperat {
     INDEX_1,
     INDEX_2,
     INDEX_3,
-    MOVE_EIGHT_BITS = 8;
-    MOVE_SIXTEEN_BITS = 16;
-    MOVE_TWENTY_FOUR_BITS = 24;
+    MOVE_EIGHT_BITS = 8,
+    MOVE_SIXTEEN_BITS = 16,
+    MOVE_TWENTY_FOUR_BITS = 24,
 };
 
 static uint32_t ConvertUint32(const uint8_t *bitOperat)
