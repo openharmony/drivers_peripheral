@@ -13,14 +13,19 @@
  * limitations under the License.
  */
 
-#include "camera.h"
 #include "camera_host_fuzzer.h"
+#include "camera.h"
 
 namespace OHOS {
 const size_t THRESHOLD = 10;
 
 enum HostCmdId {
-    CAMERA_DEVICE_PRELAUNCH,
+    CAMERA_HOST_PRELAUNCH,
+    CAMERA_HOST_GET_CAMERA_IDS,
+    CAMERA_HOST_GET_CAMERA_ABILITY,
+    CAMERA_HOST_OPEN_CAMERA,
+    CAMERA_HOST_OPEN_CAMERA_V1_1,
+    CAMERA_HOST_SET_FLASH_LIGHTS,
 };
 
 enum BitOperat {
@@ -39,18 +44,54 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
         return 0;
     }
 
-    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS)
-        | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) | (bitOperat[INDEX_2] << MOVE_EIGHT_BITS)
-        | (bitOperat[INDEX_3]);
+    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
+        (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
 {
     switch (cmd) {
-        case CAMERA_DEVICE_PRELAUNCH: {
-            cameraTest->serviceV1_1->Prelaunch(reinterpret_cast<const HDI::Camera::V1_1::PrelaunchConfig&>(rawData));
-        }
+        case CAMERA_HOST_PRELAUNCH: {
+            cameraTest->serviceV1_1->Prelaunch(reinterpret_cast<const HDI::Camera::V1_1::PrelaunchConfig &>(rawData));
             break;
+        }
+        case CAMERA_HOST_GET_CAMERA_IDS: {
+            std::vector<std::string> cameraIds = {};
+            std::string *data = const_cast<std::string *>(reinterpret_cast<const std::string *>(rawData));
+            cameraIds.push_back(*data);
+            cameraTest->serviceV1_1->GetCameraIds(cameraIds);
+            break;
+        }
+        case CAMERA_HOST_GET_CAMERA_ABILITY: {
+            std::vector<uint8_t> abilityVec = {};
+            uint8_t *data = const_cast<uint8_t *>(rawData);
+            abilityVec.push_back(*data);
+            cameraTest->serviceV1_1->GetCameraAbility(*reinterpret_cast<const std::string *>(rawData), abilityVec);
+            break;
+        }
+        case CAMERA_HOST_OPEN_CAMERA: {
+            sptr<HDI::Camera::V1_0::ICameraDevice> g_CameraDevice = nullptr;
+            const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
+                const_cast<HDI::Camera::V1_0::ICameraDeviceCallback *>(
+                    reinterpret_cast<const HDI::Camera::V1_0::ICameraDeviceCallback *>(rawData));
+
+            cameraTest->serviceV1_1->OpenCamera(
+                *reinterpret_cast<const std::string *>(rawData), callback, g_CameraDevice);
+            break;
+        }
+        case CAMERA_HOST_OPEN_CAMERA_V1_1: {
+            sptr<HDI::Camera::V1_1::ICameraDevice> g_CameraDevice = nullptr;
+            const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
+                const_cast<HDI::Camera::V1_0::ICameraDeviceCallback *>(
+                    reinterpret_cast<const HDI::Camera::V1_0::ICameraDeviceCallback *>(rawData));
+            cameraTest->serviceV1_1->OpenCamera_V1_1(
+                *reinterpret_cast<const std::string *>(rawData), callback, g_CameraDevice);
+            break;
+        }
+        case CAMERA_HOST_SET_FLASH_LIGHTS: {
+            cameraTest->serviceV1_1->SetFlashlight(*reinterpret_cast<const std::string *>(rawData), true);
+            break;
+        }
         default:
             return;
     }
@@ -90,4 +131,4 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
-}
+} // namespace OHOS
