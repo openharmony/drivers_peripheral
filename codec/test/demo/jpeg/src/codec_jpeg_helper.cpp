@@ -20,6 +20,16 @@
 #include <securec.h>
 #include "hdf_log.h"
 
+static int8_t UnZigZagTable[64] = {
+    0,  1,  5,  6, 14, 15, 27, 28,
+    2,  4,  7, 13, 16, 26, 29, 42,
+    3,  8, 12, 17, 25, 30, 41, 43,
+    9, 11, 18, 24, 31, 40, 44, 53,
+    10, 19, 23, 32, 39, 45, 52, 54,
+    20, 22, 33, 38, 46, 51, 55, 60,
+    21, 34, 37, 47, 50, 56, 59, 61,
+    35, 36, 48, 49, 57, 58, 62, 63};
+
 using namespace OHOS::HDI::Codec::Image::V1_0;
 int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t fd)
 {
@@ -80,7 +90,7 @@ int32_t CodecJpegHelper::JpegAssemble(const struct CodecJpegDecInfo &decInfo, in
 }
 
 bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct CodecJpegDecInfo &decInfo,
-                                    std::unique_ptr<int8_t[]> &compressBuffer, uint32_t &comBufLen)
+                                    std::unique_ptr<int8_t[]> &compressBuffer, uint32_t &comBufLen, uint32_t &dataStart)
 {
     HDF_LOGI("enter");
     int8_t *start = buffer;
@@ -100,6 +110,7 @@ bool CodecJpegHelper::DessambleJpeg(int8_t *buffer, size_t bufferLen, struct Cod
                 break;
             case SOS: {
                 start += DessambleSos(start, decInfo);
+                dataStart = start - buffer;
                 // compressed data start
                 auto len = DessambleCompressData(start, compressBuffer, comBufLen);
                 if (len < 0) {
@@ -498,16 +509,24 @@ int32_t CodecJpegHelper::DessambleDqt(int8_t *buffer, struct CodecJpegDecInfo &d
         buffer++;
         int32_t tableId = data & 0x000f;
         (void)tableId;
-        int32_t size = 32;     // size
-        if (((data >> 4) & 0x0f) == 1) { // 4: low 4 bits, 1: for 16 bits
-            size *= 2;  // 2: 16bits has double size
-        }
+        int32_t size = 64;
         CodecJpegQuantTable table;
         table.tableFlag = true;
+        table.quantVal.resize(size);
+        std::vector<uint16_t> mtx;
         HDF_LOGI("tableid[%{public}d]", tableId);
-        for (int32_t i = 0; i < size; i++) { // 2: 16bits has double size
-            table.quantVal.push_back(static_cast<int16_t>(GetInt16(buffer)));
-            buffer += 2;  // 2: data offset
+        for (int32_t i = 0; i < size; i++) {
+            if (((data >> 4) & 0x0f) == 1) { // 4: low 4 bits, 1: for 16 bits
+                mtx.push_back(static_cast<int16_t>(GetInt16(buffer)));
+                buffer += 2;  // 2: data offset
+            } else {
+                mtx.push_back(static_cast<int8_t>(GetInt8(buffer)));
+                buffer += 1;  // 1: data offset
+            }
+        }
+        // unzigzag quant table
+        for (int32_t i = 0; i < size; i++) {
+            table.quantVal[i] = mtx[UnZigZagTable[i]];
         }
         decInfo.quantTbl.push_back(std::move(table));
     }

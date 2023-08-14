@@ -15,29 +15,31 @@
 
 #ifndef IMAGE_AUTO_INITER
 #define IMAGE_AUTO_INITER
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 namespace OHOS {
 namespace Codec {
 namespace Image {
 class ImageAutoIniter {
 public:
-    ImageAutoIniter(OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImageJpeg> imageClient) : client_(imageClient)
+    ImageAutoIniter(OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImage> imageClient,
+        OHOS::HDI::Codec::Image::V1_0::CodecImageRole role) : client_(imageClient), role_(role)
     {
         if (client_) {
-            client_->JpegInit();
+            client_->Init(role_);
         }
     }
 
     ~ImageAutoIniter()
     {
         if (client_) {
-            client_->JpegDeInit();
+            client_->DeInit(role_);
             client_ = nullptr;
         }
     }
 
 private:
-    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImageJpeg> client_;
+    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImage> client_;
+    OHOS::HDI::Codec::Image::V1_0::CodecImageRole role_;
 };
 }  // namespace Image
 }  // namespace Codec

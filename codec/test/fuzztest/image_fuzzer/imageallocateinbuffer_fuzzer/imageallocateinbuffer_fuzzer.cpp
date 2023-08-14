@@ -17,7 +17,7 @@
 #include <hdf_log.h>
 #include <image_auto_initer.h>
 #include <vector>
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 using namespace OHOS::HDI::Codec::Image::V1_0;
 using namespace OHOS;
 using namespace std;
@@ -31,17 +31,18 @@ bool AllocateInBuffer(const uint8_t *data, size_t size)
         return false;
     }
 
-    sptr<ICodecImageJpeg> image = ICodecImageJpeg::Get(false);
+    sptr<ICodecImage> image = ICodecImage::Get(false);
     if (image == nullptr) {
-        HDF_LOGE("%{public}s: get ICodecImageJpeg failed\n", __func__);
+        HDF_LOGE("%{public}s: get ICodecImage failed\n", __func__);
         return false;
     }
-    ImageAutoIniter autoIniter(image);
+    CodecImageRole role = CodecImageRole(*data);
+    ImageAutoIniter autoIniter(image, role);
 
     CodecImageBuffer inBuffer;
     auto srcData = const_cast<uint8_t *>(data);
     unsigned int bufferSize = *reinterpret_cast<unsigned int *>(srcData);
-    auto err = image->AllocateInBuffer(inBuffer, bufferSize);
+    auto err = image->AllocateInBuffer(inBuffer, bufferSize, role);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s AllocateInBuffer return %{public}d", __func__, err);
         return false;
