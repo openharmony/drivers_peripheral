@@ -11,6 +11,82 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+
+ohos_shared_library("libcodec_image_service_1.0") {
+  include_dirs = [
+    "../utils/include",
+    "config/",
+    "vdi",
+    "jpeg/include",
+    "hdi_service/include",
+  ]
+  sources = [
+    "config/codec_image_config.cpp",
+    "hdi_service/src/codec_image_service.cpp",
+    "jpeg/src/codec_jpeg_core.cpp",
+    "jpeg/src/codec_jpeg_service.cpp",
+  ]
+  defines = [ "LOG_TAG_IMAGE" ]
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:image_idl_headers",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "hitrace:hitrace_meter",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_shared_library("libcodec_image_driver") {
+  include_dirs = [
+    "../utils/include",
+    "config/",
+    "hdi_service/include",
+  ]
+
+  sources = [ "hdi_service/src/codec_image_driver.cpp" ]
+
+  deps = [ ":libcodec_image_service_1.0" ]
+
+  defines = [ "LOG_TAG_IMAGE" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_codec:image_idl_headers",
+      "drivers_interface_codec:libimage_stub_1.0",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+  shlib_type = "hdi"
+}
+
 group("codec_image_service") {
-  deps = [ "jpeg:codec_jpeg_service" ]
+  deps = [
+    ":libcodec_image_driver",
+    ":libcodec_image_service_1.0",
+  ]
 }

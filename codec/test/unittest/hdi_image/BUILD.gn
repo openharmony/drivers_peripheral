@@ -17,10 +17,7 @@ import("//build/test.gni")
 ohos_unittest("codec_hdi_jpeg_test") {
   module_out_path = "drivers_peripheral_codec/codec"
 
-  sources = [
-    "codec_hdi_jpeg_test.cpp",
-    "codec_image_callback.cpp",
-  ]
+  sources = [ "codec_hdi_jpeg_test.cpp" ]
 
   if (is_standard_system) {
     external_deps = [

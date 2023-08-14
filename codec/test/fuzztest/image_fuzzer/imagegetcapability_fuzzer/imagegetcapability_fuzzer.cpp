@@ -16,7 +16,7 @@
 #include "imagegetcapability_fuzzer.h"
 #include <hdf_log.h>
 #include <vector>
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 using namespace OHOS::HDI::Codec::Image::V1_0;
 using namespace OHOS;
 using namespace std;
@@ -29,9 +29,9 @@ bool GetCapabilityList(const uint8_t *data, size_t size)
         return false;
     }
 
-    sptr<ICodecImageJpeg> image = ICodecImageJpeg::Get(false);
+    sptr<ICodecImage> image = ICodecImage::Get(false);
     if (image == nullptr) {
-        HDF_LOGE("%{public}s: get ICodecImageJpeg failed\n", __func__);
+        HDF_LOGE("%{public}s: get ICodecImage failed\n", __func__);
         return false;
     }
 
