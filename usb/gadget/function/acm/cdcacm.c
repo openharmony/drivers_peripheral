@@ -36,6 +36,9 @@
 
 #define PORT_RATE 9600
 #define DATA_BIT  8
+#define USBCDC_LEN 2
+#define RECEIVE_ALL_EVENTS 0xff
+
 static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
 
@@ -163,6 +166,7 @@ static void UsbSerialFreeRequests(struct DListHead * const head, int32_t *alloca
     while (!DListIsEmpty(head)) {
         req = DLIST_FIRST_ENTRY(head, struct UsbFnRequest, list);
         DListRemove(&req->list);
+        (void)UsbFnCancelRequest(req);
         (void)UsbFnFreeRequest(req);
         if (allocated) {
             (*allocated)--;
@@ -354,6 +358,13 @@ static int32_t UsbSerialAllocWriteRequests(struct UsbSerial *port, int32_t num)
     return HDF_SUCCESS;
 }
 
+static void UsbSerialFreeFifo(struct DataFifo *fifo)
+{
+    void *buf = fifo->data;
+    OsalMemFree(buf);
+    DataFifoInit(fifo, 0, NULL);
+}
+
 static int32_t UsbSerialStartIo(struct UsbSerial *port)
 {
     struct DListHead *head = &port->readPool;
@@ -390,6 +401,18 @@ static int32_t UsbSerialStartIo(struct UsbSerial *port)
     return ret;
 }
 
+static void UsbSerialStopIo(struct UsbSerial *port)
+{
+    if (port == NULL) {
+        HDF_LOGE("%s: port is null", __func__);
+        return;
+    }
+    UsbSerialFreeRequests(&port->readPool, &port->readAllocated);
+    UsbSerialFreeRequests(&port->writePool, &port->writeAllocated);
+    UsbSerialFreeFifo(&port->writeFifo);
+    UsbSerialFreeFifo(&port->readFifo);
+}
+
 static int32_t UsbSerialAllocFifo(struct DataFifo *fifo, uint32_t size)
 {
     if (!DataFifoIsInitialized(fifo)) {
@@ -401,13 +424,6 @@ static int32_t UsbSerialAllocFifo(struct DataFifo *fifo, uint32_t size)
         DataFifoInit(fifo, size, data);
     }
     return HDF_SUCCESS;
-}
-
-static void UsbSerialFreeFifo(struct DataFifo *fifo)
-{
-    void *buf = fifo->data;
-    OsalMemFree(buf);
-    DataFifoInit(fifo, 0, NULL);
 }
 
 static int32_t UsbSerialOpen(struct UsbSerial *port)
@@ -472,6 +488,7 @@ static int32_t UsbSerialClose(struct UsbSerial *port)
     }
     DataFifoReset(&port->writeFifo);
     DataFifoReset(&port->readFifo);
+    UsbSerialStopIo(port);
     port->startDelayed = false;
 
     OsalMutexUnlock(&port->lock);
@@ -891,12 +908,16 @@ static int32_t AcmDeviceDispatch(
             HDF_LOGE("%s: unknown cmd %d", __func__, cmd);
             break;
     }
+    OsalMutexLock(&acm->lock);
     struct UsbSerial *port = acm->port;
     if (port == NULL) {
+        OsalMutexUnlock(&acm->lock);
+        HDF_LOGE("%s: port is NULL", __func__);
         return HDF_ERR_IO;
     }
-
-    return AcmSerialCmd(acm, cmd, port, data, reply);
+    int32_t ret = AcmSerialCmd(acm, cmd, port, data, reply);
+    OsalMutexUnlock(&acm->lock);
+    return ret;
 }
 
 static void AcmDeviceDestroy(struct UsbAcmDevice *acm)
@@ -1011,7 +1032,7 @@ static int32_t AcmAllocNotifyRequest(struct UsbAcmDevice *acm)
 {
     /* allocate notification request, 2 means compatible liteOS and linux */
     acm->notifyReq =
-        UsbFnAllocRequest(acm->ctrlIface.handle, acm->notifyPipe.id, sizeof(struct UsbCdcNotification) * 2);
+        UsbFnAllocRequest(acm->ctrlIface.handle, acm->notifyPipe.id, sizeof(struct UsbCdcNotification) * USBCDC_LEN);
     if (acm->notifyReq == NULL) {
         HDF_LOGE("%s: allocate notify request failed", __func__);
         return HDF_FAILURE;
@@ -1037,39 +1058,9 @@ static void AcmFreeNotifyRequest(struct UsbAcmDevice *acm)
 
 static uint32_t AcmEnable(struct UsbAcmDevice *acm)
 {
-    int32_t ret;
     struct UsbSerial *port = acm->port;
-
-    if (port == NULL) {
-        HDF_LOGE("%s: port is null", __func__);
-        return HDF_FAILURE;
-    }
-
-    OsalMutexLock(&port->lock);
     port->acm = acm;
     acm->lineCoding = port->lineCoding;
-
-    ret = UsbSerialAllocFifo(&port->writeFifo, WRITE_BUF_SIZE);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
-        return HDF_FAILURE;
-    }
-    ret = UsbSerialAllocFifo(&port->readFifo, READ_BUF_SIZE);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = UsbSerialStartIo(port);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: UsbSerialStartIo failed", __func__);
-    }
-    if (acm->notify && acm->notify->Connect) {
-        acm->notify->Connect(acm);
-    }
-
-    OsalMutexUnlock(&port->lock);
-
     return HDF_SUCCESS;
 }
 
@@ -1084,10 +1075,6 @@ static uint32_t AcmDisable(struct UsbAcmDevice *acm)
 
     OsalMutexLock(&port->lock);
     port->lineCoding = acm->lineCoding;
-
-    UsbSerialFreeFifo(&port->writeFifo);
-    UsbSerialFreeFifo(&port->readFifo);
-
     OsalMutexUnlock(&port->lock);
 
     return HDF_SUCCESS;
@@ -1284,7 +1271,6 @@ static int32_t AcmNotifySerialState(struct UsbAcmDevice *acm)
     int32_t ret = 0;
     uint16_t serialState;
 
-    OsalMutexLock(&acm->lock);
     if (acm->notifyReq) {
         HDF_LOGI("acm serial state %{public}04x\n", acm->serialState);
         serialState = CPU_TO_LE16(acm->serialState);
@@ -1292,7 +1278,6 @@ static int32_t AcmNotifySerialState(struct UsbAcmDevice *acm)
     } else {
         acm->pending = true;
     }
-    OsalMutexUnlock(&acm->lock);
 
     return ret;
 }
@@ -1502,6 +1487,7 @@ static void UsbSerialFree(struct UsbAcmDevice *acm)
         return;
     }
     OsalMemFree(port);
+    acm->port = NULL;
 }
 
 /* HdfDriverEntry implementations */
@@ -1579,7 +1565,7 @@ static int32_t UsbSerialInit(struct UsbAcmDevice *acm)
         goto ERR;
     }
 
-    ret = UsbFnStartRecvInterfaceEvent(acm->ctrlIface.fn, 0xff, UsbAcmEventCallback, acm);
+    ret = UsbFnStartRecvInterfaceEvent(acm->ctrlIface.fn, RECEIVE_ALL_EVENTS, UsbAcmEventCallback, acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: register event callback failed", __func__);
         goto ERR;
@@ -1601,9 +1587,11 @@ static int32_t UsbSerialRelease(struct UsbAcmDevice *acm)
         HDF_LOGE("%s: acm is null", __func__);
         return HDF_FAILURE;
     }
+    OsalMutexLock(&acm->lock);
     (void)AcmReleaseFuncDevice(acm);
     UsbSerialFree(acm);
     acm->initFlag = false;
+    OsalMutexUnlock(&acm->lock);
     return 0;
 }
 
@@ -1629,6 +1617,7 @@ static void AcmDriverRelease(struct HdfDeviceObject *device)
     }
     (void)OsalMutexDestroy(&acm->lock);
     AcmDeviceDestroy(acm);
+    device->service = NULL;
 }
 
 struct HdfDriverEntry g_acmDriverEntry = {
