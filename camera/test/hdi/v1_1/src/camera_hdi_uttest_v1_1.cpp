@@ -19,6 +19,7 @@ using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
 
+int64_t OHOS::Camera::Test::StreamConsumer::g_timestamp[2] = {0};
 void CameraHdiUtTestV1_1::SetUpTestCase(void) {}
 void CameraHdiUtTestV1_1::TearDownTestCase(void) {}
 void CameraHdiUtTestV1_1::SetUp(void)
@@ -183,6 +184,8 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_006, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_007, TestSize.Level1)
 {
+    int64_t timeStampCapture = 0;
+    int64_t timeStampThumbnail = 0;
     cameraTest->Init();
     if (cameraTest->serviceV1_1 == nullptr) {
         return;
@@ -234,6 +237,9 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_007, TestSize.Level1)
     sleep(UT_SECOND_TIMES);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    timeStampThumbnail = OHOS::Camera::Test::StreamConsumer::g_timestamp[0];
+    timeStampCapture = OHOS::Camera::Test::StreamConsumer::g_timestamp[1];
+    EXPECT_EQ(true, timeStampThumbnail == timeStampCapture);
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
