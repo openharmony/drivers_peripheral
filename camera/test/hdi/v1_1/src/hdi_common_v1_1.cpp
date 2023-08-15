@@ -45,7 +45,7 @@ int32_t Test::DumpImageFile(int streamId, std::string suffix, const void* buffer
         return -1;
     }
     system(mkdirCmd);
-    ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "data/stream-%d/%lld.%s",
+    ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/stream-%d/%lld.%s",
         streamId, GetCurrentLocalTimeStamp(), suffix.c_str());
     if (ret < 0) {
         return -1;
@@ -183,7 +183,7 @@ void Test::DefaultInfosCapture(
     DefaultCapture(infos);
     std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdCapture, "yuv", addr, size);
+        DumpImageFile(streamIdCapture, "jpeg", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
@@ -372,6 +372,17 @@ void Test::StreamConsumer::CalculateFps(int64_t timestamp, int32_t streamId)
     timestampCount_++;
 }
 
+void Test::StreamConsumer::GetTimeStamp(int64_t *g_timestamp, uint32_t lenght, int64_t timestamp, int32_t gotSize)
+{
+    if (gotSize != UT_PREVIEW_SIZE) {
+        if (g_timestamp[0] == 0) {
+            g_timestamp[0] = timestamp;
+        } else {
+            g_timestamp[1] = timestamp;
+        }
+    }
+}
+
 OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::function<void(void*, uint32_t)> callback)
 {
     consumer_ = OHOS::IConsumerSurface::Create();
@@ -408,6 +419,7 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
                     buffer->GetExtraData()->ExtraGet(OHOS::Camera::timeStamp, timestamp);
                     buffer->GetExtraData()->ExtraGet(OHOS::Camera::streamId, streamId);
                     buffer->GetExtraData()->ExtraGet(OHOS::Camera::captureId, captureId);
+                    GetTimeStamp(g_timestamp, sizeof(g_timestamp) / sizeof(g_timestamp[0]), timestamp, gotSize);
                     if (gotSize) {
                         CalculateFps(timestamp, streamId);
                         callback_(addr, gotSize);
