@@ -40,25 +40,25 @@ IAM_STATIC void DestroyExecutorInfo(void *data)
     Free(data);
 }
 
-IAM_STATIC bool IsExecutorIdMatchById(void *data, void *condition)
+IAM_STATIC bool IsExecutorIdMatchById(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("input para is null");
         return false;
     }
-    uint64_t executorIndex = *(uint64_t *)condition;
-    ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)data;
+    uint64_t executorIndex = *(const uint64_t *)condition;
+    const ExecutorInfoHal *executorInfo = (const ExecutorInfoHal *)data;
     return (executorInfo->executorIndex == executorIndex);
 }
 
-IAM_STATIC bool IsExecutorNodeMatch(void *data, void *condition)
+IAM_STATIC bool IsExecutorNodeMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
         return false;
     }
-    ExecutorInfoHal *executorIndex = (ExecutorInfoHal *)condition;
-    ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)data;
+    const ExecutorInfoHal *executorIndex = (const ExecutorInfoHal *)condition;
+    const ExecutorInfoHal *executorInfo = (const ExecutorInfoHal *)data;
     return (executorInfo->executorRole == executorIndex->executorRole &&
         executorInfo->authType == executorIndex->authType &&
         executorInfo->executorSensorHint == executorIndex->executorSensorHint);
