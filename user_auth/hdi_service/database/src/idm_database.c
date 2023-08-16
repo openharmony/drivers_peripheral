@@ -45,7 +45,7 @@ IAM_STATIC ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInf
 IAM_STATIC ResultCode DeleteUser(int32_t userId);
 IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
 IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
-IAM_STATIC bool MatchCredentialById(void *data, void *condition);
+IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
 IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 
 ResultCode InitUserInfoList(void)
@@ -70,14 +70,14 @@ void DestroyUserInfoList(void)
     g_userInfoList = NULL;
 }
 
-IAM_STATIC bool MatchUserInfo(void *data, void *condition)
+IAM_STATIC bool MatchUserInfo(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("please check invalid node");
         return false;
     }
-    UserInfo *userInfo = (UserInfo *)data;
-    int32_t userId = *(int32_t *)condition;
+    const UserInfo *userInfo = (const UserInfo *)data;
+    int32_t userId = *(const int32_t *)condition;
     if (userInfo->userId == userId) {
         return true;
     }
@@ -533,26 +533,26 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     return ret;
 }
 
-IAM_STATIC bool MatchCredentialById(void *data, void *condition)
+IAM_STATIC bool MatchCredentialById(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
     }
-    CredentialInfoHal *credentialInfo = (CredentialInfoHal*)data;
-    uint64_t credentialId = *(uint64_t *)condition;
+    const CredentialInfoHal *credentialInfo = (const CredentialInfoHal *)data;
+    uint64_t credentialId = *(const uint64_t *)condition;
     if (credentialInfo->credentialId == credentialId) {
         return true;
     }
     return false;
 }
 
-IAM_STATIC bool MatchEnrolledInfoByType(void *data, void *condition)
+IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
     }
-    EnrolledInfoHal *enrolledInfo = (EnrolledInfoHal *)data;
-    uint32_t authType = *(uint32_t *)condition;
+    const EnrolledInfoHal *enrolledInfo = (const EnrolledInfoHal *)data;
+    uint32_t authType = *(const uint32_t *)condition;
     if (enrolledInfo->authType == authType) {
         return true;
     }
