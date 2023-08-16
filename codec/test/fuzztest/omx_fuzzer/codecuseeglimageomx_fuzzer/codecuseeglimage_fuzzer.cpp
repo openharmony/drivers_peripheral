@@ -31,7 +31,7 @@ namespace Codec {
     bool CodecUseEglImage(const uint8_t *data, size_t size)
     {
         struct AllParameters params;
-        if (data == nullptr) {
+        if (data == nullptr || size < sizeof(params)) {
             return false;
         }
 
