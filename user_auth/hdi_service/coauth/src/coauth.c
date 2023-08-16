@@ -131,14 +131,14 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
     return result;
 }
 
-IAM_STATIC bool IsScheduleMatch(void *data, void *condition)
+IAM_STATIC bool IsScheduleMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
         return false;
     }
-    uint64_t scheduleId = *(uint64_t *)condition;
-    CoAuthSchedule *coAuthSchedule = (CoAuthSchedule *)data;
+    uint64_t scheduleId = *(const uint64_t *)condition;
+    const CoAuthSchedule *coAuthSchedule = (const CoAuthSchedule *)data;
     return (coAuthSchedule->scheduleId == scheduleId);
 }
 

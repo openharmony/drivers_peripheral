@@ -443,14 +443,14 @@ ERROR:
     return RESULT_GENERAL_ERROR;
 }
 
-IAM_STATIC bool MatchSchedule(void *data, void *condition)
+IAM_STATIC bool MatchSchedule(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("param is null");
         return false;
     }
-    CoAuthSchedule *schedule = (CoAuthSchedule *)data;
-    if (schedule->scheduleId == *(uint64_t *)condition) {
+    const CoAuthSchedule *schedule = (const CoAuthSchedule *)data;
+    if (schedule->scheduleId == *(const uint64_t *)condition) {
         return true;
     }
     return false;
@@ -466,7 +466,7 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId)
     return context->scheduleList->remove(context->scheduleList, &scheduleId, MatchSchedule, true);
 }
 
-IAM_STATIC bool MatchContextSelf(void *data, void *condition)
+IAM_STATIC bool MatchContextSelf(const void *data, const void *condition)
 {
     return data == condition;
 }
