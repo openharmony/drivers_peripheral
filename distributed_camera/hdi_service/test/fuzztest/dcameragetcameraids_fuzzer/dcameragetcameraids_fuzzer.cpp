@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "dcameragetcameraIds_fuzzer.h"
+#include "dcameragetcameraids_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DcameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
+void DCameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
         return;
@@ -39,7 +39,7 @@ void DcameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DcameraGetCameraIdsFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraGetCameraIdsFuzzTest(data, size);
     return 0;
 }
 
