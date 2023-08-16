@@ -32,24 +32,13 @@ namespace Codec {
     bool CodecComponentTunnelRequest(const uint8_t *data, size_t size)
     {
         struct AllParameters params;
-        if (data == nullptr) {
+        if (data == nullptr || size < sizeof(params)) {
             return false;
         }
 
-        uint8_t *rawData = const_cast<uint8_t *>(data);
-        if (size > sizeof(uint32_t) + sizeof(int32_t) + sizeof(uint32_t) + sizeof(OMX_TUNNELSETUPTYPE *)) {
-            params.port = Convert2Uint32(rawData);
-            rawData = rawData + sizeof(uint32_t);
-            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
-            rawData = rawData + sizeof(int32_t);
-            params.tunneledPort = Convert2Uint32(rawData);
-            rawData = rawData + sizeof(uint32_t);
-            params.tunnelSetup = reinterpret_cast<OMX_TUNNELSETUPTYPE *>(rawData);
-        } else {
-            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
-            params.port = Convert2Uint32(rawData);
-            params.tunneledPort = Convert2Uint32(rawData);
-            params.tunnelSetup = reinterpret_cast<OMX_TUNNELSETUPTYPE *>(rawData);
+        if (memcpy_s(reinterpret_cast<void *>(&params), sizeof(params), data, sizeof(params)) != 0) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return false;
         }
 
         bool result = Preconditions();
