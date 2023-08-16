@@ -624,7 +624,7 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     const int PREVIEW_STREAM = 0;
     const int CAPTURE_STREAM = 2;
     const int VIDEO_STREAM = 1;
-    const int format = 1;
+    const int FORMAT = 1;
     std::string name = "YUYV 4:2:2";
     std::vector<int32_t> formatVector;
     int32_t fpsValue = 0;
@@ -637,7 +637,10 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
             formatVector.push_back(it.fmtdesc.width);
             formatVector.push_back(it.fmtdesc.height);
             formatVector.push_back(fpsValue);
-            formatVector.push_back(format);
+            formatVector.push_back(fpsValue);
+            formatVector.push_back(fpsValue);
+            formatVector.push_back(END_SYMBOL);
+            formatVector.push_back(FORMAT);
         }
     }
     if (formatVector.size() > 0) {
