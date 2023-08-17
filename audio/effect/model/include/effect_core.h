@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "effect_host_common.h"
+#include "v1_0/effect_factory.h"
 
 /* define the struct here */
 struct EffectFactoryLibListNode {

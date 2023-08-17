@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../../../.."
 import("//build/ohos.gni")
 
 if (!defined(ohos_lite)) {
@@ -18,6 +19,7 @@ if (!defined(ohos_lite)) {
     sources = [ "mock_effect_lib.c" ]
 
     include_dirs = [
+      "$hdf_audio_path/interfaces/effect",
       "../../include",
       "//third_party/bounds_checking_function/include",
     ]
