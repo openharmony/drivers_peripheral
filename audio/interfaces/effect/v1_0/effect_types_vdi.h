@@ -47,7 +47,6 @@ enum AudioEffectBufferVdiTag {
     EFFECT_BUFFER_VDI_SINGED_32 = 0x2,
     EFFECT_BUFFER_VDI_SIGNED_16 = 0x4,
     EFFECT_BUFFER_VDI_UNSIGNED_8 = 0x8,
-    EFFECT_BUFFER_VDI_BUTT,
 };
 
 struct AudioEffectBufferVdi {
@@ -66,7 +65,6 @@ enum EffectCommandTableIndexVdi {
     AUDIO_EFFECT_COMMAND_VDI_DISABLE,
     AUDIO_EFFECT_COMMAND_VDI_SET_PARAM,
     AUDIO_EFFECT_COMMAND_VDI_GET_PARAM,
-    AUDIO_EFFECT_COMMAND_VDI_BUTT,
 };
 
 #ifdef __cplusplus

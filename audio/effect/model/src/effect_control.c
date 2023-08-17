@@ -13,9 +13,13 @@
  * limitations under the License.
  */
 
-#include "effect_core.h"
+#include "effect_host_common.h"
+
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "v1_0/effect_types.h"
+#include "v1_0/effect_types_vdi.h"
+#include "v1_0/ieffect_control_vdi.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 
@@ -33,10 +37,19 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
         return HDF_FAILURE;
     }
 
-    return manager->ctrlOps->EffectProcess(manager->ctrlOps, input, output);
+    struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
+    struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output; 
+    int32_t ret = manager->ctrlOps->EffectProcess(manager->ctrlOps, inputVdi, outputVdi);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("AudioEffectProcess failed, ret=%{public}d", ret);
+        return ret;
+    }
+
+    output = (struct AudioEffectBuffer *)outputVdi; 
+    return ret;
 }
 
-int32_t EffectControlSendCommand(struct IEffectControl *self, uint32_t cmdId, const int8_t *cmdData,
+int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommandTableIndex cmdId, const int8_t *cmdData,
      uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (self == NULL || cmdData == NULL || replyData == NULL || replyDataLen == NULL) {
@@ -49,9 +62,14 @@ int32_t EffectControlSendCommand(struct IEffectControl *self, uint32_t cmdId, co
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }
-
-    return manager->ctrlOps->SendCommand(manager->ctrlOps, cmdId, (void *)cmdData, cmdDataLen,
+    enum EffectCommandTableIndexVdi cmdIdVdi = (enum EffectCommandTableIndexVdi)cmdId;
+    int32_t ret = manager->ctrlOps->SendCommand(manager->ctrlOps, cmdIdVdi, (void *)cmdData, cmdDataLen,
                                          (void *)replyData, replyDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("SendCommand failed, ret=%{public}d", ret);
+        return ret;
+    }
+    return ret;
 }
 
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc)
@@ -66,8 +84,15 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }
+    struct EffectControllerDescriptorVdi *descVdi = (struct EffectControllerDescriptorVdi *)desc;
+    int32_t ret = manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, descVdi);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("EffectGetOwnDescriptor failed, ret=%{public}d", ret);
+        return ret;
+    }
 
-    return manager->ctrlOps->GetEffectDescriptor(manager->ctrlOps, desc);
+    desc = (struct EffectControllerDescriptor *)descVdi;
+    return ret;
 }
 
 int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
@@ -83,6 +108,13 @@ int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct Aud
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }
-
-    return manager->ctrlOps->EffectReverse(manager->ctrlOps, input, output);
+    struct AudioEffectBufferVdi *inputVdi = (struct AudioEffectBufferVdi *)input;
+    struct AudioEffectBufferVdi *outputVdi = (struct AudioEffectBufferVdi *)output; 
+    int32_t ret = manager->ctrlOps->EffectReverse(manager->ctrlOps, inputVdi, outputVdi);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("EffectReverse failed, ret=%{public}d", ret);
+        return ret;
+    }
+    output = (struct AudioEffectBuffer *)outputVdi;     
+    return ret;
 }

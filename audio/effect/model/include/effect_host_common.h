@@ -35,10 +35,10 @@
 #ifndef EFFECT_HOST_COMMON_H
 #define EFFECT_HOST_COMMON_H
 
-#include "effect_compatible_access.h"
 #include "v1_0/effect_types.h"
-#include "v1_0/ieffect_control.h"
 #include "v1_0/ieffect_model.h"
+#include "v1_0/ieffect_control.h"
+#include "v1_0/ieffect_control_vdi.h"
 #include "hdf_dlist.h"
 
 #define HDF_EFFECT_LIB_NAME_LEN 64
@@ -53,7 +53,7 @@ struct EffectModelService {
 
 struct ControllerManager {
     struct IEffectControl ctrlImpls;
-    struct EffectControl *ctrlOps;
+    struct IEffectControlVdi *ctrlOps;
     char *effectId;
     char libName[HDF_EFFECT_LIB_NAME_LEN];
 };
@@ -61,7 +61,7 @@ struct ControllerManager {
 /* declare functions */
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
                                    struct AudioEffectBuffer *output);
-int32_t EffectControlSendCommand(struct IEffectControl *self, uint32_t cmdId, const int8_t *cmdData,
+int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommandTableIndex cmdId, const int8_t *cmdData,
     uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen);
 int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControllerDescriptor *desc);
 int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
