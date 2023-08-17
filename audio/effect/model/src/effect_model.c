@@ -96,7 +96,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
             HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
             return HDF_FAILURE;
         }
-   
+
         if (factLib->GetDescriptor(factLib, uuid, descVdi) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
             return HDF_FAILURE;
