@@ -129,6 +129,10 @@ int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count)
 {
     CODEC_LOGD("count[%{public}d], size[%{public}zu]", count, capList_.size());
+    if (count <= 0) {
+        CODEC_LOGW("count[%{public}d] is too small", count);
+        return HDF_FAILURE;
+    }
     if (count > static_cast<int32_t>(capList_.size())) {
         CODEC_LOGW("count[%{public}d] is too large", count);
         count = static_cast<int32_t>(capList_.size());
