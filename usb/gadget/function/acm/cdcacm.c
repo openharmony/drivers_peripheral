@@ -697,17 +697,20 @@ static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
     tmp = HdfSbufReadString(data);
     if (tmp == NULL) {
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
+        OsalMutexUnlock(&port->lock);
         return HDF_ERR_IO;
     }
     char *buf = OsalMemCalloc(strlen(tmp) + 1);
     if (buf == NULL) {
         HDF_LOGE("%s: OsalMemCalloc failed", __func__);
+        OsalMutexUnlock(&port->lock);
         return HDF_ERR_IO;
     }
 
     int32_t ret = strcpy_s(buf, strlen(tmp) + 1, tmp);
     if (ret != EOK) {
         HDF_LOGE("%s: strcpy_s failed", __func__);
+        OsalMutexUnlock(&port->lock);
         OsalMemFree(buf);
         return HDF_ERR_IO;
     }
