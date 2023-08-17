@@ -66,12 +66,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
     }
     int32_t ret = codecComponentManager->OnRemoteRequest(code, data, reply, option);
     if (ret == HDF_SUCCESS && code == CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT) {
-        uint32 componentId = 0;
+        uint32_t componentId = 0;
         if (!reply.ReadUint32(componentId)) {
             HDF_LOGE("%{public}s:read componentId failed!", __func__);
             return false;
         }
-        int32_t ret = g_codecComponentManager->DestroyComponent(componentId);
+        ret = g_codecComponentManager->DestroyComponent(componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
