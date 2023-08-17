@@ -25,6 +25,7 @@ namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
 const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec.v1_0.ICodecComponentManager";
+#define CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT 3
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
 {
@@ -70,7 +71,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
             HDF_LOGE("%{public}s:read componentId failed!", __func__);
             return false;
         }
-        int32_t ret = g_manager->DestroyComponent(componentId);
+        int32_t ret = g_codecComponentManager->DestroyComponent(componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;

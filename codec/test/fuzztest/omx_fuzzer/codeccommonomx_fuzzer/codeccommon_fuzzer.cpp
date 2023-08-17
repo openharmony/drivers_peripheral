@@ -80,7 +80,6 @@ namespace Codec {
 
         g_callback = CodecCallbackTypeStubGetInstance();
         if (g_callback == nullptr) {
-            CodecComponentManagerRelease();
             HDF_LOGE("%{public}s: CodecCallbackTypeStubGetInstance failed\n", __func__);
             return false;
         }
@@ -89,7 +88,6 @@ namespace Codec {
         int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, compName.data(), g_appData, g_callback);
         if (ret != HDF_SUCCESS) {
             CodecCallbackTypeRelease(g_callback);
-            CodecComponentManagerRelease();
             HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
             return false;
         }
@@ -102,6 +100,7 @@ namespace Codec {
         int32_t ret = g_manager->DestroyComponent(g_componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
+            return false;
         }
         CodecCallbackTypeRelease(g_callback);
         CodecComponentTypeRelease(g_component);
