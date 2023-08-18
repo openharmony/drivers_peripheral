@@ -517,6 +517,7 @@ static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uin
 int32_t AudioManagerLoadAdapter(
     struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
@@ -560,6 +561,7 @@ int32_t AudioManagerLoadAdapter(
 
 int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
         AUDIO_FUNC_LOGE("Invalid input param!");
         return AUDIO_ERR_INVALID_PARAM;
@@ -583,6 +585,7 @@ int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *ada
 
 int32_t ReleaseAudioManagerObject(struct IAudioManager *manager)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwManager *service = (struct AudioHwManager *)manager;
     if (ReleaseAudioManagerObjectComm(manager)) {
         OsalMemFree(service);
