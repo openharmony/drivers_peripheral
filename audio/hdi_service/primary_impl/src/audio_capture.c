@@ -732,7 +732,6 @@ static void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 int32_t AudioCaptureCaptureFrame(
     struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL || frame == NULL || frameLen == NULL ||
         hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
@@ -904,7 +903,6 @@ int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueL
 int32_t AudioCaptureReqMmapBuffer(
     struct IAudioCapture *handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     (void)handle;
     (void)reqSize;
     (void)desc;

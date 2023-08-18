@@ -815,7 +815,6 @@ static int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 int32_t AudioRenderRenderFrame(
     struct IAudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
@@ -1053,7 +1052,6 @@ int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueLis
 int32_t AudioRenderReqMmapBuffer(
     struct IAudioRender *handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
-    AUDIO_FUNC_LOGD("Enter.");
     (void)handle;
     (void)reqSize;
     (void)desc;
