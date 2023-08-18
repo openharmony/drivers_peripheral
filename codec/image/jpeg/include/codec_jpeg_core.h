@@ -17,7 +17,7 @@
 #define OHOS_HDI_CODEC_V1_0_CODECJPEGCORE_H
 
 #include "codec_jpeg_vdi.h"
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 
 namespace OHOS {
 namespace HDI {
@@ -27,35 +27,27 @@ class CodecJpegCore {
 public:
     using GetCodecJpegHwi = ICodecJpegHwi*(*)();
 
-    explicit CodecJpegCore();
+    explicit CodecJpegCore() = default;
 
     ~CodecJpegCore();
 
-    int32_t Init();
+    int32_t JpegInit();
 
-    int32_t DeInit();
+    int32_t JpegDeInit();
 
     int32_t AllocateInBuffer(BufferHandle **buffer, uint32_t size);
 
     int32_t FreeInBuffer(BufferHandle *buffer);
 
-    int32_t DoDecode(BufferHandle *buffer, BufferHandle *outBuffer, const V1_0::CodecJpegDecInfo *decInfo,
-                     const OHOS::sptr<V1_0::ICodecImageCallback> callbacks, int fenceFd);
-
-    static int32_t OnEvent(int32_t error);
+    int32_t DoDecode(BufferHandle *buffer, BufferHandle *outBuffer, const V1_0::CodecJpegDecInfo *decInfo);
 
 private:
     void AddVendorLib();
-
-    static int32_t SyncWait(int fd);
 
 private:
     void *libHandle_ = nullptr;
     GetCodecJpegHwi getCodecJpegHwi_ = nullptr;
     ICodecJpegHwi *JpegHwi_ = nullptr;
-    struct CodecJpegCallbackHwi vdiCallback_;
-    static int fence_;
-    static OHOS::sptr<V1_0::ICodecImageCallback> callback_;
 };
 } // Image
 } // Codec

@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_CODEC_IMAGE_V1_0_CODECJPEGHELPER_H
 #define OHOS_HDI_CODEC_IMAGE_V1_0_CODECJPEGHELPER_H
 #include <cinttypes>
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 #include <memory>
 namespace OHOS {
 namespace HDI {
@@ -39,7 +39,7 @@ public:
     ~CodecJpegHelper() = default;
     int32_t JpegAssemble(const struct CodecJpegDecInfo &decInfo, int8_t *buffer, int32_t fd);
     bool DessambleJpeg(int8_t *buffer, size_t bufferLen, struct CodecJpegDecInfo &decInfo,
-                       std::unique_ptr<int8_t[]> &compressBuffer, uint32_t &comBufLen);
+                       std::unique_ptr<int8_t[]> &compressBuffer, uint32_t &comBufLen, uint32_t &dataStart);
 
 private:
     int32_t FindMarker(int8_t *start);

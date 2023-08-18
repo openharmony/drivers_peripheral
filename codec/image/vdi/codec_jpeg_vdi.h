@@ -22,11 +22,8 @@
 extern "C" {
 #endif
 
-#define CODEC_JPEG_VDI_NAME "libjpeg_vdi_interface"
+#define CODEC_JPEG_VDI_NAME "libjpeg_vdi_impl"
 
-struct CodecJpegCallbackHwi {
-    int32_t (*OnEvent)(int32_t error);
-};
 struct ICodecJpegHwi {
     int32_t (*JpegInit)();
 
@@ -36,8 +33,7 @@ struct ICodecJpegHwi {
 
     int32_t (*FreeInBuffer)(BufferHandle *buffer);
 
-    int32_t (*DoJpegDecode)(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo *decInfo,
-        CodecJpegCallbackHwi *callback);
+    int32_t (*DoJpegDecode)(BufferHandle *buffer, BufferHandle *outBuffer, const struct CodecJpegDecInfo *decInfo);
 };
 
 struct CodecImageRegion {
