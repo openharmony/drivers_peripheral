@@ -341,6 +341,7 @@ void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCap
 
 int32_t AudioAdapterInitAllPorts(struct IAudioAdapter *adapter)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter Is NULL");
@@ -605,6 +606,7 @@ static uint32_t GetAvailableRenderID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL || renderId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -651,6 +653,7 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
 
 int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t renderId)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || renderId >= MAX_AUDIO_STREAM_NUM) {
@@ -973,6 +976,7 @@ static uint32_t GetAvailableCaptureID(struct AudioHwAdapter *hwAdapter)
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1017,6 +1021,7 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
 
 int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captureId)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || captureId >= MAX_AUDIO_STREAM_NUM) {
@@ -1179,6 +1184,7 @@ static int32_t AudioDeepCopyCapability(struct AudioPortCapability *destCap, stru
 int32_t AudioAdapterGetPortCapability(
     struct IAudioAdapter *adapter, const struct AudioPort *port, struct AudioPortCapability *capability)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || port == NULL || port->portName == NULL || capability == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1206,6 +1212,7 @@ int32_t AudioAdapterGetPortCapability(
 int32_t AudioAdapterSetPassthroughMode(
     struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode mode)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     if (adapter == NULL || port == NULL || port->portName == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
@@ -1258,6 +1265,7 @@ int32_t AudioAdapterSetPassthroughMode(
 int32_t AudioAdapterGetPassthroughMode(
     struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     if (adapter == NULL || port == NULL || port->portName == NULL || mode == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
@@ -1285,6 +1293,7 @@ int32_t AudioAdapterGetPassthroughMode(
 }
 int32_t AudioAdapterGetDeviceStatus(struct IAudioAdapter *adapter, struct AudioDeviceStatus *status)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     (void)adapter;
     (void)status;
     return AUDIO_SUCCESS;
