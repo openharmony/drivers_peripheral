@@ -13,47 +13,43 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V1_0_CODECJPEGDEC_H
-#define OHOS_HDI_CODEC_V1_0_CODECJPEGDEC_H
+#ifndef OHOS_HDI_CODEC_V1_0_CODECIMAGESERVICE_H
+#define OHOS_HDI_CODEC_V1_0_CODECIMAGESERVICE_H
 
 #include <map>
 #include <mutex>
 #include "buffer_handle.h"
-#include "codec_jpeg_core.h"
 #include "codec_image_config.h"
+#include "v1_0/icodec_image.h"
+#include "codec_jpeg_service.h"
+
 constexpr uint32_t CODEC_IMAGE_MAX_BUFFER_SIZE = 50 * 1024 *1024;
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace Image {
 namespace V1_0 {
-class CodecJpegDecoder : public ICodecImageJpeg {
+class CodecImageService : public ICodecImage {
 public:
-    explicit CodecJpegDecoder();
+    explicit CodecImageService();
 
-    virtual ~CodecJpegDecoder() = default;
+    virtual ~CodecImageService() = default;
 
     int32_t GetImageCapability(std::vector<CodecImageCapability>& capList) override;
 
-    int32_t JpegInit() override;
+    int32_t Init(enum CodecImageRole role) override;
 
-    int32_t JpegDeInit() override;
+    int32_t DeInit(enum CodecImageRole role) override;
 
     int32_t DoJpegDecode(const CodecImageBuffer& inBuffer, const CodecImageBuffer& outBuffer,
-        const sptr<ICodecImageCallback>& callbacks, const CodecJpegDecInfo& decInfo) override;
+        const CodecJpegDecInfo& decInfo) override;
 
-    int32_t AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t size) override;
+    int32_t AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t size, CodecImageRole role) override;
 
     int32_t FreeInBuffer(const CodecImageBuffer& buffer) override;
 
 private:
-    uint32_t GetNextBufferId();
-
-private:
-    uint32_t bufferId_;
-    std::mutex mutex_;
-    std::unique_ptr<CodecJpegCore> core_;
-    std::map<uint32_t, BufferHandle*> bufferHandleMap_;
+    std::unique_ptr<CodecJpegService> jpegImpl_;
 };
 } // V1_0
 } // Image
@@ -61,4 +57,4 @@ private:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V1_0_CODECJPEGDEC_H
+#endif // OHOS_HDI_CODEC_V1_0_CODECIMAGESERVICE_H

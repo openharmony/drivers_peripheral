@@ -24,7 +24,7 @@
 #include "v1_0/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_0/icodec_image_jpeg.h"
+#include "v1_0/icodec_image.h"
 
 class JpegDecoder {
 public:
@@ -51,14 +51,15 @@ private:
     }
 
 private:
-    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImageJpeg> hdiDecoder_;
+    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImage> hdiJpeg_;
     OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *hdiBuffer_;
-    OHOS::sptr<OHOS::HDI::Codec::Image::V1_0::ICodecImageCallback> callback_;
     OHOS::HDI::Codec::Image::V1_0::CodecJpegHelper *helper_ = nullptr;
     OHOS::HDI::Codec::Image::V1_0::CodecImageBuffer inBuffer_;
     OHOS::HDI::Codec::Image::V1_0::CodecImageBuffer outBuffer_;
+    std::unique_ptr<char[]> jpegBuffer_;
     std::ifstream ioIn_;
     std::ofstream ioOut_;
+    uint32_t dataStart_;
     uint32_t bufferLen_;
     uint32_t compDataLen_;
     OHOS::HDI::Codec::Image::V1_0::CodecJpegDecInfo decInfo_;

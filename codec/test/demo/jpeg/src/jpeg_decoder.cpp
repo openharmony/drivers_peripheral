@@ -18,28 +18,25 @@
 #include <securec.h>
 #include <cstdio>
 #include <unistd.h>
-#include "codec_jpeg_callback.h"
 #include "hdf_log.h"
-
+#include "jpeg_decoder.h"
 #define HDF_LOG_TAG codec_jpeg_decoder
 
 using namespace OHOS::HDI::Codec::Image::V1_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
-constexpr uint32_t MAX_WAIT = 1000 * 10;  // wait 100ms
 static std::shared_ptr<JpegDecoder> decoder;
-static volatile bool g_isDone;
 JpegDecoder::JpegDecoder()
 {
-    hdiDecoder_ = ICodecImageJpeg::Get();
+    hdiJpeg_ = ICodecImage::Get();
     hdiBuffer_ = IDisplayBuffer::Get();
     helper_ = new CodecJpegHelper();
 }
 
 JpegDecoder::~JpegDecoder()
 {
-    hdiDecoder_ = nullptr;
+    hdiJpeg_ = nullptr;
     hdiBuffer_ = nullptr;
     if (helper_ != nullptr) {
         delete helper_;
@@ -51,7 +48,6 @@ JpegDecoder::~JpegDecoder()
     if (ioIn_.is_open()) {
         ioIn_.close();
     }
-    callback_ = nullptr;
 }
 
 static std::string GetArrayStr(const std::vector<uint32_t> &vec, std::string &arrayStr)
@@ -90,12 +86,12 @@ static void PrintCapability(const CodecImageCapability &cap, int32_t index)
 
 int32_t JpegDecoder::Init()
 {
-    if (hdiDecoder_ == nullptr || hdiBuffer_ == nullptr) {
-        HDF_LOGE("hdiDecoder_ or hdiBuffer_ is null !");
+    if (hdiJpeg_ == nullptr || hdiBuffer_ == nullptr) {
+        HDF_LOGE("hdiJpeg_ or hdiBuffer_ is null !");
         return HDF_FAILURE;
     }
     std::vector<CodecImageCapability> capList;
-    auto ret = hdiDecoder_->GetImageCapability(capList);
+    auto ret = hdiJpeg_->GetImageCapability(capList);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("GetImageCapability failed, err [%{public}d] !", ret);
         return HDF_FAILURE;
@@ -103,16 +99,15 @@ int32_t JpegDecoder::Init()
     for (size_t i = 0; i < capList.size(); i++) {
         PrintCapability(capList[i], i);
     }
-    callback_ = new CodecJpegCallbackService(decoder);
-    return hdiDecoder_->JpegInit();
+    return hdiJpeg_->Init(CODEC_IMAGE_JPEG);
 }
 
 int32_t JpegDecoder::DeInit()
 {
-    if (hdiDecoder_ == nullptr) {
+    if (hdiJpeg_ == nullptr) {
         return HDF_FAILURE;
     }
-    return hdiDecoder_->JpegDeInit();
+    return hdiJpeg_->DeInit(CODEC_IMAGE_JPEG);
 }
 
 int32_t JpegDecoder::OnEvent(int32_t error)
@@ -133,11 +128,10 @@ int32_t JpegDecoder::OnEvent(int32_t error)
     HDF_LOGI("decode and write output buffer succ !");
 
     // freeInBuffer
-    auto ret = hdiDecoder_->FreeInBuffer(inBuffer_);
+    auto ret = hdiJpeg_->FreeInBuffer(inBuffer_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("FreeInBuffer failed, err [%{public}d] !", ret);
     }
-    g_isDone = true;
     return ret;
 }
 
@@ -153,16 +147,16 @@ int32_t JpegDecoder::PrepareData(std::string fileInput, std::string fileOutput)
     ioIn_.seekg(0, ioIn_.beg);
 
     HDF_LOGE("bufferLen_ is [%{public}d]!", bufferLen_);
-    std::unique_ptr<char[]> jpegBuffer = std::make_unique<char[]>(bufferLen_);
-    if (jpegBuffer == nullptr) {
-        HDF_LOGE("make_unique jpegBuffer failed !");
+    jpegBuffer_ = std::make_unique<char[]>(bufferLen_);
+    if (jpegBuffer_ == nullptr) {
+        HDF_LOGE("make_unique jpegBuffer_ failed !");
         return HDF_FAILURE;
     }
-    ioIn_.read(jpegBuffer.get(), bufferLen_);
+    ioIn_.read(jpegBuffer_.get(), bufferLen_);
 
     HDF_LOGI("start parse jpeg header data !");
-    bool err = helper_->DessambleJpeg(reinterpret_cast<int8_t *>(jpegBuffer.get()), bufferLen_,
-        decInfo_, compressBuffer_, compDataLen_);
+    bool err = helper_->DessambleJpeg(reinterpret_cast<int8_t *>(jpegBuffer_.get()), bufferLen_,
+        decInfo_, compressBuffer_, compDataLen_, dataStart_);
     if (!err) {
         HDF_LOGE("DecodeJpegHeader failed !");
         return HDF_FAILURE;
@@ -173,7 +167,7 @@ int32_t JpegDecoder::PrepareData(std::string fileInput, std::string fileOutput)
 int32_t JpegDecoder::AllocBuffer(uint32_t width, uint32_t height)
 {
     // alloc inBuffer
-    auto ret = hdiDecoder_->AllocateInBuffer(inBuffer_, compDataLen_);
+    auto ret = hdiJpeg_->AllocateInBuffer(inBuffer_, bufferLen_, CODEC_IMAGE_JPEG);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("AllocateInBuffer failed, err [%{public}d] !", ret);
         return HDF_FAILURE;
@@ -192,7 +186,6 @@ int32_t JpegDecoder::AllocBuffer(uint32_t width, uint32_t height)
     }
 
     outBuffer_.buffer = new NativeBuffer(handle);
-    outBuffer_.fenceFd = -1;
     return HDF_SUCCESS;
 }
 
@@ -211,7 +204,7 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     HDF_LOGI("write jpeg data to inBuffer !");
     BufferHandle *bufferHandle = inBuffer_.buffer->GetBufferHandle();
     hdiBuffer_->Mmap(*bufferHandle);
-    auto res  = memcpy_s(bufferHandle->virAddr, compDataLen_, compressBuffer_.get(), compDataLen_);
+    auto res  = memcpy_s(bufferHandle->virAddr, bufferLen_, jpegBuffer_.get(), bufferLen_);
     if (res != 0) {
         HDF_LOGE("memcpy_s failed, err [%{public}d] !", res);
         return HDF_FAILURE;
@@ -219,10 +212,27 @@ int32_t JpegDecoder::Decode(CommandOpt opt)
     hdiBuffer_->Unmap(*bufferHandle);
 
     HDF_LOGI("start jpeg decoding !");
-    auto err = hdiDecoder_->DoJpegDecode(inBuffer_, outBuffer_, callback_, decInfo_);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("DoJpegDecode failed, err [%{public}d] !", err);
+    decInfo_.sampleSize = 1;
+    decInfo_.compressPos = dataStart_;
+    ret = hdiJpeg_->DoJpegDecode(inBuffer_, outBuffer_, decInfo_);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("DoJpegDecode failed, err [%{public}d] !", ret);
         return HDF_FAILURE;
+    }
+    
+    // write decode result
+    BufferHandle *outHandle = outBuffer_.buffer->Move();
+    hdiBuffer_->Mmap(*outHandle);
+    ioOut_.write(reinterpret_cast<char *>(outHandle->virAddr), outHandle->size);
+    ioOut_.flush();
+    hdiBuffer_->Unmap(*outHandle);
+    hdiBuffer_->FreeMem(*outHandle);
+    HDF_LOGI("decode and write output buffer succ !");
+
+    // freeInBuffer
+    ret = hdiJpeg_->FreeInBuffer(inBuffer_);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("FreeInBuffer failed, err [%{public}d] !", ret);
     }
     return HDF_SUCCESS;
 }
@@ -248,9 +258,7 @@ int main(int argc, char *argv[])
         decoder = nullptr;
         return HDF_FAILURE;
     }
-    while (!g_isDone) {
-        usleep(MAX_WAIT);
-    }
+
     ret = decoder->DeInit();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("DeInit failed, err [%{public}d] !", ret);
