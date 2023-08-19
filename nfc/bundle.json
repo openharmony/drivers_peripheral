@@ -22,14 +22,11 @@
           "drivers_interface_nfc",
           "init"
         ],
-        "third_party": [
-          "nfc_hdiimpl"
-        ]
+        "third_party": []
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/nfc:nfc_entry",
-          "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl"
+          "//drivers/peripheral/nfc:nfc_entry"
         ]
       }
     }
