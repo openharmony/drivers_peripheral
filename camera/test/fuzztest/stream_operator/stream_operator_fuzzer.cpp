@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,35 +13,105 @@
  * limitations under the License.
  */
 
-#include "common.h"
-#include "stream_operator.h"
+#include "stream_operator_fuzzer.h"
+#include "camera.h"
+#include "v1_1/istream_operator.h"
 
 namespace OHOS {
-bool CameraStreamOperatorFuzzTest(const uint8_t *rawData, size_t size)
+const size_t THRESHOLD = 10;
+
+enum HostCmdId {
+    STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1,
+    STREAM_OPERATOR_COMMITSTREAM_V1_1,
+};
+
+enum BitOperat {
+    INDEX_0 = 0,
+    INDEX_1,
+    INDEX_2,
+    INDEX_3,
+    MOVE_EIGHT_BITS = 8,
+    MOVE_SIXTEEN_BITS = 16,
+    MOVE_TWENTY_FOUR_BITS = 24,
+};
+
+static uint32_t ConvertUint32(const uint8_t *bitOperat)
 {
+    if (bitOperat == nullptr) {
+        return 0;
+    }
+
+    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
+        (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
+}
+
+void IsStreamSupprotedApi(const uint8_t *&rawData)
+{
+    std::vector<uint8_t> abilityVec = {};
+    uint8_t *data = const_cast<uint8_t *>(rawData);
+    abilityVec.push_back(*data);
+
+    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
+    OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo;
+    extendedStreamInfo.type = OHOS::HDI::Camera::V1_1::EXTENDED_STREAM_INFO_QUICK_THUMBNAIL;
+    extendedStreamInfo.width = 0;
+    extendedStreamInfo.height = 0;
+    extendedStreamInfo.format = 0;
+    extendedStreamInfo.dataspace = 0;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
+    streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    streamInfoCapture->v1_0 = *reinterpret_cast<const struct HDI::Camera::V1_0::StreamInfo*>(rawData);
+    streamInfoCapture->exextendedStreamInfos = {extendedStreamInfo};
+    streamInfosV1_1.push_back(*streamInfoCapture);
+    HDI::Camera::V1_0::StreamSupportType pType;
+
+    cameraTest->streamOperator_V1_1->IsStreamsSupported_V1_1(
+        *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec,
+        streamInfosV1_1, pType);
+}
+
+static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
+{
+    switch (cmd) {
+        case STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1: {
+            IsStreamSupprotedApi(rawData);
+            break;
+        }
+        case STREAM_OPERATOR_COMMITSTREAM_V1_1: {
+            std::vector<uint8_t> abilityVec = {};
+            uint8_t *data = const_cast<uint8_t *>(rawData);
+            abilityVec.push_back(*data);
+            cameraTest->streamOperator_V1_1->CommitStream_V1_1(
+                *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec);
+            break;
+        }
+        default:
+            return;
+    }
+}
+
+bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
+{
+    (void)size;
     if (rawData == nullptr) {
         return false;
     }
-    constexpr uint32_t sleepTime = 2;
-    uint32_t code = U32_AT(rawData);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
 
-    MessageParcel data;
-    data.WriteInterfaceToken(IStreamOperator::GetDescriptor());
-    data.WriteBuffer(rawData, size);
-    data.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
+    uint32_t cmd = ConvertUint32(rawData);
+    rawData += sizeof(cmd);
 
-    sptr<IStreamOperator> streamOperator = new OHOS::Camera::StreamOperator();
-    CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperator, false);
-    sptr<StreamOperatorStub> IpcStream = new StreamOperatorStub(streamOperator);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcStream, false);
-    
-    sleep(sleepTime); // sleep two second
-    IpcStream->OnRemoteRequest(code, data, reply, option);
+    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
+    cameraTest->Init();
+    if (cameraTest->serviceV1_1 == nullptr) {
+        return false;
+    }
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+        return false;
+    }
 
+    HostFuncSwitch(cmd, rawData);
+    cameraTest->Close();
     return true;
 }
 
@@ -51,7 +121,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    CameraStreamOperatorFuzzTest(data, size);
+    OHOS::DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
-}
+} // namespace OHOS
