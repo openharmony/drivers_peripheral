@@ -120,6 +120,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (size < OHOS::Audio::THRESHOLD) {
         return 0;
     }
+
+    if(data == nullptr) {
+        return 0;
+    }
+
+    for (int i = 0; i < size - 1; i++) {
+        if (data[i] == '\0') {
+            return 0;
+        }
+    }
+
+    if (data[size -1] != '\0') {
+        return 0;
+    }
     OHOS::Audio::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
