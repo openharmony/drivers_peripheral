@@ -17,7 +17,7 @@ group("fuzztest") {
 
   deps += [
     "effectconfig_fuzzer:EffectConfigFuzzTest",
-    # "effectcontrol_fuzzer:EffectControlFuzzTest",
-    # "effectmodel_fuzzer:EffectModelFuzzTest",
+    "effectcontrol_fuzzer:EffectControlFuzzTest",
+    "effectmodel_fuzzer:EffectModelFuzzTest",
   ]
 }
