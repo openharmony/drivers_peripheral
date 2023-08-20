@@ -15,7 +15,11 @@
 #ifndef I_NFC_VENDOR_H
 #define I_NFC_VENDOR_H
 
-#include "phNxpNciHal_Adaptation.h"
+typedef uint8_t nfc_event_t;
+typedef uint8_t nfc_status_t;
+
+typedef void (nfc_stack_callback_t)(nfc_event_t event, nfc_status_t event_status);
+typedef void (nfc_stack_data_callback_t)(uint16_t data_len, uint8_t *p_data);
 
 namespace OHOS {
 namespace HDI {

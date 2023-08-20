@@ -15,26 +15,73 @@
 #ifndef NFC_VENDOR_ADAPTIONS_H
 #define NFC_VENDOR_ADAPTIONS_H
 
+#include <cstdint>
+#include <string>
 #include "infc_vendor.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
+const std::string NFC_HAL_SO_DEFAULT_NAME = "libnfc_hdiimpl.z.so";
+const std::string VENDOR_NFC_EXT_SERVICE_LIB = "libvendor_ext_nfc_service.z.so";
+
+const std::string EXT_GET_CHIP_TYPE_FUNC_NAME = "GetChipType";
+const std::string EXT_GET_SUFFIX_FUNC_NAME = "GetNfcHalFuncNameSuffix";
+
+const std::string HAL_OPEN_FUNC_NAME = "phNxpNciHal_open";
+const std::string HAL_WRITE_FUNC_NAME = "phNxpNciHal_write";
+const std::string HAL_CORE_INIT_FUNC_NAME = "phNxpNciHal_core_initialized";
+const std::string HAL_PRE_DISC_FUNC_NAME = "phNxpNciHal_pre_discover";
+const std::string HAL_CLOSE_FUNC_NAME = "phNxpNciHal_close";
+const std::string HAL_CTRL_GRANTED_FUNC_NAME = "phNxpNciHal_control_granted";
+const std::string HAL_POWER_CYCLE_FUNC_NAME = "phNxpNciHal_power_cycle";
+const std::string HAL_IOCTL_FUNC_NAME = "phNxpNciHal_ioctl";
+const std::string DEFAULT_FUNC_NAME_SUFFIX = "";
+
+const std::string NFC_HAL_SO_PREFIX = "libnfc_hal_impl_";
+const std::string NFC_HAL_SO_SUFFIX = ".z.so";
+
+struct NfcHalInterface {
+    int (*nfcHalOpen)(nfc_stack_callback_t *p_cback, nfc_stack_data_callback_t *p_data_cback);
+    int (*nfcHalWrite)(uint16_t data_len, const uint8_t *p_data);
+    int (*nfcHalCoreInitialized)(uint16_t core_init_rsp_len, uint8_t *p_core_init_rsp_params);
+    int (*nfcHalPrediscover)(void);
+    int (*nfcHalClose)(bool bShutdown);
+    int (*nfcHalControlGranted)(void);
+    int (*nfcHalPowerCycle)(void);
+    int (*nfcHalIoctl)(long arg, void *p_data);
+};
+
+struct NfcExtInterface {
+    const char* (*getNfcChipType)(void);
+    const char* (*getNfcHalFuncNameSuffix)(const char* chipType);
+};
+
 class NfcVendorAdaptions : public INfcVendor {
 public:
     NfcVendorAdaptions();
     ~NfcVendorAdaptions() override;
 
-    int VendorOpen(nfc_stack_callback_t *p_cback,
-                   nfc_stack_data_callback_t *p_data_cback) override;
+    int VendorOpen(nfc_stack_callback_t *p_cback, nfc_stack_data_callback_t *p_data_cback) override;
     int VendorWrite(uint16_t data_len, const uint8_t *p_data) override;
-    int VendorCoreInitialized(uint16_t core_init_rsp_len,
-                              uint8_t *p_core_init_rsp_params) override;
+    int VendorCoreInitialized(uint16_t core_init_rsp_len, uint8_t *p_core_init_rsp_params) override;
     int VendorPrediscover(void) override;
     int VendorClose(bool bShutdown) override;
     int VendorControlGranted(void) override;
     int VendorPowerCycle(void) override;
     int VendorIoctl(long arg, void *p_data) override;
+
+private:
+    std::string GetChipType(void);
+    std::string GetNfcHalFuncNameSuffix(std::string chipType);
+    void ResetNfcInterface(void);
+    int8_t InitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
+
+    void *nfcHalHandle; // handle of nfc hal so
+    NfcHalInterface nfcHalInf;
+
+    void *nfcExtHandle; // handle of nfc ext service
+    NfcExtInterface nfcExtInf;
 };
 } // Nfc
 } // HDI
