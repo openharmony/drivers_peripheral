@@ -65,7 +65,11 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
         return false;
     }
     int32_t ret = codecComponentManager->OnRemoteRequest(code, data, reply, option);
-    if (ret == HDF_SUCCESS && code == CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT) {
+    if (ret != HDF_SUCCESS) {
+        return false;
+    }
+
+    if (code == CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT) {
         uint32_t componentId = 0;
         if (!reply.ReadUint32(componentId)) {
             HDF_LOGE("%{public}s:read componentId failed!", __func__);
