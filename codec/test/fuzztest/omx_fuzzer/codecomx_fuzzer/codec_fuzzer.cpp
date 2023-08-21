@@ -41,16 +41,12 @@ uint32_t Convert2Uint32(const uint8_t* ptr)
 
 bool CodecFuzzTest(const uint8_t* rawData, size_t size)
 {
-    if (rawData == nullptr) {
+    if (rawData == nullptr || size < OFFSET) {
         HDF_LOGE("%{public}s: Failed to obtain rawData", __func__);
         return false;
     }
     uint32_t code = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
-    if (size < OFFSET) {
-        HDF_LOGE("%{public}s: Failed to obtain rawData", __func__);
-        return false;
-    }
     size = size - OFFSET;
 
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
