@@ -130,7 +130,7 @@ int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCa
 {
     CODEC_LOGD("count[%{public}d], size[%{public}zu]", count, capList_.size());
     if (count <= 0) {
-        CODEC_LOGW("count[%{public}d] is invalid", count);
+        CODEC_LOGE("count[%{public}d] is invalid", count);
         return HDF_FAILURE;
     }
     if (count > static_cast<int32_t>(capList_.size())) {
