@@ -74,44 +74,32 @@ void Test::Init()
     int32_t ret;
     if (serviceV1_1 == nullptr) {
         serviceV1_1 = OHOS::HDI::Camera::V1_1::ICameraHost::Get("camera_service", false);
-        if (serviceV1_1 == nullptr) {
-            CAMERA_LOGE("V1_1::IcameraHost get failed");
-            return;
-        } else {
-            CAMERA_LOGI("ICameraHost get success");
-            ret = serviceV1_1->GetVersion(mainVer, minVer);
-            if (ret != 0) {
-                CAMERA_LOGE("V1_1::ICameraHost get version failed, ret = %{public}d", ret);
-            } else {
-                CAMERA_LOGE("V1_1::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
-            }
-        }
-        ASSERT_TRUE(serviceV1_1 != nullptr);
+        EXPECT_NE(serviceV1_1, nullptr);
+        CAMERA_LOGI("V1_1::ICameraHost get success");
+        ret = serviceV1_1->GetVersion(mainVer, minVer);
+        EXPECT_EQ(ret, 0);
+        CAMERA_LOGI("V1_1::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
         service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_1.GetRefPtr());
     }
 
     hostCallback = new TestCameraHostCallback();
-    service->SetCallback(hostCallback);
+    ret = service->SetCallback(hostCallback);
+    EXPECT_EQ(ret, 0);
 }
 
 void Test::Open()
 {
     if (cameraDevice == nullptr) {
+        EXPECT_NE(service, nullptr);
         service->GetCameraIds(cameraIds);
-        if (cameraIds.size() == 0) {
-            CAMERA_LOGE("camera device list empty");
-        }
-        ASSERT_TRUE(cameraIds.size() != 0);
+        EXPECT_NE(cameraIds.size(), 0);
         GetCameraMetadata();
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
-        ASSERT_TRUE(serviceV1_1 != nullptr);
+        EXPECT_NE(serviceV1_1, nullptr);
         rc = serviceV1_1->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
-        if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
-            CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
-            return;
-        }
-        ASSERT_TRUE(cameraDeviceV1_1 != nullptr);
+        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
+        EXPECT_NE(cameraDeviceV1_1, nullptr);
         cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
         CAMERA_LOGI("OpenCamera V1_1 success");
     }
@@ -124,13 +112,7 @@ void Test::GetCameraMetadata()
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }
     MetadataUtils::ConvertVecToMetadata(abilityVec, ability);
-
-    common_metadata_header_t* data = ability->get();
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_AVAILABLE_MODES, &entry);
-    if (ret == 0) {
-        CAMERA_LOGI("get OHOS_CONTROL_AE_AVAILABLE_MODES success");
-    }
+    EXPECT_NE(ability, nullptr);
 }
 
 void Test::Close()
