@@ -277,6 +277,14 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
     return ret;
 }
 
+int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfos)
+{
+    IAM_LOGI("GetAllUserInfo mock start");
+    static_cast<void>(userInfos);
+
+    return RESULT_SUCCESS;
+}
+
 static int32_t CreateExecutorCommand(AuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
