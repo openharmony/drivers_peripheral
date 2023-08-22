@@ -24,7 +24,7 @@ using namespace OHOS;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
-constexpr int32_t OFFSET = 4;
+constexpr uint32_t OFFSET = 4;
 const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec_service";
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
@@ -41,7 +41,7 @@ uint32_t Convert2Uint32(const uint8_t* ptr)
 
 bool CodecFuzzTest(const uint8_t* rawData, size_t size)
 {
-    if (rawData == nullptr) {
+    if (rawData == nullptr || size < OFFSET) {
         HDF_LOGE("%{public}s: Failed to obtain rawData", __func__);
         return false;
     }
