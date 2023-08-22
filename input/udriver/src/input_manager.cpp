@@ -75,6 +75,87 @@ static int32_t GetInputDeviceList(uint32_t *devNum, InputDeviceInfo **devList, u
     return gInputDeviceManager_->GetDeviceList(devNum, devList, size);
 }
 
+static int32_t SetPowerStatus(uint32_t devIndex, uint32_t status)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->SetPowerStatus(devIndex, status);
+}
+
+static int32_t GetPowerStatus(uint32_t devIndex, uint32_t *status)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->GetPowerStatus(devIndex, status);
+}
+
+static int32_t GetChipInfo(uint32_t devIndex, char *chipInfo, uint32_t length)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->GetChipInfo(devIndex, chipInfo, length);
+}
+
+static int32_t GetVendorName(uint32_t devIndex, char *vendorName, uint32_t length)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->GetVendorName(devIndex, vendorName, length);
+}
+
+static int32_t GetChipName(uint32_t devIndex, char *chipName, uint32_t length)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->GetChipName(devIndex, chipName, length);
+}
+
+static int32_t GetDeviceType(uint32_t devIndex, uint32_t *deviceType)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->GetDeviceType(devIndex, deviceType);
+}
+
+static int32_t SetGestureMode(uint32_t devIndex, uint32_t gestureMode)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->SetGestureMode(devIndex, gestureMode);
+}
+
+static int32_t RunCapacitanceTest(uint32_t devIndex, uint32_t testType, char *result, uint32_t length)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->RunCapacitanceTest(devIndex, testType, result, length);
+}
+
+static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmd)
+{
+    if (!gInputDeviceManager_) {
+        HDF_LOGE("%{public}s: gInputDeviceManager_ is null", __func__);
+        return INPUT_FAILURE;
+    }
+    return gInputDeviceManager_->RunExtraCommand(devIndex, cmd);
+}
+
 static int32_t RegisterReportCallback(uint32_t devIndex, InputEventCb *callback)
 {
     if (!gInputDeviceManager_) {
@@ -115,8 +196,6 @@ static int32_t UnregisterHotPlugCallback(void)
 extern "C" {
 #endif
 
-int32_t InstanceReporterHdi(InputReporter **reporter);
-int32_t InstanceControllerHdi(InputController **controller);
 static int32_t InstanceManagerHdi(InputManager **manager)
 {
     InputManager *managerHdi = (InputManager *)OsalMemAlloc(sizeof(InputManager));
@@ -133,16 +212,16 @@ static int32_t InstanceManagerHdi(InputManager **manager)
         return INPUT_NOMEM;
     }
     gInputDeviceManager_->Init();
-    managerHdi->ScanInputDevice = &ScanInputDevice;
-    managerHdi->OpenInputDevice = &OpenInputDevice;
-    managerHdi->CloseInputDevice = &CloseInputDevice;
-    managerHdi->GetInputDevice = &GetInputDevice;
+    managerHdi->ScanInputDevice = ScanInputDevice;
+    managerHdi->OpenInputDevice = OpenInputDevice;
+    managerHdi->CloseInputDevice = CloseInputDevice;
+    managerHdi->GetInputDevice = GetInputDevice;
     managerHdi->GetInputDeviceList = GetInputDeviceList;
     *manager = managerHdi;
     return INPUT_SUCCESS;
 }
 
-int32_t InstanceControllerHdi(InputController **controller)
+static int32_t InstanceControllerHdi(InputController **controller)
 {
     InputController *controllerHdi = (InputController *)OsalMemAlloc(sizeof(InputController));
     if (controllerHdi == nullptr) {
@@ -150,11 +229,20 @@ int32_t InstanceControllerHdi(InputController **controller)
         return INPUT_NOMEM;
     }
     (void)memset_s(controllerHdi, sizeof(InputController), 0, sizeof(InputController));
+    controllerHdi->SetPowerStatus = SetPowerStatus;
+    controllerHdi->GetPowerStatus = GetPowerStatus;
+    controllerHdi->GetDeviceType = GetDeviceType;
+    controllerHdi->GetChipInfo = GetChipInfo;
+    controllerHdi->GetVendorName = GetVendorName;
+    controllerHdi->GetChipName = GetChipName;
+    controllerHdi->SetGestureMode = SetGestureMode;
+    controllerHdi->RunCapacitanceTest = RunCapacitanceTest;
+    controllerHdi->RunExtraCommand = RunExtraCommand;
     *controller = controllerHdi;
     return INPUT_SUCCESS;
 }
 
-int32_t InstanceReporterHdi(InputReporter **reporter)
+static int32_t InstanceReporterHdi(InputReporter **reporter)
 {
     InputReporter *reporterHdi = (InputReporter *)OsalMemAlloc(sizeof(InputReporter));
     if (reporterHdi == nullptr) {
