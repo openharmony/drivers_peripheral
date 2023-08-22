@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_HDI_UTTEST_V1_1_H
-#define CAMERA_HDI_UTTEST_V1_1_H
+#ifndef CAMERA_TAG_UTTEST_V1_1_H
+#define CAMERA_TAG_UTTEST_V1_1_H
 
 #include "hdi_common_v1_1.h"
 
-class CameraHdiUtTestV1_1 : public testing::Test {
+class CameraTagUtTestV1_1 : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
+    void TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> meta);
     std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
 };
 #endif
