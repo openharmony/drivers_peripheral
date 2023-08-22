@@ -39,6 +39,7 @@
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("The hwCapture is NULL");
@@ -80,6 +81,7 @@ int32_t AudioCaptureStart(struct IAudioCapture *handle)
 
 int32_t AudioCaptureStop(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is null");
@@ -115,6 +117,7 @@ int32_t AudioCaptureStop(struct IAudioCapture *handle)
 
 int32_t AudioCapturePause(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is empty");
@@ -156,6 +159,7 @@ int32_t AudioCapturePause(struct IAudioCapture *handle)
 
 int32_t AudioCaptureResume(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is empty");
@@ -193,6 +197,7 @@ int32_t AudioCaptureResume(struct IAudioCapture *handle)
 
 int32_t AudioCaptureFlush(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is empty");
@@ -203,6 +208,7 @@ int32_t AudioCaptureFlush(struct IAudioCapture *handle)
 
 int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -224,6 +230,7 @@ int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
 
 int32_t AudioCaptureGetFrameCount(struct IAudioCapture *handle, uint64_t *count)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || count == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -236,6 +243,7 @@ int32_t AudioCaptureGetFrameCount(struct IAudioCapture *handle, uint64_t *count)
 
 int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *handle, const struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -274,6 +282,7 @@ int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *handle, const stru
 
 int32_t AudioCaptureGetSampleAttributes(struct IAudioCapture *handle, struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -296,6 +305,7 @@ int32_t AudioCaptureGetSampleAttributes(struct IAudioCapture *handle, struct Aud
 
 int32_t AudioCaptureGetCurrentChannelId(struct IAudioCapture *handle, uint32_t *channelId)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || channelId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -309,6 +319,7 @@ int32_t AudioCaptureGetCurrentChannelId(struct IAudioCapture *handle, uint32_t *
 int32_t AudioCaptureCheckSceneCapability(
     struct IAudioCapture *handle, const struct AudioSceneDescriptor *scene, bool *supported)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL || supported == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -346,6 +357,7 @@ int32_t AudioCaptureCheckSceneCapability(
 
 int32_t AudioCaptureSelectScene(struct IAudioCapture *handle, const struct AudioSceneDescriptor *scene)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -398,6 +410,7 @@ int32_t AudioCaptureSelectScene(struct IAudioCapture *handle, const struct Audio
 
 int32_t AudioCaptureSetMute(struct IAudioCapture *handle, bool mute)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -431,6 +444,7 @@ int32_t AudioCaptureSetMute(struct IAudioCapture *handle, bool mute)
 
 int32_t AudioCaptureGetMute(struct IAudioCapture *handle, bool *mute)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || mute == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -462,6 +476,7 @@ int32_t AudioCaptureGetMute(struct IAudioCapture *handle, bool *mute)
 
 int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -509,6 +524,7 @@ int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
 
 int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || volume == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -550,6 +566,7 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
 
 int32_t AudioCaptureGetGainThreshold(struct IAudioCapture *handle, float *min, float *max)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || min == NULL || max == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -609,6 +626,7 @@ int32_t AudioCaptureGetGain(struct IAudioCapture *handle, float *gain)
 
 int32_t AudioCaptureSetGain(struct IAudioCapture *handle, float gain)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || gain < 0) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -767,6 +785,7 @@ int32_t AudioCaptureCaptureFrame(
 
 int32_t AudioCaptureGetCapturePosition(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *impl = (struct AudioHwCapture *)capture;
     if (impl == NULL || frames == NULL || time == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -804,6 +823,7 @@ static int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCa
 
 int32_t AudioCaptureSetExtraParams(struct IAudioCapture *handle, const char *keyValueList)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     int32_t check = 0;
     int32_t count = 0;
     struct ExtraParams mExtraParams;
@@ -828,6 +848,7 @@ int32_t AudioCaptureSetExtraParams(struct IAudioCapture *handle, const char *key
 
 int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueList, uint32_t listLenth)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     int32_t ret;
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || keyValueList == NULL || listLenth == 0) {
@@ -890,6 +911,7 @@ int32_t AudioCaptureReqMmapBuffer(
 
 int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || frames == NULL || time == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -930,6 +952,7 @@ int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *handle, uint64_t *fram
 
 int32_t AudioCaptureTurnStandbyMode(struct IAudioCapture *handle)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("capture is null");
@@ -947,6 +970,7 @@ int32_t AudioCaptureTurnStandbyMode(struct IAudioCapture *handle)
 
 int32_t AudioCaptureAudioDevDump(struct IAudioCapture *handle, int32_t range, int32_t fd)
 {
+    AUDIO_FUNC_LOGD("Enter.");
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
