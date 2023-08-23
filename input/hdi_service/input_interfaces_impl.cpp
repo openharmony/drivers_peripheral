@@ -231,20 +231,19 @@ int32_t InputInterfacesImpl::GetInputDevice(uint32_t devIndex, DeviceInfo &devIn
         return HDF_FAILURE;
     }
 
-    InputDeviceInfo *deviceInfo = new (std::nothrow) InputDeviceInfo();
-    if (deviceInfo == nullptr) {
-        HDF_LOGE("%{public}s get deviceInfo failed, info is null", __func__);
-        return HDF_FAILURE;
-    }
+    InputDeviceInfo *deviceInfo = nullptr;
 
     int32_t ret = inputInterface_->iInputManager->GetInputDevice(devIndex, &deviceInfo);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
-        delete deviceInfo;
         return ret;
     }
+
+    if (deviceInfo == nullptr) {
+        HDF_LOGE("%{public}s get deviceInfo failed, info is null", __func__);
+        return HDF_FAILURE;
+    }
     devInfo = TransferDevInfo(*deviceInfo);
-    delete deviceInfo;
     return ret;
 }
 
@@ -256,29 +255,28 @@ int32_t InputInterfacesImpl::GetInputDeviceList(uint32_t &devNum, std::vector<De
         return HDF_FAILURE;
     }
 
-    InputDeviceInfo *deviceList = new (std::nothrow) InputDeviceInfo[MAX_INPUT_DEV_NUM] {};
+    InputDeviceInfo *deviceList = nullptr;
     InputDeviceInfo *tmp = nullptr;
     DeviceInfo hdfDevInfo;
-    if (deviceList == nullptr) {
-        HDF_LOGE("%{public}s deviceList is null", __func__);
-        return HDF_FAILURE;
-    }
 
     int32_t ret = inputInterface_->iInputManager->GetInputDeviceList(&devNum, &deviceList, size);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
-        delete[] deviceList;
         return HDF_FAILURE;
     }
 
     tmp = deviceList;
+    if (tmp == nullptr) {
+        HDF_LOGE("%{public}s deviceList is null", __func__);
+        return HDF_FAILURE;
+    }
+
     devList.reserve(devNum);
     for (uint32_t i = 0; i < devNum; i++) {
         hdfDevInfo = TransferDevInfo(*tmp);
         devList.push_back(hdfDevInfo);
         tmp++;
     }
-    delete[] deviceList;
     return ret;
 }
 
