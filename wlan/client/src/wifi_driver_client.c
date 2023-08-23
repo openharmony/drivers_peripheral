@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <osal_mem.h>
+#include <pthread.h>
 #include "wifi_common_cmd.h"
 #include "hdf_log.h"
 #include "securec.h"
@@ -33,16 +34,45 @@ extern "C" {
 #define MAX_CALL_BACK_COUNT 10
 static struct CallbackEvent *g_callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 static struct Hid2dEvent *g_hid2dEventMap[MAX_CALL_BACK_COUNT] = {NULL};
+static pthread_mutex_t g_callbackMutex;
+static pthread_mutex_t g_hid2dEventMutex;
+
+int32_t InitEventcallbackMutex(void)
+{
+    if (pthread_mutex_init(&g_callbackMutex, NULL) != RET_CODE_SUCCESS) {
+        HDF_LOGE("%s: init g_callbackMutex failed.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (pthread_mutex_init(&g_hid2dEventMutex, NULL) != RET_CODE_SUCCESS) {
+        HDF_LOGE("%s: init g_hid2dEventMutex failed.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    return RET_CODE_SUCCESS;
+}
+
+void DeinitEventcallbackMutex(void)
+{
+    pthread_mutex_destroy(&g_callbackMutex);
+    pthread_mutex_destroy(&g_hid2dEventMutex);
+}
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
     uint32_t i;
+    OnReceiveFunc callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
+    pthread_mutex_lock(&g_callbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
             HDF_LOGI("%s: send event = %u, ifName = %s", __FUNCTION__, event, ifName);
-            g_callbackEventMap[i]->onRecFunc(event, data, ifName);
+            callbackEventMap[i] = g_callbackEventMap[i]->onRecFunc;
+        }
+    }
+    pthread_mutex_unlock(&g_callbackMutex);
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (callbackEventMap[i] != NULL) {
+            callbackEventMap[i](event, data, ifName);
         }
     }
 }
@@ -56,13 +86,16 @@ int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, c
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return RET_CODE_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_callbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && g_callbackEventMap[i]->eventType == eventType &&
             (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) && g_callbackEventMap[i]->onRecFunc == onRecFunc) {
             HDF_LOGI("%s the onRecFunc has been registered!", __FUNCTION__);
+            pthread_mutex_unlock(&g_callbackMutex);
             return RET_CODE_SUCCESS;
         }
     }
+    pthread_mutex_unlock(&g_callbackMutex);
     callbackEvent = (struct CallbackEvent *)malloc(sizeof(struct CallbackEvent));
     if (callbackEvent == NULL) {
         HDF_LOGE("%s fail: malloc fail!", __FUNCTION__);
@@ -75,13 +108,16 @@ int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, c
         return RET_CODE_FAILURE;
     }
     callbackEvent->onRecFunc = onRecFunc;
+    pthread_mutex_lock(&g_callbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] == NULL) {
             g_callbackEventMap[i] = callbackEvent;
             HDF_LOGD("%s: WifiRegisterEventCallback successful", __FUNCTION__);
+            pthread_mutex_unlock(&g_callbackMutex);
             return RET_CODE_SUCCESS;
         }
     }
+    pthread_mutex_unlock(&g_callbackMutex);
     free(callbackEvent);
     HDF_LOGE("%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
     return RET_CODE_FAILURE;
@@ -95,25 +131,36 @@ void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return;
     }
+    pthread_mutex_lock(&g_callbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && g_callbackEventMap[i]->eventType == eventType &&
             (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) && g_callbackEventMap[i]->onRecFunc == onRecFunc) {
             g_callbackEventMap[i]->onRecFunc = NULL;
             free(g_callbackEventMap[i]);
             g_callbackEventMap[i] = NULL;
+            pthread_mutex_lock(&g_callbackMutex);
             return;
         }
     }
+    pthread_mutex_unlock(&g_callbackMutex);
 }
 
 void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen)
 {
     uint32_t i;
+    Hid2dCallback hid2dEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
+    pthread_mutex_lock(&g_hid2dEventMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0)) {
             HDF_LOGI("%s: Hid2dEventReport ifName = %s", __FUNCTION__, ifName);
-            g_hid2dEventMap[i]->func(msg, msgLen);
+            hid2dEventMap[i] = g_hid2dEventMap[i]->func;
+        }
+    }
+    pthread_mutex_unlock(&g_hid2dEventMutex);
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (hid2dEventMap[i] != NULL) {
+            hid2dEventMap[i](msg, msgLen);
         }
     }
 }
@@ -127,13 +174,16 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return RET_CODE_INVALID_PARAM;
     }
+    pthread_mutex_lock(&g_hid2dEventMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0) &&
             g_hid2dEventMap[i]->func == func) {
             HDF_LOGI("%s the callback function has been registered!", __FUNCTION__);
+            pthread_mutex_unlock(&g_hid2dEventMutex);
             return RET_CODE_SUCCESS;
         }
     }
+    pthread_mutex_unlock(&g_hid2dEventMutex);
     event = (struct Hid2dEvent *)OsalMemCalloc(sizeof(struct Hid2dEvent));
     if (event == NULL) {
         HDF_LOGE("%s fail: OsalMemCalloc fail!", __FUNCTION__);
@@ -145,13 +195,16 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
             break;
         }
         event->func = func;
+        pthread_mutex_lock(&g_hid2dEventMutex);
         for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
             if (g_hid2dEventMap[i] == NULL) {
                 g_hid2dEventMap[i] = event;
                 HDF_LOGD("%s: WifiRegisterHid2dCallback successful", __FUNCTION__);
+                pthread_mutex_unlock(&g_hid2dEventMutex);
                 return RET_CODE_SUCCESS;
             }
         }
+        pthread_mutex_unlock(&g_hid2dEventMutex);
     } while (0);
 
     OsalMemFree(event);
@@ -167,15 +220,18 @@ void WifiUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return;
     }
+    pthread_mutex_lock(&g_hid2dEventMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0) &&
             g_hid2dEventMap[i]->func == func) {
             g_hid2dEventMap[i]->func = NULL;
             OsalMemFree(g_hid2dEventMap[i]);
             g_hid2dEventMap[i] = NULL;
+            pthread_mutex_unlock(&g_hid2dEventMutex);
             return;
         }
     }
+    pthread_mutex_unlock(&g_hid2dEventMutex);
 }
 
 void FreeScanResult(WifiScanResult *res)
