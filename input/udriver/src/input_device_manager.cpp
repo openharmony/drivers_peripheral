@@ -646,7 +646,7 @@ RetStatus InputDeviceManager::SetPowerStatus(uint32_t devIndex, uint32_t status)
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (status >= INPUT_POWER_STATUS_UNKNOWN)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
     return rc;
 }
@@ -656,7 +656,7 @@ RetStatus InputDeviceManager::GetPowerStatus(uint32_t devIndex, uint32_t *status
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (status == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
     return rc;
 }
@@ -666,7 +666,7 @@ RetStatus InputDeviceManager::GetDeviceType(uint32_t devIndex, uint32_t *deviceT
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (deviceType == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
 
     *deviceType = inputDevList_[devIndex].detailInfo.devType;
@@ -679,7 +679,7 @@ RetStatus InputDeviceManager::GetChipInfo(uint32_t devIndex, char *chipInfo, uin
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (chipInfo == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
 
     if (memcpy_s(chipInfo, length, inputDevList_[devIndex].detailInfo.chipInfo, length) != EOK) {
@@ -695,7 +695,7 @@ RetStatus InputDeviceManager::GetVendorName(uint32_t devIndex, char *vendorName,
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (vendorName == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
 
     if (memcpy_s(vendorName, length, inputDevList_[devIndex].detailInfo.vendorName, length) != EOK) {
@@ -711,7 +711,7 @@ RetStatus InputDeviceManager::GetChipName(uint32_t devIndex, char *chipName, uin
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size()) || (chipName == nullptr)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
 
     if (memcpy_s(chipName, length, inputDevList_[devIndex].detailInfo.chipName, length) != EOK) {
@@ -727,7 +727,7 @@ RetStatus InputDeviceManager::SetGestureMode(uint32_t devIndex, uint32_t gesture
     RetStatus rc = INPUT_SUCCESS;
     if ((devIndex >= inputDevList_.size())) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
     return rc;
 }
@@ -738,7 +738,7 @@ RetStatus InputDeviceManager::RunCapacitanceTest(uint32_t devIndex, uint32_t tes
     if ((devIndex >= inputDevList_.size()) || (testType >= TEST_TYPE_UNKNOWN) ||
         (result == nullptr) || (length < SELF_TEST_RESULT_LEN)) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
     return rc;
 }
@@ -749,7 +749,7 @@ RetStatus InputDeviceManager::RunExtraCommand(uint32_t devIndex, InputExtraCmd *
     if ((devIndex >= inputDevList_.size()) || (cmd == nullptr) || (cmd->cmdCode == nullptr ||
         (cmd->cmdValue == nullptr))) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
-        return HDF_FAILURE;
+        return INPUT_FAILURE;
     }
     return rc;
 }
