@@ -249,7 +249,7 @@ struct AudioHwRenderParam {
 
 struct ErrorDump {
     int32_t errorCode;
-    int32_t count;
+    uint32_t count;
     uint64_t frames;
     char *reason;                       // Specific reasons for failure
     char *currentTime;
