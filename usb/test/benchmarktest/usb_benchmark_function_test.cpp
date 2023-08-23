@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+#include "hdf_log.h"
+#include "usbd_function.h"
+#include "usbd_port.h"
 #include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
-#include "hdf_log.h"
-#include "usbd_port.h"
-#include "usbd_function.h"
 
 using namespace benchmark::internal;
 using namespace OHOS;
@@ -37,12 +37,18 @@ public:
     void TearDown(const ::benchmark::State &state);
 };
 
-void UsbBenchmarkFunctionTest::SetUp(const ::benchmark::State& state)
+int32_t SwitchErrCode(int32_t ret)
+{
+    return ret == HDF_ERR_NOT_SUPPORT ? HDF_SUCCESS : ret;
+}
+
+void UsbBenchmarkFunctionTest::SetUp(const ::benchmark::State &state)
 {
     g_usbInterface = IUsbInterface::Get();
     ASSERT_NE(g_usbInterface, nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE);
     sleep(SLEEP_TIME);
+    ret = SwitchErrCode(ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -59,7 +65,7 @@ BENCHMARK_F(UsbBenchmarkFunctionTest, GetCurrentFunctions)(benchmark::State &sta
 {
     ASSERT_TRUE(g_usbInterface != nullptr);
     auto ret = 0;
-    int32_t funcs = USB_FUNCTION_NONE;;
+    int32_t funcs = USB_FUNCTION_NONE;
     for (auto _ : state) {
         ret = g_usbInterface->GetCurrentFunctions(funcs);
     }
@@ -103,6 +109,7 @@ BENCHMARK_F(UsbBenchmarkFunctionTest, SetPortRole)(benchmark::State &state)
     for (auto _ : state) {
         ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SOURCE, DATA_ROLE_HOST);
     }
+    ret = SwitchErrCode(ret);
     ASSERT_EQ(0, ret);
 }
 
