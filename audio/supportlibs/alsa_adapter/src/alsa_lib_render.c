@@ -217,7 +217,7 @@ static int32_t MixerGetVolume(snd_mixer_t *mixer, snd_mixer_elem_t *pcmElemen, l
         AUDIO_FUNC_LOGE("Get right channel fail!");
         return HDF_FAILURE;
     }
-    *vol = (volLeft + volRight) / 1;
+    *vol = (volLeft + volRight) / 2;
 
     return HDF_SUCCESS;
 }
