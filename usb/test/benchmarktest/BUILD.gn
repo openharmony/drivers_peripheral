@@ -137,3 +137,13 @@ ohos_benchmarktest("hdf_usb_benchmark_transfer_test") {
   }
   external_deps += [ "ipc:ipc_single" ]
 }
+
+group("hdf_usb_benchmark") {
+  testonly = true
+  deps = [
+    ":hdf_usb_benchmark_device_test",
+    ":hdf_usb_benchmark_function_test",
+    ":hdf_usb_benchmark_request_test",
+    ":hdf_usb_benchmark_transfer_test",
+  ]
+}

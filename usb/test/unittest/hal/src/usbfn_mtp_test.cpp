@@ -166,6 +166,11 @@ bool GenerateFile(const std::string &pathName, int64_t fileSize)
     return WriteRandomDataToFile(pathName, static_cast<uint64_t>(fileSize));
 }
 
+int32_t SwitchErrCode(int32_t ret)
+{
+    return ret == HDF_ERR_NOT_SUPPORT ? HDF_SUCCESS : ret;
+}
+
 void UsbfnMtpTest::SetUpTestCase(void)
 {
     // Selinux config this UT only works in directory WORKED_UT_PATH for open/read/write file for case send/recvfile.
@@ -179,6 +184,7 @@ void UsbfnMtpTest::SetUpTestCase(void)
     ASSERT_TRUE(g_usbInterface != nullptr);
     auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, POWER_ROLE_SINK, DATA_ROLE_DEVICE);
     sleep(SLEEP_TIME);
+    ret = SwitchErrCode(ret);
     ASSERT_EQ(0, ret);
     ret = g_usbInterface->GetCurrentFunctions(g_currentFunc);
     ASSERT_EQ(0, ret);

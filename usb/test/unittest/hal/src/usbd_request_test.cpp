@@ -54,6 +54,11 @@ sptr<UsbSubscriberTest> UsbdRequestTest::subscriber_ = nullptr;
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
 
+int32_t SwitchErrCode(int32_t ret)
+{
+    return ret == HDF_ERR_NOT_SUPPORT ? HDF_SUCCESS : ret;
+}
+
 void UsbdRequestTest::SetUpTestCase(void)
 {
     g_usbInterface = IUsbInterface::Get();
@@ -64,6 +69,7 @@ void UsbdRequestTest::SetUpTestCase(void)
     auto ret = g_usbInterface->SetPortRole(1, 1, 1);
     sleep(SLEEP_TIME);
     HDF_LOGI("UsbdRequestTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
+    ret = SwitchErrCode(ret);
     ASSERT_EQ(0, ret);
     if (ret != 0) {
         exit(0);

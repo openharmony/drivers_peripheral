@@ -44,6 +44,11 @@ int32_t UsbdPort::IfCanSwitch(int32_t portId, int32_t powerRole, int32_t dataRol
         HDF_LOGE("%{public}s: dataRole error", __func__);
         return HDF_FAILURE;
     }
+
+    if (path_ == "/data/service/el1/public/usb/mode") {
+        HDF_LOGE("%{public}s: not support", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
     return HDF_SUCCESS;
 }
 
@@ -102,11 +107,13 @@ void UsbdPort::setPortPath(const std::string &path)
 
 int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
-    int32_t mode = PORT_MODE_DEVICE;
-    if (IfCanSwitch(portId, powerRole, dataRole)) {
-        return HDF_FAILURE;
+    auto ret = IfCanSwitch(portId, powerRole, dataRole);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: can not switch function", __func__);
+        return ret;
     }
 
+    int32_t mode = PORT_MODE_DEVICE;
     if (powerRole == POWER_ROLE_SOURCE && dataRole == DATA_ROLE_HOST) {
         mode = PORT_MODE_HOST;
     }
@@ -128,8 +135,8 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
     return HDF_SUCCESS;
 }
 
-int32_t UsbdPort::SetPort(int32_t portId, int32_t powerRole, int32_t dataRole,
-    UsbdSubscriber *usbdSubscribers, uint32_t len)
+int32_t UsbdPort::SetPort(
+    int32_t portId, int32_t powerRole, int32_t dataRole, UsbdSubscriber *usbdSubscribers, uint32_t len)
 {
     int32_t ret = SetPortInit(portId, powerRole, dataRole);
     if (ret != HDF_SUCCESS) {
