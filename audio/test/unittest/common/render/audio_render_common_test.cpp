@@ -187,6 +187,7 @@ void AudioUtRenderTest::TearDown()
 HWTEST_F(AudioUtRenderTest, RenderStartNull001, TestSize.Level1)
 {
     EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->Start(nullptr));
+    render_->Stop(render_);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level1)
@@ -194,6 +195,7 @@ HWTEST_F(AudioUtRenderTest, RenderStartNull002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, render_->Start(render_));
     EXPECT_NE(HDF_SUCCESS, render_->Start(render_));
     EXPECT_EQ(HDF_SUCCESS, render_->Stop(render_));
+    render_->Stop(render_);
 }
 
 HWTEST_F(AudioUtRenderTest, RenderStartStopIsValid001, TestSize.Level1)
@@ -444,7 +446,7 @@ HWTEST_F(AudioUtRenderTest, RenderGetRenderPositionIsValid002, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = render_->GetRenderPosition(render_, &frames, &time);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
 
     render_->Stop(render_);
     if (frame != nullptr) {
@@ -500,7 +502,7 @@ HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeNull001, TestSize.Level1)
 HWTEST_F(AudioUtRenderTest, RenderTurnStandbyModeIsValid001, TestSize.Level1)
 {
     int32_t ret = render_->Start(render_);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = render_->TurnStandbyMode(render_);
     EXPECT_EQ(HDF_SUCCESS, ret);
