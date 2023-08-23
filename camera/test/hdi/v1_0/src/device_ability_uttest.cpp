@@ -33,3 +33,20 @@ void DeviceAbilityUtTest::TearDown(void)
 {
     cameraTest->Close();
 }
+
+/**
+ * @tc.name: print camera ability
+ * @tc.desc: print camera ability
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(DeviceAbilityUtTest, Device_Ability_Hdi_001, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t *data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    std::string metaStr = FormatCameraMetadataToString(data);
+    EXPECT_NE(metaStr.empty(), true);
+    std::cout << "Device_Ability_001 start:" << std::endl << metaStr << std::endl <<
+        "Device_Ability_001 end" << std::endl;
+}
