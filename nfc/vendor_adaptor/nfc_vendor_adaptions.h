@@ -73,7 +73,7 @@ public:
 
 private:
     std::string GetChipType(void);
-    std::string GetNfcHalFuncNameSuffix(std::string chipType);
+    std::string GetNfcHalFuncNameSuffix(const std::string &chipType);
     void ResetNfcInterface(void);
     int8_t InitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
 
