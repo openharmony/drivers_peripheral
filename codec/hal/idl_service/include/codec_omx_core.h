@@ -35,7 +35,7 @@ public:
 public:
     CodecOMXCore() = default;
     ~CodecOMXCore();
-    int32_t Init(const std::string &libName);
+    int32_t Init(const std::string &libPath);
     void DeInit();
     int32_t GetHandle(OMX_HANDLETYPE &handle, std::string &compName, OMX_PTR appData,
                       const OMX_CALLBACKTYPE &callbacks);

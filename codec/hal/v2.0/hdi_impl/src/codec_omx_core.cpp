@@ -29,16 +29,23 @@ CodecOMXCore::~CodecOMXCore()
         dlclose(libHandle_);
     }
 }
-int32_t CodecOMXCore::Init(const std::string &libName)
+int32_t CodecOMXCore::Init(const std::string &libPath)
 {
-    if (libName.empty()) {
+    char patBuff[PATH_MAX] = {'\0'};
+
+    if (libPath.empty()) {
         CODEC_LOGE("param is empty.");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);
+    if (realpath(libPath, pathBuff) == NULL) {
+        CODEC_LOGE("path is empty");
+        return HDF_FAILURE;
+    }
+
+    libHandle_ = dlopen(libPath.c_str(), RTLD_LAZY);
     if (libHandle_ == nullptr) {
-        CODEC_LOGE("failed to dlopen %{public}s.", libName.c_str());
+        CODEC_LOGE("failed to dlopen %{public}s.", libPath.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
 
