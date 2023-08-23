@@ -294,8 +294,8 @@ static int32_t SetMatchRenderDefaultDevicePath(struct AudioHwRenderParam *render
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    for (int32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
-        const char *deviceType = AudioPathSelGetDeviceType(i);
+    for (uint32_t i = PIN_OUT_SPEAKER; i <= PIN_OUT_EARPIECE; i = i << 1) {
+        const char *deviceType = AudioPathSelGetDeviceType((int32_t)i);
         if (deviceType == NULL) {
             AUDIO_FUNC_LOGE("DeviceType not found.");
             return HDF_FAILURE;
@@ -320,9 +320,9 @@ static int32_t SetMatchRenderOtherDevicePath(
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    for (int32_t j = PIN_OUT_SPEAKER; j <= PIN_OUT_EARPIECE; j = j << 1) {
+    for (uint32_t j = PIN_OUT_SPEAKER; j <= PIN_OUT_EARPIECE; j = j << 1) {
         if ((j & tpins) == j) {
-            ret = SetRenderPathValue(j, cJsonObj, renderParam, AUDIO_DEV_ON);
+            ret = SetRenderPathValue((int32_t)j, cJsonObj, renderParam, AUDIO_DEV_ON);
             if (ret != HDF_SUCCESS) {
                 AUDIO_FUNC_LOGW("set value failed!");
                 continue;
@@ -339,7 +339,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
+    uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
     if (pins < 0) {
         AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;
@@ -519,9 +519,9 @@ static int32_t SetMatchCaptureDefaultDevicePath(struct AudioHwCaptureParam *capt
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    for (int32_t i = PIN_IN_MIC; i <= PIN_IN_BLUETOOTH_SCO_HEADSET;
+    for (uint32_t i = PIN_IN_MIC; i <= PIN_IN_BLUETOOTH_SCO_HEADSET;
          i = (1 << INPUT_OFFSET) | ((i & OUTPUT_MASK) << 1)) {
-        const char *deviceType = AudioPathSelGetDeviceType(i);
+        const char *deviceType = AudioPathSelGetDeviceType((int32_t)i);
         if (deviceType == NULL) {
             AUDIO_FUNC_LOGE("DeviceType not found.");
             return HDF_FAILURE;
@@ -543,14 +543,14 @@ static int32_t SetMatchCaptureOtherDevicePath(
     struct AudioHwCaptureParam *captureParam, cJSON *cJsonObj, int32_t tpins, int32_t value)
 {
     int32_t ret;
-    int32_t i;
+    uint32_t i;
     if (captureParam == NULL || cJsonObj == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
     for (i = PIN_IN_MIC; i <= PIN_IN_BLUETOOTH_SCO_HEADSET; i = (1 << INPUT_OFFSET) | ((i & OUTPUT_MASK) << 1)) {
         if ((i & tpins) == i) { /* Select which device to open and get the pin of which device */
-            ret = SetCapturePathValue(i, cJsonObj, captureParam, value);
+            ret = SetCapturePathValue((int32_t)i, cJsonObj, captureParam, value);
             if (ret != HDF_SUCCESS) {
                 AUDIO_FUNC_LOGE("set value failed!");
                 continue;
@@ -567,7 +567,7 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t pins = captureParam->captureMode.hwInfo.deviceDescript.pins;
+    uint32_t pins = captureParam->captureMode.hwInfo.deviceDescript.pins;
     if (pins < 0) {
         AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;

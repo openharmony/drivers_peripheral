@@ -29,8 +29,8 @@
 
 static unsigned int g_bufferTime = 500000; /* (0.5s): ring buffer length in us */
 static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
-static snd_pcm_sframes_t g_bufferSize = 0;
-static snd_pcm_sframes_t g_periodSize = 0;
+static snd_pcm_uframes_t g_bufferSize = 0;
+static snd_pcm_uframes_t g_periodSize = 0;
 static int g_resample = 1;         /* enable alsa-lib resampling */
 static bool g_periodEvent = false; /* produce poll event after each period */
 static int g_canPause = 0;         /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
@@ -126,7 +126,7 @@ static int32_t AudioCaptureMixerGetVolume(snd_mixer_t *mixer, snd_mixer_elem_t *
         AUDIO_FUNC_LOGE("Get right channel fail!");
         return HDF_FAILURE;
     }
-    *vol = (volLeft + volRight) >> 1;
+    *vol = (volLeft + volRight) / 1;
 
     return HDF_SUCCESS;
 }
@@ -1317,7 +1317,7 @@ static int32_t MmapDescWriteBufferCapture(const struct AudioHwCaptureParam *hand
         AUDIO_FUNC_LOGE("mmapAddr is NULL!");
         return HDF_FAILURE;
     }
-    size = (snd_pcm_sframes_t)handleData->frameCaptureMode.mmapBufDesc.totalBufferFrames;
+    size = (snd_pcm_uframes_t)handleData->frameCaptureMode.mmapBufDesc.totalBufferFrames;
     frameSize = handleData->frameCaptureMode.attrs.channelCount * handleData->frameCaptureMode.attrs.format;
     while (size > 0) {
         xfer = snd_pcm_mmap_readi(cardIns->capturePcmHandle, mmapAddr, size);
