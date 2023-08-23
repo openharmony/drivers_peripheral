@@ -14,6 +14,8 @@
  */
 
 #include "component_mgr.h"
+#include <securec.h>
+#include <string.h>
 #include <hdf_base.h>
 #include "codec_log_wrapper.h"
 namespace OHOS {
