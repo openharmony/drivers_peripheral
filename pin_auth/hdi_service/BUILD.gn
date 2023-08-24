@@ -15,6 +15,15 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpin_auth_interface_service_1.1") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  stack_protector_ret = true
   include_dirs = [
     "service/inc",
     "adaptor/inc",
@@ -56,6 +65,15 @@ ohos_shared_library("libpin_auth_interface_service_1.1") {
 }
 
 ohos_shared_library("libpin_auth_driver") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  stack_protector_ret = true
   include_dirs = [
     "service/inc",
     "main/inc",
