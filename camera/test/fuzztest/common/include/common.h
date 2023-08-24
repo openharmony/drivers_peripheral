@@ -42,7 +42,13 @@ public:
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
+
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoV1_1 = nullptr;
+    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::PrelaunchConfig> prelaunchConfig = nullptr;
 
     int32_t rc;
     std::vector<std::string> cameraIds;

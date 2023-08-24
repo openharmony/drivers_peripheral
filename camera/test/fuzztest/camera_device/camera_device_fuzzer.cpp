@@ -18,99 +18,116 @@
 #include "v1_1/icamera_device.h"
 
 namespace OHOS {
+#define SIZE_MAX 256
 const size_t THRESHOLD = 10;
 
 enum DeviceCmdId {
     CAMERA_DEVICE_GET_DEFAULT_SETTINGS,
     CAMERA_DEVICE_GET_STREAM_V1_1,
-    CAMERA_DEVICE_GET_STREAM,
     CAMERA_DEVICE_UPDATE_SETTINGS,
     CAMERA_DEVICE_SET_RESULT_MODE,
     CAMERA_DEVICE_GET_ENABLED_RESULTS,
     CAMERA_DEVICE_ENABLE_RESULT,
     CAMERA_DEVICE_DISABLE_RESULT,
+    CAMERA_DEVICE_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
-enum BitOperat {
-    INDEX_0 = 0,
-    INDEX_1,
-    INDEX_2,
-    INDEX_3,
-    MOVE_EIGHT_BITS = 8,
-    MOVE_SIXTEEN_BITS = 16,
-    MOVE_TWENTY_FOUR_BITS = 24,
-};
-
-static uint32_t ConvertUint32(const uint8_t *bitOperat)
+void FuncGetDefaultSettings(const uint8_t *rawData, size_t size)
 {
-    if (bitOperat == nullptr) {
-        return 0;
+    if (size >= SIZE_MAX) {
+        return;
     }
-
-    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
-        (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
+    std::vector<uint8_t> abilityVec = {};
+    uint8_t *data = const_cast<uint8_t *>(rawData);
+    abilityVec.push_back(*data);
+    cameraTest->cameraDeviceV1_1->GetDefaultSettings(abilityVec);
 }
 
-static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
+void FuncGetStreamOperator_V1_1(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    sptr<HDI::Camera::V1_0::IStreamOperatorCallback> g_callback =
+        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    sptr<HDI::Camera::V1_1::IStreamOperator> g_StreamOperator = nullptr;
+    cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(g_callback, g_StreamOperator);
+}
+
+void FuncUpdateSettings(const uint8_t *rawData, size_t size)
+{
+    if (size >= SIZE_MAX) {
+        return;
+    }
+    std::vector<uint8_t> abilityVec = {};
+    uint8_t *data = const_cast<uint8_t *>(rawData);
+    abilityVec.push_back(*data);
+    cameraTest->cameraDeviceV1_1->UpdateSettings(abilityVec);
+}
+
+void FuncSetResultMode(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    cameraTest->cameraDeviceV1_1->SetResultMode(
+        *reinterpret_cast<const HDI::Camera::V1_0::ResultCallbackMode *>(rawData));
+}
+
+void FuncGetEnabledResults(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    std::vector<int32_t> result = {};
+    int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    result.push_back(*data);
+    cameraTest->cameraDeviceV1_1->GetEnabledResults(result);
+}
+
+void FuncEnableResult(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    std::vector<int32_t> result = {};
+    int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    result.push_back(*data);
+    cameraTest->cameraDeviceV1_1->EnableResult(result);
+}
+
+void FuncDisableResult(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    std::vector<int32_t> result = {};
+    int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    result.push_back(*data);
+    cameraTest->cameraDeviceV1_1->DisableResult(result);
+}
+
+static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     CAMERA_LOGI("DeviceFuncSwitch start, the cmd is:%{public}u", cmd);
     switch (cmd) {
         case CAMERA_DEVICE_GET_DEFAULT_SETTINGS: {
-            std::vector<uint8_t> abilityVec = {};
-            uint8_t *data = const_cast<uint8_t *>(rawData);
-            abilityVec.push_back(*data);
-            cameraTest->cameraDeviceV1_1->GetDefaultSettings(abilityVec);
+            FuncGetDefaultSettings(rawData, size);
             break;
         }
         case CAMERA_DEVICE_GET_STREAM_V1_1: {
-            sptr<HDI::Camera::V1_1::IStreamOperator> g_StreamOperator = nullptr;
-            const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> callback =
-                const_cast<HDI::Camera::V1_0::IStreamOperatorCallback *>(
-                    reinterpret_cast<const HDI::Camera::V1_0::IStreamOperatorCallback *>(rawData));
-
-            cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(callback, g_StreamOperator);
+            FuncGetStreamOperator_V1_1(rawData, size);
             break;
         }
-        case CAMERA_DEVICE_GET_STREAM: {
-            sptr<HDI::Camera::V1_0::IStreamOperator> g_StreamOperator = nullptr;
-            const sptr<HDI::Camera::V1_0::IStreamOperatorCallback> callback =
-                const_cast<HDI::Camera::V1_0::IStreamOperatorCallback *>(
-                    reinterpret_cast<const HDI::Camera::V1_0::IStreamOperatorCallback *>(rawData));
 
-            cameraTest->cameraDeviceV1_1->GetStreamOperator(callback, g_StreamOperator);
-            break;
-        }
         case CAMERA_DEVICE_UPDATE_SETTINGS: {
-            std::vector<uint8_t> abilityVec = {};
-            uint8_t *data = const_cast<uint8_t *>(rawData);
-            abilityVec.push_back(*data);
-            cameraTest->cameraDeviceV1_1->UpdateSettings(abilityVec);
+            FuncUpdateSettings(rawData, size);
             break;
         }
         case CAMERA_DEVICE_SET_RESULT_MODE: {
-            cameraTest->cameraDeviceV1_1->SetResultMode(
-                *reinterpret_cast<const HDI::Camera::V1_0::ResultCallbackMode *>(rawData));
+            FuncSetResultMode(rawData, size);
             break;
         }
         case CAMERA_DEVICE_GET_ENABLED_RESULTS: {
-            std::vector<int32_t> result = {};
-            int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            result.push_back(*data);
-            cameraTest->cameraDeviceV1_1->GetEnabledResults(result);
+            FuncGetEnabledResults(rawData, size);
             break;
         }
         case CAMERA_DEVICE_ENABLE_RESULT: {
-            std::vector<int32_t> result = {};
-            int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            result.push_back(*data);
-            cameraTest->cameraDeviceV1_1->EnableResult(result);
+            FuncEnableResult(rawData, size);
             break;
         }
         case CAMERA_DEVICE_DISABLE_RESULT: {
-            std::vector<int32_t> result = {};
-            int32_t *data = const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            result.push_back(*data);
-            cameraTest->cameraDeviceV1_1->DisableResult(result);
+            FuncDisableResult(rawData, size);
             break;
         }
         default: {
@@ -122,12 +139,11 @@ static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
 
 bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 {
-    (void)size;
     if (rawData == nullptr) {
         return false;
     }
 
-    uint32_t cmd = ConvertUint32(rawData);
+    uint32_t cmd = 0;
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
@@ -140,7 +156,9 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
         return false;
     }
 
-    DeviceFuncSwitch(cmd, rawData);
+    for (cmd = 0; cmd < CAMERA_DEVICE_END; cmd++) {
+        DeviceFuncSwitch(cmd, rawData, size);
+    }
     cameraTest->Close();
     return true;
 }
@@ -148,7 +166,7 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     if (size < OHOS::THRESHOLD) {
-        CAMERA_LOGW("Fuzz test input is invalid. The size is smaller than %{public}d", OHOS::THRESHOLD);
+        CAMERA_LOGW("Fuzz test input is invalid. The size is smaller than %{public}zu", OHOS::THRESHOLD);
         return 0;
     }
 
