@@ -79,7 +79,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = false
