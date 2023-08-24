@@ -487,6 +487,10 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
         AUDIO_FUNC_LOGE("sprintf_s failed!");
         return HDF_FAILURE;
     }
+    if (listLenth < strlen(strValue)) {
+        AUDIO_FUNC_LOGE("keyValueList length too little!");
+        return HDF_FAILURE;
+    }
     ret = strncat_s(keyValueList, listLenth, strValue, strlen(strValue));
     if (ret != EOK) {
         AUDIO_FUNC_LOGE("strcat_s failed!");
