@@ -30,16 +30,16 @@ CodecOMXCore::~CodecOMXCore()
         dlclose(libHandle_);
     }
 }
-int32_t CodecOMXCore::Init(const std::string &libPath)
+int32_t CodecOMXCore::Init(const char *libPath)
 {
     char pathBuff[PATH_MAX] = {'\0'};
 
-    if (libPath.empty()) {
+    if (libPath == NULL) {
         CODEC_LOGE("param is empty.");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (realpath(libPath.c_str(), pathBuff) == NULL) {
+    if (realpath(libPath, pathBuff) == NULL) {
         CODEC_LOGE("path is empty");
         return HDF_FAILURE;
     }
