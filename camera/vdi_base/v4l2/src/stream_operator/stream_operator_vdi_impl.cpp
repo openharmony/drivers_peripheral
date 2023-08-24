@@ -287,6 +287,7 @@ int32_t StreamOperatorVdiImpl::ReleaseStreams(const std::vector<int32_t> &stream
             it->second->StopStream();
         }
         it->second->DumpStatsInfo();
+        it->second->ReleaseStreamBufferPool();
         streamMap_.erase(it);
     }
 
