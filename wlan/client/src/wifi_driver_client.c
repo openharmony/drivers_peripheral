@@ -138,7 +138,7 @@ void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
             g_callbackEventMap[i]->onRecFunc = NULL;
             free(g_callbackEventMap[i]);
             g_callbackEventMap[i] = NULL;
-            pthread_mutex_lock(&g_callbackMutex);
+            pthread_mutex_unlock(&g_callbackMutex);
             return;
         }
     }
