@@ -16,6 +16,9 @@
 #define WLAN_EXTEND_CMD_H
 #include "../wlan_impl.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG "HDF_WIFI_CORE"
+
 int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char *ifName,
     const struct MeasChannelParam *measChannelParam);
 int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char *ifName,

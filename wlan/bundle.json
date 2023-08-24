@@ -14,7 +14,8 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_wlan_feature_enable_HDF_NL80211",
-      "drivers_peripheral_wlan_feature_enable_HDF_UT"
+      "drivers_peripheral_wlan_feature_enable_HDF_UT",
+      "drivers_peripheral_wlan_feature_enable_HDF_WLAN_EXTEND_VDI"
     ],
     "adapted_system_type": ["standard", "small"],
     "rom": "660KB",
