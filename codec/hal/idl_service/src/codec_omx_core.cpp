@@ -19,8 +19,9 @@
 #include <hdf_base.h>
 #include <memory.h>
 #include <securec.h>
-#include <stdlib.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
+
 namespace OHOS {
 namespace Codec {
 namespace Omx {

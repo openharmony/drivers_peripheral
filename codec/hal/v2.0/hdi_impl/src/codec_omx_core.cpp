@@ -18,7 +18,7 @@
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <securec.h>
-#include <stdlib.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
 
 namespace OHOS {
