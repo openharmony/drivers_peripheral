@@ -206,13 +206,13 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControlException001, TestSize.Le
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->Start(mmapCapture_); // restart can be return two state
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
 
     ret = mmapCapture_->Stop(mmapCapture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = mmapCapture_->Stop(mmapCapture_); // restop can be return two state
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPosition001, TestSize.Level1)
@@ -231,7 +231,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPosition001, TestSize.Lev
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->GetMmapPosition(mmapCapture_, &frames, &time);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 
     ret = mmapCapture_->Stop(mmapCapture_);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
@@ -253,10 +253,10 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionException001, Tes
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->GetMmapPosition(nullptr, &frames, &time);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->GetMmapPosition(mmapCapture_, nullptr, &time);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->Stop(mmapCapture_);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
