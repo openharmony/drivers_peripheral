@@ -21,75 +21,76 @@ const size_t THRESHOLD = 10;
 
 enum HostCmdId {
     CAMERA_HOST_PRELAUNCH,
-    CAMERA_HOST_GET_CAMERA_IDS,
     CAMERA_HOST_GET_CAMERA_ABILITY,
     CAMERA_HOST_OPEN_CAMERA,
     CAMERA_HOST_OPEN_CAMERA_V1_1,
     CAMERA_HOST_SET_FLASH_LIGHTS,
+    CAMERA_HOST_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
-enum BitOperat {
-    INDEX_0 = 0,
-    INDEX_1,
-    INDEX_2,
-    INDEX_3,
-    MOVE_EIGHT_BITS = 8,
-    MOVE_SIXTEEN_BITS = 16,
-    MOVE_TWENTY_FOUR_BITS = 24,
-};
-
-static uint32_t ConvertUint32(const uint8_t *bitOperat)
+void FuncPrelaunch(const uint8_t *rawData, size_t size)
 {
-    if (bitOperat == nullptr) {
-        return 0;
+    if (size < sizeof(struct HDI::Camera::V1_1::PrelaunchConfig)) {
+        return;
     }
-
-    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
-        (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = const_cast<char*>(reinterpret_cast<const char*>(rawData));
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting.push_back(*rawData);
+    cameraTest->serviceV1_1->Prelaunch(*cameraTest->prelaunchConfig);
 }
 
-static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
+void FuncGetCameraAbility(const uint8_t *rawData, size_t size)
+{
+    cameraTest->serviceV1_1->GetCameraAbility(const_cast<char*>(reinterpret_cast<const char*>(rawData)),
+        cameraTest->abilityVec);
+}
+
+void FuncOpenCamera(const uint8_t *rawData, size_t size)
+{
+    sptr<HDI::Camera::V1_0::ICameraDevice> g_CameraDevice = nullptr;
+    const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
+        new Camera::CameraManager::DemoCameraDeviceCallback();
+    cameraTest->serviceV1_1->OpenCamera(
+        const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
+}
+
+void FuncOpenCamera_V1_1(const uint8_t *rawData, size_t size)
+{
+    sptr<HDI::Camera::V1_1::ICameraDevice> g_CameraDevice = nullptr;
+    const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
+        new Camera::CameraManager::DemoCameraDeviceCallback();
+    cameraTest->serviceV1_1->OpenCamera_V1_1(
+        const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
+}
+
+void FuncSetFlashlight(const uint8_t *rawData, size_t size)
+{
+    cameraTest->serviceV1_1->SetFlashlight(
+        const_cast<char*>(reinterpret_cast<const char*>(rawData)), true);
+}
+
+static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     switch (cmd) {
         case CAMERA_HOST_PRELAUNCH: {
-            cameraTest->serviceV1_1->Prelaunch(reinterpret_cast<const HDI::Camera::V1_1::PrelaunchConfig &>(rawData));
-            break;
-        }
-        case CAMERA_HOST_GET_CAMERA_IDS: {
-            std::vector<std::string> cameraIds = {};
-            std::string *data = const_cast<std::string *>(reinterpret_cast<const std::string *>(rawData));
-            cameraIds.push_back(*data);
-            cameraTest->serviceV1_1->GetCameraIds(cameraIds);
+            FuncPrelaunch(rawData, size);
             break;
         }
         case CAMERA_HOST_GET_CAMERA_ABILITY: {
-            std::vector<uint8_t> abilityVec = {};
-            uint8_t *data = const_cast<uint8_t *>(rawData);
-            abilityVec.push_back(*data);
-            cameraTest->serviceV1_1->GetCameraAbility(*reinterpret_cast<const std::string *>(rawData), abilityVec);
+            FuncGetCameraAbility(rawData, size);
             break;
         }
         case CAMERA_HOST_OPEN_CAMERA: {
-            sptr<HDI::Camera::V1_0::ICameraDevice> g_CameraDevice = nullptr;
-            const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
-                const_cast<HDI::Camera::V1_0::ICameraDeviceCallback *>(
-                    reinterpret_cast<const HDI::Camera::V1_0::ICameraDeviceCallback *>(rawData));
-
-            cameraTest->serviceV1_1->OpenCamera(
-                *reinterpret_cast<const std::string *>(rawData), callback, g_CameraDevice);
+            FuncOpenCamera(rawData, size);
             break;
         }
         case CAMERA_HOST_OPEN_CAMERA_V1_1: {
-            sptr<HDI::Camera::V1_1::ICameraDevice> g_CameraDevice = nullptr;
-            const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
-                const_cast<HDI::Camera::V1_0::ICameraDeviceCallback *>(
-                    reinterpret_cast<const HDI::Camera::V1_0::ICameraDeviceCallback *>(rawData));
-            cameraTest->serviceV1_1->OpenCamera_V1_1(
-                *reinterpret_cast<const std::string *>(rawData), callback, g_CameraDevice);
+            FuncOpenCamera_V1_1(rawData, size);
             break;
         }
         case CAMERA_HOST_SET_FLASH_LIGHTS: {
-            cameraTest->serviceV1_1->SetFlashlight(*reinterpret_cast<const std::string *>(rawData), true);
+            FuncSetFlashlight(rawData, size);
             break;
         }
         default:
@@ -99,12 +100,11 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
 
 bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 {
-    (void)size;
     if (rawData == nullptr) {
         return false;
     }
 
-    uint32_t cmd = ConvertUint32(rawData);
+    uint32_t cmd = 0;
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
@@ -117,7 +117,9 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
         return false;
     }
 
-    HostFuncSwitch(cmd, rawData);
+    for (cmd = 0; cmd < CAMERA_HOST_END; cmd++) {
+        HostFuncSwitch(cmd, rawData, size);
+    }
     cameraTest->Close();
     return true;
 }
