@@ -23,11 +23,11 @@
 #include <surface.h>
 #include <sys/time.h>
 #include <ctime>
-#include <display_type.h>
+#include <fcntl.h>
 
 #include "constants.h"
 #include "camera_metadata_operator.h"
-#include "display_type.h"
+#include "v1_0/display_composer_type.h"
 #include "v1_0/icamera_device.h"
 #include "v1_0/icamera_host.h"
 #include "v1_0/ioffline_stream_operator.h"
@@ -45,6 +45,7 @@ namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::Camera;
 using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 using CameraAbility = OHOS::Camera::CameraMetadata;
 using CameraSetting = OHOS::Camera::CameraMetadata;
 
