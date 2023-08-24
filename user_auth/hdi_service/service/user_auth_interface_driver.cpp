@@ -24,12 +24,13 @@
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
+namespace {
 struct HdfUserAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     if (client == nullptr || data == nullptr || reply == nullptr || client->device == nullptr ||
@@ -59,13 +60,13 @@ static int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
     return hdfUserAuthInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfUserAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+int HdfUserAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("HdfUserAuthInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
-static int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("HdfUserAuthInterfaceDriverBind enter");
     if (deviceObject == nullptr) {
@@ -101,7 +102,7 @@ static int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfUserAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+void HdfUserAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("HdfUserAuthInterfaceDriverRelease enter");
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
@@ -123,6 +124,7 @@ struct HdfDriverEntry g_userAuthInterfaceDriverEntry = {
     .Init = HdfUserAuthInterfaceDriverInit,
     .Release = HdfUserAuthInterfaceDriverRelease,
 };
+} // namespace
 
 #ifdef __cplusplus
 extern "C" {
