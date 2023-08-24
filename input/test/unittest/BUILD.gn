@@ -54,7 +54,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "hdf_core:libhdf_utils",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
   }
 } else {

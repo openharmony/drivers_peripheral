@@ -37,7 +37,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
       "hdf_core:libhdf_utils",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -63,7 +63,7 @@ if (defined(ohos_lite)) {
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
-    external_deps = [ "hilog_featured_lite:hilog_shared" ]
+    external_deps = [ "hilog_lite:hilog_shared" ]
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HDF_LOG" ]
     }

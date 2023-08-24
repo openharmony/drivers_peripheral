@@ -43,7 +43,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "hdf_core:hdf_posix_osal",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
 
     cflags = [
