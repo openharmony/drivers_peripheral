@@ -18,13 +18,14 @@
 
 #include <mutex>
 #include <unordered_map>
-#include "display_type.h"
+#include "v1_0/display_composer_type.h"
 #include "ibuffer.h"
 #include "surface.h"
 #include "surface_type.h"
 #include "stream_statistics.h"
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Display::Composer::V1_0;
 struct TunnelConfig {
     uint32_t width;
     uint32_t height;

@@ -23,6 +23,7 @@
 #include <surface.h>
 #include <sys/time.h>
 #include <ctime>
+#include <fcntl.h>
 #include "camera.h"
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
