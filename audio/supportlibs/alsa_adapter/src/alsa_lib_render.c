@@ -30,8 +30,8 @@
 #define CHANNEL_MAP_TYPE_VAR      "VAR"    /* freely swappable channel position */
 #define CHANNEL_MAP_TYPE_PAIRED   "PAIRED" /* pair-wise swappable channel position */
 
-static snd_pcm_sframes_t g_bufferSize = 0;
-static snd_pcm_sframes_t g_periodSize = 0;
+static snd_pcm_uframes_t g_bufferSize = 0;
+static snd_pcm_uframes_t g_periodSize = 0;
 static unsigned int g_bufferTime = 500000; /* (0.5s): ring buffer length in us */
 static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
 static int g_resample = 1;                 /* enable alsa-lib resampling */
@@ -217,7 +217,7 @@ static int32_t MixerGetVolume(snd_mixer_t *mixer, snd_mixer_elem_t *pcmElemen, l
         AUDIO_FUNC_LOGE("Get right channel fail!");
         return HDF_FAILURE;
     }
-    *vol = (volLeft + volRight) >> 1;
+    *vol = (volLeft + volRight) / 2;
 
     return HDF_SUCCESS;
 }
