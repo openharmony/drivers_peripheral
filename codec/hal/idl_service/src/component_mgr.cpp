@@ -89,12 +89,12 @@ void ComponentMgr::AddSoftComponent()
 
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
-    char libPath[PATH_MAX];
-    uint32_t ret;
+    char libPath[PATH_MAX] = {'\0'};
+    int32_t ret;
 #ifdef __aarch64__
 ret = snprintf_s(libPath, PATH_MAX, PATH_MAX, "/vendor/lib64/%s", libName);
 #else
-ret = snprintf_s(libPath, PATH_MAX, PATH_MAX, "/vendor/lib/%s", libName);
+ret = snprintf_s(libPath, PATH_MAX, PATH_MAX, "/vendor/lib/chipsetsdk/%s", libName);
 #endif
     if (ret < 0) {
         CODEC_LOGE("%{public}s: get libPath failed", __func__);
