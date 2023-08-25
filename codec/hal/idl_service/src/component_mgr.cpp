@@ -14,6 +14,8 @@
  */
 
 #include "component_mgr.h"
+#include <securec.h>
+#include <string.h>
 #include <hdf_base.h>
 #include "codec_log_wrapper.h"
 namespace OHOS {
@@ -87,8 +89,19 @@ void ComponentMgr::AddSoftComponent()
 
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
+    char libPath[PATH_MAX] = {'\0'};
+    int32_t ret;
+#ifdef __aarch64__
+ret = snprintf_s(libPath, PATH_MAX, PATH_MAX, "/vendor/lib64/%s", libName);
+#else
+ret = snprintf_s(libPath, PATH_MAX, PATH_MAX, "/vendor/lib/chipsetsdk/%s", libName);
+#endif
+    if (ret < 0) {
+        CODEC_LOGE("%{public}s: get libPath failed", __func__);
+        return;
+    }
     auto core = std::make_shared<CodecOMXCore>();
-    core->Init(libName);
+    core->Init(libPath);
     std::lock_guard<std::mutex> lk(mutex_);
     cores_.emplace_back(core);
     std::string name("");
