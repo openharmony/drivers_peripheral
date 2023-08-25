@@ -18,8 +18,8 @@
 typedef uint8_t nfc_event_t;
 typedef uint8_t nfc_status_t;
 
-typedef void (nfc_stack_callback_t)(nfc_event_t event, nfc_status_t event_status);
-typedef void (nfc_stack_data_callback_t)(uint16_t data_len, uint8_t *p_data);
+typedef void (NfcStackCallbackT)(nfc_event_t event, nfc_status_t eventStatus);
+typedef void (NfcStackDataCallbackT)(uint16_t dataLen, uint8_t *pData);
 
 namespace OHOS {
 namespace HDI {
@@ -27,16 +27,16 @@ namespace Nfc {
 class INfcVendor {
 public:
     virtual ~INfcVendor() {}
-    virtual int VendorOpen(nfc_stack_callback_t *p_cback,
-                           nfc_stack_data_callback_t *p_data_cback);
-    virtual int VendorWrite(uint16_t data_len, const uint8_t *p_data);
-    virtual int VendorCoreInitialized(uint16_t core_init_rsp_len,
-                                      uint8_t *p_core_init_rsp_params);
+    virtual int VendorOpen(NfcStackCallbackT *pCback,
+                           NfcStackDataCallbackT *pDataCback);
+    virtual int VendorWrite(uint16_t dataLen, const uint8_t *pData);
+    virtual int VendorCoreInitialized(uint16_t coreInitRspLen,
+                                      uint8_t *pCoreInitRspParams);
     virtual int VendorPrediscover(void);
     virtual int VendorClose(bool bShutdown);
     virtual int VendorControlGranted(void);
     virtual int VendorPowerCycle(void);
-    virtual int VendorIoctl(long arg, void *p_data);
+    virtual int VendorIoctl(long arg, void *pData);
 };
 } // Nfc
 } // HDI
