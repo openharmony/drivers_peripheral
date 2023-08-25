@@ -42,14 +42,14 @@ const std::string NFC_HAL_SO_PREFIX = "libnfc_hal_impl_";
 const std::string NFC_HAL_SO_SUFFIX = ".z.so";
 
 struct NfcHalInterface {
-    int (*nfcHalOpen)(nfc_stack_callback_t *p_cback, nfc_stack_data_callback_t *p_data_cback);
-    int (*nfcHalWrite)(uint16_t data_len, const uint8_t *p_data);
-    int (*nfcHalCoreInitialized)(uint16_t core_init_rsp_len, uint8_t *p_core_init_rsp_params);
+    int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
+    int (*nfcHalWrite)(uint16_t dataLen, const uint8_t *pData);
+    int (*nfcHalCoreInitialized)(uint16_t coreInitRspLen, uint8_t *pCoreInitRspParams);
     int (*nfcHalPrediscover)(void);
     int (*nfcHalClose)(bool bShutdown);
     int (*nfcHalControlGranted)(void);
     int (*nfcHalPowerCycle)(void);
-    int (*nfcHalIoctl)(long arg, void *p_data);
+    int (*nfcHalIoctl)(long arg, void *pData);
 };
 
 struct NfcExtInterface {
@@ -62,14 +62,14 @@ public:
     NfcVendorAdaptions();
     ~NfcVendorAdaptions() override;
 
-    int VendorOpen(nfc_stack_callback_t *p_cback, nfc_stack_data_callback_t *p_data_cback) override;
-    int VendorWrite(uint16_t data_len, const uint8_t *p_data) override;
-    int VendorCoreInitialized(uint16_t core_init_rsp_len, uint8_t *p_core_init_rsp_params) override;
+    int VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback) override;
+    int VendorWrite(uint16_t dataLen, const uint8_t *pData) override;
+    int VendorCoreInitialized(uint16_t coreInitRspLen, uint8_t *pCoreInitRspParams) override;
     int VendorPrediscover(void) override;
     int VendorClose(bool bShutdown) override;
     int VendorControlGranted(void) override;
     int VendorPowerCycle(void) override;
-    int VendorIoctl(long arg, void *p_data) override;
+    int VendorIoctl(long arg, void *pData) override;
 
 private:
     std::string GetChipType(void);
