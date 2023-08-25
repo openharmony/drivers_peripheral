@@ -228,7 +228,8 @@ int32_t CodecHdiAdapterDecode::ConfigPortDefine()
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
     param.nPortIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
-    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] to GetParameter OMX_IndexParamPortDefinition", __func__, ret);
         return ret;
@@ -240,7 +241,8 @@ int32_t CodecHdiAdapterDecode::ConfigPortDefine()
     param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
     param.format.video.eColorFormat = AV_COLOR_FORMAT;  // YUV420SP
-    ret = client_->SetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    ret = client_->SetParameter(client_, OMX_IndexParamPortDefinition,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] to SetParameter OMX_IndexParamPortDefinition", __func__, ret);
         return ret;
@@ -278,7 +280,7 @@ bool CodecHdiAdapterDecode::Configure()
     if (codecMime_ == codecMime::AVC) {
         param.eCompressionFormat = OMX_VIDEO_CodingAVC;  // H264
     } else {
-        param.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;  // H265
+        param.eCompressionFormat = static_cast<OMX_VIDEO_CODINGTYPE>(CODEC_OMX_VIDEO_CodingHEVC);  // H265
     }
 
     ret = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat,
@@ -392,8 +394,9 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex)
 
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)portIndex;
-    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
+    param.nPortIndex = static_cast<OMX_U32>(portIndex);
+    auto ret = client_->GetParameter(client_, OMX_IndexParamPortDefinition,
+        reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] GetParameter with OMX_IndexParamPortDefinition:portIndex[%{public}d]",
                  __func__, ret, portIndex);
@@ -544,7 +547,7 @@ void CodecHdiAdapterDecode::Run()
 int32_t CodecHdiAdapterDecode::OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info)
 {
     if (event == OMX_EventCmdComplete) {
-        OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
+        OMX_COMMANDTYPE cmd = static_cast<OMX_COMMANDTYPE>(info->data1);
         if (OMX_CommandStateSet == cmd) {
             HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
             g_core->OnStatusChanged();

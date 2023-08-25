@@ -234,9 +234,9 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
-    unsigned long tunneledComp = (unsigned long)omxHandleTypeTunneledComp;
-    auto err = comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort,
-                                               reinterpret_cast<OMX_TUNNELSETUPTYPE *>(&tunnelSetup));
+    unsigned long tunneledComp = static_cast<unsigned long>(omxHandleTypeTunneledComp);
+    auto err = comType->ComponentTunnelRequest(comp_, port, reinterpret_cast<OMX_HANDLETYPE>(tunneledComp),
+        tunneledPort, reinterpret_cast<OMX_TUNNELSETUPTYPE *>(&tunnelSetup));
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentTunnelRequest err = %{public}x ", err);
     }
@@ -274,7 +274,7 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
         CODEC_LOGE("ComponentRoleEnum ret err [0x%{public}x] ", err);
         return err;
     }
-    role.insert(role.end(), omxRole, omxRole + strlen((const char *)omxRole));
+    role.insert(role.end(), omxRole, omxRole + strlen(reinterpret_cast<const char *>(omxRole)));
     return OMX_ErrorNone;
 }
 
@@ -353,9 +353,10 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     if (buffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
+        err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType,
+            portIndex, 0, buffer.allocLen);
     } else {
-        err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen,
+        err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                             codecBuffer->GetBuffer());
     }
 
@@ -381,7 +382,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
-    int32_t err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
+    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return err;
@@ -391,7 +392,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
     sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
     if (codecBuffer == nullptr) {
         CODEC_LOGE("codecBuffer is null");
-        (void)OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+        (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
         return OMX_ErrorInvalidComponent;
     }
 
@@ -417,7 +418,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
         return err;
     }
 
-    err = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+    err = OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_FreeBuffer err [%{public}x]", err);
         return err;
@@ -461,7 +462,7 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
         return err;
     }
 
-    err = OMX_EmptyThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
+    err = OMX_EmptyThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
     return err;
 }
 
@@ -482,7 +483,7 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
         return err;
     }
 
-    err = OMX_FillThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
+    err = OMX_FillThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
     return err;
 }
 
