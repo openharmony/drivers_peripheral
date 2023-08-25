@@ -590,20 +590,20 @@ int32_t ComponentNode::ChangeComponentState(uint32_t param)
         case OMX_StateLoaded:
         case OMX_StateIdle:
         case OMX_StateWaitForResources: {
-            ret = SetState((OMX_STATETYPE)param);
+            ret = SetState(static_cast<OMX_STATETYPE>(param));
             break;
         }
         case OMX_StateExecuting: {
             ret = CodecStart(comp_);
             if (ret == HDF_SUCCESS) {
-                ret = SetState((OMX_STATETYPE)param);
+                ret = SetState(static_cast<OMX_STATETYPE>(param));
             }
             break;
         }
         case OMX_StatePause: {
             ret = CodecStop(comp_);
             if (ret == HDF_SUCCESS) {
-                ret = SetState((OMX_STATETYPE)param);
+                ret = SetState(static_cast<OMX_STATETYPE>(param));
             }
             break;
         }
@@ -635,7 +635,7 @@ int32_t ComponentNode::ChangeComponentState(uint32_t param)
 
 int32_t ComponentNode::FlushComponent(uint32_t param)
 {
-    DirectionType directType = (DirectionType)param;
+    DirectionType directType = static_cast<DirectionType>(param);
     return CodecFlush(comp_, directType);
 }
 }  // namespace CodecAdapter

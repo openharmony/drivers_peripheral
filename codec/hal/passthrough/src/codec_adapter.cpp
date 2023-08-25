@@ -54,7 +54,7 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
     }
 
     CodecExInfo exInfo;
-    auto ret = GetBasicInfoByCompName((uint8_t *)&exInfo, compName);
+    auto ret = GetBasicInfoByCompName(reinterpret_cast<uint8_t *>(&exInfo), compName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s GetBasicInfoByCompName error", __func__);
         return ret;
