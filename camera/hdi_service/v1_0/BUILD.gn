@@ -53,7 +53,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
     public_configs = [ ":camhdi_impl_config" ]
     subsystem_name = "hdf"

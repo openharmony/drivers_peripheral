@@ -31,7 +31,7 @@ ohos_executable("usb_dev_test") {
   ]
   external_deps = [
     "hdf_core:libhdf_utils",
-    "hilog_featured_lite:hilog_shared",
+    "hilog_lite:hilog_shared",
   ]
   defines = [ "__USER__" ]
 
