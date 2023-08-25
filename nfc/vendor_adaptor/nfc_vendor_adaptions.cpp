@@ -27,7 +27,7 @@ using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-static string GetNfcHalSoName(string chipType)
+static string GetNfcHalSoName(const std::string &chipType)
 {
     string nfcHalSoName = NFC_HAL_SO_PREFIX + chipType + NFC_HAL_SO_SUFFIX;
     return nfcHalSoName;
@@ -54,7 +54,7 @@ string NfcVendorAdaptions::GetChipType(void)
     return nfcChipType;
 }
 
-string NfcVendorAdaptions::GetNfcHalFuncNameSuffix(string chipType)
+string NfcVendorAdaptions::GetNfcHalFuncNameSuffix(const std::string &chipType)
 {
     string suffix = DEFAULT_FUNC_NAME_SUFFIX;
     if (nfcExtInf.getNfcHalFuncNameSuffix != nullptr) {
