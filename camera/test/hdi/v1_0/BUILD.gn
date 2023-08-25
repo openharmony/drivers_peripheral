@@ -79,7 +79,7 @@ if (defined(ohos_lite)) {
       "graphic_chipsetsdk:surface",
       "hdf_core:hdf_platform",
       "hdf_core:hdf_posix_osal",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
   }
 } else {

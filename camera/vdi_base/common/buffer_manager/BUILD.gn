@@ -57,7 +57,7 @@ if (defined(ohos_lite)) {
       "drivers_peripheral_display:hdi_display",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
-      "hilog_featured_lite:hilog_shared",
+      "hilog_lite:hilog_shared",
     ]
 
     public_configs = [ ":buffer_manager_config" ]
