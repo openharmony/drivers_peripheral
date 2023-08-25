@@ -820,22 +820,32 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto ERR;
+        OsalMemFree(port);
+        return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lockRW) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto ERR;
+        OsalMutexDestroy(&port->lock);
+        OsalMemFree(port);
+        return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lockReadFifo) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto ERR;
+        OsalMutexDestroy(&port->lock);
+        OsalMutexDestroy(&port->lockRW);
+        OsalMemFree(port);
+        return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lockWriteFifo) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto ERR;
+        OsalMutexDestroy(&port->lock);
+        OsalMutexDestroy(&port->lockRW);
+        OsalMutexDestroy(&port->lockReadFifo);
+        OsalMemFree(port);
+        return HDF_FAILURE;
     }
     DListHeadInit(&port->readPool);
     DListHeadInit(&port->readQueue);
@@ -843,9 +853,17 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
     ecm->port = port;
     return HDF_SUCCESS;
-ERR:
-    OsalMemFree(port);
-    return HDF_FAILURE;
+}
+
+static void UsbEcmFree(struct UsbEcmDevice *ecm)
+{
+    if (ecm->port != NULL) {
+        OsalMutexDestroy(&ecm->port->lock);
+        OsalMutexDestroy(&ecm->port->lockRW);
+        OsalMutexDestroy(&ecm->port->lockReadFifo);
+        OsalMutexDestroy(&ecm->port->lockWriteFifo);
+        OsalMemFree(ecm->port);
+    }
 }
 
 /* HdfDriverEntry implementations */
@@ -923,18 +941,21 @@ static int32_t EcmInit(struct HdfDeviceObject *device)
     ret = EcmAllocEp0Request(ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: EcmAllocEp0Request failed", __func__);
+        UsbEcmFree(ecm);
         return ret;
     }
 
     ret = EcmAllocNotifyRequest(ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: EcmAllocNotifyRequest failed", __func__);
+        UsbEcmFree(ecm);
         return ret;
     }
 
     ret = UsbFnStartRecvInterfaceEvent(ecm->ctrlIface.fn, RECEIVE_ALL_EVENTS, UsbEcmEventCallback, ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: register event callback failed", __func__);
+        UsbEcmFree(ecm);
         return ret;
     }
     ecm->initFlag = true;
@@ -988,6 +1009,7 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
         HDF_LOGE("%s: ecm is null", __func__);
         return;
     }
+    UsbEcmFree(ecm);
     (void)OsalMutexDestroy(&ecm->lock);
     OsalMemFree(ecm);
 }
