@@ -20,6 +20,7 @@
 #include "v1_0/iexecutor_callback.h"
 #include "v1_1/pin_auth_types.h"
 #include "v1_1/iexecutor.h"
+#include "v1_1/iexecutor_callback.h"
 #include "v1_1/ipin_auth_interface.h"
 #include "v1_1/pin_auth_interface_service.h"
 
@@ -32,8 +33,8 @@ using PinAuthInterfaceService = OHOS::HDI::PinAuth::V1_1::PinAuthInterfaceServic
 using IExecutorV1_0 = OHOS::HDI::PinAuth::V1_0::IExecutor;
 using IExecutor = OHOS::HDI::PinAuth::V1_1::IExecutor;
 
-using IExecutorCallback = OHOS::HDI::PinAuth::V1_0::IExecutorCallback;
-using IExecutorCallbackV1_1 = OHOS::HDI::PinAuth::V1_1::IExecutorCallback;
+using IExecutorCallbackV1_0 = OHOS::HDI::PinAuth::V1_0::IExecutorCallback;
+using IExecutorCallback = OHOS::HDI::PinAuth::V1_1::IExecutorCallback;
 
 using AuthType = OHOS::HDI::PinAuth::V1_0::AuthType;
 using ExecutorRole = OHOS::HDI::PinAuth::V1_0::ExecutorRole;
