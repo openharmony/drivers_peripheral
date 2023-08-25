@@ -24,12 +24,13 @@
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
 
+namespace {
 struct HdfPinAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t PinAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+int32_t PinAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     IAM_LOGI("start");
@@ -61,7 +62,7 @@ static int32_t PinAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     return hdfPinAuthInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
     if (deviceObject == nullptr) {
@@ -82,7 +83,7 @@ static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
     if (deviceObject == nullptr) {
@@ -119,7 +120,7 @@ static int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfPinAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+void HdfPinAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
@@ -136,13 +137,14 @@ static void HdfPinAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     IAM_LOGI("success");
 }
 
-static struct HdfDriverEntry g_pinAuthInterfaceDriverEntry = {
+struct HdfDriverEntry g_pinAuthInterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "drivers_peripheral_pin_auth",
     .Bind = HdfPinAuthInterfaceDriverBind,
     .Init = HdfPinAuthInterfaceDriverInit,
     .Release = HdfPinAuthInterfaceDriverRelease,
 };
+} // namespace
 
 #ifdef __cplusplus
 extern "C" {

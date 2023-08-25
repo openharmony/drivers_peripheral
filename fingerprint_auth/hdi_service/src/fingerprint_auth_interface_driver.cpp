@@ -22,12 +22,12 @@
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
 
+namespace {
 struct HdfFingerprintAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-namespace {
 using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface;
 
 int32_t FingerprintAuthInterfaceDriverDispatch(

@@ -22,12 +22,12 @@
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
 
+namespace {
 struct HdfFaceAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-namespace {
 using IFaceAuthInterface = OHOS::HDI::FaceAuth::V1_1::IFaceAuthInterface;
 
 int32_t FaceAuthInterfaceDriverDispatch(
