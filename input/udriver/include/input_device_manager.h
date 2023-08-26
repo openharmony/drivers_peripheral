@@ -130,8 +130,9 @@ public:
         }
     }
 private:
-    int32_t DeleteDevListNode(int index);
-    int32_t AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath);
+    void DeleteDevListNode(int index);
+    int32_t AddDeviceNodeToList(
+        int32_t &epollFd, int32_t &fd, string devPath, std::shared_ptr<InputDeviceInfo> &detailInfo);
 
     mutable std::mutex lock_;
     std::map<uint32_t, InputDevListNode> inputDevList_;
