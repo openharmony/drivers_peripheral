@@ -128,7 +128,7 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t si
             evtPkg[i]->type = iEvent.type;
             evtPkg[i]->code = iEvent.code;
             evtPkg[i]->value = iEvent.value;
-            evtPkg[i]->timestamp = (uint64_t)iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND + 
+            evtPkg[i]->timestamp = (uint64_t)iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND +
                                     (uint64_t)iEvent.time.tv_usec;
         }
         for (auto &callbackFunc : reportEventPkgCallback_) {
@@ -320,7 +320,7 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
     return INPUT_SUCCESS;
 }
 
-int32_t InputDeviceManager::DeleteDevListNode(int index)
+void InputDeviceManager::DeleteDevListNode(int index)
 {
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
         if (it->first == index) {
@@ -330,9 +330,11 @@ int32_t InputDeviceManager::DeleteDevListNode(int index)
             ++it;
         }
     }
+    return;
 }
 
-int32_t InputDeviceManager::AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath)
+int32_t InputDeviceManager::AddDeviceNodeToList(
+    int32_t &epollFd, int32_t &fd, string devPath, std::shared_ptr<InputDeviceInfo> &detailInfo)
 {
     if (epollFd < 0 || fd < 0) {
         HDF_LOGE("%{public}s: param invalid, %{public}d", __func__, __LINE__);
@@ -389,7 +391,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     }
     type = detailInfo->devType;
     if (!findDeviceFlag) {
-        if (AddDeviceNodeToList(epollFd, fd, devPath) != INPUT_SUCCESS) {
+        if (AddDeviceNodeToList(epollFd, fd, devPath, detailInfo) != INPUT_SUCCESS) {
             HDF_LOGE("%{public}s: add device node failed, line: %{public}d", __func__, __LINE__);
             return;
         }
@@ -614,7 +616,7 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
     std::lock_guard<std::mutex> guard(lock_);
     auto ret = INPUT_FAILURE;
 
-    if (devInfo == nullptr || deviceIndex >= inputDevList_.size() || *devInfo == nullptr) {
+    if (devInfo == nullptr || deviceIndex >= (int32_t)inputDevList_.size() || *devInfo == nullptr) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return ret;
     }
