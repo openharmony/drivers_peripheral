@@ -130,6 +130,9 @@ public:
         }
     }
 private:
+    int32_t DeleteDevListNode(int index);
+    int32_t AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath);
+
     mutable std::mutex lock_;
     std::map<uint32_t, InputDevListNode> inputDevList_;
     struct epoll_event epollEventList_[EPOLL_MAX_EVENTS] {};
