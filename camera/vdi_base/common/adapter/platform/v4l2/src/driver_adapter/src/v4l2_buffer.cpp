@@ -189,6 +189,10 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
 
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         if (adapterBufferMap_[buf.index].userBufPtr && adapterBufferMap_[buf.index].start) {
+            if (adapterBufferMap_[buf.index].length > buffLong_) {
+                CAMERA_LOGE("ERROR: BufferMap length error");
+                return RC_ERROR;
+            }
             (void)memcpy_s(adapterBufferMap_[buf.index].userBufPtr, adapterBufferMap_[buf.index].length,
                 adapterBufferMap_[buf.index].start, adapterBufferMap_[buf.index].length);
         }
@@ -245,6 +249,7 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
         CAMERA_LOGE("RROR:user buff < V4L2 buf.length\n");
         return RC_ERROR;
     }
+    buffLong_ = frameSpec->buffer_->GetSize();
     if (memoryType_ == V4L2_MEMORY_MMAP || memoryType_ == V4L2_MEMORY_DMABUF) {
         return SetAdapterBuffer(fd, buf, frameSpec);
     }
