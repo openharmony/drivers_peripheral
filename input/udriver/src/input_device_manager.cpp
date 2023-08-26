@@ -320,6 +320,45 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
     return INPUT_SUCCESS;
 }
 
+static int32_t DeleteDevListNode(int index)
+{
+    for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
+        if (it->first == index) {
+            it = inputDevList_.erase(it);
+            devIndex_ -= 1;
+        } else {
+            ++it;
+        }
+    }
+}
+
+static int32_t AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath)
+{
+    if (epollFd < 0 || fd < 0) {
+        HDF_LOGE("%{public}s: param invalid, %{public}d", __func__, __LINE__);
+        return INPUT_FAILURE;
+    }
+    InputDevListNode inputDevList {};
+    inputDevList.index = devIndex_;
+    inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
+    inputDevList.fd = fd;
+    detailInfo->devIndex = devIndex_;
+    if (memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length()) != EOK ||
+        memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
+        sizeof(InputDeviceInfo)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        return INPUT_FAILURE;
+    }
+    inputDevList_.insert_or_assign(devIndex_, inputDevList);
+    devIndex_ += 1;
+    if (AddToEpoll(epollFd, inputDevList.fd) != INPUT_SUCCESS) {
+        HDF_LOGE("%{public}s: add to epoll failed, line: %{public}d", __func__, __LINE__);
+        DeleteDevListNode(devIndex_);
+        return INPUT_FAILURE;
+    }
+    return INPUT_SUCCESS;
+}
+
 void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, string devPath)
 {
     bool findDeviceFlag = false;
@@ -350,25 +389,13 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, str
     }
     type = detailInfo->devType;
     if (!findDeviceFlag) {
-        InputDevListNode inputDevList {};
-        index = devIndex_;
-        inputDevList.index = devIndex_;
-        inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
-        inputDevList.fd = fd;
-        detailInfo->devIndex = devIndex_;
-        if (memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length()) != EOK ||
-            memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
-            sizeof(InputDeviceInfo)) != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+        if (AddDeviceNodeToList(epollFd, fd, devPath) != INPUT_SUCCESS) {
+            HDF_LOGE("%{public}s: add device node failed, line: %{public}d", __func__, __LINE__);
             return;
         }
-        inputDevList_.insert_or_assign(devIndex_, inputDevList);
     }
     status = INPUT_DEVICE_STATUS_OPENED;
     SendHotPlugEvent(type, index, status);
-    if (!findDeviceFlag) {
-        devIndex_ += 1;
-    }
 }
 
 void InputDeviceManager::SendHotPlugEvent(uint32_t &type, uint32_t &index, uint32_t status)
@@ -399,10 +426,8 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
     uint32_t devIndex {};
     uint32_t status {};
 
-    CloseInputDevice(inputDevList_[index].devPathNode);
-    RemoveEpoll(epollFd, inputDevList_[index].fd);
     HDF_LOGD("%{public}s: index: %{public}d fd: %{public}d devName: %{public}s", __func__,
-             devIndex_, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
+             index, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
 
     // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
@@ -420,14 +445,8 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index)
     }
     status = INPUT_DEVICE_STATUS_CLOSED;
     SendHotPlugEvent(type, devIndex, status);
-    for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
-        if (it->first == devIndex_) {
-            it->second.fd = 0;
-            it->second.status = INPUT_DEVICE_STATUS_CLOSED;
-        } else {
-            ++it;
-        }
-    }
+    CloseInputDevice(inputDevList_[index].devPathNode);
+    DeleteDevListNode(index);
 }
 
 int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyFd)
@@ -443,9 +462,6 @@ int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyF
     for (p = InfoBuf; p < InfoBuf + result;) {
         event = (struct inotify_event *)(p);
         auto nodePath = devPath_ + "/" + string(event->name);
-        if (nodePath.find("event") == std::string::npos) {
-            break;
-        }
         if (event->mask & IN_CREATE) {
             if (realpath(nodePath.c_str(), nodeRealPath) == nullptr) {
                 HDF_LOGE("%{public}s: The absolute path does not exist.", __func__);
