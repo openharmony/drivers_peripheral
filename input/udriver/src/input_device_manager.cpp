@@ -320,7 +320,7 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
     return INPUT_SUCCESS;
 }
 
-static int32_t DeleteDevListNode(int index)
+int32_t InputDeviceManager::DeleteDevListNode(int index)
 {
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
         if (it->first == index) {
@@ -332,7 +332,7 @@ static int32_t DeleteDevListNode(int index)
     }
 }
 
-static int32_t AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath)
+int32_t InputDeviceManager::AddDeviceNodeToList(int32_t &epollFd, int32_t &fd, string devPath)
 {
     if (epollFd < 0 || fd < 0) {
         HDF_LOGE("%{public}s: param invalid, %{public}d", __func__, __LINE__);
