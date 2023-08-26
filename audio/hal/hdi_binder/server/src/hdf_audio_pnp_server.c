@@ -107,11 +107,11 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
     }
 
     g_audioPnpDevice = device;
-    DetectAudioDevice(device);
+
     AudioUsbPnpUeventStartThread();
     AudioHeadsetPnpInputStartThread();
     AudioHdmiPnpUeventStartThread();
-
+    DetectAudioDevice(device);
     AUDIO_FUNC_LOGI("end.");
     return HDF_SUCCESS;
 }
