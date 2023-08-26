@@ -186,6 +186,7 @@ int32_t JpegDecoder::AllocBuffer(uint32_t width, uint32_t height)
     }
 
     outBuffer_.buffer = new NativeBuffer(handle);
+    outBuffer_.fenceFd = -1;
     return HDF_SUCCESS;
 }
 
