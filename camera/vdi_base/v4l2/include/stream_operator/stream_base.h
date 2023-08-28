@@ -51,6 +51,7 @@ public:
     RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) override;
     bool IsRunning() const override;
     void DumpStatsInfo() const override;
+    void ReleaseStreamBufferPool() override;
 
     virtual void HandleRequest();
     virtual uint64_t GetUsage();
@@ -66,9 +67,6 @@ public:
         STREAM_STATE_BUSY,
         STREAM_STATE_OFFLINE,
     };
-
-protected:
-    void ReleaseStreamDatas();
 
 protected:
     int32_t streamId_ = -1;
