@@ -53,6 +53,7 @@ public:
     virtual RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) = 0;
     virtual bool IsRunning() const = 0;
     virtual void DumpStatsInfo() const = 0;
+    virtual void ReleaseStreamBufferPool() = 0;
 
 public:
     static std::map<VdiStreamIntent, std::string> g_availableStreamType;
