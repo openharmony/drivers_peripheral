@@ -143,7 +143,9 @@ RetCode StreamStillCapture::StopStream()
     isFirstRequest = true;
 
     if (state_ != STREAM_STATE_OFFLINE) {
-        ReleaseStreamDatas();
+        inTransitList_.clear();
+        tunnel_->CleanBuffers();
+        bufferPool_->ClearBuffers();
     }
     return RC_OK;
 }
