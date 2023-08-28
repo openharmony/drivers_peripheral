@@ -18,7 +18,7 @@
 #include "v1_1/icamera_device.h"
 
 namespace OHOS {
-#define SIZE_MAX 256
+#define RAW_DATA_SIZE_MAX 256
 const size_t THRESHOLD = 10;
 
 enum DeviceCmdId {
