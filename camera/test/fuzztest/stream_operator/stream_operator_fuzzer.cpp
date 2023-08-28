@@ -61,7 +61,7 @@ void IsStreamSupprotedApi(const uint8_t *&rawData)
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
     streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     streamInfoCapture->v1_0 = *reinterpret_cast<const struct HDI::Camera::V1_0::StreamInfo*>(rawData);
-    streamInfoCapture->exextendedStreamInfos = {extendedStreamInfo};
+    streamInfoCapture->extendedStreamInfos = {extendedStreamInfo};
     streamInfosV1_1.push_back(*streamInfoCapture);
     HDI::Camera::V1_0::StreamSupportType pType;
 
@@ -81,7 +81,7 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
             std::vector<uint8_t> abilityVec = {};
             uint8_t *data = const_cast<uint8_t *>(rawData);
             abilityVec.push_back(*data);
-            cameraTest->streamOperator_V1_1->CommitStream_V1_1(
+            cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
                 *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec);
             break;
         }
