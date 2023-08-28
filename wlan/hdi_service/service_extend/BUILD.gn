@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../wlan.gni")
 
 HDI_SERVICE_ROOT_DIR = "../.."
 
@@ -24,7 +25,13 @@ ohos_shared_library("libwlan_service_extend") {
     "$HDI_SERVICE_ROOT_DIR/hdi_service/service_common",
     "$HDI_SERVICE_ROOT_DIR/hdi_service/service_extend",
   ]
-  sources = [ "wlan_extend_cmd.c" ]
+  sources = []
+
+  if (drivers_peripheral_wlan_feature_enable_HDF_WLAN_EXTEND_VDI) {
+    sources += [ "service_extend_vdi/wlan_extend_cmd.c" ]
+  } else {
+    sources += [ "service_extend_direct/wlan_extend_cmd.c" ]
+  }
 
   deps = [ "$HDI_SERVICE_ROOT_DIR/hal:wifi_hal" ]
 
