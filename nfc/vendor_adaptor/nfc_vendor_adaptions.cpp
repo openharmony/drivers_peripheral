@@ -95,7 +95,7 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
         return HDF_FAILURE;
     }
 
-    nfcHalInf.nfcHalOpen = reinterpret_cast<int (*)(nfc_stack_callback_t *, nfc_stack_data_callback_t *)>
+    nfcHalInf.nfcHalOpen = reinterpret_cast<int (*)(NfcStackCallbackT *, NfcStackDataCallbackT *)>
         (dlsym(nfcHalHandle, (HAL_OPEN_FUNC_NAME + suffix).c_str()));
 
     nfcHalInf.nfcHalWrite = reinterpret_cast<int (*)(uint16_t, const uint8_t *)>
@@ -137,7 +137,7 @@ NfcVendorAdaptions::NfcVendorAdaptions()
 
 NfcVendorAdaptions::~NfcVendorAdaptions() {}
 
-int NfcVendorAdaptions::VendorOpen(nfc_stack_callback_t *p_cback, nfc_stack_data_callback_t *p_data_cback)
+int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback)
 {
     if (nfcHalHandle == nullptr) {
         string chipType = GetChipType();
@@ -153,39 +153,39 @@ int NfcVendorAdaptions::VendorOpen(nfc_stack_callback_t *p_cback, nfc_stack_data
         HDF_LOGE("%{public}s: Function null.", __func__);
         return HDF_FAILURE;
     }
-    if (p_cback == nullptr || p_data_cback == nullptr) {
+    if (pCback == nullptr || pDataCback == nullptr) {
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
     }
-    int ret = nfcHalInf.nfcHalOpen(p_cback, p_data_cback);
+    int ret = nfcHalInf.nfcHalOpen(pCback, pDataCback);
     return ret;
 }
 
-int NfcVendorAdaptions::VendorCoreInitialized(uint16_t core_init_rsp_len, uint8_t *p_core_init_rsp_params)
+int NfcVendorAdaptions::VendorCoreInitialized(uint16_t coreInitRspLen, uint8_t *pCoreInitRspParams)
 {
     if (nfcHalInf.nfcHalCoreInitialized == nullptr) {
         HDF_LOGE("%{public}s: Function null.", __func__);
         return HDF_FAILURE;
     }
-    if (p_core_init_rsp_params == nullptr) {
+    if (pCoreInitRspParams == nullptr) {
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
     }
-    int ret = nfcHalInf.nfcHalCoreInitialized(core_init_rsp_len, p_core_init_rsp_params);
+    int ret = nfcHalInf.nfcHalCoreInitialized(coreInitRspLen, pCoreInitRspParams);
     return ret;
 }
 
-int NfcVendorAdaptions::VendorWrite(uint16_t data_len, const uint8_t *p_data)
+int NfcVendorAdaptions::VendorWrite(uint16_t dataLen, const uint8_t *pData)
 {
     if (nfcHalInf.nfcHalWrite == nullptr) {
         HDF_LOGE("%{public}s: Function null.", __func__);
         return HDF_FAILURE;
     }
-    if (p_data == nullptr) {
+    if (pData == nullptr) {
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
     }
-    int ret = nfcHalInf.nfcHalWrite(data_len, p_data);
+    int ret = nfcHalInf.nfcHalWrite(dataLen, pData);
     return ret;
 }
 
@@ -229,17 +229,17 @@ int NfcVendorAdaptions::VendorPowerCycle(void)
     return ret;
 }
 
-int NfcVendorAdaptions::VendorIoctl(long arg, void *p_data)
+int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
 {
     if (nfcHalInf.nfcHalIoctl == nullptr) {
         HDF_LOGE("%{public}s: Function null.", __func__);
         return HDF_FAILURE;
     }
-    if (p_data == nullptr) {
+    if (pData == nullptr) {
         HDF_LOGE("%{public}s: input param null.", __func__);
         return HDF_FAILURE;
     }
-    int ret = nfcHalInf.nfcHalIoctl(arg, p_data);
+    int ret = nfcHalInf.nfcHalIoctl(arg, pData);
     return ret;
 }
 } // Nfc
