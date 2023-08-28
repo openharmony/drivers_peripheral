@@ -236,7 +236,9 @@ RetCode StreamBase::StopStream()
     CAMERA_LOGI("stop stream [id:%{public}d] end", streamId_);
     isFirstRequest = true;
 
-    ReleaseStreamDatas();
+    inTransitList_.clear();
+    tunnel_->CleanBuffers();
+    bufferPool_->ClearBuffers();
     return RC_OK;
 }
 
@@ -598,11 +600,8 @@ void StreamBase::DumpStatsInfo() const
     }
 }
 
-void StreamBase::ReleaseStreamDatas()
+void StreamBase::ReleaseStreamBufferPool()
 {
-    inTransitList_.clear();
-    tunnel_->CleanBuffers();
-    bufferPool_->ClearBuffers();
     BufferManager* mgr = BufferManager::GetInstance();
     if (mgr != nullptr) {
         mgr->EraseBufferPoolMapById(poolId_);
