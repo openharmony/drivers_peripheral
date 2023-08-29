@@ -247,12 +247,14 @@ void BufferPool::SetId(const int64_t id)
 
 void BufferPool::NotifyStop()
 {
+    std::unique_lock<std::mutex> l(lock_);
     stop_ = true;
     cv_.notify_all();
 }
 
 void BufferPool::NotifyStart()
 {
+    std::unique_lock<std::mutex> l(lock_);
     stop_ = false;
     cv_.notify_all();
 }
