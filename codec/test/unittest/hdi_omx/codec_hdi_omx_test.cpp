@@ -232,7 +232,8 @@ public:
         }
         auto count = manager_->GetComponentNum();
         if (count > 0) {
-            CodecCompCapability *capList = (CodecCompCapability *)OsalMemAlloc(sizeof(CodecCompCapability) * count);
+            CodecCompCapability *capList = reinterpret_cast<CodecCompCapability *>
+                (OsalMemAlloc(sizeof(CodecCompCapability) * count));
             ASSERT_TRUE(capList != nullptr);
             auto err = manager_->GetComponentCapabilityList(capList, count);
             ASSERT_TRUE(err == HDF_SUCCESS);
@@ -742,7 +743,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_005, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_INPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -787,7 +788,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_007, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_OUTPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -837,7 +838,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_009, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_INPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -854,7 +855,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_OUTPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -965,7 +966,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1
     ASSERT_EQ(err, HDF_SUCCESS);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_INPUT);
     err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -973,7 +974,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1
     bool ret = UseBufferOnPort(PortIndex::PORT_INDEX_INPUT, param.nBufferCountActual, param.nBufferSize);
     ASSERT_TRUE(ret);
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_OUTPUT);
     err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -1108,7 +1109,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_OUTPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_OUTPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
@@ -1146,7 +1147,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_004, TestSize.Level1)
     ASSERT_TRUE(component_ != nullptr);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
-    param.nPortIndex = (OMX_U32)PortIndex::PORT_INDEX_INPUT;
+    param.nPortIndex = static_cast<OMX_U32>(PortIndex::PORT_INDEX_INPUT);
     auto err = component_->GetParameter(component_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
         sizeof(param));
     ASSERT_EQ(err, HDF_SUCCESS);
