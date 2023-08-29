@@ -616,7 +616,7 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
     std::lock_guard<std::mutex> guard(lock_);
     auto ret = INPUT_FAILURE;
 
-    if (devInfo == nullptr || deviceIndex >= (int32_t)inputDevList_.size() || *devInfo == nullptr) {
+    if (devInfo == nullptr || deviceIndex >= static_cast<int32_t>(inputDevList_.size()) || *devInfo == nullptr) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return ret;
     }
