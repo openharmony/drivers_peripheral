@@ -32,7 +32,9 @@ RetCode OfflinePipeline::StartProcess()
     running_ = true;
     processThread_ = new std::thread([this]() {
         prctl(PR_SET_NAME, "offlinepipeline");
+        std::unique_lock<std::mutex> l(queueLock_);
         while (running_) {
+            cv_.wait(l, [this] { return !(running_.load() && bufferCache_.empty()); });
             HandleBuffers();
         }
     });
@@ -49,11 +51,14 @@ RetCode OfflinePipeline::StopProcess()
         return RC_ERROR;
     }
 
-    if (running_.load() == false) {
-        return RC_OK;
+    {
+        std::unique_lock<std::mutex> l(queueLock_);
+        if (running_.load() == false) {
+            return RC_OK;
+        }
+        running_ = false;
     }
 
-    running_ = false;
     cv_.notify_one();
     processThread_->join();
     delete processThread_;
@@ -148,31 +153,18 @@ void OfflinePipeline::ReceiveCache(std::vector<std::shared_ptr<IBuffer>>& buffer
 
 void OfflinePipeline::HandleBuffers()
 {
-    if (bufferCache_.empty()) {
-        std::unique_lock<std::mutex> l(queueLock_);
-        if (bufferCache_.empty()) {
-            cv_.wait(l, [this] { return !(running_.load() && bufferCache_.empty()); });
-        }
-    }
-
     if (running_ == false) {
         return;
     }
 
     std::vector<std::shared_ptr<IBuffer>> cache = {};
-    if (!bufferCache_.empty()) {
-        std::unique_lock<std::mutex> l(queueLock_);
-        if (!bufferCache_.empty()) {
-            cache = bufferCache_.front();
-            bufferCache_.pop_front();
-        }
-    }
-
+    cache = bufferCache_.front();
+    bufferCache_.pop_front();
     if (cache.empty()) {
         return;
     }
-    ProcessCache(cache);
 
+    ProcessCache(cache);
     return;
 }
 
