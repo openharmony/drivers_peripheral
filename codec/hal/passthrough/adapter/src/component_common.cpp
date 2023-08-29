@@ -385,40 +385,40 @@ static void SplitParamSettingPortDefinitionVideo(int8_t *paramIn, Param *paramOu
     int32_t index = 0;
 
     paramOut[index].key = KEY_BUFFERSIZE;
-    paramOut[index].val = (void *)&(param->nBufferSize);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->nBufferSize));
     paramOut[index].size = sizeof(param->nBufferSize);
     index++;
     paramOut[index].key = KEY_MIMETYPE;
     param->format.video.eCompressionFormat =
-                (OMX_VIDEO_CODINGTYPE)ConvertVideoCodingTypeToMimeType(param->format.video.eCompressionFormat);
-    paramOut[index].val = (void *)&(param->format.video.eCompressionFormat);
+        static_cast<OMX_VIDEO_CODINGTYPE>(ConvertVideoCodingTypeToMimeType(param->format.video.eCompressionFormat));
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.eCompressionFormat));
     paramOut[index].size = sizeof(param->format.video.eCompressionFormat);
     index++;
     paramOut[index].key = KEY_VIDEO_WIDTH;
-    paramOut[index].val = (void *)&(param->format.video.nFrameWidth);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.nFrameWidth));
     paramOut[index].size = sizeof(param->format.video.nFrameWidth);
     index++;
     paramOut[index].key = KEY_VIDEO_HEIGHT;
-    paramOut[index].val = (void *)&(param->format.video.nFrameHeight);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.nFrameHeight));
     paramOut[index].size = sizeof(param->format.video.nFrameHeight);
     index++;
     paramOut[index].key = KEY_VIDEO_STRIDE;
-    paramOut[index].val = (void *)&(param->format.video.nStride);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.nStride));
     paramOut[index].size = sizeof(param->format.video.nStride);
     index++;
     paramOut[index].key = KEY_BITRATE;
-    paramOut[index].val = (void *)&(param->format.video.nBitrate);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.nBitrate));
     paramOut[index].size = sizeof(param->format.video.nBitrate);
     index++;
     paramOut[index].key = KEY_VIDEO_FRAME_RATE;
-    paramOut[index].val = (void *)&(param->format.video.xFramerate);
+    paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.xFramerate));
     paramOut[index].size = sizeof(param->format.video.xFramerate);
     index++;
     param->format.video.eColorFormat =
         static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->format.video.eColorFormat));
     if (static_cast<PixelFormat>(param->format.video.eColorFormat) != PIXEL_FMT_BUTT) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
-        paramOut[index].val = (void *)&(param->format.video.eColorFormat);
+        paramOut[index].val = reinterpret_cast<void *>(&(param->format.video.eColorFormat));
         paramOut[index].size = sizeof(param->format.video.eColorFormat);
         index++;
     }
@@ -440,13 +440,13 @@ static void SplitParamPortDefinitionAudio(int8_t *paramIn, Param *paramOut, int3
     OMX_PARAM_PORTDEFINITIONTYPE *param = reinterpret_cast<OMX_PARAM_PORTDEFINITIONTYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_BUFFERSIZE;
-    paramOut[index].val = setMark ? (void *)&(param->nBufferSize) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nBufferSize)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nBufferSize) : 0;
     index++;
     paramOut[index].key = KEY_MIMETYPE;
     param->format.audio.eEncoding =
         static_cast<OMX_AUDIO_CODINGTYPE>(ConvertAudioCodingTypeToMimeType(param->format.audio.eEncoding));
-    paramOut[index].val = setMark ? (void *)&(param->format.audio.eEncoding) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->format.audio.eEncoding)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->format.audio.eEncoding) : 0;
     index++;
     paramCnt = index;
@@ -466,8 +466,8 @@ static void SplitParamAudioPortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     OMX_AUDIO_PARAM_PORTFORMATTYPE *param = reinterpret_cast<OMX_AUDIO_PARAM_PORTFORMATTYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_MIMETYPE;
-    param->eEncoding = (OMX_AUDIO_CODINGTYPE)ConvertAudioCodingTypeToMimeType(param->eEncoding);
-    paramOut[index].val = setMark ? (void *)&(param->eEncoding) : nullptr;
+    param->eEncoding = static_cast<OMX_AUDIO_CODINGTYPE>(ConvertAudioCodingTypeToMimeType(param->eEncoding));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eEncoding)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eEncoding) : 0;
     index++;
 
@@ -479,15 +479,15 @@ static void SplitParamAudioPcm(int8_t *paramIn, Param *paramOut, int32_t &paramC
     OMX_AUDIO_PARAM_PCMMODETYPE *param = reinterpret_cast<OMX_AUDIO_PARAM_PCMMODETYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_AUDIO_CHANNEL_COUNT;
-    paramOut[index].val = setMark ? (void *)&(param->nChannels) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nChannels)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nChannels) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_POINTS_PER_FRAME;
-    paramOut[index].val = setMark ? (void *)&(param->nBitPerSample) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nBitPerSample)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nBitPerSample) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_SAMPLE_RATE;
-    paramOut[index].val = setMark ? (void *)&(param->nSamplingRate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nSamplingRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nSamplingRate) : 0;
     index++;
 
@@ -499,25 +499,25 @@ static void SplitParamAudioAac(int8_t *paramIn, Param *paramOut, int32_t &paramC
     OMX_AUDIO_PARAM_AACPROFILETYPE *param = reinterpret_cast<OMX_AUDIO_PARAM_AACPROFILETYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_AUDIO_CHANNEL_COUNT;
-    paramOut[index].val = setMark ? (void *)&(param->nChannels) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nChannels)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nChannels) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_SAMPLE_RATE;
-    paramOut[index].val = setMark ? (void *)&(param->nSampleRate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nSampleRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nSampleRate) : 0;
     index++;
     paramOut[index].key = KEY_BITRATE;
-    paramOut[index].val = setMark ? (void *)&(param->nBitRate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nBitRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nBitRate) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_PROFILE;
-    param->eAACProfile = (OMX_AUDIO_AACPROFILETYPE)ConvertAacProfileToProfile(param->eAACProfile);
-    paramOut[index].val = setMark ? (void *)&(param->eAACProfile) : nullptr;
+    param->eAACProfile = static_cast<OMX_AUDIO_AACPROFILETYPE>(ConvertAacProfileToProfile(param->eAACProfile));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eAACProfile)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eAACProfile) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_SOUND_MODE;
-    param->eChannelMode = (OMX_AUDIO_CHANNELMODETYPE)ConvertChannelModeToSoundMode(param->eChannelMode);
-    paramOut[index].val = setMark ? (void *)&(param->eChannelMode) : nullptr;
+    param->eChannelMode = static_cast<OMX_AUDIO_CHANNELMODETYPE>(ConvertChannelModeToSoundMode(param->eChannelMode));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eChannelMode)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eChannelMode) : 0;
     index++;
 
@@ -529,20 +529,20 @@ static void SplitParamAudioMp3(int8_t *paramIn, Param *paramOut, int32_t &paramC
     OMX_AUDIO_PARAM_MP3TYPE *param = reinterpret_cast<OMX_AUDIO_PARAM_MP3TYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_AUDIO_CHANNEL_COUNT;
-    paramOut[index].val = setMark ? (void *)&(param->nChannels) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nChannels)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nChannels) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_SAMPLE_RATE;
-    paramOut[index].val = setMark ? (void *)&(param->nSampleRate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nSampleRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nSampleRate) : 0;
     index++;
     paramOut[index].key = KEY_BITRATE;
-    paramOut[index].val = setMark ? (void *)&(param->nBitRate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nBitRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nBitRate) : 0;
     index++;
     paramOut[index].key = KEY_AUDIO_SOUND_MODE;
-    param->eChannelMode = (OMX_AUDIO_CHANNELMODETYPE)ConvertChannelModeToSoundMode(param->eChannelMode);
-    paramOut[index].val = setMark ? (void *)&(param->eChannelMode) : nullptr;
+    param->eChannelMode = static_cast<OMX_AUDIO_CHANNELMODETYPE>(ConvertChannelModeToSoundMode(param->eChannelMode));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eChannelMode)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eChannelMode) : 0;
     index++;
 
@@ -554,7 +554,7 @@ static void SplitParamAudioG726(int8_t *paramIn, Param *paramOut, int32_t &param
     OMX_AUDIO_PARAM_G726TYPE *param = reinterpret_cast<OMX_AUDIO_PARAM_G726TYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_AUDIO_CHANNEL_COUNT;
-    paramOut[index].val = setMark ? (void *)&(param->nChannels) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nChannels)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nChannels) : 0;
     index++;
 
@@ -567,13 +567,13 @@ static void SplitParamImagePortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     int32_t index = 0;
     paramOut[index].key = KEY_MIMETYPE;
     param->eCompressionFormat = (OMX_IMAGE_CODINGTYPE)ConvertImageCodingTypeToMimeType(param->eCompressionFormat);
-    paramOut[index].val = setMark ? (void *)&(param->eCompressionFormat) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eCompressionFormat)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eCompressionFormat) : 0;
     index++;
     param->eColorFormat = static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->eColorFormat));
     if (static_cast<PixelFormat>(param->eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
-        paramOut[index].val = setMark ? (void *)&(param->eColorFormat) : nullptr;
+        paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eColorFormat)) : nullptr;
         paramOut[index].size = setMark ? sizeof(param->eColorFormat) : 0;
         index++;
     }
@@ -585,7 +585,7 @@ static void SplitParamQfactor(int8_t *paramIn, Param *paramOut, int32_t &paramCn
     OMX_IMAGE_PARAM_QFACTORTYPE *param = reinterpret_cast<OMX_IMAGE_PARAM_QFACTORTYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_IMAGE_Q_FACTOR;
-    paramOut[index].val = setMark ? (void *)&(param->nQFactor) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->nQFactor)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->nQFactor) : 0;
     index++;
 
@@ -597,18 +597,19 @@ static void SplitParamVideoPortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     OMX_VIDEO_PARAM_PORTFORMATTYPE *param = reinterpret_cast<OMX_VIDEO_PARAM_PORTFORMATTYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_MIMETYPE;
-    param->eCompressionFormat = (OMX_VIDEO_CODINGTYPE)ConvertVideoCodingTypeToMimeType(param->eCompressionFormat);
-    paramOut[index].val = setMark ? (void *)&(param->eCompressionFormat) : nullptr;
+    param->eCompressionFormat =
+        static_cast<OMX_VIDEO_CODINGTYPE>(ConvertVideoCodingTypeToMimeType(param->eCompressionFormat));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eCompressionFormat)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eCompressionFormat) : 0;
     index++;
     paramOut[index].key = KEY_VIDEO_FRAME_RATE;
-    paramOut[index].val = setMark ? (void *)&(param->xFramerate) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->xFramerate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->xFramerate) : 0;
     index++;
     param->eColorFormat = static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->eColorFormat));
     if (static_cast<PixelFormat>(param->eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
-        paramOut[index].val = setMark ? (void *)&(param->eColorFormat) : nullptr;
+        paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eColorFormat)) : nullptr;
         paramOut[index].size = setMark ? sizeof(param->eColorFormat) : 0;
         index++;
     }
@@ -622,7 +623,7 @@ static void SplitParamVideoAvc(int8_t *paramIn, Param *paramOut, int32_t &paramC
     int32_t index = 0;
     paramOut[index].key = KEY_VIDEO_PROFILE;
     param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>(ConvertAvcProfileToProfile(param->eProfile));
-    paramOut[index].val = setMark ? (void *)&(param->eProfile) : nullptr;
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eProfile)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eProfile) : 0;
     index++;
 
@@ -634,8 +635,8 @@ static void SplitParamVideoBitrate(int8_t *paramIn, Param *paramOut, int32_t &pa
     OMX_VIDEO_PARAM_BITRATETYPE *param = reinterpret_cast<OMX_VIDEO_PARAM_BITRATETYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_VIDEO_RC_MODE;
-    param->eControlRate = (OMX_VIDEO_CONTROLRATETYPE)ConvertRateTypeToRcMode(param->eControlRate);
-    paramOut[index].val = setMark ? (void *)&(param->eControlRate) : nullptr;
+    param->eControlRate = static_cast<OMX_VIDEO_CONTROLRATETYPE>(ConvertRateTypeToRcMode(param->eControlRate));
+    paramOut[index].val = setMark ? reinterpret_cast<void *>(&(param->eControlRate)) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eControlRate) : 0;
     index++;
 
@@ -646,7 +647,7 @@ static void SplitParamPassthrough(int8_t *paramIn, Param *paramOut, int32_t &par
 {
     PassthroughParam *param = reinterpret_cast<PassthroughParam *>(paramIn);
     int32_t index = 0;
-    paramOut[index].key = (ParamKey)param->key;
+    paramOut[index].key = static_cast<ParamKey>(param->key);
     paramOut[index].val = param->val;
     paramOut[index].size = param->size;
     index++;
@@ -726,7 +727,7 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
             }
             case KEY_MIMETYPE: {
                 int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
-                param->format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)codingType;
+                param->format.video.eCompressionFormat = static_cast<OMX_VIDEO_CODINGTYPE>(codingType);
                 break;
             }
             case KEY_VIDEO_WIDTH:
@@ -876,8 +877,8 @@ static int32_t ParseParamAudioAac(Param *paramIn, int8_t *paramOut, int32_t para
                 param->nBitRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_PROFILE:
-                param->eAACProfile = (OMX_AUDIO_AACPROFILETYPE)
-                    ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val)));
+                param->eAACProfile = static_cast<OMX_AUDIO_AACPROFILETYPE>(
+                    ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val))));
                 break;
             case KEY_AUDIO_SOUND_MODE:
                 param->eChannelMode =
@@ -958,8 +959,8 @@ static int32_t ParseParamImagePortFormat(Param *paramIn, int8_t *paramOut, int32
         validCount++;
         switch (paramIn[i].key) {
             case KEY_MIMETYPE:
-                param->eCompressionFormat = (OMX_IMAGE_CODINGTYPE)
-                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
+                param->eCompressionFormat = static_cast<OMX_IMAGE_CODINGTYPE>(
+                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val))));
                 break;
             case KEY_PIXEL_FORMAT:
                 param->eColorFormat =
@@ -1006,8 +1007,8 @@ static int32_t ParseParamVideoPortFormat(Param *paramIn, int8_t *paramOut, int32
         validCount++;
         switch (paramIn[i].key) {
             case KEY_MIMETYPE:
-                param->eCompressionFormat = (OMX_VIDEO_CODINGTYPE)
-                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
+                param->eCompressionFormat = static_cast<OMX_VIDEO_CODINGTYPE>(
+                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val))));
                 break;
             case KEY_PIXEL_FORMAT:
                 param->eColorFormat =
@@ -1204,8 +1205,8 @@ void ConvertCodecBufferToOmxCodecBuffer(OmxCodecBuffer &omxBuffer, CodecBuffer &
     if (codecBuffer.flag & STREAM_FLAG_EOS) {
         omxBuffer.flag = OMX_BUFFERFLAG_EOS;
     }
-    omxBuffer.bufferType = (CodecBufferType)ConvertBufferTypeToOmxBufferType(codecBuffer.buffer[0].type);
-    omxBuffer.buffer = (uint8_t *)codecBuffer.buffer[0].buf;
+    omxBuffer.bufferType = static_cast<CodecBufferType>(ConvertBufferTypeToOmxBufferType(codecBuffer.buffer[0].type));
+    omxBuffer.buffer = reinterpret_cast<uint8_t *>(codecBuffer.buffer[0].buf);
     omxBuffer.offset = codecBuffer.buffer[0].offset;
     omxBuffer.filledLen = codecBuffer.buffer[0].length;
     omxBuffer.allocLen = codecBuffer.buffer[0].capacity;

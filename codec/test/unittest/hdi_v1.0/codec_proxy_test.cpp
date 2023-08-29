@@ -103,7 +103,7 @@ static void PrintCapability(CodecCapability *cap, int index)
         HDF_LOGE("null capability!");
         return;
     }
-    mime = (int32_t)cap->mime;
+    mime = static_cast<int32_t>(cap->mime);
     if (mime < 0) {
         HDF_LOGE("print invalid capability!");
         return;
@@ -231,7 +231,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetVideoWidthTest_001, TestSize.Level1)
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_VIDEO_WIDTH;
     int32_t width = VIDEO_WIDHT;
-    params->val = (void *)&width;
+    params->val = reinterpret_cast<void *>(&width);
     params->size = sizeof(width);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
@@ -243,11 +243,11 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetVideoHeightTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    params = reinterpret_cast<Param *>(OsalMemAlloc(sizeof(Param)*paramCnt));
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_VIDEO_HEIGHT;
     int32_t height = VIDEO_HEIGHT;
-    params->val = (void *)&height;
+    params->val = reinterpret_cast<void *>(&height);
     params->size = sizeof(height);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
@@ -259,11 +259,11 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    params = reinterpret_cast<Param *>(OsalMemAlloc(sizeof(Param)*paramCnt));
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_CODEC_TYPE;
     CodecType type = VIDEO_DECODER;
-    params->val = (void *)&type;
+    params->val = reinterpret_cast<void *>(&type);
     params->size = sizeof(type);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
@@ -275,7 +275,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetGopModeTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    params = reinterpret_cast<Param *>(OsalMemAlloc(sizeof(Param)*paramCnt));
     ASSERT_TRUE(params != nullptr);
     
     HdiGopSetup gop;
@@ -284,7 +284,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetGopModeTest_001, TestSize.Level1)
     gop.viLen = 0;
     gop.gop = 48;
     params->key = KEY_VIDEO_GOP_MODE;
-    params->val = (void *)&gop;
+    params->val = reinterpret_cast<void *>(&gop);
     params->size = sizeof(gop);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
@@ -296,11 +296,11 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetMimeTypeTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    params = reinterpret_cast<Param *>(OsalMemAlloc(sizeof(Param)*paramCnt));
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_MIMETYPE;
     AvCodecMime mime = MEDIA_MIMETYPE_IMAGE_JPEG;
-    params->val = (void *)&mime;
+    params->val = reinterpret_cast<void *>(&mime);
     params->size = sizeof(mime);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
@@ -312,7 +312,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    params = reinterpret_cast<Param *>(OsalMemAlloc(sizeof(Param)*paramCnt));
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_PIXEL_FORMAT;
     PixelFormat format = PIXEL_FMT_YCBCR_420_SP;
@@ -331,7 +331,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
     int32_t ret = CreateFdShareMemory(&g_inputBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    g_inputInfoData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
+    g_inputInfoData =
+        reinterpret_cast<CodecBuffer *>(OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1));
     ASSERT_TRUE(g_inputInfoData != nullptr);
     g_inputInfoData->bufferId = 0;
     g_inputInfoData->bufferCnt = 1;
@@ -351,7 +352,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeInputTest_001, TestSize.Level1)
 {
     int32_t acquireFd;
-    CodecBuffer *inputInfo = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
+    CodecBuffer *inputInfo =
+        reinterpret_cast<CodecBuffer *>(OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1));
     ASSERT_TRUE(inputInfo != nullptr);
     inputInfo->bufferCnt = 1;
 
@@ -392,7 +394,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_001, TestSize.Level1)
     int32_t ret = CreateFdShareMemory(&g_outputBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
-    g_outputInfoData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
+    g_outputInfoData =
+        reinterpret_cast<CodecBuffer *>(OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1));
     ASSERT_TRUE(g_outputInfoData != nullptr);
     g_outputInfoData->bufferId = 1;
     g_outputInfoData->bufferCnt = 1;
