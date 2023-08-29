@@ -46,7 +46,7 @@ MapperService::MapperService()
         vdiImpl_ = createVdi_();
         CHECK_NULLPOINTER_RETURN(vdiImpl_);
     } else {
-        HDF_LOGE("%{public}s: Load buffer VDI failed, lib: %{public}s", __func__, DISPLAY_BUFFER_VDI_LIBRARY);
+        HDF_LOGE("%{public}s: Load buffer VDI failed", __func__);
     }
 }
 
@@ -64,9 +64,15 @@ int32_t MapperService::LoadVdi()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
-        HDF_LOGI("%{public}s: mapper loadvid, clear earlier dlerror: %{public}s", __func__, errStr);
+        HDF_LOGI("%{public}s: mapper load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
     }
+#ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
+    libHandle_ = dlopen(DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
+    DISPLAY_LOGI("display buffer load default vdi library: %{public}s", DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY);
+#else
     libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY);
+    DISPLAY_LOGI("display buffer load vendor vdi library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+#endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
     createVdi_ = reinterpret_cast<CreateDisplayBufferVdiFunc>(dlsym(libHandle_, "CreateDisplayBufferVdi"));
