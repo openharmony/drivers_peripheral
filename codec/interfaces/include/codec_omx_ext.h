@@ -167,9 +167,6 @@ struct PassthroughParam {
  * @brief Enumerates the extended codec indexes.
  */
 enum OmxIndexCodecExType {
-    OMX_IndexExtCommonStartUnusedVendor = OMX_IndexKhronosExtensions + 0x00700000,
-    /* Image & Video common configurations */
-    OMX_IndexExtConfigQueuesToWindowComposer,
     /** Extended BufferType index */
     OMX_IndexExtBufferTypeStartUnused = OMX_IndexKhronosExtensions + 0x00a00000,
     /** SupportBuffer */
