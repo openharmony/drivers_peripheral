@@ -26,6 +26,9 @@ namespace Display {
 namespace Buffer {
 namespace V1_0 {
 
+#ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
+#define DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY "libdisplay_buffer_vdi_impl_default.z.so"
+#endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
 #define DISPLAY_BUFFER_VDI_LIBRARY "libdisplay_buffer_vdi_impl.z.so"
 
 class IDisplayBufferVdi {

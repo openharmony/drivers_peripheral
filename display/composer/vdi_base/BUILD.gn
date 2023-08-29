@@ -1,0 +1,75 @@
+# Copyright (C) 2021-2023 HiHope Open Source Organization .
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+root_path = "../../../../.."
+
+ohos_shared_library("display_composer_vdi_impl_default") {
+  sources = [
+    "src/display_composer_vdi_impl.cpp",
+    "src/drm_connector.cpp",
+    "src/drm_crtc.cpp",
+    "src/drm_device.cpp",
+    "src/drm_display.cpp",
+    "src/drm_encoder.cpp",
+    "src/drm_plane.cpp",
+    "src/drm_vsync_worker.cpp",
+    "src/hdi_composer.cpp",
+    "src/hdi_device_interface.cpp",
+    "src/hdi_display.cpp",
+    "src/hdi_drm_composition.cpp",
+    "src/hdi_drm_layer.cpp",
+    "src/hdi_gfx_composition.cpp",
+    "src/hdi_layer.cpp",
+    "src/hdi_netlink_monitor.cpp",
+    "src/hdi_session.cpp",
+  ]
+  output_name = "display_composer_vdi_impl_default"
+  include_dirs = [
+    "include/",
+    "../../buffer/vdi_base/include",
+    "${root_path}/drivers/peripheral/display/buffer/hdi_service/include",
+    "${root_path}/drivers/peripheral/display/composer/hdi_service/include",
+    "${root_path}/drivers/peripheral/display/utils/include",
+    "${root_path}/drivers/peripheral/base",
+    "${root_path}/drivers/interface/display/composer",
+    "${root_path}/foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${root_path}/drivers/interface/display/composer/hdifd_parcelable",
+  ]
+
+  deps = [
+    "${root_path}/third_party/libdrm:libdrm",
+    "../../buffer/vdi_base:display_buffer_vdi_impl_default",
+  ]
+  cflags_cc = [
+    "-Wno-error=unused-function",
+    "-Wno-error=missing-braces",
+    "-Wno-error=#warnings",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_display:display_buffer_idl_headers",
+    "drivers_interface_display:display_composer_idl_headers",
+    "graphic_chipsetsdk:buffer_handle",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+  ]
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_display"
+}
