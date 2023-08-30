@@ -290,7 +290,7 @@ const std::string CameraHostService::GetVendorCameraId(const std::string &totalC
 {
     UpdateCameraIdMapList();
     auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
-        [totalCameraId](const struct CameraIdInfo &cameraIdInfo) {
+        [&totalCameraId](const struct CameraIdInfo &cameraIdInfo) {
             return totalCameraId == cameraIdInfo.totalCameraId;
         });
     if (itr == cameraIdInfoList_.end()) {
