@@ -340,10 +340,6 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
-    if (pins < 0) {
-        AUDIO_FUNC_LOGE("deviceDescript pins error!");
-        return HDF_FAILURE;
-    }
 
     int32_t tpins = pins & OUTPUT_MASK;
     if ((pins >> OUTPUT_OFFSET) != 0) {
@@ -568,10 +564,6 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t pins = captureParam->captureMode.hwInfo.deviceDescript.pins;
-    if (pins < 0) {
-        AUDIO_FUNC_LOGE("deviceDescript pins error!");
-        return HDF_FAILURE;
-    }
 
     if (!((pins >> INPUT_OFFSET) & 0x01)) {
         AUDIO_FUNC_LOGE("pins: %{public}d, error!", pins);
