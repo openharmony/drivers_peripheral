@@ -24,6 +24,7 @@
 
 #include "ddk_device_manager.h"
 #include "ddk_pnp_listener_mgr.h"
+#include "ddk_uevent_queue.h"
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
@@ -40,15 +41,6 @@
 #define TIMEVAL_SECOND          0
 #define TIMEVAL_USECOND         (100 * 1000)
 #define UEVENT_POLL_WAIT_TIME   100
-
-struct DdkUeventInfo {
-    const char *action;
-    const char *devPath;
-    const char *subSystem;
-    const char *devType;
-    const char *devNum;
-    const char *busNum;
-};
 
 static int DdkUeventOpen(int *fd)
 {
@@ -90,53 +82,6 @@ static int DdkUeventOpen(int *fd)
     return HDF_SUCCESS;
 }
 
-static int32_t DdkUeventAddDevice(const char *devPath)
-{
-    char *pos = strrchr(devPath, '/');
-    if (pos == NULL) {
-        HDF_LOGE("%{public}s: no / in devpath:%{public}s", __func__, devPath);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    const struct UsbPnpNotifyMatchInfoTable *device = DdkDevMgrCreateDevice(pos + 1); // 1 skip '/'
-    if (device == NULL) {
-        HDF_LOGE("%{public}s: create device failed:%{public}s", __func__, devPath);
-        return HDF_FAILURE;
-    }
-    DdkListenerMgrNotifyAll(device, USB_PNP_NOTIFY_ADD_DEVICE);
-    return HDF_SUCCESS;
-}
-
-static int32_t DdkUeventRemoveDevice(const char *busNum, const char *devNum)
-{
-    struct UsbPnpNotifyMatchInfoTable dev;
-    int32_t ret = DdkDevMgrRemoveDevice(strtol(busNum, NULL, 10), strtol(devNum, NULL, 10), &dev); // 10 means decimal
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: remove device failed, busNum:%{public}s, devNum:%{public}s", __func__, busNum, devNum);
-        return HDF_FAILURE;
-    }
-    DdkListenerMgrNotifyAll(&dev, USB_PNP_NOTIFY_REMOVE_DEVICE);
-    return HDF_SUCCESS;
-}
-
-static void DdkDispatchUevent(const struct DdkUeventInfo *info)
-{
-    if (strcmp(info->subSystem, "usb") != 0) {
-        return;
-    }
-
-    int32_t ret = HDF_SUCCESS;
-    if (strcmp(info->action, "bind") == 0 && strcmp(info->devType, "usb_device") == 0) {
-        ret = DdkUeventAddDevice(info->devPath);
-    } else if (strcmp(info->action, "remove") == 0 && strcmp(info->devType, "usb_device") == 0) {
-        ret = DdkUeventRemoveDevice(info->busNum, info->devNum);
-    }
-
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: action:%{public}s, ret:%{public}d", __func__, info->action, ret);
-    }
-}
-
 static void DdkHandleUevent(const char msg[], ssize_t rcvLen)
 {
     (void)rcvLen;
@@ -175,7 +120,7 @@ static void DdkHandleUevent(const char msg[], ssize_t rcvLen)
         msgTmp += strlen(msgTmp) + 1; // 1 is a skip character '\0'
     }
 
-    DdkDispatchUevent(&info);
+    DdkUeventAddTask(&info);
     return;
 }
 
@@ -255,6 +200,7 @@ void *DdkUeventMain(void *param)
 
 int32_t DdkUeventInit(const char *gadgetEventPath)
 {
+    DdkUeventStartDispatchThread();
     return UsbFnUeventInit(gadgetEventPath);
 }
 #else  // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE

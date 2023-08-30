@@ -88,6 +88,7 @@ ohos_shared_library("libusb_pnp_manager") {
     } else {
       defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
     }
+    sources += [ "host/src/ddk_uevent_queue.cpp" ]
   }
 
   if (is_standard_system) {
