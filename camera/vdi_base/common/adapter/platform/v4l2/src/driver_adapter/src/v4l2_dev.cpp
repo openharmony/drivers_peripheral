@@ -237,7 +237,13 @@ void HosV4L2Dev::loopBuffers()
     CAMERA_LOGD("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
     prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
-    while (streamNumber_ > 0) {
+    while (true) {
+        {
+            std::lock_guard<std::mutex> l(streamLock_);
+            if (streamNumber_ <= 0) {
+                break;
+            }
+        }
         nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
         CAMERA_LOGD("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
 
@@ -356,47 +362,46 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
 
 RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
 {
-    int rc, fd;
-
-    if (myStreams_ == nullptr) {
-        CAMERA_LOGE("error: StopStream: myStreams_ is NULL\n");
+    if (myStreams_ == nullptr || streamThread_ == nullptr) {
+        CAMERA_LOGE("error: StopStream: myStreams_ or streamThread_ is nullptr");
         return RC_ERROR;
     }
 
-    if (streamThread_ == nullptr) {
-        CAMERA_LOGE("StopStream thread is stopped\n");
-        return RC_ERROR;
-    }
-
-    fd = GetCurrentFd(cameraID);
+    int fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("error: StopStream: GetCurrentFd error\n");
         return RC_ERROR;
     }
 
-    streamNumber_ -= 1;
-    CAMERA_LOGD("HosV4L2Dev::StopStream streamNumber_ = %d\n", streamNumber_);
+    unsigned int streamNum = 0;
+    {
+        std::lock_guard<std::mutex> l(streamLock_);
+        streamNum = --streamNumber_;
+        CAMERA_LOGD("HosV4L2Dev::StopStream streamNumber_ = %d\n", streamNumber_);
+    }
 
-    if (streamNumber_ == 0) {
+    if (streamNum == 0) {
         CAMERA_LOGD("waiting loopBuffers stop\n");
         uint64_t one = 1;
         write(eventFd_, &one, sizeof(one));
         streamThread_->join();
         close(eventFd_);
+        CAMERA_LOGD("waiting loopBuffers exit\n");
     }
 
-    rc = myStreams_->V4L2StreamOff(fd);
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("error: StartStream: V4L2StreamOn error\n");
+    if (myStreams_->V4L2StreamOff(fd) == RC_ERROR) {
+        CAMERA_LOGE("error: StopStream: V4L2StreamOn error\n");
         return RC_ERROR;
     }
 
     EraseEpoll(fd);
-
-    if (streamNumber_ == 0) {
-        close(epollFd_);
-        delete streamThread_;
-        streamThread_ = nullptr;
+    {
+        std::lock_guard<std::mutex> l(streamLock_);
+        if (streamNumber_ == 0) {
+            close(epollFd_);
+            delete streamThread_;
+            streamThread_ = nullptr;
+        }
     }
 
     return RC_OK;
