@@ -154,7 +154,7 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     if (access(folderName, 0) == -1) {
         mkdir(folderName, 0770); // 0770: restore permission
     }
-    if (realpath(fileName, realFileName) == NULL) {
+    if (realpath(fileName,realFileName) == NULL) {
         return;
     }
     if ((fp = fopen(realFileName, "a+")) != NULL) {
