@@ -107,6 +107,7 @@ void TestCameraBase::StoreVideo(const unsigned char *bufStart, const uint32_t si
         CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
     }
     CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
+    close(videoFd);
 }
 
 void TestCameraBase::OpenVideoFile()

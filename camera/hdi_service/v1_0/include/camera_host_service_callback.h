@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "camera.h"
 #ifndef CAMERA_HOST_SERVICE_CALLBACK_H
 #define CAMERA_HOST_SERVICE_CALLBACK_H
 
+#include "camera.h"
 #include "v1_0/icamera_host_callback.h"
 #include "v1_0/icamera_host_vdi_callback.h"
 
