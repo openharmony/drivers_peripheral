@@ -2057,7 +2057,7 @@ static int32_t GetWiphyInfoHandler(struct nl_msg *msg, void *arg)
     wiphyInfo->wiphyFeatures.supportsRandomMacSchedScan = featureFlags & NL80211_FEATURE_SCHED_SCAN_RANDOM_MAC_ADDR;
     if (attr[NL80211_ATTR_EXT_FEATURES] != NULL) {
         extFeatureFlagsBytes = nla_data(attr[NL80211_ATTR_EXT_FEATURES]);
-        extFeatureFlagsLen = nla_len(attr[NL80211_ATTR_EXT_FEATURES]);
+        extFeatureFlagsLen = (uint32_t)nla_len(attr[NL80211_ATTR_EXT_FEATURES]);
         wiphyInfo->wiphyFeatures.supportsLowPowerOneshotScan =
             SetExtFeatureFlag(extFeatureFlagsBytes, extFeatureFlagsLen, NL80211_EXT_FEATURE_LOW_POWER_SCAN);
         wiphyInfo->wiphyFeatures.supportsExtSchedScanRelativeRssi =
@@ -2581,7 +2581,7 @@ static void FillSignalRate(struct nlattr **stats, uint32_t size, struct SignalRe
     if (stats[NL80211_STA_INFO_RX_BITRATE] != NULL &&
         nla_parse_nested(rate, NL80211_RATE_INFO_MAX, stats[NL80211_STA_INFO_RX_BITRATE], ratePolicy) == 0) {
         if (rate[NL80211_RATE_INFO_BITRATE32] != NULL) {
-            signalResult->rxBitrate = nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
+            signalResult->rxBitrate = (int32_t)nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
         } else if (rate[NL80211_RATE_INFO_BITRATE] != NULL) {
             signalResult->rxBitrate = nla_get_u16(rate[NL80211_RATE_INFO_BITRATE]);
         }
@@ -2636,10 +2636,10 @@ static int32_t SignalInfoHandler(struct nl_msg *msg, void *arg)
         signalResult->currentTxPackets = nla_get_u32(stats[NL80211_STA_INFO_TX_PACKETS]);
     }
     if (stats[NL80211_STA_INFO_RX_PACKETS] != NULL) {
-        signalResult->currentRxPackets = nla_get_u32(stats[NL80211_STA_INFO_RX_PACKETS]);
+        signalResult->currentRxPackets = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_RX_PACKETS]);
     }
     if (stats[NL80211_STA_INFO_TX_FAILED] != NULL) {
-        signalResult->currentTxFailed = nla_get_u32(stats[NL80211_STA_INFO_TX_FAILED]);
+        signalResult->currentTxFailed = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_FAILED]);
     }
     FillSignalExt(stats, NL80211_STA_INFO_MAX + 1, signalResult);
     FillSignalRate(stats, NL80211_STA_INFO_MAX + 1, signalResult);
@@ -2668,7 +2668,7 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
         HILOG_ERROR(LOG_CORE, "%s: WifiGetAssociatedInfo failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    signalResult->associatedFreq = associatedInfo.associatedFreq;
+    signalResult->associatedFreq = (int32_t)(associatedInfo.associatedFreq);
     msg = nlmsg_alloc();
     if (msg == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);

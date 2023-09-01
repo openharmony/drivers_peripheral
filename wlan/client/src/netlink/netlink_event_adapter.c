@@ -276,7 +276,10 @@ static void WifiEventScanResultProcess(const char *ifName)
     WifiScanResultArg arg;
     uint32_t ifaceId = if_nametoindex(ifName);
     struct nl_msg *msg = nlmsg_alloc();
-
+    if (NULL == msg) {
+        HILOG_ERROR(LOG_CORE, "%s: msg is NULL.", __func__);
+        return;
+    }
     arg.scanResults = &scanResults;
     arg.ifName = ifName;
     genlmsg_put(msg, 0, 0, g_familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0);
