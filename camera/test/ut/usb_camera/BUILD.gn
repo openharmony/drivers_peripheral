@@ -109,7 +109,6 @@ ohos_unittest("camera_usb_test_ut") {
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:libcamera_stub_1.0",
     "drivers_interface_camera:metadata",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
