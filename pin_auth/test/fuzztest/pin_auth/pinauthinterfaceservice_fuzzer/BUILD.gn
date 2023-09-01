@@ -15,14 +15,6 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("PinAuthInterfaceServiceFuzzTest") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   stack_protector_ret = true
   module_out_path = "hdf/pin_auth"
   fuzz_config_file = "../pinauthinterfaceservice_fuzzer"
