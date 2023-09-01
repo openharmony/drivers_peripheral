@@ -1056,7 +1056,7 @@ static int32_t WLanFillSsid(WifiScan *wifiScan, const struct HdfWifiScan *scan)
             HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
             return HDF_FAILURE;
         }
-        wifiScan->ssids[loop].ssidLen = scan->ssids[loop].ssidLen;
+        wifiScan->ssids[loop].ssidLen = (uint32_t)(scan->ssids[loop].ssidLen);
     }
     return HDF_SUCCESS;
 }
@@ -1296,7 +1296,7 @@ static int32_t FillPnoSettings(WifiPnoSettings *wifiPnoSettings, const struct Pn
     }
     for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
         wifiPnoSettings->pnoNetworks[i].isHidden = pnoSettings->pnoNetworks[i].isHidden;
-        wifiPnoSettings->pnoNetworks[i].ssid.ssidLen = pnoSettings->pnoNetworks[i].ssid.ssidLen;
+        wifiPnoSettings->pnoNetworks[i].ssid.ssidLen = (uint32_t)(pnoSettings->pnoNetworks[i].ssid.ssidLen);
         if (memcpy_s(wifiPnoSettings->pnoNetworks[i].ssid.ssid, MAX_SSID_LEN, pnoSettings->pnoNetworks[i].ssid.ssid,
                 pnoSettings->pnoNetworks[i].ssid.ssidLen) != EOK) {
             HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
