@@ -18,7 +18,7 @@
 #include <string>
 #include "surface.h"
 #include "surface_type.h"
-#include "v1_0/display_composer_type.h"
+#include "display_format.h"
 #include "camera.h"
 
 namespace OHOS::Camera {
