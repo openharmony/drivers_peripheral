@@ -25,9 +25,11 @@ extern "C" {
     extern LinkedList *g_userInfoList;
     extern bool IsTimeValid(const UserAuthTokenHal *userAuthToken);
     extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
-    extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken);
-    extern ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
-    extern ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken);
+    extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
+        const HksAuthTokenKey *tokenKey);
+    extern ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain,
+        HksAuthTokenKey *tokenKey);
+    extern ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey);
 }
 
 namespace OHOS {
@@ -108,7 +110,7 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
     };
     HksAuthTokenKey userAuthTokenKey = {};
     EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);
-    EXPECT_EQ(GetTokenDataCipherResult(&data, &token), RESULT_SUCCESS);
+    EXPECT_EQ(GetTokenDataCipherResult(&data, &token, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenSign(&token, &userAuthTokenKey), RESULT_SUCCESS);
     UserAuthTokenPlain userAuthTokenPlain = {};
     EXPECT_EQ(UserAuthTokenVerify(&token, &userAuthTokenPlain), RESULT_SUCCESS);
@@ -122,13 +124,15 @@ HWTEST_F(UserAuthSignTest, TestDecryptTokenCipher, TestSize.Level0)
 {
     UserAuthTokenHal userAuthToken = {};
     UserAuthTokenPlain userAuthTokenPlain = {};
-    EXPECT_EQ(DecryptTokenCipher(&userAuthToken, &userAuthTokenPlain), RESULT_GENERAL_ERROR);
+    HksAuthTokenKey userAuthTokenKey = {};
+    EXPECT_EQ(DecryptTokenCipher(&userAuthToken, &userAuthTokenPlain, &userAuthTokenKey), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthSignTest, TestCheckUserAuthTokenHmac, TestSize.Level0)
 {
     UserAuthTokenHal userAuthToken = {};
-    EXPECT_EQ(CheckUserAuthTokenHmac(&userAuthToken), RESULT_BAD_SIGN);
+    HksAuthTokenKey tokenKey = {};
+    EXPECT_EQ(CheckUserAuthTokenHmac(&userAuthToken, &tokenKey), RESULT_BAD_SIGN);
 }
 
 HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
