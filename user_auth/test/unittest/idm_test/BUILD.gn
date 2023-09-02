@@ -72,6 +72,8 @@ ohos_unittest("UserAuthIdmTest") {
     "../../../hdi_service/user_auth/src/user_auth_funcs.c",
     "../../../hdi_service/user_auth/src/user_sign_centre.c",
     "enroll_specification_check_test.cpp",
+    "idm_session_test.cpp",
+    "user_idm_funcs_test.cpp",
   ]
 
   deps = [ "//third_party/openssl:libcrypto_shared" ]
