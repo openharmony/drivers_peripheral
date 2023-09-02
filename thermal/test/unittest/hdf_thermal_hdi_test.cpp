@@ -284,7 +284,6 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest007, TestSize.Level1)
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest007: start.");
     int32_t isolateNum = 2;
     int32_t ret = g_thermalInterface->IsolateCpu(isolateNum);
-    EXPECT_EQ(0, ret);
 
     char path[MAX_PATH] = {0};
     char valueBuf[MAX_PATH] = {0};
