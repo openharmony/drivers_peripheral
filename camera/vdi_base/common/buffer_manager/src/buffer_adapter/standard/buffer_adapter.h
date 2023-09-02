@@ -18,11 +18,10 @@
 
 #include <surface_buffer.h>
 #include <memory>
-#include "v1_0/display_composer_type.h"
+#include "display_format.h"
 #include "ibuffer.h"
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Display::Composer::V1_0;
 class BufferAdapter {
 public:
     // convert surfae buffer to camera ibuffer, only for external buffer.
