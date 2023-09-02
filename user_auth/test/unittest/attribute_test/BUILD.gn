@@ -22,6 +22,7 @@ ohos_unittest("UserAuthAttributeTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "../../../cfi_blocklist.txt"
   }
   stack_protector_ret = true
   module_out_path = "useriam/user_auth_hdi"
