@@ -33,7 +33,7 @@
 #include "v1_0/istream_operator.h"
 #include "v1_0/camera_host_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
-#include "v1_0/display_composer_type.h"
+#include "display_format.h"
 #include "iconsumer_surface.h"
 
 namespace OHOS::Camera {
@@ -49,7 +49,6 @@ enum ImageDataSaveSwitch {
     SWITCH_ON,
 };
 using namespace OHOS::HDI::Camera::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
 class Test {
 public:
     void Init();

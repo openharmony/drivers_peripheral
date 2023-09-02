@@ -22,7 +22,7 @@
 #include <map>
 #include <hdf_log.h>
 #include <surface.h>
-#include "v1_0/display_composer_type.h"
+#include "display_format.h"
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
 #include "iconsumer_surface.h"

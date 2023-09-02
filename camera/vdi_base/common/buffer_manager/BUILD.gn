@@ -47,13 +47,13 @@ if (defined(ohos_lite)) {
       "./src/buffer_adapter/lite",
       "$camera_path/../../display/interfaces/include",
       "$camera_path/../../base",
+      "$camera_path/../../interfaces/include",
     ]
 
     libs = []
     defines = []
     deps = []
     external_deps = [
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_peripheral_display:hdi_display",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
@@ -104,6 +104,7 @@ if (defined(ohos_lite)) {
       "./include",
       "./src/buffer_adapter/standard",
       "$camera_path/include",
+      "$camera_path/../../interfaces/include",
     ]
 
     libs = []
@@ -124,10 +125,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    external_deps += [
-      "drivers_interface_camera:metadata",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    ]
+    external_deps += [ "drivers_interface_camera:metadata" ]
     public_configs = [ ":buffer_manager_config" ]
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"

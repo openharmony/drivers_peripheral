@@ -22,7 +22,7 @@
 #include <map>
 #include <hdf_log.h>
 #include <iconsumer_surface.h>
-#include "v1_0/display_composer_type.h"
+#include "display_format.h"
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
 #include "v1_0/ioffline_stream_operator.h"
@@ -33,7 +33,6 @@
 #endif
 
 namespace OHOS::Camera {
-using namespace OHOS::HDI::Display::Composer::V1_0;
 class StreamCustomer {
 public:
     StreamCustomer();
