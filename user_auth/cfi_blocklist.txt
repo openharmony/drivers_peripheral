@@ -1,0 +1,2 @@
+src:*/third_party/googletest/googletest/include/gtest/internal/gtest-port.h
+src:*/third_party/googletest/googlemock/include/gmock/gmock-cardinalities.h
