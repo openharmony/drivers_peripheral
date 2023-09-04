@@ -34,7 +34,7 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
     "iam_fuzz_test.cpp",
   ]
 
-  deps = [ "../../../../hdi_service:libface_auth_interface_service_1.1" ]
+  deps = [ "../common_fuzzer:libface_auth_interface_service_1.1_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
