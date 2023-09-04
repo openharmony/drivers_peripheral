@@ -41,6 +41,11 @@ sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         CODEC_LOGE("bufferHandle is null");
         return nullptr;
     }
+    if (codecBuffer.fd > 0) {
+        // DynaBuffer not use fd, close dupped fd
+        close(codecBuffer.fd);
+    }
+
     BufferHandle *bufferHandle = codecBuffer.bufferhandle->Move();
     codecBuffer.bufferhandle = nullptr;
     CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer, bufferHandle);
