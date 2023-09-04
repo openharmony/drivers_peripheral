@@ -25,13 +25,13 @@
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
-#define CHECK_SENSOR_REMOVE_RESULT_RETURN_VALUE(ret, groupId,callback) do { \
+#define CHECK_SENSOR_REMOVE_RESULT_RETURN_VALUE(ret, groupId, callback) do { \
     if ((ret) != SENSOR_SUCCESS) { \
-        int32_t removeResult = RemoveSensorDeathRecipient(callback);\
-        if (removeResult != SENSOR_SUCCESS) {\
-            HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId);\
-        }\
-        return ret;\
+        int32_t removeResult = RemoveSensorDeathRecipient(callback); \
+        if (removeResult != SENSOR_SUCCESS) { \
+            HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId); \
+        } \
+        return ret; \
     } \
 } while (0)
 
@@ -328,8 +328,9 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &ca
     } else if (groupId == MEDICAL_SENSOR_TYPE) {
         ret = sensorInterface->Register(groupId, MedicalSensorDataCallback);
     }
+
     FinishTrace(HITRACE_TAG_SENSORS);
-    CHECK_SENSOR_REMOVE_RESULT_RETURN_VALUE(ret, groupId,callbackObj);
+    CHECK_SENSOR_REMOVE_RESULT_RETURN_VALUE(ret, groupId, callbackObj);
 
     std::vector<sptr<ISensorCallbackVdi>> remoteVec;
     remoteVec.push_back(callbackObj);
