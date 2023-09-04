@@ -24,13 +24,6 @@
 #define SENSOR_TIME_DECREASE      1
 #define SENSOR_GAIN_INCREASE      0
 
-#define CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, str) do { \
-    if ((ret) != HDF_SUCCESS) { \
-            HDF_LOGE("%s: Failed to %s sensor register array", __func__ , str); \
-            return HDF_FAILURE; \
-    } \
-} while (0)
-
 static struct Bh1745DrvData *g_bh1745DrvData = NULL;
 static uint32_t g_timeChangeStatus = SENSOR_TIME_DECREASE;
 

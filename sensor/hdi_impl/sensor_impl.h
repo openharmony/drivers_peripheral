@@ -22,6 +22,13 @@
 #include "isensor_interface_vdi.h"
 #include "sensor_dump.h"
 
+#define CHECK_SENSOR_REMOVE_RESULT_RETURN_VALUE(ret, groupId, removeResult) do { \
+        if (removeResult != SENSOR_SUCCESS) { \
+            HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId); \
+        } \
+        return ret; \
+} while (0)
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
