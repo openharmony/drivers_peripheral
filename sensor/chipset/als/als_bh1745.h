@@ -66,6 +66,13 @@
 #define EXTENDED_ALS_GAIN_GROUP_ATTR_VALUE_1                 0x01
 #define EXTENDED_ALS_GAIN_GROUP_ATTR_VALUE_2                 0x02
 
+#define CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, str) do { \
+    if ((ret) != HDF_SUCCESS) { \
+            HDF_LOGE("%s: Failed to %s sensor register array", __func__, str); \
+            return HDF_FAILURE; \
+    } \
+} while (0)
+
 enum ExtendedAlsTimeRegGroupIndex {
     EXTENDED_ALS_TIME_GROUP_INDEX_0 = 0,
     EXTENDED_ALS_TIME_GROUP_INDEX_1,
