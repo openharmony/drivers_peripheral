@@ -135,17 +135,34 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
     ReleaseCache();
+    if (buffer.fd > 0) {
+        // close dupped fd
+        close(buffer.fd);
+    }
+
     return ret;
 }
 
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
-    return node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    int32_t ret = node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    if (buffer.fd > 0) {
+        // close dupped fd
+        close(buffer.fd);
+    }
+
+    return ret;
 }
 
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
-    return node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    int32_t ret = node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    if (buffer.fd > 0) {
+        // close dupped fd
+        close(buffer.fd);
+    }
+
+    return ret;
 }
 
 int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
