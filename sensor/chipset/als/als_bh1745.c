@@ -26,7 +26,7 @@
 
 #define CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, str) do { \
     if ((ret) != HDF_SUCCESS) { \
-            HDF_LOGE("%s: Failed to %s sensor register array ", __func__ , str); \
+            HDF_LOGE("%s: Failed to %s sensor register array", __func__ , str); \
             return HDF_FAILURE; \
     } \
 } while (0)
@@ -94,7 +94,7 @@ static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcDa
 
         ret = WriteSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, sizeof(regValue));
         CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, "write");
-   
+
     } else if (((rgbcData[ALS_R] * BH1745_MULTIPLE_100 < BH1745_TIME_MIN) ||
         (rgbcData[ALS_G] * BH1745_MULTIPLE_100 < BH1745_TIME_MIN)) && (g_timeChangeStatus == SENSOR_TIME_DECREASE)) {
         g_timeChangeStatus = SENSOR_TIME_INCREASE;
