@@ -2589,7 +2589,7 @@ static void FillSignalRate(struct nlattr **stats, uint32_t size, struct SignalRe
     if (stats[NL80211_STA_INFO_TX_BITRATE] != NULL &&
         nla_parse_nested(rate, NL80211_RATE_INFO_MAX, stats[NL80211_STA_INFO_TX_BITRATE], ratePolicy) == 0) {
         if (rate[NL80211_RATE_INFO_BITRATE32] != NULL) {
-            signalResult->txBitrate = nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
+            signalResult->txBitrate = (int32_t)nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
         } else if (rate[NL80211_RATE_INFO_BITRATE] != NULL) {
             signalResult->txBitrate = nla_get_u16(rate[NL80211_RATE_INFO_BITRATE]);
         }
@@ -2627,7 +2627,7 @@ static int32_t SignalInfoHandler(struct nl_msg *msg, void *arg)
         signalResult->currentRssi = nla_get_s8(stats[NL80211_STA_INFO_SIGNAL]);
     }
     if (stats[NL80211_STA_INFO_TX_BYTES] != NULL) {
-        signalResult->currentTxBytes = nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
+        signalResult->currentTxBytes = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
     }
     if (stats[NL80211_STA_INFO_RX_BYTES] != NULL) {
         signalResult->currentRxBytes = nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
