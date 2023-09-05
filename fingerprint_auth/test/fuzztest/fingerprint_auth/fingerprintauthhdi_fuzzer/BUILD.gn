@@ -15,6 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("FingerprintAuthHdiFuzzTest") {
+  stack_protector_ret = true
   module_out_path = "hdf/fingerprint_auth"
   fuzz_config_file = "../fingerprintauthhdi_fuzzer"
   cflags = [
@@ -33,7 +34,7 @@ ohos_fuzztest("FingerprintAuthHdiFuzzTest") {
     "iam_fuzz_test.cpp",
   ]
 
-  deps = [ "../../../../hdi_service:libfingerprint_auth_interface_service_1.1" ]
+  deps = [ "../common_fuzzer:libfingerprint_auth_interface_service_1.1_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",

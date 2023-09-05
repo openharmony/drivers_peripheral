@@ -15,6 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("UserAuthHdiStubFuzzTest") {
+  stack_protector_ret = true
   module_out_path = "hdf/user_auth"
   fuzz_config_file = "../userauthhdistub_fuzzer"
   cflags = [

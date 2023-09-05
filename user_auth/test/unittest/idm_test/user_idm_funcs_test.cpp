@@ -259,13 +259,13 @@ HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
     session.isScheduleValid = true;
     session.time = UINT64_MAX;
     g_session = &session;
-    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_REACH_LIMIT);
+    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     session.scheduleId = 10;
-    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_REACH_LIMIT);
+    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     session.time = GetSystemTime();
-    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_REACH_LIMIT);
+    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     session.userId = userId;
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_UNKNOWN);

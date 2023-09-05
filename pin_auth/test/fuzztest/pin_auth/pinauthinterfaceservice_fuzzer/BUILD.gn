@@ -15,6 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("PinAuthInterfaceServiceFuzzTest") {
+  stack_protector_ret = true
   module_out_path = "hdf/pin_auth"
   fuzz_config_file = "../pinauthinterfaceservice_fuzzer"
   cflags = [
@@ -31,7 +32,7 @@ ohos_fuzztest("PinAuthInterfaceServiceFuzzTest") {
 
   sources = [ "pin_auth_interface_service_fuzzer.cpp" ]
 
-  deps = [ "../../../../hdi_service:libpin_auth_interface_service_1.1" ]
+  deps = [ "../common_fuzzer:libpin_auth_interface_service_1.1_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
