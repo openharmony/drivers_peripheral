@@ -15,6 +15,7 @@
 
 #include "codec_component_service.h"
 #include <hdf_base.h>
+#include <hdf_remote_service.h>
 #include <securec.h>
 #include <malloc.h>
 #include <unistd.h>
@@ -131,13 +132,12 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
     return node_->AllocateBuffer(portIndex, outBuffer);
 }
 
-static void CodecCloseDuppedFdInIPC(OmxCodecBuffer &buffer)
+void CodecComponentService::CodecCloseDuppedFdInIPC(const OmxCodecBuffer &buffer)
 {
-    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    uint32_t codecPid = static_cast<uint32_t>(GetPid());
+    pid_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    pid_t codecPid = static_cast<uint32_t>(getpid());
     if (remotePid != codecPid && buffer.fd >= 0) {
         close(buffer.fd);
-        buffer.fd = -1;
     }
 }
 
@@ -146,7 +146,7 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
     ReleaseCache();
-    CodecCloseFdInIPC(buffer);
+    CodecCloseDuppedFdInIPC(buffer);
 
     return ret;
 }
@@ -154,7 +154,7 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    CodecCloseFdInIPC(buffer);
+    CodecCloseDuppedFdInIPC(buffer);
 
     return ret;
 }
@@ -162,7 +162,7 @@ int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    CodecCloseFdInIPC(buffer);
+    CodecCloseDuppedFdInIPC(buffer);
 
     return ret;
 }

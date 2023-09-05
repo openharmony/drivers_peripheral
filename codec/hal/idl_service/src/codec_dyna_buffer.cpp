@@ -15,6 +15,7 @@
 #include "codec_dyna_buffer.h"
 #include <buffer_handle_utils.h>
 #include <hdf_base.h>
+#include <hdf_remote_service.h>
 #include <securec.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
@@ -38,12 +39,12 @@ CodecDynaBuffer::~CodecDynaBuffer()
 sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     BufferHandle *bufferHandle = nullptr;
-    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    uint32_t codecPid = static_cast<uint32_t>(GetPid());
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    pid_t codecPid = getpid();
     if (remotePid != codecPid && codecBuffer.fd >= 0) {
         // DynaBuffer not use dupped fd, close dupped fd in IPC mode
         close(codecBuffer.fd);
-        codecBuffer.fd = -1
+        codecBuffer.fd = -1;
     }
     if (codecBuffer.bufferhandle) {
         bufferHandle = codecBuffer.bufferhandle->Move();
