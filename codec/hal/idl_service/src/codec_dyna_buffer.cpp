@@ -41,7 +41,7 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
     uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     uint32_t codecPid = static_cast<uint32_t>(GetPid());
     if (remotePid != codecPid && codecBuffer.fd > 0) {
-        // HandleBuffer not use dupped fd, close dupped fd in IPC mode
+        // DynaBuffer not use dupped fd, close dupped fd in IPC mode
         close(codecBuffer.fd);
         codecBuffer.fd = -1
     }
