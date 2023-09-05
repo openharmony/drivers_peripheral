@@ -56,6 +56,7 @@ public:
 private:
     void SetComponentRole();
     void ReleaseCache();
+    void CodecCloseDuppedFdInIPC(const OmxCodecBuffer &buffer);
     std::string name_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
