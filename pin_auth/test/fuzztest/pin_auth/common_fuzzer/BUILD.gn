@@ -1,0 +1,57 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/features.gni")
+import("//build/test.gni")
+
+ohos_shared_library("libpin_auth_interface_service_1.1_fuzzer") {
+  stack_protector_ret = true
+  include_dirs = [
+    "../../../../hdi_service/service/inc",
+    "../../../../hdi_service/adaptor/inc",
+    "../../../../hdi_service/common/inc",
+    "../../../../hdi_service/database/inc",
+    "../../../../hdi_service/main/inc",
+    "//third_party/openssl/include",
+    "../../../../common/logs",
+    "../../../../common/utils",
+  ]
+  sources = [
+    "../../../../hdi_service/adaptor/src/adaptor_algorithm.c",
+    "../../../../hdi_service/adaptor/src/adaptor_file.c",
+    "../../../../hdi_service/adaptor/src/adaptor_memory.c",
+    "../../../../hdi_service/adaptor/src/adaptor_time.c",
+    "../../../../hdi_service/adaptor/src/file_operator.c",
+    "../../../../hdi_service/common/src/buffer.c",
+    "../../../../hdi_service/database/src/pin_db.c",
+    "../../../../hdi_service/main/src/pin_auth.cpp",
+    "../../../../hdi_service/main/src/pin_func.c",
+    "../../../../hdi_service/service/src/executor_impl.cpp",
+    "../../../../hdi_service/ervice/src/pin_auth_interface_service.cpp",
+  ]
+
+  deps = [ "//third_party/openssl:libcrypto_shared" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_pin_auth:pin_auth_idl_headers",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_pin_auth"
+}
