@@ -135,7 +135,7 @@ static void CodecCloseDuppedFdInIPC(OmxCodecBuffer &buffer)
 {
     uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     uint32_t codecPid = static_cast<uint32_t>(GetPid());
-    if (remotePid != codecPid && buffer.fd > 0) {
+    if (remotePid != codecPid && buffer.fd >= 0) {
         close(buffer.fd);
         buffer.fd = -1;
     }
