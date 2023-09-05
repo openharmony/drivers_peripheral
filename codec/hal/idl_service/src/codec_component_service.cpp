@@ -17,6 +17,7 @@
 #include <hdf_base.h>
 #include <securec.h>
 #include <malloc.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
 namespace OHOS {
 namespace HDI {
