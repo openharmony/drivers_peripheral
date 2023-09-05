@@ -173,7 +173,7 @@ void CodecShareBuffer::ReleaseFd(struct OmxCodecBuffer &codecBuffer)
     uint32_t codecPid = static_cast<uint32_t>(GetPid());
     if (remotePid != codecPid && codecBuffer.fd > 0) {
         close(codecBuffer.fd);
-        codecBuffer.fd = -1
+        codecBuffer.fd = -1;
     }
 }
 }  // namespace Omx
