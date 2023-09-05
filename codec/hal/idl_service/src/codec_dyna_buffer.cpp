@@ -38,13 +38,16 @@ CodecDynaBuffer::~CodecDynaBuffer()
 sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     BufferHandle *bufferHandle = nullptr;
+    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    uint32_t codecPid = static_cast<uint32_t>(GetPid());
+    if (remotePid != codecPid && codecBuffer.fd > 0) {
+        // HandleBuffer not use dupped fd, close dupped fd in IPC mode
+        close(codecBuffer.fd);
+        codecBuffer.fd = -1
+    }
     if (codecBuffer.bufferhandle) {
         bufferHandle = codecBuffer.bufferhandle->Move();
         codecBuffer.bufferhandle = nullptr;
-    }
-    if (codecBuffer.fd > 0) {
-        // DynaBuffer not use fd, close dupped fd
-        close(codecBuffer.fd);
     }
 
     codecBuffer.allocLen = sizeof(DynamicBuffer);

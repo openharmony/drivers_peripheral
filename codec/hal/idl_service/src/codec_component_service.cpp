@@ -131,15 +131,22 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
     return node_->AllocateBuffer(portIndex, outBuffer);
 }
 
+static void CodecCloseDuppedFdInIPC(OmxCodecBuffer &buffer)
+{
+    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    uint32_t codecPid = static_cast<uint32_t>(GetPid());
+    if (remotePid != codecPid && buffer.fd > 0) {
+        close(buffer.fd);
+        buffer.fd = -1;
+    }
+}
+
 int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
     ReleaseCache();
-    if (buffer.fd > 0) {
-        // close dupped fd
-        close(buffer.fd);
-    }
+    CodecCloseFdInIPC(buffer);
 
     return ret;
 }
@@ -147,10 +154,7 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    if (buffer.fd > 0) {
-        // close dupped fd
-        close(buffer.fd);
-    }
+    CodecCloseFdInIPC(buffer);
 
     return ret;
 }
@@ -158,10 +162,7 @@ int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    if (buffer.fd > 0) {
-        // close dupped fd
-        close(buffer.fd);
-    }
+    CodecCloseFdInIPC(buffer);
 
     return ret;
 }
