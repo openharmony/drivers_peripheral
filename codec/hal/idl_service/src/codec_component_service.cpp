@@ -134,8 +134,8 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
 
 void CodecComponentService::CodecCloseDuppedFdInIPC(const OmxCodecBuffer &buffer)
 {
-    pid_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    pid_t codecPid = static_cast<uint32_t>(getpid());
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    pid_t codecPid = getpid();
     if (remotePid != codecPid && buffer.fd >= 0) {
         close(buffer.fd);
     }
