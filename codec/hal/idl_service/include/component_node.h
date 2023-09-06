@@ -30,6 +30,7 @@
 using OHOS::HDI::Codec::V1_0::CompVerInfo;
 using OHOS::HDI::Codec::V1_0::ICodecCallback;
 using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V1_0::CodecStateType;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -62,7 +63,9 @@ public:
                                  uint32_t data2, void *eventData);
     OMX_ERRORTYPE static OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
     OMX_ERRORTYPE static OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
-    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &GetBufferMapCount() const;
+    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &GetBufferMapCount() const {
+         return portIndexMap_;
+    };
 
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
@@ -75,6 +78,9 @@ private:
     sptr<ICodecBuffer> GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer);
     bool GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
     void ReleaseCodecBuffer(struct OmxCodecBuffer &buffer);
+    void WaitStateChange(CodecStateType objState, CodecStateType &status);
+    void ReleaseOMXResource();
+    int32_t ReleaseAllBuffer();
 private:
     OMX_HANDLETYPE comp_;  // Compnent handle
     sptr<ICodecCallback> omxCallback_;
@@ -82,8 +88,11 @@ private:
     std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> portIndexMap_;
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
+    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderPortMap_;
     uint32_t bufferIdCount_;
     std::shared_ptr<ComponentMgr> mgr_;
+    uint32_t maxStateWaitTime = 10000;
+    uint32_t maxStateWaitCount = 100;
     std::shared_mutex mapMutex_;
 };
 }  // namespace Omx
