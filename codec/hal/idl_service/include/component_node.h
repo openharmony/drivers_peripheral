@@ -62,7 +62,7 @@ public:
                                  uint32_t data2, void *eventData);
     OMX_ERRORTYPE static OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
     OMX_ERRORTYPE static OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
-    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &GetBufferMapCount();
+    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &GetBufferMapCount() const;
 
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
