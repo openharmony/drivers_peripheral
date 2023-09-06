@@ -18,6 +18,7 @@
 
 #include <map>
 #include <mutex>
+#include <hdf_remote_service.h>
 #include "device_resource_if.h"
 #include "v1_0/icodec_component.h"
 #include "v1_0/icodec_component_manager.h"
@@ -37,6 +38,7 @@ public:
     int32_t DestroyComponent(uint32_t componentId) override;
     void LoadCapabilityData(const DeviceResourceNode &node);
     void GetManagerMap(std::map<uint32_t, sptr<ICodecComponent>> &dumpMap);
+    bool JudgePassThrouth(void);
 private:
     uint32_t GetNextComponentId(void);
 

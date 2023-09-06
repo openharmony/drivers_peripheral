@@ -35,6 +35,7 @@ CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::
 CodecComponentService::~CodecComponentService()
 {
     if (node_ != nullptr) {
+        node_->ReleaseOMXResource();
         int32_t ret = node_->CloseHandle();
         if (ret != HDF_SUCCESS) {
             CODEC_LOGE("CloseHandle failed, err[%{public}d]", ret);
