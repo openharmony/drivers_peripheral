@@ -21,6 +21,7 @@
 #include "codec_log_wrapper.h"
 #include "component_node.h"
 #include "codec_dfx_service.h"
+#include "codec_death_recipient.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -60,6 +61,13 @@ int32_t CodecComponentManagerService::GetComponentCapabilityList(std::vector<Cod
     return OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->GetComponentCapabilityList(capList, count);
 }
 
+bool CodecComponentManagerService::JudgePassThrouth(void)
+{
+    uint32_t remotePid = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    uint32_t curPid = static_cast<uint32_t>(getpid());
+    return remotePid == curPid;
+}
+
 int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &component, uint32_t &componentId,
                                                       const std::string &compName, int64_t appData,
                                                       const sptr<ICodecCallback> &callbacks)
@@ -80,6 +88,9 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
     componentMap_.emplace(std::make_pair(componentId, codecComponent));
     component = codecComponent;
     CODEC_LOGI("componentId[%{public}d]", componentId);
+    if (!JudgePassThrouth()) {
+        RegisterDeathRecipientService(callbacks, componentId, this);
+    }
     return HDF_SUCCESS;
 }
 
@@ -93,6 +104,7 @@ int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
         return HDF_ERR_INVALID_PARAM;
     }
     componentMap_.erase(iter);
+    RemoveMapperOfDestoryedComponent(componentId);
     return HDF_SUCCESS;
 }
 
