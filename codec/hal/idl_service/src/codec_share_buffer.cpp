@@ -29,8 +29,6 @@ CodecShareBuffer::CodecShareBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecB
 CodecShareBuffer::~CodecShareBuffer()
 {
     if (shMem_ != nullptr) {
-        shMem_->UnmapAshmem();
-        shMem_->CloseAshmem();
         shMem_ = nullptr;
     }
 }
@@ -128,8 +126,6 @@ int32_t CodecShareBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    shMem_->UnmapAshmem();
-    shMem_->CloseAshmem();
     shMem_ = nullptr;
     return HDF_SUCCESS;
 }
