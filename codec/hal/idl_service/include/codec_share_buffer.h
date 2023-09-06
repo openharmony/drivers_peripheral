@@ -40,9 +40,6 @@ protected:
     bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
 
 private:
-    void ReleaseFd(struct OmxCodecBuffer &codecBuffer);
-
-private:
     std::shared_ptr<OHOS::Ashmem> shMem_;
 };
 }  // namespace Omx
