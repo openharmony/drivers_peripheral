@@ -25,6 +25,12 @@ using OHOS::HDI::Codec::V1_0::EventInfo;
 using OHOS::HDI::Codec::V1_0::CodecEventType;
 using OHOS::HDI::Codec::V1_0::CodecStateType;
 using OHOS::HDI::Codec::V1_0::CodecCommandType;
+using OHOS::HDI::Codec::V1_0::CodecStateType;
+using OHOS::HDI::Codec::V1_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V1_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V1_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V1_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V1_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -83,7 +89,7 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
 ComponentNode::~ComponentNode()
 {
     omxCallback_ = nullptr;
-
+    bufferHeaderPortMap_.clear();
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     portIndexMap_.clear();
@@ -373,6 +379,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     }
     portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return err;
@@ -402,6 +409,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
         std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     }
     portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return OMX_ErrorNone;
@@ -430,6 +438,15 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
         while (iterOmxBuffer != bufferHeaderMap_.end()) {
             if (iterOmxBuffer->first == bufferHdrType) {
                 bufferHeaderMap_.erase(iterOmxBuffer);
+                break;
+            }
+            iterOmxBuffer++;
+        }
+
+        iterOmxBuffer = bufferHeaderPortMap_.begin();
+        while (iterOmxBuffer != bufferHeaderPortMap_.end()) {
+            if (iterOmxBuffer->first == bufferHdrType) {
+                bufferHeaderPortMap_.erase(iterOmxBuffer);
                 break;
             }
             iterOmxBuffer++;
@@ -546,10 +563,63 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBu
     return true;
 }
 
-std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
+void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &status)
 {
-    return portIndexMap_;
+    int32_t ret = GetState(status);
+    uint32_t count = 0;
+    while (status != objState && count++ < maxStateWaitCount) {
+        usleep(maxStateWaitTime);
+        ret = GetState(status);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetState error [%{public}x]", __func__, ret);
+            return;
+        }
+    }
 }
+
+void ComponentNode::ReleaseOMXResource()
+{
+    if (codecBufferMap_.size() == 0) {
+        return;
+    }
+    CodecStateType status = CODEC_STATE_INVALID;
+    int32_t ret = GetState(status);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("ReleaseOMXResource GetState error [%{public}x]", ret);
+        return;
+    }
+    if (status == CODEC_STATE_EXECUTING) {
+        SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, NULL);
+        WaitStateChange(CODEC_STATE_IDLE, status);
+    }
+    if (status == CODEC_STATE_IDLE) {
+        SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, NULL);
+        auto ret = ReleaseAllBuffer();
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("ReleaseAllBuffer err [%{public}x]", ret);
+            return;
+        }
+        WaitStateChange(CODEC_STATE_LOADED, status);
+    }
+    HDF_LOGI("%{public}s: Release OMX Resource success!", __func__);
+}
+
+int32_t ComponentNode::ReleaseAllBuffer()
+{
+    auto iter = bufferHeaderMap_.begin();
+    for (; iter != bufferHeaderMap_.end(); iter++) {
+        OMX_BUFFERHEADERTYPE *bufferHdrType = iter->first;
+        uint32_t protIndex = bufferHeaderPortMap_.find(bufferHdrType)->second;
+        auto ret = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, protIndex, bufferHdrType);
+        if (ret != OMX_ErrorNone) {
+            HDF_LOGE("OMX_FreeBuffer err [%{public}x]", ret);
+            return ret;
+        }
+    }
+    HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
+    return HDF_SUCCESS;
+}
+
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS
