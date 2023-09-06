@@ -47,7 +47,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
         return nullptr;
     }
     int size = OHOS::AshmemGetSize(codecBuffer.fd);
-    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd, size);
+    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(dup(codecBuffer.fd), size);
     bool mapd = false;
     if (codecBuffer.type == READ_WRITE_TYPE) {
         mapd = sharedMem->MapReadAndWriteAshmem();
@@ -95,7 +95,7 @@ int32_t CodecShareBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
         return HDF_ERR_INVALID_PARAM;
     }
-    ReleaseFd(codecBuffer);
+
     return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
 }
 
@@ -105,8 +105,6 @@ int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
         CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-
-    ReleaseFd(codecBuffer);
 
     void *sharedPtr = const_cast<void *>(shMem_->ReadFromAshmem(codecBuffer.filledLen, codecBuffer.offset));
     if (!sharedPtr) {
@@ -129,8 +127,6 @@ int32_t CodecShareBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-
-    ReleaseFd(codecBuffer);
 
     shMem_->UnmapAshmem();
     shMem_->CloseAshmem();
@@ -165,17 +161,6 @@ bool CodecShareBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
         return false;
     }
     return true;
-}
-
-void CodecShareBuffer::ReleaseFd(struct OmxCodecBuffer &codecBuffer)
-{
-    // close the fd, if fd is sent by codecBuffer in IPC mode
-    pid_t remotePid = HdfRemoteGetCallingPid();
-    pid_t codecPid = getpid();
-    if (remotePid != codecPid && codecBuffer.fd >= 0) {
-        close(codecBuffer.fd);
-        codecBuffer.fd = -1;
-    }
 }
 }  // namespace Omx
 }  // namespace Codec

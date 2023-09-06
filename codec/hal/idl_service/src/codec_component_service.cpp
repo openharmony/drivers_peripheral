@@ -30,6 +30,8 @@ CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::
     name_ = name;
     node_ = node;
     mgr_  = mgr;
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    IsIPCMode_ = remotePid != getpid();
 #ifdef SUPPORT_ROLE
     SetComponentRole();
 #endif
@@ -132,21 +134,14 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
     return node_->AllocateBuffer(portIndex, outBuffer);
 }
 
-void CodecComponentService::CodecCloseDuppedFdInIPC(const OmxCodecBuffer &buffer)
-{
-    pid_t remotePid = HdfRemoteGetCallingPid();
-    pid_t codecPid = getpid();
-    if (remotePid != codecPid && buffer.fd >= 0) {
-        close(buffer.fd);
-    }
-}
-
 int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
     ReleaseCache();
-    CodecCloseDuppedFdInIPC(buffer);
+    if (IsIPCMode_) {
+        close(buffer.fd);
+    }
 
     return ret;
 }
@@ -154,7 +149,9 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    CodecCloseDuppedFdInIPC(buffer);
+    if (IsIPCMode_) {
+        close(buffer.fd);
+    }
 
     return ret;
 }
@@ -162,7 +159,9 @@ int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     int32_t ret = node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
-    CodecCloseDuppedFdInIPC(buffer);
+    if (IsIPCMode_) {
+        close(buffer.fd);
+    }
 
     return ret;
 }
