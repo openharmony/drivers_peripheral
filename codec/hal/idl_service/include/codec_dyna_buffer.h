@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-class CodecDynaBuffer : ICodecBuffer {
+class CodecDynaBuffer : public ICodecBuffer {
 public:
     ~CodecDynaBuffer();
     sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);

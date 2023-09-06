@@ -85,7 +85,7 @@ CodecComponentConfig::CodecComponentConfig()
 void CodecComponentConfig::Init(const DeviceResourceNode &node)
 {
     node_ = node;
-    std::string codecGroupsNodeName[] = {NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
+    const std::string codecGroupsNodeName[] = {NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
                                          NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
                                          NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
                                          NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS};
@@ -180,6 +180,11 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
                                                const struct DeviceResourceNode &childNode, CodecCompCapability &cap,
                                                bool isVideoGroup)
 {
+
+    if(iface.GetUint32 == NULL || iface.GetBool == NULL){
+        CODEC_LOGE("iface GetUint32 or GetBool is NULL");
+        return HDF_FAILURE;
+    }
     if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, reinterpret_cast<uint32_t *>(&cap.role),
                         MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
