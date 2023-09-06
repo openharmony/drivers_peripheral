@@ -33,8 +33,6 @@ static bool g_isInit = false;
 static const uint8_t* g_data = nullptr;
 static size_t g_dataSize = 0;
 static size_t g_pos;
-static bool g_isSetClientBufSuc = false;
-static const BufferHandle* g_buffer = nullptr;
 
 /*
 * describe: get data from outside untrusted data(g_data) which size is according to sizeof(T)
@@ -68,25 +66,6 @@ std::string GetStringFromData(int strlen)
     }
     std::string str(cstr);
     return str;
-}
-
-static int32_t GetDisplayCapability(DisplayCapability& info)
-{
-    uint32_t lenType = GetArrLength(CONVERT_TABLE_INTERFACE_TYPE);
-    if (lenType == 0) {
-        HDF_LOGE("%{public}s: CONVERT_TABLE_INTERFACE_TYPE length is equal to 0", __func__);
-        return DISPLAY_FAILURE;
-    }
-
-    info.name = GetStringFromData(STR_LEN);
-    info.type = CONVERT_TABLE_INTERFACE_TYPE[GetData<uint32_t>() % lenType];
-    info.phyWidth = GetData<uint32_t>();
-    info.phyHeight = GetData<uint32_t>();
-    info.supportLayers = GetData<uint32_t>();
-    info.virtualDispCount = GetData<uint32_t>();
-    info.supportWriteBack = GetData<uint32_t>();
-    info.propertyCount = GetData<uint32_t>();
-    return DISPLAY_SUCCESS;
 }
 
 static int32_t GetAllocInfo(AllocInfo& info)
@@ -144,22 +123,6 @@ int32_t TestSetClientBufferCacheCount(uint32_t devId)
     int32_t ret = g_composerInterface->SetClientBufferCacheCount(devId, cacheCount);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetClientBufferCacheCount failed", __func__);
-        return DISPLAY_FAILURE;
-    }
-    return ret;
-}
-
-int32_t TestGetDisplayCapability(uint32_t devId)
-{
-    DisplayCapability info = { 0 };
-    int32_t ret = GetDisplayCapability(info);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function GetDisplayCapability failed", __func__);
-        return DISPLAY_FAILURE;
-    }
-    ret = g_composerInterface->GetDisplayCapability(devId, info);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: function GetDisplayCapability failed", __func__);
         return DISPLAY_FAILURE;
     }
     return ret;
@@ -290,35 +253,6 @@ int32_t TestSetDisplayClientCrop(uint32_t devId)
     return ret;
 }
 
-int32_t TestSetDisplayClientBuffer(uint32_t devId)
-{
-    int32_t fence = GetData<int32_t>();
-
-    if (g_buffer == nullptr) {
-        g_buffer = UsingAllocmem();
-    }
-
-    int32_t ret = DISPLAY_FAILURE;
-    if (g_buffer == nullptr) {
-        HDF_LOGE("%{public}s: g_buffer is nullptr", __func__);
-        return ret;
-    }
-
-    if (!g_isSetClientBufSuc) {
-        ret = g_composerInterface->SetDisplayClientBuffer(devId, g_buffer, 0, fence);
-    } else {
-        ret = g_composerInterface->SetDisplayClientBuffer(devId, nullptr, 0, fence);
-    }
-
-    if (ret == DISPLAY_SUCCESS) {
-        g_isSetClientBufSuc = true;
-    } else {
-        HDF_LOGE("%{public}s: function SetDisplayClientBuffer failed", __func__);
-    }
-
-    return ret;
-}
-
 int32_t TestSetDisplayClientDamage(uint32_t devId)
 {
     IRect rect;
@@ -428,7 +362,6 @@ typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
     TestSetClientBufferCacheCount,
-    TestGetDisplayCapability,
     TestGetDisplaySupportedModes,
     TestSetGetDisplayMode,
     TestSetGetDisplayPowerStatus,
@@ -437,7 +370,6 @@ TestFuncs g_testFuncs = {
     TestGetDisplayProperty,
     TestGetDisplayCompChange,
     TestSetDisplayClientCrop,
-    TestSetDisplayClientBuffer,
     TestSetDisplayClientDamage,
     TestSetDisplayVsyncEnabled,
     TestGetDisplayReleaseFence,
