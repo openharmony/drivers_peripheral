@@ -577,7 +577,7 @@ void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &sta
     }
 }
 
-std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
+const std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
 {
     return portIndexMap_;
 }

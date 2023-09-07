@@ -43,6 +43,11 @@ struct DynamicBuffer {
         }
         bufferHandle = nullptr;
     }
+
+    DynamicBuffer(const DynamicBuffer& other) = delete;
+    DynamicBuffer(DynamicBuffer&& other) = delete;
+    DynamicBuffer& operator=(const DynamicBuffer& other) = delete;
+    DynamicBuffer& operator=(DynamicBuffer&& other) = delete;
 };
 
 class ICodecBuffer : public RefBase {

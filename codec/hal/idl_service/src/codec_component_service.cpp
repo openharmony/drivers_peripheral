@@ -212,7 +212,7 @@ void CodecComponentService::SetComponentRole()
     }
 }
 
-std::string &CodecComponentService::GetComponentCompName()
+const std::string &CodecComponentService::GetComponentCompName() const
 {
     return name_;
 }

@@ -51,7 +51,7 @@ public:
                         const std::vector<int8_t> &eglImage) override;
     int32_t ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index) override;
 
-    std::string &GetComponentCompName();
+    const std::string &GetComponentCompName() const;
     void GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode_);
 private:
     void SetComponentRole();

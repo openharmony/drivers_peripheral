@@ -29,7 +29,6 @@ namespace Codec {
 namespace V1_0 {
 class CodecDfxService : public RefBase {
 public:
-    ~CodecDfxService() = default;
     static CodecDfxService &GetInstance();
     static HdfSBuf* GetReply();
     void SetComponentManager(sptr<CodecComponentManagerService> manager);
@@ -40,12 +39,13 @@ public:
 
 protected:
     CodecDfxService() = default;
+    ~CodecDfxService() = default;
 
 private:
-    static uint32_t inputBuffCount;
-    static uint32_t outputBuffCount;
+    static uint32_t inputBuffCount_;
+    static uint32_t outputBuffCount_;
     sptr<CodecComponentManagerService> managerService_;
-    static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode;
+    static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode_;
     static CodecDfxService dfxInstance_;
     static HdfSBuf *reply_;
 };

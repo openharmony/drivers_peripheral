@@ -14,6 +14,7 @@
  */
 
 #ifndef CODEC_CONFIG_H
+#define CODEC_CONFIG_H
 #include <refbase.h>
 #include "v1_0/codec_types.h"
 #include "device_resource_if.h"
@@ -23,7 +24,7 @@ namespace Codec {
 namespace Omx {
 typedef struct {
     std::string attrName;
-    int32_t &value;
+    int32_t value;
     uint32_t defaultValue;
 } ConfigUintNodeAttr;
 typedef struct {
@@ -66,5 +67,4 @@ private:
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS
-#define CODEC_CONFIG_H
 #endif  // CODEC_CONFIG_H
