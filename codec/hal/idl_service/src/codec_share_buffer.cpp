@@ -28,9 +28,7 @@ CodecShareBuffer::CodecShareBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecB
 
 CodecShareBuffer::~CodecShareBuffer()
 {
-    if (shMem_ != nullptr) {
-        shMem_ = nullptr;
-    }
+    shMem_ = nullptr;
 }
 
 void CodecShareBuffer::SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem)
@@ -45,7 +43,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
         return nullptr;
     }
     int size = OHOS::AshmemGetSize(codecBuffer.fd);
-    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(dup(codecBuffer.fd), size);
+    std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd, size);
     bool mapd = false;
     if (codecBuffer.type == READ_WRITE_TYPE) {
         mapd = sharedMem->MapReadAndWriteAshmem();

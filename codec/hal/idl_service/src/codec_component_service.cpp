@@ -122,8 +122,13 @@ int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tun
 int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer)
 {
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
+    int32_t ret;
     outBuffer = inBuffer;
-    int32_t ret = node_->UseBuffer(portIndex, outBuffer);
+    if (!isIPCMode_ && codecBuffer.bufferType) {
+        outBuffer.fd = dup(inBuffer.fd);
+    }
+
+    ret = node_->UseBuffer(portIndex, outBuffer);
     if (isIPCMode_ && inBuffer.fd >= 0) {
         close(inBuffer.fd);
     }
