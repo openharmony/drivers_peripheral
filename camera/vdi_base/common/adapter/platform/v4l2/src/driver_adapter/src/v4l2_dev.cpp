@@ -108,7 +108,7 @@ RetCode HosV4L2Dev::stop(const std::string& cameraID)
     return RC_OK;
 }
 
-RetCode HosV4L2Dev::Init(std::vector<std::string>& cameraIDs)
+RetCode HosV4L2Dev::Init(const std::vector<std::string>& cameraIDs)
 {
     auto myFileFormat = std::make_shared<HosFileFormat>();
     if (myFileFormat == nullptr) {
