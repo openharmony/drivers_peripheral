@@ -69,9 +69,8 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
         }
     }
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump End-------------\n");
-#ifndef CAMERA_BUILT_ON_OHOS_LITE
+
     SetDispatcherCallback();
-#endif
 
     return RC_OK;
 }
