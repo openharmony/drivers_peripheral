@@ -24,18 +24,18 @@ namespace V1_0 {
 #define INPUT_PORT_INDEX 0
 #define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
-uint32_t CodecDfxService::inputBuffCount;
-uint32_t CodecDfxService::outputBuffCount;
-std::shared_ptr<OHOS::Codec::Omx::ComponentNode> CodecDfxService::dumpNode;
+uint32_t CodecDfxService::inputBuffCount_;
+uint32_t CodecDfxService::outputBuffCount_;
+std::shared_ptr<OHOS::Codec::Omx::ComponentNode> CodecDfxService::dumpNode_;
 HdfSBuf *CodecDfxService::reply_;
 void CodecDfxService::GetBuffCount()
 {
-    auto iter = dumpNode->GetBufferMapCount().begin();
-    while (iter != dumpNode->GetBufferMapCount().end()) {
+    auto iter = dumpNode_->GetBufferMapCount().begin();
+    while (iter != dumpNode_->GetBufferMapCount().end()) {
         if (iter->second == INPUT_PORT_INDEX) {
-            inputBuffCount++;
+            inputBuffCount_++;
         } else {
-            outputBuffCount++;
+            outputBuffCount_++;
         }
         iter++;
     }
@@ -58,18 +58,18 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
             .append(", compId = ")
             .append(std::to_string(it.first))
             .append(", state = ");
-        componentService->GetComponentNode(dumpNode);
-        dumpNode->GetState(state);
+        componentService->GetComponentNode(dumpNode_);
+        dumpNode_->GetState(state);
         dump.append(std::to_string(state));
         GetInstance().GetBuffCount();
         dump.append(", inputPortIndex = ")
             .append(std::to_string(INPUT_PORT_INDEX))
-            .append(", inputBuffCount = ")
-            .append(std::to_string(inputBuffCount))
+            .append(", inputBuffCount_ = ")
+            .append(std::to_string(inputBuffCount_))
             .append(", outputPortIndex = ")
             .append(std::to_string(OUTPUT_PORT_INDEX))
-            .append(", outputBuffCount = ")
-            .append(std::to_string(outputBuffCount))
+            .append(", outputBuffCount_ = ")
+            .append(std::to_string(outputBuffCount_))
             .append("\n");
         if (!HdfSbufWriteString(reply, dump.c_str())) {
             CODEC_LOGE("dump write Fail!");
@@ -79,8 +79,8 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
             CODEC_LOGE("Split symbol write Fail!");
             return HDF_ERR_INVALID_PARAM;
         }
-        inputBuffCount = 0;
-        outputBuffCount = 0;
+        inputBuffCount_ = 0;
+        outputBuffCount_ = 0;
         componentService = nullptr;
     }
     return HDF_SUCCESS;
@@ -130,6 +130,10 @@ int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *
     }
 
     const char *para = HdfSbufReadString(data);
+    if (para == NULL) {
+        CODEC_LOGE("read string data failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (strcmp(para, "-h") == EOK) {
         if (!HdfSbufWriteString(reply, "-h: codec dump help! \n")) {
             CODEC_LOGE("-h write Fail!");

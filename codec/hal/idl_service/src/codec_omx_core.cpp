@@ -78,6 +78,10 @@ int32_t CodecOMXCore::GetHandle(OMX_HANDLETYPE &handle, std::string &compName, O
         CODEC_LOGE("getHandle_ is nullptr.");
         return HDF_ERR_INVALID_PARAM;
     }
+    if (compName.empty()) {
+        CODEC_LOGE("invalid component name");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return (*getHandle_)(&handle, const_cast<char *>(compName.c_str()), appData, (OMX_CALLBACKTYPE *)&callbacks);
 }
 
@@ -110,6 +114,10 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t roleCount = 0;
+    if (name.empty()) {
+        CODEC_LOGE("empty name");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("get roleCount return err [%{public}x].", err);
