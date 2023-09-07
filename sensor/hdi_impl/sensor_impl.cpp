@@ -134,7 +134,7 @@ int32_t SensorImpl::Init()
 int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
 {
     HDF_LOGI("%{public}s: Enter the GetAllSensorInfo function.", __func__);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, GetAllSensors);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetAllSensors);
 
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *tmp = nullptr;
@@ -181,7 +181,7 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
 int32_t SensorImpl::Enable(int32_t sensorId)
 {
     HDF_LOGI("%{public}s: Enter the Enable function, sensorId is %{public}d", __func__, sensorId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, Enable);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Enable);
 
     StartTrace(HITRACE_TAG_SENSORS, "Enable");
     int32_t ret = sensorInterface->Enable(sensorId);
@@ -196,7 +196,7 @@ int32_t SensorImpl::Enable(int32_t sensorId)
 int32_t SensorImpl::Disable(int32_t sensorId)
 {
     HDF_LOGI("%{public}s: Enter the Disable function, sensorId is %{public}d", __func__, sensorId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, Disable);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Disable);
 
     StartTrace(HITRACE_TAG_SENSORS, "Disable");
     int32_t ret = sensorInterface->Disable(sensorId);
@@ -212,7 +212,7 @@ int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t
 {
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, SetBatch);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetBatch);
 
     StartTrace(HITRACE_TAG_SENSORS, "SetBatch");
     int32_t ret = sensorInterface->SetBatch(sensorId, samplingInterval, reportInterval);
@@ -228,7 +228,7 @@ int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 {
     HDF_LOGI("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
         __func__, sensorId, mode);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, SetMode);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetMode);
 
     StartTrace(HITRACE_TAG_SENSORS, "SetMode");
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
@@ -244,7 +244,7 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 {
     HDF_LOGI("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
         __func__, sensorId, option);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, SetOption);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetOption);
 
     StartTrace(HITRACE_TAG_SENSORS, "SetOption");
     int32_t ret = sensorInterface->SetOption(sensorId, option);
@@ -259,7 +259,7 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &callbackObj)
 {
     HDF_LOGI("%{public}s: Enter the Register function, groupId is %{public}d", __func__, groupId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, Register);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Register);
 
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
@@ -329,7 +329,7 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &
 
 int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
 {
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, Unregister);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Unregister);
 
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
