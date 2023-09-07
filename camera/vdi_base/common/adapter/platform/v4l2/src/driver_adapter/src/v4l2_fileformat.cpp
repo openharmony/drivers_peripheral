@@ -107,7 +107,7 @@ RetCode HosFileFormat::V4L2GetFmtDescs(int fd, std::vector<DeviceFormat>& fmtDes
     return rc;
 }
 
-RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std::string& cameraId)
+RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, const std::string& cameraId)
 {
     struct v4l2_capability cap = {};
 
@@ -323,7 +323,7 @@ void HosFileFormat::V4L2CloseDevice(int fd)
     close(fd);
 }
 
-void HosFileFormat::V4L2MatchDevice(std::vector<std::string>& cameraIDs)
+void HosFileFormat::V4L2MatchDevice(const std::vector<std::string>& cameraIDs)
 {
     struct stat st = {};
     char devName[16] = {0};

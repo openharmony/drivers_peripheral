@@ -79,7 +79,7 @@ public:
 
     void SetMemoryType(uint8_t &memType);
 
-    static RetCode Init(std::vector<std::string>& cameraIDs);
+    static RetCode Init(const std::vector<std::string>& cameraIDs);
 
     static std::map<std::string, std::string> deviceMatch;
     static std::map<std::string, int> fdMatch;
