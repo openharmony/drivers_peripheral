@@ -22,6 +22,13 @@
 #include "isensor_interface_vdi.h"
 #include "sensor_dump.h"
 
+#define CHECK_SENSOR_MODULE_INSTANCE(sptr, ptr) do { \
+    if ((sptr) == nullptr || (ptr) == nullptr) { \
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__); \
+        return HDF_FAILURE; \
+    } \
+} while (0)
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {

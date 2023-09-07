@@ -69,10 +69,7 @@ static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcDa
     }
 
     ret = ReadSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, &regValue, sizeof(regValue));
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: Failed to read sensor register array ", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, "read");
 
     regValue &= timeGroupNode->regCfgItem->mask;
     temp = GetTimeByRegValue(regValue, g_timeMap, timeItemNum);
@@ -89,10 +86,7 @@ static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcDa
         index--;
 
         ret = WriteSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, sizeof(regValue));
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: Failed to write sensor register array ", __func__);
-            return HDF_FAILURE;
-        }
+        CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, "write");
     } else if (((rgbcData[ALS_R] * BH1745_MULTIPLE_100 < BH1745_TIME_MIN) ||
         (rgbcData[ALS_G] * BH1745_MULTIPLE_100 < BH1745_TIME_MIN)) && (g_timeChangeStatus == SENSOR_TIME_DECREASE)) {
         g_timeChangeStatus = SENSOR_TIME_INCREASE;
@@ -104,10 +98,7 @@ static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcDa
         }
 
         ret = WriteSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, sizeof(regValue));
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: Failed to write sensor register array ", __func__);
-            return HDF_FAILURE;
-        }
+        CHECK_SENSOR_REGIARRAY_RETURN_VALUE(ret, "write");
     }
 
     return HDF_SUCCESS;
