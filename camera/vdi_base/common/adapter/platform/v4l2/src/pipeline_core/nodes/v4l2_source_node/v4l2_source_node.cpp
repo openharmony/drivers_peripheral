@@ -22,6 +22,8 @@ V4L2SourceNode::V4L2SourceNode(const std::string& name, const std::string& type,
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
     RetCode rc = RC_OK;
+    constexpr int itemCapacitySize = 30;
+    constexpr int dataCapacitySize = 1000;
     deviceManager_ = IDeviceManager::GetInstance();
     if (deviceManager_ == nullptr) {
         CAMERA_LOGE("get device manager failed.");
@@ -32,6 +34,7 @@ V4L2SourceNode::V4L2SourceNode(const std::string& name, const std::string& type,
         CAMERA_LOGE("GetDeviceController failed.");
         return;
     }
+    meta_ = std::make_shared<CameraMetadata>(itemCapacitySize, dataCapacitySize);
 }
 
 RetCode V4L2SourceNode::GetDeviceController()
@@ -78,6 +81,11 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
             return RC_ERROR;
         }
     }
+
+    if (meta_ != nullptr) {
+        sensorController_->ConfigFps(meta_);
+    }
+
     rc = SourceNode::Start(streamId);
     return rc;
 }
@@ -151,6 +159,7 @@ void V4L2SourceNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& me
     } else {
         CAMERA_LOGE("V4L2SourceNode sensorController_ is null");
     }
+    GetUpdateFps(metadata);
 }
 
 void V4L2SourceNode::SetBufferCallback()
@@ -169,6 +178,20 @@ RetCode V4L2SourceNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
         return RC_OK;
     }
     return RC_ERROR;
+}
+
+void V4L2SourceNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
+{
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
+    if (ret == 0) {
+        std::vector<int32_t> fpsRange;
+        for (int i = 0; i < entry.count; i++) {
+            fpsRange.push_back(*(entry.data.i32 + i));
+        }
+        meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+    }
 }
 REGISTERNODE(V4L2SourceNode, {"v4l2_source"})
 } // namespace OHOS::Camera

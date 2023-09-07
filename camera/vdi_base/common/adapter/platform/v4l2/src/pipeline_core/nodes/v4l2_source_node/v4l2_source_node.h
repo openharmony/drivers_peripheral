@@ -38,12 +38,14 @@ public:
 private:
     void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
     int32_t GetStreamId(const CaptureMeta &meta);
+    void GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata);
 
 private:
     std::mutex                              requestLock_;
     std::map<int32_t, std::list<int32_t>>   captureRequests_ = {};
     std::shared_ptr<SensorController>       sensorController_ = nullptr;
     std::shared_ptr<IDeviceManager>     deviceManager_ = nullptr;
+    std::shared_ptr<CameraMetadata> meta_ = nullptr;
 };
 } // namespace OHOS::Camera
 #endif
