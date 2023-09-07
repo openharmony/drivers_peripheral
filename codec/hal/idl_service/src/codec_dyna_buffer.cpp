@@ -15,7 +15,6 @@
 #include "codec_dyna_buffer.h"
 #include <buffer_handle_utils.h>
 #include <hdf_base.h>
-#include <hdf_remote_service.h>
 #include <securec.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
@@ -43,7 +42,6 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         bufferHandle = codecBuffer.bufferhandle->Move();
         codecBuffer.bufferhandle = nullptr;
     }
-
     codecBuffer.allocLen = sizeof(DynamicBuffer);
     CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer, bufferHandle);
     return sptr<ICodecBuffer>(buffer);

@@ -15,7 +15,6 @@
 
 #include "codec_share_buffer.h"
 #include <hdf_base.h>
-#include <hdf_remote_service.h>
 #include <securec.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
