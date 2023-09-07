@@ -531,7 +531,7 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
         AUDIO_FUNC_LOGE("audioPnpUevent is null!");
         return HDF_ERR_INVALID_PARAM;
     }
-    if(SetAudioEventValue(&audioEvent, audioPnpUevent)) {
+    if(SetAudioEventValue(&audioEvent, audioPnpUevent) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     AUDIO_FUNC_LOGI("audio analog [%{public}s][%{public}s]",
