@@ -34,32 +34,26 @@ RetCode V4L2DeviceManager::Init()
 {
     RetCode rc = RC_ERROR;
 
+	hardwareList_.clear();
     std::vector<std::string> hardwareName;
-    for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
-        if ((*iter).controllerId == DM_C_SENSOR) {
-            hardwareName.push_back((*iter).hardwareName);
+	
+    for (auto it = hardware.cbegin(); it != hardware.cend(); ++it) {
+
+        if (it->controllerId == DM_C_SENSOR) {
+
+            hardwareName.push_back(it->hardwareName);
+            hardwareList_.push_back(*it);
         }
-    }
+	}
+
     rc = HosV4L2Dev::Init(hardwareName);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("%s HosV4L2Dev Init fail", __FUNCTION__);
         return RC_ERROR;
     }
 
-    for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
-        bool eraseHardwareNameFlag = true;
-        for (auto iterName = hardwareName.cbegin(); iterName != hardwareName.cend(); iterName++) {
-            if ((*iter).controllerId == DM_C_SENSOR && (*iterName) == (*iter).hardwareName) {
-                eraseHardwareNameFlag = false;
-            }
-        }
-        if (eraseHardwareNameFlag == true && (*iter).controllerId == DM_C_SENSOR) {
-            hardware.erase(iter);
-        }
-    }
-    for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
-        hardwareList_.push_back(*iter);
-    }
+	hardware = hardwareList_;
+
     rc = CreateManager();
     enumeratorManager_ = std::make_shared<EnumeratorManager>();
     if (enumeratorManager_ == nullptr) {
