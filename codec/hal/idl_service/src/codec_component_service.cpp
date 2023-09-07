@@ -126,6 +126,11 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
         outBuffer.fd = dup(inBuffer.fd);
     }
 
+    if (outBuffer.fd >= 0 && isIPCMode_ && (outBuffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE || outBuffer.bufferType == CODEC_BUFFER_TYPE_HANDLE)) {
+        close(outBuffer.fd);
+        outBuffer.fd = -1;
+    }
+
     return node_->UseBuffer(portIndex, outBuffer);
 }
 
