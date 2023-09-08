@@ -27,11 +27,7 @@ CodecShareBuffer::CodecShareBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecB
 
 CodecShareBuffer::~CodecShareBuffer()
 {
-    if (shMem_ != nullptr) {
-        shMem_->UnmapAshmem();
-        shMem_->CloseAshmem();
-        shMem_ = nullptr;
-    }
+    shMem_ = nullptr;
 }
 
 void CodecShareBuffer::SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem)
@@ -94,7 +90,7 @@ int32_t CodecShareBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
         return HDF_ERR_INVALID_PARAM;
     }
-    ReleaseFd(codecBuffer);
+
     return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
 }
 
@@ -104,8 +100,6 @@ int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
         CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-
-    ReleaseFd(codecBuffer);
 
     void *sharedPtr = const_cast<void *>(shMem_->ReadFromAshmem(codecBuffer.filledLen, codecBuffer.offset));
     if (!sharedPtr) {
@@ -129,10 +123,6 @@ int32_t CodecShareBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ReleaseFd(codecBuffer);
-
-    shMem_->UnmapAshmem();
-    shMem_->CloseAshmem();
     shMem_ = nullptr;
     return HDF_SUCCESS;
 }
@@ -164,15 +154,6 @@ bool CodecShareBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
         return false;
     }
     return true;
-}
-
-void CodecShareBuffer::ReleaseFd(struct OmxCodecBuffer &codecBuffer)
-{
-    // close the fd, if fd is sent by codecBuffer
-    if (codecBuffer.fd >= 0) {
-        close(codecBuffer.fd);
-        codecBuffer.fd = -1;
-    }
 }
 }  // namespace Omx
 }  // namespace Codec

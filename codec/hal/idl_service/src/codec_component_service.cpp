@@ -15,8 +15,10 @@
 
 #include "codec_component_service.h"
 #include <hdf_base.h>
+#include <hdf_remote_service.h>
 #include <securec.h>
 #include <malloc.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
 namespace OHOS {
 namespace HDI {
@@ -28,6 +30,7 @@ CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::
     name_ = name;
     node_ = node;
     mgr_  = mgr;
+    isIPCMode_ = (HdfRemoteGetCallingPid() == getpid() ? false : true);
 #ifdef SUPPORT_ROLE
     SetComponentRole();
 #endif
@@ -119,7 +122,16 @@ int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tun
 int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer)
 {
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
-    outBuffer = inBuffer;
+    outBuffer = const_cast<OmxCodecBuffer &>(inBuffer);
+    if (outBuffer.fd >= 0 && !isIPCMode_ && outBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+        outBuffer.fd = dup(inBuffer.fd);
+    }
+
+    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+        close(outBuffer.fd);
+        outBuffer.fd = -1;
+    }
+
     return node_->UseBuffer(portIndex, outBuffer);
 }
 
@@ -133,20 +145,40 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
 
 int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
+    OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
     ReleaseCache();
+    if (isIPCMode_ && bufferTemp.fd >= 0) {
+        close(bufferTemp.fd);
+        bufferTemp.fd = -1;
+    }
+
     return ret;
 }
 
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
-    return node_->EmptyThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
+    int32_t ret = node_->EmptyThisBuffer(bufferTemp);
+    if (isIPCMode_ && bufferTemp.fd >= 0) {
+        close(bufferTemp.fd);
+        bufferTemp.fd = -1;
+    }
+
+    return ret;
 }
 
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
-    return node_->FillThisBuffer(const_cast<OmxCodecBuffer &>(buffer));
+    OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
+    int32_t ret = node_->FillThisBuffer(bufferTemp);
+    if (isIPCMode_ && bufferTemp.fd >= 0) {
+        close(bufferTemp.fd);
+        bufferTemp.fd = -1;
+    }
+
+    return ret;
 }
 
 int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
