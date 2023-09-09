@@ -258,7 +258,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice003, TestSize.Level1)
 HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
 {
     printf("%s: [Input] GetInputDevice001 enter %d\n", __func__, __LINE__);
-    InputDeviceInfo *dev = new InputDeviceInfo();
+    InputDeviceInfo *dev = nullptr;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(g_touchIndex, &dev);
@@ -282,7 +282,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
 HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
 {
     printf("%s: [Input] GetInputDevice002 enter %d\n", __func__, __LINE__);
-    InputDeviceInfo *dev = new InputDeviceInfo();
+    InputDeviceInfo *dev = nullptr;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(INVALID_INDEX1, &dev);
@@ -301,7 +301,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
 HWTEST_F(HdiInputTest, GetInputDevice003, TestSize.Level1)
 {
     printf("%s: [Input] GetInputDevice003 enter %d\n", __func__, __LINE__);
-    InputDeviceInfo *dev = new InputDeviceInfo();
+    InputDeviceInfo *dev = nullptr;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(INVALID_INDEX, &dev);
@@ -322,7 +322,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
     printf("%s: [Input] GetInputDeviceList001 enter\n", __func__);
     int32_t ret;
     uint32_t num = 0;
-    InputDeviceInfo *dev = new InputDeviceInfo[MAX_INPUT_DEV_NUM] {};
+    InputDeviceInfo *dev = nullptr;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputManager->GetInputDeviceList(&num, &dev, MAX_INPUT_DEV_NUM);
