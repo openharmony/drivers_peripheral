@@ -27,6 +27,7 @@ extern "C" {
 
 #define IAUDIO_VDI_MANAGER_MAJOR_VERSION 1
 #define IAUDIO_VDI_MANAGER_MINOR_VERSION 0
+#define AUDIO_VDI_ADAPTER_NUM_MAX  20
 
 struct IAudioManagerVdi {
     int32_t (*GetAllAdapters)(struct IAudioManagerVdi *self,
