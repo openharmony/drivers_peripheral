@@ -92,11 +92,13 @@ enum AudioPortPin {
     PIN_OUT_BLUETOOTH_SCO        = 0x40u,      /**< Bluetooth SCO output pin */
     PIN_OUT_DAUDIO_DEFAULT       = 0x80u,
     PIN_OUT_HEADPHONE            = 0x100u,     /**< Wired headphone output pin*/
+    PIN_OUT_USB_HEADSET          = 0x200u,     /**< ARM USB out pin */
     PIN_IN_MIC                   = 0x8000001u, /**< Microphone input pin */
     PIN_IN_HS_MIC                = 0x8000002u, /**< Wired headset microphone pin for input */
     PIN_IN_LINEIN                = 0x8000004u, /**< Line-in pin */
     PIN_IN_USB_EXT               = 0x8000008u, /**< Extended USB input pin*/
     PIN_IN_BLUETOOTH_SCO_HEADSET = 0x8000010u, /**< Bluetooth SCO headset input pin */
+    PIN_IN_USB_HEADSET           = 0x8000040u, /**< ARM USB input pin */
 };
 
 /**
