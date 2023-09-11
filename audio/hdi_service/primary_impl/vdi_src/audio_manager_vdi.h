@@ -19,7 +19,7 @@
 #include "iaudio_manager_vdi.h"
 #include "v1_0/iaudio_manager.h"
 
-#define AUDIO_VDI_ADAPTER_NUM_MAX  8 // Limit the number of sound cards supported to a maximum of 8
+#define AUDIO_VDI_ADAPTER_NUM_MAX  20 // Limit the number of sound cards supported to a maximum of 20
 #define AUDIO_VDI_PORT_NUM_MAX    10
 #define AUDIO_VDI_STREAM_NUM_MAX  10
 
