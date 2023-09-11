@@ -616,17 +616,24 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
     std::lock_guard<std::mutex> guard(lock_);
     auto ret = INPUT_FAILURE;
 
-    if (devInfo == nullptr || deviceIndex >= static_cast<int32_t>(inputDevList_.size()) || *devInfo == nullptr) {
+    if (devInfo == nullptr || deviceIndex >= static_cast<int32_t>(inputDevList_.size()) || *devInfo != nullptr) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return ret;
     }
     auto it = inputDevList_.find(deviceIndex);
     if (it != inputDevList_.end()) {
-        ret = INPUT_SUCCESS;
-        if (memcpy_s(*devInfo, sizeof(InputDeviceInfo), &it->second.detailInfo, sizeof(InputDeviceInfo)) != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
-            ret = INPUT_FAILURE;
+        int inputDeviceInfoSize = sizeof(InputDeviceInfo);
+        *devInfo = reinterpret_cast<InputDeviceInfo *>(OsalMemAlloc(inputDeviceInfoSize));
+        if (devInfo == nullptr) {
+            HDF_LOGE("%{public}s: %{public}d OsalMemAlloc failed", __func__, __LINE__);
+            return ret;
         }
+        if (memcpy_s(*devInfo, inputDeviceInfoSize, &it->second.detailInfo, inputDeviceInfoSize) != EOK) {
+            OsalMemFree(*devInfo);
+            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+            return ret;
+        }
+        ret = INPUT_SUCCESS;
     }
     HDF_LOGD("%{public}s: devIndex: %{public}d ret: %{public}d", __func__, deviceIndex, ret);
     return ret;
@@ -635,27 +642,33 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
 int32_t InputDeviceManager::GetDeviceList(uint32_t *devNum, InputDeviceInfo **deviceList, uint32_t size)
 {
     std::lock_guard<std::mutex> guard(lock_);
+    auto ret = INPUT_FAILURE;
 
     auto scanCount = (size >= inputDevList_.size() ? inputDevList_.size() : size);
-    if ((devNum == nullptr) || (deviceList == nullptr) || (*deviceList == nullptr)) {
-        HDF_LOGE("%{public}s: null pointer", __func__);
-        return INPUT_FAILURE;
+    if ((devNum == nullptr) || (deviceList == nullptr) || inputDevList_.size() == 0 || *deviceList != nullptr) {
+        HDF_LOGE("%{public}s: param is wrong", __func__);
+        return ret;
     }
-    if (inputDevList_.size() == 0) {
-        HDF_LOGE("%{public}s: inputDevList_ size is 0", __func__);
-        return INPUT_FAILURE;
+
+    int inputDeviceInfoSize = sizeof(InputDeviceInfo);
+    *deviceList = reinterpret_cast<InputDeviceInfo *>(OsalMemAlloc(inputDeviceInfoSize * scanCount));
+    if (deviceList == nullptr) {
+        HDF_LOGE("%{public}s: %{public}d OsalMemAlloc failed", __func__, __LINE__);
+        return ret;
     }
     for (size_t i = 0; i < scanCount; i++) {
-        if (memcpy_s((*deviceList) + i, sizeof(InputDeviceInfo), &inputDevList_[i].detailInfo,
-            sizeof(InputDeviceInfo)) != EOK) {
+        if (memcpy_s((*deviceList) + i, inputDeviceInfoSize, &inputDevList_[i].detailInfo, inputDeviceInfoSize) !=
+            EOK) {
+            OsalMemFree(*deviceList);
             HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
-            return INPUT_FAILURE;
+            return ret;
         }
     }
     *devNum = inputDevList_.size();
+    ret = INPUT_SUCCESS;
     HDF_LOGD("%{public}s: devNum: %{public}u devIndex_: %{public}d", __func__, *devNum, devIndex_);
 
-    return INPUT_SUCCESS;
+    return ret;
 }
 
 // InputController

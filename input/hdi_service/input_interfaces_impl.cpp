@@ -21,6 +21,7 @@
 #include <securec.h>
 #include "input_manager.h"
 #include "input_type.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG InputInterfacesImpl
 
@@ -244,6 +245,9 @@ int32_t InputInterfacesImpl::GetInputDevice(uint32_t devIndex, DeviceInfo &devIn
         return HDF_FAILURE;
     }
     devInfo = TransferDevInfo(*deviceInfo);
+#ifdef DRIVERS_PERIPHERAL_INPUT_FEATURE_UDRIVER
+    OsalMemFree(deviceInfo);
+#endif /* DRIVERS_PERIPHERAL_INPUT_FEATURE_UDRIVER */
     return ret;
 }
 
@@ -277,6 +281,9 @@ int32_t InputInterfacesImpl::GetInputDeviceList(uint32_t &devNum, std::vector<De
         devList.push_back(hdfDevInfo);
         tmp++;
     }
+#ifdef DRIVERS_PERIPHERAL_INPUT_FEATURE_UDRIVER
+    OsalMemFree(deviceList);
+#endif /* DRIVERS_PERIPHERAL_INPUT_FEATURE_UDRIVER */
     return ret;
 }
 
