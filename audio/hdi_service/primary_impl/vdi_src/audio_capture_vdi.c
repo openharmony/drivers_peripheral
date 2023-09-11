@@ -502,6 +502,7 @@ int32_t AudioCaptureAddAudioEffectVdi(struct IAudioCapture *capture, uint64_t ef
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    vdiCapture->AddAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -520,6 +521,7 @@ int32_t AudioCaptureRemoveAudioEffectVdi(struct IAudioCapture *capture, uint64_t
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    vdiCapture->RemoveAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -539,6 +541,7 @@ int32_t AudioCaptureGetFrameBufferSizeVdi(struct IAudioCapture *capture, uint64_
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    vdiCapture->GetFrameBufferSize = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -685,6 +688,7 @@ int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, b
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
     struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    vdiCapture->IsSupportsPauseAndResume = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 

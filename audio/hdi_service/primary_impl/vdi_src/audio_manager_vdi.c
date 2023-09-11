@@ -216,7 +216,12 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (priv->vdiDescsCount != 0 && priv->vdiDescs != NULL) {
+    if (*descsLen > AUDIO_VDI_ADAPTER_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio adapter num demanded too large");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (priv->vdiDescsCount != 0 && priv->vdiDescs != NULL && priv->vdiDescsCount >= *descsLen) {
         ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
@@ -225,8 +230,16 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
         }
         return HDF_SUCCESS;
     }
+
+    if (priv->vdiDescs != NULL) {
+        free(priv->vdiDescs);
+        priv->vdiDescs = NULL;
+    }
+
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc
     (sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
+    
+    priv->vdiDescsCount = *descsLen;
     ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call GetAllAdapters fail, ret=%{public}d", ret);
