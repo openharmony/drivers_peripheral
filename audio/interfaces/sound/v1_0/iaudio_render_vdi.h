@@ -36,7 +36,7 @@ struct IAudioRenderVdi {
     int32_t (*GetRenderSpeed)(struct IAudioRenderVdi *self, float *speed);
     int32_t (*SetChannelMode)(struct IAudioRenderVdi *self, enum AudioChannelModeVdi mode);
     int32_t (*GetChannelMode)(struct IAudioRenderVdi *self, enum AudioChannelModeVdi *mode);
-    int32_t (*RegCallback)(struct IAudioRenderVdi *self, struct IAudioCallbackVdi *audioCallback, int8_t cookie);
+    int32_t (*RegCallback)(struct IAudioRenderVdi *self, RenderCallbackVdi audioCallback, void *cookie);
     int32_t (*DrainBuffer)(struct IAudioRenderVdi *self, enum AudioDrainNotifyTypeVdi *type);
     int32_t (*IsSupportsDrain)(struct IAudioRenderVdi *self, bool *support);
     int32_t (*CheckSceneCapability)(struct IAudioRenderVdi *self, const struct AudioSceneDescriptorVdi *scene,
@@ -69,6 +69,7 @@ struct IAudioRenderVdi {
     int32_t (*TurnStandbyMode)(struct IAudioRenderVdi *self);
     int32_t (*AudioDevDump)(struct IAudioRenderVdi *self, int32_t range, int32_t fd);
     int32_t (*IsSupportsPauseAndResume)(struct IAudioRenderVdi *self, bool *supportPause, bool *supportResume);
+    int32_t (*SetBufferSize)(struct IAudioRenderVdi *self, uint32_t size);
 };
 
 #ifdef __cplusplus

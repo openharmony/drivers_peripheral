@@ -33,6 +33,8 @@ struct AudioRenderInfo {
     struct IAudioRenderVdi *vdiRender;
     uint32_t renderId;
     unsigned int usrCount;
+    struct IAudioCallback *callback;
+    bool isRegCb;
 };
 
 struct AudioRenderPrivVdi {
@@ -151,6 +153,42 @@ int32_t AudioGetRenderSpeedVdi(struct IAudioRender *render, float *speed)
         return ret;
     }
 
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioRenderCallbackVdi(enum  AudioCallbackTypeVdi type, void *reserved, void *cookie)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct IAudioCallback *cb = renderInfo->callback;
+    CHECK_NULL_PTR_RETURN_VALUE(cb, HDF_ERR_INVALID_PARAM);
+    int8_t newCookie = 0;
+    int8_t newReserved = 0;
+    int32_t ret = cb->RenderCallback(cb, (enum AudioCallbackType)type, &newReserved, &newCookie);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio render AudioHwiRenderCallback fail, ret=%{public}d", ret);
+        return HDF_FAILURE;        
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioRenderRegCallbackVdi(struct IAudioRender *render, struct IAudioCallback *audioCallback, int8_t cookie)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(audioCallback, HDF_ERR_INVALID_PARAM);
+
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
+    CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RegCallback, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = vdiRender->RegCallback(vdiRender, AudioRenderCallbackVdi, (void *)render);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio render regCallback fail, ret=%{public}d", ret);
+        return HDF_FAILURE;
+    }
+    renderInfo->callback = audioCallback;
+    renderInfo->isRegCb = true;
     return HDF_SUCCESS;
 }
 
@@ -804,6 +842,15 @@ int32_t AudioRenderIsSupportsPauseAndResumeVdi(struct IAudioRender *render, bool
     return vdiRender->IsSupportsPauseAndResume(vdiRender, supportPause, supportResume);
 }
 
+int32_t AudioRenderSetbufferSize(struct IAudioRender *render, uint32_t size)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
+    CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
+    return vdiRender->SetBufferSize(vdiRender, size);
+}
+
 static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
 {
     render->GetLatency = AudioGetLatencyVdi;
@@ -811,6 +858,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
     render->GetRenderPosition = AudioGetRenderPositionVdi;
     render->SetRenderSpeed = AudioSetRenderSpeedVdi;
     render->GetRenderSpeed = AudioGetRenderSpeedVdi;
+    render->RegCallback = AudioRenderRegCallbackVdi;
     render->SetChannelMode = AudioRenderSetChannelModeVdi;
     render->GetChannelMode = AudioRenderGetChannelModeVdi;
     render->DrainBuffer = AudioRenderDrainBufferVdi;
@@ -844,6 +892,7 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
     render->TurnStandbyMode = AudioRenderTurnStandbyModeVdi;
     render->AudioDevDump = AudioRenderAudioDevDumpVdi;
     render->IsSupportsPauseAndResume = AudioRenderIsSupportsPauseAndResumeVdi;
+    render->SetBufferSize = AudioRenderSetbufferSize;
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
@@ -932,6 +981,8 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
     priv->renderInfos[*renderId]->renderId = *renderId;
     priv->renderInfos[*renderId]->usrCount = 1;
+    priv->renderInfos[*renderId]->callback = NULL;
+    priv->renderInfos[*renderId]->isRegCb = false;
     render = &(priv->renderInfos[*renderId]->render);
     AudioInitRenderInstanceVdi(render);
 
@@ -974,7 +1025,8 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
     priv->renderInfos[renderId]->desc.desc = NULL;
     priv->renderInfos[renderId]->desc.portId = UINT_MAX;
     priv->renderInfos[renderId]->desc.pins = PIN_NONE;
-
+    priv->renderInfos[*renderId]->callback = NULL;
+    priv->renderInfos[*renderId]->isRegCb = false;
     OsalMemFree(priv->renderInfos[renderId]);
     priv->renderInfos[renderId] = NULL;
 }

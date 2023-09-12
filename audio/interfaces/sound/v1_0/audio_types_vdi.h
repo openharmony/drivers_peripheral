@@ -57,6 +57,7 @@ enum AudioCategoryVdi {
     AUDIO_VDI_IN_RINGTONE = 2,
     AUDIO_VDI_IN_CALL = 3,
     AUDIO_VDI_MMAP_NOIRQ = 4,
+    AUDIO_VDI_OFFLOAD = 5,
     AUDIO_VDI_CATEGORY_BUTT,
 };
 
@@ -65,6 +66,8 @@ enum AudioFormatVdi {
     AUDIO_VDI_FORMAT_TYPE_PCM_16_BIT = 1 << 1,
     AUDIO_VDI_FORMAT_TYPE_PCM_24_BIT = 1 << 1 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_PCM_32_BIT = 1 << 2,
+    AUDIO_FORMAT_TYPE_PCM_FLOAT  = 1 << 2 | 1 << 0,
+    AUDIO_FORMAT_TYPE_MP3        = 1 << 24,
     AUDIO_VDI_FORMAT_TYPE_AAC_MAIN = 1 << 24 | 1 << 0,
     AUDIO_VDI_FORMAT_TYPE_AAC_LC = 1 << 24 | 1 << 1,
     AUDIO_VDI_FORMAT_TYPE_AAC_LD = 1 << 24 | 1 << 1 | 1 << 0,
@@ -265,6 +268,16 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
 };
 
+struct AudioOffloadInfoVdi
+{
+    uint32_t sampleRate;
+    uint32_t channelCount;
+    uint32_t bitRate;
+    uint32_t bitWidth;
+    uint32_t offloadBufferSize;
+    uint64_t duration;
+};
+
 struct AudioSampleAttributesVdi {
     enum AudioCategoryVdi type;
     bool interleaved;
@@ -280,6 +293,7 @@ struct AudioSampleAttributesVdi {
     uint32_t silenceThreshold;
     int32_t streamId;
     int32_t sourceType;
+    AudioOffloadInfoVdi offloadInfo;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {
@@ -359,6 +373,21 @@ struct AudioEventVdi {
     uint32_t eventType;
     uint32_t deviceType;
 } __attribute__ ((aligned(8)));
+
+typedef int32_t (*RenderCallbackVdi)(enum AudioCallbackType, void *reserved, void *cookie);
+
+/**
+ * @brief Register audio extra param callback that will be invoked during audio param event.
+ *
+ * @param key Indicates param change event.
+ * @param condition Indicates the param condition.
+ * @param value Indicates the param value.
+ * @param reserved Indicates reserved param.
+ * @param cookie Indicates the pointer to the callback parameters;
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+ */
+typedef int32_t (*ParamCallbackVdi)(enum AudioExtParamKey key, const char *condition, const char *value, void *reserved,
+    void *cookie);
 
 #ifdef __cplusplus
 }
