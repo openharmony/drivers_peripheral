@@ -125,6 +125,15 @@ struct AudioControlHwi {
      * @see IsSupportsPauseAndResume
      */
     int32_t (*IsSupportsPauseAndResume)(AudioHandle handle, bool *supportPause, bool *supportResume);
+
+    /**
+     * @brief Set offload buffer size.
+     *
+     * @param handle Indicates the audio handle.
+     * @param size Indicates the buffer size which contains the audio data.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*SetBufferSize)(AudioHandle handle, uint32_t size);
 };
 
 #endif /* I_AUDIO_CONTROL_H */
