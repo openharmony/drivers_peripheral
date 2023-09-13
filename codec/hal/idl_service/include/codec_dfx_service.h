@@ -29,23 +29,21 @@ namespace Codec {
 namespace V1_0 {
 class CodecDfxService : public RefBase {
 public:
+    ~CodecDfxService() = default;
     static CodecDfxService &GetInstance();
     static HdfSBuf* GetReply();
     void SetComponentManager(sptr<CodecComponentManagerService> manager);
-    static void GetBuffCount();
+    static void GetBuffCount(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode,
+                             uint32_t &inputBuffCount, uint32_t &outputBuffCount);
     static int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply);
     static int32_t GetCodecComponentListInfo(struct HdfSBuf *reply);
     static void GetCodecMemoryInfo();
 
 protected:
     CodecDfxService() = default;
-    ~CodecDfxService() = default;
 
 private:
-    static uint32_t inputBuffCount_;
-    static uint32_t outputBuffCount_;
     sptr<CodecComponentManagerService> managerService_;
-    static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode_;
     static CodecDfxService dfxInstance_;
     static HdfSBuf *reply_;
 };

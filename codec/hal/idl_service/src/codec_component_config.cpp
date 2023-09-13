@@ -86,9 +86,9 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
 {
     node_ = node;
     const std::string codecGroupsNodeName[] = {NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
-                                         NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
-                                         NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
-                                         NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS};
+                                               NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
+                                               NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
+                                               NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS};
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
     for (int index = 0; index < count; index++) {
         if (GetGroupCapabilities(codecGroupsNodeName[index]) != HDF_SUCCESS) {
@@ -181,7 +181,7 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
                                                bool isVideoGroup)
 {
 
-    if(iface.GetUint32 == NULL || iface.GetBool == NULL){
+    if(iface.GetUint32 == nullptr || iface.GetBool == nullptr){
         CODEC_LOGE("iface GetUint32 or GetBool is NULL");
         return HDF_FAILURE;
     }
