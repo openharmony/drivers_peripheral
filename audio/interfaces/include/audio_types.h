@@ -239,7 +239,7 @@ struct AudioSampleAttributes {
     uint32_t silenceThreshold; /**< Audio capture buffer threshold. */
     int32_t streamId;          /**< Audio Identifier of render or capture */
     int32_t sourceType;
-    AudioOffloadInfo offloadInfo;  /**< offload info for offload stream */
+    struct AudioOffloadInfo offloadInfo;  /**< offload info for offload stream */
 };
 
 /**
