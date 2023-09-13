@@ -29,7 +29,7 @@ namespace V1_0 {
 sptr<CodecComponentManagerService> g_codecManagerService = nullptr;
 std::once_flag m_serviceFlag;
 using OHOS::Codec::Omx::ComponentNode;
-sptr<ICodecComponentManager> CodecComponentManagerImplGetInstance(void)
+extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
     std::call_once(m_serviceFlag, [] {
         g_codecManagerService = new (std::nothrow) CodecComponentManagerService();

@@ -113,11 +113,11 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
         CODEC_LOGE("getRoles is null.");
         return HDF_ERR_INVALID_PARAM;
     }
-    uint32_t roleCount = 0;
     if (name.empty()) {
         CODEC_LOGE("empty name");
         return HDF_ERR_INVALID_PARAM;
-    }    
+    }
+    uint32_t roleCount = 0;
     int32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("getRoles_ nullptr return err [%{public}x].", err);
