@@ -720,11 +720,10 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
             case KEY_OUTPUT_BUFFER_COUNT:
                 param->nBufferCountActual = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
-            case KEY_BUFFERSIZE: {
+            case KEY_BUFFERSIZE:
                 param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 param->bEnabled = OMX_TRUE;
                 break;
-            }
             case KEY_MIMETYPE: {
                 int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
                 param->format.video.eCompressionFormat = static_cast<OMX_VIDEO_CODINGTYPE>(codingType);
@@ -749,12 +748,10 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
                 param->format.video.eColorFormat =
                     ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn[i].val)));
                 break;
-
-            default: {
+            default:
                 validCount--;
                 HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
                 break;
-            }
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;

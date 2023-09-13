@@ -329,15 +329,13 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
         CODEC_LOGE("invalid param!");
         return HDF_ERR_INVALID_PARAM;
     }
-
     CodecCapablityGroup *codecCapGroup = NULL;
     int32_t index;
     int32_t codecNum = 0;
 
     char *codecGroupsNodeName[] = {
-        NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
-        NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
-        NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
+        NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS, NODE_VIDEO_SOFTWARE_ENCODERS,
+        NODE_VIDEO_SOFTWARE_DECODERS, NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
         NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS
     };
     CodecCapablityGroup *codecCapGroups[] = {
@@ -373,7 +371,6 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
             return HDF_FAILURE;
         }
     }
-
     caps->inited = true;
     return HDF_SUCCESS;
 }
