@@ -36,11 +36,9 @@ RetCode V4L2DeviceManager::Init()
 
     hardwareList_.clear();
     std::vector<std::string> hardwareName;
-    
+
     for (auto it = hardware.cbegin(); it != hardware.cend(); ++it) {
-
         if (it->controllerId == DM_C_SENSOR) {
-
             hardwareName.push_back(it->hardwareName);
             hardwareList_.push_back(*it);
         }
@@ -51,8 +49,6 @@ RetCode V4L2DeviceManager::Init()
         CAMERA_LOGE("%s HosV4L2Dev Init fail", __FUNCTION__);
         return RC_ERROR;
     }
-
-    hardware = hardwareList_;
 
     rc = CreateManager();
     enumeratorManager_ = std::make_shared<EnumeratorManager>();
@@ -209,21 +205,20 @@ RetCode V4L2DeviceManager::DestroyController()
 
 bool V4L2DeviceManager::CheckCameraIdList(CameraId cameraId)
 {
-    if (hardwareList_.size() == 0) {
-        return false;
-    }
-    for (auto it = hardwareList_.cbegin(); it != hardwareList_.cend(); it++) {
-        if ((*it).cameraId == cameraId) {
-            return true;
-        }
-    }
-    return false;
+    auto it = std::find_if (hardwareList_.cbegin(), hardwareList_.cend(),
+        [&cameraId](const HardwareConfiguration &item) -> bool {
+                return item.cameraId == cameraId;
+            });
+
+    return hardwareList_.cend() != it;
 }
 
 bool V4L2DeviceManager::CheckManagerList(ManagerId managerId)
 {
-    auto it = std::find_if (managerList_.cbegin(), managerList_.cend(), \
-        [&managerId] (const std::shared_ptr<IManager> sptr) -> bool { return sptr->GetManagerId() == managerId; });
+    auto it = std::find_if (managerList_.cbegin(), managerList_.cend(),
+        [&managerId](const std::shared_ptr<IManager> sptr) -> bool {
+            return sptr->GetManagerId() == managerId;
+        });
 
     return managerList_.cend() != it;
 }
