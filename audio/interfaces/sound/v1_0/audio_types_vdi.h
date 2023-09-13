@@ -293,7 +293,7 @@ struct AudioSampleAttributesVdi {
     uint32_t silenceThreshold;
     int32_t streamId;
     int32_t sourceType;
-    AudioOffloadInfoVdi offloadInfo;
+    struct AudioOffloadInfoVdi offloadInfo;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {
