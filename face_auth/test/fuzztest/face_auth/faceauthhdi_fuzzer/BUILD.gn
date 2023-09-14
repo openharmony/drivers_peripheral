@@ -16,7 +16,7 @@ import("//build/test.gni")
 
 ohos_fuzztest("FaceAuthHdiFuzzTest") {
   stack_protector_ret = true
-  module_out_path = "hdf/face_auth"
+  module_out_path = "drivers_peripheral_face_auth/drivers_peripheral_face_auth"
   fuzz_config_file = "../faceauthhdi_fuzzer"
   cflags = [
     "-g",
