@@ -274,6 +274,7 @@ struct AudioOffloadInfoVdi
     uint32_t channelCount;
     uint32_t bitRate;
     uint32_t bitWidth;
+    enum AudioFormatVdi format;
     uint32_t offloadBufferSize;
     uint64_t duration;
 };
