@@ -215,9 +215,10 @@ struct AudioOffloadInfo
     uint32_t channelCount;  /**< Number of audio channels */
     uint32_t bitRate;       /**< bitRate of compressed audio data */
     uint32_t bitWidth;      /**< bitwidth of audio data */
+    enum AudioFormat format;   /**< Audio data format. */
     uint32_t offloadBufferSize;    /**< buffersize for offload audio data */
     uint64_t duration;
-};
+} __attribute__ ((aligned(8)));
 
 /**
  * @brief Defines audio sampling attributes.
@@ -240,7 +241,7 @@ struct AudioSampleAttributes {
     int32_t streamId;          /**< Audio Identifier of render or capture */
     int32_t sourceType;
     struct AudioOffloadInfo offloadInfo;  /**< offload info for offload stream */
-};
+} __attribute__ ((aligned(8)));
 
 /**
  * @brief Defines the audio timestamp, which is a substitute for POSIX <b>timespec</b>.
