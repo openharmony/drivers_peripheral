@@ -76,6 +76,7 @@ void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_
 
 void RemoveMapperOfDestoryedComponent(uint32_t componentId)
 {
+    std::lock_guard<std::mutex> lk(g_mutex);
     auto compRemote = g_compRemoteMap.find(componentId);
     if (compRemote == g_compRemoteMap.end()) {
         return;
