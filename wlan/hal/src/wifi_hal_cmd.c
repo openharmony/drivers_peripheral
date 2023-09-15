@@ -231,7 +231,7 @@ int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan)
     int32_t ret;
     ret = WifiCmdScan(ifName, (WifiScan *)scan);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: SetScanMacAddr failed", __FUNCTION__);
+        HDF_LOGE("%s: WifiStartScan failed", __FUNCTION__);
     }
     return ret;
 }
