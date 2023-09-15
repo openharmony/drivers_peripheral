@@ -16,7 +16,7 @@ import("//build/test.gni")
 
 ohos_fuzztest("PinAuthHdiFuzzTest") {
   stack_protector_ret = true
-  module_out_path = "hdf/pin_auth"
+  module_out_path = "drivers_peripheral_pin_auth/drivers_peripheral_pin_auth"
   fuzz_config_file = "../pinauthhdi_fuzzer"
   cflags = [
     "-g",
