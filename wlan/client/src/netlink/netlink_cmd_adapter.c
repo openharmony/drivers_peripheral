@@ -348,7 +348,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             rc = RET_CODE_NOT_SUPPORT;
         }
         if (error == -EBUSY) {
-            HILOG_ERROR(LOG_CORE, "%s: Devcie is busy.", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: Device is busy.", __FUNCTION__);
             rc = RET_CODE_DEVICE_BUSY;
         }
         nl_cb_put(cb);

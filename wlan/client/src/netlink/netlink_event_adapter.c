@@ -31,7 +31,7 @@
 
 #define OUI_QCA 0x001374
 
-#define LISTEN_FD_NUMS 2
+#define LISTEN_FD_NUMS 1
 #define EVENT_SOCKET_INDEX 0
 #define CTRL_SOCKET_INDEX 1
 #define CTRL_SOCKET_WRITE_SIDE 0
@@ -64,20 +64,6 @@ typedef struct {
 } WifiScanResultArg;
 
 static int g_familyId = 0;
-
-static int HandleCtrlEvent(int fd)
-{
-    int ret;
-    char buf[BUFSIZE];
-
-    ret = TEMP_FAILURE_RETRY(read(fd, buf, sizeof(buf)));
-    if (ret < 0) {
-        HILOG_ERROR(LOG_CORE, "%s: Read after POLL returned %d, error no = %d (%s)",
-            __FUNCTION__, ret, errno, strerror(errno));
-    }
-
-    return ret;
-}
 
 static int NoSeqCheck(struct nl_msg *msg, void *arg)
 {
@@ -408,7 +394,6 @@ void *EventThread(void *para)
     struct nl_sock *eventSock = NULL;
     struct pollfd pollFds[LISTEN_FD_NUMS] = {0};
     struct WifiThreadParam *threadParam = NULL;
-    int ctrlSocks[2];
     int ret;
     enum ThreadStatus *status = NULL;
 
@@ -426,15 +411,6 @@ void *EventThread(void *para)
     pollFds[EVENT_SOCKET_INDEX].fd = nl_socket_get_fd(eventSock);
     pollFds[EVENT_SOCKET_INDEX].events = POLLIN | POLLERR;
 
-    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, ctrlSocks);
-    if (ret != 0) {
-        HILOG_ERROR(LOG_CORE, "%s: fail socketpair", __FUNCTION__);
-        *status = THREAD_STOP;
-        return NULL;
-    }
-    pollFds[CTRL_SOCKET_INDEX].fd = ctrlSocks[CTRL_SOCKET_READ_SIDE];
-    pollFds[CTRL_SOCKET_INDEX].events = POLLIN | POLLERR;
-
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
         if (ret < 0) {
@@ -447,17 +423,9 @@ void *EventThread(void *para)
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
                 break;
             }
-        } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_CORE, "%s: ctrl socket get POLLERR event", __FUNCTION__);
-            break;
-        } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
-            if (HandleCtrlEvent(pollFds[CTRL_SOCKET_INDEX].fd) != RET_CODE_SUCCESS) {
-                break;
-            }
         }
     }
 
-    close(pollFds[CTRL_SOCKET_INDEX].fd);
     *status = THREAD_STOP;
     return NULL;
 }
