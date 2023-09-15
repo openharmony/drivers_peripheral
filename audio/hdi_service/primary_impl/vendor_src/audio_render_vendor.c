@@ -191,8 +191,8 @@ int32_t AudioHwiRenderGetChannelMode(struct IAudioRender *render, enum AudioChan
 
 static int32_t AudioHwiRenderCallback(enum  AudioHwiCallbackType type, void *reserved, void *cookie)
 {
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    CHECK_NULL_PTR_RETURN_VALUE(cookie, HDF_ERR_INVALID_PARAM);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)cookie;
     struct IAudioCallback *cb = renderInfo->callback;
     CHECK_NULL_PTR_RETURN_VALUE(cb, HDF_ERR_INVALID_PARAM);
     int8_t newCookie = 0;
@@ -994,8 +994,8 @@ void AudioHwiDestroyRenderById(uint32_t renderId)
     priv->renderInfos[renderId]->desc.desc = NULL;
     priv->renderInfos[renderId]->desc.portId = UINT_MAX;
     priv->renderInfos[renderId]->desc.pins = PIN_NONE;
-    priv->renderInfos[*renderId]->callback = NULL;
-    priv->renderInfos[*renderId]->isRegCb = false;
+    priv->renderInfos[renderId]->callback = NULL;
+    priv->renderInfos[renderId]->isRegCb = false;
     OsalMemFree(priv->renderInfos[renderId]);
     priv->renderInfos[renderId] = NULL;
 }

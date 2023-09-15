@@ -56,7 +56,15 @@ void AudioHwiCommonAttrsToHwiAttrs(const struct AudioSampleAttributes *attrs, st
     hwiAttrs->silenceThreshold = attrs->silenceThreshold;
     hwiAttrs->streamId = attrs->streamId;
     hwiAttrs->sourceType = attrs->sourceType;
-    hwiAttrs->offloadInfo = attrs->offloadInfo;
+    if (hwiAttrs->type == HW_AUDIO_OFFLOAD) {
+        hwiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
+        hwiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
+        hwiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
+        hwiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
+        hwiAttrs->offloadInfo.format = (enum AudioHwiFormat)attrs->offloadInfo.format;
+        hwiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        hwiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
+    }
 }
 
 int32_t AudioHwiCommonPortToHwiPort(const struct AudioPort *port, struct AudioHwiPort *hwiPort)
@@ -412,7 +420,15 @@ int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttribut
     hwiAttrs->silenceThreshold = attrs->silenceThreshold;
     hwiAttrs->streamId = attrs->streamId;
     hwiAttrs->sourceType = attrs->sourceType;
-    hwiAttrs->offloadInfo = attrs->offloadInfo;
+    if (hwiAttrs->type == HW_AUDIO_OFFLOAD) {
+        hwiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
+        hwiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
+        hwiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
+        hwiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
+        hwiAttrs->offloadInfo.format = (enum AudioHwiFormat)attrs->offloadInfo.format;
+        hwiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        hwiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
+    }
     return HDF_SUCCESS;
 }
 
@@ -435,6 +451,14 @@ int32_t AudioHwiCommonHwiSampleAttrToSampleAttr(const struct AudioHwiSampleAttri
     attrs->stopThreshold = hwiAttrs->stopThreshold;
     attrs->silenceThreshold = hwiAttrs->silenceThreshold;
     attrs->streamId = hwiAttrs->streamId;
-
+    if (attrs->type == AUDIO_OFFLOAD) {
+        attrs->offloadInfo.sampleRate = hwiAttrs->offloadInfo.sampleRate;
+        attrs->offloadInfo.channelCount = hwiAttrs->offloadInfo.channelCount;
+        attrs->offloadInfo.bitRate = hwiAttrs->offloadInfo.bitRate;
+        attrs->offloadInfo.bitWidth = hwiAttrs->offloadInfo.bitWidth;
+        attrs->offloadInfo.format = (enum AudioFormat)hwiAttrs->offloadInfo.format;
+        attrs->offloadInfo.offloadBuffersize = hwiAttrs->offloadInfo.offloadBuffersize;
+        attrs->offloadInfo.duration = hwiAttrs->offloadInfo.duration;
+    }
     return HDF_SUCCESS;
 }

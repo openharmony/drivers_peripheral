@@ -1025,8 +1025,8 @@ void AudioDestroyRenderByIdVdi(uint32_t renderId)
     priv->renderInfos[renderId]->desc.desc = NULL;
     priv->renderInfos[renderId]->desc.portId = UINT_MAX;
     priv->renderInfos[renderId]->desc.pins = PIN_NONE;
-    priv->renderInfos[*renderId]->callback = NULL;
-    priv->renderInfos[*renderId]->isRegCb = false;
+    priv->renderInfos[renderId]->callback = NULL;
+    priv->renderInfos[renderId]->isRegCb = false;
     OsalMemFree(priv->renderInfos[renderId]);
     priv->renderInfos[renderId] = NULL;
 }
