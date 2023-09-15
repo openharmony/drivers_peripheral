@@ -268,8 +268,7 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
 };
 
-struct AudioOffloadInfoVdi
-{
+struct AudioOffloadInfoVdi {
     uint32_t sampleRate;
     uint32_t channelCount;
     uint32_t bitRate;
@@ -375,7 +374,16 @@ struct AudioEventVdi {
     uint32_t deviceType;
 } __attribute__ ((aligned(8)));
 
-typedef int32_t (*RenderCallbackVdi)(enum AudioCallbackType, void *reserved, void *cookie);
+/**
+ * @brief Called when an event defined in {@link AudioCallbackType} occurs.
+ *
+ * @param AudioCallbackTypeVdi Indicates the occurred event that triggers this callback.
+ * @param reserved Indicates the pointer to a reserved field.
+ * @param cookie Indicates the pointer to the cookie for data transmission.
+ * @return Returns <b>0</b> if the callback is successfully executed; returns a negative value otherwise.
+ * @see RegCallback
+ */
+typedef int32_t (*RenderCallbackVdi)(enum AudioCallbackTypeVdi, void *reserved, void *cookie);
 
 /**
  * @brief Register audio extra param callback that will be invoked during audio param event.
@@ -387,7 +395,7 @@ typedef int32_t (*RenderCallbackVdi)(enum AudioCallbackType, void *reserved, voi
  * @param cookie Indicates the pointer to the callback parameters;
  * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
  */
-typedef int32_t (*ParamCallbackVdi)(enum AudioExtParamKey key, const char *condition, const char *value, void *reserved,
+typedef int32_t (*ParamCallbackVdi)(enum AudioExtParamKeyVdi key, const char *condition, const char *value, void *reserved,
     void *cookie);
 
 #ifdef __cplusplus

@@ -250,7 +250,7 @@ struct AudioSampleAttributes {
 struct AudioTimeStamp {
     int64_t tvSec;  /**< Seconds */
     int64_t tvNSec; /**< Nanoseconds */
-};
+} __attribute__ ((aligned(8)));
 
 /**
  * @brief Enumerates the passthrough data transmission mode of an audio port.
