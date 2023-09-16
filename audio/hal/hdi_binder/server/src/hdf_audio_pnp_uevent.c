@@ -83,6 +83,7 @@
 #define AUDIO_DEVICE_WAIT_ONLINE 20
 #define AUDIO_DEVICE_WAIT_TRY_TIME 10
 #define AUDIO_DEVICE_WAIT_USB_ONLINE 1000
+#define UEVENT_ARR_SIZE         9
 
 struct UsbDevice {
     int8_t devName[USB_DEV_NAME_LEN_MAX];
@@ -488,18 +489,24 @@ static int32_t SetAudioEventValue(struct AudioEvent *audioEvent, struct AudioPnp
             AUDIO_FUNC_LOGE("the switch name of 'h2w' not found!");
             return HDF_FAILURE;
         }
-        if (audioPnpUevent->switchState[0] == '0') {
-            audioEvent->eventType = AUDIO_DEVICE_REMOVE;
-            audioEvent->deviceType = h2wTypeLast;
-        } else if ((audioPnpUevent->switchState[0] == '1') || (audioPnpUevent->switchState[0] == '2')) {
-            audioEvent->eventType = AUDIO_DEVICE_ADD;
-            audioEvent->deviceType = AUDIO_HEADSET;
-        } else if (audioPnpUevent->switchState[0] == '4'){
-            audioEvent->eventType = AUDIO_DEVICE_ADD;
-            audioEvent->deviceType = AUDIO_ADAPTER_DEVICE;
-        } else {
-            audioEvent->eventType = AUDIO_DEVICE_ADD;
-            audioEvent->deviceType = AUDIO_DEVICE_UNKNOWN;
+        switch (audioPnpUevent->switchState[0]) {
+            case '0':
+                audioEvent->eventType = AUDIO_DEVICE_REMOVE;
+                audioEvent->deviceType = h2wTypeLast;
+                break;
+            case '1':
+            case '2':
+                audioEvent->eventType = AUDIO_DEVICE_ADD;
+                audioEvent->deviceType = AUDIO_HEADSET;
+                break;
+            case '4':
+                audioEvent->eventType = AUDIO_DEVICE_ADD;
+                audioEvent->deviceType = AUDIO_ADAPTER_DEVICE;
+                break;
+            default:
+                audioEvent->eventType = AUDIO_DEVICE_ADD;
+                audioEvent->deviceType = AUDIO_DEVICE_UNKNOWN;
+                break;
         }
         h2wTypeLast = audioEvent->deviceType;
     } else {
@@ -547,39 +554,6 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
     return AudioPnpUpdateInfoOnly(audioEvent);
 }
 
-static void SetAudioPnpUeventValue(struct AudioPnpUevent *audioPnpUevent, const char *msgTmp)
-{
-    if (strncmp(msgTmp, UEVENT_ACTION, strlen(UEVENT_ACTION)) == 0) {
-        msgTmp += strlen(UEVENT_ACTION);
-        audioPnpUevent->action = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_DEV_NAME, strlen(UEVENT_DEV_NAME)) == 0) {
-        msgTmp += strlen(UEVENT_DEV_NAME);
-        audioPnpUevent->devName = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_NAME, strlen(UEVENT_NAME)) == 0) {
-        msgTmp += strlen(UEVENT_NAME);
-        audioPnpUevent->name = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_STATE, strlen(UEVENT_STATE)) == 0) {
-        msgTmp += strlen(UEVENT_STATE);
-        audioPnpUevent->state = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_DEVTYPE, strlen(UEVENT_DEVTYPE)) == 0) {
-        msgTmp += strlen(UEVENT_DEVTYPE);
-        audioPnpUevent->devType = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_SUBSYSTEM, strlen(UEVENT_SUBSYSTEM)) == 0) {
-        msgTmp += strlen(UEVENT_SUBSYSTEM);
-        audioPnpUevent->subSystem = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_SWITCH_NAME, strlen(UEVENT_SWITCH_NAME)) == 0) {
-        msgTmp += strlen(UEVENT_SWITCH_NAME);
-        audioPnpUevent->switchName = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_SWITCH_STATE, strlen(UEVENT_SWITCH_STATE)) == 0) {
-        msgTmp += strlen(UEVENT_SWITCH_STATE);
-        audioPnpUevent->switchState = msgTmp;
-    } else if (strncmp(msgTmp, UEVENT_HDI_NAME, strlen(UEVENT_HDI_NAME)) == 0) {
-        msgTmp += strlen(UEVENT_HDI_NAME);
-        audioPnpUevent->hidName = msgTmp;
-    }
-    return;
-}
-
 static bool AudioPnpUeventParse(const char *msg, const ssize_t strLength)
 {
     struct AudioPnpUevent audioPnpUevent = {"", "", "", "", "", "", "", "", ""};
@@ -597,7 +571,22 @@ static bool AudioPnpUeventParse(const char *msg, const ssize_t strLength)
             msgTmp++;
             continue;
         }
-        SetAudioPnpUeventValue(&audioPnpUevent, msgTmp);
+        const char *arrStrTmp[UEVENT_ARR_SIZE] = {
+            UEVENT_ACTION, UEVENT_DEV_NAME, UEVENT_NAME, UEVENT_STATE, UEVENT_DEVTYPE,
+            UEVENT_SUBSYSTEM, UEVENT_SWITCH_NAME, UEVENT_SWITCH_STATE, UEVENT_HDI_NAME
+        };
+        const char **arrVarTmp[UEVENT_ARR_SIZE] = {
+            &audioPnpUevent.action, &audioPnpUevent.devName, &audioPnpUevent.name,
+            &audioPnpUevent.state, &audioPnpUevent.devType, &audioPnpUevent.subSystem,
+            &audioPnpUevent.switchName, &audioPnpUevent.switchState, &audioPnpUevent.hidName
+        };
+        for (int i = 0; i < UEVENT_ARR_SIZE; i++) {
+            if (strncmp(msgTmp, arrStrTmp[i], strlen(arrStrTmp[i])) == 0) {
+                msgTmp += strlen(arrStrTmp[i]);
+                *arrVarTmp[i] = msgTmp;
+                break;
+            }
+        }
         msgTmp += strlen(msgTmp) + 1;
     }
 
