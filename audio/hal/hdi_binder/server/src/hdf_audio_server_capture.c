@@ -20,6 +20,12 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 #define INTERNEL_INPUT_STEAM_ID 1
+#define IF_TRUE_PRINT_LOG_RETURN_ERROR(cond, log, err) \
+    if (cond) { \
+        AUDIO_FUNC_LOGE(log); \
+        return err; \
+    }
+
 
 static int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
@@ -114,53 +120,32 @@ static int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescri
 
 int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    if (client == NULL || data == NULL || reply == NULL) {
-        AUDIO_FUNC_LOGE("client or data or reply is null!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((client == NULL || data == NULL || reply == NULL),
+        "client or data or reply is null!", AUDIO_HAL_ERR_INVALID_PARAM);
     struct AudioAdapter *adapter = NULL;
     struct AudioDeviceDescriptor devDesc;
     struct AudioSampleAttributes attrs;
     struct AudioCapture *capture = NULL;
     const char *adapterName = NULL;
     uint32_t capturePid = 0;
-    if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, &capturePid)) {
-        AUDIO_FUNC_LOGE("read capturePid fail");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR(((adapterName = HdfSbufReadString(data)) == NULL),
+        "adapterNameCase Is NULL", AUDIO_HAL_ERR_INVALID_PARAM);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((!HdfSbufReadUint32(data, &capturePid)),
+        "read capturePid fail", AUDIO_HAL_ERR_INTERNAL);
     AUDIO_FUNC_LOGD("capturePid = %{public}u", capturePid);
     int32_t ret = GetInitCapturePara(data, &devDesc, &attrs);
-    if (ret < 0) {
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
-        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is empty!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "GetInitCapturePara fail", AUDIO_HAL_ERR_INTERNAL);
+    ret = AudioAdapterListGetAdapter(adapterName, &adapter);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioAdapterListGetAdapter fail", AUDIO_HAL_ERR_INTERNAL);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter == NULL),"adapter is empty!", AUDIO_HAL_ERR_INVALID_PARAM);
     const int32_t priority = attrs.type;
     ret = AudioCreatCaptureCheck(adapterName, priority);
-    if (ret < 0) {
-        return ret;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioCreatCaptureCheck fail", ret);
 
     attrs.streamId = INTERNEL_INPUT_STEAM_ID;
-    if (adapter->CreateCapture == NULL) {
-        AUDIO_FUNC_LOGE("CreateCapture is NULL");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter->CreateCapture == NULL), "CreateCapture is NULL", AUDIO_HAL_ERR_INTERNAL);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
-    if (capture == NULL || ret < 0) {
-        AUDIO_FUNC_LOGE("Failed to CreateCapture");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((capture == NULL || ret < 0), "Failed to CreateCapture", AUDIO_HAL_ERR_INTERNAL);
     if (AudioAddCaptureInfoInAdapter(adapterName, capture, adapter, priority, capturePid)) {
         AUDIO_FUNC_LOGE("AudioAddRenderInfoInAdapter");
         adapter->DestroyCapture(adapter, capture);
