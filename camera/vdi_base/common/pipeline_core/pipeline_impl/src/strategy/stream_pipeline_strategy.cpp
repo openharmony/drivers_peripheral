@@ -102,7 +102,7 @@ PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipe
         .streamId_ = hostStreamInfo.streamId_,
         .format_ = hostStreamInfo.format_,
         .usage_ = hostStreamInfo.usage_,
-        .needAllocation_ = pipeSpecPtr->nodeSpec[j].portSpec[k].need_allocation,
+        .needAllocation_ = pipeSpecPtr->nodeSpec[j].portSpec[k].needAllocation,
         .bufferCount_ = hostStreamInfo.bufferCount_
     };
     (void)typeId;
@@ -134,17 +134,17 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
         struct NodeSpec nodeSpec {
             .name_ = pipeSpecPtr->nodeSpec[j].name,
             .status_ = std::string(pipeSpecPtr->nodeSpec[j].status),
-            .type_ = std::string(pipeSpecPtr->nodeSpec[j].stream_type)
+            .type_ = std::string(pipeSpecPtr->nodeSpec[j].streamType)
         };
         for (int k = pipeSpecPtr->nodeSpec[j].portSpecSize - 1; k >= 0; k--) {
             PortInfo info {
                 .name_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].name),
-                .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peer_port_name),
-                .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peer_port_node_name)
+                .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortName),
+                .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortNodeName)
             };
             CAMERA_LOGV("read node %{public}s", info.peerPortNodeName_.c_str());
 
-            std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].stream_type),
+            std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].streamType),
                 G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
             PortFormat format {};
 

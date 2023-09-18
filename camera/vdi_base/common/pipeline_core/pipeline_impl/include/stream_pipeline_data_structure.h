@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <dlfcn.h>
 extern "C" {
 #include "config.h"
 #include "params.h"
@@ -74,6 +75,9 @@ struct NodeSpec {
 struct PipelineSpec {
     std::vector<NodeSpec>   nodeSpecSet_;
 };
+
+extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void);
+extern "C" const struct HdfConfigPipelineSpecsRoot* HdfGetPipelineSpecsModuleConfigRoot(void);
 
 #define G_STREAM_SCENE_TABLE HdfGetModuleConfigRoot()
 #define G_STREAM_TABLE_PTR HdfGetModuleConfigRoot()->streamInfo
