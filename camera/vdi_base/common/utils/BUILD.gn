@@ -23,11 +23,12 @@ if (defined(ohos_lite)) {
       "-DCOLORSPACE=\"videoconvert\"",
     ]
     cflags_cc = [ "-std=c++17" ]
+    include_dirs = [ "watchdog" ]
   }
 
-  ohos_shared_library("camera_utils") {
+  ohos_shared_library("peripheral_camera_utils") {
     sources = [ "watchdog/watchdog.cpp" ]
-    include_dirs = [ "watchdog" ]
+    include_dirs = []
     libs = []
     defines = []
     deps = []
@@ -45,8 +46,12 @@ if (defined(ohos_lite)) {
       "-DHAVE_CONFIG_H",
       "-DCOLORSPACE=\"videoconvert\"",
     ]
+    include_dirs = [
+      "watchdog",
+      "exif",
+    ]
   }
-  ohos_shared_library("camera_utils") {
+  ohos_shared_library("peripheral_camera_utils") {
     sources = [
       "exif/exif_utils.cpp",
       "watchdog/watchdog.cpp",
@@ -54,8 +59,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$camera_path/include",
       "//third_party/libexif",
-      "watchdog",
-      "exif",
     ]
     libs = []
     defines = []

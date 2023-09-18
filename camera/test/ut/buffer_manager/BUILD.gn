@@ -71,7 +71,8 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config",
       "$camera_path/pipeline_core/ipp/include",
     ]
-    public_deps = [ "$camera_path/buffer_manager:camera_buffer_manager" ]
+    public_deps =
+        [ "$camera_path/buffer_manager:peripheral_camera_buffer_manager" ]
     external_deps = [
       "../../../../hdf_core/adapter/uhdf/manager:hdf_core",
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
@@ -160,7 +161,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0_static",
-      "$camera_path/buffer_manager:camera_buffer_manager",
+      "$camera_path/buffer_manager:peripheral_camera_buffer_manager",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
