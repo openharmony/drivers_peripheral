@@ -28,7 +28,7 @@
 struct WlanExtendInterfaceVdi *g_wlanExtendVdiImpl = NULL;
 struct HdfVdiObject *g_vdi = NULL;
 
-static void CloseVdi()
+static void CloseVdi(void)
 {
     if (g_vdi != NULL) {
         HdfCloseVdi(g_vdi);
