@@ -18,6 +18,11 @@
 #include "osal_mutex.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
+#define IF_TRUE_PRINT_LOG_RETURN_ERROR(cond, log, err) \
+    if (cond) { \
+        AUDIO_FUNC_LOGE(log); \
+        return err; \
+    }
 struct OsalMutex g_renderLock;
 
 static int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
@@ -117,50 +122,29 @@ static int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescrip
 int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    if (client == NULL || data == NULL || reply == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((client == NULL || data == NULL || reply == NULL),
+        "client or data or reply is null!", AUDIO_HAL_ERR_INVALID_PARAM);
     struct AudioAdapter *adapter = NULL;
     struct AudioDeviceDescriptor devDesc;
     struct AudioSampleAttributes attrs;
     struct AudioRender *render = NULL;
     const char *adapterName = NULL;
     uint32_t renderPid = 0;
-    if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, &renderPid)) {
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR(((adapterName = HdfSbufReadString(data)) == NULL),
+        "adapterNameCase Is NULL", AUDIO_HAL_ERR_INVALID_PARAM);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((!HdfSbufReadUint32(data, &renderPid)),
+        "read renderPid fail", AUDIO_HAL_ERR_INTERNAL);
     int32_t ret = GetInitRenderPara(data, &devDesc, &attrs);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("GetInitRenderPara fail");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
-        AUDIO_FUNC_LOGE("fail");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is NULL!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "GetInitRenderPara fail", AUDIO_HAL_ERR_INTERNAL);
+    ret = AudioAdapterListGetAdapter(adapterName, &adapter);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioAdapterListGetAdapter fail", AUDIO_HAL_ERR_INTERNAL);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter == NULL), "adapter is NULL!", AUDIO_HAL_ERR_INVALID_PARAM);
     const int32_t priority = attrs.type;
     ret = AudioCreatRenderCheck(adapterName, priority);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioCreatRenderCheck: Render is working can not replace!");
-        return ret;
-    }
-    if (adapter->CreateRender == NULL) {
-        AUDIO_FUNC_LOGE("CreateRender is NULL");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioCreatRenderCheck: Render is working can not replace!", ret);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter->CreateRender == NULL), "CreateRender is NULL", AUDIO_HAL_ERR_INTERNAL);
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
-    if (render == NULL || ret < 0) {
-        AUDIO_FUNC_LOGE("Failed to CreateRender");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((render == NULL || ret < 0), "Failed to CreateRender", AUDIO_HAL_ERR_INTERNAL);
     if (AudioAddRenderInfoInAdapter(adapterName, render, adapter, priority, renderPid)) {
         AUDIO_FUNC_LOGE("AudioAddRenderInfoInAdapter");
         adapter->DestroyRender(adapter, render);
