@@ -624,7 +624,7 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
     if (it != inputDevList_.end()) {
         int inputDeviceInfoSize = sizeof(InputDeviceInfo);
         *devInfo = reinterpret_cast<InputDeviceInfo *>(OsalMemAlloc(inputDeviceInfoSize));
-        if (devInfo == nullptr) {
+        if (*devInfo == nullptr) {
             HDF_LOGE("%{public}s: %{public}d OsalMemAlloc failed", __func__, __LINE__);
             return ret;
         }
@@ -652,7 +652,7 @@ int32_t InputDeviceManager::GetDeviceList(uint32_t *devNum, InputDeviceInfo **de
 
     int inputDeviceInfoSize = sizeof(InputDeviceInfo);
     *deviceList = reinterpret_cast<InputDeviceInfo *>(OsalMemAlloc(inputDeviceInfoSize * scanCount));
-    if (deviceList == nullptr) {
+    if (*deviceList == nullptr) {
         HDF_LOGE("%{public}s: %{public}d OsalMemAlloc failed", __func__, __LINE__);
         return ret;
     }
