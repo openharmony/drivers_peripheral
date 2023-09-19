@@ -22,6 +22,7 @@
 #include "adaptor_memory.h"
 #include "enroll_specification_check.h"
 #include "idm_common.h"
+#include "token_key.h"
 
 extern "C" {
     extern struct SessionInfo {
@@ -37,8 +38,9 @@ extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
     extern ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen);
-    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken);
-    extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken);
+    extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey);
+    extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
+        const HksAuthTokenKey *tokenKey);
 }
 
 namespace OHOS {
@@ -58,10 +60,10 @@ public:
     void TearDown() {};
 };
 
-#define GENERATE_TOKEN(dataToEncrypt, userAuthTokenHal) \
+#define GENERATE_TOKEN(dataToEncrypt, userAuthTokenHal, tokenKey) \
 { \
-    EXPECT_EQ(GetTokenDataCipherResult(&(dataToEncrypt), &(userAuthTokenHal)), RESULT_SUCCESS); \
-    EXPECT_EQ(UserAuthTokenSign(&(userAuthTokenHal)), RESULT_SUCCESS); \
+    EXPECT_EQ(GetTokenDataCipherResult(&(dataToEncrypt), &(userAuthTokenHal), &(tokenKey)), RESULT_SUCCESS); \
+    EXPECT_EQ(UserAuthTokenSign(&(userAuthTokenHal), &(tokenKey)), RESULT_SUCCESS); \
 }
 
 HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)
@@ -73,10 +75,12 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
     TokenDataToEncrypt data = {};
     token.tokenDataPlain.time = GetSystemTime();
-    GENERATE_TOKEN(data, token);
+    HksAuthTokenKey tokenKey = {};
+    GetTokenKey(&tokenKey);
+    GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
     token.tokenDataPlain.authType = PIN_AUTH;
-    GENERATE_TOKEN(data, token);
+    GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
 }
 
@@ -98,12 +102,14 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_002, TestSize.Level0)
         .credentialId = 3,
     };
     EXPECT_EQ(memcpy_s(token.tokenDataPlain.challenge, CHALLENGE_LEN, session.challenge, CHALLENGE_LEN), EOK);
-    GENERATE_TOKEN(data, token);
+    HksAuthTokenKey tokenKey = {};
+    GetTokenKey(&tokenKey);
+    GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
     EXPECT_EQ(CheckIdmOperationToken(session.userId, &token), RESULT_BAD_MATCH);
 
     data.userId = session.userId;
-    GENERATE_TOKEN(data, token);
+    GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(session.userId, &token), RESULT_BAD_MATCH);
 
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
