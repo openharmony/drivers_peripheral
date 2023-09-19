@@ -23,7 +23,7 @@
 extern "C" {
 #endif // __cplusplus
 
-PinDbV1 *ReadPinDb();
+PinDbV1 *ReadPinDb(void);
 ResultCode WritePinDb(PinDbV1 *pinDbV1);
 void FreePinDb(PinDbV1 **pinDbV1);
 
