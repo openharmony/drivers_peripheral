@@ -44,6 +44,9 @@ int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan);
 int32_t HalCmdStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings);
 int32_t HalCmdStopPnoScan(const char *ifName);
 int32_t HalCmdGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult);
+int32_t HalCmdGetFeatureByIfName(const char *ifName, struct IWiFiBaseFeature **ifeature);
+int32_t HalCmdGetApBandwidth(const char *ifName, uint8_t *bandwidth);
+int32_t HalCmdResetToFactoryMacAddress(const char *ifNames);
 
 struct DListHead *GetNetworkHead(void);
 void ClearIWiFiList(void);

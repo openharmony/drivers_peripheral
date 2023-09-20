@@ -62,6 +62,14 @@ static int32_t HalSetCountryCode(const struct IWiFiAp *apFeature, const char *co
     return ret;
 }
 
+static int32_t HalGetApBandwidth(const char *ifName, uint8_t *bandwidth)
+{
+    HalMutexLock();
+    int32_t ret = HalCmdGetApBandwidth(ifName, bandwidth);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t InitApFeature(struct IWiFiAp **fe)
 {
     if (fe == NULL || *fe == NULL) {
@@ -74,6 +82,7 @@ int32_t InitApFeature(struct IWiFiAp **fe)
     }
     (*fe)->getAssociatedStas = HalGetAssociatedStas;
     (*fe)->setCountryCode = HalSetCountryCode;
+    (*fe)->getApBandwidth = HalGetApBandwidth;
     return HDF_SUCCESS;
 }
 

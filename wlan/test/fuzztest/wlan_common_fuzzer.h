@@ -16,8 +16,8 @@
 #ifndef WLAN_COMMON_FUZZER_H
 #define WLAN_COMMON_FUZZER_H
 #include "hdf_log.h"
-#include "v1_1/iwlan_interface.h"
-#include "v1_1/wlan_types.h"
+#include "v1_2/iwlan_interface.h"
+#include "v1_2/wlan_types.h"
 #include "wlan_callback_impl.h"
 #include "wifi_hal_base_feature.h"
 #include "securec.h"
