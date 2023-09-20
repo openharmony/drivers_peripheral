@@ -19,8 +19,8 @@
 #include <osal_time.h>
 #include <osal_mem.h>
 #include "wlan_extend_cmd.h"
-#include "v1_1/iwlan_callback.h"
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_callback.h"
+#include "v1_2/iwlan_interface.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
@@ -1424,6 +1424,54 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
     ret = g_staFeature->getSignalPollInfo(ifName, (struct SignalResult *)signalResult);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get signal information failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceGetApBandwidth(struct IWlanInterface *self, const char *ifName,
+    uint8_t *bandwidth)
+{
+    int32_t ret;
+    (void)self;
+
+    if (ifName == NULL || bandwidth == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_apFeature == NULL || g_apFeature->getApBandwidth == NULL) {
+        HDF_LOGE("%{public}s g_apFeature or g_staFeature->getApBandwidth is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_apFeature->getApBandwidth(ifName, bandwidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get signal information failed!, error code: %d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceResetToFactoryMacAddress(struct IWlanInterface *self, const char *ifName)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (g_staFeature != NULL) {
+        HDF_LOGD("%{public}s g_staFeature is not NULL!", __func__);
+        ret = g_staFeature->baseFeature.resetToFactoryMacAddress(ifName);
+    } else if (g_apFeature != NULL) {
+        HDF_LOGD("%{public}s g_apFeature is not NULL!", __func__);
+        ret = g_apFeature->baseFeature.resetToFactoryMacAddress(ifName);
+    } else {
+        HDF_LOGE("%{public}s: ap and sta feature is Invalid.", __func__);
+        ret = HDF_FAILURE;
+    }
+
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s get name failed!, error code: %{public}d", __func__, ret);
     }
     return ret;
 }

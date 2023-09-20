@@ -164,6 +164,14 @@ static int32_t HalGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint3
     return ret;
 }
 
+static int32_t HalResetToFactoryMacAddress(const char *ifName)
+{
+    HalMutexLock();
+    int32_t ret = HalCmdResetToFactoryMacAddress(ifName);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t InitBaseFeature(struct IWiFiBaseFeature **fe)
 {
     if (fe == NULL || *fe == NULL) {
@@ -178,6 +186,7 @@ int32_t InitBaseFeature(struct IWiFiBaseFeature **fe)
     (*fe)->setTxPower = HalSetTxPower;
     (*fe)->getChipId = HalGetChipId;
     (*fe)->getIfNamesByChipId = HalGetIfNamesByChipId;
+    (*fe)->resetToFactoryMacAddress = HalResetToFactoryMacAddress;
     return HDF_SUCCESS;
 }
 

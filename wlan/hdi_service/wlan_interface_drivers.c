@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "wlan_impl.h"
 
 struct HdfWlanInterfaceHost {

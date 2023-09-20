@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "wlan_callback_impl.h"
 #include "wlan_impl.h"
 
@@ -1269,4 +1269,67 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_051, TestSize.Level1)
     OsalMemFree(scan.freqs);
     OsalMemFree(scan.ssids);
 }
+
+/**
+ * @tc.name: GetApBandwidthTest_052
+ * @tc.desc: Wifi hdi get AP bandwidth function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetApBandwidthTest_052, TestSize.Level1)
+{
+    uint8_t bandwidth = 0;
+    const char *ifName = "wlan0";
+
+    struct HdfFeatureInfo ifeature;
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wlanObj->GetApBandwidth(g_wlanObj, nullptr, &bandwidth);
+        ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+
+        rc = g_wlanObj->GetApBandwidth(g_wlanObj, ifName, &bandwidth);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_FAILURE);
+        ASSERT_TRUE(flag);
+
+        printf("bandwidth: %u\n", bandwidth);
+
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
+}
+
+/**
+ * @tc.name: ResetToFactoryMacAddressTest_0053
+ * @tc.desc: Wifi hdi reset to factory maca address function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, ResetToFactoryMacAddressTest_0053, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+    struct HdfFeatureInfo ifeature;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    if (rc == HDF_SUCCESS) {
+        uint8_t mac[ETH_ADDR_LEN] = {0};
+        uint32_t macLen = ETH_ADDR_LEN;
+        rc = g_wlanObj->GetDeviceMacAddress(g_wlanObj, &ifeature, mac, &macLen, ETH_ADDR_LEN);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+
+        uint8_t tmpMac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+        rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, tmpMac, macLen);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
+        ASSERT_TRUE(flag);
+
+        const char *ifName = "wlan0";
+        rc = g_wlanObj->ResetToFactoryMacAddress(g_wlanObj, ifName);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+
+        rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
+}
+
 };

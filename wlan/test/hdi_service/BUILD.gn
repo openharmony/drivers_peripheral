@@ -44,7 +44,7 @@ ohos_unittest("WlanHdiServiceTestC") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwlan_proxy_1.1",
+      "drivers_interface_wlan:libwlan_proxy_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
