@@ -139,7 +139,7 @@ static ResultCode ReadPinDbData(uint8_t **data, uint32_t *dataLen)
     return RESULT_SUCCESS;
 }
 
-PinDbV1 *ReadPinDb()
+PinDbV1 *ReadPinDb(void)
 {
     uint8_t *data = NULL;
     uint32_t dataLen = 0;
