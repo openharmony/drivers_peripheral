@@ -567,17 +567,18 @@ void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &sta
 {
     int32_t ret = GetState(status);
     uint32_t count = 0;
-    while (status != objState && count++ < maxStateWaitCount) {
+    while (status != objState && count < maxStateWaitCount) {
         usleep(maxStateWaitTime);
         ret = GetState(status);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetState error [%{public}x]", __func__, ret);
             return;
         }
+        count++;
     }
 }
 
-std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
+const std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCount()
 {
     return portIndexMap_;
 }
@@ -588,7 +589,7 @@ void ComponentNode::ReleaseOMXResource()
         return;
     }
     CodecStateType status = CODEC_STATE_INVALID;
-    int32_t ret = GetState(status);
+    int32_t ret = 0;
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("ReleaseOMXResource GetState error [%{public}x]", ret);
         return;
@@ -599,7 +600,7 @@ void ComponentNode::ReleaseOMXResource()
     }
     if (status == CODEC_STATE_IDLE) {
         SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_LOADED, NULL);
-        auto ret = ReleaseAllBuffer();
+        ret = ReleaseAllBuffer();
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("ReleaseAllBuffer err [%{public}x]", ret);
             return;

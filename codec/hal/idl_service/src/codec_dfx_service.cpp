@@ -24,11 +24,9 @@ namespace V1_0 {
 #define INPUT_PORT_INDEX 0
 #define OUTPUT_PORT_INDEX 1
 CodecDfxService CodecDfxService::dfxInstance_;
-uint32_t CodecDfxService::inputBuffCount;
-uint32_t CodecDfxService::outputBuffCount;
-std::shared_ptr<OHOS::Codec::Omx::ComponentNode> CodecDfxService::dumpNode;
 HdfSBuf *CodecDfxService::reply_;
-void CodecDfxService::GetBuffCount()
+void CodecDfxService::GetBuffCount(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode,
+                                   uint32_t &inputBuffCount, uint32_t &outputBuffCount)
 {
     auto iter = dumpNode->GetBufferMapCount().begin();
     while (iter != dumpNode->GetBufferMapCount().end()) {
@@ -44,6 +42,9 @@ void CodecDfxService::GetBuffCount()
 int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
 {
     CodecStateType state;
+    uint32_t inputBuffCount = 0;
+    uint32_t outputBuffCount = 0;
+    std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode = nullptr;
     std::map<uint32_t, sptr<ICodecComponent>> dumpMap = {};
 
     GetInstance().managerService_->GetManagerMap(dumpMap);
@@ -61,7 +62,7 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
         componentService->GetComponentNode(dumpNode);
         dumpNode->GetState(state);
         dump.append(std::to_string(state));
-        GetInstance().GetBuffCount();
+        GetInstance().GetBuffCount(dumpNode, inputBuffCount, outputBuffCount);
         dump.append(", inputPortIndex = ")
             .append(std::to_string(INPUT_PORT_INDEX))
             .append(", inputBuffCount = ")
@@ -130,6 +131,10 @@ int32_t CodecDfxService::DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *
     }
 
     const char *para = HdfSbufReadString(data);
+    if (para == nullptr) {
+        CODEC_LOGE("read string data failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (strcmp(para, "-h") == EOK) {
         if (!HdfSbufWriteString(reply, "-h: codec dump help! \n")) {
             CODEC_LOGE("-h write Fail!");

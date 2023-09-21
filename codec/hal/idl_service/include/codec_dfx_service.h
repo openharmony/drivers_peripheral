@@ -33,7 +33,6 @@ public:
     static CodecDfxService &GetInstance();
     static HdfSBuf* GetReply();
     void SetComponentManager(sptr<CodecComponentManagerService> manager);
-    static void GetBuffCount();
     static int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply);
     static int32_t GetCodecComponentListInfo(struct HdfSBuf *reply);
     static void GetCodecMemoryInfo();
@@ -42,10 +41,9 @@ protected:
     CodecDfxService() = default;
 
 private:
-    static uint32_t inputBuffCount;
-    static uint32_t outputBuffCount;
+    void GetBuffCount(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode,
+                      uint32_t &inputBuffCount, uint32_t &outputBuffCount);
     sptr<CodecComponentManagerService> managerService_;
-    static std::shared_ptr<OHOS::Codec::Omx::ComponentNode> dumpNode;
     static CodecDfxService dfxInstance_;
     static HdfSBuf *reply_;
 };
