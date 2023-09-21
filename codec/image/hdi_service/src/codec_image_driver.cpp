@@ -101,7 +101,7 @@ static void HdfCodecImageDriverRelease(struct HdfDeviceObject *deviceObject)
     }
 }
 
-struct HdfDriverEntry g_CodecImageDriverEntry = {
+static struct HdfDriverEntry g_CodecImageDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "libcodec_image_service",
     .Bind = HdfCodecImageDriverBind,

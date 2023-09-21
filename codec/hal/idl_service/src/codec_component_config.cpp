@@ -85,10 +85,10 @@ CodecComponentConfig::CodecComponentConfig()
 void CodecComponentConfig::Init(const DeviceResourceNode &node)
 {
     node_ = node;
-    std::string codecGroupsNodeName[] = {NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
-                                         NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
-                                         NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
-                                         NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS};
+    const std::string codecGroupsNodeName[] = { NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
+                                                NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
+                                                NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
+                                                NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS };
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
     for (int index = 0; index < count; index++) {
         if (GetGroupCapabilities(codecGroupsNodeName[index]) != HDF_SUCCESS) {
@@ -146,16 +146,16 @@ int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCa
 int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 {
     bool isVideoGroup = true;
-    const struct DeviceResourceNode *codecGroupNode = NULL;
-    struct DeviceResourceNode *childNode = NULL;
+    const struct DeviceResourceNode *codecGroupNode = nullptr;
+    struct DeviceResourceNode *childNode = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface == NULL) {
-        CODEC_LOGE(" failed, iface NULL!");
+    if ((iface == nullptr) || (iface->GetUint32 == nullptr) || (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
+        CODEC_LOGE(" failed, iface or its GetUint32 or GetBool or GetString is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     codecGroupNode = iface->GetChildNode(&node_, nodeName.c_str());
-    if (codecGroupNode == NULL) {
+    if (codecGroupNode == nullptr) {
         CODEC_LOGE("failed to get child node: %{public}s!", nodeName.c_str());
         return HDF_FAILURE;
     }
@@ -177,8 +177,7 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 }
 
 int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface &iface,
-                                               const struct DeviceResourceNode &childNode, CodecCompCapability &cap,
-                                               bool isVideoGroup)
+                                               const struct DeviceResourceNode &childNode, CodecCompCapability &cap, bool isVideoGroup)
 {
     if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, reinterpret_cast<uint32_t *>(&cap.role),
                         MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
@@ -186,7 +185,6 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
         CODEC_LOGE("failed to get mime for: %{public}s! Discarded", childNode.name);
         return HDF_FAILURE;
     }
-
     if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_TYPE, reinterpret_cast<uint32_t *>(&cap.type), INVALID_TYPE) !=
         HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
@@ -195,15 +193,15 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
         return HDF_FAILURE;
     }
 
-    const char *compName = NULL;
+    const char *compName = nullptr;
     if (iface.GetString(&childNode, CODEC_CONFIG_KEY_NAME, &compName, "") != HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
         CODEC_LOGE("get attr %{public}s err!", CODEC_CONFIG_KEY_NAME);
         return HDF_FAILURE;
     }
-    if (compName == NULL || strlen(compName) == 0) {
+    if (compName == nullptr || strlen(compName) == 0) {
         cap.role = MEDIA_ROLETYPE_INVALID;
-        CODEC_LOGE("compName is null or empty!");
+        CODEC_LOGE("compName is nullptr or empty!");
         return HDF_FAILURE;
     }
     cap.compName = compName;
@@ -216,7 +214,6 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
         CODEC_LOGE("get misc cap  err!");
         return HDF_FAILURE;
     }
-
     if (isVideoGroup) {
         if (GetVideoPortCapability(iface, childNode, cap) != HDF_SUCCESS) {
             cap.role = MEDIA_ROLETYPE_INVALID;
