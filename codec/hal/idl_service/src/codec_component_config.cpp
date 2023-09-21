@@ -146,16 +146,16 @@ int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCa
 int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
 {
     bool isVideoGroup = true;
-    const struct DeviceResourceNode *codecGroupNode = NULL;
-    struct DeviceResourceNode *childNode = NULL;
+    const struct DeviceResourceNode *codecGroupNode = nullptr;
+    struct DeviceResourceNode *childNode = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if ((iface == NULL) || (iface->GetUint32 == nullptr) || (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
-        CODEC_LOGE(" failed, iface or its GetUint32 or GetBool or GetString is NULL!");
+    if ((iface == nullptr) || (iface->GetUint32 == nullptr) || (iface->GetBool == nullptr) || (iface->GetString == nullptr)) {
+        CODEC_LOGE(" failed, iface or its GetUint32 or GetBool or GetString is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     codecGroupNode = iface->GetChildNode(&node_, nodeName.c_str());
-    if (codecGroupNode == NULL) {
+    if (codecGroupNode == nullptr) {
         CODEC_LOGE("failed to get child node: %{public}s!", nodeName.c_str());
         return HDF_FAILURE;
     }
@@ -193,15 +193,15 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
         return HDF_FAILURE;
     }
 
-    const char *compName = NULL;
+    const char *compName = nullptr;
     if (iface.GetString(&childNode, CODEC_CONFIG_KEY_NAME, &compName, "") != HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
         CODEC_LOGE("get attr %{public}s err!", CODEC_CONFIG_KEY_NAME);
         return HDF_FAILURE;
     }
-    if (compName == NULL || strlen(compName) == 0) {
+    if (compName == nullptr || strlen(compName) == 0) {
         cap.role = MEDIA_ROLETYPE_INVALID;
-        CODEC_LOGE("compName is null or empty!");
+        CODEC_LOGE("compName is nullptr or empty!");
         return HDF_FAILURE;
     }
     cap.compName = compName;
