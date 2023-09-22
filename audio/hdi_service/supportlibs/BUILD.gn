@@ -159,7 +159,7 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
-         "//device/board/${product_company}/${device_name}/audio_alsa",
+        "//device/board/${product_company}/${device_name}/audio_alsa",
       ]
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
