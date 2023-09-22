@@ -1171,35 +1171,35 @@ int32_t UsbImpl::GetConfig(const UsbDev &dev, uint8_t &configIndex)
     return HDF_SUCCESS;
 }
 
-int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t force)
+int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
-    if (interfaceid >= USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:interfaceid larger then max num", __func__);
+    if (interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (port->iface[interfaceid] == nullptr) {
+    if (port->iface[interfaceId] == nullptr) {
         if (force) {
-            port->iface[interfaceid] =
-                UsbClaimInterface(port->service->session_, port->busNum, port->devAddr, interfaceid);
+            port->iface[interfaceId] =
+                UsbClaimInterface(port->service->session_, port->busNum, port->devAddr, interfaceId);
         } else {
-            port->iface[interfaceid] =
-                UsbClaimInterfaceUnforce(port->service->session_, port->busNum, port->devAddr, interfaceid);
+            port->iface[interfaceId] =
+                UsbClaimInterfaceUnforce(port->service->session_, port->busNum, port->devAddr, interfaceId);
         }
-        if (port->iface[interfaceid] == nullptr) {
+        if (port->iface[interfaceId] == nullptr) {
             HDF_LOGE("%{public}s:UsbClaimInterface failed, busNum=%{public}u, devAddr=%{public}u", __func__,
                 port->busNum, port->devAddr);
             return HDF_FAILURE;
         }
     }
-    if (port->devHandle[interfaceid] == nullptr) {
-        port->devHandle[interfaceid] = UsbOpenInterface(port->iface[interfaceid]);
-        if (port->devHandle[interfaceid] == nullptr) {
+    if (port->devHandle[interfaceId] == nullptr) {
+        port->devHandle[interfaceId] = UsbOpenInterface(port->iface[interfaceId]);
+        if (port->devHandle[interfaceId] == nullptr) {
             HDF_LOGE("%{public}s:UsbOpenInterface failed.", __func__);
             return HDF_FAILURE;
         }
@@ -1207,7 +1207,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t 
     return HDF_SUCCESS;
 }
 
-int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceid)
+int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
@@ -1215,14 +1215,14 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceid)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    if (interfaceid >= USB_MAX_INTERFACES) {
+    if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 }
 
-int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t altIndex)
+int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
@@ -1230,19 +1230,19 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t al
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceid);
-    if (interfaceHandle == nullptr) {
-        HDF_LOGE("%{public}s:interfaceid failed busNum:%{public}u devAddr:%{public}u interfaceid:%{public}u", __func__,
-            port->busNum, port->devAddr, interfaceid);
+    UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
+    if (interfaceHandle == nullptr || interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId failed busNum:%{public}u devAddr:%{public}u interfaceId:%{public}u", __func__,
+            port->busNum, port->devAddr, interfaceId);
         return HDF_FAILURE;
     }
-    if (port->iface[interfaceid] && port->iface[interfaceid]->info.curAltSetting == altIndex) {
-        HDF_LOGE("%{public}s:bus:%{public}d devAddr:%{public}d interfaceid:%{public}d cur:%{public}d", __func__,
-            port->busNum, port->devAddr, interfaceid, altIndex);
+    if (port->iface[interfaceId] && port->iface[interfaceId]->info.curAltSetting == altIndex) {
+        HDF_LOGE("%{public}s:bus:%{public}d devAddr:%{public}d interfaceId:%{public}d cur:%{public}d", __func__,
+            port->busNum, port->devAddr, interfaceId, altIndex);
         return HDF_SUCCESS;
     }
 
-    int32_t ret = UsbSelectInterfaceSetting(interfaceHandle, altIndex, &port->iface[interfaceid]);
+    int32_t ret = UsbSelectInterfaceSetting(interfaceHandle, altIndex, &port->iface[interfaceId]);
     if (ret == HDF_SUCCESS) {
         UsbdRequestSyncReleaseList(port);
         UsbdRequestASyncReleaseList(port);
