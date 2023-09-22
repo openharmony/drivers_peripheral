@@ -34,7 +34,7 @@ ohos_fuzztest("StaFuzzTest") {
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   external_deps = [
-    "drivers_interface_wlan:libwlan_proxy_1.1",
+    "drivers_interface_wlan:libwlan_proxy_1.2",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
   ]

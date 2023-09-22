@@ -15,7 +15,7 @@
 #ifndef WLAN_EXTEND_VDI_CMD_H
 #define WLAN_EXTEND_VDI_CMD_H
 
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "hdf_load_vdi.h"
 #include "wifi_hal.h"
 

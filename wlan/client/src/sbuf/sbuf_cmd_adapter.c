@@ -1083,6 +1083,40 @@ int32_t WifiStopPnoScan(const char *ifName)
     return ret;
 }
 
+int32_t ClientGetApBandwidth(const char *ifName, uint8_t *bandwidth)
+{
+    int32_t ret;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        HDF_LOGE("%s: HdfSbufObtainDefault fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HDF_LOGE("%s: write ifName fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_AP_BANDWIDTH, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%s: SendCmdSync fail, code=%d", __FUNCTION__, ret);
+            break;
+        }
+        if (!HdfSbufReadUint8(reply, bandwidth)) {
+            HDF_LOGE("%s: HdfSbufReadUint8 failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+    } while (0);
+
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
+    return ret;
+}
+
 int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
 {
     int32_t ret = RET_CODE_FAILURE;

@@ -64,6 +64,9 @@ int32_t WlanInterfaceStartPnoScan(struct IWlanInterface *self, const char *ifNam
 int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName);
 int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *ifName,
     struct SignalPollResult *signalResult);
+int32_t WlanInterfaceGetApBandwidth(struct IWlanInterface *self, const char *ifName,
+    uint8_t *bandwidth);
+int32_t WlanInterfaceResetToFactoryMacAddress(struct IWlanInterface *self, const char *ifName);
 int32_t WlanInterfaceWifiConstruct(void);
 int32_t WlanInterfaceWifiDestruct(void);
 #endif

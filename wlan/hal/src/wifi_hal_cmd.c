@@ -296,6 +296,58 @@ int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName)
     return ret;
 }
 
+int32_t HalCmdGetFeatureByIfName(const char *ifName, struct IWiFiBaseFeature **ifeature)
+{
+    struct DListHead *networkHead = GetNetworkHead();
+    struct IWiFiList *networkNode = NULL;
+
+    if (ifName == NULL || ifeature == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
+        if (strcmp(networkNode->ifName, ifName) == HDF_SUCCESS) {
+            *ifeature = networkNode->ifeature;
+            return HDF_SUCCESS;
+        }
+    }
+    HDF_LOGE("%s: cannot find feature by ifName, line: %d", __FUNCTION__, __LINE__);
+    return HDF_FAILURE;
+}
+
+int32_t HalCmdGetApBandwidth(const char *ifName, uint8_t *bandwidth)
+{
+    int32_t ret = ClientGetApBandwidth(ifName, bandwidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: get ap bandwidth failed, code=%d", __FUNCTION__, ret);
+    }
+    return ret;
+}
+
+int32_t HalCmdResetToFactoryMacAddress(const char *ifName)
+{
+    int32_t ret;
+    struct IWiFiBaseFeature *ifeature = NULL;
+    ret = HalCmdGetFeatureByIfName(ifName, &ifeature);
+    if (ret != HDF_SUCCESS || ifeature == NULL) {
+        HDF_LOGE("%s: hal cmd get devmac addr failed, code=%d", __FUNCTION__, ret);
+        return ret;
+    }
+
+    unsigned char mac[ETH_ADDR_LEN] = {0};
+    ret = HalCmdGetDevMacAddr(ifName, ifeature->type, mac, ETH_ADDR_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: hal cmd get devmac addr failed, code=%d", __FUNCTION__, ret);
+        return ret;
+    }
+
+    ret = HalCmdSetMacAddr(ifName, mac, ETH_ADDR_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: hal cmd set mac addr failed, code=%d", __FUNCTION__, ret);
+    }
+    return ret;
+}
+
 void ClearIWiFiList(void)
 {
     struct IWiFiList *networkList = NULL;

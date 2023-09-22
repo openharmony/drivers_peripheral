@@ -18,7 +18,7 @@
 #include <hdf_load_vdi.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "wifi_hal.h"
 #include "wlan_common_cmd.h"
 #include "wlan_extend_cmd_vdi.h"

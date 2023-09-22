@@ -210,6 +210,19 @@ struct IWiFiBaseFeature {
      * @version 1.0
      */
     int32_t (*getIfNamesByChipId)(const uint8_t chipId, char **ifNames, uint32_t *num);
+
+    /**
+     * @brief reset to factory mac address(permanent hardware address).
+     *
+     * @param ifName Indicates the NIC name.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns a negative value if the operation fails.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*resetToFactoryMacAddress)(const char *ifNames);
 };
 
 /**
