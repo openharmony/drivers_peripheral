@@ -182,25 +182,6 @@ static int32_t CreateFeatureInner(int32_t type, struct IWiFiBaseFeature **ifeatu
     return HDF_SUCCESS;
 }
 
-static int32_t GetFeatureByIfNameInner(const char *ifName, struct IWiFiBaseFeature **ifeature)
-{
-    struct DListHead *networkHead = GetNetworkHead();
-    struct IWiFiList *networkNode = NULL;
-
-    if (ifName == NULL) {
-        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
-        if (strcmp(networkNode->ifName, ifName) == HDF_SUCCESS) {
-            *ifeature = networkNode->ifeature;
-            return HDF_SUCCESS;
-        }
-    }
-    HDF_LOGE("%s: cannot find feature by ifName, line: %d", __FUNCTION__, __LINE__);
-    return HDF_FAILURE;
-}
-
 static int32_t DestroyFeatureInner(struct IWiFiBaseFeature *ifeature)
 {
     struct DListHead *networkHead = GetNetworkHead();
@@ -394,7 +375,7 @@ static int32_t CreateFeature(int32_t type, struct IWiFiBaseFeature **ifeature)
 static int32_t GetFeatureByIfName(const char *ifName, struct IWiFiBaseFeature **ifeature)
 {
     HalMutexLock();
-    int32_t ret = GetFeatureByIfNameInner(ifName, ifeature);
+    int32_t ret = HalCmdGetFeatureByIfName(ifName, ifeature);
     HalMutexUnlock();
     return ret;
 }

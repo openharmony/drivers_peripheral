@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_WLAN_V1_1_WLANCALLBACKSERVICE_H
-#define OHOS_HDI_WLAN_V1_1_WLANCALLBACKSERVICE_H
+#ifndef OHOS_HDI_WLAN_V1_2_WLANCALLBACKSERVICE_H
+#define OHOS_HDI_WLAN_V1_2_WLANCALLBACKSERVICE_H
 
-#include "v1_1/iwlan_callback.h"
+#include "v1_2/iwlan_callback.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,4 +33,4 @@ void WlanCallbackServiceRelease(struct IWlanCallback *instance);
 }
 #endif /* __cplusplus */
 
-#endif // OHOS_HDI_WLAN_V1_1_WLANCALLBACKSERVICE_H
+#endif // OHOS_HDI_WLAN_V1_2_WLANCALLBACKSERVICE_H

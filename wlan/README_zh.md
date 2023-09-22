@@ -51,7 +51,7 @@ WLAN驱动模块通过HAL/HDI层(HAL是直调，HDI是通过IPC调用)对Wi-Fi S
 </tr>
 </thead>
 <tbody><tr id="row112150333476">
-<td class="cellrowborder" rowspan="31" valign="top" width="10.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>v1_1/iwlan_interface.h(V1_1为版本号，随着接口的增加而改变)</p>
+<td class="cellrowborder" rowspan="31" valign="top" width="10.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>v1_2/iwlan_interface.h(V1_2为版本号，随着接口的增加而改变)</p>
 <p id="p189132019183"><a name="p189132019183"></a><a name="p189132019183"></a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p4950434142314"><a name="p4950434142314"></a><a name="p4950434142314"></a>int32_t (*Start)(struct IWlanInterface *self);</p>
@@ -371,7 +371,7 @@ HDI接口使用步骤：
 代码示例：
 
 ```
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "wlan_callback_impl.h"
 #include "wlan_impl.h"
 

@@ -96,6 +96,20 @@ struct IWiFiAp {
      * @version 1.0
      */
     int32_t (*setCountryCode)(const struct IWiFiAp *apFeature, const char *code, uint32_t len);
+
+    /**
+     * @brief Obtain ap current bandwidth.
+     *
+     * @param ifName Indicates the NIC name.
+     * @param bandwidth ap current bandwidth, 1(20M), 2(40M), 4(80M), 8(160M).
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns a negative value if the operation fails.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*getApBandwidth)(const char *ifName, uint8_t *bandwidth);
 };
 
 /**

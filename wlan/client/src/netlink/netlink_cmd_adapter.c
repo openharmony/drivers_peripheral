@@ -69,6 +69,8 @@
 #define CMD_SET_GO_DETECT_RADAR   "CMD_SET_GO_DETECT_RADAR"
 #define CMD_SET_DYNAMIC_DBAC_MODE "SET_DYNAMIC_DBAC_MODE"
 #define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
+#define CMD_GET_AP_BANDWIDTH      "GET_AP_BANDWIDTH"
+
 #define P2P_BUF_SIZE              64
 #define MAX_PRIV_CMD_SIZE         4096
 #define LOW_LITMIT_FREQ_2_4G      2400
@@ -1599,18 +1601,16 @@ int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
     return RET_CODE_NOT_SUPPORT;
 }
 
-static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *ifName)
+static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *ifName, WifiPrivCmd *out)
 {
     struct ifreq ifr;
-    WifiPrivCmd privCmd = {0};
-    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
     int32_t ret = RET_CODE_FAILURE;
 
-    if (cmd == NULL) {
-        HILOG_ERROR(LOG_CORE, "%{public}s: cmd is null", __FUNCTION__);
+    if (cmd == NULL || out == NULL) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: cmd or out is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (len > MAX_PRIV_CMD_SIZE) {
+    if (len > out->size) {
         HILOG_ERROR(LOG_CORE, "%{public}s: Size of command is too large", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
@@ -1618,14 +1618,12 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
         HILOG_ERROR(LOG_CORE, "%s: memset_s ifr failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmd, len) != EOK) {
+    if (memcpy_s(out->buf, out->size, cmd, len) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s error", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    privCmd.buf = buf;
-    privCmd.size = sizeof(buf);
-    privCmd.len = len;
-    ifr.ifr_data = (void *)&privCmd;
+    out->len = len;
+    ifr.ifr_data = (void *)out;
     if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifName) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: strcpy_s error", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -1643,11 +1641,6 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
                 strerror(errno));
             ret = (errno == EOPNOTSUPP) ? RET_CODE_NOT_SUPPORT : RET_CODE_FAILURE;
             break;
-        }
-        (void)memset_s((void *)cmd, len, 0, len);
-        if (memcpy_s((void *)cmd, len, privCmd.buf, len - 1) != EOK) {
-            HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s error", __FUNCTION__);
-            ret = RET_CODE_FAILURE;
         }
     } while (0);
 
@@ -1694,7 +1687,11 @@ static int32_t DisableNextCacOnce(const char *ifName)
 {
     char cmdBuf[P2P_BUF_SIZE] = {CMD_SET_CLOSE_GO_CAC};
 
-    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
 static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len)
@@ -1718,7 +1715,12 @@ static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len
         HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
         return RET_CODE_NETDOWN;
     }
-    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
 static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t len)
@@ -1742,7 +1744,12 @@ static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t
         HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
         return RET_CODE_NETDOWN;
     }
-    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
 static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len)
@@ -1766,7 +1773,12 @@ static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len
         HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
         return RET_CODE_NETDOWN;
     }
-    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
 static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32_t len)
@@ -1790,7 +1802,12 @@ static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32
         HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
         return RET_CODE_NETDOWN;
     }
-    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
 int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
@@ -2645,6 +2662,29 @@ static int32_t SignalInfoHandler(struct nl_msg *msg, void *arg)
     FillSignalRate(stats, NL80211_STA_INFO_MAX + 1, signalResult);
 
     return NL_SKIP;
+}
+
+int32_t ClientGetApBandwidth(const char *ifName, uint8_t *bandwidth)
+{
+    if (ifName == NULL || bandwidth == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    const char *cmd = CMD_GET_AP_BANDWIDTH;
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    int32_t ret = SendCommandToDriver(cmd, strlen(cmd), ifName, &out);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: send command to driver failed, code=%d", __FUNCTION__, ret);
+        return ret;
+    }
+    *bandwidth = *out.buf;
+
+    HILOG_INFO(LOG_CORE, "%s: AP bandwidth: %d", __FUNCTION__, *bandwidth);
+    return RET_CODE_SUCCESS;
 }
 
 int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
