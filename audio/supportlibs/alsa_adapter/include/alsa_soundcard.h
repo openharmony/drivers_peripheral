@@ -78,9 +78,9 @@ struct AlsaMixerCtlElement {
 
 typedef struct AlsaSoundCard AlsaSoundCard;
 struct AlsaSoundCard{
-	/*
-		save alsa soundcard base info and hardware params
-	*/
+    /*
+        save alsa soundcard base info and hardware params
+    */
     enum SndCardType cardType;
     char adapterName[MAX_CARD_NAME_LEN + 1];  //save adapterName
     char devName[MAX_CARD_NAME_LEN + 1];   //device name hw:x
@@ -88,18 +88,18 @@ struct AlsaSoundCard{
     char ctrlName[MAX_CARD_NAME_LEN + 1];
     struct AudioPcmHwParams hwParams;
 
-	/*
-		alsa soundcard driver handle
-	*/
+    /*
+        alsa soundcard driver handle
+    */
     snd_pcm_t *pcmHandle;
     snd_mixer_t *mixerHandle;
 
-	/*
-		alsa soundcard public variable
-	*/
+    /*
+        alsa soundcard public variable
+    */
     uint8_t cardStatus; 
     bool canPause;
-	bool pauseState;
+    bool pauseState;
     int32_t muteValue;
     bool mmapFlag;
     uint64_t mmapFrames;

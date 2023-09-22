@@ -226,7 +226,7 @@ int32_t AudioInterfaceLibCtlCapture(
 {
     int32_t ret;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-	CHECK_VALID_RANGE_RETURN(cmdId, AUDIODRV_CTL_IOCTL_ELEM_INFO_CAPTURE, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, HDF_FAILURE);
+    CHECK_VALID_RANGE_RETURN(cmdId, AUDIODRV_CTL_IOCTL_ELEM_INFO_CAPTURE, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, HDF_FAILURE);
 
     switch (cmdId) {
         /* setPara: */
@@ -324,7 +324,7 @@ int32_t AudioOutputCaptureOpen(
 
 
 int32_t AudioOutputCaptureRead(
-	const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AlsaCapture *captureIns = NULL;
