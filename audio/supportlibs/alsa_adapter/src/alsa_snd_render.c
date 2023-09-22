@@ -745,10 +745,10 @@ int32_t RenderWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRender
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard*)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
-	if(cardIns->pauseState) {
-		AUDIO_FUNC_LOGE("Currently in pause, please check!");
-		return HDF_FAILURE;
-	}
+    if(cardIns->pauseState) {
+        AUDIO_FUNC_LOGE("Currently in pause, please check!");
+        return HDF_FAILURE;
+    }
     
     if (!cardIns->mmapFlag) {
         ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
