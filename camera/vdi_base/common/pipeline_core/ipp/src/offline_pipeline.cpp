@@ -70,7 +70,7 @@ RetCode OfflinePipeline::StopProcess()
         }
 
         std::notify_all_at_thread_exit(cv_, std::move(l));
-		running_ = false;
+        running_ = false;
     }
 
     processThread_->detach();
