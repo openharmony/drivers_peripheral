@@ -187,7 +187,14 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());
-        while (cltRun) {
+        while (true) {
+            {
+                std::unique_lock<std::mutex> l(cltLock);
+                if (cltRun == false) {
+                    CAMERA_LOGD("collect buffer thread break");
+                    break;
+                }
+            }
             CollectBuffers();
         }
     });
@@ -199,7 +206,10 @@ RetCode SourceNode::PortHandler::StopCollectBuffers()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
     CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers enter");
-    cltRun = false;
+    {
+        std::unique_lock<std::mutex> l(cltLock);
+        cltRun = false;
+    }
     pool->NotifyStop();
     if (collector != nullptr) {
         collector->join();
@@ -246,12 +256,17 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
         PortFormat format = {};
         port->GetFormat(format);
         int id = format.streamId_;
-        std::string name = "collect#" + std::to_string(id);
+        std::string name = "distribute#" + std::to_string(id);
         prctl(PR_SET_NAME, name.c_str());
 
-        std::unique_lock<std::mutex> l(rblock);
-        while (dbtRun) {
-            rbcv.wait(l, [this] { return !dbtRun || !respondBufferList.empty(); });
+        while (true) {
+            {
+                std::unique_lock<std::mutex> l(rblock);
+                if (dbtRun == false) {
+                    CAMERA_LOGD("distribute buffers thread break");
+                    break;
+                }
+            }
             DistributeBuffers();
         }
     });
@@ -279,6 +294,8 @@ void SourceNode::PortHandler::DistributeBuffers()
 {
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
+        std::unique_lock<std::mutex> l(rblock);
+        rbcv.wait(l, [this] { return !dbtRun || !respondBufferList.empty(); });
         if (!dbtRun) {
             return;
         }
@@ -300,8 +317,9 @@ void SourceNode::PortHandler::OnBuffer(std::shared_ptr<IBuffer>& buffer)
     {
         std::unique_lock<std::mutex> l(rblock);
         respondBufferList.emplace_back(buffer);
+        rbcv.notify_one();
     }
-    rbcv.notify_one();
+
     CAMERA_LOGV("SourceNode::PortHandler::OnBuffer exit");
 
     return;
