@@ -68,6 +68,7 @@ protected:
         std::condition_variable rbcv;
         std::mutex rblock;
         std::list<std::shared_ptr<IBuffer>> respondBufferList = {};
+        std::mutex cltLock;
     };
 
     std::mutex hndl_ = {};

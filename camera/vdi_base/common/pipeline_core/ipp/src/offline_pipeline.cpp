@@ -19,7 +19,7 @@
 #include <vector>
 
 namespace OHOS::Camera {
-OfflinePipeline::OfflinePipeline() {}
+OfflinePipeline::OfflinePipeline() : calltimes_(0) {}
 
 OfflinePipeline::~OfflinePipeline()
 {
@@ -29,15 +29,28 @@ OfflinePipeline::~OfflinePipeline()
 
 RetCode OfflinePipeline::StartProcess()
 {
+    int origin = calltimes_.fetch_add(1);
+    if (origin != 0) {
+        // already called at most 1 time, no reenter
+        CAMERA_LOGE("Now will not start, current start %{public}d times", calltimes_.load());
+        return RC_ERROR;
+    }
+
     running_ = true;
     processThread_ = new std::thread([this]() {
         prctl(PR_SET_NAME, "offlinepipeline");
-        std::unique_lock<std::mutex> l(queueLock_);
-        while (running_) {
-            cv_.wait(l, [this] { return !(running_.load() && bufferCache_.empty()); });
+        while (true) {
+            {
+                std::unique_lock<std::mutex> l(queueLock_);
+                if (running_ == false) {
+                    CAMERA_LOGD("offlinepipeline thread break");
+                    break;
+                }
+            }
             HandleBuffers();
         }
     });
+
     if (processThread_ == nullptr) {
         return RC_ERROR;
     }
@@ -55,11 +68,12 @@ RetCode OfflinePipeline::StopProcess()
         if (running_.load() == false) {
             return RC_OK;
         }
+
+        std::notify_all_at_thread_exit(cv_, std::move(l));
         running_ = false;
     }
 
-    cv_.notify_one();
-    processThread_->join();
+    processThread_->detach();
     delete processThread_;
     processThread_ = nullptr;
     return RC_OK;
@@ -152,18 +166,21 @@ void OfflinePipeline::ReceiveCache(std::vector<std::shared_ptr<IBuffer>>& buffer
 
 void OfflinePipeline::HandleBuffers()
 {
-    if (running_ == false) {
-        return;
+    std::vector<std::shared_ptr<IBuffer>> buffers = {};
+    {
+        std::unique_lock<std::mutex> l(queueLock_);
+        cv_.wait(l, [this] { return !(running_.load() && bufferCache_.empty()); });
+        if (running_ == false) {
+            return;
+        }
+        buffers = bufferCache_.front();
+        bufferCache_.pop_front();
+        if (buffers.empty()) {
+            return;
+        }
     }
 
-    std::vector<std::shared_ptr<IBuffer>> cache = {};
-    cache = bufferCache_.front();
-    bufferCache_.pop_front();
-    if (cache.empty()) {
-        return;
-    }
-
-    ProcessCache(cache);
+    ProcessCache(buffers);
     return;
 }
 
