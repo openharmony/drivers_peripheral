@@ -25,6 +25,9 @@
 #define POLL_EVENT_DEF false
 #define AUDIO_BUFFER_TIME_DEF 500000
 #define AUDIO_PERIOD_TIME_DEF 100000
+#define AUDIO_PERIOD_TIME_RATIO 4
+#define BIT_COUNT_OF_BYTE       8
+#define PCM_WAIT_TIMEOUT_MS     100
 #ifdef SUPPORT_ALSA_CHMAP
 #define CHMAP_NAME_LENGHT_MAX      256
 
@@ -62,14 +65,14 @@ static int32_t CreateRenderIns(void)
 static int32_t RenderFreeMemory(void)
 {
     int32_t i;
-    
+
     if (g_alsaRenderList != NULL) {
         for (i = 0; i < MAX_CARD_NUM; i++) {
             if (g_alsaRenderList[i].soundCard.cardStatus != 0) {
                 AUDIO_FUNC_LOGE("refCount is not zero, Sound card in use!");
                 return HDF_ERR_DEVICE_BUSY;
             }
-            
+
             if (g_alsaRenderList[i].priData != NULL) {
                 OsalMemFree(g_alsaRenderList[i].priData);
                 g_alsaRenderList[i].priData = NULL;
@@ -110,7 +113,8 @@ static int32_t SetHWParamsSub(
     /* set the sample format */
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Sample format not available for playback: %{public}s, format: %{public}d", snd_strerror(ret), pcmFormat);
+        AUDIO_FUNC_LOGE("Sample format not available for playback: %{public}s, format: %{public}d",
+            snd_strerror(ret), pcmFormat);
         return HDF_FAILURE;
     }
     /* set the count of channels */
@@ -150,76 +154,58 @@ static int32_t SetHWRate(snd_pcm_t *handle, snd_pcm_hw_params_t *params, uint32_
     }
     /* Update to hardware supported rate */
     *rate = rRate;
-   
+
     return HDF_SUCCESS;
 }
 
 static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t access)
 {
-    int ret;
     int dir = 0; /* dir Value range (-1,0,1) */
     snd_pcm_uframes_t size;
     snd_pcm_hw_params_t *hwParams = NULL;
-    snd_pcm_t *handle = cardIns->pcmHandle;
     struct AlsaRender *renderIns = (struct AlsaRender*)cardIns;
-    CHECK_NULL_PTR_RETURN_DEFAULT(handle);
-    
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns->pcmHandle);
+
     snd_pcm_hw_params_alloca(&hwParams);
-    ret = snd_pcm_hw_params_any(handle, hwParams); // choose all parameters
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("No configurations available: %{public}s", snd_strerror(ret));
+    if (snd_pcm_hw_params_any(cardIns->pcmHandle, hwParams) < 0) {
+        AUDIO_FUNC_LOGE("No configurations available");
         return HDF_FAILURE;
     }
-    
-    ret = SetHWParamsSub(handle, hwParams, &cardIns->hwParams, access);
-    if (ret != HDF_SUCCESS) {
+    if (SetHWParamsSub(cardIns->pcmHandle, hwParams, &cardIns->hwParams, access) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("SetHWParamsSub failed!");
-        return ret;
-    }
-
-    ret = SetHWRate(handle, hwParams, &(cardIns->hwParams.rate));
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("SetHWRate failed!");
-        return ret;
-    }
-    
-     snd_pcm_hw_params_get_buffer_time_max(hwParams, &renderIns->bufferTime, &dir);
-    if (renderIns->bufferTime > 500000)
-        renderIns->bufferTime = 500000;
-    renderIns->periodTime = renderIns->bufferTime / 4;
-
-    ret = snd_pcm_hw_params_set_buffer_time_near(handle, hwParams, &renderIns->bufferTime, &dir);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Set buffer time %{public}u failed: %{public}s", renderIns->bufferTime, snd_strerror(ret));
         return HDF_FAILURE;
     }
-    
-    ret = snd_pcm_hw_params_get_buffer_size(hwParams, &size);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Unable to get buffer size for playback: %{public}s", snd_strerror(ret));
+    if (SetHWRate(cardIns->pcmHandle, hwParams, &(cardIns->hwParams.rate)) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("SetHWRate failed!");
+        return HDF_FAILURE;
+    }
+    snd_pcm_hw_params_get_buffer_time_max(hwParams, &renderIns->bufferTime, &dir);
+    if (renderIns->bufferTime > AUDIO_BUFFER_TIME_DEF)
+        renderIns->bufferTime = AUDIO_BUFFER_TIME_DEF;
+    renderIns->periodTime = renderIns->bufferTime / AUDIO_PERIOD_TIME_RATIO;
+    if (snd_pcm_hw_params_set_buffer_time_near(cardIns->pcmHandle, hwParams, &renderIns->bufferTime, &dir) < 0) {
+        AUDIO_FUNC_LOGE("Set buffer time %{public}u failed", renderIns->bufferTime);
+        return HDF_FAILURE;
+    }
+    if (snd_pcm_hw_params_get_buffer_size(hwParams, &size) < 0) {
+        AUDIO_FUNC_LOGE("Unable to get buffer size for playback");
         return HDF_FAILURE;
     }
     renderIns->bufferSize = size;
-    
-    ret = snd_pcm_hw_params_set_period_time_near(handle, hwParams, &renderIns->periodTime, &dir);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Set period time %{public}u failed: %{public}s", renderIns->bufferTime, snd_strerror(ret));
+    if (snd_pcm_hw_params_set_period_time_near(cardIns->pcmHandle, hwParams, &renderIns->periodTime, &dir) < 0) {
+        AUDIO_FUNC_LOGE("Set period time %{public}u failed", renderIns->bufferTime);
         return HDF_FAILURE;
     }
-    
-    ret = snd_pcm_hw_params_get_period_size(hwParams, &size, &dir);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Unable to get period size for playback: %{public}s", snd_strerror(ret));
+    if (snd_pcm_hw_params_get_period_size(hwParams, &size, &dir) < 0) {
+        AUDIO_FUNC_LOGE("Unable to get period size for playback");
         return HDF_FAILURE;
     }
     renderIns->periodSize = size;
-    
-    ret = snd_pcm_hw_params(handle, hwParams); // write the parameters to device
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Unable to set hw params for playback: %{public}s", snd_strerror(ret));
+    if (snd_pcm_hw_params(cardIns->pcmHandle, hwParams) < 0) {
+        AUDIO_FUNC_LOGE("Unable to set hw params for playback");
         return HDF_FAILURE;
     }
-    
+
     cardIns->canPause = snd_pcm_hw_params_can_pause(hwParams);
     return HDF_SUCCESS;
 }
@@ -247,7 +233,7 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
         AUDIO_FUNC_LOGE("g_periodSize=0");
         return HDF_FAILURE;
     }
-    ret = snd_pcm_sw_params_set_start_threshold(handle, swParams, 
+    ret = snd_pcm_sw_params_set_start_threshold(handle, swParams,
         (renderIns->bufferSize / renderIns->periodSize) * renderIns->periodSize);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to set start threshold mode for playback: %{public}s", snd_strerror(ret));
@@ -255,7 +241,7 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
     }
     /* allow the transfer when at least period_size samples can be processed */
     /* or disable this mechanism when period event is enabled (aka interrupt like style processing) */
-    ret = snd_pcm_sw_params_set_avail_min(handle, swParams, 
+    ret = snd_pcm_sw_params_set_avail_min(handle, swParams,
         renderIns->periodEvent ? renderIns->bufferSize : renderIns->periodSize);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to set avail min for playback: %{public}s", snd_strerror(ret));
@@ -319,7 +305,7 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
             }
         }
     }
-    
+
     for (i = 0; i < MAX_CARD_NUM; i++) {
         renderIns = &g_alsaRenderList[i];
         alsaSnd = (struct AlsaSoundCard *)&g_alsaRenderList[i];
@@ -338,7 +324,7 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
             return renderIns;
         }
     }
-    AUDIO_FUNC_LOGE("Failed to AddCardIns!");    
+    AUDIO_FUNC_LOGE("Failed to AddCardIns!");
     return NULL;
 }
 
@@ -572,7 +558,7 @@ int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRender
     SndConverAlsaPcmFormat(&cardIns->hwParams, &fmt);
     bits_per_sample = snd_pcm_format_physical_width(fmt);
     cardIns->hwParams.bitsPerFrame = bits_per_sample * cardIns->hwParams.channels;
-    
+
     return HDF_SUCCESS;
 }
 
@@ -585,8 +571,6 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
     size_t sbufFrameSize;
     snd_pcm_state_t state;
     int32_t tryNum = AUDIO_ALSALIB_RETYR;
-    CHECK_NULL_PTR_RETURN_DEFAULT(pcm);
-    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
     /* Check whether the PCM status is normal */
     state = snd_pcm_state(pcm);
@@ -596,18 +580,18 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
             AUDIO_FUNC_LOGE("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
-    } 
+    }
 
     sbufFrameSize = (size_t)handleData->frameRenderMode.bufferFrameSize;
     dataBuf = handleData->frameRenderMode.buffer;
-    offset = hwParams->bitsPerFrame /8;
+    offset = hwParams->bitsPerFrame / BIT_COUNT_OF_BYTE;
     while (sbufFrameSize > 0) {
         frames = snd_pcm_writei(pcm, dataBuf, sbufFrameSize);
         if (frames > 0) {
             sbufFrameSize -= frames;
             dataBuf += frames * offset;
-        } else if (frames == -EAGAIN){
-            snd_pcm_wait(pcm, 100);
+        } else if (frames == -EAGAIN) {
+            snd_pcm_wait(pcm, PCM_WAIT_TIMEOUT_MS);
             tryNum--;
             if (tryNum == 0) {
                 return HDF_SUCCESS;
@@ -622,7 +606,7 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
              * stream is suspended and waiting for an application recovery.
              * -EPIPE: an underrun occurred.
              */
-            AUDIO_FUNC_LOGI("err: %{public}s",snd_strerror(ret));
+            AUDIO_FUNC_LOGI("err: %{public}s", snd_strerror(ret));
             ret = snd_pcm_recover(pcm, frames, 0); // 0 for open render recover log.
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("snd_pcm_writei failed: %{public}s", snd_strerror(ret));
@@ -701,14 +685,14 @@ static int32_t RenderOpenImpl(struct AlsaRender *renderIns)
         return HDF_ERR_DEVICE_BUSY;
     }
 
-    ret = snd_pcm_open(&cardIns->pcmHandle, cardIns->devName, 
+    ret = snd_pcm_open(&cardIns->pcmHandle, cardIns->devName,
         SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_pcm_open fail: %{public}s!", snd_strerror(ret));
         RenderFreeMemory();
         return HDF_FAILURE;
     }
-    
+
     ret = snd_pcm_nonblock(cardIns->pcmHandle, 1);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_pcm_nonblock fail: %{public}s!", snd_strerror(ret));
@@ -745,11 +729,11 @@ int32_t RenderWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRender
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard*)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
-    if(cardIns->pauseState) {
+    if (cardIns->pauseState) {
         AUDIO_FUNC_LOGE("Currently in pause, please check!");
         return HDF_FAILURE;
     }
-    
+
     if (!cardIns->mmapFlag) {
         ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
         if (ret < 0) {
@@ -798,20 +782,20 @@ int32_t RenderMmapWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRe
 static int32_t RenderInitImpl(struct AlsaRender* renderIns)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
-    return HDF_SUCCESS;    
+    return HDF_SUCCESS;
 }
 
 static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPortPin descPins,
         const struct PathDeviceInfo *deviceInfo)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
-    return HDF_SUCCESS;    
+    return HDF_SUCCESS;
 }
 
 static int32_t RenderStartImpl(struct AlsaRender *renderIns)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
-    return HDF_SUCCESS;    
+    return HDF_SUCCESS;
 }
 
 static int32_t RenderStopImpl(struct AlsaRender *renderIns)
@@ -885,7 +869,7 @@ static void RegisterRenderImpl(struct AlsaRender *renderIns)
     if (renderIns == NULL) {
         AUDIO_FUNC_LOGE("renderIns is NULL!");
     }
-    
+
     renderIns->Init = RenderInitImpl;
     renderIns->Open = RenderOpenImpl;
     renderIns->SelectScene = RenderSelectSceneImpl;

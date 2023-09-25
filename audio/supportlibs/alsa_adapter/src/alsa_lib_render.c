@@ -65,10 +65,10 @@ int32_t AudioCtlRenderSetPauseStu(
     int32_t ret;
     struct AlsaRender *renderIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-    
+
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-    
+
     ret = SndPcmPause(&renderIns->soundCard, handleData->renderMode.ctlParam.pause);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set pause failed!");
@@ -148,7 +148,7 @@ int32_t AudioCtlRenderGetGainStu(
         return HDF_FAILURE;
     }
     handleData->renderMode.ctlParam.audioGain.gain = gainValue;
-    
+
     return HDF_SUCCESS;
 }
 
@@ -168,11 +168,11 @@ int32_t AudioCtlRenderSceneSelect(
     deviceInfo = &handleData->renderMode.hwInfo.pathSelect.deviceInfo;
     ret = renderIns->SelectScene(renderIns, descPins, deviceInfo);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Render select scene pin: (0x%{public}x) failed!",descPins);
+        AUDIO_FUNC_LOGE("Render select scene pin: (0x%{public}x) failed!", descPins);
         return HDF_FAILURE;
     }
 
-    AUDIO_FUNC_LOGD("Render scene select pin: (0x%{public}x) success",descPins);
+    AUDIO_FUNC_LOGD("Render scene select pin: (0x%{public}x) success", descPins);
     return HDF_SUCCESS;
 }
 
@@ -232,7 +232,7 @@ int32_t AudioCtlRenderSetChannelMode(
 
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-    
+
     mode = handleData->frameRenderMode.mode;
     ret = renderIns->SetChannelMode(renderIns, mode);
     if (ret != HDF_SUCCESS) {
@@ -253,14 +253,14 @@ int32_t AudioCtlRenderGetChannelMode(
 
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-    
+
     ret = renderIns->GetChannelMode(renderIns, &mode);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render get channel mode failed!");
         return HDF_FAILURE;
     }
     handleData->frameRenderMode.mode = mode;
-    
+
     return HDF_SUCCESS;
 }
 
@@ -385,7 +385,7 @@ int32_t AudioOutputRenderPrepare(
 
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
-    
+
     ret = SndPcmPrepare(&renderIns->soundCard);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Render pcm prepare failed");
@@ -465,7 +465,7 @@ int32_t AudioOutputRenderReqMmapBuffer(
         AUDIO_FUNC_LOGE("Render MmapWrite error!");
         return HDF_FAILURE;
     }
-    
+
     return HDF_SUCCESS;
 }
 

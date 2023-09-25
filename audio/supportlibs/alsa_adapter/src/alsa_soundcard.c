@@ -119,7 +119,7 @@ static enum SndCardType CfgGetAdapterCardType(const char* adapterName)
     if(adapterName == NULL) {
         return SND_CARD_UNKNOWN;
     }
-    
+
     struct AlsaAdapterCfgInfo *info;
     for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
         for(int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
@@ -137,7 +137,7 @@ static struct AlsaAdapterCfgInfo *CfgGetAdapterInfo(const char* adapterName)
     if(adapterName == NULL) {
         return NULL;
     }
-        
+
     struct AlsaAdapterCfgInfo *info;
     for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
         for(int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
@@ -171,14 +171,14 @@ static int32_t CfgDumpAdapterInfo(struct AlsaAdapterCfgInfo *info)
     }
 
     idx = g_alsaAdapterList[cardType].num;
-    ret = memcpy_s((void*)&g_alsaAdapterList[cardType].list[idx], sizeof(struct AlsaAdapterCfgInfo), 
+    ret = memcpy_s((void*)&g_alsaAdapterList[cardType].list[idx], sizeof(struct AlsaAdapterCfgInfo),
         (void*)info, sizeof(struct AlsaAdapterCfgInfo));
     if (ret != EOK) {
         AUDIO_FUNC_LOGE("memcpy_s g_alsaAdapterList fail!");
         return HDF_FAILURE;
     }
     g_alsaAdapterList[cardType].num++;
-    
+
     AUDIO_FUNC_LOGI("cardId:%{public}d: adapterName:%{public}s, cardName:%{public}s",
         g_alsaAdapterList[cardType].list[idx].cardId,
         g_alsaAdapterList[cardType].list[idx].adapterName,
@@ -192,7 +192,7 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
     cJSON *item;
     CHECK_NULL_PTR_RETURN_DEFAULT(adapter);
     CHECK_NULL_PTR_RETURN_DEFAULT(info);
-    
+
     item = cJSON_GetObjectItem(adapter, "name");
     if (item == NULL || item->valuestring == NULL) {
         AUDIO_FUNC_LOGE("adapter name is null!");
@@ -203,14 +203,14 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
         AUDIO_FUNC_LOGE("memcpy_s adapterName fail!");
         return HDF_FAILURE;
     }
-    
+
     item = cJSON_GetObjectItem(adapter, "cardId");
     if (item == NULL) {
         AUDIO_FUNC_LOGE("cardId not set!");
         return HDF_FAILURE;
     }
     info->cardId = item->valuedouble;
-    
+
     item = cJSON_GetObjectItem(adapter, "cardName");
     if (item == NULL || item->valuestring == NULL) {
         AUDIO_FUNC_LOGE("cardName is null!");
@@ -225,11 +225,54 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
     return HDF_SUCCESS;
 }
 
+static int32_t CfgParseAdapterItems(cJSON *adapterObj)
+{
+	int32_t ret, adapterNum;
+    cJSON *adapterItems = NULL;
+
+    adapterItems = cJSON_GetObjectItem(adapterObj, "adapters");
+    if (adapterItems == NULL) {
+        AUDIO_FUNC_LOGE("Get adapterItems from json failed!\n");
+        return HDF_FAILURE;
+    }
+    adapterNum = cJSON_GetArraySize(adapterItems);
+    if (adapterNum <= 0) {
+        AUDIO_FUNC_LOGE("Get adapter number failed!");
+        return HDF_FAILURE;
+    }
+    else if (adapterNum > MAX_CARD_NUM) {
+        AUDIO_FUNC_LOGE("Read adapters number is %{public}d over max num %{public}d!", adapterNum, MAX_CARD_NUM);
+        return HDF_FAILURE;
+    }
+
+    for(int32_t i = 0; i < adapterNum; ++i) {
+        cJSON *adapter;
+        struct AlsaAdapterCfgInfo info;
+        adapter = cJSON_GetArrayItem(adapterItems, i);
+        if(adapter == NULL) {
+            AUDIO_FUNC_LOGE("Get adapter item from array failed!");
+        }
+
+        ret = CfgSaveAdapterStruct(adapter, &info);
+        if(ret != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("CfgSaveAdapterStruct failed!");
+            return HDF_FAILURE;
+        }
+
+        ret = CfgDumpAdapterInfo(&info);
+        if(ret != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("CfgDumpAdapterInfo failed!");
+            return HDF_FAILURE;
+        }
+    }
+
+	return HDF_SUCCESS;
+}
+
 int32_t CfgSaveAdapterFromFile(void)
 {
-    int32_t ret, adapterNum;
+    int32_t ret;
     cJSON *adapterObj = NULL;
-    cJSON *adapterItems = NULL;
     char *configBuf = NULL;
 
     configBuf = CfgReadAdapterFile(ALSA_CARD_CONFIG_FILE);
@@ -245,48 +288,14 @@ int32_t CfgSaveAdapterFromFile(void)
     }
     AudioMemFree((void **)&configBuf);
 
-    adapterItems = cJSON_GetObjectItem(adapterObj, "adapters");
-    if (adapterItems == NULL) {
-        AUDIO_FUNC_LOGE("Get adapterItems from json failed!\n");
+    ret = CfgParseAdapterItems(adapterObj);
+    if(ret != HDF_SUCCESS) {
         cJSON_Delete(adapterObj);
-        return HDF_FAILURE;
-    }
-    adapterNum = cJSON_GetArraySize(adapterItems);
-    if (adapterNum <= 0) {
-        AUDIO_FUNC_LOGE("Get adapter number failed!");
-        cJSON_Delete(adapterObj);
-        return HDF_FAILURE;
-    }
-    else if (adapterNum > MAX_CARD_NUM) {
-        AUDIO_FUNC_LOGE("Read adapters number is %{public}d over max num %{public}d!", adapterNum, MAX_CARD_NUM);
-        cJSON_Delete(adapterObj);
+        AUDIO_FUNC_LOGE("Parse adapter items failed!");
         return HDF_FAILURE;
     }
 
-    for(int32_t i = 0; i < adapterNum; ++i) {
-        cJSON *adapter;
-        struct AlsaAdapterCfgInfo info;
-        adapter = cJSON_GetArrayItem(adapterItems, i);
-        if(adapter == NULL) {
-            AUDIO_FUNC_LOGE("Get adapter item from array failed!");
-            cJSON_Delete(adapterObj);
-        }
-
-        ret = CfgSaveAdapterStruct(adapter, &info);
-        if(ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("CfgSaveAdapterStruct failed!");
-            cJSON_Delete(adapterObj);
-            return HDF_FAILURE;
-        }
-
-        ret = CfgDumpAdapterInfo(&info);
-        if(ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("CfgDumpAdapterInfo failed!");
-            cJSON_Delete(adapterObj);
-            return HDF_FAILURE;
-        }
-    }
-
+	cJSON_Delete(adapterObj);
     return HDF_SUCCESS;
 }
 
@@ -323,62 +332,47 @@ static int32_t DevSaveCardPcmInfo(snd_ctl_t *handle, snd_pcm_stream_t stream, in
     int pcmDev = -1;
     snd_ctl_card_info_t *info = NULL;
     snd_pcm_info_t *pcminfo = NULL;
-
     snd_ctl_card_info_alloca(&info);
     snd_pcm_info_alloca(&pcminfo);
 
-    ret = snd_ctl_card_info(handle, info);
-    if(ret != 0) {
+    if (snd_ctl_card_info(handle, info) != 0) {
         AUDIO_FUNC_LOGE("snd_ctl_card_info failed.");
         return HDF_FAILURE;
     }
-
-    ret = snd_ctl_pcm_next_device(handle, &pcmDev);
-    if(ret < 0 || pcmDev < 0) {
-        AUDIO_FUNC_LOGE("No pcm device found: %{public}s.", snd_strerror(ret));
-        return HDF_FAILURE;        
+    if (snd_ctl_pcm_next_device(handle, &pcmDev) < 0 || pcmDev < 0) {
+        AUDIO_FUNC_LOGE("No pcm device found");
+        return HDF_FAILURE;
     }
-
-    while(pcmDev >= 0) {
+    while (pcmDev >= 0) {
         snd_pcm_info_set_device(pcminfo, pcmDev);
         snd_pcm_info_set_subdevice(pcminfo, 0);
         snd_pcm_info_set_stream(pcminfo, stream);
         ret = snd_ctl_pcm_info(handle, pcminfo);
-        if(ret < 0) {
+        if (ret < 0) {
             if (ret != -ENOENT) {
-                AUDIO_FUNC_LOGE("control digital audio info (%{public}d): %{public}s", pcmDev, snd_strerror(ret));
+                AUDIO_FUNC_LOGE("control digital audio info (%{public}d)", pcmDev);
             }
             continue;
         }
-
         struct AlsaDevInfo *devInfo = &g_alsaCardsDevList.alsaDevIns[g_alsaCardsDevList.num];
         const char *cardId = snd_ctl_card_info_get_id(info);
         const char *pcmInfoId = snd_pcm_info_get_id(pcminfo);
-        CHECK_NULL_PTR_RETURN_DEFAULT(cardId);
-        CHECK_NULL_PTR_RETURN_DEFAULT(pcmInfoId);
-        AUDIO_FUNC_LOGE("card %{public}s: pcm: %{public}s", cardId, pcmInfoId);
-    
         devInfo->card = card;
         devInfo->device = pcmDev;
-        ret = strncpy_s(devInfo->cardId, MAX_CARD_NAME_LEN + 1, cardId, strlen(cardId));
-        if (ret != 0) {
+        if (strncpy_s(devInfo->cardId, MAX_CARD_NAME_LEN + 1, cardId, strlen(cardId)) != 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
             return HDF_FAILURE;
         }
-        ret = strncpy_s(devInfo->pcmInfoId, MAX_CARD_NAME_LEN + 1, pcmInfoId, strlen(pcmInfoId));
-        if (ret != 0) {
+        if (strncpy_s(devInfo->pcmInfoId, MAX_CARD_NAME_LEN + 1, pcmInfoId, strlen(pcmInfoId)) != 0) {
             AUDIO_FUNC_LOGE("strncpy_s failed!");
             return HDF_FAILURE;
         }
         g_alsaCardsDevList.num++;
-
-        ret = snd_ctl_pcm_next_device(handle, &pcmDev);
-        if(ret < 0) {
-            AUDIO_FUNC_LOGE("snd_ctl_pcm_next_device error: %{public}s.", snd_strerror(ret));
-            return HDF_FAILURE;        
+        if(snd_ctl_pcm_next_device(handle, &pcmDev) < 0) {
+            AUDIO_FUNC_LOGE("snd_ctl_pcm_next_device error!");
+            return HDF_FAILURE;
         }
     }
-
     return HDF_SUCCESS;
 }
 
@@ -414,7 +408,7 @@ static int32_t DevSaveDriverInfo(snd_pcm_stream_t stream)
         if(ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("save alsa sound cards %{public}s pcm info failed!",deviceName);
         }
-        
+
         ret = snd_ctl_close(handle);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("snd_ctl_close error: %{public}s.", snd_strerror(ret));
@@ -437,7 +431,7 @@ int32_t SndSaveCardListInfo(snd_pcm_stream_t stream)
 
     (void)memset_s(&g_alsaAdapterList, sizeof(struct AlsaAdapterList) * SND_CARD_MAX,
         0, sizeof(struct AlsaAdapterList) * SND_CARD_MAX);
-    (void)memset_s(&g_alsaCardsDevList, sizeof(struct AlsaCardsList), 
+    (void)memset_s(&g_alsaCardsDevList, sizeof(struct AlsaCardsList),
         0, sizeof(struct AlsaCardsList));
 
     /* Parse sound card from configuration file */
@@ -497,20 +491,21 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
         return HDF_FAILURE;
     }
 
-    ret = snprintf_s(cardIns->devName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d,%d", devInfo->card, devInfo->device);
+    ret = snprintf_s(cardIns->devName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1,
+        "hw:%d,%d", devInfo->card, devInfo->device);
     if(ret < 0) {
-        AUDIO_FUNC_LOGE("%{public}s snprintf_s devName failed",cardIns->adapterName);
-        return HDF_FAILURE;    
+        AUDIO_FUNC_LOGE("%{public}s snprintf_s devName failed", cardIns->adapterName);
+        return HDF_FAILURE;
     }
     ret = snprintf_s(cardIns->ctrlName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d", devInfo->card);
     if(ret < 0) {
-        AUDIO_FUNC_LOGE("%{public}s snprintf_s ctrlName failed",cardIns->adapterName);
-        return HDF_FAILURE;    
+        AUDIO_FUNC_LOGE("%{public}s snprintf_s ctrlName failed", cardIns->adapterName);
+        return HDF_FAILURE;
     }
     ret = snprintf_s(cardIns->alsaCardId, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "%s", devInfo->cardId);
     if(ret < 0) {
-        AUDIO_FUNC_LOGE("%{public}s snprintf_s alsaCardId failed",cardIns->adapterName);
-        return HDF_FAILURE;    
+        AUDIO_FUNC_LOGE("%{public}s snprintf_s alsaCardId failed", cardIns->adapterName);
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
@@ -698,8 +693,7 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
     uint8_t portNum;
     CHECK_NULL_PTR_RETURN_DEFAULT(desc);
 
-    switch(type)
-    {
+    switch(type) {
         case SND_CARD_PRIMARY:
             portNum = PORT_OUT_IN;
             break;
@@ -739,7 +733,7 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
         AUDIO_FUNC_LOGE("adapter list not support sound card type %{public}d", type);
         return HDF_FAILURE;
     }
-    
+
     return HDF_SUCCESS;
 }
 
@@ -767,8 +761,8 @@ int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndC
     *sndCardNum = adapterNum;
 
     idx = 0;
-    for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
-        for(int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
+    for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
+        for (int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
             (*descs)[idx].adapterName = strdup(g_alsaAdapterList[type].list[i].adapterName);
             AudioInitPorts(&(*descs)[idx], type);
             AUDIO_FUNC_LOGI("adapter name : %{public}s", (*descs)[idx].adapterName);
@@ -821,6 +815,35 @@ void SndElementItemInit(struct AlsaMixerCtlElement *m)
     m->subdevice = -1;
 }
 
+static snd_ctl_elem_iface_t ConvertIfaceType(enum SndIfaceType iface)
+{
+    snd_ctl_elem_iface_t snd_iface;
+    switch(iface) {
+        case IFACE_CARD:
+            snd_iface = SND_CTL_ELEM_IFACE_CARD;
+            break;
+        case IFACE_MIXER:
+            snd_iface = SND_CTL_ELEM_IFACE_MIXER;
+            break;
+        case IFACE_PCM:
+            snd_iface = SND_CTL_ELEM_IFACE_PCM;
+            break;
+        case IFACE_RAWMIDI:
+            snd_iface = SND_CTL_ELEM_IFACE_RAWMIDI;
+            break;
+        case IFACE_TIMER:
+            snd_iface = SND_CTL_ELEM_IFACE_TIMER;
+            break;
+        case IFACE_SEQUENCER:
+            snd_iface = SND_CTL_ELEM_IFACE_SEQUENCER;
+            break;
+        default:
+            snd_iface = SND_CTL_ELEM_IFACE_MIXER;
+            break;
+    }
+    return snd_iface;
+}
+
 static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlElement *ctlElem, 
         snd_ctl_elem_info_t *info, snd_ctl_elem_id_t *id)
 {
@@ -834,39 +857,17 @@ static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlEl
     if (ctlElem->numid >= 0) {
         snd_ctl_elem_id_set_numid(id, ctlElem->numid);
     }
-    if (ctlElem->index >= 0){
+    if (ctlElem->index >= 0) {
         snd_ctl_elem_id_set_index(id, ctlElem->index);
     }
-    if (ctlElem->device >= 0){
+    if (ctlElem->device >= 0) {
         snd_ctl_elem_id_set_index(id, ctlElem->device);
     }
-    if (ctlElem->subdevice >= 0){
+    if (ctlElem->subdevice >= 0) {
         snd_ctl_elem_id_set_index(id, ctlElem->subdevice);
     }
 
-    switch(ctlElem->iface) {
-        case IFACE_CARD:
-            ifaceType = SND_CTL_ELEM_IFACE_CARD;
-            break;
-        case IFACE_MIXER:
-            ifaceType = SND_CTL_ELEM_IFACE_MIXER;
-            break;
-        case IFACE_PCM:
-            ifaceType = SND_CTL_ELEM_IFACE_PCM;
-            break;
-        case IFACE_RAWMIDI:
-            ifaceType = SND_CTL_ELEM_IFACE_RAWMIDI;
-            break;
-        case IFACE_TIMER:
-            ifaceType = SND_CTL_ELEM_IFACE_TIMER;
-            break;
-        case IFACE_SEQUENCER:
-            ifaceType = SND_CTL_ELEM_IFACE_SEQUENCER;
-            break;
-        default:
-            break;
-    }
-
+    ifaceType = ConvertIfaceType(ctlElem->iface);
     snd_ctl_elem_id_set_interface(id, ifaceType);
     if (ctlElem->name) {
         snd_ctl_elem_id_set_name(id, ctlElem->name);
@@ -882,8 +883,8 @@ static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlEl
     return HDF_SUCCESS;
 }
 
-int32_t SndElementReadInt
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long *value)
+int32_t SndElementReadInt(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, long *value)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -934,8 +935,8 @@ int32_t SndElementReadInt
     return HDF_SUCCESS;
 }
 
-int32_t SndElementReadEnum
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int *item)
+int32_t SndElementReadEnum(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int *item)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -984,8 +985,8 @@ int32_t SndElementReadEnum
     return HDF_SUCCESS;
 }
 
-int32_t SndElementReadRange
-        (struct AlsaSoundCard * cardIns, const struct AlsaMixerCtlElement * ctlElem, long * mix, long * max)
+int32_t SndElementReadRange(
+        struct AlsaSoundCard * cardIns, const struct AlsaMixerCtlElement * ctlElem, long * mix, long * max)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1024,7 +1025,7 @@ int32_t SndElementReadRange
     }
 
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_INTEGER) {
+    if (type == SND_CTL_ELEM_TYPE_INTEGER) {
         *mix = snd_ctl_elem_info_get_min(elem_info);
         *max = snd_ctl_elem_info_get_max(elem_info);
     } else if (type == SND_CTL_ELEM_TYPE_INTEGER64) {
@@ -1038,8 +1039,8 @@ int32_t SndElementReadRange
     return HDF_SUCCESS;
 }
 
-int32_t SndElementReadSwitch
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool *on)
+int32_t SndElementReadSwitch(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool *on)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1089,8 +1090,8 @@ int32_t SndElementReadSwitch
     return HDF_SUCCESS;
 }
 
-int32_t SndElementWriteInt
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long value)
+int32_t SndElementWriteInt(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long value)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1142,8 +1143,8 @@ int32_t SndElementWriteInt
     return HDF_SUCCESS;
 }
 
-int32_t SndElementWriteEnum
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int item)
+int32_t SndElementWriteEnum(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int item)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1193,8 +1194,8 @@ int32_t SndElementWriteEnum
     return HDF_SUCCESS;
 }
 
-int32_t SndElementWriteSwitch
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on)
+int32_t SndElementWriteSwitch(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on)
 {
     int ret;
     int value;
@@ -1212,7 +1213,7 @@ int32_t SndElementWriteSwitch
         AUDIO_FUNC_LOGE("snd_ctl_open error: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
-    
+
     snd_ctl_elem_id_alloca(&elem_id);
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
@@ -1246,8 +1247,8 @@ int32_t SndElementWriteSwitch
     return HDF_SUCCESS;
 }
 
-int32_t SndElementWrite
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem)
+int32_t SndElementWrite(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1293,15 +1294,15 @@ int32_t SndElementWrite
     return HDF_SUCCESS;
 }
 
-int32_t SndElementGroupWrite
-    (struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize)
+int32_t SndElementGroupWrite(
+    struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize)
 {
     int err;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
 
-    for(int i = 0; i < groupSize; ++i){
+    for (int i = 0; i < groupSize; ++i) {
         err = SndElementWrite(cardIns, &elemGroup[i]);
-        if(err < 0){
+        if(err < 0) {
             AUDIO_FUNC_LOGE("Cant't set element %{public}s", elemGroup[i].name);
         }
     }

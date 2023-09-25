@@ -26,7 +26,7 @@ int32_t AudioCtlCaptureSetPauseStu(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
-    
+
     ret = SndPcmPause(&captureIns->soundCard, handleData->captureMode.ctlParam.pause);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture set pause failed!");
@@ -72,7 +72,7 @@ int32_t AudioCtlCaptureSetVolume(
     ret = captureIns->SetVolume(captureIns, vol);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture SetVolume fail!");
-        return HDF_FAILURE;    
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
@@ -106,7 +106,7 @@ int32_t AudioCtlCaptureGetMuteStu(
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     handleData->captureMode.ctlParam.mute = captureIns->GetMute(captureIns);
-    
+
     return HDF_SUCCESS;
 }
 
@@ -148,7 +148,7 @@ int32_t AudioCtlCaptureGetGainStu(
         return HDF_FAILURE;
     }
     handleData->captureMode.ctlParam.audioGain.gain = gainValue;
-    
+
     return HDF_SUCCESS;
 }
 
@@ -168,11 +168,11 @@ int32_t AudioCtlCaptureSceneSelect(
     deviceInfo = &handleData->captureMode.hwInfo.pathSelect.deviceInfo;
     ret = captureIns->SelectScene(captureIns, descPins, deviceInfo);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Capture select scene pin: (0x%{public}x) failed",descPins);
+        AUDIO_FUNC_LOGE("Capture select scene pin: (0x%{public}x) failed", descPins);
         return HDF_FAILURE;
     }
 
-    AUDIO_FUNC_LOGD("Capture scene select pin: (0x%{public}x) success",descPins);
+    AUDIO_FUNC_LOGD("Capture scene select pin: (0x%{public}x) success", descPins);
     return HDF_SUCCESS;
 }
 
@@ -187,7 +187,7 @@ int32_t AudioCtlCaptureGetGainThreshold(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
-    
+
     ret = captureIns->GetGainThreshold(captureIns, &gainMin, &gainMax);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture get gain threshold failed");
@@ -210,7 +210,7 @@ int32_t AudioCtlCaptureGetVolThreshold(
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
-    
+
     ret = captureIns->GetVolThreshold(captureIns, &volMin, &volMax);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture get volume threshold failed!");
@@ -226,7 +226,6 @@ int32_t AudioInterfaceLibCtlCapture(
 {
     int32_t ret;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-    CHECK_VALID_RANGE_RETURN(cmdId, AUDIODRV_CTL_IOCTL_ELEM_INFO_CAPTURE, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, HDF_FAILURE);
 
     switch (cmdId) {
         /* setPara: */
@@ -287,7 +286,7 @@ int32_t AudioOutputCaptureHwParams(
         AUDIO_FUNC_LOGE("Capture set parameters failed!");
         return HDF_FAILURE;
     }
-    
+
     AUDIO_FUNC_LOGI("Capture set hwparams success.");
     return HDF_SUCCESS;
 }
@@ -311,7 +310,7 @@ int32_t AudioOutputCaptureOpen(
         AUDIO_FUNC_LOGE("Capture open pcm failed.");
         return HDF_FAILURE;
     }
-    
+
     ret = captureIns->Init(captureIns);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture init failed.");
@@ -357,7 +356,7 @@ int32_t AudioOutputCapturePrepare(
         AUDIO_FUNC_LOGE("pcm prepare fail");
         return HDF_FAILURE;
     }
-    
+
     return HDF_SUCCESS;
 }
 
@@ -396,7 +395,7 @@ int32_t AudioOutputCaptureStop(
         AUDIO_FUNC_LOGE("Capture stop route failed!");
         return ret;
     }
-    
+
     AUDIO_FUNC_LOGI("Capture stop success.");
     return HDF_SUCCESS;
 }
