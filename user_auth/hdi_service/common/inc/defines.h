@@ -146,6 +146,7 @@ typedef enum Atl {
 #define MAX_TEMPLATE_OF_SCHEDULE 10
 #define CHALLENGE_LEN 32
 #define MAX_CREDENTIAL_OUTPUT 10
+#define MAX_ENROLL_OUTPUT 5
 
 #ifdef __cplusplus
 }

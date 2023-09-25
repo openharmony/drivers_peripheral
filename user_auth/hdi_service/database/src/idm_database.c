@@ -874,3 +874,113 @@ void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId
     condition->userId = userId;
     condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
 }
+
+IAM_STATIC bool IsInvalidUser(UserInfo *user)
+{
+    LinkedList *credentialInfoList = user->credentialInfoList;
+    CredentialInfoHal *pinCredential = QueryCredentialByAuthType(PIN_AUTH, credentialInfoList);
+    if (pinCredential == NULL) {
+        return true;
+    }
+    return false;
+}
+
+IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount)
+{
+    LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return;
+    }
+
+    UserInfo *user = NULL;
+    while (iterator->hasNext(iterator)) {
+        user = (UserInfo *)iterator->next(iterator);
+        if (user == NULL) {
+            LOG_ERROR("userinfo list node is null, please check");
+            continue;
+        }
+
+        if (*userCount >= maxUserCount) {
+            LOG_ERROR("too many users");
+            break;
+        }
+
+        if (IsInvalidUser(user) == false) {
+            invalidUserId[*userCount] = user->userId;
+            (*userCount)++;
+        }
+    }
+
+    g_userInfoList->destroyIterator(iterator);
+}
+
+void ClearInvalidUser(void)
+{
+    int32_t invalidUserId[MAX_USER] = {0};
+    uint32_t userCount = 0;
+    GetInvalidUser(invalidUserId, MAX_USER, &userCount);
+    for (uint32_t i = 0; i < userCount; ++i) {
+        DeleteUser(invalidUserId[i]);
+    }
+}
+
+ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfoLen, uint32_t *userInfocount)
+{
+    if (userInfos == NULL || userInfocount == NULL) {
+        LOG_ERROR("param is null");
+        return RESULT_BAD_PARAM;
+    }
+
+    LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return RESULT_NO_MEMORY;
+    }
+
+    UserInfo *user = NULL;
+    EnrolledInfoHal *enrolledInfoHal = NULL;
+    *userInfocount = 0;
+    while (iterator->hasNext(iterator)) {
+        user = (UserInfo *)iterator->next(iterator);
+        if (user == NULL) {
+            LOG_ERROR("userinfo list node is null, please check");
+            continue;
+        }
+
+        if (*userInfocount >= userInfoLen) {
+            LOG_ERROR("too many users");
+            goto ERROR;
+        }
+
+        userInfos[*userInfocount].userId = user->userId;
+        userInfos[*userInfocount].secUid = user->secUid;
+        userInfos[*userInfocount].pinSubType = (uint32_t)user->pinSubType;
+
+        ResultCode ret = GetAllEnrolledInfoFromUser(user, &enrolledInfoHal, &(userInfos[*userInfocount].enrollNum));
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("get enrolled info fail");
+            goto ERROR;
+        }
+        if (userInfos[*userInfocount].enrollNum > MAX_ENROLL_OUTPUT) {
+            LOG_ERROR("too many elements");
+            free(enrolledInfoHal);
+            goto ERROR;
+        }
+
+        for (uint32_t i = 0; i < userInfos[*userInfocount].enrollNum; i++) {
+            userInfos[*userInfocount].enrolledInfo[i].authType = enrolledInfoHal[i].authType;
+            userInfos[*userInfocount].enrolledInfo[i].enrolledId = enrolledInfoHal[i].enrolledId;
+        }
+
+        free(enrolledInfoHal);
+        (*userInfocount)++;
+    }
+
+    g_userInfoList->destroyIterator(iterator);
+    return RESULT_SUCCESS;
+
+ERROR:
+    g_userInfoList->destroyIterator(iterator);
+    return RESULT_GENERAL_ERROR;
+}
