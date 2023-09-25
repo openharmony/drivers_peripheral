@@ -36,7 +36,7 @@ struct AlsaCapture{
     unsigned int periodTime;    /* (0.1s): period time in us */
     int resample;    /* enable alsa-lib resampling */
     CapturePriData priData;
-    
+
     /* Capture scene */
     int32_t (*Init)(struct AlsaCapture*);
     int32_t (*Open)(struct AlsaCapture *);
@@ -71,7 +71,7 @@ CapturePriData CaptureGetPriData(struct AlsaCapture *captureIns);
 
 /*
     Different platforms implement this function rewriting capture implementation
- */
+*/
 int32_t CaptureOverrideFunc(struct AlsaCapture *captureIns);
 
 #ifdef __cplusplus
