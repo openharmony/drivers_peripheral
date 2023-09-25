@@ -158,16 +158,16 @@ int32_t AudioGetRenderSpeedVdi(struct IAudioRender *render, float *speed)
 
 static int32_t AudioRenderCallbackVdi(enum  AudioCallbackTypeVdi type, void *reserved, void *cookie)
 {
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    CHECK_NULL_PTR_RETURN_VALUE(cookie, HDF_ERR_INVALID_PARAM);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)cookie;
     struct IAudioCallback *cb = renderInfo->callback;
     CHECK_NULL_PTR_RETURN_VALUE(cb, HDF_ERR_INVALID_PARAM);
     int8_t newCookie = 0;
     int8_t newReserved = 0;
     int32_t ret = cb->RenderCallback(cb, (enum AudioCallbackType)type, &newReserved, &newCookie);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render AudioHwiRenderCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;        
+        AUDIO_FUNC_LOGE("audio render AudioRenderCallbackVdi fail, ret=%{public}d", ret);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -182,7 +182,7 @@ int32_t AudioRenderRegCallbackVdi(struct IAudioRender *render, struct IAudioCall
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RegCallback, HDF_ERR_INVALID_PARAM);
 
-    int32_t ret = vdiRender->RegCallback(vdiRender, AudioRenderCallbackVdi, (void *)render);
+    int32_t ret = vdiRender->RegCallback(vdiRender, AudioRenderCallbackVdi, (void *)renderInfo);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render regCallback fail, ret=%{public}d", ret);
         return HDF_FAILURE;

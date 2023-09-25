@@ -210,8 +210,7 @@ enum AudioInputType {
 /**
  * @brief Defines audio offload attributes.
  */
-struct AudioOffloadInfo
-{
+struct AudioOffloadInfo {
     uint32_t sampleRate;    /**< Audio sampling rate */
     uint32_t channelCount;  /**< Number of audio channels */
     uint32_t bitRate;       /**< bitRate of compressed audio data */
