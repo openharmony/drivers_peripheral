@@ -48,6 +48,14 @@ typedef struct {
     LinkedList *enrolledInfoList;
 } UserInfo;
 
+typedef struct {
+    int32_t userId;
+    uint64_t secUid;
+    uint64_t pinSubType;
+    uint32_t enrollNum;
+    EnrolledInfoHal enrolledInfo[MAX_ENROLL_OUTPUT];
+} UserInfoResult;
+
 void DestroyUserInfoNode(void *userInfo);
 void DestroyCredentialNode(void *credential);
 void DestroyEnrolledNode(void *enrolled);

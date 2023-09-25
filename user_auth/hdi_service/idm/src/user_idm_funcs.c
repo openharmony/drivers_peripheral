@@ -391,3 +391,19 @@ EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
     return ret;
 }
+
+ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t *userInfoCount)
+{
+    if (userInfos == NULL || userInfoCount == NULL) {
+        LOG_ERROR("param is null");
+        return RESULT_BAD_PARAM;
+    }
+
+    ResultCode ret = GetAllExtUserInfo(userInfos, userInfoCount);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetAllExtUserInfo failed");
+        return RESULT_BAD_PARAM;
+    }
+
+    return RESULT_SUCCESS;
+}
