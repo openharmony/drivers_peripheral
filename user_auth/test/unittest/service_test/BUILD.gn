@@ -51,7 +51,7 @@ ohos_unittest("UserAuthHdiTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_proxy_1.1",
+    "drivers_interface_user_auth:libuser_auth_proxy_1.2",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",

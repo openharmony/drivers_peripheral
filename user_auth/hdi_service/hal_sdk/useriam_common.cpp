@@ -53,6 +53,10 @@ int32_t Init()
         LOG_ERROR("init ed25519 key failed");
         goto FAIL;
     }
+    if (ClearRedundancyCredential() != RESULT_SUCCESS) {
+        LOG_ERROR("clear redundancy credential failed");
+        goto FAIL;
+    }
     LOG_INFO("init success");
     g_isInitUserIAM = true;
     return RESULT_SUCCESS;

@@ -46,6 +46,7 @@ IAM_STATIC ResultCode DeleteUser(int32_t userId);
 IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
 IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
 IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
+IAM_STATIC bool MatchCredentialByAuthTpye(const void *data, const void *condition);
 IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 
 ResultCode InitUserInfoList(void)
@@ -546,6 +547,19 @@ IAM_STATIC bool MatchCredentialById(const void *data, const void *condition)
     return false;
 }
 
+IAM_STATIC bool MatchCredentialByAuthType(const void *data, const void *condition)
+{
+    if (data == NULL || condition == NULL) {
+        return false;
+    }
+    const CredentialInfoHal *credentialInfo = (const CredentialInfoHal *)data;
+    uint32_t authType = *(const uint32_t *)condition;
+    if (credentialInfo->authType == authType) {
+        return true;
+    }
+    return false;
+}
+
 IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
@@ -873,4 +887,79 @@ void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId
     }
     condition->userId = userId;
     condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
+}
+
+IAM_STATIC void DeleteCredentialByAuthType(UserInfo *user, AuthType authType)
+{
+    LinkedList *credentialInfoList = user->credentialInfoList;
+    LinkedList *enrolledInfoList = user->enrolledInfoList;
+
+    ResultCode ret = credentialList->remove(credentialInfoList, &authType, MatchCredentialByAuthType, true);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("remove credential failed");
+        return ret;
+    }
+    
+    ResultCode ret = credentialList->remove(enrolledInfoList, &authType, MatchEnrolledInfoByType, true);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("remove credential failed");
+        return ret;
+    }
+}
+
+IAM_STATIC void ProcRedundancyCredential(UserInfo *user)
+{
+    if (IsUserInfoValid(user)) {
+        return;
+    }
+
+    LinkedList *credentialInfoList = user->credentialInfoList;
+    CredentialInfoHal *pinCredential = QueryCredentialByAuthType(PIN_AUTH, credentialInfoList);
+    if (pinCredential == NULL) {
+        DeleteCredentialByAuthType(user, FACE_AUTH);
+        DeleteCredentialByAuthType(user, FINGER_AUTH);
+    }
+}
+
+ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t *userInfocount)
+{
+    LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return RESULT_NO_MEMORY;
+    }
+
+    UserInfo *user = NULL;
+    while (iterator->hasNext(iterator)) {
+        user = (UserInfo *)iterator->next(iterator);
+        if (user == NULL) {
+            LOG_ERROR("userinfo list node is null, please check");
+            continue;
+        }
+
+        userInfos[*userInfocount].userId = user->userId;
+        userinfos[*userInfocount].secUid = user->secUid;
+        userinfos[*userInfocount].pinSubType = (uint32_t)user->pinSubType;
+
+        EnrolledInfoHal *enrolledInfoHal = NULL;
+        GetAllEnrolledInfoFromUser(user, &enrolledInfoHal, &(userInfos[*userInfocount].enrollNum));
+        if (userInfos[*userInfocount].enrollNum > MAC_ENROLL_OUTPUT) {
+            LOG_ERROR("too many elements");
+            Free(enrolledInfoHal);
+            g_userInfoList->destoryIterator(iterator);
+            return RESULT_GENERAL_ERROR;
+        }
+
+        for (uint32_t i = 0; i < userInfos[*userInfocount].enrollNum; i++) {
+            userInfos[*userInfocount].enrollInfo[i].authType = enrolledInfoHal[i].authType;
+            userInfos[*userInfocount].enrollInfo[i].enrolledId = enrolledInfoHal[i].enrolledId;
+        }
+
+        free(enrolledInfoHal);
+
+        (*userInfocount)++;
+    }
+
+    g_userInfoList->destoryIterator(iterator);
+    return RESULT_SUCCESS;
 }

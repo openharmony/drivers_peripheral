@@ -27,7 +27,7 @@
 
 #undef private
 
-using namespace OHOS::HDI::UserAuth::V1_1;
+using namespace OHOS::HDI::UserAuth::V1_2;
 
 namespace OHOS {
 namespace UserIam {
@@ -46,14 +46,14 @@ bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V1_1::IUserAuthInterface> serviceImpl =
-        OHOS::HDI::UserAuth::V1_1::IUserAuthInterface::Get(true);
+    sptr<OHOS::HDI::UserAuth::V1_2::IUserAuthInterface> serviceImpl =
+        OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:IUserAuthInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V1_1::UserAuthInterfaceStub> userAuthInterfaceStub =
-        new OHOS::HDI::UserAuth::V1_1::UserAuthInterfaceStub(serviceImpl);
+    sptr<OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceStub> userAuthInterfaceStub =
+        new OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceStub(serviceImpl);
     if (userAuthInterfaceStub == nullptr) {
         IAM_LOGE("%{public}s:new UserAuthInterfaceStub failed.", __func__);
         return false;
