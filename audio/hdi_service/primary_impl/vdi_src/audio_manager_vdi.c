@@ -201,7 +201,7 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
     return HDF_SUCCESS;
 }
 
-int32_t AudioManagerGetAllAdapters(struct AudioManagerPrivVdi *priv,
+int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
     int32_t ret;
@@ -271,7 +271,7 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
         priv->vdiDescs = NULL;
     }
 
-    return AudioManagerGetAllAdapters(priv, descs, descsLen);
+    return AudioManagerPrivVdiGetAllAdapters(priv, descs, descsLen);
 }
 
 static uint32_t AudioManagerVendorFindAdapterPos(struct IAudioManager *manager, const char *adapterName)
