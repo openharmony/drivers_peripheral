@@ -24,10 +24,11 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
 
   sources = [
     "$hdf_audio_path/hal/hdi_passthrough/src/audio_common.c",
-    "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_common.c",
+    "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
     "audiocardconfig_fuzzer.cpp",
   ]
   include_dirs = [
+    "$hdf_audio_path/hdi_service/vendor_interface/utils",
     "$hdf_audio_path/hal/hdi_passthrough/include",
     "$hdf_audio_path/supportlibs/alsa_adapter/include",
     "$hdf_audio_path/supportlibs/interfaces/include",
