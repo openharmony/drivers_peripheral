@@ -225,7 +225,7 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
     return HDF_SUCCESS;
 }
 
-static int32_t CfgSaveAdapterFromFile(void)
+int32_t CfgSaveAdapterFromFile(void)
 {
     int32_t ret, adapterNum;
     cJSON *adapterObj = NULL;
