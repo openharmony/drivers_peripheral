@@ -35,7 +35,7 @@ struct AlsaRender{
     unsigned int bufferTime;    /* (0.5s): ring buffer length in us */
     unsigned int periodTime;    /* (0.1s): period time in us */
     RenderPriData priData;
-    
+
     /* render scene */
     int32_t (*Init)(struct AlsaRender*);
     int32_t (*SelectScene)(struct AlsaRender *, enum AudioPortPin, const struct PathDeviceInfo *);
@@ -74,7 +74,7 @@ RenderPriData RenderGetPriData(struct AlsaRender *renderIns);
 
 /*
     Different platforms implement this function rewriting render implementation
- */
+*/
 int32_t RenderOverrideFunc(struct AlsaRender *renderIns);
 
 #ifdef __cplusplus

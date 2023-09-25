@@ -129,8 +129,7 @@ int32_t SndElementWriteEnum(struct AlsaSoundCard *cardIns, const struct AlsaMixe
 int32_t SndElementWriteSwitch(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on);
 int32_t SndElementWrite(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem);
 int32_t SndElementGroupWrite(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize);
-int32_t SndTraversalMixerElement(struct AlsaSoundCard *cardIns,
-        bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data);
+int32_t SndTraversalMixerElement(struct AlsaSoundCard *cardIns, bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data);
 
 #ifdef __cplusplus
 }
