@@ -22,7 +22,7 @@
 #include "iam_logger.h"
 
 #include "user_auth_hdi.h"
-#include "v1_1/user_auth_interface_service.h"
+#include "v1_2/user_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 

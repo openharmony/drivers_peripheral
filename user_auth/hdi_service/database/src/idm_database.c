@@ -921,6 +921,29 @@ IAM_STATIC void ProcRedundancyCredential(UserInfo *user)
     }
 }
 
+ResultCode ClearRedundancyCredential(void)
+{
+    LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return RESULT_NO_MEMORY;
+    }
+
+    UserInfo *user = NULL;
+    while (iterator->hasNext(iterator)) {
+        user = (UserInfo *)iterator->next(iterator);
+        if (user == NULL) {
+            LOG_ERROR("userinfo list node is null, please check");
+            continue;
+        }
+
+        ProcRedundancyCredential(user);
+    }
+
+    g_userInfoList->destoryIterator(iterator);
+    return RESULT_SUCCESS;
+}
+
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t *userInfocount)
 {
     LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
