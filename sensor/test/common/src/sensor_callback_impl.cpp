@@ -71,7 +71,6 @@ namespace {
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
     {
         for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
-            printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j + 1, *(&data + j));
             if (sensorNode.dataForm == 0) {
                 if (std::abs(*(&data + j) - sensorNode.valueRange[j].highThreshold) < EPSINON ||
                     std::abs(*(&data + j) - sensorNode.valueRange[j].lowThreshold) < EPSINON) {
@@ -86,7 +85,6 @@ namespace {
                 if (*(&data + j) >= sensorNode.valueRange[j].lowThreshold &&
                     *(&data + j) <= sensorNode.valueRange[j].highThreshold) {
                     SensorCallbackImpl::sensorDataFlag &= 1;
-                    printf("sensorDataFlag = 1;");
                 } else {
                     SensorCallbackImpl::sensorDataFlag = 0;
                     printf("%s: %s Not expected\n\r", __func__, sensorNode.sensorName);
