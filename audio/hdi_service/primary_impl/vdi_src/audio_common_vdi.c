@@ -61,7 +61,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
         vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;
-        vdiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
 }
@@ -421,7 +421,7 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
         vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;
-        vdiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
     return HDF_SUCCESS;

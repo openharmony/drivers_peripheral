@@ -200,7 +200,7 @@ static int32_t AudioHwiRenderCallback(enum  AudioHwiCallbackType type, void *res
     int32_t ret = cb->RenderCallback(cb, (enum AudioCallbackType)type, &newReserved, &newCookie);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render AudioHwiRenderCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;        
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
