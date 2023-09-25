@@ -25,7 +25,7 @@ extern "C" {
 typedef void* CapturePriData;
 
 typedef struct AlsaCapture AlsaCapture;
-struct AlsaCapture{
+struct AlsaCapture {
     struct AlsaSoundCard soundCard;
     enum AudioPortPin descPins;
     bool muteState;
@@ -52,7 +52,7 @@ struct AlsaCapture{
     int32_t (*GetVolThreshold)(struct AlsaCapture *, long *, long *);
     int32_t (*GetVolume)(struct AlsaCapture *, long *);
     int32_t (*SetVolume)(struct AlsaCapture *, long);
-    
+
     /* gain operation */
     int32_t (*GetGainThreshold)(struct AlsaCapture *, float *, float *);
     int32_t (*GetGain)(struct AlsaCapture *, float *);
@@ -60,7 +60,7 @@ struct AlsaCapture{
 
     /* mute operation */
     bool  (*GetMute)(struct AlsaCapture *);
-    int32_t (*SetMute)(struct AlsaCapture *,bool);
+    int32_t (*SetMute)(struct AlsaCapture *, bool);
 };
 
 struct AlsaCapture *CaptureCreateInstance(const char* adapterName);
@@ -71,7 +71,7 @@ CapturePriData CaptureGetPriData(struct AlsaCapture *captureIns);
 
 /*
     Different platforms implement this function rewriting capture implementation
-*/
+ */
 int32_t CaptureOverrideFunc(struct AlsaCapture *captureIns);
 
 #ifdef __cplusplus

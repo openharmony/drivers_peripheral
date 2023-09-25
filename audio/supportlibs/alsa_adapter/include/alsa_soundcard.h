@@ -97,7 +97,7 @@ struct AlsaSoundCard{
     /*
         alsa soundcard public variable
     */
-    uint8_t cardStatus; 
+    uint8_t cardStatus;
     bool canPause;
     bool pauseState;
     int32_t muteValue;
@@ -110,7 +110,8 @@ void AudioCloseService(const struct DevHandle *handle);
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
 
 int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterName);
-int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams, snd_pcm_format_t *alsaPcmFormat);
+int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams,
+    snd_pcm_format_t *alsaPcmFormat);
 int32_t SndSaveCardListInfo(snd_pcm_stream_t stream);
 bool  SndisBusy(struct AlsaSoundCard *cardIns);
 int32_t SndOpenMixer(struct AlsaSoundCard *cardIns);
@@ -120,16 +121,26 @@ snd_pcm_state_t SndGetRunState(struct AlsaSoundCard *cardIns);
 void  SndCloseHandle(struct AlsaSoundCard *cardIns);
 
 void SndElementItemInit(struct AlsaMixerCtlElement *m);
-int32_t SndElementReadInt(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long *value);
-int32_t SndElementReadEnum(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int *item);
-int32_t SndElementReadRange(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long *mix, long *max);
-int32_t SndElementReadSwitch(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool *on);
-int32_t SndElementWriteInt(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, long value);
-int32_t SndElementWriteEnum(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, unsigned int item);
-int32_t SndElementWriteSwitch(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem, bool on);
-int32_t SndElementWrite(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement *ctlElem);
-int32_t SndElementGroupWrite(struct AlsaSoundCard *cardIns, const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize);
-int32_t SndTraversalMixerElement(struct AlsaSoundCard *cardIns, bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data);
+int32_t SndElementReadInt(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, long *value);
+int32_t SndElementReadEnum(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, unsigned int *item);
+int32_t SndElementReadRange(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, long *mix, long *max);
+int32_t SndElementReadSwitch(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, bool *on);
+int32_t SndElementWriteInt(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, long value);
+int32_t SndElementWriteEnum(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, unsigned int item);
+int32_t SndElementWriteSwitch(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem, bool on);
+int32_t SndElementWrite(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement *ctlElem);
+int32_t SndElementGroupWrite(struct AlsaSoundCard *cardIns,
+    const struct AlsaMixerCtlElement* elemGroup, int32_t groupSize);
+int32_t SndTraversalMixerElement(struct AlsaSoundCard *cardIns,
+    bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data);
 
 #ifdef __cplusplus
 }

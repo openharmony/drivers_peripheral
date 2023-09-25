@@ -46,16 +46,16 @@ struct AlsaRender{
     int32_t (*Write)(struct AlsaRender *, const struct AudioHwRenderParam *);
     int32_t (*GetMmapPosition)(struct AlsaRender *);
     int32_t (*MmapWrite)(struct AlsaRender *, const struct AudioHwRenderParam *);
-    
+
     /* volume operation */
     int32_t (*GetVolThreshold)(struct AlsaRender *, long *, long *);
     int32_t (*GetVolume)(struct AlsaRender *, long *);
-    int32_t (*SetVolume)(struct AlsaRender *, long );
-    
+    int32_t (*SetVolume)(struct AlsaRender *, long);
+
     /* gain operation */
     int32_t (*GetGainThreshold)(struct AlsaRender *, float *, float *);
     int32_t (*GetGain)(struct AlsaRender *, float *);
-    int32_t (*SetGain)(struct AlsaRender *, float );
+    int32_t (*SetGain)(struct AlsaRender *, float);
 
     /* mute operation */
     bool  (*GetMute)(struct AlsaRender *);
@@ -63,7 +63,7 @@ struct AlsaRender{
 
     /* channel mode operation */
     int32_t (*GetChannelMode)(struct AlsaRender *, enum AudioChannelMode *);
-    int32_t (*SetChannelMode)(struct AlsaRender *, enum AudioChannelMode );
+    int32_t (*SetChannelMode)(struct AlsaRender *, enum AudioChannelMode);
 };
 
 struct AlsaRender *RenderCreateInstance(const char* adapterName);
@@ -74,7 +74,7 @@ RenderPriData RenderGetPriData(struct AlsaRender *renderIns);
 
 /*
     Different platforms implement this function rewriting render implementation
-*/
+ */
 int32_t RenderOverrideFunc(struct AlsaRender *renderIns);
 
 #ifdef __cplusplus
