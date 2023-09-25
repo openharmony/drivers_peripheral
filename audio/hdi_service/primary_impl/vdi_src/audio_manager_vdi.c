@@ -207,20 +207,21 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     int32_t ret;
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc
     (sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
-    
+    CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
+
     priv->vdiDescsCount = *descsLen;
     ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call GetAllAdapters fail, ret=%{public}d", ret);
+        AudioManagerReleaseDescs(priv->vdiDescs, *descsLen);
         return HDF_FAILURE;
     }
-
-    CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
 
     ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
         AudioManagerReleaseDescs(descs, *descsLen);
+        AudioManagerReleaseDescs(priv->vdiDescs, *descsLen);
         return HDF_FAILURE;
     }
 
@@ -230,9 +231,11 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
         AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
         AudioManagerReleaseDescs(descs, *descsLen);
         AudioManagerReleaseDescs(priv->descs, priv->descsCount);
+        AudioManagerReleaseDescs(priv->vdiDescs, *descsLen);
         priv->descsCount = 0;
         return HDF_FAILURE;
     }
+    AudioManagerReleaseDescs(priv->vdiDescs, *descsLen);
     return HDF_SUCCESS;
 }
 
