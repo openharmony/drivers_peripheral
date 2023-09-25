@@ -61,6 +61,7 @@ private:
     std::condition_variable cv_;
     std::atomic<bool> running_ = false;
     std::thread* processThread_ = nullptr;
+    std::atomic<int> calltimes_;
 };
 } // namespace OHOS::Camera
 #endif
