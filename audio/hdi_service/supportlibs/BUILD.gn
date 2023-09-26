@@ -76,8 +76,9 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
-        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_common.c",
-        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_mixer_path.c",
+        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_snd_capture.c",
+        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
+        "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c",
         "//third_party/cJSON/cJSON.c",
       ]
     } else {
@@ -99,6 +100,7 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
+        "//device/board/${product_company}/${device_name}/audio_alsa",
       ]
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
@@ -131,9 +133,10 @@ if (defined(ohos_lite)) {
     sources = [ "$hdf_hdi_service_path/primary_impl/src/audio_common.c" ]
     if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
-        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_common.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_render.c",
-        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_mixer_path.c",
+        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_snd_render.c",
+        "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_soundcard.c",
+        "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c",
         "//third_party/cJSON/cJSON.c",
       ]
     } else {
@@ -156,6 +159,7 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
         "$hdf_audio_path/supportlibs/alsa_adapter/include",
+        "//device/board/${product_company}/${device_name}/audio_alsa",
       ]
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {

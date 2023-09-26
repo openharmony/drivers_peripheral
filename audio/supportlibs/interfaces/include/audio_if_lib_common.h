@@ -30,6 +30,7 @@ struct AudioPcmHwParams {
     uint32_t periodCount;
     uint32_t period;
     uint32_t frameSize;
+    uint32_t bitsPerFrame;
     uint32_t startThreshold;
     uint32_t stopThreshold;
     uint32_t silenceThreshold;

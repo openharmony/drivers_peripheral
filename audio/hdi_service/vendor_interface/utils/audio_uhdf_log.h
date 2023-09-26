@@ -51,6 +51,16 @@
 
 #endif
 
+#ifndef CHECK_NULL_PTR_RETURN_DEFAULT
+#define CHECK_NULL_PTR_RETURN_DEFAULT(pointer)          \
+    do {                                                      \
+        if ((pointer) == NULL) {                              \
+            AUDIO_FUNC_LOGE("%{public}s is null and return INVALID_PARAM", #pointer); \
+            return HDF_ERR_INVALID_PARAM;                                     \
+        }                                                     \
+    } while (0)
+#endif
+
 #ifndef CHECK_NULL_PTR_RETURN_VALUE
 #define CHECK_NULL_PTR_RETURN_VALUE(pointer, ret)          \
     do {                                                      \
