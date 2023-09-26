@@ -144,6 +144,8 @@ private:
         sptr<IUsbdSubscriber> deathSubscriber_;
     };
 
+    void parsePortPath();
+
 private:
     static HdfDevEventlistener listenerForLoadService_;
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
