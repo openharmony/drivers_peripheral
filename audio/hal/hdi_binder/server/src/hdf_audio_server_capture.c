@@ -137,7 +137,7 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "GetInitCapturePara fail", AUDIO_HAL_ERR_INTERNAL);
     ret = AudioAdapterListGetAdapter(adapterName, &adapter);
     IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioAdapterListGetAdapter fail", AUDIO_HAL_ERR_INTERNAL);
-    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter == NULL),"adapter is empty!", AUDIO_HAL_ERR_INVALID_PARAM);
+    IF_TRUE_PRINT_LOG_RETURN_ERROR((adapter == NULL), "adapter is empty!", AUDIO_HAL_ERR_INVALID_PARAM);
     const int32_t priority = attrs.type;
     ret = AudioCreatCaptureCheck(adapterName, priority);
     IF_TRUE_PRINT_LOG_RETURN_ERROR((ret < 0), "AudioCreatCaptureCheck fail", ret);
