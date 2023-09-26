@@ -20,7 +20,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-    int32_t CardInfoParseFromConfig(void);
+    int32_t CfgSaveAdapterFromFile(void);
 }
 #endif
 
@@ -40,7 +40,7 @@ static bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     close(fd);
 
     // Call the interface with the temporary file
-    int32_t ret = CardInfoParseFromConfig();
+    int32_t ret = CfgSaveAdapterFromFile();
     if (ret != HDF_SUCCESS) {
         return false;
     }

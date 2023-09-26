@@ -16,7 +16,8 @@
 #ifndef ALSA_LIB_RENDER_H
 #define ALSA_LIB_RENDER_H
 
-#include "alsa_lib_common.h"
 #include "audio_if_lib_render.h"
+#include "alsa_soundcard.h"
+#include "alsa_snd_render.h"
 
 #endif /* ALSA_LIB_RENDER_H */
