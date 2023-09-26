@@ -77,7 +77,7 @@ struct AlsaMixerCtlElement {
 };
 
 typedef struct AlsaSoundCard AlsaSoundCard;
-struct AlsaSoundCard{
+struct AlsaSoundCard {
     /*
         save alsa soundcard base info and hardware params
     */

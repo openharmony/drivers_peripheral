@@ -255,14 +255,12 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
     CHECK_NULL_PTR_RETURN_DEFAULT(handle);
 
     snd_pcm_sw_params_alloca(&swParams);
-
     /* get the current swparams */
     ret = snd_pcm_sw_params_current(handle, swParams);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to determine current swparams for capture: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
-
     if (captureIns->periodSize == 0) {
         AUDIO_FUNC_LOGE("error: g_periodSize cannot be zero!");
         return HDF_FAILURE;
@@ -293,7 +291,6 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
             return HDF_FAILURE;
         }
     }
-
     /* write the parameters to the capture device */
     ret = snd_pcm_sw_params(handle, swParams);
     if (ret < 0) {
@@ -667,6 +664,28 @@ static int32_t CaptureCloseImpl(struct AlsaCapture *captureIns)
     return HDF_SUCCESS;
 }
 
+static int32_t CaptureCheckMmapMode(struct AlsaSoundCard *cardIns)
+{
+    int32_t ret;
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
+
+    if (!cardIns->mmapFlag) {
+        ret = ResetCaptureParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
+        if (ret != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
+            return ret;
+        }
+
+        ret = snd_pcm_start(cardIns->pcmHandle);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s", snd_strerror(ret));
+            return HDF_FAILURE;
+        }
+        cardIns->mmapFlag = true;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t CaptureReadImpl(struct AlsaCapture *captureIns, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
@@ -683,56 +702,37 @@ static int32_t CaptureReadImpl(struct AlsaCapture *captureIns, struct AudioHwCap
         AUDIO_FUNC_LOGE("Get capture params error: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
-
-    if (!cardIns->mmapFlag) {
-        ret = ResetCaptureParams(cardIns, SND_PCM_ACCESS_RW_INTERLEAVED);
-        if (ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
-            return ret;
-        }
-        ret = snd_pcm_start(cardIns->pcmHandle);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-        cardIns->mmapFlag = true;
+    if(CaptureCheckMmapMode(cardIns) != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
+    if (CheckCapFrameBufferSize(handleData, &periodSize) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("CheckCapFrameBufferSize failed.");
+        return HDF_FAILURE;
+    }
+    if (CheckPcmStatus(cardIns->pcmHandle) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("CheckPcmStatus failed.");
+        return HDF_FAILURE;
+    }
     buffer = OsalMemCalloc(ALSA_CAP_BUFFER_SIZE);
     if (buffer == NULL) {
         AUDIO_FUNC_LOGE("Failed to Calloc buffer");
         return HDF_FAILURE;
     }
-
-    ret = CheckCapFrameBufferSize(handleData, &periodSize);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("CheckCapFrameBufferSize failed.");
-        AudioMemFree((void **)&buffer);
-        return ret;
-    }
-
-    ret = CheckPcmStatus(cardIns->pcmHandle);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("CheckPcmStatus failed.");
-        AudioMemFree((void **)&buffer);
-        return ret;
-    }
-
     ret = CapturePcmReadi(cardIns->pcmHandle, &frames, buffer, periodSize);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("CapturePcmReadi is error!");
         AudioMemFree((void **)&buffer);
         return ret;
     }
-
     ret = CaptureDataCopy(handleData, buffer, frames);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to copy data. It may be paused. Check the status!");
         AudioMemFree((void **)&buffer);
         return ret;
     }
-    AudioMemFree((void **)&buffer);
 
+    AudioMemFree((void **)&buffer);
     return HDF_SUCCESS;
 }
 
@@ -743,7 +743,6 @@ static int32_t CaptureGetMmapPositionImpl(struct AlsaCapture *captureIns)
 
 static int32_t CaptureMmapReadImpl(struct AlsaCapture *captureIns, const struct AudioHwCaptureParam *handleData)
 {
-    int32_t ret;
     char *mmapAddr;
     uint32_t frameSize;
     snd_pcm_sframes_t xfer;
@@ -752,10 +751,9 @@ static int32_t CaptureMmapReadImpl(struct AlsaCapture *captureIns, const struct 
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
-    ret = UpdateSetParams(cardIns);
-    if (ret != HDF_SUCCESS) {
+    if (UpdateSetParams(cardIns) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Update set params failed!");
-        return ret;
+        return HDF_FAILURE;
     }
 
     mmapAddr = (char *)handleData->frameCaptureMode.mmapBufDesc.memoryAddress;
