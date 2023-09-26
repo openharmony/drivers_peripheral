@@ -947,6 +947,7 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    inst->parsePortPath();
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
@@ -1637,25 +1638,30 @@ int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
     return HDF_SUCCESS;
 }
 
-int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
+void UsbImpl::parsePortPath()
 {
+    const char *path_ = nullptr;
+    const char *pathDef_ = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == nullptr) {
         HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
-        return HDF_FAILURE;
+        return;
     }
 
-    const char *path = nullptr;
-    const char *pathDef = nullptr;
     if (device_ == nullptr) {
         HDF_LOGE("%{public}s: device_ is empty\n", __func__);
-        return HDF_FAILURE;
+        return;
     }
-    if (iface->GetString(device_->property, "port_file_path", &path, pathDef) != HDF_SUCCESS) {
+    if (iface->GetString(device_->property, "port_file_path", &path_, pathDef_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read port_file_path failed", __func__);
-        return HDF_FAILURE;
+        return;
     }
-    UsbdPort::GetInstance().setPortPath(path);
+    UsbdPort::GetInstance().setPortPath(path_);
+    return;
+}
+
+int32_t UsbImpl::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole)
+{
     int32_t ret = UsbdPort::GetInstance().SetPort(portId, powerRole, dataRole, subscribers_, MAX_SUBSCRIBER);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:FunSetRole failed, ret:%{public}d", __func__, ret);
