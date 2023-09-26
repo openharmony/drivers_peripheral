@@ -18,6 +18,7 @@
 
 #include "nfc_vendor_adaptions.h"
 #include "v1_0/infc_interface.h"
+#include "remote_death_recipient.h"
 
 namespace OHOS {
 namespace HDI {
@@ -25,7 +26,8 @@ namespace Nfc {
 namespace V1_0 {
 class NfcImpl : public INfcInterface {
 public:
-    virtual ~NfcImpl() {}
+    NfcImpl();
+    virtual ~NfcImpl();
     int32_t Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status) override;
     int32_t CoreInitialized(const std::vector<uint8_t> &data, NfcStatus &status) override;
     int32_t Prediscover(NfcStatus &status) override;
@@ -35,7 +37,13 @@ public:
     int32_t Close(NfcStatus &status) override;
     int32_t Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStatus &status) override;
 private:
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
+    int32_t AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj);
+    int32_t RemoveNfcDeathRecipient(const sptr<INfcCallback> &callbackObj);
+
     NfcVendorAdaptions adaptor_;
+    sptr<INfcCallback> callbacks_ = nullptr;
+    sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
 };
 } // V1_0
 } // Nfc

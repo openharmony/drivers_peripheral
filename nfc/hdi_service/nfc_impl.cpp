@@ -16,6 +16,7 @@
 #include "nfc_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <iproxy_broker.h>
 #include <vector>
 #include "nfc_vendor_adaptions.h"
 
@@ -52,6 +53,20 @@ extern "C" INfcInterface *NfcInterfaceImplGetInstance(void)
     return service;
 }
 
+NfcImpl::NfcImpl()
+{
+    remoteDeathRecipient_ =
+        new RemoteDeathRecipient(std::bind(&NfcImpl::OnRemoteDied, this, std::placeholders::_1));
+}
+
+NfcImpl::~NfcImpl()
+{
+    if (callbacks_ != nullptr) {
+        RemoveNfcDeathRecipient(callbacks_);
+        callbacks_ = nullptr;
+    }
+}
+
 int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
 {
     if (callbackObj == nullptr) {
@@ -62,6 +77,8 @@ int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
 
     int ret = adaptor_.VendorOpen(EventCallback, DataCallback);
     if (ret == 0) {
+        callbacks_ = callbackObj;
+        AddNfcDeathRecipient(callbacks_);
         status = NfcStatus::OK;
         return HDF_SUCCESS;
     }
@@ -135,6 +152,10 @@ int32_t NfcImpl::PowerCycle(NfcStatus &status)
 int32_t NfcImpl::Close(NfcStatus &status)
 {
     g_callbackV1_0 = nullptr;
+    if (callbacks_ != nullptr) {
+        RemoveNfcDeathRecipient(callbacks_);
+        callbacks_ = nullptr;
+    }
     int ret = adaptor_.VendorClose(true);
     if (ret == 0) {
         status = NfcStatus::OK;
@@ -157,6 +178,38 @@ int32_t NfcImpl::Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStat
     }
     status = NfcStatus::FAILED;
     return HDF_FAILURE;
+}
+
+void NfcImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    callbacks_ = nullptr;
+    NfcStatus status = NfcStatus::FAILED;
+    int32_t ret = Close(status);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("OnRemoteDied, Close failed, status(%{public}d)!", status);
+    }
+}
+
+int32_t NfcImpl::AddNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
+{
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
+    bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("NfcImpl AddDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t NfcImpl::RemoveNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
+{
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<INfcCallback>(callbackObj);
+    bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
+    if (!result) {
+        HDF_LOGE("NfcImpl RemoveDeathRecipient failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 } // V1_0
 } // Nfc
