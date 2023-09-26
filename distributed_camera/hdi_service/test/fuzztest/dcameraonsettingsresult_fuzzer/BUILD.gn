@@ -17,7 +17,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraOnSettingsResultFuzzTest") {
-  module_out_path = "distributed_camera/dcameraonsettingsresult"
+  module_out_path = "${fuzz_test_output_path}/dcameraonsettingsresult"
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameraonsettingsresult_fuzzer"
 
