@@ -97,6 +97,18 @@ static void AudioManagerReleaseVdiDesc(struct AudioAdapterDescriptorVdi *vdiDesc
 #endif
 }
 
+static void AudioManagerReleaseVdiDescs(struct AudioAdapterDescriptorVdi *vdiDescs, uint32_t descsCount)
+{
+    if (descsCount == 0 || descsCount > AUDIO_VDI_PORT_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio vdiManager vdiDescsCount is invalid");
+        return;
+    }
+
+    for (uint32_t i = 0; i < descsCount; i++) {
+        AudioManagerReleaseVdiDesc(&vdiDescs[i]);
+    }
+}
+
 static void AudioManagerReleaseDescs(struct AudioAdapterDescriptor *descs, uint32_t descsCount)
 {
     if (descsCount == 0 || descsCount > AUDIO_VDI_PORT_NUM_MAX) {
@@ -213,7 +225,7 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     ret = priv->vdiManager->GetAllAdapters(priv->vdiManager, priv->vdiDescs, &priv->vdiDescsCount);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call GetAllAdapters fail, ret=%{public}d", ret);
-        AudioManagerReleaseVdiDesc(priv->vdiDescs);
+        AudioManagerReleaseVdiDescs(priv->vdiDescs, priv->vdiDescsCount);
         return HDF_FAILURE;
     }
 
@@ -221,7 +233,7 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
         AudioManagerReleaseDescs(descs, *descsLen);
-        AudioManagerReleaseVdiDesc(priv->vdiDescs);
+        AudioManagerReleaseVdiDescs(priv->vdiDescs, priv->vdiDescsCount);
         return HDF_FAILURE;
     }
 
@@ -231,11 +243,11 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
         AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
         AudioManagerReleaseDescs(descs, *descsLen);
         AudioManagerReleaseDescs(priv->descs, priv->descsCount);
-        AudioManagerReleaseVdiDesc(priv->vdiDescs);
+        AudioManagerReleaseVdiDescs(priv->vdiDescs, priv->vdiDescsCount);
         priv->descsCount = 0;
         return HDF_FAILURE;
     }
-    AudioManagerReleaseVdiDesc(priv->vdiDescs);
+    AudioManagerReleaseVdiDescs(priv->vdiDescs, priv->vdiDescsCount);
     return HDF_SUCCESS;
 }
 
