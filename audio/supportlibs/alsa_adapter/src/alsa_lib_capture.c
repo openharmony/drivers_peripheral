@@ -205,7 +205,7 @@ int32_t AudioCtlCaptureGetVolThreshold(
     int32_t ret;
     long volMax = MIN_VOLUME;
     long volMin = MIN_VOLUME;
-    struct AlsaCapture * captureIns = NULL;
+    struct AlsaCapture *captureIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
@@ -299,7 +299,7 @@ int32_t AudioOutputCaptureOpen(
     const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
-    struct AlsaCapture * captureIns = NULL;
+    struct AlsaCapture *captureIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
     captureIns = CaptureCreateInstance(handleData->captureMode.hwInfo.adapterName);

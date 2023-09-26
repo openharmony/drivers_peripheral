@@ -334,7 +334,7 @@ int32_t AudioOutputRenderOpen(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
-    struct AlsaRender * renderIns = NULL;
+    struct AlsaRender *renderIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
     renderIns = RenderCreateInstance(handleData->renderMode.hwInfo.adapterName);
@@ -362,7 +362,6 @@ int32_t AudioOutputRenderWrite(
     int32_t ret;
     struct AlsaRender *renderIns = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-
 
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);

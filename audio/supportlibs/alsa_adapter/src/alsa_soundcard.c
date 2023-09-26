@@ -108,7 +108,7 @@ static char *CfgReadAdapterFile(const char *fpath)
 static int32_t CfgGetAdapterCount()
 {
     int32_t num = 0;
-    for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
+    for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
         num += g_alsaAdapterList[type].num;
     }
     return num;
@@ -116,15 +116,15 @@ static int32_t CfgGetAdapterCount()
 
 static enum SndCardType CfgGetAdapterCardType(const char* adapterName)
 {
-    if(adapterName == NULL) {
+    if (adapterName == NULL) {
         return SND_CARD_UNKNOWN;
     }
 
     struct AlsaAdapterCfgInfo *info;
-    for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
-        for(int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
+    for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
+        for (int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
             info = &g_alsaAdapterList[type].list[i];
-            if(strcmp(adapterName, info->adapterName) == 0) {
+            if (strcmp(adapterName, info->adapterName) == 0) {
                 return type;
             }
         }
@@ -134,15 +134,15 @@ static enum SndCardType CfgGetAdapterCardType(const char* adapterName)
 
 static struct AlsaAdapterCfgInfo *CfgGetAdapterInfo(const char* adapterName)
 {
-    if(adapterName == NULL) {
+    if (adapterName == NULL) {
         return NULL;
     }
 
     struct AlsaAdapterCfgInfo *info;
-    for(enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
-        for(int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
+    for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
+        for (int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
             info = &g_alsaAdapterList[type].list[i];
-            if(strcmp(adapterName, info->adapterName) == 0) {
+            if (strcmp(adapterName, info->adapterName) == 0) {
                 return info;
             }
         }
@@ -166,7 +166,7 @@ static int32_t CfgDumpAdapterInfo(struct AlsaAdapterCfgInfo *info)
         cardType = SND_CARD_BT;
     }
 
-    if(cardType == SND_CARD_UNKNOWN) {
+    if (cardType == SND_CARD_UNKNOWN) {
         AUDIO_FUNC_LOGE("Error: %{public}s is unspupported adapter name", info->adapterName);
     }
 
@@ -227,7 +227,7 @@ static int32_t CfgSaveAdapterStruct(cJSON *adapter, struct AlsaAdapterCfgInfo *i
 
 static int32_t CfgParseAdapterItems(cJSON *adapterObj)
 {
-	int32_t ret, adapterNum;
+    int32_t ret, adapterNum;
     cJSON *adapterItems = NULL;
 
     adapterItems = cJSON_GetObjectItem(adapterObj, "adapters");
@@ -239,34 +239,33 @@ static int32_t CfgParseAdapterItems(cJSON *adapterObj)
     if (adapterNum <= 0) {
         AUDIO_FUNC_LOGE("Get adapter number failed!");
         return HDF_FAILURE;
-    }
-    else if (adapterNum > MAX_CARD_NUM) {
+    } else if (adapterNum > MAX_CARD_NUM) {
         AUDIO_FUNC_LOGE("Read adapters number is %{public}d over max num %{public}d!", adapterNum, MAX_CARD_NUM);
         return HDF_FAILURE;
     }
 
-    for(int32_t i = 0; i < adapterNum; ++i) {
+    for (int32_t i = 0; i < adapterNum; ++i) {
         cJSON *adapter;
         struct AlsaAdapterCfgInfo info;
         adapter = cJSON_GetArrayItem(adapterItems, i);
-        if(adapter == NULL) {
+        if (adapter == NULL) {
             AUDIO_FUNC_LOGE("Get adapter item from array failed!");
         }
 
         ret = CfgSaveAdapterStruct(adapter, &info);
-        if(ret != HDF_SUCCESS) {
+        if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("CfgSaveAdapterStruct failed!");
             return HDF_FAILURE;
         }
 
         ret = CfgDumpAdapterInfo(&info);
-        if(ret != HDF_SUCCESS) {
+        if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("CfgDumpAdapterInfo failed!");
             return HDF_FAILURE;
         }
     }
 
-	return HDF_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 int32_t CfgSaveAdapterFromFile(void)
@@ -289,23 +288,23 @@ int32_t CfgSaveAdapterFromFile(void)
     AudioMemFree((void **)&configBuf);
 
     ret = CfgParseAdapterItems(adapterObj);
-    if(ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         cJSON_Delete(adapterObj);
         AUDIO_FUNC_LOGE("Parse adapter items failed!");
         return HDF_FAILURE;
     }
 
-	cJSON_Delete(adapterObj);
+    cJSON_Delete(adapterObj);
     return HDF_SUCCESS;
 }
 
 static struct AlsaDevInfo *DevGetInfoByCardId(int32_t cardId)
 {
-    struct AlsaDevInfo * info = NULL;
+    struct AlsaDevInfo *info = NULL;
     int num = g_alsaCardsDevList.num;
-    for(int i = 0; i < num; ++i) {
+    for (int i = 0; i < num; ++i) {
         info = &g_alsaCardsDevList.alsaDevIns[i];
-        if(info->card == cardId) {
+        if (info->card == cardId) {
             return info;
         }
     }
@@ -316,9 +315,9 @@ static struct AlsaDevInfo *DevGetInfoByPcmInfoId(const char * name)
 {
     struct AlsaDevInfo *info = NULL;
     int num = g_alsaCardsDevList.num;
-    for(int i = 0; i < num; ++i) {
+    for (int i = 0; i < num; ++i) {
         info = &g_alsaCardsDevList.alsaDevIns[i];
-        if(strcmp(name, info->pcmInfoId) == 0) {
+        if (strcmp(name, info->pcmInfoId) == 0) {
             return info;
         }
     }
@@ -368,7 +367,7 @@ static int32_t DevSaveCardPcmInfo(snd_ctl_t *handle, snd_pcm_stream_t stream, in
             return HDF_FAILURE;
         }
         g_alsaCardsDevList.num++;
-        if(snd_ctl_pcm_next_device(handle, &pcmDev) < 0) {
+        if (snd_ctl_pcm_next_device(handle, &pcmDev) < 0) {
             AUDIO_FUNC_LOGE("snd_ctl_pcm_next_device error!");
             return HDF_FAILURE;
         }
@@ -399,14 +398,14 @@ static int32_t DevSaveDriverInfo(snd_pcm_stream_t stream)
         }
 
         ret = snd_ctl_open(&handle, deviceName, 0);
-        if(ret != 0) {
+        if (ret != 0) {
             AUDIO_FUNC_LOGE("snd_ctl_open failed.");
             return HDF_FAILURE;
         }
 
         ret = DevSaveCardPcmInfo(handle, stream, card, deviceName);
-        if(ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("save alsa sound cards %{public}s pcm info failed!",deviceName);
+        if (ret != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("save alsa sound cards %{public}s pcm info failed!", deviceName);
         }
 
         ret = snd_ctl_close(handle);
@@ -450,7 +449,7 @@ int32_t SndSaveCardListInfo(snd_pcm_stream_t stream)
 
     /* if the alsa hardware include usb then add to adapter list */
     struct AlsaDevInfo *devInfo = DevGetInfoByPcmInfoId(USB_AUDIO);
-    if(devInfo != NULL) {
+    if (devInfo != NULL) {
         g_alsaAdapterList[SND_CARD_USB].num = 1;
         ret = memcpy_s((void*)&g_alsaAdapterList[SND_CARD_USB].list[0].adapterName, MAX_CARD_NAME_LEN,
         USB_AUDIO, sizeof(USB_AUDIO));
@@ -468,42 +467,42 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
     int32_t ret;
     enum SndCardType cardType;
     struct AlsaAdapterCfgInfo *info = NULL;
-    struct AlsaDevInfo * devInfo = NULL;
+    struct AlsaDevInfo *devInfo = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(adapterName);
 
     cardType = CfgGetAdapterCardType(adapterName);
-    if(cardType == SND_CARD_UNKNOWN) {
+    if (cardType == SND_CARD_UNKNOWN) {
         AUDIO_FUNC_LOGE("unknow card type error.");
         return HDF_FAILURE;
     }
     cardIns->cardType = cardType;
 
     info = CfgGetAdapterInfo(adapterName);
-    if(info == NULL) {
+    if (info == NULL) {
         AUDIO_FUNC_LOGE("adapter %{public}s is not exits.", cardIns->adapterName);
         return HDF_FAILURE;
     }
 
     devInfo = DevGetInfoByCardId(info->cardId);
-    if(devInfo == NULL) {
+    if (devInfo == NULL) {
         AUDIO_FUNC_LOGE("adapter %{public}s cant not find sound card device.", cardIns->adapterName);
         return HDF_FAILURE;
     }
 
     ret = snprintf_s(cardIns->devName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1,
         "hw:%d,%d", devInfo->card, devInfo->device);
-    if(ret < 0) {
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("%{public}s snprintf_s devName failed", cardIns->adapterName);
         return HDF_FAILURE;
     }
     ret = snprintf_s(cardIns->ctrlName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d", devInfo->card);
-    if(ret < 0) {
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("%{public}s snprintf_s ctrlName failed", cardIns->adapterName);
         return HDF_FAILURE;
     }
     ret = snprintf_s(cardIns->alsaCardId, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "%s", devInfo->cardId);
-    if(ret < 0) {
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("%{public}s snprintf_s alsaCardId failed", cardIns->adapterName);
         return HDF_FAILURE;
     }
@@ -534,7 +533,7 @@ int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams, snd_pcm_
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_LE; /** Signed 32 bit Little Endian */
                 break;
             default:
-                AUDIO_FUNC_LOGE("not support format %{public}d",audioFormat);
+                AUDIO_FUNC_LOGE("not support format %{public}d", audioFormat);
                 return HDF_ERR_NOT_SUPPORT;
         }
     } else { /** Big Endian */
@@ -552,7 +551,7 @@ int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams, snd_pcm_
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_BE; /** Signed 32 bit Big Endian */
                 break;
             default:
-                AUDIO_FUNC_LOGE("not support format %{public}d",audioFormat);
+                AUDIO_FUNC_LOGE("not support format %{public}d", audioFormat);
                 return HDF_ERR_NOT_SUPPORT;
         }
     }
@@ -583,7 +582,7 @@ int32_t SndPcmPause(struct AlsaSoundCard *cardIns, bool state)
             return HDF_FAILURE;
         }
     } else {
-        if(enable == AUDIO_ALSALIB_IOCTRL_PAUSE) {
+        if (enable == AUDIO_ALSALIB_IOCTRL_PAUSE) {
             snd_pcm_drop(cardIns->pcmHandle);
         } else {
             snd_pcm_prepare(cardIns->pcmHandle);
@@ -693,7 +692,7 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
     uint8_t portNum;
     CHECK_NULL_PTR_RETURN_DEFAULT(desc);
 
-    switch(type) {
+    switch (type) {
         case SND_CARD_PRIMARY:
             portNum = PORT_OUT_IN;
             break;
@@ -720,7 +719,7 @@ static int32_t AudioInitPorts(struct AudioAdapterDescriptor *desc, enum SndCardT
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if(type == SND_CARD_PRIMARY) {
+    if (type == SND_CARD_PRIMARY) {
         AudioInitPortOut(&desc->ports[0]);
         AudioInitPortIn(&desc->ports[SUPPORT_CAPTURE_OR_RENDER]);
         AudioInitPortOutAndIn(&desc->ports[SUPPORT_CAPTURE_AND_RENDER]);
@@ -818,7 +817,7 @@ void SndElementItemInit(struct AlsaMixerCtlElement *m)
 static snd_ctl_elem_iface_t ConvertIfaceType(enum SndIfaceType iface)
 {
     snd_ctl_elem_iface_t snd_iface;
-    switch(iface) {
+    switch (iface) {
         case IFACE_CARD:
             snd_iface = SND_CTL_ELEM_IFACE_CARD;
             break;
@@ -844,7 +843,7 @@ static snd_ctl_elem_iface_t ConvertIfaceType(enum SndIfaceType iface)
     return snd_iface;
 }
 
-static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlElement *ctlElem, 
+static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlElement *ctlElem,
         snd_ctl_elem_info_t *info, snd_ctl_elem_id_t *id)
 {
     int32_t ret;
@@ -906,13 +905,13 @@ int32_t SndElementReadInt(struct AlsaSoundCard *cardIns,
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
     snd_ctl_elem_value_set_id(elem_value, elem_id);
 
-    if(!snd_ctl_elem_info_is_readable(elem_info)) {
+    if (!snd_ctl_elem_info_is_readable(elem_info)) {
         AUDIO_FUNC_LOGE("Element read enable\n");
         return HDF_FAILURE;
     }
@@ -958,13 +957,13 @@ int32_t SndElementReadEnum(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
     snd_ctl_elem_value_set_id(elem_value, elem_id);
 
-    if(!snd_ctl_elem_info_is_readable(elem_info)) {
+    if (!snd_ctl_elem_info_is_readable(elem_info)) {
         AUDIO_FUNC_LOGE("Element read enable\n");
         return HDF_FAILURE;
     }
@@ -975,7 +974,7 @@ int32_t SndElementReadEnum(
     }
 
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_ENUMERATED) {
+    if (type == SND_CTL_ELEM_TYPE_ENUMERATED) {
         *item = snd_ctl_elem_value_get_enumerated(elem_value, 0);
     } else {
         AUDIO_FUNC_LOGE("Element type is not enumerated\n");
@@ -1008,13 +1007,13 @@ int32_t SndElementReadRange(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
     snd_ctl_elem_value_set_id(elem_value, elem_id);
 
-    if(!snd_ctl_elem_info_is_readable(elem_info)) {
+    if (!snd_ctl_elem_info_is_readable(elem_info)) {
         AUDIO_FUNC_LOGE("Element read enable\n");
         return HDF_FAILURE;
     }
@@ -1062,13 +1061,13 @@ int32_t SndElementReadSwitch(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
     snd_ctl_elem_value_set_id(elem_value, elem_id);
 
-    if(!snd_ctl_elem_info_is_readable(elem_info)) {
+    if (!snd_ctl_elem_info_is_readable(elem_info)) {
         AUDIO_FUNC_LOGE("Element read enable\n");
         return HDF_FAILURE;
     }
@@ -1079,7 +1078,7 @@ int32_t SndElementReadSwitch(
     }
 
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_BOOLEAN) {
+    if (type == SND_CTL_ELEM_TYPE_BOOLEAN) {
         ret = snd_ctl_elem_value_get_boolean(elem_value, 0);
         *on = (ret > 0) ? true : false;
     } else {
@@ -1113,19 +1112,19 @@ int32_t SndElementWriteInt(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
 
-    if(!snd_ctl_elem_info_is_writable(elem_info)) {
+    if (!snd_ctl_elem_info_is_writable(elem_info)) {
         AUDIO_FUNC_LOGE("Element write enable\n");
         return HDF_FAILURE;
     }
 
     snd_ctl_elem_value_set_id(elem_value, elem_id);
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_INTEGER) {
+    if (type == SND_CTL_ELEM_TYPE_INTEGER) {
         snd_ctl_elem_value_set_integer(elem_value, 0, value);
     } else if (type == SND_CTL_ELEM_TYPE_INTEGER64) {
         snd_ctl_elem_value_set_integer64(elem_value, 0, (long long)value);
@@ -1166,19 +1165,19 @@ int32_t SndElementWriteEnum(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
 
-    if(!snd_ctl_elem_info_is_writable(elem_info)) {
+    if (!snd_ctl_elem_info_is_writable(elem_info)) {
         AUDIO_FUNC_LOGE("Element write enable\n");
         return HDF_FAILURE;
     }
 
     snd_ctl_elem_value_set_id(elem_value, elem_id);
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_ENUMERATED) {
+    if (type == SND_CTL_ELEM_TYPE_ENUMERATED) {
         snd_ctl_elem_value_set_enumerated(elem_value, 0, item);
     } else {
         AUDIO_FUNC_LOGE("Element value is not enum type!\n");
@@ -1218,19 +1217,19 @@ int32_t SndElementWriteSwitch(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
 
-    if(!snd_ctl_elem_info_is_writable(elem_info)) {
+    if (!snd_ctl_elem_info_is_writable(elem_info)) {
         AUDIO_FUNC_LOGE("Element write enable\n");
         return HDF_FAILURE;
     }
 
     snd_ctl_elem_value_set_id(elem_value, elem_id);
     type = snd_ctl_elem_info_get_type(elem_info);
-    if(type == SND_CTL_ELEM_TYPE_BOOLEAN) {
+    if (type == SND_CTL_ELEM_TYPE_BOOLEAN) {
         value = on ? 1 : 0;
         snd_ctl_elem_value_set_boolean(elem_value, 0, value);
     } else {
@@ -1269,12 +1268,12 @@ int32_t SndElementWrite(
     snd_ctl_elem_info_alloca(&elem_info);
     snd_ctl_elem_value_alloca(&elem_value);
     ret = SetElementInfo(alsaHandle, ctlElem, elem_info, elem_id);
-    if(ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n",ctlElem->name);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Set element %{public}s elem_info failed!\n", ctlElem->name);
         return HDF_FAILURE;
     }
 
-    if(!snd_ctl_elem_info_is_writable(elem_info)) {
+    if (!snd_ctl_elem_info_is_writable(elem_info)) {
         AUDIO_FUNC_LOGE("Element write enable\n");
         return HDF_FAILURE;
     }
@@ -1302,7 +1301,7 @@ int32_t SndElementGroupWrite(
 
     for (int i = 0; i < groupSize; ++i) {
         err = SndElementWrite(cardIns, &elemGroup[i]);
-        if(err < 0) {
+        if (err < 0) {
             AUDIO_FUNC_LOGE("Cant't set element %{public}s", elemGroup[i].name);
         }
     }

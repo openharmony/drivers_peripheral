@@ -529,7 +529,7 @@ static int32_t RenderHwParamsChmaps(struct AlsaSoundCard *cardIns)
 int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
-    int bits_per_sample;
+    int bitsPerSample;
     snd_pcm_format_t fmt;
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
@@ -556,8 +556,8 @@ int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRender
 #endif
 
     SndConverAlsaPcmFormat(&cardIns->hwParams, &fmt);
-    bits_per_sample = snd_pcm_format_physical_width(fmt);
-    cardIns->hwParams.bitsPerFrame = bits_per_sample * cardIns->hwParams.channels;
+    bitsPerSample = snd_pcm_format_physical_width(fmt);
+    cardIns->hwParams.bitsPerFrame = bitsPerSample * cardIns->hwParams.channels;
 
     return HDF_SUCCESS;
 }
@@ -567,7 +567,7 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
 {
     int32_t ret, offset;
     long frames;
-    char * dataBuf;
+    char *dataBuf;
     size_t sbufFrameSize;
     snd_pcm_state_t state;
     int32_t tryNum = AUDIO_ALSALIB_RETYR;

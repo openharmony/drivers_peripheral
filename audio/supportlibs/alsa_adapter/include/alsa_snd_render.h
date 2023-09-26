@@ -25,7 +25,7 @@ extern "C" {
 typedef void* RenderPriData;
 
 typedef struct AlsaRender AlsaRender;
-struct AlsaRender{
+struct AlsaRender {
     struct AlsaSoundCard soundCard;
     enum AudioPortPin descPins;
     bool muteState;
