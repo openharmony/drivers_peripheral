@@ -17,7 +17,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraEnableDCameraDeviceFuzzTest") {
-  module_out_path = "distributed_camera/dcameraenabledcameradevice"
+  module_out_path = "${fuzz_test_output_path}/dcameraenabledcameradevice"
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameraenabledcameradevice_fuzzer"
 

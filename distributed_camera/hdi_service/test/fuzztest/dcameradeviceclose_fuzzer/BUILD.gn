@@ -17,7 +17,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraDeviceCloseFuzzTest") {
-  module_out_path = "distributed_camera/dcameradeviceclose"
+  module_out_path = "${fuzz_test_output_path}/dcameradeviceclose"
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameradeviceclose_fuzzer"
 

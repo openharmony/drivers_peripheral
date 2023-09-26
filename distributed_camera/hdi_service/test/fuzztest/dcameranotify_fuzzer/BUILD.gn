@@ -17,7 +17,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraNotifyFuzzTest") {
-  module_out_path = "distributed_camera/dcameranotify"
+  module_out_path = "${fuzz_test_output_path}/dcameranotify"
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameranotify_fuzzer"
 

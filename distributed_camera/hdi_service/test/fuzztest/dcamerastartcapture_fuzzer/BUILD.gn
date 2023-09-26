@@ -17,7 +17,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraStartCaptureFuzzTest") {
-  module_out_path = "distributed_camera/dcamerastartcapture"
+  module_out_path = "${fuzz_test_output_path}/dcamerastartcapture"
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcamerastartcapture_fuzzer"
 
