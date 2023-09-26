@@ -26,12 +26,14 @@
         "ipc",
         "drivers_interface_display",
         "graphic_chipsetsdk",
-        "hilog",
         "init",
         "memory_utils",
         "hitrace",
         "googletest",
         "thirdparty_benchmark"
+      ],
+      "third_party": [
+        "libdrm"
       ]
     },
     "build": {

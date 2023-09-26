@@ -28,6 +28,9 @@ namespace Composer {
 namespace V1_0 {
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
+#ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
+#define DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY "libdisplay_composer_vdi_impl_default.z.so"
+#endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
 #define DISPLAY_COMPOSER_VDI_LIBRARY "libdisplay_composer_vdi_impl.z.so"
 class IDisplayComposerVdi {
 public:
