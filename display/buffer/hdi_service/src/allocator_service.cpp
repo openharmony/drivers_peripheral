@@ -68,10 +68,15 @@ int32_t AllocatorService::LoadVdi()
     }
 #ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
-    DISPLAY_LOGI("display buffer load default vdi library: %{public}s", DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY);
-#else
-    libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY);
-    DISPLAY_LOGI("display buffer load vendor vdi library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+    if (libHandle_ == nullptr) {
+        DISPLAY_LOGE("display buffer load vendor vdi default library failed: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+#endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
+        libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY);
+        DISPLAY_LOGI("display buffer load vendor vdi library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+#ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
+    } else {
+        DISPLAY_LOGI("display buffer load vendor vdi default library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+    }
 #endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 

@@ -14,8 +14,8 @@
 import("./../display_config.gni")
 
 group("display_composer_entry") {
-  deps = [
-    "hdi_service:display_composer_hdi_service",
-    "vdi_base:display_composer_vdi_impl_default",
-  ]
+  deps = [ "hdi_service:display_composer_hdi_service" ]
+  if (drivers_peripheral_display_vdi_default) {
+    deps += [ "vdi_base:display_composer_vdi_impl_default" ]
+  }
 }

@@ -13,10 +13,13 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../display_config.gni")
 
 root_path = "../../../../.."
 
 ohos_shared_library("display_composer_vdi_impl_default") {
+  defines = []
+  defines += display_defines
   sources = [
     "src/display_composer_vdi_impl.cpp",
     "src/drm_connector.cpp",

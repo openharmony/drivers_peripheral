@@ -13,10 +13,18 @@
 
 declare_args() {
   drivers_peripheral_display_community = false
+  drivers_peripheral_display_vdi_default = false
 }
 
 if (drivers_peripheral_display_community) {
   display_defines = [ "DISPLAY_COMMUNITY" ]
 } else {
   display_defines = []
+}
+
+if (drivers_peripheral_display_vdi_default) {
+  display_defines += [
+    "COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE",
+    "BUFFER_VDI_DEFAULT_LIBRARY_ENABLE",
+  ]
 }
