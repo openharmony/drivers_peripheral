@@ -24,7 +24,7 @@
 using namespace std;
 
 namespace OHOS::Camera {
-const std::string DUMP_PATH = "/data/camera/";
+const std::string DUMP_PATH = "/data/local/tmp/";
 constexpr uint32_t ARGS_MAX_NUM = 5;
 constexpr uint32_t PATH_MAX_LEN = 200;
 constexpr int32_t READ_DISKINFO_NUM = 6;
