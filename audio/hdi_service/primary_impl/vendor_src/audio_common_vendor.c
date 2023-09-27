@@ -62,7 +62,7 @@ void AudioHwiCommonAttrsToHwiAttrs(const struct AudioSampleAttributes *attrs, st
         hwiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         hwiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         hwiAttrs->offloadInfo.format = (enum AudioHwiFormat)attrs->offloadInfo.format;
-        hwiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        hwiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         hwiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
 }
@@ -426,7 +426,7 @@ int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttribut
         hwiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         hwiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         hwiAttrs->offloadInfo.format = (enum AudioHwiFormat)attrs->offloadInfo.format;
-        hwiAttrs->offloadInfo.offloadBuffersize = attrs->offloadInfo.offloadBuffersize;
+        hwiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         hwiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
     return HDF_SUCCESS;
@@ -457,7 +457,7 @@ int32_t AudioHwiCommonHwiSampleAttrToSampleAttr(const struct AudioHwiSampleAttri
         attrs->offloadInfo.bitRate = hwiAttrs->offloadInfo.bitRate;
         attrs->offloadInfo.bitWidth = hwiAttrs->offloadInfo.bitWidth;
         attrs->offloadInfo.format = (enum AudioFormat)hwiAttrs->offloadInfo.format;
-        attrs->offloadInfo.offloadBuffersize = hwiAttrs->offloadInfo.offloadBuffersize;
+        attrs->offloadInfo.offloadBufferSize = hwiAttrs->offloadInfo.offloadBufferSize;
         attrs->offloadInfo.duration = hwiAttrs->offloadInfo.duration;
     }
     return HDF_SUCCESS;
