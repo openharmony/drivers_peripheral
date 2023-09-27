@@ -97,14 +97,14 @@ static void AudioManagerReleaseVdiDesc(struct AudioAdapterDescriptorVdi *vdiDesc
 #endif
 }
 
-static void AudioManagerReleaseVdiDescs(struct AudioAdapterDescriptorVdi *vdiDescs, uint32_t descsCount)
+static void AudioManagerReleaseVdiDescs(struct AudioAdapterDescriptorVdi *vdiDescs, uint32_t vdiDescsCount)
 {
-    if (descsCount == 0 || descsCount > AUDIO_VDI_PORT_NUM_MAX) {
+    if (vdiDescsCount == 0 || vdiDescsCount > AUDIO_VDI_PORT_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio vdiManager vdiDescsCount is invalid");
         return;
     }
 
-    for (uint32_t i = 0; i < descsCount; i++) {
+    for (uint32_t i = 0; i < vdiDescsCount; i++) {
         AudioManagerReleaseVdiDesc(&vdiDescs[i]);
     }
 }
