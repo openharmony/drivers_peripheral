@@ -106,6 +106,7 @@ public:
     int32_t Init(DrmDevice &drmDevice);
     int GetCrtcProp(DrmDevice &drmDevice);
     int GetSrcProp(DrmDevice &drmDevice);
+    int GetNameProp(DrmDevice &drmDevice);
     uint32_t GetId() const
     {
         return mId;

@@ -56,16 +56,16 @@ int32_t DrmCrtc::Init(DrmDevice &drmDevice)
     ret = drmDevice.GetCrtcProperty(*this, "PLANE_MASK", prop);
     if (ret != DISPLAY_SUCCESS) {
         DISPLAY_LOGE("Failed to get plane_mask property");
-    } else {
-        for (int i = 0; i < static_cast<int>(ARRAY_SIZE(planeMaskNames)); i++) {
-            for (auto &drmEnum : prop.enums) {
-                if (!strncmp(drmEnum.name.c_str(), (const char*)planeMaskNames[i].name,
-                             strlen(drmEnum.name.c_str())) && (prop.value & (1LL << drmEnum.value)) > 0) {
+        return DISPLAY_SUCCESS;
+    }
+
+    for (int i = 0; i < static_cast<int>(ARRAY_SIZE(planeMaskNames)); i++) {
+        for (auto &drmEnum : prop.enums) {
+            if (!strncmp(drmEnum.name.c_str(), (const char*)planeMaskNames[i].name,
+                strlen(drmEnum.name.c_str())) && (prop.value & (1LL << drmEnum.value)) > 0) {
                     mPlaneMask |=  static_cast<int>(planeMaskNames[i].mask);
                     DISPLAY_LOGI("crtc id %{public}d, plane name %{public}s value %{public}llx",
-                                 GetId(), (const char*)planeMaskNames[i].name,
-                                 (long long)planeMaskNames[i].mask);
-                }
+                        GetId(), (const char*)planeMaskNames[i].name, (long long)planeMaskNames[i].mask);
             }
         }
     }

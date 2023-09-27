@@ -15,8 +15,8 @@ import("//build/ohos.gni")
 import("./../display_config.gni")
 
 group("display_buffer_entry") {
-  deps = [
-    "hdi_service:hdf_display_buffer_service",
-    "vdi_base:display_buffer_vdi_impl_default",
-  ]
+  deps = [ "hdi_service:hdf_display_buffer_service" ]
+  if (drivers_peripheral_display_vdi_default) {
+    deps += [ "vdi_base:display_buffer_vdi_impl_default" ]
+  }
 }

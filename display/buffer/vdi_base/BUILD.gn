@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../display_config.gni")
 
 root_path = "../../../../.."
 
@@ -21,6 +22,8 @@ config("libdisplay_buffer_vdi_impl_default_config") {
 }
 
 ohos_shared_library("display_buffer_vdi_impl_default") {
+  defines = []
+  defines += display_defines
   sources = [
     "src/display_buffer_vdi_impl.cpp",
     "src/display_gralloc_gbm.cpp",
