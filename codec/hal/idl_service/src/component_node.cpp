@@ -565,7 +565,7 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBu
 
 void ComponentNode::WaitStateChange(CodecStateType objState, CodecStateType &status)
 {
-    int32_t ret = GetState(status);
+    int32_t ret;
     uint32_t count = 0;
     while (status != objState && count < maxStateWaitCount) {
         usleep(maxStateWaitTime);
@@ -589,7 +589,7 @@ void ComponentNode::ReleaseOMXResource()
         return;
     }
     CodecStateType status = CODEC_STATE_INVALID;
-    int32_t ret = 0;
+    int32_t ret = GetState(status);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("ReleaseOMXResource GetState error [%{public}x]", ret);
         return;
