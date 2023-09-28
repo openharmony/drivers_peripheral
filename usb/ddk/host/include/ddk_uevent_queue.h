@@ -27,7 +27,7 @@ struct DdkUeventInfo {
     const char *devNum;
     const char *busNum;
 };
-int32_t DdkUeventStartDispatchThread();
+int32_t DdkUeventStartDispatchThread(void);
 int32_t DdkUeventAddTask(const struct DdkUeventInfo *info);
 #ifdef __cplusplus
 }
