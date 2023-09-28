@@ -22,7 +22,6 @@
 #include "refbase.h"
 #include "v1_1/ipower_interface.h"
 #include "v1_1/running_lock_types.h"
-
 namespace OHOS {
 namespace HDI {
 namespace Power {

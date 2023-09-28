@@ -41,6 +41,20 @@ public:
         return type_;
     }
 private:
+    enum ChangedType {
+        NOTIFY_RUNNINGLOCK_ADD,
+        NOTIFY_RUNNINGLOCK_REMOVE,
+        NOTIFY_RUNNINGLOCK_OVERTIME,
+        RUNNINGLOCK_CHANGED_BUTT
+    };
+    enum class RunningLockState : uint32_t {
+        RUNNINGLOCK_STATE_DISABLE = 0,
+        RUNNINGLOCK_STATE_ENABLE = 1,
+    };
+    void NotifyHiView(const RunningLockInfo &info, ChangedType changeType, RunningLockState state);
+    const std::array<std::string, RUNNINGLOCK_CHANGED_BUTT> runninglockNotifyStr_ {
+        "DUBAI_TAG_RUNNINGLOCK_ADD", "DUBAI_TAG_RUNNINGLOCK_REMOVE", "DUBAI_TAG_RUNNINGLOCK_OVERTIME"
+    };
     const RunningLockType type_;
     const std::string tag_;
     uint32_t counter_;
