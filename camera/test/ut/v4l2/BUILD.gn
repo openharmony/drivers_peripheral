@@ -115,6 +115,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/test_camera_base.cpp",
       "$ut_root_path/v4l2/usb_camera_test.cpp",
       "$ut_root_path/v4l2/usb_camera_test_mult.cpp",
+      "$ut_root_path/v4l2/usb_camera_vendor_tag_test.cpp",
     ]
 
     include_dirs = [
@@ -169,6 +170,7 @@ if (defined(ohos_lite)) {
 
       # metadata manager includes
       "$camera_path/metadata_manager/include",
+      "$camera_path/adapter/platform/v4l2/src/device_manager/include/",
     ]
 
     deps = [
