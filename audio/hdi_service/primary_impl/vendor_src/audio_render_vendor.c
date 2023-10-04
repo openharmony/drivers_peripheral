@@ -33,8 +33,6 @@ struct AudioRenderInfo {
     struct AudioHwiRender *hwiRender;
     uint32_t renderId;
     unsigned int usrCount;
-    struct IAudioCallback *callback;
-    bool isRegCb;
 };
 
 struct AudioHwiRenderPriv {
@@ -187,42 +185,6 @@ int32_t AudioHwiRenderGetChannelMode(struct IAudioRender *render, enum AudioChan
     }
 
     return ret;
-}
-
-static int32_t AudioHwiRenderCallback(enum  AudioHwiCallbackType type, void *reserved, void *cookie)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(cookie, HDF_ERR_INVALID_PARAM);
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)cookie;
-    struct IAudioCallback *cb = renderInfo->callback;
-    CHECK_NULL_PTR_RETURN_VALUE(cb, HDF_ERR_INVALID_PARAM);
-    int8_t newCookie = 0;
-    int8_t newReserved = 0;
-    int32_t ret = cb->RenderCallback(cb, (enum AudioCallbackType)type, &newReserved, &newCookie);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render AudioHwiRenderCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t AudioHwiRenderRegCallback(struct IAudioRender *render, struct IAudioCallback *audioCallback, int8_t cookie)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(audioCallback, HDF_ERR_INVALID_PARAM);
-
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    struct IAudioRender *hwiRender = renderInfo->hwiRender;
-    CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(hwiRender->RegCallback, HDF_ERR_INVALID_PARAM);
-
-    int32_t ret = hwiRender->RegCallback(hwiRender, AudioHwiRenderCallback, (void *)render);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("audio render regCallback fail, ret=%{public}d", ret);
-        return HDF_FAILURE;
-    }
-    renderInfo->callback = audioCallback;
-    renderInfo->isRegCb = true;
-    return HDF_SUCCESS;
 }
 
 int32_t AudioHwiRenderDrainBuffer(struct IAudioRender *render, enum AudioDrainNotifyType *type)
@@ -810,15 +772,6 @@ int32_t AudioHwiRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool
     return hwiRender->control.IsSupportsPauseAndResume(hwiRender, supportPause, supportResume);
 }
 
-int32_t AudioHwiRenderSetbufferSize(struct IAudioRender *render, uint32_t size)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
-    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
-    struct IAudioHwiRender *hwiRender = renderInfo->hwiRender;
-    CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
-    return hwiRender->control.SetBufferSize(hwiRender, size);
-}
-
 static void AudioHwiInitRenderInstance(struct IAudioRender *render)
 {
     render->GetLatency = AudioHwiGetLatency;
@@ -826,7 +779,6 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetRenderPosition = AudioHwiGetRenderPosition;
     render->SetRenderSpeed = AudioHwiSetRenderSpeed;
     render->GetRenderSpeed = AudioHwiGetRenderSpeed;
-    render->RegCallback = AudioHwiRenderRegCallback;    
     render->SetChannelMode = AudioHwiRenderSetChannelMode;
     render->GetChannelMode = AudioHwiRenderGetChannelMode;
     render->DrainBuffer = AudioHwiRenderDrainBuffer;
@@ -860,7 +812,6 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->TurnStandbyMode = AudioHwiRenderTurnStandbyMode;
     render->AudioDevDump = AudioHwiRenderAudioDevDump;
     render->IsSupportsPauseAndResume = AudioHwiRenderIsSupportsPauseAndResume;
-    render->SetBufferSize = AudioHwiRenderSetBufferSize;
 }
 
 struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
@@ -950,8 +901,6 @@ struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
     priv->renderInfos[*renderId]->renderId = *renderId;
     priv->renderInfos[*renderId]->usrCount = 1;
-    priv->renderInfos[*renderId]->callback = NULL;
-    priv->renderInfos[*renderId]->isRegCb = false;
     render = &(priv->renderInfos[*renderId]->render);
     AudioHwiInitRenderInstance(render);
 
@@ -994,8 +943,7 @@ void AudioHwiDestroyRenderById(uint32_t renderId)
     priv->renderInfos[renderId]->desc.desc = NULL;
     priv->renderInfos[renderId]->desc.portId = UINT_MAX;
     priv->renderInfos[renderId]->desc.pins = PIN_NONE;
-    priv->renderInfos[renderId]->callback = NULL;
-    priv->renderInfos[renderId]->isRegCb = false;
+
     OsalMemFree(priv->renderInfos[renderId]);
     priv->renderInfos[renderId] = NULL;
 }
