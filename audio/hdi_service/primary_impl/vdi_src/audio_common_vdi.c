@@ -55,15 +55,6 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     vdiAttrs->silenceThreshold = attrs->silenceThreshold;
     vdiAttrs->streamId = attrs->streamId;
     vdiAttrs->sourceType = attrs->sourceType;
-    if (vdiAttrs->type == AUDIO_VDI_OFFLOAD) {
-        vdiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
-        vdiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
-        vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
-        vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
-        vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;
-        vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
-        vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
-    }
 }
 
 int32_t AudioCommonPortToVdiPortVdi(const struct AudioPort *port, struct AudioPortVdi *vdiPort)
@@ -415,15 +406,7 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
     vdiAttrs->silenceThreshold = attrs->silenceThreshold;
     vdiAttrs->streamId = attrs->streamId;
     vdiAttrs->sourceType = attrs->sourceType;
-    if (vdiAttrs->type == AUDIO_VDI_OFFLOAD) {
-        vdiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
-        vdiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
-        vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
-        vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
-        vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;
-        vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
-        vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
-    }
+
     return HDF_SUCCESS;
 }
 
