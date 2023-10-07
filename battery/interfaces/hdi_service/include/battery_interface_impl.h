@@ -50,6 +50,11 @@ public:
     int32_t GetTechnology(std::string& technology) override;
     int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit) override;
     int32_t GetChargeType(ChargeType& chargeType) override;
+    
+    int32_t SetBatteryConfig(const std::string& sceneName, const std::string& value) override;
+    int32_t GetBatteryConfig(const std::string& sceneName, std::string& value) override;
+    int32_t IsBatteryConfigSupported(const std::string& sceneName, bool& value) override;
+    
     class BatteryDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit BatteryDeathRecipient(
@@ -60,14 +65,11 @@ public:
         wptr<BatteryInterfaceImpl> interfaceImpl_;
     };
 private:
-    std::unique_ptr<OHOS::HDI::Battery::V1_2::PowerSupplyProvider> provider_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_2::PowerSupplyProvider> powerSupplyProvider_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V1_2::BatteryThread> loop_ = nullptr;
     sptr<IBatteryCallback> batteryCallback_ = nullptr;
     int32_t AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
     int32_t RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
-    std::string currentPath_;
-    std::string voltagePath_;
-    std::string chargeTypePath_;
 };
 } // V1_2
 } // Battery
