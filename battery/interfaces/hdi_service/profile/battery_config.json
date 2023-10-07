@@ -36,5 +36,20 @@
         "type": {
             "path": "/data/service/el0/battery/charger_type"
         }
+    },
+    "charge_scene" :{
+        "wireless": {
+            "support": {
+                "path": "",
+                "type": "",
+                "expect_value": ""
+            },
+            "get": {
+                "path": ""
+            },
+            "set": {
+                "path": ""
+            }
+        }
     }
 }
