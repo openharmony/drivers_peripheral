@@ -69,6 +69,7 @@ static FuzzWlanFuncs g_fuzzWlanFuncs[] = {
     FuzzGetStaInfo,
     FuzzGetChannelMeasResult,
     FuzzSetScanningMacAddress,
+    FuzzResetToFactoryMacAddress,
 };
 
 static void FuncToOptimal(struct IWlanInterface *interface, uint32_t cmdId, const uint8_t *data)

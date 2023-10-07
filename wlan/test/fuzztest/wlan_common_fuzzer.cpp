@@ -250,6 +250,13 @@ void FuzzGetStaInfo(struct IWlanInterface *interface, const uint8_t *rawData)
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
+void FuzzResetToFactoryMacAddress(struct IWlanInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
+    interface->ResetToFactoryMacAddress(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
 void FuzzGetChannelMeasResult(struct IWlanInterface *interface, const uint8_t *rawData)
 {
     const char *ifName = reinterpret_cast<const char *>(rawData);
