@@ -369,6 +369,54 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
     }
 }
 
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetApBandwidth001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiAp *apFeature = nullptr;
+    struct timespec tv1 = (struct timespec){0};
+    struct timespec tv2 = (struct timespec){0};
+    int timeUsed = 0;
+    uint8_t bandwidth = 0;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, apFeature);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = apFeature->getApBandwidth(apFeature->baseFeature.ifName, &bandwidth);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(COMMON_TIME, timeUsed);
+
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
+HWTEST_F(HdfWlanPerformanceTest, WifiHalResetToFactoryMacAddress001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiSta *staFeature = nullptr;
+    struct timespec tv1 = (struct timespec){0};
+    struct timespec tv2 = (struct timespec){0};
+    int timeUsed = 0;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    if (ret == HDF_SUCCESS) {
+        EXPECT_NE(nullptr, staFeature);
+        clock_gettime(CLOCK_REALTIME, &tv1);
+        ret = staFeature->baseFeature.resetToFactoryMacAddress(staFeature->baseFeature.ifName);
+        clock_gettime(CLOCK_REALTIME, &tv2);
+        timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
+            (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
+        EXPECT_GE(LONG_TIME, timeUsed);
+        EXPECT_NE(HDF_FAILURE, ret);
+
+        ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+}
+
 /**
  * @tc.name: WifiHalRegisterEventCallback001
  * @tc.desc: Wifi hal register callback function test

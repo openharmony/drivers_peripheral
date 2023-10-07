@@ -49,9 +49,18 @@ void FuzzSetCountryCode(struct IWlanInterface *interface, const uint8_t *rawData
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
+void FuzzGetApBandwidth(struct IWlanInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
+    uint8_t bandwidth;
+    interface->GetApBandwidth(interface, ifName, &bandwidth);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
 static FuzzWlanFuncs g_fuzzWlanFuncs[] = {
     FuzzGetAssociatedStas,
     FuzzSetCountryCode,
+    FuzzGetApBandwidth,
     FuzzGetChipId,
     FuzzGetDeviceMacAddress,
     FuzzGetFeatureType,
@@ -69,6 +78,7 @@ static FuzzWlanFuncs g_fuzzWlanFuncs[] = {
     FuzzGetFeatureByIfName,
     FuzzGetStaInfo,
     FuzzGetChannelMeasResult,
+    FuzzResetToFactoryMacAddress,
 };
 
 static void FuncToOptimal(struct IWlanInterface *interface, uint32_t cmdId, const uint8_t *data)
