@@ -1,0 +1,57 @@
+{
+    "name": "@ohos/drivers_peripheral_distributed_audio",
+    "description": "distributed audo device driver",
+    "version": "4.0",
+    "license": "Apache License 2.0",
+    "segment": {
+      "destPath":"drivers/peripheral/distributed_audio/"
+    },
+    "component": {
+      "name": "drivers_peripheral_distributed_audio",
+      "subsystem": "hdf",
+      "adapted_system_type": [
+        "standard"
+      ],
+      "rom": "1000KB",
+      "ram": "8000KB",
+      "deps": {
+        "components": [
+          "c_utils",
+          "drivers_interface_distributed_audio",
+          "hdf_core",
+          "hilog",
+          "ipc"
+        ],
+        "third_party": [
+          "cJSON"
+        ]
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/distributed_audio:distributed_audio_entry",
+          "//drivers/peripheral/distributed_audio/hdi_service/common:libdaudio_hdf_utils"
+        ],
+        "test": [
+          "//drivers/peripheral/distributed_audio/hdi_service/audio/v1_0/test/unittest:hdi_service_audio_test",
+          "//drivers/peripheral/distributed_audio/hdi_service/audio_ext/v1_0/test/unittest:hdi_service_audio_ext_test",
+          "//drivers/peripheral/distributed_audio/hdi_service/audio/v1_0/test/fuzztest:fuzztest"
+        ],
+        "inner_kits": [
+          {
+            "name": "//drivers/interface/distributed_audio/audio/v1_0:libdaudio_proxy_1.0",
+            "header": {
+              "header_files": [],
+              "header_base": "//drivers/interface/distributed_audio/audio"
+            }
+          },
+          {
+            "name": "//drivers/interface/distributed_audio/audioext/v1_0:libdaudioext_proxy_1.0",
+            "header": {
+              "header_files": [],
+              "header_base": "//drivers/interface/distributed_audio/audioext"
+            }
+          }
+        ]
+      }
+    }
+}
