@@ -495,9 +495,9 @@ struct GnssVendorDevice {
 /* Status of AGNSS. */
 typedef struct {
     size_t size;
-    /* See AgnssClass for the definition of agnss_type */
+    /* See AgnssClass for the definition of agnssType */
     uint16_t agnssType;
-    /* See AgnssDataConnStatus for the definition of conn_status. */
+    /* See AgnssDataConnStatus for the definition of connStatus. */
     uint16_t connStatus;
     /* IPv4 address. */
     uint32_t ipaddr;
@@ -565,7 +565,7 @@ typedef struct {
 /*
  * The callback associated with the geofence.
  * Parameters:
- *      geofence_id - The id associated with the add_gnss_geofence.
+ *      geofenceId - The id associated with the add_gnss_geofence.
  *      location    - The current GNSS location.
  *      event  - Can be one of GEOFENCE_EVENT_UNCERTAIN, GEOFENCE_EVENT_ENTERED,
  *                    GEOFENCE_EVENT_EXITED.
@@ -578,15 +578,15 @@ typedef void (* geofence_event_callback)(int32_t geofenceId,  GnssLocation* loca
  * Callback function that indicates whether the geofence service is available.
  *
  * Parameters:
- *  is_available is true when gnss geofence service is available.
+ *  isAvailable is true when gnss geofence service is available.
  */
 typedef void (* geofence_availability_callback)(bool isAvailable);
 
 /*
  * Callback function indicating the result of the geofence operation
  *
- * geofence_id - Id of the geofence.
- * operate_type - geofence operate type.
+ * geofenceId - Id of the geofence.
+ * operateType - geofence operate type.
  * result - GEOFENCE_OPERATION_SUCCESS
  *          GEOFENCE_OPERATION_ERROR_TOO_MANY_GEOFENCES  - geofence limit has been reached.
  *          GEOFENCE_OPERATION_ERROR_GEOFENCE_ID_EXISTS  - geofence with id already exists
@@ -614,10 +614,10 @@ typedef struct {
     /*
      * Add a geofence area. This api currently supports circular geofences.
      * Parameters:
-     *    geofence_id - The id for the geofence.
-     *    latitude, longtitude, radius_meters - The lat, long and radius
+     *    geofenceId - The id for the geofence.
+     *    latitude, longtitude, radius - The lat, long and radius
      *       (in meters) for the geofence
-     *    monitor_event - Which transitions to monitor. Bitwise OR of
+     *    monitorEvent - Which transitions to monitor. Bitwise OR of
      *       GEOFENCE_EVENT_UNCERTAIN, GEOFENCE_EVENT_ENTERED and
      *       GEOFENCE_EVENT_EXITED.
      */
@@ -626,7 +626,7 @@ typedef struct {
 
     /*
      * Remove a gnss geofence.
-     * geofence_id - The id for the geofence.
+     * geofenceId - The id for the geofence.
      * Return true if delete successful.
      */
     bool (* delete_gnss_geofence)(int32_t geofenceId);
