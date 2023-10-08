@@ -19,9 +19,7 @@
 #include <hdf_base.h>
 #include <memory.h>
 #include <securec.h>
-#include <unistd.h>
 #include "codec_log_wrapper.h"
-
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -31,23 +29,16 @@ CodecOMXCore::~CodecOMXCore()
         dlclose(libHandle_);
     }
 }
-int32_t CodecOMXCore::Init(const char *libPath)
+int32_t CodecOMXCore::Init(const std::string &libName)
 {
-    char pathBuff[PATH_MAX] = {'\0'};
-
-    if (libPath == NULL) {
+    if (libName.empty()) {
         CODEC_LOGE("param is empty");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (realpath(libPath, pathBuff) == NULL) {
-        CODEC_LOGE("path is empty");
-        return HDF_FAILURE;
-    }
-
-    libHandle_ = dlopen(pathBuff, RTLD_LAZY);
+    libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);
     if (libHandle_ == nullptr) {
-        CODEC_LOGE("Failed to dlopen %{public}s.", pathBuff);
+        CODEC_LOGE("Failed to dlopen %{public}s.", libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
 
