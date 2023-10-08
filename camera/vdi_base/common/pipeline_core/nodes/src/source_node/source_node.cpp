@@ -295,8 +295,15 @@ void SourceNode::PortHandler::DistributeBuffers()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::unique_lock<std::mutex> l(rblock);
-        rbcv.wait(l, [this] { return !dbtRun || !respondBufferList.empty(); });
-        if (!dbtRun) {
+        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(5000); // 5000ms
+        if (!rbcv.wait_until(l, timeout, [this] {
+            return (!dbtRun || !respondBufferList.empty());
+            })) {
+            CAMERA_LOGE("DistributeBuffers timeout, dbtRun=%{public}d, respondBufferList size=%{public}d",
+                dbtRun.load(std::memory_order_acquire), respondBufferList.size());
+        }
+
+        if (!dbtRun || respondBufferList.empty()) {
             return;
         }
 
