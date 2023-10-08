@@ -24,7 +24,7 @@ namespace Codec {
 namespace Omx {
 typedef struct {
     std::string attrName;
-    int32_t value;
+    int32_t &value;
     uint32_t defaultValue;
 } ConfigUintNodeAttr;
 typedef struct {
