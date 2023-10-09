@@ -247,6 +247,10 @@ int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<VdiStreamInfo> &s
             CAMERA_LOGE("configure stream %{public}d failed", it.streamId_);
             return INVALID_ARGUMENT;
         }
+        if (it.bufferQueue_ == nullptr) {
+            CAMERA_LOGE("stream [id:%{public}d] bufferQueue_ is nullptr", it.streamId_);
+            return INVALID_ARGUMENT;
+        }
         if (!scg.tunnelMode && (it.bufferQueue_)->producer_ != nullptr) {
             CAMERA_LOGE("stream [id:%{public}d] is not tunnel mode, can't bind a buffer producer", it.streamId_);
             return INVALID_ARGUMENT;
