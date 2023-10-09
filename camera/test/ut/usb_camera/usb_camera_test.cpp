@@ -1030,3 +1030,99 @@ TEST_F(UtestUSBCameraTest, camera_usb_0032)
         cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
     }
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Open the capture stream for both cameras at the same time.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0033)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[i]);
+        ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+        // Get the stream manager
+        cameraBase_->AchieveStreamOperator();
+        // start stream
+        cameraBase_->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraBase_->StartStream(cameraBase_->intents);
+        // Get preview
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
+        // release stream
+        cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE,
+        cameraBase_->CAPTURE_ID_VIDEO};
+        cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE,
+        cameraBase_->STREAM_ID_VIDEO};
+        cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: One camera starts capturing and the other camera starts recording.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0034)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+
+    if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[0]);
+    ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+
+    cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[1]);
+    ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    cameraBase_->StartStream(cameraBase_->intents);
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE,
+    cameraBase_->CAPTURE_ID_VIDEO};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE,
+    cameraBase_->STREAM_ID_VIDEO};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
