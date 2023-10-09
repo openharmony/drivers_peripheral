@@ -45,6 +45,7 @@ void FuzzResetDriver(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzStartChannelMeas(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzSetProjectionScreenParam(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzWifiSendCmdIoctl(struct IWlanInterface *interface, const uint8_t *rawData);
+void FuzzResetToFactoryMacAddress(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzGetFeatureByIfName(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzGetStaInfo(struct IWlanInterface *interface, const uint8_t *rawData);
 void FuzzGetChannelMeasResult(struct IWlanInterface *interface, const uint8_t *rawData);
