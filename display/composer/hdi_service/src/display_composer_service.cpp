@@ -83,10 +83,16 @@ int32_t DisplayComposerService::LoadVdi()
     }
 #ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
-    DISPLAY_LOGI("composer load default vdi library: %{public}s", DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
-#else
-    libHandle_ = dlopen(DISPLAY_COMPOSER_VDI_LIBRARY, RTLD_LAZY);
-    DISPLAY_LOGI("composer load vendor vdi library: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
+    if (libHandle_ == nullptr) {
+        DISPLAY_LOGE("composer load vendor vdi default library failed: %{public}s",
+            DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
+#endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
+        libHandle_ = dlopen(DISPLAY_COMPOSER_VDI_LIBRARY, RTLD_LAZY);
+        DISPLAY_LOGI("composer load vendor vdi library: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
+#ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
+    } else {
+        DISPLAY_LOGI("composer load vendor vdi default library: %{public}s", DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
+    }
 #endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 

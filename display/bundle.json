@@ -16,7 +16,8 @@
     "rom": "1260KB",
     "ram": "7700KB",
     "features": [
-      "drivers_peripheral_display_community"
+      "drivers_peripheral_display_community",
+      "drivers_peripheral_display_vdi_default"
     ],
     "deps": {
       "components": [
