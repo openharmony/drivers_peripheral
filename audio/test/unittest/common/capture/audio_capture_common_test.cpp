@@ -730,7 +730,11 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetSampleAttributes001, TestSize.Lev
     EXPECT_NE(capture_->SetSampleAttributes, nullptr);
 
     int32_t ret = capture_->SetSampleAttributes(capture_, &attrs);
+#ifdef ALSA_SUPPORT_FEATURE
+    EXPECT_EQ(ret, HDF_SUCCESS);
+#else
     EXPECT_NE(ret, HDF_SUCCESS);
+#endif
 
     ret = capture_->SetSampleAttributes(capture_, nullptr);
     EXPECT_NE(ret, HDF_SUCCESS);
