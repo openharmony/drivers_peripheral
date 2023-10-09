@@ -296,14 +296,17 @@ bool DrmDevice::HandleHotplug(uint32_t dispId, bool plugIn)
             break;
         }
     }
-    if (find) {
-        for (auto &connectorPair : mConnectors) {
-            auto connector = connectorPair.second;
-            if (connectorId == connector->GetId()) {
-                if (connector->HandleHotplug(mEncoders, mCrtcs, plugIn) == true) {
-                    connector->Init(*this);
-                    return true;
-                }
+
+    if (find == 0) {
+        return false;
+    }
+
+    for (auto &connectorPair : mConnectors) {
+        auto connector = connectorPair.second;
+        if (connectorId == connector->GetId()) {
+            if (connector->HandleHotplug(mEncoders, mCrtcs, plugIn) == true) {
+                connector->Init(*this);
+                return true;
             }
         }
     }

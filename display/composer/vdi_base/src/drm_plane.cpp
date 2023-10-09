@@ -90,7 +90,7 @@ int DrmPlane::GetCrtcProp(DrmDevice &drmDevice)
     return 0;
 }
 
-int  DrmPlane::GetSrcProp(DrmDevice &drmDevice)
+int DrmPlane::GetSrcProp(DrmDevice &drmDevice)
 {
     int32_t ret;
     int32_t src_x, src_y, src_w, src_h;
@@ -122,31 +122,14 @@ int  DrmPlane::GetSrcProp(DrmDevice &drmDevice)
     return 0;
 }
 
-int32_t DrmPlane::Init(DrmDevice &drmDevice)
+int DrmPlane::GetNameProp(DrmDevice &drmDevice)
 {
-    DISPLAY_LOGD();
     int32_t ret;
-    uint32_t find_name = 0;
     DrmProperty prop;
-    GetCrtcProp(drmDevice);
-    GetSrcProp(drmDevice);
-    ret = drmDevice.GetPlaneProperty(*this, PROP_FBID, prop);
-    mPropFbId = prop.propId;
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not get plane fb id"));
-    ret = drmDevice.GetPlaneProperty(*this, PROP_IN_FENCE_FD, prop);
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get plane in fence prop id"));
-    mPropFenceInId = prop.propId;
-    ret = drmDevice.GetPlaneProperty(*this, PROP_CRTC_ID, prop);
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
-    mPropCrtcId = prop.propId;
-
-    ret = drmDevice.GetPlaneProperty(*this, PROP_ZPOS_ID, prop);
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
-    mPropZposId = prop.propId;
-
     ret = drmDevice.GetPlaneProperty(*this, "NAME", prop);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
 
+    uint32_t find_name = 0;
     for (int i = 0; i < static_cast<int>ARRAY_SIZE(planeTypeNames); i++) {
         find_name = 0;
 
@@ -165,6 +148,32 @@ int32_t DrmPlane::Init(DrmDevice &drmDevice)
             break;
         }
     }
+
+    return 0;
+}
+
+int32_t DrmPlane::Init(DrmDevice &drmDevice)
+{
+    DISPLAY_LOGD();
+    int32_t ret;
+    DrmProperty prop;
+    GetCrtcProp(drmDevice);
+    GetSrcProp(drmDevice);
+    GetNameProp(drmDevice);
+
+    ret = drmDevice.GetPlaneProperty(*this, PROP_FBID, prop);
+    mPropFbId = prop.propId;
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not get plane fb id"));
+    ret = drmDevice.GetPlaneProperty(*this, PROP_IN_FENCE_FD, prop);
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get plane in fence prop id"));
+    mPropFenceInId = prop.propId;
+    ret = drmDevice.GetPlaneProperty(*this, PROP_CRTC_ID, prop);
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
+    mPropCrtcId = prop.propId;
+
+    ret = drmDevice.GetPlaneProperty(*this, PROP_ZPOS_ID, prop);
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
+    mPropZposId = prop.propId;
 
     ret = drmDevice.GetPlaneProperty(*this, PROP_TYPE, prop);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("cat not get pane crtc prop id"));
