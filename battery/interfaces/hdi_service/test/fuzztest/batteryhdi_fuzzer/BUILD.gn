@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("BatteryHdiFuzzTest") {
-  module_out_path = "drivers_peripheral_battery/battery"
+  module_out_path = "drivers_peripheral_battery/drivers_peripheral_battery"
   fuzz_config_file = "."
   include_dirs = [ "." ]
   cflags = [

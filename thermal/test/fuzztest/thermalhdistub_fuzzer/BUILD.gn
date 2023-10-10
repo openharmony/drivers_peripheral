@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("ThermalHdiStubFuzzTest") {
-  module_out_path = "drivers_peripheral_thermal/thermal"
+  module_out_path = "drivers_peripheral_thermal/drivers_peripheral_thermal"
   fuzz_config_file = "."
   include_dirs = [ "../../../interfaces/hdi_service/include" ]
   cflags = [
