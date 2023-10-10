@@ -246,12 +246,12 @@ int main(int argc, char** argv)
     auto mainDemo = std::make_shared<OhosCameraDemo>();
     rc = mainDemo->InitSensors();
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("main test: mainDemo->InitSensors() error\n");
+        CAMERA_LOGE("main test: mainDemo->InitSensors() error");
         return -1;
     }
     rc = mainDemo->InitCameraDevice();
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("main test: mainDemo->InitCameraDevice() error\n");
+        CAMERA_LOGE("main test: mainDemo->InitCameraDevice() error");
         return -1;
     }
     mainDemo->SetEnableResult();
