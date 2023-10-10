@@ -18,7 +18,6 @@
 #include "hdf_log.h"
 #include "v1_2/iwlan_interface.h"
 #include "v1_2/wlan_types.h"
-#include "wlan_callback_impl.h"
 #include "wifi_hal_base_feature.h"
 #include "securec.h"
 #include <osal_mem.h>
