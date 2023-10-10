@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../../audio.gni")
 
-module_output_path = "drivers_peripheral_audio/effect"
+module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 effect_config_path = "../../../config"
 
 ohos_fuzztest("EffectConfigFuzzTest") {

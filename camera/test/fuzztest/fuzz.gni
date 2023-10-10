@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../camera.gni")
-module_output_path = "hdf/camera"
+module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 
 include_dirs = [
   "$camera_path/include",
