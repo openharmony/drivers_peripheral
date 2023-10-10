@@ -17,6 +17,7 @@
 #include "buffer_manager.h"
 #include "idevice_manager.h"
 #include "inode.h"
+#include <mutex>
 
 namespace OHOS::Camera {
 class PortBase : public IPort {
@@ -52,6 +53,7 @@ public:
     }
     ~NodeBase() override
     {
+        CAMERA_LOGI("node dtor enter\n");
         for (const auto& it : portVec_) {
             it->DisConnect();
         }
@@ -87,6 +89,7 @@ protected:
     std::string type_;
     std::string cameraId_;
     std::vector<std::shared_ptr<IPort>> portVec_;
+    mutable std::mutex portLock_;
 };
 }
 #endif
