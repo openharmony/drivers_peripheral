@@ -119,6 +119,7 @@ std::string NodeBase::GetType() const
 
 std::shared_ptr<IPort> NodeBase::GetPort(const std::string& name)
 {
+    std::unique_lock<std::mutex> l(portLock_);
     auto it = std::find_if(portVec_.begin(), portVec_.end(),
                            [name](std::shared_ptr<IPort> p) { return p->GetName() == name; });
     if (it != portVec_.end()) {
@@ -169,20 +170,22 @@ RetCode NodeBase::Config(const int32_t streamId, const CaptureMeta& meta)
 
 int32_t NodeBase::GetNumberOfInPorts() const
 {
+    std::unique_lock<std::mutex> l(portLock_);
     int32_t re = std::count_if(portVec_.begin(), portVec_.end(), [](auto &it) { return it->Direction() == 0; });
     return re;
 }
 
 int32_t NodeBase::GetNumberOfOutPorts() const
 {
+    std::unique_lock<std::mutex> l(portLock_);
     int32_t re = std::count_if(portVec_.begin(), portVec_.end(), [](auto &it) { return it->Direction() == 1; });
     return re;
 }
 
 std::vector<std::shared_ptr<IPort>> NodeBase::GetInPorts() const
 {
+    std::unique_lock<std::mutex> l(portLock_);
     std::vector<std::shared_ptr<IPort>> re;
-
     std::copy_if(portVec_.begin(), portVec_.end(), std::back_inserter(re),
         [](auto &it) { return it->Direction() == 0; });
 
@@ -191,8 +194,8 @@ std::vector<std::shared_ptr<IPort>> NodeBase::GetInPorts() const
 
 std::vector<std::shared_ptr<IPort>> NodeBase::GetOutPorts()
 {
+    std::unique_lock<std::mutex> l(portLock_);
     std::vector<std::shared_ptr<IPort>> out = {};
-
     std::copy_if(portVec_.begin(), portVec_.end(), std::back_inserter(out),
         [](auto &it) { return it->Direction() == 1; });
 
