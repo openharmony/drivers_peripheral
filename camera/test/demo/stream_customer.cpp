@@ -22,7 +22,7 @@ StreamCustomer::~StreamCustomer() {}
 
 void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callback)
 {
-    CAMERA_LOGD("demo test:enter CamFrame thread ++ \n");
+    CAMERA_LOGD("demo test:enter CamFrame thread ++ ");
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     do {
         OHOS::SurfaceBuffer* buffer = consumer_->AcquireBuffer();
@@ -65,7 +65,7 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
     } while (camFrameExit_ == 0);
 #endif
 
-    CAMERA_LOGD("demo test:Exiting CamFrame thread -- \n");
+    CAMERA_LOGD("demo test:Exiting CamFrame thread -- ");
 }
 
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
@@ -106,11 +106,11 @@ RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(void*, uint32_t)
         camFrameExit_ = 0;
         previewThreadId_ = new (std::nothrow) std::thread(&StreamCustomer::CamFrame, this, callback);
         if (previewThreadId_ == nullptr) {
-            CAMERA_LOGE("demo test:ReceiveFrameOn failed\n");
+            CAMERA_LOGE("demo test:ReceiveFrameOn failed");
             return OHOS::Camera::RC_ERROR;
         }
     } else {
-        CAMERA_LOGD("demo test:ReceiveFrameOn loop thread is running\n");
+        CAMERA_LOGD("demo test:ReceiveFrameOn loop thread is running");
     }
     CAMERA_LOGD("demo test:ReceiveFrameOn exit");
 
@@ -119,7 +119,7 @@ RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(void*, uint32_t)
 
 void StreamCustomer::ReceiveFrameOff()
 {
-    CAMERA_LOGD("demo test:ReceiveFrameOff enter\n");
+    CAMERA_LOGD("demo test:ReceiveFrameOff enter");
 
     if (camFrameExit_ == 0) {
         camFrameExit_ = 1;
@@ -130,6 +130,6 @@ void StreamCustomer::ReceiveFrameOff()
         }
     }
 
-    CAMERA_LOGD("demo test:ReceiveFrameOff exit\n");
+    CAMERA_LOGD("demo test:ReceiveFrameOff exit");
 }
 }
