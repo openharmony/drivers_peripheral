@@ -33,13 +33,7 @@ ohos_unittest("WlanHdiServiceTestC") {
     "//third_party/googletest:gtest_main",
   ]
 
-  include_dirs = [
-    "include",
-    "$TEST_ROOT_DIR/interfaces/include",
-    "$TEST_ROOT_DIR/hdi_service",
-    "$TEST_ROOT_DIR/client/include",
-    "$TEST_ROOT_DIR/hal/include",
-  ]
+  include_dirs = [ "include" ]
 
   if (is_standard_system) {
     external_deps = [
