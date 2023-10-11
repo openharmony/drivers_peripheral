@@ -72,6 +72,11 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrame, HDF_ERR_INVALID_PARAM);
 
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
+    FILE *fpDump = fopen("/data/audio_dump_capture.pcm", "a+");
+    if (fpDump != NULL) {
+        fwrite(frame, frameLen, 1, fpDump);
+        fclose(fpDump);
+    }
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         return ret;

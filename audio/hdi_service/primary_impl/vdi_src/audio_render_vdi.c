@@ -89,7 +89,11 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
-
+    FILE *fpDump = fopen("/data/audio_dump_render.pcm", "a+");
+    if (fpDump != NULL) {
+        fwrite(frame, frameLen, 1, fpDump);
+        fclose(fpDump);
+    }
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
