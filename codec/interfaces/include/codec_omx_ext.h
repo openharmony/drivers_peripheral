@@ -163,6 +163,12 @@ struct PassthroughParam {
     int size;      /**< Parameter value size */
 };
 
+struct WorkingFrequencyParam {
+    uint32_t size;                        /** Size of the structure */
+    union OMX_VERSIONTYPE version;        /** Component version */
+    uint32_t level;                            /** Working Frequency level */
+};
+ 
 /**
  * @brief Enumerates the extended codec indexes.
  */
@@ -185,6 +191,7 @@ enum OmxIndexCodecExType {
     OMX_IndexParamVideoHevc,
     /** range/primary/transfer/matrix */
     OMX_IndexColorAspects,
+    OMX_IndexParamWorkingFrequency,
 };
 
 /**
