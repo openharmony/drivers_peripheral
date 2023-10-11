@@ -678,6 +678,13 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
         HDF_LOGE("%{public}s: scanResults is NULL!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
+    if (wifiScanResults->num == 0) {
+        scanResults->res = NULL;
+        scanResults->resLen = 0;
+        ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
+        HdfWifiScanResultsFree(scanResults, true);
+        return ret;
+    }
     scanResults->resLen = wifiScanResults->num;
     size = sizeof(struct HdfWifiScanResultExt);
     scanResults->res = (struct HdfWifiScanResultExt *)OsalMemCalloc(size * scanResults->resLen);

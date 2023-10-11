@@ -306,6 +306,10 @@ int32_t HalCmdGetFeatureByIfName(const char *ifName, struct IWiFiBaseFeature **i
         return HDF_ERR_INVALID_PARAM;
     }
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
+        if (networkNode == NULL) {
+            HDF_LOGE("%s: networkNode is NULL, line: %d", __FUNCTION__, __LINE__);
+            return HDF_FAILURE;
+        }
         if (strcmp(networkNode->ifName, ifName) == HDF_SUCCESS) {
             *ifeature = networkNode->ifeature;
             return HDF_SUCCESS;
