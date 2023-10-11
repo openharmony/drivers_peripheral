@@ -853,7 +853,11 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
-
+    FILE *fpDump = fopen("/data/audio_dump_render.pcm", "a+");
+    if (fpDump != NULL) {
+        fwrite(frame, frameLen, 1, fpDump);
+        fclose(fpDump);
+    }
     if (TimeToAudioTimeStamp(hwRender->renderParam.frameRenderMode.bufferFrameSize,
         &hwRender->renderParam.frameRenderMode.time,
         hwRender->renderParam.frameRenderMode.attrs.sampleRate) == HDF_FAILURE) {

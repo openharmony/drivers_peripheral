@@ -770,6 +770,11 @@ int32_t AudioCaptureCaptureFrame(
     *replyBytes = (uint32_t)hwCapture->captureParam.frameCaptureMode.bufferSize;
 
     hwCapture->captureParam.frameCaptureMode.frames += hwCapture->captureParam.frameCaptureMode.bufferFrameSize;
+    FILE *fpDump = fopen("/data/audio_dump_capture.pcm", "a+");
+    if (fpDump != NULL) {
+        fwrite(frame, frameLen, 1, fpDump);
+        fclose(fpDump);
+    }
     if (hwCapture->captureParam.frameCaptureMode.attrs.sampleRate == 0) {
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
