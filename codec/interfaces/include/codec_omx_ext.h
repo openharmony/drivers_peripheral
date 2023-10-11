@@ -191,6 +191,7 @@ enum OmxIndexCodecExType {
     OMX_IndexParamVideoHevc,
     /** range/primary/transfer/matrix */
     OMX_IndexColorAspects,
+    /** WorkingFrequencyParam */
     OMX_IndexParamWorkingFrequency,
 };
 
