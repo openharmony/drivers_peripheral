@@ -164,9 +164,9 @@ struct PassthroughParam {
 };
 
 struct WorkingFrequencyParam {
-    uint32_t size;                        /** Size of the structure */
-    union OMX_VERSIONTYPE version;        /** Component version */
-    uint32_t level;                            /** Working Frequency level */
+    uint32_t size;                    /** Size of the structure */
+    union OMX_VERSIONTYPE version;    /** Component version */
+    uint32_t level;                   /** Working Frequency level */
 };
  
 /**
