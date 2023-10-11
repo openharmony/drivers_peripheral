@@ -172,5 +172,5 @@ int32_t InitEventcallbackMutex(void);
 void DeinitEventcallbackMutex(void);
 void FreeScanResult(WifiScanResult *res);
 void FreeScanResults(WifiScanResults *res);
-
+int32_t InitScanResults(WifiScanResults *scanResults);
 #endif /* end of wifi_common_cmd.h */
