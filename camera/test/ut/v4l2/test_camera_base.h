@@ -155,6 +155,7 @@ public:
     void Init();
     void UsbInit();
     std::shared_ptr<CameraAbility> GetCameraAbility();
+    std::shared_ptr<CameraAbility> SelectGetCameraAbility(std::string cameraId);
     void OpenUsbCamera();
     CamRetCode SelectOpenCamera(std::string cameraId);
     void Close();
