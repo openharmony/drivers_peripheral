@@ -24,6 +24,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define PROCESS_NAME_LEN 50
+
 /**
  * @brief Enumerates the extended codec codingtyps.
  */
