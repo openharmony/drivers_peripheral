@@ -738,11 +738,7 @@ int32_t AudioCaptureCaptureFrame(
         AUDIO_FUNC_LOGE("Param is NULL Fail!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    FILE *fpDump = fopen("/data/audio_dump_capture.pcm", "a+");
-    if (fpDump != NULL) {
-        fwrite(frame, *frameLen, 1, fpDump);
-        fclose(fpDump);
-    }
+
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
