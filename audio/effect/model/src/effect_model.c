@@ -22,7 +22,7 @@
 #include "osal_mem.h"
 #include "parse_effect_config.h"
 
-#define AUDIO_EFFECT_CONFIG  HDF_CHIP_PROD_CONFIG_DIR"/audio_effect.json"
+#define AUDIO_EFFECT_CONFIG  HDF_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 struct ConfigDescriptor *g_cfgDescs = NULL;
 
