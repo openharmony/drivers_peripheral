@@ -853,7 +853,6 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
-    
     if (TimeToAudioTimeStamp(hwRender->renderParam.frameRenderMode.bufferFrameSize,
         &hwRender->renderParam.frameRenderMode.time,
         hwRender->renderParam.frameRenderMode.attrs.sampleRate) == HDF_FAILURE) {
