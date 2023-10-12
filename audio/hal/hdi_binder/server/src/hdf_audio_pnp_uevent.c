@@ -83,7 +83,12 @@
 #define AUDIO_DEVICE_WAIT_ONLINE 20
 #define AUDIO_DEVICE_WAIT_TRY_TIME 10
 #define AUDIO_DEVICE_WAIT_USB_ONLINE 1000
-#define UEVENT_ARR_SIZE         9
+#define UEVENT_ARR_SIZE 9
+
+#define REMOVE_LAST_DEVICE '0'
+#define ADD_DEVICE_HEADSET_1 '1'
+#define ADD_DEVICE_HEADSET_2 '2'
+#define ADD_DEVICE_ADAPTER '4'
 
 struct UsbDevice {
     int8_t devName[USB_DEV_NAME_LEN_MAX];
@@ -490,16 +495,16 @@ static int32_t SetAudioEventValue(struct AudioEvent *audioEvent, struct AudioPnp
             return HDF_FAILURE;
         }
         switch (audioPnpUevent->switchState[0]) {
-            case '0':
+            case REMOVE_LAST_DEVICE:
                 audioEvent->eventType = AUDIO_DEVICE_REMOVE;
                 audioEvent->deviceType = h2wTypeLast;
                 break;
-            case '1':
-            case '2':
+            case ADD_DEVICE_HEADSET_1:
+            case ADD_DEVICE_HEADSET_2:
                 audioEvent->eventType = AUDIO_DEVICE_ADD;
                 audioEvent->deviceType = AUDIO_HEADSET;
                 break;
-            case '4':
+            case ADD_DEVICE_ADAPTER:
                 audioEvent->eventType = AUDIO_DEVICE_ADD;
                 audioEvent->deviceType = AUDIO_ADAPTER_DEVICE;
                 break;
