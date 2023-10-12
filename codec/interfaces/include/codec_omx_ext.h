@@ -181,7 +181,7 @@ struct ProcessNameParam {
     uint32_t size;                         /** Size of the structure */
     union OMX_VERSIONTYPE version;         /** Component version */
     char processName[PROCESS_NAME_LEN];    /** Process name array */
-}
+};
 /**
  * @brief Enumerates the extended codec indexes.
  */
