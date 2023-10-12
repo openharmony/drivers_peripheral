@@ -21,6 +21,7 @@ group("camera_hal_test") {
     deps = [
       "$test_path/benchmarktest/v1_0:hdf_camera_benchmark_test",
       "$test_path/benchmarktest/v1_1:hdf_camera_benchmark_test_v1_1",
+      "$test_path/benchmarktest/v1_2:hdf_camera_benchmark_test_v1_2",
       "$test_path/hdi/v1_0:camera_test_at",
       "$test_path/hdi/v1_1:camera_test_hdi_V1_1",
       "$test_path/hdi/v1_2:camera_test_hdi_V1_2",
