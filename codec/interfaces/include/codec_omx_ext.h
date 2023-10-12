@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 #endif /* __cplusplus */
+
+#define PROCESS_NAME_LEN 50
 /**
  * @brief Enumerates the extended codec codingtyps.
  */
@@ -163,12 +165,23 @@ struct PassthroughParam {
     int size;      /**< Parameter value size */
 };
 
+/**
+ * @brief Defines the <b>WorkingFrequencyParam</b>.
+ */
 struct WorkingFrequencyParam {
     uint32_t size;                    /** Size of the structure */
     union OMX_VERSIONTYPE version;    /** Component version */
     uint32_t level;                   /** Working Frequency level */
 };
  
+ /**
+ * @brief Defines the <b>ProcessNameParam</b>.
+ */
+struct ProcessNameParam {
+    uint32_t size;                         /** Size of the structure */
+    union OMX_VERSIONTYPE version;         /** Component version */
+    char processName[PROCESS_NAME_LEN];    /** Process name array */
+}
 /**
  * @brief Enumerates the extended codec indexes.
  */
@@ -193,6 +206,8 @@ enum OmxIndexCodecExType {
     OMX_IndexColorAspects,
     /** WorkingFrequencyParam */
     OMX_IndexParamWorkingFrequency,
+    /** ProcessNameParam */
+    OMX_IndexParamProcessName,
 };
 
 /**
