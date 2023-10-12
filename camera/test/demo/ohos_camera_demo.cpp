@@ -78,7 +78,7 @@ void OhosCameraDemo::GetStreamOpt()
 #endif
         int rc = demoCameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
-            CAMERA_LOGE("demo test: GetStreamOpt GetStreamOperator fail\n");
+            CAMERA_LOGE("demo test: GetStreamOpt GetStreamOperator fail");
             streamOperator_ = nullptr;
         }
     }
@@ -124,7 +124,7 @@ RetCode OhosCameraDemo::CaptureON(const int streamId,
 
     int rc = streamOperator_->Capture(captureId, captureInfo_, true);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CaptureStart Capture error\n");
+        CAMERA_LOGE("demo test: CaptureStart Capture error");
         streamOperator_->ReleaseStreams(captureInfo_.streamIds_);
         return RC_ERROR;
     }
@@ -153,7 +153,7 @@ RetCode OhosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
     CAMERA_LOGD("demo test: CaptureOff enter mode == %{public}d", mode);
 
     if (streamOperator_ == nullptr) {
-        CAMERA_LOGE("demo test: CaptureOff streamOperator_ is nullptr\n");
+        CAMERA_LOGE("demo test: CaptureOff streamOperator_ is nullptr");
         return RC_ERROR;
     }
 
@@ -171,7 +171,7 @@ RetCode OhosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
     }
 
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CaptureOff CancelCapture error mode %{public}d rc == %{public}d\n", mode, rc);
+        CAMERA_LOGE("demo test: CaptureOff CancelCapture error mode %{public}d rc == %{public}d", mode, rc);
         return RC_ERROR;
     }
     CAMERA_LOGD("demo test: CaptureOff exit");
@@ -187,7 +187,7 @@ RetCode OhosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamC
 
     GetStreamOpt();
     if (streamOperator_ == nullptr) {
-        CAMERA_LOGE("demo test: CreateStream GetStreamOpt() is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream GetStreamOpt() is nullptr");
         return RC_ERROR;
     }
 
@@ -195,7 +195,7 @@ RetCode OhosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamC
 
     SetStreamInfo(streamInfo, streamCustomer, streamId, intent);
     if (streamInfo.bufferQueue_->producer_ == nullptr) {
-        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr");
         return RC_ERROR;
     }
 
@@ -204,13 +204,13 @@ RetCode OhosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamC
 
     rc = streamOperator_->CreateStreams(streamInfos);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CreateStreams error");
         return RC_ERROR;
     }
 
     rc = streamOperator_->CommitStreams(NORMAL, cameraAbility_);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CommitStreams error");
         std::vector<int> streamIds;
         streamIds.push_back(streamId);
         streamOperator_->ReleaseStreams(streamIds);
@@ -335,21 +335,21 @@ void OhosCameraDemo::StoreImage(const void *bufStart, const uint32_t size) const
     struct timeval start = {};
     gettimeofday(&start, nullptr);
     if (sprintf_s(path, sizeof(path), "%spicture_%ld.jpeg", prefix, start.tv_usec) < 0) {
-        CAMERA_LOGE("sprintf_s error .....\n");
+        CAMERA_LOGE("sprintf_s error .....");
         return;
     }
 
     imgFD = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
     if (imgFD == -1) {
-        CAMERA_LOGE("demo test:open image file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:open image file error %{public}s.....", strerror(errno));
         return;
     }
 
-    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d\n", path, size);
+    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d", path, size);
 
     ret = write(imgFD, bufStart, size);
     if (ret == -1) {
-        CAMERA_LOGE("demo test:write image file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:write image file error %{public}s.....", strerror(errno));
     }
 
     close(imgFD);
@@ -361,9 +361,9 @@ void OhosCameraDemo::StoreVideo(const void *bufStart, const uint32_t size) const
 
     ret = write(videoFd_, bufStart, size);
     if (ret == -1) {
-        CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:write video file error %{public}s.....", strerror(errno));
     }
-    CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
+    CAMERA_LOGD("demo test:StoreVideo size == %{public}d", size);
 }
 
 void OhosCameraDemo::OpenVideoFile()
@@ -395,7 +395,7 @@ RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent int
     CAMERA_LOGD("demo test: CreateStreams streamIdSecond = %{public}d", streamIdSecond);
     GetStreamOpt();
     if (streamOperator_ == nullptr) {
-        CAMERA_LOGE("demo test: CreateStreams GetStreamOpt() is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams GetStreamOpt() is nullptr");
         return RC_ERROR;
     }
 
@@ -403,7 +403,7 @@ RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent int
 
     SetStreamInfo(previewStreamInfo, streamCustomerPreview_, STREAM_ID_PREVIEW, PREVIEW);
     if (previewStreamInfo.bufferQueue_->producer_ == nullptr) {
-        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr");
         return RC_ERROR;
     }
     streamInfos.push_back(previewStreamInfo);
@@ -417,20 +417,20 @@ RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent int
     }
 
     if (secondStreamInfo.bufferQueue_->producer_ == nullptr) {
-        CAMERA_LOGE("demo test: CreateStreams CreateProducer() secondStreamInfo is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams CreateProducer() secondStreamInfo is nullptr");
         return RC_ERROR;
     }
     streamInfos.push_back(secondStreamInfo);
 
     rc = streamOperator_->CreateStreams(streamInfos);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CreateStreams error");
         return RC_ERROR;
     }
 
     rc = streamOperator_->CommitStreams(NORMAL, cameraAbility_);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CommitStreams error");
         std::vector<int> streamIds = {STREAM_ID_PREVIEW, streamIdSecond};
         streamOperator_->ReleaseStreams(streamIds);
         return RC_ERROR;
@@ -451,7 +451,7 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
 
     rc = streamOperator_->Capture(CAPTURE_ID_PREVIEW, previewCaptureInfo, true);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: CaptureOnDualStreams preview Capture error\n");
+        CAMERA_LOGE("demo test: CaptureOnDualStreams preview Capture error");
         streamOperator_->ReleaseStreams(previewCaptureInfo.streamIds_);
         return RC_ERROR;
     }
@@ -465,7 +465,7 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     if (streamIdSecond == STREAM_ID_CAPTURE) {
         rc = streamOperator_->Capture(CAPTURE_ID_CAPTURE, secondCaptureInfo, true);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
-            CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_CAPTURE error\n");
+            CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_CAPTURE error");
             streamOperator_->ReleaseStreams(secondCaptureInfo.streamIds_);
             return RC_ERROR;
         }
@@ -476,7 +476,7 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     } else {
         rc = streamOperator_->Capture(CAPTURE_ID_VIDEO, secondCaptureInfo, true);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
-            CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_VIDEO error\n");
+            CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_VIDEO error");
             streamOperator_->ReleaseStreams(secondCaptureInfo.streamIds_);
             return RC_ERROR;
         }
@@ -644,23 +644,23 @@ RetCode OhosCameraDemo::ReleaseAllStream()
 void OhosCameraDemo::QuitDemo()
 {
     ReleaseCameraDevice();
-    CAMERA_LOGD("demo test: QuitDemo done\n");
+    CAMERA_LOGD("demo test: QuitDemo done");
 }
 
 void OhosCameraDemo::SetEnableResult()
 {
-    CAMERA_LOGI("demo test: SetEnableResult enter\n");
+    CAMERA_LOGI("demo test: SetEnableResult enter");
 
     results_list_.push_back(OHOS_CONTROL_EXPOSURE_MODE);
     results_list_.push_back(OHOS_CONTROL_FOCUS_MODE);
     demoCameraDevice_->EnableResult(results_list_);
 
-    CAMERA_LOGI("demo test: SetEnableResult exit\n");
+    CAMERA_LOGI("demo test: SetEnableResult exit");
 }
 
 void OhosCameraDemo::SetAwbMode(const int mode) const
 {
-    CAMERA_LOGD("demo test: SetAwbMode enter\n");
+    CAMERA_LOGD("demo test: SetAwbMode enter");
 
     constexpr size_t entryCapacity = 100;
     constexpr size_t dataCapacity = 2000;
@@ -673,14 +673,14 @@ void OhosCameraDemo::SetAwbMode(const int mode) const
     MetadataUtils::ConvertMetadataToVec(metaData, result);
     demoCameraDevice_->UpdateSettings(result);
 
-    CAMERA_LOGD("demo test: SetAwbMode exit\n");
+    CAMERA_LOGD("demo test: SetAwbMode exit");
 }
 
 void OhosCameraDemo::SetAeExpo()
 {
     int32_t expo;
 
-    CAMERA_LOGD("demo test: SetAeExpo enter\n");
+    CAMERA_LOGD("demo test: SetAeExpo enter");
 
     constexpr size_t entryCapacity = 100;
     constexpr size_t dataCapacity = 2000;
@@ -698,12 +698,12 @@ void OhosCameraDemo::SetAeExpo()
     MetadataUtils::ConvertMetadataToVec(metaData, result);
     demoCameraDevice_->UpdateSettings(result);
 
-    CAMERA_LOGD("demo test: SetAeExpo exit\n");
+    CAMERA_LOGD("demo test: SetAeExpo exit");
 }
 
 void OhosCameraDemo::SetMetadata()
 {
-    CAMERA_LOGI("demo test: SetMetadata enter\n");
+    CAMERA_LOGI("demo test: SetMetadata enter");
     constexpr size_t entryCapacity = 100;
     constexpr size_t dataCapacity = 2000;
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
@@ -768,28 +768,28 @@ void OhosCameraDemo::SetMetadata()
     MetadataUtils::ConvertMetadataToVec(metaData, result);
     demoCameraDevice_->UpdateSettings(result);
 
-    CAMERA_LOGI("demo test: SetMetadata exit\n");
+    CAMERA_LOGI("demo test: SetMetadata exit");
 }
 
 void OhosCameraDemo::FlashlightOnOff(bool onOff)
 {
-    CAMERA_LOGD("demo test: FlashlightOnOff enter\n");
+    CAMERA_LOGD("demo test: FlashlightOnOff enter");
 
     if (demoCameraHost_ == nullptr) {
-        CAMERA_LOGE("demo test: FlashlightOnOff demoCameraHost_ == nullptr\n");
+        CAMERA_LOGE("demo test: FlashlightOnOff demoCameraHost_ == nullptr");
         return;
     }
 
     demoCameraHost_->SetFlashlight(cameraIds_.front(), onOff);
 
-    CAMERA_LOGD("demo test: FlashlightOnOff exit \n");
+    CAMERA_LOGD("demo test: FlashlightOnOff exit ");
 }
 
 RetCode OhosCameraDemo::StreamOffline(const int streamId)
 {
     int rc = 0;
     constexpr size_t offlineDelayTime = 4;
-    CAMERA_LOGD("demo test: StreamOffline enter\n");
+    CAMERA_LOGD("demo test: StreamOffline enter");
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<DemoStreamOperatorCallback>();
     std::shared_ptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
@@ -801,7 +801,7 @@ RetCode OhosCameraDemo::StreamOffline(const int streamId)
     streamIds.push_back(streamId);
     rc = streamOperator_->ChangeToOfflineStream(streamIds, streamOperatorCallback, offlineStreamOperator);
     if (rc != HDI::Camera::V1_0::NO_ERROR || offlineStreamOperator == nullptr) {
-        CAMERA_LOGE("demo test: StreamOffline ChangeToOfflineStream error\n");
+        CAMERA_LOGE("demo test: StreamOffline ChangeToOfflineStream error");
         return RC_ERROR;
     }
 
@@ -815,19 +815,19 @@ RetCode OhosCameraDemo::StreamOffline(const int streamId)
     CAMERA_LOGD("demo test: begin to release offlne stream");
     rc = offlineStreamOperator->CancelCapture(CAPTURE_ID_CAPTURE);
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->CancelCapture error\n");
+        CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->CancelCapture error");
         return RC_ERROR;
     }
 
     rc = offlineStreamOperator->Release();
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->Release() error\n");
+        CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->Release() error");
         return RC_ERROR;
     }
 
     streamCustomerCapture_->ReceiveFrameOff();
 
-    CAMERA_LOGD("demo test: StreamOffline exit\n");
+    CAMERA_LOGD("demo test: StreamOffline exit");
 
     return RC_OK;
 }
@@ -839,7 +839,7 @@ RetCode OhosCameraDemo::GetFaceDetectMode(std::shared_ptr<CameraAbility> &abilit
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_MODE, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MODE error\n");
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MODE error");
         return RC_ERROR;
     }
     faceDetectMode = *(entry.data.u8);
@@ -854,7 +854,7 @@ RetCode OhosCameraDemo::GetFocalLength(std::shared_ptr<CameraAbility> &ability)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCAL_LENGTH, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test:  get OHOS_ABILITY_FOCAL_LENGTH error\n");
+        CAMERA_LOGE("demo test:  get OHOS_ABILITY_FOCAL_LENGTH error");
         return RC_ERROR;
     }
     focalLength = *(entry.data.f);
@@ -869,7 +869,7 @@ RetCode OhosCameraDemo::GetAvailableFocusModes(std::shared_ptr<CameraAbility> &a
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_MODES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_FOCUS_MODES  error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FOCUS_MODES  error");
         return RC_ERROR;
     }
     uint32_t count = entry.count;
@@ -892,7 +892,7 @@ RetCode OhosCameraDemo::GetAvailableExposureModes(std::shared_ptr<CameraAbility>
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_EXPOSURE_MODES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_EXPOSURE_MODES  error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_EXPOSURE_MODES  error");
         return RC_ERROR;
     }
     uint32_t count = entry.count;
@@ -915,7 +915,7 @@ RetCode OhosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbili
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_RANGE, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_RANGE error\n");
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_RANGE error");
         return RC_ERROR;
     }
 
@@ -939,7 +939,7 @@ RetCode OhosCameraDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbili
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_STEP, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_STEP error\n");
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_STEP error");
         return RC_ERROR;
     }
     exposureCompensationSteps.numerator = entry.data.r->numerator;
@@ -956,7 +956,7 @@ RetCode OhosCameraDemo::GetAvailableMeterModes(std::shared_ptr<CameraAbility> &a
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_METER_MODES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_METER_MODES  error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_METER_MODES  error");
         return RC_ERROR;
     }
     uint32_t count = entry.count;
@@ -979,7 +979,7 @@ RetCode OhosCameraDemo::GetAvailableFlashModes(std::shared_ptr<CameraAbility> &a
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_MODES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_FLASH_MODES  error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FLASH_MODES  error");
         return RC_ERROR;
     }
     uint32_t count = entry.count;
@@ -1002,7 +1002,7 @@ RetCode OhosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &abili
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED error\n");
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED error");
         return RC_ERROR;
     }
     mirrorSupported = *(entry.data.u8);
@@ -1017,7 +1017,7 @@ RetCode OhosCameraDemo::GetStreamBasicConfigurations(std::shared_ptr<CameraAbili
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS error");
         return RC_ERROR;
     }
 
@@ -1041,7 +1041,7 @@ RetCode OhosCameraDemo::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FPS_RANGES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_FPS_RANGES error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FPS_RANGES error");
         return RC_ERROR;
     }
 
@@ -1065,7 +1065,7 @@ RetCode OhosCameraDemo::GetCameraPosition(std::shared_ptr<CameraAbility> &abilit
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_POSITION error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_POSITION error");
         return RC_ERROR;
     }
 
@@ -1081,7 +1081,7 @@ RetCode OhosCameraDemo::GetCameraType(std::shared_ptr<CameraAbility> &ability)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_TYPE error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_TYPE error");
         return RC_ERROR;
     }
 
@@ -1097,7 +1097,7 @@ RetCode OhosCameraDemo::GetCameraConnectionType(std::shared_ptr<CameraAbility> &
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_CONNECTION_TYPE error\n");
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_CONNECTION_TYPE error");
         return RC_ERROR;
     }
 
@@ -1113,7 +1113,7 @@ RetCode OhosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &abil
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_MAX_NUM, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MAX_NUM error\n");
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MAX_NUM error");
         return RC_ERROR;
     }
     faceDetectMaxNum = *(entry.data.u8);
@@ -1141,7 +1141,7 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
                 camera_metadata_item_t entry;
                 int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
                 if (ret != 0) {
-                    CAMERA_LOGE("demo test: get OHOS_CONTROL_FOCUS_MODE error\n");
+                    CAMERA_LOGE("demo test: get OHOS_CONTROL_FOCUS_MODE error");
                     return RC_ERROR;
                 }
                 focusMode = *(entry.data.u8);
@@ -1154,7 +1154,7 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
                 camera_metadata_item_t entry;
                 int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
                 if (ret != 0) {
-                    CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+                    CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error");
                     return RC_ERROR;
                 }
                 exposureMode = *(entry.data.u8);
