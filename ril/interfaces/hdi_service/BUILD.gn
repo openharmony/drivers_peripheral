@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-ohos_shared_library("libril_service_1.1") {
+ohos_shared_library("libril_service_1.2") {
   include_dirs = [ "include" ]
   sources = [ "src/ril_impl.cpp" ]
 
@@ -52,6 +52,7 @@ ohos_shared_library("libril_driver") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_ril:libril_stub_1.1",
+      "drivers_interface_ril:libril_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -76,6 +77,6 @@ ohos_shared_library("libril_driver") {
 group("hdf_ril") {
   deps = [
     ":libril_driver",
-    ":libril_service_1.1",
+    ":libril_service_1.2",
   ]
 }
