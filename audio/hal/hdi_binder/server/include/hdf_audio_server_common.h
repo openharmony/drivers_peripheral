@@ -26,7 +26,7 @@
 #define STR_MAX 512
 #define CHECK_NULL_PTR_RETURN_VALUE(ptr, ret) do { \
     if ((ptr) == NULL) { \
-        HDF_LOGE("%s:line:%{public}d pointer is null and return ret", __func__, __LINE__); \
+        HDF_LOGE("%{public}s:line:%{public}d pointer is null, ret = %{public}d", __func__, __LINE__, ret); \
         return (ret); \
     } \
 } while (0)
