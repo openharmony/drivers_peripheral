@@ -1972,19 +1972,19 @@ static bool AudioRouteNodeBlockUnmarshalling(struct HdfSBuf *data, struct AudioR
 static bool AudioRouteSinksBlockUnmarshalling(
     struct HdfSBuf *data,
     struct AudioRouteNode* sourcesOrSinksCp,
-    uint32_t sourcesOrSinksNum
+    uint32_t *sourcesOrSinksNum
 )
 {
-    if (!HdfSbufReadUint32(data, &sourcesOrSinksNum)) {
+    if (!HdfSbufReadUint32(data, sourcesOrSinksNum)) {
         HDF_LOGE("%{public}s: read sourcesOrSinksNum failed!", __func__);
         return false;
     }
-    if (sourcesOrSinksNum > 0) {
-        sourcesOrSinksCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * sourcesOrSinksNum);
+    if (*sourcesOrSinksNum > 0) {
+        sourcesOrSinksCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * (*sourcesOrSinksNum));
         if (sourcesOrSinksCp == NULL) {
             return false;
         }
-        for (uint32_t i = 0; i < sourcesOrSinksNum; i++) {
+        for (uint32_t i = 0; i < *sourcesOrSinksNum; i++) {
             if (!AudioRouteNodeBlockUnmarshalling(data, &sourcesOrSinksCp[i])) {
                 HDF_LOGE("%{public}s: read &sourcesOrSinksCp[i] failed!", __func__);
                 OsalMemFree((void*)sourcesOrSinksCp);
@@ -2008,14 +2008,14 @@ static bool AudioRouteSourceBlockUnmarshalling(struct HdfSBuf *data, struct Audi
     struct AudioRouteNode* sinksCp = NULL;
     uint32_t sinksNum = 0;
 
-    if (!AudioRouteSinksBlockUnmarshalling(data, sourcesCp, sourcesNum)) {
+    if (!AudioRouteSinksBlockUnmarshalling(data, sourcesCp, &sourcesNum)) {
         HDF_LOGE("%{public}s: read sources failed!", __func__);
         return false;
     }
     dataBlock->sources = sourcesCp;
     dataBlock->sourcesNum = sourcesNum;
 
-    if (!AudioRouteSinksBlockUnmarshalling(data, sinksCp, sinksNum)) {
+    if (!AudioRouteSinksBlockUnmarshalling(data, sinksCp, *sinksNum)) {
         HDF_LOGE("%{public}s: read sinks failed!", __func__);
         OsalMemFree((void*)sourcesCp);
         return false;
