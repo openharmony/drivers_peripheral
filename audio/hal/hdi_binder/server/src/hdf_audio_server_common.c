@@ -2015,7 +2015,7 @@ static bool AudioRouteSourceBlockUnmarshalling(struct HdfSBuf *data, struct Audi
     dataBlock->sources = sourcesCp;
     dataBlock->sourcesNum = sourcesNum;
 
-    if (!AudioRouteSinksBlockUnmarshalling(data, sinksCp, *sinksNum)) {
+    if (!AudioRouteSinksBlockUnmarshalling(data, sinksCp, &sinksNum)) {
         HDF_LOGE("%{public}s: read sinks failed!", __func__);
         OsalMemFree((void*)sourcesCp);
         return false;
