@@ -22,13 +22,13 @@
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "v1_1/iril.h"
+#include "v1_2/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_1 {
+namespace V1_2 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -166,7 +166,8 @@ public:
 
     int32_t SendRilAck() override;
 
-    int32_t SetCallback(const sptr<IRilCallback> &rilCallback) override;
+    int32_t SetCallback(const sptr<V1_1::IRilCallback> &rilCallback) override;
+    int32_t SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -198,7 +199,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
