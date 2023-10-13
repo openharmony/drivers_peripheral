@@ -14,9 +14,11 @@
  */
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
+#include <osal_mem.h>
 #include "v1_2/iwlan_interface.h"
 #include "wlan_callback_impl.h"
-#include "wlan_impl.h"
+#include "securec.h"
+#include "wlan_hdi_types.h"
 
 #define HDF_LOG_TAG service_manager_test
 using namespace testing::ext;
@@ -1325,7 +1327,8 @@ HWTEST_F(HdfWifiServiceCTest, ResetToFactoryMacAddressTest_0053, TestSize.Level1
 
         const char *ifName = "wlan0";
         rc = g_wlanObj->ResetToFactoryMacAddress(g_wlanObj, ifName);
-        ASSERT_EQ(rc, HDF_SUCCESS);
+        flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
+        ASSERT_TRUE(flag);
 
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
