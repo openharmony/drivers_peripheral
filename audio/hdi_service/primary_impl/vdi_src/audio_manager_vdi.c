@@ -271,8 +271,7 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
     }
 
     if (priv->vdiDescsCount != 0 && priv->vdiDescs != NULL && priv->vdiDescsCount >= *descsLen) {
-        int32_t ret;
-        ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
+        int32_t ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
             AudioManagerReleaseDescs(descs, *descsLen);
