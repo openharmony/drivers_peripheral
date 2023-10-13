@@ -34,3 +34,37 @@ void CameraHdiUtTestV1_2::TearDown(void)
     cameraTest->Close();
 }
 
+HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SUPPORTED_COLOR_MODES, &entry);
+    if (ret == 0) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        CAMERA_LOGI("OHOS_ABILITY_SUPPORTED_COLOR_MODES: %{public}d", entry.data.u8[0]);
+    } else {
+        CAMERA_LOGI("XMage not supported");
+    }
+}
+
+HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
+{
+    // Start Xmage control setting and verify
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+    uint8_t xmageMode = CAMERA_CUSTOM_COLOR_NORMAL;
+    meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &xmageMode, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->cameraDevice->UpdateSettings(metaVec);
+    
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    sleep(1);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
