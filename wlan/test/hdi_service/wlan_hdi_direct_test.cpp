@@ -16,7 +16,8 @@
 #include <servmgr_hdi.h>
 #include "v1_2/iwlan_interface.h"
 #include "wlan_callback_impl.h"
-#include "wlan_impl.h"
+#include "securec.h"
+#include "wlan_hdi_types.h"
 
 #define HDF_LOG_TAG service_manager_test
 using namespace testing::ext;
