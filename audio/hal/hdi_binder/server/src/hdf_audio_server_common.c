@@ -1972,8 +1972,7 @@ static bool AudioRouteNodeBlockUnmarshalling(struct HdfSBuf *data, struct AudioR
 static bool AudioRouteSinksBlockUnmarshalling(
     struct HdfSBuf *data,
     struct AudioRouteNode* sourcesOrSinksCp,
-    uint32_t *sourcesOrSinksNum
-)
+    uint32_t *sourcesOrSinksNum)
 {
     if (!HdfSbufReadUint32(data, sourcesOrSinksNum)) {
         HDF_LOGE("%{public}s: read sourcesOrSinksNum failed!", __func__);
