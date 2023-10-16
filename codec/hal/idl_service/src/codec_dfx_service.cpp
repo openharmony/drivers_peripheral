@@ -60,7 +60,7 @@ int32_t CodecDfxService::GetCodecComponentListInfo(struct HdfSBuf *reply)
             .append(std::to_string(it.first))
             .append(", state = ");
         componentService->GetComponentNode(dumpNode);
-        if(dumpNode == nullptr){
+        if (dumpNode == nullptr) {
             CODEC_LOGE("get dumpNode failed!");
             return HDF_ERR_INVALID_PARAM;
         }
