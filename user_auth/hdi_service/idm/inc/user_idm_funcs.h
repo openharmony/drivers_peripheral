@@ -46,6 +46,7 @@ ResultCode GetUserInfoFunc(int32_t userId, uint64_t *secureUid, uint64_t *pinSub
     EnrolledInfoHal **enrolledInfoArray, uint32_t *enrolledNum);
 ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId,
     CredentialInfoHal *deletedCredential, Buffer **rootSecret);
+ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 
 #ifdef __cplusplus
 }
