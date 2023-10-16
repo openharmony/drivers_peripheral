@@ -103,11 +103,13 @@ static void WifiEventScanDoneProcess(const char *ifName, uint32_t event, struct 
         HDF_LOGE("%s: fail to get status", __FUNCTION__);
         return;
     }
-    if (g_scanResults.num != 0) {
-        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
-        FreeScanResults(&g_scanResults);
-        (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    if (g_scanResults.scanResult == NULL) {
+        HDF_LOGE("%s: g_scanResults.scanResult is NULL", __FUNCTION__);
+        return;
     }
+    WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
+    HDF_LOGI("%s: g_scanResults.num = %d", __FUNCTION__, g_scanResults.num);
+    FreeScanResults(&g_scanResults);
     WifiEventReport(ifName, event, &status);
 }
 
@@ -164,6 +166,12 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
     WifiScanResult scanResult = { 0 };
     uint32_t len = 0;
 
+    if (g_scanResults.scanResult == NULL) {
+        if (InitScanResults(&g_scanResults) != RET_CODE_SUCCESS) {
+            HDF_LOGE("%s: InitScanResults failed",  __FUNCTION__);
+            return;
+        }
+    }
     if (!HdfSbufReadUint16(reqData, &(scanResult.beaconInt))) {
         HDF_LOGE("%s: fail to get beaconInt", __FUNCTION__);
         return;
@@ -203,10 +211,23 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
         return;
     }
     g_scanResults.num++;
-    if (g_scanResults.num == MAX_SCAN_RES_NUM) {
-        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
-        FreeScanResults(&g_scanResults);
-        (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    if (g_scanResults.num == g_scanResults.scanResultCapacity) {
+        g_scanResults.scanResultCapacity += INIT_SCAN_RES_NUM;
+        WifiScanResult *newScanResult = NULL;
+        newScanResult = (WifiScanResult *)OsalMemCalloc(sizeof(WifiScanResult) * (g_scanResults.scanResultCapacity));
+        if (newScanResult == NULL) {
+            HDF_LOGE("%s: newscanResult is NULL",  __FUNCTION__);
+            g_scanResults.num = 0;
+            g_scanResults.scanResultCapacity -= INIT_SCAN_RES_NUM;
+            return;
+        }
+        if (memcpy_s((void *)newScanResult, sizeof(WifiScanResult) * (g_scanResults.scanResultCapacity),
+            (void *)g_scanResults.scanResult, sizeof(WifiScanResult) * (g_scanResults.num)) != RET_CODE_SUCCESS) {
+            HDF_LOGE("%s: memcpy_s fail",  __FUNCTION__);
+        }
+        OsalMemFree(&g_scanResults.scanResult);
+        g_scanResults.scanResult = newScanResult;
+        newScanResult = NULL;
     }
 }
 

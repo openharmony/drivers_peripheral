@@ -241,12 +241,15 @@ void FreeScanResult(WifiScanResult *res)
     }
     if (res->bssid != NULL) {
         OsalMemFree(res->bssid);
+        res->bssid = NULL;
     }
     if (res->ie != NULL) {
         OsalMemFree(res->ie);
+        res->ie = NULL;
     }
     if (res->beaconIe != NULL) {
         OsalMemFree(res->beaconIe);
+        res->beaconIe = NULL;
     }
 }
 
@@ -259,8 +262,25 @@ void FreeScanResults(WifiScanResults *res)
     for (i = 0; i < res->num; i++) {
         FreeScanResult(&res->scanResult[i]);
     }
+    OsalMemFree(res->scanResult);
+    res->scanResult = NULL;
 }
 
+int32_t InitScanResults(WifiScanResults *scanResults)
+{
+    if (scanResults == NULL) {
+        HDF_LOGE("%s: scanResults is NULL", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    scanResults->scanResultCapacity = INIT_SCAN_RES_NUM;
+    scanResults->num = 0;
+    scanResults->scanResult = (WifiScanResult *)OsalMemCalloc(sizeof(WifiScanResult) * scanResults->scanResultCapacity);
+    if (scanResults->scanResult == NULL) {
+        HDF_LOGE("%s: scanResults->scanResult is NULL", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    return RET_CODE_SUCCESS;
+}
 #ifdef __cplusplus
 #if __cplusplus
 }
