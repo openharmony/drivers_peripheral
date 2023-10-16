@@ -20,7 +20,7 @@
 #include "iam_logger.h"
 #include "useriam_common.h"
 
-#include "v1_1/user_auth_interface_stub.h"
+#include "v1_2/user_auth_interface_stub.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
@@ -83,7 +83,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUserAuthInterfaceHost->ioService.Open = nullptr;
     hdfUserAuthInterfaceHost->ioService.Release = nullptr;
 
-    auto serviceImpl = OHOS::HDI::UserAuth::V1_1::IUserAuthInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("failed to get of implement service");
         delete hdfUserAuthInterfaceHost;
@@ -91,7 +91,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUserAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, OHOS::HDI::UserAuth::V1_1::IUserAuthInterface::GetDescriptor());
+        serviceImpl, OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::GetDescriptor());
     if (hdfUserAuthInterfaceHost->stub == nullptr) {
         IAM_LOGE("failed to get stub object");
         delete hdfUserAuthInterfaceHost;

@@ -34,7 +34,7 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
     "user_auth_hdi_fuzzer.cpp",
   ]
 
-  deps = [ "../common_fuzzer:libuser_auth_interface_service_1.1_fuzzer" ]
+  deps = [ "../common_fuzzer:libuser_auth_interface_service_1.2_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
