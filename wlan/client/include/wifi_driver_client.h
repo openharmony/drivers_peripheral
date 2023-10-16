@@ -46,7 +46,7 @@ extern "C" {
 #define WIFI_POWER_MODE_THROUGH_WALL 2
 #define WIFI_POWER_MODE_NUM 3
 
-#define MAX_SCAN_RES_NUM 200
+#define INIT_SCAN_RES_NUM 200
 #define MAX_SSID_LEN 32
 
 typedef enum {
@@ -154,7 +154,8 @@ typedef struct {
 } WifiScanResult;
 
 typedef struct {
-    WifiScanResult scanResult[MAX_SCAN_RES_NUM];
+    WifiScanResult *scanResult;
+    uint32_t scanResultCapacity;
     uint32_t num;
 } WifiScanResults;
 

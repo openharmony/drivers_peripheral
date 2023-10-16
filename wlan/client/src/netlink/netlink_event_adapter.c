@@ -84,7 +84,7 @@ static void QcaWifiEventScanDoneProcess(const char *ifName, struct nlattr *data,
 
     status = nla_get_u8(attr[WLAN_ATTR_SCAN_STATUS]);
     if (status >= SCAN_STATUS_MAX) {
-        HILOG_ERROR(LOG_CORE, "%s: invalid status", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: invalid status",  __FUNCTION__);
         return;
     }
 
@@ -224,33 +224,45 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
     bssPolicy[NL80211_BSS_STATUS].type = NLA_U32;
     bssPolicy[NL80211_BSS_SEEN_MS_AGO].type = NLA_U32;
 
-    if (handlerArg == NULL || handlerArg->scanResults == NULL ||
-        handlerArg->scanResults->num >= MAX_SCAN_RES_NUM || handlerArg->ifName == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: Invalid param", __func__);
+    if (handlerArg == NULL || handlerArg->scanResults == NULL || handlerArg->ifName == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: Invalid param",  __FUNCTION__);
         return NL_SKIP;
     }
     scanResults = handlerArg->scanResults;
     scanResult = &scanResults->scanResult[scanResults->num];
     nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (!attr[NL80211_ATTR_BSS]) {
-        HILOG_ERROR(LOG_CORE, "%s: bss info missing", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: bss info missing",  __FUNCTION__);
         return NL_SKIP;
     }
     if (nla_parse_nested(bssAttr, NL80211_BSS_MAX, attr[NL80211_ATTR_BSS], bssPolicy)) {
-        HILOG_ERROR(LOG_CORE, "%s: failed to parse nested attributes", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: failed to parse nested attributes",  __FUNCTION__);
         return NL_SKIP;
     }
     if (DoGetScanResult(bssAttr, NL80211_BSS_MAX + 1, scanResult) != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: DoGetScanResult fail", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: DoGetScanResult fail",  __FUNCTION__);
         FreeScanResult(scanResult);
         return NL_SKIP;
     }
     WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULT, scanResult);
     scanResults->num++;
-    if (scanResults->num == MAX_SCAN_RES_NUM) {
-        WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULTS, scanResults);
-        FreeScanResults(scanResults);
-        (void)memset_s(scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    if (scanResults->num == scanResults->scanResultCapacity) {
+        scanResults->scanResultCapacity += INIT_SCAN_RES_NUM;
+        WifiScanResult *newScanResult = NULL;
+        newScanResult = (WifiScanResult *)OsalMemCalloc(sizeof(WifiScanResult) * (scanResults->scanResultCapacity));
+        if (newScanResult == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: newscanResult is NULL",  __FUNCTION__);
+            scanResults->scanResultCapacity -= INIT_SCAN_RES_NUM;
+            scanResults->num = 0;
+            return NL_SKIP;
+        }
+        if (memcpy_s((void *)newScanResult, sizeof(WifiScanResult) * (scanResults->scanResultCapacity),
+            (void *)scanResults->scanResult, sizeof(WifiScanResult) * (scanResults->num)) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: memcpy_s fail",  __FUNCTION__);
+        }
+        OsalMemFree(scanResults->scanResult);
+        scanResults->scanResult = newScanResult;
+        newScanResult = NULL;
     }
     return NL_SKIP;
 }
@@ -263,7 +275,11 @@ static void WifiEventScanResultProcess(const char *ifName)
     uint32_t ifaceId = if_nametoindex(ifName);
     struct nl_msg *msg = nlmsg_alloc();
     if (NULL == msg) {
-        HILOG_ERROR(LOG_CORE, "%s: msg is NULL.", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: msg is NULL.",  __FUNCTION__);
+        return;
+    }
+    if (InitScanResults(&scanResults) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: InitScanResults failed",  __FUNCTION__);
         return;
     }
     arg.scanResults = &scanResults;
@@ -272,11 +288,10 @@ static void WifiEventScanResultProcess(const char *ifName)
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     ret = NetlinkSendCmdSync(msg, WifiGetScanResultHandler, (void *)&arg);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: send cmd failed",  __FUNCTION__);
     }
-    if (scanResults.num != 0) {
-        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &scanResults);
-    }
+    WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &scanResults);
+    HILOG_INFO(LOG_CORE, "%s: scanResults.num = %d", __FUNCTION__, scanResults.num);
     FreeScanResults(&scanResults);
     nlmsg_free(msg);
 }
@@ -286,7 +301,7 @@ static void WifiEventScanAbortedProcess(const char *ifName)
     WifiScanResults scanResults = {0};
 
     if (ifName == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.",  __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, WIFI_EVENT_SCAN_ABORTED, &scanResults);
