@@ -171,6 +171,17 @@ void Test::DefaultInfosSketch(
     consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
 }
 
+void Test::DefaultInfosPreviewV1_2(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    DefaultPreview(infos);
+    std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdPreview, "yuv", addr, size);
+    });
+    infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+}
+
 void Test::DefaultInfosPreview(
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
 {

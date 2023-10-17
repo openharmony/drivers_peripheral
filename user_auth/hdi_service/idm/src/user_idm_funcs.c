@@ -391,3 +391,14 @@ EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
     return ret;
 }
+
+ResultCode QueryAllExtUserInfoFunc(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount)
+{
+    ResultCode ret = GetAllExtUserInfo(userInfos, userInfolen, userInfoCount);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetAllExtUserInfo failed");
+        return RESULT_BAD_PARAM;
+    }
+
+    return RESULT_SUCCESS;
+}

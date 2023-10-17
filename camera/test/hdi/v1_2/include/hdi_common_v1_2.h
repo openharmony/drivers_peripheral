@@ -64,6 +64,8 @@ public:
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosPreview(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosPreviewV1_2(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosCapture(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosAnalyze(
@@ -105,12 +107,13 @@ public:
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
     int streamIdPreview = 100;
     int streamIdCapture = 101;
-    int streamIdSketch = 102;
+    int streamIdSketch = 105;
     int captureWidth = 1280;
     int captureHeight = 960;
     int sketchWidth = 640;
     int sketchHeight = 480;
     int captureIdPreview = 2000;
+    int captureIdSketch = 2050;
     int previewWidth = 1920;
     int previewHeight = 1080;
     int captureIdCapture = 2010;

@@ -25,7 +25,6 @@ ohos_fuzztest("ApFuzzTest") {
 
   include_dirs = [
     "$TEST_ROOT_DIR/interfaces/include",
-    "$TEST_ROOT_DIR/test/hdi_service",
     "$TEST_ROOT_DIR/test/fuzztest",
   ]
 
@@ -48,7 +47,6 @@ ohos_fuzztest("ApFuzzTest") {
 
   sources = [
     "$TEST_ROOT_DIR/test/fuzztest/wlan_common_fuzzer.cpp",
-    "$TEST_ROOT_DIR/test/hdi_service/wlan_callback_impl.c",
     "ap_fuzzer.cpp",
   ]
 }

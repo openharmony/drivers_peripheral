@@ -455,6 +455,16 @@ std::shared_ptr<CameraAbility> TestCameraBase::GetCameraAbility()
     return ability;
 }
 
+std::shared_ptr<CameraAbility> TestCameraBase::SelectGetCameraAbility(std::string cameraId)
+{
+    int ret = cameraHost->GetCameraAbility(cameraId, ability_);
+    if (ret != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGD("==========[test log]GetCameraAbility failed, ret = %{public}d", ret);
+    }
+    MetadataUtils::ConvertVecToMetadata(ability_, ability);
+    return ability;
+}
+
 void TestCameraBase::OpenUsbCamera()
 {
     if (cameraDevice == nullptr) {

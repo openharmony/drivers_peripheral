@@ -1749,10 +1749,7 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is NULL!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(adapter, AUDIO_HAL_ERR_INVALID_PARAM);
     if (adapter->GetPassthroughMode == NULL) {
         AUDIO_FUNC_LOGE("GetPassthroughMode is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1972,56 +1969,55 @@ static bool AudioRouteNodeBlockUnmarshalling(struct HdfSBuf *data, struct AudioR
     return true;
 }
 
-static bool AudioRouteBlockUnmarshalling(struct HdfSBuf *data, struct AudioRoute *dataBlock)
+static bool AudioRouteSinksBlockUnmarshalling(
+    struct HdfSBuf *data,
+    struct AudioRouteNode* sourcesOrSinksCp,
+    uint32_t *sourcesOrSinksNum)
+{
+    if (!HdfSbufReadUint32(data, sourcesOrSinksNum)) {
+        HDF_LOGE("%{public}s: read sourcesOrSinksNum failed!", __func__);
+        return false;
+    }
+    if (*sourcesOrSinksNum > 0) {
+        sourcesOrSinksCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * (*sourcesOrSinksNum));
+        if (sourcesOrSinksCp == NULL) {
+            return false;
+        }
+        for (uint32_t i = 0; i < *sourcesOrSinksNum; i++) {
+            if (!AudioRouteNodeBlockUnmarshalling(data, &sourcesOrSinksCp[i])) {
+                HDF_LOGE("%{public}s: read &sourcesOrSinksCp[i] failed!", __func__);
+                OsalMemFree((void*)sourcesOrSinksCp);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+static bool AudioRouteSourceBlockUnmarshalling(struct HdfSBuf *data, struct AudioRoute *dataBlock)
 {
     if (data == NULL || dataBlock == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
         return false;
     }
-
+    
     struct AudioRouteNode* sourcesCp = NULL;
     uint32_t sourcesNum = 0;
     struct AudioRouteNode* sinksCp = NULL;
     uint32_t sinksNum = 0;
-    if (!HdfSbufReadUint32(data, &sourcesNum)) {
-        HDF_LOGE("%{public}s: read sourcesNum failed!", __func__);
+
+    if (!AudioRouteSinksBlockUnmarshalling(data, sourcesCp, &sourcesNum)) {
+        HDF_LOGE("%{public}s: read sources failed!", __func__);
         return false;
-    }
-    if (sourcesNum > 0) {
-        sourcesCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * sourcesNum);
-        if (sourcesCp == NULL) {
-            return false;
-        }
-        for (uint32_t i = 0; i < sourcesNum; i++) {
-            if (!AudioRouteNodeBlockUnmarshalling(data, &sourcesCp[i])) {
-                HDF_LOGE("%{public}s: read &sourcesCp[i] failed!", __func__);
-                OsalMemFree((void*)sourcesCp);
-                return false;
-            }
-        }
     }
     dataBlock->sources = sourcesCp;
     dataBlock->sourcesNum = sourcesNum;
 
-    if (!HdfSbufReadUint32(data, &sinksNum)) {
-        HDF_LOGE("%{public}s: read sinksNum failed!", __func__);
+    if (!AudioRouteSinksBlockUnmarshalling(data, sinksCp, &sinksNum)) {
+        HDF_LOGE("%{public}s: read sinks failed!", __func__);
         OsalMemFree((void*)sourcesCp);
         return false;
-    }
-    if (sinksNum > 0) {
-        sinksCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * sinksNum);
-        if (sinksCp == NULL) {
-            OsalMemFree((void*)sourcesCp);
-            return false;
-        }
-        for (uint32_t i = 0; i < sinksNum; i++) {
-            if (!AudioRouteNodeBlockUnmarshalling(data, &sinksCp[i])) {
-                HDF_LOGE("%{public}s: read &sinksCp[i] failed!", __func__);
-                OsalMemFree((void*)sourcesCp);
-                OsalMemFree((void*)sinksCp);
-                return false;
-            }
-        }
     }
     dataBlock->sinks = sinksCp;
     dataBlock->sinksNum = sinksNum;
@@ -2087,7 +2083,7 @@ static int32_t HdiSerStubUpdateAudioRoute(const struct HdfDeviceIoClient *client
         goto FINISHED;
     }
 
-    if (!AudioRouteBlockUnmarshalling(audioAdapterData, route)) {
+    if (!AudioRouteSourceBlockUnmarshalling(audioAdapterData, route)) {
         HDF_LOGE("%{public}s: read route failed!", __func__);
         audioAdapterRet = HDF_ERR_INVALID_PARAM;
         goto FINISHED;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_1/user_auth_interface_service.h"
+#include "v1_2/user_auth_interface_service.h"
 
 #include <mutex>
 #include <hdf_base.h>
@@ -862,6 +862,40 @@ int32_t UserAuthInterfaceService::DeleteExecutor(uint64_t index)
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
     return UnRegisterExecutor(index);
+}
+
+int32_t UserAuthInterfaceService::GetAllExtUserInfo(std::vector<ExtUserInfo> &userInfos)
+{
+    IAM_LOGI("start");
+    UserInfoResult *userInfoResult = (UserInfoResult *)Malloc(sizeof(UserInfoResult) * MAX_USER);
+    if (userInfoResult == NULL) {
+        IAM_LOGE("malloc failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    uint32_t userInfoCount = 0;
+    ResultCode ret = QueryAllExtUserInfoFunc(userInfoResult, MAX_USER, &userInfoCount);
+    if (ret != RESULT_SUCCESS) {
+        Free(userInfoResult);
+        IAM_LOGE("QueryAllExtUserInfoFunc failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    for (uint32_t i = 0; i < userInfoCount; i++) {
+        ExtUserInfo info = {};
+        info.userId = userInfoResult[i].userId;
+        info.userInfo.secureUid = userInfoResult[i].secUid;
+        info.userInfo.pinSubType = static_cast<PinSubType>(userInfoResult[i].pinSubType);
+        for (uint32_t j = 0; j < userInfoResult[i].enrollNum; j++) {
+            EnrolledInfo enrolledInfo = {};
+            enrolledInfo.authType = static_cast<AuthType>(userInfoResult[i].enrolledInfo[j].authType);
+            enrolledInfo.enrolledId = userInfoResult[i].enrolledInfo[j].enrolledId;
+            info.userInfo.enrolledInfos.push_back(enrolledInfo);
+        }
+        userInfos.push_back(info);
+    }
+
+    Free(userInfoResult);
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI
