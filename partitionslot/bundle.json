@@ -34,10 +34,10 @@
         {
           "name:": "//drivers/peripheral/partitionslot/hal:libpartition_slot_manager",
           "header": {
-            "header_files": [
+            "header_files": [],
+            "header_base": [
               "//drivers/peripheral/partitionslot/hal/include"
-            ],
-          "header_base": []
+            ]
           }
         }
       ],
