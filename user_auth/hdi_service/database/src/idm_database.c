@@ -906,7 +906,7 @@ IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, ui
             break;
         }
 
-        if (IsInvalidUser(user) == false) {
+        if (IsInvalidUser(user) == true) {
             invalidUserId[*userCount] = user->userId;
             (*userCount)++;
         }
