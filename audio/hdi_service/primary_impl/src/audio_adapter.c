@@ -1127,6 +1127,7 @@ static int32_t AudioDeepCopySubCapability(
                 AUDIO_FUNC_LOGE("OsalMemCalloc fail");
                 return AUDIO_ERR_MALLOC_FAIL;
             }
+            AUDIO_FUNC_LOGE("memcpy_s port");
             int32_t ret = memcpy_s(
                 dstSubPorts[i].desc, strlen(srcSubPorts[i].desc), srcSubPorts[i].desc, strlen(srcSubPorts[i].desc));
             if (ret != EOK) {
