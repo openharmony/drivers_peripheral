@@ -44,6 +44,54 @@ void CameraManager::Init()
     service->SetCallback(hostCallback);
 }
 
+void CameraManager::InitV1_2()
+{
+    uint32_t mainVer;
+    uint32_t minVer;
+    int32_t ret;
+    if (serviceV1_2 == nullptr) {
+        serviceV1_2 = OHOS::HDI::Camera::V1_1::ICameraHost::Get("camera_service", false);
+        if (serviceV1_2 == nullptr) {
+            CAMERA_LOGE("V1_2::IcameraHost get failed");
+            return;
+        } else {
+            CAMERA_LOGI("ICameraHost get success");
+            ret = serviceV1_2->GetVersion(mainVer, minVer);
+            if (ret != 0) {
+                CAMERA_LOGE("V1_2::ICameraHost get version failed, ret = %{public}d", ret);
+            } else {
+                CAMERA_LOGE("V1_2::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
+            }
+        }
+
+        service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_2.GetRefPtr());
+    }
+
+    hostCallback = new TestCameraHostCallback();
+    service->SetCallback(hostCallback);
+}
+
+void CameraManager::OpenV1_2()
+{
+    if (cameraDevice == nullptr) {
+        service->GetCameraIds(cameraIds);
+        if (cameraIds.size() == 0) {
+            CAMERA_LOGE("camera device list empty");
+        }
+        GetCameraMetadata();
+        deviceCallback = new OHOS::Camera::CameraManager::DemoCameraDeviceCallback();
+
+        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
+            CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
+            return;
+        }
+
+        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
+        CAMERA_LOGI("OpenCamera V1_2 success");
+    }
+}
+
 void CameraManager::Open()
 {
     if (cameraDevice == nullptr) {

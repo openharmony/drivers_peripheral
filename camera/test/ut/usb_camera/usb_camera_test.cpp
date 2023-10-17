@@ -1126,3 +1126,604 @@ TEST_F(UtestUSBCameraTest, camera_usb_0034)
     cameraBase_->STREAM_ID_VIDEO};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_ZOOM_RATIO_RANGE
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0035)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_ZOOM_RATIO_RANGE, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("OHOS_ABILITY_ZOOM_RATIO_RANGE: count is %{public}d ", entry.count);
+            CAMERA_LOGD("Zoom ratio range: [%{public}d,[%{public}d]", entry.data.f[0], entry.data.f[1]);
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_ZOOM_RATIO_RANGE is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_FLASH_AVAILABLE
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0036)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_AVAILABLE, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("OHOS_ABILITY_FLASH_AVAILABLE value is %{public}d", entry.data.u8[0]);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_VIDEO_STABILIZATION_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0037)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            for (int i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("OHOS_ABILITY_VIDEO_STABILIZATION_MODES value is %{public}d", entry.data.u8[i]);
+            }
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_VIDEO_STABILIZATION_MODES is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_FLASH_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0038)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_MODES, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("supported flash mode list:");
+            for (int i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("%{public}d", entry.data.u8[i]);
+            }
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_FLASH_MODES is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_FOCUS_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0039)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_MODES, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("supported flash mode list:");
+            for (int i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("%{public}d", entry.data.u8[i]);
+            }
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_FOCUS_MODES is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_EXPOSURE_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0040)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_EXPOSURE_MODES, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("supported flash mode list:");
+            for (int i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("%{public}d ", entry.data.u8[i]);
+            }
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_EXPOSURE_MODES is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0041)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("capture mirror supported is :");
+        for (int i = 0; i < entry.count; i++) {
+            CAMERA_LOGD("%{public}d", entry.data.u8[i]);
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_MUTE_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0042)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_MUTE_MODES, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("supported flash mode list:");
+            for (int i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("%{public}d", entry.data.u8[i]);
+            }
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("OHOS_ABILITY_MUTE_MODES is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_FPS_RANGES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0043)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FPS_RANGES, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("supported fps ranges list: [ %{public}d, %{public}d ]", entry.data.i32[0], entry.data.i32[1]);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_JPEG_ORIENTATION
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0044)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("OHOS_JPEG_ORIENTATION value is %{public}d", entry.data.i32[0]);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_JPEG_QUALITY
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0045)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("OHOS_JPEG_QUALITY value is %{public}d", entry.data.i32[0]);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0046)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+        CAMERA_LOGD("OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS value is %{public}d", entry.data.u8[0]);
+        EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_FORMAT_RGBA_8888);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0047)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        EXPECT_NE(data, nullptr);
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
+        if (ret == 0 && entry.data.i32 != nullptr && entry.count > 0) {
+            CAMERA_LOGD("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start.");
+            const size_t STEP = 10; // print step
+            CAMERA_LOGD("count: %{public}s", entry.count);
+            for (size_t i = 0; i < entry.count; i++) {
+                CAMERA_LOGD("======%{public}d==========", entry.data.i32[i]);
+            }
+            CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_FOCAL_LENGTH
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0048)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCAL_LENGTH, &entry);
+        if (ret == CAM_META_SUCCESS) {
+            CAMERA_LOGD("log OHOS_ABILITY_FOCAL_LENGTH: count is %{public}s", entry.count);
+            CAMERA_LOGD("log focal length value: %{pubilc}d", entry.data.f[0]);
+        } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+            CAMERA_LOGD("log OHOS_ABILITY_FOCAL_LENGTH is not support");
+        }
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_SENSOR_ORIENTATION
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0049)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_CAMERA_TYPE_UNSPECIFIED
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0050)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0051)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
+        EXPECT_EQ(ret, CAM_META_SUCCESS);
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Plug in multiple USB cameras,get value of OHOS_ABILITY_CAMERA_POSITION
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0052)
+{
+    // Get the device manager
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        if (!g_usbCameraExit) {
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+        }
+        ability_ = cameraBase_->SelectGetCameraAbility(usbCameraIds[i]);
+        EXPECT_NE(ability_, nullptr);
+        common_metadata_header_t *data = ability_->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
+    }
+}

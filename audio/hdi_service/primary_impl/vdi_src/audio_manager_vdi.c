@@ -255,7 +255,6 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
     AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
-    int32_t ret;
     CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(descs, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(descsLen, HDF_ERR_INVALID_PARAM);
@@ -272,7 +271,7 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
     }
 
     if (priv->vdiDescsCount != 0 && priv->vdiDescs != NULL && priv->vdiDescsCount >= *descsLen) {
-        ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
+        int32_t ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("audio vdiManager DescsVdi To Descs fail, ret=%{public}d", ret);
             AudioManagerReleaseDescs(descs, *descsLen);
