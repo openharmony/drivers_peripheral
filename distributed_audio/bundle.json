@@ -16,11 +16,11 @@
       "ram": "8000KB",
       "deps": {
         "components": [
-          "c_utils",
-          "drivers_interface_distributed_audio",
+          "ipc",
           "hdf_core",
           "hilog",
-          "ipc"
+          "drivers_interface_distributed_audio",
+          "c_utils"
         ],
         "third_party": [
           "cJSON"

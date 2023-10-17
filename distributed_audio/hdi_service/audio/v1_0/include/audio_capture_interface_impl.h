@@ -79,7 +79,7 @@ public:
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
-    const std::string FILE_NAME = "/data/data/daudio/hdf_captureframe.pcm";
+    const std::string HDF_CAPTURE_FILENAME = "/data/data/daudio/hdf_capture_from_sa.pcm";
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
@@ -89,6 +89,7 @@ private:
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
     int64_t lastCaptureStartTime_ = 0;
+    std::atomic<bool> muteState_ = false;
 
     std::mutex captureMtx_;
     AudioCaptureStatus captureStatus_ = CAPTURE_STATUS_CLOSE;
