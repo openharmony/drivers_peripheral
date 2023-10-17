@@ -854,7 +854,13 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    vol = std::stoi(std::string(cJSON_GetObjectItem(jParam, key.c_str())->valuestring));
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, key.c_str());
+    if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    vol = std::stoi(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
     return DH_SUCCESS;
 }

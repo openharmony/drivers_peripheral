@@ -87,13 +87,14 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     }
 #ifdef DUMP_CAPTURE_FILE
     if (dumpFlag_) {
-        SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
+        SaveFile(HDF_CAPTURE_FILENAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
     }
 #endif
-    frame.resize(devAttrs_.frameSize);
-    ret = memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size());
-    if (ret != EOK) {
-        DHLOGE("Copy capture frame failed, error code %d.", ret);
+    frame.clear();
+    frame.resize(devAttrs_.frameSize, 0);
+    if (!muteState_.load() && memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size()) !=
+        EOK) {
+        DHLOGE("Copy capture frame failed");
         return HDF_FAILURE;
     }
     ++frameIndex_;
@@ -231,15 +232,15 @@ int32_t AudioCaptureInterfaceImpl::SelectScene(const AudioSceneDescriptor &scene
 
 int32_t AudioCaptureInterfaceImpl::SetMute(bool mute)
 {
-    DHLOGI("Set mute, not support yet.");
-    (void)mute;
+    DHLOGI("Set audio mute state.");
+    muteState_.store(mute);
     return HDF_SUCCESS;
 }
 
 int32_t AudioCaptureInterfaceImpl::GetMute(bool &mute)
 {
-    DHLOGI("Get mute, not support yet.");
-    (void)mute;
+    DHLOGI("Get audio mute state.");
+    mute = muteState_.load();
     return HDF_SUCCESS;
 }
 

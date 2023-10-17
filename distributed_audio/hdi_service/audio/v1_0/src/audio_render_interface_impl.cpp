@@ -104,7 +104,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     AudioData data = { param, frame };
 #ifdef DUMP_RENDER_FILE
     if (dumpFlag_) {
-        SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
+        SaveFile(HDF_RENDER_FILENAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
     }
 #endif
     FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
