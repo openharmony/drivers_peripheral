@@ -875,14 +875,15 @@ void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId
     condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
 }
 
-IAM_STATIC bool IsInvalidUser(UserInfo *user)
+IAM_STATIC bool IsUserValid(UserInfo *user)
 {
     LinkedList *credentialInfoList = user->credentialInfoList;
     CredentialInfoHal *pinCredential = QueryCredentialByAuthType(PIN_AUTH, credentialInfoList);
     if (pinCredential == NULL) {
-        return true;
+        LOG_INFO("user is invalid, userId: %d", user->userId);
+        return false;
     }
-    return false;
+    return true;
 }
 
 IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount)
@@ -906,7 +907,7 @@ IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, ui
             break;
         }
 
-        if (IsInvalidUser(user) == true) {
+        if (!IsUserValid(user)) {
             invalidUserId[*userCount] = user->userId;
             (*userCount)++;
         }
@@ -917,16 +918,19 @@ IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, ui
 
 void ClearInvalidUser(void)
 {
+    LOG_INFO("start");
     int32_t invalidUserId[MAX_USER] = {0};
     uint32_t userCount = 0;
     GetInvalidUser(invalidUserId, MAX_USER, &userCount);
     for (uint32_t i = 0; i < userCount; ++i) {
         DeleteUser(invalidUserId[i]);
+        LOG_INFO("DeleteUser, userid: %d", invalidUserId[i]);
     }
 }
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfoLen, uint32_t *userInfocount)
 {
+    LOG_INFO("start");
     if (userInfos == NULL || userInfocount == NULL) {
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
