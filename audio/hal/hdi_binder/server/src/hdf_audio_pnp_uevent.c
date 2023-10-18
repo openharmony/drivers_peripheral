@@ -726,7 +726,7 @@ FINISH:
 }
 
 static bool g_pnpThreadRunning = false;
-static void *AudioPnpUeventStart(void *useless)
+static void AudioPnpUeventStart(void *useless)
 {
     (void)useless;
     ssize_t rcvLen;
@@ -737,7 +737,7 @@ static void *AudioPnpUeventStart(void *useless)
     AUDIO_FUNC_LOGI("audio uevent start");
     if (AudioPnpUeventOpen(&socketFd) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("open audio pnp socket failed!");
-        return NULL;
+        return;
     }
 
     fd.fd = socketFd;
@@ -767,28 +767,20 @@ static void *AudioPnpUeventStart(void *useless)
     }
 
     close(socketFd);
-    return NULL;
+    return;
 }
 
 int32_t AudioUsbPnpUeventStartThread(void)
 {
-    pthread_t thread;
-    pthread_attr_t tidsAttr;
     const char *threadName = "pnp_usb";
     g_pnpThreadRunning = true;
 
     AUDIO_FUNC_LOGI("create audio usb uevent thread");
-    pthread_attr_init(&tidsAttr);
-    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL) != 0) {
-        AUDIO_FUNC_LOGE("create audio pnp uevent thread failed");
-        return HDF_FAILURE;
-    }
-
-    if (pthread_setname_np(thread, threadName) != 0) {
-        AUDIO_FUNC_LOGE("setname failed");
-        return HDF_FAILURE;
-    }
+    ffrt_task_attr_t attr;
+    ffrt_task_attr_init(&attr);
+    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
+    ffrt_task_attr_set_name(&attr, threadname);
+    ffrt_submit_base(ffrt_create_function_wrapper(AudioPnpUeventStart, NULL, NULL), NULL, &attr);
 
     return HDF_SUCCESS;
 }
