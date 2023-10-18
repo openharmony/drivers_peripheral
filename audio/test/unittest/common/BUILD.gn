@@ -26,6 +26,10 @@ ohos_unittest("audio_ut_common_test") {
     "service/audio_manager_service_test.cpp",
   ]
 
+  if (!drivers_peripheral_audio_feature_community) {
+    sources += [ "render/audio_render_offload_test.cpp" ]
+  }
+
   include_dirs =
       [ "./../../../hdi_service/primary_impl/vendor_include/include" ]
 
