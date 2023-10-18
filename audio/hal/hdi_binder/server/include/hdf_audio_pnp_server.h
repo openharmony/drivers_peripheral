@@ -29,7 +29,8 @@ int32_t AudioPnpUpdateInfo(const char *statusInfo);
 int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
 int32_t AudioUhdfUnloadDriver(const char *driverName);
 int32_t AudioUhdfLoadDriver(const char *driverName);
-
+ffrt_function_header_t* ffrt_create_function_wrapper(const ffrt_function_t func,
+    const ffrt_function_t after_func, void* arg);
 #ifdef __cplusplus
 }
 #endif
