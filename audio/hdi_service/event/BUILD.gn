@@ -41,6 +41,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       external_deps = [
         "c_utils:utils",
         "drivers_interface_audio:audio_idl_headers",
+        "ffrt:libffrt",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
