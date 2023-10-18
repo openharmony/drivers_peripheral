@@ -23,7 +23,7 @@ ohos_unittest("PinAuthHdiUtTest") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   module_out_path = "drivers_peripheral_pin_auth/drivers_peripheral_pin_auth"
 
   include_dirs = [

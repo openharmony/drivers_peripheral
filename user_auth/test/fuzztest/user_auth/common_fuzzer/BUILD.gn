@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_shared_library("libuser_auth_interface_service_1.2_fuzzer") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/adaptor/inc",
     "../../../../hdi_service/coauth/inc",
