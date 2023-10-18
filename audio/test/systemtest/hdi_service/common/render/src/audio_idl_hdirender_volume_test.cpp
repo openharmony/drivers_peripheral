@@ -431,17 +431,17 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_001, TestSize.Level1)
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeInitExpc, volumeInit);
     ret = render->SetVolume(render, volumeLow);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeLow);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeLowExpc, volumeLow);
     ret = render->SetVolume(render, volumeMid);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeMid);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMidExpc, volumeMid);
     ret = render->SetVolume(render, volumeHigh);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeHigh);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeHighExpc, volumeHigh);
@@ -469,16 +469,16 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_002, TestSize.Level1)
     EXPECT_EQ(volumeMinExpc, volumeMin);
 
     ret = render->SetVolume(render, volumeMax);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ret = render->GetVolume(render, &volumeMax);
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     EXPECT_EQ(volumeMaxExpc, volumeMax);
 
     ret = render->SetVolume(render, volumeMinBoundary);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = render->SetVolume(render, volumeMaxBoundary);
-    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_NOT_SUPPORT);
 }
 /**
 * @tc.name  AudioRenderSetVolumeNull_003
