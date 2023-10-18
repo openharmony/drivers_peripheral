@@ -18,6 +18,7 @@
 
 #include "v1_0/audio_types.h"
 #include "hdf_types.h"
+#include "ffrt_inner.h"
 
 #ifdef __cplusplus
 extern "C" {
