@@ -30,6 +30,17 @@
       "sub_component": [
         "//drivers/peripheral/partitionslot:partitionslot_entry"
       ],
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/partitionslot/hal:libpartition_slot_manager",
+          "header": {
+            "header_files": [],
+            "header_base": [
+              "//drivers/peripheral/partitionslot/hal/include"
+            ]
+          }
+        }
+      ],
       "test": [
         "//drivers/peripheral/partitionslot/test:partitionslot_unittest"
       ]
