@@ -34,6 +34,44 @@
 
 #define AUDIODRV_CTRL_IOCTRL_ELEM_HDMI 5 // define from adm control stream id
 
+typedef struct {
+    ffrt_function_header_t header;
+    ffrt_function_t func;
+    ffrt_function_t after_func;
+    void* arg;
+} c_function;
+
+static void ffrt_exec_function_wrapper(void* t)
+{
+    c_function* f = (c_function*)t;
+    if (f->func) {
+        f->func(f->arg);
+    }
+}
+
+static void ffrt_destroy_function_wrapper(void* t)
+{
+    c_function* f = (c_function*)t;
+    if (f->after_func) {
+        f->after_func(f->arg);
+    }
+}
+
+#define FFRT_STATIC_ASSERT(cond, msg) int x(int static_assertion_##msg[(cond) ? 1 : -1])
+ffrt_function_header_t* ffrt_create_function_wrapper(const ffrt_function_t func,
+    const ffrt_function_t after_func, void* arg)
+{
+    FFRT_STATIC_ASSERT(sizeof(c_function) <= ffrt_auto_managed_function_storage_size,
+        size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
+    c_function* f = (c_function*)ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_general);
+    f->header.exec = ffrt_exec_function_wrapper;
+    f->header.destroy = ffrt_destroy_function_wrapper;
+    f->func = func;
+    f->after_func = after_func;
+    f->arg = arg;
+    return (ffrt_function_header_t*)f;
+}
+
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
 
 int32_t AudioPnpUpdateInfo(const char *statusInfo)
