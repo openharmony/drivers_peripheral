@@ -938,7 +938,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.L
     func_->ObjectToVector(freqParam, inParam);
     ret = g_component->GetParameter(OMX_IndexParamWorkingFrequency, inParam, outParam);
     ASSERT_TRUE(ret == HDF_SUCCESS);
-    func_->VectorToObject(freqParam, outParam);
+    func_->VectorToObject(outParam, freqParam);
 
     // 设置为最高档
     freqParam.level = freqParam.level - 1;
