@@ -25,27 +25,27 @@
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-namespace V1_0 {
-static sptr<V1_0::INfcCallback> g_callbackV1_0 = nullptr;
+namespace V1_1 {
+static sptr<INfcCallback> g_callbackV1_1 = nullptr;
 
 static void EventCallback(unsigned char event, unsigned char status)
 {
-    if (g_callbackV1_0 != nullptr) {
-        g_callbackV1_0->OnEvent((NfcEvent)event, (NfcStatus)status);
+    if (g_callbackV1_1 != nullptr) {
+        g_callbackV1_1->OnEvent((NfcEvent)event, (NfcStatus)status);
     }
 }
 
 static void DataCallback(uint16_t len, uint8_t *data)
 {
-    if (g_callbackV1_0 != nullptr) {
+    if (g_callbackV1_1 != nullptr) {
         std::vector<uint8_t> vec(data, data + len / sizeof(uint8_t));
-        g_callbackV1_0->OnData(vec);
+        g_callbackV1_1->OnData(vec);
     }
 }
 
 extern "C" INfcInterface *NfcInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Nfc::V1_0::NfcImpl;
+    using OHOS::HDI::Nfc::V1_1::NfcImpl;
     NfcImpl *service = new (std::nothrow) NfcImpl();
     if (service == nullptr) {
         return nullptr;
@@ -73,7 +73,7 @@ int32_t NfcImpl::Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status)
         HDF_LOGE("Open, callback is nullptr!");
         return HDF_ERR_INVALID_PARAM;
     }
-    g_callbackV1_0 = callbackObj;
+    g_callbackV1_1 = callbackObj;
 
     int ret = adaptor_.VendorOpen(EventCallback, DataCallback);
     if (ret == 0) {
@@ -151,7 +151,7 @@ int32_t NfcImpl::PowerCycle(NfcStatus &status)
 
 int32_t NfcImpl::Close(NfcStatus &status)
 {
-    g_callbackV1_0 = nullptr;
+    g_callbackV1_1 = nullptr;
     if (callbacks_ != nullptr) {
         RemoveNfcDeathRecipient(callbacks_);
         callbacks_ = nullptr;
@@ -172,6 +172,39 @@ int32_t NfcImpl::Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStat
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = adaptor_.VendorIoctl(data.size(), (uint8_t *)&data[0]);
+    if (ret == 0) {
+        status = NfcStatus::OK;
+        return HDF_SUCCESS;
+    }
+    status = NfcStatus::FAILED;
+    return HDF_FAILURE;
+}
+
+int32_t NfcImpl::GetVendorConfig(NfcVendorConfig &config, NfcStatus &status)
+{
+    if (adaptor_.VendorGetConfig(config) != HDF_SUCCESS) {
+        HDF_LOGE("GetConfig, fail to get vendor config!");
+        status = NfcStatus::FAILED;
+        return HDF_FAILURE;
+    }
+    status = NfcStatus::OK;
+    return HDF_SUCCESS;
+}
+
+int32_t NfcImpl::DoFactoryReset(NfcStatus &status)
+{
+    int ret = adaptor_.VendorFactoryReset();
+    if (ret == 0) {
+        status = NfcStatus::OK;
+        return HDF_SUCCESS;
+    }
+    status = NfcStatus::FAILED;
+    return HDF_FAILURE;
+}
+
+int32_t NfcImpl::Shutdown(NfcStatus &status)
+{
+    int ret = adaptor_.VendorShutdownCase();
     if (ret == 0) {
         status = NfcStatus::OK;
         return HDF_SUCCESS;
@@ -211,7 +244,7 @@ int32_t NfcImpl::RemoveNfcDeathRecipient(const sptr<INfcCallback> &callbackObj)
     }
     return HDF_SUCCESS;
 }
-} // V1_0
+} // V1_1
 } // Nfc
 } // HDI
 } // OHOS
