@@ -19,7 +19,9 @@
 #include <hdf_log.h>
 #include <vector>
 
+#ifdef SECURE_ELEMENT_USE_CA
 #include "secure_element_ca.h"
+#endif
 
 #define HDF_LOG_TAG hdf_se
 
@@ -27,7 +29,9 @@ namespace OHOS {
 namespace HDI {
 namespace SecureElement {
 static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
+#ifdef SECURE_ELEMENT_USE_CA
 static const int RES_BUFFER_MAX_LENGTH = 512;
+#endif
 
 SeVendorAdaptions::SeVendorAdaptions() {}
 
@@ -41,13 +45,14 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
         status = SecureElementStatus::SE_NULL_POINTER_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
-    
-    int ret = HuaweiSecureElementCaInit();
+#ifdef SECURE_ELEMENT_USE_CA
+    int ret = VendorSecureElementCaInit();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("getAtr failed ret %u", ret);
         status = SecureElementStatus::SE_GENERAL_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
+#endif
     g_callbackV1_0 = clientCallback;
     g_callbackV1_0->OnSeStateChanged(true);
     status = SecureElementStatus::SE_SUCCESS;
@@ -57,15 +62,17 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
 {
     HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+#ifdef SECURE_ELEMENT_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = HuaweiSecureElementCaGetAtr(res, &resLen);
+    int ret = VendorSecureElementCaGetAtr(res, &resLen);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("getAtr failed ret %u", ret);
     }
+#endif
     return HDF_SUCCESS;
 }
 
@@ -89,9 +96,10 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef SECURE_ELEMENT_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = HuaweiSecureElementCaOpenLogicalChannel((uint8_t *)&aid[0], aid.size(), p2, res, &resLen,
+    int ret = VendorSecureElementCaOpenLogicalChannel((uint8_t *)&aid[0], aid.size(), p2, res, &resLen,
         (uint32_t *)&channelNumber);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
@@ -100,6 +108,7 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openLogicalChannel failed ret %u", ret);
     }
+#endif
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
@@ -113,9 +122,10 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
         status = SecureElementStatus::SE_ILLEGAL_PARAMETER_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef SECURE_ELEMENT_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = HuaweiSecureElementCaOpenBasicChannel((uint8_t *)&aid[0], aid.size(), res, &resLen);
+    int ret = VendorSecureElementCaOpenBasicChannel((uint8_t *)&aid[0], aid.size(), res, &resLen);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -123,6 +133,7 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openBasicChannel failed ret %u", ret);
     }
+#endif
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
@@ -130,11 +141,13 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
 int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStatus& status)
 {
     HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
-    int ret = HuaweiSecureElementCaCloseChannel(channelNumber);
+#ifdef SECURE_ELEMENT_USE_CA
+    int ret = VendorSecureElementCaCloseChannel(channelNumber);
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("closeChannel failed ret %u", ret);
     }
+#endif
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
@@ -143,9 +156,10 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
     SecureElementStatus& status)
 {
     HDF_LOGI("SeVendorAdaptions:%{public}s!", __func__);
+#ifdef SECURE_ELEMENT_USE_CA
     uint8_t res[RES_BUFFER_MAX_LENGTH] = {0};
     uint32_t resLen = RES_BUFFER_MAX_LENGTH;
-    int ret = HuaweiSecureElementCaTransmit((uint8_t *)&command[0], command.size(), res, &resLen);
+    int ret = VendorSecureElementCaTransmit((uint8_t *)&command[0], command.size(), res, &resLen);
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -153,6 +167,7 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("transmit failed ret %u", ret);
     }
+#endif
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
