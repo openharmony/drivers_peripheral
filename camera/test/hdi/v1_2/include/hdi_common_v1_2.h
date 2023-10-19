@@ -60,13 +60,19 @@ public:
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultCapture(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultSketch(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosPreview(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosPreviewV1_2(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosCapture(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosAnalyze(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosVideo(
+        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosSketch(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void StartStream(std::vector<StreamIntent> intents);
     uint64_t GetCurrentLocalTimeStamp();
@@ -75,6 +81,7 @@ public:
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraHost> serviceV1_1 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
@@ -92,6 +99,7 @@ public:
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoAnalyze = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoPre = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSketch = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
@@ -99,9 +107,13 @@ public:
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
     int streamIdPreview = 100;
     int streamIdCapture = 101;
+    int streamIdSketch = 105;
     int captureWidth = 1280;
     int captureHeight = 960;
+    int sketchWidth = 640;
+    int sketchHeight = 480;
     int captureIdPreview = 2000;
+    int captureIdSketch = 2050;
     int previewWidth = 1920;
     int previewHeight = 1080;
     int captureIdCapture = 2010;
