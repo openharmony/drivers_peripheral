@@ -228,7 +228,7 @@ int32_t AudioHdmiPnpUeventStartThread(void)
     ffrt_task_attr_init(&attr);
     ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
     ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(ffrt_create_function_wrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
