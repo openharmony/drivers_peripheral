@@ -101,6 +101,8 @@ enum SensorTypeTag {
     SENSOR_TYPE_SIGNIFICANT_MOTION          = 264,   /**< Significant motion sensor */
     SENSOR_TYPE_PEDOMETER_DETECTION         = 265,   /**< Pedometer detection sensor */
     SENSOR_TYPE_PEDOMETER                   = 266,   /**< Pedometer sensor */
+    SENSOR_TYPE_POSTURE                     = 267,   /**< Posture sensor */
+    SENSOR_TYPE_HEADPOSTURE                 = 268,   /**< Headposture sensor */
     SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR = 277,   /**< Geomagnetic rotation vector sensor */
     SENSOR_TYPE_HEART_RATE                  = 278,   /**< Heart rate sensor */
     SENSOR_TYPE_DEVICE_ORIENTATION          = 279,   /**< Device orientation sensor */
