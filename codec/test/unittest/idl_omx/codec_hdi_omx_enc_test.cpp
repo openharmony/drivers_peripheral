@@ -919,11 +919,11 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.L
 {
     const std::string processName = "cast_engine_service";
     std::vector<int8_t> paramVec;
-    
+
     ASSERT_TRUE(g_component != nullptr);
-    
+
     ProcessNameParam nameParam;
-    func_->InitExtParam(nameParam)；
+    func_->InitExtParam(nameParam);
     int32_t ret = strcpy_s(nameParam.processName, sizeof(nameParam.processName), processName.c_str());
     ASSERT_TRUE(ret == EOK);
     func_->ObjectToVector(nameParam, paramVec);
