@@ -15,6 +15,9 @@
       "adapted_system_type": ["standard"],
       "rom": "1000KB",
       "ram": "1000KB",
+      "features": [
+        "drivers_peripheral_secure_element_use_ca"
+      ],
       "deps": {
         "components": [
           "ipc",
