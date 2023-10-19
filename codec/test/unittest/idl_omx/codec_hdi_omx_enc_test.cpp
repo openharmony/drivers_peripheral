@@ -914,7 +914,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 #endif
-
+#ifdef NON_COMMUNITY
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.Level1)
 {
     const std::string processName = "cast_engine_service";
@@ -946,4 +946,5 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.L
     ret = g_component->SetParameter(OMX_IndexParamWorkingFrequency, inParam);
     ASSERT_TRUE(ret == HDF_SUCCESS);
 }
+#endif
 }  // namespace

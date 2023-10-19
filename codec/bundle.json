@@ -15,7 +15,8 @@
     "features": [
       "drivers_peripheral_codec_feature_support_omx_extend_test",
       "drivers_peripheral_codec_feature_set_omx_role",
-      "drivers_peripheral_codec_feature_support_hdi_v1"
+      "drivers_peripheral_codec_feature_support_hdi_v1",
+      "drivers_peripheral_codec_feature_non_community"
     ],
     "syscap": [],
     "adapted_system_type": ["standard"],
