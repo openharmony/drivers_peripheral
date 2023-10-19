@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,17 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef AUDIOOFFLOADRENDER_FUZZER_H
+#define AUDIOOFFLOADRENDER_FUZZER_H
+#define FUZZ_PROJECT_NAME "audiooffloadrender_fuzzer"
 
-#ifndef AUDIO_RENDER_VDI_H
-#define AUDIO_RENDER_VDI_H
-
-#include "iaudio_render_vdi.h"
-#include "v1_0/iaudio_render.h"
-
-struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
-    struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc);
-void AudioDestroyRenderByIdVdi(uint32_t renderId);
-struct IAudioRenderVdi *AudioGetVdiRenderByIdVdi(uint32_t renderId);
-uint32_t DecreaseRenderUsrCount(uint32_t renderId);
-
-#endif // AUDIO_RENDER_VDI_H
+#endif
