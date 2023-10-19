@@ -260,6 +260,66 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_010, TestSize.Level1)
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 }
 
+
+/**
+ * @tc.name: CommitStreams_V1_1_SCAN_CODE
+ * @tc.desc: CommitStreams_V1_1 for Scan code, preview and video   
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_011, TestSize.Level1)
+{
+    // Get Stream Operator
+    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator_V1_1);
+    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    // preview streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+    // video streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+    // is streams supported V1_1
+    std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
+    int64_t expoTime = 0;
+    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
+    int64_t colorGains[4] = {0};
+    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
+    std::vector<uint8_t> modeSettingVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, modeSettingVec);
+    StreamSupportType pType;
+    cameraTest->rc = cameraTest->streamOperator_V1_1->IsStreamsSupported_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SCAN_CODE),
+        modeSettingVec, cameraTest->streamInfosV1_1, pType);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // create and commitstreams
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SCAN_CODE),
+        cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    sleep(UT_SECOND_TIMES);
+
+    // start capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+    sleep(UT_SECOND_TIMES);
+
+    // stop stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
 HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
 {
     common_metadata_header_t* data = cameraTest->ability->get();
