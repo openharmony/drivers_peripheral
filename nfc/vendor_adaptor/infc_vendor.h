@@ -15,6 +15,8 @@
 #ifndef I_NFC_VENDOR_H
 #define I_NFC_VENDOR_H
 
+#include "v1_1/nfc_types.h"
+
 typedef uint8_t nfc_event_t;
 typedef uint8_t nfc_status_t;
 
@@ -27,16 +29,17 @@ namespace Nfc {
 class INfcVendor {
 public:
     virtual ~INfcVendor() {}
-    virtual int VendorOpen(NfcStackCallbackT *pCback,
-                           NfcStackDataCallbackT *pDataCback);
+    virtual int VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
     virtual int VendorWrite(uint16_t dataLen, const uint8_t *pData);
-    virtual int VendorCoreInitialized(uint16_t coreInitRspLen,
-                                      uint8_t *pCoreInitRspParams);
+    virtual int VendorCoreInitialized(uint16_t coreInitRspLen, uint8_t *pCoreInitRspParams);
     virtual int VendorPrediscover(void);
     virtual int VendorClose(bool bShutdown);
     virtual int VendorControlGranted(void);
     virtual int VendorPowerCycle(void);
     virtual int VendorIoctl(long arg, void *pData);
+    virtual int VendorGetConfig(V1_1::NfcVendorConfig &config);
+    virtual int VendorFactoryReset(void);
+    virtual int VendorShutdownCase(void);
 };
 } // Nfc
 } // HDI
