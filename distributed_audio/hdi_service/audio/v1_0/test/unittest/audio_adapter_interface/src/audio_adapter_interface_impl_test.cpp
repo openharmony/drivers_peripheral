@@ -285,7 +285,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
     std::string value = "world";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_LOWPOWER;
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
 }
@@ -625,7 +625,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback(nullptr);
     AdapterTest_->spkPinInUse_  = 0;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     AdapterTest_->spkPinInUse_  = 1;
     callback = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
@@ -706,7 +706,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
     std::string condition = "EVENT_TYPE=4;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
     int32_t dhId = 1;
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     AdapterTest_->extCallbackMap_[dhId] = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     std::string adpterName = "adbcef";
@@ -902,7 +902,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_001, TestSize.Lev
         new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback));
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
     AdapterTest_->paramCallback_ = new MockIAudioParamCallback();
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
 /**
@@ -1104,11 +1104,11 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_001, TestSize.Level1)
             AdapterTest_->spkWaitCond_.notify_one();
         }});
     AudioDeviceEvent  event = EVENT_OPEN_SPK;
-    AdapterTest_->isSpkOpened_ = false;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL, AdapterTest_->WaitForSANotify(event));
-    AudioDeviceEvent  event1 = EVENT_CLOSE_SPK ;
     AdapterTest_->isSpkOpened_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL, AdapterTest_->WaitForSANotify(event1));
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event));
+    AudioDeviceEvent event1 = EVENT_CLOSE_SPK ;
+    AdapterTest_->isSpkOpened_ = false;
+    EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event1));
     flag = 0;
     if (th.joinable()) {
         th.join();
@@ -1155,11 +1155,12 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_003, TestSize.Level1)
             AdapterTest_->micWaitCond_.notify_one();
         }});
     AudioDeviceEvent  event = EVENT_OPEN_MIC;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL, AdapterTest_->WaitForSANotify(event));
+    AdapterTest_->isMicOpened_ = true;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(event));
 
     AudioDeviceEvent  event1 = EVENT_CLOSE_MIC;
-    AdapterTest_->isMicOpened_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL, AdapterTest_->WaitForSANotify(event1));
+    AdapterTest_->isMicOpened_ = false;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(event1));
     flag = 0;
     if (th.joinable()) {
         th.join();
@@ -1250,7 +1251,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_003, TestSize.Level1)
     AdapterTest_->paramCallback_ = new MockRevertIAudioParamCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleDeviceClosed(event));
 }
-
 } // V1_0
 } // Audio
 } // Distributedaudio

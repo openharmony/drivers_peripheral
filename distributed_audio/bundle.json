@@ -4,7 +4,7 @@
     "version": "4.0",
     "license": "Apache License 2.0",
     "segment": {
-      "destPath":"drivers/peripheral/distributed_audio/"
+      "destPath":"drivers/peripheral/distributed_audio"
     },
     "component": {
       "name": "drivers_peripheral_distributed_audio",
