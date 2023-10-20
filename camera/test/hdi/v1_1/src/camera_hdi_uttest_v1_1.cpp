@@ -229,6 +229,9 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_008, TestSize.Level1)
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     sleep(UT_SECOND_TIMES);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 
     // Release
     cameraTest->rc = cameraTest->streamOperator_V1_1->DetachBufferQueue(cameraTest->streamInfoV1_1->v1_0.streamId_);
