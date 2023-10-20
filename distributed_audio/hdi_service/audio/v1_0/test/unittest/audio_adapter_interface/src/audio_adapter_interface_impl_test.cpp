@@ -281,7 +281,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, ReleaseAudioRoute_001, TestSize.Level1)
 HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
 {
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
-    std::string condition = "hello";
+    std::string condition = "{\"dhId\":\"1\"}";
     std::string value = "world";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;

@@ -58,6 +58,8 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
 void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
 
 int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::string>> &keys, std::string &content);
+
+bool CheckIsNum(const std::string &jsonString);
 } // DistributedHardware
 } // OHOS
 #endif

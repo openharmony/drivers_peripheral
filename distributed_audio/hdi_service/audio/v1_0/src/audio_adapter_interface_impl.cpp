@@ -573,7 +573,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
 
     ret = WaitForSANotify(EVENT_OPEN_SPK);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed.");
+        DHLOGE("Wait SA notify failed. ret: %d", ret);
         return ret;
     }
     DHLOGI("Open render device success.");
@@ -602,7 +602,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
 
     ret = WaitForSANotify(EVENT_CLOSE_SPK);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed.");
+        DHLOGE("Wait SA notify failed. ret: %d.", ret);
         return ret;
     }
     spkPinInUse_ = 0;
@@ -641,7 +641,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
 
     ret = WaitForSANotify(EVENT_OPEN_MIC);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed.");
+        DHLOGE("Wait SA notify failed. ret: %d.", ret);
         return ret;
     }
     DHLOGI("Open capture device success.");
@@ -666,7 +666,7 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
 
     ret = WaitForSANotify(EVENT_CLOSE_MIC);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed.");
+        DHLOGE("Wait SA notify failed. ret:%d.", ret);
         return ret;
     }
     micPinInUse_ = 0;
@@ -790,7 +790,12 @@ int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, 
 int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &condition)
 {
     std::string::size_type position = condition.find_first_of(";");
-    int32_t type = std::stoi(condition.substr(TYPE_CONDITION, position - TYPE_CONDITION));
+    std::string val = condition.substr(TYPE_CONDITION, position - TYPE_CONDITION);
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    int32_t type = std::stoi(val);
     return static_cast<VolumeEventType>(type);
 }
 
@@ -860,7 +865,12 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-    vol = std::stoi(std::string(dhIdItem->valuestring));
+    std::string val(dhIdItem->valuestring);
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    vol = std::stoi(val);
     cJSON_Delete(jParam);
     return DH_SUCCESS;
 }
@@ -899,6 +909,23 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
     return DH_SUCCESS;
 }
 
+int32_t AudioAdapterInterfaceImpl::ConvertMsg2Code(const std::string &msg)
+{
+    if (msg == HDF_EVENT_RESULT_SUCCESS) {
+        return DH_SUCCESS;
+    } else if (msg == HDF_EVENT_INIT_ENGINE_FAILED) {
+        return ERR_DH_AUDIO_HDF_INIT_ENGINE_FAILED;
+    } else if (msg == HDF_EVENT_NOTIFY_SINK_FAILED) {
+        return ERR_DH_AUDIO_HDF_NOTIFY_SINK_FAILED;
+    } else if (msg == HDF_EVENT_TRANS_SETUP_FAILED) {
+        return ERR_DH_AUDIO_HDF_TRANS_SETUP_FAILED;
+    } else if (msg == HDF_EVENT_TRANS_START_FAILED) {
+        return ERR_DH_AUDIO_HDF_TRANS_START_FAILED;
+    } else {
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+}
+
 int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
 {
     DHLOGD("Notify event type %d, event content: %s.", event.type, event.content.c_str());
@@ -907,6 +934,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             if (event.content == HDF_EVENT_RESULT_SUCCESS) {
                 isSpkOpened_ = true;
             }
+            errCode_ = ConvertMsg2Code(event.content);
             spkNotifyFlag_ = true;
             spkWaitCond_.notify_all();
             break;
@@ -914,6 +942,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             if (event.content == HDF_EVENT_RESULT_SUCCESS) {
                 isSpkOpened_ = false;
             }
+            errCode_ = ConvertMsg2Code(event.content);
             spkNotifyFlag_ = true;
             spkWaitCond_.notify_all();
             break;
@@ -921,6 +950,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             if (event.content == HDF_EVENT_RESULT_SUCCESS) {
                 isMicOpened_ = true;
             }
+            errCode_ = ConvertMsg2Code(event.content);
             micNotifyFlag_ = true;
             micWaitCond_.notify_all();
             break;
@@ -928,6 +958,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             if (event.content == HDF_EVENT_RESULT_SUCCESS) {
                 isMicOpened_ = false;
             }
+            errCode_ = ConvertMsg2Code(event.content);
             micNotifyFlag_ = true;
             micWaitCond_.notify_all();
             break;
@@ -959,10 +990,10 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
         }
         if (event == EVENT_OPEN_SPK && !isSpkOpened_) {
             DHLOGE("Wait open render device failed.");
-            return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
+            return errCode_;
         } else if (event == EVENT_CLOSE_SPK && isSpkOpened_) {
             DHLOGE("Wait close render device failed.");
-            return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
+            return errCode_;
         }
         return DH_SUCCESS;
     }
@@ -980,10 +1011,10 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
         }
         if (event == EVENT_OPEN_MIC && !isMicOpened_) {
             DHLOGE("Wait open capture device failed.");
-            return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
+            return errCode_;
         } else if (event == EVENT_CLOSE_MIC && isMicOpened_) {
             DHLOGE("Wait close capture device failed.");
-            return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
+            return errCode_;
         }
         return DH_SUCCESS;
     }

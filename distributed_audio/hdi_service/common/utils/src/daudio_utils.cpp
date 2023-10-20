@@ -21,12 +21,17 @@
 
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
+#include "daudio_log.h"
+
+#undef DH_LOG_TAG
+#define DH_LOG_TAG "DAudioUtils"
 
 namespace OHOS {
 namespace DistributedHardware {
 constexpr size_t INT32_SHORT_ID_LENGTH = 20;
 constexpr size_t INT32_PLAINTEXT_LENGTH = 4;
 constexpr size_t INT32_MIN_ID_LENGTH = 3;
+constexpr uint8_t MAX_KEY_DH_ID_LEN = 20;
 
 std::string GetAnonyString(const std::string &value)
 {
@@ -71,10 +76,29 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
 
 int32_t GetAudioParamInt(const std::string &params, const std::string &key, int32_t &value)
 {
-    std::string val = "0";
+    std::string val = "-1";
     int32_t ret = GetAudioParamStr(params, key, val);
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return -1;
+    }
     value = std::stoi(val);
     return ret;
+}
+
+bool CheckIsNum(const std::string &jsonString)
+{
+    if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
+        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
+        return false;
+    }
+    for (char const &c : jsonString) {
+        if (!std::isdigit(c)) {
+            DHLOGE("Json string is not number.");
+            return false;
+        }
+    }
+    return true;
 }
 
 int32_t GetAudioParamUInt(const std::string &params, const std::string &key, uint32_t &value)

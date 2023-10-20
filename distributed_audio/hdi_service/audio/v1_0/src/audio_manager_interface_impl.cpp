@@ -130,6 +130,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         }
     }
     remote_ = OHOS::HDI::hdi_objcast<IDAudioCallback>(callback);
+    if (remote_ == nullptr) {
+        DHLOGE("remote callback is nullptr.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
     remote_->AddDeathRecipient(audioManagerRecipient_);
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
@@ -143,7 +147,6 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         case AUDIO_DEVICE_TYPE_MIC:
             adp->second->SetMicCallback(dhId, callback);
             break;
-        case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:
             DHLOGE("DhId is illegal, devType is unknow.");
             return ERR_DH_AUDIO_HDF_FAIL;
@@ -154,11 +157,8 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         return ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    DAudioDevEvent event = { adpName,
-                             dhId,
-                             HDF_AUDIO_DEVICE_ADD,
-                             0,
-                             adp->second->GetVolumeGroup(dhId),
+    DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD,
+                             0, adp->second->GetVolumeGroup(dhId),
                              adp->second->GetInterruptGroup(dhId) };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
