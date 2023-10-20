@@ -121,13 +121,13 @@ void Test::Open()
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         ASSERT_TRUE(serviceV1_2 != nullptr);
-        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
         if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
             CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
             return;
         }
         ASSERT_TRUE(cameraDeviceV1_1 != nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
+        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
         CAMERA_LOGI("OpenCamera V1_1 success");
     }
 }
