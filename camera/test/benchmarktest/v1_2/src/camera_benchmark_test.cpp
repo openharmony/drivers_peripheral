@@ -57,24 +57,24 @@ BENCHMARK_REGISTER_F(CameraBenchmarkTest, NotifyDeviceStateChangeInfo_benchmark_
 
 
 /**
-  * @tc.name: UpdateSettings
+  * @tc.name: UpdateSettings_V1_2
   * @tc.desc: benchmark
   * @tc.level: Level0
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-BENCHMARK_F(CameraBenchmarkTest, UpdateSettings_benchmark_001)(
+BENCHMARK_F(CameraBenchmarkTest, UpdateSettings_V1_2_benchmark_001)(
     benchmark::State &st)
 {
-    EXPECT_EQ(false, cameraTest->serviceV1_2 == nullptr);
+    EXPECT_EQ(false, cameraTest->cameraDeviceV1_2 == nullptr);
     constexpr uint32_t inputSettings = 50;
     char settings[inputSettings];
     int paramPriority = 1;
     for (auto _ : st) {
-        cameraTest->rc = cameraTest->serviceV1_2->UpdateSettings(settings, paramPriority);
+        cameraTest->rc = cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(settings, paramPriority);
     }
 }
-BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateSettings_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateSettings_V1_2_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 BENCHMARK_MAIN();
