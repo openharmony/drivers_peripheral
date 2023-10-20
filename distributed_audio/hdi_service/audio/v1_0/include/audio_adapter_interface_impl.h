@@ -135,6 +135,7 @@ private:
     sptr<IDAudioCallback> MatchStreamCallback(const AudioSampleAttributes &attrs,
         const AudioDeviceDescriptor &desc, int32_t &dhId);
     int32_t GetVolFromEvent(const std::string &content, const std::string &key, int32_t &vol);
+    int32_t ConvertMsg2Code(const std::string &msg);
 
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
@@ -162,6 +163,7 @@ private:
     std::condition_variable micWaitCond_;
 
     bool isSpkOpened_ = false;
+    int32_t errCode_ = -1;
     bool isMicOpened_ = false;
     bool spkNotifyFlag_ = false;
     bool micNotifyFlag_ = false;
