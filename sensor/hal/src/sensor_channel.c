@@ -161,7 +161,6 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
     } else {
         groupType = TRADITIONAL_SENSOR_TYPE;
     }
-    event->option = SENSOR_STATUS_ACCURACY_HIGH;
 
     ConvertSensorData(event);
     CopyEventData(event);
