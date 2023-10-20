@@ -29,3 +29,7 @@ battery/ @time_zhang
 input/ @time_zhang
 thermal/ @time_zhang
 power/ @time_zhang
+location/ @xujiang1981
+bluetooth/hci/ @xujiang1981
+bluetooth/audio/ @xujiang1981
+nfc/ @knpingan
