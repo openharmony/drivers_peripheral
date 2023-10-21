@@ -200,11 +200,6 @@ int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
 int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct IAudioAdapter **adapter, struct IAudioRender **render, uint32_t *renderId);
 
-#ifdef SUPPORT_OFFLOAD
-int32_t AudioOffloadCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct IAudioAdapter **adapter, struct IAudioRender **render, uint32_t *renderId);
-#endif
-
 int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct IAudioAdapter **adapter, struct IAudioCapture **capture, uint32_t *captureId);
 
