@@ -40,7 +40,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
 {
     CHECK_NULL_PTR_RETURN(attrs);
     CHECK_NULL_PTR_RETURN(vdiAttrs);
-    AUDIO_FUNC_LOGI("render or capture type is %{public}d", attrs->type);
+
     vdiAttrs->type = (enum AudioCategoryVdi)attrs->type;
     vdiAttrs->interleaved = attrs->interleaved;
     vdiAttrs->format = (enum AudioFormatVdi)attrs->format;

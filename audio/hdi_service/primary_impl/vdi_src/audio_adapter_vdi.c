@@ -109,6 +109,12 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
     CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
+    *render = FindRenderCreated(desc->pins, attrs, renderId);
+    if (*render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return HDF_SUCCESS;
+    }
+
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
@@ -130,7 +136,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         AUDIO_FUNC_LOGE("Create audio render failed");
         return HDF_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success");
+
     return HDF_SUCCESS;
 }
 
@@ -173,6 +179,12 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(captureId, HDF_ERR_INVALID_PARAM);
     CHECK_VALID_RANGE_RETURN(*captureId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
+    *capture = FindCaptureCreated(desc->pins, attrs, captureId);
+    if (*capture != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return HDF_SUCCESS;
+    }
+
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
 
@@ -198,7 +210,7 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
         AUDIO_FUNC_LOGE("create audio capture failed");
         return HDF_ERR_INVALID_PARAM;
     }
-    AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success");
+
     return HDF_SUCCESS;
 }
 

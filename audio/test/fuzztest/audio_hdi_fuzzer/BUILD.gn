@@ -14,15 +14,10 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 import("//build/test.gni")
-import("./../../../audio.gni")
 
 group("audio_hdi_fuzzer") {
   testonly = true
   deps = []
-
-  if (!drivers_peripheral_audio_feature_community) {
-    deps += [ "audiooffloadrender_fuzzer:AudioOffloadRenderFuzzTest" ]
-  }
 
   deps += [
     "audioadapter_fuzzer:AudioAdapterFuzzTest",
