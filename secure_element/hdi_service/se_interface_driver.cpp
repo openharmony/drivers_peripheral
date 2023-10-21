@@ -19,6 +19,10 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/secure_element_interface_stub.h"
 
+#ifdef SECURE_ELEMENT_USE_CA
+#include "secure_element_ca.h"
+#endif
+
 #define HDF_LOG_TAG hdf_se
 
 using OHOS::HDI::SecureElement::V1_0::ISecureElementInterface;
@@ -52,6 +56,14 @@ static int32_t SeInterfaceDriverDispatch(struct HdfDeviceIoClient* client, int c
 
 static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
+    HDF_LOGE("%{public}s: Enter", __func__);
+#ifdef SECURE_ELEMENT_USE_CA
+    int ret = VendorSecureElementCaInit();
+    if (ret != SECURE_ELEMENT_CA_RET_OK) {
+        HDF_LOGE("%{public}s: Failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+#endif
     return HDF_SUCCESS;
 }
 
