@@ -12,6 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../secure_element.gni")
 
 ohos_shared_library("libsecure_element_interface_service_1.0") {
   include_dirs = [ "../vendor_adaptor" ]
@@ -52,6 +53,11 @@ ohos_shared_library("se_hdi_driver") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+
+  if (drivers_peripheral_secure_element_use_ca) {
+    defines += [ "SECURE_ELEMENT_USE_CA" ]
+    external_deps += [ "nfc_ca:secure_element_ca" ]
+  }
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
