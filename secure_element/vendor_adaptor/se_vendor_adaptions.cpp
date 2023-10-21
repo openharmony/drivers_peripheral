@@ -48,7 +48,7 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
 #ifdef SECURE_ELEMENT_USE_CA
     int ret = VendorSecureElementCaInit();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        HDF_LOGE("getAtr failed ret %u", ret);
+        HDF_LOGE("VendorSecureElementCaInit failed ret %{public}u", ret);
         status = SecureElementStatus::SE_GENERAL_ERROR;
         return HDF_ERR_INVALID_PARAM;
     }
@@ -70,7 +70,7 @@ int32_t SeVendorAdaptions::getAtr(std::vector<uint8_t>& response)
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        HDF_LOGE("getAtr failed ret %u", ret);
+        HDF_LOGE("getAtr failed ret %{public}u", ret);
     }
 #endif
     return HDF_SUCCESS;
@@ -106,7 +106,7 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
-        HDF_LOGE("openLogicalChannel failed ret %u", ret);
+        HDF_LOGE("openLogicalChannel failed ret %{public}u", ret);
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
@@ -131,7 +131,7 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
-        HDF_LOGE("openBasicChannel failed ret %u", ret);
+        HDF_LOGE("openBasicChannel failed ret %{public}u", ret);
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
@@ -145,7 +145,7 @@ int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStat
     int ret = VendorSecureElementCaCloseChannel(channelNumber);
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
-        HDF_LOGE("closeChannel failed ret %u", ret);
+        HDF_LOGE("closeChannel failed ret %{public}u", ret);
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
@@ -165,7 +165,7 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
-        HDF_LOGE("transmit failed ret %u", ret);
+        HDF_LOGE("transmit failed ret %{public}u", ret);
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
