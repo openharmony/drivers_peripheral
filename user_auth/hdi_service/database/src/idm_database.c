@@ -47,6 +47,9 @@ IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedL
 IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
 IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
 IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
+IAM_STATIC bool IsUserValid(UserInfo *user);
+IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount);
+IAM_STATIC ResultCode ClearInvalidUser(void);
 
 ResultCode InitUserInfoList(void)
 {
@@ -59,6 +62,12 @@ ResultCode InitUserInfoList(void)
     if (g_userInfoList == NULL) {
         LOG_ERROR("load file info failed");
         return RESULT_NEED_INIT;
+    }
+    ResultCode ret = ClearInvalidUser();
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("clear invalid user failed");
+        DestroyUserInfoList();
+        return ret;
     }
     LOG_INFO("InitUserInfoList end");
     return RESULT_SUCCESS;
@@ -880,21 +889,28 @@ IAM_STATIC bool IsUserValid(UserInfo *user)
     LinkedList *credentialInfoList = user->credentialInfoList;
     CredentialInfoHal *pinCredential = QueryCredentialByAuthType(PIN_AUTH, credentialInfoList);
     if (pinCredential == NULL) {
-        LOG_INFO("user is invalid, userId: %d", user->userId);
+        LOG_INFO("user is invalid, userId: %{public}d", user->userId);
         return false;
     }
     return true;
 }
 
-IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount)
+IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount)
 {
+    LOG_INFO("get invalid user start");
+    if (g_userInfoList == NULL) {
+        LOG_ERROR("g_userInfoList is null");
+        return RESULT_GENERAL_ERROR;
+    }
+
     LinkedListIterator *iterator = g_userInfoList->createIterator(g_userInfoList);
     if (iterator == NULL) {
         LOG_ERROR("create iterator failed");
-        return;
+        return RESULT_NO_MEMORY;
     }
 
     UserInfo *user = NULL;
+    *userCount = 0;
     while (iterator->hasNext(iterator)) {
         user = (UserInfo *)iterator->next(iterator);
         if (user == NULL) {
@@ -914,24 +930,41 @@ IAM_STATIC void GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, ui
     }
 
     g_userInfoList->destroyIterator(iterator);
+    return RESULT_SUCCESS;
 }
 
-void ClearInvalidUser(void)
+IAM_STATIC ResultCode ClearInvalidUser(void)
 {
-    LOG_INFO("start");
+    LOG_INFO("clear invalid user start");
     int32_t invalidUserId[MAX_USER] = {0};
     uint32_t userCount = 0;
-    GetInvalidUser(invalidUserId, MAX_USER, &userCount);
-    for (uint32_t i = 0; i < userCount; ++i) {
-        DeleteUser(invalidUserId[i]);
-        LOG_INFO("DeleteUser, userid: %d", invalidUserId[i]);
+    if (GetInvalidUser(invalidUserId, MAX_USER, &userCount) != RESULT_SUCCESS) {
+        LOG_ERROR("GetInvalidUser fail");
+        return RESULT_GENERAL_ERROR;
     }
+    ResultCode ret = RESULT_SUCCESS;
+    for (uint32_t i = 0; i < userCount; ++i) {
+        ret = DeleteUser(invalidUserId[i]);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("delete invalid user fail, userId: %{public}d, ret: %{public}d", invalidUserId[i], ret);
+            return ret;
+        }
+        LOG_INFO("delete invalid user success, userId: %{public}d, ret: %{public}d", invalidUserId[i], ret);
+    }
+    if (userCount != 0) {
+        ret = UpdateFileInfo(g_userInfoList);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("UpdateFileInfo fail, ret: %{public}d", ret);
+            return ret;
+        }
+    }
+    return RESULT_SUCCESS;
 }
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfoLen, uint32_t *userInfocount)
 {
-    LOG_INFO("start");
-    if (userInfos == NULL || userInfocount == NULL) {
+    LOG_INFO("get all user info start");
+    if (userInfos == NULL || userInfocount == NULL || g_userInfoList == NULL) {
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
     }
