@@ -389,7 +389,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0003, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
