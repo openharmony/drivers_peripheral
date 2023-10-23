@@ -87,7 +87,7 @@ void Test::Init()
             }
         }
         ASSERT_TRUE(serviceV1_2 != nullptr);
-        service = static_cast<OHOS::HDI::Camera::V1_2::ICameraHost *>(serviceV1_2.GetRefPtr());
+        service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_2.GetRefPtr());
     }
     hostCallback = new TestCameraHostCallback();
     service->SetCallback(hostCallback);
@@ -127,7 +127,7 @@ void Test::Open()
             return;
         }
         ASSERT_TRUE(cameraDeviceV1_2 != nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_2::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
+        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
         CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
