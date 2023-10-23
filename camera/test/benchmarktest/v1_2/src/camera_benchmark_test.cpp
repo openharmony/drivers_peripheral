@@ -68,8 +68,8 @@ BENCHMARK_F(CameraBenchmarkTest, UpdateSettings_V1_2_benchmark_001)(
 {
     EXPECT_EQ(false, cameraTest->cameraDeviceV1_2 == nullptr);
     constexpr uint32_t inputSettings = 50;
-    char settings[inputSettings];
-    int paramPriority = 1;
+    unsigned char settings[inputSettings];
+    uint32_t paramPriority = 1;
     for (auto _ : st) {
         cameraTest->rc = cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(settings, paramPriority);
     }
