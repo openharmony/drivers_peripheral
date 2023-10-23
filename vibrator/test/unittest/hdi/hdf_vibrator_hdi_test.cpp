@@ -37,8 +37,8 @@ namespace {
     constexpr int32_t MIN_DURATION = 0;
     constexpr int32_t MAX_DURATION = 3600000;
     std::string g_timeSequence = "haptic.clock.timer";
-    std::vector<std::string> g_effect_list{"haptic.long_press.light","haptic.long_press.medium", \
-        "haptic.long_press.light","haptic.fail","haptic.charging","haptic.slide.light","haptic.threshold"};
+    std::vector<std::string> g_effect_list{"haptic.long_press.light", "haptic.long_press.medium", \
+        "haptic.long_press.light", "haptic.fail", "haptic.charging", "haptic.slide.light", "haptic.threshold"};
     std::string g_builtIn = "haptic.default.effect";
     std::string g_arbitraryStr = "arbitraryString";
     sptr<IVibratorInterface> g_vibratorInterface = nullptr;
@@ -465,7 +465,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_011, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
