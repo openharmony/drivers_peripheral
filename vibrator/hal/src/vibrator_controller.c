@@ -21,7 +21,6 @@
 
 #define HDF_LOG_TAG    uhdf_vibrator_service
 #define EFFECT_SUN 64
-#define EFFECT_DURATION    2000
 #define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
@@ -262,15 +261,12 @@ static int32_t Start(const char *effect)
 
 static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
 {
-    if (!strcmp(effect, "haptic.clock.timer")) {
-        effectInfo->isSupportEffect = true;
-        effectInfo->duration = EFFECT_DURATION;
-    } else {
-        HDF_LOGE("%s: effect not support", __func__);
-        effectInfo->isSupportEffect = false;
-        effectInfo->duration = 0;
+    for (int i=0; i<9; i++) {
+        if (!strcmp(effect, EffectMap[i].effectName)) {
+            effectInfo->isSupportEffect = EffectMap[i].issupport;
+            effectInfo->duration = EffectMap[i].duration;
+        }
     }
-
     return HDF_SUCCESS;
 }
 

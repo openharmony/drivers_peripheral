@@ -37,4 +37,22 @@ struct VibratorDevice {
     struct OsalMutex mutex;
 };
 
+struct Map {
+    char *effectName;
+    bool issupport;
+    int  duration;
+};
+
+struct Map EffectMap[9] = {
+    {.effectName = "haptic.clock.timer", .issupport = true, .duration = 2000},
+    {.effectName = "haptic.long_press.heavy", .issupport = true, .duration = 80},
+    {.effectName = "haptic.long_press.medium", .issupport = true, .duration = 80},
+    {.effectName = "haptic.long_press.light", .issupport = true, .duration = 80},
+    {.effectName = "haptic.fail", .issupport = true, .duration = 60},
+    {.effectName = "haptic.charging", .issupport = true, .duration = 100},
+    {.effectName = "haptic.slide.light", .issupport = true, .duration = 10},
+    {.effectName = "haptic.threshold", .issupport = true, .duration = 42},
+    {.effectName = "haptic.default.effect", .issupport = false, .duration = 0},
+};
+
 #endif /* HAL_VIBRATOR_CONTROLLER_H */
