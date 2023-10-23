@@ -261,7 +261,7 @@ static int32_t Start(const char *effect)
 
 static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
 {
-    for (int i=0; i<9; i++) {
+    for (int i = 0; i < EFFECT_TYPE_MAX; i++) {
         if (!strcmp(effect, EffectMap[i].effectName)) {
             effectInfo->isSupportEffect = EffectMap[i].issupport;
             effectInfo->duration = EffectMap[i].duration;

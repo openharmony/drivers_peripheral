@@ -21,6 +21,8 @@
 #include "vibrator_if.h"
 #include "vibrator_type.h"
 
+#define EFFECT_TYPE_MAX 9
+
 enum VibratorIoCmd {
     VIBRATOR_IO_START_ONCE                     = 0,
     VIBRATOR_IO_START_EFFECT                   = 1,
@@ -43,16 +45,16 @@ struct Map {
     int  duration;
 };
 
-struct Map EffectMap[9] = {
-    {.effectName = "haptic.clock.timer", .issupport = true, .duration = 2000},
-    {.effectName = "haptic.long_press.heavy", .issupport = true, .duration = 80},
-    {.effectName = "haptic.long_press.medium", .issupport = true, .duration = 80},
-    {.effectName = "haptic.long_press.light", .issupport = true, .duration = 80},
-    {.effectName = "haptic.fail", .issupport = true, .duration = 60},
-    {.effectName = "haptic.charging", .issupport = true, .duration = 100},
-    {.effectName = "haptic.slide.light", .issupport = true, .duration = 10},
-    {.effectName = "haptic.threshold", .issupport = true, .duration = 42},
-    {.effectName = "haptic.default.effect", .issupport = false, .duration = 0},
+struct Map EffectMap[EFFECT_TYPE_MAX] = {
+    {"haptic.clock.timer", true, 2000},
+    {"haptic.long_press.heavy", true, 80},
+    {"haptic.long_press.medium", true, 80},
+    {"haptic.long_press.light", true, 80},
+    {"haptic.fail", true, 60},
+    {"haptic.charging", true, 100},
+    {"haptic.slide.light", true, 10},
+    {"haptic.threshold", true, 42},
+    {"haptic.default.effect", false, 0},
 };
 
 #endif /* HAL_VIBRATOR_CONTROLLER_H */
