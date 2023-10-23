@@ -67,11 +67,10 @@ BENCHMARK_F(CameraBenchmarkTest, UpdateSettings_V1_2_benchmark_001)(
     benchmark::State &st)
 {
     EXPECT_EQ(false, cameraTest->cameraDeviceV1_2 == nullptr);
-    constexpr uint32_t inputSettings = 50;
-    unsigned char settings[inputSettings];
+    std::vector<uint8_t> abilityVec = {2, 128};
     uint32_t paramPriority = 1;
     for (auto _ : st) {
-        cameraTest->rc = cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(settings, paramPriority);
+        cameraTest->rc = cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(abilityVec, paramPriority);
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateSettings_V1_2_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
