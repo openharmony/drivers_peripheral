@@ -121,7 +121,6 @@ void Test::Open()
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         ASSERT_TRUE(serviceV1_1 != nullptr);
-        rc = serviceV1_1->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
         if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
             CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
             return;

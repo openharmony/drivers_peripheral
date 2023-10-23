@@ -48,7 +48,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_001, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
 
@@ -89,7 +89,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_002, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -124,7 +124,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Device_Hdi_V1_2_003 start");
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_1(
         cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -155,7 +155,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
     modeSetting->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
-    cameraTest->cameraDeviceV1_1->UpdateSettings(metaVec);
+    cameraTest->cameraDeviceV1_2->UpdateSettings(metaVec);
 
     // capture streamInfo
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
@@ -309,7 +309,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0001, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -349,7 +349,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0002, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -429,7 +429,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0004, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -469,7 +469,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0005, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
