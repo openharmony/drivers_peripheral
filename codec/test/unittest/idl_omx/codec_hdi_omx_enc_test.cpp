@@ -915,7 +915,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
 }
 #endif
 
-#ifdef NON_COMMUNITY
+#ifndef SUPPORT_COMMUNITY
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.Level1)
 {
     const std::string processName = "cast_engine_service";
