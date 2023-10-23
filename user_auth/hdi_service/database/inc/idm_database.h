@@ -70,7 +70,6 @@ void SetCredentialConditionExecutorSensorHint(CredentialCondition *condition, ui
 void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint32_t executorMatcher);
 void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId);
 
-void ClearInvalidUser(void);
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 
 #ifdef __cplusplus
