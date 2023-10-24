@@ -1,0 +1,168 @@
+diff --git a/codec/hal/idl_service/BUILD.gn b/codec/hal/idl_service/BUILD.gn
+index 56904e636..eb58b68e4 100644
+--- a/codec/hal/idl_service/BUILD.gn
++++ b/codec/hal/idl_service/BUILD.gn
+@@ -31,6 +31,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
+     "src/codec_handle_buffer.cpp",
+     "src/codec_omx_core.cpp",
+     "src/codec_share_buffer.cpp",
++    "src/codec_dma_buffer.cpp",
+     "src/component_mgr.cpp",
+     "src/component_node.cpp",
+     "src/icodec_buffer.cpp",
+diff --git a/codec/hal/idl_service/include/icodec_buffer.h b/codec/hal/idl_service/include/icodec_buffer.h
+index 398f4638d..34c3f0957 100644
+--- a/codec/hal/idl_service/include/icodec_buffer.h
++++ b/codec/hal/idl_service/include/icodec_buffer.h
+@@ -55,7 +55,7 @@ public:
+     ICodecBuffer(struct OmxCodecBuffer &codecBuffer);
+     virtual ~ICodecBuffer();
+     sptr<ICodecBuffer> static CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer);
+-    sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer);
++    sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
+     virtual int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
+     virtual int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
+     virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) = 0;
+diff --git a/codec/hal/idl_service/src/codec_component_service.cpp b/codec/hal/idl_service/src/codec_component_service.cpp
+index 27d411717..3ec30c5fa 100644
+--- a/codec/hal/idl_service/src/codec_component_service.cpp
++++ b/codec/hal/idl_service/src/codec_component_service.cpp
+@@ -127,7 +127,8 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
+         outBuffer.fd = dup(inBuffer.fd);
+     }
+ 
+-    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
++    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD &&
++        outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD) {
+         close(outBuffer.fd);
+         outBuffer.fd = -1;
+     }
+diff --git a/codec/hal/idl_service/src/component_node.cpp b/codec/hal/idl_service/src/component_node.cpp
+index 386939c42..4d85beaa9 100644
+--- a/codec/hal/idl_service/src/component_node.cpp
++++ b/codec/hal/idl_service/src/component_node.cpp
+@@ -17,6 +17,7 @@
+ #include <ashmem.h>
+ #include <securec.h>
+ #include <unistd.h>
++#include <sys/stat.h>
+ #include "codec_log_wrapper.h"
+ #include "component_mgr.h"
+ #include "icodec_buffer.h"
+@@ -358,12 +359,22 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
+         return OMX_ErrorInvalidComponent;
+     }
+     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
+-    if (buffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+-        err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType,
+-            portIndex, 0, buffer.allocLen);
+-    } else {
+-        err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+-                            codecBuffer->GetBuffer());
++    switch (buffer.bufferType) {
++        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
++            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
++            break;
++        case CODEC_BUFFER_TYPE_HANDLE:
++        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
++            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
++                codecBuffer->GetBuffer());
++            break;
++        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
++            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
++                reinterpret_cast<uint8_t *>(&buffer.fd));
++            break;
++        }
++    default:
++        break;
+     }
+ 
+     if (err != OMX_ErrorNone) {
+@@ -396,7 +407,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
+     }
+ 
+     buffer.allocLen = bufferHdrType->nAllocLen;
+-    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
++    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer, *bufferHdrType);
+     if (codecBuffer == nullptr) {
+         CODEC_LOGE("codecBuffer is null");
+         (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
+diff --git a/codec/hal/idl_service/src/icodec_buffer.cpp b/codec/hal/idl_service/src/icodec_buffer.cpp
+index 73459487c..1e4f83baa 100644
+--- a/codec/hal/idl_service/src/icodec_buffer.cpp
++++ b/codec/hal/idl_service/src/icodec_buffer.cpp
+@@ -18,6 +18,7 @@
+ #include <securec.h>
+ #include "codec_dyna_buffer.h"
+ #include "codec_handle_buffer.h"
++#include "codec_dma_buffer.h"
+ #include "codec_log_wrapper.h"
+ #include "codec_share_buffer.h"
+ #include "v1_0/codec_types.h"
+@@ -45,6 +46,9 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
+         case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
+             buffer = CodecDynaBuffer::Create(codecBuffer);
+             break;
++        case CODEC_BUFFER_TYPE_DMA_MEM_FD:
++            buffer = CodecDMABuffer::Create(codecBuffer);
++            break;
+         default:
+             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
+             break;
+@@ -52,14 +56,21 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
+     return buffer;
+ }
+ 
+-sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer)
++sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+ {
+     sptr<ICodecBuffer> buffer = nullptr;
+-    if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+-        buffer = CodecShareBuffer::Allocate(codecBuffer);
+-    } else {
+-        CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
++    switch (codecBuffer.bufferType) {
++        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
++            buffer = CodecShareBuffer::Allocate(codecBuffer);
++            break;
++        case CODEC_BUFFER_TYPE_DMA_MEM_FD:
++            buffer = CodecDMABuffer::Allocate(codecBuffer, omxBuffer);
++            break;
++        default:
++            CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
++            break;
+     }
++
+     return buffer;
+ }
+ 
+diff --git a/codec/interfaces/include/codec_omx_ext.h b/codec/interfaces/include/codec_omx_ext.h
+index b4374eb7c..7051a0dc9 100644
+--- a/codec/interfaces/include/codec_omx_ext.h
++++ b/codec/interfaces/include/codec_omx_ext.h
+@@ -102,6 +102,8 @@ enum CodecBufferType {
+     CODEC_BUFFER_TYPE_HANDLE = 0x4,
+     /** Dynamic handle. */
+     CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
++    /** DMA memory. */
++    CODEC_BUFFER_TYPE_DMA_MEM_FD = 0x10,
+ };
+ 
+ /**
+@@ -320,6 +322,16 @@ struct CodecVideoColorspace {
+     struct ColorAspects aspects;
+ };
+ 
++/**
++ * @brief Structure for pAppPrivate data of OMX_BUFFERHEADERTYPE
++*/
++struct OMXBufferAppPrivateData {
++    uint32_t allocLen;                    /** Size of fd */
++    uint32_t fd;                          /** dma fd or secure dma fd allocated by vender */
++    uint32_t sizeOfParam;
++    void *param;
++};
++
+ #ifdef __cplusplus
+ #if __cplusplus
+ }

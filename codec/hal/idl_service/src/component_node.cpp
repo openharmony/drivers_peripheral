@@ -17,6 +17,7 @@
 #include <ashmem.h>
 #include <securec.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"
@@ -358,12 +359,22 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    if (buffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType,
-            portIndex, 0, buffer.allocLen);
-    } else {
-        err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
-                            codecBuffer->GetBuffer());
+    switch (buffer.bufferType) {
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
+            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
+            break;
+        case CODEC_BUFFER_TYPE_HANDLE:
+        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                codecBuffer->GetBuffer());
+            break;
+        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
+                reinterpret_cast<uint8_t *>(&buffer.fd));
+            break;
+        }
+    default:
+        break;
     }
 
     if (err != OMX_ErrorNone) {
@@ -396,7 +407,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
     }
 
     buffer.allocLen = bufferHdrType->nAllocLen;
-    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
+    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer, *bufferHdrType);
     if (codecBuffer == nullptr) {
         CODEC_LOGE("codecBuffer is null");
         (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);

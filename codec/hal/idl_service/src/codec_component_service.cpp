@@ -127,7 +127,8 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
         outBuffer.fd = dup(inBuffer.fd);
     }
 
-    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD &&
+        outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD) {
         close(outBuffer.fd);
         outBuffer.fd = -1;
     }
