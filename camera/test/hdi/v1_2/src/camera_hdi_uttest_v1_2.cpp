@@ -295,14 +295,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Ability__0001
+ * @tc.name: Camera_Device_Hdi_V1_2_015
  * @tc.desc: OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0001, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_015, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Ability__0001 start");
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_015 start");
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return;
@@ -335,14 +335,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0001, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Ability__0002
+ * @tc.name: Camera_Device_Hdi_V1_2_016
  * @tc.desc: OHOS_CAMERA_MESURE_EXPOSURE_TIME
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0002, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_016, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Ability__0002 start");
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_016 start");
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return;
@@ -375,14 +375,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0002, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Ability__0003
+ * @tc.name: Camera_Device_Hdi_V1_2_017
  * @tc.desc: OHOS_CAMERA_MANUAL_EXPOSURE_TIME
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0003, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_017, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Ability__0003 start");
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_017 start");
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return;
@@ -415,14 +415,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0003, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Ability__0004
+ * @tc.name: Camera_Device_Hdi_V1_2_018
  * @tc.desc: OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0004, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_018, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Ability__0004 start");
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_018 start");
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return;
@@ -455,14 +455,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0004, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Ability__0005
+ * @tc.name: Camera_Device_Hdi_V1_2_019
  * @tc.desc: OHOS_CONTROL_NIGHT_MODE_TRY_AE
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Ability__0005, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_019, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Ability__0005 start");
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_019 start");
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return;
