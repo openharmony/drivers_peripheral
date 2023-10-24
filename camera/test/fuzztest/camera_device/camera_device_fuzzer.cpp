@@ -60,7 +60,7 @@ void FuncUpdateSettings_V1_2(const uint8_t *rawData, size_t size)
     std::vector<uint8_t> abilityVec = {};
     uint8_t *data = const_cast<uint8_t *>(rawData);
     abilityVec.push_back(*data);
-    cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(abilityVec);
+    cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(abilityVec, size);
 }
 
 void FuncSetResultMode(const uint8_t *rawData, size_t size)
