@@ -36,7 +36,7 @@ namespace {
     int32_t g_frequency2 = -200;
     constexpr int32_t MIN_DURATION = 0;
     constexpr int32_t MAX_DURATION = 3600000;
-    std::vector<std::string> g_effect_list {"haptic.clock.timer", "haptic.long_press.light", \
+    std::vector<std::string> g_effect_list = {"haptic.clock.timer", "haptic.long_press.light", \
         "haptic.long_press.medium", "haptic.long_press.light", "haptic.fail", "haptic.charging", \
         "haptic.slide.light", "haptic.threshold"};
     std::string g_builtIn = "haptic.default.effect";
