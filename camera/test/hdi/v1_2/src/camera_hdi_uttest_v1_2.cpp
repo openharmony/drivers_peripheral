@@ -260,7 +260,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_010, TestSize.Level1)
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
-
 /**
  * @tc.name: CommitStreams_V1_1_SCAN_CODE
  * @tc.desc: CommitStreams_V1_1 for Scan code, preview and video   
@@ -320,7 +319,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_011, TestSize.Level1)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
-HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_012, TestSize.Level1)
 {
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -333,7 +332,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
     }
 }
 
-HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_013, TestSize.Level1)
 {
     // Start Xmage control setting and verify
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -352,4 +351,102 @@ HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+#define TODEFINESTRING(x) #x
+
+static std::string TranslateXMageAbilityToString(camera_xmage_color_type mode)
+{
+    std::string res;
+    
+    switch (mode) {
+        case CAMERA_CUSTOM_COLOR_NORMAL:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_NORMAL);
+            break;
+        }
+        case CAMERA_CUSTOM_COLOR_BRIGHT:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_BRIGHT);
+            break;
+        }
+        case CAMERA_CUSTOM_COLOR_SOFT:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_SOFT);
+            break;
+        }
+        default:
+            break;
+    }
+    return res;
+}
+
+
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
+{
+    // Start Xmage control setting and verify
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SUPPORTED_COLOR_MODES, &entry);
+    
+    std::vector<uint8_t> xmageAbilities;
+    // 查询支持的Xmage所有模式
+    if (ret == 0) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_NE(entry.count, 0);
+        
+        for (uint32_t i = 0; i < entry.count; ++i) {
+            // 打印并保存当前相机所支持的xmage能力
+            CAMERA_LOGI("Current camera xmage ability %{public}s supported!",
+                TranslateXMageAbilityToString(static_cast<camera_xmage_color_type>(entry.data.u8[i])).c_str());
+            
+            xmageAbilities.push_back(entry.data.u8[i]);
+        }
+    } else {
+        CAMERA_LOGI("XMage not supported");
+    }
+    
+    CAMERA_LOGI("%{public}lu xmage abilities supported",
+                          static_cast<unsigned long>(xmageAbilities.size()));
+    
+    // 打开文件dump开关
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    // 遍历所有的xmage能力，并获取预览 图片 视频
+    for (uint32_t i = 0; i < xmageAbilities.size(); ++i) {
+        std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+        // 设置模式
+        uint8_t xmageMode = xmageAbilities[i];
+        meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &xmageMode, 1);
+        std::vector<uint8_t> metaVec;
+        MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+        cameraTest->cameraDevice->UpdateSettings(metaVec);
+        
+        CAMERA_LOGI("Now current camera xmage ability is %{public}s !",
+                TranslateXMageAbilityToString(static_cast<camera_xmage_color_type>(xmageMode)).c_str());
+        
+        // 配置三路流信息
+        cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraTest->StartStream(cameraTest->intents);
+        
+        // 捕获预览流
+        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+        
+        // 捕获拍照流，连拍
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+        
+        // 捕获拍照流，连拍
+        cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+        
+        // 后处理
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture,
+                                                                        cameraTest->captureIdVideo};
+                                                                        
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+        
+        sleep(1);
+    }
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
