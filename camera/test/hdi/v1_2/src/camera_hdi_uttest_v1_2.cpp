@@ -48,7 +48,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_001, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
 
@@ -89,7 +89,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_002, TestSize.Level1)
     }
 
     cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return;
     }
     EXPECT_NE(cameraTest->ability, nullptr);
@@ -124,7 +124,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
 {
     CAMERA_LOGI("test Camera_Device_Hdi_V1_2_003 start");
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_1(
         cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -155,7 +155,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
     modeSetting->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, 1);
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
-    cameraTest->cameraDeviceV1_1->UpdateSettings(metaVec);
+    cameraTest->cameraDeviceV1_2->UpdateSettings(metaVec);
 
     // capture streamInfo
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
@@ -381,7 +381,6 @@ static std::string TranslateXMageAbilityToString(camera_xmage_color_type mode)
     return res;
 }
 
-
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
 {
     // Start Xmage control setting and verify
@@ -450,3 +449,204 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
     }
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_2_015
+ * @tc.desc: OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_015, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_015 start");
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME> f value start.");
+        constexpr size_t step = 2; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME> f value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_2_016
+ * @tc.desc: OHOS_CAMERA_MESURE_EXPOSURE_TIME
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_016, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_016 start");
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CAMERA_MESURE_EXPOSURE_TIME, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_CAMERA_MESURE_EXPOSURE_TIME> f value start.");
+        constexpr size_t step = 2; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_CAMERA_MESURE_EXPOSURE_TIME> f value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_2_017
+ * @tc.desc: OHOS_CAMERA_MANUAL_EXPOSURE_TIME
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_017, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_017 start");
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CAMERA_MANUAL_EXPOSURE_TIME, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_CAMERA_MANUAL_EXPOSURE_TIME> f value start.");
+        constexpr size_t step = 2; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_CAMERA_MANUAL_EXPOSURE_TIME> f value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_2_018
+ * @tc.desc: OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_018, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_018 start");
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE> f value start.");
+        constexpr size_t step = 2; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE> f value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_2_019
+ * @tc.desc: OHOS_CONTROL_NIGHT_MODE_TRY_AE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_019, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_019 start");
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return;
+    }
+
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_NIGHT_MODE_TRY_AE, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_CONTROL_NIGHT_MODE_TRY_AE> f value start.");
+        constexpr size_t step = 2; // print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_CONTROL_NIGHT_MODE_TRY_AE> f value end.");
+    }
+}
+
