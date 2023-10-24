@@ -40,6 +40,13 @@ enum SensorDataDimension {
     DATA_MAX_DATA_SIZE = DATA_POSTURE
 };
 
+enum SensorStatusAccuracy {
+    SENSOR_STATUS_UNRELIABLE = 0,
+    SENSOR_STATUS_ACCURACY_LOW = 1,
+    SENSOR_STATUS_ACCURACY_MEDIUM = 2,
+    SENSOR_STATUS_ACCURACY_HIGH = 3,
+};
+
 struct SensorCovertCoff {
     int32_t sensorTypeId;
     int32_t sensorId;
