@@ -56,7 +56,8 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
     return buffer;
 }
 
-sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
+sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer,
+                                                     OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     sptr<ICodecBuffer> buffer = nullptr;
     switch (codecBuffer.bufferType) {
