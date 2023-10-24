@@ -130,7 +130,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_001, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
     
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
@@ -153,7 +153,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_002, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
@@ -176,7 +176,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_004, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
@@ -203,7 +203,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_005, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
@@ -227,7 +227,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_006, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t startRet = g_vibratorInterface->Start(iter);
         EXPECT_EQ(startRet, HDF_SUCCESS);
 
@@ -441,7 +441,7 @@ HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_001, TestSize.Level1)
 
     HdfEffectInfo effectInfo;
     for (auto iter : g_effect_list) {
-        printf("VibratorEffect : %s\n",iter.c_str());
+        printf("VibratorEffect : %s\n", iter.c_str());
         int32_t ret = g_vibratorInterface->GetEffectInfo(iter, effectInfo);
         printf("isSupportEffect = [%d]\n\r", effectInfo.isSupportEffect);
         printf("duration = [%d]\n\r", effectInfo.duration);
