@@ -81,9 +81,9 @@ void Test::Init()
             CAMERA_LOGI("ICameraHost get success");
             ret = serviceV1_2->GetVersion(mainVer, minVer);
             if (ret != 0) {
-                CAMERA_LOGE("V1_1::ICameraHost get version failed, ret = %{public}d", ret);
+                CAMERA_LOGE("V1_2::ICameraHost get version failed, ret = %{public}d", ret);
             } else {
-                CAMERA_LOGE("V1_1::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
+                CAMERA_LOGE("V1_2::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
             }
         }
         ASSERT_TRUE(serviceV1_2 != nullptr);
@@ -127,8 +127,8 @@ void Test::Open()
             return;
         }
         ASSERT_TRUE(cameraDeviceV1_1 != nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
-        CAMERA_LOGI("OpenCamera V1_1 success");
+        cameraDeviceV1_2 = static_cast<OHOS::HDI::Camera::V1_2::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
+        CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
 
@@ -145,7 +145,7 @@ void Test::StartStream(std::vector<StreamIntent> intents)
     streamOperatorCallback = new TestStreamOperatorCallback();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
-    rc = cameraDeviceV1_1->GetStreamOperator_V1_1(streamOperatorCallback, streamOperator_V1_1);
+    rc = cameraDeviceV1_2->GetStreamOperator_V1_1(streamOperatorCallback, streamOperator_V1_1);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
         rc = streamOperator_V1_1->GetVersion(mainVersion, minVersion);
         streamOperator = static_cast<OHOS::HDI::Camera::V1_0::IStreamOperator *>(streamOperator_V1_1.GetRefPtr());
