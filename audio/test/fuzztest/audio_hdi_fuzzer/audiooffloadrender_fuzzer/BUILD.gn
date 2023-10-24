@@ -1,0 +1,48 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+hdf_test_path = "./../../.."
+
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("./../../../../audio.gni")
+
+module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
+
+ohos_fuzztest("AudioOffloadRenderFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "../audiooffloadrender_fuzzer"
+
+  sources = [
+    "$hdf_test_path/systemtest/common/hdi_service_common/src/hdi_service_common.cpp",
+    "audiooffloadrender_fuzzer.cpp",
+  ]
+  include_dirs = [
+    "$hdf_test_path/systemtest/common/hdi_service_common/include/",
+    "include",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+  ]
+
+  defines = []
+  defines += [ "AUDIO_ADM_PASSTHROUGH" ]
+  if (!drivers_peripheral_audio_feature_community) {
+    defines += [ "SUPPORT_OFFLOAD" ]
+  }
+}

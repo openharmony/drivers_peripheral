@@ -243,7 +243,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_009, TestSize.Level1)
     int32_t notifyType = 2;
     int32_t deviceState = 3;
     cameraTest->rc = cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(notifyType, deviceState);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
 /**
@@ -257,10 +257,69 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_010, TestSize.Level1)
     int32_t notifyType = 2;
     int32_t deviceState = 10;
     cameraTest->rc = cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(notifyType, deviceState);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
-HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
+/**
+ * @tc.name: CommitStreams_V1_1_SCAN_CODE
+ * @tc.desc: CommitStreams_V1_1 for Scan code, preview and video   
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_011, TestSize.Level1)
+{
+    // Get Stream Operator
+    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator_V1_1);
+    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    // preview streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+    // video streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+    // is streams supported V1_1
+    std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
+    int64_t expoTime = 0;
+    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
+    int64_t colorGains[4] = {0};
+    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
+    std::vector<uint8_t> modeSettingVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, modeSettingVec);
+    StreamSupportType pType;
+    cameraTest->rc = cameraTest->streamOperator_V1_1->IsStreamsSupported_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SCAN_CODE),
+        modeSettingVec, cameraTest->streamInfosV1_1, pType);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // create and commitstreams
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SCAN_CODE),
+        cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    sleep(UT_SECOND_TIMES);
+
+    // start capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+    sleep(UT_SECOND_TIMES);
+
+    // stop stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_012, TestSize.Level1)
 {
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -273,7 +332,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0001, TestSize.Level1)
     }
 }
 
-HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_013, TestSize.Level1)
 {
     // Start Xmage control setting and verify
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
@@ -292,6 +351,103 @@ HWTEST_F(CameraHdiUtTestV1_2, Device_Ability_0002, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+#define TODEFINESTRING(x) #x
+
+static std::string TranslateXMageAbilityToString(camera_xmage_color_type mode)
+{
+    std::string res;
+    
+    switch (mode) {
+        case CAMERA_CUSTOM_COLOR_NORMAL:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_NORMAL);
+            break;
+        }
+        case CAMERA_CUSTOM_COLOR_BRIGHT:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_BRIGHT);
+            break;
+        }
+        case CAMERA_CUSTOM_COLOR_SOFT:
+        {
+            res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_SOFT);
+            break;
+        }
+        default:
+            break;
+    }
+    return res;
+}
+
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
+{
+    // Start Xmage control setting and verify
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SUPPORTED_COLOR_MODES, &entry);
+    
+    std::vector<uint8_t> xmageAbilities;
+    // 查询支持的Xmage所有模式
+    if (ret == 0) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_NE(entry.count, 0);
+        
+        for (uint32_t i = 0; i < entry.count; ++i) {
+            // 打印并保存当前相机所支持的xmage能力
+            CAMERA_LOGI("Current camera xmage ability %{public}s supported!",
+                TranslateXMageAbilityToString(static_cast<camera_xmage_color_type>(entry.data.u8[i])).c_str());
+            
+            xmageAbilities.push_back(entry.data.u8[i]);
+        }
+    } else {
+        CAMERA_LOGI("XMage not supported");
+    }
+    
+    CAMERA_LOGI("%{public}lu xmage abilities supported",
+                          static_cast<unsigned long>(xmageAbilities.size()));
+    
+    // 打开文件dump开关
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    // 遍历所有的xmage能力，并获取预览 图片 视频
+    for (uint32_t i = 0; i < xmageAbilities.size(); ++i) {
+        std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+        // 设置模式
+        uint8_t xmageMode = xmageAbilities[i];
+        meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &xmageMode, 1);
+        std::vector<uint8_t> metaVec;
+        MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+        cameraTest->cameraDevice->UpdateSettings(metaVec);
+        
+        CAMERA_LOGI("Now current camera xmage ability is %{public}s !",
+                TranslateXMageAbilityToString(static_cast<camera_xmage_color_type>(xmageMode)).c_str());
+        
+        // 配置三路流信息
+        cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraTest->StartStream(cameraTest->intents);
+        
+        // 捕获预览流
+        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+        
+        // 捕获拍照流，连拍
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+        
+        // 捕获拍照流，连拍
+        cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+        
+        // 后处理
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture,
+                                                                        cameraTest->captureIdVideo};
+                                                                        
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+        
+        sleep(1);
+    }
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
 
 /**
