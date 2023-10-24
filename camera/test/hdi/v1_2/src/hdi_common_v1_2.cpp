@@ -97,10 +97,10 @@ void Test::Open()
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         EXPECT_NE(serviceV1_2, nullptr);
-        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
+        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
-        EXPECT_NE(cameraDeviceV1_2, nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_2::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
+        EXPECT_NE(cameraDeviceV1_1, nullptr);
+        cameraDeviceV1_2 = static_cast<OHOS::HDI::Camera::V1_2::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
         CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
