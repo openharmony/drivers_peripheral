@@ -45,7 +45,7 @@ struct Map {
     int  duration;
 };
 
-struct Map g_effectmap [EFFECT_TYPE_MAX] = {
+struct Map g_effectmap[EFFECT_TYPE_MAX] = {
     {"haptic.clock.timer", true, 2000},
     {"haptic.long_press.heavy", true, 80},
     {"haptic.long_press.medium", true, 80},
