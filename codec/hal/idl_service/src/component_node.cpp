@@ -373,8 +373,8 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
                 reinterpret_cast<uint8_t *>(&buffer.fd));
             break;
         }
-    default:
-        break;
+        default:
+            break;
     }
 
     if (err != OMX_ErrorNone) {
