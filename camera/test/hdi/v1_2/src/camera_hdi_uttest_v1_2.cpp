@@ -407,7 +407,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_014, TestSize.Level1)
         CAMERA_LOGI("XMage not supported");
     }
     
-    CAMERA_LOGI("%{public}lu xmage abilities supported", xmageAbilities.size());
+    CAMERA_LOGI("%{public}lu xmage abilities supported",
+                          static_cast<unsigned long>(xmageAbilities.size());
     
     // 打开文件dump开关
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
