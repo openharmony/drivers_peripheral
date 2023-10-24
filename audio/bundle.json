@@ -11,7 +11,7 @@
     "scripts": {},
     "component": {
         "name": "drivers_peripheral_audio",
-        "subsystem": "drivers",
+        "subsystem": "hdf",
         "features": [
             "drivers_peripheral_audio_feature_mono_to_stereo",
             "drivers_peripheral_audio_feature_hal_notsupport_pathselect",
