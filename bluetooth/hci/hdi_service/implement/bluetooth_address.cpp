@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <hdf_log.h>
 #include <unistd.h>
+#include <dlfcn.h>
 #include "securec.h"
 
 namespace OHOS {
@@ -84,6 +85,33 @@ int BluetoothAddress::ParseAddressFromString(const std::string &string) const
     return bytesIndex;
 }
 
+bool BluetoothAddress::GetConstantAddress(char *address, int len)
+{
+    if (address == nullptr || len < ADDRESS_STR_LEN + 1) {
+        HDF_LOGE("GetConstantAddress buf error");
+        return false;
+    }
+
+    void *libMac = dlopen(BT_MAC_LIB, RTLD_LAZY);
+    if (libMac == nullptr) {
+        HDF_LOGI("GetConstantAddress no mac lib ready for dlopen");
+        return false;
+    }
+
+    using GetMacFun = int (*)(char*, int);
+    GetMacFun getMac = reinterpret_cast<GetMacFun>(dlsym(libMac, GET_BT_MAC_SYMBOL_NAME));
+    if (getMac == nullptr) {
+       HDF_LOGE("GetConstantAddress dlsym error");
+       dlclose(libMac);
+       return false;
+    }
+
+    int ret = getMac(address, len);
+    HDF_LOGI("GetConstantAddress ret: %{public}d", ret);
+    dlclose(libMac);
+    return (ret == 0);
+}
+
 std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::string &path)
 {
     const int bufsize = 256;
@@ -94,14 +122,17 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
         int newFd = open(path.c_str(), O_RDWR | O_CREAT, 00644);
         HDF_LOGI("GetDeviceAddress open newFd %{public}d.", newFd);
         char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
-        auto tmpPtr = GenerateDeviceAddress();
-        std::string strAddress;
-        ParseAddressToString(tmpPtr->address_, strAddress);
-        HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
-        int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
-        if (ret != 0) {
-            HDF_LOGI("ParseAddressToString strcpy_s err!");
+        if (!GetConstantAddress(addressStr, ADDRESS_STR_LEN + 1)) {
+            auto tmpPtr = GenerateDeviceAddress();
+            std::string strAddress;
+            ParseAddressToString(tmpPtr->address_, strAddress);
+            HDF_LOGI("device mac addr: %{public}s", GetEncryptAddr(strAddress).c_str());
+            int ret = strcpy_s(addressStr, ADDRESS_STR_LEN + 1, strAddress.c_str());
+            if (ret != 0) {
+                HDF_LOGI("ParseAddressToString strcpy_s err!");
+            }
         }
+
         if (newFd >= 0) {
             int fdRet = write(newFd, addressStr, ADDRESS_STR_LEN);
             if (fdRet < 0) {

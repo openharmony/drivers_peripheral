@@ -36,6 +36,9 @@ const std::string HAL_CLOSE_FUNC_NAME = "phNxpNciHal_close";
 const std::string HAL_CTRL_GRANTED_FUNC_NAME = "phNxpNciHal_control_granted";
 const std::string HAL_POWER_CYCLE_FUNC_NAME = "phNxpNciHal_power_cycle";
 const std::string HAL_IOCTL_FUNC_NAME = "phNxpNciHal_ioctl";
+const std::string HAL_GET_CONFIG_FUNC_NAME = "phNxpNciHal_getVendorConfig_1_2";
+const std::string HAL_FACTORY_RESET_FUNC_NAME = "phNxpNciHal_do_factory_reset";
+const std::string HAL_SHUTDOWN_CASE_FUNC_NAME = "phNxpNciHal_configDiscShutdown";
 const std::string DEFAULT_FUNC_NAME_SUFFIX = "";
 
 const std::string NFC_HAL_SO_PREFIX = "libnfc_hal_impl_";
@@ -50,6 +53,9 @@ struct NfcHalInterface {
     int (*nfcHalControlGranted)(void);
     int (*nfcHalPowerCycle)(void);
     int (*nfcHalIoctl)(long arg, void *pData);
+    void (*nfcHalGetConfig)(V1_1::NfcVendorConfig &config);
+    void (*nfcHalFactoryReset)(void);
+    int (*nfcHalShutdownCase)(void);
 };
 
 struct NfcExtInterface {
@@ -70,6 +76,9 @@ public:
     int VendorControlGranted(void) override;
     int VendorPowerCycle(void) override;
     int VendorIoctl(long arg, void *pData) override;
+    int VendorGetConfig(V1_1::NfcVendorConfig &config) override;
+    int VendorFactoryReset(void) override;
+    int VendorShutdownCase(void) override;
 
 private:
     std::string GetChipType(void);
