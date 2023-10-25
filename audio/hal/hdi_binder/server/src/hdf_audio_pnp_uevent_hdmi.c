@@ -186,6 +186,7 @@ static void AudioHdmiPnpUeventStart(void *useless)
     int fdEpoll = -1;
     int32_t sockFd = -1;
 
+    AUDIO_FUNC_LOGI("audio hdmi uevent start!");
     if (InitializeHdmiStateInternal() != HDF_SUCCESS) {
         AUDIO_FUNC_LOGW("booting check hdmi audio device statu failed!");
     }
