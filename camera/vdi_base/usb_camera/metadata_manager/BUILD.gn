@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//drivers/peripheral/camera/camera.gni")
 import("../camera_usb.gni")
 
 if (!defined(ohos_lite)) {
@@ -35,7 +36,12 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("usb_camera_metadata_manager") {
+    defines = []
+    if (drivers_peripheral_camera_feature_usb) {
+      defines += [ "CAMERA_BUILT_ON_USB" ]
+    }
     sources = [
+      "$camera_path_vdi/dump/src/camera_dump.cpp",
       "$camera_path_vdi/metadata_manager/src/metadata_config.cpp",
       "$camera_path_vdi/metadata_manager/src/metadata_controller.cpp",
     ]
@@ -44,6 +50,8 @@ if (!defined(ohos_lite)) {
       "$camera_path_vdi/include",
       "$camera_path_vdi/device_manager/include",
       "$camera_path_vdi/metadata_manager/include",
+      "$camera_path_vdi/dump/include",
+      "$camera_path_vdi/../interfaces",
     ]
 
     deps = [ "$camera_path_usb/device_manager:usb_camera_device_manager" ]
