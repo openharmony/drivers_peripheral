@@ -24,7 +24,6 @@ extern "C" {
 
 typedef void* CapturePriData;
 
-typedef struct AlsaCapture AlsaCapture;
 struct AlsaCapture {
     struct AlsaSoundCard soundCard;
     enum AudioPortPin descPins;
@@ -61,6 +60,9 @@ struct AlsaCapture {
     /* mute operation */
     bool  (*GetMute)(struct AlsaCapture *);
     int32_t (*SetMute)(struct AlsaCapture *, bool);
+
+    /* set pause or resume state */
+    int32_t (*SetPauseState)(struct AlsaCapture *, bool);
 };
 
 struct AlsaCapture *CaptureCreateInstance(const char* adapterName);
