@@ -102,6 +102,8 @@ enum CodecBufferType {
     CODEC_BUFFER_TYPE_HANDLE = 0x4,
     /** Dynamic handle. */
     CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
+    /** DMA memory. */
+    CODEC_BUFFER_TYPE_DMA_MEM_FD = 0x10,
 };
 
 /**
@@ -318,6 +320,16 @@ struct CodecVideoColorspace {
     uint32_t pixeFormat;
     uint32_t dataSpace;
     struct ColorAspects aspects;
+};
+
+/**
+ * @brief Structure for pAppPrivate data of OMX_BUFFERHEADERTYPE
+*/
+struct OMXBufferAppPrivateData {
+    uint32_t allocLen;                    /** Size of fd */
+    uint32_t fd;                          /** dma fd or secure dma fd allocated by vender */
+    uint32_t sizeOfParam;
+    void *param;
 };
 
 #ifdef __cplusplus
