@@ -736,30 +736,6 @@ static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
     capture->IsSupportsPauseAndResume = AudioCaptureIsSupportsPauseAndResumeVdi;
 }
 
-static int32_t JudgeParameters(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    struct AudioCaptureInfo *captureInfos)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(captureInfos, HDF_ERR_INVALID_PARAM);
-
-    if (captureInfos->desc.pins != pin) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->streamType != attrs->type) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->sampleRate != attrs->sampleRate) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->channelCount != attrs->channelCount) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->sourceType != attrs->sourceType) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
 {
     uint32_t captureId = AUDIO_VDI_STREAM_NUM_MAX;
