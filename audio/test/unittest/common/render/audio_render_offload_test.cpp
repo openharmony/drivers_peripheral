@@ -56,6 +56,7 @@ void AudioUtRenderOffloadTest::InitRenderAttrs(struct AudioSampleAttributes &att
 {
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
     attrs.interleaved = 0;
     attrs.type = AUDIO_OFFLOAD;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
@@ -67,6 +68,9 @@ void AudioUtRenderOffloadTest::InitRenderAttrs(struct AudioSampleAttributes &att
     attrs.silenceThreshold = BUFFER_LENTH;
     attrs.offloadInfo.bitRate = AUDIO_SAMPLE_RATE_48K * 8;
     attrs.offloadInfo.bitWidth = 32;
+    attrs.offloadInfo.sampleRate = AUDIO_SAMPLE_RATE_48K;
+    attrs.offloadInfo.channelCount = AUDIO_RENDER_CHANNELCOUNT;
+    attrs.offloadInfo.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
 }
 
 void AudioUtRenderOffloadTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
@@ -125,13 +129,7 @@ void AudioUtRenderOffloadTest::SetUp()
     ASSERT_NE(adapter_, nullptr);
     InitRenderDevDesc(devDescRender_);
     InitRenderAttrs(attrsRender_);
-
-    attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    int32_t ret = adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
-    if (ret != HDF_SUCCESS) {
-        attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
-        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_));
-    }
+    (void)adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
     ASSERT_NE(render_, nullptr);
 }
 
