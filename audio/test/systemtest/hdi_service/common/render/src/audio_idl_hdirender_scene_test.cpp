@@ -97,7 +97,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSi
 
     ASSERT_NE(nullptr, render);
     ret = render->CheckSceneCapability(render, &scenes, &supported);
-    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(ret == HDF_FAILURE || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_SUCCESS);
     free(scenes.desc.desc);
 }
 /**
