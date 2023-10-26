@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
-#ifdef AUDIO_ADM_SERVICE
+#ifdef AUDIO_SAMPLE_LOW_BITWIDTH
     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = CHANNELCOUNT;
     attrs.sampleRate = SAMPLERATE;
@@ -486,7 +486,7 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
         return HDF_FAILURE;
     }
     InitAttrs(attrs);
-#ifndef AUDIO_ADM_SERVICE
+#ifndef AUDIO_SAMPLE_LOW_BITWIDTH
     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
     attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
