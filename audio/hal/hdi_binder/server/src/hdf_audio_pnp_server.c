@@ -71,7 +71,7 @@ ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
     FFRTFunction* f = (FFRTFunction*)ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_general);
     if (f == NULL) {
-        return;
+        return NULL;
     }
     f->header.exec = FFRTExecFunctionWrapper;
     f->header.destroy = FFRTDestroyFunctionWrapper;
