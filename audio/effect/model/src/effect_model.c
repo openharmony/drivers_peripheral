@@ -263,6 +263,8 @@ static int32_t RegLibraryInst(struct LibraryConfigDescriptor **libCfgDescs, cons
     for (i = 0; i < libNum; i++) {
 #ifdef __aarch64__
 ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib64/%s.z.so", (*libCfgDescs)[i].libPath);
+#elif defined(__x86_64__)
+ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib64/%s.z.so", (*libCfgDescs)[i].libPath);
 #else
 ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)[i].libPath);
 #endif
