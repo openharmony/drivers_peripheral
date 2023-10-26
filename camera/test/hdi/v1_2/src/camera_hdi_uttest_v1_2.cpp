@@ -650,3 +650,50 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_019, TestSize.Level1)
     }
 }
 
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_020, TestSize.Level1)
+{
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    // Start Xmage control setting and verify
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+    uint8_t xmageMode = CAMERA_CUSTOM_COLOR_BRIGHT;
+    meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &xmageMode, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->cameraDevice->UpdateSettings(metaVec);
+
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_021, TestSize.Level1)
+{
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    // Start Xmage control setting and verify
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+    uint8_t xmageMode = CAMERA_CUSTOM_COLOR_SOFT;
+    meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &xmageMode, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->cameraDevice->UpdateSettings(metaVec);
+
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
