@@ -44,6 +44,9 @@ typedef struct {
 static void FFRTExecFunctionWrapper(void* t)
 {
     FFRTFunction* f = (FFRTFunction*)t;
+    if (f == NULL) {
+        return;
+    }
     if (f->func) {
         f->func(f->arg);
     }
@@ -52,6 +55,9 @@ static void FFRTExecFunctionWrapper(void* t)
 static void FFRTDestroyFunctionWrapper(void* t)
 {
     FFRTFunction* f = (FFRTFunction*)t;
+    if (f == NULL) {
+        return;
+    }
     if (f->afterFunc) {
         f->afterFunc(f->arg);
     }
@@ -64,6 +70,9 @@ ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
     FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= ffrt_auto_managed_function_storage_size,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
     FFRTFunction* f = (FFRTFunction*)ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_general);
+    if (f == NULL) {
+        return;
+    }
     f->header.exec = FFRTExecFunctionWrapper;
     f->header.destroy = FFRTDestroyFunctionWrapper;
     f->func = func;
