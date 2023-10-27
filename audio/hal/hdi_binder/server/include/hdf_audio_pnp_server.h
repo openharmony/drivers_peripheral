@@ -18,6 +18,7 @@
 
 #include "v1_0/audio_types.h"
 #include "hdf_types.h"
+#include "ffrt_inner.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +29,8 @@ int32_t AudioPnpUpdateInfo(const char *statusInfo);
 int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
 int32_t AudioUhdfUnloadDriver(const char *driverName);
 int32_t AudioUhdfLoadDriver(const char *driverName);
-
+ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
+    const ffrt_function_t afterFunc, void* arg);
 #ifdef __cplusplus
 }
 #endif
