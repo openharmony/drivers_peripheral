@@ -18,7 +18,6 @@
 #include "gtest/gtest.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/include/idisplay_buffer.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 
@@ -26,9 +25,10 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
+using namespace testing::ext;
 using namespace OHOS::HDI::Display::Composer::V1_0;
-using namespace OHOS::HDI::Display::Buffer::V1_0;
-
+using namespace OHOS::HDI::Display::Buffer::V1_1;
+using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 #ifndef DISPLAY_TEST_CHK_RETURN
 #define DISPLAY_TEST_CHK_RETURN(val, ret, ...) \
     do {                                       \
@@ -218,6 +218,46 @@ void DisplayBufferUt::TearDown()
 {
 }
 
+#ifndef DISPLAY_COMMUNITY
+int32_t DisplayBufferUt::MetadataTest(BufferHandle& handle)
+{
+    int32_t ret = displayBuffer_->RegisterBuffer(handle);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("RegisterBuffer failed");
+        return DISPLAY_FAILURE;
+    }
+
+    int32_t key = 1;
+    std::vector<uint8_t> values = {1, 2, 3};
+    std::vector<uint8_t> rets = {};
+    std::vector<uint32_t> keys = {};
+    ret = displayBuffer_->SetMetadata(handle, key, values);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("SetMetadata failed");
+        return DISPLAY_FAILURE;
+    }
+
+    ret = displayBuffer_->GetMetadata(handle, key, rets);
+    if ((ret != DISPLAY_SUCCESS) || rets != values) {
+        HDF_LOGE("GetMetadata failed");
+        return DISPLAY_FAILURE;
+    }
+
+    ret = displayBuffer_->ListMetadataKeys(handle, keys);
+    if ((ret != DISPLAY_SUCCESS) || keys.size() != 1 || keys[0] != key) {
+        HDF_LOGE("ListMetadataKey failed");
+        return DISPLAY_FAILURE;
+    }
+
+    rets = {};
+    ret = displayBuffer_->EraseMetadataKey(handle, key);
+    if ((ret != DISPLAY_SUCCESS) || displayBuffer_->GetMetadata(handle, key, rets) == DISPLAY_SUCCESS) {
+        HDF_LOGE("EraseMetadataKey failed");
+        return DISPLAY_FAILURE;
+    }
+    return DISPLAY_SUCCESS;
+}
+#endif
 int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
 {
     int ret;
@@ -229,13 +269,19 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             HDF_LOGE("AllocMem failed");
             return ret;
         }
+#ifndef DISPLAY_COMMUNITY
+        ret = MetadataTest(*buffer);
+        if (ret != DISPLAY_SUCCESS) {
+            HDF_LOGE("MetadataTest failed");
+            return ret;
+        }
+#endif
         void *vAddr = displayBuffer_->Mmap(*buffer);
         if (vAddr == nullptr) {
             HDF_LOGE("Mmap failed");
             displayBuffer_->FreeMem(*buffer);
             return DISPLAY_FAILURE;
         }
-
         if (info.usage & (HBM_USE_CPU_READ | HBM_USE_CPU_WRITE)) {
             ret = displayBuffer_->InvalidateCache(*buffer);
             if (ret != DISPLAY_SUCCESS) {
@@ -251,7 +297,6 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             displayBuffer_->FreeMem(*buffer);
             return DISPLAY_NOMEM;
         }
-
         if (info.usage & (HBM_USE_CPU_READ | HBM_USE_CPU_WRITE)) {
             ret = displayBuffer_->FlushCache(*buffer);
             if (ret != DISPLAY_SUCCESS) {
