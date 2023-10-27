@@ -26,7 +26,7 @@ void CameraHdiUtTestV1_1::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init(); // assert inside
-    cameraTest->Open(); // assert inside
+    cameraTest->Open(DEVICE_0); // assert inside
 }
 
 void CameraHdiUtTestV1_1::TearDown(void)
@@ -246,16 +246,6 @@ HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_008, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_1, Camera_Device_Hdi_V1_1_009, TestSize.Level1)
 {
-    cameraTest->Init();
-    if (cameraTest->serviceV1_1 == nullptr) {
-        return;
-    }
-
-    cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
-        return;
-    }
-
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);

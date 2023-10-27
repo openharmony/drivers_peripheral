@@ -93,9 +93,15 @@ void Test::Init()
     service->SetCallback(hostCallback);
 }
 
-void Test::GetCameraMetadata()
+void Test::GetCameraMetadata(int cameraId)
 {
-    rc = service->GetCameraAbility(cameraIds.front(), abilityVec);
+    if (DEVICE_1 == cameraId) {
+        // front camera
+        rc = service->GetCameraAbility(cameraIds[1], abilityVec);
+    } else {
+        // rear camera
+        rc = service->GetCameraAbility(cameraIds[0], abilityVec);
+    }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }
@@ -109,7 +115,7 @@ void Test::GetCameraMetadata()
     }
 }
 
-void Test::Open()
+void Test::Open(int cameraId)
 {
     if (cameraDevice == nullptr) {
         service->GetCameraIds(cameraIds);
@@ -117,11 +123,17 @@ void Test::Open()
             CAMERA_LOGE("camera device list empty");
         }
         ASSERT_TRUE(cameraIds.size() != 0);
-        GetCameraMetadata();
+        GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         ASSERT_TRUE(serviceV1_1 != nullptr);
-        rc = serviceV1_1->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        if (DEVICE_1 == cameraId) {
+            // front camera
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1);
+        } else {
+            // rear camera
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1);
+        }
         if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
             CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
             return;
