@@ -219,7 +219,7 @@ void Test::DefaultInfosVideo(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdVideo, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::VIDEO] = consumer_video;
