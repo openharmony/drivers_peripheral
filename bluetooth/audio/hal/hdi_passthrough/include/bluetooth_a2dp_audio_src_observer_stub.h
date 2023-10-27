@@ -35,6 +35,7 @@ private:
     ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
     ErrCode OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
+	ErrCode OnMediaStackChanged(MessageParcel &data, MessageParcel &reply);
     using BluetoothA2dpAudioSrcObserverFunc =
         ErrCode (BluetoothA2dpAudioSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpAudioSrcObserverFunc> funcMap_;
