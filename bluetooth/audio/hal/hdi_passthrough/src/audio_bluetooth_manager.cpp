@@ -70,7 +70,7 @@ static void AudioOnConfigurationChanged(const RawAddress &device, const Bluetoot
     (void) error;
 }
 
-static void AudioOnMedieStackChanged(const RawAddress &device, int action)
+static void AudioOnMediaStackChanged(const RawAddress &device, int action)
 {
     (void) device;
     (void) action;
@@ -81,7 +81,7 @@ static BtA2dpAudioCallback g_hdiCallbacks = {
     .OnConnectionStateChanged = AudioOnConnectionStateChanged,
     .OnPlayingStatusChanged = AudioOnPlayingStatusChanged,
     .OnConfigurationChanged =  AudioOnConfigurationChanged,
-    .OnMediaStackChanged = AudioOnMedieStackChanged,
+    .OnMediaStackChanged = AudioOnMediaStackChanged,
 };
 
 int GetPlayingState()
