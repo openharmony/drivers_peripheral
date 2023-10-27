@@ -96,7 +96,7 @@ ErrCode BluetoothA2dpAudioSrcObserverStub::OnMediaStackChangedInner(MessageParce
     std::string addr = data.ReadString();
     int action = data.ReadInt32();
     HDF_LOGI("BluetoothA2dpAudioSrcObserverStub::OnMediaStackChangedInner");
-    OnConfigurationChanged(RawAddress(addr), action);
+    OnMediaStackChanged(RawAddress(addr), action);
 
     return NO_ERROR;
 }
