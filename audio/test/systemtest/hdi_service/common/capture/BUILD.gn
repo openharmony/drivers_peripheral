@@ -43,6 +43,9 @@ if (!defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     defines = []
+    if (drivers_peripheral_audio_feature_community) {
+      defines += [ "AUDIO_SAMPLE_LOW_BITWIDTH" ]
+    }
     if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_PASSTHROUGH" ]
     }
