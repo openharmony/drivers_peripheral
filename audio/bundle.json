@@ -30,7 +30,6 @@
         "deps": {
             "components": [
                 "c_utils",
-                "ffrt",
                 "hilog",
                 "hdf_core",
                 "drivers_interface_audio"
