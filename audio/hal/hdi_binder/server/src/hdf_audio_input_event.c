@@ -136,38 +136,47 @@ static int32_t AudioPnpInputOpen(void)
     return (j == 0) ? HDF_FAILURE : HDF_SUCCESS;
 }
 
-static void AudioPnpInputStart(void *useless)
+static void *AudioPnpInputStart(void *useless)
 {
     int ret;
     (void)useless;
 
     AUDIO_FUNC_LOGI("audio input start.");
     if (AudioPnpInputOpen() != HDF_SUCCESS) {
-        return;
+        return NULL;
     }
 
     do {
         ret = AudioPnpInputPollAndRead();
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("[AudioPnpInputPollAndRead] failed!");
-            return;
+            return NULL;
         }
     } while (g_bRunThread);
 
-    return;
+    return NULL;
 }
 
 int32_t AudioHeadsetPnpInputStartThread(void)
 {
+    pthread_t thread;
+    pthread_attr_t tidsAttr;
     const char *threadName = "pnp_headset";
+
     AUDIO_FUNC_LOGI("create audio headset pnp uevent thread");
     g_bRunThread = true;
-    
-    ffrt_task_attr_t attr;
-    ffrt_task_attr_init(&attr);
-    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
-    ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL) != 0) {
+        AUDIO_FUNC_LOGE("[pthread_create] failed!");
+        g_bRunThread = false;
+        return HDF_FAILURE;
+    }
+
+    if (pthread_setname_np(thread, threadName) != 0) {
+        AUDIO_FUNC_LOGE("Setname failed!");
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
 }

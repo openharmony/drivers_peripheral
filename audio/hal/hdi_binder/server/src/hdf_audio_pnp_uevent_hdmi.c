@@ -179,21 +179,20 @@ static int32_t InitializeHdmiStateInternal(void)
 }
 
 static bool g_hdmiPnpThreadRunning = false;
-static void AudioHdmiPnpUeventStart(void *useless)
+static void *AudioHdmiPnpUeventStart(void *useless)
 {
     (void)useless;
 
     int fdEpoll = -1;
     int32_t sockFd = -1;
 
-    AUDIO_FUNC_LOGI("audio hdmi uevent start!");
     if (InitializeHdmiStateInternal() != HDF_SUCCESS) {
         AUDIO_FUNC_LOGW("booting check hdmi audio device statu failed!");
     }
 
     if (AudioHdmiOpenEventPoll(&sockFd, &fdEpoll) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("fail to open event poll");
-        return;
+        return NULL;
     }
 
     while (g_hdmiPnpThreadRunning) {
@@ -216,20 +215,28 @@ static void AudioHdmiPnpUeventStart(void *useless)
     close(fdEpoll);
     close(sockFd);
 
-    return;
+    return NULL;
 }
 
 int32_t AudioHdmiPnpUeventStartThread(void)
 {
+    pthread_t thread;
+    pthread_attr_t tidsAttr;
     const char *threadName = "pnp_hdmi";
     g_hdmiPnpThreadRunning = true;
 
     AUDIO_FUNC_LOGI("create audio hdmi pnp uevent thread");
-    ffrt_task_attr_t attr;
-    ffrt_task_attr_init(&attr);
-    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
-    ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    if (pthread_create(&thread, &tidsAttr, AudioHdmiPnpUeventStart, NULL) != 0) {
+        AUDIO_FUNC_LOGE("create AudioHdmiPnpUeventStart thread failed");
+        return HDF_FAILURE;
+    }
+
+    if (pthread_setname_np(thread, threadName) != 0) {
+        AUDIO_FUNC_LOGE("set tid name failed");
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
 }

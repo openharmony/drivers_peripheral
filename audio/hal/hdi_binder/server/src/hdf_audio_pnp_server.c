@@ -34,53 +34,6 @@
 
 #define AUDIODRV_CTRL_IOCTRL_ELEM_HDMI 5 // define from adm control stream id
 
-typedef struct {
-    ffrt_function_header_t header;
-    ffrt_function_t func;
-    ffrt_function_t afterFunc;
-    void* arg;
-} FFRTFunction;
-
-static void FFRTExecFunctionWrapper(void* t)
-{
-    FFRTFunction* f = (FFRTFunction*)t;
-    if (f == NULL) {
-        return;
-    }
-    if (f->func) {
-        f->func(f->arg);
-    }
-}
-
-static void FFRTDestroyFunctionWrapper(void* t)
-{
-    FFRTFunction* f = (FFRTFunction*)t;
-    if (f == NULL) {
-        return;
-    }
-    if (f->afterFunc) {
-        f->afterFunc(f->arg);
-    }
-}
-
-#define FFRT_STATIC_ASSERT(cond, msg) int x(int static_assertion_##msg[(cond) ? 1 : -1])
-ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
-    const ffrt_function_t afterFunc, void* arg)
-{
-    FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= ffrt_auto_managed_function_storage_size,
-        size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
-    FFRTFunction* f = (FFRTFunction*)ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_general);
-    if (f == NULL) {
-        return NULL;
-    }
-    f->header.exec = FFRTExecFunctionWrapper;
-    f->header.destroy = FFRTDestroyFunctionWrapper;
-    f->func = func;
-    f->afterFunc = afterFunc;
-    f->arg = arg;
-    return (ffrt_function_header_t*)f;
-}
-
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
 
 int32_t AudioPnpUpdateInfo(const char *statusInfo)
