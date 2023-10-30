@@ -42,16 +42,6 @@ void CameraHdiUtTestV1_2::TearDown(void)
  */
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_001, TestSize.Level1)
 {
-    cameraTest->Init();
-    if (cameraTest->serviceV1_2 == nullptr) {
-        return;
-    }
-
-    cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_2 == nullptr) {
-        return;
-    }
-
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
@@ -60,12 +50,14 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_001, TestSize.Level1)
 
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_SKETCH_ENABLE_RATIO> f value start.");
-        constexpr size_t step = 2; // print step
+        printf("OHOS_ABILITY_SKETCH_ENABLE_RATIO f value count %d\n", entry.count);
+        constexpr size_t step = 4; // print step
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
             ss << entry.data.f[i] << " ";
             if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
                 CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_SKETCH_ENABLE_RATIO %s\n", ss.str().c_str());
                 ss.clear();
                 ss.str("");
             }
@@ -82,16 +74,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_001, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_002, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_002 start");
-    cameraTest->Init();
-    if (cameraTest->serviceV1_2 == nullptr) {
-        return;
-    }
-
-    cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_2 == nullptr) {
-        return;
-    }
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
@@ -100,11 +82,13 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_002, TestSize.Level1)
 
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         CAMERA_LOGI("print tag<OHOS_ABILITY_SKETCH_REFERENCE_FOV_RATIO> f value start.");
-        constexpr size_t step = 2; // print step
+        printf("OHOS_ABILITY_SKETCH_REFERENCE_FOV_RATIO f value count %d\n", entry.count);
+        constexpr size_t step = 4; // print step
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
             ss << entry.data.f[i] << " ";
             if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                printf("OHOS_ABILITY_SKETCH_REFERENCE_FOV_RATIO %s\n", ss.str().c_str());
                 CAMERA_LOGI("%{public}s\n", ss.str().c_str());
                 ss.clear();
                 ss.str("");
