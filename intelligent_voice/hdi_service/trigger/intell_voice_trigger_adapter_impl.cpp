@@ -14,6 +14,7 @@
  */
 #include "intell_voice_trigger_adapter_impl.h"
 #include "hdf_base.h"
+#include "iproxy_broker.h"
 #include "intell_voice_log.h"
 #include "securec.h"
 #include "scope_guard.h"
@@ -30,8 +31,7 @@ namespace IntelligentVoice {
 namespace Trigger {
 IntellVoiceTriggerCallbackDevice::IntellVoiceTriggerCallbackDevice(OHOS::sptr<IIntellVoiceTriggerCallback> callback)
     : callback_(callback)
-{
-}
+{}
 
 IntellVoiceTriggerCallbackDevice::~IntellVoiceTriggerCallbackDevice()
 {
@@ -49,8 +49,7 @@ void IntellVoiceTriggerCallbackDevice::OnRecognitionHdiEvent(const IntellVoiceRe
 
 IntellVoiceTriggerAdapterImpl::IntellVoiceTriggerAdapterImpl(std::unique_ptr<ITrigger> adapter)
     : adapter_(std::move(adapter))
-{
-}
+{}
 
 IntellVoiceTriggerAdapterImpl::~IntellVoiceTriggerAdapterImpl()
 {
@@ -71,6 +70,7 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
         INTELLIGENT_VOICE_LOGE("callback is nullptr");
         return HDF_ERR_MALLOC_FAIL;
     }
+    RegisterDeathRecipient(triggerCallback);
 
     if (model.data == nullptr) {
         INTELLIGENT_VOICE_LOGE("model data is nullptr");
@@ -89,6 +89,7 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
     }
 
     TriggerModel triggerModel(model.type, model.uid, modelData);
+    handle_ = handle;
     return adapter_->LoadIntellVoiceTriggerModel(triggerModel, cb, cookie, handle);
 }
 
@@ -101,6 +102,7 @@ int32_t IntellVoiceTriggerAdapterImpl::UnloadModel(int32_t handle)
 int32_t IntellVoiceTriggerAdapterImpl::Start(int32_t handle)
 {
     MemoryGuard memoryGuard;
+    handle_ = handle;
     return adapter_->Start(handle);
 }
 
@@ -137,6 +139,29 @@ int32_t IntellVoiceTriggerAdapterImpl::GetModelDataFromAshmem(sptr<Ashmem> ashme
     modelData.insert(modelData.begin(), buffer, buffer + size);
     return HDF_SUCCESS;
 }
+
+bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(const sptr<IIntellVoiceTriggerCallback> &triggerCallback)
+{
+    sptr<IRemoteObject> object = OHOS::HDI::hdi_objcast<IIntellVoiceTriggerCallback>(triggerCallback);
+    if (object == nullptr) {
+        INTELLIGENT_VOICE_LOGE("object is nullptr");
+        return false;
+    }
+    sptr<IntellVoiceDeathRecipient> recipient = new (std::nothrow) IntellVoiceDeathRecipient();
+    if (recipient == nullptr) {
+        INTELLIGENT_VOICE_LOGE("create death recipient failed");
+        return false;
+    }
+
+    recipient->SetServerDiedCallback(std::bind(&IntellVoiceTriggerAdapterImpl::Clean, this));
+    return object->AddDeathRecipient(recipient);
 }
+
+void IntellVoiceTriggerAdapterImpl::Clean()
+{
+    Stop(handle_);
+    UnloadModel(handle_);
 }
-}
+}  // namespace Trigger
+}  // namespace IntelligentVoice
+}  // namespace OHOS
