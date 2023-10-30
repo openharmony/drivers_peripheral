@@ -321,6 +321,7 @@ static struct AlsaRender *GetRenderInsByName(const char *adapterName)
             renderIns->periodTime = AUDIO_PERIOD_TIME_DEF;
             renderIns->bufferTime = AUDIO_BUFFER_TIME_DEF;
             renderIns->descPins = PIN_NONE;
+            renderIns->resample = 1;
             return renderIns;
         }
     }
@@ -764,6 +765,11 @@ int32_t RenderMmapWriteImpl(struct AlsaRender *renderIns, const struct AudioHwRe
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
+    if (cardIns->pauseState) {
+        AUDIO_FUNC_LOGE("Currently in pause, please check!");
+        return HDF_FAILURE;
+    }
+
     cardIns->mmapFlag = false;
     ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_MMAP_INTERLEAVED);
     if (ret < 0) {
@@ -852,6 +858,30 @@ static int32_t RenderSetMuteImpl(struct AlsaRender *renderIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
+static int32_t RenderSetPauseStateImpl(struct AlsaRender *renderIns, bool pauseFlag)
+{
+    int32_t ret;
+    int enable = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
+    struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)renderIns;
+
+    if (cardIns->canPause) {
+        ret = snd_pcm_pause(cardIns->pcmHandle, enable);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("snd_pcm_pause failed!");
+            return HDF_FAILURE;
+        }
+    } else {
+        if (enable == AUDIO_ALSALIB_IOCTRL_PAUSE) {
+            snd_pcm_drain(cardIns->pcmHandle);
+        } else {
+            snd_pcm_prepare(cardIns->pcmHandle);
+        }
+    }
+    cardIns->pauseState = pauseFlag;
+
+    return HDF_SUCCESS;
+}
+
 static int32_t RenderGetChannelModeImpl(struct AlsaRender *renderIns, enum AudioChannelMode *mode)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
@@ -887,6 +917,7 @@ static void RegisterRenderImpl(struct AlsaRender *renderIns)
     renderIns->SetGain = RenderSetGainImpl;
     renderIns->GetMute = RenderGetMuteImpl;
     renderIns->SetMute = RenderSetMuteImpl;
+    renderIns->SetPauseState = RenderSetPauseStateImpl;
     renderIns->GetChannelMode = RenderGetChannelModeImpl;
     renderIns->SetChannelMode = RenderSetChannelModeImpl;
 }

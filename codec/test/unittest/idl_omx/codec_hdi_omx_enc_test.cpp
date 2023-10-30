@@ -915,4 +915,37 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
 }
 #endif
 
+#ifdef SUPPORT_HIGH_WORK_FREQUENCY
+HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiHighWorkingFrequencyTest_001, TestSize.Level1)
+{
+    const std::string processName = "cast_engine_service";
+    std::vector<int8_t> paramVec;
+
+    ASSERT_TRUE(g_component != nullptr);
+
+    ProcessNameParam nameParam;
+    func_->InitExtParam(nameParam);
+    int32_t ret = strcpy_s(nameParam.processName, sizeof(nameParam.processName), processName.c_str());
+    ASSERT_TRUE(ret == EOK);
+    func_->ObjectToVector(nameParam, paramVec);
+    ret = g_component->SetParameter(OMX_IndexParamProcessName, paramVec);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
+
+    WorkingFrequencyParam freqParam;
+    std::vector<int8_t> inParam;
+    std::vector<int8_t> outParam;
+
+    func_->InitExtParam(freqParam);
+    func_->ObjectToVector(freqParam, inParam);
+    ret = g_component->GetParameter(OMX_IndexParamWorkingFrequency, inParam, outParam);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
+    func_->VectorToObject(outParam, freqParam);
+
+    // 设置为最高档
+    freqParam.level = freqParam.level - 1;
+    func_->ObjectToVector(freqParam, inParam);
+    ret = g_component->SetParameter(OMX_IndexParamWorkingFrequency, inParam);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
+}
+#endif
 }  // namespace

@@ -76,7 +76,6 @@ struct AlsaMixerCtlElement {
     unsigned int subdevice;
 };
 
-typedef struct AlsaSoundCard AlsaSoundCard;
 struct AlsaSoundCard {
     /*
         save alsa soundcard base info and hardware params
@@ -116,7 +115,6 @@ int32_t SndSaveCardListInfo(snd_pcm_stream_t stream);
 bool  SndisBusy(struct AlsaSoundCard *cardIns);
 int32_t SndOpenMixer(struct AlsaSoundCard *cardIns);
 int32_t SndPcmPrepare(struct AlsaSoundCard *cardIns);
-int32_t SndPcmPause(struct AlsaSoundCard *cardIns, bool state);
 snd_pcm_state_t SndGetRunState(struct AlsaSoundCard *cardIns);
 void  SndCloseHandle(struct AlsaSoundCard *cardIns);
 

@@ -17,11 +17,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/nfc_interface_stub.h"
+#include "v1_1/nfc_interface_stub.h"
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
-using namespace OHOS::HDI::Nfc::V1_0;
+using namespace OHOS::HDI::Nfc::V1_1;
 using namespace OHOS::HDI::Nfc;
 
 struct HdfNfcInterfaceHost {
@@ -71,7 +71,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfNfcInterfaceHost->ioservice.Open = nullptr;
     hdfNfcInterfaceHost->ioservice.Release = nullptr;
 
-    auto serviceImpl = INfcInterface::Get(true);
+    auto serviceImpl = OHOS::HDI::Nfc::V1_1::INfcInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("HdfNfcInterfaceDriverBind, failed to get of implement service");
         delete hdfNfcInterfaceHost;
@@ -79,7 +79,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfNfcInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        INfcInterface::GetDescriptor());
+        OHOS::HDI::Nfc::V1_1::INfcInterface::GetDescriptor());
     if (hdfNfcInterfaceHost->stub == nullptr) {
         HDF_LOGE("HdfNfcInterfaceDriverBind, failed to get stub object");
         delete hdfNfcInterfaceHost;

@@ -531,6 +531,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     InitAttrs(attrs);
+#ifndef AUDIO_SAMPLE_LOW_BITWIDTH
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+#endif
     InitDevDesc(devDesc, audioPort.portId, PIN_IN_MIC);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &firstCapture, &captureId_);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -565,8 +570,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_003, TestSize.Level1)
     InitDevDesc(captureDevDesc, audioPort.portId, PIN_IN_MIC);
     ret = adapter->CreateRender(adapter, &renderDevDesc, &attrs, &render, &renderId_);
     EXPECT_EQ(HDF_SUCCESS, ret);
-
+#ifndef AUDIO_SAMPLE_LOW_BITWIDTH
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
     ret = adapter->CreateCapture(adapter, &captureDevDesc, &attrs, &capture, &captureId_);
+#endif
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyCapture(adapter, captureId_);
     IAudioCaptureRelease(capture, IS_STUB);

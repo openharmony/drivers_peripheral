@@ -72,6 +72,9 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
             waitCV_.wait(l, [this] { return wakeup_ == true; });
             usleep(SLEEP_TIME);
         }
+        if (fence != -1) {
+            close(fence);
+        }
         stats_.RequestBufferResult(sfError);
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;

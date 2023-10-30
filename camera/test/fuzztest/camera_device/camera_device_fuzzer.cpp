@@ -24,7 +24,7 @@ const size_t THRESHOLD = 10;
 enum DeviceCmdId {
     CAMERA_DEVICE_GET_DEFAULT_SETTINGS,
     CAMERA_DEVICE_GET_STREAM_V1_1,
-    CAMERA_DEVICE_UPDATE_SETTINGS,
+    CAMERA_DEVICE_UPDATE_SETTINGS_V1_2,
     CAMERA_DEVICE_SET_RESULT_MODE,
     CAMERA_DEVICE_GET_ENABLED_RESULTS,
     CAMERA_DEVICE_ENABLE_RESULT,
@@ -52,7 +52,7 @@ void FuncGetStreamOperator_V1_1(const uint8_t *rawData, size_t size)
     cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(g_callback, g_StreamOperator);
 }
 
-void FuncUpdateSettings(const uint8_t *rawData, size_t size)
+void FuncUpdateSettings_V1_2(const uint8_t *rawData, size_t size)
 {
     if (size >= SIZE_MAX) {
         return;
@@ -60,7 +60,7 @@ void FuncUpdateSettings(const uint8_t *rawData, size_t size)
     std::vector<uint8_t> abilityVec = {};
     uint8_t *data = const_cast<uint8_t *>(rawData);
     abilityVec.push_back(*data);
-    cameraTest->cameraDeviceV1_1->UpdateSettings(abilityVec);
+    cameraTest->cameraDeviceV1_2->UpdateSettings_V1_2(abilityVec, size);
 }
 
 void FuncSetResultMode(const uint8_t *rawData, size_t size)
@@ -110,8 +110,8 @@ static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
             break;
         }
 
-        case CAMERA_DEVICE_UPDATE_SETTINGS: {
-            FuncUpdateSettings(rawData, size);
+        case CAMERA_DEVICE_UPDATE_SETTINGS_V1_2: {
+            FuncUpdateSettings_V1_2(rawData, size);
             break;
         }
         case CAMERA_DEVICE_SET_RESULT_MODE: {

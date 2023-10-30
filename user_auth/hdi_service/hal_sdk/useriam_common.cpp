@@ -53,7 +53,6 @@ int32_t Init()
         LOG_ERROR("init ed25519 key failed");
         goto FAIL;
     }
-    ClearInvalidUser();
 
     LOG_INFO("init success");
     g_isInitUserIAM = true;

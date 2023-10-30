@@ -1,0 +1,64 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../../../../distributedaudio.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SetExtraParamsFuzzTest") {
+  module_out_path = "${distributedaudio_fuzz_path}/setextraparams_fuzzer"
+  fuzz_config_file = "${hdf_ser_aud_path}/test/fuzztest/setextraparams_fuzzer"
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "setextraparams_fuzzer.cpp" ]
+
+  include_dirs = [
+    "${hdf_ser_aud_path}/include",
+    "${hdf_service_path}/hdi_service/common/include",
+    "${hdf_service_path}/hdi_service/common/log/include",
+    "${hdf_service_path}/hdi_service/common/utils/include",
+  ]
+
+  include_dirs += [
+    "include",
+    "${common_path}/include",
+  ]
+
+  deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
+
+  external_deps = [
+    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
+    "ipc:ipc_core",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"SetExtraParamsFuzzTest\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = [ ":SetExtraParamsFuzzTest" ]
+}
+###############################################################################

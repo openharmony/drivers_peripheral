@@ -736,69 +736,6 @@ static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
     capture->IsSupportsPauseAndResume = AudioCaptureIsSupportsPauseAndResumeVdi;
 }
 
-static int32_t JudgeParameters(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    struct AudioCaptureInfo *captureInfos)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(captureInfos, HDF_ERR_INVALID_PARAM);
-
-    if (captureInfos->desc.pins != pin) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->streamType != attrs->type) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->sampleRate != attrs->sampleRate) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->channelCount != attrs->channelCount) {
-        return HDF_FAILURE;
-    }
-    if (captureInfos->sourceType != attrs->sourceType) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *captureId)
-{
-    uint32_t index = 0;
-
-    if (captureId == NULL || attrs == NULL) {
-        AUDIO_FUNC_LOGE("audio params is null");
-        return NULL;
-    }
-
-    struct AudioCapturePrivVdi *capturePriv = AudioCaptureGetPrivVdi();
-    if (capturePriv == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return NULL;
-    }
-
-    if (capturePriv->captureCnt == 0) {
-        AUDIO_FUNC_LOGI("no capture created");
-        return NULL;
-    }
-
-    for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
-        if (capturePriv->captureInfos[index] == NULL) {
-            continue;
-        }
-            
-        int32_t ret = JudgeParameters(pin, attrs, capturePriv->captureInfos[index]);
-        if (ret != HDF_SUCCESS) {
-            continue;
-        }
-
-        *captureId = capturePriv->captureInfos[index]->captureId;
-        capturePriv->captureInfos[index]->usrCount++;
-        return &capturePriv->captureInfos[index]->capture;
-    }
-
-    return NULL;
-}
-
 static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
 {
     uint32_t captureId = AUDIO_VDI_STREAM_NUM_MAX;
