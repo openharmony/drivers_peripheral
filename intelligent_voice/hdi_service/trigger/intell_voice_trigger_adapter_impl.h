@@ -41,26 +41,20 @@ private:
 
 class IntellVoiceDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    explicit IntellVoiceDeathRecipient(){};
+    using ServiceDiedCallback = std::function<void()>;
+    explicit IntellVoiceDeathRecipient(ServiceDiedCallback callback) : callback_(callback) {};
     ~IntellVoiceDeathRecipient() override = default;
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override
     {
         (void)remote;
-        if (m_callback != nullptr) {
-            m_callback();
+        if (callback_ != nullptr) {
+            callback_();
         }
     }
 
-    using ServiceDiedCallback = std::function<void()>;
-
-    void SetServerDiedCallback(ServiceDiedCallback callback)
-    {
-        m_callback = callback;
-    }
-
 private:
-    ServiceDiedCallback m_callback = nullptr;
+    ServiceDiedCallback callback_ = nullptr;
 };
 
 class IntellVoiceTriggerAdapterImpl : public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter {
