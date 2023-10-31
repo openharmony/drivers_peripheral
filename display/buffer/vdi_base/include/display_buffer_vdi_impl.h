@@ -38,6 +38,11 @@ public:
     virtual int32_t InvalidateCache(const BufferHandle& handle) const override;
     virtual int32_t IsSupportedAlloc(const std::vector<VerifyAllocInfo>& infos,
         std::vector<bool>& supporteds) const override;
+    virtual int32_t RegisterBuffer(const BufferHandle& handle) override;
+    virtual int32_t SetMetadata(const BufferHandle& handle, uint32_t key, const std::vector<uint8_t>& value) override;
+    virtual int32_t GetMetadata(const BufferHandle& handle, uint32_t key, std::vector<uint8_t>& value) override;
+    virtual int32_t ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys) override;
+    virtual int32_t EraseMetadataKey(const BufferHandle& handle, uint32_t key) override;
 };
 } // namespace DISPLAY
 } // namespace HDI
