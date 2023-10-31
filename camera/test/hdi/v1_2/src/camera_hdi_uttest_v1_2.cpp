@@ -20,6 +20,9 @@ using namespace testing::ext;
 using namespace OHOS::Camera;
 
 int64_t OHOS::Camera::Test::StreamConsumer::g_timestamp[2] = {0};
+constexpr uint32_t ITEM_CAPACITY = 100;
+constexpr uint32_t DATA_CAPACITY = 2000;
+constexpr uint32_t DATA_COUNT = 1;
 void CameraHdiUtTestV1_2::SetUpTestCase(void) {}
 void CameraHdiUtTestV1_2::TearDownTestCase(void) {}
 void CameraHdiUtTestV1_2::SetUp(void)
@@ -681,3 +684,100 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_021, TestSize.Level1)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_022
+ * @tc.desc:OHOS_CAMERA_VIDEO_STABILIZATION_OFF, OHOS_CAMERA_VIDEO_STABILIZATION_AUTO
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_022, TestSize.Level1)
+{
+    //find Stabilization tag
+    common_metadata_header_t* data = cameraTest->ability->get();
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    CAMERA_LOGI("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES success!");
+    EXPECT_EQ(META_TYPE_BYTE, entry.data_type);
+    for (int i = 0; i < entry.count; i++) {
+        if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_OFF) {
+            CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_OFF found!");
+        } else if (entry.data.u8[i] == OHOS_CAMERA_VIDEO_STABILIZATION_AUTO) {
+            CAMERA_LOGI("OHOS_CAMERA_VIDEO_STABILIZATION_AUTO found!");
+        }
+    }
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_023
+ * @tc.desc:OHOS_CAMERA_VIDEO_STABILIZATION_OFF
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_023, TestSize.Level1)
+{
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    //start stream
+    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->StartStream(cameraTest->intents);
+
+    //updateSettings
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t videoStabiliMode = OHOS_CAMERA_VIDEO_STABILIZATION_OFF;
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    const int32_t deviceStreamId = cameraTest->streamIdPreview;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    //get preview capture and video
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+    //release stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_024
+ * @tc.desc:OHOS_CAMERA_VIDEO_STABILIZATION_AUTO
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_024, TestSize.Level1)
+{
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    //start stream
+    cameraTest->intents = {PREVIEW, VIDEO};
+    cameraTest->StartStream(cameraTest->intents);
+
+    //updateSettings
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t videoStabiliMode = OHOS_CAMERA_VIDEO_STABILIZATION_AUTO;
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    const int32_t deviceStreamId = cameraTest->streamIdPreview;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    //get preview capture and video
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+    //release stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
