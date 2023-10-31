@@ -147,13 +147,13 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(const sptr<IIntellVoi
         INTELLIGENT_VOICE_LOGE("object is nullptr");
         return false;
     }
-    sptr<IntellVoiceDeathRecipient> recipient = new (std::nothrow) IntellVoiceDeathRecipient();
+    sptr<IntellVoiceDeathRecipient> recipient = new (std::nothrow) IntellVoiceDeathRecipient(
+        std::bind(&IntellVoiceTriggerAdapterImpl::Clean, this));
     if (recipient == nullptr) {
         INTELLIGENT_VOICE_LOGE("create death recipient failed");
         return false;
     }
 
-    recipient->SetServerDiedCallback(std::bind(&IntellVoiceTriggerAdapterImpl::Clean, this));
     return object->AddDeathRecipient(recipient);
 }
 
