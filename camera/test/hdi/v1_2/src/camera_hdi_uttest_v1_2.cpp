@@ -490,7 +490,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_016, TestSize.Level1)
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CAMERA_MANUAL_EXPOSURE_TIME success!");
-            TakePhotoWithTagsForOrdinary(meta);  
+            TakePhotoWithTags(meta);  
         }
         CAMERA_LOGI("print tag<OHOS_CAMERA_MANUAL_EXPOSURE_TIME> f value end.");
     } else {
@@ -523,7 +523,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_017, TestSize.Level1)
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CONTROL_MANUAL_EXPOSURE_TIME success!");
-            TakePhotoWithTagsForOrdinary(meta);
+            TakePhotoWithTags(meta);
         }
         CAMERA_LOGI("print tag<OHOS_CONTROL_MANUAL_EXPOSURE_TIME> f value end.");
     } else {
@@ -556,7 +556,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_018, TestSize.Level1)
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE success!");
-            TakePhotoWithTagsForOrdinary(meta);
+            TakePhotoWithTags(meta);
         }
         CAMERA_LOGI("print tag<OHOS_CAMERA_EXPOSURE_MODE_PREVIEW_STATE> f value end.");
     } else {
@@ -589,7 +589,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_019, TestSize.Level1)
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CONTROL_NIGHT_MODE_TRY_AE success!");
-            TakePhotoWithTagsForOrdinary(meta);
+            TakePhotoWithTags(meta);
         }
         CAMERA_LOGI("print tag<OHOS_CONTROL_NIGHT_MODE_TRY_AE> f value end.");
     } else {
@@ -597,7 +597,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_019, TestSize.Level1)
     }
 }
 
-void CameraHdiUtTestV1_2::TakePhotoWithTagsForOrdinary(std::shared_ptr<OHOS::Camera::CameraSetting> metaDate)
+void CameraHdiUtTestV1_2::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> metaDate)
 {
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(metaDate, metaVec);
