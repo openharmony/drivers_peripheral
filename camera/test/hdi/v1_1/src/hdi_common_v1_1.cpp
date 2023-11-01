@@ -95,14 +95,11 @@ void Test::Open(int cameraId)
         EXPECT_NE(cameraIds.size(), 0);
         GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
-
         EXPECT_NE(serviceV1_1, nullptr);
         if (DEVICE_1 == cameraId) {
-            // front camera
-            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1);
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1); // front camera
         } else {
-            // rear camera
-            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1);
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1); // rear camera
         }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_1, nullptr);
@@ -114,11 +111,9 @@ void Test::Open(int cameraId)
 void Test::GetCameraMetadata(int cameraId)
 {
     if (DEVICE_1 == cameraId) {
-        // front camera
-        rc = service->GetCameraAbility(cameraIds[1], abilityVec);
+        rc = service->GetCameraAbility(cameraIds[1], abilityVec); // front camera
     } else {
-        // rear camera
-        rc = service->GetCameraAbility(cameraIds[0], abilityVec);
+        rc = service->GetCameraAbility(cameraIds[0], abilityVec); // rear camera
     }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
@@ -196,7 +191,7 @@ void Test::DefaultInfosVideo(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdVideo, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::VIDEO] = consumer_video;
