@@ -37,7 +37,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
     if (drivers_peripheral_audio_feature_double_pnp_detect) {
-      defined += [ "AUDIO_DOUBLE_PNP_DETECT" ]
+      defines += [ "AUDIO_DOUBLE_PNP_DETECT" ]
     }
 
     if (is_standard_system) {
