@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_1 {
+namespace V1_2 {
 VibratorIfService::VibratorIfService()
 {
     int32_t ret = GetVibratorVdiImpl();
@@ -277,6 +277,90 @@ int32_t VibratorIfService::IsVibratorRunning(bool& state)
     return ret;
 }
 
+int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp PlayHapticPattern function", __func__);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    HapticPaketVdi hapticPaketVdi;
+    hapticPaketVdi.time=pkg.time;
+    hapticPaketVdi.event_num=pkg.event_num;
+    for (const auto &event : pkg.events) {
+        HapticEventVdi hapticEventVdi;
+        if(event.type==CONTINUOUS){
+            hapticEventVdi.type=VDI_CONTINUOUS;
+        }else if(event.type==TRANSIENT){
+            hapticEventVdi.type=VDI_TRANSIENT;
+        }
+        hapticEventVdi.duration=event.duration;
+        hapticEventVdi.intensity=event.intensity;
+        hapticEventVdi.frequency=event.frequency;
+        hapticEventVdi.index=event.index;
+        hapticEventVdi.point_num=event.point_num;
+        for (const auto &point : event.points) {
+            CurvePointVdi curvePointVdip;
+            curvePointVdip.time=point.time;
+            curvePointVdip.intensity=point.intensity;
+            curvePointVdip.frequency=point.frequency;
+            hapticEventVdi.points.push_back(std::move(curvePointVdip));
+        }
+        hapticPaketVdi.events.push_back(std::move(hapticEventVdi));
+    }
+    StartTrace(HITRACE_TAG_HDF, "PlayHapticPattern");
+    int32_t ret = vibratorVdiImpl_->PlayHapticPattern(hapticPaketVdi);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s PlayHapticPattern failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
+int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp GetHapticCapacity function", __func__);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    HapticCapacityVdi hapticCapacityVdi;
+    StartTrace(HITRACE_TAG_HDF, "GetHapticCapacity");
+    int32_t ret = vibratorVdiImpl_->GetHapticCapacity(hapticCapacityVdi);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetHapticCapacity failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+    hapticCapacity.isSupportHdHaptic=hapticCapacityVdi.isSupportHdHaptic;
+    hapticCapacity.isSupportPredefineWave=hapticCapacityVdi.isSupportPredefineWave;
+    hapticCapacity.isSupportTimeDelay=hapticCapacityVdi.isSupportTimeDelay;
+    hapticCapacity.reserved0=hapticCapacityVdi.reserved0;
+    hapticCapacity.reserved1=hapticCapacityVdi.reserved1;
+
+    return ret;
+}
+
+int32_t VibratorIfService::GetHapticStartUpTime(int32_t& startUpTime)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp GetHapticStartUpTime function", __func__);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "GetHapticStartUpTime");
+    int32_t ret = vibratorVdiImpl_->GetHapticStartUpTime(startUpTime);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetHapticStartUpTime failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
 extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 {
     VibratorIfService *impl = new (std::nothrow) VibratorIfService();
@@ -293,7 +377,7 @@ extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // V1_1
+} // V1_2
 } // Vibrator
 } // HDI
 } // OHOS
