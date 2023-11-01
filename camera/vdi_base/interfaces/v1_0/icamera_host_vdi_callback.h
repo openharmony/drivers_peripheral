@@ -39,6 +39,8 @@ public:
     virtual int32_t OnFlashlightStatus(const std::string &cameraId, VdiFlashlightStatus status) = 0;
 
     virtual int32_t OnCameraEvent(const std::string &cameraId, VdiCameraEvent event) = 0;
+
+    virtual const sptr<IRemoteObject> Remote() const = 0;
 };
 } // V1_0
 } // Camera
