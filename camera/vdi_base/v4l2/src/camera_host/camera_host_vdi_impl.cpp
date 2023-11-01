@@ -96,6 +96,7 @@ int32_t CameraHostVdiImpl::SetCallback(const OHOS::sptr<ICameraHostVdiCallback> 
         CAMERA_LOGW("host callback is null.");
         return INVALID_ARGUMENT;
     }
+    ICameraHostVdi::SetCallback(callbackObj);
 
     cameraHostCallback_ = callbackObj;
 
@@ -388,6 +389,7 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
         std::shared_ptr<CameraDeviceVdiImpl> cameraDevice =
             CameraDeviceVdiImpl::CreateCameraDevice(logicalCameraId);
         if (cameraDevice != nullptr) {
+            std::lock_guard<std::mutex> lck (mtx);
             cameraDeviceMap_[logicalCameraId] = cameraDevice;
         }
     } else {
@@ -399,9 +401,22 @@ void CameraHostVdiImpl::OnCameraStatus(CameraId cameraId,
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
                 cameraHostCallback_->OnCameraEvent(logicalCameraId, CAMERA_EVENT_DEVICE_RMV);
             }
+            std::lock_guard<std::mutex> lck (mtx);
             cameraDeviceMap_.erase(logicalCameraId);
         }
     }
+}
+
+int32_t CameraHostVdiImpl::CloseAllCameras()
+{
+    std::lock_guard<std::mutex> lck (mtx);
+    for (auto it : cameraDeviceMap_) {
+        if (it.second->IsOpened()) {
+            (void) it.second->Close();
+        }
+    }
+
+    return VDI::Camera::V1_0::NO_ERROR;
 }
 
 static int CreateCameraHostVdiInstance(struct HdfVdiBase *vdiBase)
