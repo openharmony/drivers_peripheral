@@ -286,25 +286,25 @@ int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
     }
 
     HapticPaketVdi hapticPaketVdi;
-    hapticPaketVdi.time=pkg.time;
-    hapticPaketVdi.event_num=pkg.event_num;
+    hapticPaketVdi.time = pkg.time;
+    hapticPaketVdi.eventNum = pkg.eventNum;
     for (const auto &event : pkg.events) {
         HapticEventVdi hapticEventVdi;
-        if(event.type==CONTINUOUS){
-            hapticEventVdi.type=VDI_CONTINUOUS;
-        }else if(event.type==TRANSIENT){
-            hapticEventVdi.type=VDI_TRANSIENT;
+        if (event.type == CONTINUOUS) {
+            hapticEventVdi.type = VDI_CONTINUOUS;
+        }else if (event.type == TRANSIENT) {
+            hapticEventVdi.type = VDI_TRANSIENT;
         }
-        hapticEventVdi.duration=event.duration;
-        hapticEventVdi.intensity=event.intensity;
-        hapticEventVdi.frequency=event.frequency;
-        hapticEventVdi.index=event.index;
-        hapticEventVdi.point_num=event.point_num;
+        hapticEventVdi.duration = event.duration;
+        hapticEventVdi.intensity = event.intensity;
+        hapticEventVdi.frequency = event.frequency;
+        hapticEventVdi.index = event.index;
+        hapticEventVdi.pointNum = event.pointNum;
         for (const auto &point : event.points) {
             CurvePointVdi curvePointVdip;
-            curvePointVdip.time=point.time;
-            curvePointVdip.intensity=point.intensity;
-            curvePointVdip.frequency=point.frequency;
+            curvePointVdip.time = point.time;
+            curvePointVdip.intensity = point.intensity;
+            curvePointVdip.frequency = point.frequency;
             hapticEventVdi.points.push_back(std::move(curvePointVdip));
         }
         hapticPaketVdi.events.push_back(std::move(hapticEventVdi));
@@ -334,11 +334,11 @@ int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
         HDF_LOGE("%{public}s GetHapticCapacity failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
-    hapticCapacity.isSupportHdHaptic=hapticCapacityVdi.isSupportHdHaptic;
-    hapticCapacity.isSupportPredefineWave=hapticCapacityVdi.isSupportPredefineWave;
-    hapticCapacity.isSupportTimeDelay=hapticCapacityVdi.isSupportTimeDelay;
-    hapticCapacity.reserved0=hapticCapacityVdi.reserved0;
-    hapticCapacity.reserved1=hapticCapacityVdi.reserved1;
+    hapticCapacity.isSupportHdHaptic = hapticCapacityVdi.isSupportHdHaptic;
+    hapticCapacity.isSupportPredefineWave = hapticCapacityVdi.isSupportPredefineWave;
+    hapticCapacity.isSupportTimeDelay = hapticCapacityVdi.isSupportTimeDelay;
+    hapticCapacity.reserved0 = hapticCapacityVdi.reserved0;
+    hapticCapacity.reserved1 = hapticCapacityVdi.reserved1;
 
     return ret;
 }
