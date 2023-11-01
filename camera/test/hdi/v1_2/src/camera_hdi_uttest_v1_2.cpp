@@ -467,7 +467,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_015, TestSize.Level1)
 
 /**
  * @tc.name: Camera_Device_Hdi_V1_2_016
- * @tc.desc: OHOS_CAMERA_MESURE_EXPOSURE_TIME,OHOS_CAMERA_MANUAL_EXPOSURE_TIME
+ * @tc.desc: OHOS_CAMERA_MESURE_EXPOSURE_TIME,OHOS_CONTROL_MANUAL_EXPOSURE_TIME
  * @tc.size: MediumTest
  * @tc.type: Function
  */
@@ -479,20 +479,20 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_016, TestSize.Level1)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CAMERA_MESURE_EXPOSURE_TIME, &entry);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.count > 0) {
-        CAMERA_LOGI("print tag<OHOS_CAMERA_MANUAL_EXPOSURE_TIME> f value start.");
+        CAMERA_LOGI("print tag<OHOS_CONTROL_MANUAL_EXPOSURE_TIME> f value start.");
         for (size_t i = 0; i < entry.count; i++) {
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-            printf("OHOS_CAMERA_MANUAL_EXPOSURE_TIME : %d\n", entry.data.i32[i]);
+            printf("OHOS_CONTROL_MANUAL_EXPOSURE_TIME : %d\n", entry.data.i32[i]);
             int32_t value = entry.data.i32[i];
-            meta->addEntry(OHOS_CAMERA_MANUAL_EXPOSURE_TIME, &value, 1);
+            meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &value, 1);
             std::vector<uint8_t> metaVec;
             MetadataUtils::ConvertMetadataToVec(meta, metaVec);
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-            CAMERA_LOGI("addEntry for OHOS_CAMERA_MANUAL_EXPOSURE_TIME success!");
+            CAMERA_LOGI("addEntry for OHOS_CONTROL_MANUAL_EXPOSURE_TIME success!");
             TakePhotoWithTags(meta);  
         }
-        CAMERA_LOGI("print tag<OHOS_CAMERA_MANUAL_EXPOSURE_TIME> f value end.");
+        CAMERA_LOGI("print tag<OHOS_CONTROL_MANUAL_EXPOSURE_TIME> f value end.");
     } else {
         CAMERA_LOGI("OHOS_CAMERA_MESURE_EXPOSURE_TIME value count is 0");
     }
