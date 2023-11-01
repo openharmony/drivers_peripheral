@@ -17,17 +17,17 @@
 #define HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
 
 #include <memory>
-
+#include "iremote_object.h"
 #include "v1_0/iintell_voice_trigger_adapter.h"
 #include "i_trigger.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
 namespace Trigger {
-using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerProperties;
-using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModel;
-using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceRecognitionEvent;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerCallback;
+using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceRecognitionEvent;
+using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModel;
+using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerProperties;
 
 class IntellVoiceTriggerCallbackDevice : public ITriggerCallback {
 public:
@@ -39,8 +39,25 @@ private:
     OHOS::sptr<IIntellVoiceTriggerCallback> callback_ = nullptr;
 };
 
-class IntellVoiceTriggerAdapterImpl :
-    public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter {
+class IntellVoiceDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    using ServiceDiedCallback = std::function<void()>;
+    explicit IntellVoiceDeathRecipient(ServiceDiedCallback callback) : callback_(callback) {};
+    ~IntellVoiceDeathRecipient() override = default;
+
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+    {
+        (void)remote;
+        if (callback_ != nullptr) {
+            callback_();
+        }
+    }
+
+private:
+    ServiceDiedCallback callback_ = nullptr;
+};
+
+class IntellVoiceTriggerAdapterImpl : public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter {
 public:
     explicit IntellVoiceTriggerAdapterImpl(std::unique_ptr<ITrigger> adapter);
     ~IntellVoiceTriggerAdapterImpl();
@@ -51,14 +68,17 @@ public:
     int32_t UnloadModel(int32_t handle) override;
     int32_t Start(int32_t handle) override;
     int32_t Stop(int32_t handle) override;
+    void Clean();
 
 private:
     int32_t GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData);
+    bool RegisterDeathRecipient(const sptr<IIntellVoiceTriggerCallback> &triggerCallback);
 
 private:
     std::unique_ptr<ITrigger> adapter_ = nullptr;
+    int32_t handle_;
 };
-}
-}
-}
-#endif // HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
+}  // namespace Trigger
+}  // namespace IntelligentVoice
+}  // namespace OHOS
+#endif  // HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
