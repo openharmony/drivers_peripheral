@@ -14,6 +14,7 @@
  */
 
 #include "camera_host_service_callback.h"
+#include "iproxy_broker.h"
 
 namespace OHOS::Camera {
 CameraHostServiceCallback::CameraHostServiceCallback(OHOS::sptr<ICameraHostCallback> cameraHostCallback)
@@ -37,6 +38,11 @@ int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, Vd
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostCallback_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     return cameraHostCallback_->OnCameraEvent(cameraId, static_cast<CameraEvent>(event));
+}
+
+const sptr<IRemoteObject> CameraHostServiceCallback::Remote() const
+{
+    return OHOS::HDI::hdi_objcast<ICameraHostCallback>(cameraHostCallback_);
 }
 
 } // end namespace OHOS::Camera
