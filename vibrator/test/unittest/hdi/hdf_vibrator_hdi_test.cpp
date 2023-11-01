@@ -464,20 +464,42 @@ HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
 
     printf("into function PlayHapticPattern\n");
     HapticPaket pkg;
-    pkg.time=1000;
+    pkg.time=434;
     pkg.event_num=1;
+
     HapticEvent hapticEvent;
     hapticEvent.type=CONTINUOUS;
-    hapticEvent.duration=1000;
-    hapticEvent.intensity=1;
-    hapticEvent.frequency=1;
+    hapticEvent.duration=149;
+    hapticEvent.time=0;
+    hapticEvent.intensity=100;
+    hapticEvent.frequency=50;
     hapticEvent.index=0;
-    hapticEvent.point_num=1;
+    hapticEvent.point_num=4;
+
     CurvePoint curvePoint;
-    curvePoint.time=1000;
-    curvePoint.intensity=1;
-    curvePoint.frequency=1;
+    curvePoint.time=0;
+    curvePoint.intensity=0;
+    curvePoint.frequency=0;
     hapticEvent.points.push_back(std::move(curvePoint));
+
+    CurvePoint curvePoint;
+    curvePoint.time=1;
+    curvePoint.intensity=1;
+    curvePoint.frequency=0;
+    hapticEvent.points.push_back(std::move(curvePoint));
+
+    CurvePoint curvePoint;
+    curvePoint.time=32;
+    curvePoint.intensity=1;
+    curvePoint.frequency=-39;
+    hapticEvent.points.push_back(std::move(curvePoint));
+
+    CurvePoint curvePoint;
+    curvePoint.time=149;
+    curvePoint.intensity=0;
+    curvePoint.frequency=-39;
+    hapticEvent.points.push_back(std::move(curvePoint));
+
     pkg.events.push_back(std::move(hapticEvent));
     int32_t startRet = g_vibratorInterface->PlayHapticPattern(pkg);
     EXPECT_EQ(startRet, HDF_SUCCESS);
