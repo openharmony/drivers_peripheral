@@ -684,7 +684,8 @@ static ssize_t AudioPnpReadUeventMsg(int sockFd, char *buffer, size_t length)
     return len;
 }
 
-static void UpdateDeviceState(struct AudioEvent audioEvent, struct HdfDeviceObject *device) {
+static void UpdateDeviceState(struct AudioEvent audioEvent, struct HdfDeviceObject *device)
+{
     char pnpInfo[AUDIO_EVENT_INFO_LEN_MAX] = {0};
     int32_t ret;
     if (!IsUpdatePnpDeviceState(&audioEvent)) {
@@ -708,13 +709,14 @@ static void UpdateDeviceState(struct AudioEvent audioEvent, struct HdfDeviceObje
 
 #ifdef AUDIO_DOUBLE_PNP_DETECT
 static struct AudioEvent g_usbHeadset = {0};
-static void* UpdateUsbHeadset(void *arg) {
+static void* UpdateUsbHeadset(void *arg)
+{
     OsalMSleep(AUDIO_DEVICE_WAIT_USB_HEADSET_ONLINE);
     char pnpInfo[AUDIO_EVENT_INFO_LEN_MAX] = {0};
     int32_t ret;
     if (!IsUpdatePnpDeviceState(&g_usbHeadset)) {
-        AUDIO_FUNC_LOGI("audio first pnp device[%{public}u] state[%{public}u] not need flush !", g_usbHeadset.deviceType,
-            g_usbHeadset.eventType);
+        AUDIO_FUNC_LOGI("audio first pnp device[%{public}u] state[%{public}u] not need flush !",
+            g_usbHeadset.deviceType, g_usbHeadset.eventType);
         return NULL;
     }
     ret = snprintf_s(pnpInfo, AUDIO_EVENT_INFO_LEN_MAX, AUDIO_EVENT_INFO_LEN_MAX - 1, "EVENT_TYPE=%u;DEVICE_TYPE=%u",
@@ -729,7 +731,7 @@ static void* UpdateUsbHeadset(void *arg) {
     if (HdfDeviceObjectSetServInfo(device, pnpInfo) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("set audio event status info failed!");
     }
-    if (HdfDeviceObjectUpdate(g_audioPnpDevice) != HDF_SUCCESS) {
+    if (HdfDeviceObjectUpdate(device) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("update audio status info failed!");
         return NULL;
     }
@@ -740,13 +742,15 @@ void DetectAudioDevice(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct AudioEvent audioEvent = {0};
-    char pnpInfo[AUDIO_EVENT_INFO_LEN_MAX] = {0};
 
     OsalMSleep(AUDIO_DEVICE_WAIT_USB_ONLINE); // Wait until the usb node is successfully created
     ret = DetectAnalogHeadsetState(&audioEvent);
     if ((ret == HDF_SUCCESS) && (audioEvent.eventType == AUDIO_DEVICE_ADD)) {
         AUDIO_FUNC_LOGI("audio detect analog headset");
         UpdateDeviceState(audioEvent, device);
+#ifndef AUDIO_DOUBLE_PNP_DETECT
+        return;
+#endif
     }
 #ifdef AUDIO_DOUBLE_PNP_DETECT
     ret = DetectUsbHeadsetState(&g_usbHeadset);
