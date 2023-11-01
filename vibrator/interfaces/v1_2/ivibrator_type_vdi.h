@@ -98,13 +98,13 @@ struct HapticEventVdi {
     int32_t intensity;
     int32_t frequency;
     int32_t index;
-    int32_t point_num;
+    int32_t pointNum;
     std::vector<CurvePointVdi> points;
 };
 
 struct HapticPaketVdi {
     int32_t time;
-    int32_t event_num;
+    int32_t eventNum;
     std::vector<HapticEventVdi> events;
 };
 
