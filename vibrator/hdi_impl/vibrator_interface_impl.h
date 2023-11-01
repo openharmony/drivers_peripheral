@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
-#define OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
+#ifndef OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H
+#define OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H
 
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_1 {
+namespace V1_2 {
 class VibratorInterfaceImpl : public IVibratorInterfaceVdi {
 public:
     VibratorInterfaceImpl() {}
@@ -35,11 +35,14 @@ public:
     int32_t EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency) override;
     int32_t EnableCompositeEffect(const HdfCompositeEffectVdi& effect) override;
     int32_t GetEffectInfo(const std::string &effectType, HdfEffectInfoVdi &effectInfo) override;
-    int32_t IsVibratorRunning(bool& state) override;;
+    int32_t IsVibratorRunning(bool& state) override;
+    int32_t PlayHapticPattern(const HapticPaketVdi& pkg) override;
+    int32_t GetHapticCapacity(HapticCapacityVdi& HapticCapacity) override;
+    int32_t GetHapticStartUpTime(int32_t& startUpTime) override;
 };
-} // V1_1
+} // v1_2
 } // Vibrator
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
+#endif // OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H

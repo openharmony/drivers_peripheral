@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_1 {
+namespace V1_2 {
 
 int32_t VibratorInterfaceImpl::Init()
 {
@@ -191,6 +191,42 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
     return HDF_SUCCESS;
 }
 
+int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp PlayHapticPattern function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& HapticCapacityVdi)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp GetHapticCapacity function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t& startUpTime)
+{
+    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp GetHapticStartUpTime function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t CreateLightVdiInstance(struct HdfVdiBase *vdiBase)
 {
     HDF_LOGI("%{public}s: Enter the CreateLightVdiInstance function", __func__);
@@ -237,7 +273,7 @@ static struct VdiWrapperVibrator g_vibratorVdi = {
 
 extern "C" HDF_VDI_INIT(g_vibratorVdi);
 
-} // V1_1
+} // v1_2
 } // Vibrator
 } // HDI
 } // OHOS

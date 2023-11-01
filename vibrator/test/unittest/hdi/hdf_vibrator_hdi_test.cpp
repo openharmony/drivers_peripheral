@@ -19,10 +19,10 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_1/ivibrator_interface.h"
+#include "v1_2/ivibrator_interface.h"
 #include "vibrator_type.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
+using namespace OHOS::HDI::Vibrator::V1_2;
 using namespace testing::ext;
 
 namespace {
@@ -39,7 +39,7 @@ namespace {
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     std::string g_arbitraryStr = "arbitraryString";
-    sptr<IVibratorInterface> g_vibratorInterface = nullptr;
+    sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = nullptr;
 }
 
 class HdfVibratorHdiTest : public testing::Test {
@@ -52,7 +52,7 @@ public:
 
 void HdfVibratorHdiTest::SetUpTestCase()
 {
-    g_vibratorInterface = IVibratorInterface::Get();
+    g_vibratorInterface = OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
 }
 
 void HdfVibratorHdiTest::TearDownTestCase()
@@ -450,4 +450,77 @@ HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_002, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
     EXPECT_EQ(effectInfo.isSupportEffect, false);
     EXPECT_EQ(effectInfo.duration, 0);
+}
+
+/**
+  * @tc.name: PlayHapticPattern
+  * @tc.desc: HD vibration data packet delivery.
+  * @tc.type: FUNC
+  * @tc.require:#I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    printf("into function PlayHapticPattern\n");
+    HapticPaket pkg;
+    pkg.time=1000;
+    pkg.event_num=1;
+    HapticEvent hapticEvent;
+    hapticEvent.type=CONTINUOUS;
+    hapticEvent.duration=1000;
+    hapticEvent.intensity=1;
+    hapticEvent.frequency=1;
+    hapticEvent.index=0;
+    hapticEvent.point_num=1;
+    CurvePoint curvePoint;
+    curvePoint.time=1000;
+    curvePoint.intensity=1;
+    curvePoint.frequency=1;
+    hapticEvent.points.push_back(std::move(curvePoint));
+    pkg.events.push_back(std::move(hapticEvent));
+    int32_t startRet = g_vibratorInterface->PlayHapticPattern(pkg);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetHapticCapacity
+  * @tc.desc: Obtains the vibration capability of the motor.
+  * @tc.type: FUNC
+  * @tc.require:#I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    printf("into function GetHapticCapacity\n");
+    HapticCapacity HapticCapacity;
+    int32_t startRet = g_vibratorInterface->GetHapticCapacity(HapticCapacity);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetHapticStartUpTime
+  * @tc.desc: Indicates the time from the time when the vibration command is issued to the time the motor starts to vibrate.
+  * @tc.type: FUNC
+  * @tc.require:#I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+    
+    printf("into function GetHapticStartUpTime\n");
+    int32_t startUpTime;
+    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(startUpTime);
+    printf("startUpTime=%d\n",startUpTime);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
