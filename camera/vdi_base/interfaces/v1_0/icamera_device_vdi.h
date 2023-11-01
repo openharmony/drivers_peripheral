@@ -23,7 +23,6 @@
 #include "v1_0/istream_operator_vdi.h"
 #include "v1_0/istream_operator_vdi_callback.h"
 
-
 namespace OHOS {
 namespace VDI {
 namespace Camera {
