@@ -456,7 +456,7 @@ HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_002, TestSize.Level1)
   * @tc.name: PlayHapticPattern
   * @tc.desc: HD vibration data packet delivery.
   * @tc.type: FUNC
-  * @tc.require:#I4NN4Z
+  * @tc.require:#I8BZ5H
   */
 HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
 {
@@ -512,7 +512,7 @@ HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
   * @tc.name: GetHapticCapacity
   * @tc.desc: Obtains the vibration capability of the motor.
   * @tc.type: FUNC
-  * @tc.require:#I4NN4Z
+  * @tc.require:#I8BZ5H
   */
 HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
 {
@@ -529,9 +529,10 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
 
 /**
   * @tc.name: GetHapticStartUpTime
-  * @tc.desc: Indicates the time from the time when the vibration command is issued to the time the motor starts to vibrate.
+  * @tc.desc: Indicates the time from the time when the vibration 
+  * command is issued to the time the motor starts to vibrate.
   * @tc.type: FUNC
-  * @tc.require:#I4NN4Z
+  * @tc.require:#I8BZ5H
   */
 HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
 {
@@ -540,7 +541,7 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
     printf("into function GetHapticStartUpTime\n");
     int32_t startUpTime;
     int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(startUpTime);
-    printf("startUpTime = %d\n",startUpTime);
+    printf("startUpTime = %d\n", startUpTime);
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
