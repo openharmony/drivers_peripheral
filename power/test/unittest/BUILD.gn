@@ -75,6 +75,7 @@ ohos_unittest("hdi_unittest_power_runninglock") {
     "drivers_interface_power:power_idl_headers",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 }

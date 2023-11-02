@@ -30,6 +30,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 
@@ -51,6 +52,7 @@ ohos_shared_library("libpower_driver") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 
