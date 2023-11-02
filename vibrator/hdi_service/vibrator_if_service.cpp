@@ -292,7 +292,7 @@ int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
         HapticEventVdi hapticEventVdi;
         if (event.type == CONTINUOUS) {
             hapticEventVdi.type = VDI_CONTINUOUS;
-        }else if (event.type == TRANSIENT) {
+        } else if (event.type == TRANSIENT) {
             hapticEventVdi.type = VDI_TRANSIENT;
         }
         hapticEventVdi.duration = event.duration;

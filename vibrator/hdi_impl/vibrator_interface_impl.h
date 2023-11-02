@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H
-#define OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H
+#ifndef OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
+#define OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
 
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
@@ -45,4 +45,4 @@ public:
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_v1_2_VIBRATORINTERFACEIMPL_H
+#endif // OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
