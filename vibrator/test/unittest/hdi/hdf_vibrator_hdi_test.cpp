@@ -529,8 +529,7 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
 
 /**
   * @tc.name: GetHapticStartUpTime
-  * @tc.desc: Indicates the time from the time when the vibration 
-  *           command is issued to the time the motor starts to vibrate.
+  * @tc.desc: Indicates the time from command is issued to the time the motor starts.
   * @tc.type: FUNC
   * @tc.require:#I8BZ5H
   */
