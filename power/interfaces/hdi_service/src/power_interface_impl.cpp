@@ -335,7 +335,6 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
     return RunningLockImpl::Unhold(info);
 }
-
 } // namespace V1_1
 } // namespace Power
 } // namespace HDI
