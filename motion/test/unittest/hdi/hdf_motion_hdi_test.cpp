@@ -24,6 +24,9 @@
 #include "v1_1/imotion_interface.h"
 #include "motion_callback_impl.h"
 
+#define DATA_NUM 12
+#define DATA_VALUE 6
+
 using namespace OHOS::HDI::Motion::V1_1;
 using namespace testing::ext;
 
@@ -31,6 +34,7 @@ namespace {
     sptr<OHOS::HDI::Motion::V1_1::IMotionInterface> g_motionInterface = nullptr;
     sptr<IMotionCallback> g_motionCallback = new MotionCallbackImpl();
     sptr<IMotionCallback> g_motionCallbackUnregistered = new MotionCallbackImpl();
+    std::vector<uint8_t> g_motionConfigData(DATA_NUM, DATA_VALUE);
 }
 
 class HdfMotionTest : public testing::Test {
@@ -250,5 +254,16 @@ HWTEST_F(HdfMotionTest, DisableMotion_004, TestSize.Level1)
     }
     int32_t motionType = -1;
     int32_t ret = g_motionInterface->DisableMotion(motionType);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfMotionTest, SetMotionConfig_001, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t motionType = -1;
+    int32_t ret = g_motionInterface->SetMotionConfig(motionType, g_motionConfigData);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
