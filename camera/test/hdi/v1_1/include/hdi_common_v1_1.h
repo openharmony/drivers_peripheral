@@ -50,10 +50,8 @@ enum ImageDataSaveSwitch {
     SWITCH_ON,
 };
 enum CameraIds {
-    // front camera
-    DEVICE_0,
-    // rear camera
-    DEVICE_1,
+    DEVICE_0, // rear camera
+    DEVICE_1, // front camera
     DEVICE_2,
     DEVICE_3,
     DEVICE_4,
