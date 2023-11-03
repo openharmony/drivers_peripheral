@@ -20,6 +20,8 @@
 #include <hdf_log.h>
 #include "vibrator_if.h"
 
+using namespace OHOS::HDI::Vibrator::V1_1;
+
 #define HDF_LOG_TAG    uhdf_vibrator_service
 
 namespace OHOS {
@@ -193,9 +195,9 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
 
 int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp PlayHapticPattern function\n", __func__);
+    HDF_LOGI("%{public}s: Enter the PlayHapticPattern function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->PlayHapticPattern == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -205,9 +207,9 @@ int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
 
 int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& HapticCapacityVdi)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp GetHapticCapacity function\n", __func__);
+    HDF_LOGI("%{public}s: Enter the GetHapticCapacity function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->GetHapticCapacity == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -217,9 +219,9 @@ int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& HapticCapaci
 
 int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t& startUpTime)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_interface_impl.cpp GetHapticStartUpTime function\n", __func__);
+    HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->GetHapticStartUpTime == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }

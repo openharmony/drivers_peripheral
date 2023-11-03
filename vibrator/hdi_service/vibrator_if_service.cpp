@@ -279,7 +279,7 @@ int32_t VibratorIfService::IsVibratorRunning(bool& state)
 
 int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp PlayHapticPattern function", __func__);
+    HDF_LOGI("%{public}s: Enter the PlayHapticPattern function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -321,7 +321,7 @@ int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
 
 int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp GetHapticCapacity function", __func__);
+    HDF_LOGI("%{public}s: Enter the GetHapticCapacity function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -345,7 +345,7 @@ int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
 
 int32_t VibratorIfService::GetHapticStartUpTime(int32_t& startUpTime)
 {
-    HDF_LOGI("%{public}s: Enter the vibrator_if_service.cpp GetHapticStartUpTime function", __func__);
+    HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;

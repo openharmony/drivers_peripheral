@@ -24,7 +24,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "../interfaces/include/",
       ".",
-      "../interfaces/v1_2/",
+      "../interfaces/v1_1/",
     ]
     sources = [ "vibrator_if_service.cpp" ]
     deps = [ "../hal:hdi_vibrator" ]
