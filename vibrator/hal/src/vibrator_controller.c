@@ -315,7 +315,7 @@ static int32_t PlayHapticPattern(struct HapticPaket *pkg)
 
 static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 {
-    HDF_LOGE("%s: hapticCapacity->eventNum = %{public}d", __func__, hapticCapacity->eventNum);
+    HDF_LOGE("%s: hapticCapacity->isSupportHdHaptic = %{public}d", __func__, hapticCapacity->isSupportHdHaptic);
     HDF_LOGE("%s: hapticCapacity->isSupportPredefineWave = %{public}d", __func__, hapticCapacity->isSupportPredefineWave);
     HDF_LOGE("%s: hapticCapacity->isSupportTimeDelay = %{public}d", __func__, hapticCapacity->isSupportTimeDelay);
     HDF_LOGE("%s: hapticCapacity->reserved0 = %{public}d", __func__, hapticCapacity->reserved0);
@@ -326,7 +326,7 @@ static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 
 static int32_t GetHapticStartUpTime(int *startUpTime)
 {
-    HDF_LOGE("%s: startUpTime = %{public}d", __func__, startUpTime);
+    HDF_LOGE("%s: startUpTime = %{public}d", __func__, *startUpTime);
     return HDF_SUCCESS;
 }
 
