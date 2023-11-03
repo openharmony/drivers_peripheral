@@ -52,7 +52,6 @@ ohos_shared_library("libpower_driver") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 
