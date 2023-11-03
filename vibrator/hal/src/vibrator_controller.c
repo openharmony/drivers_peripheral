@@ -304,6 +304,24 @@ static int32_t Stop(enum VibratorMode mode)
     return ret;
 }
 
+
+static int32_t PlayHapticPattern(struct HapticPaket *pkg)
+{
+    return HDF_SUCCESS;
+}
+
+
+static int32_t GetHapticCapacity(struct HapticCapacity *HapticCapacity)
+{
+    return HDF_SUCCESS;
+}
+
+
+static int32_t GetHapticStartUpTime(int *startUpTime)
+{
+    return HDF_SUCCESS;
+}
+
 const struct VibratorInterface *NewVibratorInterfaceInstance(void)
 {
     static struct VibratorInterface vibratorDevInstance;
@@ -320,6 +338,9 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     vibratorDevInstance.GetVibratorInfo = GetVibratorInfo;
     vibratorDevInstance.GetEffectInfo = GetEffectInfo;
     vibratorDevInstance.EnableVibratorModulation = EnableVibratorModulation;
+    vibratorDevInstance.PlayHapticPattern = PlayHapticPattern;
+    vibratorDevInstance.GetHapticCapacity = GetHapticCapacity;
+    vibratorDevInstance.GetHapticStartUpTime = GetHapticStartUpTime;
 
     priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
     if (priv->ioService == NULL) {

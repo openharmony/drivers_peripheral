@@ -225,7 +225,7 @@ struct HapticEvent {
     int32_t intensity;
     /** Indicates the vibration frequency. */
     int32_t frequency;
-    /** ID of the vibration motor. The value 0indicates that all channels are transmitted. The value 1 and 2 indacate the left and right motors of the channel respectively. */
+    /** ID of the vibration motor. Indicates the time from command is issued to the time the motor starts. */
     int32_t index;
     /** Indicates the number of vibration points. */
     int32_t pointNum;
