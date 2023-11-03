@@ -158,6 +158,42 @@ struct VibratorInterface {
      * @version 1.1
      */
     int32_t (*IsVibratorRunning)(bool state);
+    /**
+     * @brief HD vibration data packet delivery.
+     *
+     * @param Indecates the Hd vibration data packet.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*PlayHapticPattern)(struct HapticPaket *pkg);
+    /**
+     * @brief Obtains the vibration capability of the motor.
+     *
+     * @param Indecates the vibration capability of the motor.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*GetHapticCapacity)(struct HapticCapacity *HapticCapacity);
+    /**
+     * @brief Obtains the start_up time of the motor.
+     *
+     * @param Indicates the time from the time when the vabration command is issued to the time when the motor starts to vibrate.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*GetHapticStartUpTime)(int *startUpTime);
 };
 
 /**

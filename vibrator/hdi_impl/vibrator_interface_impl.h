@@ -19,11 +19,12 @@
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
 
+
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_2 {
-class VibratorInterfaceImpl : public IVibratorInterfaceVdi {
+class VibratorInterfaceImpl : public V1_1::IVibratorInterfaceVdi {
 public:
     VibratorInterfaceImpl() {}
     ~VibratorInterfaceImpl() {}

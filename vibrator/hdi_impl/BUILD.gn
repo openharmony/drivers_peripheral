@@ -22,7 +22,7 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("libhdi_vibrator_impl") {
     include_dirs = [
-      "../interfaces/v1_2/",
+      "../interfaces/v1_1/",
       ".",
     ]
     sources = [ "vibrator_interface_impl.cpp" ]
