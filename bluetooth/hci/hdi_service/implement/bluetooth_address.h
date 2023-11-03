@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <stdbool.h>
 #include "bt_hal_constant.h"
 
 namespace OHOS {
