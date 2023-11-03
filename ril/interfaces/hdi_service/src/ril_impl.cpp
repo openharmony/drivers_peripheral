@@ -563,6 +563,11 @@ int32_t RilImpl::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockTyp
     return TaskSchedule(&Telephony::HRilManager::UnlockSimLock, slotId, serialId, lockType, key);
 }
 
+int32_t RilImpl::SendSimMatchedOperatorInfo(int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendSimMatchedOperatorInfo, slotId, serialId, ncfgOperatorInfo);
+}
+
 // Sms
 int32_t RilImpl::SendGsmSms(int32_t slotId, int32_t serialId, const GsmSmsMessageInfo &gsmSmsMessageInfo)
 {
