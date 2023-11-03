@@ -181,7 +181,7 @@ struct VibratorInterface {
      * @since 4.1
      * @version 1.2
      */
-    int32_t (*GetHapticCapacity)(struct HapticCapacity *HapticCapacity);
+    int32_t (*GetHapticCapacity)(struct HapticCapacity *hapticCapacity);
     /**
      * @brief Obtains the start_up time of the motor.
      *

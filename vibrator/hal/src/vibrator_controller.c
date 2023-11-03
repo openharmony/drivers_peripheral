@@ -307,18 +307,26 @@ static int32_t Stop(enum VibratorMode mode)
 
 static int32_t PlayHapticPattern(struct HapticPaket *pkg)
 {
+    HDF_LOGE("%s: pkg->time = %{public}d", __func__, pkg->time);
+    HDF_LOGE("%s: pkg->eventNum = %{public}d", __func__, pkg->eventNum);
     return HDF_SUCCESS;
 }
 
 
-static int32_t GetHapticCapacity(struct HapticCapacity *HapticCapacity)
+static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 {
+    HDF_LOGE("%s: hapticCapacity->eventNum = %{public}d", __func__, hapticCapacity->eventNum);
+    HDF_LOGE("%s: hapticCapacity->isSupportPredefineWave = %{public}d", __func__, hapticCapacity->isSupportPredefineWave);
+    HDF_LOGE("%s: hapticCapacity->isSupportTimeDelay = %{public}d", __func__, hapticCapacity->isSupportTimeDelay);
+    HDF_LOGE("%s: hapticCapacity->reserved0 = %{public}d", __func__, hapticCapacity->reserved0);
+    HDF_LOGE("%s: hapticCapacity->reserved1 = %{public}d", __func__, hapticCapacity->reserved1);
     return HDF_SUCCESS;
 }
 
 
 static int32_t GetHapticStartUpTime(int *startUpTime)
 {
+    HDF_LOGE("%s: startUpTime = %{public}d", __func__, startUpTime);
     return HDF_SUCCESS;
 }
 
