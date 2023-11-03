@@ -20,14 +20,12 @@
 #include <hdf_log.h>
 #include "vibrator_if.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
-
 #define HDF_LOG_TAG    uhdf_vibrator_service
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_2 {
+namespace V1_1 {
 
 int32_t VibratorInterfaceImpl::Init()
 {
@@ -275,7 +273,7 @@ static struct VdiWrapperVibrator g_vibratorVdi = {
 
 extern "C" HDF_VDI_INIT(g_vibratorVdi);
 
-} // v1_2
+} // v1_1
 } // Vibrator
 } // HDI
 } // OHOS

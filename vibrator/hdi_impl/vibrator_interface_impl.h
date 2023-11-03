@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
-#define OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
+#ifndef OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
+#define OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
 
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
@@ -23,8 +23,8 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_2 {
-class VibratorInterfaceImpl : public V1_1::IVibratorInterfaceVdi {
+namespace V1_1 {
+class VibratorInterfaceImpl : public IVibratorInterfaceVdi {
 public:
     VibratorInterfaceImpl() {}
     ~VibratorInterfaceImpl() {}
@@ -41,9 +41,9 @@ public:
     int32_t GetHapticCapacity(HapticCapacityVdi& HapticCapacity) override;
     int32_t GetHapticStartUpTime(int32_t& startUpTime) override;
 };
-} // v1_2
+} // v1_1
 } // Vibrator
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_V1_2_VIBRATORINTERFACEIMPL_H
+#endif // OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
