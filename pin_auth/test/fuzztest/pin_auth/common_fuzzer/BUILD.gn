@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_shared_library("libpin_auth_interface_service_1.1_fuzzer") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/service/inc",
     "../../../../hdi_service/adaptor/inc",
