@@ -87,6 +87,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_HUMIDITY            = 13,  /**< Humidity sensor */
     SENSOR_TYPE_COLOR               = 14,  /**< Color sensor */
     SENSOR_TYPE_SAR                 = 15,  /**< SAR sensor */
+    SENSOR_TYPE_AMBIENT_LIGHT1      = 16,  /**< Secondary ambient light sensor*/
     SENSOR_TYPE_MEDICAL_BEGIN       = 128, /**< The begin of medical sensorId enumeration value range */
     SENSOR_TYPE_MEDICAL_END         = 160, /**< The end of medical sensorId enumeration value range */
     SENSOR_TYPE_PHYSICAL_MAX        = 255, /**< Maximum type of a physical sensor */
