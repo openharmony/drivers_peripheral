@@ -185,7 +185,7 @@ struct VibratorInterface {
     /**
      * @brief Obtains the start_up time of the motor.
      *
-     * @param Indicates the time from the time when the vabration command is issued to the time when the motor starts to vibrate.
+     * @param Indicates the time from command is issued to the time the motor starts.
      *
      * @return Returns <b>0</b> if the operation is successful.
      * @return Returns negative value if the get failed.
