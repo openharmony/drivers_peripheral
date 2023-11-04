@@ -14,6 +14,7 @@
  */
 
 #include "../include/cdcacm.h"
+#include <unistd.h>
 #include "device_resource_if.h"
 #include "hdf_base.h"
 #include "hdf_device_object.h"
@@ -38,7 +39,8 @@
 #define DATA_BIT  8
 #define USBCDC_LEN 2
 #define RECEIVE_ALL_EVENTS 0xff
-
+const int32_t WAIT_UDC_MAX_LOOP = 3;
+const uint32_t WAIT_UDC_TIME = 100000;
 static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
 
@@ -1333,6 +1335,7 @@ static struct AcmNotifyMethod g_acmNotifyMethod = {
 static int32_t AcmParseEachPipe(struct UsbAcmDevice *acm, struct UsbAcmInterface *iface)
 {
     struct UsbFnInterface *fnIface = iface->fn;
+    uint32_t repetIdx = 0;
     for (uint32_t i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
@@ -1358,7 +1361,12 @@ static int32_t AcmParseEachPipe(struct UsbAcmDevice *acm, struct UsbAcmInterface
                 }
                 break;
             default:
-                HDF_LOGE("%s: pipe type %d don't support", __func__, pipeInfo.type);
+                if (repetIdx < WAIT_UDC_MAX_LOOP) {
+                    usleep(WAIT_UDC_TIME);
+                    i--;
+                }
+                repetIdx++;
+                HDF_LOGE("%s: pipe type %{public}d don't support", __func__, pipeInfo.type);
                 break;
         }
     }

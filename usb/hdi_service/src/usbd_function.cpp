@@ -98,6 +98,7 @@ int32_t UsbdFunction::InitMtp()
     }
     ret = serviceImpl->Init();
     if (ret != HDF_SUCCESS) {
+        UsbdUnregisterDevice(MTP_PTP_SERVICE_NAME);
         HDF_LOGE("%{public}s: init mtp device failed: %{public}d", __func__, ret);
     }
     HDF_LOGI("%{public}s: start Init done", __func__);
@@ -302,9 +303,11 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
             return HDF_FAILURE;
         }
         if (SendCmdToService(ACM_SERVICE_NAME, ACM_INIT, USB_FUNCTION_ACM) != 0) {
+            UsbdUnRegisterDevice(std::string(ACM_SERVICE_NAME));
             HDF_LOGE("%{public}s: acm init error", __func__);
             return HDF_FAILURE;
         }
+        currentFuncs_ |= USB_FUNCTION_ACM;
     }
     if ((funcs & USB_FUNCTION_ECM) != 0) {
         ret = UsbdRegisterDevice(std::string(ECM_SERVICE_NAME));
@@ -313,9 +316,11 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
             return HDF_FAILURE;
         }
         if (SendCmdToService(ECM_SERVICE_NAME, ECM_INIT, USB_FUNCTION_ECM) != 0) {
+            UsbdUnRegisterDevice(std::string(ECM_SERVICE_NAME));
             HDF_LOGE("%{public}s: ecm init error", __func__);
             return HDF_FAILURE;
         }
+        currentFuncs_ |= USB_FUNCTION_ACM;
     }
     if ((funcs & USB_FUNCTION_MTP) != 0 || (funcs & USB_FUNCTION_PTP) != 0) {
         ret = InitMtp();
@@ -374,7 +379,7 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
         HDF_LOGE("%{public}s, set kernel func failed", __func__);
         return HDF_FAILURE;
     }
-
+    currentFuncs_ |= kfuns;
     if (funcs == USB_FUNCTION_NONE) {
         HDF_LOGI("%{public}s, none function", __func__);
         return HDF_SUCCESS;
