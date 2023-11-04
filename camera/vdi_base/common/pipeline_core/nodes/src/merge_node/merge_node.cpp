@@ -22,8 +22,12 @@ MergeNode::MergeNode(const std::string& name, const std::string& type, const std
 
 MergeNode::~MergeNode()
 {
-    streamRunning_ = false;
-    cv_.notify_all();
+    {
+        std::unique_lock<std::mutex> lck(mtx_);
+        streamRunning_ = false;
+        cv_.notify_all();
+    }
+
     if (mergeThread_ != nullptr) {
         CAMERA_LOGI("mergeThread need join");
         mergeThread_->join();
@@ -35,19 +39,27 @@ RetCode MergeNode::Start(const int32_t streamId)
 {
     (void)streamId;
     GetOutPorts();
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("streamrunning = false");
-        streamRunning_ = true;
+    {
+        std::unique_lock<std::mutex> lck(mtx_);
+        if (streamRunning_ == false) {
+            CAMERA_LOGI("streamrunning = false");
+            streamRunning_ = true;
+        }
     }
+
     MergeBuffers();
     return RC_OK;
 }
 
 RetCode MergeNode::Stop(const int32_t streamId)
 {
-    streamRunning_ = false;
+    {
+        std::unique_lock<std::mutex> lck(mtx_);
+        streamRunning_ = false;
+        cv_.notify_all();
+    }
+
     (void)streamId;
-    cv_.notify_all();
     if (mergeThread_ != nullptr) {
         CAMERA_LOGI("mergeThread need join");
         mergeThread_->join();
@@ -72,18 +84,43 @@ void MergeNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
     return;
 }
 
+void MergeNode::DealSecondBuffer()
+{
+    std::unique_lock<std::mutex> lck(mtx_);
+    auto tmpFrame_2 = std::find_if(mergeVec_.begin(), mergeVec_.end(),
+        [it](std::shared_ptr<FrameSpec> fs) {
+        return it->format_.bufferPoolId_ != fs->bufferPoolId_;
+    });
+    if (tmpFrame_2 != mergeVec_.end()) {
+        tmpVec_.push_back((*tmpFrame_2));
+        mergeVec_.erase(tmpFrame_2);
+        bufferNum_--;
+    }
+}
+
 void MergeNode::MergeBuffers()
 {
     mergeThread_ = std::make_shared<std::thread>([this] {
         prctl(PR_SET_NAME, "merge_buffers");
         tmpVec_.clear();
-        while (streamRunning_ == true) {
+        while (true) {
+            {
+                std::unique_lock<std::mutex> lck(mtx_);
+                if (!streamRunning_) {
+                    CAMERA_LOGI("merge thread break");
+                    break;
+                }
+            }
+
             if (bufferNum_ > 0) {
                 auto outPorts = GetOutPorts();
                 for (auto& it : outPorts) {
                     if (tmpVec_.size() == 0) {
-                    {
                         std::unique_lock<std::mutex> lck(mtx_);
+                        if (!streamRunning_) {
+                            CAMERA_LOGI("merge thread break");
+                            return;
+                        }
                         cv_.wait(lck, [this] { return !mergeVec_.empty(); });
                         auto tmpFrame = std::find_if(mergeVec_.begin(), mergeVec_.end(),
                             [it](std::shared_ptr<FrameSpec> fs) {
@@ -95,20 +132,8 @@ void MergeNode::MergeBuffers()
                             bufferNum_--;
                             break;
                         }
-                    }
                     } else if (tmpVec_.size() == 1) {
-                    {
-                        std::unique_lock<std::mutex> lck(mtx_);
-                        auto tmpFrame_2 = std::find_if(mergeVec_.begin(), mergeVec_.end(),
-                            [it](std::shared_ptr<FrameSpec> fs) {
-                            return it->format_.bufferPoolId_ != fs->bufferPoolId_;
-                        });
-                        if (tmpFrame_2 != mergeVec_.end()) {
-                            tmpVec_.push_back((*tmpFrame_2));
-                            mergeVec_.erase(tmpFrame_2);
-                            bufferNum_--;
-                        }
-                    }
+                        DealSecondBuffer();
                     } else if (tmpVec_.size() == 2) { // the total occupied space is 2 bytes
                         for (auto port : outPorts) {
                             port->DeliverBuffers(tmpVec_);
