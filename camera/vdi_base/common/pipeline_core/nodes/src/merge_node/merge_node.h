@@ -32,7 +32,7 @@ public:
     void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
     void MergeBuffers();
 private:
-    void DealSecondBuffer(int64_t bufferPoolId);
+    void DealSecondBuffer(std::shared_ptr<IPort>& port);
 private:
     std::mutex                                  mtx_;
     std::condition_variable                     cv_;
