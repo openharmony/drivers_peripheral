@@ -183,7 +183,11 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     pool->NotifyStart();
     CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers");
 
-    cltRun = true;
+    {
+        std::unique_lock<std::mutex> l(cltLock);
+        cltRun = true;
+    }
+
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());
@@ -251,7 +255,11 @@ void SourceNode::PortHandler::CollectBuffers()
 
 RetCode SourceNode::PortHandler::StartDistributeBuffers()
 {
-    dbtRun = true;
+    {
+        std::unique_lock<std::mutex> l(rblock);
+        dbtRun = true;
+    }
+
     distributor = std::make_unique<std::thread>([this] {
         PortFormat format = {};
         port->GetFormat(format);

@@ -55,8 +55,12 @@ CaptureMessageOperator::CaptureMessageOperator(MessageOperatorFunc f)
 
 CaptureMessageOperator::~CaptureMessageOperator()
 {
-    running_ = false;
-    cv_.notify_one();
+    {
+        std::unique_lock<std::mutex> l(lock_);
+        running_ = false;
+        cv_.notify_one();
+    }
+
     if (messageHandler_ != nullptr) {
         messageHandler_->join();
     }
@@ -117,10 +121,20 @@ void CaptureMessageOperator::SendMessage(std::shared_ptr<ICaptureMessage>& messa
 
 RetCode CaptureMessageOperator::StartProcess()
 {
-    running_ = true;
+    {
+        std::unique_lock<std::mutex> l(lock_);
+        running_ = true;
+    }
+
     messageHandler_ = std::make_unique<std::thread>([this]() {
         prctl(PR_SET_NAME, "MessageOperator");
-        while (running_) {
+        while (true) {
+            {
+                std::unique_lock<std::mutex> l(lock_);
+                if (!running_) {
+                    break;
+                }
+            }
             HandleMessage();
         }
     });
@@ -136,10 +150,9 @@ void CaptureMessageOperator::HandleMessage()
         std::unique_lock<std::mutex> l(lock_);
         cv_.wait(l, [this] { return !running_ || wakeup_; });
         wakeup_ = false;
-    }
-
-    if (!running_) {
-        return;
+        if (!running_) {
+            return;
+        }
     }
 
     std::list<MessageGroup> messages = {};
