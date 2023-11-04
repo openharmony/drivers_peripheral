@@ -180,7 +180,7 @@ void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((y < 0 || y >= handle.height),
         DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
 
-    int32_t position = y * handle.width + x;
+    int32_t position = y * handle.stride / PIXEL_BYTES + x;
     if ((position * PIXEL_BYTES) > handle.size) {
         DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
