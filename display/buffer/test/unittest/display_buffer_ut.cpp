@@ -218,7 +218,28 @@ void DisplayBufferUt::TearDown()
 {
 }
 
-#ifndef DISPLAY_COMMUNITY
+void DisplayBufferUt::MetadataTest(BufferHandle& handle, int32_t isCommunity)
+{
+    int32_t ret = displayBuffer_->RegisterBuffer(handle);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+
+    int32_t key = 1;
+    std::vector<uint8_t> values = {1, 2, 3};
+    std::vector<uint32_t> keys = {};
+    std::vector<uint8_t> rets = {};
+    ret = displayBuffer_->SetMetadata(handle, key, values);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+
+    ret = displayBuffer_->GetMetadata(handle, key, rets);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+
+    ret = displayBuffer_->ListMetadataKeys(handle, keys);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+
+    ret = displayBuffer_->EraseMetadataKey(handle, key);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+}
+
 int32_t DisplayBufferUt::MetadataTest(BufferHandle& handle)
 {
     int32_t ret = displayBuffer_->RegisterBuffer(handle);
@@ -257,7 +278,7 @@ int32_t DisplayBufferUt::MetadataTest(BufferHandle& handle)
     }
     return DISPLAY_SUCCESS;
 }
-#endif
+
 int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
 {
     int ret;
@@ -271,11 +292,13 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
         }
 #ifndef DISPLAY_COMMUNITY
         ret = MetadataTest(*buffer);
+#else
+        MetadataTest(*buffer, true);
+#endif
         if (ret != DISPLAY_SUCCESS) {
             HDF_LOGE("MetadataTest failed");
             return ret;
         }
-#endif
         void *vAddr = displayBuffer_->Mmap(*buffer);
         if (vAddr == nullptr) {
             HDF_LOGE("Mmap failed");
