@@ -39,9 +39,8 @@ protected:
 public:
     IDisplayBuffer* displayBuffer_{ nullptr };
     int32_t AllocMemTest(AllocInfo& info);
-#ifndef DISPLAY_COMMUNITY
+    void MetadataTest(BufferHandle& handle, int32_t isCommunity);
     int32_t MetadataTest(BufferHandle& handle);
-#endif
 };
 } // OHOS
 } // HDI
