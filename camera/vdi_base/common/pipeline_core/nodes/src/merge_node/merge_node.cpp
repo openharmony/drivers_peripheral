@@ -84,12 +84,12 @@ void MergeNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
     return;
 }
 
-void MergeNode::DealSecondBuffer(int64_t bufferPoolId)
+void MergeNode::DealSecondBuffer(std::shared_ptr<IPort>& port)
 {
     std::unique_lock<std::mutex> lck(mtx_);
     auto tmpFrame_2 = std::find_if(mergeVec_.begin(), mergeVec_.end(),
-        [it](std::shared_ptr<FrameSpec> fs) {
-        return bufferPoolId != fs->bufferPoolId_;
+        [port](std::shared_ptr<FrameSpec> fs) {
+        return port->format_.bufferPoolId_ != fs->bufferPoolId_;
     });
     if (tmpFrame_2 != mergeVec_.end()) {
         tmpVec_.push_back((*tmpFrame_2));
@@ -133,7 +133,7 @@ void MergeNode::MergeBuffers()
                             break;
                         }
                     } else if (tmpVec_.size() == 1) {
-                        DealSecondBuffer(it->format_.bufferPoolId_);
+                        DealSecondBuffer(it);
                     } else if (tmpVec_.size() == 2) { // the total occupied space is 2 bytes
                         for (auto port : outPorts) {
                             port->DeliverBuffers(tmpVec_);
