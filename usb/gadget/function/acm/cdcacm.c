@@ -39,8 +39,8 @@
 #define DATA_BIT  8
 #define USBCDC_LEN 2
 #define RECEIVE_ALL_EVENTS 0xff
-const int32_t WAIT_UDC_MAX_LOOP = 3;
-const uint32_t WAIT_UDC_TIME = 100000;
+static const int32_t WAIT_UDC_MAX_LOOP = 3;
+static const uint32_t WAIT_UDC_TIME = 100000;
 static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
 
