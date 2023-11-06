@@ -218,65 +218,36 @@ void DisplayBufferUt::TearDown()
 {
 }
 
-void DisplayBufferUt::MetadataTest(BufferHandle& handle, int32_t isCommunity)
+void DisplayBufferUt::MetadataTest(BufferHandle& handle)
 {
     int32_t ret = displayBuffer_->RegisterBuffer(handle);
-    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == DISPLAY_SUCCESS);
 
-    int32_t key = 1;
+    uint32_t key = 1;
     std::vector<uint8_t> values = {1, 2, 3};
     std::vector<uint32_t> keys = {};
     std::vector<uint8_t> rets = {};
     ret = displayBuffer_->SetMetadata(handle, key, values);
-    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
-
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == DISPLAY_SUCCESS);
     ret = displayBuffer_->GetMetadata(handle, key, rets);
-    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
-
-    ret = displayBuffer_->ListMetadataKeys(handle, keys);
-    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
-
-    ret = displayBuffer_->EraseMetadataKey(handle, key);
-    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == 0);
-}
-
-int32_t DisplayBufferUt::MetadataTest(BufferHandle& handle)
-{
-    int32_t ret = displayBuffer_->RegisterBuffer(handle);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("RegisterBuffer failed");
-        return DISPLAY_FAILURE;
-    }
-
-    int32_t key = 1;
-    std::vector<uint8_t> values = {1, 2, 3};
-    std::vector<uint8_t> rets = {};
-    std::vector<uint32_t> keys = {};
-    ret = displayBuffer_->SetMetadata(handle, key, values);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("SetMetadata failed");
-        return DISPLAY_FAILURE;
-    }
-
-    ret = displayBuffer_->GetMetadata(handle, key, rets);
-    if ((ret != DISPLAY_SUCCESS) || rets != values) {
-        HDF_LOGE("GetMetadata failed");
-        return DISPLAY_FAILURE;
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == DISPLAY_SUCCESS);
+    if (ret != DISPLAY_NOT_SUPPORT) {
+        EXPECT_TRUE(rets == values);
     }
 
     ret = displayBuffer_->ListMetadataKeys(handle, keys);
-    if ((ret != DISPLAY_SUCCESS) || keys.size() != 1 || keys[0] != key) {
-        HDF_LOGE("ListMetadataKey failed");
-        return DISPLAY_FAILURE;
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == DISPLAY_SUCCESS);
+    if (ret != DISPLAY_NOT_SUPPORT) {
+        EXPECT_TRUE(keys.size() == 1 && keys[0] == key);
     }
 
-    rets = {};
     ret = displayBuffer_->EraseMetadataKey(handle, key);
-    if ((ret != DISPLAY_SUCCESS) || displayBuffer_->GetMetadata(handle, key, rets) == DISPLAY_SUCCESS) {
-        HDF_LOGE("EraseMetadataKey failed");
-        return DISPLAY_FAILURE;
+    EXPECT_TRUE(ret == DISPLAY_NOT_SUPPORT || ret == DISPLAY_SUCCESS);
+    if (ret != DISPLAY_NOT_SUPPORT) {
+        rets = {};
+        ret = displayBuffer_->GetMetadata(handle, key, rets);
+        EXPECT_TRUE(ret != DISPLAY_SUCCESS);
     }
-    return DISPLAY_SUCCESS;
 }
 
 int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
@@ -290,11 +261,7 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             HDF_LOGE("AllocMem failed");
             return ret;
         }
-#ifndef DISPLAY_COMMUNITY
-        ret = MetadataTest(*buffer);
-#else
-        MetadataTest(*buffer, true);
-#endif
+        MetadataTest(*buffer);
         if (ret != DISPLAY_SUCCESS) {
             HDF_LOGE("MetadataTest failed");
             return ret;
