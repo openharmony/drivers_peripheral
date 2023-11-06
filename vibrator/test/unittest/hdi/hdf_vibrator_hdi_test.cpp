@@ -57,7 +57,9 @@ namespace {
     int32_t g_pointFrequency3 = -39;
     constexpr int32_t MIN_DURATION = 0;
     constexpr int32_t MAX_DURATION = 3600000;
-    std::string g_timeSequence = "haptic.clock.timer";
+    std::vector<std::string> g_effect_list = {"haptic.clock.timer", "haptic.long_press.light", \
+        "haptic.long_press.medium", "haptic.long_press.light", "haptic.fail", "haptic.charging", \
+        "haptic.slide.light", "haptic.threshold"};
     std::string g_builtIn = "haptic.default.effect";
     std::string g_arbitraryStr = "arbitraryString";
     sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = nullptr;
@@ -147,14 +149,18 @@ HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration_002, TestSize.Level1
 HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
+    
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->Start(iter);
+        EXPECT_EQ(ret, HDF_SUCCESS);
 
-    int32_t startRet = g_vibratorInterface->Start(g_timeSequence);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
+        OsalMSleep(g_sleepTime2);
 
-    OsalMSleep(g_sleepTime2);
-
-    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -168,13 +174,17 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->Start(g_builtIn);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->Start(iter);
+        EXPECT_EQ(ret, HDF_SUCCESS);
 
-    OsalMSleep(g_sleepTime1);
+        OsalMSleep(g_sleepTime1);
 
-    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -188,16 +198,20 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->Start(g_timeSequence);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->Start(iter);
+        EXPECT_EQ(ret, HDF_SUCCESS);
 
-    OsalMSleep(g_sleepTime2);
+        OsalMSleep(g_sleepTime2);
 
-    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_BUTT);
-    EXPECT_EQ(endRet, HDF_FAILURE);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_BUTT);
+        EXPECT_EQ(ret, HDF_FAILURE);
 
-    endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -212,13 +226,17 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_005, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->Start(g_timeSequence);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->Start(iter);
+        EXPECT_EQ(ret, HDF_SUCCESS);
 
-    OsalMSleep(g_sleepTime2);
+        OsalMSleep(g_sleepTime2);
 
-    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -233,13 +251,17 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_006, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->Start(g_builtIn);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->Start(iter);
+        EXPECT_EQ(ret, HDF_SUCCESS);
 
-    OsalMSleep(g_sleepTime2);
+        OsalMSleep(g_sleepTime2);
 
-    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+        ret = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+    }
 }
 
 /**
@@ -444,13 +466,17 @@ HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_001, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     HdfEffectInfo effectInfo;
-    int32_t ret = g_vibratorInterface->GetEffectInfo("haptic.clock.timer", effectInfo);
-    printf("isSupportEffect = [%d]\n\r", effectInfo.isSupportEffect);
-    printf("duration = [%d]\n\r", effectInfo.duration);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    if (effectInfo.isSupportEffect) {
-        EXPECT_GT(effectInfo.duration, MIN_DURATION);
-        EXPECT_LE(effectInfo.duration, MAX_DURATION);
+    int32_t ret;
+    for (auto iter : g_effect_list) {
+        printf("VibratorEffect : %s\n", iter.c_str());
+        ret = g_vibratorInterface->GetEffectInfo(iter, effectInfo);
+        printf("isSupportEffect = [%d]\n\r", effectInfo.isSupportEffect);
+        printf("duration = [%d]\n\r", effectInfo.duration);
+        EXPECT_EQ(ret, HDF_SUCCESS);
+        if (effectInfo.isSupportEffect) {
+            EXPECT_GT(effectInfo.duration, MIN_DURATION);
+            EXPECT_LE(effectInfo.duration, MAX_DURATION);
+        }
     }
 }
 

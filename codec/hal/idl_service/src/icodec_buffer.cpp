@@ -18,6 +18,7 @@
 #include <securec.h>
 #include "codec_dyna_buffer.h"
 #include "codec_handle_buffer.h"
+#include "codec_dma_buffer.h"
 #include "codec_log_wrapper.h"
 #include "codec_share_buffer.h"
 #include "v1_0/codec_types.h"
@@ -45,6 +46,9 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
         case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
             buffer = CodecDynaBuffer::Create(codecBuffer);
             break;
+        case CODEC_BUFFER_TYPE_DMA_MEM_FD:
+            buffer = CodecDMABuffer::Create(codecBuffer);
+            break;
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
             break;
@@ -52,14 +56,22 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
     return buffer;
 }
 
-sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer)
+sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer,
+                                                     OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     sptr<ICodecBuffer> buffer = nullptr;
-    if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        buffer = CodecShareBuffer::Allocate(codecBuffer);
-    } else {
-        CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
+    switch (codecBuffer.bufferType) {
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
+            buffer = CodecShareBuffer::Allocate(codecBuffer);
+            break;
+        case CODEC_BUFFER_TYPE_DMA_MEM_FD:
+            buffer = CodecDMABuffer::Allocate(codecBuffer, omxBuffer);
+            break;
+        default:
+            CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
+            break;
     }
+
     return buffer;
 }
 

@@ -495,26 +495,32 @@ int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, AuthType aut
 int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::vector<AuthType> &authTypes,
     uint32_t authTrustLevel, std::vector<AuthType> &validTypes)
 {
-    IAM_LOGI("start");
-    int32_t ret = RESULT_TYPE_NOT_SUPPORT;
+    IAM_LOGI("start userId:%{public}d authTrustLevel:%{public}u", userId, authTrustLevel);
+    int32_t result = RESULT_TYPE_NOT_SUPPORT;
+    validTypes.clear();
     std::lock_guard<std::mutex> lock(g_mutex);
-    for (auto authType : authTypes) {
+    for (auto &authType : authTypes) {
         uint32_t supportedAtl = AUTH_TRUST_LEVEL_SYS;
-        ret = SingleAuthTrustLevel(userId, authType, &supportedAtl);
+        int32_t ret = SingleAuthTrustLevel(userId, authType, &supportedAtl);
         if (ret != RESULT_SUCCESS) {
-            IAM_LOGE("authType does not support，authType:%{public}d, ret:%{public}d", authType, ret);
-            validTypes.clear();
-            return RESULT_NOT_ENROLLED;
+            IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, ret);
+            result = RESULT_NOT_ENROLLED;
+            continue;
         }
         if (authTrustLevel > supportedAtl) {
-            IAM_LOGE("authTrustLevel does not support，authType:%{public}d, supportedAtl:%{public}u",
+            IAM_LOGE("authTrustLevel does not support, authType:%{public}d, supportedAtl:%{public}u",
                 authType, supportedAtl);
-            validTypes.clear();
-            return RESULT_TRUST_LEVEL_NOT_SUPPORT;
+            result = RESULT_TRUST_LEVEL_NOT_SUPPORT;
+            continue;
         }
+        IAM_LOGE("get valid authType:%{public}d", authType);
         validTypes.push_back(authType);
     }
-    return ret;
+    if (validTypes.empty()) {
+        IAM_LOGE("no auth type valid");
+        return result;
+    }
+    return RESULT_SUCCESS;
 }
 
 int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_t> &challenge)

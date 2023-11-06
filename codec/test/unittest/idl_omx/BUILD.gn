@@ -54,6 +54,9 @@ ohos_unittest("codec_idl_omx_test") {
   if (drivers_peripheral_codec_feature_support_omx_extend_test) {
     defines += [ "SUPPORT_OMX_EXTEND" ]
   }
+  if (drivers_peripheral_codec_feature_support_high_work_frequency) {
+    defines += [ "SUPPORT_HIGH_WORK_FREQUENCY" ]
+  }
 }
 
 group("codec_idl_2.0_test") {

@@ -31,6 +31,8 @@ const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
 const int32_t AUDIO_OFFLOAD_BUFFER_SIZE = 100;
+const int32_t AUDIO_BIT_RATE = AUDIO_SAMPLE_RATE_48K * 8;
+const int32_t AUDIO_BIT_WIDTH = 32;
 
 class AudioUtRenderOffloadTest : public testing::Test {
 public:
@@ -56,6 +58,7 @@ void AudioUtRenderOffloadTest::InitRenderAttrs(struct AudioSampleAttributes &att
 {
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
     attrs.interleaved = 0;
     attrs.type = AUDIO_OFFLOAD;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
@@ -65,8 +68,11 @@ void AudioUtRenderOffloadTest::InitRenderAttrs(struct AudioSampleAttributes &att
     attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
     attrs.stopThreshold = INT_MAX;
     attrs.silenceThreshold = BUFFER_LENTH;
-    attrs.offloadInfo.bitRate = AUDIO_SAMPLE_RATE_48K * 8;
-    attrs.offloadInfo.bitWidth = 32;
+    attrs.offloadInfo.bitRate = AUDIO_BIT_RATE;
+    attrs.offloadInfo.bitWidth = AUDIO_BIT_WIDTH;
+    attrs.offloadInfo.sampleRate = AUDIO_SAMPLE_RATE_48K;
+    attrs.offloadInfo.channelCount = AUDIO_RENDER_CHANNELCOUNT;
+    attrs.offloadInfo.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
 }
 
 void AudioUtRenderOffloadTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
@@ -125,13 +131,7 @@ void AudioUtRenderOffloadTest::SetUp()
     ASSERT_NE(adapter_, nullptr);
     InitRenderDevDesc(devDescRender_);
     InitRenderAttrs(attrsRender_);
-
-    attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    int32_t ret = adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
-    if (ret != HDF_SUCCESS) {
-        attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
-        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_));
-    }
+    (void)adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
     ASSERT_NE(render_, nullptr);
 }
 

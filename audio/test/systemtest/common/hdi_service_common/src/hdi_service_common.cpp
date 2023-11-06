@@ -19,7 +19,10 @@
 
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
-
+#ifdef SUPPORT_OFFLOAD
+#define OFFLOAD_AUDIO_WIDTH 32
+#define OFFLOAD_AUDIO_BIT 8
+#endif
 using namespace std;
 
 static int g_frameStatus = 1;
@@ -30,11 +33,44 @@ namespace OHOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
+#ifdef AUDIO_SAMPLE_LOW_BITWIDTH
     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = CHANNELCOUNT;
     attrs.sampleRate = SAMPLERATE;
     attrs.interleaved = 0;
     attrs.type = AUDIO_IN_MEDIA;
+    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.isBigEndian = false;
+    attrs.isSignedData = true;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.stopThreshold = INT_32_MAX;
+    attrs.silenceThreshold = BUFFER_LENTH;
+#else
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+    attrs.channelCount = CHANNELCOUNT;
+    attrs.sampleRate = SAMPLERATE;
+    attrs.interleaved = 0;
+    attrs.type = AUDIO_IN_MEDIA;
+    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_32_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.isBigEndian = false;
+    attrs.isSignedData = true;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.stopThreshold = INT_32_MAX;
+    attrs.silenceThreshold = BUFFER_LENTH;
+#endif
+    return HDF_SUCCESS;
+}
+
+#ifdef SUPPORT_OFFLOAD
+int32_t InitOffloadAttrs(struct AudioSampleAttributes &attrs)
+{
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+    attrs.channelCount = CHANNELCOUNT;
+    attrs.sampleRate = SAMPLERATE;
+    attrs.interleaved = 0;
+    attrs.type = AUDIO_OFFLOAD;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     attrs.frameSize = PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
     attrs.isBigEndian = false;
@@ -42,8 +78,15 @@ int32_t InitAttrs(struct AudioSampleAttributes &attrs)
     attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (PCM_16_BIT * attrs.channelCount / MOVE_LEFT_NUM);
     attrs.stopThreshold = INT_32_MAX;
     attrs.silenceThreshold = BUFFER_LENTH;
+    attrs.offloadInfo.sampleRate = SAMPLERATE;
+    attrs.offloadInfo.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+    attrs.offloadInfo.bitRate = SAMPLERATE * CHANNELCOUNT * OFFLOAD_AUDIO_WIDTH / OFFLOAD_AUDIO_BIT;
+    attrs.offloadInfo.bitWidth = OFFLOAD_AUDIO_WIDTH;
+    attrs.offloadInfo.channelCount = CHANNELCOUNT;
     return HDF_SUCCESS;
 }
+#endif
+
 int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
     uint32_t sampleRate, uint32_t silenceThreshold)
 {
@@ -345,6 +388,47 @@ int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string
     return HDF_SUCCESS;
 }
 
+#ifdef SUPPORT_OFFLOAD
+int32_t AudioOffloadCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
+    struct IAudioAdapter **adapter, struct IAudioRender **render, unsigned *renderId)
+{
+    int32_t ret = -1;
+    struct AudioSampleAttributes attrs = {};
+    struct AudioDeviceDescriptor devDesc = {};
+    struct AudioPort audioPort = {};
+    if (adapter == nullptr || render == nullptr || renderId == nullptr) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = GetLoadAdapter(manager, PORT_OUT, adapterName, adapter, audioPort);
+    if (ret < 0) {
+        if (audioPort.portName != nullptr) {
+            free(audioPort.portName);
+        }
+        return ret;
+    }
+    if (*adapter == nullptr || (*adapter)->CreateRender == nullptr) {
+        free(audioPort.portName);
+        return HDF_FAILURE;
+    }
+
+    InitOffloadAttrs(attrs);
+
+    InitDevDesc(devDesc, audioPort.portId, pins);
+    ret = (*adapter)->CreateRender(*adapter, &devDesc, &attrs, render, renderId);
+    if (ret < 0 || *render == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:Create render failed\n", __func__);
+        manager->UnloadAdapter(manager, adapterName.c_str());
+        IAudioAdapterRelease(*adapter, IS_STUB);
+        free(audioPort.portName);
+        free(devDesc.desc);
+        return ret;
+    }
+    free(audioPort.portName);
+    free(devDesc.desc);
+    return HDF_SUCCESS;
+}
+#endif
+
 int32_t AudioRenderStartAndOneFrame(struct IAudioRender *render)
 {
     int32_t ret = -1;
@@ -402,7 +486,13 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
         return HDF_FAILURE;
     }
     InitAttrs(attrs);
+#ifndef AUDIO_SAMPLE_LOW_BITWIDTH
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+#endif
     InitDevDesc(devDesc, audioPort.portId, pins);
+
     ret = (*adapter)->CreateCapture(*adapter, &devDesc, &attrs, capture, captureId);
     if (ret < 0 || *capture == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:Create capture failed\n", __func__);
@@ -422,6 +512,9 @@ int32_t AudioCaptureStartAndOneFrame(struct IAudioCapture *capture)
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
     InitAttrs(attrs);
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
     FILE *file = fopen(AUDIO_CAPTURE_FILE.c_str(), "wb+");
     if (file == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:foen failed\n", __func__);

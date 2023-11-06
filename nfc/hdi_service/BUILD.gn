@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libnfc_interface_service_1.0") {
+ohos_shared_library("libnfc_interface_service_1.1") {
   include_dirs = [
     "//drivers/peripheral/nfc/hdi_service",
     "//drivers/peripheral/nfc/vendor_adaptor",
@@ -50,7 +50,7 @@ ohos_shared_library("nfc_hdi_driver") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_nfc:libnfc_stub_1.0",
+    "drivers_interface_nfc:libnfc_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -67,7 +67,7 @@ ohos_shared_library("nfc_hdi_driver") {
 
 group("hdi_nfc_service") {
   deps = [
-    ":libnfc_interface_service_1.0",
+    ":libnfc_interface_service_1.1",
     ":nfc_hdi_driver",
   ]
 }

@@ -21,23 +21,26 @@
 #include <vector>
 #include <fcntl.h>
 #include "camera.h"
-#include "v1_1/types.h"
+#include "v1_2/types.h"
 #include "metadata_utils.h"
-#include "v1_1/icamera_host.h"
+#include "v1_2/icamera_host.h"
 #include "v1_1/icamera_device.h"
 #include "v1_1/istream_operator.h"
-#include "v1_1/camera_host_proxy.h"
+#include "v1_2/camera_host_proxy.h"
 
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;
 class CameraManager {
 public:
     void Init();
+    void InitV1_2();
     void Open();
+    void OpenV1_2();
     void Close();
     void GetCameraMetadata();
     OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraHost> serviceV1_1 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;

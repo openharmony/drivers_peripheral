@@ -24,7 +24,6 @@ extern "C" {
 
 typedef void* RenderPriData;
 
-typedef struct AlsaRender AlsaRender;
 struct AlsaRender {
     struct AlsaSoundCard soundCard;
     enum AudioPortPin descPins;
@@ -34,6 +33,7 @@ struct AlsaRender {
     snd_pcm_sframes_t periodSize;
     unsigned int bufferTime;    /* (0.5s): ring buffer length in us */
     unsigned int periodTime;    /* (0.1s): period time in us */
+    int resample;
     RenderPriData priData;
 
     /* render scene */
@@ -64,6 +64,9 @@ struct AlsaRender {
     /* channel mode operation */
     int32_t (*GetChannelMode)(struct AlsaRender *, enum AudioChannelMode *);
     int32_t (*SetChannelMode)(struct AlsaRender *, enum AudioChannelMode);
+
+    /* set pause or resume state */
+    int32_t (*SetPauseState)(struct AlsaRender *, bool);
 };
 
 struct AlsaRender *RenderCreateInstance(const char* adapterName);

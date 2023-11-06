@@ -25,7 +25,7 @@ void CameraTagUtTestV1_1::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init(); // assert inside
-    cameraTest->Open(); // assert inside
+    cameraTest->Open(DEVICE_0); // assert inside
 }
 
 void CameraTagUtTestV1_1::TearDown(void)
@@ -80,13 +80,6 @@ void invalidParmTestI32(int tag, int32_t value)
  */
 HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_001, TestSize.Level1)
 {
-    // stub codes
-    std::vector<uint8_t> cameraModesVector;
-    cameraModesVector.push_back(OHOS::HDI::Camera::V1_1::NORMAL);
-    cameraModesVector.push_back(OHOS::HDI::Camera::V1_1::PORTRAIT);
-    cameraTest->ability->addEntry(OHOS_ABILITY_CAMERA_MODES,
-        cameraModesVector.data(), cameraModesVector.size());
-
     // real test
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -111,16 +104,6 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_001, TestSize.Level1)
  */
 HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
 {
-    // stub codes
-    std::vector<uint8_t> cameraModesVector;
-    cameraModesVector.push_back(OHOS::HDI::Camera::V1_1::PORTRAIT);
-    cameraTest->ability->addEntry(OHOS_ABILITY_CAMERA_MODES,
-        cameraModesVector.data(), cameraModesVector.size());
-    std::vector<uint8_t> portraitEffectVector;
-    portraitEffectVector.push_back(OHOS_CAMERA_PORTRAIT_CIRCLES);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES,
-        portraitEffectVector.data(), portraitEffectVector.size());
-
     // real test
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -132,16 +115,26 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
         CAMERA_LOGI("OHOS::HDI::Camera::V1_1::PORTRAIT found!");
         return;
     }
-
+    printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = OHOS_CAMERA_PORTRAIT_CIRCLES;
-    meta->addEntry(OHOS_CONTROL_PORTRAIT_EFFECT_TYPE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inValidValue = 100;
-    invalidParmTestU8(OHOS_CONTROL_PORTRAIT_EFFECT_TYPE, inValidValue);
+    if (entry.count == 0) {
+        CAMERA_LOGI("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES value count is 0");
+        return;
+    } else {
+        for (size_t i = 0; i < entry.count; i++)
+        {
+            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+            printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES : %d\n", entry.data.u8[i]);
+            uint8_t value = entry.data.u8[i];
+            meta->addEntry(OHOS_CONTROL_PORTRAIT_EFFECT_TYPE, &value, 1);
+            std::vector<uint8_t> metaVec;
+            MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+            cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+            EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+            CAMERA_LOGI("addEntry for OHOS_CONTROL_PORTRAIT_EFFECT_TYPE success!");
+            TakePhotoWithTags(meta);
+        }
+    }
 }
 
 /**
@@ -152,12 +145,6 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
  */
 HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_003, TestSize.Level1)
 {
-    // stub codes
-    std::vector<uint8_t> filterTypesVector;
-    filterTypesVector.push_back(OHOS_CAMERA_FILTER_TYPE_CLASSIC);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_FILTER_TYPES,
-        filterTypesVector.data(), filterTypesVector.size());
-
     // real test
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -167,49 +154,25 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_003, TestSize.Level1)
         return;
     }
     CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES found");
-
+    printf("OHOS_ABILITY_SCENE_FILTER_TYPES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = OHOS_CAMERA_FILTER_TYPE_CLASSIC;
-    meta->addEntry(OHOS_CONTROL_FILTER_TYPE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inValidValue = 100;
-    invalidParmTestU8(OHOS_CONTROL_FILTER_TYPE, inValidValue);
-}
-/**
- * @tc.name: OHOS_ABILITY_SCENE_BEAUTY_TYPES, OHOS_CONTROL_BEAUTY_TYPE
- * @tc.desc: OHOS_ABILITY_SCENE_BEAUTY_TYPES, OHOS_CONTROL_BEAUTY_TYPE
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
-{
-    std::vector<uint8_t> beautyTypesVector;
-    beautyTypesVector.push_back(OHOS_CAMERA_BEAUTY_TYPE_OFF);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        beautyTypesVector.data(), beautyTypesVector.size());
-
-    // real test
-    common_metadata_header_t* data = cameraTest->ability->get();
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_SCENE_BEAUTY_TYPES, &entry);
-    if (ret != 0) {
-        CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES not found");
+    if (entry.count == 0) {
+        CAMERA_LOGI("OHOS_ABILITY_SCENE_FILTER_TYPES value count is 0");
         return;
+    } else {
+        for (size_t i = 0; i < entry.count; i++) {
+            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+            printf("OHOS_ABILITY_SCENE_FILTER_VALUES : %d\n", entry.data.u8[i]);
+            uint8_t value = entry.data.u8[i];
+            meta->addEntry(OHOS_CONTROL_FILTER_TYPE, &value, 1);
+            std::vector<uint8_t> metaVec;
+            MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+            cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+            EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+            CAMERA_LOGI("addEntry for OHOS_CONTROL_FILTER_TYPE success!");
+            TakePhotoWithTags(meta);
+        }
     }
-    CAMERA_LOGI("OHOS_ABILITY_SCENE_BEAUTY_TYPES found");
-
-    // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = OHOS_CAMERA_BEAUTY_TYPE_OFF;
-    meta->addEntry(OHOS_CONTROL_BEAUTY_TYPE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inValidValue = 100;
-    invalidParmTestU8(OHOS_CONTROL_BEAUTY_TYPE, inValidValue);
 }
 
 /**
@@ -220,17 +183,6 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_004, TestSize.Level1)
  */
 HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_005, TestSize.Level1)
 {
-    // stub codes
-    std::vector<uint8_t> beautyTypesVector;
-    beautyTypesVector.push_back(OHOS_CAMERA_BEAUTY_TYPE_AUTO);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        beautyTypesVector.data(), beautyTypesVector.size());
-    std::vector<uint8_t> beautyAutoVector;
-    uint8_t beautyAutoValue = 0;
-    beautyAutoVector.push_back(beautyAutoValue);
-    cameraTest->ability->addEntry(OHOS_ABILITY_BEAUTY_AUTO_VALUES,
-        beautyAutoVector.data(), beautyAutoVector.size());
-
     // real test
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -246,153 +198,25 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_005, TestSize.Level1)
         CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES not found");
         return;
     }
-
+    printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is %d\n", entry.count);
     // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = entry.data.u8[0];
-    meta->addEntry(OHOS_CONTROL_BEAUTY_AUTO_VALUE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inValidValue = 100;
-    invalidParmTestU8(OHOS_CONTROL_BEAUTY_AUTO_VALUE, inValidValue);
-}
-
-/**
- * @tc.name: OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES, OHOS_CONTROL_BEAUTY_FACE_SLENDER_VALUE
- * @tc.desc: OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES, OHOS_CONTROL_BEAUTY_FACE_SLENDER_VALUE
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_006, TestSize.Level1)
-{
-    // stub codes
-    std::vector<uint8_t> beautyTypesVector;
-    beautyTypesVector.push_back(OHOS_CAMERA_BEAUTY_TYPE_FACE_SLENDER);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        beautyTypesVector.data(), beautyTypesVector.size());
-    std::vector<uint8_t> beautyFaceSlenderVector;
-    uint8_t beautyFaceSlenderValue = 0;
-    beautyFaceSlenderVector.push_back(beautyFaceSlenderValue);
-    cameraTest->ability->addEntry(OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES,
-        beautyFaceSlenderVector.data(), beautyFaceSlenderVector.size());
-
-    // real test
-    common_metadata_header_t* data = cameraTest->ability->get();
-    camera_metadata_item_t entry;
-    bool beautyFaceSlenderFlag = isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        OHOS_CAMERA_BEAUTY_TYPE_FACE_SLENDER);
-    if (!beautyFaceSlenderFlag) {
-        CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_FACE_SLENDER not found");
+    if (entry.count == 0) {
+        CAMERA_LOGI("OHOS_ABILITY_BEAUTY_AUTO_VALUES value count is 0");
         return;
+    } else {
+        for (size_t i = 0; i < entry.count; i++) {
+            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
+            printf("OHOS_ABILITY_BEAUTY_AUTO_VALUES : %d\n", entry.data.u8[i]);
+            uint8_t value = entry.data.u8[i];
+            meta->addEntry(OHOS_CONTROL_BEAUTY_AUTO_VALUE, &value, 1);
+            std::vector<uint8_t> metaVec;
+            MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+            cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+            EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+            CAMERA_LOGI("addEntry for OHOS_CONTROL_BEAUTY_AUTO_VALUE success!");
+            TakePhotoWithTags(meta);
+        }
     }
-
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES, &entry);
-    if (ret != 0) {
-        CAMERA_LOGI("OHOS_ABILITY_BEAUTY_FACE_SLENDER_VALUES not found");
-        return;
-    }
-
-    // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = entry.data.u8[0];
-    meta->addEntry(OHOS_CONTROL_BEAUTY_FACE_SLENDER_VALUE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inValidValue = 100;
-    invalidParmTestU8(OHOS_CONTROL_BEAUTY_FACE_SLENDER_VALUE, inValidValue);
-}
-
-/**
- * @tc.name: OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES, OHOS_CONTROL_BEAUTY_SKIN_TONE_VALUE
- * @tc.desc: OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES, OHOS_CONTROL_BEAUTY_SKIN_TONE_VALUE
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_007, TestSize.Level1)
-{
-    // stub codes
-    std::vector<uint8_t> beautyTypesVector;
-    beautyTypesVector.push_back(OHOS_CAMERA_BEAUTY_TYPE_SKIN_TONE);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        beautyTypesVector.data(), beautyTypesVector.size());
-    std::vector<int32_t> beautySkinToneVector;
-    int32_t skinToneValue = 0xBF986C;
-    beautySkinToneVector.push_back(skinToneValue);
-    cameraTest->ability->addEntry(OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES,
-        beautySkinToneVector.data(), beautySkinToneVector.size());
-
-    // real test
-    common_metadata_header_t* data = cameraTest->ability->get();
-    camera_metadata_item_t entry;
-    bool beautyFaceSlenderFlag = isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        OHOS_CAMERA_BEAUTY_TYPE_SKIN_TONE);
-    if (!beautyFaceSlenderFlag) {
-        CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_SKIN_TONE not found");
-        return;
-    }
-
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES, &entry);
-    if (ret != 0) {
-        CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_TONE_VALUES not found");
-        return;
-    }
-
-    // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    int32_t value = entry.data.i32[0];
-    meta->addEntry(OHOS_CONTROL_BEAUTY_SKIN_TONE_VALUE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    int32_t inValidValue = 0xFFFFFF;
-    invalidParmTestU8(OHOS_CONTROL_BEAUTY_SKIN_TONE_VALUE, inValidValue);
-}
-
-/**
- * @tc.name: OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES, OHOS_CONTROL_BEAUTY_SKIN_SMOOTH_VALUE
- * @tc.desc: OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES, OHOS_CONTROL_BEAUTY_SKIN_SMOOTH_VALUE
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_008, TestSize.Level1)
-{
-    // stub codes
-    std::vector<uint8_t> beautyTypesVector;
-    beautyTypesVector.push_back(OHOS_CAMERA_BEAUTY_TYPE_SKIN_SMOOTH);
-    cameraTest->ability->addEntry(OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        beautyTypesVector.data(), beautyTypesVector.size());
-    std::vector<uint8_t> beautySkinSmoothVector;
-    beautySkinSmoothVector.push_back(0);
-    cameraTest->ability->addEntry(OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES,
-        beautySkinSmoothVector.data(), beautySkinSmoothVector.size());
-
-    // real test
-    common_metadata_header_t* data = cameraTest->ability->get();
-    camera_metadata_item_t entry;
-    bool beautyFaceSlenderFlag = isTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_SCENE_BEAUTY_TYPES,
-        OHOS_CAMERA_BEAUTY_TYPE_SKIN_SMOOTH);
-    if (!beautyFaceSlenderFlag) {
-        CAMERA_LOGE("OHOS_CAMERA_BEAUTY_TYPE_SKIN_SMOOTH, not found");
-        return;
-    }
-
-    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES, &entry);
-    if (ret != 0) {
-        CAMERA_LOGI("OHOS_ABILITY_BEAUTY_SKIN_SMOOTH_VALUES not found");
-        return;
-    }
-
-    // Take a photo using the blurring effect TakePhotoWithTags()
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
-    uint8_t value = entry.data.u8[0];
-    meta->addEntry(OHOS_CONTROL_BEAUTY_SKIN_SMOOTH_VALUE, &value, 1);
-    TakePhotoWithTags(meta);
-
-    // Abnormal input parameter validation: The standard behavior is not determined
-    uint8_t inVavalueTest = 100;
-    invalidParmTestU8(OHOS_CONTROL_BEAUTY_SKIN_SMOOTH_VALUE, inVavalueTest);
 }
 
 /**
@@ -403,12 +227,6 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_008, TestSize.Level1)
  */
 HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
 {
-    //stub codes
-    std::vector<uint8_t> cameraModesVector;
-    cameraModesVector.push_back(OHOS::HDI::Camera::V1_1::PORTRAIT);
-    cameraTest->ability->addEntry(OHOS_ABILITY_CAMERA_MODES, cameraModesVector.data(),
-        cameraModesVector.size());
-
     //real test
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
@@ -424,7 +242,6 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
     int32_t tagValue[2] = {entry.data.i32[0], entry.data.i32[0]};
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &tagValue, 2);
-    TakePhotoWithTags(meta);
 
     std::shared_ptr<CameraSetting> metaInvalid = std::make_shared<CameraSetting>(100, 200);
     int32_t valueInvalid[2] = {1000, 1000};
@@ -438,8 +255,6 @@ void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::Camera
 {
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
-    //int rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
-    
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
@@ -447,6 +262,6 @@ void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::Camera
     sleep(1);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
     cameraTest->captureIds = {cameraTest->captureIdPreview};
-	cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }

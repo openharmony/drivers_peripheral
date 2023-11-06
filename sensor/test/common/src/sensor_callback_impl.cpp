@@ -17,6 +17,7 @@
 #include "osal_mem.h"
 #include "sensor_callback_impl.h"
 #include "sensor_type.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -105,6 +106,8 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
     for (auto value : event.data) {
        *tmp++ = value;
     }
+    HDF_LOGI("%{public}s: event info: sensorId = %{public}d, option = %{public}d, mode = %{public}d\n\r", __func__,
+        event.sensorId, event.option, event.mode);
 
     for (int32_t i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {

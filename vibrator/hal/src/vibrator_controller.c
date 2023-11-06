@@ -263,15 +263,12 @@ static int32_t Start(const char *effect)
 
 static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
 {
-    if (!strcmp(effect, "haptic.clock.timer")) {
-        effectInfo->isSupportEffect = true;
-        effectInfo->duration = EFFECT_DURATION;
-    } else {
-        HDF_LOGE("%s: effect not support", __func__);
-        effectInfo->isSupportEffect = false;
-        effectInfo->duration = 0;
+    for (int i = 0; i < EFFECT_TYPE_MAX; i++) {
+        if (!strcmp(effect, g_effectmap[i].effectName)) {
+            effectInfo->isSupportEffect = g_effectmap[i].issupport;
+            effectInfo->duration = g_effectmap[i].duration;
+        }
     }
-
     return HDF_SUCCESS;
 }
 

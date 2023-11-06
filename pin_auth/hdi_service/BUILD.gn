@@ -23,7 +23,7 @@ ohos_shared_library("libpin_auth_interface_service_1.1") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "service/inc",
     "adaptor/inc",
@@ -77,7 +77,7 @@ ohos_shared_library("libpin_auth_driver") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "service/inc",
     "main/inc",

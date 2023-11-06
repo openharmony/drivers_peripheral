@@ -241,6 +241,7 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
     }
 
     cardIns->canPause = snd_pcm_hw_params_can_pause(hwParams);
+    AUDIO_FUNC_LOGI("hardware driver %{public}s support pause",cardIns->canPause ? "is" : "is not");
 
     return HDF_SUCCESS;
 }
@@ -455,7 +456,7 @@ struct AlsaCapture *CaptureCreateInstance(const char* adapterName)
     }
     RegisterCaptureImpl(captureIns);
 
-    ret = SndSaveCardListInfo(SND_PCM_STREAM_PLAYBACK);
+    ret = SndSaveCardListInfo(SND_PCM_STREAM_CAPTURE);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to save card device info.");
         return NULL;
@@ -697,12 +698,17 @@ static int32_t CaptureReadImpl(struct AlsaCapture *captureIns, struct AudioHwCap
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
 
+    if (cardIns->pauseState) {
+        AUDIO_FUNC_LOGE("Currently in pause, please check!");
+        return HDF_FAILURE;
+    }
+
     ret = snd_pcm_get_params(cardIns->pcmHandle, &bufferSize, &periodSize);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Get capture params error: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
-    if(CaptureCheckMmapMode(cardIns) != HDF_SUCCESS) {
+    if (CaptureCheckMmapMode(cardIns) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
 
@@ -750,6 +756,11 @@ static int32_t CaptureMmapReadImpl(struct AlsaCapture *captureIns, const struct 
     struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    if (cardIns->pauseState) {
+        AUDIO_FUNC_LOGE("Currently in pause, please check!");
+        return HDF_FAILURE;
+    }
 
     if (UpdateSetParams(cardIns) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Update set params failed!");
@@ -857,6 +868,44 @@ static int32_t CaptureSetMuteImpl(struct AlsaCapture *captureIns, bool muteFlag)
     return HDF_SUCCESS;
 }
 
+static int32_t CaptureSetPauseStateImpl(struct AlsaCapture *captureIns, bool pauseFlag)
+{
+    int32_t ret;
+    int pause = pauseFlag ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
+    struct AlsaSoundCard *cardIns = (struct AlsaSoundCard *)captureIns;
+
+    if (cardIns->canPause) {
+        ret = snd_pcm_pause(cardIns->pcmHandle, pause);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("snd_pcm_pause failed!");
+            return HDF_FAILURE;
+        }
+    } else {
+        if (pause == AUDIO_ALSALIB_IOCTRL_RESUME) {
+            ret = snd_pcm_prepare(cardIns->pcmHandle);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
+                return HDF_FAILURE;
+            }
+            ret = snd_pcm_start(cardIns->pcmHandle);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s", snd_strerror(ret));
+                return HDF_FAILURE;
+            }
+        }
+        if (pause == AUDIO_ALSALIB_IOCTRL_PAUSE) {
+            ret = snd_pcm_drop(cardIns->pcmHandle);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("Pause fail: %{public}s", snd_strerror(ret));
+                return HDF_FAILURE;
+            }
+        }
+    }
+    cardIns->pauseState = pauseFlag;
+
+    return HDF_SUCCESS;
+}
+
 static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
 {
     if (captureIns == NULL) {
@@ -880,4 +929,5 @@ static void RegisterCaptureImpl(struct AlsaCapture *captureIns)
     captureIns->SetGain = CaptureSetGainImpl;
     captureIns->GetMute = CaptureGetMuteImpl;
     captureIns->SetMute = CaptureSetMuteImpl;
+    captureIns->SetPauseState = CaptureSetPauseStateImpl;
 }

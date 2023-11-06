@@ -24,7 +24,7 @@ ohos_unittest("UserAuthUserAuthTest") {
     debug = false
     blocklist = "../../../cfi_blocklist.txt"
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   module_out_path = "useriam/user_auth_hdi"
 
   cflags = [ "-DIAM_TEST_ENABLE" ]

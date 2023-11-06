@@ -250,7 +250,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
     g_session = nullptr;
     uint64_t scheduleId = 10;
     int32_t userId = 2112;
-    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_REACH_LIMIT);
+    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     struct SessionInfo session = {};
     session.userId = 1122;
@@ -265,7 +265,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     session.time = GetSystemTime();
-    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_REACH_LIMIT);
 
     session.userId = userId;
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_UNKNOWN);

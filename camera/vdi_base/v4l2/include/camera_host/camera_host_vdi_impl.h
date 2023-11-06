@@ -15,7 +15,7 @@
 
 #ifndef CAMERA_HOST_CAMERA_HOST_VDI_IMPL_H
 #define CAMERA_HOST_CAMERA_HOST_VDI_IMPL_H
-
+#include <mutex>
 #include <map>
 #include "v1_0/icamera_host_vdi.h"
 #include "v1_0/icamera_device_vdi.h"
@@ -53,9 +53,12 @@ private:
         bool isEnable, VdiFlashlightStatus &flashlightStatus);
     void OnCameraStatus(CameraId cameraId, VdiCameraStatus status, const std::shared_ptr<CameraAbility> ability);
 
+    int32_t CloseAllCameras() override;
+
 private:
     // key: cameraId, value: CameraDevice
     using CameraDeviceMap = std::map<std::string, std::shared_ptr<CameraDeviceVdiImpl>>;
+    std::mutex mtx;
     CameraDeviceMap cameraDeviceMap_;
     OHOS::sptr<ICameraHostVdiCallback> cameraHostCallback_;
     // to keep remote object OHOS::sptr<ICameraDeviceVdi> alive
