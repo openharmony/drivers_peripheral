@@ -325,6 +325,7 @@ static int32_t GetHapticStartUpTime(int32_t *startUpTime, int32_t mode)
 {
     *startUpTime = DEFAULT_START_UP_TIME;
     HDF_LOGE("%{public}s: startUpTime = %{public}d", __func__, *startUpTime);
+    HDF_LOGE("%{public}s: mode = %{public}d", __func__, mode);
     return HDF_SUCCESS;
 }
 
