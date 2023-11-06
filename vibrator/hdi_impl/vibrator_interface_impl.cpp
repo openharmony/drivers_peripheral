@@ -203,7 +203,7 @@ int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
     return HDF_SUCCESS;
 }
 
-int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& HapticCapacityVdi)
+int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& hapticCapacityVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetHapticCapacity function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
