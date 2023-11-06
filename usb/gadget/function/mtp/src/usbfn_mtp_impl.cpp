@@ -115,8 +115,8 @@ constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means
 constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 100 * 1024; /* 100KB */
-constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
-constexpr uint32_t WAIT_UDC_TIME = 100000;
+static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
+static constexpr uint32_t WAIT_UDC_TIME = 100000;
 enum UsbMtpNeedZeroLengthPacket {
     ZLP_NO_NEED = 0, /* no need send ZLP */
     ZLP_NEED,        /* need send ZLP */
