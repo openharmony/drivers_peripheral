@@ -11,13 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("display_buffer_test") {
+group("hdf_disp_buffer_fuzztest") {
   testonly = true
-  deps = [
-    "benchmarktest:hdf_display_buffer_benchmarktest",
-    "fuzztest:hdf_disp_buffer_fuzztest",
-    "moduletest:hdf_disp_buffer_moduletest",
-    "unittest:buffer_death_test",
-    "unittest:hdf_disp_buffer_unittest",
-  ]
+  deps = [ "metadata_fuzzer:fuzztest" ]
 }

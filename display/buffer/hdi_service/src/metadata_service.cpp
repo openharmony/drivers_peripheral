@@ -62,7 +62,7 @@ int32_t MetadataService::LoadVdi()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
-        HDF_LOGI("%{public}s: mapper load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
+        HDF_LOGI("%{public}s: metadata load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
     }
 #ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
@@ -82,7 +82,7 @@ int32_t MetadataService::LoadVdi()
     if (createVdi_ == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: mapper CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+            HDF_LOGE("%{public}s: metadata CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
         }
         dlclose(libHandle_);
         return HDF_FAILURE;
@@ -92,7 +92,7 @@ int32_t MetadataService::LoadVdi()
     if (destroyVdi_ == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: mapper DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+            HDF_LOGE("%{public}s: metadata DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
         }
         dlclose(libHandle_);
         return HDF_FAILURE;

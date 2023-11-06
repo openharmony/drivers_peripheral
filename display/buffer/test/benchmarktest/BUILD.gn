@@ -11,17 +11,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
 import("//build/test.gni")
-import("./../../../display_config.gni")
 
-module_output_path = "drivers_peripheral_display/buffer"
+module_output_path = "drivers_peripheral_display/display"
 
-ohos_moduletest("hdf_disp_buffer_moduletest") {
-  defines = []
-  defines += display_defines
+ohos_benchmarktest("hdf_display_buffer_benchmarktest") {
   module_out_path = module_output_path
-  sources = [ "display_buffer_mt.cpp" ]
+  sources = [ "display_buffer_benchmark_test.cpp" ]
+  include_dirs = [
+    "../common",
+    ".",
+  ]
 
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
@@ -30,8 +40,8 @@ ohos_moduletest("hdf_disp_buffer_moduletest") {
     "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_1",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "googletest:gtest",
-    "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
