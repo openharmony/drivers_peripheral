@@ -337,13 +337,11 @@ int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
     hapticCapacity.isSupportHdHaptic = hapticCapacityVdi.isSupportHdHaptic;
     hapticCapacity.isSupportPresetMapping = hapticCapacityVdi.isSupportPresetMapping;
     hapticCapacity.isSupportTimeDelay = hapticCapacityVdi.isSupportTimeDelay;
-    hapticCapacity.reserved0 = hapticCapacityVdi.reserved0;
-    hapticCapacity.reserved1 = hapticCapacityVdi.reserved1;
 
     return ret;
 }
 
-int32_t VibratorIfService::GetHapticStartUpTime(int32_t& startUpTime, int32_t mode)
+int32_t VibratorIfService::GetHapticStartUpTime(int32_t mode, int32_t& startUpTime)
 {
     HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
@@ -352,7 +350,7 @@ int32_t VibratorIfService::GetHapticStartUpTime(int32_t& startUpTime, int32_t mo
     }
 
     StartTrace(HITRACE_TAG_HDF, "GetHapticStartUpTime");
-    int32_t ret = vibratorVdiImpl_->GetHapticStartUpTime(startUpTime, mode);
+    int32_t ret = vibratorVdiImpl_->GetHapticStartUpTime(mode, startUpTime);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s GetHapticStartUpTime failed, error code is %{public}d", __func__, ret);
     }

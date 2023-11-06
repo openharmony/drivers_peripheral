@@ -34,6 +34,27 @@ namespace {
     int32_t g_intensity2 = -30;
     int32_t g_frequency1 = 200;
     int32_t g_frequency2 = -200;
+    int32_t g_pkgTime = 434;
+    int32_t g_pkgEventNum = 1;
+    enum OHOS::HDI::Vibrator::V1_2::EVENT_TYPE g_eventType = OHOS::HDI::Vibrator::V1_2::CONTINUOUS;
+    int32_t g_eventDuration = 149;
+    int32_t g_eventTime = 0;
+    int32_t g_eventIntensity = 100;
+    int32_t g_eventFrequency = 50;
+    int32_t g_eventIndex = 0;
+    int32_t g_eventPointNum = 4;
+    int32_t g_pointTime0 = 0;
+    int32_t g_pointIntensity0 = 0;
+    int32_t g_pointFrequency0 = 0;
+    int32_t g_pointTime1 = 1;
+    int32_t g_pointIntensity1 = 1;
+    int32_t g_pointFrequency1 = 0;
+    int32_t g_pointTime2 = 32;
+    int32_t g_pointIntensity2 = 1;
+    int32_t g_pointFrequency2 = -39;
+    int32_t g_pointTime3 = 149;
+    int32_t g_pointIntensity3 = 0;
+    int32_t g_pointFrequency3 = -39;
     constexpr int32_t MIN_DURATION = 0;
     constexpr int32_t MAX_DURATION = 3600000;
     std::string g_timeSequence = "haptic.clock.timer";
@@ -462,42 +483,41 @@ HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    printf("into function PlayHapticPattern\n");
     OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
-    pkg.time = 434;
-    pkg.eventNum = 1;
+    pkg.time = g_pkgTime;
+    pkg.eventNum = g_pkgEventNum;
 
     OHOS::HDI::Vibrator::V1_2::HapticEvent hapticEvent;
-    hapticEvent.type = OHOS::HDI::Vibrator::V1_2::CONTINUOUS;
-    hapticEvent.duration = 149;
-    hapticEvent.time = 0;
-    hapticEvent.intensity = 100;
-    hapticEvent.frequency = 50;
-    hapticEvent.index = 0;
-    hapticEvent.pointNum = 4;
+    hapticEvent.type = g_eventType;
+    hapticEvent.duration = g_eventDuration;
+    hapticEvent.time = g_eventTime;
+    hapticEvent.intensity = g_eventIntensity;
+    hapticEvent.frequency = g_eventFrequency;
+    hapticEvent.index = g_eventIndex;
+    hapticEvent.pointNum = g_eventPointNum;
 
     OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint0;
-    curvePoint0.time = 0;
-    curvePoint0.intensity = 0;
-    curvePoint0.frequency = 0;
+    curvePoint0.time = g_pointTime0;
+    curvePoint0.intensity = g_pointIntensity0;
+    curvePoint0.frequency = g_pointFrequency0;
     hapticEvent.points.push_back(std::move(curvePoint0));
 
     OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint1;
-    curvePoint1.time = 1;
-    curvePoint1.intensity = 1;
-    curvePoint1.frequency = 0;
+    curvePoint1.time = g_pointTime1;
+    curvePoint1.intensity = g_pointIntensity1;
+    curvePoint1.frequency = g_pointFrequency1;
     hapticEvent.points.push_back(std::move(curvePoint1));
 
     OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint2;
-    curvePoint2.time = 32;
-    curvePoint2.intensity = 1;
-    curvePoint2.frequency = -39;
+    curvePoint2.time = g_pointTime2;
+    curvePoint2.intensity = g_pointIntensity2;
+    curvePoint2.frequency = g_pointFrequency2;
     hapticEvent.points.push_back(std::move(curvePoint2));
 
     OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint3;
-    curvePoint3.time = 149;
-    curvePoint3.intensity = 0;
-    curvePoint3.frequency = -39;
+    curvePoint3.time = g_pointTime3;
+    curvePoint3.intensity = g_pointIntensity3;
+    curvePoint3.frequency = g_pointFrequency3;
     hapticEvent.points.push_back(std::move(curvePoint3));
 
     pkg.events.push_back(std::move(hapticEvent));
@@ -518,15 +538,12 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    printf("into function GetHapticCapacity\n");
     OHOS::HDI::Vibrator::V1_2::HapticCapacity hapticCapacity;
     int32_t startRet = g_vibratorInterface->GetHapticCapacity(hapticCapacity);
     EXPECT_EQ(startRet, HDF_SUCCESS);
     printf("hapticCapacity.isSupportHdHaptic = %d\n", hapticCapacity.isSupportHdHaptic);
     printf("hapticCapacity.isSupportPresetMapping = %d\n", hapticCapacity.isSupportPresetMapping);
     printf("hapticCapacity.isSupportTimeDelay = %d\n", hapticCapacity.isSupportTimeDelay);
-    printf("hapticCapacity.reserved0 = %d\n", hapticCapacity.reserved0);
-    printf("hapticCapacity.reserved1 = %d\n", hapticCapacity.reserved1);
 
     int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
     EXPECT_EQ(endRet, HDF_SUCCESS);
@@ -542,10 +559,9 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
     
-    printf("into function GetHapticStartUpTime\n");
     int32_t startUpTime;
     int32_t mode = 0;
-    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(startUpTime, mode);
+    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(mode, startUpTime);
     EXPECT_EQ(startRet, HDF_SUCCESS);
     printf("startUpTime = %d\n", startUpTime);
 

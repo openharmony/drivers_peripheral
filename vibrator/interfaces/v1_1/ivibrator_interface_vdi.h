@@ -43,7 +43,7 @@ public:
     virtual int32_t IsVibratorRunning(bool& state) = 0;
     virtual int32_t PlayHapticPattern(const HapticPaketVdi& pkg) = 0;
     virtual int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) = 0;
-    virtual int32_t GetHapticStartUpTime(int32_t& startUpTime, int32_t mode) = 0;
+    virtual int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) = 0;
 };
 struct VdiWrapperVibrator {
     struct HdfVdiBase base;
