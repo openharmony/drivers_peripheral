@@ -260,7 +260,7 @@ struct HapticCapacity {
     /** Indicates the vibration support HD vibration. */
     bool isSupportHdHaptic;
     /** Indicates the vibration support predefined waveforms. */
-    bool isSupportPredefineWave;
+    bool isSupportPresetMapping;
     /** Indicates the vibration support dalay vibration. */
     bool isSupportTimeDelay;
     /** Indicates the vibration Standby parameter. */

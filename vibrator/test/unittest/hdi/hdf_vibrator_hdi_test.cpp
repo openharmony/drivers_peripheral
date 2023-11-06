@@ -523,7 +523,7 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
     int32_t startRet = g_vibratorInterface->GetHapticCapacity(hapticCapacity);
     EXPECT_EQ(startRet, HDF_SUCCESS);
     printf("hapticCapacity.isSupportHdHaptic = %d\n", hapticCapacity.isSupportHdHaptic);
-    printf("hapticCapacity.isSupportPredefineWave = %d\n", hapticCapacity.isSupportPredefineWave);
+    printf("hapticCapacity.isSupportPresetMapping = %d\n", hapticCapacity.isSupportPresetMapping);
     printf("hapticCapacity.isSupportTimeDelay = %d\n", hapticCapacity.isSupportTimeDelay);
     printf("hapticCapacity.reserved0 = %d\n", hapticCapacity.reserved0);
     printf("hapticCapacity.reserved1 = %d\n", hapticCapacity.reserved1);
