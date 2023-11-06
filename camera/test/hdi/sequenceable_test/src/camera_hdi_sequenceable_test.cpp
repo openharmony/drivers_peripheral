@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "camera_hdi_sequenceable_test.h"
 #include "map_data_sequenceable.h"
 #include "buffer_handle_sequenceable.h"
@@ -81,7 +84,7 @@ HWTEST_F(CameraHdiSequenceableTest, MapDataSequencebleTest_01, TestSize.Level1)
     // Marshalling and Unmarshalling Test
     Parcel parcel;
     ret = mapDataSequenceable->Marshalling(parcel);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, true);
     auto mapDataSequenceable2 = MapDataSequenceable::Unmarshalling(parcel);
     EXPECT_NE(mapDataSequenceable2, nullptr);
 
@@ -114,14 +117,22 @@ HWTEST_F(CameraHdiSequenceableTest, MapDataSequencebleTest_01, TestSize.Level1)
  */
 HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_01, TestSize.Level1)
 {
-    constexpr int32_t reserveFds = 10;
-    constexpr int32_t reserveInts = 10;
+    constexpr int32_t reserveFds = 1;
+    constexpr int32_t reserveInts = 0;
     int32_t ret;
-    shared_ptr<BufferHandle> handle(AllocateNativeBufferHandle(reserveFds, reserveInts));
-    auto bufferHandleSeq = make_shared<BufferHandleSequenceable>(handle);
+    BufferHandle* handle0 = BufferHandleSequenceable::NewBufferHandle(reserveFds, reserveInts);
+    handle0->fd = open("/dev/null", O_WRONLY);
+    handle0->reserve[0] = dup(handle0->fd);
+    EXPECT_NE(handle0, nullptr);
+    auto bufferHandleSeq0 = make_shared<BufferHandleSequenceable>(handle0);
+    BufferHandle* handle1 = bufferHandleSeq0->GetBufferHandle();
+    EXPECT_NE(handle1, nullptr);
     Parcel parcel;
-    ret = bufferHandleSeq->Marshalling(parcel);
-    EXPECT_EQ(ret, 0);
-    auto bufferHandleSeq2 = BufferHandleSequenceable::Unmarshalling(parcel);
-    EXPECT_NE(bufferHandleSeq2, nullptr);
+    ret = bufferHandleSeq0->Marshalling(parcel);
+    EXPECT_EQ(ret, true);
+    auto bufferHandleSeq1 = BufferHandleSequenceable::Unmarshalling(parcel);
+    EXPECT_NE(bufferHandleSeq1, nullptr);
+    BufferHandle* handle2 = bufferHandleSeq1->GetBufferHandle();
+    EXPECT_NE(handle2, nullptr);
+    EXPECT_EQ(handle2->reserveFds, reserveFds);
 }
