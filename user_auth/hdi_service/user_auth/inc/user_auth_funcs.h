@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 typedef struct AuthResult {
+    int32_t userId;
     uint32_t authType;
     int32_t freezingTime;
     int32_t remainTimes;

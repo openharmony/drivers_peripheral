@@ -18,7 +18,7 @@
 #include "user_auth_funcs.h"
 
 extern "C" {
-    extern int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result);
+    extern int32_t SetAuthResult(int32_t userId, uint32_t authType, const ExecutorResultInfo *info, AuthResult *result);
 }
 
 namespace OHOS {
@@ -51,7 +51,7 @@ HWTEST_F(UserAuthFuncsTest, TestSetAuthResult, TestSize.Level0)
     info.result = 0;
     info.rootSecret = nullptr;
     AuthResult result = {};
-    EXPECT_EQ(SetAuthResult(authType, &info, &result), RESULT_NO_MEMORY);
+    EXPECT_EQ(SetAuthResult(0, authType, &info, &result), RESULT_NO_MEMORY);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestRequestAuthResultFunc, TestSize.Level0)
