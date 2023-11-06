@@ -19,11 +19,11 @@
 #include "hdf_log.h"
 #include "osal_mem.h"
 
-#define HDF_LOG_TAG    uhdf_vibrator_service
+#define HDF_LOG_TAG uhdf_vibrator_service
 #define EFFECT_SUN 64
-#define EFFECT_DURATION    2000
-#define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
-#define DEFAULT_START_UP_TIME    20
+#define EFFECT_DURATION 2000
+#define VIBRATOR_SERVICE_NAME "hdf_misc_vibrator"
+#define DEFAULT_START_UP_TIME 20
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
 {
@@ -305,13 +305,11 @@ static int32_t Stop(enum VibratorMode mode)
     return ret;
 }
 
-
 static int32_t PlayHapticPattern(struct HapticPaket *pkg)
 {
     HDF_LOGE("%{public}s: pkg->time = %{public}d", __func__, pkg->time);
     return HDF_SUCCESS;
 }
-
 
 static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 {
@@ -320,12 +318,11 @@ static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
     return HDF_SUCCESS;
 }
 
-
-static int32_t GetHapticStartUpTime(int32_t *startUpTime, int32_t mode)
+static int32_t GetHapticStartUpTime(int32_t mode, int32_t *startUpTime)
 {
     *startUpTime = DEFAULT_START_UP_TIME;
-    HDF_LOGE("%{public}s: startUpTime = %{public}d", __func__, *startUpTime);
     HDF_LOGE("%{public}s: mode = %{public}d", __func__, mode);
+    HDF_LOGE("%{public}s: startUpTime = %{public}d", __func__, *startUpTime);
     return HDF_SUCCESS;
 }
 

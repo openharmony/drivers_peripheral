@@ -193,7 +193,7 @@ struct VibratorInterface {
      * @since 4.1
      * @version 1.2
      */
-    int32_t (*GetHapticStartUpTime)(int32_t *startUpTime, int32_t mode);
+    int32_t (*GetHapticStartUpTime)(int32_t mode, int32_t *startUpTime);
 };
 
 /**
