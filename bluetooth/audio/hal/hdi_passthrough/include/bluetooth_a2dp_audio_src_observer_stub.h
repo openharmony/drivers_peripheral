@@ -32,12 +32,12 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    ErrCode OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnConnectionStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPlayingStatusChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply);
     using BluetoothA2dpAudioSrcObserverFunc =
-        ErrCode (BluetoothA2dpAudioSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
+        int32_t (BluetoothA2dpAudioSrcObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothA2dpAudioSrcObserverFunc> funcMap_;
 
     DISALLOW_COPY_AND_MOVE(BluetoothA2dpAudioSrcObserverStub);
