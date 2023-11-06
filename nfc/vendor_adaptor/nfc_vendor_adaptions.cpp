@@ -74,6 +74,9 @@ void NfcVendorAdaptions::ResetNfcInterface(void)
     nfcHalInf.nfcHalControlGranted = nullptr;
     nfcHalInf.nfcHalPowerCycle = nullptr;
     nfcHalInf.nfcHalIoctl = nullptr;
+    nfcHalInf.nfcHalGetConfig = nullptr;
+    nfcHalInf.nfcHalFactoryReset = nullptr;
+    nfcHalInf.nfcHalShutdownCase = nullptr;
     nfcExtHandle = nullptr;
     nfcExtInf.getNfcChipType = nullptr;
     nfcExtInf.getNfcHalFuncNameSuffix = nullptr;
@@ -119,10 +122,21 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
     nfcHalInf.nfcHalIoctl = reinterpret_cast<int (*)(long, void *)>
         (dlsym(nfcHalHandle, (HAL_IOCTL_FUNC_NAME + suffix).c_str()));
 
+    nfcHalInf.nfcHalGetConfig = reinterpret_cast<void (*)(V1_1::NfcVendorConfig &)>
+        (dlsym(nfcHalHandle, (HAL_GET_CONFIG_FUNC_NAME + suffix).c_str()));
+
+    nfcHalInf.nfcHalFactoryReset = reinterpret_cast<void (*)()>
+        (dlsym(nfcHalHandle, (HAL_FACTORY_RESET_FUNC_NAME + suffix).c_str()));
+
+    nfcHalInf.nfcHalShutdownCase = reinterpret_cast<int (*)()>
+        (dlsym(nfcHalHandle, (HAL_SHUTDOWN_CASE_FUNC_NAME + suffix).c_str()));
+
     if (nfcHalInf.nfcHalOpen == nullptr || nfcHalInf.nfcHalWrite == nullptr ||
         nfcHalInf.nfcHalCoreInitialized == nullptr || nfcHalInf.nfcHalPrediscover == nullptr ||
         nfcHalInf.nfcHalClose == nullptr || nfcHalInf.nfcHalControlGranted == nullptr ||
-        nfcHalInf.nfcHalPowerCycle == nullptr || nfcHalInf.nfcHalIoctl == nullptr) {
+        nfcHalInf.nfcHalPowerCycle == nullptr || nfcHalInf.nfcHalIoctl == nullptr ||
+        nfcHalInf.nfcHalGetConfig == nullptr || nfcHalInf.nfcHalFactoryReset == nullptr ||
+        nfcHalInf.nfcHalShutdownCase == nullptr) {
         HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
         return HDF_FAILURE;
     }
@@ -133,22 +147,20 @@ int8_t NfcVendorAdaptions::InitNfcHalInterfaces(string nfcHalSoName, string suff
 NfcVendorAdaptions::NfcVendorAdaptions()
 {
     ResetNfcInterface();
-}
-
-NfcVendorAdaptions::~NfcVendorAdaptions() {}
-
-int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback)
-{
     if (nfcHalHandle == nullptr) {
         string chipType = GetChipType();
         string nfcHalSoName = GetNfcHalSoName(chipType);
         string nfcHalFuncNameSuffix = GetNfcHalFuncNameSuffix(chipType);
         if (InitNfcHalInterfaces(nfcHalSoName, nfcHalFuncNameSuffix) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fail to init hal inf.", __func__);
-            return HDF_FAILURE;
         }
     }
+}
 
+NfcVendorAdaptions::~NfcVendorAdaptions() {}
+
+int NfcVendorAdaptions::VendorOpen(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback)
+{
     if (nfcHalInf.nfcHalOpen == nullptr) {
         HDF_LOGE("%{public}s: Function null.", __func__);
         return HDF_FAILURE;
@@ -240,6 +252,39 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalIoctl(arg, pData);
+    return ret;
+}
+
+int NfcVendorAdaptions::VendorGetConfig(V1_1::NfcVendorConfig &config)
+{
+    HDF_LOGD("%{public}s: start.", __func__);
+    if (nfcHalInf.nfcHalGetConfig == nullptr) {
+        HDF_LOGE("%{public}s: Function null.", __func__);
+        return HDF_FAILURE;
+    }
+    nfcHalInf.nfcHalGetConfig(config);
+    return HDF_SUCCESS;
+}
+
+int NfcVendorAdaptions::VendorFactoryReset(void)
+{
+    HDF_LOGD("%{public}s: start.", __func__);
+    if (nfcHalInf.nfcHalFactoryReset == nullptr) {
+        HDF_LOGE("%{public}s: Function null.", __func__);
+        return HDF_FAILURE;
+    }
+    nfcHalInf.nfcHalFactoryReset();
+    return HDF_SUCCESS;
+}
+
+int NfcVendorAdaptions::VendorShutdownCase(void)
+{
+    HDF_LOGD("%{public}s: start.", __func__);
+    if (nfcHalInf.nfcHalShutdownCase == nullptr) {
+        HDF_LOGE("%{public}s: Function null.", __func__);
+        return HDF_FAILURE;
+    }
+    int ret = nfcHalInf.nfcHalShutdownCase();
     return ret;
 }
 } // Nfc

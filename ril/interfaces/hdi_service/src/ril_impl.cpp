@@ -21,15 +21,16 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_1 {
+namespace V1_2 {
 static std::mutex mutex_;
-static sptr<IRilCallback> callback_;
+static sptr<V1_1::IRilCallback> callback1_1_;
+static sptr<V1_2::IRilCallback> callback_;
 namespace {
 sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_1::RilImpl;
+    using OHOS::HDI::Ril::V1_2::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -420,7 +421,12 @@ int32_t RilImpl::GetRrcConnectionState(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::GetRrcConnectionState, slotId, serialId);
 }
 
-int32_t RilImpl::SetCallback(const sptr<IRilCallback> &rilCallback)
+int32_t RilImpl::SetCallback(const sptr<V1_1::IRilCallback> &rilCallback)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = rilCallback;
@@ -430,12 +436,12 @@ int32_t RilImpl::SetCallback(const sptr<IRilCallback> &rilCallback)
     }
     g_deathRecipient = new RilDeathRecipient(this);
     if (g_deathRecipient == nullptr) {
-        HDF_LOGE("SetCallback fail g_deathRecipient is null");
+        HDF_LOGE("SetCallback1_2 fail g_deathRecipient is null");
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
     if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("SetCallback fail manager_ is null");
+        HDF_LOGE("SetCallback1_2 fail manager_ is null");
         return HDF_FAILURE;
     }
     Telephony::HRilManager::manager_->SetRilCallback(callback_);
@@ -697,7 +703,7 @@ int32_t RilImpl::Init()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

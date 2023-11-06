@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-camera/ @Danny_liuXu
-wlan/ @Danny_liuXu
-usb/ @Danny_liuXu
-audio/ @whoselettlelion
-codec/ @whoselettlelion
-format/ @whoselettlelion
-display/ @whoselettlelion
-sensor/ @whoselettlelion
-vibrator/ @whoselettlelion
-light/ @whoselettlelion
-motion/ @whoselettlelion
-base/ @time_zhang
-battery/ @time_zhang
-input/ @time_zhang
-thermal/ @time_zhang
-power/ @time_zhang
+location/ @xujiang1981
+bluetooth/hci/ @xujiang1981
+bluetooth/audio/ @xujiang1981
+nfc/ @knpingan

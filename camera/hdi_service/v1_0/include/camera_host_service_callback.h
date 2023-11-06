@@ -39,6 +39,8 @@ public:
 
     int32_t OnCameraEvent(const std::string &cameraId, VdiCameraEvent event) override;
 
+    const sptr<IRemoteObject> Remote() const override;
+
 private:
     OHOS::sptr<ICameraHostCallback> cameraHostCallback_;
 };

@@ -87,6 +87,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_HUMIDITY            = 13,  /**< Humidity sensor */
     SENSOR_TYPE_COLOR               = 14,  /**< Color sensor */
     SENSOR_TYPE_SAR                 = 15,  /**< SAR sensor */
+    SENSOR_TYPE_AMBIENT_LIGHT1      = 16,  /**< Secondary ambient light sensor*/
     SENSOR_TYPE_MEDICAL_BEGIN       = 128, /**< The begin of medical sensorId enumeration value range */
     SENSOR_TYPE_MEDICAL_END         = 160, /**< The end of medical sensorId enumeration value range */
     SENSOR_TYPE_PHYSICAL_MAX        = 255, /**< Maximum type of a physical sensor */
@@ -101,6 +102,8 @@ enum SensorTypeTag {
     SENSOR_TYPE_SIGNIFICANT_MOTION          = 264,   /**< Significant motion sensor */
     SENSOR_TYPE_PEDOMETER_DETECTION         = 265,   /**< Pedometer detection sensor */
     SENSOR_TYPE_PEDOMETER                   = 266,   /**< Pedometer sensor */
+    SENSOR_TYPE_POSTURE                     = 267,   /**< Posture sensor */
+    SENSOR_TYPE_HEADPOSTURE                 = 268,   /**< Headposture sensor */
     SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR = 277,   /**< Geomagnetic rotation vector sensor */
     SENSOR_TYPE_HEART_RATE                  = 278,   /**< Heart rate sensor */
     SENSOR_TYPE_DEVICE_ORIENTATION          = 279,   /**< Device orientation sensor */

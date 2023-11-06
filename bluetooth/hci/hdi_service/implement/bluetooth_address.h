@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
 #include "bt_hal_constant.h"
 
 namespace OHOS {
@@ -38,9 +37,12 @@ public:
 private:
     static void ParseAddressToString(std::vector<uint8_t> &address, std::string &outString);
     int ParseAddressFromString(const std::string &string) const;
+    static bool GetConstantAddress(char *address, int len);
 
 private:
     std::vector<uint8_t> address_;
+    static constexpr const char *BT_MAC_LIB = "libbt_mac.z.so";
+    static constexpr const char *GET_BT_MAC_SYMBOL_NAME = "GetBtMac";
 };
 }  // namespace Hci
 }  // namespace Bluetooth

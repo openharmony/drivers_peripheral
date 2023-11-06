@@ -23,8 +23,6 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
     struct IAudioCaptureVdi *vdiCapture, const struct AudioDeviceDescriptor *desc);
 void AudioDestroyCaptureByIdVdi(uint32_t captureId);
 struct IAudioCaptureVdi *AudioGetVdiCaptureByIdVdi(uint32_t captureId);
-struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *captureId);
 uint32_t DecreaseCaptureUsrCount(uint32_t captureId);
 
 #endif // AUDIO_CAPTURE_VDI_H

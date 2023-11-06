@@ -72,14 +72,14 @@ void Test::Init()
     uint32_t mainVer;
     uint32_t minVer;
     int32_t ret;
-    if (serviceV1_1 == nullptr) {
-        serviceV1_1 = OHOS::HDI::Camera::V1_1::ICameraHost::Get("camera_service", false);
-        EXPECT_NE(serviceV1_1, nullptr);
-        CAMERA_LOGI("V1_1::ICameraHost get success");
-        ret = serviceV1_1->GetVersion(mainVer, minVer);
+    if (serviceV1_2 == nullptr) {
+        serviceV1_2 = OHOS::HDI::Camera::V1_2::ICameraHost::Get("camera_service", false);
+        EXPECT_NE(serviceV1_2, nullptr);
+        CAMERA_LOGI("V1_2::ICameraHost get success");
+        ret = serviceV1_2->GetVersion(mainVer, minVer);
         EXPECT_EQ(ret, 0);
-        CAMERA_LOGI("V1_1::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
-        service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_1.GetRefPtr());
+        CAMERA_LOGI("V1_2::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
+        service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_2.GetRefPtr());
     }
 
     hostCallback = new TestCameraHostCallback();
@@ -96,12 +96,12 @@ void Test::Open()
         GetCameraMetadata();
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
-        EXPECT_NE(serviceV1_1, nullptr);
-        rc = serviceV1_1->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        EXPECT_NE(serviceV1_2, nullptr);
+        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_1, nullptr);
         cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
-        CAMERA_LOGI("OpenCamera V1_1 success");
+        CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
 
@@ -147,6 +147,41 @@ void Test::DefaultCapture(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
 }
 
+void Test::DefaultSketch(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    infos->v1_0.streamId_ = streamIdSketch;
+    infos->v1_0.width_ = sketchWidth;
+    infos->v1_0.height_ = sketchHeight;
+    infos->v1_0.format_ = previewFormat;
+    infos->v1_0.dataspace_ = UT_DATA_SIZE;
+    infos->v1_0.intent_ = StreamIntent::PREVIEW;
+    infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
+}
+
+void Test::DefaultInfosSketch(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    DefaultSketch(infos);
+    std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdSketch, "yuv", addr, size);
+    });
+    infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
+}
+
+void Test::DefaultInfosPreviewV1_2(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    DefaultPreview(infos);
+    std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdPreview, "yuv", addr, size);
+    });
+    infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+}
+
 void Test::DefaultInfosPreview(
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
 {
@@ -184,7 +219,7 @@ void Test::DefaultInfosVideo(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdVideo, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::VIDEO] = consumer_video;

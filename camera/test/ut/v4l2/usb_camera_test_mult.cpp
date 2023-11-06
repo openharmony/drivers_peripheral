@@ -423,17 +423,24 @@ TEST_F(UtestUSBCameraTestMult, camera_usb_mult_0003)
         format = entry.data.i32[entry.count - 6]; // 6:The sixth digit from the bottom is the format of video
     }
     videoFormat_ = ConvertPixfmtHal2V4l2(format);
-    cameraBase_->intents = {PREVIEW, VIDEO};
-    cameraBase_->StartStream(cameraBase_->intents);
-    StartStream(cameraBase_->intents);
-    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
-    cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
-    StartCapture(STREAM_ID_PREVIEW_DOUBLE, CAPTURE_ID_PREVIEW_DOUBLE, false, true);
-    StartCapture(STREAM_ID_VIDEO_DOUBLE, CAPTURE_ID_VIDEO_DOUBLE, false, true);
-    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_VIDEO};
-    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_VIDEO};
-    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
-    cameraBase_->captureIds = {CAPTURE_ID_PREVIEW_DOUBLE, CAPTURE_ID_VIDEO_DOUBLE};
-    cameraBase_->streamIds = {STREAM_ID_PREVIEW_DOUBLE, STREAM_ID_VIDEO_DOUBLE};
-    StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    
+    for (int i = 0; i < usbCameraIds.size(); i++) {
+        cameraBase_->rc = cameraBase_->SelectOpenCamera(usbCameraIds[i]);
+        ASSERT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+        // Get the stream manager
+        cameraBase_->AchieveStreamOperator();
+        // start stream
+        cameraBase_->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraBase_->StartStream(cameraBase_->intents);
+        // Get preview
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+        cameraBase_->StartCapture(cameraBase_->STREAM_ID_VIDEO, cameraBase_->CAPTURE_ID_VIDEO, false, true);
+        // release stream
+        cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE,
+        cameraBase_->CAPTURE_ID_VIDEO};
+        cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE,
+        cameraBase_->STREAM_ID_VIDEO};
+        cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    }
 }

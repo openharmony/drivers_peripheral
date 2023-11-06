@@ -25,6 +25,8 @@
 #include "v1_0/icamera_device_vdi_callback.h"
 #include "v1_0/icamera_host_vdi_callback.h"
 #include "hdf_load_vdi.h"
+#include "iproxy_broker.h"
+#include "camera.h"
 
 
 namespace OHOS {
@@ -36,6 +38,28 @@ using namespace OHOS::HDI;
 
 class ICameraHostVdi : public HdiBase {
 public:
+    class CameraHostCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
+        public:
+            explicit CameraHostCallBackDeathRecipient(const sptr<ICameraHostVdi> &cameraHostVdi)
+                : cameraHostVdi_(cameraHostVdi) {}
+
+            virtual ~CameraHostCallBackDeathRecipient() = default;
+
+            void OnRemoteDied(const wptr<IRemoteObject> &object) override
+            {
+                CAMERA_LOGE("Remote died, do clean works.");
+
+                if (cameraHostVdi_ == nullptr) {
+                    return;
+                }
+
+                (void) cameraHostVdi_->CloseAllCameras();
+            }
+
+        private:
+            sptr<ICameraHostVdi> cameraHostVdi_;
+    };
+
     virtual ~ICameraHostVdi() = default;
 
     static sptr<ICameraHostVdi> Get(bool isStub = false);
@@ -51,7 +75,28 @@ public:
          sptr<ICameraDeviceVdi> &device) = 0;
 
     virtual int32_t SetFlashlight(const std::string &cameraId, bool isEnable) = 0;
+
+    virtual int32_t CloseAllCameras() = 0;
 };
+
+int32_t ICameraHostVdi::SetCallback(const sptr<ICameraHostVdiCallback> &callbackObj)
+{
+    sptr<CameraHostCallBackDeathRecipient> callBackDeathRecipient =
+                                            new CameraHostCallBackDeathRecipient(this);
+
+    const sptr<IRemoteObject> remote = callbackObj->Remote();
+    if (nullptr == remote) {
+        CAMERA_LOGE("No remote of hostcallback, set deathcallback fail.");
+
+        return VDI::Camera::V1_0::INVALID_ARGUMENT;
+    }
+
+    bool res = remote->AddDeathRecipient(callBackDeathRecipient);
+    if (!res) {
+        return VDI::Camera::V1_0::INVALID_ARGUMENT;
+    }
+    return VDI::Camera::V1_0::NO_ERROR;
+}
 
 
 struct VdiWrapperCameraHost {

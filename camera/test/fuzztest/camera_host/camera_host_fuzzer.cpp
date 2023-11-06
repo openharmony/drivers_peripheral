@@ -25,6 +25,7 @@ enum HostCmdId {
     CAMERA_HOST_OPEN_CAMERA,
     CAMERA_HOST_OPEN_CAMERA_V1_1,
     CAMERA_HOST_SET_FLASH_LIGHTS,
+    CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO,
     CAMERA_HOST_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
@@ -37,12 +38,12 @@ void FuncPrelaunch(const uint8_t *rawData, size_t size)
     cameraTest->prelaunchConfig->cameraId = const_cast<char*>(reinterpret_cast<const char*>(rawData));
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting.push_back(*rawData);
-    cameraTest->serviceV1_1->Prelaunch(*cameraTest->prelaunchConfig);
+    cameraTest->serviceV1_2->Prelaunch(*cameraTest->prelaunchConfig);
 }
 
 void FuncGetCameraAbility(const uint8_t *rawData, size_t size)
 {
-    cameraTest->serviceV1_1->GetCameraAbility(const_cast<char*>(reinterpret_cast<const char*>(rawData)),
+    cameraTest->serviceV1_2->GetCameraAbility(const_cast<char*>(reinterpret_cast<const char*>(rawData)),
         cameraTest->abilityVec);
 }
 
@@ -51,7 +52,7 @@ void FuncOpenCamera(const uint8_t *rawData, size_t size)
     sptr<HDI::Camera::V1_0::ICameraDevice> g_CameraDevice = nullptr;
     const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
         new Camera::CameraManager::DemoCameraDeviceCallback();
-    cameraTest->serviceV1_1->OpenCamera(
+    cameraTest->serviceV1_2->OpenCamera(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
 }
 
@@ -60,14 +61,20 @@ void FuncOpenCamera_V1_1(const uint8_t *rawData, size_t size)
     sptr<HDI::Camera::V1_1::ICameraDevice> g_CameraDevice = nullptr;
     const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
         new Camera::CameraManager::DemoCameraDeviceCallback();
-    cameraTest->serviceV1_1->OpenCamera_V1_1(
+    cameraTest->serviceV1_2->OpenCamera_V1_1(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
 }
 
 void FuncSetFlashlight(const uint8_t *rawData, size_t size)
 {
-    cameraTest->serviceV1_1->SetFlashlight(
+    cameraTest->serviceV1_2->SetFlashlight(
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), true);
+}
+
+void FuncNotifyDeviceStateChangeInfo(const uint8_t *rawData, size_t size)
+{
+    int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData))
+    cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(data[0], data[1]);
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
@@ -93,6 +100,10 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
             FuncSetFlashlight(rawData, size);
             break;
         }
+        case CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO: {
+            FuncNotifyDeviceStateChangeInfo(rawData, size);
+            break;
+        }
         default:
             return;
     }
@@ -108,11 +119,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->Init();
-    if (cameraTest->serviceV1_1 == nullptr) {
+    cameraTest->InitV1_2();
+    if (cameraTest->serviceV1_2 == nullptr) {
         return false;
     }
-    cameraTest->Open();
+    cameraTest->OpenV1_2();
     if (cameraTest->cameraDeviceV1_1 == nullptr) {
         return false;
     }

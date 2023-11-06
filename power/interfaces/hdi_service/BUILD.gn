@@ -30,6 +30,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
 
