@@ -37,8 +37,8 @@
 #define ECM_BIT              9728000
 #define USBCDC_LEN 2
 #define RECEIVE_ALL_EVENTS 0xff
-const int32_t WAIT_UDC_MAX_LOOP = 3;
-const uint32_t WAIT_UDC_TIME = 100000;
+static const int32_t WAIT_UDC_MAX_LOOP = 3;
+static const uint32_t WAIT_UDC_TIME = 100000;
 
 static int32_t EcmInit(struct HdfDeviceObject *device);
 static int32_t EcmRelease(struct HdfDeviceObject *device);
