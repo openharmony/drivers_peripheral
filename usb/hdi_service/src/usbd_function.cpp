@@ -303,7 +303,7 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
             return HDF_FAILURE;
         }
         if (SendCmdToService(ACM_SERVICE_NAME, ACM_INIT, USB_FUNCTION_ACM) != 0) {
-            UsbdUnRegisterDevice(std::string(ACM_SERVICE_NAME));
+            UsbdUnregisterDevice(std::string(ACM_SERVICE_NAME));
             HDF_LOGE("%{public}s: acm init error", __func__);
             return HDF_FAILURE;
         }
@@ -316,7 +316,7 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
             return HDF_FAILURE;
         }
         if (SendCmdToService(ECM_SERVICE_NAME, ECM_INIT, USB_FUNCTION_ECM) != 0) {
-            UsbdUnRegisterDevice(std::string(ECM_SERVICE_NAME));
+            UsbdUnregisterDevice(std::string(ECM_SERVICE_NAME));
             HDF_LOGE("%{public}s: ecm init error", __func__);
             return HDF_FAILURE;
         }
