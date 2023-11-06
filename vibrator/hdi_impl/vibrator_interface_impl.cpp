@@ -273,7 +273,7 @@ static struct VdiWrapperVibrator g_vibratorVdi = {
 
 extern "C" HDF_VDI_INIT(g_vibratorVdi);
 
-} // v1_1
+} // V1_1
 } // Vibrator
 } // HDI
 } // OHOS

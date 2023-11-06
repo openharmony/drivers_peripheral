@@ -19,7 +19,6 @@
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
 
-
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
@@ -41,7 +40,7 @@ public:
     int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) override;
     int32_t GetHapticStartUpTime(int32_t& startUpTime) override;
 };
-} // v1_1
+} // V1_1
 } // Vibrator
 } // HDI
 } // OHOS
