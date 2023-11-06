@@ -23,6 +23,7 @@
 #define EFFECT_SUN 64
 #define EFFECT_DURATION    2000
 #define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
+#define DEFAULT_START_UP_TIME    20
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
 {
@@ -322,7 +323,7 @@ static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 
 static int32_t GetHapticStartUpTime(int32_t *startUpTime, int32_t mode)
 {
-    *startUpTime = 20;
+    *startUpTime = DEFAULT_START_UP_TIME;
     HDF_LOGE("%{public}s: startUpTime = %{public}d", __func__, *startUpTime);
     return HDF_SUCCESS;
 }

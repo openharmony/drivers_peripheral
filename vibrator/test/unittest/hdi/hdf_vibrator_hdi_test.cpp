@@ -544,7 +544,8 @@ HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
     
     printf("into function GetHapticStartUpTime\n");
     int32_t startUpTime;
-    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(startUpTime);
+    int32_t mode = 0;
+    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(startUpTime, mode);
     EXPECT_EQ(startRet, HDF_SUCCESS);
     printf("startUpTime = %d\n", startUpTime);
 
