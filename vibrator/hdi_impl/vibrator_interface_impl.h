@@ -38,7 +38,7 @@ public:
     int32_t IsVibratorRunning(bool& state) override;
     int32_t PlayHapticPattern(const HapticPaketVdi& pkg) override;
     int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) override;
-    int32_t GetHapticStartUpTime(int32_t& startUpTime) override;
+    int32_t GetHapticStartUpTime(int32_t& startUpTime, int32_t mode) override;
 };
 } // V1_1
 } // Vibrator

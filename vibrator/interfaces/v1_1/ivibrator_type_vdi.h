@@ -110,7 +110,7 @@ struct HapticPaketVdi {
 
 struct HapticCapacityVdi {
     bool isSupportHdHaptic;
-    bool isSupportPredefineWave;
+    bool isSupportPresetMapping;
     bool isSupportTimeDelay;
     bool reserved0;
     int32_t reserved1;
