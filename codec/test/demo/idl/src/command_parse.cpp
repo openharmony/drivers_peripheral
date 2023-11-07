@@ -18,6 +18,7 @@
 enum class MyOptIndex {
     OPT_INDEX_UNKONWN = 0,
     OPT_INDEX_BUFFER_HANDLE,
+    OPT_INDEX_DMA_BUFFER,
     OPT_INDEX_HEVC,
     OPT_INDEX_HELP,
     OPT_INDEX_HEIGHT = 'h',
@@ -25,28 +26,35 @@ enum class MyOptIndex {
     OPT_INDEX_OUTPUT = 'o',
     OPT_INDEX_WIDTH = 'w'
 };
+
+static struct option g_longOptions[] = {
+    {"width", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_WIDTH)},
+    {"height", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEIGHT)},
+    {"in", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_INPUT)},
+    {"out", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_OUTPUT)},
+    {"nocopy", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_BUFFER_HANDLE)},
+    {"dma", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_DMA_BUFFER)},
+    {"HEVC", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEVC)},
+    {"help", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HELP)},
+    {nullptr, 0, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_UNKONWN)}
+};
+
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
     while (1) {
         int optionIndex = 0;
-        static struct option long_options[] = {
-            {"width", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_WIDTH)},
-            {"height", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_HEIGHT)},
-            {"in", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_INPUT)},
-            {"out", required_argument, 0, static_cast<int>(MyOptIndex::OPT_INDEX_OUTPUT)},
-            {"nocopy", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_BUFFER_HANDLE)},
-            {"HEVC", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEVC)},
-            {"help", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HELP)},
-            {0, 0, 0, static_cast<int>(MyOptIndex::OPT_INDEX_UNKONWN)}
-        };
-        int c = getopt_long(argc, argv, "i:o:w:h:", long_options, &optionIndex);
+
+        int c = getopt_long(argc, argv, "i:o:w:h:", g_longOptions, &optionIndex);
         if (c == -1) {
             break;
         }
         MyOptIndex index = (MyOptIndex)c;
         switch (index) {
             case MyOptIndex::OPT_INDEX_BUFFER_HANDLE:
-                opt.useBuffer = true;
+                opt.useBufferHandle = true;
+                break;
+            case MyOptIndex::OPT_INDEX_DMA_BUFFER:
+                opt.useDMABuffer = true;
                 break;
             case MyOptIndex::OPT_INDEX_HEVC:
                 opt.codec = codecMime::HEVC;
@@ -86,5 +94,6 @@ void CommandParse::ShowUsage()
     std::cout << " -i, --in=FILE              The file name for input file." << std::endl;
     std::cout << " --HEVC                     HEVC decode or HEVC encode, AVC for default." << std::endl;
     std::cout << " --nocopy                   Support BufferHandle." << std::endl;
+    std::cout << " --dma                      Support dma Buffer." << std::endl;
     std::cout << " --help                     The help info." << std::endl;
 }
