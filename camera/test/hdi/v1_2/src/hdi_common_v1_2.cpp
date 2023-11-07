@@ -19,7 +19,8 @@
 
 namespace OHOS::Camera {
 Test::ResultCallback Test::resultCallback_ = 0;
-
+OHOS::HDI::Camera::V1_0::FlashlightStatus Test::statusCallback =
+                static_cast<OHOS::HDI::Camera::V1_0::FlashlightStatus>(-1);
 uint64_t Test::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
@@ -542,4 +543,30 @@ int32_t Test::TestCameraHostCallback::OnCameraEvent(const std::string& cameraId,
     CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), event);
     return HDI::Camera::V1_0::NO_ERROR;
 }
+
+int32_t Test::TestCameraHostCallbackV1_2::OnCameraStatus(const std::string& cameraId, CameraStatus status)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnCameraEvent(const std::string& cameraId, CameraEvent event)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), event);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatusV1_2(FlashlightStatus status)
+{
+    CAMERA_LOGE("status: %{public}d", status);
+    Test::statusCallback = status;
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
 }
