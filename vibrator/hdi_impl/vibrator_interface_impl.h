@@ -35,7 +35,10 @@ public:
     int32_t EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency) override;
     int32_t EnableCompositeEffect(const HdfCompositeEffectVdi& effect) override;
     int32_t GetEffectInfo(const std::string &effectType, HdfEffectInfoVdi &effectInfo) override;
-    int32_t IsVibratorRunning(bool& state) override;;
+    int32_t IsVibratorRunning(bool& state) override;
+    int32_t PlayHapticPattern(const HapticPaketVdi& pkg) override;
+    int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) override;
+    int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
 };
 } // V1_1
 } // Vibrator
