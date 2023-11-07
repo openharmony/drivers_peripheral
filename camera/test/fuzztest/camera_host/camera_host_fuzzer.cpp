@@ -25,6 +25,7 @@ enum HostCmdId {
     CAMERA_HOST_OPEN_CAMERA,
     CAMERA_HOST_OPEN_CAMERA_V1_1,
     CAMERA_HOST_SET_FLASH_LIGHTS,
+    CAMERA_HOST_SET_FLASH_LIGHTS_V1_2,
     CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO,
     CAMERA_HOST_END, // Enumerated statistical value. The new enumerated value is added before
 };
@@ -71,9 +72,15 @@ void FuncSetFlashlight(const uint8_t *rawData, size_t size)
         const_cast<char*>(reinterpret_cast<const char*>(rawData)), true);
 }
 
+void FuncSetFlashlightV1_2(const uint8_t *rawData, size_t size)
+{
+    float *level = const_cast<float*>(reinterpret_cast<const float*>(rawData));
+    cameraTest->serviceV1_2->SetFlashlightV1_2(*level);
+}
+
 void FuncNotifyDeviceStateChangeInfo(const uint8_t *rawData, size_t size)
 {
-    int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData))
+    int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
     cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(data[0], data[1]);
 }
 
@@ -98,6 +105,10 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
         }
         case CAMERA_HOST_SET_FLASH_LIGHTS: {
             FuncSetFlashlight(rawData, size);
+            break;
+        }
+        case CAMERA_HOST_SET_FLASH_LIGHTS_V1_2: {
+            FuncSetFlashlightV1_2(rawData, size);
             break;
         }
         case CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO: {

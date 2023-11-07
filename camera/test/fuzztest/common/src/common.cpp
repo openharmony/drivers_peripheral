@@ -50,7 +50,7 @@ void CameraManager::InitV1_2()
     uint32_t minVer;
     int32_t ret;
     if (serviceV1_2 == nullptr) {
-        serviceV1_2 = OHOS::HDI::Camera::V1_1::ICameraHost::Get("camera_service", false);
+        serviceV1_2 = OHOS::HDI::Camera::V1_2::ICameraHost::Get("camera_service", false);
         if (serviceV1_2 == nullptr) {
             CAMERA_LOGE("V1_2::IcameraHost get failed");
             return;
