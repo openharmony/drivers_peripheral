@@ -118,7 +118,8 @@ ohos_shared_library("libmetadata_service_1.1") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_display:display_buffer_idl_headers",
+    "drivers_interface_display:display_buffer_idl_headers_1.0",
+    "drivers_interface_display:display_buffer_idl_headers_1.1",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
