@@ -19,10 +19,10 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_1/ivibrator_interface.h"
+#include "v1_2/ivibrator_interface.h"
 #include "vibrator_type.h"
 
-using namespace OHOS::HDI::Vibrator::V1_1;
+using namespace OHOS::HDI::Vibrator::V1_2;
 using namespace testing::ext;
 
 namespace {
@@ -34,6 +34,27 @@ namespace {
     int32_t g_intensity2 = -30;
     int32_t g_frequency1 = 200;
     int32_t g_frequency2 = -200;
+    int32_t g_pkgTime = 434;
+    int32_t g_pkgEventNum = 1;
+    enum OHOS::HDI::Vibrator::V1_2::EVENT_TYPE g_eventType = OHOS::HDI::Vibrator::V1_2::CONTINUOUS;
+    int32_t g_eventDuration = 149;
+    int32_t g_eventTime = 0;
+    int32_t g_eventIntensity = 100;
+    int32_t g_eventFrequency = 50;
+    int32_t g_eventIndex = 0;
+    int32_t g_eventPointNum = 4;
+    int32_t g_pointTime0 = 0;
+    int32_t g_pointIntensity0 = 0;
+    int32_t g_pointFrequency0 = 0;
+    int32_t g_pointTime1 = 1;
+    int32_t g_pointIntensity1 = 1;
+    int32_t g_pointFrequency1 = 0;
+    int32_t g_pointTime2 = 32;
+    int32_t g_pointIntensity2 = 1;
+    int32_t g_pointFrequency2 = -39;
+    int32_t g_pointTime3 = 149;
+    int32_t g_pointIntensity3 = 0;
+    int32_t g_pointFrequency3 = -39;
     constexpr int32_t MIN_DURATION = 0;
     constexpr int32_t MAX_DURATION = 3600000;
     std::vector<std::string> g_effect_list = {"haptic.clock.timer", "haptic.long_press.light", \
@@ -41,7 +62,7 @@ namespace {
         "haptic.slide.light", "haptic.threshold"};
     std::string g_builtIn = "haptic.default.effect";
     std::string g_arbitraryStr = "arbitraryString";
-    sptr<IVibratorInterface> g_vibratorInterface = nullptr;
+    sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = nullptr;
 }
 
 class HdfVibratorHdiTest : public testing::Test {
@@ -54,7 +75,7 @@ public:
 
 void HdfVibratorHdiTest::SetUpTestCase()
 {
-    g_vibratorInterface = IVibratorInterface::Get();
+    g_vibratorInterface = OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
 }
 
 void HdfVibratorHdiTest::TearDownTestCase()
@@ -476,4 +497,100 @@ HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_002, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
     EXPECT_EQ(effectInfo.isSupportEffect, false);
     EXPECT_EQ(effectInfo.duration, 0);
+}
+
+/**
+  * @tc.name: PlayHapticPattern
+  * @tc.desc: HD vibration data packet delivery.
+  * @tc.type: FUNC
+  * @tc.require:#I8BZ5H
+  */
+HWTEST_F(HdfVibratorHdiTest, PlayHapticPattern, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
+    pkg.time = g_pkgTime;
+    pkg.eventNum = g_pkgEventNum;
+
+    OHOS::HDI::Vibrator::V1_2::HapticEvent hapticEvent;
+    hapticEvent.type = g_eventType;
+    hapticEvent.duration = g_eventDuration;
+    hapticEvent.time = g_eventTime;
+    hapticEvent.intensity = g_eventIntensity;
+    hapticEvent.frequency = g_eventFrequency;
+    hapticEvent.index = g_eventIndex;
+    hapticEvent.pointNum = g_eventPointNum;
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint0;
+    curvePoint0.time = g_pointTime0;
+    curvePoint0.intensity = g_pointIntensity0;
+    curvePoint0.frequency = g_pointFrequency0;
+    hapticEvent.points.push_back(std::move(curvePoint0));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint1;
+    curvePoint1.time = g_pointTime1;
+    curvePoint1.intensity = g_pointIntensity1;
+    curvePoint1.frequency = g_pointFrequency1;
+    hapticEvent.points.push_back(std::move(curvePoint1));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint2;
+    curvePoint2.time = g_pointTime2;
+    curvePoint2.intensity = g_pointIntensity2;
+    curvePoint2.frequency = g_pointFrequency2;
+    hapticEvent.points.push_back(std::move(curvePoint2));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint3;
+    curvePoint3.time = g_pointTime3;
+    curvePoint3.intensity = g_pointIntensity3;
+    curvePoint3.frequency = g_pointFrequency3;
+    hapticEvent.points.push_back(std::move(curvePoint3));
+
+    pkg.events.push_back(std::move(hapticEvent));
+    int32_t startRet = g_vibratorInterface->PlayHapticPattern(pkg);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetHapticCapacity
+  * @tc.desc: Obtains the vibration capability of the motor.
+  * @tc.type: FUNC
+  * @tc.require:#I8BZ5H
+  */
+HWTEST_F(HdfVibratorHdiTest, GetHapticCapacity, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    OHOS::HDI::Vibrator::V1_2::HapticCapacity hapticCapacity;
+    int32_t startRet = g_vibratorInterface->GetHapticCapacity(hapticCapacity);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+    printf("hapticCapacity.isSupportHdHaptic = %d\n", hapticCapacity.isSupportHdHaptic);
+    printf("hapticCapacity.isSupportPresetMapping = %d\n", hapticCapacity.isSupportPresetMapping);
+    printf("hapticCapacity.isSupportTimeDelay = %d\n", hapticCapacity.isSupportTimeDelay);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetHapticStartUpTime
+  * @tc.desc: Indicates the time from command is issued to the time the motor starts.
+  * @tc.type: FUNC
+  * @tc.require:#I8BZ5H
+  */
+HWTEST_F(HdfVibratorHdiTest, GetHapticStartUpTime, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+    
+    int32_t startUpTime;
+    int32_t mode = 0;
+    int32_t startRet = g_vibratorInterface->GetHapticStartUpTime(mode, startUpTime);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+    printf("startUpTime = %d\n", startUpTime);
+
+    int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
