@@ -400,7 +400,7 @@ int32_t CodecHdiEncode::UseDMABuffer(PortIndex portIndex, int bufferCount, int b
         unUsedOutBuffers_.push_back(omxBuffer->bufferId);
 
         const void *addr = mmap(nullptr, static_cast<size_t>(bufferInfo->omxBuffer->allocLen),
-                                  PROT_READ | PROT_WRITE, MAP_SHARED, outBuffer.fd, 0);
+                                PROT_READ | PROT_WRITE, MAP_SHARED, outBuffer.fd, 0);
         if (addr == nullptr) {
             HDF_LOGE("%{public}s mmap fail fd %{public}d", __func__, outBuffer.fd);
             return HDF_FAILURE;

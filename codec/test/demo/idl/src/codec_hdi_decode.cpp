@@ -555,15 +555,13 @@ int32_t CodecHdiDecode::UseDMABuffer(PortIndex portIndex, int bufferCount, int b
         unUsedInBuffers_.push_back(omxBuffer->bufferId);
 
         void *addr = mmap(nullptr, static_cast<size_t>(bufferInfo->omxBuffer->allocLen),
-                            PROT_READ | PROT_WRITE, MAP_SHARED, bufferInfo->omxBuffer->fd, 0);
+                          PROT_READ | PROT_WRITE, MAP_SHARED, bufferInfo->omxBuffer->fd, 0);
         if (addr == nullptr) {
             HDF_LOGE("%{public}s mmap fail fd %{public}d", __func__, omxBuffer->fd);
             return HDF_FAILURE;
         } else {
             addrs_[omxBuffer->bufferId] = addr;
         }
-
-
     }
     return HDF_SUCCESS;
 }
@@ -775,8 +773,7 @@ bool CodecHdiDecode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
     if (useDMABuffer_) {
         auto ret = addrs_.find(bufferInfo->omxBuffer->bufferId);
         if (ret != addrs_.end()) {
-            void *addr = ret->second;
-            eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(addr), bufferInfo->omxBuffer->filledLen);
+            eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(ret->second), bufferInfo->omxBuffer->filledLen);
             bufferInfo->omxBuffer->offset = 0;
         }
     } else {
