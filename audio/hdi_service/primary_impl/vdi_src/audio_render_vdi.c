@@ -663,11 +663,11 @@ int32_t AudioRenderGetMmapPositionVdi(struct IAudioRender *render, uint64_t *fra
 
 int32_t AudioRenderAddAudioEffectVdi(struct IAudioRender *render, uint64_t effectid)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(NULL, HDF_ERR_NOT_SUPPORT);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->AddAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -676,11 +676,11 @@ int32_t AudioRenderAddAudioEffectVdi(struct IAudioRender *render, uint64_t effec
 
 int32_t AudioRenderRemoveAudioEffectVdi(struct IAudioRender *render, uint64_t effectid)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(NULL, HDF_ERR_NOT_SUPPORT);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->RemoveAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -689,12 +689,12 @@ int32_t AudioRenderRemoveAudioEffectVdi(struct IAudioRender *render, uint64_t ef
 
 int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *bufferSize)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(NULL, HDF_ERR_NOT_SUPPORT);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->GetFrameBufferSize = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -829,13 +829,13 @@ int32_t AudioRenderAudioDevDumpVdi(struct IAudioRender *render, int32_t range, i
 
 int32_t AudioRenderIsSupportsPauseAndResumeVdi(struct IAudioRender *render, bool *supportPause, bool *supportResume)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(NULL, HDF_ERR_NOT_SUPPORT);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->IsSupportsPauseAndResume = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 
