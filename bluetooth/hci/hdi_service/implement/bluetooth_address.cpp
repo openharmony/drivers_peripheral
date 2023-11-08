@@ -101,9 +101,9 @@ bool BluetoothAddress::GetConstantAddress(char *address, int len)
     using GetMacFun = int (*)(char*, int);
     GetMacFun getMac = reinterpret_cast<GetMacFun>(dlsym(libMac, GET_BT_MAC_SYMBOL_NAME));
     if (getMac == nullptr) {
-       HDF_LOGE("GetConstantAddress dlsym error");
-       dlclose(libMac);
-       return false;
+        HDF_LOGE("GetConstantAddress dlsym error");
+        dlclose(libMac);
+        return false;
     }
 
     int ret = getMac(address, len);

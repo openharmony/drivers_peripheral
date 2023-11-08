@@ -69,7 +69,7 @@ int32_t AudioCtlRenderSetPauseStu(
     renderIns = RenderGetInstance(handleData->renderMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(renderIns);
 
-    ret = SndPcmPause(&renderIns->soundCard, handleData->renderMode.ctlParam.pause);
+    ret = renderIns->SetPauseState(renderIns, handleData->renderMode.ctlParam.pause);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Render set pause failed!");
         return HDF_FAILURE;

@@ -27,7 +27,7 @@ int32_t AudioCtlCaptureSetPauseStu(
     captureIns = CaptureGetInstance(handleData->captureMode.hwInfo.adapterName);
     CHECK_NULL_PTR_RETURN_DEFAULT(captureIns);
 
-    ret = SndPcmPause(&captureIns->soundCard, handleData->captureMode.ctlParam.pause);
+    ret = captureIns->SetPauseState(captureIns, handleData->captureMode.ctlParam.pause);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture set pause failed!");
         return HDF_FAILURE;

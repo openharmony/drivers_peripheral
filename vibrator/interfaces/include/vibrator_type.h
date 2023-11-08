@@ -90,6 +90,18 @@ enum EffectType {
 };
 
 /**
+ * @brief Enumerates the event types.
+ *
+ * @since 4.1
+ */
+enum EVENT_TYPE {
+    /**< Indicates that the vibration is continuous. */
+    CONTINUOUS = 0,
+    /**< Indicates that the vibration is instantaneous. */
+    TRANSIENT  = 1,
+};
+
+/**
  * @brief Defines the vibration parameters.
  *
  * The parameters include the setting intensity and frequency capability the on and intensity and frequency range.
@@ -176,6 +188,85 @@ struct EffectInfo {
     int32_t duration;
     /**< setting effect capability. 1 indicates support, 0 indicates not support. */
     bool isSupportEffect;
+};
+
+
+/**
+ * @brief Defines the vibration point parameters.
+ *
+ * The information include the time, intensity, and frequency.
+ *
+ * @since 4.1
+ */
+struct CurvePoint {
+    /** Time of the vibration point. */
+    int32_t time;
+    /** Intensity of the vibration point. */
+    int32_t intensity;
+    /** Frequency of the vibration point. */
+    int32_t frequency;
+};
+
+/**
+ * @brief Defines the HD vibration event.
+ *
+ * The information include the HD vibration event.
+ *
+ * @since 4.1
+ */
+struct HapticEvent {
+    /** Indicates the vibration type. */
+    enum EVENT_TYPE type;
+    /** Indicates the vibration time. */
+    int32_t time;
+    /** Indicates the vibration duration. */
+    int32_t duration;
+    /** Indicates the vibration intensity. */
+    int32_t intensity;
+    /** Indicates the vibration frequency. */
+    int32_t frequency;
+    /** ID of the vibration motor. Indicates the time from command is issued to the time the motor starts. */
+    int32_t index;
+    /** Indicates the number of vibration points. */
+    int32_t pointNum;
+    /** Indicates the vibration point array. */
+    struct CurvePoint points[];
+};
+
+/**
+ * @brief Defines the vibration data delivery packet.
+ *
+ * The information include the different trypes of vibrationsr;
+ *
+ * @since 4.1
+ */
+struct HapticPaket {
+    /** Indicates the vibration data delivery time. */
+    int32_t time;
+    /** Indicates the vibration number of data to be delivered. */
+    int32_t eventNum;
+    /** Indicates the vibration data delivery event array. */
+    struct HapticEvent events[];
+};
+
+/**
+ * @brief Defines the vibration capability data package.
+ *
+ * The information include the different types of vibrations.
+ *
+ * @since 4.1
+ */
+struct HapticCapacity {
+    /** Indicates the vibration support HD vibration. */
+    bool isSupportHdHaptic;
+    /** Indicates the vibration support preset mapping. */
+    bool isSupportPresetMapping;
+    /** Indicates the vibration support dalay vibration. */
+    bool isSupportTimeDelay;
+    /** Indicates the vibration Standby parameter. */
+    bool reserved0;
+    /** Indicates the vibration Standby parameter. */
+    int32_t reserved1;
 };
 
 #ifdef __cplusplus

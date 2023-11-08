@@ -52,7 +52,7 @@ ohos_shared_library("libthermal_interface_service_1.1") {
   } else {
     external_deps = [
       "hilog:libhilog",
-      "init_lite:libbegetutil",
+      "init:libbegetutil",
       "ipc:ipc_single",
     ]
   }

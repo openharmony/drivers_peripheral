@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 
 ohos_fuzztest("PinAuthInterfaceServiceFuzzTest") {
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   module_out_path = "drivers_peripheral_pin_auth/drivers_peripheral_pin_auth"
   fuzz_config_file = "../pinauthinterfaceservice_fuzzer"
   cflags = [

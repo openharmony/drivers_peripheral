@@ -87,17 +87,20 @@ void Test::Init()
     EXPECT_EQ(ret, 0);
 }
 
-void Test::Open()
+void Test::Open(int cameraId)
 {
     if (cameraDevice == nullptr) {
         EXPECT_NE(service, nullptr);
         service->GetCameraIds(cameraIds);
         EXPECT_NE(cameraIds.size(), 0);
-        GetCameraMetadata();
+        GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
-
         EXPECT_NE(serviceV1_1, nullptr);
-        rc = serviceV1_1->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        if (DEVICE_1 == cameraId) {
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1); // front camera
+        } else {
+            rc = serviceV1_1->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1); // rear camera
+        }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_1, nullptr);
         cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
@@ -105,9 +108,13 @@ void Test::Open()
     }
 }
 
-void Test::GetCameraMetadata()
+void Test::GetCameraMetadata(int cameraId)
 {
-    rc = service->GetCameraAbility(cameraIds.front(), abilityVec);
+    if (DEVICE_1 == cameraId) {
+        rc = service->GetCameraAbility(cameraIds[1], abilityVec); // front camera
+    } else {
+        rc = service->GetCameraAbility(cameraIds[0], abilityVec); // rear camera
+    }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }
@@ -184,7 +191,7 @@ void Test::DefaultInfosVideo(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdVideo, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::VIDEO] = consumer_video;
