@@ -123,6 +123,8 @@ public:
     int32_t SimAuthentication(
         int32_t slotId, int32_t serialId, const SimAuthenticationRequestInfo &simAuthInfo) override;
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
+    int32_t SendSimMatchedOperatorInfo(
+        int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo) override;
 
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId) override;
