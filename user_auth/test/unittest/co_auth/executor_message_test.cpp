@@ -39,10 +39,12 @@ extern "C" {
     extern Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode,
         const Uint64Array *templateIds);
     extern void DestoryExecutorMsg(void *data);
-    extern ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, Uint64Array *templateIds);
-    extern ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t authPropertyMode,
-        LinkedList *executorMsg);
-    extern ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg);
+    extern ResultCode GetExecutorTemplateList(
+        int32_t userId, const ExecutorInfoHal *executorNode, Uint64Array *templateIds);
+    extern ResultCode AssemblyMessage(
+        int32_t userId, const ExecutorInfoHal *executorNode, uint32_t authPropertyMode, LinkedList *executorMsg);
+    extern ResultCode TraverseExecutor(
+        int32_t userId, uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg);
 }
 
 namespace OHOS {
@@ -393,7 +395,7 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorTemplateList, TestSize.Level0)
     info.authType = 1;
     info.executorSensorHint = 10;
     Uint64Array array = {};
-    EXPECT_EQ(GetExecutorTemplateList(&info, &array), RESULT_UNKNOWN);
+    EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_UNKNOWN);
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     UserInfo userInfo = {};
@@ -407,9 +409,9 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorTemplateList, TestSize.Level0)
         userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
     }
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-    EXPECT_EQ(GetExecutorTemplateList(&info, &array), RESULT_REACH_LIMIT);
+    EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_REACH_LIMIT);
     info.authType = 2;
-    EXPECT_EQ(GetExecutorTemplateList(&info, &array), RESULT_SUCCESS);
+    EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_SUCCESS);
 }
 
 HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_001, TestSize.Level0)
@@ -418,7 +420,7 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_001, TestSize.Level0)
     ExecutorInfoHal info = {};
     info.authType = 1;
     info.executorSensorHint = 10;
-    EXPECT_EQ(AssemblyMessage(&info, 2, nullptr), RESULT_UNKNOWN);
+    EXPECT_EQ(AssemblyMessage(0, &info, 2, nullptr), RESULT_UNKNOWN);
 }
 
 HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
@@ -442,12 +444,12 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
     info.authType = 1;
     info.executorSensorHint = 20;
     LinkedList *executorMsg = CreateLinkedList(DestoryExecutorMsg);
-    EXPECT_EQ(AssemblyMessage(&info, 2, executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
 
     executorMsg = CreateLinkedList(DestoryExecutorMsg);
     info.executorSensorHint = 10;
-    EXPECT_EQ(AssemblyMessage(&info, 2, executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
     DestroyUserInfoList();
 }
@@ -456,14 +458,14 @@ HWTEST_F(ExecutorMessageTest, TestTraverseExecutor, TestSize.Level0)
 {
     g_poolList = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(TraverseExecutor(1, 0, nullptr), RESULT_UNKNOWN);
+    EXPECT_EQ(TraverseExecutor(0, 1, 0, nullptr), RESULT_UNKNOWN);
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
     info.authType = 2;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     LinkedList *executorMsg = new LinkedList();
-    EXPECT_EQ(TraverseExecutor(2, 0, executorMsg), RESULT_UNKNOWN);
+    EXPECT_EQ(TraverseExecutor(0, 2, 0, executorMsg), RESULT_UNKNOWN);
     delete executorMsg;
 }
 
@@ -471,15 +473,15 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorMsgList, TestSize.Level0)
 {
     g_poolList = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(GetExecutorMsgList(2, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetExecutorMsgList(1, 2, nullptr), RESULT_BAD_PARAM);
     LinkedList *executorMsg = nullptr;
-    EXPECT_EQ(GetExecutorMsgList(0, &executorMsg), RESULT_UNKNOWN);
+    EXPECT_EQ(GetExecutorMsgList(1, 0, &executorMsg), RESULT_UNKNOWN);
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
     info.authType = 1;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
-    EXPECT_EQ(GetExecutorMsgList(4, &executorMsg), RESULT_SUCCESS);
+    EXPECT_EQ(GetExecutorMsgList(1, 4, &executorMsg), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam

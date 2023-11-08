@@ -55,8 +55,10 @@ ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
     return ret;
 }
 
-IAM_STATIC ResultCode SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
+IAM_STATIC ResultCode SetAuthResult(
+    int32_t userId, uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
 {
+    result->userId = userId;
     result->authType = authType;
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;
@@ -113,7 +115,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     }
 
 EXIT:
-    ret = SetAuthResult(userAuthContext->authType, executorResultInfo, result);
+    ret = SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("set result failed");
     }

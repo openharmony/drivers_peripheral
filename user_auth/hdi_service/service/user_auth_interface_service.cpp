@@ -285,7 +285,7 @@ int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfo
     return RESULT_SUCCESS;
 }
 
-static int32_t CreateExecutorCommand(AuthResultInfo &info)
+static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
     AuthPropertyMode authPropMode;
@@ -296,7 +296,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
     } else {
         return RESULT_SUCCESS;
     }
-    ResultCode ret = GetExecutorMsgList(authPropMode, &executorSendMsg);
+    ResultCode ret = GetExecutorMsgList(userId, authPropMode, &executorSendMsg);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("get executor msg failed");
         return ret;
@@ -379,12 +379,12 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         }
     }
     DestoryBuffer(authResult.rootSecret);
-    if (authTokenHal.tokenDataPlain.authType != PIN_AUTH) {
+    if (authResult.authType != PIN_AUTH) {
         IAM_LOGI("type not pin");
         return RESULT_SUCCESS;
     }
     IAM_LOGI("type pin");
-    return CreateExecutorCommand(info);
+    return CreateExecutorCommand(authResult.userId, info);
 }
 
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
@@ -513,7 +513,7 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
             result = RESULT_TRUST_LEVEL_NOT_SUPPORT;
             continue;
         }
-        IAM_LOGE("get valid authType:%{public}d", authType);
+        IAM_LOGI("get valid authType:%{public}d", authType);
         validTypes.push_back(authType);
     }
     if (validTypes.empty()) {
