@@ -479,9 +479,11 @@ IAM_STATIC void DestoryExecutorMsg(void *data)
     Free(msg);
 }
 
-IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, Uint64Array *templateIds)
+IAM_STATIC ResultCode GetExecutorTemplateList(
+    int32_t userId, const ExecutorInfoHal *executorNode, Uint64Array *templateIds)
 {
     CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
     SetCredentialConditionAuthType(&condition, executorNode->authType);
     SetCredentialConditionExecutorSensorHint(&condition, executorNode->executorSensorHint);
     LinkedList *credList = QueryCredentialLimit(&condition);
@@ -527,11 +529,11 @@ IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNod
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t authPropertyMode,
-    LinkedList *executorMsg)
+IAM_STATIC ResultCode AssemblyMessage(
+    int32_t userId, const ExecutorInfoHal *executorNode, uint32_t authPropertyMode, LinkedList *executorMsg)
 {
     Uint64Array templateIds;
-    ResultCode ret = GetExecutorTemplateList(executorNode, &templateIds);
+    ResultCode ret = GetExecutorTemplateList(userId, executorNode, &templateIds);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get template list failed");
         return ret;
@@ -562,7 +564,8 @@ IAM_STATIC ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint3
     return ret;
 }
 
-IAM_STATIC ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg)
+IAM_STATIC ResultCode TraverseExecutor(
+    int32_t userId, uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorRole(&condition, executorRole);
@@ -580,7 +583,7 @@ IAM_STATIC ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPrope
         }
         ExecutorInfoHal *executorNode = (ExecutorInfoHal *)temp->data;
         if (executorNode->authType != PIN_AUTH) {
-            ResultCode ret = AssemblyMessage(executorNode, authPropertyMode, executorMsg);
+            ResultCode ret = AssemblyMessage(userId, executorNode, authPropertyMode, executorMsg);
             if (ret != RESULT_SUCCESS) {
                 LOG_ERROR("assembly message failed");
                 DestroyLinkedList(executors);
@@ -593,7 +596,7 @@ IAM_STATIC ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPrope
     return RESULT_SUCCESS;
 }
 
-ResultCode GetExecutorMsgList(uint32_t authPropertyMode, LinkedList **executorMsg)
+ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedList **executorMsg)
 {
     if (executorMsg == NULL) {
         LOG_ERROR("executorMsg is null");
@@ -604,14 +607,14 @@ ResultCode GetExecutorMsgList(uint32_t authPropertyMode, LinkedList **executorMs
         LOG_ERROR("create list failed");
         return RESULT_NO_MEMORY;
     }
-    ResultCode ret = TraverseExecutor(VERIFIER, authPropertyMode, *executorMsg);
+    ResultCode ret = TraverseExecutor(userId, VERIFIER, authPropertyMode, *executorMsg);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("traverse verifier failed");
         DestroyLinkedList(*executorMsg);
         *executorMsg = NULL;
         return ret;
     }
-    ret = TraverseExecutor(ALL_IN_ONE, authPropertyMode, *executorMsg);
+    ret = TraverseExecutor(userId, ALL_IN_ONE, authPropertyMode, *executorMsg);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("traverse allInOne executor failed");
         DestroyLinkedList(*executorMsg);
