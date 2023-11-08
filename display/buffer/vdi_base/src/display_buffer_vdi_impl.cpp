@@ -77,7 +77,37 @@ int32_t DisplayBufferVdiImpl::InvalidateCache(const BufferHandle& handle) const
 int32_t DisplayBufferVdiImpl::IsSupportedAlloc(const std::vector<VerifyAllocInfo>& infos,
     std::vector<bool>& supporteds) const
 {
-    return HDF_ERR_NOT_SUPPORT;
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::RegisterBuffer(const BufferHandle& handle)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::SetMetadata(const BufferHandle& handle, uint32_t key, const std::vector<uint8_t>& value)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::GetMetadata(const BufferHandle& handle, uint32_t key, std::vector<uint8_t>& value)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::EraseMetadataKey(const BufferHandle& handle, uint32_t key)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
 }
 
 extern "C" IDisplayBufferVdi* CreateDisplayBufferVdi()

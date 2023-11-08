@@ -25,6 +25,7 @@ namespace Codec {
 namespace V1_0 {
 
 static std::map<IRemoteObject *, std::set<uint32_t>> g_remoteCompsMap;
+static std::map<IRemoteObject *, sptr<CodecDeathRecipient>> g_deathReciMap;
 static std::map<uint32_t, IRemoteObject *> g_compRemoteMap;
 static std::mutex g_mutex;
 
@@ -71,12 +72,12 @@ void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_
     std::set<uint32_t> compIds;
     compIds.insert(componentId);
     g_remoteCompsMap.emplace(std::make_pair(remote.GetRefPtr(), compIds));
+    g_deathReciMap[remote.GetRefPtr()] = deathCallBack;
     CODEC_LOGI("Add deathRecipient success!");
 }
 
 void RemoveMapperOfDestoryedComponent(uint32_t componentId)
 {
-    std::lock_guard<std::mutex> lk(g_mutex);
     auto compRemote = g_compRemoteMap.find(componentId);
     if (compRemote == g_compRemoteMap.end()) {
         return;
@@ -89,6 +90,18 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
     }
     remoteComps->second.erase(componentId);
     g_compRemoteMap.erase(compRemote);
+
+    auto deathReci = g_deathReciMap.find(remote);
+    if (deathReci == g_deathReciMap.end()) {
+        CODEC_LOGE("%{public}s: not find recipient", __func__);
+        return;
+    }
+    bool result = remote->RemoveDeathRecipient(deathReci->second);
+    g_deathReciMap.erase(deathReci);
+    if (!result) {
+        CODEC_LOGE("%{public}s: removeDeathRecipient fail", __func__);
+        return;
+    }
     CODEC_LOGI("Remove mapper destoryedComponent success!");
 }
 }  // namespace V1_0

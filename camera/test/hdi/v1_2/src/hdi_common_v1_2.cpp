@@ -19,7 +19,8 @@
 
 namespace OHOS::Camera {
 Test::ResultCallback Test::resultCallback_ = 0;
-
+OHOS::HDI::Camera::V1_0::FlashlightStatus Test::statusCallback =
+                static_cast<OHOS::HDI::Camera::V1_0::FlashlightStatus>(-1);
 uint64_t Test::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
@@ -100,7 +101,7 @@ void Test::Open()
         rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_1, nullptr);
-        cameraDeviceV1_2 = static_cast<OHOS::HDI::Camera::V1_2::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
+        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
         CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
@@ -219,7 +220,7 @@ void Test::DefaultInfosVideo(
     infos->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     infos->v1_0.bufferQueue_ = consumer_video->CreateProducerSeq([this](void* addr, uint32_t size) {
-        DumpImageFile(streamIdPreview, "yuv", addr, size);
+        DumpImageFile(streamIdVideo, "yuv", addr, size);
     });
     infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
     consumerMap_[StreamIntent::VIDEO] = consumer_video;
@@ -266,7 +267,7 @@ void Test::StartStream(std::vector<StreamIntent> intents)
     streamOperatorCallback = new TestStreamOperatorCallback();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
-    rc = cameraDeviceV1_2->GetStreamOperator_V1_1(streamOperatorCallback, streamOperator_V1_1);
+    rc = cameraDeviceV1_1->GetStreamOperator_V1_1(streamOperatorCallback, streamOperator_V1_1);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
         rc = streamOperator_V1_1->GetVersion(mainVersion, minVersion);
         streamOperator = static_cast<OHOS::HDI::Camera::V1_0::IStreamOperator *>(streamOperator_V1_1.GetRefPtr());
@@ -542,4 +543,30 @@ int32_t Test::TestCameraHostCallback::OnCameraEvent(const std::string& cameraId,
     CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), event);
     return HDI::Camera::V1_0::NO_ERROR;
 }
+
+int32_t Test::TestCameraHostCallbackV1_2::OnCameraStatus(const std::string& cameraId, CameraStatus status)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnCameraEvent(const std::string& cameraId, CameraEvent event)
+{
+    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), event);
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatusV1_2(FlashlightStatus status)
+{
+    CAMERA_LOGE("status: %{public}d", status);
+    Test::statusCallback = status;
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
 }

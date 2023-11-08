@@ -29,7 +29,7 @@
 #include "v1_2/types.h"
 #include "metadata_utils.h"
 #include "v1_2/icamera_host.h"
-#include "v1_2/icamera_device.h"
+#include "v1_1/icamera_device.h"
 #include "v1_1/istream_operator.h"
 #include "v1_2/camera_host_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
@@ -84,9 +84,9 @@ public:
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
     OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
@@ -133,6 +133,8 @@ public:
 
     int32_t rc;
     bool status;
+    float statusV1_2;
+    static FlashlightStatus statusCallback;
     std::vector<std::string> cameraIds;
     std::vector<uint8_t> abilityVec = {};
     std::shared_ptr<CameraMetadata> ability = nullptr;
@@ -228,6 +230,17 @@ public:
 
         int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
         int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+        int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
+    };
+
+    class TestCameraHostCallbackV1_2 : public OHOS::HDI::Camera::V1_2::ICameraHostCallback {
+    public:
+        TestCameraHostCallbackV1_2() = default;
+        virtual ~TestCameraHostCallbackV1_2() = default;
+
+        int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
+        int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+        int32_t OnFlashlightStatusV1_2(FlashlightStatus status) override;
         int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
     };
 };
