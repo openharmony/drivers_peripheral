@@ -400,7 +400,8 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
-    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
+    OMXBufferAppPrivateData priv{};
+    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, &priv, buffer.allocLen);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return err;
@@ -416,6 +417,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
+    codecBuffer->SetBufferId(bufferId);
     {
         std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
