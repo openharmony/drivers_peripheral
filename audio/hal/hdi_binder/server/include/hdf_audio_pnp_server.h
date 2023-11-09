@@ -16,7 +16,7 @@
 #ifndef HDF_AUDIO_PNP_SERVER_H
 #define HDF_AUDIO_PNP_SERVER_H
 
-#include "v1_0/audio_types.h"
+#include "v1_1/audio_types.h"
 #include "hdf_types.h"
 #include "ffrt_inner.h"
 

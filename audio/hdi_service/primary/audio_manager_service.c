@@ -19,7 +19,7 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 
-#include "v1_0/iaudio_manager.h"
+#include "v1_1/iaudio_manager.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_SRV
 

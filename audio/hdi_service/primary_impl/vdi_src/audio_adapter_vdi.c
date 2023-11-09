@@ -23,7 +23,7 @@
 #include "audio_capture_vdi.h"
 #include "audio_common_vdi.h"
 #include "audio_render_vdi.h"
-#include "v1_0/iaudio_callback.h"
+#include "v1_1/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
