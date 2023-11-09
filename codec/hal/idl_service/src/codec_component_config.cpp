@@ -92,7 +92,6 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
     for (int index = 0; index < count; index++) {
         if (GetGroupCapabilities(codecGroupsNodeName[index]) != HDF_SUCCESS) {
-            continue;
         }
     }
     CODEC_LOGD("Init Run....capList_.size=%{public}zu", capList_.size());
