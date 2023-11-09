@@ -28,9 +28,11 @@
 #include <OMX_VideoExt.h>
 #include <securec.h>
 #include "codec_hdi_callback.h"
+#include "codec_omx_ext.h"
 #include "codec_utils.h"
 #include "command_parse.h"
 #include "hdf_log.h"
+#include "sys/mman.h"
 #include "v1_0/codec_types.h"
 #include "v1_0/icodec_callback.h"
 #include "v1_0/icodec_component.h"
@@ -99,6 +101,11 @@ private:
     int32_t UseBufferOnPort(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseBufferHandle(int bufferCount, int bufferSize);
     int32_t CheckAndUseBufferHandle();
+    int32_t CheckAndUseDMABuffer();
+    int32_t CreateBufferHandle();
+    int32_t UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize);
+    bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferIndo, bool &endFlag);
+    int32_t CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType);
     int GetYuvSize();
     int32_t ConfigPortDefine();
     bool FillAllTheBuffer();
@@ -122,6 +129,7 @@ private:
     OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponentManager> omxMgr_;
     uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is buferid
+    std::map<int, void *> addrs_;
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;
     std::mutex lockInputBuffers_;
@@ -130,6 +138,7 @@ private:
     bool exit_;
     codecMime codecMime_;
     bool useBufferHandle_;
+    bool useDMABuffer_;
     int count_;
     static CodecUtil *util_;
     static constexpr uint32_t alignment_ = 16;

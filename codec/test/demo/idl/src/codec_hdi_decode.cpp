@@ -37,6 +37,7 @@ constexpr int32_t FRAME = 30 << 16;
 constexpr int32_t DENOMINATOR = 2;
 constexpr int32_t NUMERATOR = 3;
 constexpr int32_t START_CODE_OFFSET_ONE = -1;
+constexpr int32_t INIT_BUFFER_CODE = -1;
 constexpr int32_t START_CODE_OFFSET_SEC = -2;
 constexpr int32_t START_CODE_OFFSET_THIRD = -3;
 constexpr int32_t START_CODE_SIZE_FRAME = 4;
@@ -55,6 +56,7 @@ CodecHdiDecode::CodecHdiDecode() : fpIn_(nullptr), fpOut_(nullptr)
     codecMime_ = codecMime::AVC;
     count_ = 0;
     useBufferHandle_ = false;
+    useDMABuffer_ = false;
     componentId_ = 0;
 }
 
@@ -129,17 +131,13 @@ bool CodecHdiDecode::Init(const CommandOpt &opt)
     this->height_ = opt.height;
     this->codecMime_ = opt.codec;
     this->stride_ = AlignUp(opt.width);
-    this->useBufferHandle_ = opt.useBuffer;
-    HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d],infile[%{public}s],outfile[%{public}s]", width_,
-             height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
-
-    // gralloc init
+    this->useBufferHandle_ = opt.useBufferHandle;
+    this->useDMABuffer_ = opt.useDMABuffer;
     gralloc_ = IDisplayBuffer::Get();
     fpIn_ = fopen(opt.fileInput.c_str(), "rb");
     fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
     if ((fpIn_ == nullptr) || (fpOut_ == nullptr)) {
-        HDF_LOGE("%{public}s failed to open file %{public}s or %{public}s", __func__, opt.fileInput.c_str(),
-                 opt.fileOutput.c_str());
+        HDF_LOGE("%{public}s failed to open file", __func__);
         return false;
     }
     omxMgr_ = ICodecComponentManager::Get(false);
@@ -174,7 +172,6 @@ bool CodecHdiDecode::Init(const CommandOpt &opt)
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
         return false;
     }
-
     return true;
 }
 
@@ -275,7 +272,46 @@ bool CodecHdiDecode::Configure()
         HDF_LOGE("%{public}s failed  with CheckAndUseBufferHandle", __func__);
         return false;
     }
+
+    err = CheckAndUseDMABuffer();
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed  with CheckAndUseDMABuffer", __func__);
+        return false;
+    }
     return true;
+}
+
+int32_t CodecHdiDecode::CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType)
+{
+    //get support buffer
+    SupportBufferType param;
+    std::vector<int8_t> inVec, outVec;
+    if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    param.portIndex = static_cast<uint32_t>(portIndex);
+
+    util_->ObjectToVector(param, inVec);
+    auto err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed get parameter with portIndex %{public}d and ret %{public}d ",
+                 __func__, portIndex, err);
+    }
+    util_->VectorToObject(outVec, param);
+    if (!(param.bufferTypes & codecBufferType)) {
+        HDF_LOGE("%{public}s unSupport bufferType %{public}d ,ret is  %{public}d",
+                 __func__, codecBufferType,  param.bufferTypes);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CodecHdiDecode::CheckAndUseDMABuffer()
+{
+    if (!useDMABuffer_) {
+        return HDF_SUCCESS;
+    }
+    return CheckSupportBufferType(PortIndex::PORT_INDEX_INPUT, CODEC_BUFFER_TYPE_DMA_MEM_FD);
 }
 
 int32_t CodecHdiDecode::CheckAndUseBufferHandle()
@@ -462,6 +498,8 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
              portIndex, bufferSize, bufferCount, portEnable, err);
     if (useBufferHandle_ && portIndex == PortIndex::PORT_INDEX_OUTPUT) {
         err = UseBufferHandle(bufferCount, bufferSize);
+    } else if (useDMABuffer_ && portIndex == PortIndex::PORT_INDEX_INPUT) {
+        err = UseDMABuffer(portIndex, bufferCount, bufferSize);
     } else {
         err = UseBufferOnPort(portIndex, bufferCount, bufferSize);
     }
@@ -476,6 +514,53 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s SendCommand OMX_CommandPortEnable::PortIndex::PORT_INDEX_INPUT error", __func__);
             return err;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CodecHdiDecode::UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize)
+{
+    if (bufferCount <= 0 || bufferSize <= 0) {
+        HDF_LOGE("UseDMABuffer bufferCount <= 0 or bufferSize <= 0");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    for (int i = 0; i < bufferCount; i++) {
+        std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+        omxBuffer->size = sizeof(OmxCodecBuffer);
+        omxBuffer->version.version.majorVersion = 1;
+        omxBuffer->bufferType = CODEC_BUFFER_TYPE_DMA_MEM_FD;
+        omxBuffer->fd = INIT_BUFFER_CODE;
+        omxBuffer->bufferhandle = nullptr;
+        omxBuffer->allocLen = bufferSize;
+        omxBuffer->fenceFd = INIT_BUFFER_CODE;
+        omxBuffer->pts = 0;
+        omxBuffer->flag = 0;
+        omxBuffer->type = READ_WRITE_TYPE;
+
+        OmxCodecBuffer outBuffer;
+        auto err = client_->AllocateBuffer(static_cast<uint32_t>(portIndex), *omxBuffer.get(), outBuffer);
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s failed to UseBuffer with  portIndex[%{public}d]", __func__, portIndex);
+            return err;
+        }
+        omxBuffer->bufferId = outBuffer.bufferId;
+        HDF_LOGI("UseBuffer returned bufferID [%{public}d]", omxBuffer->bufferId);
+
+        std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
+        bufferInfo->omxBuffer = omxBuffer;
+        bufferInfo->portIndex = portIndex;
+        bufferInfo->omxBuffer->fd = outBuffer.fd;
+        omxBuffers_.insert(std::make_pair(omxBuffer->bufferId, bufferInfo));
+        unUsedInBuffers_.push_back(omxBuffer->bufferId);
+
+        void *addr = mmap(nullptr, static_cast<size_t>(bufferInfo->omxBuffer->allocLen),
+                          PROT_READ | PROT_WRITE, MAP_SHARED, bufferInfo->omxBuffer->fd, 0);
+        if (addr == nullptr) {
+            HDF_LOGE("%{public}s mmap fail fd %{public}d", __func__, omxBuffer->fd);
+            return HDF_FAILURE;
+        } else {
+            addrs_[omxBuffer->bufferId] = addr;
         }
     }
     return HDF_SUCCESS;
@@ -659,9 +744,10 @@ void CodecHdiDecode::Run()
             continue;
         }
         auto bufferInfo = iter->second;
-        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
-        eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
-        bufferInfo->omxBuffer->offset = 0;
+        
+        if (!FillCodecBuffer(bufferInfo, eosFlag)) {
+            break;
+        }
         if (eosFlag) {
             bufferInfo->omxBuffer->flag = OMX_BUFFERFLAG_EOS;
         }
@@ -680,6 +766,22 @@ void CodecHdiDecode::Run()
     HDF_LOGI("cost %{public}f, count=%{public}d", diff.count(), count_);
     (void)client_->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, {});
     return;
+}
+
+bool CodecHdiDecode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &eosFlag)
+{
+    if (useDMABuffer_) {
+        auto ret = addrs_.find(bufferInfo->omxBuffer->bufferId);
+        if (ret != addrs_.end()) {
+            eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(ret->second), bufferInfo->omxBuffer->filledLen);
+            bufferInfo->omxBuffer->offset = 0;
+        }
+    } else {
+        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
+        eosFlag = this->ReadOnePacket(fpIn_, static_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
+        bufferInfo->omxBuffer->offset = 0;
+    }
+    return true;
 }
 
 int32_t CodecHdiDecode::OnEmptyBufferDone(const struct OmxCodecBuffer &buffer)

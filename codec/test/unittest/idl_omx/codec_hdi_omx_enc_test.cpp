@@ -291,6 +291,22 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
+//Test DMA Buffer
+#ifdef SUPPORT_DMA_BUFFER
+HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDMABufferTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    SupportBufferType bufferType;
+    func_->InitExtParam(bufferType);
+    bufferType.portIndex = inputIndex;
+    std::vector<int8_t> inParam, outParam;
+    func_->ObjectToVector(bufferType, inParam);
+    auto ret = g_component->GetParameter(OMX_IndexParamSupportBufferType, inParam, outParam);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(bufferType.bufferTypes & CODEC_BUFFER_TYPE_DMA_MEM_FD) ;
+}
+#endif
+
 // Test GetConfig
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiGetConfigTest_001, TestSize.Level1)
 {
