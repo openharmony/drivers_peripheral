@@ -391,3 +391,18 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_020, TestSize.Level1)
     cameraTest->Open();
     sleep(UT_SLEEP_TIME);
 }
+
+/**
+ * @tc.name: FormatCameraMetadataToString
+ * @tc.desc: Open the camera print metadata
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_021, TestSize.Level1)
+{
+    CAMERA_LOGI("HdiHostUtTest Camera_Host_Hdi_021 start ...");
+    cameraTest->Open();
+    common_metadata_header_t* data = cameraTest->ability->get();
+    std::string metaStr = FormatCameraMetadataToString(data);
+    CAMERA_LOGI("HdiHostUtTest matestr %{public}s\n", metaStr.c_str());
+}
