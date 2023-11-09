@@ -21,6 +21,12 @@
 #include "codec_function_utils.h"
 #include "v1_0/codec_callback_service.h"
 
+#define ERR_STATE_TYPE (100)
+#define ERR_COUNT (-1)
+#define ERR_COUNT_2 (10000)
+
+
+
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
@@ -107,7 +113,7 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t errStateType = 100;
+    int32_t errStateType = ERR_STATE_TYPE;
     int32_t errOMXIndexType = OMX_IndexMax;
     auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, errStateType, cmdData);
     ASSERT_TRUE(ret != HDF_SUCCESS);
@@ -156,10 +162,10 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
 HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiGetComponentCapabilityListTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    int32_t count = 10000;
+    int32_t count = ERR_COUNT_2;
     std::vector<CodecCompCapability> capList;
     auto err = g_manager->GetComponentCapabilityList(capList, count);
-    count = -1;
+    count = ERR_COUNT;
     err = g_manager->GetComponentCapabilityList(capList, count);
     ASSERT_TRUE(err != HDF_SUCCESS);
 }

@@ -20,9 +20,10 @@
 #include <securec.h>
 #include <servmgr_hdi.h>
 
-
 #define HDF_LOG_TAG codec_hdi_test
-#define ERR_PORT_INDEX -1
+#define ERR_PORT_INDEX (-1)
+#define ERR_BUFFER_ID (-1)
+#define ERR_PORT_INDEX_2 (1000)
 
 using namespace std;
 using namespace OHOS::HDI::Codec::V1_0;
@@ -288,13 +289,13 @@ bool FunctionUtil::FreeBufferOnPort(sptr<ICodecComponent> component, enum PortIn
     }
     for (auto [bufferId, bufferInfo] : buffer) {
         OmxCodecBuffer errBuffer = *bufferInfo->omxBuffer.get();
-        errBuffer.bufferId = -1;
+        errBuffer.bufferId = ERR_BUFFER_ID;
         ret = component->FreeBuffer(static_cast<uint32_t>(port), errBuffer);
         if (ret == HDF_SUCCESS) {
             return false;
         }
 
-        const uint32_t errPortIndex = 10000;
+        const uint32_t errPortIndex = ERR_PORT_INDEX_2;
         ret = component->FreeBuffer(errPortIndex, *bufferInfo->omxBuffer.get());
         if (ret == HDF_SUCCESS) {
             return false;
@@ -334,7 +335,7 @@ bool FunctionUtil::FillAndEmptyAllBuffer(sptr<ICodecComponent> component, CodecB
         component->FillThisBuffer(errBuffer0);
 
         OmxCodecBuffer errBuffer1 = *iter->second->omxBuffer.get();
-        errBuffer1.bufferId = -1;
+        errBuffer1.bufferId = ERR_BUFFER_ID;
         ret = component->FillThisBuffer(errBuffer1);
         if (ret == HDF_SUCCESS) {
             return false;
