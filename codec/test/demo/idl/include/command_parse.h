@@ -23,7 +23,8 @@ using CommandOpt = struct CommandOpt {
     std::string fileOutput = "";
     uint32_t width = 0;
     uint32_t height = 0;
-    bool useBuffer = false;
+    bool useBufferHandle = false;
+    bool useDMABuffer = false;
     codecMime codec = codecMime::AVC;
 };
 

@@ -29,8 +29,10 @@
 #include <securec.h>
 #include "codec_hdi_callback.h"
 #include "codec_utils.h"
+#include "codec_omx_ext.h"
 #include "command_parse.h"
 #include "hdf_log.h"
+#include "sys/mman.h"
 #include "v1_0/codec_types.h"
 #include "v1_0/icodec_callback.h"
 #include "v1_0/icodec_component.h"
@@ -93,6 +95,9 @@ private:
     int GetFreeBufferId();
     int32_t ConfigPortDefine();
     int32_t CheckAndUseBufferHandle();
+    int32_t CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType);
+    int32_t CheckAndUseDMABuffer();
+    int32_t UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseDynaBuffer(int bufferCount, int bufferSize);
     bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag);
     int32_t CreateBufferHandle();
@@ -113,6 +118,7 @@ private:
     OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponentManager> omxMgr_;
     uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is bufferID
+    std::map<int, const void *> addrs_;
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;
     std::mutex lockInputBuffers_;
@@ -122,6 +128,7 @@ private:
     std::map<int, BufferHandle *> bufferHandles_;
     std::list<int> freeBufferHandles_;
     bool useBufferHandle_;
+    bool useDMABuffer_;
     static CodecUtil *util_;
     static constexpr uint32_t alignment_ = 16;
     static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *gralloc_;
