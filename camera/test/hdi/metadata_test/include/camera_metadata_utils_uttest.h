@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_HDI_UTTEST_V1_2_H
-#define CAMERA_HDI_UTTEST_V1_2_H
+#ifndef CAMERA_METADATA_UTILS_UTTEST_H
+#define CAMERA_METADATA_UTILS_UTTEST_H
 
 #include <gtest/gtest.h>
-#include "camera_metadata_operator.h"
+#include "metadata_utils.h"
 
-class CameraMetadataOperatorTest : public testing::Test {
+class CameraMetadataUtilsTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
