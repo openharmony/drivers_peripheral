@@ -41,6 +41,7 @@
 
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_sta_feature.h"
+#include "wifi_hal_p2p_feature.h"
 
 #ifdef __cplusplus
 #if __cplusplus
