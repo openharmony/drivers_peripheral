@@ -61,7 +61,7 @@ public:
         int32_t errcount = -1;
         err = g_manager->GetComponentCapabilityList(capList, errcount);
         ASSERT_TRUE(err != HDF_SUCCESS);
-        int32_t errcount = static_cast<int32_t>(capList.size()) + 1;
+        errcount = static_cast<int32_t>(capList.size()) + 1;
         err = g_manager->GetComponentCapabilityList(capList, errcount);
         ASSERT_TRUE(err != HDF_SUCCESS);
     }
@@ -79,7 +79,7 @@ public:
         auto ret = g_manager->CreateComponent(g_component, componentId_, g_compName.data(), APP_DATA, g_callback);
         ASSERT_EQ(ret, HDF_SUCCESS);
         ret = g_manager->CreateComponent(g_component, componentId_, "", APP_DATA, g_callback);
-        ASSERT_TRUE(err != HDF_SUCCESS);
+        ASSERT_TRUE(ret != HDF_SUCCESS);
         struct CompVerInfo verInfo;
         ret = g_component->GetComponentVersion(verInfo);
         ASSERT_EQ(ret, HDF_SUCCESS);
