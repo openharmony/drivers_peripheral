@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "osal_mem.h"
-#include "v1_0/audio_types.h"
-#include "v1_0/iaudio_adapter.h"
-#include "v1_0/iaudio_manager.h"
+#include "v1_1/audio_types.h"
+#include "v1_1/iaudio_adapter.h"
+#include "v1_1/iaudio_manager.h"
 
 using namespace std;
 using namespace testing::ext;

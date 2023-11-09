@@ -17,7 +17,7 @@
 #define AUDIO_RENDER_VDI_H
 
 #include "iaudio_render_vdi.h"
-#include "v1_0/iaudio_render.h"
+#include "v1_1/iaudio_render.h"
 
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc);

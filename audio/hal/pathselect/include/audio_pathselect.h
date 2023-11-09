@@ -18,7 +18,7 @@
 
 #include "audio_internal.h"
 #ifdef IDL_MODE
-#include "v1_0/audio_types.h"
+#include "v1_1/audio_types.h"
 #else
 #include "audio_types.h"
 #endif
