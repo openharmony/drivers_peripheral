@@ -20,6 +20,12 @@ group("usbfn_cdcecm") {
 }
 
 ohos_shared_library("libusbfn_cdcecm") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
+
   include_dirs = [
     "./../../../interfaces/ddk/device",
     "./../../../interfaces/ddk/common",
