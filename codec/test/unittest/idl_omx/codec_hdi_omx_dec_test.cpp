@@ -25,8 +25,6 @@
 #define ERR_COUNT (-1)
 #define ERR_COUNT_2 (10000)
 
-
-
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
