@@ -240,3 +240,10 @@ void FileClose(FILE **file)
     return;
 }
 
+void PrintAudioInputTypeMenu(void)
+{
+    printf(" ================= Audio Input Type =============== \n");
+    printf("| 1. Voice Call Type                               |\n");
+    printf("| 2. Default                                       |\n");
+    printf(" ================================================== \n");
+}
