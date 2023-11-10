@@ -295,8 +295,7 @@ bool FunctionUtil::FreeBufferOnPort(sptr<ICodecComponent> component, enum PortIn
             return false;
         }
 
-        const uint32_t errPortIndex = ERR_PORT_INDEX_2;
-        ret = component->FreeBuffer(errPortIndex, *bufferInfo->omxBuffer.get());
+        ret = component->FreeBuffer(ERR_PORT_INDEX_2, *bufferInfo->omxBuffer.get());
         if (ret == HDF_SUCCESS) {
             return false;
         }
