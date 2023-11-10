@@ -59,7 +59,7 @@ if (defined(ohos_lite)) {
       } else {
         deps = [
           # acceptance unit test
-          "test/hdi/metadata_operator_test:camera_metadata_operator_ut",
+          "test/hdi/metadata_test:camera_metadata_operator_ut",
           "test/hdi/v1_0:camera_test_at",
           "test/hdi/v1_1:camera_test_hdi_V1_1",
           "test/hdi/v1_2:camera_test_hdi_V1_2",
