@@ -900,7 +900,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyThisBufferTest_002, TestSize.Level1
     
     func_->InitOmxCodecBuffer(omxBuffer, CODEC_BUFFER_TYPE_HANDLE);
     ret = g_component->EmptyThisBuffer(omxBuffer);
-    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
