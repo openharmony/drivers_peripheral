@@ -140,6 +140,7 @@ private:
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
     static constexpr int32_t TYPE_CONDITION = 11;
+    static constexpr int32_t MAX_EVENT_DIGITS = 3;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
 
