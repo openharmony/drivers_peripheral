@@ -201,9 +201,8 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     const float zoomRatio = 1.0;
     AddAbilityEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, 1);
 
-    int32_t activeArraySize[] = {
-        0, 0, static_cast<int32_t>(maxPreviewResolution_.width_), static_cast<int32_t>(maxPreviewResolution_.height_)
-    };
+    int32_t activeArraySize[] = {0, 0, static_cast<int32_t>(maxPreviewResolution_.width_),
+        static_cast<int32_t>(maxPreviewResolution_.height_)};
     AddAbilityEntry(OHOS_SENSOR_INFO_ACTIVE_ARRAY_SIZE, activeArraySize,
         (sizeof(activeArraySize) / sizeof(activeArraySize[0])));
 
