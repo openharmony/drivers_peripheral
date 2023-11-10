@@ -56,7 +56,7 @@ namespace OHOS {
             return false;
         }
 
-        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = 
+        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
         OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
         
         pkg.time = params.g_pkgTime;

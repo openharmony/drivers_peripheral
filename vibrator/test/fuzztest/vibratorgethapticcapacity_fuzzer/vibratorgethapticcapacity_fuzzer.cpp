@@ -44,7 +44,7 @@ namespace OHOS {
             return false;
         }
 
-        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = 
+        sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
         OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
         int32_t ret = !g_vibratorInterface->GetHapticCapacity(params.hapticCapacity);
         if (ret != HDF_SUCCESS) {
