@@ -20,6 +20,8 @@
 #include "codec_function_utils.h"
 #include "v1_0/codec_callback_service.h"
 
+#define ERR_COUNT (-1)
+
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
@@ -58,6 +60,12 @@ public:
                 break;
             }
         }
+        int32_t errcount = ERR_COUNT;
+        err = g_manager->GetComponentCapabilityList(capList, errcount);
+        ASSERT_TRUE(err != HDF_SUCCESS);
+        errcount = static_cast<int32_t>(capList.size()) + 1;
+        err = g_manager->GetComponentCapabilityList(capList, errcount);
+        ASSERT_TRUE(err != HDF_SUCCESS);
     }
 
     static void TearDownTestCase()
@@ -72,7 +80,8 @@ public:
         ASSERT_TRUE(g_callback != nullptr);
         auto ret = g_manager->CreateComponent(g_component, componentId_, g_compName.data(), APP_DATA, g_callback);
         ASSERT_EQ(ret, HDF_SUCCESS);
-
+        ret = g_manager->CreateComponent(g_component, componentId_, "", APP_DATA, g_callback);
+        ASSERT_TRUE(ret != HDF_SUCCESS);
         struct CompVerInfo verInfo;
         ret = g_component->GetComponentVersion(verInfo);
         ASSERT_EQ(ret, HDF_SUCCESS);
