@@ -194,6 +194,8 @@ int32_t PowerInterfaceImpl::ForceSuspend()
     DoSuspend();
     g_powerState = PowerHdfState::AWAKE;
     NotifyCallback(CMD_ON_WAKEUP);
+
+    StartSuspend();
     return HDF_SUCCESS;
 }
 
