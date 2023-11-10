@@ -844,22 +844,31 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    ss << VOLUME_CHANAGE << ";"
-        << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(event.content, AUDIO_STREAM_TYPE) << ";"
-        << VOLUME_LEVEL << "=" << ParseStringFromArgs(event.content, VOLUME_LEVEL.c_str()) << ";"
-        << IS_UPDATEUI << "=" << ParseStringFromArgs(event.content, IS_UPDATEUI) << ";"
-        << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(event.content, VOLUME_GROUP_ID.c_str()) << ";"
-        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-    DHLOGI("get ss : %s", ss.c_str());
+    std::string volumeChange = GetVolumeChangeString(event.content);
     int8_t reserved = 0;
     int8_t cookie = 0;
-    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, ss.str(), std::to_string(vol),
+    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, volumeChange, std::to_string(vol),
         reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify vol failed.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }
     return DH_SUCCESS;
+}
+
+std::string AudioAdapterInterfaceImpl::GetVolumeChangeString(const std::string &args)
+{
+    DHLOGI("Vol change (%s).", args.c_str());
+    std::stringstream ss;
+    ss << VOLUME_CHANAGE << ";"
+        << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(args, AUDIO_STREAM_TYPE) << ";"
+        << VOLUME_LEVEL << "=" << ParseStringFromArgs(args, VOLUME_LEVEL.c_str()) << ";"
+        << IS_UPDATEUI << "=" << ParseStringFromArgs(args, IS_UPDATEUI) << ";"
+        << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(args, VOLUME_GROUP_ID.c_str()) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(args, KEY_DH_ID) << ";";
+    std::string res = ss.str();
+    DHLOGI("get ss : %s", res.c_str());
+    return res;
 }
 
 int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, const std::string &key, int32_t &vol)
@@ -899,7 +908,7 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
         << FORCE_TYPE << "=" << ParseStringFromArgs(event.content, FORCE_TYPE) << ";"
         << HINT_TYPE << "=" << ParseStringFromArgs(event.content, HINT_TYPE) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-    DHLOGI("get ss : %s", ss.c_str());
+    DHLOGI("get ss : %s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_FOCUS, ss.str(), "", reserved, cookie);
@@ -921,7 +930,7 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
     ss << RENDER_STATE_CHANGE_EVENT << ";"
         << KEY_STATE << "=" << ParseStringFromArgs(event.content, KEY_STATE) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-    DHLOGI("get ss : %s", ss.c_str());
+    DHLOGI("get ss : %s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(), "", reserved, cookie);
@@ -1052,7 +1061,7 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
         ss << "ERR_EVENT;DEVICE_TYPE=" <<
             (event.type == HDF_AUDIO_EVENT_SPK_CLOSED ? AUDIO_DEVICE_TYPE_SPEAKER : AUDIO_DEVICE_TYPE_MIC) << ";"
             << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-        DHLOGI("get ss : %s", ss.c_str());
+        DHLOGI("get ss : %s", ss.str().c_str());
         int8_t reserved = 0;
         int8_t cookie = 0;
         int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(),

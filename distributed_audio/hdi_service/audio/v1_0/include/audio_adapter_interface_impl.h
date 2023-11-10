@@ -136,6 +136,7 @@ private:
         const AudioDeviceDescriptor &desc, int32_t &dhId);
     int32_t GetVolFromEvent(const std::string &content, const std::string &key, int32_t &vol);
     int32_t ConvertMsg2Code(const std::string &msg);
+    std::string GetVolumeChangeString(const std::string &args);
 
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
