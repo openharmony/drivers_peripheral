@@ -823,7 +823,7 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
         return ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    if (event.content.rfind("FIRST_VOLUME_CHANAGE", 0) == 0) {
+    if (event.content.rfind(FIRST_VOLUME_CHANAGE, 0) == 0) {
         int32_t maxVol = AUDIO_DEFAULT_MAX_VOLUME_LEVEL;
         ret = GetVolFromEvent(event.content, MAX_VOLUME_LEVEL, maxVol);
         if (ret != DH_SUCCESS) {
@@ -844,9 +844,16 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
+    ss << VOLUME_CHANAGE << ";"
+        << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(event.content, AUDIO_STREAM_TYPE) << ";"
+        << VOLUME_LEVEL << "=" << ParseStringFromArgs(event.content, VOLUME_LEVEL.c_str()) << ";"
+        << IS_UPDATEUI << "=" << ParseStringFromArgs(event.content, IS_UPDATEUI) << ";"
+        << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(event.content, VOLUME_GROUP_ID.c_str()) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+    DHLOGI("get ss : %s", ss.c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
-    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, event.content, std::to_string(vol),
+    ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, ss.str(), std::to_string(vol),
         reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify vol failed.");
@@ -886,9 +893,16 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
+    std::stringstream ss;
+    ss << INTERRUPT_EVENT << ";"
+        << VOLUME_EVENT_TYPE << "=" << ParseStringFromArgs(event.content, VOLUME_EVENT_TYPE.c_str()) << ";"
+        << FORCE_TYPE << "=" << ParseStringFromArgs(event.content, FORCE_TYPE) << ";"
+        << HINT_TYPE << "=" << ParseStringFromArgs(event.content, HINT_TYPE) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+    DHLOGI("get ss : %s", ss.c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
-    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_FOCUS, event.content, "", reserved, cookie);
+    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_FOCUS, ss.str(), "", reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify Focus failed.");
         return ERR_DH_AUDIO_HDF_FAIL;
@@ -903,9 +917,14 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
+    std::stringstream ss;
+    ss << RENDER_STATE_CHANGE_EVENT << ";"
+        << KEY_STATE << "=" << ParseStringFromArgs(event.content, KEY_STATE) << ";"
+        << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+    DHLOGI("get ss : %s", ss.c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
-    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, event.content, "", reserved, cookie);
+    int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(), "", reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify render state failed.");
         return ERR_DH_AUDIO_HDF_FAIL;
@@ -1031,7 +1050,9 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
     if (paramCallback_ != nullptr) {
         std::stringstream ss;
         ss << "ERR_EVENT;DEVICE_TYPE=" <<
-            (event.type == HDF_AUDIO_EVENT_SPK_CLOSED ? AUDIO_DEVICE_TYPE_SPEAKER : AUDIO_DEVICE_TYPE_MIC) << ";";
+            (event.type == HDF_AUDIO_EVENT_SPK_CLOSED ? AUDIO_DEVICE_TYPE_SPEAKER : AUDIO_DEVICE_TYPE_MIC) << ";"
+            << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
+        DHLOGI("get ss : %s", ss.c_str());
         int8_t reserved = 0;
         int8_t cookie = 0;
         int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(),
