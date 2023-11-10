@@ -62,6 +62,12 @@ int32_t CodecDMABuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BU
         return HDF_ERR_INVALID_PARAM;
     }
 
+    OMXBufferAppPrivateData *privateData = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
+    privateData->sizeOfParam = static_cast<uint32_t>(codecBuffer.alongParam.size());
+    if (privateData->sizeOfParam > 0) {
+        privateData->param = static_cast<void *>(&codecBuffer.alongParam[0]);
+    }
+
     return ICodecBuffer::FillOmxBuffer(codecBuffer, omxBuffer);
 }
 
@@ -72,6 +78,11 @@ int32_t CodecDMABuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_B
         return HDF_ERR_INVALID_PARAM;
     }
 
+    OMXBufferAppPrivateData *privateData = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
+    privateData->sizeOfParam = static_cast<uint32_t>(codecBuffer.alongParam.size());
+    if (privateData->sizeOfParam > 0) {
+        privateData->param = static_cast<void *>(&codecBuffer.alongParam[0]);
+    }
     return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
 }
 
