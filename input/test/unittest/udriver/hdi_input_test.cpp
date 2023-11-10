@@ -569,7 +569,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus003, TestSize.Level1)
 
 /**
   * @tc.name: GetDeviceType
-  * @tc.desc: get device type test 
+  * @tc.desc: get device type test
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
