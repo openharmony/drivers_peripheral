@@ -23,7 +23,7 @@
 #define HDF_LOG_TAG codec_hdi_test
 #define ERR_PORT_INDEX (-1)
 #define ERR_BUFFER_ID (-1)
-#define ERR_PORT_INDEX_2 (10000)
+#define ERR_PORT_INDEX_2 10000
 
 using namespace std;
 using namespace OHOS::HDI::Codec::V1_0;
