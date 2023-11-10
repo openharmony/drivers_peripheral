@@ -91,9 +91,7 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
                                                 NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS };
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
     for (int index = 0; index < count; index++) {
-        if (GetGroupCapabilities(codecGroupsNodeName[index]) != HDF_SUCCESS) {
-            continue;
-        }
+        GetGroupCapabilities(codecGroupsNodeName[index]);
     }
     CODEC_LOGD("Init Run....capList_.size=%{public}zu", capList_.size());
 }
