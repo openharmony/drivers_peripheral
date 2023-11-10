@@ -19,6 +19,8 @@
 #include "camera.h"
 #include "v1_0/icamera_host_callback.h"
 #include "v1_0/icamera_host_vdi_callback.h"
+#include "v1_0/icamera_host_vdi.h"
+#include "camera_host_service.h"
 
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;
@@ -27,7 +29,8 @@ using namespace OHOS::VDI::Camera::V1_0;
 class CameraHostServiceCallback : public ICameraHostVdiCallback {
 public:
 
-    explicit CameraHostServiceCallback(OHOS::sptr<ICameraHostCallback> cameraHostCallback);
+    CameraHostServiceCallback(OHOS::sptr<ICameraHostCallback> cameraHostCallback,
+        OHOS::sptr<ICameraHostVdi> cameraHostVdi, std::vector<CameraIdInfo> &cameraIdInfoList);
 
     CameraHostServiceCallback() = delete;
 
@@ -43,6 +46,8 @@ public:
 
 private:
     OHOS::sptr<ICameraHostCallback> cameraHostCallback_;
+    OHOS::sptr<ICameraHostVdi> cameraHostVdi_;
+    std::vector<CameraIdInfo> &cameraIdInfoList_;
 };
 
 } // end namespace OHOS::Camera
