@@ -147,33 +147,38 @@ CameraHostService::~CameraHostService()
 
 int32_t CameraHostService::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
 {
-    int32_t ret = OHOS::HDI::Camera::V1_0::NO_ERROR;
-    OHOS::sptr<ICameraHostVdiCallback> vdiCallbackObj = new CameraHostServiceCallback(callbackObj);
-    if (vdiCallbackObj == nullptr) {
-        CAMERA_LOGE("Camera host service set callback failed, vdiCallbackObj is nullptr");
-        return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
-    }
     for (auto cameraHostVdi : cameraHostVdiList_) {
         CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
-        ret = cameraHostVdi->SetCallback(vdiCallbackObj);
+        OHOS::sptr<ICameraHostVdiCallback> vdiCallbackObj = new CameraHostServiceCallback(callbackObj,
+            cameraHostVdi, cameraIdInfoList_);
+        if (vdiCallbackObj == nullptr) {
+            CAMERA_LOGE("Camera host service set callback failed, vdiCallbackObj is nullptr");
+            return OHOS::HDI::Camera::V1_0::INSUFFICIENT_RESOURCES;
+        }
+        int32_t ret = cameraHostVdi->SetCallback(vdiCallbackObj);
         if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("Camera host service set callback failed");
-            break;
+            return ret;
         }
     }
-    return ret;
+
+    return OHOS::HDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t CameraHostService::GetCameraIds(std::vector<std::string> &cameraIds)
 {
     std::vector<std::string>().swap(cameraIds);
-    int32_t ret = UpdateCameraIdMapList();
-    if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
-        CAMERA_LOGE("Camera get cameraIds failed");
-        return ret;
+    if (cameraIdInfoList_.size() == 0) {
+        int32_t ret = UpdateCameraIdMapList();
+        if (ret != OHOS::HDI::Camera::V1_0::NO_ERROR) {
+            CAMERA_LOGE("Camera get cameraIds failed");
+            return ret;
+        }
     }
     for (auto cameraIdInfo : cameraIdInfoList_) {
-        cameraIds.push_back(cameraIdInfo.totalCameraId);
+        if (cameraIdInfo.isDeleted == false) {
+            cameraIds.push_back(cameraIdInfo.currentCameraId);
+        }
     }
 
     return OHOS::HDI::Camera::V1_0::NO_ERROR;
@@ -247,7 +252,7 @@ int32_t CameraHostService::SetFlashlight(const std::string &cameraId, bool isEna
 int32_t CameraHostService::UpdateCameraIdMapList()
 {
     std::vector<CameraIdInfo>().swap(cameraIdInfoList_);
-    int32_t totalCameraIndex = 1;
+    int32_t currentCameraIndex = 1;
     for (auto cameraHostVdi : cameraHostVdiList_) {
         CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
 
@@ -259,42 +264,43 @@ int32_t CameraHostService::UpdateCameraIdMapList()
         }
         for (auto id : vdiCameraIds) {
             struct CameraIdInfo cameraIdInfo;
-            std::string totalCameraId = "lcam00" + std::to_string(totalCameraIndex);
-            cameraIdInfo.totalCameraId = totalCameraId;
+            std::string currentCameraId = "lcam00" + std::to_string(currentCameraIndex);
+            cameraIdInfo.currentCameraId = currentCameraId;
             cameraIdInfo.cameraHostVdi = cameraHostVdi;
             cameraIdInfo.vendorCameraId = id;
+            cameraIdInfo.isDeleted = false;
             cameraIdInfoList_.push_back(cameraIdInfo);
-            totalCameraIndex++;
+            currentCameraIndex++;
         }
     }
 
     return OHOS::HDI::Camera::V1_0::NO_ERROR;
 }
 
-OHOS::sptr<ICameraHostVdi> CameraHostService::GetCameraHostVdi(const std::string &totalCameraId)
+OHOS::sptr<ICameraHostVdi> CameraHostService::GetCameraHostVdi(const std::string &currentCameraId)
 {
-    UpdateCameraIdMapList();
     auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
-        [&totalCameraId](const struct CameraIdInfo &cameraIdInfo) {
-            return totalCameraId == cameraIdInfo.totalCameraId;
+        [&currentCameraId](const struct CameraIdInfo &cameraIdInfo) {
+            return currentCameraId == cameraIdInfo.currentCameraId;
         });
     if (itr == cameraIdInfoList_.end()) {
-        CAMERA_LOGE("Get camera host vdi failed, total camera id = %{public}s doesn't exist", totalCameraId.c_str());
+        CAMERA_LOGE("Get camera host vdi failed, current camera id = %{public}s doesn't exist",
+            currentCameraId.c_str());
         return nullptr;
     }
 
     return itr->cameraHostVdi;
 }
 
-const std::string CameraHostService::GetVendorCameraId(const std::string &totalCameraId)
+const std::string CameraHostService::GetVendorCameraId(const std::string &currentCameraId)
 {
-    UpdateCameraIdMapList();
     auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
-        [&totalCameraId](const struct CameraIdInfo &cameraIdInfo) {
-            return totalCameraId == cameraIdInfo.totalCameraId;
+        [&currentCameraId](const struct CameraIdInfo &cameraIdInfo) {
+            return currentCameraId == cameraIdInfo.currentCameraId;
         });
     if (itr == cameraIdInfoList_.end()) {
-        CAMERA_LOGE("Get vendor camera id failed, total camera id = %{public}s doesn't exist", totalCameraId.c_str());
+        CAMERA_LOGE("Get vendor camera id failed, current camera id = %{public}s doesn't exist",
+            currentCameraId.c_str());
         return std::string("");
     }
 
