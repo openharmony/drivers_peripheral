@@ -32,11 +32,15 @@ config("camhdi_at_test_config") {
 ohos_unittest("camera_metadata_operator_ut") {
   testonly = true
   module_out_path = module_output_path
-  sources = [ "$camera_test_path/metadata_operator_test/src/camera_metadata_operator_uttest.cpp" ]
+  sources = [
+    "$camera_test_path/metadata_test/src/camera_metadata_info_uttest.cpp",
+    "$camera_test_path/metadata_test/src/camera_metadata_operator_uttest.cpp",
+    "$camera_test_path/metadata_test/src/camera_metadata_utils_uttest.cpp",
+  ]
 
   include_dirs = [
     # common includes
-    "$camera_test_path/metadata_operator_test/include",
+    "$camera_test_path/metadata_test/include",
     "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
