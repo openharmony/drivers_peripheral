@@ -111,15 +111,13 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t errStateType = ERR_STATE_TYPE;
-    int32_t errOMXIndexType = OMX_IndexMax;
-    auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, errStateType, cmdData);
+    auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, ERR_STATE_TYPE, cmdData);
     ASSERT_TRUE(ret != HDF_SUCCESS);
     ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
     std::vector<int8_t> inParam, outParam;
-    ret = g_component->GetParameter(errOMXIndexType, inParam, outParam);
+    ret = g_component->GetParameter(OMX_IndexMax, inParam, outParam);
     ASSERT_TRUE(ret != HDF_SUCCESS);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
