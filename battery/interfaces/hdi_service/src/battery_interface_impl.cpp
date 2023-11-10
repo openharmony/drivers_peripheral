@@ -45,22 +45,17 @@ extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 
 int32_t BatteryInterfaceImpl::Init()
 {
-    provider_ = std::make_unique<OHOS::HDI::Battery::V1_2::PowerSupplyProvider>();
-    if (provider_ == nullptr) {
+    powerSupplyProvider_ = std::make_unique<OHOS::HDI::Battery::V1_2::PowerSupplyProvider>();
+    if (powerSupplyProvider_ == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "make_unique PowerSupplyProvider error");
         return HDF_ERR_MALLOC_FAIL;
     }
-    provider_->InitBatteryPath();
-    provider_->InitPowerSupplySysfs();
+    powerSupplyProvider_->InitBatteryPath();
+    powerSupplyProvider_->InitPowerSupplySysfs();
 
     auto& batteryConfig = BatteryConfig::GetInstance();
-    batteryConfig.ParseConfig();
-    currentPath_ = batteryConfig.GetString("charger.current_limit.path");
-    voltagePath_ = batteryConfig.GetString("charger.voltage_limit.path");
-    chargeTypePath_ = batteryConfig.GetString("charger.type.path");
 
-    // The configuration can be released when it is not needed
-    BatteryConfig::DestroyInstance();
+    batteryConfig.ParseConfig();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V1_2::BatteryThread>();
     if (loop_ == nullptr) {
@@ -109,30 +104,30 @@ int32_t BatteryInterfaceImpl::UnRegister()
 
 int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 {
-    provider_->SetSysFilePath(path);
-    provider_->InitPowerSupplySysfs();
+    powerSupplyProvider_->SetSysFilePath(path);
+    powerSupplyProvider_->InitPowerSupplySysfs();
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::GetCapacity(int32_t& capacity)
 {
-    return provider_->ParseCapacity(&capacity);
+    return powerSupplyProvider_->ParseCapacity(&capacity);
 }
 
 int32_t BatteryInterfaceImpl::GetVoltage(int32_t& voltage)
 {
-    return provider_->ParseVoltage(&voltage);
+    return powerSupplyProvider_->ParseVoltage(&voltage);
 }
 
 int32_t BatteryInterfaceImpl::GetTemperature(int32_t& temperature)
 {
-    return provider_->ParseTemperature(&temperature);
+    return powerSupplyProvider_->ParseTemperature(&temperature);
 }
 
 int32_t BatteryInterfaceImpl::GetHealthState(BatteryHealthState& healthState)
 {
     int32_t state = 0;
-    int32_t ret = provider_->ParseHealthState(&state);
+    int32_t ret = powerSupplyProvider_->ParseHealthState(&state);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -144,7 +139,7 @@ int32_t BatteryInterfaceImpl::GetHealthState(BatteryHealthState& healthState)
 int32_t BatteryInterfaceImpl::GetPluggedType(BatteryPluggedType& pluggedType)
 {
     int32_t type = 0;
-    int32_t ret = provider_->ParsePluggedType(&type);
+    int32_t ret = powerSupplyProvider_->ParsePluggedType(&type);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -156,7 +151,7 @@ int32_t BatteryInterfaceImpl::GetPluggedType(BatteryPluggedType& pluggedType)
 int32_t BatteryInterfaceImpl::GetChargeState(BatteryChargeState& chargeState)
 {
     int32_t state = 0;
-    int32_t ret = provider_->ParseChargeState(&state);
+    int32_t ret = powerSupplyProvider_->ParseChargeState(&state);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -168,7 +163,7 @@ int32_t BatteryInterfaceImpl::GetChargeState(BatteryChargeState& chargeState)
 int32_t BatteryInterfaceImpl::GetPresent(bool& present)
 {
     int8_t isPresent = 0;
-    int32_t ret = provider_->ParsePresent(&isPresent);
+    int32_t ret = powerSupplyProvider_->ParsePresent(&isPresent);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -179,36 +174,36 @@ int32_t BatteryInterfaceImpl::GetPresent(bool& present)
 
 int32_t BatteryInterfaceImpl::GetTechnology(std::string& technology)
 {
-    return provider_->ParseTechnology(technology);
+    return powerSupplyProvider_->ParseTechnology(technology);
 }
 
 int32_t BatteryInterfaceImpl::GetTotalEnergy(int32_t& totalEnergy)
 {
-    return provider_->ParseTotalEnergy(&totalEnergy);
+    return powerSupplyProvider_->ParseTotalEnergy(&totalEnergy);
 }
 
 int32_t BatteryInterfaceImpl::GetCurrentAverage(int32_t& curAverage)
 {
-    return provider_->ParseCurrentAverage(&curAverage);
+    return powerSupplyProvider_->ParseCurrentAverage(&curAverage);
 }
 
 int32_t BatteryInterfaceImpl::GetCurrentNow(int32_t& curNow)
 {
-    return provider_->ParseCurrentNow(&curNow);
+    return powerSupplyProvider_->ParseCurrentNow(&curNow);
 }
 
 int32_t BatteryInterfaceImpl::GetRemainEnergy(int32_t& remainEnergy)
 {
-    return provider_->ParseRemainEnergy(&remainEnergy);
+    return powerSupplyProvider_->ParseRemainEnergy(&remainEnergy);
 }
 
 int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 {
-    if (provider_ == nullptr) {
+    if (powerSupplyProvider_ == nullptr) {
         return HDF_FAILURE;
     }
 
-    BatterydInfo batteryInfo = provider_->GetBatteryInfo();
+    BatterydInfo batteryInfo = powerSupplyProvider_->GetBatteryInfo();
     info.capacity = batteryInfo.capacity_;
     info.voltage = batteryInfo.voltage_;
     info.temperature = batteryInfo.temperature_;
@@ -230,19 +225,104 @@ int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 
 int32_t BatteryInterfaceImpl::SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit)
 {
-    return provider_->SetChargingLimit(chargingLimit, currentPath_, voltagePath_);
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    BatteryConfig::ChargerConfig chargerConfig = batteryConfig.GetChargerConfig();
+
+    return powerSupplyProvider_->SetChargingLimit(chargingLimit, chargerConfig.currentPath, chargerConfig.voltagePath);
 }
 
 int32_t BatteryInterfaceImpl::GetChargeType(ChargeType& chargeType)
 {
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    BatteryConfig::ChargerConfig chargerConfig = batteryConfig.GetChargerConfig();
+
     int32_t type = static_cast<int32_t>(CHARGE_TYPE_NONE);
-    int32_t ret = provider_->ParseChargeType(&type, chargeTypePath_);
+    int32_t ret = powerSupplyProvider_->ParseChargeType(&type, chargerConfig.chargeTypePath);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
     chargeType = ChargeType(type);
     return HDF_SUCCESS;
+}
+
+int32_t BatteryInterfaceImpl::SetBatteryConfig(const std::string& sceneName, const std::string& value)
+{
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>
+        chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
+    if (chargeSceneConfigMap.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "chargeSceneConfigMap is empty");
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>::iterator it = chargeSceneConfigMap.find(sceneName);
+    if (it != chargeSceneConfigMap.end()) {
+        std::string setPath = (it -> second).setPath;
+        return powerSupplyProvider_->SetConfigByPath(setPath, value);
+    }
+
+    BATTERY_HILOGW(FEATURE_BATT_INFO, "key:%{public}s not found", sceneName.c_str());
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t BatteryInterfaceImpl::GetBatteryConfig(const std::string& sceneName, std::string& value)
+{
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>
+        chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
+    if (chargeSceneConfigMap.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "chargeSceneConfigMap is empty");
+        value = "";
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>::iterator it = chargeSceneConfigMap.find(sceneName);
+    if (it != chargeSceneConfigMap.end()) {
+        std::string getPath = (it -> second).getPath;
+        return powerSupplyProvider_->GetConfigByPath(getPath, value);
+    }
+
+    BATTERY_HILOGE(FEATURE_BATT_INFO, "key:%{public}s not found", sceneName.c_str());
+    value = "";
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t BatteryInterfaceImpl::IsBatteryConfigSupported(const std::string& sceneName, bool& value)
+{
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>
+        chargeSceneConfigMap = batteryConfig.GetChargeSceneConfigMap();
+    if (chargeSceneConfigMap.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "chargeSceneConfigMap is empty");
+        value = false;
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    
+    std::map<std::string, BatteryConfig::ChargeSceneConfig>::iterator it = chargeSceneConfigMap.find(sceneName);
+    if (it != chargeSceneConfigMap.end()) {
+        std::string supportPath = (it -> second).supportPath;
+        std::string type = (it -> second).type;
+        std::string expectValue = (it -> second).expectValue;
+        BATTERY_HILOGI(FEATURE_BATT_INFO,
+            "is support charge config, path:%{public}s, type:%{public}s, expect_value:%{public}s",
+            supportPath.c_str(), type.c_str(), expectValue.c_str());
+        
+        if (type == "dir") {
+            return powerSupplyProvider_->CheckPathExists(supportPath, value);
+        } else if (type == "file") {
+            std::string temp;
+            int ret = powerSupplyProvider_->GetConfigByPath(supportPath, temp);
+            value = ret == HDF_SUCCESS ? expectValue == temp : false;
+            return ret;
+        } else {
+            value = false;
+            return HDF_SUCCESS;
+        }
+    }
+    BATTERY_HILOGE(FEATURE_BATT_INFO, "key:%{public}s not found", sceneName.c_str());
+    value = false;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
