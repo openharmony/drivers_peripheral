@@ -49,7 +49,7 @@ protected:
     virtual void CycleMatters() {}
 private:
     int32_t OpenUeventSocket();
-    bool MatchPowerUevent(const char* msg, std::strin& powerU);
+    bool MatchPowerUevent(const char* msg, std::string& powerU);
     bool CheckPowerUevent(const char* msg);
     int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
