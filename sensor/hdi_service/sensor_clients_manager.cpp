@@ -156,7 +156,7 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
 
 bool SensorClientsManager::IsClientsEmpty(int groupId)
 {
-    if (clients_.find(groupId) == clients_.end()) {
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return true;
     }
     return false;
