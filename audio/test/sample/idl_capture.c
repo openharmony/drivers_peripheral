@@ -113,7 +113,7 @@ struct ProcessCaptureMenuSwitchList {
 
 static int32_t g_closeEnd = 0;
 bool g_isDirect = true;
-static bool g_voiceCallType = false;
+static int g_voiceCallType = 0;
 
 static int32_t CheckInputName(int type, void *val)
 {
@@ -182,10 +182,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
     captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
-    captureAttrs->sourceType = AUDIO_INPUT_SPEECH_WAKEUP_TYPE;
-    if (g_voiceCallType) {
-        captureAttrs->sourceType = AUDIO_INPUT_VOICE_CALL_TYPE;
-    }
+    captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
 
@@ -592,7 +589,7 @@ static int32_t SelectAudioInputType(void)
 {
     system("clear");
     int choice = 0;
-    g_voiceCallType = false;
+    g_voiceCallType = 0;
 
     PrintAudioInputTypeMenu();
     printf("Please enter your choice: ");
@@ -602,9 +599,10 @@ static int32_t SelectAudioInputType(void)
         return HDF_FAILURE;
     }
 
-    if (choice == 1) { // 1. Voice Call Type
-        g_voiceCallType = true;
+    if ((choice >= 0) || (choice <= 7)) { // 7. the max value of audio input type
+        g_voiceCallType = 1 << choice;
     }
+
     return HDF_SUCCESS;
 }
 
