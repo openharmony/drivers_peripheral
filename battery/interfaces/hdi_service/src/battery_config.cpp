@@ -99,7 +99,7 @@ const std::map<std::string, BatteryConfig::ChargeSceneConfig>& BatteryConfig::Ge
 
 const std::vector<std::string>& BatteryConfig::GetUeventList() const
 {
-    return ueventList_;
+    return ueventMap_;
 }
 
 void BatteryConfig::DestroyInstance()
@@ -265,12 +265,24 @@ void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
         BATTERY_HILOGW(COMP_HDI, "ueventConfig is invalid");
         return;
     }
-    ueventList_.clear();
+    ueventMap_.clear();
     Json::Value::Members members = ueventConfig.getMemberNames();
     for (auto iter = members.begin(); iter != members.end(); iter++) {
-        ueventList_.push_back(*iter);
+        std::string key = *iter;
+        Json::Value valueObj = ueventConfig[key];
+        if (valueObj.isNull() || !valueObj.isObject()) {
+            BATTERY_HILOGW(COMP_HDI, "The uevent conf is invalid, key=%{public}s", key.c_str());
+            continue;
+        }
+        std::vector<std::string> ueventList;
+        Json::Value::Members ObjMembers = valueObj.getMemberNames();
+        for (auto it = ObjMembers.begin(); it != ObjMembers.end(); it++) {
+            ueventList.push_back(*it);
+        }
+        ueventMap_.emplace(*iter, ueventList);
+        BATTERY_HILOGI(COMP_HDI, "%{public}s size: %{public}u", key.c_str(), ueventList.size());
     }
-    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}u", ueventList_.size());
+    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}u", ueventMap_.size());
 }
 
 bool BatteryConfig::SplitKey(const std::string& key, std::vector<std::string>& keys) const

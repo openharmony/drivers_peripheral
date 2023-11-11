@@ -57,7 +57,7 @@ public:
     const std::vector<LightConfig>& GetLightConfig() const;
     const BatteryConfig::ChargerConfig& GetChargerConfig() const;
     const std::map<std::string, BatteryConfig::ChargeSceneConfig>& GetChargeSceneConfigMap() const;
-    const std::vector<std::string>& GetUeventList() const;
+    const std::map<std::string, std::vector<std::string>>& GetUeventList() const;
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
@@ -74,7 +74,7 @@ private:
     std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<BatteryConfig> instance_;
-    std::vector<std::string> ueventList_;
+    std::map<std::string, std::vector<std::string>> ueventMap_;
 };
 }  // namespace V1_2
 }  // namespace Battery
