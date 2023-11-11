@@ -33,7 +33,7 @@ ohos_fuzztest("CodecHdiFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_codec:codec_idl_headers",
-    "drivers_interface_codec:libcodec_stub_1.0",
+    "drivers_interface_codec:libcodec_stub_2.0",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V1_0 {
+namespace V2_0 {
 sptr<CodecComponentManagerService> g_codecManagerService = nullptr;
 std::once_flag m_serviceFlag;
 using OHOS::Codec::Omx::ComponentNode;
@@ -126,7 +126,7 @@ void CodecComponentManagerService::GetManagerMap(std::map<uint32_t, sptr<ICodecC
 {
     dumpMap = componentMap_;
 }
-}  // namespace V1_0
+}  // namespace V2_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS
