@@ -18,6 +18,10 @@ import("//build/test.gni")
 group("hdf_vibrator_fuzztest") {
   testonly = true
   deps = [
+    "vibrator_fuzzer:fuzztest",
+    "vibratorgethapticcapacity_fuzzer:fuzztest",
+    "vibratorgethapticstartuptime_fuzzer:fuzztest",
+    "vibratorplayhapticpattern_fuzzer:fuzztest",
     "vibratorstart_fuzzer:fuzztest",
     "vibratorstartonce_fuzzer:fuzztest",
     "vibratorstop_fuzzer:fuzztest",
