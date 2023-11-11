@@ -46,6 +46,7 @@ public:
     static SensorClientsManager* GetInstance();
     std::mutex clientsMutex_;
     std::mutex sensorUsedMutex_;
+    std::mutex sensorConfigMutex_;
 private:
     SensorClientsManager();
     static SensorClientsManager *instance;
