@@ -270,7 +270,7 @@ void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
     for (auto iter = members.begin(); iter != members.end(); iter++) {
         ueventList_.push_back(*iter);
     }
-    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}lu", ueventList_.size());
+    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}u", ueventList_.size());
 }
 
 bool BatteryConfig::SplitKey(const std::string& key, std::vector<std::string>& keys) const

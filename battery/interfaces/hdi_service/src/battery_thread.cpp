@@ -171,7 +171,7 @@ void BatteryThread::UeventCallback(void* service)
     UpdateBatteryInfo(service, powerUevent);
 }
 
-void BatteryThread::UpdateBatteryInfo(void* service, const string& powerU)
+void BatteryThread::UpdateBatteryInfo(void* service, const std::string& powerU)
 {
     BatteryInfo event = {};
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
@@ -204,7 +204,7 @@ void BatteryThread::UpdateBatteryInfo(void* service, const string& powerU)
     }
 }
 
-bool BatteryThread::MatchPowerUevent(const char* msg, std::strin& powerU)
+bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerU)
 {
     while (*msg) {
         if (!strcmp(msg, POWER_SUPPLY.c_str())) {
