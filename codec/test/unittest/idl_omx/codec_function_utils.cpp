@@ -26,7 +26,7 @@
 #define ERR_PORT_INDEX_2 10000
 
 using namespace std;
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 IDisplayBuffer *FunctionUtil::buffer_ = nullptr;
