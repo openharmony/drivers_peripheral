@@ -113,6 +113,7 @@ struct ProcessCaptureMenuSwitchList {
 
 static int32_t g_closeEnd = 0;
 bool g_isDirect = true;
+static int g_voiceCallType = 0;
 
 static int32_t CheckInputName(int type, void *val)
 {
@@ -181,6 +182,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
     captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
+    captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
 
@@ -583,6 +585,27 @@ static int32_t SelectLoadingMode(void)
     return HDF_SUCCESS;
 }
 
+static int32_t SelectAudioInputType(void)
+{
+    system("clear");
+    int choice = 0;
+    g_voiceCallType = 0;
+
+    PrintAudioInputTypeMenu();
+    printf("Please enter your choice: ");
+
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+    if (ret < 0) {
+        return HDF_FAILURE;
+    }
+
+    if ((choice >= 0) && (choice <= 7)) { // 7. the max value of audio input type
+        g_voiceCallType = 1 << choice;
+    }
+
+    return HDF_SUCCESS;
+}
+
 void AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *captureDataBlock, bool freeSelf)
 {
     if (captureDataBlock == NULL) {
@@ -711,6 +734,11 @@ static int32_t InitParam(void)
 {
     if (SelectLoadingMode() < 0) {
         AUDIO_FUNC_LOGE("SelectLoadingMode failed!");
+        return HDF_FAILURE;
+    }
+
+    if (SelectAudioInputType() < 0) {
+        AUDIO_FUNC_LOGE("SelectAudioInputType failed!");
         return HDF_FAILURE;
     }
 

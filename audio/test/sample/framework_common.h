@@ -79,6 +79,7 @@ int32_t SelectAudioCard(struct AudioAdapterDescriptor *descs, int32_t size, int3
 int32_t SwitchAudioPort(
     struct AudioAdapterDescriptor *descs, enum AudioPortDirection portFlag, struct AudioPort *renderPort);
 void PrintLoadModeMenu(void);
+void PrintAudioInputTypeMenu(void);
 int32_t CheckWavFileHeader(FILE *file, struct AudioHeadInfo *wavHeadInfo, struct AudioSampleAttributes *attrs);
 int32_t AddWavFileHeader(FILE *file, const struct StrParaCapture *strParam);
 #endif
