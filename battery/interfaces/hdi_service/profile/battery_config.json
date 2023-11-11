@@ -51,5 +51,10 @@
                 "path": ""
             }
         }
+    },
+    "uevent": {
+        "BATTERY_UNDER_VOLTAGE=1": "shutdown",
+        "BATTERY_UNDER_VOLTAGE=2": "reboot",
+        "BATTERY_UNDER_VOLTAGE=3": "sendcommonevent"
     }
 }

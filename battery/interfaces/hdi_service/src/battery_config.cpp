@@ -97,6 +97,11 @@ const std::map<std::string, BatteryConfig::ChargeSceneConfig>& BatteryConfig::Ge
     return chargeSceneConfigMap_;
 }
 
+const std::vector<std::string>& BatteryConfig::GetUeventList() const
+{
+    return ueventList_;
+}
+
 void BatteryConfig::DestroyInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -135,6 +140,7 @@ void BatteryConfig::ParseConfInner(const Json::Value& config)
     ParseLightConfig(GetValue(config, "light"));
     ParseChargerConfig(GetValue(config, "charger"));
     ParseChargeSceneConfig(GetValue(config, "charge_scene"));
+    ParseUeventConfig(GetValue(config, "uevent"));
 }
 
 void BatteryConfig::ParseChargerConfig(const Json::Value& chargerConfig)
@@ -251,6 +257,20 @@ void BatteryConfig::ParseChargeSceneConfig(const Json::Value& chargeSceneConfig)
     }
     BATTERY_HILOGI(COMP_HDI, "The charge scene config size: %{public}d",
         static_cast<int32_t>(chargeSceneConfigMap_.size()));
+}
+
+void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
+{
+    if (ueventConfig.isNull() || !ueventConfig.isObject()) {
+        BATTERY_HILOGW(COMP_HDI, "ueventConfig is invalid");
+        return;
+    }
+    ueventList_.clear();
+    Json::Value::Members members = ueventConfig.getMemberNames();
+    for (auto iter = members.begin(); iter != members.end(); iter++) {
+        ueventList_.push_back(*iter);
+    }
+    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}lu", ueventList_.size());
 }
 
 bool BatteryConfig::SplitKey(const std::string& key, std::vector<std::string>& keys) const

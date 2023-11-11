@@ -57,6 +57,7 @@ public:
     const std::vector<LightConfig>& GetLightConfig() const;
     const BatteryConfig::ChargerConfig& GetChargerConfig() const;
     const std::map<std::string, BatteryConfig::ChargeSceneConfig>& GetChargeSceneConfigMap() const;
+    const std::vector<std::string>& GetUeventList() const;
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
@@ -64,6 +65,7 @@ private:
     void ParseLightConfig(const Json::Value& lightConfig);
     void ParseChargeSceneConfig(const Json::Value& chargeSceneConfig);
     void ParseChargerConfig(const Json::Value& chargerConfig);
+    void ParseUeventConfig(const Json::Value& ueventConfig);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
     Json::Value GetValue(const Json::Value& config, std::string key) const;
     bool isValidJsonString(const Json::Value& config) const;
@@ -72,6 +74,7 @@ private:
     std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<BatteryConfig> instance_;
+    std::vector<std::string> ueventList_;
 };
 }  // namespace V1_2
 }  // namespace Battery

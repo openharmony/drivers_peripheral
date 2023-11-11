@@ -117,6 +117,7 @@ private:
         std::string curAveragePath;
         std::string curNowPath;
         std::string remainEnergyPath;
+        std::string uevent;
     } batterySysfsInfo_;
 
     static inline int32_t ParseInt(const char* str);

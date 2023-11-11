@@ -42,14 +42,15 @@ public:
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
-    virtual void UpdateBatteryInfo(void* service);
+    virtual void UpdateBatteryInfo(void* service, const string& powerU);
     virtual void HandleStates() {}
     virtual int32_t UpdateWaitInterval();
     void UpdateEpollInterval(int32_t chargeState);
     virtual void CycleMatters() {}
 private:
     int32_t OpenUeventSocket();
-    bool IsPowerSupplyEvent(const char* msg);
+    bool MatchPowerUevent(const char* msg, std::strin& powerU);
+    bool CheckPowerUevent(const char* msg);
     int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
     void UeventCallback(void* service);
@@ -62,6 +63,7 @@ private:
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
+    std::vector<std::string> powerUeventList_;
 };
 }  // namespace V1_2
 }  // namespace Battery
