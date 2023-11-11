@@ -39,7 +39,7 @@ SensorClientsManager::~SensorClientsManager()
 void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    if (clients_.find[groupId] == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         if (callbackObj == nullptr) {
             HDF_LOGE("%{public}s: the callback of service %{public}d is null", __func__, serviceId);
             return;
@@ -58,11 +58,12 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, cons
 void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    if (clients_.find[groupId] == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
 
+    auto it = clients_[groupId].find(serviceId);
     clients_[groupId].erase(it);
     HDF_LOGI("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
     return;
@@ -152,7 +153,7 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
     return false;
 }
 
-bool SensorClientsManager::GetClients(int groupId, unordered_map<int32_t, SensorClientInfo> &client)
+bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
     if (clients_.find(groupId) == clients_.end()) {
         return false;
