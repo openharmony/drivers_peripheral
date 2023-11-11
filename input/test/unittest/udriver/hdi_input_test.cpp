@@ -412,7 +412,7 @@ HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level1)
     printf("%s: [Input] FindIndexFromFd001 enter\n", __func__);
     int32_t ret;
     InputDeviceManager InputDeviceManagerTest;
-    int32_t fd = FD_VALUE;
+    int32_t fd = VALUE_NULL;
     uint32_t index = VALUE_NULL;
     InputDeviceManagerTest.FindIndexFromFd(fd, &index);
     if (ret != INPUT_SUCCESS) {
