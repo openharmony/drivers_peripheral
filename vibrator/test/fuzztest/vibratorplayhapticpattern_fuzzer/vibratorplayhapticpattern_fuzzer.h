@@ -16,7 +16,6 @@
 #ifndef VIBRATORPLAYHAPTICPATTERN_FUZZER_H
 #define VIBRATORPLAYHAPTICPATTERN_FUZZER_H
 
-
 #define FUZZ_PROJECT_NAME "vibratorplayhapticpattern_fuzzer"
 
 #endif
