@@ -42,7 +42,7 @@ public:
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
-    virtual void UpdateBatteryInfo(void* service, const string& powerU);
+    virtual void UpdateBatteryInfo(void* service, const std::string& powerU);
     virtual void HandleStates() {}
     virtual int32_t UpdateWaitInterval();
     void UpdateEpollInterval(int32_t chargeState);
