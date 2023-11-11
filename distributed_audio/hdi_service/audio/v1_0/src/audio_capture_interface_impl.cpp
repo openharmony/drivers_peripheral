@@ -102,7 +102,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     DHLOGD("Capture audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-        DHLOGD("This time capture frame spend: %lld us, The interval of this capture frame time and the last time: %lld us",
+        DHLOGD("This time capture frame spend: %lld us, The interval of this time and the last time: %lld us",
             endTime - startTime, startTime - lastCaptureStartTime_);
     }
     lastCaptureStartTime_ = startTime;
