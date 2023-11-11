@@ -210,8 +210,7 @@ bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
             powerUevent = POWER_SUPPLY;
             return true;
         }
-        if (CheckPowerUevent(msg)) {
-            powerUevent = msg;
+        if (CheckPowerUevent(msg, powerUevent)) {
             return true;
         }
         while (*msg++) {} // move to next
@@ -220,17 +219,16 @@ bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
     return false;
 }
 
-bool BatteryThread::CheckPowerUevent(const char* msg)
+bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "ueventType:%{public}s msg:%{public}s", 
-        msg, ueventType.c_str());
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", msg);
     for (auto& ueventInfo : powerUeventMap_) {
-        if (!strcmp(msg, ueventInfo.first)) {
+        if (!strcmp(msg, ueventInfo.first.c_str())) {
             while (*msg++) {}
-            for (auto& uevent : ueventInfo.second()) {
+            for (auto& uevent : ueventInfo.second) {
                 std::regex r(uevent);
                 if (std::regex_match(msg, r)) {
-                    
+                    powerUevent = msg;
                     return true;
                 }
             }
