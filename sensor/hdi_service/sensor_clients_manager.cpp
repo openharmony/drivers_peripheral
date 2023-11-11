@@ -49,6 +49,7 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, cons
         return;
     }
 
+    auto it = clients_[groupId].find(serviceId);
     it -> second.SetReportDataCb(callbackObj);
     HDF_LOGI("%{public}s: service %{public}d update the callback", __func__, serviceId);
 
