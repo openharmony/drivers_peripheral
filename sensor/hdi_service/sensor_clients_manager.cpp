@@ -72,6 +72,7 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
 
 void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it != sensorConfig_.end()) {
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
@@ -145,6 +146,7 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
 
 bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, bool isOpen)
 {
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     if (isOpen && IsNeedOpenSensor(sensorId, serviceId)) {
         return true;
     }
