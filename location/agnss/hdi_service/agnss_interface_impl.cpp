@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 #include "idevmgr_hdi.h"
-
+#include "securec.h"
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 
@@ -39,6 +39,8 @@ constexpr const char* AGNSS_SERVICE_NAME = "agnss_interface_service";
 AgnssCallBackMap g_agnssCallBackMap;
 AgnssDeathRecipientMap g_agnssCallBackDeathRecipientMap;
 std::mutex g_mutex;
+uint32_t g_refInfoType; // reference loction info type
+const int MAC_LEN = 6;
 } // namespace
 
 extern "C" IAGnssInterface* AGnssInterfaceImplGetInstance(void)
@@ -75,9 +77,11 @@ static void GetSetidCb(uint16_t type)
         }
     }
 }
+
 static void GetRefLocationidCb(uint32_t type)
 {
-    HDF_LOGI("%{public}s.", __func__);
+    HDF_LOGI("%{public}s, type=%{public}d", __func__, type);
+    g_refInfoType = type;
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -99,6 +103,7 @@ static void GetAGnssCallbackMethods(AGnssCallbackIfaces* device)
 
 AGnssInterfaceImpl::AGnssInterfaceImpl()
 {
+    g_refInfoType = 0;
 }
 
 AGnssInterfaceImpl::~AGnssInterfaceImpl()
@@ -178,31 +183,39 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    HDF_LOGI("%{public}s, g_refInfoType=%{public}d", __func__, refInfo.type);
     AGnssRefLocInfo loc;
-    loc.type = refInfo.type;
-    switch (refInfo.cellId.type) {
-        case CELLID_TYPE_GSM:
-            loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::GSM_CELLID);
-            break;
-        case CELLID_TYPE_UMTS:
-            loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::UMTS_CELLID);
-            break;
-        case CELLID_TYPE_LTE:
-            loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::LTE_CELLID);
-            break;
-        case CELLID_TYPE_NR:
-            loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::NR_CELLID);
-            break;
-        default:
-            HDF_LOGE("%{public}s wrong cellType.", __func__);
-            return HDF_ERR_INVALID_PARAM;
+    loc.type = g_refInfoType;
+    if (loc.type == static_cast<uint32_t>(AgnssRefLocClass::AGNSS_REF_LOC_CLASS_MAC)) {
+        for (size_t i = 0; i < MAC_LEN; i++) {
+            loc.u.mac.mac[i] = refInfo.mac.mac[i];
+        }
+        loc.u.mac.size = MAC_LEN;
+    } else if (loc.type == static_cast<uint32_t>(AgnssRefLocClass::AGNSS_REF_LOC_CLASS_CELLID)) {
+        switch (refInfo.cellId.type) {
+            case CELLID_TYPE_GSM:
+                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::GSM_CELLID);
+                break;
+            case CELLID_TYPE_UMTS:
+                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::UMTS_CELLID);
+                break;
+            case CELLID_TYPE_LTE:
+                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::LTE_CELLID);
+                break;
+            case CELLID_TYPE_NR:
+                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::NR_CELLID);
+                break;
+            default:
+                HDF_LOGE("%{public}s wrong cellType.", __func__);
+                return HDF_ERR_INVALID_PARAM;
+        }
+        loc.u.cellId.mcc = refInfo.cellId.mcc;
+        loc.u.cellId.mnc = refInfo.cellId.mnc;
+        loc.u.cellId.lac = refInfo.cellId.lac;
+        loc.u.cellId.cid = refInfo.cellId.cid;
+        loc.u.cellId.tac = refInfo.cellId.tac;
+        loc.u.cellId.pcid = refInfo.cellId.pcid;
     }
-    loc.u.cellId.mcc = refInfo.cellId.mcc;
-    loc.u.cellId.mnc = refInfo.cellId.mnc;
-    loc.u.cellId.lac = refInfo.cellId.lac;
-    loc.u.cellId.cid = refInfo.cellId.cid;
-    loc.u.cellId.tac = refInfo.cellId.tac;
-    loc.u.cellId.pcid = refInfo.cellId.pcid;
     bool ret = agnssInterface->set_ref_location(&loc);
     if (!ret) {
         HDF_LOGE("set_ref_location failed.");
