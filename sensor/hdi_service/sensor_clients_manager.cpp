@@ -154,9 +154,17 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
     return false;
 }
 
-bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
+bool SensorClientsManager::IsClientsEmpty(int groupId)
 {
     if (clients_.find(groupId) == clients_.end()) {
+        return true;
+    }
+    return false;
+}
+
+bool SensorClientsManager::GetClients(int groupId, unordered_map<int32_t, SensorClientInfo> &client)
+{
+    if (IsClientsEmpty) {
         return false;
     }
     client = clients_[groupId];
