@@ -898,7 +898,7 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyThisBufferTest_002, TestSize.Level1
         omxBuffer.alongParam.push_back(*ptr + i);
     }
     
-    func_->InitOmxCodecBuffer(omxBuffer, CODEC_BUFFER_TYPE_HANDLE);
+    func_->InitOmxCodecBuffer(omxBuffer, CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
     ret = g_component->EmptyThisBuffer(omxBuffer);
     ASSERT_TRUE(ret == HDF_SUCCESS);
 }
