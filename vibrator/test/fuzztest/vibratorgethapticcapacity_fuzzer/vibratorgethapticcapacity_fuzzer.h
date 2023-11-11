@@ -16,7 +16,6 @@
 #ifndef VIBRATORGETHAPTICCAPACITY_FUZZER_H
 #define VIBRATORGETHAPTICCAPACITY_FUZZER_H
 
-
 #define FUZZ_PROJECT_NAME "vibratorgethapticcapacity_fuzzer"
 
 #endif

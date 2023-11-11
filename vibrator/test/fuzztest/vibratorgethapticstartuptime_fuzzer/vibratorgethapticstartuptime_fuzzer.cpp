@@ -29,7 +29,7 @@ namespace OHOS {
         }
 
         sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
-        OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
+            OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
         
         int startUpTime = 0;
         int32_t ret = !g_vibratorInterface->GetHapticStartUpTime(*(int32_t *)data, startUpTime);

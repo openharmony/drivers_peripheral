@@ -45,7 +45,7 @@ namespace OHOS {
         }
 
         sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface =
-        OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
+            OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
         int32_t ret = !g_vibratorInterface->GetHapticCapacity(params.hapticCapacity);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: GetConfig failed, ret is [%{public}x]\n", __func__, ret);

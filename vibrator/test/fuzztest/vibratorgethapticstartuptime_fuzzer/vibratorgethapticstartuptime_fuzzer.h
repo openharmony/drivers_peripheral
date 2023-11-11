@@ -16,7 +16,6 @@
 #ifndef VIBRATORGETHAPTICSTARTUPTIME_FUZZER
 #define VIBRATORGETHAPTICSTARTUPTIME_FUZZER
 
-
 #define FUZZ_PROJECT_NAME "vibratorgethapticstartuptime_fuzzer"
 
 #endif
