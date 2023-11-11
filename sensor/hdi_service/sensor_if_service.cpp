@@ -246,7 +246,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
              __func__, groupId, serviceId);
-    if (!SensorClientsManager::GetInstance()->GetClients(groupId).empty()) {
+    if (SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         if (sensorVdiImpl_ == nullptr) {
             HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
             return HDF_FAILURE;
@@ -270,7 +270,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     HDF_LOGI("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
              __func__, groupId, serviceId);
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
-    if (!SensorClientsManager::GetInstance()->GetClients(groupId).empty()) {
+    if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         HDF_LOGI("%{public}s: clients is not empty, do not unregister", __func__);
         return HDF_SUCCESS;
     }
