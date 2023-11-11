@@ -24,6 +24,8 @@ ohos_shared_library("libsensor_interface_service_1.1") {
 
   sources = [
     "sensor_callback_vdi.cpp",
+    "sensor_client_info.cpp",
+    "sensor_clients_manager.cpp",
     "sensor_if_service.cpp",
   ]
 
