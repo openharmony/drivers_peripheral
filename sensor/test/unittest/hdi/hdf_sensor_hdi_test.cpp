@@ -236,7 +236,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
   * @tc.name: EnableSensor0002
   * @tc.desc: Enables the sensor available in the sensor list based on the specified sensor ID.
   * @tc.type: FUNC
-  * @tc.require: #I4L3LF
+  * @tc.require: #I4L3LF #I8FJ2I
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
 {
