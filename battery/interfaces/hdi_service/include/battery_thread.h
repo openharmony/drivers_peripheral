@@ -50,7 +50,7 @@ protected:
 private:
     int32_t OpenUeventSocket();
     bool MatchPowerUevent(const char* msg, std::string& powerUevent);
-    bool CheckPowerUevent(const char* msg,);
+    bool CheckPowerUevent(const char* msg, std::string& powerUevent);
     int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
     void UeventCallback(void* service);

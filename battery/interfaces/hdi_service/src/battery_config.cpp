@@ -97,7 +97,7 @@ const std::map<std::string, BatteryConfig::ChargeSceneConfig>& BatteryConfig::Ge
     return chargeSceneConfigMap_;
 }
 
-const std::vector<std::string>& BatteryConfig::GetUeventList() const
+const std::map<std::string, std::vector<std::string>>& BatteryConfig::GetUeventList() const
 {
     return ueventMap_;
 }
@@ -280,9 +280,10 @@ void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
             ueventList.push_back(*it);
         }
         ueventMap_.emplace(*iter, ueventList);
-        BATTERY_HILOGI(COMP_HDI, "%{public}s size: %{public}u", key.c_str(), ueventList.size());
+        BATTERY_HILOGI(COMP_HDI, "%{public}s size: %{public}d", key.c_str(),
+            static_cast<int32_t>(ueventList.size()));
     }
-    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}u", ueventMap_.size());
+    BATTERY_HILOGI(COMP_HDI, "The uevent config size: %{public}d", static_cast<int32_t>(ueventMap_.size()));
 }
 
 bool BatteryConfig::SplitKey(const std::string& key, std::vector<std::string>& keys) const
