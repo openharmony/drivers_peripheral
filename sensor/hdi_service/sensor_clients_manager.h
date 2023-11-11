@@ -37,6 +37,7 @@ public:
     bool IsUpdateSensorBestConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
+    bool IsClientsEmpty(int groupId);
     std::unordered_map<int32_t, std::set<int32_t>> GetSensorUsed();
     bool IsNeedOpenSensor(int sensorId, int serviceId);
     bool IsNeedCloseSensor(int sensorId, int serviceId);
