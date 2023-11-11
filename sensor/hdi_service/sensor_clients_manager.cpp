@@ -162,9 +162,9 @@ bool SensorClientsManager::IsClientsEmpty(int groupId)
     return false;
 }
 
-bool SensorClientsManager::GetClients(int groupId, unordered_map<int32_t, SensorClientInfo> &client)
+bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
-    if (IsClientsEmpty) {
+    if (IsClientsEmpty(groupId)) {
         return false;
     }
     client = clients_[groupId];
