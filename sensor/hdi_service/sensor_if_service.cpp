@@ -149,7 +149,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
         SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
     }
     FinishTrace(HITRACE_TAG_HDF);
-    
+
     return ret;
 }
 
