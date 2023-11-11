@@ -38,30 +38,31 @@ SensorClientsManager::~SensorClientsManager()
 
 void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
-    auto it = clients_[groupId].find(serviceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    if (it != clients_[groupId].end()) {
-        it -> second.SetReportDataCb(callbackObj);
-        HDF_LOGI("%{public}s: service %{public}d update the callback", __func__, serviceId);
-    } else {
-        if (callbackObj != nullptr) {
-            clients_[groupId].emplace(serviceId, callbackObj);
-            HDF_LOGI("%{public}s: service %{public}d insert the callback", __func__, serviceId);
-        } else {
+    if (clients_.find[groupId] == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        if (callbackObj == nullptr) {
             HDF_LOGE("%{public}s: the callback of service %{public}d is null", __func__, serviceId);
+            return;
         }
+        clients_[groupId].emplace(serviceId, callbackObj);
+        HDF_LOGI("%{public}s: service %{public}d insert the callback", __func__, serviceId);
+        return;
     }
+
+    it -> second.SetReportDataCb(callbackObj);
+    HDF_LOGI("%{public}s: service %{public}d update the callback", __func__, serviceId);
+
     return;
 }
 
 void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
-    auto it = clients_[groupId].find(serviceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    if (it == clients_[groupId].end()) {
+    if (clients_.find[groupId] == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
+
     clients_[groupId].erase(it);
     HDF_LOGI("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
     return;
@@ -151,9 +152,13 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
     return false;
 }
 
-std::unordered_map<int32_t, SensorClientInfo> SensorClientsManager::GetClients(int groupId)
+bool SensorClientsManager::GetClients(int groupId, unordered_map<int32_t, SensorClientInfo> &client)
 {
-    return clients_[groupId];
+    if (clients_.find(groupId) == clients_.end()) {
+        return false;
+    }
+    client = clients_[groupId];
+    return true;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
