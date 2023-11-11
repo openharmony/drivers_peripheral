@@ -599,7 +599,7 @@ static int32_t SelectAudioInputType(void)
         return HDF_FAILURE;
     }
 
-    if ((choice >= 0) || (choice <= 7)) { // 7. the max value of audio input type
+    if ((choice >= 0) && (choice <= 7)) { // 7. the max value of audio input type
         g_voiceCallType = 1 << choice;
     }
 
