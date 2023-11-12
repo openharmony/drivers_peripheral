@@ -22,17 +22,17 @@
 #include <random>
 #include <vector>
 
-#include "v1_2/battery_interface_proxy.h"
-#include "v1_2/ibattery_callback.h"
-#include "v1_2/types.h"
+#include "v2_0/battery_interface_proxy.h"
+#include "v2_0/ibattery_callback.h"
+#include "v2_0/types.h"
 
-using namespace OHOS::HDI::Battery::V1_2;
+using namespace OHOS::HDI::Battery::V2_0;
 using namespace HDI::Battery;
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 class BatteryCallback : public IBatteryCallback {
 public:
@@ -193,7 +193,7 @@ void BatteryHdiFuzzTest(const uint8_t *data, size_t size)
     int32_t number = randomNum(engine);
     fuzzFunc[number](data, size);
 }
-} // namespace V1_2
+} // namespace V2_0
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
@@ -202,6 +202,6 @@ void BatteryHdiFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Battery::V1_2::BatteryHdiFuzzTest(data, size);
+    OHOS::HDI::Battery::V2_0::BatteryHdiFuzzTest(data, size);
     return 0;
 }

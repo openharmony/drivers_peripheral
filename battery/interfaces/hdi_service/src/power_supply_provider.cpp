@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 constexpr int32_t MAX_SYSFS_SIZE = 64;
 constexpr int32_t MAX_BUFF_SIZE = 128;
@@ -1036,7 +1036,7 @@ int32_t PowerSupplyProvider::CheckPathExists(const std::string& path, bool& resu
     BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists exit, value:%{public}d", result);
     return HDF_SUCCESS;
 }
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

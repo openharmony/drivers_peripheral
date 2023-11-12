@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 constexpr int32_t UEVENT_BUFF_SIZE = (64 * 1024);
 constexpr int32_t UEVENT_RESERVED_SIZE = 2;
@@ -222,15 +222,14 @@ bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
 bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
 {
     BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", msg);
-    for (auto& ueventInfo : powerUeventMap_) {
-        if (!strcmp(msg, ueventInfo.first.c_str())) {
-            while (*msg++) {}
-            for (auto& uevent : ueventInfo.second) {
-                std::regex r(uevent);
-                if (std::regex_match(msg, r)) {
-                    powerUevent = msg;
-                    return true;
-                }
+    auto iter = powerUeventMap_.find(msg);
+    if (iter != powerUeventMap_.end()) {
+        while (*msg++) {}
+        for (auto& uevent : iter->second) {
+            std::regex r(uevent);
+            if (std::regex_match(msg, r)) {
+                powerUevent = msg;
+                return true;
             }
         }
     }
@@ -282,7 +281,7 @@ void BatteryThread::Run(void* service)
     pthread_setname_np(batteryThread.native_handle(), "battery_thread");
     batteryThread.detach();
 }
-} // namespace V1_2
+} // namespace V2_0
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
