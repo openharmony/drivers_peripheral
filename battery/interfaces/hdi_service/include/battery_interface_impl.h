@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_BATTERY_V1_2_BATTERYINTERFACEIMPL_H
-#define OHOS_HDI_BATTERY_V1_2_BATTERYINTERFACEIMPL_H
+#ifndef OHOS_HDI_BATTERY_V2_0_BATTERYINTERFACEIMPL_H
+#define OHOS_HDI_BATTERY_V2_0_BATTERYINTERFACEIMPL_H
 
 #include <iremote_object.h>
 #include <iproxy_broker.h>
 #include "batteryd_api.h"
 #include "battery_thread.h"
 #include "power_supply_provider.h"
-#include "v1_2/ibattery_interface.h"
+#include "v2_0/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 class BatteryInterfaceImpl : public IBatteryInterface {
 public:
     BatteryInterfaceImpl() = default;
@@ -65,13 +65,13 @@ public:
         wptr<BatteryInterfaceImpl> interfaceImpl_;
     };
 private:
-    std::unique_ptr<OHOS::HDI::Battery::V1_2::PowerSupplyProvider> powerSupplyProvider_ = nullptr;
-    std::unique_ptr<OHOS::HDI::Battery::V1_2::BatteryThread> loop_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V2_0::PowerSupplyProvider> powerSupplyProvider_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V2_0::BatteryThread> loop_ = nullptr;
     sptr<IBatteryCallback> batteryCallback_ = nullptr;
     int32_t AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
     int32_t RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
 };
-} // V1_2
+} // V2_0
 } // Battery
 } // HDI
 } // OHOS

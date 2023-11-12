@@ -22,12 +22,12 @@
 #include <thread>
 #include <vector>
 #include "power_supply_provider.h"
-#include "v1_2/ibattery_callback.h"
+#include "v2_0/ibattery_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 enum EventType {
     EVENT_UEVENT_FD,
     EVENT_TIMER_FD,
@@ -38,7 +38,7 @@ public:
     virtual ~BatteryThread() = default;
 
     void StartThread(void* service);
-    void InitCallback(const sptr<OHOS::HDI::Battery::V1_2::IBatteryCallback>& callback);
+    void InitCallback(const sptr<OHOS::HDI::Battery::V2_0::IBatteryCallback>& callback);
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
@@ -65,7 +65,7 @@ private:
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
     std::map<std::string, std::vector<std::string>> powerUeventMap_;
 };
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

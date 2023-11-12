@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 constexpr const char* BATTERY_CONFIG_PATH = "etc/battery/battery_config.json";
 constexpr const char* SYSTEM_BATTERY_CONFIG_PATH = "/system/etc/battery/battery_config.json";
@@ -321,7 +321,7 @@ bool BatteryConfig::isValidJsonString(const Json::Value& config) const
 {
     return !config.isNull() && config.isString();
 }
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
