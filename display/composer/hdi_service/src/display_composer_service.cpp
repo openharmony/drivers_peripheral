@@ -94,7 +94,6 @@ int32_t DisplayComposerService::LoadVdi()
     }
 #endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
-    DISPLAY_LOGE("[YMZ]composer vdi.so success");
 
     createVdiFunc_ = reinterpret_cast<CreateComposerVdiFunc>(dlsym(libHandle_, "CreateComposerVdi"));
     if (createVdiFunc_ == nullptr) {
@@ -103,7 +102,6 @@ int32_t DisplayComposerService::LoadVdi()
             DISPLAY_LOGE("composer CreateComposerVdi dlsym error: %{public}s", errStr);
         }
         dlclose(libHandle_);
-        DISPLAY_LOGE("[YMZ]composer Load CreateComposerVdi failed");
         return HDF_FAILURE;
     }
 
@@ -114,10 +112,8 @@ int32_t DisplayComposerService::LoadVdi()
             DISPLAY_LOGE("composer DestroyComposerVdi dlsym error: %{public}s", errStr);
         }
         dlclose(libHandle_);
-        DISPLAY_LOGE("[YMZ]composer Load DestroyComposerVdi failed");
         return HDF_FAILURE;
     }
-    DISPLAY_LOGE("[YMZ]composer LoadVdi success");
     return HDF_SUCCESS;
 }
 
