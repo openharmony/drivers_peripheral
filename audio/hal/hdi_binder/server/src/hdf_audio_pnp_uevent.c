@@ -612,6 +612,7 @@ static int AudioPnpUeventOpen(int *fd)
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     const int32_t on = 1; // turn on passcred
     const int LOOP_NUM = 2;
+    const int MOVE_NUM = 16;
     struct sockaddr_nl addr;
 
     if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != EOK) {
@@ -648,7 +649,7 @@ static int AudioPnpUeventOpen(int *fd)
                 return HDF_FAILURE;
             }
             AUDIO_FUNC_LOGW("bind socket failed, %{public}d", errno);
-            addr.nl_pid = (addr.nl_pid << 16) + gettid();
+            addr.nl_pid = (addr.nl_pid << MOVE_NUM) + gettid();
         } else {
             break;
         }
