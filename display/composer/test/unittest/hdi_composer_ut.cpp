@@ -787,3 +787,68 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
+
+constexpr int32_t FD_INVALID = -1;
+constexpr int32_t FD_INVALID_2 = 1000;
+
+// test Init() with invalid fd
+HWTEST_F(DeviceTest, test_HdifdParcelable_Init_1, TestSize.Level1)
+{
+    bool ret;
+    HdifdParcelable hdifdParcelable(FD_INVALID);
+    ret = hdifdParcelable.Init(FD_INVALID);
+    EXPECT_EQ(false, ret);
+}
+
+// test Init() with invalid fd that is not -1
+HWTEST_F(DeviceTest, test_HdifdParcelable_Init_2, TestSize.Level1)
+{
+    bool ret;
+    HdifdParcelable hdifdParcelable(FD_INVALID);
+    ret = hdifdParcelable.Init(FD_INVALID_2);
+    EXPECT_EQ(false, ret);
+}
+
+// test Move() with invalid fd
+HWTEST_F(DeviceTest, test_Move, TestSize.Level1)
+{
+    int32_t hdiFd;
+    HdifdParcelable hdifdParcelable;
+    hdiFd = hdifdParcelable.Move();
+    EXPECT_EQ(FD_INVALID, hdiFd);
+}
+
+// test GetFd() with invalid fd
+HWTEST_F(DeviceTest, test_GetFd, TestSize.Level1)
+{
+    int32_t hdiFd;
+    HdifdParcelable hdifdParcelable;
+    hdiFd = hdifdParcelable.GetFd();
+    EXPECT_EQ(FD_INVALID, hdiFd);
+}
+
+// test Dump with invalid fd
+HWTEST_F(DeviceTest, test_Dump, TestSize.Level1)
+{
+    HdifdParcelable hdifdParcelable;
+    std::string  str = hdifdParcelable.Dump();
+    std::string dump("fd: {-1}\n");
+    ASSERT_TRUE(dump.compare(str) == 0) << "Dump Result" << str;
+}
+
+HWTEST_F(DeviceTest, test_AddDeathRecipient, TestSize.Level1)
+{
+    bool ret;
+    sptr<IRemoteObject::DeathRecipient> recipient;
+    ret = g_gralloc->AddDeathRecipient(recipient);
+    EXPECT_EQ(true, ret);
+}
+
+HWTEST_F(DeviceTest, test_IsSupportedAlloc, TestSize.Level1)
+{
+    int32_t ret;
+    const std::vector<VerifyAllocInfo> infos;
+    std::vector<bool> supporteds;
+    ret = g_gralloc->IsSupportedAlloc(infos, supporteds);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+}
