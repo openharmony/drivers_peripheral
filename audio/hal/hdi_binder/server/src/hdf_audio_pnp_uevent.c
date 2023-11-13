@@ -611,7 +611,7 @@ static int AudioPnpUeventOpen(int *fd)
     int socketFd = -1;
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     const int32_t on = 1; // turn on passcred
-    const int BIND_TIMES = 3; // try bind 3 times
+    const int LOOP_NUM = 2;
     struct sockaddr_nl addr;
 
     if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != EOK) {
@@ -640,21 +640,19 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     
-    int i = BIND_TIMES;
-    for(; i > 0; i--) {
+    for(int i = LOOP_NUM; i >= 0; i--) {
         if (bind(socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+            if(i == 0) {
+                AUDIO_FUNC_LOGE("bind socket failed 3 times");
+                close(socketFd);
+                return HDF_FAILURE;
+            }
             AUDIO_FUNC_LOGW("bind socket failed, %{public}d", errno);
             addr.nl_pid = (addr.nl_pid << 16) + gettid();
         } else {
             break;
         }
     }
-    if(i <= 0) {
-        AUDIO_FUNC_LOGE("bind socket failed 3 times");
-        close(socketFd);
-        return HDF_FAILURE;
-    }
-    
 
     *fd = socketFd;
 
