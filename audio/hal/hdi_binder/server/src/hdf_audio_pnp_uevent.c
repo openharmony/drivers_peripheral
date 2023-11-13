@@ -611,7 +611,6 @@ static int AudioPnpUeventOpen(int *fd)
     int socketFd = -1;
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     const int32_t on = 1; // turn on passcred
-    const int LOOP_NUM = 3;
     const int MOVE_NUM = 16;
     struct sockaddr_nl addr;
 
@@ -620,7 +619,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = (sa_family_t)getpid();
+    addr.nl_pid = (gettid() << MOVE_NUM) | getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
@@ -640,22 +639,13 @@ static int AudioPnpUeventOpen(int *fd)
         close(socketFd);
         return HDF_FAILURE;
     }
-    
-    int i = LOOP_NUM;
-    for(; i > 0; i--) {
-        if (bind(socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-            AUDIO_FUNC_LOGW("bind socket failed, %{public}d", errno);
-            addr.nl_pid = (addr.nl_pid << MOVE_NUM) + gettid();
-        } else {
-            break;
-        }
-    }
-    if(i <= 0) {
-        AUDIO_FUNC_LOGE("bind socket failed 3 times");
+
+    if (bind(socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        AUDIO_FUNC_LOGE("bind socket failed, %{public}d", errno);
         close(socketFd);
         return HDF_FAILURE;
     }
-
+    
     *fd = socketFd;
 
     return HDF_SUCCESS;
