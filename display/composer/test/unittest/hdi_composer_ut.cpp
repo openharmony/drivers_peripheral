@@ -27,6 +27,8 @@
 #include "hdi_test_device_common.h"
 #include "hdi_test_display.h"
 #include "hdi_test_render_utils.h"
+#include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
+#include "v1_0/display_command/display_cmd_requester.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;

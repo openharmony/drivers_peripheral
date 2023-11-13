@@ -19,13 +19,13 @@
 #include <vector>
 #include "hdi_session.h"
 #include "idisplay_composer_vdi.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_0/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
 using namespace OHOS::HDI::Display::Composer;
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 
 class DisplayComposerVdiImpl : public IDisplayComposerVdi {
 public:
