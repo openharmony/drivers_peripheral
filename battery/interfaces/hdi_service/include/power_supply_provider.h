@@ -22,12 +22,12 @@
 #include <map>
 #include <vector>
 #include "batteryd_api.h"
-#include "v1_2/ibattery_interface.h"
+#include "v2_0/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h
@@ -117,6 +117,7 @@ private:
         std::string curAveragePath;
         std::string curNowPath;
         std::string remainEnergyPath;
+        std::string uevent;
     } batterySysfsInfo_;
 
     static inline int32_t ParseInt(const char* str);
@@ -160,7 +161,7 @@ private:
     std::string path_;
     int32_t index_;
 };
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
