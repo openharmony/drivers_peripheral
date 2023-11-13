@@ -181,7 +181,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 {
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
-    if (samplingInterval <= 0 || reportInterval <= 0) {
+    if (samplingInterval < 0 || reportInterval < 0) {
         HDF_LOGI("%{public}s: the current sensor paramater is invalid", __func__);
         return SENSOR_INVALID_PARAM;
     }
