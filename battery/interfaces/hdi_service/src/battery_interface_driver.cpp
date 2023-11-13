@@ -17,9 +17,9 @@
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
 #include "battery_log.h"
-#include "v1_2/battery_interface_stub.h"
+#include "v2_0/battery_interface_stub.h"
 
-using namespace OHOS::HDI::Battery::V1_2;
+using namespace OHOS::HDI::Battery::V2_0;
 using namespace OHOS::HDI::Battery;
 
 namespace {

@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 sptr<BatteryInterfaceImpl::BatteryDeathRecipient> g_deathRecipient = nullptr;
 bool g_isHdiStart = false;
@@ -29,7 +29,7 @@ bool g_isHdiStart = false;
 
 extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Battery::V1_2::BatteryInterfaceImpl;
+    using OHOS::HDI::Battery::V2_0::BatteryInterfaceImpl;
     BatteryInterfaceImpl *service = new (std::nothrow) BatteryInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -45,7 +45,7 @@ extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 
 int32_t BatteryInterfaceImpl::Init()
 {
-    powerSupplyProvider_ = std::make_unique<OHOS::HDI::Battery::V1_2::PowerSupplyProvider>();
+    powerSupplyProvider_ = std::make_unique<OHOS::HDI::Battery::V2_0::PowerSupplyProvider>();
     if (powerSupplyProvider_ == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "make_unique PowerSupplyProvider error");
         return HDF_ERR_MALLOC_FAIL;
@@ -57,7 +57,7 @@ int32_t BatteryInterfaceImpl::Init()
 
     batteryConfig.ParseConfig();
 
-    loop_ = std::make_unique<OHOS::HDI::Battery::V1_2::BatteryThread>();
+    loop_ = std::make_unique<OHOS::HDI::Battery::V2_0::BatteryThread>();
     if (loop_ == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "make_unique BatteryThread error");
         return HDF_ERR_MALLOC_FAIL;
@@ -357,7 +357,7 @@ void BatteryInterfaceImpl::BatteryDeathRecipient::OnRemoteDied(const wptr<IRemot
 {
     interfaceImpl_->UnRegister();
 }
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace Hdi
 }  // namespace OHOS
