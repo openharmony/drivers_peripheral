@@ -1022,3 +1022,83 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_034
+ * @tc.desc:Whether macro ability support
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_034, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MACRO_SUPPORTED, &entry);
+    if (ret == 0) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        CAMERA_LOGI("OHOS_ABILITY_CAMERA_MACRO_SUPPORTED: %{public}d", entry.data.u8[0]);
+    } else {
+        CAMERA_LOGI("Macro not supported");
+    }
+}
+
+void CustomCallback(uint64_t timestamp, const std::shared_ptr<CameraMetadata> ability,
+    std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    time_t tt = static_cast<time_t>(timestamp);
+    CAMERA_LOGD("callback invoke time: %{public}s.", ctime(&tt));
+
+    common_metadata_header_t* data = ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CAMERA_MACRO_STATUS, &entry);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+        uint8_t value = entry.data.u8[0];
+        // 查询到状态， 检测状态到 微距模式可开启
+        if (OHOS_CAMERA_MACRO_ENABLE == value) {
+            // 下发设置 开启微距模式
+            std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+            uint8_t macroControl = OHOS_CAMERA_MACRO_ENABLE;
+            meta->addEntry(OHOS_CONTROL_CAMERA_MACRO, &macroControl, DATA_COUNT);
+            // ability meta data serialization for updating
+            std::vector<uint8_t> setting;
+            MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+            cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            CAMERA_LOGD("Macro mode is set enabled.");
+        }
+    }
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_035
+ * @tc.desc: Update macro ability setting and check the callback
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
+{
+    // Start OHOS_ABILITY_CAMERA_MACRO_SUPPORTED ability query
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MACRO_SUPPORTED, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+        uint8_t value = entry.data.u8[0];
+
+        EXPECT_TRUE(value == OHOS_CAMERA_MACRO_NOT_SUPPORTED || value == OHOS_CAMERA_MACRO_SUPPORTED);
+
+        // Macro ability is supported, then verify the callback
+        if (OHOS_CAMERA_MACRO_SUPPORTED == value) {
+            OHOS::Camera::Test::resultCallback_ = std::bind(CustomCallback, std::placeholders::_1,
+                                std::placeholders::_2, cameraTest);
+        }
+    }
+
+    std::this_thread::sleep_for (std::chrono::seconds(20));
+    // 清除测试回调函数
+    OHOS::Camera::Test::resultCallback_ = nullptr;
+}
