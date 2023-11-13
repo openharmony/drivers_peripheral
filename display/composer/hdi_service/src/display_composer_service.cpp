@@ -412,12 +412,7 @@ int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
 int32_t DisplayComposerService::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = HDF_FAILURE;
-    ret = vdiImpl_->GetDisplaySupportedModesExt(devId, modes);
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 void DisplayComposerService::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
@@ -438,23 +433,13 @@ void DisplayComposerService::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void
 int32_t DisplayComposerService::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = HDF_FAILURE;
-    ret = vdiImpl_->SetDisplayModeAsync(devId, modeId, OnMode, cb.GetRefPtr());
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerService::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = HDF_FAILURE;
-    ret = vdiImpl_->GetDisplayVBlankPeriod(devId, period);
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 void DisplayComposerService::OnSeamlessChange(uint32_t devId, void* data)
@@ -475,12 +460,7 @@ void DisplayComposerService::OnSeamlessChange(uint32_t devId, void* data)
 int32_t DisplayComposerService::RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = HDF_FAILURE;
-    ret = vdiImpl_->RegSeamlessChangeCallback(OnSeamlessChange, cb.GetRefPtr());
-    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>>& request)

@@ -326,30 +326,6 @@ int32_t DisplayComposerVdiImpl::SetLayerColor(uint32_t devId, uint32_t layerId, 
     DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
-/**/
-int32_t DisplayComposerVdiImpl::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
-{
-    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t DisplayComposerVdiImpl::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data)
-{
-    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t DisplayComposerVdiImpl::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
-{
-    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
-    return HDF_ERR_NOT_SUPPORT;
-}
-
-int32_t DisplayComposerVdiImpl::RegSeamlessChangeCallback(SeamlessChangeCallback cb, void* data)
-{
-    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
-    return HDF_ERR_NOT_SUPPORT;
-}
 
 extern "C" IDisplayComposerVdi *CreateComposerVdi()
 {
