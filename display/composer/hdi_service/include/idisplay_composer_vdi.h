@@ -78,11 +78,6 @@ public:
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) = 0;
     virtual int32_t SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo) = 0;
     virtual int32_t SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor) = 0;
-    /* LTPO func */
-    virtual int32_t GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes) = 0;
-    virtual int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data) = 0;
-    virtual int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period) = 0;
-    virtual int32_t RegSeamlessChangeCallback(SeamlessChangeCallback cb, void* data) = 0;
 };
 
 using CreateComposerVdiFunc = IDisplayComposerVdi* (*)();

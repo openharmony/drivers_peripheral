@@ -72,10 +72,6 @@ public:
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) override;
     virtual int32_t SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo) override;
     virtual int32_t SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor) override;
-    virtual int32_t GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes) override;
-    virtual int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data) override;
-    virtual int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period) override;
-    virtual int32_t RegSeamlessChangeCallback(SeamlessChangeCallback cb, void* data) override;
 };
 } // DISPLAY
 } // HDI
