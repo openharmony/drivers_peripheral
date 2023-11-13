@@ -19,13 +19,13 @@
 #include <vector>
 #include "hdi_session.h"
 #include "idisplay_composer_vdi.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
 using namespace OHOS::HDI::Display::Composer;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
 class DisplayComposerVdiImpl : public IDisplayComposerVdi {
 public:
@@ -72,6 +72,10 @@ public:
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) override;
     virtual int32_t SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo) override;
     virtual int32_t SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor) override;
+    virtual int32_t GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes) override;
+    virtual int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data) override;
+    virtual int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period) override;
+    virtual int32_t RegSeamlessChangeCallback(SeamlessChangeCallback cb, void* data) override;
 };
 } // DISPLAY
 } // HDI

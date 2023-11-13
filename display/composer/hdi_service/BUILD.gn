@@ -17,11 +17,11 @@ import("./../../display_config.gni")
 group("display_composer_hdi_service") {
   deps = [
     ":libdisplay_composer_driver_1.0",
-    ":libdisplay_composer_service_1.0",
+    ":libdisplay_composer_service_1.1",
   ]
 }
 
-ohos_shared_library("libdisplay_composer_service_1.0") {
+ohos_shared_library("libdisplay_composer_service_1.1") {
   defines = []
   defines += display_defines
   include_dirs = [
@@ -36,6 +36,7 @@ ohos_shared_library("libdisplay_composer_service_1.0") {
     "drivers_interface_display:libcomposer_buffer_cache",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "drivers_interface_display:libdisplay_composer_stub_1.1",
     "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -59,6 +60,7 @@ ohos_shared_library("libdisplay_composer_driver_1.0") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
+    "drivers_interface_display:libdisplay_composer_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
