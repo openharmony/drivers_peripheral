@@ -645,7 +645,7 @@ static int AudioPnpUeventOpen(int *fd)
         close(socketFd);
         return HDF_FAILURE;
     }
-    
+
     *fd = socketFd;
 
     return HDF_SUCCESS;
