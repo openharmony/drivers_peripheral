@@ -105,7 +105,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayBacklight(uint32_t devId, uint32_t lev
 
 int32_t DisplayComposerVdiImpl::GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
@@ -129,7 +129,7 @@ int32_t DisplayComposerVdiImpl::GetDisplayCompChange(uint32_t devId, std::vector
 
 int32_t DisplayComposerVdiImpl::SetDisplayClientCrop(uint32_t devId, const IRect& rect)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
@@ -143,7 +143,7 @@ int32_t DisplayComposerVdiImpl::SetDisplayClientBuffer(uint32_t devId, const Buf
 
 int32_t DisplayComposerVdiImpl::SetDisplayClientDamage(uint32_t devId, std::vector<IRect>& rects)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
@@ -181,25 +181,25 @@ int32_t DisplayComposerVdiImpl::GetDisplayReleaseFence(uint32_t devId, std::vect
 
 int32_t DisplayComposerVdiImpl::CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t& format, uint32_t& devId)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerVdiImpl::DestroyVirtualDisplay(uint32_t devId)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerVdiImpl::SetVirtualDisplayBuffer(uint32_t devId, const BufferHandle& buffer, const int32_t fence)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerVdiImpl::SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
@@ -286,7 +286,7 @@ int32_t DisplayComposerVdiImpl::SetLayerDirtyRegion(uint32_t devId, uint32_t lay
 
 int32_t DisplayComposerVdiImpl::SetLayerVisibleRegion(uint32_t devId, uint32_t layerId, std::vector<IRect>& rects)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
@@ -315,15 +315,39 @@ int32_t DisplayComposerVdiImpl::SetLayerBlendType(uint32_t devId, uint32_t layer
 
 int32_t DisplayComposerVdiImpl::SetLayerMaskInfo(uint32_t devId, uint32_t layerId, const MaskInfo maskInfo)
 {
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t DisplayComposerVdiImpl::SetLayerColor(uint32_t devId, uint32_t layerId, const LayerColor& layerColor)
 {
-    DISPLAY_LOGE("%s layerColor: r=%{public}d, g=%{public}d, b=%{public}d, a=%{public}d",
+    DISPLAY_LOGE("%{public}s layerColor: r=%{public}d, g=%{public}d, b=%{public}d, a=%{public}d",
         __func__, layerColor.r, layerColor.g, layerColor.b, layerColor.a);
-    DISPLAY_LOGE("%s is not supported", __func__);
+    DISPLAY_LOGE("%{public}s is not supported", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+/**/
+int32_t DisplayComposerVdiImpl::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
+{
+    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t DisplayComposerVdiImpl::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data)
+{
+    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t DisplayComposerVdiImpl::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
+{
+    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t DisplayComposerVdiImpl::RegSeamlessChangeCallback(SeamlessChangeCallback cb, void* data)
+{
+    DISPLAY_LOGE("%{public}s is not supported in vdi_base", __func__);
     return HDF_ERR_NOT_SUPPORT;
 }
 
