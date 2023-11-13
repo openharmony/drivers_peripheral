@@ -22,12 +22,12 @@
 #include <map>
 #include <vector>
 #include "batteryd_api.h"
-#include "v1_2/ibattery_interface.h"
+#include "v2_0/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h
@@ -97,6 +97,10 @@ public:
     void InitBatteryPath();
     int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit,
         std::string& currentPath, std::string& voltagePath);
+    
+    int32_t SetConfigByPath(const std::string& path, const std::string& value);
+    int32_t GetConfigByPath(const std::string& path, std::string& result);
+    int32_t CheckPathExists(const std::string& path, bool& result);
 
 private:
     struct BatterySysfsInfo {
@@ -113,6 +117,7 @@ private:
         std::string curAveragePath;
         std::string curNowPath;
         std::string remainEnergyPath;
+        std::string uevent;
     } batterySysfsInfo_;
 
     static inline int32_t ParseInt(const char* str);
@@ -150,13 +155,13 @@ private:
     void CreateMockBatteryPath(std::string& mockBatteryPath);
     void CreateMockChargeTypePath(std::string& mockChargeTypePath);
     int32_t ReadFileToMap(std::map<std::string, std::string>& chargingLimitMap, std::string chargingLimitPath);
-    int32_t WriteChargingLimit(std::string chargingLimitPath, std::string& configStr);
+    int32_t WriteConf(std::string path);
     std::vector<std::string> nodeNames_;
     std::map<std::string, std::string> nodeNamePathMap_;
     std::string path_;
     int32_t index_;
 };
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

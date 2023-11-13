@@ -2647,10 +2647,10 @@ static int32_t SignalInfoHandler(struct nl_msg *msg, void *arg)
         signalResult->currentTxBytes = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
     }
     if (stats[NL80211_STA_INFO_RX_BYTES] != NULL) {
-        signalResult->currentRxBytes = nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
+        signalResult->currentRxBytes = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
     }
     if (stats[NL80211_STA_INFO_TX_PACKETS] != NULL) {
-        signalResult->currentTxPackets = nla_get_u32(stats[NL80211_STA_INFO_TX_PACKETS]);
+        signalResult->currentTxPackets = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_TX_PACKETS]);
     }
     if (stats[NL80211_STA_INFO_RX_PACKETS] != NULL) {
         signalResult->currentRxPackets = (int32_t)nla_get_u32(stats[NL80211_STA_INFO_RX_PACKETS]);

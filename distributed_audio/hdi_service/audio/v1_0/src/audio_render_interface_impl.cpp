@@ -124,7 +124,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     DHLOGD("Render audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastRenderStartTime_)) {
-        DHLOGE("This time render frame spend: %lld us, The interval of render frame this time and the last time: %lld us",
+        DHLOGE("This time render frame spend: %lld us, The interval of this time and the last time: %lld us",
             endTime - startTime, startTime - lastRenderStartTime_);
     }
     lastRenderStartTime_ = startTime;

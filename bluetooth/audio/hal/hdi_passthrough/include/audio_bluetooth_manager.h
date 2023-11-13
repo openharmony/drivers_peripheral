@@ -29,6 +29,7 @@ typedef struct BtA2dpAudioCallback {
     void (*OnConnectionStateChanged)(const RawAddress &device, int state);
     void (*OnPlayingStatusChanged)(const RawAddress &device, int playingState, int error);
     void (*OnConfigurationChanged)(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error);
+    void (*OnMediaStackChanged)(const RawAddress &device, int action);
 }BtA2dpAudioCallback;
 
 int GetPlayingState();

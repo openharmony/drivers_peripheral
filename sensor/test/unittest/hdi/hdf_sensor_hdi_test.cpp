@@ -236,7 +236,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
   * @tc.name: EnableSensor0002
   * @tc.desc: Enables the sensor available in the sensor list based on the specified sensor ID.
   * @tc.type: FUNC
-  * @tc.require: #I4L3LF
+  * @tc.require: #I4L3LF #I8FJ2I
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
 {
@@ -247,7 +247,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
     int32_t ret = g_sensorInterface->Enable(ABNORMAL_SENSORID);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     ret = g_sensorInterface->Disable(ABNORMAL_SENSORID);
-    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
 /**

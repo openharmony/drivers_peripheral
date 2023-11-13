@@ -39,10 +39,14 @@ MetadataController::MetadataController() {}
 
 MetadataController::~MetadataController()
 {
-    if (isRunning_.load()) {
-        isRunning_.store(false);
+    {
+        std::unique_lock<std::mutex> lock(queueLock_);
+        if (isRunning_.load()) {
+            isRunning_.store(false);
+        }
+        cv_.notify_all();
     }
-    cv_.notify_all();
+
     StopThread();
 }
 
@@ -479,8 +483,11 @@ bool MetadataController::DealUpdateNewTagData(
 
 void MetadataController::DealMessage()
 {
-    while (isRunning_.load()) {
+    while (true) {
         std::unique_lock<std::mutex> lock(queueLock_);
+        if (!isRunning_.load()) {
+            break;
+        }
         if (queue_.empty()) {
             cv_.wait(lock, [this] {
                 return isRunning_.load() == false || !queue_.empty();
@@ -557,8 +564,13 @@ void MetadataController::Stop()
         return;
     }
     isInit_ = false;
-    isRunning_.store(false);
-    cv_.notify_all();
+
+    {
+        std::unique_lock<std::mutex> lock(queueLock_);
+        isRunning_.store(false);
+        cv_.notify_all();
+    }
+
     StopThread();
     ClearNodeCallback();
 }

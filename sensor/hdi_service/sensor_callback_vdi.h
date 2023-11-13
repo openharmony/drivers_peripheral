@@ -20,11 +20,15 @@
 #include "hdf_log.h"
 #include "isensor_callback_vdi.h"
 #include "v1_1/isensor_interface.h"
+#include "v1_1/sensor_types.h"
+#include "sensor_clients_manager.h"
+#include "sensor_client_info.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_1 {
+
 class SensorCallbackVdi : public ISensorCallbackVdi {
 public:
     SensorCallbackVdi() = default;
@@ -34,7 +38,9 @@ public:
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
     sptr<ISensorCallback> sensorCallback_;
+    SensorClientInfo sensorClientInfo_;
 };
+
 } // V1_1
 } // Sensor
 } // HDI
