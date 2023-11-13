@@ -26,7 +26,9 @@ config("camhdi_at_test_config") {
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
+    "--coverage",
   ]
+  ldflags = [ "--coverage" ]
 }
 
 ohos_unittest("camera_test_hdi_V1_1") {
