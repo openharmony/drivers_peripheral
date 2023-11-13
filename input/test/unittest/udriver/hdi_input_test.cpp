@@ -35,6 +35,14 @@ static const int32_t KEEP_ALIVE_TIME_MS = 3000;
 static const int32_t INVALID_INDEX = 15;
 static const int32_t INVALID_INDEX1 = -1;
 static const int32_t MAX_DEVICES = 32;
+static const int32_t TEST_RESULT_LEN = 32;
+static const int32_t TEST_TYPE = 2;
+static const int32_t TEST_LEN1 = 10;
+static const int32_t TEST_LEN2 = -1;
+static const int32_t VALUE_NULL = 0;
+static const int32_t VALUE_DEFAULT = 1;
+static const uint32_t INIT_DEFAULT_VALUE = 255;
+
 class HdiInputTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -391,4 +399,532 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
         printf("%s: close device %d failed, ret %d\n", __func__, g_touchIndex, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: FindIndexFromFd
+  * @tc.desc: find index from fd test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level1)
+{
+    printf("%s: [Input] FindIndexFromFd001 enter\n", __func__);
+    int32_t ret;
+    InputDeviceManager InputDeviceManagerTest;
+    int32_t fd = VALUE_NULL;
+    uint32_t index = VALUE_NULL;
+    InputDeviceManagerTest.FindIndexFromFd(fd, &index);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: find index from fd failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: FindIndexFromDevName
+  * @tc.desc: find index from device name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, FindIndexFromDevName001, TestSize.Level1)
+{
+    printf("%s: [Input] FindIndexFromDevName001 enter\n", __func__);
+    int32_t ret;
+    InputDeviceManager InputDeviceManagerTest;
+    string devName = "MOUSE1";
+    uint32_t index = VALUE_NULL;
+    InputDeviceManagerTest.FindIndexFromDevName(devName, &index);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: find index from device name failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SetPowerStatus
+  * @tc.desc: set power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
+{
+    printf("%s: [Input] SetPowerStatus001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->SetPowerStatus(g_touchIndex, status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: set power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SetPowerStatus
+  * @tc.desc: set power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
+{
+    printf("%s: [Input] SetPowerStatus002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->SetPowerStatus(INVALID_INDEX, status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: set power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SetPowerStatus
+  * @tc.desc: set power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SetPowerStatus003, TestSize.Level1)
+{
+    printf("%s: [Input] SetPowerStatus003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->SetPowerStatus(INVALID_INDEX1, status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: set power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetPowerStatus
+  * @tc.desc: get power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
+{
+    printf("%s: [Input] GetPowerStatus001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->GetPowerStatus(g_touchIndex, &status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetPowerStatus
+  * @tc.desc: get power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
+{
+    printf("%s: [Input] GetPowerStatus002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->GetPowerStatus(INVALID_INDEX, &status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetPowerStatus
+  * @tc.desc: get power status test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetPowerStatus003, TestSize.Level1)
+{
+    printf("%s: [Input] GetPowerStatus003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t status = VALUE_NULL;
+    ret = g_inputInterface->iInputController->GetPowerStatus(INVALID_INDEX1, &status);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get power status failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetDeviceType
+  * @tc.desc: get device type test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
+{
+    printf("%s: [Input] GetDeviceType001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t deviceType = INIT_DEFAULT_VALUE;
+    ret = g_inputInterface->iInputController->GetDeviceType(g_touchIndex, &deviceType);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get device type failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetDeviceType
+  * @tc.desc: get device type test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetDeviceType002, TestSize.Level1)
+{
+    printf("%s: [Input] GetDeviceType002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t deviceType = INIT_DEFAULT_VALUE;
+    ret = g_inputInterface->iInputController->GetDeviceType(INVALID_INDEX, &deviceType);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get device type failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetDeviceType
+  * @tc.desc: get device type test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetDeviceType003, TestSize.Level1)
+{
+    printf("%s: [Input] GetDeviceType003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t deviceType = INIT_DEFAULT_VALUE;
+    ret = g_inputInterface->iInputController->GetDeviceType(INVALID_INDEX1, &deviceType);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get device type failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipInfo
+  * @tc.desc: get input device chip info test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipInfo001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipInfo[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipInfo(g_touchIndex, chipInfo, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get chip info failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipInfo
+  * @tc.desc: get input device chip info test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipInfo002, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipInfo002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipInfo[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipInfo(INVALID_INDEX, chipInfo, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get chip info failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipInfo
+  * @tc.desc: get input device chip info test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipInfo003, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipInfo003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipInfo[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipInfo(g_touchIndex, chipInfo, TEST_LEN2);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: get device chip info failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetVendorName
+  * @tc.desc: get device vendor name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
+{
+    printf("%s: [Input] GetVendorName001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char vendorName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetVendorName(g_touchIndex, vendorName, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device vendor name failed, ret %d", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetVendorName
+  * @tc.desc: get device vendor name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
+{
+    printf("%s: [Input] GetVendorName002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char vendorName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetVendorName(INVALID_INDEX, vendorName, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device vendor name failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetVendorName
+  * @tc.desc: get device vendor name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetVendorName003, TestSize.Level1)
+{
+    printf("%s: [Input] GetVendorName003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char vendorName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetVendorName(g_touchIndex, vendorName, TEST_LEN2);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device vendor name failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipName
+  * @tc.desc: get device chip name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipName001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipName(g_touchIndex, chipName, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device chip name failed, ret %d", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipName
+  * @tc.desc: get device chip name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipName002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipName(INVALID_INDEX, chipName, TEST_LEN1);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device chip name failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: GetChipName
+  * @tc.desc: get device chip name test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, GetChipName003, TestSize.Level1)
+{
+    printf("%s: [Input] GetChipName003 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char chipName[TEST_LEN1] = {0};
+    ret = g_inputInterface->iInputController->GetChipName(g_touchIndex, chipName, TEST_LEN2);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: get device chip name failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SetGestureMode
+  * @tc.desc: set device gestureMode test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
+{
+    printf("%s: [Input] SetGestureMode001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t gestureMode = VALUE_DEFAULT;
+    ret = g_inputInterface->iInputController->SetGestureMode(g_touchIndex, gestureMode);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: set device gestureMode failed, ret %d", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SetGestureMode
+  * @tc.desc: set device gestureMode test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
+{
+    printf("%s: [Input] SetGestureMode002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    uint32_t gestureMode = VALUE_DEFAULT;
+    ret = g_inputInterface->iInputController->SetGestureMode(INVALID_INDEX, gestureMode);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: set device gestureMode failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: RunCapacitanceTest
+  * @tc.desc: run capacitance test test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
+{
+    printf("%s: [Input] RunCapacitanceTest001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    char result[TEST_RESULT_LEN] = {0};
+    uint32_t testType = TEST_TYPE;
+    ret = g_inputInterface->iInputController->RunCapacitanceTest(g_touchIndex, testType, result, TEST_RESULT_LEN);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: run capacitance test failed, ret %d", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: RunExtraCommand
+  * @tc.desc: run extra command test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
+{
+    printf("%s: [Input] RunExtraCommand001 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    InputExtraCmd extraCmd = {0};
+    extraCmd.cmdCode = "WakeUpMode";
+    extraCmd.cmdValue = "Enable";
+    ret = g_inputInterface->iInputController->RunExtraCommand(g_touchIndex, &extraCmd);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: run extra command failed, ret %d", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: RunExtraCommand
+  * @tc.desc: run extra command test
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, RunExtraCommand002, TestSize.Level1)
+{
+    printf("%s: [Input] RunExtraCommand002 enter\n", __func__);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
+
+    int32_t ret;
+    InputExtraCmd extraCmd = {0};
+    extraCmd.cmdCode = "WakeUpMode";
+    extraCmd.cmdValue = "Enable";
+    ret = g_inputInterface->iInputController->RunExtraCommand(INVALID_INDEX, &extraCmd);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: run extra command failed, ret %d", __func__, ret);
+    }
+    EXPECT_NE(ret, INPUT_SUCCESS);
 }

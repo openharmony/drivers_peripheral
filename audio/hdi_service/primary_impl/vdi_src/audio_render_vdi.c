@@ -667,7 +667,6 @@ int32_t AudioRenderAddAudioEffectVdi(struct IAudioRender *render, uint64_t effec
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->AddAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -680,7 +679,6 @@ int32_t AudioRenderRemoveAudioEffectVdi(struct IAudioRender *render, uint64_t ef
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->RemoveAudioEffect = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -694,7 +692,6 @@ int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->GetFrameBufferSize = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -835,7 +832,6 @@ int32_t AudioRenderIsSupportsPauseAndResumeVdi(struct IAudioRender *render, bool
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
-    vdiRender->IsSupportsPauseAndResume = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 

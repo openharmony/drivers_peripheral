@@ -41,7 +41,7 @@ ohos_fuzztest("VibratorFuzzTest") {
   ]
 }
 
-group("hdf_fuzztest_vibrator") {
+group("fuzztest") {
   testonly = true
   deps = []
   deps += [

@@ -123,7 +123,10 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
-
+    vdiRender->AddAudioEffect = NULL;
+    vdiRender->RemoveAudioEffect = NULL;
+    vdiRender->GetFrameBufferSize = NULL;
+    vdiRender->IsSupportsPauseAndResume = NULL;
     *render = AudioCreateRenderByIdVdi(attrs, renderId, vdiRender, desc);
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
@@ -191,7 +194,10 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
-
+    vdiCapture->AddAudioEffect = NULL;
+    vdiCapture->RemoveAudioEffect = NULL;
+    vdiCapture->GetFrameBufferSize = NULL;
+    vdiCapture->IsSupportsPauseAndResume = NULL;
     *capture = AudioCreateCaptureByIdVdi(attrs, captureId, vdiCapture, desc);
     if (*capture == NULL) {
         (void)vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);

@@ -30,9 +30,10 @@ using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::VDI::Camera::V1_0;
 
 struct CameraIdInfo {
-    std::string totalCameraId;
+    std::string currentCameraId;
     OHOS::sptr<ICameraHostVdi> cameraHostVdi;
     std::string vendorCameraId;
+    bool isDeleted;
 };
 
 class CameraHostService : public ICameraHost {
@@ -57,8 +58,8 @@ private:
 
     static int32_t GetVdiLibList(std::vector<std::string> &vdiLibList);
     static void HdfCloseVdiLoaderList(std::vector<struct HdfVdiObject *> &cameraHostVdiLoaderList);
-    OHOS::sptr<ICameraHostVdi> GetCameraHostVdi(const std::string &totalCameraId);
-    const std::string GetVendorCameraId(const std::string &totalCameraId);
+    OHOS::sptr<ICameraHostVdi> GetCameraHostVdi(const std::string &currentCameraId);
+    const std::string GetVendorCameraId(const std::string &currentCameraId);
     int32_t UpdateCameraIdMapList();
 
     std::vector<OHOS::sptr<ICameraHostVdi>> cameraHostVdiList_;

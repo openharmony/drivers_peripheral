@@ -28,6 +28,8 @@ BluetoothA2dpAudioSrcObserverStub::BluetoothA2dpAudioSrcObserverStub()
         &BluetoothA2dpAudioSrcObserverStub::OnPlayingStatusChangedInner;
     funcMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_CONFIGURATION_CHANGED)] =
         &BluetoothA2dpAudioSrcObserverStub::OnConfigurationChangedInner;
+    funcMap_[static_cast<uint32_t>(IBluetoothA2dpSourceObserver::Code::BT_A2DP_SRC_OBSERVER_MEDIASTACK_CHANGED)] =
+        &BluetoothA2dpAudioSrcObserverStub::OnMediaStackChangedInner;
 }
 
 BluetoothA2dpAudioSrcObserverStub::~BluetoothA2dpAudioSrcObserverStub()
@@ -85,6 +87,16 @@ ErrCode BluetoothA2dpAudioSrcObserverStub::OnConfigurationChangedInner(MessagePa
     int error = data.ReadInt32();
     HDF_LOGI("BluetoothA2dpAudioSrcObserverStub::OnConfigurationChangedInner");
     OnConfigurationChanged(RawAddress(addr), info, error);
+
+    return NO_ERROR;
+}
+
+int32_t BluetoothA2dpAudioSrcObserverStub::OnMediaStackChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::string addr = data.ReadString();
+    int action = data.ReadInt32();
+    HDF_LOGI("BluetoothA2dpAudioSrcObserverStub::OnMediaStackChangedInner");
+    OnMediaStackChanged(RawAddress(addr), action);
 
     return NO_ERROR;
 }
