@@ -44,7 +44,7 @@ public:
     virtual int32_t PlayHapticPattern(const HapticPaketVdi& pkg) = 0;
     virtual int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacity) = 0;
     virtual int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) = 0;
-    virtual int32_t StartByIntensity(const std::string& effectType, int32_t Intensity) {return HDF_SUCCESS;};
+    virtual int32_t StartByIntensity(const std::string& effectType, uint16_t Intensity) {return HDF_SUCCESS;};
 };
 struct VdiWrapperVibrator {
     struct HdfVdiBase base;
