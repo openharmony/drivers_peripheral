@@ -62,7 +62,7 @@ const std::string captureId = "captureId";
 const int32_t VIDEO_KEY_CAPTRUE_ID = 0x05;
 
 /**
- * @brief Specifies whether the image is a degraded image. The value type is int32_t. 
+ * @brief Specifies whether the image is a degraded image. The value type is int32_t.
  * The value <b>1</b> means that the image is a degraded image, and <b>0</b> means the opposite.
  */
 const std::string isDegradedImage = "isDegradedImage";

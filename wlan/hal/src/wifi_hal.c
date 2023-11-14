@@ -116,6 +116,15 @@ static int32_t InitFeatureByType(int32_t type, struct IWiFiBaseFeature **ifeatur
             (void)memset_s(*ifeature, sizeof(struct IWiFiSta), 0, sizeof(struct IWiFiSta));
             ret = InitStaFeature((struct IWiFiSta **)ifeature);
             break;
+        case PROTOCOL_80211_IFTYPE_P2P_DEVICE:
+            *ifeature = (struct IWiFiBaseFeature *)malloc(sizeof(struct IWiFiP2p));
+            if (*ifeature == NULL) {
+                HDF_LOGE("%s: malloc failed, line: %d", __FUNCTION__, __LINE__);
+                return HDF_FAILURE;
+            }
+            (void)memset_s(*ifeature, sizeof(struct IWiFiP2p), 0, sizeof(struct IWiFiP2p));
+            ret = InitP2pFeature((struct IWiFiP2p **)ifeature);
+            break;
         default:
             HDF_LOGE("%s: type not support, line: %d", __FUNCTION__, __LINE__);
             return HDF_FAILURE;

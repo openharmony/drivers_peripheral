@@ -19,19 +19,19 @@
 #include <memory>
 
 #include "battery_interface_impl.h"
-#include "v1_2/battery_interface_proxy.h"
-#include "v1_2/battery_interface_stub.h"
-#include "v1_2/ibattery_callback.h"
-#include "v1_2/types.h"
+#include "v2_0/battery_interface_proxy.h"
+#include "v2_0/battery_interface_stub.h"
+#include "v2_0/ibattery_callback.h"
+#include "v2_0/types.h"
 
-using namespace OHOS::HDI::Battery::V1_2;
+using namespace OHOS::HDI::Battery::V2_0;
 using namespace HDI::Battery;
 using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<BatteryInterfaceStub> g_fuzzService = nullptr;
@@ -60,7 +60,7 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
     }
     g_fuzzService->OnRemoteRequest(code, datas, reply, option);
 }
-} // namespace V1_2
+} // namespace V2_0
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
@@ -69,6 +69,6 @@ static void BatteryStubFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::Battery::V1_2::BatteryStubFuzzTest(data, size);
+    OHOS::HDI::Battery::V2_0::BatteryStubFuzzTest(data, size);
     return 0;
 }

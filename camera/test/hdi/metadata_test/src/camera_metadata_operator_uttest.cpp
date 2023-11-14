@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "camera_metadata_operator_uttest.h"
+#include "camera_metadata_info.h"
 
 using namespace OHOS;
 using namespace std;
@@ -23,12 +24,12 @@ void CameraMetadataOperatorTest::SetUpTestCase(void) {}
 void CameraMetadataOperatorTest::TearDownTestCase(void) {}
 void CameraMetadataOperatorTest::SetUp(void)
 {
-    printf("CameraMetadataOperatorTest start");
+    printf("CameraMetadataOperatorTest start\r\n");
 }
 
 void CameraMetadataOperatorTest::TearDown(void)
 {
-    printf("CameraMetadataOperatorTest end");
+    printf("CameraMetadataOperatorTest end\r\n");
 }
 
 /**
@@ -375,4 +376,82 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_026, TestSize.Level
 {
     printf("CameraMetadataOperatorTest Camera_metedate_opertor_026 start...");
     FormatCameraMetadataToString(nullptr);
+}
+
+/**
+ * @tc.name: Camera_metedate_opertor_026
+ * @tc.desc: FormatCameraMetadataToString
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_FormatCameraMetadataToString, TestSize.Level1)
+{
+    int ret = 0;
+    auto metaData = make_shared<CameraMetadata>(1000, 2000);
+    int8_t cameraType[10] = {0};
+    int32_t cameraFpsRange[10] = {0};
+    uint32_t cameraMesureExposureTime[10] = {0};
+    int64_t sensorExposeTime[10] = {0};
+    float sensorInfoPhysicalSize[] = {0};
+    float jpegGpsCoordinates[10] = {0};
+
+    camera_rational_t controlAeCompenstationStep[10] = {{0}};
+    ret = metaData->addEntry(OHOS_ABILITY_CAMERA_TYPE, cameraType, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_ABILITY_FPS_RANGES, cameraFpsRange, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, cameraMesureExposureTime, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_SENSOR_EXPOSURE_TIME, sensorExposeTime, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, sensorInfoPhysicalSize, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, jpegGpsCoordinates, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, controlAeCompenstationStep, 10);
+    EXPECT_EQ(ret, true);
+    string metaStr = FormatCameraMetadataToString(metaData->get());
+    cout << metaStr << endl;
+    EXPECT_NE(metaStr, "");
+}
+
+/**
+ * @tc.name: Camera_metedate_opertor_026
+ * @tc.desc: DeleteCameraMetadataItemByIndex
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_DeleteCameraMetadataItemByIndex, TestSize.Level1)
+{
+    int ret = 0;
+    auto metaData = make_shared<CameraMetadata>(1000, 2000);
+    int8_t cameraType[10] = {0};
+    int32_t cameraFpsRange[10] = {0};
+    uint32_t cameraMesureExposureTime[10] = {0};
+    int64_t sensorExposeTime[10] = {0};
+    float sensorInfoPhysicalSize[] = {0};
+    float jpegGpsCoordinates[10] = {0};
+
+    camera_rational_t controlAeCompenstationStep[10] = {{0}};
+    ret = metaData->addEntry(OHOS_ABILITY_CAMERA_TYPE, cameraType, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_ABILITY_FPS_RANGES, cameraFpsRange, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, cameraMesureExposureTime, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_SENSOR_EXPOSURE_TIME, sensorExposeTime, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, sensorInfoPhysicalSize, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, jpegGpsCoordinates, 10);
+    EXPECT_EQ(ret, true);
+    ret = metaData->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, controlAeCompenstationStep, 10);
+    EXPECT_EQ(ret, true);
+
+    ret = DeleteCameraMetadataItemByIndex(metaData->get(), OHOS_CONTROL_AE_COMPENSATION_STEP);
+    EXPECT_GE(ret, 0);
+    ret = DeleteCameraMetadataItemByIndex(metaData->get(), OHOS_JPEG_GPS_COORDINATES);
+    EXPECT_GE(ret, 0);
+    ret = DeleteCameraMetadataItemByIndex(metaData->get(), 0);
+    EXPECT_EQ(ret, 0);
 }
