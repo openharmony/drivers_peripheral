@@ -34,6 +34,7 @@ enum HdfVibratorStatusVdi {
 enum HdfVibratorModeVdi {
     VDI_VIBRATOR_MODE_ONCE   = 0,
     VDI_VIBRATOR_MODE_PRESET = 1,
+    VDI_VIBRATOR_MODE_HDHAPTIC = 2,
     VDI_VIBRATOR_MODE_BUTT
 };
 
