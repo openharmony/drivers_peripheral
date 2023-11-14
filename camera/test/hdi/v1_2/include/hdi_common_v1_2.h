@@ -39,7 +39,8 @@
 namespace OHOS::Camera {
 enum CameraUtConstants {
     UT_SLEEP_TIME = 2,
-    UT_SECOND_TIMES,
+    UT_SECOND_TIMES = 3,
+    UT_SECOND_TIMES_MAX = 100,
     UT_TUNNEL_MODE = 5,
     UT_DATA_SIZE = 8,
     UT_PREVIEW_SIZE = 3112960,
