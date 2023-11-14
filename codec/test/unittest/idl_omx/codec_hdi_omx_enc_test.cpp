@@ -307,11 +307,12 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiDMABufferTest_001, TestSize.Level1)
     ASSERT_TRUE(g_component != nullptr);
     SupportBufferType bufferType;
     func_->InitExtParam(bufferType);
-    bufferType.portIndex = inputIndex;
+    bufferType.portIndex = outputIndex;
     std::vector<int8_t> inParam, outParam;
     func_->ObjectToVector(bufferType, inParam);
     auto ret = g_component->GetParameter(OMX_IndexParamSupportBufferType, inParam, outParam);
     ASSERT_EQ(ret, HDF_SUCCESS);
+    func_->VectorToObject(outParam, bufferType);
     ASSERT_TRUE(bufferType.bufferTypes & CODEC_BUFFER_TYPE_DMA_MEM_FD) ;
 }
 #endif
