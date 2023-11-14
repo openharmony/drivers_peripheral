@@ -86,23 +86,17 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     return;
 }
 
-bool SensorClientsManager::IsUpdateSensorBestConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
+void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
-    if (sensorUsed_.find(sensorId) == sensorUsed_.end()) {
-        HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
-        return true;
-    }
     auto it = sensorConfig_.find(sensorId);
-    if (it != sensorConfig_.end()) {
-        if (samplingInterval < it->second.samplingInterval || reportInterval < it->second.reportInterval) {
-            HDF_LOGI("%{public}s: sensor: %{public}d need updated", __func__, sensorId);
-            return true;
-        }
-        HDF_LOGI("%{public}s: sensor: %{public}d do not need update", __func__, sensorId);
-        return false;
+    if (it == sensorConfig_.end()) {
+        HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId)
+        return;
     }
-    HDF_LOGI("%{public}s: sensor: %{public}d insert", __func__, sensorId);
-    return true;
+    
+    samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
+    reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
+    return;
 }
 
 void SensorClientsManager::OpenSensor(int sensorId, int serviceId)
@@ -132,8 +126,8 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
 {
     auto it = sensorUsed_.find(sensorId);
     if (it == sensorUsed_.end()) {
-        HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or is using by others", __func__, sensorId);
-        return false;
+        HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
+        return true;
     }
     sensorUsed_[sensorId].erase(serviceId);
     if (sensorUsed_[sensorId].empty()) {

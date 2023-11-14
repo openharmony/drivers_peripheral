@@ -40,6 +40,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
         HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
+        return HDF_FAILURE;
     }
     sptr<ISensorCallback> callback;
     if (map.find(event.sensorId) == map.end()) {
