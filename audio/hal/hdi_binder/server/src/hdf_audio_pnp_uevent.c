@@ -85,6 +85,7 @@
 #define AUDIO_DEVICE_WAIT_USB_ONLINE 1000
 #define AUDIO_DEVICE_WAIT_USB_HEADSET_ONLINE 150
 #define UEVENT_ARR_SIZE 9
+#define MOVE_NUM 16
 
 #define REMOVE_AUDIO_DEVICE '0'
 #define ADD_DEVICE_HEADSET '1'
@@ -611,7 +612,6 @@ static int AudioPnpUeventOpen(int *fd)
     int socketFd = -1;
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     const int32_t on = 1; // turn on passcred
-    const int MOVE_NUM = 16;
     struct sockaddr_nl addr;
 
     if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != EOK) {
