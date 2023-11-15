@@ -233,7 +233,7 @@ int32_t AudioRenderInterfaceImpl::Stop()
         return HDF_FAILURE;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_RESTART.c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_PAUSE.c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
