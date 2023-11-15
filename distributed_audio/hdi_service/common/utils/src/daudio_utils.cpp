@@ -17,8 +17,6 @@
 
 #include <ctime>
 
-#include "cJSON.h"
-
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
 #include "daudio_log.h"
@@ -230,6 +228,72 @@ int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::st
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     return DH_SUCCESS;
+}
+
+static bool IsString(const cJSON *jsonObj, const std::string &key)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+    cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, key.c_str());
+    if (paramValue == nullptr) {
+        DHLOGE("paramValue is null");
+        return false;
+    }
+
+    if (cJSON_IsString(paramValue)) {
+        return true;
+    }
+    return false;
+}
+
+bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+
+    for (auto it = keys.begin(); it != keys.end(); it++) {
+        cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
+        if (paramValue == nullptr) {
+            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
+            return false;
+        }
+        bool res = IsString(jsonObj, *it);
+        if (!res) {
+            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string ParseStringFromArgs(std::string args, const char *key)
+{
+    DHLOGD("ParseStringFrom Args : %s", args.c_str());
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        cJSON_Delete(jParam);
+        return "Failed to parse JSON";
+    }
+    if (!CJsonParamCheck(jParam, { key })) {
+        DHLOGE("Not found the key : %s.", key);
+        cJSON_Delete(jParam);
+        return "Not found the key.";
+    }
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, key);
+    if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
+        DHLOGE("Not found the value of the key : %s.", key);
+        cJSON_Delete(jParam);
+        return "Not found the value.";
+    }
+    std::string content(dhIdItem->valuestring);
+    cJSON_Delete(jParam);
+    DHLOGD("Parsed string is: %s.", content.c_str());
+    return content;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
