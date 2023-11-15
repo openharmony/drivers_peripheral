@@ -37,7 +37,7 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:face_auth_idl_headers",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "hilog:libhilog",
   ]
 
