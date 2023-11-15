@@ -22,8 +22,9 @@ if (defined(ohos_lite)) {
   config("camera_ut_test_config") {
     visibility = [ ":*" ]
 
-    cflags_cc = []
+    cflags_cc = [ "--coverage" ]
     cflags_cc += [ "-std=c++17" ]
+    ldflags = [ "--coverage" ]
   }
 
   unittest("camera_test_v4l2_ut") {
