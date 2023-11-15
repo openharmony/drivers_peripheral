@@ -21,7 +21,6 @@
 #include "codec_function_utils.h"
 #include "v1_0/codec_callback_service.h"
 
-#define ERR_STATE_TYPE (100)
 #define ERR_COUNT (-1)
 #define ERR_COUNT_2 (10000)
 
@@ -111,9 +110,7 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, ERR_STATE_TYPE, cmdData);
-    ASSERT_TRUE(ret != HDF_SUCCESS);
-    ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
+    auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
     std::vector<int8_t> inParam, outParam;

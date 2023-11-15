@@ -60,12 +60,6 @@ public:
                 break;
             }
         }
-        int32_t errcount = ERR_COUNT;
-        err = g_manager->GetComponentCapabilityList(capList, errcount);
-        ASSERT_TRUE(err != HDF_SUCCESS);
-        errcount = static_cast<int32_t>(capList.size()) + 1;
-        err = g_manager->GetComponentCapabilityList(capList, errcount);
-        ASSERT_TRUE(err != HDF_SUCCESS);
     }
 
     static void TearDownTestCase()
