@@ -611,6 +611,7 @@ static int AudioPnpUeventOpen(int *fd)
     int socketFd = -1;
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     const int32_t on = 1; // turn on passcred
+    const int MOVE_NUM = 16;
     struct sockaddr_nl addr;
 
     if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != EOK) {
@@ -618,7 +619,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = (sa_family_t)getpid();
+    addr.nl_pid = (gettid() << MOVE_NUM) | getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
