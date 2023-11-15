@@ -195,3 +195,13 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
+
+TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_008)
+{
+    std::vector<vendorTag_t> tagVec {};
+    auto ret = GetAllVendorTags(tagVec);
+    for (auto tag : tagVec) {
+        std::cout << "tagId = " << tag.tagId << ", tagName = " << tag.tagName << "\n";
+    }
+    EXPECT_EQ(ret, CAM_META_SUCCESS);
+}
