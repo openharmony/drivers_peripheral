@@ -17,14 +17,14 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_0/codec_component_manager_stub.h"
+#include "v2_0/codec_component_manager_stub.h"
 
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec.v1_0.ICodecComponentManager";
+const std::u16string CODEC_INTERFACE_TOKEN = u"ohos.hdi.codec.V2_0.ICodecComponentManager";
 #define CMD_CODEC_COMPONENT_MANAGER_GREATE_COMPONENT 3
 
 uint32_t Convert2Uint32(const uint8_t* ptr)

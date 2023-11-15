@@ -14,13 +14,13 @@
  */
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
-#include "v1_0/codec_callback_service.h"
-#include "v1_0/icodec_callback.h"
-#include "v1_0/icodec_component_manager.h"
+#include "v2_0/codec_callback_service.h"
+#include "v2_0/icodec_callback.h"
+#include "v2_0/icodec_component_manager.h"
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 constexpr int64_t APP_DATA = 3;
 namespace {
 const int32_t ITERATION_FREQUENCY = 100;
