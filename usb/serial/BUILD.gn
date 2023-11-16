@@ -61,7 +61,7 @@ ohos_shared_library("libusbhost_acm_rawapi") {
     ubsan = true
     boundary_sanitize = true
   }
-  
+
   sources = [ "src/usb_serial_rawapi.c" ]
 
   include_dirs = [
