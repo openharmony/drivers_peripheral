@@ -71,6 +71,8 @@ enum VibratorMode {
     VIBRATOR_MODE_ONCE   = 0,
     /**< Indicates the periodic vibration with the preset effect. */
     VIBRATOR_MODE_PRESET = 1,
+    /**< Indicates the vibration is high-definition. */
+    VIBRATOR_MODE_HDHAPTIC = 2,
     /**< Indicates invalid the effect mode. */
     VIBRATOR_MODE_BUTT
 };

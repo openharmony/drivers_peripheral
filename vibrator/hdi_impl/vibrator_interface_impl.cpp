@@ -82,6 +82,8 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorModeVdi mode)
         tmp = VIBRATOR_MODE_ONCE;
     } else if (mode == VDI_VIBRATOR_MODE_PRESET) {
         tmp = VIBRATOR_MODE_PRESET;
+    } else if (mode == VDI_VIBRATOR_MODE_HDHAPTIC) {
+        tmp = VIBRATOR_MODE_HDHAPTIC;
     } else if (mode == VDI_VIBRATOR_MODE_BUTT) {
         tmp = VIBRATOR_MODE_BUTT;
     } else {
