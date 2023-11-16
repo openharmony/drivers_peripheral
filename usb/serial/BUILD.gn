@@ -18,12 +18,6 @@ group("usbhost_acm") {
 }
 
 ohos_shared_library("libusbhost_acm") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-  }
-
   sources = [ "src/usb_serial.c" ]
 
   include_dirs = [
@@ -56,12 +50,6 @@ ohos_shared_library("libusbhost_acm") {
 }
 
 ohos_shared_library("libusbhost_acm_rawapi") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-  }
-
   sources = [ "src/usb_serial_rawapi.c" ]
 
   include_dirs = [
