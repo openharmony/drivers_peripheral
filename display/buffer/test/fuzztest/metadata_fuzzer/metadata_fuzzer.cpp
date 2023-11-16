@@ -29,7 +29,7 @@ static bool g_isInit = false;
 static const uint8_t* g_data = nullptr;
 static size_t g_dataSize = 0;
 static size_t g_pos;
-static int32_t g_maxVectorLen = 3220;
+static int32_t g_maxVectorLen = 2880;     // max size of value vector
 /*
 * describe: get data from outside untrusted data(g_data) which size is according to sizeof(T)
 * tips: only support basic type
@@ -82,7 +82,7 @@ BufferHandle* UsingAllocmem()
 
     BufferHandle* handle = nullptr;
     ret = g_bufferInterface->AllocMem(info, handle);
-    if (ret != DISPLAY_SUCCESS) {
+    if (ret != DISPLAY_SUCCESS && handle != nullptr) {
         HDF_LOGE("%{public}s: function AllocMem failed", __func__);
         g_bufferInterface->FreeMem(*handle);
         return nullptr;
@@ -90,68 +90,43 @@ BufferHandle* UsingAllocmem()
     return handle;
 }
 
-int32_t TestRegisterBuffer(const BufferHandle& handle)
+void TestRegisterBuffer(const BufferHandle& handle)
 {
-    int32_t ret = g_bufferInterface->RegisterBuffer(handle);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("TestRegisterBuffer failed");
-        return DISPLAY_FAILURE;
-    }
-    return DISPLAY_SUCCESS;
+    (void)g_bufferInterface->RegisterBuffer(handle);
 }
 
-int32_t TestSetMetadata(const BufferHandle& handle)
+void TestSetMetadata(const BufferHandle& handle)
 {
-    uint32_t key = GetData<uint32_t>();
+    uint16_t key = GetData<uint16_t>();
     uint32_t len = GetData<uint32_t>() % g_maxVectorLen;
     std::vector<uint8_t> values;
     for (uint32_t i = 0; i < len; i++) {
         values.push_back(GetData<uint8_t>() % ALPHA_VALUE_RANGE);
     }
 
-    int32_t ret = g_bufferInterface->SetMetadata(handle, key, values);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("TestSetMetadata failed");
-        return DISPLAY_FAILURE;
-    }
-    return DISPLAY_SUCCESS;
+    (void)g_bufferInterface->SetMetadata(handle, key, values);
 }
 
-int32_t TestGetMetadata(const BufferHandle& handle)
+void TestGetMetadata(const BufferHandle& handle)
 {
-    uint32_t key = GetData<uint32_t>();
+    uint16_t key = GetData<uint16_t>();
     std::vector<uint8_t> values = {};
-    int32_t ret = g_bufferInterface->GetMetadata(handle, key, values);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("TestGetMetadata failed");
-        return DISPLAY_FAILURE;
-    }
-    return DISPLAY_SUCCESS;
+    (void)g_bufferInterface->GetMetadata(handle, key, values);
 }
 
-int32_t TestListMetadataKeys(const BufferHandle& handle)
+void TestListMetadataKeys(const BufferHandle& handle)
 {
     std::vector<uint32_t> keys = {};
-    int32_t ret = g_bufferInterface->ListMetadataKeys(handle, keys);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("TestListMetadataKeys failed");
-        return DISPLAY_FAILURE;
-    }
-    return DISPLAY_SUCCESS;
+    (void)g_bufferInterface->ListMetadataKeys(handle, keys);
 }
 
-int32_t TestEraseMetadataKey(const BufferHandle& handle)
+void TestEraseMetadataKey(const BufferHandle& handle)
 {
-    uint32_t key = GetData<uint32_t>();
-    int32_t ret = g_bufferInterface->EraseMetadataKey(handle, key);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("TestEraseMetadataKey failed");
-        return DISPLAY_FAILURE;
-    }
-    return DISPLAY_SUCCESS;
+    uint16_t key = GetData<uint16_t>();
+    (void)g_bufferInterface->EraseMetadataKey(handle, key);
 }
 
-typedef int32_t (*TestFuncs[])(const BufferHandle&);
+typedef void (*TestFuncs[])(const BufferHandle&);
 
 TestFuncs g_testFuncs = {
     TestRegisterBuffer,
@@ -190,14 +165,11 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     uint32_t len = GetArrLength(g_testFuncs);
     if (len == 0) {
         HDF_LOGE("%{public}s: g_testFuncs length is equal to 0", __func__);
+        g_bufferInterface->FreeMem(*buffer);
         return false;
     }
 
-    int32_t ret = g_testFuncs[code % len](*buffer);
-    if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("function %{public}u failed", code % len);
-        return false;
-    }
+    g_testFuncs[code % len](*buffer);
     g_bufferInterface->FreeMem(*buffer);
     return true;
 }
