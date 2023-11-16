@@ -39,12 +39,11 @@
 #define AUDIO_CHANNELCOUNT              2
 #define AUDIO_SAMPLE_RATE_48K           48000
 #define PATH_LEN                        256
-#define BUFFER_PERIOD_SIZE              (4 * 1024)
+#define BUFFER_PERIOD_SIZE              (2 * 1024)
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE  4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX                      0x7fffffff
 #define BUFFER_SIZE_BASE                1024
-#define AUDIO_BUFF_SIZE                 (1024 * 16)
 #define PCM_8_BIT                       8
 #define PCM_16_BIT                      16
 #define AUDIO_TOTALSIZE_15M             (1024 * 15)
@@ -182,7 +181,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->isSignedData = true;
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
-    captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
+    captureAttrs->silenceThreshold = 0;
     captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
@@ -322,8 +321,8 @@ static int32_t FrameStartCapture(const struct StrParaCapture *param)
     if (param == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t bufferSize = AUDIO_BUFF_SIZE;
-    uint64_t requestBytes = AUDIO_BUFF_SIZE;
+    uint32_t bufferSize = BUFFER_PERIOD_SIZE;
+    uint64_t requestBytes = BUFFER_PERIOD_SIZE;
     uint64_t totalSize = 0;
     uint32_t failCount = 0;
 
