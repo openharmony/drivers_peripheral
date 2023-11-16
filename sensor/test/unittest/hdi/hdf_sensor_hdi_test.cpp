@@ -247,7 +247,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
     int32_t ret = g_sensorInterface->Enable(ABNORMAL_SENSORID);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     ret = g_sensorInterface->Disable(ABNORMAL_SENSORID);
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
 
 /**
