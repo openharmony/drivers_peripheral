@@ -35,12 +35,6 @@ config("usbd_public_config") {
 }
 
 ohos_shared_library("libusb_interface_service_1.0") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-  }
-
   sources = [
     "src/usb_impl.cpp",
     "src/usbd_dispatcher.cpp",
