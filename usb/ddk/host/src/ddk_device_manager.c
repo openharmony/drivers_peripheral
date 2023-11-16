@@ -184,7 +184,7 @@ static int32_t DdkDevMgrScanSysfs(const char *sysfsDevDir)
     struct dirent *devHandle;
     while ((devHandle = readdir(dir))) {
         // only read dir like 3-1
-        if ((!isdigit(devHandle->d_name[0])) || strchr(devHandle->d_name, ':')) {
+        if (devHandle->d_name[0] > '9' || devHandle->d_name[0] < '0' || strchr(devHandle->d_name, ':')) {
             continue;
         }
 
