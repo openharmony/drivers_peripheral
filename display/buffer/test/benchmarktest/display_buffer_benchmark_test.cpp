@@ -62,6 +62,9 @@ void DisplayBenchmarkTest::SetUp(const ::benchmark::State &state)
         HDF_LOGE("AllocMem failed");
         ASSERT_TRUE(ret == DISPLAY_SUCCESS && g_bufferHandle != nullptr);
     }
+
+    ret = g_gralloc->RegisterBuffer(*g_bufferHandle);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
 }
 
 void DisplayBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -95,11 +98,9 @@ BENCHMARK_F(DisplayBenchmarkTest, SetMetadataTest)(benchmark::State &state)
 {
     int32_t ret;
     int32_t key = 0;
-    std::vector<uint8_t> values(3220, 0);
     for (auto _ : state) {
-        std::vector<uint8_t> values(3220, 0);
+        std::vector<uint8_t> values(2880, 0);
         ret = g_gralloc->SetMetadata(*g_bufferHandle, key, values);
-        key++;
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     }
 }
@@ -116,9 +117,11 @@ BENCHMARK_F(DisplayBenchmarkTest, GetMetadataTest)(benchmark::State &state)
     int32_t ret;
     int32_t key = 0;
     for (auto _ : state) {
+        std::vector<uint8_t> values(2880, 0);
+        ret = g_gralloc->SetMetadata(*g_bufferHandle, key, values);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
         std::vector<uint8_t> rets;
         ret = g_gralloc->GetMetadata(*g_bufferHandle, key, rets);
-        key++;
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     }
 }
@@ -133,8 +136,12 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetMetadataTest)->
 BENCHMARK_F(DisplayBenchmarkTest, ListMetadataKeysTest)(benchmark::State &state)
 {
     int32_t ret;
+    int32_t key = 0;
     for (auto _ : state) {
         std::vector<uint32_t> keys;
+        std::vector<uint8_t> values(2880, 0);
+        ret = g_gralloc->SetMetadata(*g_bufferHandle, key, values);
+        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
         ret = g_gralloc->ListMetadataKeys(*g_bufferHandle, keys);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     }
@@ -150,15 +157,12 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, ListMetadataKeysTest)->
 BENCHMARK_F(DisplayBenchmarkTest, EraseMetadataKeyTest)(benchmark::State &state)
 {
     int32_t ret;
+    int32_t key = 0;
     for (auto _ : state) {
-        std::vector<uint32_t> keys;
-        ret = g_gralloc->ListMetadataKeys(*g_bufferHandle, keys);
+        std::vector<uint8_t> values(2880, 0);
+        ret = g_gralloc->SetMetadata(*g_bufferHandle, key, values);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
-        if (keys.size() == 0) {
-            continue;
-        }
-        ret = g_gralloc->EraseMetadataKey(*g_bufferHandle, keys.back());
-        keys.pop_back();
+        ret = g_gralloc->EraseMetadataKey(*g_bufferHandle, key);
         EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
     }
 }
