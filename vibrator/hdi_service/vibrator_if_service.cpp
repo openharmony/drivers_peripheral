@@ -125,11 +125,43 @@ int32_t VibratorIfService::Stop(HdfVibratorMode mode)
     }
 
     HdfVibratorModeVdi vibratorMode;
-    if (mode == HDF_VIBRATOR_MODE_ONCE) {
+    if (mode == HdfVibratorMode::HDF_VIBRATOR_MODE_ONCE) {
         vibratorMode = VDI_VIBRATOR_MODE_ONCE;
-    } else if (mode == HDF_VIBRATOR_MODE_PRESET) {
+    } else if (mode == HdfVibratorMode::HDF_VIBRATOR_MODE_PRESET) {
         vibratorMode = VDI_VIBRATOR_MODE_PRESET;
-    } else if (mode == HDF_VIBRATOR_MODE_BUTT) {
+    } else if (mode == HdfVibratorMode::HDF_VIBRATOR_MODE_BUTT) {
+        vibratorMode = VDI_VIBRATOR_MODE_BUTT;
+    } else {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_FAILURE;
+    }
+    
+    StartTrace(HITRACE_TAG_HDF, "Stop");
+    int32_t ret = vibratorVdiImpl_->Stop(vibratorMode);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s Stop failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
+int32_t VibratorIfService::StopV1_2(int32_t mode)
+{
+    HDF_LOGI("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    HdfVibratorModeVdi vibratorMode;
+    if (mode == HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_ONCE) {
+        vibratorMode = VDI_VIBRATOR_MODE_ONCE;
+    } else if (mode == HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_PRESET) {
+        vibratorMode = VDI_VIBRATOR_MODE_PRESET;
+    } else if (mode == HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_HDHAPTIC) {
+        vibratorMode = VDI_VIBRATOR_MODE_HDHAPTIC;
+    } else if (mode == HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_BUTT) {
         vibratorMode = VDI_VIBRATOR_MODE_BUTT;
     } else {
         HDF_LOGE("%{public}s: invalid param", __func__);
