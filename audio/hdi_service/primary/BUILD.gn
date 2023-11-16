@@ -39,7 +39,7 @@ ohos_shared_library("audio_primary_driver") {
   part_name = "drivers_peripheral_audio"
 }
 
-ohos_shared_library("audio_manager_service_1.0") {
+ohos_shared_library("audio_manager_service_1.1") {
   sources = [ "audio_manager_service.c" ]
 
   if (is_standard_system) {
