@@ -90,7 +90,7 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
 {
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
-        HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId)
+        HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
         return;
     }
     
