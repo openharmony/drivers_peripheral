@@ -55,6 +55,7 @@
 #define EXT_PARAMS_MAXLEN               107
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
+#define AUDIO_CAPTURE_STREAM_ID         14
 
 struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
@@ -487,6 +488,41 @@ static int32_t RecordingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
+static int32_t UpdateAudioRoute()
+{
+    struct AudioRouteNode source = {
+        .ext.device.type = PIN_IN_MIC,
+        .ext.device.desc = (char *)"pin_in_mic",
+        .ext.device.moduleId = 0,
+        .portId = 0,
+        .role = AUDIO_PORT_SOURCE_ROLE,
+        .type = AUDIO_PORT_DEVICE_TYPE,
+    };
+
+    struct AudioRouteNode sink = {
+        .portId = 0,
+        .role = AUDIO_PORT_SINK_ROLE,
+        .type = AUDIO_PORT_MIN_TYPE,
+        .ext.mix.moduleId = 0,
+        .ext.mix.streamId = AUDIO_CAPTURE_STREAM_ID,
+        .ext.device.desc = (char *)"",
+    };
+
+    struct AudioRoute route = {
+        .sources = &source,
+        .sourcesLen = 1,
+        .sinks = &sink,
+        .sinksLen = 1,
+    };
+
+    int routeHandle = 0;
+    int32_t ret = g_adapter->UpdateAudioRoute(g_adapter, &route, &routeHandle);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("UpdateAudioRoute failed");
+    }
+    return ret;
+}
+
 static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
 {
     if (captureTemp == NULL) {
@@ -497,6 +533,10 @@ static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
     struct IAudioCapture *capture = NULL;
     int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture, &g_captureId);
     if (capture == NULL || ret < 0) {
+        return HDF_FAILURE;
+    }
+
+    if (UpdateAudioRoute() < 0) {
         return HDF_FAILURE;
     }
 
