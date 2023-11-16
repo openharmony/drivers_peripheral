@@ -324,7 +324,7 @@ int32_t FunctionUtil::GetPortParameter(sptr<ICodecComponent> component, PortInde
     return ret;
 }
 
-bool FunctionUtil::PushAlongParam(OmxCodecBuffer &buffer)
+bool FunctionUtil::PushAlongParam(OmxCodecBuffer &omxBuffer)
 {
     const std::string processName = "cast_engine_service";
     ProcessNameParam nameParam;
