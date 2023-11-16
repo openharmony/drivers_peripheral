@@ -146,7 +146,7 @@ int32_t VibratorIfService::Stop(HdfVibratorMode mode)
     return ret;
 }
 
-int32_t VibratorIfService::StopV1_2(HdfVibratorModeV1_2 mode)
+int32_t VibratorIfService::StopV1_2(int32_t mode)
 {
     HDF_LOGI("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
     if (vibratorVdiImpl_ == nullptr) {
