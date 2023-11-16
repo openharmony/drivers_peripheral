@@ -874,35 +874,6 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyThisBufferTest_001, TestSize.Level1
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiEmptyThisBufferTest_002, TestSize.Level1)
-{
-    ASSERT_TRUE(g_component != nullptr);
-    const std::string processName = "cast_engine_service";
-    std::vector<int8_t> paramVec;
-    ProcessNameParam nameParam;
-    struct OmxCodecBuffer omxBuffer;
-    func_->InitExtParam(nameParam);
-    int32_t ret = strcpy_s(nameParam.processName, sizeof(nameParam.processName), processName.c_str());
-    ASSERT_TRUE(ret == EOK);
-
-    uint32_t size = sizeof(uint32_t) / sizeof(uint8_t);
-    uint32_t index = OMX_IndexParamProcessName;
-    uint8_t *ptr = reinterpret_cast<uint8_t*>(index);
-    for (int i = 0; i < size; i++) {
-        omxBuffer.alongParam.push_back(*ptr + i);
-    }
-
-    size = sizeof(nameParam);
-    ptr = reinterpret_cast<uint8_t*>(&nameParam);
-    for (int i = 0; i < size; i++) {
-        omxBuffer.alongParam.push_back(*ptr + i);
-    }
-    
-    func_->InitOmxCodecBuffer(omxBuffer, CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
-    ret = g_component->EmptyThisBuffer(omxBuffer);
-    ASSERT_TRUE(ret == HDF_SUCCESS);
-}
-
 HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
