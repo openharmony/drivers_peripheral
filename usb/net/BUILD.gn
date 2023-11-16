@@ -18,12 +18,6 @@ group("usbhost_ecm") {
 }
 
 ohos_shared_library("libusbhost_ecm") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-  }
-
   sources = [ "src/cdc_ether.c" ]
 
   include_dirs = [
