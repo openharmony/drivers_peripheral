@@ -319,6 +319,25 @@ int32_t FunctionUtil::GetPortParameter(sptr<ICodecComponent> component, PortInde
     return ret;
 }
 
+bool FunctionUtil::PushAlongParam(OmxCodecBuffer &omxBuffer)
+{
+    const std::string processName = "cast_engine_service";
+    ProcessNameParam nameParam;
+    this->InitExtParam(nameParam);
+    int32_t ret = strcpy_s(nameParam.processName, sizeof(nameParam.processName), processName.c_str());
+    if (ret != EOK) {
+        return false;
+    }
+
+    uint32_t size = sizeof(nameParam);
+    uint8_t *ptr = reinterpret_cast<uint8_t*>(&nameParam);
+    for (uint32_t i = 0; i < size; i++) {
+        omxBuffer.alongParam.push_back(*(ptr + i));
+    }
+
+    return true;
+}
+
 bool FunctionUtil::FillAndEmptyAllBuffer(sptr<ICodecComponent> component, CodecBufferType type)
 {
     int32_t ret;
@@ -344,11 +363,9 @@ bool FunctionUtil::FillAndEmptyAllBuffer(sptr<ICodecComponent> component, CodecB
     iter = inputBuffers_.begin();
     if (iter != inputBuffers_.end()) {
         auto bufferInfo = iter->second;
-        if (type == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
-            FillCodecBufferWithBufferHandle(bufferInfo->omxBuffer);
-            OmxCodecBuffer errBuffer = *bufferInfo->omxBuffer.get();
-            errBuffer.bufferhandle = nullptr;
-            component->EmptyThisBuffer(errBuffer);
+        if (type == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!PushAlongParam(*bufferInfo->omxBuffer.get()))) {
+            HDF_LOGE("PushAlongParam error");
+            return false;
         }
         ret = component->EmptyThisBuffer(*bufferInfo->omxBuffer.get());
         if (ret != HDF_SUCCESS) {
