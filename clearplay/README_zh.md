@@ -260,8 +260,8 @@ int main(int argc, char *argv[])
     std::string responseString = "key1:1234567812345678";
     std::vector<uint8_t> response(responseString.begin(), responseString.end());
     std::vector<uint8_t> keyId;
-    key_session->ProcessLicenseResponse(response, keyId); // response第一个字节为0x30表示解析在线License，第一个字节为0x31表示解析离线License; keyId的base64编码+“:”（英文冒号）+keyValue的base64编码，多组keyId和keyValue用逗号隔开，开头的
-    第一个字节0x30、0x31不用重复。
+    /* response第一个字节为0x30表示解析在线License，第一个字节为0x31表示解析离线License; keyId的base64编码+“:”（英文冒号）+keyValue的base64编码，多组keyId和keyValue用逗号隔开，开头的第一个字节0x30、0x31不用重复。*/
+    key_session->ProcessLicenseResponse(response, keyId);
     printf("keyid: %s, expect: key1\n", keyId.data());
 
     // GetMediaDecryptModule
