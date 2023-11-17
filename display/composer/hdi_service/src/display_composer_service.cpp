@@ -34,8 +34,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-namespace V1_0 {
-extern "C" IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_1::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -57,7 +56,7 @@ DisplayComposerService::DisplayComposerService()
         CHECK_NULLPOINTER_RETURN(vdiImpl_);
         cacheMgr_ = DeviceCacheManager::GetInstance();
         CHECK_NULLPOINTER_RETURN(cacheMgr_);
-        cmdResponser_ = HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
+        cmdResponser_ = V1_0::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
         CHECK_NULLPOINTER_RETURN(cmdResponser_);
     } else {
         DISPLAY_LOGE("Load composer VDI failed, lib: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
@@ -406,6 +405,60 @@ int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
     return devCache->RemoveLayerCache(layerId);
 }
 
+int32_t DisplayComposerService::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
+{
+    DISPLAY_TRACE;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+void DisplayComposerService::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("cb data is nullptr");
+        return;
+    }
+
+    IModeCallback* remoteCb = reinterpret_cast<IModeCallback*>(data);
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnMode(modeId, vBlankPeriod);
+}
+
+int32_t DisplayComposerService::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb)
+{
+    DISPLAY_TRACE;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t DisplayComposerService::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
+{
+    DISPLAY_TRACE;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+void DisplayComposerService::OnSeamlessChange(uint32_t devId, void* data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("cb data is nullptr");
+        return;
+    }
+
+    ISeamlessChangeCallback* remoteCb = reinterpret_cast<ISeamlessChangeCallback*>(data);
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnSeamlessChange(devId);
+}
+
+int32_t DisplayComposerService::RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb)
+{
+    DISPLAY_TRACE;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>>& request)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(request, HDF_FAILURE);
@@ -431,7 +484,6 @@ int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
-} // namespace V1_0
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
