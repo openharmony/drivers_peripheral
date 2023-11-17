@@ -39,7 +39,7 @@
 #define AUDIO_CHANNELCOUNT              2
 #define AUDIO_SAMPLE_RATE_48K           48000
 #define PATH_LEN                        256
-#define BUFFER_PERIOD_SIZE              (2 * 1024)
+#define BUFFER_PERIOD_SIZE              3840
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE  4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX                      0x7fffffff
