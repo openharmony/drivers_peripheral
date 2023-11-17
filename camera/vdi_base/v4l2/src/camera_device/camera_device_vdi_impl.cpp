@@ -23,9 +23,12 @@
 #include "metadata_controller.h"
 #include "metadata_utils.h"
 #include "camera_dump.h"
+#ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
-
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
+#else
+#define HDF_CAMERA_TRACE
+#endif
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
     PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceVdiImpl::OnRequestTimeout, this))
 
