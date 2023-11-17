@@ -27,7 +27,10 @@ ohos_unittest("audio_ut_common_test") {
   ]
 
   if (!drivers_peripheral_audio_feature_community) {
-    sources += [ "render/audio_render_offload_test.cpp" ]
+    sources += [ 
+      "render/audio_render_offload_test.cpp",
+      "render/audio_render_multchannel_test.cpp",
+     ]
   }
 
   include_dirs =
