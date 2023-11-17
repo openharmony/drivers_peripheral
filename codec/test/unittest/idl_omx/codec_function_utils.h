@@ -148,6 +148,8 @@ public:
 
     bool WaitState(sptr<ICodecComponent> component, CodecStateType objState);
 
+    bool PushAlongParam(OmxCodecBuffer &buffer);
+
 private:
     static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *buffer_;
     CodecVersionType version_;
