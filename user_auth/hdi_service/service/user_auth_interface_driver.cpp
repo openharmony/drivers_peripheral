@@ -21,6 +21,7 @@
 #include "useriam_common.h"
 
 #include "v1_2/user_auth_interface_stub.h"
+#include "v1_2/user_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
@@ -83,7 +84,8 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUserAuthInterfaceHost->ioService.Open = nullptr;
     hdfUserAuthInterfaceHost->ioService.Release = nullptr;
 
-    auto serviceImpl = OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::Get(true);
+    OHOS::sptr<OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceService> serviceImpl(
+        new (std::nothrow) OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceService());
     if (serviceImpl == nullptr) {
         IAM_LOGE("failed to get of implement service");
         delete hdfUserAuthInterfaceHost;
@@ -99,6 +101,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     deviceObject->service = &hdfUserAuthInterfaceHost->ioService;
+    static_cast<void>(serviceImpl->Init());
     return HDF_SUCCESS;
 }
 

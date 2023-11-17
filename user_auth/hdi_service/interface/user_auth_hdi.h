@@ -44,6 +44,8 @@ using EnrolledInfo = OHOS::HDI::UserAuth::V1_2::EnrolledInfo;
 using EnrollResultInfo = OHOS::HDI::UserAuth::V1_2::EnrollResultInfo;
 
 using ScheduleInfoV1_1 = OHOS::HDI::UserAuth::V1_2::ScheduleInfoV1_1;
+using AuthSolutionV1_2 = OHOS::HDI::UserAuth::V1_2::AuthSolutionV1_2;
+using EnrollParamV1_2 = OHOS::HDI::UserAuth::V1_2::EnrollParamV1_2;
 using UserInfo = OHOS::HDI::UserAuth::V1_2::UserInfo;
 using ExtUserInfo = OHOS::HDI::UserAuth::V1_2::ExtUserInfo;
 } // namespace UserAuth
