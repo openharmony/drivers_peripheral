@@ -1,0 +1,136 @@
+import("//build/ohos.gni")
+
+ohos_executable("clearplay_sample_media_key_system_factory") {
+  include_dirs = [
+    "//drivers/peripheral/clearplay/test/sample/include",
+    "//drivers/peripheral/clearplay/hdi_service/include/drm",
+    "//drivers/peripheral/clearplay/hdi_service/include",
+    "//drivers/peripheral/clearplay/hdi_service/common",
+    "//drivers/peripheral/clearplay/interfaces/include/drm",
+    "//drivers/peripheral/clearplay/interfaces/include",
+  ]
+  sources = [
+    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system_factory.cpp",
+  ]
+
+  deps = [ 
+    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_clearplay"
+}
+
+ohos_executable("clearplay_sample_media_key_system") {
+  include_dirs = [
+    "//drivers/peripheral/clearplay/test/sample/include",
+    "//drivers/peripheral/clearplay/hdi_service/include/drm",
+    "//drivers/peripheral/clearplay/hdi_service/include",
+    "//drivers/peripheral/clearplay/hdi_service/common",
+    "//drivers/peripheral/clearplay/interfaces/include/drm",
+    "//drivers/peripheral/clearplay/interfaces/include",
+  ]
+  sources = [
+    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system.cpp",
+  ]
+
+  deps = [ 
+    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_clearplay"
+}
+
+ohos_executable("clearplay_sample_decrypt") {
+  include_dirs = [
+    "//drivers/peripheral/clearplay/test/sample/include",
+    "//drivers/peripheral/clearplay/hdi_service/include/drm",
+    "//drivers/peripheral/clearplay/hdi_service/include",
+    "//drivers/peripheral/clearplay/hdi_service/common",
+    "//drivers/peripheral/clearplay/interfaces/include/drm",
+    "//drivers/peripheral/clearplay/interfaces/include",
+  ]
+  sources = [
+    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_decrypt.cpp",
+    "//drivers/peripheral/clearplay/test/sample/src/byte_show.cpp",
+  ]
+
+  deps = [ 
+    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  install_enable = false
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_clearplay"
+}
+
+group("clearplay_sample") {
+  deps = [
+    ":clearplay_sample_media_key_system_factory",
+    ":clearplay_sample_media_key_system",
+    ":clearplay_sample_decrypt",
+  ]
+}

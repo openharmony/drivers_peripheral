@@ -1,0 +1,4 @@
+#ifndef CLEARPLAY_DEMO_H
+#define CLEARPLAY_DEMO_H
+
+#endif /* CLEARPLAY_DEMO_H */
