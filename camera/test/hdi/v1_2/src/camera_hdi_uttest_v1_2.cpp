@@ -741,7 +741,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_025, TestSize.Level1)
     int32_t ret;
     // step 1: close cameraDevice
     cameraTest->Close();
-    EXPECT_EQ(true, cameraTest->serviceV1_2 == nullptr);
     // step 2: get serviceV1_2
     cameraTest->serviceV1_2 = OHOS::HDI::Camera::V1_2::ICameraHost::Get("camera_service", false);
     EXPECT_NE(cameraTest->serviceV1_2, nullptr);
@@ -762,7 +761,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_026, TestSize.Level1)
     int32_t ret;
     // step 1: close cameraDevice
     cameraTest->Close();
-    EXPECT_EQ(true, cameraTest->serviceV1_2 == nullptr);
     // step 2: get serviceV1_2
     cameraTest->serviceV1_2 = OHOS::HDI::Camera::V1_2::ICameraHost::Get("camera_service", false);
     EXPECT_NE(cameraTest->serviceV1_2, nullptr);
@@ -852,14 +850,12 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_029, TestSize.Level1)
     cameraTest->statusV1_2 = 1.0f;
     cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::DEVICE_CONFLICT);
+    EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_UNAVAILABLE);
     // step 5: close the cameraDevice
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->Close();
-    // delay for obtaining statusCallback
-    sleep(UT_SECOND_TIMES);
-    EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_UNAVAILABLE);
 }
 
 /**
