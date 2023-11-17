@@ -492,13 +492,12 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
         CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
         return err;
     }
-    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!codecBuffer.alongParam.empty())) {
-        CODEC_LOGE("yjw:EmptyThisBuffer along param");
+    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
         OMXBufferAppPrivateData privateData;
         memset(&privateData, 0, sizeof(privateData));
-        privateData.sizeOfParam = static_cast<uint32_t>(codecBuffer.alongParam.size());
-        privateData.param = static_cast<void *>(&codecBuffer.alongParam[0]);
-        omxBuffer.pAppPrivate = static_cast<void *>(&privateData);
+        privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
+        privateData.param = static_cast<void *>(&buffer.alongParam[0]);
+        bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 
     err = OMX_EmptyThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
