@@ -13,22 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_V1_0_DISPLAY_COMPOSER_SERVICE_H
-#define OHOS_HDI_DISPLAY_V1_0_DISPLAY_COMPOSER_SERVICE_H
+#ifndef OHOS_HDI_DISPLAY_COMPOSER_SERVICE_H
+#define OHOS_HDI_DISPLAY_COMPOSER_SERVICE_H
 
 #include "idisplay_composer_vdi.h"
-#include "v1_0/cache_manager/device_cache_manager.h"
-#include "v1_0/display_command/display_cmd_responser.h"
-#include "v1_0/idisplay_composer.h"
+#include "cache_manager/device_cache_manager.h"
+#include "v1_1/display_command/display_cmd_responser.h"
+#include "v1_1/idisplay_composer.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-namespace V1_0 {
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
-class DisplayComposerService : public IDisplayComposer {
+class DisplayComposerService : public V1_1::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -60,10 +59,17 @@ public:
         std::vector<HdifdInfo>& outFds) override;
     int32_t GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply) override;
 
+    int32_t RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb) override;
+    int32_t GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes) override;
+    int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb) override;
+    int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t &period) override;
+
 private:
     int32_t LoadVdi();
     static void OnHotPlug(uint32_t outputId, bool connected, void* data);
     static void OnVBlank(unsigned int sequence, uint64_t ns, void* data);
+    static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
+    static void OnSeamlessChange(uint32_t devId, void* data);
 
 private:
     void* libHandle_;
@@ -73,13 +79,12 @@ private:
 
     uint32_t currentBacklightLevel_;
     IDisplayComposerVdi* vdiImpl_;
-    std::unique_ptr<HdiDisplayCmdResponser> cmdResponser_;
+    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
     sptr<IHotPlugCallback> hotPlugCb_;
     sptr<IVBlankCallback> vBlankCb_;
 };
-} // namespace V1_0
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_DISPLAY_V1_0_DISPLAY_COMPOSER_SERVICE_H
+#endif // OHOS_HDI_DISPLAY_COMPOSER_SERVICE_H
