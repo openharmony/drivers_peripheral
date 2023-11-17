@@ -78,7 +78,7 @@ if (defined(ohos_lite)) {
       "../../../../hdf_core/adapter/uhdf/manager:hdf_core",
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
-      "graphic_chipsetsdk:surface",
+      "graphic_surface:surface",
       "hdf_core:hdf_posix_osal",
     ]
   }
@@ -184,7 +184,7 @@ if (defined(ohos_lite)) {
     external_deps += [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
-      "graphic_chipsetsdk:surface",
+      "graphic_surface:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]

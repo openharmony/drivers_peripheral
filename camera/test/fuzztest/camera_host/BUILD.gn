@@ -73,7 +73,7 @@ ohos_fuzztest("camera_host_fuzztest") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_proxy_1.2",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
   public_configs = [ ":camhdi_host_config" ]

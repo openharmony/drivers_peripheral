@@ -25,15 +25,15 @@
         "samgr",
         "ipc",
         "drivers_interface_camera",
-        "graphic_chipsetsdk",
+        "graphic_surface",
         "drivers_interface_display",
         "c_utils",
         "hitrace"
       ],
       "third_party": [
-      	"ffmpeg",
-	"libjpeg-turbo",
-	"libexif"
+        "ffmpeg",
+        "libjpeg-turbo",
+        "libexif"
       ]
     },
     "build": {
