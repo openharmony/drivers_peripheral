@@ -50,7 +50,7 @@ if (!defined(ohos_lite)) {
 
     external_deps = [
       "drivers_interface_camera:metadata",
-      "graphic_chipsetsdk:surface",
+      "graphic_surface:surface",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
