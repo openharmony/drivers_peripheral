@@ -55,6 +55,7 @@
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
 #define AUDIO_CAPTURE_STREAM_ID         14
+#define AUDIO_ROUTE_NODE_LEN            1
 
 struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
@@ -509,9 +510,9 @@ static int32_t UpdateAudioRoute()
 
     struct AudioRoute route = {
         .sources = &source,
-        .sourcesLen = 1,
+        .sourcesLen = AUDIO_ROUTE_NODE_LEN,
         .sinks = &sink,
-        .sinksLen = 1,
+        .sinksLen = AUDIO_ROUTE_NODE_LEN,
     };
 
     int routeHandle = 0;
