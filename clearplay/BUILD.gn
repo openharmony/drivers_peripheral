@@ -1,0 +1,12 @@
+if (defined(ohos_lite)) {
+  group("clearplay_entry") {
+    deps = [ ]
+  }
+} else {
+  group("clearplay_entry") {
+    deps = [
+      "//drivers/peripheral/clearplay/hdi_service:hdf_clearplay_service",
+      "//drivers/peripheral/clearplay/interfaces:hdf_clearplay_interfaces",
+    ]
+  }
+}
