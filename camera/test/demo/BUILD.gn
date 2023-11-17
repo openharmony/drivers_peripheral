@@ -77,7 +77,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
-      "graphic_chipsetsdk:surface",
+      "graphic_surface:surface",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
@@ -155,7 +155,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
-      "graphic_chipsetsdk:surface",
+      "graphic_surface:surface",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]

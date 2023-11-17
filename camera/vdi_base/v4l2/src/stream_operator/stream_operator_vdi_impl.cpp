@@ -22,9 +22,12 @@
 #include "camera_host_config.h"
 #include "metadata_utils.h"
 #include "camera_dump.h"
+#ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
-
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
+#else
+#define HDF_CAMERA_TRACE
+#endif
 
 namespace OHOS::Camera {
 StreamOperatorVdiImpl::StreamOperatorVdiImpl(const OHOS::sptr<IStreamOperatorVdiCallback> &callback,

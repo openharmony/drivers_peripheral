@@ -153,7 +153,7 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "ipc:ipc_single",
   ]
 
