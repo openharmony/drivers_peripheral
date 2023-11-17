@@ -73,11 +73,6 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
         codecBuffer.fenceFd = -1;
     }
 
-    OMXBufferAppPrivateData *privateData = static_cast<OMXBufferAppPrivateData *>(omxBuffer.pAppPrivate);
-    privateData->sizeOfParam = static_cast<uint32_t>(codecBuffer.alongParam.size());
-    if (privateData->sizeOfParam > 0) {
-        privateData->param = static_cast<void *>(&codecBuffer.alongParam[0]);
-    }
     return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
 }
 
