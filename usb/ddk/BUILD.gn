@@ -24,6 +24,12 @@ group("libusb_core") {
 }
 
 ohos_shared_library("libusb_ddk_host") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
+
   include_dirs = [
     "device/include",
     "$hdf_framework_path/model/usb/include",
@@ -66,6 +72,12 @@ ohos_shared_library("libusb_ddk_host") {
 }
 
 ohos_shared_library("libusb_pnp_manager") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
+
   include_dirs = [
     "$hdf_framework_path/model/usb/include",
     "host/include",
@@ -109,6 +121,12 @@ ohos_shared_library("libusb_pnp_manager") {
 }
 
 ohos_shared_library("libusb_ddk_device") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
+
   include_dirs = [
     "device/include",
     "host/include",
