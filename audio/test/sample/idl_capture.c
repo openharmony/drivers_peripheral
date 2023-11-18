@@ -502,7 +502,7 @@ static int32_t UpdateAudioRoute()
     struct AudioRouteNode sink = {
         .portId = 0,
         .role = AUDIO_PORT_SINK_ROLE,
-        .type = AUDIO_PORT_MIN_TYPE,
+        .type = AUDIO_PORT_MIX_TYPE,
         .ext.mix.moduleId = 0,
         .ext.mix.streamId = AUDIO_CAPTURE_STREAM_ID,
         .ext.device.desc = (char *)"",
