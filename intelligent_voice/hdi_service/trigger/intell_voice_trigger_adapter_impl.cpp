@@ -177,7 +177,7 @@ void IntellVoiceTriggerAdapterImpl::Clean()
     MemoryGuard memoryGuard;
     for (auto it = handleSet_.begin(); it != handleSet_.end();) {
         (void)adapter_->UnloadIntellVoiceTriggerModel(*it);
-        handleSet_.erase(it);
+        it = handleSet_.erase(it);
     }
 }
 }  // namespace Trigger
