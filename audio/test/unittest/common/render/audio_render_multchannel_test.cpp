@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-#include <benchmark/benchmark.h>
-#include <climits>
 #include <gtest/gtest.h>
-#include "hdf_base.h"
 #include "osal_mem.h"
+
 #include "v1_1/audio_types.h"
 #include "v1_1/iaudio_manager.h"
 #include "v1_1/iaudio_render.h"
@@ -29,14 +27,12 @@ namespace {
 const int BUFFER_LENTH = 1024 * 16;
 const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
 const int MOVE_LEFT_NUM = 8;
-const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
+const int32_t AUDIO_RENDER_CHANNELCOUNT = 6;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
 const int32_t MMAP_SUGGEST_BUFFER_SIZE = 1920;
-const int32_t ITERATION_FREQUENCY = 100;
-const int32_t REPETITION_FREQUENCY = 3;
 
-class AudioRenderMmapBenchmarkTest : public benchmark::Fixture {
+class AudioUtRenderMmapTest : public testing::Test {
 public:
     struct IAudioManager *manager_ = nullptr;
     struct AudioAdapterDescriptor descs_[MAX_AUDIO_ADAPTER_DESC];
@@ -48,20 +44,20 @@ public:
     uint32_t renderId_ = 0;
     char *devDescriptorName_ = nullptr;
     uint32_t size_ = MAX_AUDIO_ADAPTER_DESC;
-    virtual void SetUp(const ::benchmark::State &state);
-    virtual void TearDown(const ::benchmark::State &state);
+    virtual void SetUp();
+    virtual void TearDown();
     void InitRenderAttrs(struct AudioSampleAttributes &attrs);
     void InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc);
     void FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf);
     void ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen);
 };
 
-void AudioRenderMmapBenchmarkTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
+void AudioUtRenderMmapTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 {
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs.interleaved = 0;
-    attrs.type = AUDIO_MMAP_NOIRQ;
+    attrs.type = AUDIO_MULTI_CHANNEL;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT / MOVE_LEFT_NUM;
     attrs.isBigEndian = false;
@@ -71,7 +67,7 @@ void AudioRenderMmapBenchmarkTest::InitRenderAttrs(struct AudioSampleAttributes 
     attrs.silenceThreshold = BUFFER_LENTH;
 }
 
-void AudioRenderMmapBenchmarkTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
+void AudioUtRenderMmapTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
 {
     devDesc.pins = PIN_OUT_SPEAKER;
     devDescriptorName_ = strdup("cardname");
@@ -86,10 +82,9 @@ void AudioRenderMmapBenchmarkTest::InitRenderDevDesc(struct AudioDeviceDescripto
         }
     }
     free(devDesc.desc);
-    devDesc.desc = nullptr;
 }
 
-void AudioRenderMmapBenchmarkTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
+void AudioUtRenderMmapTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
 {
     if (dataBlock == nullptr) {
         return;
@@ -104,7 +99,7 @@ void AudioRenderMmapBenchmarkTest::FreeAdapterElements(struct AudioAdapterDescri
     }
 }
 
-void AudioRenderMmapBenchmarkTest::ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen)
+void AudioUtRenderMmapTest::ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen)
 {
     if (descs == nullptr || descsLen == 0) {
         return;
@@ -115,7 +110,7 @@ void AudioRenderMmapBenchmarkTest::ReleaseAllAdapterDescs(struct AudioAdapterDes
     }
 }
 
-void AudioRenderMmapBenchmarkTest::SetUp(const ::benchmark::State &state)
+void AudioUtRenderMmapTest::SetUp()
 {
     manager_ = IAudioManagerGet(false);
     ASSERT_NE(manager_, nullptr);
@@ -138,7 +133,7 @@ void AudioRenderMmapBenchmarkTest::SetUp(const ::benchmark::State &state)
     ASSERT_NE(render_, nullptr);
 }
 
-void AudioRenderMmapBenchmarkTest::TearDown(const ::benchmark::State &state)
+void AudioUtRenderMmapTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
     free(devDescriptorName_);
@@ -156,32 +151,4 @@ void AudioRenderMmapBenchmarkTest::TearDown(const ::benchmark::State &state)
     }
 }
 
-BENCHMARK_F(AudioRenderMmapBenchmarkTest, ReqMmapBuffer)(benchmark::State &state)
-{
-    ASSERT_NE(render_, nullptr);
-    int32_t ret;
-    uint64_t frames = 0;
-    struct AudioTimeStamp time;
-    time.tvNSec = 0;
-    time.tvSec = 0;
-    int32_t reqSize = MMAP_SUGGEST_BUFFER_SIZE;
-    struct AudioMmapBufferDescriptor desc;
-
-    for (auto _ : state) {
-        ret = render_->ReqMmapBuffer(render_, reqSize, &desc);
-        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_INVALID_PARAM);
-
-        ret = render_->Start(render_);
-        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
-
-        ret = render_->GetMmapPosition(render_, &frames, &time);
-        ASSERT_TRUE(ret == HDF_SUCCESS);
-
-        ret = render_->Stop(render_);
-        ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
-    }
-}
-
-BENCHMARK_REGISTER_F(AudioRenderMmapBenchmarkTest, ReqMmapBuffer)->
-    Iterations(ITERATION_FREQUENCY)->Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-}
+}// end of namespace
