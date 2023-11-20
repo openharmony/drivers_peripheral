@@ -17,6 +17,7 @@
 #define OHOS_HDI_DISPLAY_IDISPLAY_COMPOSER_VDI_H
 
 #include <vector>
+#include <string>
 #include "buffer_handle.h"
 #include "common/include/display_common.h"
 #include "v1_1/display_composer_type.h"

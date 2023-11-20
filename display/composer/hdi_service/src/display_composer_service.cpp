@@ -21,6 +21,9 @@
 #include "display_log.h"
 #include "hdf_log.h"
 #include "hdf_trace.h"
+#ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
+    #include "display_dump_service.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_SRV"
@@ -61,6 +64,11 @@ DisplayComposerService::DisplayComposerService()
     } else {
         DISPLAY_LOGE("Load composer VDI failed, lib: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
     }
+
+    
+#ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
+    (void)DevHostRegisterDumpHost(ComposerDumpEvent);
+#endif
 }
 
 DisplayComposerService::~DisplayComposerService()
@@ -114,6 +122,12 @@ int32_t DisplayComposerService::LoadVdi()
         dlclose(libHandle_);
         return HDF_FAILURE;
     }
+
+#ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
+    VdiDumper& dumper = VdiDumper::GetInstance();
+    dumper.SetDumpInfoFunc(reinterpret_cast<GetDumpInfoFunc>(dlsym(libHandle_, "GetDumpInfo")));
+    dumper.SetConfigFunc(reinterpret_cast<UpdateConfigFunc>(dlsym(libHandle_, "UpdateConfig")));
+#endif
     return HDF_SUCCESS;
 }
 
