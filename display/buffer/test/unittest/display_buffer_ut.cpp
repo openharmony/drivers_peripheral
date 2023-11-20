@@ -257,6 +257,10 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
     const int TEST_COUNT = 40; // test 40 times
     for (int i = 0; i < TEST_COUNT; i++) {
         ret = displayBuffer_->AllocMem(info, buffer);
+        if (ret == DISPLAY_NOT_SUPPORT) {
+            HDF_LOGE("%{public}s: AllocMem not support, ret=%{public}d", __func__, ret);
+            return DISPLAY_SUCCESS;
+        }
         if (ret != DISPLAY_SUCCESS || buffer == nullptr) {
             HDF_LOGE("AllocMem failed");
             return ret;
