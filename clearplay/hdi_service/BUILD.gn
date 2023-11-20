@@ -15,28 +15,28 @@ import("//build/ohos.gni")
 
 ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/clearplay/hdi_service/include",
-    "//drivers/peripheral/clearplay/hdi_service/include/drm/v1_0",
-    "//drivers/peripheral/clearplay/hdi_service/include/drm",
-    "//drivers/peripheral/clearplay/interfaces/include",
-    "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0",
-    "//drivers/peripheral/clearplay/interfaces/include/drm",
-    "//drivers/peripheral/clearplay/hdi_service/common",
+    "./include",
+    "./include/drm/v1_0",
+    "./include/drm",
+    "./../interfaces/include",
+    "./../interfaces/include/drm/v1_0",
+    "./../interfaces/include/drm",
+    "./common",
     "//third_party/openssl/include",
     "//third_party/cJSON/",
   ]
   sources = [
-    "//drivers/peripheral/clearplay/hdi_service/common/base64_utils.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/common/clearplay_uuid.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/common/data_parser.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/common/session.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_decrypt_module_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_callback_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_callback_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_factory_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/oem_certificate_service.cpp",
+    "./common/base64_utils.cpp",
+    "./common/clearplay_uuid.cpp",
+    "./common/data_parser.cpp",
+    "./common/session.cpp",
+    "./src/media_decrypt_module_service.cpp",
+    "./src/media_key_session_callback_service.cpp",
+    "./src/media_key_session_service.cpp",
+    "./src/media_key_system_callback_service.cpp",
+    "./src/media_key_system_factory_service.cpp",
+    "./src/media_key_system_service.cpp",
+    "./src/oem_certificate_service.cpp",
   ]
 
   deps = [
