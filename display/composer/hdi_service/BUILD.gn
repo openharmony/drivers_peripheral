@@ -47,7 +47,7 @@ ohos_shared_library("libdisplay_composer_service_1.1") {
     "ipc:ipc_single",
   ]
 
-  if (build_variant != "user"){
+  if (build_variant != "user") {
     include_dirs += [ "../../hal" ]
     sources += [
       "src/display_dump_disp.cpp",
