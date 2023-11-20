@@ -293,10 +293,15 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
     std::string onlineNode = "USB";
     int32_t ret;
     int32_t online;
-    std::string onlinePath;
-
+    std::string onlinePath = path_ + "/" + onlineNode + "/" + "online";
+    ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
+    online = ParseInt(buf);
     auto iter = nodeNames_.begin();
-    while (iter != nodeNames_.end()) {
+    while (!online && iter != nodeNames_.end()) {
+        if (*iter == "USB") {
+            iter++;
+            continue;
+        }
         onlinePath = path_ + "/" + *iter + "/" + "online";
         ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
         if (ret != HDF_SUCCESS) {
@@ -310,13 +315,11 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         iter++;
     }
 
-    ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
         return;
     }
 
-    online = ParseInt(buf);
     if (!online) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "charger is not online, so no type return");
         return;
