@@ -17,6 +17,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("clearplay_test_entry") {
-    deps = [ "//drivers/peripheral/clearplay/test/sample:clearplay_sample" ]
+    deps = [ "./sample:clearplay_sample" ]
   }
 }

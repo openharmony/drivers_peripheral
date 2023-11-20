@@ -15,11 +15,11 @@ import("//build/ohos.gni")
 
 ohos_shared_library("libclearplay_driver") {
   include_dirs = [
-    "//drivers/peripheral/clearplay/interfaces/include",
-    "//drivers/peripheral/clearplay/interfaces/include/drm",
+    "./include",
+    "./include/drm",
   ]
 
-  sources = [ "//drivers/peripheral/clearplay/interfaces/src/media_key_system_factory_driver.cpp" ]
+  sources = [ "./src/media_key_system_factory_driver.cpp" ]
 
   external_deps = [
     "c_utils:utils",

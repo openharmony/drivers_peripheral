@@ -15,18 +15,18 @@ import("//build/ohos.gni")
 
 ohos_executable("clearplay_sample_media_key_system_factory") {
   include_dirs = [
-    "//drivers/peripheral/clearplay/test/sample/include",
-    "//drivers/peripheral/clearplay/hdi_service/include/drm",
-    "//drivers/peripheral/clearplay/hdi_service/include",
-    "//drivers/peripheral/clearplay/hdi_service/common",
-    "//drivers/peripheral/clearplay/interfaces/include/drm",
-    "//drivers/peripheral/clearplay/interfaces/include",
+    "./include",
+    "./../../hdi_service/include/drm",
+    "./../../hdi_service/include",
+    "./../../hdi_service/common",
+    "./../../interfaces/include/drm",
+    "./../../interfaces/include",
   ]
-  sources = [ "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system_factory.cpp" ]
+  sources = [ "./sample/src/clearplay_sample_media_key_system_factory.cpp" ]
 
   deps = [
-    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
-    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+    "./../../hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "./../../interfaces:libclearplay_driver",
   ]
 
   cflags = [
@@ -55,18 +55,18 @@ ohos_executable("clearplay_sample_media_key_system_factory") {
 
 ohos_executable("clearplay_sample_media_key_system") {
   include_dirs = [
-    "//drivers/peripheral/clearplay/test/sample/include",
-    "//drivers/peripheral/clearplay/hdi_service/include/drm",
-    "//drivers/peripheral/clearplay/hdi_service/include",
-    "//drivers/peripheral/clearplay/hdi_service/common",
-    "//drivers/peripheral/clearplay/interfaces/include/drm",
-    "//drivers/peripheral/clearplay/interfaces/include",
+    "./include",
+    "./../../hdi_service/include/drm",
+    "./../../hdi_service/include",
+    "./../../hdi_service/common",
+    "./../../interfaces/include/drm",
+    "./../../interfaces/include",
   ]
-  sources = [ "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system.cpp" ]
+  sources = [ "./src/clearplay_sample_media_key_system.cpp" ]
 
   deps = [
-    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
-    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+    "./../../hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "./../../interfaces:libclearplay_driver",
   ]
 
   cflags = [
@@ -95,21 +95,21 @@ ohos_executable("clearplay_sample_media_key_system") {
 
 ohos_executable("clearplay_sample_decrypt") {
   include_dirs = [
-    "//drivers/peripheral/clearplay/test/sample/include",
-    "//drivers/peripheral/clearplay/hdi_service/include/drm",
-    "//drivers/peripheral/clearplay/hdi_service/include",
-    "//drivers/peripheral/clearplay/hdi_service/common",
-    "//drivers/peripheral/clearplay/interfaces/include/drm",
-    "//drivers/peripheral/clearplay/interfaces/include",
+    "./include",
+    "./../../hdi_service/include/drm",
+    "./../../hdi_service/include",
+    "./../../hdi_service/common",
+    "./../../interfaces/include/drm",
+    "./../../interfaces/include",
   ]
   sources = [
-    "//drivers/peripheral/clearplay/test/sample/src/byte_show.cpp",
-    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_decrypt.cpp",
+    "./src/byte_show.cpp",
+    "./src/clearplay_sample_decrypt.cpp",
   ]
 
   deps = [
-    "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
-    "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+    "./../../hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+    "./../../interfaces:libclearplay_driver",
   ]
 
   cflags = [
