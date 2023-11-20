@@ -30,18 +30,18 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
     "//drivers/peripheral/clearplay/hdi_service/common/clearplay_uuid.cpp",
     "//drivers/peripheral/clearplay/hdi_service/common/data_parser.cpp",
     "//drivers/peripheral/clearplay/hdi_service/common/session.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_callback_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_callback_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/oem_certificate_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_service.cpp",
     "//drivers/peripheral/clearplay/hdi_service/src/media_decrypt_module_service.cpp",
-    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_service.cpp",
+    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_callback_service.cpp",
+    "//drivers/peripheral/clearplay/hdi_service/src/media_key_session_service.cpp",
+    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_callback_service.cpp",
     "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_factory_service.cpp",
+    "//drivers/peripheral/clearplay/hdi_service/src/media_key_system_service.cpp",
+    "//drivers/peripheral/clearplay/hdi_service/src/oem_certificate_service.cpp",
   ]
 
   deps = [
-    "//third_party/openssl:libcrypto_shared",
     "//third_party/cJSON:cjson",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   cflags = [
@@ -54,10 +54,10 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "c_utils:utils"
   ]
 
   install_images = [ chipset_base_dir ]
@@ -66,7 +66,5 @@ ohos_shared_library("libmedia_key_system_factory_clearplay_service_1.0") {
 }
 
 group("hdf_clearplay_service") {
-  deps = [
-    ":libmedia_key_system_factory_clearplay_service_1.0",
-  ]
+  deps = [ ":libmedia_key_system_factory_clearplay_service_1.0" ]
 }

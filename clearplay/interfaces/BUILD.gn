@@ -16,22 +16,20 @@ import("//build/ohos.gni")
 ohos_shared_library("libclearplay_driver") {
   include_dirs = [
     "//drivers/peripheral/clearplay/interfaces/include",
-    "//drivers/peripheral/clearplay/interfaces/include/drm"
+    "//drivers/peripheral/clearplay/interfaces/include/drm",
   ]
 
-  sources = [
-    "//drivers/peripheral/clearplay/interfaces/src/media_key_system_factory_driver.cpp"
-  ]
+  sources = [ "//drivers/peripheral/clearplay/interfaces/src/media_key_system_factory_driver.cpp" ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_drm:libdrm_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "c_utils:utils",
-    "hdf_core:libhdi",
-    "drivers_interface_drm:libdrm_stub_1.0"
   ]
   cflags = [
     "-Wall",
@@ -48,7 +46,5 @@ ohos_shared_library("libclearplay_driver") {
 }
 
 group("hdf_clearplay_interfaces") {
-  deps = [
-    ":libclearplay_driver",
-  ]
+  deps = [ ":libclearplay_driver" ]
 }

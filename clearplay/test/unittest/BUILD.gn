@@ -15,24 +15,14 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ohos_unittest("clearplay_unittest") {
-  include_dirs = [
-    
-  ]
-  sources = [
-    
-  ]
+  include_dirs = []
+  sources = []
 
-  deps = [ 
-    
-  ]
+  deps = []
 
-  cflags = [
-    
-  ]
+  cflags = []
 
-  external_deps = [
-    
-  ]
+  external_deps = []
 
   install_enable = false
   install_images = [ chipset_base_dir ]
