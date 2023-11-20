@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <dlfcn.h>
 #include "hdf_audio_pnp_server.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_input_event.h"
@@ -34,12 +35,15 @@
 
 #define AUDIODRV_CTRL_IOCTRL_ELEM_HDMI 5 // define from adm control stream id
 
-typedef struct {
-    ffrt_function_header_t header;
-    ffrt_function_t func;
-    ffrt_function_t afterFunc;
-    void* arg;
-} FFRTFunction;
+struct AudioPnpPriv {
+    void *handle;
+    ffrt_alloc_base ffrtAllocBase;
+    ffrt_task_attr_init ffrtInitAttr;
+    ffrt_task_attr_set_qos ffrtSetQosAttr;
+    ffrt_task_attr_set_name ffrtSetNameAttr;
+    ffrt_submit_base ffrtSubmitBase;
+};
+static struct AudioPnpPriv priv;
 
 static void FFRTExecFunctionWrapper(void* t)
 {
@@ -67,9 +71,9 @@ static void FFRTDestroyFunctionWrapper(void* t)
 ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
     const ffrt_function_t afterFunc, void* arg)
 {
-    FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= ffrt_auto_managed_function_storage_size,
+    FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
-    FFRTFunction* f = (FFRTFunction*)ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_general);
+    FFRTFunction* f = (FFRTFunction*)priv.ffrtAllocBase(ffrt_function_kind_general);
     if (f == NULL) {
         return NULL;
     }
@@ -79,6 +83,55 @@ ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
     f->afterFunc = afterFunc;
     f->arg = arg;
     return (ffrt_function_header_t*)f;
+}
+
+static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
+{
+    char *error = NULL;
+#ifdef AUDIO_FEATURE_COMMUNITY
+    const char *ffrtLibPath = "/system/lib/chipset-sdk/libffrt.so";
+#else
+    const char *ffrtLibPath = "/system/lib64/chipset-sdk/libffrt.so";
+#endif
+    pPriv->handle = dlopen(ffrtLibPath, RTLD_LAZY);
+    if (pPriv->handle == NULL) {
+        error = dlerror();
+        AUDIO_FUNC_LOGE("audio pnp load path%{public}s, dlopen err=%{public}s", ffrtLibPath, error);
+        return HDF_FAILURE;
+    }
+    (void)dlerror(); // clear existing error
+    pPriv->ffrtAllocBase = dlsym(pPriv->handle, "ffrt_alloc_auto_managed_function_storage_base");
+    pPriv->ffrtInitAttr = dlsym(pPriv->handle, "ffrt_task_attr_init");
+    pPriv->ffrtSetQosAttr = dlsym(pPriv->handle, "ffrt_task_attr_set_qos");
+    pPriv->ffrtSetNameAttr = dlsym(pPriv->handle, "ffrt_task_attr_set_name");
+    pPriv->ffrtSubmitBase = dlsym(pPriv->handle, "ffrt_submit_base");
+    if (pPriv->ffrtAllocBase == NULL || pPriv->ffrtInitAttr == NULL || pPriv->ffrtSetQosAttr == NULL
+        || pPriv->ffrtSetNameAttr == NULL || pPriv->ffrtSubmitBase == NULL) {
+        error = dlerror();
+        AUDIO_FUNC_LOGE("dlsym ffrt err=%{public}s", error);
+        dlclose(pPriv->handle);
+        pPriv->handle = NULL;
+        return HDF_FAILURE;
+    }
+    AUDIO_FUNC_LOGD("audio pnp load ffrt lib success");
+    return HDF_SUCCESS;
+}
+
+ffrt_task_attr_init FFRTAttrInit()
+{
+    return priv.ffrtInitAttr;
+}
+ffrt_task_attr_set_qos FFRTAttrSetQos()
+{
+    return priv.ffrtSetQosAttr;
+}
+ffrt_task_attr_set_name FFRTAttrSetName()
+{
+    return priv.ffrtSetNameAttr;
+}
+ffrt_submit_base FFRTSubmitBase()
+{
+    return priv.ffrtSubmitBase;
 }
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
@@ -154,6 +207,11 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
     }
 
     g_audioPnpDevice = device;
+
+    if (AudioPnpLoadFfrtLib(&priv) < 0) {
+        AUDIO_FUNC_LOGE("audio pnp load ffrt lib fail");
+        return HDF_FAILURE;
+    }
 
     AudioUsbPnpUeventStartThread();
     AudioHeadsetPnpInputStartThread();

@@ -836,10 +836,10 @@ int32_t AudioUsbPnpUeventStartThread(void)
 
     AUDIO_FUNC_LOGI("create audio usb uevent thread");
     ffrt_task_attr_t attr;
-    ffrt_task_attr_init(&attr);
-    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
-    ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    FFRTAttrInit()(&attr);
+    FFRTAttrSetQos()(&attr, ffrt_qos_default);
+    FFRTAttrSetName()(&attr, threadName);
+    FFRTSubmitBase()(FFRTCreateFunctionWrapper(AudioPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
