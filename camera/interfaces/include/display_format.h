@@ -105,8 +105,20 @@ enum PixelFormat : int32_t {
     PIXEL_FMT_YVYU_422_PKG,
     PIXEL_FMT_VYUY_422_PKG,
     PIXEL_FMT_RGBA_1010102,
+    PIXEL_FMT_YCBCR_P010,
+    PIXEL_FMT_YCRCB_P010,
+    PIXEL_FMT_RAW10,
     PIXEL_FMT_VENDER_MASK = 0X7FFF0000,
     PIXEL_FMT_BUTT = 0X7FFFFFFF,
+};
+
+enum OhosColorSpace {
+    OHOS_CAMERA_COLORSPACE_NONE,
+    OHOS_CAMERA_BT709_FULL          = 1 | (1 << 8) | (1 << 16) | (1 << 21),  // COLORPRIMARIES_BT709   | (TRANSFUNC_BT709 << 8) | (MATRIX_BT709   << 16) | (RANGE_FULL << 21)
+    OHOS_CAMERA_BT2020_HLG_FULL     = 4 | (5 << 8) | (4 << 16) | (1 << 21),  // COLORPRIMARIES_BT2020  | (TRANSFUNC_HLG   << 8) | (MATRIX_BT2020  << 16) | (RANGE_FULL << 21)
+    OHOS_CAMERA_BT2020_PQ_FULL      = 4 | (4 << 8) | (4 << 16) | (1 << 21),  // COLORPRIMARIES_BT2020  | (TRANSFUNC_PQ    << 8) | (MATRIX_BT2020  << 16) | (RANGE_FULL << 21)
+    OHOS_CAMERA_SRGB_FULL           = 1 | (2 << 8) | (3 << 16) | (1 << 21),  // COLORPRIMARIES_SRGB    | (TRANSFUNC_SRGB  << 8) | (MATRIX_BT601_N << 16) | (RANGE_FULL << 21)
+    OHOS_CAMERA_P3_FULL             = 6 | (2 << 8) | (3 << 16) | (1 << 21),  // COLORPRIMARIES_P3_D65  | (TRANSFUNC_SRGB  << 8) | (MATRIX_P3      << 16) | (RANGE_FULL << 21)
 };
 
 } // end namespace OHOS::Camera
