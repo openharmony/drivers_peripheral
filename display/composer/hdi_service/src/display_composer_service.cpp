@@ -65,7 +65,6 @@ DisplayComposerService::DisplayComposerService()
         DISPLAY_LOGE("Load composer VDI failed, lib: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
     }
 
-    
 #ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
     (void)DevHostRegisterDumpHost(ComposerDumpEvent);
 #endif
