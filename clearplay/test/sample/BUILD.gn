@@ -22,11 +22,9 @@ ohos_executable("clearplay_sample_media_key_system_factory") {
     "//drivers/peripheral/clearplay/interfaces/include/drm",
     "//drivers/peripheral/clearplay/interfaces/include",
   ]
-  sources = [
-    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system_factory.cpp",
-  ]
+  sources = [ "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system_factory.cpp" ]
 
-  deps = [ 
+  deps = [
     "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
     "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
   ]
@@ -64,11 +62,9 @@ ohos_executable("clearplay_sample_media_key_system") {
     "//drivers/peripheral/clearplay/interfaces/include/drm",
     "//drivers/peripheral/clearplay/interfaces/include",
   ]
-  sources = [
-    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system.cpp",
-  ]
+  sources = [ "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_media_key_system.cpp" ]
 
-  deps = [ 
+  deps = [
     "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
     "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
   ]
@@ -107,11 +103,11 @@ ohos_executable("clearplay_sample_decrypt") {
     "//drivers/peripheral/clearplay/interfaces/include",
   ]
   sources = [
-    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_decrypt.cpp",
     "//drivers/peripheral/clearplay/test/sample/src/byte_show.cpp",
+    "//drivers/peripheral/clearplay/test/sample/src/clearplay_sample_decrypt.cpp",
   ]
 
-  deps = [ 
+  deps = [
     "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
     "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
   ]
@@ -142,8 +138,8 @@ ohos_executable("clearplay_sample_decrypt") {
 
 group("clearplay_sample") {
   deps = [
-    ":clearplay_sample_media_key_system_factory",
-    ":clearplay_sample_media_key_system",
     ":clearplay_sample_decrypt",
+    ":clearplay_sample_media_key_system",
+    ":clearplay_sample_media_key_system_factory",
   ]
 }

@@ -13,13 +13,10 @@
 
 if (defined(ohos_lite)) {
   group("clearplay_test_entry") {
-    deps = [ ]
+    deps = []
   }
 } else {
   group("clearplay_test_entry") {
-    deps = [
-      "//drivers/peripheral/clearplay/test/sample:clearplay_sample",
-      # "//drivers/peripheral/clearplay/test/unittest:clearplay_unittest",
-    ]
+    deps = [ "//drivers/peripheral/clearplay/test/sample:clearplay_sample" ]
   }
 }
