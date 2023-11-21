@@ -167,7 +167,7 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     FfrtAttrInitFunc()(&attr);
     FfrtAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
     FfrtAttrSetNameFunc()(&attr, threadName);
-    FfrtSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
+    FfrtSubmitBaseFunc()(FfrtCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
