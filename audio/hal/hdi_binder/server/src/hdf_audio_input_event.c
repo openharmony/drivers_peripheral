@@ -164,10 +164,10 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     g_bRunThread = true;
     
     FFRTTaskAttr attr;
-    FFRTAttrInit()(&attr);
-    FFRTAttrSetQos()(&attr, FFRT_QOS_DEFAULT);
-    FFRTAttrSetName()(&attr, threadName);
-    FFRTSubmitBase()(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
+    FFRTAttrInitFunc()(&attr);
+    FFRTAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
+    FFRTAttrSetNameFunc()(&attr, threadName);
+    FFRTSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
