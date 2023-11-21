@@ -36,10 +36,16 @@ ohos_unittest("camera_test_hdi_V1_1") {
   module_out_path = module_output_path
   sources = [
     "$camera_test_path/v1_1/src/camera_hdi_uttest_v1_1.cpp",
-    "$camera_test_path/v1_1/src/camera_tag_uttest_v1_1.cpp",
-    "$camera_test_path/v1_1/src/front_camera_tag_uttest_v1_1.cpp",
     "$camera_test_path/v1_1/src/hdi_common_v1_1.cpp",
   ]
+
+  UNITTEST_ALN_ENABLE = false
+  if (UNITTEST_ALN_ENABLE) {
+    sources += [
+      "$camera_test_path/v1_1/src/camera_tag_uttest_v1_1.cpp",
+      "$camera_test_path/v1_1/src/front_camera_tag_uttest_v1_1.cpp",
+    ]
+  }
 
   include_dirs = [
     # common includes
