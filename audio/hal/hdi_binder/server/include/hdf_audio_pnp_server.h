@@ -20,7 +20,7 @@
 #include "hdf_types.h"
 
 #define FFRT_TASK_ATTR_STORAGE_SIZE 128
-#define FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE (64 + sizeof(ffrt_function_header_t))
+#define FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE (64 + sizeof(FFRTFunctionHeader))
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
 
 typedef struct {
     uint32_t storage[(FFRT_TASK_ATTR_STORAGE_SIZE + sizeof(uint32_t) - 1) / sizeof(uint32_t)];
-} ffrt_task_attr_t;
+} FFRTTaskAttr;
 
-typedef void(*ffrt_function_t)(void*);
+typedef void(*FFRTFunctionT)(void*);
 
 typedef enum {
     FFRT_FUNCTION_KIND_GENERAL,
@@ -56,44 +56,44 @@ typedef enum {
 typedef struct {
     FFRTDependenceType type;
     const void *ptr;
-} ffrt_dependence_t;
+} FFRTDependence;
 
 typedef struct {
     uint32_t len;
-    const ffrt_dependence_t *items;
-} ffrt_deps_t;
+    const FFRTDependence *items;
+} FFRTDeps;
 
 typedef struct {
-    ffrt_function_t exec;
-    ffrt_function_t destroy;
+    FFRTFunctionT exec;
+    FFRTFunctionT destroy;
     uint64_t reserve[2];
-} ffrt_function_header_t;
+} FFRTFunctionHeader;
 
 typedef struct {
-    ffrt_function_header_t header;
-    ffrt_function_t func;
-    ffrt_function_t afterFunc;
+    FFRTFunctionHeader header;
+    FFRTFunctionT func;
+    FFRTFunctionT afterFunc;
     void *arg;
 } FFRTFunction;
 
-typedef void*(*ffrt_alloc_base)(FFRTFunctionKind);
-typedef int(*ffrt_task_attr_init)(ffrt_task_attr_t*);
-typedef void(*ffrt_task_attr_set_qos)(ffrt_task_attr_t*, int);
-typedef void(*ffrt_task_attr_set_name)(ffrt_task_attr_t*, const char*);
-typedef void(*ffrt_submit_base)(
-    ffrt_function_header_t*, const ffrt_deps_t*, const ffrt_deps_t*, const ffrt_task_attr_t*);
-ffrt_task_attr_init FFRTAttrInit();
-ffrt_task_attr_set_qos FFRTAttrSetQos();
-ffrt_task_attr_set_name FFRTAttrSetName();
-ffrt_submit_base FFRTSubmitBase();
+typedef void*(*FFRTAllocBase)(FFRTFunctionKind);
+typedef int(*FFRTTaskAttrInit)(FFRTTaskAttr*);
+typedef void(*FFRTTaskAttrSetQos)(FFRTTaskAttr*, int);
+typedef void(*FFRTTaskAttrSetName)(FFRTTaskAttr*, const char*);
+typedef void(*FFRTSubmitBase)(
+    FFRTFunctionHeader*, const FFRTDeps*, const FFRTDeps*, const FFRTTaskAttr*);
+FFRTTaskAttrInit FFRTAttrInitFunc();
+FFRTTaskAttrSetQos FFRTAttrSetQosFunc();
+FFRTTaskAttrSetName FFRTAttrSetNameFunc();
+FFRTSubmitBase FFRTSubmitBaseFunc();
 
 /* statusInfo is update new info */
 int32_t AudioPnpUpdateInfo(const char *statusInfo);
 int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
 int32_t AudioUhdfUnloadDriver(const char *driverName);
 int32_t AudioUhdfLoadDriver(const char *driverName);
-ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
-    const ffrt_function_t afterFunc, void* arg);
+FFRTFunctionHeader* FFRTCreateFunctionWrapper(const FFRTFunctionT func,
+    const FFRTFunctionT afterFunc, void* arg);
 #ifdef __cplusplus
 }
 #endif
