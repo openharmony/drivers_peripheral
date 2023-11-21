@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,18 +25,16 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 class Session : public RefBase {
 public:
-    explicit Session(){}
-    virtual ~Session(){}
-    int32_t getKeyRequest(const std::vector<uint8_t>& indexInfo,
-        const std::string& mimeType, LicenseType keyType, std::map<std::string, std::string> optionalData, std::vector<uint8_t>* keyRequest);
-    int32_t setKeyIdAndKeyValue(const std::vector<uint8_t>& keyId, const std::vector<uint8_t>& keyValue);
-    int32_t getKeyValueByKeyId(const std::vector<uint8_t>& keyId, std::vector<uint8_t>& keyValue);
+    explicit Session() {}
+    virtual ~Session() {}
+    int32_t getKeyRequest(const std::vector<uint8_t> &indexInfo, const std::string &mimeType, LicenseType keyType,
+        std::map<std::string, std::string> optionalData, std::vector<uint8_t> *keyRequest);
+    int32_t setKeyIdAndKeyValue(const std::vector<uint8_t> &keyId, const std::vector<uint8_t> &keyValue);
+    int32_t getKeyValueByKeyId(const std::vector<uint8_t> &keyId, std::vector<uint8_t> &keyValue);
     std::vector<std::pair<std::vector<uint8_t>, std::vector<uint8_t>>> keyIdAndKeyValue_;
 };
-
 } // V1_0
 } // Drm
 } // HDI

@@ -25,7 +25,7 @@ namespace Drm {
 namespace V1_0 {
 
 bool IsClearPlayUuid(const std::string& uuid) {
-    return uuid == clearPlayUuid;
+    return uuid == CLEARPLAY_UUID;
 }
 
 } // V1_0

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> media_key_system_factory = new MediaKeySystemFactoryService();
 
     // IsMediaKeySystemSupported case 1
-    media_key_system_factory->IsMediaKeySystemSupported(clearPlayUuid, isoVideoMimeType, SECURE_UNKNOWN, isSupported);
+    media_key_system_factory->IsMediaKeySystemSupported(clearPlayUuid, ISO_VIDEO_MIME_TYPE, SECURE_UNKNOWN, isSupported);
     printf("IsMediaKeySystemSupported: %d, expect 1\n", isSupported);
     // IsMediaKeySystemSupported case 2
     clearPlayUuid = "E79628B6406A6724DCD5A1DA50B53E81"; // wrong uuid
-    media_key_system_factory->IsMediaKeySystemSupported(clearPlayUuid, isoVideoMimeType, SECURE_UNKNOWN, isSupported);
+    media_key_system_factory->IsMediaKeySystemSupported(clearPlayUuid, ISO_VIDEO_MIME_TYPE, SECURE_UNKNOWN, isSupported);
     printf("IsMediaKeySystemSupported: %d, expect 0\n", isSupported);
 
     // CreateMediaKeySystem
