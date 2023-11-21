@@ -225,11 +225,11 @@ int32_t AudioHdmiPnpUeventStartThread(void)
     g_hdmiPnpThreadRunning = true;
 
     AUDIO_FUNC_LOGI("create audio hdmi pnp uevent thread");
-    FFRTTaskAttr attr;
-    FFRTAttrInitFunc()(&attr);
-    FFRTAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
-    FFRTAttrSetNameFunc()(&attr, threadName);
-    FFRTSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    FfrtTaskAttr attr;
+    FfrtAttrInitFunc()(&attr);
+    FfrtAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
+    FfrtAttrSetNameFunc()(&attr, threadName);
+    FfrtSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
