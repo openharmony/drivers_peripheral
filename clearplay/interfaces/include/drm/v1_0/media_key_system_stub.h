@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 using namespace OHOS;
 class MediaKeySystemStub : public IPCObjectStub {
 public:
@@ -36,77 +35,125 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t MediaKeySystemStubGetConfigurationString_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetConfigurationString_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubSetConfigurationString_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubSetConfigurationString_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetConfigurationByteArray_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetConfigurationByteArray_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubSetConfigurationByteArray_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubSetConfigurationByteArray_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetMetrics_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetMetrics_(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetMaxSecurityLevel_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetMaxSecurityLevel_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGenerateKeySystemRequest_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGenerateKeySystemRequest_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubProcessKeySystemResponse_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubProcessKeySystemResponse_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOemCertificateStatus_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOemCertificateStatus_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubSetCallback_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubSetCallback_(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubCreateMediaKeySession_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubCreateMediaKeySession_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOfflineLicenseIds_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOfflineLicenseIds_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOfflineLicenseStatus_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOfflineLicenseStatus_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubRemoveOfflineLicense_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubRemoveOfflineLicense_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOemCertificate_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOemCertificate_(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubDestroy_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubDestroy_(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetVersion_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetVersion_(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
 private:
-    int32_t MediaKeySystemStubGetConfigurationString(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetConfigurationString(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubSetConfigurationString(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubSetConfigurationString(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetConfigurationByteArray(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetConfigurationByteArray(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubSetConfigurationByteArray(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubSetConfigurationByteArray(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetMetrics(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetMetrics(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetMaxSecurityLevel(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetMaxSecurityLevel(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGenerateKeySystemRequest(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGenerateKeySystemRequest(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubProcessKeySystemResponse(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubProcessKeySystemResponse(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOemCertificateStatus(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOemCertificateStatus(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubSetCallback(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubSetCallback(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubCreateMediaKeySession(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubCreateMediaKeySession(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOfflineLicenseIds(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOfflineLicenseIds(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOfflineLicenseStatus(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOfflineLicenseStatus(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubRemoveOfflineLicense(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubRemoveOfflineLicense(MessageParcel &mediaKeySystemData,
+        MessageParcel &mediaKeySystemReply, MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOemCertificate(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOemCertificate(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubDestroy(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubDestroy(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetVersion(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetVersion(MessageParcel &mediaKeySystemData, MessageParcel &mediaKeySystemReply,
+        MessageOption &mediaKeySystemOption);
 
 
-    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaKeySystemStub, OHOS::HDI::Drm::V1_0::IMediaKeySystem> objDelegator_;
+    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaKeySystemStub, OHOS::HDI::Drm::V1_0::IMediaKeySystem>
+        objDelegator_;
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl_;
 };
 } // V1_0

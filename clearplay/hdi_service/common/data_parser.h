@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,16 +24,15 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+const size_t KEY_ID_SIZE = 16;
+const size_t SYSTEM_ID_SIZE = 16;
 
-const size_t keyIdSize = 16;
-const size_t systemIdSize = 16;
+int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<uint8_t>> &keyIds);
 
-int32_t ParsePssh(const std::vector<uint8_t>& initData, std::vector<std::vector<uint8_t>>& keyIds);
+int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
+    std::string *request);
 
-int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>>& keyIds, std::string* request);
-
-int32_t findSubVector(const std::vector<uint8_t>& main, const std::vector<uint8_t>& sub);
-
+int32_t findSubVector(const std::vector<uint8_t> &main, const std::vector<uint8_t> &sub);
 } // V1_0
 } // Drm
 } // HDI
