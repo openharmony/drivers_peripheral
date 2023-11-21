@@ -37,17 +37,17 @@
 
 struct AudioPnpPriv {
     void *handle;
-    FFRTAllocBase ffrtAllocBase;
-    FFRTTaskAttrInit ffrtInitAttr;
-    FFRTTaskAttrSetQos ffrtSetQosAttr;
-    FFRTTaskAttrSetName ffrtSetNameAttr;
-    FFRTSubmitBase ffrtSubmitBase;
+    FfrtAllocBase ffrtAllocBase;
+    FfrtTaskAttrInit ffrtInitAttr;
+    FfrtTaskAttrSetQos ffrtSetQosAttr;
+    FfrtTaskAttrSetName ffrtSetNameAttr;
+    FfrtSubmitBase ffrtSubmitBase;
 };
 static struct AudioPnpPriv g_priv;
 
-static void FFRTExecFunctionWrapper(void* t)
+static void FfrtExecFunctionWrapper(void* t)
 {
-    FFRTFunction* f = (FFRTFunction*)t;
+    FfrtFunction* f = (FfrtFunction*)t;
     if (f == NULL) {
         return;
     }
@@ -56,9 +56,9 @@ static void FFRTExecFunctionWrapper(void* t)
     }
 }
 
-static void FFRTDestroyFunctionWrapper(void* t)
+static void FfrtDestroyFunctionWrapper(void* t)
 {
-    FFRTFunction* f = (FFRTFunction*)t;
+    FfrtFunction* f = (FfrtFunction*)t;
     if (f == NULL) {
         return;
     }
@@ -68,21 +68,21 @@ static void FFRTDestroyFunctionWrapper(void* t)
 }
 
 #define FFRT_STATIC_ASSERT(cond, msg) int x(int static_assertion_##msg[(cond) ? 1 : -1])
-FFRTFunctionHeader* FFRTCreateFunctionWrapper(const FFRTFunctionT func,
-    const FFRTFunctionT afterFunc, void* arg)
+FfrtFunctionHeader* FfrtCreateFunctionWrapper(const FfrtFunctionT func,
+    const FfrtFunctionT afterFunc, void* arg)
 {
-    FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
+    FFRT_STATIC_ASSERT(sizeof(FfrtFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
-    FFRTFunction* f = (FFRTFunction*)g_priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
+    FfrtFunction* f = (FfrtFunction*)g_priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
     if (f == NULL) {
         return NULL;
     }
-    f->header.exec = FFRTExecFunctionWrapper;
-    f->header.destroy = FFRTDestroyFunctionWrapper;
+    f->header.exec = FfrtExecFunctionWrapper;
+    f->header.destroy = FfrtDestroyFunctionWrapper;
     f->func = func;
     f->afterFunc = afterFunc;
     f->arg = arg;
-    return (FFRTFunctionHeader*)f;
+    return (FfrtFunctionHeader*)f;
 }
 
 static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
@@ -117,19 +117,19 @@ static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
     return HDF_SUCCESS;
 }
 
-FFRTTaskAttrInit FFRTAttrInitFunc()
+FfrtTaskAttrInit FfrtAttrInitFunc()
 {
     return g_priv.ffrtInitAttr;
 }
-FFRTTaskAttrSetQos FFRTAttrSetQosFunc()
+FfrtTaskAttrSetQos FfrtAttrSetQosFunc()
 {
     return g_priv.ffrtSetQosAttr;
 }
-FFRTTaskAttrSetName FFRTAttrSetNameFunc()
+FfrtTaskAttrSetName FfrtAttrSetNameFunc()
 {
     return g_priv.ffrtSetNameAttr;
 }
-FFRTSubmitBase FFRTSubmitBaseFunc()
+FfrtSubmitBase FfrtSubmitBaseFunc()
 {
     return g_priv.ffrtSubmitBase;
 }
