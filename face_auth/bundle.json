@@ -23,7 +23,7 @@
           "c_utils",
           "drivers_interface_camera",
           "drivers_interface_face_auth",
-          "graphic_chipsetsdk"
+          "graphic_surface"
         ],
         "third_party": [
         ]
