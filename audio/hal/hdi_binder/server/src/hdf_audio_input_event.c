@@ -163,11 +163,11 @@ int32_t AudioHeadsetPnpInputStartThread(void)
     AUDIO_FUNC_LOGI("create audio headset pnp uevent thread");
     g_bRunThread = true;
     
-    FFRTTaskAttr attr;
-    FFRTAttrInitFunc()(&attr);
-    FFRTAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
-    FFRTAttrSetNameFunc()(&attr, threadName);
-    FFRTSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
+    FfrtTaskAttr attr;
+    FfrtAttrInitFunc()(&attr);
+    FfrtAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
+    FfrtAttrSetNameFunc()(&attr, threadName);
+    FfrtSubmitBaseFunc()(FFRTCreateFunctionWrapper(AudioPnpInputStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }
