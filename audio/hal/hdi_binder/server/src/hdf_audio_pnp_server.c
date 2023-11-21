@@ -43,7 +43,7 @@ struct AudioPnpPriv {
     ffrt_task_attr_set_name ffrtSetNameAttr;
     ffrt_submit_base ffrtSubmitBase;
 };
-static struct AudioPnpPriv priv;
+static struct AudioPnpPriv g_priv;
 
 static void FFRTExecFunctionWrapper(void* t)
 {
@@ -68,12 +68,12 @@ static void FFRTDestroyFunctionWrapper(void* t)
 }
 
 #define FFRT_STATIC_ASSERT(cond, msg) int x(int static_assertion_##msg[(cond) ? 1 : -1])
-ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
-    const ffrt_function_t afterFunc, void* arg)
+FFRTFunctionHeader* FFRTCreateFunctionWrapper(const FFRTFunctionT func,
+    const FFRTFunctionT afterFunc, void* arg)
 {
     FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
-    FFRTFunction* f = (FFRTFunction*)priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
+    FFRTFunction* f = (FFRTFunction*)g_priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
     if (f == NULL) {
         return NULL;
     }
@@ -82,7 +82,7 @@ ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
     f->func = func;
     f->afterFunc = afterFunc;
     f->arg = arg;
-    return (ffrt_function_header_t*)f;
+    return (FFRTFunctionHeader*)f;
 }
 
 static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
@@ -117,21 +117,21 @@ static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
     return HDF_SUCCESS;
 }
 
-ffrt_task_attr_init FFRTAttrInit()
+FFRTTaskAttrInit FFRTAttrInitFunc()
 {
-    return priv.ffrtInitAttr;
+    return g_priv.ffrtInitAttr;
 }
-ffrt_task_attr_set_qos FFRTAttrSetQos()
+FFRTTaskAttrSetQos FFRTAttrSetQosFunc()
 {
-    return priv.ffrtSetQosAttr;
+    return g_priv.ffrtSetQosAttr;
 }
-ffrt_task_attr_set_name FFRTAttrSetName()
+FFRTTaskAttrSetName FFRTAttrSetNameFunc()
 {
-    return priv.ffrtSetNameAttr;
+    return g_priv.ffrtSetNameAttr;
 }
-ffrt_submit_base FFRTSubmitBase()
+FFRTSubmitBase FFRTSubmitBaseFunc()
 {
-    return priv.ffrtSubmitBase;
+    return g_priv.ffrtSubmitBase;
 }
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
@@ -208,7 +208,7 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
 
     g_audioPnpDevice = device;
 
-    if (AudioPnpLoadFfrtLib(&priv) < 0) {
+    if (AudioPnpLoadFfrtLib(&g_priv) < 0) {
         AUDIO_FUNC_LOGE("audio pnp load ffrt lib fail");
         return HDF_FAILURE;
     }
