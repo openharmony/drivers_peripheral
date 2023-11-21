@@ -24,6 +24,7 @@ namespace Sensor {
 namespace V1_1 {
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
+std::mutex SensorClientsManager::instanceMutex_;
 
 SensorClientsManager::SensorClientsManager()
 {
@@ -175,7 +176,10 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 SensorClientsManager* SensorClientsManager::GetInstance()
 {
     if (instance == nullptr) {
-        instance = new SensorClientsManager();
+        std::unique_lock<std::mutex> lock(instanceMutex_);
+        if (instance == nullptr) {
+            instance = new SensorClientsManager();
+        }
     }
     return instance;
 }
