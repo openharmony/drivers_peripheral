@@ -20,7 +20,7 @@
 #include "hdf_types.h"
 
 #define FFRT_TASK_ATTR_STORAGE_SIZE 128
-#define FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE 64 + sizeof(ffrt_function_header_t)
+#define FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE (64 + sizeof(ffrt_function_header_t))
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,28 +33,28 @@ typedef struct {
 typedef void(*ffrt_function_t)(void*);
 
 typedef enum {
-    ffrt_function_kind_general,
-    ffrt_function_kind_queue,
+    FFRT_FUNCTION_KIND_GENERAL,
+    FFRT_FUNCTION_KIND_QUEUE,
 #ifdef FFRT_IO_TASK_SCHEDULER
-    ffrt_function_kind_io,
+    FFRT_FUNCTION_KIND_IO,
 #endif
-} ffrt_function_kind_t;
+} FFRTFunctionKind;
 
 typedef enum {
-    ffrt_qos_inherit = -1,
-    ffrt_qos_background,
-    ffrt_qos_utility,
-    ffrt_qos_default,
-    ffrt_qos_user_initiated,
-} ffrt_qos_default_t;
+    FFRT_QOS_INHERIT = -1,
+    FFRT_QOS_BACKGROUND,
+    FFRT_QOS_UTILITY,
+    FFRT_QOS_DEFAULT,
+    FFRT_QOS_USER_INITIATED,
+} FFRTQosDefault;
 
 typedef enum {
-    ffrt_dependence_data,
-    ffrt_dependence_task,
-} ffrt_dependence_type_t;
+    FFRT_DEPENDENCE_DATA,
+    FFRT_DEPENDENCE_TASK,
+} FFRTDependenceType;
 
 typedef struct {
-    ffrt_dependence_type_t type;
+    FFRTDependenceType type;
     const void *ptr;
 } ffrt_dependence_t;
 
@@ -76,7 +76,7 @@ typedef struct {
     void *arg;
 } FFRTFunction;
 
-typedef void*(*ffrt_alloc_base)(ffrt_function_kind_t);
+typedef void*(*ffrt_alloc_base)(FFRTFunctionKind);
 typedef int(*ffrt_task_attr_init)(ffrt_task_attr_t*);
 typedef void(*ffrt_task_attr_set_qos)(ffrt_task_attr_t*, int);
 typedef void(*ffrt_task_attr_set_name)(ffrt_task_attr_t*, const char*);

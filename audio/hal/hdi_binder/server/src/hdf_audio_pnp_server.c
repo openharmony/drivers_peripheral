@@ -73,7 +73,7 @@ ffrt_function_header_t* FFRTCreateFunctionWrapper(const ffrt_function_t func,
 {
     FFRT_STATIC_ASSERT(sizeof(FFRTFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
         size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
-    FFRTFunction* f = (FFRTFunction*)priv.ffrtAllocBase(ffrt_function_kind_general);
+    FFRTFunction* f = (FFRTFunction*)priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
     if (f == NULL) {
         return NULL;
     }
@@ -113,7 +113,7 @@ static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
         pPriv->handle = NULL;
         return HDF_FAILURE;
     }
-    AUDIO_FUNC_LOGD("audio pnp load ffrt lib success");
+    AUDIO_FUNC_LOGE("audio pnp load ffrt lib success");
     return HDF_SUCCESS;
 }
 
