@@ -37,11 +37,11 @@
 
 struct AudioPnpPriv {
     void *handle;
-    ffrt_alloc_base ffrtAllocBase;
-    ffrt_task_attr_init ffrtInitAttr;
-    ffrt_task_attr_set_qos ffrtSetQosAttr;
-    ffrt_task_attr_set_name ffrtSetNameAttr;
-    ffrt_submit_base ffrtSubmitBase;
+    FFRTAllocBase ffrtAllocBase;
+    FFRTTaskAttrInit ffrtInitAttr;
+    FFRTTaskAttrSetQos ffrtSetQosAttr;
+    FFRTTaskAttrSetName ffrtSetNameAttr;
+    FFRTSubmitBase ffrtSubmitBase;
 };
 static struct AudioPnpPriv g_priv;
 
