@@ -36,28 +36,27 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
     event.mode = eventVdi.mode;
     event.data = eventVdi.data;
     event.dataLen = eventVdi.dataLen;
-    std::unordered_map<int, std::set<int>> map = SensorClientsManager::GetInstance()->GetSensorUsed();
+    std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
         HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
         return HDF_FAILURE;
     }
     sptr<ISensorCallback> callback;
-    if (map.find(event.sensorId) == map.end()) {
+    if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGE("%{public}s sensor is not enabled by anyone", __func__);
         return HDF_FAILURE;
     }
-    for (auto it = map[event.sensorId].begin(); it != map[event.sensorId].end(); ++it) {
+    for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
             HDF_LOGE("%{public}s callback is nullptr", __func__);
-            break;
+            continue;
         }
         ret = callback->OnDataEvent(event);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
-            break;
         }
     }
     return HDF_SUCCESS;
