@@ -66,7 +66,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     readPosition += sizeof(psshVersion1);
 
     // Validate system ID
-    std::string uuid(static_cast<char *>(initData.data()) + readPosition, CLEARPLAY_UUID.size());
+    std::string uuid((reinterpret_cast<const char*>(initData.data())) + readPosition, CLEARPLAY_UUID.size());
     if (IsClearPlayUuid(uuid)) {
         HDF_LOGE("%{public}s: uuid error", __func__);
         return HDF_ERR_INVALID_PARAM;
