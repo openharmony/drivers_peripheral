@@ -32,7 +32,7 @@ ohos_unittest("codec_hdi_omx_test") {
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
       "drivers_peripheral_codec:libcodec_hdi_omx_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

@@ -30,7 +30,7 @@ ohos_unittest("codec_hdi_1.0_test") {
       "c_utils:utils",
       "drivers_peripheral_codec:libcodec_client",
       "drivers_peripheral_display:hdi_gralloc_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

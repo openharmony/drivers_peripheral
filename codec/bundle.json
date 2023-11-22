@@ -30,7 +30,7 @@
         "drivers_interface_codec",
         "drivers_interface_display",
         "drivers_peripheral_display",
-        "graphic_surface",
+        "graphic_chipsetsdk",
         "hdf_core",
         "hitrace",
         "hilog",
