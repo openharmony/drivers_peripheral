@@ -131,15 +131,14 @@ int32_t MediaDecryptModuleService::DecryptBySM4Cbc(const std::vector<uint8_t> &k
     uint8_t *srcData, uint8_t *destData, const std::vector<SubSample> &subSamples)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    EVP_CIPHER_CTX *ctx;
+    size_t offset = 0;
+    int len;
+    int32_t ret = HDF_FAILURE;
     if (key.size() != BLOCK_SIZE || iv.size() != BLOCK_SIZE) {
         HDF_LOGE("key or iv length error");
         return HDF_ERR_INVALID_PARAM;
     }
-
-    EVP_CIPHER_CTX *ctx;
-    size_t offset = 0;
-    int len;
-
     HDF_LOGI("%{public}s: before EVP_DecryptInit_ex", __func__);
     ctx = EVP_CIPHER_CTX_new();
     EVP_DecryptInit_ex(ctx, EVP_sm4_cbc(), nullptr, key.data(), iv.data());
@@ -149,7 +148,11 @@ int32_t MediaDecryptModuleService::DecryptBySM4Cbc(const std::vector<uint8_t> &k
     for (auto &subSample : subSamples) {
         if (subSample.clearHeaderLen > 0) {
             HDF_LOGI("%{public}s: before clear header memcpy_s", __func__);
-            memcpy_s(destData + offset, subSample.clearHeaderLen, srcData + offset, subSample.clearHeaderLen);
+            ret = memcpy_s(destData + offset, subSample.clearHeaderLen, srcData + offset, subSample.clearHeaderLen);
+            if (ret != 0) {
+                HDF_LOGI("%{public}s: memcpy_s faild!", __func__);
+                return ret;
+            }
             HDF_LOGI("%{public}s: after clear header memcpy_s", __func__);
             offset += subSample.clearHeaderLen;
         }
@@ -161,7 +164,6 @@ int32_t MediaDecryptModuleService::DecryptBySM4Cbc(const std::vector<uint8_t> &k
                 (const unsigned char *)(srcData + offset), (int)(subSample.payLoadLen));
             // End decryption process
             EVP_DecryptFinal_ex(ctx, (unsigned char *)(destData + offset + len), &len);
-            ;
             HDF_LOGI("%{public}s: after EVP_DecryptFinal_ex", __func__);
             offset += subSample.payLoadLen;
         }
@@ -176,13 +178,13 @@ int32_t MediaDecryptModuleService::DecryptByAesCbc(const std::vector<uint8_t> &k
     uint8_t *srcData, uint8_t *destData, const std::vector<SubSample> &subSamples)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    size_t offset = 0;
+    AES_KEY opensslKey;
+    int32_t ret = HDF_FAILURE;
     if (key.size() != BLOCK_SIZE || iv.size() != BLOCK_SIZE) {
         HDF_LOGE("key or iv length error");
         return HDF_ERR_INVALID_PARAM;
     }
-
-    size_t offset = 0;
-    AES_KEY opensslKey;
     HDF_LOGI("%{public}s: before AES_set_decrypt_key", __func__);
     AES_set_decrypt_key((unsigned char *)key.data(), BLOCK_BIT_SIZE, &opensslKey);
     HDF_LOGI("%{public}s: after AES_set_decrypt_key", __func__);
@@ -190,7 +192,11 @@ int32_t MediaDecryptModuleService::DecryptByAesCbc(const std::vector<uint8_t> &k
     for (auto &subSample : subSamples) {
         if (subSample.clearHeaderLen > 0) {
             HDF_LOGI("%{public}s: before clear header memcpy_s", __func__);
-            memcpy_s(destData + offset, subSample.clearHeaderLen, srcData + offset, subSample.clearHeaderLen);
+            ret = memcpy_s(destData + offset, subSample.clearHeaderLen, srcData + offset, subSample.clearHeaderLen);
+            if (ret != 0) {
+                HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+                return ret;
+            }
             HDF_LOGI("%{public}s: after clear header memcpy_s", __func__);
             offset += subSample.clearHeaderLen;
         }
@@ -212,14 +218,23 @@ int32_t MediaDecryptModuleService::CopyBuffer(uint8_t *srcBuffer, uint8_t *destB
 {
     HDF_LOGI("%{public}s: start", __func__);
     size_t offset = 0;
+    int32_t ret = HDF_FAILURE;
     for (auto &subSample : subSamples) {
         if (subSample.clearHeaderLen > 0) {
-            memcpy_s(destBuffer + offset, subSample.clearHeaderLen, srcBuffer + offset, subSample.clearHeaderLen);
+            ret = memcpy_s(destBuffer + offset, subSample.clearHeaderLen, srcBuffer + offset, subSample.clearHeaderLen);
+            if (ret != 0) {
+                HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+                return ret;
+            }
             offset += subSample.clearHeaderLen;
         }
 
         if (subSample.payLoadLen > 0) {
-            memcpy_s(destBuffer + offset, subSample.clearHeaderLen, srcBuffer + offset, subSample.payLoadLen);
+            ret = memcpy_s(destBuffer + offset, subSample.clearHeaderLen, srcBuffer + offset, subSample.payLoadLen);
+            if (ret != 0) {
+                HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+                return ret;
+            }
             offset += subSample.payLoadLen;
         }
     }
