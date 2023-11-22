@@ -41,7 +41,7 @@ ohos_shared_library("libcodec_client") {
     external_deps = [
       "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -93,7 +93,7 @@ ohos_shared_library("libcodec_server") {
     external_deps = [
       "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -140,7 +140,7 @@ ohos_static_library("libcodec_server_static") {
     external_deps = [
       "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
