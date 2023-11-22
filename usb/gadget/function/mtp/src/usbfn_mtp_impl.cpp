@@ -617,8 +617,12 @@ void UsbfnMtpImpl::UsbMtpDeviceResume(struct UsbMtpDevice *mtpDev)
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
 {
+    if (mtpDev == nullptr || mtpDev->initFlag == false) {
+        HDF_LOGE("%{public}s: no init", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     struct UsbMtpPort *mtpPort = mtpDev->mtpPort;
-    if (mtpPort == nullptr || mtpDev == nullptr || mtpDev->initFlag == false) {
+    if (mtpPort == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -631,8 +635,12 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev)
 {
+    if (mtpDev == nullptr || mtpDev->initFlag == false) {
+        HDF_LOGE("%{public}s: no init", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     struct UsbMtpPort *mtpPort = mtpDev->mtpPort;
-    if (mtpPort == nullptr || mtpDev == nullptr || mtpDev->initFlag == false) {
+    if (mtpPort == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
