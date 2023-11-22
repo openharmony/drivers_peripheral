@@ -619,7 +619,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = (gettid() << MOVE_NUM) | getpid();
+    addr.nl_pid = ((uint32_t)gettid() << MOVE_NUM) | (uint32_t)getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
