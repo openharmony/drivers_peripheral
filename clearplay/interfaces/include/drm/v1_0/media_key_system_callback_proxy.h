@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,10 +23,11 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 class MediaKeySystemCallbackProxy : public IProxyBroker<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback> {
 public:
-    explicit MediaKeySystemCallbackProxy(const sptr<IRemoteObject>& remote) : IProxyBroker<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>(remote) {}
+    explicit MediaKeySystemCallbackProxy(const sptr<IRemoteObject> &remote)
+        : IProxyBroker<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>(remote)
+    {}
 
     virtual ~MediaKeySystemCallbackProxy() = default;
 
@@ -35,19 +36,18 @@ public:
         return true;
     }
 
-    int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
+    int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t> &data) override;
 
-    int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
+    int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) override;
 
-    static int32_t SendEvent_(EventType eventType, int32_t extra, const std::vector<uint8_t>& data,
-         const sptr<IRemoteObject> remote);
+    static int32_t SendEvent_(EventType eventType, int32_t extra, const std::vector<uint8_t> &data,
+        const sptr<IRemoteObject> remote);
 
-    static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
+    static int32_t GetVersion_(uint32_t &majorVer, uint32_t &minorVer, const sptr<IRemoteObject> remote);
 
 private:
     static inline BrokerDelegator<OHOS::HDI::Drm::V1_0::MediaKeySystemCallbackProxy> delegator_;
 };
-
 } // V1_0
 } // Drm
 } // HDI

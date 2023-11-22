@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@
 #include "v1_0/media_key_system_factory_stub.h"
 #include "v1_0/imedia_key_system_factory.h"
 
-#define HDF_LOG_TAG    media_key_system_factory_driver
+#define HDF_LOG_TAG media_key_system_factory_driver
 
 using namespace OHOS::HDI::Drm::V1_0;
 
@@ -33,7 +33,8 @@ struct HdfMediaKeySystemFactoryHost {
 static int32_t MediaKeySystemFactoryDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    auto *hdfMediaKeySystemFactoryHost = CONTAINER_OF(client->device->service, struct HdfMediaKeySystemFactoryHost, ioService);
+    auto *hdfMediaKeySystemFactoryHost =
+        CONTAINER_OF(client->device->service, struct HdfMediaKeySystemFactoryHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -100,7 +101,8 @@ static void HdfMediaKeySystemFactoryDriverRelease(struct HdfDeviceObject *device
         return;
     }
 
-    auto *hdfMediaKeySystemFactoryHost = CONTAINER_OF(deviceObject->service, struct HdfMediaKeySystemFactoryHost, ioService);
+    auto *hdfMediaKeySystemFactoryHost =
+        CONTAINER_OF(deviceObject->service, struct HdfMediaKeySystemFactoryHost, ioService);
     if (hdfMediaKeySystemFactoryHost != nullptr) {
         delete hdfMediaKeySystemFactoryHost;
     }

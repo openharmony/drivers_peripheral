@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,24 +22,23 @@
 #include "base64_utils.h"
 #include "data_parser.h"
 #include "cJSON.h"
+#include "securec.h"
 
-#define HDF_LOG_TAG    data_parse
+#define HDF_LOG_TAG data_parse
 
 namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
-int32_t ParsePssh(const std::vector<uint8_t>& initData,
-    std::vector<std::vector<uint8_t>>& keyIds) {
+int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<uint8_t>> &keyIds)
+{
     HDF_LOGE("%{public}s: start", __func__);
     size_t readPosition = 0;
 
     // Validate size field
     uint32_t expectedSize = initData.size();
     expectedSize = htonl(expectedSize);
-    if (memcmp(&initData[readPosition], &expectedSize,
-               sizeof(expectedSize)) != 0) {
+    if (memcmp(&initData[readPosition], &expectedSize, sizeof(expectedSize)) != 0) {
         HDF_LOGE("%{public}s: memcmp(&initData[readPosition], &expectedSize, sizeof(expectedSize)) != 0", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -47,8 +46,7 @@ int32_t ParsePssh(const std::vector<uint8_t>& initData,
 
     // Validate PSSH box identifier
     const char psshIdentifier[4] = {'p', 's', 's', 'h'};
-    if (memcmp(&initData[readPosition], psshIdentifier,
-               sizeof(psshIdentifier)) != 0) {
+    if (memcmp(&initData[readPosition], psshIdentifier, sizeof(psshIdentifier)) != 0) {
         HDF_LOGE("%{public}s: without \"pssh\"", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -58,10 +56,8 @@ int32_t ParsePssh(const std::vector<uint8_t>& initData,
     const uint8_t psshVersion1[4] = {1, 0, 0, 0};
     const uint8_t psshVersion0[4] = {0, 0, 0, 0};
     int psshVersionId = 0;
-    if (memcmp(&initData[readPosition], psshVersion0,
-               sizeof(psshVersion0)) != 0) {
-        if (memcmp(&initData[readPosition], psshVersion1,
-               sizeof(psshVersion1)) != 0) {
+    if (memcmp(&initData[readPosition], psshVersion0, sizeof(psshVersion0)) != 0) {
+        if (memcmp(&initData[readPosition], psshVersion1, sizeof(psshVersion1)) != 0) {
             HDF_LOGE("%{public}s: psshVersion error", __func__);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -70,15 +66,15 @@ int32_t ParsePssh(const std::vector<uint8_t>& initData,
     readPosition += sizeof(psshVersion1);
 
     // Validate system ID
-    std::string uuid((char*)initData.data() + readPosition, clearPlayUuid.size());
+    std::string uuid((reinterpret_cast<const char*>(initData.data())) + readPosition, CLEARPLAY_UUID.size());
     if (IsClearPlayUuid(uuid)) {
         HDF_LOGE("%{public}s: uuid error", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    readPosition += systemIdSize;
+    readPosition += SYSTEM_ID_SIZE;
 
     if (psshVersionId == 0) {
-        std::vector<uint8_t> keyIdString = {'k', 'i', 'd', 's'};
+        std::vector<uint8_t> keyIdString = { 'k', 'i', 'd', 's' };
         int32_t keyIdPos = findSubVector(initData, keyIdString);
         if (keyIdPos == -1) {
             HDF_LOGE("%{public}s: without \"kids\"", __func__);
@@ -110,19 +106,23 @@ int32_t ParsePssh(const std::vector<uint8_t>& initData,
     } else if (psshVersionId == 1) {
         // Read key ID count
         uint32_t keyIdCount;
-        memcpy(&keyIdCount, &initData[readPosition], sizeof(keyIdCount));
+        int32_t ret = HDF_FAILURE;
+        ret = memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
+        if(ret != 0) {
+            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+            return ret;
+        }
         keyIdCount = ntohl(keyIdCount);
         readPosition += sizeof(keyIdCount);
-        if (readPosition + ((uint64_t)keyIdCount * keyIdSize) !=
-                initData.size() - sizeof(uint32_t)) {
+        if (readPosition + ((uint64_t)keyIdCount * KEY_ID_SIZE) != initData.size() - sizeof(uint32_t)) {
             return HDF_ERR_INVALID_PARAM;
         }
 
         // Calculate the key ID offsets
         for (uint32_t i = 0; i < keyIdCount; ++i) {
             std::vector<uint8_t> keyId;
-            for (size_t j = 0; i < keyIdSize; ++j) {
-                keyId.push_back(initData[readPosition + i * keyIdSize + j]);
+            for (size_t j = 0; i < KEY_ID_SIZE; ++j) {
+                keyId.push_back(initData[readPosition + i * KEY_ID_SIZE + j]);
             }
             keyIds.push_back(keyId);
         }
@@ -133,7 +133,9 @@ int32_t ParsePssh(const std::vector<uint8_t>& initData,
     return HDF_SUCCESS;
 }
 
-int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>>& keyIds, std::string* request) {
+int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
+    std::string *request)
+{
     // begin
     *request = "{\"kids\":[";
     std::string encodedKeyId;
@@ -158,13 +160,12 @@ int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector
     return HDF_SUCCESS;
 }
 
-int32_t findSubVector(const std::vector<uint8_t>& main, const std::vector<uint8_t>& sub)
+int32_t findSubVector(const std::vector<uint8_t> &main, const std::vector<uint8_t> &sub)
 {
-    // if main = "123456", sub = "234"
-    // return 1;
     for (size_t i = 0; i < main.size(); ++i) {
         size_t j = 0;
-        for (j = 0; j < sub.size() && main[i+j] == sub[j]; ++j) {}
+        for (j = 0; j < sub.size() && main[i + j] == sub[j]; ++j) {
+        }
         // for j end
         if (j == sub.size()) {
             return i;
@@ -172,7 +173,6 @@ int32_t findSubVector(const std::vector<uint8_t>& main, const std::vector<uint8_
     }
     return -1;
 }
-
 } // V1_0
 } // Drm
 } // HDI
