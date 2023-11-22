@@ -47,7 +47,8 @@ ohos_shared_library("libclearplay_driver") {
 }
 
 config("clearplay_imp_external_library_config") {
-  include_dirs = ["//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"]
+  include_dirs =
+      [ "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0" ]
 }
 group("hdf_clearplay_interfaces") {
   deps = [ ":libclearplay_driver" ]
