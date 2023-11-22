@@ -67,14 +67,16 @@ static void FfrtDestroyFunctionWrapper(void* t)
     }
 }
 
-#define FFRT_STATIC_ASSERT(cond, msg) int x(int static_assertion_##msg[(cond) ? 1 : -1])
 FfrtFunctionHeader* FfrtCreateFunctionWrapper(const FfrtFunctionT func,
     const FfrtFunctionT afterFunc, void* arg)
 {
-    FFRT_STATIC_ASSERT(sizeof(FfrtFunction) <= FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE,
-        size_of_function_must_be_less_than_ffrt_auto_managed_function_storage_size);
+    if (sizeof(FfrtFunction) > FFRT_AUTO_MANAGED_FUNCTION_STORAGE_SIZE) {
+        AUDIO_FUNC_LOGE("over memory limit");
+        return NULL;
+    }
     FfrtFunction* f = (FfrtFunction*)g_priv.ffrtAllocBase(FFRT_FUNCTION_KIND_GENERAL);
     if (f == NULL) {
+        AUDIO_FUNC_LOGE("ffrt alloc fail");
         return NULL;
     }
     f->header.exec = FfrtExecFunctionWrapper;
@@ -113,7 +115,7 @@ static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
         pPriv->handle = NULL;
         return HDF_FAILURE;
     }
-    AUDIO_FUNC_LOGE("audio pnp load ffrt lib success");
+    AUDIO_FUNC_LOGD("audio pnp load ffrt lib success");
     return HDF_SUCCESS;
 }
 
