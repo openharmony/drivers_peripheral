@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,20 +27,22 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
-    if ((lv) compare (rv)) { \
-        return ret; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
+    do {                                             \
+        if ((lv)compare(rv)) {                       \
+            return ret;                              \
+        }                                            \
+    } while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
-    if ((lv) compare (rv)) { \
-        ret = value; \
-        goto table; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
+    do {                                                             \
+        if ((lv)compare(rv)) {                                       \
+            ret = value;                                             \
+            goto table;                                              \
+        }                                                            \
+    } while (false)
 #endif
 
 namespace OHOS {
@@ -51,7 +53,6 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 using namespace OHOS;
 
 enum SecurityLevel : int32_t {
@@ -141,12 +142,12 @@ struct LicenseRequest {
 struct Pattern {
     uint32_t encryptBlocks;
     uint32_t skipBlocks;
-} __attribute__ ((aligned(8)));
+} __attribute__((aligned(8)));
 
 struct SubSample {
     uint32_t clearHeaderLen;
     uint32_t payLoadLen;
-} __attribute__ ((aligned(8)));
+} __attribute__((aligned(8)));
 
 struct CryptoInfo {
     CryptoAlgorithmType type;
@@ -162,34 +163,33 @@ struct DrmBuffer {
     int fd;
 };
 
-bool LicenseStatusStringBlockMarshalling(OHOS::MessageParcel &data, const LicenseStatusString& dataBlock);
+bool LicenseStatusStringBlockMarshalling(OHOS::MessageParcel &data, const LicenseStatusString &dataBlock);
 
-bool LicenseStatusStringBlockUnmarshalling(OHOS::MessageParcel &data, LicenseStatusString& dataBlock);
+bool LicenseStatusStringBlockUnmarshalling(OHOS::MessageParcel &data, LicenseStatusString &dataBlock);
 
-bool LicenseRequestInfoBlockMarshalling(OHOS::MessageParcel &data, const LicenseRequestInfo& dataBlock);
+bool LicenseRequestInfoBlockMarshalling(OHOS::MessageParcel &data, const LicenseRequestInfo &dataBlock);
 
-bool LicenseRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data, LicenseRequestInfo& dataBlock);
+bool LicenseRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data, LicenseRequestInfo &dataBlock);
 
-bool LicenseRequestBlockMarshalling(OHOS::MessageParcel &data, const LicenseRequest& dataBlock);
+bool LicenseRequestBlockMarshalling(OHOS::MessageParcel &data, const LicenseRequest &dataBlock);
 
-bool LicenseRequestBlockUnmarshalling(OHOS::MessageParcel &data, LicenseRequest& dataBlock);
+bool LicenseRequestBlockUnmarshalling(OHOS::MessageParcel &data, LicenseRequest &dataBlock);
 
-bool PatternBlockMarshalling(OHOS::MessageParcel &data, const Pattern& dataBlock);
+bool PatternBlockMarshalling(OHOS::MessageParcel &data, const Pattern &dataBlock);
 
-bool PatternBlockUnmarshalling(OHOS::MessageParcel &data, Pattern& dataBlock);
+bool PatternBlockUnmarshalling(OHOS::MessageParcel &data, Pattern &dataBlock);
 
-bool SubSampleBlockMarshalling(OHOS::MessageParcel &data, const SubSample& dataBlock);
+bool SubSampleBlockMarshalling(OHOS::MessageParcel &data, const SubSample &dataBlock);
 
-bool SubSampleBlockUnmarshalling(OHOS::MessageParcel &data, SubSample& dataBlock);
+bool SubSampleBlockUnmarshalling(OHOS::MessageParcel &data, SubSample &dataBlock);
 
-bool CryptoInfoBlockMarshalling(OHOS::MessageParcel &data, const CryptoInfo& dataBlock);
+bool CryptoInfoBlockMarshalling(OHOS::MessageParcel &data, const CryptoInfo &dataBlock);
 
-bool CryptoInfoBlockUnmarshalling(OHOS::MessageParcel &data, CryptoInfo& dataBlock);
+bool CryptoInfoBlockUnmarshalling(OHOS::MessageParcel &data, CryptoInfo &dataBlock);
 
-bool DrmBufferBlockMarshalling(OHOS::MessageParcel &data, const DrmBuffer& dataBlock);
+bool DrmBufferBlockMarshalling(OHOS::MessageParcel &data, const DrmBuffer &dataBlock);
 
-bool DrmBufferBlockUnmarshalling(OHOS::MessageParcel &data, DrmBuffer& dataBlock);
-
+bool DrmBufferBlockUnmarshalling(OHOS::MessageParcel &data, DrmBuffer &dataBlock);
 } // V1_0
 } // Drm
 } // HDI

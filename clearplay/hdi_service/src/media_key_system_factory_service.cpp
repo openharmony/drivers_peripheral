@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,7 @@
 #include "clearplay_uuid.h"
 #include "mime_type.h"
 
-#define HDF_LOG_TAG    media_key_system_factory_service
+#define HDF_LOG_TAG media_key_system_factory_service
 
 namespace OHOS {
 namespace HDI {
@@ -47,8 +47,8 @@ MediaKeySystemFactoryService::~MediaKeySystemFactoryService()
     HDF_LOGI("%{public}s: end", __func__);
 }
 
-int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::string& uuid, const std::string& mimeType,
-     SecurityLevel level, bool& isSupported)
+int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::string &uuid, const std::string &mimeType,
+    SecurityLevel level, bool &isSupported)
 {
     HDF_LOGI("%{public}s: start", __func__);
     if (IsClearPlayUuid(uuid) != true) {
@@ -56,22 +56,14 @@ int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::strin
         HDF_LOGE("%{public}s: uuid is wrown", __func__);
         return HDF_SUCCESS;
     }
-    if (mimeType != "" && 
-        mimeType != isoVideoMimeType &&
-        mimeType != isoAudioMimeType &&
-        mimeType != cencInitDataFormat &&
-        mimeType != webmInitDataFormat &&
-        mimeType != webmAudioDataFormat &&
-        mimeType != webmVideoDataFormat) {
+    if (mimeType != "" && mimeType != ISO_VIDEO_MIME_TYPE && mimeType != ISO_AUDIO_MIME_TYPE &&
+        mimeType != CENC_INIT_DATA_FORMAT && mimeType != WEBM_INIT_DATA_FORMAT && mimeType != WEBM_AUDIO_DATA_FORMAT &&
+        mimeType != WEBM_VIDEO_DATA_FORMAT) {
         isSupported = false;
         return HDF_SUCCESS;
     }
-    if (level != SECURE_UNKNOWN &&
-        level != SW_SECURE_CRYPTO &&
-        level != SW_SECURE_DECODE &&
-        level != HW_SECURE_CRYPTO &&
-        level != HW_SECURE_DECODE &&
-        level != HW_SECURE_ALL) {
+    if (level != SECURE_UNKNOWN && level != SW_SECURE_CRYPTO && level != SW_SECURE_DECODE &&
+        level != HW_SECURE_CRYPTO && level != HW_SECURE_DECODE && level != HW_SECURE_ALL) {
         isSupported = false;
         return HDF_SUCCESS;
     }
@@ -80,7 +72,7 @@ int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::strin
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemFactoryService::CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem)
+int32_t MediaKeySystemFactoryService::CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> &mediaKeySystem)
 {
     HDF_LOGI("%{public}s: start", __func__);
     sptr<MediaKeySystemService> newMediaKeySystem = new (std::nothrow) MediaKeySystemService();
@@ -109,7 +101,6 @@ int32_t MediaKeySystemFactoryService::CloseMediaKeySystemService(sptr<MediaKeySy
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
-
 } // V1_0
 } // Drm
 } // HDI

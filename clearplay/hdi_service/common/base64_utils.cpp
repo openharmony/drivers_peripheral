@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,7 +64,7 @@ static inline bool IsBase64Char(const char c)
 }
 
 static inline void MakeCharFour(const std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> &charArrayThree,
-                                std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> &charArrayFour)
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> &charArrayFour)
 {
     const uint8_t table[CHAR_ARRAY_LENGTH_FOUR] = {
         static_cast<uint8_t>((charArrayThree[BASE64_ENCODE_INDEX0] & BASE64_ENCODE_MASK1) >> BASE64_ENCODE_OFFSET2),
@@ -80,7 +80,7 @@ static inline void MakeCharFour(const std::array<uint8_t, CHAR_ARRAY_LENGTH_THRE
 }
 
 static inline void MakeCharTree(const std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> &charArrayFour,
-                                std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> &charArrayThree)
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> &charArrayThree)
 {
     const uint8_t table[CHAR_ARRAY_LENGTH_THREE] = {
         static_cast<uint8_t>((charArrayFour[BASE64_DECODE_INDEX0] << BASE64_DECODE_OFFSET2) +
@@ -103,8 +103,8 @@ std::string Encode(const std::string &source)
     auto it = source.begin();
     std::string ret;
     size_t index = 0;
-    std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> charArrayThree = {0};
-    std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> charArrayFour = {0};
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> charArrayThree = { 0 };
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> charArrayFour = { 0 };
 
     while (it != source.end()) {
         charArrayThree[index] = *it;
@@ -147,8 +147,8 @@ std::string Decode(const std::string &encoded)
 #ifdef __linux__
     auto it = encoded.begin();
     size_t index = 0;
-    std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> charArrayThree = {0};
-    std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> charArrayFour = {0};
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_THREE> charArrayThree = { 0 };
+    std::array<uint8_t, CHAR_ARRAY_LENGTH_FOUR> charArrayFour = { 0 };
     std::string ret;
 
     while (it != encoded.end() && IsBase64Char(*it)) {
@@ -187,7 +187,6 @@ std::string Decode(const std::string &encoded)
     return {};
 #endif
 }
-
 } // V1_0
 } // Drm
 } // HDI

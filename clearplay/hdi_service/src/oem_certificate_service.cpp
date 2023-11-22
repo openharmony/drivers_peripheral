@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,26 +17,25 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
-#define HDF_LOG_TAG    oem_certificate_service
+#define HDF_LOG_TAG oem_certificate_service
 
 namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-int32_t OemCertificateService::GetOemProvisionRequest(std::string& defaultUrl, std::vector<uint8_t>& request)
+int32_t OemCertificateService::GetOemProvisionRequest(std::string &defaultUrl, std::vector<uint8_t> &request)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t OemCertificateService::ProvideOemProvisionResponse(const std::vector<uint8_t>& response)
+int32_t OemCertificateService::ProvideOemProvisionResponse(const std::vector<uint8_t> &response)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
-
 } // V1_0
 } // Drm
 } // HDI

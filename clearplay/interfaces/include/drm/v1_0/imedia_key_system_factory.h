@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,20 +28,22 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
-    if ((lv) compare (rv)) { \
-        return ret; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
+    do {                                             \
+        if ((lv)compare(rv)) {                       \
+            return ret;                              \
+        }                                            \
+    } while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
-    if ((lv) compare (rv)) { \
-        ret = value; \
-        goto table; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
+    do {                                                             \
+        if ((lv)compare(rv)) {                                       \
+            ret = value;                                             \
+            goto table;                                              \
+        }                                                            \
+    } while (false)
 #endif
 
 namespace OHOS {
@@ -66,12 +68,12 @@ public:
     static sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> Get(bool isStub = false);
     static sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> Get(const std::string &serviceName, bool isStub = false);
 
-    virtual int32_t IsMediaKeySystemSupported(const std::string& uuid, const std::string& mimeType, SecurityLevel level,
-         bool& isSupported) = 0;
+    virtual int32_t IsMediaKeySystemSupported(const std::string &uuid, const std::string &mimeType, SecurityLevel level,
+        bool &isSupported) = 0;
 
-    virtual int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) = 0;
+    virtual int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> &mediaKeySystem) = 0;
 
-    virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
+    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
     {
         majorVer = 1;
         minorVer = 0;
