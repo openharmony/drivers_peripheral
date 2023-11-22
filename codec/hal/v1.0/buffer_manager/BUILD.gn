@@ -27,7 +27,7 @@ ohos_shared_library("libcodec_buffer_manager") {
     external_deps = [
       "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]

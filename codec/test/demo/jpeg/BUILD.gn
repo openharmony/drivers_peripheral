@@ -31,7 +31,7 @@ ohos_executable("codec_jpeg_decode") {
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
-      "graphic_surface:buffer_handle",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
