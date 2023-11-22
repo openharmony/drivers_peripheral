@@ -87,9 +87,19 @@ int main(int argc, char *argv[])
     dstBuffer.bufferLen = sizeof(testData);
     uint8_t *srcData =
         (uint8_t *)mmap(nullptr, srcBuffer.bufferLen, PROT_READ | PROT_WRITE, MAP_SHARED, srcBuffer.fd, 0);
+    if (destData == nullptr) {
+        HDF_LOGE("%{public}s: invalid dest_shared_mem", __func__);
+        (void)munmap(srcData, srcBuffer.bufferLen);
+        (void)::close(srcBuffer.fd);
+        (void)::close(destBuffer.fd);
+        return HDF_FAILURE;
+    }
     ret = memcpy_s(srcData, sizeof(testData), &testData, sizeof(testData));
     if (ret != 0) {
         HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+        (void)munmap(srcData, srcBuffer.bufferLen);
+        (void)::close(srcBuffer.fd);
+        (void)::close(destBuffer.fd);
         return ret;
     }
     (void)munmap(srcData, srcBuffer.bufferLen);
