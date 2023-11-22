@@ -108,6 +108,13 @@ int main(int argc, char *argv[])
 
     uint8_t *dstData =
         (uint8_t *)mmap(nullptr, dstBuffer.bufferLen, PROT_READ | PROT_WRITE, MAP_SHARED, dstBuffer.fd, 0);
+    if (destData == nullptr) {
+        HDF_LOGE("%{public}s: invalid dest_shared_mem", __func__);
+        (void)munmap(srcData, dstBuffer.bufferLen);
+        (void)::close(dstBuffer.fd);
+        (void)::close(dstBuffer.fd);
+        return HDF_FAILURE;
+    }
     ByteShow("clearplay decrypt", dstData, dstBuffer.bufferLen);
     (void)munmap(dstData, dstBuffer.bufferLen);
     printf("\n\n");
