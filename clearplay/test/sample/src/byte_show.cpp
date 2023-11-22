@@ -53,6 +53,7 @@ static void ParseBytes2HexChar(unsigned char *src, unsigned int srcLen, unsigned
 
 void ByteShow(const char *name, unsigned char *src, unsigned int srcLen)
 {
+    int32_t ret = HDF_FAILURE;
     unsigned char *tmpBuf = (unsigned char *)malloc(srcLen * 2 * sizeof(unsigned char) + 1);
     unsigned int tmpBufLen;
     unsigned int idx;
@@ -63,8 +64,16 @@ void ByteShow(const char *name, unsigned char *src, unsigned int srcLen)
     for (idx = 0; idx + BYTE_SHOW_ONECE_MAX_LEN < tmpBufLen; idx += BYTE_SHOW_ONECE_MAX_LEN) {
         unsigned char *showBuf = (unsigned char *)malloc(BYTE_SHOW_ONECE_MAX_LEN * sizeof(unsigned char));
         unsigned int showBufLen = BYTE_SHOW_ONECE_MAX_LEN * sizeof(unsigned char);
-        memset_s(showBuf, showBufLen, 0x0, showBufLen);
-        memcpy_s(showBuf, showBufLen, tmpBuf + idx, showBufLen);
+        ret = memset_s(showBuf, showBufLen, 0x0, showBufLen);
+        if (ret != 0) {
+            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+            return ret;
+        }
+        ret = memcpy_s(showBuf, showBufLen, tmpBuf + idx, showBufLen);
+        if (ret != 0) {
+            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+            return ret;
+        }
         BYTE_SHOW_PRINTF("%s DATA[%d]:%s\n", name, idx, showBuf);
         free(showBuf);
         showBuf = nullptr;

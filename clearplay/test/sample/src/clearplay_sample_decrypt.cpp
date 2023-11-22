@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
     // create key system factory
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> media_key_system_factory = new MediaKeySystemFactoryService();
-
+    
     // CreateMediaKeySystem
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> media_key_system;
     media_key_system_factory->CreateMediaKeySystem(media_key_system);
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
     // DecryptData
     printf("\nDecryptData\n");
     CryptoInfo info;
+    int32_t ret = HDF_FAILURE;
     info.type = ALGTYPE_AES_CBC;
     info.keyId = keyId;
     info.iv = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -86,7 +87,11 @@ int main(int argc, char *argv[])
     dstBuffer.bufferLen = sizeof(testData);
     uint8_t *srcData =
         (uint8_t *)mmap(nullptr, srcBuffer.bufferLen, PROT_READ | PROT_WRITE, MAP_SHARED, srcBuffer.fd, 0);
-    memcpy_s(srcData, sizeof(testData), &testData, sizeof(testData));
+    ret = memcpy_s(srcData, sizeof(testData), &testData, sizeof(testData));
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+        return ret;
+    }
     (void)munmap(srcData, srcBuffer.bufferLen);
 
     decryptModule->DecryptMediaData(false, info, srcBuffer, dstBuffer);

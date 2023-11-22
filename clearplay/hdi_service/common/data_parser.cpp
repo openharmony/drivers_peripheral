@@ -66,7 +66,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     readPosition += sizeof(psshVersion1);
 
     // Validate system ID
-    std::string uuid((char *)initData.data() + readPosition, CLEARPLAY_UUID.size());
+    std::string uuid(reinterpret_cast<char *>(initData.data()) + readPosition, CLEARPLAY_UUID.size());
     if (IsClearPlayUuid(uuid)) {
         HDF_LOGE("%{public}s: uuid error", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -106,7 +106,12 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     } else if (psshVersionId == 1) {
         // Read key ID count
         uint32_t keyIdCount;
-        memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
+        int32_t ret = HDF_FAILURE;
+        ret = memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
+        if(ret != 0) {
+            HDF_LOGE("%{public}s: memcpy_s faild", __func__);
+            return ret;
+        }
         keyIdCount = ntohl(keyIdCount);
         readPosition += sizeof(keyIdCount);
         if (readPosition + ((uint64_t)keyIdCount * KEY_ID_SIZE) != initData.size() - sizeof(uint32_t)) {
