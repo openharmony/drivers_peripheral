@@ -19,6 +19,7 @@ ohos_shared_library("libclearplay_driver") {
     "./include/drm",
   ]
 
+  public_configs = [ ":clearplay_imp_external_library_config" ]
   sources = [ "./src/media_key_system_factory_driver.cpp" ]
 
   external_deps = [
@@ -45,6 +46,9 @@ ohos_shared_library("libclearplay_driver") {
   part_name = "drivers_peripheral_clearplay"
 }
 
+config("clearplay_imp_external_library_config") {
+  include_dirs = ["//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"]
+}
 group("hdf_clearplay_interfaces") {
   deps = [ ":libclearplay_driver" ]
 }
