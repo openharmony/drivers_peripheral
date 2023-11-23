@@ -37,6 +37,21 @@ void CameraHdiUtTestV1_2::TearDown(void)
     cameraTest->Close();
 }
 
+bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, uint8_t value)
+{
+    common_metadata_header_t* data = ability->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, tag, &entry);
+    EXPECT_EQ(ret, 0);
+    EXPECT_NE(entry.count, 0);
+    for (int i = 0; i < entry.count; i++) {
+        if (entry.data.u8[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * @tc.name: Camera_Device_Hdi_V1_2_001
  * @tc.desc: OHOS_ABILITY_SKETCH_ENABLE_RATIO
@@ -1018,6 +1033,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
 /**
  * @tc.name: CommitStreams_V1_1_SUPER_STAB
  * @tc.desc: CommitStreams_V1_1 for super stabilization mode, preview and video
@@ -1026,6 +1042,11 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level1)
 {
+    // Check SUPER_STAB in OHOS_ABLITY_CAMERA_MODES tag
+    bool superStabModeFlag = IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES,
+        OHOS::HDI::Camera::V1_2::SUPER_STAB);
+    EXPECT_EQ(superStabModeFlag, true);
+
     // Get Stream Operator
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
