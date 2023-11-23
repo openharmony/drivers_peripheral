@@ -50,7 +50,7 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
-static std::chrono::milliseconds waitTime_(100); // {100ms};
+static std::chrono::milliseconds waitTime_(1000); // {1000ms};
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
 static std::condition_variable g_suspendCv;
