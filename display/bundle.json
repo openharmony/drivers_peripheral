@@ -29,9 +29,7 @@
         "graphic_surface",
         "init",
         "memory_utils",
-        "hitrace",
-        "googletest",
-        "thirdparty_benchmark"
+        "hitrace"
       ],
       "third_party": [
         "libdrm"
