@@ -1225,3 +1225,127 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_036, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name: PreCameraSwitch
+ * @tc.desc: PreCameraSwitch cameraId:device/0
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_037, TestSize.Level1)
+{
+    std::string cameraId = "device/0";
+
+    cameraTest->rc = cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: PreCameraSwitch
+ * @tc.desc: PreCameraSwitch cameraId:device/1
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_038, TestSize.Level1)
+{
+    std::string cameraId = "device/1";
+
+    cameraTest->rc = cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: PreCameraSwitch
+ * @tc.desc: PreCameraSwitch cameraId:device/10
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_039, TestSize.Level1)
+{
+    std::string cameraId = "device/10";
+
+    cameraTest->rc = cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: PreCameraSwitch
+ * @tc.desc: PreCameraSwitch cameraId:ABC
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_040, TestSize.Level1)
+{
+    std::string cameraId = "ABC";
+
+    cameraTest->rc = cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: PrelaunchWithOpMode
+ * @tc.desc: PrelaunchWithOpMode cameraId:device/0
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_041, TestSize.Level1)
+{
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = "device/0";
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting = {};
+
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: PrelaunchWithOpMode
+ * @tc.desc: PrelaunchWithOpMode cameraId:device/1
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_042, TestSize.Level1)
+{
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = "device/1";
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting = {};
+
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+ * @tc.name: PrelaunchWithOpMode
+ * @tc.desc: PrelaunchWithOpMode cameraId:device/10
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_043, TestSize.Level1)
+{
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = "device/10";
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting = {};
+
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
+}
+
+/**
+ * @tc.name: PrelaunchWithOpMode
+ * @tc.desc: PrelaunchWithOpMode cameraId:ABC
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_044, TestSize.Level1)
+{
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = "ABC";
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting = {};
+
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
+}
