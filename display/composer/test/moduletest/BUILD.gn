@@ -39,7 +39,7 @@ ohos_moduletest("composer_mt") {
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "googletest:gtest",
-    "graphic_chipsetsdk:buffer_handle",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
