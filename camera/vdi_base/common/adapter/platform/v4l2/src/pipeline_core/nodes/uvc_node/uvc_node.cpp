@@ -113,6 +113,7 @@ RetCode UvcNode::Start(const int32_t streamId)
     if (meta_ != nullptr) {
         sensorController_->ConfigFps(meta_);
     }
+
     rc = SourceNode::Start(streamId);
     return rc;
 }
@@ -174,15 +175,20 @@ void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
         CAMERA_LOGE("Meta is nullptr");
         return;
     }
+
+    sensorController_->ConfigStart();
     constexpr uint32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
             sensorController_->Configure(metadata);
         }
+        metaData_ = metadata;
     } else {
         CAMERA_LOGE("UvcNode sensorController_ is null");
     }
     GetUpdateFps(metadata);
+
+    sensorController_->ConfigStop();
 }
 
 void UvcNode::SetBufferCallback()
