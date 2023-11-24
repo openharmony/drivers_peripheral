@@ -49,6 +49,7 @@ private:
     std::shared_ptr<SensorController> sensorController_ = nullptr;
     std::shared_ptr<IDeviceManager> deviceManager_ = nullptr;
     std::shared_ptr<CameraMetadata> meta_ = nullptr;
+    std::shared_ptr<CameraMetadata> metaData_ = nullptr;
 };
 } // namespace OHOS::Camera
 #endif

@@ -101,6 +101,34 @@ RetCode SensorController::ConfigFps(std::shared_ptr<CameraMetadata> meta)
     return rc;
 }
 
+RetCode SensorController::ConfigStart()
+{
+    CAMERA_LOGI("%s ConfigStart", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(startSensorLock_);
+    RetCode rc = RC_OK;
+    if (startSensorState_ == false) {
+        configState_ = true;
+        rc = sensorVideo_->start(GetName());
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("ConfigStart fail");
+            return rc;
+        }
+    }
+    return rc;
+}
+
+RetCode SensorController::ConfigStop()
+{
+    CAMERA_LOGI("%s ConfigStop", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(startSensorLock_);
+    RetCode rc = RC_OK;
+    if (startSensorState_ == false && configState_ == true) {
+        rc = sensorVideo_->stop(GetName());
+        configState_ = false;
+    }
+    return rc;
+}
+
 RetCode SensorController::Start(int buffCont, DeviceFormat& format)
 {
     CAMERA_LOGI("%s Start", __FUNCTION__);
@@ -108,10 +136,10 @@ RetCode SensorController::Start(int buffCont, DeviceFormat& format)
     RetCode rc = RC_OK;
     if (startSensorState_ == false) {
         buffCont_ = buffCont;
+        startSensorState_ = true;
         sensorVideo_->start(GetName());
         sensorVideo_->ConfigSys(GetName(), CMD_V4L2_SET_FORMAT, format);
         sensorVideo_->ReqBuffers(GetName(), buffCont_);
-        startSensorState_ = true;
     }
     return rc;
 };
@@ -126,6 +154,7 @@ RetCode SensorController::Stop()
         sensorVideo_->ReleaseBuffers(GetName());
         sensorVideo_->stop(GetName());
         startSensorState_ = false;
+        configState_ = false;
     }
     return rc;
 };
@@ -490,14 +519,30 @@ RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> met
     RetCode rc = SendAWBMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendAWBMetaData fail");
+    } else {
+        CAMERA_LOGE("SendAWBMetaData success");
+    }
+    rc = SendAWBLockMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendAWBLockMetaData fail");
+    } else {
+        CAMERA_LOGE("SendAWBLockMetaData success");
     }
     rc = SendExposureMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendExposureMetaData fail");
     }
+    rc = SendAELockMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendAELockMetaData fail");
+    }
     rc = SendFocusMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendFocusMetaData fail");
+    }
+    rc = SendFocusRegionsMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendFocusRegionsMetaData fail");
     }
     rc = SendMeterMetaData(data);
     if (rc == RC_ERROR) {
@@ -521,11 +566,11 @@ RetCode SensorController::SendAEMetaData(common_metadata_header_t *data)
             int32_t aemode = 1;
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO, (int*)&aemode);
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPOTIME, (int*)&expo);
-            CAMERA_LOGD("%s Set CMD_AE_EXPO EXPOTIME[%d] EXPO[%d]", __FUNCTION__, expo, aemode);
+            CAMERA_LOGI("%s Set CMD_AE_EXPO EXPOTIME[%d] EXPO[%d]", __FUNCTION__, expo, aemode);
         } else {
             int32_t aemode = 0;
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO, (int*)&aemode);
-            CAMERA_LOGD("%s Set CMD_AE_EXPOTIME [%d]", __FUNCTION__, aemode);
+            CAMERA_LOGI("%s Set CMD_AE_EXPOTIME [%d]", __FUNCTION__, aemode);
         }
         if (rc == RC_ERROR) {
             CAMERA_LOGE("%s Send CMD_AE_EXPOTIME fail", __FUNCTION__);
@@ -543,11 +588,72 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, (int*)&awbMode);
-        CAMERA_LOGD("%s Set CMD_AWB_MODE [%d]", __FUNCTION__, awbMode);
+        CAMERA_LOGI("%s Send CMD_AWB_MODE awbMode = %{public}d", __FUNCTION__, awbMode);
+        int awbModeVal = V4L2_WHITE_BALANCE_AUTO;
+        // Can not find tag for OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT and OHOS_CAMERA_AWB_MODE_TWILIGHT
+        // in V4L2, so set V4L2_WHITE_BALANCE_AUTO.
+        if (awbMode == OHOS_CAMERA_AWB_MODE_AUTO ||
+            awbMode == OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT ||
+            awbMode == OHOS_CAMERA_AWB_MODE_TWILIGHT) {
+            awbModeVal = V4L2_WHITE_BALANCE_AUTO;
+        }
+
+        if (awbMode == OHOS_CAMERA_AWB_MODE_OFF) {
+            awbModeVal = V4L2_WHITE_BALANCE_MANUAL;
+        }
+
+        if (awbMode == OHOS_CAMERA_AWB_MODE_DAYLIGHT) {
+            awbModeVal = V4L2_WHITE_BALANCE_DAYLIGHT;
+        }
+
+        if (awbMode == OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT) {
+            awbModeVal = V4L2_WHITE_BALANCE_CLOUDY;
+        }
+
+        if (awbMode == OHOS_CAMERA_AWB_MODE_SHADE) {
+            awbModeVal = V4L2_WHITE_BALANCE_SHADE;
+        }
+
+        CAMERA_LOGI("Set CMD_AWB_MODE GetName = [%{public}s]", GetName().c_str());
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, &awbModeVal);
+        CAMERA_LOGI("%s Set CMD_AWB_MODE [%{public}d]", __FUNCTION__, awbModeVal);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send CMD_AWB_MODE fail", __FUNCTION__);
+            CAMERA_LOGE("%s Send V4L2_CID_AUTO_WHITE_BALANCE fail", __FUNCTION__);
             return rc;
+        } else {
+            CAMERA_LOGI("%{public}s Send V4L2_CID_AUTO_WHITE_BALANCE success", __FUNCTION__);
+        }
+    }
+    return rc;
+}
+
+RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
+{
+    uint8_t awbLock = 0;
+    RetCode rc = RC_OK;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_LOCK, &entry);
+    if (ret == 0) {
+        awbLock = *(entry.data.u8);
+        CAMERA_LOGI("%s Send CMD_AWB_LOCK awbLock = %{public}d", __FUNCTION__, awbLock);
+
+        int curLock = 0;
+        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
+        // set the position of AWB bit to 1;
+            curLock |= V4L2_LOCK_WHITE_BALANCE;
+        } else if (awbLock == OHOS_CAMERA_AWB_LOCK_OFF) {
+            // set the position of AWB bit to 0;
+            curLock &= ~V4L2_LOCK_WHITE_BALANCE;
+        }
+        CAMERA_LOGI("Set CMD_AWB_LOCK GetName = [%{public}s]", GetName().c_str());
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, &curLock);
+        CAMERA_LOGI("%s Set CMD_AWB_LOCK [%{public}d]", __FUNCTION__, awbLock);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("%s Send OHOS_CONTROL_AWB_LOCK fail", __FUNCTION__);
+            return rc;
+        } else {
+            CAMERA_LOGI("%{public}s Send OHOS_CONTROL_AWB_LOCK success", __FUNCTION__);
         }
     }
     return rc;
@@ -556,21 +662,12 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
 RetCode SensorController::SendExposureMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
-
-    uint8_t exposureMode = 0;
     camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
-    if (ret == 0) {
-        exposureMode = *(entry.data.u8);
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureMode);
-        CAMERA_LOGI("Set CMD_EXPOSURE_MODE [%{public}d]", exposureMode);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send CMD_EXPOSURE_MODE fail");
-        }
-    }
+
+    SendExposureModeMetaData(data);
 
     int64_t exposureTime = 0;
-    ret = FindCameraMetadataItem(data, OHOS_SENSOR_EXPOSURE_TIME, &entry);
+    int ret = FindCameraMetadataItem(data, OHOS_SENSOR_EXPOSURE_TIME, &entry);
     if (ret == 0) {
         exposureTime = *(entry.data.i64);
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPOTIME, (int*)&exposureTime);
@@ -595,31 +692,204 @@ RetCode SensorController::SendExposureMetaData(common_metadata_header_t *data)
     return rc;
 }
 
+RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *data)
+{
+    RetCode rc = RC_OK;
+    uint8_t exposureMode = 0;
+    uint8_t aeLock = 0;
+    camera_metadata_item_t entry;
+    bool isAutoMode = false;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
+    if (ret == 0) {
+        exposureMode = *(entry.data.u8);
+        int exposureVal = V4L2_EXPOSURE_AUTO;
+
+        if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_MANUAL) {
+            exposureVal = V4L2_EXPOSURE_MANUAL;
+        } else if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO) {
+            exposureVal = V4L2_EXPOSURE_AUTO;
+            isAutoMode = true;
+        } else if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_AUTO) {
+            exposureVal = V4L2_EXPOSURE_AUTO;
+            isAutoMode = true;
+        }
+
+        int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_LOCK, &entry);
+        if (ret == 0) {
+            aeLock = *(entry.data.u8);
+        }
+
+        if (aeLock == 0) {
+            int curLock = 0;
+            auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+            if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED) {
+                // set the position of AE bit to 1;
+                curLock |= V4L2_LOCK_EXPOSURE;
+            } else {
+                curLock &= ~V4L2_LOCK_EXPOSURE;
+            }
+
+            if (queryResult == RC_OK) {
+                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, &curLock);
+                CAMERA_LOGI("Set CMD_EXPOSURE_LOCK [%{public}d]", exposureMode);
+                if (rc == RC_ERROR) {
+                    CAMERA_LOGE("Send CMD_EXPOSURE_LOCK fail");
+                }
+            }
+
+            if (isAutoMode == true) {
+                rc = SendExposureAutoModeMetaData(data);
+            } else {
+                rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
+                CAMERA_LOGI("Set CMD_EXPOSURE_MODE [%{public}d]", exposureMode);
+                if (rc == RC_ERROR) {
+                    CAMERA_LOGE("Send CMD_EXPOSURE_MODE fail");
+                }
+            }
+        }
+    }
+    return rc;
+}
+
+RetCode SensorController::SendExposureAutoModeMetaData(common_metadata_header_t *data)
+{
+    RetCode rc = RC_OK;
+
+    uint8_t exposureMode = 0;
+    uint8_t aeLock = 0;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
+    if (ret == 0) {
+        exposureMode = *(entry.data.u8);
+        int exposureVal = V4L2_EXPOSURE_AUTO;
+
+        if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO ||
+            exposureMode == OHOS_CAMERA_EXPOSURE_MODE_AUTO) {
+            exposureVal = V4L2_EXPOSURE_AUTO;
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
+        }
+        if (rc == RC_ERROR) {
+            exposureVal = V4L2_EXPOSURE_SHUTTER_PRIORITY;
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
+        }
+        if (rc == RC_ERROR) {
+            exposureVal = V4L2_EXPOSURE_APERTURE_PRIORITY;
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
+        }
+        if (rc == RC_ERROR) {
+            CAMERA_LOGI("Set CMD_EXPOSURE_MODE fail");
+        }
+    }
+    return rc;
+}
+
+RetCode SensorController::SendAELockMetaData(common_metadata_header_t *data)
+{
+    uint8_t aeLock = 0;
+    RetCode rc = RC_OK;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_LOCK, &entry);
+    if (ret == 0) {
+        aeLock = *(entry.data.u8);
+        CAMERA_LOGI("%s Send CMD_AE_LOCK aeLock = %{public}d", __FUNCTION__, aeLock);
+
+        int curLock = 0;
+        sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        if (aeLock == OHOS_CAMERA_AE_LOCK_ON) {
+            // set the position of AE bit to 1;
+            curLock |= V4L2_LOCK_EXPOSURE;
+        } else if (aeLock == OHOS_CAMERA_AE_LOCK_OFF) {
+            // set the position of AE bit to 0;
+            curLock &= ~V4L2_LOCK_EXPOSURE;
+        }
+
+        CAMERA_LOGI("Set CMD_AE_LOCK GetName = [%{public}s]", GetName().c_str());
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_LOCK, &curLock);
+        CAMERA_LOGI("%s Set CMD_AE_LOCK [%{public}d]", __FUNCTION__, aeLock);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("%s Send OHOS_CONTROL_AWB_LOCK fail", __FUNCTION__);
+            return rc;
+        } else {
+            CAMERA_LOGI("%{public}s Send OHOS_CONTROL_AWB_LOCK success", __FUNCTION__);
+        }
+    }
+    return rc;
+}
+
 RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
     uint8_t focusMode = 0;
+    uint8_t afLock = 0;
+    AdapterCmd focusModeCmd = CMD_AUTO_FOCUS_START;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
     if (ret == 0) {
         focusMode = *(entry.data.u8);
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_MODE, (int*)&focusMode);
-        CAMERA_LOGI("Set CMD_FOCUS_MODE [%{public}d]", focusMode);
+        int curLock = 0;
+        auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
+        if (focusMode == OHOS_CAMERA_FOCUS_MODE_LOCKED) {
+            curLock |= V4L2_LOCK_FOCUS;
+        } else {
+            curLock &= ~V4L2_LOCK_FOCUS;
+        }
+
+        if (queryResult == RC_OK) {
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_LOCK, &curLock);
+            CAMERA_LOGI("Set CMD_FOCUS_LOCK [%{public}d]", focusMode);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("Send CMD_FOCUS_LOCK fail");
+            }
+        }
+
+        int focusVal = 0;
+        if (focusMode == OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO) {
+            focusVal = 1;
+        } else if (focusMode == OHOS_CAMERA_FOCUS_MODE_MANUAL) {
+            focusVal = 0;
+            focusModeCmd = CMD_AUTO_FOCUS_STOP;
+        } else if (focusMode == OHOS_CAMERA_FOCUS_MODE_AUTO) {
+            focusVal = 0;
+            focusModeCmd = CMD_AUTO_FOCUS_START;
+        }
+
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_AUTO, &focusVal);
+        CAMERA_LOGI("Set CMD_FOCUS_AUTO [%{public}d]", focusMode);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send CMD_FOCUS_MODE fail");
+            CAMERA_LOGE("Send CMD_FOCUS_AUTO fail");
+        }
+
+        focusVal = 1;
+        rc = sensorVideo_->UpdateSetting(GetName(), focusModeCmd, &focusVal);
+        CAMERA_LOGI("Set CMD_FOCUS_AUTO [%{public}d]", focusMode);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("Send CMD_FOCUS_AUTO fail");
         }
     }
+    return rc;
+}
 
+RetCode SensorController::SendFocusRegionsMetaData(common_metadata_header_t *data)
+{
+    RetCode rc = RC_OK;
     std::vector<int32_t> afRegions;
-    ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
+    const uint32_t GROUP_LEN = 2;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
     if (ret == 0) {
         for (int i = 0; i < entry.count; i++) {
             afRegions.push_back(*(entry.data.i32 + i));
             CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
         }
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_REGION, (int*)&afRegions);
+        if (afRegions.size() != GROUP_LEN) {
+            CAMERA_LOGE("afRegions size error");
+            return RC_ERROR;
+        }
+
+        int32_t averageVal = (afRegions[0] + afRegions[1]) / GROUP_LEN;
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_ABSOLUTE, (int*)&averageVal);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send afRegions fail");
+            CAMERA_LOGE("Send CMD_FOCUS_ABSOLUTE fail");
         }
     }
 
@@ -634,7 +904,17 @@ RetCode SensorController::SendMeterMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_METER_MODE, &entry);
     if (ret == 0) {
         meterMode = *(entry.data.u8);
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_METER_MODE, (int*)&meterMode);
+        int meterModeVal = 0;
+        if (meterMode == OHOS_CAMERA_SPOT_METERING) {
+            meterModeVal = V4L2_EXPOSURE_METERING_SPOT;
+        }
+        if (meterMode == OHOS_CAMERA_REGION_METERING) {
+            meterModeVal = V4L2_EXPOSURE_METERING_MATRIX;
+        }
+        if (meterMode == OHOS_CAMERA_OVERALL_METERING) {
+            meterModeVal = V4L2_EXPOSURE_METERING_AVERAGE;
+        }
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_METER_MODE, &meterModeVal);
         CAMERA_LOGI("Set CMD_METER_MODE [%{public}d]", meterMode);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("Send CMD_METER_MODE fail");
