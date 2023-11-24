@@ -43,7 +43,7 @@ constexpr unsigned int IAM_DOMAIN_ID_COMMON = 0xD002400;
 constexpr HiLogLabel LABEL_IAM_COMMON = {LOG_CORE, IAM_DOMAIN_ID_COMMON, "IAM_COMMON"};
 
 // pin
-constexpr unsigned int IAM_DOMAIN_ID_PIN = 0xD002441;
+constexpr unsigned int IAM_DOMAIN_ID_PIN = 0xD002404;
 constexpr HiLogLabel LABEL_PIN_AUTH_NAPI = {LOG_CORE, IAM_DOMAIN_ID_PIN, "PIN_AUTH_NAPI"};
 constexpr HiLogLabel LABEL_PIN_AUTH_SDK = {LOG_CORE, IAM_DOMAIN_ID_PIN, "PIN_AUTH_SDK"};
 constexpr HiLogLabel LABEL_PIN_AUTH_SA = {LOG_CORE, IAM_DOMAIN_ID_PIN, "PIN_AUTH_SA"};
