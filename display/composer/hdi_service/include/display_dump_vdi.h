@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    VdiDumper() {};
+    VdiDumper() : getDumpInfoFunc_(nullptr), updateConfigFunc_(nullptr) {};
     int32_t DumpBuffer(HdfSBuf *reply);
     int32_t UpdateUserConfig(HdfSBuf *reply);
 private:
