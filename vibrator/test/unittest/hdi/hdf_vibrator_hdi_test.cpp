@@ -62,6 +62,7 @@ namespace {
         "haptic.long_press.medium", "haptic.long_press.light", "haptic.fail", "haptic.charging", \
         "haptic.slide.light", "haptic.threshold"};
     std::string g_builtIn = "haptic.default.effect";
+    std::string g_effect1 = "haptic.long_press.light";
     std::string g_arbitraryStr = "arbitraryString";
     sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = nullptr;
 }
@@ -643,7 +644,45 @@ HWTEST_F(HdfVibratorHdiTest, StopV1_2Test_003, TestSize.Level1)
     HDF_LOGI("StopV1_2Test_003 in");
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->PlayHapticPattern(g_pkg);
+    OHOS::HDI::Vibrator::V1_2::HapticPaket pkg;
+    pkg.time = g_pkgTime;
+    pkg.eventNum = g_pkgEventNum;
+
+    OHOS::HDI::Vibrator::V1_2::HapticEvent hapticEvent;
+    hapticEvent.type = g_eventType;
+    hapticEvent.duration = g_eventDuration;
+    hapticEvent.time = g_eventTime;
+    hapticEvent.intensity = g_eventIntensity;
+    hapticEvent.frequency = g_eventFrequency;
+    hapticEvent.index = g_eventIndex;
+    hapticEvent.pointNum = g_eventPointNum;
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint0;
+    curvePoint0.time = g_pointTime0;
+    curvePoint0.intensity = g_pointIntensity0;
+    curvePoint0.frequency = g_pointFrequency0;
+    hapticEvent.points.push_back(std::move(curvePoint0));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint1;
+    curvePoint1.time = g_pointTime1;
+    curvePoint1.intensity = g_pointIntensity1;
+    curvePoint1.frequency = g_pointFrequency1;
+    hapticEvent.points.push_back(std::move(curvePoint1));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint2;
+    curvePoint2.time = g_pointTime2;
+    curvePoint2.intensity = g_pointIntensity2;
+    curvePoint2.frequency = g_pointFrequency2;
+    hapticEvent.points.push_back(std::move(curvePoint2));
+
+    OHOS::HDI::Vibrator::V1_2::CurvePoint curvePoint3;
+    curvePoint3.time = g_pointTime3;
+    curvePoint3.intensity = g_pointIntensity3;
+    curvePoint3.frequency = g_pointFrequency3;
+    hapticEvent.points.push_back(std::move(curvePoint3));
+
+    pkg.events.push_back(std::move(hapticEvent));
+    int32_t startRet = g_vibratorInterface->PlayHapticPattern(pkg);
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_HDHAPTIC);
@@ -661,9 +700,9 @@ HWTEST_F(HdfVibratorHdiTest, StopV1_2Test_004, TestSize.Level1)
     HDF_LOGI("StopV1_2Test_004 in");
     ASSERT_NE(nullptr, g_vibratorInterface);
 
-    int32_t startRet = g_vibratorInterface->StartOnce(g_duration);
+    int32_t startRet = g_vibratorInterface->Start(g_effect1);
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_BUTT);
-    EXPECT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_FAILURE);
 }
