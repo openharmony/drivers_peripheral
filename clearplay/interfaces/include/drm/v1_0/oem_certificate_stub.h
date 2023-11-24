@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+
 using namespace OHOS;
 class OemCertificateStub : public IPCObjectStub {
 public:
@@ -35,30 +36,21 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t OemCertificateStubGetOemProvisionRequest_(MessageParcel &oemCertificateData,
-        MessageParcel &oemCertificateReply, MessageOption &oemCertificateOption,
-        sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
+    static int32_t OemCertificateStubGetOemProvisionRequest_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
-    static int32_t OemCertificateStubProvideOemProvisionResponse_(MessageParcel &oemCertificateData,
-        MessageParcel &oemCertificateReply, MessageOption &oemCertificateOption,
-        sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
+    static int32_t OemCertificateStubProvideOemProvisionResponse_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
-    static int32_t OemCertificateStubGetVersion_(MessageParcel &oemCertificateData, MessageParcel &oemCertificateReply,
-        MessageOption &oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
+    static int32_t OemCertificateStubGetVersion_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
 private:
-    int32_t OemCertificateStubGetOemProvisionRequest(MessageParcel &oemCertificateData,
-        MessageParcel &oemCertificateReply, MessageOption &oemCertificateOption);
+    int32_t OemCertificateStubGetOemProvisionRequest(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 
-    int32_t OemCertificateStubProvideOemProvisionResponse(MessageParcel &oemCertificateData,
-        MessageParcel &oemCertificateReply, MessageOption &oemCertificateOption);
+    int32_t OemCertificateStubProvideOemProvisionResponse(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 
-    int32_t OemCertificateStubGetVersion(MessageParcel &oemCertificateData, MessageParcel &oemCertificateReply,
-        MessageOption &oemCertificateOption);
+    int32_t OemCertificateStubGetVersion(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 
 
-    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::OemCertificateStub, OHOS::HDI::Drm::V1_0::IOemCertificate>
-        objDelegator_;
+    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::OemCertificateStub, OHOS::HDI::Drm::V1_0::IOemCertificate> objDelegator_;
     sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl_;
 };
 } // V1_0
