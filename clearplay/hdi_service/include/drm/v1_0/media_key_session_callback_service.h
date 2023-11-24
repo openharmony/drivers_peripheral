@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,10 +27,11 @@ public:
     MediaKeySessionCallbackService() = default;
     virtual ~MediaKeySessionCallbackService() = default;
 
-    int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t> &data) override;
+    int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
 
-    int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, MediaKeySessionLicenseStatus> &licenseStatus,
-        bool hasNewGoodLicense) override;
+    int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense) override;
+
 };
 } // V1_0
 } // Drm

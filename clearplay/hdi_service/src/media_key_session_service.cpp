@@ -119,14 +119,13 @@ int32_t MediaKeySessionService::ProcessLicenseResponse(const std::vector<uint8_t
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySessionService::CheckLicenseStatus(std::vector<LicenseStatusString> &licenseStatus)
+int32_t MediaKeySessionService::CheckLicenseStatus(std::map<std::string, MediaKeySessionKeyStatus>& licenseStatus)
 {
     HDF_LOGI("%{public}s: start", __func__);
     for (auto &keyValuePair : session_->keyIdAndKeyValue_) {
-        LicenseStatusString status;
-        status.name = std::string(keyValuePair.first.begin(), keyValuePair.first.end());
-        status.value = "ok";
-        licenseStatus.push_back(status);
+        std::string name = std::string(keyValuePair.first.begin(), keyValuePair.first.end());
+        MediaKeySessionKeyStatus value = MEDIA_KEY_SESSION_KEY_STATUS_USABLE;
+        licenseStatus.insert(std::make_pair(name, value));
     }
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
