@@ -164,12 +164,14 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     if (IsClientsEmpty(groupId)) {
         return false;
     }
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     client = clients_[groupId];
     return true;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
 {
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     return sensorUsed_;
 }
 
