@@ -44,7 +44,7 @@ constexpr unsigned int IAM_DOMAIN_ID_COMMON = 0xD002400;
 constexpr HiLogLabel LABEL_IAM_COMMON = {LOG_CORE, IAM_DOMAIN_ID_COMMON, "IAM_COMMON"};
 
 // face
-constexpr unsigned int IAM_DOMAIN_ID_FACE = 0xD002442;
+constexpr unsigned int IAM_DOMAIN_ID_FACE = 0xD002406;
 constexpr HiLogLabel LABEL_FACE_AUTH_NAPI = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_NAPI"};
 constexpr HiLogLabel LABEL_FACE_AUTH_SDK = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_SDK"};
 constexpr HiLogLabel LABEL_FACE_AUTH_SA = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_SA"};
