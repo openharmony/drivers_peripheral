@@ -70,7 +70,7 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
   | 生成一个许可证获取请求             | int32_t GenerateLicenseRequest(const LicenseRequestInfo& licenseRequestInfo,
   LicenseRequest& licenseRequest) |
   | 解析许可证获取响应                 | int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse, std::vector<uint8_t>& licenseId) | 
-  | 检查当前会话的许可证状态            | int32_t CheckLicenseStatus(std::vector<LicenseStatusString>& licenseStatus) |
+  | 检查当前会话的许可证状态            | int32_t CheckLicenseStatus(std::map<std::string, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) |
   | 移除当前会话下所有许可证            | int32_t RemoveLicense() |
   | 生成离线密钥释放请求                | int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId, std::vector<uint8_t>& releaseRequest) |
   | 解析离线密钥释放响应                | int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId, const std::vector<uint8_t>& response) |
@@ -95,7 +95,7 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
   | 功能描述                       | 接口名称                                                     |
   | ------------------------------| ------------------------------------------------------------ |
   | HDI MediaKeySession事件监听接口                  | int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) |
-  | HDI MediaKeySession事件监听接口，密钥状态改变     | int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, MediaKeySessionLicenseStatus>& licenseStatus, bool hasNewGoodLicense) |
+  | HDI MediaKeySession事件监听接口，密钥状态改变     | int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense) |
 
 - imedia_key_system_callback.h
 

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 #define OHOS_HDI_DRM_V1_0_IMEDIAKEYSESSION_H
 
 #include <stdint.h>
+#include <map>
 #include <string>
 #include <vector>
 #include <hdf_base.h>
@@ -30,22 +31,20 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
-    do {                                             \
-        if ((lv)compare(rv)) {                       \
-            return ret;                              \
-        }                                            \
-    } while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
+    if ((lv) compare (rv)) { \
+        return ret; \
+    } \
+} while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
-    do {                                                             \
-        if ((lv)compare(rv)) {                                       \
-            ret = value;                                             \
-            goto table;                                              \
-        }                                                            \
-    } while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
+    if ((lv) compare (rv)) { \
+        ret = value; \
+        goto table; \
+    } \
+} while (false)
 #endif
 
 namespace OHOS {
@@ -77,35 +76,36 @@ public:
 
     virtual ~IMediaKeySession() = default;
 
-    virtual int32_t GenerateLicenseRequest(const LicenseRequestInfo &licenseRequestInfo,
-        LicenseRequest &licenseRequest) = 0;
+    virtual int32_t GenerateLicenseRequest(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
+         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest) = 0;
 
-    virtual int32_t ProcessLicenseResponse(const std::vector<uint8_t> &licenseResponse,
-        std::vector<uint8_t> &licenseId) = 0;
+    virtual int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
+         std::vector<uint8_t>& licenseId) = 0;
 
-    virtual int32_t CheckLicenseStatus(std::vector<LicenseStatusString> &licenseStatus) = 0;
+    virtual int32_t CheckLicenseStatus(std::map<std::string,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) = 0;
 
     virtual int32_t RemoveLicense() = 0;
 
-    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t> &licenseId,
-        std::vector<uint8_t> &releaseRequest) = 0;
+    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId,
+         std::vector<uint8_t>& releaseRequest) = 0;
 
-    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t> &licenseId,
-        const std::vector<uint8_t> &response) = 0;
+    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId,
+         const std::vector<uint8_t>& response) = 0;
 
-    virtual int32_t RestoreOfflineLicense(const std::vector<uint8_t> &licenseId) = 0;
+    virtual int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
 
-    virtual int32_t GetSecurityLevel(SecurityLevel &level) = 0;
+    virtual int32_t GetSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
 
-    virtual int32_t RequiresSecureDecoderModule(const std::string &mimeType, bool &required) = 0;
+    virtual int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) = 0;
 
-    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback> &sessionCallback) = 0;
+    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback>& sessionCallback) = 0;
 
-    virtual int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> &decryptModule) = 0;
+    virtual int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule>& decryptModule) = 0;
 
     virtual int32_t Destroy() = 0;
 
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
+    virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
     {
         majorVer = 1;
         minorVer = 0;

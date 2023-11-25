@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+
 using namespace OHOS;
 class MediaKeySystemFactoryStub : public IPCObjectStub {
 public:
@@ -35,32 +36,21 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t MediaKeySystemFactoryStubIsMediaKeySystemSupported_(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption,
-        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
+    static int32_t MediaKeySystemFactoryStubIsMediaKeySystemSupported_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
-    static int32_t MediaKeySystemFactoryStubCreateMediaKeySystem_(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption,
-        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
+    static int32_t MediaKeySystemFactoryStubCreateMediaKeySystem_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
-    static int32_t MediaKeySystemFactoryStubGetVersion_(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption,
-        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
+    static int32_t MediaKeySystemFactoryStubGetVersion_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
 private:
-    int32_t MediaKeySystemFactoryStubIsMediaKeySystemSupported(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption);
+    int32_t MediaKeySystemFactoryStubIsMediaKeySystemSupported(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
-    int32_t MediaKeySystemFactoryStubCreateMediaKeySystem(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption);
+    int32_t MediaKeySystemFactoryStubCreateMediaKeySystem(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
-    int32_t MediaKeySystemFactoryStubGetVersion(MessageParcel &mediaKeySystemFactoryData,
-        MessageParcel &mediaKeySystemFactoryReply, MessageOption &mediaKeySystemFactoryOption);
+    int32_t MediaKeySystemFactoryStubGetVersion(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
 
-    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaKeySystemFactoryStub,
-        OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory>
-        objDelegator_;
+    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaKeySystemFactoryStub, OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> objDelegator_;
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl_;
 };
 } // V1_0
