@@ -62,10 +62,10 @@ void AudioUtRenderOffloadTest::InitRenderAttrs(struct AudioSampleAttributes &att
     attrs.interleaved = 0;
     attrs.type = AUDIO_OFFLOAD;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT;
     attrs.isBigEndian = false;
     attrs.isSignedData = true;
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount);
     attrs.stopThreshold = INT_MAX;
     attrs.silenceThreshold = BUFFER_LENTH;
     attrs.offloadInfo.bitRate = AUDIO_BIT_RATE;
