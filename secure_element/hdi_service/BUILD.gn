@@ -35,8 +35,6 @@ ohos_shared_library("libsecure_element_interface_service_1.0") {
 }
 
 ohos_shared_library("se_hdi_driver") {
-  include_dirs = []
-
   sources = [ "se_interface_driver.cpp" ]
 
   deps = []
@@ -57,7 +55,7 @@ ohos_shared_library("se_hdi_driver") {
 
   if (drivers_peripheral_secure_element_use_ca) {
     defines += [ "SECURE_ELEMENT_USE_CA" ]
-    external_deps += [ "nfc_ca:secure_element_ca" ]
+    deps += [ "../secure_element_ca_proxy:secure_element_ca_proxy" ]
   }
 
   shlib_type = "hdi"
