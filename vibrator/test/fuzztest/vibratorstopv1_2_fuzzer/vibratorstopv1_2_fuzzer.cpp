@@ -20,6 +20,7 @@
 #include <securec.h>
 
 using namespace OHOS::HDI::Vibrator;
+using namespace OHOS::HDI::Vibrator::V1_2;
 
 namespace OHOS {
     bool VibratorStopV1_2FuzzTest(const uint8_t* data, size_t size)
@@ -28,7 +29,7 @@ namespace OHOS {
             return false;
         }
         sptr<V1_2::IVibratorInterface> g_vibratorInterface = V1_2::IVibratorInterface::Get();
-        int ret = g_vibratorInterface->Start(reinterpret_cast<const std::string &>(data));
+        int ret = g_vibratorInterface->StartOnce(*(uint32_t *)data);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Vibrator Start failed, ret is [%{public}x]\n", __func__, ret);
             return false;
