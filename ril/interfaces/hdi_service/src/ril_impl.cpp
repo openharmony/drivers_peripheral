@@ -291,6 +291,11 @@ int32_t RilImpl::SendDataSleepMode(
     return TaskSchedule(&Telephony::HRilManager::SendDataSleepMode, slotId, serialId, dataSleepInfo);
 }
 
+int32_t RilImpl::CleanAllConnections(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::CleanAllConnections, slotId, serialId);
+}
+
 // Modem
 int32_t RilImpl::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {
