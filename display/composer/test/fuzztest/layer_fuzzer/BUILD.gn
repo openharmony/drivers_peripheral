@@ -26,7 +26,7 @@ ohos_fuzztest("LayerFuzzTest") {
     "drivers_interface_display:display_composer_idl_headers",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
-    "graphic_chipsetsdk:buffer_handle",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
