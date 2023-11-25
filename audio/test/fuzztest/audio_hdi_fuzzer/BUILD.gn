@@ -20,7 +20,7 @@ group("audio_hdi_fuzzer") {
   testonly = true
   deps = []
 
-  if (!drivers_peripheral_audio_feature_community) {
+  if (drivers_peripheral_audio_feature_offload)) {
     deps += [ "audiooffloadrender_fuzzer:AudioOffloadRenderFuzzTest" ]
   }
 
