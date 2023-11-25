@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,22 +32,20 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
-    do {                                             \
-        if ((lv)compare(rv)) {                       \
-            return ret;                              \
-        }                                            \
-    } while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
+    if ((lv) compare (rv)) { \
+        return ret; \
+    } \
+} while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
-    do {                                                             \
-        if ((lv)compare(rv)) {                                       \
-            ret = value;                                             \
-            goto table;                                              \
-        }                                                            \
-    } while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
+    if ((lv) compare (rv)) { \
+        ret = value; \
+        goto table; \
+    } \
+} while (false)
 #endif
 
 namespace OHOS {
@@ -83,41 +81,41 @@ public:
 
     virtual ~IMediaKeySystem() = default;
 
-    virtual int32_t GetConfigurationString(const std::string &name, std::string &value) = 0;
+    virtual int32_t GetConfigurationString(const std::string& name, std::string& value) = 0;
 
-    virtual int32_t SetConfigurationString(const std::string &name, const std::string &value) = 0;
+    virtual int32_t SetConfigurationString(const std::string& name, const std::string& value) = 0;
 
-    virtual int32_t GetConfigurationByteArray(const std::string &name, std::vector<uint8_t> &value) = 0;
+    virtual int32_t GetConfigurationByteArray(const std::string& name, std::vector<uint8_t>& value) = 0;
 
-    virtual int32_t SetConfigurationByteArray(const std::string &name, const std::vector<uint8_t> &value) = 0;
+    virtual int32_t SetConfigurationByteArray(const std::string& name, const std::vector<uint8_t>& value) = 0;
 
-    virtual int32_t GetMetrics(std::map<std::string, std::string> &metrics) = 0;
+    virtual int32_t GetMetrics(std::map<std::string, std::string>& metrics) = 0;
 
-    virtual int32_t GetMaxSecurityLevel(SecurityLevel &level) = 0;
+    virtual int32_t GetMaxSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
 
-    virtual int32_t GenerateKeySystemRequest(std::string &defaultUrl, std::vector<uint8_t> &request) = 0;
+    virtual int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) = 0;
 
-    virtual int32_t ProcessKeySystemResponse(const std::vector<uint8_t> &response) = 0;
+    virtual int32_t ProcessKeySystemResponse(const std::vector<uint8_t>& response) = 0;
 
-    virtual int32_t GetOemCertificateStatus(CertificateStatus &status) = 0;
+    virtual int32_t GetOemCertificateStatus(OHOS::HDI::Drm::V1_0::CertificateStatus& status) = 0;
 
-    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback> &systemCallback) = 0;
+    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback) = 0;
 
-    virtual int32_t CreateMediaKeySession(SecurityLevel level,
-        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> &keySession) = 0;
+    virtual int32_t CreateMediaKeySession(OHOS::HDI::Drm::V1_0::SecurityLevel level,
+         sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) = 0;
 
-    virtual int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>> &licenseIds) = 0;
+    virtual int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) = 0;
 
-    virtual int32_t GetOfflineLicenseStatus(const std::vector<uint8_t> &licenseId,
-        OfflineLicenseStatus &licenseStatus) = 0;
+    virtual int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
+         OHOS::HDI::Drm::V1_0::OfflineLicenseStatus& licenseStatus) = 0;
 
-    virtual int32_t RemoveOfflineLicense(const std::vector<uint8_t> &licenseId) = 0;
+    virtual int32_t RemoveOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
 
-    virtual int32_t GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> &oemCert) = 0;
+    virtual int32_t GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate>& oemCert) = 0;
 
     virtual int32_t Destroy() = 0;
 
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
+    virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
     {
         majorVer = 1;
         minorVer = 0;
