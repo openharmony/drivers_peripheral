@@ -34,9 +34,6 @@
       "sub_component": [
         "//drivers/peripheral/clearplay:clearplay_entry"
       ],
-      "test": [
-        "//drivers/peripheral/clearplay/test:clearplay_test_entry"
-      ],
       "inner_kits": [
         {
           "type":"so",
