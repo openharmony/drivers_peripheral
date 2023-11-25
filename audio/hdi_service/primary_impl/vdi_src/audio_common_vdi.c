@@ -46,6 +46,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     vdiAttrs->format = (enum AudioFormatVdi)attrs->format;
     vdiAttrs->sampleRate = attrs->sampleRate;
     vdiAttrs->channelCount = attrs->channelCount;
+    vdiAttrs->channelLayout = attrs->channelLayout;
     vdiAttrs->period = attrs->period;
     vdiAttrs->frameSize = attrs->frameSize;
     vdiAttrs->isBigEndian = attrs->isBigEndian;
@@ -406,6 +407,7 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
     vdiAttrs->format = (enum AudioFormatVdi)attrs->format;
     vdiAttrs->sampleRate = attrs->sampleRate;
     vdiAttrs->channelCount = attrs->channelCount;
+    vdiAttrs->channelLayout = attrs->channelLayout;
     vdiAttrs->period = attrs->period;
     vdiAttrs->frameSize = attrs->frameSize;
     vdiAttrs->isBigEndian = attrs->isBigEndian;
