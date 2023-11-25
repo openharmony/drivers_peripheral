@@ -1349,3 +1349,99 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_044, TestSize.Level1)
     cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_045
+ * @tc.desc: OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_045, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE, &entry);
+    
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        printf("OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE f value count %d\n", entry.count);
+        constexpr size_t step = 4; //print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << "";
+            if ((i != 0) && (i % step == 0 || i == entry.count -1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE%s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_046
+ * @tc.desc: OHOS_ABILITY_CAMERA_VIRTUAL_APERTURE_RANGE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_046, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
+
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        printf("OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE f value count %d\n", entry.count);
+        constexpr size_t step = 4; //print step
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.f[i] << "";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE%s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_047
+ * @tc.desc: OHOS_CONTROL_CAMERA_VIRTUAL_APERTURE_RANGE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_047, TestSize.Level1)
+{
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    float virtualApertureValue = 1.6;
+    meta->addEntry(OHOS_CONTROL_CAMERA_VIRTUAL_APERTURE_VALUE, &virtualApertureValue, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+}
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_048
+ * @tc.desc: OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_RANGE
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
+{
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    float physicalApertureValue = 2;
+    meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+}
