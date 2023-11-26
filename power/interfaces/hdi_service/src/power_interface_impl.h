@@ -49,6 +49,8 @@ public:
 
     int32_t UnholdRunningLock(const RunningLockInfo &info) override;
 
+    int32_t GetWakeupReason(const std::string &reason) override;
+
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl) :
