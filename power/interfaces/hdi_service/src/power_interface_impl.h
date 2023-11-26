@@ -49,7 +49,7 @@ public:
 
     int32_t UnholdRunningLock(const RunningLockInfo &info) override;
 
-    int32_t GetWakeupReason(const std::string &reason) override;
+    int32_t GetWakeupReason(std::string &reason) override;
 
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
