@@ -50,6 +50,7 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
+static constexpr const char * const WAKEUP_CAUSE_PATH = "/sys/bus/platform/devices/echub_battery/wakeup_cause";
 static std::chrono::milliseconds waitTime_(1000); // {1000ms};
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
@@ -180,6 +181,7 @@ void NotifyCallback(int code)
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
+    HDF_LOGI("stop suspend");
     g_suspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
@@ -187,6 +189,7 @@ int32_t PowerInterfaceImpl::StopSuspend()
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
+    HDF_LOGI("force suspend");
     g_suspendRetry = false;
 
     NotifyCallback(CMD_ON_SUSPEND);
@@ -337,6 +340,16 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
     return RunningLockImpl::Unhold(info);
 }
+
+int32_t PowerInterfaceImpl::GetWakeupReason(const std::string &reason)
+{
+    UniqueFd wakeupReasonFd(TEMP_FAILURE_RETRY(open(WAKEUP_CAUSE_PATH, O_RDONLY | O_CLOEXEC)));
+    if(wakeupReasonFd < 0) {
+        HDF_LOGW("get wakup reason open wakeup_cause node fail");
+        return HDF_FAILURE;
+    }
+    LoadStringFd(wakeupReasonFd, reason);
+    return HDF_SUCCESS;
 } // namespace V1_1
 } // namespace Power
 } // namespace HDI
