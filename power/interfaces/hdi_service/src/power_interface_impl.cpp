@@ -341,7 +341,7 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
     return RunningLockImpl::Unhold(info);
 }
 
-int32_t PowerInterfaceImpl::GetWakeupReason(const std::string &reason)
+int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
     UniqueFd wakeupReasonFd(TEMP_FAILURE_RETRY(open(WAKEUP_CAUSE_PATH, O_RDONLY | O_CLOEXEC)));
     if(wakeupReasonFd < 0) {
