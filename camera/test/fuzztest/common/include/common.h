@@ -53,7 +53,7 @@ public:
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_2 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV_2 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoV1_1 = nullptr;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::PrelaunchConfig> prelaunchConfig = nullptr;
@@ -84,6 +84,8 @@ public:
         int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
         int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
+        int32_t OnCaptureStartedV1_2(int32_t captureId,
+            const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
     };
 
     class DemoCameraDeviceCallback : public ICameraDeviceCallback {

@@ -41,7 +41,7 @@ ohos_shared_library("libcodec_component_manager_service_2.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -85,7 +85,7 @@ ohos_shared_library("libcodec_driver") {
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
       "drivers_interface_codec:libcodec_stub_2.0",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

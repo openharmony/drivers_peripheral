@@ -1270,8 +1270,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_036, TestSize.Level1)
 {
     cameraTest->OpenCameraV1_2();
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallback,
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
     EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();

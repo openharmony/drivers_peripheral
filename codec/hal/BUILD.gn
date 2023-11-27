@@ -53,7 +53,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -112,7 +112,7 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -153,7 +153,7 @@ ohos_shared_library("libcodec_hdi_omx_client") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "graphic_chipsetsdk:buffer_handle",
+      "graphic_surface:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
