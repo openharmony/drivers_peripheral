@@ -344,7 +344,7 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
     UniqueFd wakeupReasonFd(TEMP_FAILURE_RETRY(open(WAKEUP_CAUSE_PATH, O_RDONLY | O_CLOEXEC)));
-    if(wakeupReasonFd < 0) {
+    if (wakeupReasonFd < 0) {
         HDF_LOGW("get wakup reason open wakeup_cause node fail");
         return HDF_FAILURE;
     }
