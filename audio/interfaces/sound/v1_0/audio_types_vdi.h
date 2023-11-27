@@ -290,6 +290,7 @@ enum AudioInputTypeVdi {
 struct AudioOffloadInfoVdi {
     uint32_t sampleRate;
     uint32_t channelCount;
+    uint64_t channelLayout;
     uint32_t bitRate;
     uint32_t bitWidth;
     enum AudioFormatVdi format;
