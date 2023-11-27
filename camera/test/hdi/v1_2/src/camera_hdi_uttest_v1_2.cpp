@@ -1295,7 +1295,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_041, TestSize.Level1)
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
 
-    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
+        *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 }
 
@@ -1312,7 +1313,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_042, TestSize.Level1)
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
 
-    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
+        *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 }
 
@@ -1329,7 +1331,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_043, TestSize.Level1)
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
 
-    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
+        *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
@@ -1346,7 +1349,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_044, TestSize.Level1)
     cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
     cameraTest->prelaunchConfig->setting = {};
 
-    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
+        *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::INVALID_ARGUMENT);
 }
 
