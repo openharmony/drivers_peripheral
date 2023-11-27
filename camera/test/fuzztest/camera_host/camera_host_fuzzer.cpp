@@ -27,6 +27,8 @@ enum HostCmdId {
     CAMERA_HOST_SET_FLASH_LIGHTS,
     CAMERA_HOST_SET_FLASH_LIGHTS_V1_2,
     CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO,
+    CAMERA_HOST_PRE_CAMERA_SWITCH,
+    CAMERA_HOST_PRELAUNCH_WITH_OPMODE,
     CAMERA_HOST_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
@@ -84,6 +86,25 @@ void FuncNotifyDeviceStateChangeInfo(const uint8_t *rawData, size_t size)
     cameraTest->serviceV1_2->NotifyDeviceStateChangeInfo(data[0], data[1]);
 }
 
+void FuncPreCameraSwitch(const uint8_t *rawData, size_t size)
+{
+    std::string cameraId = reinterpret_cast<const char*>(rawData);
+    cameraTest->serviceV1_2->PreCameraSwitch(cameraId);
+}
+
+void FuncPrelaunchWithOpMode(const uint8_t *rawData, size_t size)
+{
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    std::string cameraId = reinterpret_cast<const char*>(rawData);
+    cameraTest->prelaunchConfig->cameraId = cameraId;
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting.push_back(*rawData);
+
+    int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
+
+    cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, data[0]);
+}
+
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     switch (cmd) {
@@ -113,6 +134,14 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
         }
         case CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO: {
             FuncNotifyDeviceStateChangeInfo(rawData, size);
+            break;
+        }
+        case CAMERA_HOST_PRE_CAMERA_SWITCH: {
+            FuncPreCameraSwitch(rawData, size);
+            break;
+        }
+        case CAMERA_HOST_PRELAUNCH_WITH_OPMODE: {
+            FuncPrelaunchWithOpMode(rawData, size);
             break;
         }
         default:
