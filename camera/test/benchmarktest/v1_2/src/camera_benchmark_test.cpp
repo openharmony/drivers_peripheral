@@ -55,5 +55,49 @@ BENCHMARK_F(CameraBenchmarkTest, NotifyDeviceStateChangeInfo_benchmark_001)(
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, NotifyDeviceStateChangeInfo_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: PreCameraSwitch
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, PreCameraSwitch_benchmark_001)(
+    benchmark::State &st)
+{
+    EXPECT_EQ(false, cameraTest->serviceV1_2 == nullptr);
+    cameraTest->serviceV1_2->GetCameraIds(cameraTest->cameraIds);
+    for (auto _ : st) {
+        cameraTest->rc = cameraTest->serviceV1_2->PreCameraSwitch(cameraTest->cameraIds.front());
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, PreCameraSwitch_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: PrelaunchWithOpMode
+  * @tc.desc: Prelaunch, benchmark.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)(
+    benchmark::State &st)
+{
+    EXPECT_EQ(false, cameraTest->serviceV1_2 == nullptr);
+    cameraTest->serviceV1_2->GetCameraIds(cameraTest->cameraIds);
+
+    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
+    cameraTest->prelaunchConfig->cameraId = cameraTest->cameraIds.front();
+    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
+    cameraTest->prelaunchConfig->setting = {};
+    for (auto _ : st) {
+        cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
+            *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 BENCHMARK_MAIN();
 
