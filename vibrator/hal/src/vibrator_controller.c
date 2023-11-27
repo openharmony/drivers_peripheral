@@ -274,6 +274,12 @@ static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
 
 static int32_t Stop(enum VibratorMode mode)
 {
+    if (mode < VIBRATOR_MODE_ONCE || mode >= VIBRATOR_MODE_BUTT) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (mode == VIBRATOR_MODE_HDHAPTIC) {
+        return HDF_ERR_NOT_SUPPORT;
+    }
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 

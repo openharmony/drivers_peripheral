@@ -20,7 +20,10 @@
 #include "hilog/log.h"
 #include "display_log.h"
 
-#define HDF_LOG_TAG    metadata_service
+#undef LOG_TAG
+#define LOG_TAG "METADATA_SRV"
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002500
 
 namespace OHOS {
 namespace HDI {

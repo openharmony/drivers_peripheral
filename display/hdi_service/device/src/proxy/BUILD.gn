@@ -38,7 +38,7 @@ ohos_shared_library("libdisplay_device_proxy") {
 
   external_deps = [
     "c_utils:utils",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",

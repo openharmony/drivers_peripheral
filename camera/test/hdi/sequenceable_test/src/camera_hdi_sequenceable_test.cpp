@@ -18,6 +18,7 @@
 #include "camera_hdi_sequenceable_test.h"
 #include "map_data_sequenceable.h"
 #include "buffer_handle_sequenceable.h"
+#include "buffer_producer_sequenceable.h"
 #include "buffer_util.h"
 using namespace OHOS;
 using namespace std;
@@ -135,4 +136,38 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_01, TestSize.Lev
     BufferHandle* handle2 = bufferHandleSeq1->GetBufferHandle();
     EXPECT_NE(handle2, nullptr);
     EXPECT_EQ(handle2->reserveFds, reserveFds);
+}
+
+/**
+ * @tc.name: BufferHandleSequencebleTest_02
+ * @tc.desc: BufferHandleSequencebleTest_02
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_02, TestSize.Level1)
+{
+    constexpr int32_t reserveFds = 1;
+    constexpr int32_t reserveInts = 0;
+    BufferHandle* handle0 = BufferHandleSequenceable::NewBufferHandle(reserveFds, reserveInts);
+    handle0->fd = open("/dev/null", O_WRONLY);
+    handle0->reserve[0] = dup(handle0->fd);
+    EXPECT_NE(handle0, nullptr);
+    auto bufferHandleSeq0 = make_shared<BufferHandleSequenceable>(handle0);
+    bufferHandleSeq0->SetBufferHandle(handle0);
+}
+
+/**
+ * @tc.name: BufferProducerSequenceTest_01
+ * @tc.desc: BufferProducerSequenceTest_01
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiSequenceableTest, BufferProducerSequenceTest_01, TestSize.Level1)
+{
+    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferProducerSequenceble01;
+    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferProducerSequenceble02;
+    bufferProducerSequenceble01.operator = (bufferProducerSequenceble02);
+    Parcel parcel;
+    bufferProducerSequenceble01.Marshalling(parcel);
+    BufferHandleSequenceable::Unmarshalling(parcel);
 }
