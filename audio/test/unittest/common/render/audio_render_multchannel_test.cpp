@@ -26,7 +26,6 @@ using namespace testing::ext;
 namespace {
 const int BUFFER_LENTH = 1024 * 16;
 const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
-const int MOVE_LEFT_NUM = 8;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 6;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
