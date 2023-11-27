@@ -350,6 +350,7 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
     }
     LoadStringFd(wakeupReasonFd, reason);
     return HDF_SUCCESS;
+}
 } // namespace V1_1
 } // namespace Power
 } // namespace HDI
