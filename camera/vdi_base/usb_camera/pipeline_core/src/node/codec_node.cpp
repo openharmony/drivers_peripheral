@@ -13,6 +13,7 @@
 
 #include "codec_node.h"
 #include <securec.h>
+#include "camera_dump.h"
 
 extern "C" {
 #include <jpeglib.h>
@@ -383,6 +384,9 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         previewHeight_ = buffer->GetHeight();
         Yuv422ToRGBA8888(buffer);
     }
+
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpBuffer("CodecNode", ENABLE_CODEC_NODE_CONVERTED, buffer);
 
     std::vector<std::shared_ptr<IPort>> outPutPorts_;
     outPutPorts_ = GetOutPorts();

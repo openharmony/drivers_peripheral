@@ -14,6 +14,7 @@
 #include "fork_node.h"
 #include "securec.h"
 #include "codec_node.h"
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 PcForkNode::PcForkNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -110,6 +111,10 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
                 CAMERA_LOGW("PcForkNode::memcpy_s failed.");
             }
+
+            CameraDumper& dumper = CameraDumper::GetInstance();
+            dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
+
             for (auto& it : outPutPorts_) {
                 if (it->format_.streamId_ != streamId_) {
                     continue;

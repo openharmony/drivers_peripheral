@@ -13,44 +13,58 @@
  * limitations under the License.
  */
 
+#include "camera_dump.h"
+
 #include <sys/time.h>
 #include <fstream>
 #include <sstream>
 #include <cstdio>
-#include "camera_dump.h"
-#include "v1_0/vdi_types.h"
+#include <iostream>
+#include <cstdlib>
+#include <regex>
+
 #include "camera.h"
+#include "v1_0/vdi_types.h"
 
 using namespace std;
 
 namespace OHOS::Camera {
 const std::string DUMP_PATH = "/data/local/tmp/";
+const std::string DUMP_CONFIG_PATH = "/data/local/tmp/dump.config";
 constexpr uint32_t ARGS_MAX_NUM = 5;
-constexpr uint32_t PATH_MAX_LEN = 200;
-constexpr int32_t READ_DISKINFO_NUM = 6;
 constexpr uint32_t MAX_USAGE_RATE = 70;
 constexpr int32_t CHECK_DISKINFO_TIME_MS = 10000;
-#define TITLEINFO_ARRAY_SIZE 200
+const uint32_t TITLEINFO_ARRAY_SIZE = 200;
 
 const char *g_cameraDumpHelp =
     " Camera manager dump options:\n"
     "     -h: camera dump help\n"
     "     -m: start dump metadata\n"
     "     -b: start dump buffer\n"
+    "     -o: start dump start\n"
     "     -e: exit all dump\n";
 
 std::map<DumpType, bool> g_dumpInfoMap = {
     {MedataType, false},
-    {BufferType, false}
+    {BufferType, false},
+    {OpenType, false}
 };
 
-struct DiskInfo {
-    char diskName[100];
-    uint32_t diskTotal;
-    uint32_t diskUse;
-    uint32_t canUse;
-    uint32_t diskUsePer;
-    char diskMountInfo[200];
+std::map<std::string, std::string> g_dumpToolMap = {
+    {ENABLE_DQ_BUFFER_DUMP, "false"},
+    {ENABLE_UVC_NODE, "false"},
+    {ENABLE_UVC_NODE_CONVERTED, "false"},
+    {ENABLE_EXIF_NODE_CONVERTED, "false"},
+    {ENABLE_FACE_NODE_CONVERTED, "false"},
+    {ENABLE_FORK_NODE_CONVERTED, "false"},
+    {ENABLE_RKFACE_NODE_CONVERTED, "false"},
+    {ENABLE_RKEXIF_NODE_CONVERTED, "false"},
+    {ENABLE_CODEC_NODE_CONVERTED, "false"},
+    {ENABLE_RKCODEC_NODE_CONVERTED, "false"},
+    {ENABLE_STREAM_TUNNEL, "false"},
+    {ENABLE_METADATA, "false"},
+    {PREVIEW_INTERVAL, "1"},
+    {CAPTURE_INTERVAL, "1"}
 };
 
 CameraDumper::~CameraDumper()
@@ -58,55 +72,117 @@ CameraDumper::~CameraDumper()
     StopCheckDiskInfo();
 }
 
-bool CameraDumper::DumpBuffer(const std::shared_ptr<IBuffer>& buffer)
+bool CameraDumper::DumpStart()
 {
-    if (buffer == nullptr) {
-        CAMERA_LOGE("buffer is nullptr");
+    if (!IsDumpOpened(OpenType)) {
+        return false;
+    }
+    std::stringstream mkdirCmd;
+    mkdirCmd << "mkdir -p " << DUMP_PATH;
+    system(mkdirCmd.str().c_str());
+
+    ReadDumpConfig();
+    return true;
+}
+
+bool CameraDumper::ReadDumpConfig()
+{
+    std::stringstream ss;
+    ss << DUMP_CONFIG_PATH;
+    std::ifstream ifs;
+    ifs.open(ss.str(), std::ios::in);
+    if (!ifs) {
+        CAMERA_LOGE("open dump config file <%{public}s> failed, error: %{public}s",
+            ss.str().c_str(), std::strerror(errno));
         return false;
     }
 
-    if (!IsDumpOpened(BufferType)) {
+    std::string str;
+    while (!ifs.eof()) {
+        if (ifs >> str) {
+            istringstream istr(str);
+            std::string strTemp;
+            vector<std::string> strVector;
+            while (getline(istr, strTemp, '=')) {
+                strVector.push_back(strTemp);
+            }
+            g_dumpToolMap[strVector[0]] = strVector[1];
+        }
+    }
+
+    ifs.close();
+    return true;
+}
+
+bool CameraDumper::IsDumpCommandOpened(std::string type)
+{
+    std::lock_guard<std::mutex> l(dumpStateLock_);
+    if (g_dumpToolMap.find(type) != g_dumpToolMap.end() && g_dumpToolMap[type] == "true") {
+        return true;
+    }
+    return false;
+}
+
+bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer)
+{
+    if (!IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
 
     uint32_t size = buffer->GetSize();
-    uint32_t width = buffer->GetWidth();
-    void* addr = buffer->GetVirAddress();
-    uint32_t height = buffer->GetHeight();
-    int32_t streamId = buffer->GetStreamId();
-    int32_t captureId = buffer->GetCaptureId();
-    int32_t encodeType = buffer->GetEncodeType();
-    EsFrameInfo esInfo = buffer->GetEsFrameInfo();
-    size = esInfo.size > 0 ? esInfo.size : size;
+    size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
 
     std::stringstream ss;
     std::string fileName;
-    ss << "captureId[" << captureId << "]_streamId[" << streamId <<
-        "]_width[" << width << "]_height[" << height;
+    ss << name.c_str() << "_captureId[" << buffer->GetCaptureId() << "]_streamId[" << buffer->GetStreamId() <<
+        "]_width[" << buffer->GetWidth() << "]_height[" << buffer->GetHeight();
 
-    if (encodeType == VDI::Camera::V1_0::ENCODE_TYPE_JPEG) {
+    int32_t previewInterval = 1;
+    std::istringstream ssPreview(g_dumpToolMap[PREVIEW_INTERVAL]);
+    ssPreview >> previewInterval;
+
+    int32_t captureInterval = 1;
+    std::istringstream ssVideo(g_dumpToolMap[CAPTURE_INTERVAL]);
+    ssVideo >> captureInterval;
+
+    ++dumpCount_;
+    if (buffer->GetEncodeType() == VDI::Camera::V1_0::ENCODE_TYPE_JPEG) {
+        if (dumpCount_ % captureInterval != 0) {
+            return true;
+        }
         ss << "]_" << GetCurrentLocalTimeStamp();
         ss >> fileName;
         fileName += ".jpeg";
-    } else if (encodeType == VDI::Camera::V1_0::ENCODE_TYPE_H264) {
-        fileName = "cameraDumpVideo.h264";
+    } else if (buffer->GetEncodeType() == VDI::Camera::V1_0::ENCODE_TYPE_H264) {
+#ifdef CAMERA_BUILT_ON_USB
+        ss << "]_" << GetCurrentLocalTimeStamp();
+        ss >> fileName;
+        fileName += "_umpVideo.yuv";
+#else
+        fileName += "_dumpVideo.h264";
+#endif
     } else {
+        if (dumpCount_ % previewInterval != 0) {
+            return true;
+        }
+
         ss << "]_" << GetCurrentLocalTimeStamp();
         ss >> fileName;
         fileName += ".yuv";
     }
 
-    return SaveDataToFile(fileName.c_str(), addr, size);
+    return SaveDataToFile(fileName.c_str(), buffer->GetVirAddress(), size);
 }
 
-bool CameraDumper::DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata, std::string tag)
+bool CameraDumper::DumpMetadata(std::string name, std::string type,
+    const std::shared_ptr<CameraMetadata>& metadata)
 {
     if (metadata == nullptr) {
         CAMERA_LOGE("metadata is nullptr");
         return false;
     }
 
-    if (!IsDumpOpened(MedataType)) {
+    if (!IsDumpCommandOpened(type)) {
         return false;
     }
 
@@ -121,7 +197,7 @@ bool CameraDumper::DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata,
         return true;
     }
     std::stringstream ss;
-    ss << GetCurrentLocalTimeStamp() << "_" << tag << ".meta";
+    ss << GetCurrentLocalTimeStamp() << "_" << name << ".meta";
 
     return SaveDataToFile(ss.str().c_str(), metaStr.c_str(), metaStr.size());
 }
@@ -225,6 +301,8 @@ void CameraDumper::CameraHostDumpProcess(HdfSBuf *data, HdfSBuf *reply)
         } else if (strcmp(value, "-e") == 0) {
             UpdateDumpMode(BufferType, false, reply);
             UpdateDumpMode(MedataType, false, reply);
+        } else if (strcmp(value, "-o") == 0) {
+            UpdateDumpMode(OpenType, true, reply);
         } else {
             ShowDumpMenu(reply);
         }
@@ -240,12 +318,6 @@ int32_t CameraDumpEvent(HdfSBuf *data, HdfSBuf *reply)
 
 void CameraDumper::CheckDiskInfo()
 {
-    DiskInfo diskInfo;
-    auto ret = memset_s(&diskInfo, sizeof(DiskInfo), 0, sizeof(DiskInfo));
-    if (ret != EOK) {
-        CAMERA_LOGE("diskInfo memset failed!");
-        return;
-    }
     stringstream ss;
     ss << "df " << DUMP_PATH;
 
@@ -256,24 +328,29 @@ void CameraDumper::CheckDiskInfo()
     }
 
     char titleInfo[TITLEINFO_ARRAY_SIZE] = {0};
+    char resultInfo[TITLEINFO_ARRAY_SIZE] = {0};
     fgets(titleInfo, sizeof(titleInfo) / sizeof(titleInfo[0]) - 1, fp);
-    int readNum = fscanf_s(fp, "%s %u %u %u %u%% %s\n", diskInfo.diskName, sizeof(diskInfo.diskName) - 1,
-        &diskInfo.diskTotal, &diskInfo.diskUse, &diskInfo.canUse, &diskInfo.diskUsePer, diskInfo.diskMountInfo,
-        sizeof(diskInfo.diskMountInfo) - 1);
+    fgets(resultInfo, sizeof(resultInfo) / sizeof(resultInfo[0]) - 1, fp);
+
     pclose(fp);
 
-    if (readNum != READ_DISKINFO_NUM) {
-        CAMERA_LOGD("readNum != READ_DISKINFO_NUM readNum: %{public}d", readNum);
-        return;
+    std::string diskInfoStr(resultInfo);
+    istringstream str(diskInfoStr);
+    string out;
+    std::vector<std::string> infos;
+
+    while (str >> out) {
+        infos.push_back(out);
     }
 
-    if (diskInfo.diskUsePer >= MAX_USAGE_RATE) {
+    std::string userPerStr = infos[4].substr(0, infos[4].length() - 1);
+    uint32_t usePer = std::atoi(userPerStr.c_str());
+    if (usePer >= MAX_USAGE_RATE) {
+        CAMERA_LOGE("dump use disk over the limit, stop dump");
         std::lock_guard<std::mutex> l(dumpStateLock_);
         for (auto it = g_dumpInfoMap.begin(); it != g_dumpInfoMap.end(); it++) {
             it->second = false;
         }
-        CAMERA_LOGD("readNum: %{public}d, diskName: %{public}s, diskUsePer: %{public}u%% diskMountInfo: %{public}s",
-            readNum, diskInfo.diskName, diskInfo.diskUsePer, diskInfo.diskMountInfo);
     }
 }
 
