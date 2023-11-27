@@ -19,7 +19,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 static void GetCheckPoints(Point center, std::vector<Point> &points)
 {
     const uint32_t STEP = 3;
