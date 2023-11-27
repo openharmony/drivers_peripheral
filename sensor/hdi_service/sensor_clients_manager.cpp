@@ -161,10 +161,10 @@ bool SensorClientsManager::IsClientsEmpty(int groupId)
 
 bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     if (IsClientsEmpty(groupId)) {
         return false;
     }
-    std::unique_lock<std::mutex> lock(clientsMutex_);
     client = clients_[groupId];
     return true;
 }
