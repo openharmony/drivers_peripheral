@@ -30,14 +30,17 @@ config("module_private_config") {
 ohos_unittest("composer_ut") {
   module_out_path = module_output_path
   sources = [ "hdi_composer_ut.cpp" ]
-  include_dirs = [ "../common" ]
+  include_dirs = [
+    "../common",
+    "//commonlibrary/c_utils/base/include",
+  ]
   deps = [ "../common:disp_dev_hdi_test_common" ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
-    "drivers_interface_display:display_composer_idl_headers",
+    "drivers_interface_display:display_composer_idl_headers_1.1",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
-    "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
     "googletest:gtest",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
