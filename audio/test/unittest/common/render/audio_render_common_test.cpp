@@ -28,7 +28,6 @@ const float MAX_GAINTHRESHOLD = 15.0;
 const float MIN_GAINTHRESHOLD = 0.0;
 const int BUFFER_LENTH = 1024 * 16;
 const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
-const int MOVE_LEFT_NUM = 8;
 const int32_t AUDIO_RENDER_BUF_TEST = 1024;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
@@ -88,15 +87,16 @@ uint64_t AudioUtRenderTest::GetRenderBufferSize()
 
 void AudioUtRenderTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 {
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs.interleaved = 0;
     attrs.type = AUDIO_IN_MEDIA;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT;
     attrs.isBigEndian = false;
     attrs.isSignedData = true;
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount);
     attrs.stopThreshold = INT_MAX;
     attrs.silenceThreshold = BUFFER_LENTH;
 }
@@ -157,7 +157,6 @@ void AudioUtRenderTest::SetUp()
     InitRenderDevDesc(devDescRender_);
     InitRenderAttrs(attrsRender_);
 
-    attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     int32_t ret = adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
