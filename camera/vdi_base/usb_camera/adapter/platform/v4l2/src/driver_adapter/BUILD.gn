@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//drivers/peripheral/camera/camera.gni")
 import("../../../../../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../../../../camera_usb.gni")
 
@@ -35,23 +36,32 @@ config("v4l2_config") {
 }
 
 ohos_shared_library("usb_camera_v4l2_adapter") {
+  defines = []
+  if (drivers_peripheral_camera_feature_usb) {
+    defines += [ "CAMERA_BUILT_ON_USB" ]
+  }
   sources = [
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_buffer.cpp",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_control.cpp",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_dev.cpp",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_fileformat.cpp",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/src/v4l2_stream.cpp",
+    "$camera_path_vdi/dump/src/camera_dump.cpp",
     "src/v4l2_uvc.cpp",
   ]
 
   include_dirs = [
     "$camera_path_vdi/include",
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/include",
+    "$camera_path_vdi/dump/include",
+    "$camera_path_vdi/../interfaces",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:metadata",
+    "graphic_surface:surface",
+    "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
   ]
