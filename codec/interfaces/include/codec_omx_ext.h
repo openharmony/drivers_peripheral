@@ -326,7 +326,7 @@ struct CodecVideoColorspace {
  * @brief Structure for pAppPrivate data of OMX_BUFFERHEADERTYPE
 */
 struct OMXBufferAppPrivateData {
-    uint32_t fd;                          /** dma fd or secure dma fd allocated by vender */
+    int fd;                          /** dma fd or secure dma fd allocated by vender */
     uint32_t sizeOfParam;
     void *param;
 };
