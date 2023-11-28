@@ -155,7 +155,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
     printf("%s: [Input] OpenInputDev001 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
-    int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(g_touchIndex);
+    int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(VALUE_DEFAULT);
     if (ret != INPUT_SUCCESS) {
         printf("%s: open device1 failed, ret %d\n", __func__, ret);
     }
@@ -212,7 +212,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
     printf("%s: [Input] CloseInputDev001 enter %d\n", __func__, __LINE__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
-    int32_t ret = g_inputInterface->iInputManager->CloseInputDevice(g_touchIndex);
+    int32_t ret = g_inputInterface->iInputManager->CloseInputDevice(VALUE_DEFAULT);
     if (ret != INPUT_SUCCESS) {
         printf("%s: close device %d failed, ret %d\n", __func__, g_touchIndex, ret);
     }
@@ -368,7 +368,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
         printf("%s: register callback failed for device %d, ret %d\n", __func__, g_touchIndex, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    ret = g_inputInterface->iInputManager->OpenInputDevice(g_touchIndex);
+    ret = g_inputInterface->iInputManager->OpenInputDevice(VALUE_DEFAULT);
     EXPECT_EQ(ret, INPUT_SUCCESS);
     printf("%s: wait 3s for testing, pls touch the panel now\n", __func__);
     printf("%s: The event data is as following:\n", __func__);
@@ -394,7 +394,7 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
         printf("%s: unregister callback failed for device %d, ret %d\n", __func__, g_touchIndex, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    ret = g_inputInterface->iInputManager->CloseInputDevice(g_touchIndex);
+    ret = g_inputInterface->iInputManager->CloseInputDevice(VALUE_DEFAULT);
     if (ret != INPUT_SUCCESS) {
         printf("%s: close device %d failed, ret %d\n", __func__, g_touchIndex, ret);
     }
@@ -414,7 +414,7 @@ HWTEST_F(HdiInputTest, FindIndexFromFd001, TestSize.Level1)
     InputDeviceManager InputDeviceManagerTest;
     int32_t fd = VALUE_NULL;
     uint32_t index = VALUE_NULL;
-    InputDeviceManagerTest.FindIndexFromFd(fd, &index);
+    ret = InputDeviceManagerTest.FindIndexFromFd(fd, &index);
     if (ret != INPUT_SUCCESS) {
         printf("%s: find index from fd failed, ret %d\n", __func__, ret);
     }
@@ -434,7 +434,7 @@ HWTEST_F(HdiInputTest, FindIndexFromDevName001, TestSize.Level1)
     InputDeviceManager InputDeviceManagerTest;
     string devName = "MOUSE1";
     uint32_t index = VALUE_NULL;
-    InputDeviceManagerTest.FindIndexFromDevName(devName, &index);
+    ret = InputDeviceManagerTest.FindIndexFromDevName(devName, &index);
     if (ret != INPUT_SUCCESS) {
         printf("%s: find index from device name failed, ret %d\n", __func__, ret);
     }

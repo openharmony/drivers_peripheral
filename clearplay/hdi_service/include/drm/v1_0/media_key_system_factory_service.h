@@ -28,11 +28,10 @@ public:
     MediaKeySystemFactoryService() = default;
     virtual ~MediaKeySystemFactoryService();
 
-    int32_t IsMediaKeySystemSupported(const std::string& uuid, const std::string& mimeType, SecurityLevel level,
-         bool& isSupported) override;
+    int32_t IsMediaKeySystemSupported(const std::string& name, const std::string& mimeType,
+         OHOS::HDI::Drm::V1_0::SecurityLevel level, bool& isSupported) override;
 
     int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) override;
-    // used in interface only
     int32_t CloseMediaKeySystemService(sptr<OHOS::HDI::Drm::V1_0::MediaKeySystemService> mediaKeySystem) override;
 
 private:

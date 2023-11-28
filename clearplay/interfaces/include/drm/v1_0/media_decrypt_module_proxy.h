@@ -35,15 +35,15 @@ public:
         return true;
     }
 
-    int32_t DecryptMediaData(bool secure, const CryptoInfo& cryptoInfo, const DrmBuffer& srcBuffer,
-         const DrmBuffer& destBuffer) override;
+    int32_t DecryptMediaData(bool secure, const OHOS::HDI::Drm::V1_0::CryptoInfo& cryptoInfo,
+         const OHOS::HDI::Drm::V1_0::DrmBuffer& srcBuffer, const OHOS::HDI::Drm::V1_0::DrmBuffer& destBuffer) override;
 
     int32_t Release() override;
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
-    static int32_t DecryptMediaData_(bool secure, const CryptoInfo& cryptoInfo, const DrmBuffer& srcBuffer,
-         const DrmBuffer& destBuffer, const sptr<IRemoteObject> remote);
+    static int32_t DecryptMediaData_(bool secure, const OHOS::HDI::Drm::V1_0::CryptoInfo& cryptoInfo,
+         const OHOS::HDI::Drm::V1_0::DrmBuffer& srcBuffer, const OHOS::HDI::Drm::V1_0::DrmBuffer& destBuffer, const sptr<IRemoteObject> remote);
 
     static int32_t Release_(const sptr<IRemoteObject> remote);
 

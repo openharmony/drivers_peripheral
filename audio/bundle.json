@@ -23,7 +23,8 @@
             "drivers_peripheral_audio_feature_rich_device",
             "drivers_peripheral_audio_feature_community",
             "drivers_peripheral_audio_feature_effect",
-            "drivers_peripheral_audio_feature_double_pnp_detect"
+            "drivers_peripheral_audio_feature_double_pnp_detect",
+            "drivers_peripheral_audio_feature_offload"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",
@@ -31,7 +32,6 @@
         "deps": {
             "components": [
                 "c_utils",
-                "ffrt",
                 "hilog",
                 "hdf_core",
                 "drivers_interface_audio"

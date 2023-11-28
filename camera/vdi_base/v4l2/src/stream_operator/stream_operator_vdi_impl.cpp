@@ -500,8 +500,10 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
+
     CameraDumper &dumper = CameraDumper::GetInstance();
-    dumper.DumpMetadata(captureSetting, "capturesetting");
+    dumper.DumpMetadata("capturesetting", ENABLE_METADATA, captureSetting);
+
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
                                          info.enableShutterCallback_, isStreaming);

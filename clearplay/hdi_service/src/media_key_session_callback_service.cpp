@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,13 +17,13 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
-#define HDF_LOG_TAG    media_key_session_callback_service
+#define HDF_LOG_TAG media_key_session_callback_service
 
 namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-int32_t MediaKeySessionCallbackService::SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data)
+int32_t MediaKeySessionCallbackService::SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t> &data)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
@@ -31,13 +31,12 @@ int32_t MediaKeySessionCallbackService::SendEvent(EventType eventType, int32_t e
 }
 
 int32_t MediaKeySessionCallbackService::SendEventKeyChange(const std::map<std::vector<uint8_t>,
-     MediaKeySessionLicenseStatus>& licenseStatus, bool hasNewGoodLicense)
+    OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
-
 } // V1_0
 } // Drm
 } // HDI

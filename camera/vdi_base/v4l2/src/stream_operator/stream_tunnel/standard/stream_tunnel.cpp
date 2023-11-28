@@ -125,8 +125,10 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
                 extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
             }
         }
+
         CameraDumper& dumper = CameraDumper::GetInstance();
-        dumper.DumpBuffer(buffer);
+        dumper.DumpBuffer("BeforeFlushSurface", ENABLE_STREAM_TUNNEL, buffer);
+
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         stats_.FlushBufferResult(ret);
         frameCount_++;

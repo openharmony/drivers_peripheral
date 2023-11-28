@@ -45,23 +45,23 @@ public:
 
     int32_t GetMetrics(std::map<std::string, std::string>& metrics) override;
 
-    int32_t GetMaxSecurityLevel(SecurityLevel& level) override;
+    int32_t GetMaxSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) override;
 
     int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
 
     int32_t ProcessKeySystemResponse(const std::vector<uint8_t>& response) override;
 
-    int32_t GetOemCertificateStatus(CertificateStatus& status) override;
+    int32_t GetOemCertificateStatus(OHOS::HDI::Drm::V1_0::CertificateStatus& status) override;
 
     int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback) override;
 
-    int32_t CreateMediaKeySession(SecurityLevel level,
+    int32_t CreateMediaKeySession(OHOS::HDI::Drm::V1_0::SecurityLevel level,
          sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) override;
 
     int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) override;
 
     int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
-         OfflineLicenseStatus& licenseStatus) override;
+         OHOS::HDI::Drm::V1_0::OfflineLicenseStatus& licenseStatus) override;
 
     int32_t RemoveOfflineLicense(const std::vector<uint8_t>& licenseId) override;
 
@@ -85,26 +85,27 @@ public:
 
     static int32_t GetMetrics_(std::map<std::string, std::string>& metrics, const sptr<IRemoteObject> remote);
 
-    static int32_t GetMaxSecurityLevel_(SecurityLevel& level, const sptr<IRemoteObject> remote);
+    static int32_t GetMaxSecurityLevel_(OHOS::HDI::Drm::V1_0::SecurityLevel& level, const sptr<IRemoteObject> remote);
 
     static int32_t GenerateKeySystemRequest_(std::string& defaultUrl, std::vector<uint8_t>& request,
          const sptr<IRemoteObject> remote);
 
     static int32_t ProcessKeySystemResponse_(const std::vector<uint8_t>& response, const sptr<IRemoteObject> remote);
 
-    static int32_t GetOemCertificateStatus_(CertificateStatus& status, const sptr<IRemoteObject> remote);
+    static int32_t GetOemCertificateStatus_(OHOS::HDI::Drm::V1_0::CertificateStatus& status,
+         const sptr<IRemoteObject> remote);
 
     static int32_t SetCallback_(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback,
          const sptr<IRemoteObject> remote);
 
-    static int32_t CreateMediaKeySession_(SecurityLevel level, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession,
-         const sptr<IRemoteObject> remote);
+    static int32_t CreateMediaKeySession_(OHOS::HDI::Drm::V1_0::SecurityLevel level,
+         sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession, const sptr<IRemoteObject> remote);
 
     static int32_t GetOfflineLicenseIds_(std::vector<std::vector<uint8_t>>& licenseIds,
          const sptr<IRemoteObject> remote);
 
-    static int32_t GetOfflineLicenseStatus_(const std::vector<uint8_t>& licenseId, OfflineLicenseStatus& licenseStatus,
-         const sptr<IRemoteObject> remote);
+    static int32_t GetOfflineLicenseStatus_(const std::vector<uint8_t>& licenseId,
+         OHOS::HDI::Drm::V1_0::OfflineLicenseStatus& licenseStatus, const sptr<IRemoteObject> remote);
 
     static int32_t RemoveOfflineLicense_(const std::vector<uint8_t>& licenseId, const sptr<IRemoteObject> remote);
 

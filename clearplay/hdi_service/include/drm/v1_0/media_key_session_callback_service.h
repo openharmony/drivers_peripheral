@@ -29,8 +29,8 @@ public:
 
     int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
 
-    int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, MediaKeySessionLicenseStatus>& licenseStatus,
-         bool hasNewGoodLicense) override;
+    int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense) override;
 
 };
 } // V1_0

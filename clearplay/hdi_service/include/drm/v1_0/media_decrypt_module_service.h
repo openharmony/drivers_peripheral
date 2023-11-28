@@ -32,14 +32,13 @@ public:
          const DrmBuffer& destBuffer) override;
 
     int32_t Release() override;
-    // used only in interface
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
 private:
     int32_t DecryptByAesCbc(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, 
-        uint8_t* srcData, uint8_t* destData, const std::vector<SubSample>& subSamples);
-    int32_t DecryptBySM4Cbc(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, 
-        uint8_t* srcData, uint8_t* destData, const std::vector<SubSample>& subSamples);
+        uint8_t* src_data, uint8_t* dest_data, const std::vector<SubSample>& subSamples);
+    int32_t DecryptBySM4Cbc(const std::vector<uint8_t> &key, const std::vector<uint8_t> &iv,
+    uint8_t *srcData, uint8_t *destData, const std::vector<SubSample> &subSamples);
 
     int32_t CopyBuffer(uint8_t* srcBuffer, uint8_t* dstBuffer, const std::vector<SubSample>& subSamples);
     int32_t decryptNumber = 0;

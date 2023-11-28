@@ -619,7 +619,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = (gettid() << MOVE_NUM) | getpid();
+    addr.nl_pid = ((uint32_t)gettid() << MOVE_NUM) | (uint32_t)getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
@@ -835,11 +835,11 @@ int32_t AudioUsbPnpUeventStartThread(void)
     g_pnpThreadRunning = true;
 
     AUDIO_FUNC_LOGI("create audio usb uevent thread");
-    ffrt_task_attr_t attr;
-    ffrt_task_attr_init(&attr);
-    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
-    ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    FfrtTaskAttr attr;
+    FfrtAttrInitFunc()(&attr);
+    FfrtAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
+    FfrtAttrSetNameFunc()(&attr, threadName);
+    FfrtSubmitBaseFunc()(FfrtCreateFunctionWrapper(AudioPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }

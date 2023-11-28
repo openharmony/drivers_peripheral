@@ -16,18 +16,18 @@
 #ifndef HDI_TEST_LAYER_H
 #define HDI_TEST_LAYER_H
 #include <queue>
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
 class HdiGrallocBuffer {
 public:
-    HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, PixelFormat fmt);
+    HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, Composer::V1_0::PixelFormat fmt);
     ~HdiGrallocBuffer();
     BufferHandle* Get() const
     {

@@ -17,6 +17,7 @@
 #define OHOS_HDI_DRM_V1_0_IMEDIAKEYSESSION_H
 
 #include <stdint.h>
+#include <map>
 #include <string>
 #include <vector>
 #include <hdf_base.h>
@@ -75,13 +76,14 @@ public:
 
     virtual ~IMediaKeySession() = default;
 
-    virtual int32_t GenerateLicenseRequest(const LicenseRequestInfo& licenseRequestInfo,
-         LicenseRequest& licenseRequest) = 0;
+    virtual int32_t GenerateLicenseRequest(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
+         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest) = 0;
 
     virtual int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
          std::vector<uint8_t>& licenseId) = 0;
 
-    virtual int32_t CheckLicenseStatus(std::vector<LicenseStatusString>& licenseStatus) = 0;
+    virtual int32_t CheckLicenseStatus(std::map<std::string,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) = 0;
 
     virtual int32_t RemoveLicense() = 0;
 
@@ -93,7 +95,7 @@ public:
 
     virtual int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
 
-    virtual int32_t GetSecurityLevel(SecurityLevel& level) = 0;
+    virtual int32_t GetSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
 
     virtual int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) = 0;
 

@@ -18,6 +18,7 @@ declare_args() {
   drivers_peripheral_audio_feature_community = true
   drivers_peripheral_audio_feature_effect = false
   drivers_peripheral_audio_feature_double_pnp_detect = false
+  drivers_peripheral_audio_feature_offload = false
 }
 
 if (defined(ohos_lite)) {

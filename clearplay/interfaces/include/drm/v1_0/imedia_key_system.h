@@ -91,23 +91,23 @@ public:
 
     virtual int32_t GetMetrics(std::map<std::string, std::string>& metrics) = 0;
 
-    virtual int32_t GetMaxSecurityLevel(SecurityLevel& level) = 0;
+    virtual int32_t GetMaxSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
 
     virtual int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) = 0;
 
     virtual int32_t ProcessKeySystemResponse(const std::vector<uint8_t>& response) = 0;
 
-    virtual int32_t GetOemCertificateStatus(CertificateStatus& status) = 0;
+    virtual int32_t GetOemCertificateStatus(OHOS::HDI::Drm::V1_0::CertificateStatus& status) = 0;
 
     virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback) = 0;
 
-    virtual int32_t CreateMediaKeySession(SecurityLevel level,
+    virtual int32_t CreateMediaKeySession(OHOS::HDI::Drm::V1_0::SecurityLevel level,
          sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) = 0;
 
     virtual int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) = 0;
 
     virtual int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
-         OfflineLicenseStatus& licenseStatus) = 0;
+         OHOS::HDI::Drm::V1_0::OfflineLicenseStatus& licenseStatus) = 0;
 
     virtual int32_t RemoveOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
 

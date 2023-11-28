@@ -119,7 +119,8 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
     }
 
     CameraDumper &dumper = CameraDumper::GetInstance();
-    dumper.DumpMetadata(ability, "cameraAbility");
+    dumper.DumpMetadata("cameraAbility", ENABLE_METADATA, ability);
+
     MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     DFX_LOCAL_HITRACE_END;
     return VDI::Camera::V1_0::NO_ERROR;
@@ -177,6 +178,8 @@ int32_t CameraHostVdiImpl::OpenCamera(const std::string &cameraId, const sptr<IC
     }
     device = deviceBackup_[cameraId];
     cameraDevice->SetStatus(true);
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpStart();
     CAMERA_LOGD("Open camera success.");
     DFX_LOCAL_HITRACE_END;
     return VDI::Camera::V1_0::NO_ERROR;

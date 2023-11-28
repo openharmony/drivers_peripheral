@@ -26,7 +26,6 @@ using namespace testing::ext;
 namespace {
 const int BUFFER_LENTH = 1024 * 16;
 const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
-const int MOVE_LEFT_NUM = 8;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 6;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
@@ -54,15 +53,16 @@ public:
 
 void AudioUtRenderMmapTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 {
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs.interleaved = 0;
     attrs.type = AUDIO_MULTI_CHANNEL;
     attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT / MOVE_LEFT_NUM;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT;
     attrs.isBigEndian = false;
     attrs.isSignedData = true;
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount);
     attrs.stopThreshold = INT_MAX;
     attrs.silenceThreshold = BUFFER_LENTH;
 }
@@ -124,7 +124,6 @@ void AudioUtRenderMmapTest::SetUp()
     InitRenderDevDesc(devDescRender_);
     InitRenderAttrs(attrsRender_);
 
-    attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     int32_t ret = adapter_->CreateRender(adapter_, &devDescRender_, &attrsRender_, &render_, &renderId_);
     if (ret != HDF_SUCCESS) {
         attrsRender_.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;

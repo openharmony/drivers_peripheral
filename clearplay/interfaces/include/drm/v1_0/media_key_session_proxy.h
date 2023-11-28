@@ -35,13 +35,14 @@ public:
         return true;
     }
 
-    int32_t GenerateLicenseRequest(const LicenseRequestInfo& licenseRequestInfo,
-         LicenseRequest& licenseRequest) override;
+    int32_t GenerateLicenseRequest(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
+         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest) override;
 
     int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
          std::vector<uint8_t>& licenseId) override;
 
-    int32_t CheckLicenseStatus(std::vector<LicenseStatusString>& licenseStatus) override;
+    int32_t CheckLicenseStatus(std::map<std::string,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) override;
 
     int32_t RemoveLicense() override;
 
@@ -53,7 +54,7 @@ public:
 
     int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) override;
 
-    int32_t GetSecurityLevel(SecurityLevel& level) override;
+    int32_t GetSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) override;
 
     int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) override;
 
@@ -65,14 +66,14 @@ public:
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
-    static int32_t GenerateLicenseRequest_(const LicenseRequestInfo& licenseRequestInfo, LicenseRequest& licenseRequest,
-         const sptr<IRemoteObject> remote);
+    static int32_t GenerateLicenseRequest_(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
+         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest, const sptr<IRemoteObject> remote);
 
     static int32_t ProcessLicenseResponse_(const std::vector<uint8_t>& licenseResponse, std::vector<uint8_t>& licenseId,
          const sptr<IRemoteObject> remote);
 
-    static int32_t CheckLicenseStatus_(std::vector<LicenseStatusString>& licenseStatus,
-         const sptr<IRemoteObject> remote);
+    static int32_t CheckLicenseStatus_(std::map<std::string,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus, const sptr<IRemoteObject> remote);
 
     static int32_t RemoveLicense_(const sptr<IRemoteObject> remote);
 
@@ -84,7 +85,7 @@ public:
 
     static int32_t RestoreOfflineLicense_(const std::vector<uint8_t>& licenseId, const sptr<IRemoteObject> remote);
 
-    static int32_t GetSecurityLevel_(SecurityLevel& level, const sptr<IRemoteObject> remote);
+    static int32_t GetSecurityLevel_(OHOS::HDI::Drm::V1_0::SecurityLevel& level, const sptr<IRemoteObject> remote);
 
     static int32_t RequiresSecureDecoderModule_(const std::string& mimeType, bool& required,
          const sptr<IRemoteObject> remote);
