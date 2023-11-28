@@ -23,6 +23,8 @@ const size_t THRESHOLD = 10;
 enum HostCmdId {
     STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1,
     STREAM_OPERATOR_COMMITSTREAM_V1_1,
+    STREAM_OPERATOR_UPDATESTREAMS,
+    STREAM_OPERATOR_END,
 };
 
 enum BitOperat {
@@ -70,7 +72,23 @@ void IsStreamSupprotedApi(const uint8_t *&rawData)
         streamInfosV1_1, pType);
 }
 
-static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
+void UpdateStreams(const uint8_t *rawData)
+{
+    if (rawData == nullptr) {
+        return false;
+    }
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
+}
+
+static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 {
     switch (cmd) {
         case STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1: {
@@ -85,6 +103,9 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
                 *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec);
             break;
         }
+        case STREAM_OPERATOR_UPDATESTREAMS:
+            UpdateStreams(rawData);
+            break;
         default:
             return;
     }
@@ -105,12 +126,14 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     if (cameraTest->serviceV1_1 == nullptr) {
         return false;
     }
-    cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    cameraTest->OpenCameraV1_2();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return false;
     }
 
-    HostFuncSwitch(cmd, rawData);
+    for (cmd = 0; cmd < CAMERA_STREAM_OPERATOR_END; cmd++) {
+        HostFuncSwitch(cmd, rawData);
+    }
     cameraTest->Close();
     return true;
 }

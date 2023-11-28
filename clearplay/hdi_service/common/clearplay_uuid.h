@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,11 +23,9 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+static const std::string CLEARPLAY_UUID = "E79628B6406A6724DCD5A1DA50B53E80";
 
-static std::string clearPlayUuid = "E79628B6406A6724DCD5A1DA50B53E80";
-
-bool IsClearPlayUuid(const std::string& uuid);
-
+bool IsClearPlayUuid(const std::string &uuid);
 } // V1_0
 } // Drm
 } // HDI

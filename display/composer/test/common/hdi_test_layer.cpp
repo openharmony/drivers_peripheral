@@ -18,15 +18,16 @@
 #include "hdi_test_device.h"
 #include "v1_0/include/idisplay_buffer.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
-HdiGrallocBuffer::HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, PixelFormat fmt)
+HdiGrallocBuffer::HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, Composer::V1_0::PixelFormat fmt)
 {
     std::shared_ptr<IDisplayBuffer> gralloc = HdiTestDevice::GetInstance().GetGrallocInterface();
     AllocInfo info = { 0 };

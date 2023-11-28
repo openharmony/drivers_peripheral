@@ -31,7 +31,6 @@ namespace HDI {
 namespace Drm {
 namespace V1_0 {
 class KeySessionServiceCallback;
-
 class MediaKeySessionService : public OHOS::HDI::Drm::V1_0::IMediaKeySession {
 public:
     MediaKeySessionService();
@@ -44,7 +43,8 @@ public:
     int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
          std::vector<uint8_t>& licenseId) override;
 
-    int32_t CheckLicenseStatus(std::vector<LicenseStatusString>& licenseStatus) override;
+    int32_t CheckLicenseStatus(std::map<std::string,
+         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) override;
 
     int32_t RemoveLicense() override;
 
@@ -67,36 +67,28 @@ public:
     int32_t Destroy() override;
 
     int32_t Init();
-
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
-
-    // callback, used in interface only
     int32_t SetKeySessionServiceCallback(sptr<KeySessionServiceCallback> callback);
-
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
-
     sptr<Session> session_;
     SecurityLevel level_;
     sptr<OHOS::HDI::Drm::V1_0::MediaDecryptModuleService> decryptModule_;
     sptr<OHOS::HDI::Drm::V1_0::MediaKeySessionCallbackService> keySessionCallback_;
     sptr<KeySessionServiceCallback> sessionCallback_;
-    // offline license
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
     const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
     const int keyIdMaxLength = 255;
 };
-
 class KeySessionServiceCallback : public virtual RefBase {
 public:
     KeySessionServiceCallback() = default;
     virtual ~KeySessionServiceCallback() = default;
     virtual int32_t CloseKeySessionService(sptr<MediaKeySessionService> mediaKeySession) = 0;
 };
-
 } // V1_0
 } // Drm
 } // HDI

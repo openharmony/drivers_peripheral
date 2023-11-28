@@ -39,12 +39,14 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     if (drivers_peripheral_audio_feature_double_pnp_detect) {
       defines += [ "AUDIO_DOUBLE_PNP_DETECT" ]
     }
+    if (drivers_peripheral_audio_feature_community) {
+      defines += [ "AUDIO_FEATURE_COMMUNITY" ]
+    }
 
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
         "drivers_interface_audio:audio_idl_headers",
-        "ffrt:libffrt",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",

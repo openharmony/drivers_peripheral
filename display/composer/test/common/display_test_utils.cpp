@@ -20,7 +20,7 @@
 #include "display_test.h"
 #include "buffer_handle.h"
 
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
@@ -29,7 +29,6 @@ namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
 
 const uint8_t BITS_PER_BYTE = 8;
 
@@ -50,13 +49,13 @@ static uint32_t BGRAToRGBA(uint32_t bgra)
     return rgba;
 }
 
-static int32_t GetPixelFormatBpp(PixelFormat format)
+static int32_t GetPixelFormatBpp(Composer::V1_0::PixelFormat format)
 {
     const int32_t BPP_RGBA_8888 = 32;
     switch (format) {
-        case PIXEL_FMT_RGBA_8888:
+        case Composer::V1_0::PIXEL_FMT_RGBA_8888:
             return BPP_RGBA_8888;
-        case PIXEL_FMT_BGRA_8888:
+        case Composer::V1_0::PIXEL_FMT_BGRA_8888:
             return BPP_RGBA_8888;
         default:
             return -1;
@@ -80,12 +79,12 @@ void SaveFile(const char *fileName, uint8_t *data, int size)
     }
 }
 
-static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
+static uint32_t ConverToRGBA(Composer::V1_0::PixelFormat fmt, uint32_t color)
 {
     switch (fmt) {
-        case PIXEL_FMT_BGRA_8888:
+        case Composer::V1_0::PIXEL_FMT_BGRA_8888:
             return BGRAToRGBA(color);
-        case PIXEL_FMT_RGBA_8888:
+        case Composer::V1_0::PIXEL_FMT_RGBA_8888:
             return color;
         default:
             DISPLAY_TEST_LOGE("the fmt can not convert %{public}d", fmt);
@@ -96,7 +95,7 @@ static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
 uint32_t GetPixelValue(const BufferHandle &handle, int x, int y)
 {
     const int32_t PIXEL_BYTES = 4;
-    int32_t bpp = GetPixelFormatBpp((PixelFormat)handle.format);
+    int32_t bpp = GetPixelFormatBpp((Composer::V1_0::PixelFormat)handle.format);
     DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d",
         handle.format));
     DISPLAY_TEST_CHK_RETURN((handle.virAddr == nullptr), 0,
@@ -129,7 +128,7 @@ uint32_t GetUint32(uint32_t value)
 uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 {
     const int32_t PIXEL_BYTES = 4;
-    int32_t bpp = GetPixelFormatBpp(static_cast<PixelFormat>(handle.format));
+    int32_t bpp = GetPixelFormatBpp(static_cast<Composer::V1_0::PixelFormat>(handle.format));
     DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d",
         handle.format));
     DISPLAY_TEST_CHK_RETURN((handle.virAddr == nullptr), 0,
@@ -146,7 +145,7 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     DISPLAY_TEST_CHK_RETURN((pixel == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("get pixel failed"));
 
-    uint32_t checkColor = ConverToRGBA(static_cast<PixelFormat>(handle.format), GetUint32(*pixel));
+    uint32_t checkColor = ConverToRGBA(static_cast<Composer::V1_0::PixelFormat>(handle.format), GetUint32(*pixel));
     if (checkColor != color) {
         DISPLAY_TEST_LOGD("x:%{public}d y:%{public}d width:%{public}d", x, y, handle.width);
         SaveFile("/data/display_test_bitmap_", static_cast<uint8_t *>(handle.virAddr), handle.size);

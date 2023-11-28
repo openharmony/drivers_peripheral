@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,14 +20,12 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
-const std::string isoVideoMimeType = "video/mp4";
-const std::string isoAudioMimeType = "audio/mp4";
-const std::string cencInitDataFormat = "cenc";
-const std::string webmInitDataFormat = "webm";
-const std::string webmAudioDataFormat = "audio/webm";
-const std::string webmVideoDataFormat = "video/webm";
-
+const std::string ISO_VIDEO_MIME_TYPE = "video/mp4";
+const std::string ISO_AUDIO_MIME_TYPE = "audio/mp4";
+const std::string CENC_INIT_DATA_FORMAT = "cenc";
+const std::string WEBM_INIT_DATA_FORMAT = "webm";
+const std::string WEBM_AUDIO_DATA_FORMAT = "audio/webm";
+const std::string WEBM_VIDEO_DATA_FORMAT = "video/webm";
 } // V1_0
 } // Drm
 } // HDI

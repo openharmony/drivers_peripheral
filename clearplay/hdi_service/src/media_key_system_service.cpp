@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,9 @@
 #include "v1_0/media_key_session_service.h"
 #include "base64_utils.h"
 #include "data_parser.h"
+#include "securec.h"
 
-#define HDF_LOG_TAG    media_key_system_service
+#define HDF_LOG_TAG media_key_system_service
 
 namespace OHOS {
 namespace HDI {
@@ -39,7 +40,7 @@ MediaKeySystemService::~MediaKeySystemService()
     HDF_LOGI("%{public}s: end", __func__);
 }
 
-int32_t MediaKeySystemService::GetConfigurationString(const std::string& name, std::string& value)
+int32_t MediaKeySystemService::GetConfigurationString(const std::string &name, std::string &value)
 {
     HDF_LOGI("%{public}s: start", __func__);
     if (configurationString_.find(name) == configurationString_.end()) {
@@ -51,7 +52,7 @@ int32_t MediaKeySystemService::GetConfigurationString(const std::string& name, s
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::SetConfigurationString(const std::string& name, const std::string& value)
+int32_t MediaKeySystemService::SetConfigurationString(const std::string &name, const std::string &value)
 {
     HDF_LOGI("%{public}s: start", __func__);
     configurationString_[name] = value;
@@ -59,7 +60,7 @@ int32_t MediaKeySystemService::SetConfigurationString(const std::string& name, c
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetConfigurationByteArray(const std::string& name, std::vector<uint8_t>& value)
+int32_t MediaKeySystemService::GetConfigurationByteArray(const std::string &name, std::vector<uint8_t> &value)
 {
     HDF_LOGI("%{public}s: start", __func__);
     if (configuration_.find(name) == configuration_.end()) {
@@ -71,7 +72,7 @@ int32_t MediaKeySystemService::GetConfigurationByteArray(const std::string& name
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::SetConfigurationByteArray(const std::string& name, const std::vector<uint8_t>& value)
+int32_t MediaKeySystemService::SetConfigurationByteArray(const std::string &name, const std::vector<uint8_t> &value)
 {
     HDF_LOGI("%{public}s: start", __func__);
     configuration_[name] = value;
@@ -79,14 +80,14 @@ int32_t MediaKeySystemService::SetConfigurationByteArray(const std::string& name
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetMetrics(std::map<std::string, std::string>& metrics)
+int32_t MediaKeySystemService::GetMetrics(std::map<std::string, std::string> &metrics)
 {
     HDF_LOGI("%{public}s: start", __func__);
     mediaKeySessionMutex_.lock();
     int sessionNum = mediaKeySessionMap_.size();
     int decryptNumber = 0;
     int errorDecryptNumber = 0;
-    for (auto& pair:mediaKeySessionMap_) {
+    for (auto &pair : mediaKeySessionMap_) {
         decryptNumber += pair.first->GetDecryptNumber();
         errorDecryptNumber += pair.first->GetErrorDecryptNumber();
     }
@@ -100,7 +101,7 @@ int32_t MediaKeySystemService::GetMetrics(std::map<std::string, std::string>& me
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetMaxSecurityLevel(SecurityLevel& level)
+int32_t MediaKeySystemService::GetMaxSecurityLevel(SecurityLevel &level)
 {
     HDF_LOGI("%{public}s: start", __func__);
 
@@ -109,7 +110,7 @@ int32_t MediaKeySystemService::GetMaxSecurityLevel(SecurityLevel& level)
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request)
+int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string &defaultUrl, std::vector<uint8_t> &request)
 {
     HDF_LOGI("%{public}s: start", __func__);
     defaultUrl = "http://default.com";
@@ -120,7 +121,7 @@ int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string& defaultUrl,
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::ProcessKeySystemResponse(const std::vector<uint8_t>& response)
+int32_t MediaKeySystemService::ProcessKeySystemResponse(const std::vector<uint8_t> &response)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: response: %{public}s", __func__, response.data());
@@ -129,7 +130,7 @@ int32_t MediaKeySystemService::ProcessKeySystemResponse(const std::vector<uint8_
 }
 
 int32_t MediaKeySystemService::CreateMediaKeySession(SecurityLevel level,
-     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession)
+    sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> &keySession)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: start, level: %d", __func__, level);
@@ -153,7 +154,7 @@ int32_t MediaKeySystemService::CreateMediaKeySession(SecurityLevel level,
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds)
+int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint8_t>> &licenseIds)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -162,7 +163,7 @@ int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint
         offlineKeyMutex_.unlock();
         return ret;
     }
-    for (auto& keyIdValueBase64Pair : offlineKeyIdAndKeyValueBase64_) {
+    for (auto &keyIdValueBase64Pair : offlineKeyIdAndKeyValueBase64_) {
         std::string keyIdString = Decode(keyIdValueBase64Pair.first);
         std::vector<uint8_t> keyId(keyIdString.begin(), keyIdString.end());
         licenseIds.push_back(keyId);
@@ -173,8 +174,8 @@ int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
-     OfflineLicenseStatus& licenseStatus)
+int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t> &licenseId,
+    OfflineLicenseStatus &licenseStatus)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -198,7 +199,7 @@ int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t>& licenseId)
+int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t> &licenseId)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -226,21 +227,21 @@ int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t>& 
     return HDF_FAILURE;
 }
 
-int32_t MediaKeySystemService::GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate>& oemCert)
+int32_t MediaKeySystemService::GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> &oemCert)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetOemCertificateStatus(CertificateStatus& status)
+int32_t MediaKeySystemService::GetOemCertificateStatus(CertificateStatus &status)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback)
+int32_t MediaKeySystemService::SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback> &systemCallback)
 {
     return HDF_SUCCESS;
 }
@@ -285,8 +286,7 @@ int32_t MediaKeySystemService::SetKeySystemServiceCallback(sptr<MediaKeySystemSe
 int32_t MediaKeySystemService::GetOfflineKeyFromFile()
 {
     HDF_LOGI("%{public}s: start", __func__);
-    FILE* offlineKeyFile;
-    offlineKeyFile = fopen(offlineKeyFileName, "r+");
+    FILE *offlineKeyFile = fopen(offlineKeyFileName, "r+");
     if (offlineKeyFile == NULL) {
         HDF_LOGE("%{public}s: open: \"%{public}s\" failed", __func__, offlineKeyFileName);
         // file do not exist, is allright
@@ -294,7 +294,7 @@ int32_t MediaKeySystemService::GetOfflineKeyFromFile()
     }
     char keyIdBase64Chars[keyIdMaxLength];
     char keyValueBase64Chars[keyIdMaxLength];
-    while (fscanf(offlineKeyFile, "%s %s", keyIdBase64Chars, keyValueBase64Chars) != EOF) {
+    while (fscanf_s(offlineKeyFile, "%s %s", keyIdBase64Chars, sizeof(keyIdBase64Chars), keyValueBase64Chars, sizeof(keyValueBase64Chars)) != EOF) {
         std::string tempKeyIdBase64 = keyIdBase64Chars;
         std::string tempKeyValueBase64 = keyValueBase64Chars;
         tempKeyIdBase64.erase(std::remove(tempKeyIdBase64.begin(), tempKeyIdBase64.end(), '\0'), tempKeyIdBase64.end());
@@ -308,14 +308,13 @@ int32_t MediaKeySystemService::GetOfflineKeyFromFile()
 int32_t MediaKeySystemService::SetOfflineKeyToFile()
 {
     HDF_LOGI("%{public}s: start", __func__);
-    FILE* offlineKeyFile;
-    offlineKeyFile = fopen(offlineKeyFileName, "w+");
+    FILE *offlineKeyFile = fopen(offlineKeyFileName, "w+");
     if (offlineKeyFile == NULL) {
         offlineKeyIdAndKeyValueBase64_.clear();
         HDF_LOGE("%{public}s: create failed, ret: %{public}s", __func__, strerror(errno));
         return HDF_FAILURE;
     }
-    for (auto& keyIdValueBase64Pair:offlineKeyIdAndKeyValueBase64_) {
+    for (auto &keyIdValueBase64Pair : offlineKeyIdAndKeyValueBase64_) {
         fprintf(offlineKeyFile, "%s %s\n", keyIdValueBase64Pair.first.c_str(), keyIdValueBase64Pair.second.c_str());
     }
     offlineKeyIdAndKeyValueBase64_.clear();
@@ -323,7 +322,6 @@ int32_t MediaKeySystemService::SetOfflineKeyToFile()
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
-
 } // V1_0
 } // Drm
 } // HDI

@@ -24,7 +24,6 @@ namespace HDI {
 namespace Drm {
 namespace V1_0 {
 class MediaKeySystemServiceCallback;
-
 class MediaKeySystemService : public OHOS::HDI::Drm::V1_0::IMediaKeySystem, public KeySessionServiceCallback {
 public:
     MediaKeySystemService() = default;
@@ -64,39 +63,31 @@ public:
 
     int32_t Destroy() override;
 
-    // callback, used in interface only
     int32_t SetKeySystemServiceCallback(sptr<MediaKeySystemServiceCallback> callback);
     int32_t CloseKeySessionService(sptr<MediaKeySessionService> mediaKeySession) override;
-
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
-
     std::map<std::string, std::vector<uint8_t>> configuration_;
     std::map<std::string, std::string> configurationString_;
     std::map<sptr<MediaKeySessionService>, bool> mediaKeySessionMap_;
     std::mutex mediaKeySessionMutex_;
     sptr<MediaKeySystemServiceCallback> systemCallback_;
-
-    // offline license
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
     const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
     const int keyIdMaxLength = 255;
-
     const std::string currentSessionNumName = "currentSessionNum";
     const std::string versionName = "version";
     const std::string decryptNumberName = "decryptNumber";
     const std::string errorDecryptNumberName = "errorDecryptNumber";
 };
-
 class MediaKeySystemServiceCallback : public virtual RefBase {
 public:
     MediaKeySystemServiceCallback() = default;
     virtual ~MediaKeySystemServiceCallback() = default;
     virtual int32_t CloseMediaKeySystemService(sptr<MediaKeySystemService> mediaKeySystem) = 0;
 };
-
 } // V1_0
 } // Drm
 } // HDI

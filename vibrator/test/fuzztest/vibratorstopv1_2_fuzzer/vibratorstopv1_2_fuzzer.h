@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef CLEARPLAY_DEMO_H
-#define CLEARPLAY_DEMO_H
+#ifndef VIBRATORSTOPV1_2_FUZZER_H
+#define VIBRATORSTOPV1_2_FUZZER_H
 
-#endif /* CLEARPLAY_DEMO_H */
+#define FUZZ_PROJECT_NAME "vibratorstopv1_2_fuzzer"
+
+#endif
+

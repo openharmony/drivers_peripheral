@@ -265,7 +265,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 {
     int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file");
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file");
         return HDF_ERR_IO;
     }
 
@@ -305,7 +305,7 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         onlinePath = path_ + "/" + *iter + "/" + "online";
         ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
         if (ret != HDF_SUCCESS) {
-            BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed in loop, ret: %{public}d", ret);
+            BATTERY_HILOGD(FEATURE_BATT_INFO, "read online path failed in loop, ret: %{public}d", ret);
         }
         online = ParseInt(buf);
         if (online) {

@@ -61,8 +61,8 @@ public:
 
     virtual ~IMediaDecryptModule() = default;
 
-    virtual int32_t DecryptMediaData(bool secure, const CryptoInfo& cryptoInfo, const DrmBuffer& srcBuffer,
-         const DrmBuffer& destBuffer) = 0;
+    virtual int32_t DecryptMediaData(bool secure, const OHOS::HDI::Drm::V1_0::CryptoInfo& cryptoInfo,
+         const OHOS::HDI::Drm::V1_0::DrmBuffer& srcBuffer, const OHOS::HDI::Drm::V1_0::DrmBuffer& destBuffer) = 0;
 
     virtual int32_t Release() = 0;
 

@@ -10,13 +10,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/ohos.gni")
 
-if (defined(ohos_lite)) {
-  group("clearplay_test_entry") {
-    deps = []
-  }
-} else {
-  group("clearplay_test_entry") {
-    deps = [ "./sample:clearplay_sample" ]
-  }
+config("exported_ca_header") {
+  visibility = [ ":*" ]
+  include_dirs = [ "." ]
+}
+
+ohos_shared_library("secure_element_ca_proxy") {
+  include_dirs = []
+  sources = [ "secure_element_ca_proxy.cpp" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+  ]
+
+  public_configs = [ ":exported_ca_header" ]
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_secure_element"
 }

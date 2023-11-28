@@ -35,12 +35,13 @@ public:
         return true;
     }
 
-    int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
+    int32_t SendEvent(OHOS::HDI::Drm::V1_0::EventType eventType, int32_t extra,
+         const std::vector<uint8_t>& data) override;
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
-    static int32_t SendEvent_(EventType eventType, int32_t extra, const std::vector<uint8_t>& data,
-         const sptr<IRemoteObject> remote);
+    static int32_t SendEvent_(OHOS::HDI::Drm::V1_0::EventType eventType, int32_t extra,
+         const std::vector<uint8_t>& data, const sptr<IRemoteObject> remote);
 
     static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
 
