@@ -25,11 +25,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_types.h"
 
-#ifdef __aarch64__
-#define CODEC_CALLBACK_SO_PATH "/vendor/lib64/chipset-sdk/libcodec_hdi_omx_callback_type_service_impl.z.so"
-#else
-#define CODEC_CALLBACK_SO_PATH "/vendor/lib/chipset-sdk/libcodec_hdi_omx_callback_type_service_impl.z.so"
-#endif
+#define CODEC_CALLBACK_SO_PATH "libcodec_hdi_omx_callback_type_service_impl.z.so"
 
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct CodecCallbackType *);
 
@@ -217,17 +213,8 @@ static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *
 
 static void *LoadServiceHandler(void)
 {
-    char *libPath = NULL;
     void *handler = NULL;
-
-    char pathBuf[PATH_MAX] = {'\0'};
-    libPath = CODEC_CALLBACK_SO_PATH;
-    if (realpath(libPath, pathBuf) == NULL) {
-        CODEC_LOGE("realpath failed!");
-        return NULL;
-    }
-
-    handler = dlopen(pathBuf, RTLD_LAZY);
+    handler = dlopen(CODEC_CALLBACK_SO_PATH, RTLD_LAZY);
     if (handler == NULL) {
         CODEC_LOGE("dlopen failed %{public}s", dlerror());
         return NULL;
