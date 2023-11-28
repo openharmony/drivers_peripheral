@@ -14,6 +14,7 @@
  */
 
 #include "metadata_controller.h"
+#include "camera_dump.h"
 
 namespace OHOS {
 namespace Camera {
@@ -254,6 +255,10 @@ bool MetadataController::DealMetadata(int32_t streamId, const std::shared_ptr<Ca
     }
     std::unique_lock<std::mutex> lock(queueLock_);
     queue_.push(changeMetadata);
+
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpMetadata("MetadataController", ENABLE_METADATA, changeMetadata);
+
     cv_.notify_all();
     return true;
 }

@@ -37,7 +37,12 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_shared_library("peripheral_camera_metadata_manager") {
+    defines = []
+    if (drivers_peripheral_camera_feature_usb) {
+      defines += [ "CAMERA_BUILT_ON_USB" ]
+    }
     sources = [
+      "$camera_path/dump/src/camera_dump.cpp",
       "$camera_path/metadata_manager/src/metadata_config.cpp",
       "$camera_path/metadata_manager/src/metadata_controller.cpp",
     ]
@@ -45,6 +50,8 @@ if (!defined(ohos_lite)) {
       "$camera_path/../../interfaces/include",
       "$camera_path/device_manager/include",
       "$camera_path/metadata_manager/include",
+      "$camera_path/dump/include",
+      "$camera_path/../interfaces",
     ]
 
     deps = [ "$camera_path/device_manager:peripheral_camera_device_manager" ]
