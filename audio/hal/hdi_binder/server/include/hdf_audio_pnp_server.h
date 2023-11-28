@@ -82,10 +82,10 @@ typedef void(*FfrtTaskAttrSetQos)(FfrtTaskAttr*, int);
 typedef void(*FfrtTaskAttrSetName)(FfrtTaskAttr*, const char*);
 typedef void(*FfrtSubmitBase)(
     FfrtFunctionHeader*, const FfrtDeps*, const FfrtDeps*, const FfrtTaskAttr*);
-FfrtTaskAttrInit FfrtAttrInitFunc();
-FfrtTaskAttrSetQos FfrtAttrSetQosFunc();
-FfrtTaskAttrSetName FfrtAttrSetNameFunc();
-FfrtSubmitBase FfrtSubmitBaseFunc();
+FfrtTaskAttrInit FfrtAttrInitFunc(void);
+FfrtTaskAttrSetQos FfrtAttrSetQosFunc(void);
+FfrtTaskAttrSetName FfrtAttrSetNameFunc(void);
+FfrtSubmitBase FfrtSubmitBaseFunc(void);
 
 /* statusInfo is update new info */
 int32_t AudioPnpUpdateInfo(const char *statusInfo);
