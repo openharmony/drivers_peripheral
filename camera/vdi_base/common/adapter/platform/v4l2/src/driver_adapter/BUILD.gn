@@ -37,7 +37,12 @@ config("v4l2_config") {
 }
 
 ohos_shared_library("peripheral_camera_v4l2_adapter") {
+  defines = []
+  if (drivers_peripheral_camera_feature_usb) {
+    defines += [ "CAMERA_BUILT_ON_USB" ]
+  }
   sources = [
+    "$camera_path/dump/src/camera_dump.cpp",
     "src/v4l2_buffer.cpp",
     "src/v4l2_control.cpp",
     "src/v4l2_dev.cpp",
@@ -46,11 +51,17 @@ ohos_shared_library("peripheral_camera_v4l2_adapter") {
     "src/v4l2_uvc.cpp",
   ]
 
-  include_dirs = [ "$camera_path/include" ]
+  include_dirs = [
+    "$camera_path/include",
+    "$camera_path/dump/include",
+    "$camera_path/../interfaces",
+  ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "graphic_surface:surface",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
