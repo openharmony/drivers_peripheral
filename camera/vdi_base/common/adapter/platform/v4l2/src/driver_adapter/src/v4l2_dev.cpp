@@ -440,14 +440,32 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
         case CMD_AWB_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE, *args);
             break;
-        case CMD_FOCUS_MODE:
+        case CMD_AE_LOCK:
+        case CMD_EXPOSURE_LOCK:
+        case CMD_FOCUS_LOCK:
+        case CMD_AWB_LOCK:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_3A_LOCK, *args);
+            break;
+        case CMD_FOCUS_AUTO:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FOCUS_AUTO, *args);
+            break;
+        case CMD_FOCUS_ABSOLUTE:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FOCUS_ABSOLUTE, *args);
+            break;
+        case CMD_AUTO_FOCUS_START:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_FOCUS_START, *args);
+            break;
+        case CMD_AUTO_FOCUS_STOP:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_FOCUS_STOP, *args);
             break;
         case CMD_METER_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_METERING, *args);
             break;
         case CMD_FLASH_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FLASH_LED_MODE, *args);
+            break;
+        case CMD_AE_EXPO:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_BRIGHTNESS, *args);
             break;
         default:
             break;

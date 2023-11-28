@@ -114,6 +114,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/meta_data_test.cpp",
       "$ut_root_path/v4l2/stream_customer.cpp",
       "$ut_root_path/v4l2/test_camera_base.cpp",
+      "$ut_root_path/v4l2/usb_camera_3a_test.cpp",
       "$ut_root_path/v4l2/usb_camera_test.cpp",
       "$ut_root_path/v4l2/usb_camera_test_mult.cpp",
       "$ut_root_path/v4l2/usb_camera_vendor_tag_test.cpp",
