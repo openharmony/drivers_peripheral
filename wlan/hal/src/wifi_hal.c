@@ -305,7 +305,7 @@ static int32_t StartChannelMeasInner(const char *ifName, const struct MeasParam 
     return StartChannelMeas(ifName, measParam);
 }
 
-static int32_t GetChannelMeasResultInner(const char *ifName, const struct MeasResult *measResult)
+static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult *measResult)
 {
     if (ifName == NULL || measResult == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
