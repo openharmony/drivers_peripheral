@@ -962,76 +962,170 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_032, TestSize.Level1)
     int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_COLOR_SPACES, &entry);
     printf("OHOS_ABILITY_AVAILABLE_COLOR_SPACES value count %d\n", entry.count);
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        constexpr size_t step = 10; // print step
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
             ss << entry.data.i32[i] << " ";
-            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            if (i == entry.count - 1) {
                 printf("OHOS_ABILITY_AVAILABLE_COLOR_SPACES: %s\n", ss.str().c_str());
                 ss.clear();
-                ss.str("");
             }
         }
     }
 }
 
+void CaptureByColorSpaces(std::vector<int32_t> captureColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    if (!captureColorSpaces.empty()) {
+        for (int32_t colorSpaces : captureColorSpaces) {
+            printf("capture colorSpaces value %d\n", colorSpaces);
+            // preview streamInfo
+            cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+            cameraTest->streamInfoV1_1->v1_0.dataspace_ = colorSpaces;
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+            // capture streamInfo
+            cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+            cameraTest->streamInfoCapture->v1_0.dataspace_ = colorSpaces;
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
+                OperationMode::NORMAL, cameraTest->abilityVec);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            sleep(UT_SECOND_TIMES);
+            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+            cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+            cameraTest->captureIds = {cameraTest->captureIdPreview};
+            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+            cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+            cameraTest->streamInfosV1_1.clear();
+        }
+    }
+}
+
+void VideoByColorSpaces(std::vector<int32_t> videoColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    if (!videoColorSpaces.empty()) {
+        for (int32_t colorSpaces : videoColorSpaces) {
+            printf("video colorSpaces value %d\n", colorSpaces);
+            // preview streamInfo
+            cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+            cameraTest->streamInfoV1_1->v1_0.dataspace_ = colorSpaces;
+            if (colorSpaces == OHOS_CAMERA_BT2020_HLG_FULL) {
+                cameraTest->streamInfoV1_1->v1_0.format_ = OHOS_CAMERA_FORMAT_YCBCR_P010;
+            }
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+            // video streamInfo
+            cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
+            cameraTest->streamInfoVideo->v1_0.dataspace_ = colorSpaces;
+            if (colorSpaces == OHOS_CAMERA_BT2020_HLG_FULL) {
+                cameraTest->streamInfoVideo->v1_0.format_ = OHOS_CAMERA_FORMAT_YCBCR_P010;
+            }
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
+                OperationMode::NORMAL, cameraTest->abilityVec);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            sleep(UT_SECOND_TIMES);
+            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+            cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+            cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+            cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+            cameraTest->streamInfosV1_1.clear();
+        }
+    }
+}
+
+void SuperStubByColorSpaces(std::vector<int32_t> superStubColorSpaces, std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    if (!superStubColorSpaces.empty()) {
+        for (int32_t colorSpaces : superStubColorSpaces) {
+            printf("superStubColorSpaces colorSpaces value %d\n", colorSpaces);
+            // preview streamInfo
+            cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+            cameraTest->streamInfoV1_1->v1_0.dataspace_ = colorSpaces;
+            if (colorSpaces == OHOS_CAMERA_BT2020_HLG_FULL) {
+                cameraTest->streamInfoV1_1->v1_0.format_ = OHOS_CAMERA_FORMAT_YCBCR_P010;
+            }
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+            // video streamInfo
+            cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
+            cameraTest->streamInfoVideo->v1_0.dataspace_ = colorSpaces;
+            if (colorSpaces == OHOS_CAMERA_BT2020_HLG_FULL) {
+                cameraTest->streamInfoVideo->v1_0.format_ = OHOS_CAMERA_FORMAT_YCBCR_P010;
+            }
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+                static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SUPER_STAB),
+                cameraTest->abilityVec);
+            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+            sleep(UT_SECOND_TIMES);
+            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+            cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+            cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+            cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+            cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+            cameraTest->streamInfosV1_1.clear();
+        }
+    }
+}
+
 /**
- * @tc.name: Camera_Device_Hdi_V1_2_033
- * @tc.desc: P3 color spaces
- * @tc.size: MediumTest
- * @tc.type: Function
- */
+ * @tc.name:Camera_Device_Hdi_V1_2_033
+ * @tc.desc: Update macro ability setting and check the callback
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_033 start ...");
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
         cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
     EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    // preview streamInfo
-    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreviewV1_2(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = 2294273;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-    // capture streamInfo
-    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
-    cameraTest->streamInfoCapture->v1_0.dataspace_ = 2294273;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
-		    OperationMode::NORMAL, cameraTest->abilityVec);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    sleep(UT_SECOND_TIMES);
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-    cameraTest->captureIds = {cameraTest->captureIdPreview};
-    cameraTest->streamIds = {cameraTest->streamIdPreview};
-    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->streamInfosV1_1.clear();
-    // preview streamInfo
-    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreviewV1_2(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = 2294278;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-    // video streamInfo
-    cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
-    cameraTest->streamInfoVideo->v1_0.dataspace_ = 2294278;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
-		    OperationMode::NORMAL, cameraTest->abilityVec);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    sleep(UT_SECOND_TIMES);
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
-    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
-    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
-    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_COLOR_SPACES, &entry);
+    printf("OHOS_ABILITY_AVAILABLE_COLOR_SPACES value count %d\n", entry.count);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        std::vector<int32_t> captureColorSpaces;
+        std::vector<int32_t> videoColorSpaces;
+        std::vector<int32_t> superStubColorSpaces;
+        int32_t operatorMode = -2;
+        for (size_t i = 0; i < entry.count - 1; i++) {
+            if (operatorMode == -2 && entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::CAPTURE) {
+                operatorMode = HDI::Camera::V1_2::OperationMode_V1_2::CAPTURE;
+            } else if (operatorMode == -2 && entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::VIDEO) {
+                operatorMode = HDI::Camera::V1_2::OperationMode_V1_2::VIDEO;
+            } else if (operatorMode == -2 && entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::SUPER_STAB) {
+                operatorMode = HDI::Camera::V1_2::OperationMode_V1_2::SUPER_STAB;
+            } else if (entry.data.i32[i] == -1 && operatorMode != -2 && entry.data.i32[i + 1] == -1) {
+                operatorMode = -2;
+            } else if (entry.data.i32[i] == -1 && operatorMode != -2 && entry.data.i32[i + 1] != -1) {
+                operatorMode = -1;
+            } else if (operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::CAPTURE) {
+                captureColorSpaces.push_back(entry.data.i32[i]);
+            } else if (operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::VIDEO) {
+                videoColorSpaces.push_back(entry.data.i32[i]);
+            } else if (operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::SUPER_STAB) {
+                superStubColorSpaces.push_back(entry.data.i32[i]);
+            } else if (operatorMode == -2 && entry.data.i32[i] > 0) {
+                operatorMode = -1;
+            }
+        }
+        CaptureByColorSpaces(captureColorSpaces, cameraTest);
+        VideoByColorSpaces(videoColorSpaces, cameraTest);
+        SuperStubByColorSpaces(superStubColorSpaces, cameraTest);
+    }
 }
 
 /**
@@ -1189,61 +1283,42 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Device_Hdi_V1_2_036
- * @tc.desc: P3 color spaces
- * @tc.size: MediumTest
- * @tc.type: Function
- */
+ * @tc.name:Camera_Device_Hdi_V1_2_036
+ * @tc.desc: updateColorSpace by updateStreams
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_036, TestSize.Level1)
 {
-    CAMERA_LOGI("test Camera_Device_Hdi_V1_2_036 start ...");
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(
-        cameraTest->streamOperatorCallback, cameraTest->streamOperator_V1_1);
-    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    // preview streamInfo
+    cameraTest->OpenCameraV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreviewV1_2(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = 2294278;
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
     // capture streamInfo
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
-    cameraTest->streamInfoCapture->v1_0.dataspace_ = 2294278;
+    cameraTest->streamInfoCapture->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
-		    OperationMode::NORMAL, cameraTest->abilityVec);
+        OperationMode::NORMAL, cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     sleep(UT_SECOND_TIMES);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-    cameraTest->captureIds = {cameraTest->captureIdPreview};
-    cameraTest->streamIds = {cameraTest->streamIdPreview};
-    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->streamInfosV1_1.clear();
-    // preview streamInfo
-    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreviewV1_2(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = 2294273;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-    // video streamInfo
-    cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
-    cameraTest->streamInfoVideo->v1_0.dataspace_ = 2294273;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
-		    OperationMode::NORMAL, cameraTest->abilityVec);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    sleep(UT_SECOND_TIMES);
+    cameraTest->streamOperator_V1_2->CancelCapture(cameraTest->captureIdPreview);
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_P3_FULL;
+    cameraTest->streamInfoCapture->v1_0.dataspace_ = OHOS_CAMERA_P3_FULL;
+    cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
-    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
-    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
