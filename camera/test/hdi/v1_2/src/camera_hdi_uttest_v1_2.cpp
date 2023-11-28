@@ -829,7 +829,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_028, TestSize.Level1)
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
     ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
-    // step 3: turn off the flashlight
+    // step 3: turn on the flashlight
     if (cameraTest->cameraDevice == nullptr) {
         cameraTest->statusV1_2 = 1.0f;
         cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
@@ -894,7 +894,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_030, TestSize.Level1)
     cameraTest->intents = {PREVIEW};
     cameraTest->StartStream(cameraTest->intents);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    // step 4: turn on the flashlight
+    // step 4: turn off the flashlight
     cameraTest->statusV1_2 = 0.0f;
     cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::DEVICE_CONFLICT);
