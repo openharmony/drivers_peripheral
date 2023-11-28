@@ -99,5 +99,47 @@ BENCHMARK_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)(
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: UpdateStreams
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)(
+    benchmark::State &st)
+{
+    cameraTest->OpenCameraV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->streamInfoV1_1->v1_0.streamId_ = 100;
+    cameraTest->streamInfoV1_1->v1_0.width_ = 1920;
+    cameraTest->streamInfoV1_1->v1_0.height_ = 1080;
+    cameraTest->streamInfoV1_1->v1_0.intent_ = StreamIntent::PREVIEW;
+    cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
+    cameraTest->streamInfoV1_1->v1_0.format_ = PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    // capture streamInfo
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->streamInfoCapture->v1_0.streamId_ = 101;
+    cameraTest->streamInfoCapture->v1_0.width_ = 1920;
+    cameraTest->streamInfoCapture->v1_0.height_ = 1080;
+    cameraTest->streamInfoCapture->v1_0.intent_ = StreamIntent::STILL_CAPTURE;
+    cameraTest->streamInfoCapture->v1_0.encodeType_ = ENCODE_TYPE_H265;
+    cameraTest->streamInfoCapture->v1_0.tunneledMode_ = UT_TUNNEL_MODE;
+    cameraTest->streamInfoCapture->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
+    cameraTest->streamInfoCapture->v1_0.format_ = PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    for (auto _ : st) {
+        cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 BENCHMARK_MAIN();
 
