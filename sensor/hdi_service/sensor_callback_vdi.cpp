@@ -44,14 +44,14 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
     }
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
-        HDF_LOGE("%{public}s sensor is not enabled by anyone", __func__);
+        HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
         return HDF_FAILURE;
     }
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
-            HDF_LOGE("%{public}s callback is nullptr", __func__);
+            HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
             continue;
         }
         ret = callback->OnDataEvent(event);

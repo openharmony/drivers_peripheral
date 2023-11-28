@@ -153,6 +153,7 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
 
 bool SensorClientsManager::IsClientsEmpty(int groupId)
 {
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return true;
     }
@@ -161,11 +162,12 @@ bool SensorClientsManager::IsClientsEmpty(int groupId)
 
 bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
-    if (IsClientsEmpty(groupId)) {
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    auto it = clients_.find(groupId);
+    if (it == clients_.end() || it->second.empty()) {
         return false;
     }
-    std::unique_lock<std::mutex> lock(clientsMutex_);
-    client = clients_[groupId];
+    client = it->second;
     return true;
 }
 
