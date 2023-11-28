@@ -47,7 +47,7 @@ int32_t HdiTestDisplay::Init()
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("can not get the mode of id : %{public}u", activeModeId_));
 
-    ret = device_->SetDisplayPowerStatus(id_, DispPowerStatus::POWER_STATUS_ON);
+    ret = device_->SetDisplayPowerStatus(id_, Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("SetDisplayPowerStatus failed, id_ : %{public}u", id_));
 
@@ -121,7 +121,7 @@ int32_t HdiTestDisplay::RefreshLayersCompType()
     for (uint32_t i = 0; i < layers.size(); i++) {
         DISPLAY_TEST_LOGD(" the layer id %{public}u ", layers[i]);
         std::shared_ptr<HdiTestLayer> layer = GetLayerFromId(layers[i]);
-        layer->SetCompType(static_cast<CompositionType>(types[i]));
+        layer->SetCompType(static_cast<Composer::V1_0::CompositionType>(types[i]));
     }
     return DISPLAY_SUCCESS;
 }

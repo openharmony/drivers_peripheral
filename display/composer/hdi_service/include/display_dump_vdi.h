@@ -24,7 +24,7 @@
 #include "hdf_sbuf.h"
 #include "devhost_dump_reg.h"
 #include "display_log.h"
-#include "idisplay_composer_vdi.h"
+#include "idisplay_composer_vdi_v1_1.h"
 
 namespace OHOS {
 namespace HDI {

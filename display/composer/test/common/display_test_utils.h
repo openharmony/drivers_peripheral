@@ -62,7 +62,7 @@ struct LayerSettings {
     Size bufferSize = { 0 };
     BufferRatio bufferRatio { 0 };
     int32_t alpha = -1;
-    CompositionType compositionType = COMPOSITION_DEVICE;
+    Composer::V1_0::CompositionType compositionType = Composer::V1_0::CompositionType::COMPOSITION_DEVICE;
     BlendType blendType = BLEND_SRC;
     TransformType rotate = ROTATE_NONE;
 };
