@@ -168,11 +168,10 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
     cameraBase_->StartStream(cameraBase_->intents);
 
      // updateSettings
-    const uint32_t ITEM_CAPACITY = 100;
-    const uint32_t DATA_CAPACITY = 2000;
-    const int32_t FPS_VALUE = 10;
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
-        ITEM_CAPACITY, DATA_CAPACITY);
+        itemCapacity, dataCapacity);
     const int64_t sensorExposure = 8888;
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
@@ -180,8 +179,8 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
         return;
     }
     std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add success" << std::endl;
-    const int32_t DEVICE_STREAM_ID = 0;
-    meta->addEntry(OHOS_CAMERA_STREAM_ID, &DEVICE_STREAM_ID, 1);
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
