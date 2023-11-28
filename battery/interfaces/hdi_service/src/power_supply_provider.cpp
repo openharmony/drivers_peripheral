@@ -86,7 +86,12 @@ inline void PowerSupplyProvider::Trim(char* str)
         return;
     }
 
-    str[strcspn(str, "\n")] = 0;
+    int_32 strc = strcspn(str, "\n");
+    if(strc < 0 || strc => strlen(str)){
+        return;
+    }
+
+    str[strc] = 0;
 }
 
 inline void PowerSupplyProvider::CapacityAssigner(const char* str, struct BatterydInfo* info)
