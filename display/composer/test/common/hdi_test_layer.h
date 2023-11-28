@@ -65,7 +65,7 @@ public:
     {
         return id_;
     }
-    CompositionType GetCompType() const
+    Composer::V1_0::CompositionType GetCompType() const
     {
         return compType_;
     }
@@ -80,7 +80,7 @@ public:
     void SetLayerPosition(const IRect& rect);
     void SetLayerCrop(const IRect& rect);
     void SetZorder(uint32_t zorder);
-    void SetCompType(CompositionType type);
+    void SetCompType(Composer::V1_0::CompositionType type);
     void SetReleaseFence(int fd);
     void SetAlpha(LayerAlpha alpha);
     void SetBlendType(BlendType type);
@@ -96,9 +96,9 @@ private:
     LayerInfo layerInfo_ = { 0 };
 
 #ifdef DISPLAY_COMMUNITY
-    CompositionType compType_ = COMPOSITION_CLIENT;
+    Composer::V1_0::CompositionType compType_ = Composer::V1_0::CompositionType::COMPOSITION_CLIENT;
 #else
-    CompositionType compType_ = COMPOSITION_DEVICE;
+    Composer::V1_0::CompositionType compType_ = Composer::V1_0::CompositionType::COMPOSITION_DEVICE;
 #endif // DISPLAY_COMMUNITY
     IRect displayRect_ = { 0 };
     IRect cropRect_ = { 0 };

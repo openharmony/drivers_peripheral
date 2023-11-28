@@ -146,7 +146,7 @@ int32_t HdiTestLayer::Init(uint32_t bufferCount)
     // init the font queue
     DISPLAY_TEST_LOGD();
     layerBufferCount_ = bufferCount;
-    for (int i = 0; i < layerBufferCount_; i++) {
+    for (uint32_t i = 0; i < layerBufferCount_; i++) {
         std::unique_ptr<HdiGrallocBuffer> buffer =
             std::make_unique<HdiGrallocBuffer>(GenerateSeq(),
             layerInfo_.width, layerInfo_.height, layerInfo_.pixFormat);
@@ -250,7 +250,7 @@ void HdiTestLayer::SetZorder(uint32_t zorder)
     zorder_ = zorder;
 }
 
-void HdiTestLayer::SetCompType(CompositionType type)
+void HdiTestLayer::SetCompType(Composer::V1_0::CompositionType type)
 {
     DISPLAY_TEST_LOGD("layer id %{public}u ,the type is : %{public}d", id_, type);
     compType_ = type;

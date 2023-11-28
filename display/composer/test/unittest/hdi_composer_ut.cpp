@@ -259,17 +259,17 @@ HWTEST_F(DeviceTest, test_SetDisplayMode, TestSize.Level1)
 
 HWTEST_F(DeviceTest, test_GetDisplayPowerStatus, TestSize.Level1)
 {
-    DispPowerStatus powerStatus = DispPowerStatus::POWER_STATUS_OFF;
+    Composer::V1_0::DispPowerStatus powerStatus = Composer::V1_0::DispPowerStatus::POWER_STATUS_OFF;
     auto ret = g_composerDevice->GetDisplayPowerStatus(g_displayIds[0], powerStatus);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_SetDisplayPowerStatus, TestSize.Level1)
 {
-    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], DispPowerStatus::POWER_STATUS_STANDBY);
+    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_STANDBY);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
-    ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], DispPowerStatus::POWER_STATUS_ON);
+    ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
@@ -666,7 +666,7 @@ HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
 
     auto layer = layers[0];
 
-    CompositionType type = CompositionType::COMPOSITION_CLIENT;
+    Composer::V1_0::CompositionType type = Composer::V1_0::CompositionType::COMPOSITION_CLIENT;
     auto ret = g_composerDevice->SetLayerCompositionType(g_displayIds[0], layer->GetId(), type);
 
     PrepareAndPrensent();
