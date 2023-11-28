@@ -13,22 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_IDISPLAY_COMPOSER_VDI_H
-#define OHOS_HDI_DISPLAY_IDISPLAY_COMPOSER_VDI_H
+#ifndef OHOS_HDI_DISPLAY_V1_0_IDISPLAY_COMPOSER_VDI_H
+#define OHOS_HDI_DISPLAY_V1_0_IDISPLAY_COMPOSER_VDI_H
 
 #include <vector>
 #include <string>
 #include "buffer_handle.h"
 #include "common/include/display_common.h"
-#include "v1_1/display_composer_type.h"
-#include "v1_1/imode_callback.h"
-#include "v1_1/iseamless_change_callback.h"
+#include "v1_0/display_composer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_1;
+namespace V1_0 {
+using namespace OHOS::HDI::Display::Composer::V1_0;
 
 #ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
 #define DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY "libdisplay_composer_vdi_impl_default.z.so"
@@ -85,8 +84,9 @@ using CreateComposerVdiFunc = IDisplayComposerVdi* (*)();
 using DestroyComposerVdiFunc = void (*)(IDisplayComposerVdi* vdi);
 extern "C" IDisplayComposerVdi* CreateComposerVdi();
 extern "C" void DestroyComposerVdi(IDisplayComposerVdi* vdi);
+} // namespace V1_0
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_DISPLAY_IDISPLAY_COMPOSER_VDI_H
+#endif // OHOS_HDI_DISPLAY_V1_0_IDISPLAY_COMPOSER_VDI_H
