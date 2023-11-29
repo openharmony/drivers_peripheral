@@ -56,7 +56,10 @@ ohos_shared_library("libdisplay_composer_service_1.1") {
     ]
     external_deps += [ "hdf_core:libhdf_host" ]
     cflags_cc = [ "-DUSING_OHOS" ]
-    defines += [ "DISPLAY_COMPOSER_SERVICE_HIDUMPER" ]
+    defines += [
+      "DISPLAY_COMPOSER_SERVICE_HIDUMPER",
+      "DISPLAY_COMSPOER_DEBUG_DUMP",
+    ]
   }
 
   install_images = [ chipset_base_dir ]
