@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #ifdef IDL_SAMPLE
-#include "v1_1/iaudio_manager.h"
+#include "v2_0/iaudio_manager.h"
 #else
 #include "audio_manager.h"
 #endif
