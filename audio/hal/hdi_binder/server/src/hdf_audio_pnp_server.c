@@ -119,19 +119,19 @@ static int32_t AudioPnpLoadFfrtLib(struct AudioPnpPriv *pPriv)
     return HDF_SUCCESS;
 }
 
-FfrtTaskAttrInit FfrtAttrInitFunc()
+FfrtTaskAttrInit FfrtAttrInitFunc(void)
 {
     return g_priv.ffrtInitAttr;
 }
-FfrtTaskAttrSetQos FfrtAttrSetQosFunc()
+FfrtTaskAttrSetQos FfrtAttrSetQosFunc(void)
 {
     return g_priv.ffrtSetQosAttr;
 }
-FfrtTaskAttrSetName FfrtAttrSetNameFunc()
+FfrtTaskAttrSetName FfrtAttrSetNameFunc(void)
 {
     return g_priv.ffrtSetNameAttr;
 }
-FfrtSubmitBase FfrtSubmitBaseFunc()
+FfrtSubmitBase FfrtSubmitBaseFunc(void)
 {
     return g_priv.ffrtSubmitBase;
 }
