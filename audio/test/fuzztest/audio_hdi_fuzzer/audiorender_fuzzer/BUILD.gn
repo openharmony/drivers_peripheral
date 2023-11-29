@@ -35,7 +35,7 @@ ohos_fuzztest("AudioRenderFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_audio:libaudio_proxy_1.1",
+    "drivers_interface_audio:libaudio_proxy_2.0",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
   ]
