@@ -266,7 +266,8 @@ HWTEST_F(DeviceTest, test_GetDisplayPowerStatus, TestSize.Level1)
 
 HWTEST_F(DeviceTest, test_SetDisplayPowerStatus, TestSize.Level1)
 {
-    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_STANDBY);
+    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0],
+        Composer::V1_0::DispPowerStatus::POWER_STATUS_STANDBY);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
     ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
