@@ -25,6 +25,9 @@ ohos_unittest("WlanHdiServiceTestC") {
     "wlan_callback_impl.c",
     "wlan_hdi_direct_test.cpp",
     "wlan_hdi_hal_services_c_test.cpp",
+    "wpa_callback_impl.c",
+    "wpa_hdi_direct_test.cpp",
+    "wpa_hdi_hal_services_c_test.cpp",
   ]
 
   deps = [
@@ -39,6 +42,7 @@ ohos_unittest("WlanHdiServiceTestC") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_wlan:libwlan_proxy_1.2",
+      "drivers_interface_wlan:libwpa_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
