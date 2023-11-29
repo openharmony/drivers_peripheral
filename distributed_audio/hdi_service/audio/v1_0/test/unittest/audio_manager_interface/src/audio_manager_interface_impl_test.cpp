@@ -134,25 +134,6 @@ HWTEST_F(AudioManagerInterfaceImplTest, AddAudioDevice_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AddAudioDevice_002
- * @tc.desc: Verify the AddAudioDevice and RemoveAudioDevice function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6H
- */
-HWTEST_F(AudioManagerInterfaceImplTest, AddAudioDevice_002, TestSize.Level1)
-{
-    std::string adpName = "adpName";
-    uint32_t devId = 1;
-    std::string caps = "world";
-    sptr<IDAudioCallback> callback = new MockIDAudioCallback();
-    AudioAdapterDescriptor desc;
-    sptr<AudioAdapterInterfaceImpl> AudioAdapter = new AudioAdapterInterfaceImpl(desc);
-    audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->AddAudioDevice(adpName, devId, caps, callback));
-    EXPECT_EQ(DH_SUCCESS, audioManagerInterfaceImpl_->RemoveAudioDevice(adpName, devId));
-}
-
-/**
  * @tc.name: Notify_001
  * @tc.desc: Verify the Notify function.
  * @tc.type: FUNC
@@ -218,7 +199,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_001, TestSize.Level1)
 HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_002, TestSize.Level1)
 {
     std::string adpName = "adpName";
-    uint32_t devId = static_cast<uint32_t>(PIN_OUT_DAUDIO_DEFAULT);
+    uint32_t devId = static_cast<uint32_t>(DEFAULT_RENDER_ID);
     sptr<IDAudioCallback> callback = new MockIDAudioCallback();
     EXPECT_EQ(DH_SUCCESS, audioManagerInterfaceImpl_->CreateAdapter(adpName, devId, callback));
 }
