@@ -791,7 +791,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGD("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
@@ -818,7 +818,7 @@ static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMs
         }
         ret = pos->callbackObj->WifiNetlinkMessage(pos->callbackObj, recvMsg, recvMsgLen);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGD("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
