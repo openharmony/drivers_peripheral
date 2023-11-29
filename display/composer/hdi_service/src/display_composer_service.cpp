@@ -71,6 +71,7 @@ DisplayComposerService::DisplayComposerService()
 
     if (ret != HDF_SUCCESS) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
         DISPLAY_LOGE("Load composer VDI function failed");
     }
 
