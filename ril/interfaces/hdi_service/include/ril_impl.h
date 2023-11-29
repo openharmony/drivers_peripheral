@@ -88,6 +88,7 @@ public:
     int32_t SendDataPerformanceMode(int32_t slotId, int32_t serialId,
         const DataPerformanceInfo &dataPerformanceInfo) override;
     int32_t SendDataSleepMode(int32_t slotId, int32_t serialId, const DataSleepInfo &dataSleepInfo) override;
+    int32_t CleanAllConnections(int32_t slotId, int32_t serialId) override;
 
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) override;
     int32_t GetRadioState(int32_t slotId, int32_t serialId) override;
