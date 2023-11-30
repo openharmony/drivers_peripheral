@@ -182,11 +182,6 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         DHLOGE("Remove audio device failed, adapter return: %d.", ret);
         return ret;
     }
-    sptr<IRemoteObject> remote = GetRemote(adpName);
-    if (remote != nullptr) {
-        remote->RemoveDeathRecipient(audioManagerRecipient_);
-    }
-    mapAudioCallback_.erase(adpName);
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
@@ -194,6 +189,11 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     }
     if (adp->second->IsPortsNoReg()) {
         mapAudioAdapter_.erase(adpName);
+        sptr<IRemoteObject> remote = GetRemote(adpName);
+        if (remote != nullptr) {
+            remote->RemoveDeathRecipient(audioManagerRecipient_);
+        }
+        mapAudioCallback_.erase(adpName);
     }
     DHLOGI("Remove audio device success, mapAudioAdapter size() is : %d .", mapAudioAdapter_.size());
     return DH_SUCCESS;
