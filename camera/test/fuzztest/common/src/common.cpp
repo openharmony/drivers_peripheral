@@ -103,7 +103,7 @@ void CameraManager::OpenCameraV1_2()
         deviceCallback = new OHOS::Camera::CameraManager::DemoCameraDeviceCallback();
 
         rc = serviceV1_2->OpenCameraV1_2(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
-        if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_1 == nullptr) {
+        if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_2 == nullptr) {
             CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
             return;
         }

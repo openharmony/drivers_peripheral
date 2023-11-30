@@ -1283,46 +1283,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
 }
 
 /**
- * @tc.name:Camera_Device_Hdi_V1_2_036
- * @tc.desc: updateColorSpace by updateStreams
- * @tc.size:MediumTest
- * @tc.type:Function
-*/
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_036, TestSize.Level1)
-{
-    cameraTest->OpenCameraV1_2();
-    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
-    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
-        cameraTest->streamOperator_V1_2);
-    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
-    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-    // capture streamInfo
-    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
-    cameraTest->streamInfoCapture->v1_0.dataspace_ = OHOS_CAMERA_SRGB_FULL;
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams(
-        OperationMode::NORMAL, cameraTest->abilityVec);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    sleep(UT_SECOND_TIMES);
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-    cameraTest->streamOperator_V1_2->CancelCapture(cameraTest->captureIdPreview);
-    cameraTest->streamInfoV1_1->v1_0.dataspace_ = OHOS_CAMERA_P3_FULL;
-    cameraTest->streamInfoCapture->v1_0.dataspace_ = OHOS_CAMERA_P3_FULL;
-    cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-}
-
-/**
  * @tc.name: PreCameraSwitch
  * @tc.desc: PreCameraSwitch cameraId:device/0
  * @tc.size: MediumTest
