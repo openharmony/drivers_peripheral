@@ -23,7 +23,5 @@ ohos_prebuilt_etc("power_config") {
 }
 
 group("power_hdi_service_config") {
-  deps = [
-    ":power_config",
-  ]
+  deps = [ ":power_config" ]
 }
