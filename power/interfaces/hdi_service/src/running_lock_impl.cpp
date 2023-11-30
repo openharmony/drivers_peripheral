@@ -17,6 +17,7 @@
 
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "system_operation.h"
 
 namespace OHOS {
 namespace HDI {
@@ -96,6 +97,20 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
     std::shared_ptr<RunningLockCounter> lockCounter = iterator->second;
     int32_t status = lockCounter->Decrease(filledInfo);
     return status;
+}
+
+void RunningLockImpl::Clean()
+{
+    HDF_LOGI("start to clear running locks");
+    std::lock_guard<std::mutex> lock(mutex_);
+    timerHandler_->Clean();
+
+    for (auto &iter : lockCounters_) {
+       HDF_LOGI("clear running lock type %{public}d", iter.first);
+       SystemOperation::WriteWakeUnlock(GetRunningLockTag(iter.first));
+       iter.second->Clean();
+    }
+    lockCounters_.clear();
 }
 
 uint32_t RunningLockImpl::GetCount(RunningLockType type)

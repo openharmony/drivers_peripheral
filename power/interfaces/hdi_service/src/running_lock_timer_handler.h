@@ -33,6 +33,7 @@ public:
 
     bool RegisterRunningLockTimer(const RunningLockInfo &info, const std::function<void()> &callback, bool once = true);
     bool UnregisterRunningLockTimer(const RunningLockInfo &info);
+    void Clean();
 
 private:
     uint32_t GetRunningLockTimerId(RunningLockType type, std::string name);
