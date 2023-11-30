@@ -12,6 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../power.gni")
 
 ohos_shared_library("libpower_interface_service_1.1") {
   sources = [
@@ -33,6 +34,22 @@ ohos_shared_library("libpower_interface_service_1.1") {
     "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
+
+  if (drivers_peripheral_power_wakeup_cause_path) {
+    sources += [
+      "src/power_config.cpp",
+    ]
+
+    deps += [
+      "//third_party/jsoncpp:jsoncpp",
+    ]
+
+    external_deps += [
+      "config_policy:configpolicy_util",
+    ]
+    
+    defines = [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+  }
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -66,4 +83,10 @@ group("hdf_power") {
     ":libpower_driver",
     ":libpower_interface_service_1.1",
   ]
+
+  if (drivers_peripheral_power_wakeup_cause_path) {
+    deps += [
+      "profile:power_hdi_service_config"
+    ]
+  }
 }
