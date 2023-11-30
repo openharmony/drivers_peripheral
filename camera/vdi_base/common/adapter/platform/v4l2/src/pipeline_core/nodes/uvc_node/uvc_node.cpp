@@ -102,8 +102,8 @@ RetCode UvcNode::Start(const int32_t streamId)
     for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = it->format_.w_;
-        format.fmtdesc.height = it->format_.h_;
+        format.fmtdesc.width = wide_;
+        format.fmtdesc.height = high_;
         int bufCnt = it->format_.bufferCount_;
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -111,6 +111,7 @@ RetCode UvcNode::Start(const int32_t streamId)
             return RC_ERROR;
         }
     }
+    isAdjust_ = true;
     if (meta_ != nullptr) {
         sensorController_->ConfigFps(meta_);
     }
@@ -237,7 +238,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
-        buffer->GetWidth(), buffer->GetHeight());
+        wide_, high_);
     int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),
         static_cast<uint8_t *>(jBuf), buffer->GetSize());
     if (ret == 0) {

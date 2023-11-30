@@ -20,6 +20,7 @@
 #include <mutex>
 
 namespace OHOS::Camera {
+
 class PortBase : public IPort {
 public:
     PortBase(const std::string& name, const std::weak_ptr<INode>& n) : name_(name), owner_(n)

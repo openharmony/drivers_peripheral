@@ -262,7 +262,7 @@ void HosV4L2Dev::loopBuffers()
             }
         }
     }
-    CAMERA_LOGD("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
+    CAMERA_LOGD("!!! loopBuffers exit, streamNumber_=%d\n", streamNumber_);
 }
 
 RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
@@ -377,7 +377,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
     {
         std::lock_guard<std::mutex> l(streamLock_);
         streamNum = --streamNumber_;
-        CAMERA_LOGD("HosV4L2Dev::StopStream streamNumber_ = %d\n", streamNumber_);
+        CAMERA_LOGD("HosV4L2Dev::StopStream streamNumber_ = %{public}d\n", streamNumber_);
     }
 
     if (streamNum == 0) {

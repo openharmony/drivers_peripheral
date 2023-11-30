@@ -60,8 +60,9 @@ RetCode SourceNode::Start(const int32_t streamId)
     }
 
     SetBufferCallback();
-    std::shared_ptr<PortHandler> ph = std::make_shared<PortHandler>(port);
+    std::shared_ptr<PortHandler> ph = std::make_shared<PortHandler>(port, isAdjust_);
     CHECK_IF_PTR_NULL_RETURN_VALUE(ph, RC_ERROR);
+    ph->setWideAndHigh(wide_, high_);
     {
         std::lock_guard<std::mutex> l(hndl_);
         handler_[streamId] = ph;
@@ -167,7 +168,7 @@ RetCode SourceNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p) : port(p)
+SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p, bool isResize) : port(p), isResize_(isResize)
 {
 }
 
@@ -243,7 +244,33 @@ void SourceNode::PortHandler::CollectBuffers()
     std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
     frameSpec->bufferPoolId_ = format.bufferPoolId_;
     frameSpec->bufferCount_ = format.bufferCount_;
-    frameSpec->buffer_ = buffer;
+    constexpr uint32_t YUV422Width = 2;
+    uint32_t bufferSize = maxWide_ * maxHigh_ * YUV422Width;
+    if (isResize_ == false || (maxWide_ == buffer->GetWidth() && maxHigh_ == buffer->GetHeight())) {
+        frameSpec->buffer_ = buffer;
+    } else {
+        if (count_ < frameSpec->bufferCount_) {
+            uint8_t* addr = reinterpret_cast<uint8_t*>(malloc(static_cast<uint32_t>(bufferSize)));
+            if (addr == nullptr) {
+                CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
+                return;
+            }
+            pool->setSFBuffer(buffer);
+            cBuffer.insert(std::make_pair(buffer->GetIndex(), (uint8_t *)addr));
+            buffer->SetVirAddress(addr);
+            buffer->SetSize(bufferSize);
+        } else {
+            auto iterMap = cBuffer.find(buffer->GetIndex());
+            if (iterMap == cBuffer.end()) {
+                CAMERA_LOGE("std::map cBuffer no buffer>GetIndex()\n");
+                return;
+            }
+            buffer->SetVirAddress(iterMap->second);
+            buffer->SetSize(bufferSize);
+        }
+        count_++;
+        frameSpec->buffer_ = buffer;
+    }
 
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
@@ -294,6 +321,12 @@ RetCode SourceNode::PortHandler::StopDistributeBuffers()
         distributor->join();
     }
     FlushBuffers(); // flush buffers after stopping distributor
+    if (isResize_ == true) {
+        for (auto iter : cBuffer) {
+            free(iter.second);
+        }
+        cBuffer.clear();
+    }
     CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers exit");
     return RC_OK;
 }
@@ -359,6 +392,12 @@ void SourceNode::PortHandler::FlushBuffers()
     CAMERA_LOGV("SourceNode::PortHandler::FlushBuffers exit");
 
     return;
+}
+
+void SourceNode::PortHandler::setWideAndHigh(int32_t wide, int32_t high)
+{
+    maxWide_ = wide;
+    maxHigh_ = high;
 }
 
 REGISTERNODE(SourceNode, {"source"})
