@@ -150,7 +150,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayModeTest)->
 BENCHMARK_F(DisplayBenchmarkTest, GetDisplayPowerStatusTest)(benchmark::State &state)
 {
     int32_t ret;
-    DispPowerStatus powerStatus = DispPowerStatus::POWER_STATUS_OFF;
+    Composer::V1_0::DispPowerStatus powerStatus = Composer::V1_0::DispPowerStatus::POWER_STATUS_OFF;
     for (auto _ : state) {
         ret = g_composerDevice->GetDisplayPowerStatus(g_displayIds[0], powerStatus);
     }
@@ -168,7 +168,8 @@ BENCHMARK_F(DisplayBenchmarkTest, SetDisplayPowerStatusTest)(benchmark::State &s
 {
     int32_t ret;
     for (auto _ : state) {
-        ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], DispPowerStatus::POWER_STATUS_ON);
+        ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0],
+            Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }

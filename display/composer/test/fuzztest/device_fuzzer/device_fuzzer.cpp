@@ -169,7 +169,7 @@ int32_t TestSetGetDisplayPowerStatus(uint32_t devId)
         HDF_LOGE("%{public}s: CONVERT_TABLE_POWER_STATUS length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    DispPowerStatus status = CONVERT_TABLE_POWER_STATUS[GetData<uint32_t>() % len];
+    Composer::V1_0::DispPowerStatus status = CONVERT_TABLE_POWER_STATUS[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetDisplayPowerStatus(devId, status);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayPowerStatus failed", __func__);
