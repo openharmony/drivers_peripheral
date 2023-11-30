@@ -27,7 +27,7 @@ void CameraBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init();
-    cameraTest->Open();
+    cameraTest->OpenCameraV1_2();
 }
 
 void CameraBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -109,7 +109,6 @@ BENCHMARK_REGISTER_F(CameraBenchmarkTest, PrelaunchWithOpMode_benchmark_001)->It
 BENCHMARK_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)(
     benchmark::State &st)
 {
-    cameraTest->OpenCameraV1_2();
     cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
