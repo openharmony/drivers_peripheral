@@ -2512,7 +2512,7 @@ static int32_t GetAssociatedInfoHandler(struct nl_msg *msg, void *arg)
     }
     if (nla_parse_nested(bss, NL80211_BSS_MAX, attr[NL80211_ATTR_BSS], bssPolicy) < 0 ||
         bss[NL80211_BSS_STATUS] == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: BSS attr or status missing!", __FUNCTION__);
+        HILOG_INFO(LOG_CORE, "%s: BSS attr or status missing!", __FUNCTION__);
         return NL_SKIP;
     }
     status = nla_get_u32(bss[NL80211_BSS_STATUS]);
