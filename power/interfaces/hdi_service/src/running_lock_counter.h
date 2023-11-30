@@ -32,6 +32,7 @@ public:
     ~RunningLockCounter() = default;
     int32_t Increase(const RunningLockInfo &info);
     int32_t Decrease(const RunningLockInfo &info);
+    void Clean();
     uint32_t GetCount() const
     {
         return counter_;

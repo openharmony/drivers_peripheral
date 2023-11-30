@@ -253,7 +253,9 @@ int32_t PowerInterfaceImpl::RemovePowerDeathRecipient(const sptr<IPowerHdiCallba
 
 void PowerInterfaceImpl::PowerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
+    HDF_LOGI("PowerDeathRecipient OnRemoteDied");
     powerInterfaceImpl_->UnRegister();
+    RunningLockImpl::Clean();
 }
 
 void LoadStringFd(int32_t fd, std::string &content)
