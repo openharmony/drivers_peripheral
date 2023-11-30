@@ -1207,6 +1207,35 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    port->iface[interfaceId] =
+        UsbManageInterface(port->service->session_, port->busNum, port->devAddr, interfaceId, disable);
+    if (port->iface[interfaceId] == nullptr) {
+        HDF_LOGE("%{public}s: ManageInterface failed, busNum=%{public}u, devAddr=%{public}u", __func__,
+            port->busNum, port->devAddr);
+        return HDF_FAILURE;
+    }
+    if (port->devHandle[interfaceId] == nullptr) {
+        port->devHandle[interfaceId] = UsbOpenInterface(port->iface[interfaceId]);
+        if (port->devHandle[interfaceId] == nullptr) {
+            HDF_LOGE("%{public}s:UsbOpenInterface failed.", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);

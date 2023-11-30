@@ -1073,14 +1073,51 @@ static int32_t AdapterClaimInterface(const struct UsbDeviceHandle *handle, unsig
     return HDF_SUCCESS;
 }
 
-static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber)
+static int32_t AdapterDetachKernelDriver(const struct UsbDeviceHandle *handle, uint8_t interfaceNumber)
 {
-    struct UsbAdapterDisconnectClaim dc;
     int32_t ret;
     if (handle == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+
+    struct UsbAdapterIoctl command = {interfaceNumber, USBDEVFS_DISCONNECT, NULL};
+    ret = ioctl(handle->fd, USBDEVFS_IOCTL, &command);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s connect failed, ret = %{public}d, errno:%{public}d", __func__, ret, errno);
+        return ret;
+    }
+    HDF_LOGI("%{public}s ret = %{public}d, errno = %{public}d ", __func__, ret, errno);
+    return ret;
+}
+
+static int32_t AdapterAttachKernelDriver(const struct UsbDeviceHandle *handle, uint8_t interfaceNumber)
+{
+    int32_t ret;
+    if (handle == NULL) {
+        HDF_LOGE("%{public}s invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbAdapterIoctl cmd = {interfaceNumber, USBDEVFS_CONNECT, NULL};
+    ret = ioctl(handle->fd, USBDEVFS_IOCTL, &cmd);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s connect failed, ret = %{public}d, errno:%{public}d", __func__, ret, errno);
+        return ret;
+    }
+    HDF_LOGI("%{public}s ret = %{public}d, errno = %{public}d ", __func__, ret, errno);
+    return ret;
+
+}
+
+static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber)
+{
+    int32_t ret;
+    if (handle == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct UsbAdapterDisconnectClaim dc;
     struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
     ret = ioctl(handle->fd, USBDEVFS_GETDRIVER, &getDriver);
     if (ret != 0 && errno == ENODATA) {
@@ -1412,19 +1449,7 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     return ret;
 }
 
-static void AdapterAttachKernelDriver(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber)
-{
-    if (devHandle == NULL) {
-        HDF_LOGE("%{public}s invalid parameter", __func__);
-        return;
-    }
 
-    struct UsbAdapterIoctl cmd = {interfaceNumber, USBDEVFS_CONNECT, NULL};
-    int32_t ret = ioctl(devHandle->fd, USBDEVFS_IOCTL, &cmd);
-    if (ret <= 0) {
-        HDF_LOGE("%{public}s connect failed, errno:%{public}d", __func__, errno);
-    }
-}
 
 static struct UsbOsAdapterOps g_usbAdapter = {
     .init = AdapterInit,
@@ -1448,6 +1473,7 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .urbCompleteHandle = AdapterUrbCompleteHandle,
     .detachKernelDriverAndClaim = AdapterDetachKernelDriverAndClaim,
     .attachKernelDriver = AdapterAttachKernelDriver,
+    .detachKernelDriver = AdapterDetachKernelDriver,
 };
 
 static void OsSignalHandler(int32_t signo)
