@@ -41,7 +41,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     deps += [ "//third_party/jsoncpp:jsoncpp" ]
 
     external_deps += [ "config_policy:configpolicy_util" ]
-    
+
     defines = [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
@@ -79,8 +79,6 @@ group("hdf_power") {
   ]
 
   if (drivers_peripheral_power_wakeup_cause_path) {
-    deps += [
-      "profile:power_hdi_service_config"
-    ]
+    deps += [ "profile:power_hdi_service_config" ]
   }
 }
