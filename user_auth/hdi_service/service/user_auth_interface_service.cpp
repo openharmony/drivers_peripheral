@@ -18,6 +18,7 @@
 #include <mutex>
 #include <hdf_base.h>
 #include "securec.h"
+#include <set>
 
 #include "iam_logger.h"
 #include "iam_ptr.h"
@@ -44,6 +45,16 @@ namespace {
 static std::mutex g_mutex;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
+const int32_t INNERAPI_API_VERSION_10000 = 10000;
+// white list of allowing to authenticate without using widget
+const std::set<std::string> AUTH_WITHOUT_WIDGET_WHITE_SET = {
+    {"com.ohos.systemui"}, {"com.ohos.settings"}, {"com.ohos.settings.faceauth"},
+};
+
+// white list of allowing to beginEnrollment
+const std::set<std::string> BEGIN_ENROLLMENT_WHITE_SET = {
+    {"com.ohos.settings"}, {"com.ohos.settings.faceauth"},
+};
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -215,6 +226,16 @@ static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in,
     }
 }
 
+static int32_t CopyAuthSolutionV1_2ToV1_0(const AuthSolutionV1_2 &in, AuthSolution &out)
+{
+    out.userId = in.userId;
+    out.authTrustLevel = in.authTrustLevel;
+    out.authType = in.authType;
+    out.executorSensorHint = in.executorSensorHint;
+    out.challenge = std::move(in.challenge);
+    return RESULT_SUCCESS;
+}
+
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
     std::vector<ScheduleInfo> &infos)
 {
@@ -222,6 +243,25 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::vector<ScheduleInfoV1_1> infosV1_1;
     int32_t ret = BeginAuthenticationV1_1(contextId, param, infosV1_1);
     CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
+    std::vector<ScheduleInfoV1_1> &infos)
+{
+    IAM_LOGI("start");
+    if (paramV1_2.apiVersion >= INNERAPI_API_VERSION_10000 &&
+        AUTH_WITHOUT_WIDGET_WHITE_SET.find(paramV1_2.callerName) == AUTH_WITHOUT_WIDGET_WHITE_SET.end()) {
+        IAM_LOGE("failed to check authenticate without widget white list");
+        return RESULT_BAD_PARAM;
+    }
+    AuthSolution param;
+    int32_t ret = CopyAuthSolutionV1_2ToV1_0(paramV1_2, param);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("AuthSolution copy failed");
+        return ret;
+    }
+    ret = BeginAuthenticationV1_1(contextId, param, infos);
     return ret;
 }
 
@@ -542,6 +582,21 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     std::lock_guard<std::mutex> lock(g_mutex);
     return CloseEditSession();
 }
+
+int32_t UserAuthInterfaceService::BeginEnrollmentV1_2(int32_t userId, const std::vector<uint8_t> &authToken,
+    const EnrollParamV1_2 &paramV1_2, ScheduleInfoV1_1 &infoV1_1)
+{
+    IAM_LOGI("start");
+    if (BEGIN_ENROLLMENT_WHITE_SET.find(paramV1_2.callerName) == BEGIN_ENROLLMENT_WHITE_SET.end()) {
+        IAM_LOGE("failed to check beginEnrollment white list");
+        return RESULT_BAD_PARAM;
+    }
+    EnrollParam param;
+    param.authType = paramV1_2.authType;
+    param.executorSensorHint = paramV1_2.executorSensorHint;
+    return BeginEnrollmentV1_1(userId, authToken, param, infoV1_1);
+}
+
 
 int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vector<uint8_t> &authToken,
     const EnrollParam &param, ScheduleInfo &info)
