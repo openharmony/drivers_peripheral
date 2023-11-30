@@ -108,7 +108,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 0.125f },
             .color = GREEN,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
 
@@ -119,7 +119,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = RED,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
     {
@@ -129,7 +129,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 0.125f },
             .color = GREEN,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
     {
@@ -139,7 +139,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0.875f, 1.0f, 0.125f },
             .color = YELLOW,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     }
 };

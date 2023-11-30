@@ -299,7 +299,7 @@ int32_t TestSetLayerCompositionType(uint32_t devId, uint32_t layerId)
         HDF_LOGE("%{public}s: CONVERT_TABLE_COMPOSITION length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    CompositionType type = CONVERT_TABLE_COMPOSITION[GetData<uint32_t>() % len];
+    Composer::V1_0::CompositionType type = CONVERT_TABLE_COMPOSITION[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetLayerCompositionType(devId, layerId, type);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetLayerCompositionType failed", __func__);
