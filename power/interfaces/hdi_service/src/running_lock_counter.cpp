@@ -61,6 +61,11 @@ int32_t RunningLockCounter::Decrease(const RunningLockInfo &info)
     return HDF_SUCCESS;
 }
 
+void RunningLockCounter::Clean()
+{
+    runninglockInfos_.clear();
+}
+
 void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType changeType, RunningLockState state)
 {
     const int logLevel = 2;
