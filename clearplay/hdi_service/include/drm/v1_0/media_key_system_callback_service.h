@@ -24,11 +24,13 @@ namespace Drm {
 namespace V1_0 {
 class MediaKeySystemCallbackService : public OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback {
 public:
-    MediaKeySystemCallbackService() = default;
+    MediaKeySystemCallbackService(OHOS::sptr<IMediaKeySystemCallback> callback);
+
     virtual ~MediaKeySystemCallbackService() = default;
 
     int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
-
+private:
+    OHOS::sptr<IMediaKeySystemCallback> keySystemCallback_;
 };
 } // V1_0
 } // Drm

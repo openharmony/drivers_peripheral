@@ -20,6 +20,7 @@
 #include "v1_0/media_decrypt_module_service.h"
 #include "v1_0/media_key_session_callback_service.h"
 #include "v1_0/media_key_system_types.h"
+#include "media_key_session_callback_service.h"
 #include "session.h"
 #include <mutex>
 #include <map>
@@ -76,12 +77,12 @@ private:
     sptr<Session> session_;
     SecurityLevel level_;
     sptr<OHOS::HDI::Drm::V1_0::MediaDecryptModuleService> decryptModule_;
-    sptr<OHOS::HDI::Drm::V1_0::MediaKeySessionCallbackService> keySessionCallback_;
     sptr<KeySessionServiceCallback> sessionCallback_;
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
     const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
     const int keyIdMaxLength = 255;
+    OHOS::sptr<MediaKeySessionCallbackService> vdiCallbackObj;
 };
 class KeySessionServiceCallback : public virtual RefBase {
 public:
