@@ -24,14 +24,16 @@ namespace Drm {
 namespace V1_0 {
 class MediaKeySessionCallbackService : public OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback {
 public:
-    MediaKeySessionCallbackService() = default;
+    MediaKeySessionCallbackService(OHOS::sptr<IMediaKeySessionCallback> callback);
+
     virtual ~MediaKeySessionCallbackService() = default;
 
     int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) override;
 
     int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>,
          OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense) override;
-
+private:
+    OHOS::sptr<IMediaKeySessionCallback> keySessionCallback_;
 };
 } // V1_0
 } // Drm

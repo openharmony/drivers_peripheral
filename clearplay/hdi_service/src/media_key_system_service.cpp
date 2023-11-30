@@ -117,6 +117,9 @@ int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string &defaultUrl,
     std::string requestData = "{\"signedRequest\":\"KEYREQUESTTYPE_DOWNLOADCERT\"}";
     size_t requestDataLen = requestData.size();
     request.assign(requestData.c_str(), requestData.c_str() + requestDataLen);
+    std::string eventData = "PROVISIONRE QUIRED";
+    std::vector<uint8_t> data(eventData.begin(), eventData.end());
+    vdiCallbackObj->SendEvent(EVENTTYPE_PROVISIONREQUIRED, 0, data);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -124,7 +127,8 @@ int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string &defaultUrl,
 int32_t MediaKeySystemService::ProcessKeySystemResponse(const std::vector<uint8_t> &response)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    HDF_LOGI("%{public}s: response: %{public}s", __func__, response.data());
+    std::string responseData(response.begin(), response.end());
+    HDF_LOGI("%{public}s: response: %{public}s", __func__, responseData.c_str());
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -243,8 +247,14 @@ int32_t MediaKeySystemService::GetOemCertificateStatus(CertificateStatus &status
 
 int32_t MediaKeySystemService::SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback> &systemCallback)
 {
+    vdiCallbackObj = new (std::nothrow) MediaKeySystemCallbackService(systemCallback);
+    if (vdiCallbackObj == nullptr) {
+        HDF_LOGE("new MediaKeySystemCallbackService() failed");
+        return HDF_ERR_MALLOC_FAIL;
+    }
     return HDF_SUCCESS;
 }
+
 int32_t MediaKeySystemService::Destroy()
 {
     HDF_LOGI("%{public}s: start", __func__);
@@ -267,6 +277,9 @@ int32_t MediaKeySystemService::CloseKeySessionService(sptr<MediaKeySessionServic
     }
     mediaKeySessionMap_.erase(it);
     mediaKeySessionMutex_.unlock();
+    std::string eventData = "KEYSESSION LOST";
+    std::vector<uint8_t> data(eventData.begin(), eventData.end());
+    vdiCallbackObj->SendEvent(EVENTTYPE_KEYSESSION_LOST, 0, data);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }

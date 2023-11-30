@@ -18,6 +18,7 @@
 
 #include "v1_0/imedia_key_system.h"
 #include "v1_0/media_key_session_service.h"
+#include "media_key_system_callback_service.h"
 
 namespace OHOS {
 namespace HDI {
@@ -81,6 +82,7 @@ private:
     const std::string versionName = "version";
     const std::string decryptNumberName = "decryptNumber";
     const std::string errorDecryptNumberName = "errorDecryptNumber";
+    OHOS::sptr<MediaKeySystemCallbackService> vdiCallbackObj;
 };
 class MediaKeySystemServiceCallback : public virtual RefBase {
 public:

@@ -23,9 +23,14 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+MediaKeySessionCallbackService::MediaKeySessionCallbackService(OHOS::sptr<IMediaKeySessionCallback> callback)
+    : keySessionCallback_(callback)
+{}
+
 int32_t MediaKeySessionCallbackService::SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t> &data)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    keySessionCallback_->SendEvent(eventType, extra, data);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -34,6 +39,7 @@ int32_t MediaKeySessionCallbackService::SendEventKeyChange(const std::map<std::v
     OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    keySessionCallback_->SendEventKeyChange(keyStatus, hasNewGoodLicense);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
