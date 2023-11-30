@@ -334,10 +334,12 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
     captureInfo->streamIds_ = {streamId};
     captureInfo->captureSetting_ = abilityVec;
     captureInfo->enableShutterCallback_ = shutterCallback;
-    if (streamOperator_V1_1 != nullptr) {
+    if (streamOperator_V1_2 != nullptr) {
+        rc = (CamRetCode)streamOperator_V1_2->Capture(captureId, *captureInfo, isStreaming);
+    } else if (streamOperator_V1_1 != nullptr) {
         rc = (CamRetCode)streamOperator_V1_1->Capture(captureId, *captureInfo, isStreaming);
     } else {
-    rc = (CamRetCode)streamOperator->Capture(captureId, *captureInfo, isStreaming);
+        rc = (CamRetCode)streamOperator->Capture(captureId, *captureInfo, isStreaming);
     }
 
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
@@ -354,7 +356,9 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
-            if (streamOperator_V1_1 != nullptr) {
+            if (streamOperator_V1_2 != nullptr) {
+                rc = streamOperator_V1_2->CancelCapture(captureId);
+            } else if (streamOperator_V1_1 != nullptr) {
                 rc = streamOperator_V1_1->CancelCapture(captureId);
             } else {
                 rc = streamOperator->CancelCapture(captureId);
@@ -369,7 +373,9 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
         }
     }
     if (sizeof(streamIds) > 0) {
-        if (streamOperator_V1_1 != nullptr) {
+        if (streamOperator_V1_2 != nullptr) {
+            rc = streamOperator_V1_2->ReleaseStreams(streamIds);
+        } else if (streamOperator_V1_1 != nullptr) {
             rc = streamOperator_V1_1->ReleaseStreams(streamIds);
         } else {
             rc = streamOperator->ReleaseStreams(streamIds);
