@@ -595,7 +595,7 @@ void TestCameraBase::StartStream(std::vector<StreamIntent> intents)
         } else {
             CAMERA_LOGE("CreateStreams fail, rc = %{public}d", rc);
         }
-        
+
         rc = (CamRetCode)streamOperator->CommitStreams(NORMAL, ability_);
         EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {

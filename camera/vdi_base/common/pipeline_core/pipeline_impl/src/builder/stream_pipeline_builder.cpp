@@ -13,6 +13,7 @@
 
 #include "inode.h"
 #include "stream_pipeline_builder.h"
+#include <set>
 
 namespace OHOS::Camera {
 StreamPipelineBuilder::StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr>& streamMgr,
@@ -28,6 +29,7 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
     }
     CAMERA_LOGI("------------------------Node Instantiation Begin-------------\n");
     RetCode re = RC_OK;
+    std::set<std::vector<int32_t>> sizeSet;
     for (auto& it : pipelineSpec->nodeSpecSet_) {
         if (it.status_ == "new") {
             std::string nodeName;
@@ -46,6 +48,10 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
             pipeline_->nodes_.push_back(newNode);
             it.status_ = "remain";
             for (const auto& portSpec : it.portSpecSet_) {
+                std::vector<int32_t> vectorSize;
+                vectorSize.push_back(portSpec.format_.w_);
+                vectorSize.push_back(portSpec.format_.h_);
+                sizeSet.insert(vectorSize);
                 auto peerNode = std::find_if(pipeline_->nodes_.begin(), pipeline_->nodes_.end(),
                     [portSpec](const std::shared_ptr<INode>& n) {
                         return n->GetName() == portSpec.info_.peerPortNodeName_;
@@ -73,6 +79,15 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
             }
         }
     }
+    std::vector<int32_t> max(2);
+    for (auto i : sizeSet) {
+        if (i[0] * i[1] > max[0] * max[1]) {
+            max[0] = i[0];
+            max[1] = i[1];
+        }
+    }
+    pipeline_->wide_ = max[0];
+    pipeline_->high_ = max[1];
     CAMERA_LOGI("------------------------Node Instantiation End-------------\n");
     return pipeline_;
 }

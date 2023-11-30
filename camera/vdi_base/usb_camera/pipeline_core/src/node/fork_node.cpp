@@ -77,7 +77,10 @@ RetCode PcForkNode::Stop(const int32_t streamId)
         return RC_OK;
     }
 
-    DrainForkBufferPool();
+    if (bufferPool_ != nullptr) {
+        bufferPool_->SetForkBufferId(-1);
+        DrainForkBufferPool();
+    }
 
     streamRunning_ = false;
 
@@ -107,13 +110,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 forkBuffer->SetFormat(CAMERA_FORMAT_YCRCB_420_SP);
                 CAMERA_LOGD("forkBuffer EncodeType is NULL, change Format to CAMERA_FORMAT_YCRCB_420_SP");
             }
-            if (forkBuffer->GetFormat() == CAMERA_FORMAT_YCRCB_420_SP) {
-                CodecNode::Yuv422ToYuv420(buffer, forkBuffer);
-            } else if (memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
-                buffer->GetVirAddress(), buffer->GetSize()) != 0) {
-                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                CAMERA_LOGW("PcForkNode::memcpy_s failed.");
-            }
+            bufferPool_->setSFBuffer(buffer);
 
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);

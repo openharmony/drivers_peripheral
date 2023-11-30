@@ -58,6 +58,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_usb/pipeline_core/src/node/exif_node.cpp",
     "$camera_path_usb/pipeline_core/src/node/face_node.cpp",
     "$camera_path_usb/pipeline_core/src/node/fork_node.cpp",
+    "$camera_path_usb/pipeline_core/src/node/scale_node.cpp",
     "$camera_path_vdi/dump/src/camera_dump.cpp",
     "$camera_path_vdi/pipeline_core/host_stream/src/host_stream_impl.cpp",
     "$camera_path_vdi/pipeline_core/host_stream/src/host_stream_mgr_impl.cpp",
