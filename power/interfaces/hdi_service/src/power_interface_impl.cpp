@@ -50,7 +50,6 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
-static constexpr const char * const WAKEUP_CAUSE_PATH = "/sys/bus/platform/devices/echub_battery/wakeup_cause";
 static std::chrono::milliseconds waitTime_(1000); // {1000ms};
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
@@ -93,6 +92,12 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipow
         AddPowerDeathRecipient(g_callback);
         g_isHdiStart = true;
     }
+
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    powerConfig.ParseConfig();
+#endif
+
     return HDF_SUCCESS;
 }
 
@@ -343,13 +348,34 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
-    UniqueFd wakeupReasonFd(TEMP_FAILURE_RETRY(open(WAKEUP_CAUSE_PATH, O_RDONLY | O_CLOEXEC)));
-    if (wakeupReasonFd < 0) {
-        HDF_LOGW("get wakup reason open wakeup_cause node fail");
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
+    if (sceneConfigMap.empty()) {
+        HDF_LOGE("sceneConfigMap is empty");
         return HDF_FAILURE;
     }
-    LoadStringFd(wakeupReasonFd, reason);
+
+    std::string setPath{""};
+    std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
+    if (it != sceneConfigMap.end()) {
+        setPath = (it -> second).setPath;
+        HDF_LOGI("setPath = %{public}s", setPath.c_str());
+    } else {
+        HDF_LOGW("wakeuo_cause setPath does not exist");
+        return HDF_FAILURE;
+    }
+
+    UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(setPath.c_str(), O_RDONLY | O_CLOEXEC)));
+    if (wakeupCauseFd < 0) {
+        return HDF_FAILURE;
+    }
+    LoadStringFd(wakeupCauseFd, reason);
     return HDF_SUCCESS;
+#else
+    HDF_LOGW("wakrup cause path not config");
+    return HDF_FAILURE;
+#endif
 }
 } // namespace V1_1
 } // namespace Power
