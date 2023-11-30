@@ -40,15 +40,6 @@
           "name": "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
             "header": {
               "header_files": [
-              ],
-              "header_base": "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"
-          }
-        },
-        {
-          "type":"so",
-          "name": "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
-            "header": {
-              "header_files": [
                 "imedia_decrypt_module.h",
                 "imedia_key_session_callback.h",
                 "imedia_key_session.h",
@@ -71,6 +62,15 @@
                 "media_key_system_types.h",
                 "oem_certificate_proxy.h",
                 "oem_certificate_stub.h"
+              ],
+              "header_base": "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"
+          }
+        },
+        {
+          "type":"so",
+          "name": "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+            "header": {
+              "header_files": [
               ],
               "header_base": "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"
           }
