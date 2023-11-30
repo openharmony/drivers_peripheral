@@ -1026,6 +1026,61 @@ ERROR:
     return NULL;
 }
 
+struct UsbInterface *UsbManageInterface(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex, bool disable)
+{
+    struct UsbPoolQueryPara poolQueryPara = {0};
+    struct UsbInterfacePool *interfacePool = NULL;
+    struct UsbInterfaceQueryPara interfaceQueryPara = {USB_INTERFACE_INTERFACE_INDEX_TYPE, interfaceIndex, 0};
+    struct UsbSdkInterface *interfaceObj = NULL;
+    struct UsbDeviceHandle *devHandle = NULL;
+    struct UsbSession *realSession = RawGetSession(session);
+    int32_t ret;
+    bool claimFlag = false;
+
+    if (realSession == NULL) {
+        return NULL;
+    }
+    SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    if (interfacePool == NULL || interfacePool->device == NULL) {
+        interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
+        if (interfacePool == NULL || interfacePool->device == NULL) {
+            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+            return NULL;
+        }
+    }
+
+    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
+        goto ERROR;
+    }
+
+    if (interfaceIndex != USB_CTRL_INTERFACE_ID) {
+        OsalMutexLock(&interfacePool->interfaceLock);
+        devHandle = interfacePool->device->devHandle;
+        interfaceObj->forceDetachKernelDriver = disable;
+        if (disable) {
+            ret = RawDetachInterface(devHandle, interfaceIndex);
+        } else {
+            ret = RawAttachInterface(devHandle, interfaceIndex);
+        }
+        if (ret != HDF_SUCCESS) {
+            AdapterAtomicDec(&interfaceObj->refCount);
+            OsalMutexUnlock(&interfacePool->interfaceLock);
+            goto ERROR;
+        }
+        OsalMutexUnlock(&interfacePool->interfaceLock);
+    }
+    interfaceObj->session = realSession;
+
+    return (struct UsbInterface *)interfaceObj;
+ERROR:
+    (void)IfDestoryDevice(realSession, interfacePool, devHandle, true);
+    return NULL;
+}
+
 struct UsbInterface *UsbClaimInterfaceUnforce(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
 {

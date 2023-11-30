@@ -346,6 +346,23 @@ struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t
     uint8_t usbAddr, uint8_t interfaceIndex);
 
 /**
+ * @brief Obtains a USB interface object based on a specified interface index in force state.
+ *
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
+ * @param busNum Indicates the USB device bus number.
+ * @param usbAddr Indicates the USB device address.
+ * @param interfaceIndex Indicates the index of the interface object to be obtained. This parameter is defined in the
+ * <b>UsbInterfaceInfo</b> structure.
+ * The default index of the control interface is <b>0xFF</b>.
+ * @param diable Indicates the USB device manage policy.
+ * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b>
+ * otherwise.
+ */
+struct UsbInterface *UsbManageInterface(const struct UsbSession *session, uint8_t busNum,
+    uint8_t usbAddr, uint8_t interfaceIndex, bool disable);
+
+/**
  * @brief Releases a USB interface object.
  *
  * @param interfaceObj Indicates the pointer to the USB interface object to release.

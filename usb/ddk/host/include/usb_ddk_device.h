@@ -56,6 +56,8 @@ struct UsbDeviceHandle {
     uint32_t caps;
     int32_t fd;
     int32_t mmapFd;
+    uint64_t detachedInterfaces;
+    uint64_t attachedInterfaces;
 };
 
 #endif /* USB_DDK_DEVICE_H */
