@@ -23,9 +23,14 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
+MediaKeySystemCallbackService::MediaKeySystemCallbackService(OHOS::sptr<IMediaKeySystemCallback> callback)
+    : keySystemCallback_(callback)
+{}
+
 int32_t MediaKeySystemCallbackService::SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t> &data)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    keySystemCallback_->SendEvent(eventType, extra, data);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
