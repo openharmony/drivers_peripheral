@@ -88,17 +88,21 @@ void Test::Init()
     EXPECT_EQ(ret, 0);
 }
 
-void Test::Open()
+void Test::Open(int cameraId)
 {
     if (cameraDevice == nullptr) {
         EXPECT_NE(service, nullptr);
         service->GetCameraIds(cameraIds);
         EXPECT_NE(cameraIds.size(), 0);
-        GetCameraMetadata();
+        GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         EXPECT_NE(serviceV1_2, nullptr);
-        rc = serviceV1_2->OpenCamera_V1_1(cameraIds.front(), deviceCallback, cameraDeviceV1_1);
+        if (DEVICE_1 == cameraId) {
+            rc = serviceV1_2->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1);
+        } else {
+            rc = serviceV1_2->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1);
+        }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_1, nullptr);
         cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
@@ -106,17 +110,21 @@ void Test::Open()
     }
 }
 
-void Test::OpenCameraV1_2()
+void Test::OpenCameraV1_2(int cameraId)
 {
     if (cameraDevice == nullptr) {
         EXPECT_NE(service, nullptr);
         service->GetCameraIds(cameraIds);
         EXPECT_NE(cameraIds.size(), 0);
-        GetCameraMetadata();
+        GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
         EXPECT_NE(serviceV1_2, nullptr);
-        rc = serviceV1_2->OpenCameraV1_2(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
+        if (cameraId == DEVICE_1) {
+            rc = serviceV1_2->OpenCameraV1_2(cameraIds[1], deviceCallback, cameraDeviceV1_2);
+        } else {
+            rc = serviceV1_2->OpenCameraV1_2(cameraIds[0], deviceCallback, cameraDeviceV1_2);
+        }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_2, nullptr);
         cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
@@ -124,9 +132,13 @@ void Test::OpenCameraV1_2()
     }
 }
 
-void Test::GetCameraMetadata()
+void Test::GetCameraMetadata(int cameraId)
 {
-    rc = service->GetCameraAbility(cameraIds.front(), abilityVec);
+    if (DEVICE_1 == cameraId) {
+        rc = service->GetCameraAbility(cameraIds[1], abilityVec);
+    } else {
+        rc = service->GetCameraAbility(cameraIds[0], abilityVec);
+    }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
     }

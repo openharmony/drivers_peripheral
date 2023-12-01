@@ -50,14 +50,25 @@ enum ImageDataSaveSwitch {
     SWITCH_OFF,
     SWITCH_ON,
 };
+
+enum CameraIds {
+    DEVICE_0, // rear camera
+    DEVICE_1, // front camera
+    DEVICE_2,
+    DEVICE_3,
+    DEVICE_4,
+    DEVICE_5,
+    DEVICE_6,
+};
+
 using namespace OHOS::HDI::Camera::V1_0;
 class Test {
 public:
     void Init();
-    void Open();
-    void OpenCameraV1_2();
+    void Open(int cameraId);
+    void OpenCameraV1_2(int cameraId);
     void Close();
-    void GetCameraMetadata();
+    void GetCameraMetadata(int cameraId);
     void DefaultPreview(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultCapture(

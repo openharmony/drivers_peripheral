@@ -27,7 +27,7 @@ void CameraBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init();
-    cameraTest->OpenCameraV1_2();
+    cameraTest->OpenCameraV1_2(DEVICE_0);
 }
 
 void CameraBenchmarkTest::TearDown(const ::benchmark::State &state)

@@ -139,6 +139,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_003, TestSize.Level1)
     EXPECT_EQ(ret, true);
 
     string metaString = MetadataUtils::EncodeToString(metaData);
+    std::cout << "metaString: " << metaString << std::endl;
 }
 
 constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;

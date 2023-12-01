@@ -25,7 +25,7 @@ void CameraStreamUtTestV1_2::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init(); // assert inside
-    cameraTest->OpenCameraV1_2(); // assert inside
+    cameraTest->OpenCameraV1_2(DEVICE_0); // assert inside
 }
 
 void CameraStreamUtTestV1_2::TearDown(void)
