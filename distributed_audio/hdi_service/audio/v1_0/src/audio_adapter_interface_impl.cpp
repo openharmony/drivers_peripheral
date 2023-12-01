@@ -889,6 +889,7 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
     std::string val(dhIdItem->valuestring);
     if (!CheckIsNum(val)) {
         DHLOGE("String is not number. str:%s.", val.c_str());
+        cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
     vol = std::stoi(val);
