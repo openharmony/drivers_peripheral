@@ -901,7 +901,6 @@ int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
         HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-        devHandle->attachedInterfaces, interfaceNumber);
     if (((devHandle->attachedInterfaces) & (1U << interfaceNumber)) != 0) {
         return HDF_SUCCESS;
     }
