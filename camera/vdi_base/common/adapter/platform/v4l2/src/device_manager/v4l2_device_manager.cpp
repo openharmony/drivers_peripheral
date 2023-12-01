@@ -497,6 +497,18 @@ RetCode V4L2DeviceManager::ConvertEntryToOhos(std::shared_ptr<CameraMetadata> me
             ConvertAbilityVideoStabilizationModesToOhos(metadata);
             break;
         }
+        case OHOS_ABILITY_METER_MODES: {
+            ConvertAbilityMeterModesToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_AWB_MODES: {
+            ConvertAbilityAWBModesToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_EXPOSURE_TIME: {
+            ConvertAbilityExposureTimeToOhos(metadata, deviceControl);
+            break;
+        }
         default:
             CAMERA_LOGE("There is no corresponding tag transformation");
             break;
@@ -508,7 +520,10 @@ void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> meta
     const DeviceControl& deviceControl)
 {
     std::vector<uint8_t> lockModeVector;
+    std::vector<uint8_t> aeLockVector;
+    std::vector<uint8_t> awbLockVector;
     const int EXPOSURE_MASK = 1 << 0;
+    const int AWB_MASK = 1 << 1;
     const int FOCUS_MASK = 1 << 2;
     if (deviceControl.default_value & FOCUS_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_FOCUS_MODE_LOCKED);
@@ -518,6 +533,15 @@ void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> meta
     if (deviceControl.default_value & EXPOSURE_MASK) {
         lockModeVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_LOCKED);
         AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_MODES, lockModeVector);
+
+        aeLockVector.push_back(OHOS_CAMERA_AE_LOCK_ON);
+        aeLockVector.push_back(OHOS_CAMERA_AE_LOCK_OFF);
+        AddOrUpdateOhosTag(metadata, OHOS_ABILITY_AE_LOCK, aeLockVector);
+    }
+    if (deviceControl.default_value & AWB_MASK) {
+        awbLockVector.push_back(OHOS_CAMERA_AWB_LOCK_ON);
+        awbLockVector.push_back(OHOS_CAMERA_AWB_LOCK_OFF);
+        AddOrUpdateOhosTag(metadata, OHOS_ABILITY_AWB_LOCK, awbLockVector);
     }
 }
 
@@ -668,6 +692,54 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
                        streamAvailableExtendConfigurationsVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityMeterModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> abilityMeterModesVector;
+
+    if (deviceControl.id == V4L2_EXPOSURE_METERING_SPOT) {
+        abilityMeterModesVector.push_back(OHOS_CAMERA_SPOT_METERING);
+    } else if (deviceControl.id == V4L2_EXPOSURE_METERING_MATRIX) {
+        abilityMeterModesVector.push_back(OHOS_CAMERA_REGION_METERING);
+    } else if (deviceControl.id == V4L2_EXPOSURE_METERING_AVERAGE) {
+        abilityMeterModesVector.push_back(OHOS_CAMERA_OVERALL_METERING);
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_METER_MODES, abilityMeterModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityAWBModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> abilityAWBModesVector;
+
+    if (deviceControl.id == V4L2_WHITE_BALANCE_AUTO) {
+        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_AUTO);
+    } else if (deviceControl.id == V4L2_WHITE_BALANCE_MANUAL) {
+        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_OFF);
+    } else if (deviceControl.id == V4L2_WHITE_BALANCE_DAYLIGHT) {
+        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_DAYLIGHT);
+    } else if (deviceControl.id == V4L2_WHITE_BALANCE_CLOUDY) {
+        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT);
+    } else if (deviceControl.id == V4L2_WHITE_BALANCE_SHADE) {
+        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_SHADE);
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_AWB_MODES, abilityAWBModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityExposureTimeToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> abilityExposureTimeVector;
+
+    if (deviceControl.id == V4L2_CID_EXPOSURE_ABSOLUTE) {
+        abilityExposureTimeVector.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_TIME, abilityExposureTimeVector);
 }
 
 void V4L2DeviceManager::AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraMetadata> metadata,
