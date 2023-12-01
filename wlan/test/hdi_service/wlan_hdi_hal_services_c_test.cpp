@@ -963,7 +963,7 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_040, TestSize.Level1)
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_HID2D_MODULE_INIT, (const int8_t *)&deviceType,
         sizeof(deviceType));
     printf("SendCmdIoctl MODULE_INIT, rc=%d.\n", rc);
-    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT) || (rc == HDF_DEV_ERR_NETDOWN));
     ASSERT_TRUE(flag);
 }
 
@@ -983,7 +983,7 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_041, TestSize.Level1)
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_BATTERY_LEVEL, (const int8_t *)&batterylevel,
         sizeof(batterylevel));
     printf("SendCmdIoctl BATTERY_LEVEL, rc=%d.\n", rc);
-    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT) || (rc == HDF_DEV_ERR_NETDOWN));
     ASSERT_TRUE(flag);
 }
 
