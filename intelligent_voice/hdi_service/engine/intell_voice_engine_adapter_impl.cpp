@@ -19,8 +19,8 @@
 #include <vector>
 
 #include "hdf_base.h"
-#include "intell_voice_log.h"
 #include "securec.h"
+#include "intell_voice_log.h"
 #include "scope_guard.h"
 
 #undef HDF_LOG_TAG

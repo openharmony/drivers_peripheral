@@ -17,6 +17,7 @@
 #include <dlfcn.h>
 #include <cinttypes>
 #include "hdf_base.h"
+#include "securec.h"
 #include "intell_voice_log.h"
 #include "scope_guard.h"
 #include "intell_voice_engine_adapter_impl.h"
@@ -171,9 +172,9 @@ int32_t DataOprListener::OnDataOprEvent(IntellVoiceDataOprType type, const OprDa
 
     sptr<Ashmem> inMem = nullptr;
     if (type == ENCRYPT_TYPE) {
-        inMem = CreateAshmemFromOprData(inData, "EnryptInData");
+        inMem = CreateAshmemFromOprData(inData, "EnryptInIntellVoiceData");
     } else if (type == DECRYPT_TYPE) {
-        inMem = CreateAshmemFromOprData(inData, "DeryptInData");
+        inMem = CreateAshmemFromOprData(inData, "DeryptInIntellVoiceData");
     } else {
         INTELLIGENT_VOICE_LOGE("invalid type:%{public}d", type);
         return HDF_FAILURE;
