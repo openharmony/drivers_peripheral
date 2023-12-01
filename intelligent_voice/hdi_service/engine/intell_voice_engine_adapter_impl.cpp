@@ -131,14 +131,20 @@ int32_t IntellVoiceEngineAdapterImpl::Read(ContentType type, sptr<Ashmem> &buffe
 
     if (!buffer->MapReadAndWriteAshmem()) {
         INTELLIGENT_VOICE_LOGE("failed to map and write ashmem");
-        return HDF_FAILURE;
+        goto ERROR_EXIT;
     }
 
     if (!buffer->WriteToAshmem(tmp, size, 0)) {
         INTELLIGENT_VOICE_LOGE("failed to write to ashmem");
-        return HDF_FAILURE;
+        goto ERROR_EXIT;
     }
     return HDF_SUCCESS;
+
+ERROR_EXIT:
+    buffer->UnmapAshmem();
+    buffer->CloseAshmem();
+    buffer = nullptr;
+    return HDF_FAILURE;
 }
 
 int32_t IntellVoiceEngineAdapterImpl::ReadFileDataInner(ContentType type, uint8_t *&buffer, uint32_t &size)
