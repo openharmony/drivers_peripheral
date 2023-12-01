@@ -12,6 +12,9 @@
     "component": {
       "name": "drivers_peripheral_power",
       "subsystem": "hdf",
+      "features": [
+        "drivers_peripheral_power_wakeup_cause_path"
+      ],
       "adapted_system_type": ["standard", "small"],
       "rom": "981KB",
       "ram": "6000KB",
