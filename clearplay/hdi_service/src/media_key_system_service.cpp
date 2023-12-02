@@ -117,9 +117,12 @@ int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string &defaultUrl,
     std::string requestData = "{\"signedRequest\":\"KEYREQUESTTYPE_DOWNLOADCERT\"}";
     size_t requestDataLen = requestData.size();
     request.assign(requestData.c_str(), requestData.c_str() + requestDataLen);
-    std::string eventData = "PROVISIONRE QUIRED";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_PROVISIONREQUIRED, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "PROVISIONRE QUIRED";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_PROVISIONREQUIRED, 0, data);
+    }
+
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -277,9 +280,11 @@ int32_t MediaKeySystemService::CloseKeySessionService(sptr<MediaKeySessionServic
     }
     mediaKeySessionMap_.erase(it);
     mediaKeySessionMutex_.unlock();
-    std::string eventData = "KEYSESSION LOST";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_KEYSESSION_LOST, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "KEYSESSION LOST";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_KEYSESSION_LOST, 0, data);
+    }
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
