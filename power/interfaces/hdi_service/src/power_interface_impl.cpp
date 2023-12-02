@@ -358,17 +358,17 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
         return HDF_FAILURE;
     }
 
-    std::string setPath{""};
+    std::string getPath{""};
     std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
     if (it != sceneConfigMap.end()) {
-        setPath = (it -> second).setPath;
-        HDF_LOGI("setPath = %{public}s", setPath.c_str());
+        getPath = (it -> second).getPath;
+        HDF_LOGI("getPath = %{public}s", getPath.c_str());
     } else {
-        HDF_LOGW("wakeuo_cause setPath does not exist");
+        HDF_LOGW("wakeuo_cause getPath does not exist");
         return HDF_FAILURE;
     }
 
-    UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(setPath.c_str(), O_RDONLY | O_CLOEXEC)));
+    UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
     if (wakeupCauseFd < 0) {
         return HDF_FAILURE;
     }
