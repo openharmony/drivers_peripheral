@@ -17,7 +17,9 @@
 #include <dlfcn.h>
 #include <cinttypes>
 #include "hdf_base.h"
+#include "securec.h"
 #include "intell_voice_log.h"
+#include "scope_guard.h"
 #include "intell_voice_engine_adapter_impl.h"
 
 #undef HDF_LOG_TAG
@@ -131,6 +133,142 @@ int32_t IntellVoiceEngineManagerImpl::ReleaseAdapter(const IntellVoiceEngineAdap
 
     it->second = nullptr;
     adapters_.erase(it);
+    return HDF_SUCCESS;
+}
+
+int32_t IntellVoiceEngineManagerImpl::SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback>& dataOprCallback)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
+        return HDF_FAILURE;
+    }
+
+    std::shared_ptr<DataOprListener> listener = std::make_shared<DataOprListener>(dataOprCallback);
+    if (listener == nullptr) {
+        INTELLIGENT_VOICE_LOGE("listener is nullptr");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+
+    return inst_->SetDataOprListener(listener);
+}
+
+DataOprListener::DataOprListener(sptr<IIntellVoiceDataOprCallback> cb) : cb_(cb)
+{
+}
+
+DataOprListener::~DataOprListener()
+{
+    cb_ = nullptr;
+}
+
+int32_t DataOprListener::OnDataOprEvent(IntellVoiceDataOprType type, const OprDataInfo &inData, OprDataInfo &outData)
+{
+    if (cb_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("cb is nullptr");
+        return HDF_FAILURE;
+    }
+
+    sptr<Ashmem> inMem = nullptr;
+    if (type == ENCRYPT_TYPE) {
+        inMem = CreateAshmemFromOprData(inData, "EnryptInIntellVoiceData");
+    } else if (type == DECRYPT_TYPE) {
+        inMem = CreateAshmemFromOprData(inData, "DeryptInIntellVoiceData");
+    } else {
+        INTELLIGENT_VOICE_LOGE("invalid type:%{public}d", type);
+        return HDF_FAILURE;
+    }
+
+    if (inMem == nullptr) {
+        INTELLIGENT_VOICE_LOGE("failed to create ashmem");
+        return HDF_FAILURE;
+    }
+
+    sptr<Ashmem> outMem = nullptr;
+    ON_SCOPE_EXIT {
+        if (outMem != nullptr) {
+            INTELLIGENT_VOICE_LOGI("clear ashmem");
+            outMem->UnmapAshmem();
+            outMem->CloseAshmem();
+        }
+    };
+
+    int32_t ret = cb_->OnIntellVoiceDataOprEvent(type, inMem, outMem);
+    if (ret != HDF_SUCCESS) {
+        INTELLIGENT_VOICE_LOGE("data opr failed");
+        return HDF_FAILURE;
+    }
+
+    return FillOprDataFromAshmem(outMem, outData);
+}
+
+sptr<Ashmem> DataOprListener::CreateAshmemFromOprData(const OprDataInfo &data, const std::string &name)
+{
+    if ((data.data == nullptr) || (data.size == 0)) {
+        INTELLIGENT_VOICE_LOGE("data is empty");
+        return nullptr;
+    }
+
+    sptr<Ashmem> ashmem = OHOS::Ashmem::CreateAshmem(name.c_str(), data.size);
+    if (ashmem == nullptr) {
+        INTELLIGENT_VOICE_LOGE("failed to create ashmem");
+        return nullptr;
+    }
+
+    ON_SCOPE_EXIT {
+        ashmem->UnmapAshmem();
+        ashmem->CloseAshmem();
+        ashmem = nullptr;
+    };
+
+    if (!ashmem->MapReadAndWriteAshmem()) {
+        INTELLIGENT_VOICE_LOGE("failed to map ashmem");
+        return nullptr;
+    }
+
+    if (!ashmem->WriteToAshmem(data.data.get(), data.size, 0)) {
+        INTELLIGENT_VOICE_LOGE("failed to write ashmem");
+        return nullptr;
+    }
+
+    CANCEL_SCOPE_EXIT;
+    INTELLIGENT_VOICE_LOGI("create ashmem success,  size:%{public}u", data.size);
+    return ashmem;
+}
+
+int32_t DataOprListener::FillOprDataFromAshmem(const sptr<Ashmem> &ashmem, OprDataInfo &data)
+{
+    if (ashmem == nullptr) {
+        INTELLIGENT_VOICE_LOGE("ashmem is nullptr");
+        return HDF_FAILURE;
+    }
+
+    uint32_t size = static_cast<uint32_t>(ashmem->GetAshmemSize());
+    if (size == 0) {
+        INTELLIGENT_VOICE_LOGE("size is zero");
+        return HDF_FAILURE;
+    }
+
+    if (!ashmem->MapReadOnlyAshmem()) {
+        INTELLIGENT_VOICE_LOGE("map ashmem failed");
+        return HDF_FAILURE;
+    }
+
+    const uint8_t *mem = static_cast<const uint8_t *>(ashmem->ReadFromAshmem(size, 0));
+    if (mem == nullptr) {
+        INTELLIGENT_VOICE_LOGE("read from ashmem failed");
+        return HDF_FAILURE;
+    }
+
+    data.data = std::shared_ptr<char>(new char[size], [](char *p) { delete[] p; });
+    if (data.data == nullptr) {
+        INTELLIGENT_VOICE_LOGE("allocate data failed");
+        return HDF_FAILURE;
+    }
+
+    (void)memcpy_s(data.data.get(), size, mem, size);
+    data.size = size;
     return HDF_SUCCESS;
 }
 }

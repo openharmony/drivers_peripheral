@@ -27,6 +27,7 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::StartInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
+using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceDataOprType;
 
 using IntellVoiceStatus = int32_t;
 
@@ -38,6 +39,18 @@ public:
     IEngineCallback() = default;
     virtual ~IEngineCallback() = default;
     virtual void OnIntellVoiceEvent(const IntellVoiceEngineCallBackEvent &event) = 0;
+};
+
+struct OprDataInfo {
+    std::shared_ptr<char> data = nullptr;
+    uint32_t size = 0;
+};
+
+class IDataOprListener {
+public:
+    IDataOprListener() = default;
+    virtual ~IDataOprListener() = default;
+    virtual int32_t OnDataOprEvent(IntellVoiceDataOprType type, const OprDataInfo &inData, OprDataInfo &outData) = 0;
 };
 
 class IEngine {
@@ -61,6 +74,7 @@ public:
     virtual int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor,
         std::unique_ptr<IEngine> &engine) = 0;
     virtual int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor) = 0;
+    virtual int32_t SetDataOprListener(std::shared_ptr<IDataOprListener> listener) = 0;
 };
 }
 }
