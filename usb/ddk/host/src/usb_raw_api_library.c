@@ -867,6 +867,58 @@ int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t inter
     return ret;
 }
 
+int32_t RawDetachInterface(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+
+    if (devHandle == NULL || interfaceNumber >= USB_MAXINTERFACES || osAdapterOps->claimInterface == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("devHandle->detachedInterfaces = %{public}llu, interfaceNumber = %{public}u",
+        devHandle->detachedInterfaces, interfaceNumber);
+    if (((devHandle->detachedInterfaces) & (1U << interfaceNumber)) != 0) {
+        return HDF_SUCCESS;
+    }
+
+    OsalMutexLock(&devHandle->lock);
+    int32_t ret = osAdapterOps->detachKernelDriver(devHandle, interfaceNumber);
+    if (ret >= 0) {
+        devHandle->detachedInterfaces |= 1U << interfaceNumber;
+        devHandle->attachedInterfaces = 0;
+        OsalMutexUnlock(&devHandle->lock);
+        return HDF_SUCCESS;
+    }
+    OsalMutexUnlock(&devHandle->lock);
+    return HDF_FAILURE;
+}
+
+int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+
+    if (devHandle == NULL || interfaceNumber >= USB_MAXINTERFACES || osAdapterOps->claimInterface == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("devHandle->attachedInterfaces = %{public}llu, interfaceNumber = %{public}u",
+        devHandle->attachedInterfaces, interfaceNumber);
+    if (((devHandle->attachedInterfaces) & (1U << interfaceNumber)) != 0) {
+        return HDF_SUCCESS;
+    }
+
+    OsalMutexLock(&devHandle->lock);
+    int32_t ret = osAdapterOps->attachKernelDriver(devHandle, interfaceNumber);
+    if (ret >= 0) {
+        devHandle->attachedInterfaces |= 1U << interfaceNumber;
+        devHandle->detachedInterfaces = 0;
+        OsalMutexUnlock(&devHandle->lock);
+        return HDF_SUCCESS;
+    }
+    OsalMutexUnlock(&devHandle->lock);
+    return HDF_FAILURE;
+}
+
 struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, size_t length)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();

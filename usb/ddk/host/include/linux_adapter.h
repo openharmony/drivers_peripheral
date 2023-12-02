@@ -132,7 +132,8 @@ struct UsbOsAdapterOps {
     int32_t (*cancelRequest)(struct UsbHostRequest *request);
     int32_t (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
     int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
-    void (*attachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    int32_t (*attachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    int32_t (*detachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
 };
 #ifdef __cplusplus
 extern "C" {

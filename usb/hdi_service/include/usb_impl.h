@@ -54,6 +54,7 @@ public:
     int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex) override;
     int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force) override;
     int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId) override;
+    int32_t ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable) override;
     int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex) override;
     int32_t BulkTransferRead(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data) override;
