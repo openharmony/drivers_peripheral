@@ -1872,4 +1872,150 @@ HWTEST_F(UsbdRequestTest, BulkCancel005, TestSize.Level1)
     HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
 }
+
+/**
+ * @tc.name: UsbdManageInterface001
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface001, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface001 %{public}d ManageInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdManageInterface002
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, busNum error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface002, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = dev_;
+    dev.busNum = BUS_NUM_INVALID;
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface002 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface003
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, devAddr error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface003, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface003 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface004
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, interfaceid error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface004, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = dev_;
+    interfaceId = INTERFACEID_INVALID;
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface004 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface005
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface005, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface005 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface006
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, busNum && interfaceid error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface006, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_INVALID;
+    struct UsbDev dev = {BUS_NUM_INVALID, dev_.devAddr};
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface006 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface007
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, devAddr && interfaceid error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface007, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_INVALID;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface007 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface008
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceid error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface008, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_INVALID;
+    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, true);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface008 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdManageInterface001
+ * @tc.desc: Test functions to ManageInterface
+ * @tc.desc: int32_t  ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool disable);
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdRequestTest, UsbdManageInterface009, TestSize.Level1)
+{
+    uint8_t interfaceId = INTERFACEID_OK;
+    struct UsbDev dev = dev_;
+    auto ret = g_usbInterface->ManageInterface(dev, interfaceId, false);
+    HDF_LOGI("UsbdRequestTest::UsbdManageInterface00 %{public}d ManageInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
 } // namespace
