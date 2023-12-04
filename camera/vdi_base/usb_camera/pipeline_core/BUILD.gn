@@ -49,6 +49,11 @@ config("pipe_config") {
   ]
 }
 
+# weak dependency of ffmpeg
+config("weak_ffmpeg") {
+  defines = [ "DEVICE_USAGE_FFMPEG_ENABLE" ]
+}
+
 ohos_shared_library("usb_camera_pipeline_core") {
   sources = [
     "$camera_path_usb/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
@@ -123,7 +128,6 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_vdi/adapter/platform/v4l2/src/driver_adapter/include/",
     "src/node",
     "$third_path/libexif",
-    "$third_path/ffmpeg",
     "$camera_path_vdi/dump/include",
     "$camera_path_vdi/../interfaces",
   ]
@@ -135,7 +139,6 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_usb/device_manager:usb_camera_device_manager",
     "$camera_path_usb/metadata_manager:usb_camera_metadata_manager",
     "$camera_path_vdi/utils:peripheral_camera_utils",
-    "$third_path/ffmpeg:libohosffmpeg",
     "$third_path/libjpeg-turbo:turbojpeg_static",
   ]
 
@@ -154,6 +157,12 @@ ohos_shared_library("usb_camera_pipeline_core") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_camera"
+
+  if (device_usb_camera_ffmpeg_enable) {
+    deps += [ "$third_path/ffmpeg:libohosffmpeg" ]
+    include_dirs += [ "$third_path/ffmpeg" ]
+    configs = [ ":weak_ffmpeg" ]
+  }
 }
 
 config("example_config") {
