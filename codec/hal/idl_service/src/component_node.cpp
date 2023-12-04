@@ -21,6 +21,7 @@
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"
+#include "hitrace_meter.h"
 
 using OHOS::HDI::Codec::V2_0::EventInfo;
 using OHOS::HDI::Codec::V2_0::CodecEventType;
@@ -305,6 +306,7 @@ int32_t ComponentNode::OnEvent(CodecEventType event, uint32_t data1, uint32_t da
     }
     (void)eventData;
     EventInfo info = {.appData = appData_, .data1 = data1, .data2 = data2};
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnEvent");
     (void)omxCallback_->EventHandler(event, info);
 
     return OMX_ErrorNone;
@@ -322,6 +324,7 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
         return OMX_ErrorNone;
     }
     OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnEmptyBufferDone");
     (void)omxCallback_->EmptyBufferDone(appData_, codecOmxBuffer);
     return OMX_ErrorNone;
 }
@@ -340,6 +343,7 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     }
 
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnFillBufferDone");
     (void)omxCallback_->FillBufferDone(appData_, codecOmxBuffer);
     return OMX_ErrorNone;
 }
