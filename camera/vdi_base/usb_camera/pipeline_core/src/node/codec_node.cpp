@@ -18,9 +18,11 @@
 extern "C" {
 #include <jpeglib.h>
 #include <transupp.h>
+#ifdef DEVICE_USAGE_FFMPEG_ENABLE
 #include "libavutil/frame.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
+#endif // DEVICE_USAGE_FFMPEG_ENABLE
 }
 
 namespace OHOS::Camera {
