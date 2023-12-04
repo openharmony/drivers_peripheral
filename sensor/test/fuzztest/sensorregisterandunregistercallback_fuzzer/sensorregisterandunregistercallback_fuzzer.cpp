@@ -16,20 +16,20 @@
 #include "sensorregisterandunregistercallback_fuzzer.h"
 #include "hdf_base.h"
 #include "sensor_impl.h"
-#include "v1_1/isensor_interface.h"
+#include "v2_0/isensor_interface.h"
 
-using namespace OHOS::HDI::Sensor::V1_1;
+using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 int32_t SensorRegisterAndUnregisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
 {
     (void)event;
     return HDF_SUCCESS;
 }
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

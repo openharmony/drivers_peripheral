@@ -30,7 +30,7 @@ constexpr int ENABLE_SENSOR = 1;
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 SensorIfService::SensorIfService()
 {
     int32_t ret = GetSensorVdiImpl();
@@ -48,7 +48,7 @@ SensorIfService::~SensorIfService()
 
 int32_t SensorIfService::GetSensorVdiImpl()
 {
-    struct WrapperSensorVdi *wrapperSensorVdi = nullptr;
+    struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *wrapperSensorVdi = nullptr;
     uint32_t version = 0;
     vdi_ = HdfLoadVdi(HDI_SENSOR_VDI_LIBNAME);
     if (vdi_ == nullptr || vdi_->vdiBase == nullptr) {
@@ -62,7 +62,7 @@ int32_t SensorIfService::GetSensorVdiImpl()
         return HDF_FAILURE;
     }
 
-    wrapperSensorVdi = reinterpret_cast<struct WrapperSensorVdi *>(vdi_->vdiBase);
+    wrapperSensorVdi = reinterpret_cast<struct OHOS::HDI::Sensor::V1_1::WrapperSensorVdi *>(vdi_->vdiBase);
     sensorVdiImpl_ = wrapperSensorVdi->sensorModule;
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor impl failed", __func__);
@@ -94,7 +94,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         return HDF_FAILURE;
     }
 
-    std::vector<HdfSensorInformationVdi> sensorInfoVdi = {};
+    std::vector<OHOS::HDI::Sensor::V1_1::HdfSensorInformationVdi> sensorInfoVdi = {};
     StartTrace(HITRACE_TAG_HDF, "GetAllSensorInfo");
     int32_t ret = sensorVdiImpl_->GetAllSensorInfo(sensorInfoVdi);
     if (ret != SENSOR_SUCCESS) {
@@ -122,6 +122,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         sensorInfo.minDelay = it.minDelay;
         sensorInfo.maxDelay = it.maxDelay;
         info.push_back(std::move(sensorInfo));
+        sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
     }
 
     return HDF_SUCCESS;

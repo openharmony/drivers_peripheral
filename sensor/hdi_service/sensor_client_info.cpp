@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 
 SensorClientInfo::SensorClientInfo()
 {
@@ -38,7 +38,7 @@ sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
     return pollCallback_;
 }
 
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

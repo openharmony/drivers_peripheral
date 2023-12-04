@@ -17,14 +17,14 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "v1_1/sensor_interface_stub.h"
+#include "v2_0/sensor_interface_stub.h"
 
-using namespace OHOS::HDI::Sensor::V1_1;
+using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-const std::u16string SENSOR_INTERFACE_TOKEN = u"ohos.hdi.sensor.v1_1.ISensorInterface";
+const std::u16string SENSOR_INTERFACE_TOKEN = u"ohos.hdi.sensor.v2_0.ISensorInterface";
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
 {
