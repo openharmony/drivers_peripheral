@@ -51,9 +51,11 @@ int32_t MediaKeySessionService::GenerateLicenseRequest(const LicenseRequestInfo 
     int32_t ret = HDF_SUCCESS;
     licenseRequest.requestType = REQUEST_TYPE_INITIAL;
     licenseRequest.mDefaultUrl = "http://default.com";
-    std::string eventData = "KEY NEEDED";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_KEYNEEDED, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "KEY NEEDED";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_KEYNEEDED, 0, data);
+    }
     ret = session_->getKeyRequest(licenseRequestInfo.initData, licenseRequestInfo.mimeType,
         licenseRequestInfo.licenseType, licenseRequestInfo.optionalData, &licenseRequest.mData);
     HDF_LOGI("%{public}s: end", __func__);
@@ -64,9 +66,11 @@ int32_t MediaKeySessionService::ProcessLicenseResponse(const std::vector<uint8_t
     std::vector<uint8_t> &licenseId)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    std::string eventData = "KEY CHANGE";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_KEYCHANGE, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "KEY CHANGE";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_KEYCHANGE, 0, data);
+    }
     licenseId.clear();
     size_t commaPos = 0;
     std::vector<std::vector<uint8_t>> keyIdAndValuePairs;
@@ -102,7 +106,7 @@ int32_t MediaKeySessionService::ProcessLicenseResponse(const std::vector<uint8_t
 
         std::vector<uint8_t> localKeyId(keyIdString.begin(), keyIdString.end());
         std::vector<uint8_t> value(keyValueString.begin(), keyValueString.end());
-
+        licenseId.assign(localKeyId.begin(), localKeyId.end());
         int32_t ret = session_->setKeyIdAndKeyValue(localKeyId, value);
         if (ret != HDF_SUCCESS) {
             return ret;
@@ -146,9 +150,11 @@ int32_t MediaKeySessionService::RemoveLicense()
     if (session_->keyIdAndKeyValue_.size() != 0) {
         return HDF_FAILURE;
     }
-    std::string eventData = "KEY EXPIRED";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_KEYEXPIRED, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "KEY EXPIRED";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_KEYEXPIRED, 0, data);
+    }
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -174,6 +180,8 @@ int32_t MediaKeySessionService::ProcessOfflineReleaseResponse(const std::vector<
     const std::vector<uint8_t> &response)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    std::string releaseResponseData(response.begin(), response.end());
+    HDF_LOGI("%{public}s: response: %{public}s", __func__, releaseResponseData.c_str());
     offlineKeyMutex_.lock();
     int32_t ret = GetOfflineKeyFromFile();
     if (ret != HDF_SUCCESS) {
@@ -185,11 +193,9 @@ int32_t MediaKeySessionService::ProcessOfflineReleaseResponse(const std::vector<
     auto it = offlineKeyIdAndKeyValueBase64_.find(keyIdBase64);
     if (it != offlineKeyIdAndKeyValueBase64_.end()) {
         offlineKeyIdAndKeyValueBase64_.erase(it);
-        ret = SetOfflineKeyToFile();
-        if (ret != HDF_SUCCESS) {
-            offlineKeyMutex_.unlock();
-            return ret;
-        }
+        std::string tmpValue = "";
+        std::vector<uint8_t> value(tmpValue.begin(), tmpValue.end());
+        session_->setKeyIdAndKeyValue(licenseId, value);
         offlineKeyMutex_.unlock();
         HDF_LOGI("%{public}s: end", __func__);
         return HDF_SUCCESS;
@@ -224,9 +230,11 @@ int32_t MediaKeySessionService::RestoreOfflineLicense(const std::vector<uint8_t>
     std::vector<uint8_t> value(keyValueString.begin(), keyValueString.end());
     offlineKeyIdAndKeyValueBase64_.clear();
     offlineKeyMutex_.unlock();
-    std::string eventData = "KEY EXPIRATION UPDATE";
-    std::vector<uint8_t> data(eventData.begin(), eventData.end());
-    vdiCallbackObj->SendEvent(EVENTTYPE_EXPIRATIONUPDATE, 0, data);
+    if (vdiCallbackObj != nullptr) {
+        std::string eventData = "KEY EXPIRATION UPDATE";
+        std::vector<uint8_t> data(eventData.begin(), eventData.end());
+        vdiCallbackObj->SendEvent(EVENTTYPE_EXPIRATIONUPDATE, 0, data);
+    }
     HDF_LOGI("%{public}s: end", __func__);
     return session_->setKeyIdAndKeyValue(licenseId, value);
 }
@@ -362,6 +370,7 @@ int32_t MediaKeySessionService::SetOfflineKeyToFile()
     }
     for (auto &keyIdValueBase64Pair : offlineKeyIdAndKeyValueBase64_) {
         fprintf(offlineKeyFile, "%s %s\n", keyIdValueBase64Pair.first.c_str(), keyIdValueBase64Pair.second.c_str());
+        fflush(offlineKeyFile);
     }
     offlineKeyIdAndKeyValueBase64_.clear();
     fclose(offlineKeyFile);
