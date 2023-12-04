@@ -20,6 +20,7 @@
 #include <malloc.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
+#include "hitrace_meter.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -62,11 +63,13 @@ void CodecComponentService::ReleaseCache()
 
 int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetComponentVersion");
     return node_->GetComponentVersion(verInfo);
 }
 
 int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSendCommand");
     CODEC_LOGI("commandType: [%{public}d], command [%{public}d]", cmd, param);
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
 }
@@ -74,6 +77,7 @@ int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param,
 int32_t CodecComponentService::GetParameter(uint32_t index, const std::vector<int8_t> &inParamStruct,
                                             std::vector<int8_t> &outParamStruct)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetParameter");
     CODEC_LOGI("index [%{public}x]", index);
     outParamStruct = inParamStruct;
     return node_->GetParameter(static_cast<enum OMX_INDEXTYPE>(index), outParamStruct.data());
@@ -81,6 +85,7 @@ int32_t CodecComponentService::GetParameter(uint32_t index, const std::vector<in
 
 int32_t CodecComponentService::SetParameter(uint32_t index, const std::vector<int8_t> &paramStruct)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetParameter");
     CODEC_LOGI("index [%{public}x]", index);
     return node_->SetParameter(static_cast<enum OMX_INDEXTYPE>(index), paramStruct.data());
 }
@@ -88,6 +93,7 @@ int32_t CodecComponentService::SetParameter(uint32_t index, const std::vector<in
 int32_t CodecComponentService::GetConfig(uint32_t index, const std::vector<int8_t> &inCfgStruct,
                                          std::vector<int8_t> &outCfgStruct)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetConfig");
     CODEC_LOGI("index [%{public}x]", index);
     outCfgStruct = inCfgStruct;
     return node_->GetConfig(static_cast<enum OMX_INDEXTYPE>(index), outCfgStruct.data());
@@ -95,18 +101,21 @@ int32_t CodecComponentService::GetConfig(uint32_t index, const std::vector<int8_
 
 int32_t CodecComponentService::SetConfig(uint32_t index, const std::vector<int8_t> &cfgStruct)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetConfig");
     CODEC_LOGI("index [%{public}x]", index);
     return node_->SetConfig(static_cast<enum OMX_INDEXTYPE>(index), cfgStruct.data());
 }
 
 int32_t CodecComponentService::GetExtensionIndex(const std::string &paramName, uint32_t &indexType)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetExtensionIndex");
     CODEC_LOGI("paramName [%{public}s]", paramName.c_str());
     return node_->GetExtensionIndex(paramName.c_str(), indexType);
 }
 
 int32_t CodecComponentService::GetState(CodecStateType &state)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecGetState");
     return node_->GetState(state);
 }
 
@@ -114,6 +123,7 @@ int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tun
                                                       const CodecTunnelSetupType &inTunnelSetup,
                                                       CodecTunnelSetupType &outTunnelSetup)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentTunnelRequest");
     CODEC_LOGI("port [%{public}d]", port);
     outTunnelSetup = inTunnelSetup;
     return node_->ComponentTunnelRequest(port, tunneledComp, tunneledPort, outTunnelSetup);
@@ -121,6 +131,7 @@ int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tun
 
 int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseBuffer");
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
     outBuffer = const_cast<OmxCodecBuffer &>(inBuffer);
     if (outBuffer.fd >= 0 && !isIPCMode_ && outBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
@@ -139,6 +150,7 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
 int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer,
                                               OmxCodecBuffer &outBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecAllocateBuffer");
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
     outBuffer = inBuffer;
     return node_->AllocateBuffer(portIndex, outBuffer);
@@ -146,6 +158,7 @@ int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodec
 
 int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecFreeBuffer");
     OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
     int32_t ret = node_->FreeBuffer(portIndex, buffer);
@@ -160,6 +173,7 @@ int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuff
 
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecEmptyThisBuffer");
     OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     int32_t ret = node_->EmptyThisBuffer(bufferTemp);
     if (isIPCMode_ && bufferTemp.fd >= 0) {
@@ -172,6 +186,7 @@ int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 
 int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecFillThisBuffer");
     OmxCodecBuffer &bufferTemp = const_cast<OmxCodecBuffer &>(buffer);
     int32_t ret = node_->FillThisBuffer(bufferTemp);
     if (isIPCMode_ && bufferTemp.fd >= 0) {
@@ -184,6 +199,7 @@ int32_t CodecComponentService::FillThisBuffer(const OmxCodecBuffer &buffer)
 
 int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callbacks, int64_t appData)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetCallbacks");
     CODEC_LOGI("service impl!");
     CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
     return node_->SetCallbacks(callbacks, appData);
@@ -191,6 +207,7 @@ int32_t CodecComponentService::SetCallbacks(const sptr<ICodecCallback> &callback
 
 int32_t CodecComponentService::ComponentDeInit()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentDeInit");
     CODEC_LOGI("service impl!");
     return node_->ComponentDeInit();
 }
@@ -198,6 +215,7 @@ int32_t CodecComponentService::ComponentDeInit()
 int32_t CodecComponentService::UseEglImage(uint32_t portIndex, const OmxCodecBuffer &inBuffer,
                                            OmxCodecBuffer &outBuffer, const std::vector<int8_t> &eglImage)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseEglImage");
     CODEC_LOGI("portIndex [%{public}d]", portIndex);
     outBuffer = inBuffer;
     return node_->UseEglImage(outBuffer, portIndex, eglImage.data());
@@ -205,12 +223,14 @@ int32_t CodecComponentService::UseEglImage(uint32_t portIndex, const OmxCodecBuf
 
 int32_t CodecComponentService::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecComponentRoleEnum");
     CODEC_LOGI("index [%{public}d]", index);
     return node_->ComponentRoleEnum(role, index);
 }
 
 void CodecComponentService::SetComponentRole()
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSetComponentRole");
     if (name_ == "") {
         CODEC_LOGE("compName is null");
         return;
