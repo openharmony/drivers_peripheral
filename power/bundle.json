@@ -28,7 +28,8 @@
           "ipc"
         ],
         "third_party": [
-          "libxml2"
+          "libxml2",
+          "jsoncpp"
         ]
       },
       "build": {
