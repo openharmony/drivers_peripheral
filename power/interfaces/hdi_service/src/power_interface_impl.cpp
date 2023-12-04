@@ -40,6 +40,10 @@
 #include <thread>
 #include <unistd.h>
 
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+#include "power_config.h"
+#endif
+
 namespace OHOS {
 namespace HDI {
 namespace Power {
