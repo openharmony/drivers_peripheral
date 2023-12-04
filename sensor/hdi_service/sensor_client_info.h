@@ -18,13 +18,13 @@
 
 #include <mutex>
 #include <unordered_map>
-#include "v1_1/isensor_interface.h"
+#include "v2_0/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 
 class SensorClientInfo {
 public:
@@ -38,7 +38,7 @@ private:
     sptr<ISensorCallback> pollCallback_;
 };
 
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

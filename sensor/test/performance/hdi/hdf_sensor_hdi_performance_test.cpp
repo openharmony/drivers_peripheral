@@ -19,11 +19,11 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_1/sensor_interface_proxy.h"
+#include "v2_0/sensor_interface_proxy.h"
 #include "sensor_callback_impl.h"
 
 using namespace testing::ext;
-using namespace OHOS::HDI::Sensor::V1_1;
+using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace {
     const int32_t SENSOR_ID = 0;
