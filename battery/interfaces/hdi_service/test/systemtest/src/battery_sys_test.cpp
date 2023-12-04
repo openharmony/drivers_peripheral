@@ -15,15 +15,6 @@
 
 #include "battery_sys_test.h"
 
-#include <cmath>
-#include <csignal>
-#include <hisysevent.h>
-#include <if_system_ability_manager.h>
-#include <iostream>
-#include <ipc_skeleton.h>
-#include <iservice_registry.h>
-#include <unistd.h>
-
 #include "battery_config.h"
 #include "battery_log.h"
 
