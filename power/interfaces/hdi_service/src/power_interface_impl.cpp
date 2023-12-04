@@ -44,7 +44,6 @@
 #include "power_config.h"
 #endif
 
-
 namespace OHOS {
 namespace HDI {
 namespace Power {
