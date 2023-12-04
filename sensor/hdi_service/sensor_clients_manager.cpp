@@ -133,6 +133,7 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
     sensorUsed_[sensorId].erase(serviceId);
     if (sensorUsed_[sensorId].empty()) {
         sensorUsed_.erase(sensorId);
+        sensorConfig_.erase(sensorId);
         HDF_LOGI("%{public}s: disabled sensor %{public}d", __func__, sensorId);
         return true;
     }
