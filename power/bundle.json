@@ -21,6 +21,7 @@
       "deps": {
         "components": [
           "c_utils",
+          "config_policy",
           "drivers_interface_power",
           "hdf_core",
           "hilog", 
