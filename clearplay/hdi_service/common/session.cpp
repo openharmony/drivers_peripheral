@@ -73,6 +73,10 @@ int32_t Session::getKeyValueByKeyId(const std::vector<uint8_t> &keyId, std::vect
 {
     for (auto &idValuePair : keyIdAndKeyValue_) {
         if (idValuePair.first == keyId) {
+            if (idValuePair.second.size() == 0) {
+                HDF_LOGE("bbb--%{public}s: key has release.", __func__);
+                return HDF_FAILURE;
+            }
             keyValue = idValuePair.second;
             return HDF_SUCCESS;
         }
