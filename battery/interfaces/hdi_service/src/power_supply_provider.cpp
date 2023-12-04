@@ -87,7 +87,7 @@ inline void PowerSupplyProvider::Trim(char* str)
     }
 
     size_t strc = strcspn(str, "\n");
-    if (strc < 0 || strc >= strlen(str)) {
+    if (strc >= strlen(str)) {
         return;
     }
 
