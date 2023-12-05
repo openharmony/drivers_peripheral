@@ -29,9 +29,9 @@ const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
 const int32_t AUDIO_RENDER_CHANNELCOUNT = 6;
 const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
 const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
-const int32_t MMAP_SUGGEST_BUFFER_SIZE = 1920;
+const int32_t MULTCHANNEL_SUGGEST_BUFFER_SIZE = 1920;
 
-class AudioUtRenderMmapTest : public testing::Test {
+class AudioUtRenderMultchannelTest : public testing::Test {
 public:
     struct IAudioManager *manager_ = nullptr;
     struct AudioAdapterDescriptor descs_[MAX_AUDIO_ADAPTER_DESC];
@@ -51,7 +51,7 @@ public:
     void ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen);
 };
 
-void AudioUtRenderMmapTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
+void AudioUtRenderMultchannelTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 {
     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = AUDIO_RENDER_CHANNELCOUNT;
@@ -67,7 +67,7 @@ void AudioUtRenderMmapTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
     attrs.silenceThreshold = BUFFER_LENTH;
 }
 
-void AudioUtRenderMmapTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
+void AudioUtRenderMultchannelTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
 {
     devDesc.pins = PIN_OUT_SPEAKER;
     devDescriptorName_ = strdup("cardname");
@@ -84,7 +84,7 @@ void AudioUtRenderMmapTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devD
     free(devDesc.desc);
 }
 
-void AudioUtRenderMmapTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
+void AudioUtRenderMultchannelTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
 {
     if (dataBlock == nullptr) {
         return;
@@ -99,7 +99,7 @@ void AudioUtRenderMmapTest::FreeAdapterElements(struct AudioAdapterDescriptor *d
     }
 }
 
-void AudioUtRenderMmapTest::ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen)
+void AudioUtRenderMultchannelTest::ReleaseAllAdapterDescs(struct AudioAdapterDescriptor *descs, uint32_t descsLen)
 {
     if (descs == nullptr || descsLen == 0) {
         return;
@@ -110,7 +110,7 @@ void AudioUtRenderMmapTest::ReleaseAllAdapterDescs(struct AudioAdapterDescriptor
     }
 }
 
-void AudioUtRenderMmapTest::SetUp()
+void AudioUtRenderMultchannelTest::SetUp()
 {
     manager_ = IAudioManagerGet(false);
     ASSERT_NE(manager_, nullptr);
@@ -132,7 +132,7 @@ void AudioUtRenderMmapTest::SetUp()
     ASSERT_NE(render_, nullptr);
 }
 
-void AudioUtRenderMmapTest::TearDown()
+void AudioUtRenderMultchannelTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
     free(devDescriptorName_);
