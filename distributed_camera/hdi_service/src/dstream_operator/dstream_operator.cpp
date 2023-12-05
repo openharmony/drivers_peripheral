@@ -341,7 +341,7 @@ void DStreamOperator::ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfo
 int32_t DStreamOperator::Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
     if (IsCaptureInfoInvalid(info)) {
-        DHLOGE("DStreamOperator::Capture, input capture info is valid.");
+        DHLOGE("DStreamOperator::Capture, input capture info is invalid.");
         return CamRetCode::INVALID_ARGUMENT;
     }
     if (captureId < 0 || FindCaptureInfoById(captureId) != nullptr) {
