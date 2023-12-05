@@ -19,8 +19,8 @@
 #include <securec.h>
 #include <malloc.h>
 #include <unistd.h>
+#include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
-#include "hitrace_meter.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
