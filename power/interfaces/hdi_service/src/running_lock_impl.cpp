@@ -103,12 +103,14 @@ void RunningLockImpl::Clean()
 {
     HDF_LOGI("start to clear running locks");
     std::lock_guard<std::mutex> lock(mutex_);
-    timerHandler_->Clean();
+    if (timerHandler_ != nullptr) {
+        timerHandler_->Clean();
+    }
 
     for (auto &iter : lockCounters_) {
-       HDF_LOGI("clear running lock type %{public}d", iter.first);
-       SystemOperation::WriteWakeUnlock(GetRunningLockTag(iter.first));
-       iter.second->Clean();
+        HDF_LOGI("clear running lock type %{public}d", iter.first);
+        SystemOperation::WriteWakeUnlock(GetRunningLockTag(iter.first));
+        iter.second->Clean();
     }
     lockCounters_.clear();
 }
