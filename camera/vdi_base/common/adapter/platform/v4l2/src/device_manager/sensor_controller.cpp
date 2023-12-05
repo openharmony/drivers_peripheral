@@ -756,7 +756,6 @@ RetCode SensorController::SendExposureAutoModeMetaData(common_metadata_header_t 
     RetCode rc = RC_OK;
 
     uint8_t exposureMode = 0;
-    uint8_t aeLock = 0;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
     if (ret == 0) {
@@ -820,7 +819,6 @@ RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
     uint8_t focusMode = 0;
-    uint8_t afLock = 0;
     AdapterCmd focusModeCmd = CMD_AUTO_FOCUS_START;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
