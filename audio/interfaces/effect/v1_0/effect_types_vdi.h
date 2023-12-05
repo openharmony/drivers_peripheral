@@ -67,6 +67,15 @@ enum EffectCommandTableIndexVdi {
     AUDIO_EFFECT_COMMAND_VDI_GET_PARAM,
 };
 
+enum AudioEffectHDICommandVdi {
+    EFFECT_INIT = 0,
+    EFFECT_BYPASS = 1,
+    EFFECT_HEAD_MODE = 2,
+    EFFECT_ROOM_MODE = 3,
+    EFFECT_BLUETOOTH_MODE = 4,
+    EFFECT_DESTORY = 5,
+}
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
