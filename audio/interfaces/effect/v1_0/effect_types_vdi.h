@@ -74,7 +74,7 @@ enum AudioEffectHDICommandVdi {
     EFFECT_ROOM_MODE = 3,
     EFFECT_BLUETOOTH_MODE = 4,
     EFFECT_DESTORY = 5,
-}
+};
 
 #ifdef __cplusplus
 }
