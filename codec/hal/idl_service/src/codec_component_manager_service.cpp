@@ -16,13 +16,13 @@
 #include "codec_component_manager_service.h"
 #include <hdf_base.h>
 #include <atomic>
+#include <hitrace_meter.h>
 #include "codec_component_config.h"
 #include "codec_component_service.h"
 #include "codec_log_wrapper.h"
 #include "component_node.h"
 #include "codec_dfx_service.h"
 #include "codec_death_recipient.h"
-#include "hitrace_meter.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
