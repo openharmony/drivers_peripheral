@@ -149,8 +149,6 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_02, TestSize.Lev
     constexpr int32_t reserveFds = 1;
     constexpr int32_t reserveInts = 0;
     BufferHandle* handle0 = BufferHandleSequenceable::NewBufferHandle(reserveFds, reserveInts);
-    handle0->fd = open("/dev/null", O_WRONLY);
-    handle0->reserve[0] = dup(handle0->fd);
     EXPECT_NE(handle0, nullptr);
     auto bufferHandleSeq0 = make_shared<BufferHandleSequenceable>(handle0);
     bufferHandleSeq0->SetBufferHandle(handle0);
