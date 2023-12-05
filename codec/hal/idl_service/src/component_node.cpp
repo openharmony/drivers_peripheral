@@ -18,10 +18,10 @@
 #include <securec.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"
-#include "hitrace_meter.h"
 
 using OHOS::HDI::Codec::V2_0::EventInfo;
 using OHOS::HDI::Codec::V2_0::CodecEventType;
