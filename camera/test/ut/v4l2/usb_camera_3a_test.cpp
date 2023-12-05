@@ -155,7 +155,7 @@ bool UtestUSBCamera3ATest::RunCamera3A(TestMetadata& metadata)
     cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
     cameraBase_->StartStream(cameraBase_->intents);
 
-     // updateSettings
+    // updateSettings
     const uint32_t itemCapacity = 100;
     const uint32_t dataCapacity = 2000;
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
@@ -198,3 +198,160 @@ TEST_P(UtestUSBCamera3ATest, UtestUSBCamera3ATest)
 }
 
 INSTANTIATE_TEST_SUITE_P(Test3A, UtestUSBCamera3ATest, ::testing::ValuesIn(CAMERA_3A_TEST_SETS));
+
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_01)
+{
+    std::cout << "start capture for auto exposure mode on" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> aeVector;
+
+    aeVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_EXPOSURE_MODE, aeVector.data(), aeVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_02)
+{
+    std::cout << "start capture for auto exposure mode off" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> aeVector;
+
+    aeVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_MANUAL);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_EXPOSURE_MODE, aeVector.data(), aeVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_03)
+{
+    std::cout << "start capture for auto focus mode on" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> afVector;
+
+    afVector.push_back(OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_FOCUS_MODE, afVector.data(), afVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_04)
+{
+    std::cout << "start capture for auto focus mode off" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> afVector;
+
+    afVector.push_back(OHOS_CAMERA_FOCUS_MODE_MANUAL);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_FOCUS_MODE, afVector.data(), afVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_05)
+{
+    std::cout << "start capture for auto white balance mode on" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> awbVector;
+
+    awbVector.push_back(OHOS_CAMERA_AWB_MODE_AUTO);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_AWB_MODE, awbVector.data(), awbVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+TEST_F(UtestUSBCamera3ATest, camera_usb_3a_06)
+{
+    std::cout << "start capture for auto white balance mode off" << std::endl;
+    // Get the device manager
+    cameraBase_->OpenUsbCamera();
+    // Get the stream manager
+    cameraBase_->AchieveStreamOperator();
+    std::vector<int32_t> awbVector;
+
+    awbVector.push_back(OHOS_CAMERA_AWB_MODE_OFF);
+    cameraBase_->ability->updateEntry(OHOS_CONTROL_AWB_MODE, awbVector.data(), awbVector.size());
+    cameraBase_->ability_.clear();
+    MetadataUtils::ConvertMetadataToVec(cameraBase_->ability, cameraBase_->ability_);
+    // start stream
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    // Get preview
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    // release stream
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
