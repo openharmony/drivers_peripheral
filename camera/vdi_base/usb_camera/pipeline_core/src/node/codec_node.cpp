@@ -26,8 +26,6 @@ extern "C" {
 }
 
 namespace OHOS::Camera {
-uint32_t CodecNode::previewWidth_ = 640;
-uint32_t CodecNode::previewHeight_ = 480;
 const unsigned long long TIME_CONVERSION_NS_S = 1000000000ULL; /* ns to s */
 
 CodecNode::CodecNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -253,15 +251,16 @@ void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
         buffer->SetEsFrameSize(0);
     }
 
-    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)temp, AV_PIX_FMT_YUYV422, previewWidth_, previewHeight_);
+    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)temp, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
+        buffer->GetHeight());
     avpicture_fill((AVPicture *)pFrameRGBA, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_RGBA,
-                   previewWidth_, previewHeight_);
+        buffer->GetWidth(), buffer->GetHeight());
 
-    struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
-                                               previewHeight_, AV_PIX_FMT_RGBA, SWS_BILINEAR, 0, 0, 0);
+    struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
+        buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGBA, SWS_BILINEAR, 0, 0, 0);
 
     if (imgCtx != nullptr) {
-        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
+        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, buffer->GetHeight(),
                   pFrameRGBA->data, pFrameRGBA->linesize);
         if (imgCtx) {
             sws_freeContext(imgCtx);
@@ -276,48 +275,6 @@ void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
     free(temp);
 }
 
-void CodecNode::Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& bufferYuv420)
-{
-    if (buffer == nullptr) {
-        CAMERA_LOGI("CodecNode::Yuv422ToYuv420 buffer == nullptr");
-        return;
-    }
-
-    AVFrame *pFrameYUV420 = nullptr;
-    AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    pFrameYUV420 = av_frame_alloc();
-
-    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
-                   previewWidth_, previewHeight_);
-    avpicture_fill((AVPicture *)pFrameYUV420, (uint8_t *)bufferYuv420->GetVirAddress(), AV_PIX_FMT_NV21,
-                   previewWidth_, previewHeight_);
-
-    struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
-                                               previewHeight_, AV_PIX_FMT_NV21, SWS_BILINEAR, 0, 0, 0);
-
-    if (imgCtx != nullptr) {
-        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
-                  pFrameYUV420->data, pFrameYUV420->linesize);
-        if (imgCtx) {
-            sws_freeContext(imgCtx);
-            imgCtx = nullptr;
-        }
-    } else {
-        sws_freeContext(imgCtx);
-        imgCtx = nullptr;
-    }
-    av_frame_free(&pFrameYUV);
-    av_frame_free(&pFrameYUV420);
-    struct timespec ts = {};
-    int64_t timestamp = 0;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    timestamp = ts.tv_nsec + ts.tv_sec * TIME_CONVERSION_NS_S;
-    bufferYuv420->SetEsTimestamp(timestamp);
-    bufferYuv420->SetEsFrameSize(bufferYuv420->GetSize());
-    bufferYuv420->SetEsKeyFrame(0);
-}
-
 void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 {
     constexpr uint32_t RGB24Width = 3;
@@ -329,7 +286,7 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 
     uint8_t* jBuf = nullptr;
     unsigned long jpegSize = 0;
-    uint32_t tempSize = (previewWidth_ * previewHeight_ * RGB24Width);
+    uint32_t tempSize = (buffer->GetWidth() * buffer->GetHeight() * RGB24Width);
     void* temp = malloc(tempSize);
     if (temp == nullptr) {
         CAMERA_LOGI("CodecNode::Yuv422ToJpeg malloc buffer == nullptr");
@@ -342,19 +299,19 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     m_pFrameRGB = av_frame_alloc();
 
     avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
-                   previewWidth_, previewHeight_);
+        buffer->GetWidth(), buffer->GetHeight());
     avpicture_fill((AVPicture *)m_pFrameRGB, (uint8_t *)temp, AV_PIX_FMT_RGB24,
-                   previewWidth_, previewHeight_);
-    struct SwsContext* imgCtx = sws_getContext(previewWidth_, previewHeight_, AV_PIX_FMT_YUYV422, previewWidth_,
-                                               previewHeight_, AV_PIX_FMT_RGB24, SWS_BILINEAR, 0, 0, 0);
+        buffer->GetWidth(), buffer->GetHeight());
+    struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
+        buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGB24, SWS_BILINEAR, 0, 0, 0);
 
-    sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, previewHeight_,
+    sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, buffer->GetHeight(),
               m_pFrameRGB->data, m_pFrameRGB->linesize);
     sws_freeContext(imgCtx);
     imgCtx = nullptr;
     av_frame_free(&pFrameYUV);
     av_frame_free(&m_pFrameRGB);
-    EncodeJpegToMemory((uint8_t *)temp, previewWidth_, previewHeight_, nullptr, &jpegSize, &jBuf);
+    EncodeJpegToMemory((uint8_t *)temp, buffer->GetWidth(), buffer->GetHeight(), nullptr, &jpegSize, &jBuf);
 
     int ret = memcpy_s((uint8_t*)buffer->GetVirAddress(), buffer->GetSize(), jBuf, jpegSize);
     if (ret == 0) {
@@ -382,8 +339,6 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         Yuv422ToJpeg(buffer);
     } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
     } else {
-        previewWidth_ = buffer->GetWidth();
-        previewHeight_ = buffer->GetHeight();
         Yuv422ToRGBA8888(buffer);
     }
 

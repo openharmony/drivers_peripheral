@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,40 +11,35 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_RKCODEC_NODE_H
-#define HOS_CAMERA_RKCODEC_NODE_H
+#ifndef HOS_CAMERA_SCALE_NODE_H
+#define HOS_CAMERA_SCALE_NODE_H
 
 #include <vector>
 #include <condition_variable>
 #include <ctime>
+#include <mutex>
 #include "device_manager_adapter.h"
 #include "utils.h"
 #include "camera.h"
 #include "source_node.h"
 
-
 namespace OHOS::Camera {
-class CodecNode : public NodeBase {
+class ScaleNode : public NodeBase {
 public:
-    CodecNode(const std::string& name, const std::string& type, const std::string &cameraId);
-    ~CodecNode() override;
+    ScaleNode(const std::string& name, const std::string& type, const std::string &cameraId);
+    ~ScaleNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
     RetCode CancelCapture(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId);
-    RetCode ConfigJpegOrientation(common_metadata_header_t* data);
-    RetCode ConfigJpegQuality(common_metadata_header_t* data);
-    RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
 private:
-    void EncodeJpegToMemory(uint8_t* image, int width, int height,
-            const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
-    void Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer);
-    void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);
-
-    uint32_t jpegRotation_;
-    uint32_t jpegQuality_;
+    void PreviewScaleConver(std::shared_ptr<IBuffer>& buffer);
+    void ScaleConver(std::shared_ptr<IBuffer>& buffer);
+    void ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer);
+    std::vector<std::shared_ptr<IPort>>   outPutPorts_;
+    std::shared_ptr<IBufferPool>          bufferPool_ = nullptr;    // buffer pool of branch stream
 };
 } // namespace OHOS::Camera
 #endif

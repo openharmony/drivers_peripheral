@@ -96,6 +96,8 @@ extern "C" const struct HdfConfigPipelineSpecsRoot* HdfGetPipelineSpecsModuleCon
 class INode;
 using Pipeline = struct {
     std::vector<std::shared_ptr<INode>> nodes_;
+    uint32_t wide_;
+    uint32_t high_;
 };
 }
 #endif
