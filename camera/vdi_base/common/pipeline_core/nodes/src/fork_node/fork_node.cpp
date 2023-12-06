@@ -75,7 +75,10 @@ RetCode ForkNode::Stop(const int32_t streamId)
         return RC_OK;
     }
 
-    DrainForkBufferPool();
+    if (bufferPool_ != nullptr) {
+        bufferPool_->SetForkBufferId(-1);
+        DrainForkBufferPool();
+    }
 
     streamRunning_ = false;
 
@@ -101,11 +104,7 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
-            if (memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
-                buffer->GetVirAddress(), buffer->GetSize()) != 0) {
-                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                CAMERA_LOGW("memcpy_s failed.");
-            }
+            bufferPool_->setSFBuffer(buffer);
             for (auto& it : outPutPorts_) {
                 if (it->format_.streamId_ != streamId_) {
                     continue;
