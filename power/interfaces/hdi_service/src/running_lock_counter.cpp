@@ -75,7 +75,8 @@ void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType c
         HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "PID", info.pid, "UID", info.uid, "STATE", static_cast<int32_t>(state), "TYPE", type_, "NAME", info.name,
         "BUNDLENAME", bundleName, "LOG_LEVEL", logLevel, "TAG", tag);
-    HDF_LOGW("name = %{public}s, tag=%{public}s", info.name.c_str(), tag.c_str());
+    HDF_LOGW("name = %{public}s, tag=%{public}s, PID=%{public}d, UID=%{public}d", info.name.c_str(), tag.c_str(),
+        info.pid, info.uid);
 }
 } // namespace V1_1
 } // namespace Power
