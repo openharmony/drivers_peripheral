@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 struct BatteryThreadUnitTest {};
 struct BatteryConfigUnitTest {};

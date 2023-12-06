@@ -15,6 +15,11 @@
 
 #include "dcamera_host.h"
 
+#include <cstdlib>
+#include "iservice_registry.h"
+#include "iproxy_broker.h"
+#include "iservmgr_hdi.h"
+
 #include "anonymous_string.h"
 #include "distributed_hardware_log.h"
 #include "metadata_utils.h"
@@ -49,6 +54,7 @@ int32_t DCameraHost::SetCallback(const sptr<ICameraHostCallback> &callbackObj)
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
+    dCameraHostRecipient_ = new DCameraHostRecipient();
     return CamRetCode::NO_ERROR;
 }
 
@@ -189,7 +195,10 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
-
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
+    if (remote != nullptr) {
+        remote->AddDeathRecipient(dCameraHostRecipient_);
+    }
     DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s",
         GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
@@ -213,7 +222,11 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         }
         dcameraDevice->SetProviderCallback(nullptr);
     }
-
+    sptr<IDCameraProviderCallback> callback = dcameraDevice->GetProviderCallback();
+    if (callback != nullptr) {
+        sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
+        remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+    }
     DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
     dhBaseHashDCamIdMap_.erase(dcameraBase);
     dCameraDeviceMap_.erase(dCameraId);
@@ -279,6 +292,12 @@ void DCameraHost::NotifyDCameraStatus(const DHBase &dhBase, int32_t result)
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
     }
+}
+
+void DCameraHost::DCameraHostRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGE("Exit the current process.");
+    _Exit(0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

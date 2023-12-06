@@ -12,12 +12,16 @@
     "component": {
       "name": "drivers_peripheral_power",
       "subsystem": "hdf",
+      "features": [
+        "drivers_peripheral_power_wakeup_cause_path"
+      ],
       "adapted_system_type": ["standard", "small"],
       "rom": "981KB",
       "ram": "6000KB",
       "deps": {
         "components": [
           "c_utils",
+          "config_policy",
           "drivers_interface_power",
           "hdf_core",
           "hilog", 
@@ -25,7 +29,8 @@
           "ipc"
         ],
         "third_party": [
-          "libxml2"
+          "libxml2",
+          "jsoncpp"
         ]
       },
       "build": {

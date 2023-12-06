@@ -122,7 +122,7 @@ static int32_t AudioHdmiOpenEventPoll(int32_t *sockFd, int *fdEpoll)
         return HDF_FAILURE;
     }
 
-    OsalMSleep(30); // Wait 30ms to resolve the conflict with the pnp uevent "address already in use"
+    OsalMSleep(60); // Wait 60ms to resolve the conflict with the pnp uevent "address already in use"
     *sockFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (*sockFd < 0) {
         AUDIO_FUNC_LOGE("new socket failed, %{public}d", errno);
@@ -225,11 +225,11 @@ int32_t AudioHdmiPnpUeventStartThread(void)
     g_hdmiPnpThreadRunning = true;
 
     AUDIO_FUNC_LOGI("create audio hdmi pnp uevent thread");
-    ffrt_task_attr_t attr;
-    ffrt_task_attr_init(&attr);
-    ffrt_task_attr_set_qos(&attr, ffrt_qos_default);
-    ffrt_task_attr_set_name(&attr, threadName);
-    ffrt_submit_base(FFRTCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
+    FfrtTaskAttr attr;
+    FfrtAttrInitFunc()(&attr);
+    FfrtAttrSetQosFunc()(&attr, FFRT_QOS_DEFAULT);
+    FfrtAttrSetNameFunc()(&attr, threadName);
+    FfrtSubmitBaseFunc()(FfrtCreateFunctionWrapper(AudioHdmiPnpUeventStart, NULL, NULL), NULL, NULL, &attr);
 
     return HDF_SUCCESS;
 }

@@ -27,3 +27,11 @@ use_hitrace = false
 if (use_hitrace) {
   defines += [ "HITRACE_LOG_ENABLED" ]
 }
+
+declare_args() {
+  device_usb_camera_ffmpeg_enable = true
+  if (defined(device_usb_camera_info) &&
+      !defined(device_usb_camera_info.ffmpeg)) {
+    device_usb_camera_ffmpeg_enable = false
+  }
+}

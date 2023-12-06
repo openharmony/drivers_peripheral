@@ -101,6 +101,7 @@ private:
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+    static constexpr int64_t MAX_FRAME_COUNT = 100;
     const std::string HDF_RENDER_FILENAME = "/data/data/daudio/hdf_render_to_sa.pcm";
 
     std::string adapterName_;

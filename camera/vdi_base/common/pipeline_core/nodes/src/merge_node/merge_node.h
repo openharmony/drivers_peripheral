@@ -32,6 +32,8 @@ public:
     void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
     void MergeBuffers();
 private:
+    void DealSecondBuffer(std::shared_ptr<IPort>& port);
+private:
     std::mutex                                  mtx_;
     std::condition_variable                     cv_;
     std::vector<std::shared_ptr<FrameSpec>>     mergeVec_;

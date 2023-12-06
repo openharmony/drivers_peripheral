@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_V1_1_VIBRAORINTERFACESERVICE_H
-#define OHOS_HDI_VIBRATOR_V1_1_VIBRAORINTERFACESERVICE_H
+#ifndef OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H
+#define OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H
 
-#include "v1_1/ivibrator_interface.h"
+#include "v1_2/ivibrator_interface.h"
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_1 {
+namespace V1_2 {
 class VibratorIfService : public IVibratorInterface {
 public:
     VibratorIfService();
@@ -32,20 +32,24 @@ public:
     int32_t StartOnce(uint32_t duration) override;
     int32_t Start(const std::string &effectType) override;
     int32_t Stop(HdfVibratorMode mode) override;
+    int32_t StopV1_2(int32_t mode) override;
     int32_t GetVibratorInfo(std::vector<HdfVibratorInfo> &vibratorInfo) override;
     int32_t EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency) override;
     int32_t EnableCompositeEffect(const HdfCompositeEffect& effect) override;
     int32_t GetEffectInfo(const std::string &effectType, HdfEffectInfo &effectInfo) override;
     int32_t IsVibratorRunning(bool& state) override;
+    int32_t PlayHapticPattern(const HapticPaket& pkg) override;
+    int32_t GetHapticCapacity(HapticCapacity& hapticCapacity) override;
+    int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
     int32_t GetVibratorVdiImpl();
 
 private:
     IVibratorInterfaceVdi *vibratorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };
-} // V1_1
+} // V1_2
 } // Vibrator
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_V1_1_VIBRAORINTERFACESERVICE_H
+#endif // OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H

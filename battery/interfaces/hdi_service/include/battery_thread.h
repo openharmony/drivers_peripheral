@@ -22,12 +22,12 @@
 #include <thread>
 #include <vector>
 #include "power_supply_provider.h"
-#include "v1_2/ibattery_callback.h"
+#include "v2_0/ibattery_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 enum EventType {
     EVENT_UEVENT_FD,
     EVENT_TIMER_FD,
@@ -38,18 +38,19 @@ public:
     virtual ~BatteryThread() = default;
 
     void StartThread(void* service);
-    void InitCallback(const sptr<OHOS::HDI::Battery::V1_2::IBatteryCallback>& callback);
+    void InitCallback(const sptr<OHOS::HDI::Battery::V2_0::IBatteryCallback>& callback);
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
-    virtual void UpdateBatteryInfo(void* service);
+    virtual void UpdateBatteryInfo(void* service, const std::string& powerUevent);
     virtual void HandleStates() {}
     virtual int32_t UpdateWaitInterval();
     void UpdateEpollInterval(int32_t chargeState);
     virtual void CycleMatters() {}
 private:
     int32_t OpenUeventSocket();
-    bool IsPowerSupplyEvent(const char* msg);
+    bool MatchPowerUevent(const char* msg, std::string& powerUevent);
+    bool CheckPowerUevent(const char* msg, std::string& powerUevent);
     int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
     void UeventCallback(void* service);
@@ -62,8 +63,9 @@ private:
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
+    std::map<std::string, std::vector<std::string>> powerUeventMap_;
 };
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

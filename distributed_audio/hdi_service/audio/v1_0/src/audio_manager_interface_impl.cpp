@@ -129,12 +129,6 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             return ERR_DH_AUDIO_HDF_FAIL;
         }
     }
-    remote_ = OHOS::HDI::hdi_objcast<IDAudioCallback>(callback);
-    if (remote_ == nullptr) {
-        DHLOGE("remote callback is nullptr.");
-        return ERR_DH_AUDIO_HDF_FAIL;
-    }
-    remote_->AddDeathRecipient(audioManagerRecipient_);
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
         DHLOGE("Audio device has not been created  or is null ptr.");
@@ -165,6 +159,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         DHLOGE("Notify audio fwk failed, ret = %d.", ret);
         return ret;
     }
+    sptr<IRemoteObject> remote = GetRemote(adpName);
+    if (remote != nullptr) {
+        remote->AddDeathRecipient(audioManagerRecipient_);
+    }
     DHLOGI("Add audio device success.");
     return DH_SUCCESS;
 }
@@ -184,7 +182,6 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         DHLOGE("Remove audio device failed, adapter return: %d.", ret);
         return ret;
     }
-    remote_->RemoveDeathRecipient(audioManagerRecipient_);
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
@@ -192,6 +189,11 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     }
     if (adp->second->IsPortsNoReg()) {
         mapAudioAdapter_.erase(adpName);
+        sptr<IRemoteObject> remote = GetRemote(adpName);
+        if (remote != nullptr) {
+            remote->RemoveDeathRecipient(audioManagerRecipient_);
+        }
+        mapAudioCallback_.erase(adpName);
     }
     DHLOGI("Remove audio device success, mapAudioAdapter size() is : %d .", mapAudioAdapter_.size());
     return DH_SUCCESS;
@@ -258,6 +260,7 @@ int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, con
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
     mapAudioAdapter_.insert(std::make_pair(adpName, adapter));
+    mapAudioCallback_.insert(std::make_pair(adpName, callback));
     return DH_SUCCESS;
 }
 
@@ -270,6 +273,21 @@ void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<I
 {
     DHLOGE("Exit the current process.");
     _Exit(0);
+}
+
+sptr<IRemoteObject> AudioManagerInterfaceImpl::GetRemote(const std::string &adpName)
+{
+    auto call = mapAudioCallback_.find(adpName);
+    if (call == mapAudioCallback_.end() || call->second == nullptr) {
+        DHLOGE("Audio callback has not been created or is null ptr.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioCallback>(call->second);
+    if (remote == nullptr) {
+        DHLOGE("Remote callback is nullptr.");
+        return nullptr;
+    }
+    return remote;
 }
 } // V1_0
 } // Audio

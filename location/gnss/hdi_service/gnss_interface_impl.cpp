@@ -26,6 +26,10 @@
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 
+namespace {
+GnssConfigPara g_configPara;
+}
+
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -178,7 +182,18 @@ GnssInterfaceImpl::~GnssInterfaceImpl()
 int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
 {
     HDF_LOGI("%{public}s.", __func__);
-    return HDF_SUCCESS;
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
+    if (gnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    // GnssConfigPara configPara;
+    g_configPara.type = static_cast<uint32_t>(GnssStartClass::GNSS_START_CLASS_NORMAL);
+    g_configPara.u.gnssBasicConfig.gnssMode = para.gnssBasic.gnssMode;
+    g_configPara.u.gnssBasicConfig.size = sizeof(GnssBasicConfigPara);
+    int ret = gnssInterface->set_gnss_config_para(&g_configPara);
+    HDF_LOGI("%{public}s, ret=%{public}d", __func__, ret);
+    return ret;
 }
 
 int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
@@ -262,6 +277,14 @@ int32_t GnssInterfaceImpl::SetGnssReferenceInfo(const GnssRefInfo& refInfo)
 int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryData data)
 {
     HDF_LOGI("%{public}s.", __func__);
+    uint16_t flags = static_cast<uint16_t>(data);
+    HDF_LOGI("%{public}s, flag=%{public}d", __func__, flags);
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
+    if (gnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    gnssInterface->remove_auxiliary_data(flags);
     return HDF_SUCCESS;
 }
 

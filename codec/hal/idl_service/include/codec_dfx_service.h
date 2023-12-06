@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V1_0 {
+namespace V2_0 {
 class CodecDfxService : public RefBase {
 public:
     ~CodecDfxService() = default;
@@ -48,7 +48,7 @@ private:
     static HdfSBuf *reply_;
 };
 
-}  // namespace V1_0
+}  // namespace V2_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS

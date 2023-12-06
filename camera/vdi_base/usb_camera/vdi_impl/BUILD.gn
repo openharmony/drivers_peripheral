@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//drivers/peripheral/camera/camera.gni")
 import("../camera_usb.gni")
 
 import("//build/ohos.gni")
@@ -36,7 +37,6 @@ config("camhdi_impl_config") {
 }
 
 host_sources = [
-  "$camera_path_usb/vdi_impl/src/camera_dump.cpp",
   "$camera_path_usb/vdi_impl/src/camera_host/camera_host_usb_config.cpp",
   "$camera_path_usb/vdi_impl/src/camera_host/camera_host_usb_vdi_impl.cpp",
   "$camera_path_vdi/../v4l2/src/camera_device/camera_device_vdi_impl.cpp",
@@ -52,6 +52,7 @@ host_sources = [
   "$camera_path_vdi/../v4l2/src/stream_operator/stream_still_capture.cpp",
   "$camera_path_vdi/../v4l2/src/stream_operator/stream_tunnel/standard/stream_tunnel.cpp",
   "$camera_path_vdi/../v4l2/src/stream_operator/stream_video.cpp",
+  "$camera_path_vdi/dump/src/camera_dump.cpp",
 ]
 
 host_includes = [
@@ -70,6 +71,7 @@ host_includes = [
   "$camera_path_vdi/buffer_manager/src/buffer_adapter/standard",
   "$camera_path_vdi/utils/event",
   "$camera_path_vdi/../../../display/interfaces/include",
+  "$camera_path_vdi/dump/include",
 
   #producer
   "$camera_path_vdi/pipeline_core/utils",
@@ -110,12 +112,15 @@ ohos_shared_library("camera_daemon") {
   if (use_hitrace) {
     defines += [ "HITRACE_LOG_ENABLED" ]
   }
+  if (drivers_peripheral_camera_feature_usb) {
+    defines += [ "CAMERA_BUILT_ON_USB" ]
+  }
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -154,12 +159,15 @@ ohos_static_library("camera_daemon_static") {
   if (use_hitrace) {
     defines += [ "HITRACE_LOG_ENABLED" ]
   }
+  if (drivers_peripheral_camera_feature_usb) {
+    defines += [ "CAMERA_BUILT_ON_USB" ]
+  }
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

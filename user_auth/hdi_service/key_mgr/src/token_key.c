@@ -16,7 +16,8 @@
 #include "token_key.h"
 #include "securec.h"
 
-#define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
+#define HKS_DEFAULT_USER_AT_MAC_KEY "huks_default_user_auth_token_mac"
+#define HKS_DEFAULT_USER_AT_CIPHER_KEY "huks_default_user_auth_cipherkey"
 
 /*
  * The key here is only for example.
@@ -24,13 +25,13 @@
  */
 ResultCode GetTokenKey(HksAuthTokenKey *key)
 {
-    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY,
+    if (memcpy_s(key->macKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_MAC_KEY,
         HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("macKey copy error");
         return RESULT_BAD_COPY;
     }
 
-    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_KEY,
+    if (memcpy_s(key->cipherKey, HKS_DEFAULT_USER_AT_KEY_LEN, HKS_DEFAULT_USER_AT_CIPHER_KEY,
         HKS_DEFAULT_USER_AT_KEY_LEN) != EOK) {
         LOG_ERROR("cipherKey copy error");
         return RESULT_BAD_COPY;

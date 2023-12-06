@@ -67,7 +67,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_CHANNEL_COUNT[] = "channelCount";
 }
 
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -91,9 +91,7 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
                                                 NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS };
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
     for (int index = 0; index < count; index++) {
-        if (GetGroupCapabilities(codecGroupsNodeName[index]) != HDF_SUCCESS) {
-            continue;
-        }
+        GetGroupCapabilities(codecGroupsNodeName[index]);
     }
     CODEC_LOGD("Init Run....capList_.size=%{public}zu", capList_.size());
 }

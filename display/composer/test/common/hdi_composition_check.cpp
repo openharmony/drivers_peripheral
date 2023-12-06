@@ -19,7 +19,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 static void GetCheckPoints(Point center, std::vector<Point> &points)
 {
     const uint32_t STEP = 3;
@@ -65,7 +65,7 @@ static std::vector<uint32_t> GetCheckColors(const std::vector<LayerSettings> &la
             // check whether the point is inside the rect
             if ((point.x >= RECT.x) && (point.x < (RECT.x + RECT.w)) && (point.y >= RECT.y) &&
                 (point.y < (RECT.y + RECT.h))) {
-                if (layer.compositionType != COMPOSITION_VIDEO) {
+                if (layer.compositionType != Composer::V1_0::CompositionType::COMPOSITION_VIDEO) {
                     color = layer.color;
                     SimpleHandleAlpha(layer, color);
                 }

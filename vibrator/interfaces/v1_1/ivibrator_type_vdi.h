@@ -34,6 +34,7 @@ enum HdfVibratorStatusVdi {
 enum HdfVibratorModeVdi {
     VDI_VIBRATOR_MODE_ONCE   = 0,
     VDI_VIBRATOR_MODE_PRESET = 1,
+    VDI_VIBRATOR_MODE_HDHAPTIC = 2,
     VDI_VIBRATOR_MODE_BUTT
 };
 
@@ -41,6 +42,11 @@ enum HdfEffectTypeVdi {
     VDI_EFFECT_TYPE_TIME,
     VDI_EFFECT_TYPE_PRIMITIVE,
     VDI_EFFECT_TYPE_BUTT,
+};
+
+enum EVENT_TYPEVdi {
+    VDI_CONTINUOUS = 0,
+    VDI_TRANSIENT = 1,
 };
 
 struct HdfVibratorInfoVdi {
@@ -78,6 +84,37 @@ struct HdfCompositeEffectVdi {
 struct HdfEffectInfoVdi {
     int32_t duration;
     bool isSupportEffect;
+};
+
+struct CurvePointVdi {
+    int32_t time;
+    int32_t intensity;
+    int32_t frequency;
+};
+
+struct HapticEventVdi {
+    EVENT_TYPEVdi type;
+    int32_t time;
+    int32_t duration;
+    int32_t intensity;
+    int32_t frequency;
+    int32_t index;
+    int32_t pointNum;
+    std::vector<CurvePointVdi> points;
+};
+
+struct HapticPaketVdi {
+    int32_t time;
+    int32_t eventNum;
+    std::vector<HapticEventVdi> events;
+};
+
+struct HapticCapacityVdi {
+    bool isSupportHdHaptic;
+    bool isSupportPresetMapping;
+    bool isSupportTimeDelay;
+    bool reserved0;
+    int32_t reserved1;
 };
 
 #ifdef __cplusplus

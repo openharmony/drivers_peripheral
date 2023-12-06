@@ -60,5 +60,26 @@ const int32_t VIDEO_KEY_STREAM_ID = 0x04;
  */
 const std::string captureId = "captureId";
 const int32_t VIDEO_KEY_CAPTRUE_ID = 0x05;
+
+/**
+ * @brief Specifies whether the image is a degraded image. The value type is int32_t.
+ * The value <b>1</b> means that the image is a degraded image, and <b>0</b> means the opposite.
+ */
+const std::string isDegradedImage = "isDegradedImage";
+const int32_t VIDEO_KEY_IS_DEGRADED_IMAGE = 0x06;
+
+/**
+ * @brief Indicates the image id corresponding to the image data. The value type is int32_t.
+ */
+const std::string imageId = "imageId";
+const int32_t VIDEO_KEY_IMAGE_ID = 0x07;
+
+/**
+ * @brief Indicates the type of to the deferred processing.
+ * The value type is int32_t. The value <b>1</b> means that breakgound process, and <b>0</b> means offline process.
+ */
+const std::string deferredProcessingType = "deferredProcessingType";
+const int32_t VIDEO_KEY_DEFERRED_PROCESSING_TYPE = 0x08;
+
 } // end namespace OHOS::Camera
 #endif

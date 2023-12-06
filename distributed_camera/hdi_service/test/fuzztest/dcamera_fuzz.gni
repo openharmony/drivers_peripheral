@@ -44,8 +44,8 @@ dcamera_external_deps = [
   "drivers_interface_camera:metadata",
   "drivers_interface_display:libdisplay_composer_stub_1.0",
   "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.0",
-  "graphic_chipsetsdk:surface",
-  "graphic_chipsetsdk:sync_fence",
+  "graphic_surface:surface",
+  "graphic_surface:sync_fence",
   "hdf_core:libhdi",
   "ipc:ipc_core",
 ]

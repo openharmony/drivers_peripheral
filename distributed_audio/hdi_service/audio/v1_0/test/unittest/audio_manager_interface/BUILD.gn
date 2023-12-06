@@ -22,6 +22,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "//third_party/cJSON",
     "include",
     "${hdf_ser_aud_path}/test/unittest/audio_test_utils",
     "${hdf_ser_aud_path}/include",
@@ -39,6 +40,7 @@ ohos_unittest("HDIServiceManagerTest") {
 
   configs = [ ":module_private_config" ]
 
+  deps = [ "//third_party/cJSON:cjson" ]
   public_deps = [
     "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
     "//third_party/googletest:gmock",

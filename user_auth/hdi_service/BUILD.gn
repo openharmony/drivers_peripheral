@@ -99,6 +99,7 @@ ohos_shared_library("libuser_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
+  deps = [ ":libuser_auth_interface_service_1.2" ]
 
   external_deps = [
     "c_utils:utils",

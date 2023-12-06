@@ -23,6 +23,7 @@
 #endif
 #include "securec.h"
 #include "v4l2_buffer.h"
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 const std::string DMA_BUF_FILE_NAME = "/dev/dma_heap/system";
@@ -214,6 +215,10 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
         bufferMap.erase(Iter);
         return RC_ERROR;
     }
+
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpBuffer("DQBuffer", ENABLE_DQ_BUFFER_DUMP, Iter->second->buffer_);
+
     dequeueBuffer_(Iter->second);
     bufferMap.erase(Iter);
     return RC_OK;

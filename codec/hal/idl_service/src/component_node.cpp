@@ -22,16 +22,16 @@
 #include "component_mgr.h"
 #include "icodec_buffer.h"
 
-using OHOS::HDI::Codec::V1_0::EventInfo;
-using OHOS::HDI::Codec::V1_0::CodecEventType;
-using OHOS::HDI::Codec::V1_0::CodecStateType;
-using OHOS::HDI::Codec::V1_0::CodecCommandType;
-using OHOS::HDI::Codec::V1_0::CodecStateType;
-using OHOS::HDI::Codec::V1_0::CODEC_STATE_INVALID;
-using OHOS::HDI::Codec::V1_0::CODEC_STATE_LOADED;
-using OHOS::HDI::Codec::V1_0::CODEC_STATE_IDLE;
-using OHOS::HDI::Codec::V1_0::CODEC_STATE_EXECUTING;
-using OHOS::HDI::Codec::V1_0::CODEC_COMMAND_STATE_SET;
+using OHOS::HDI::Codec::V2_0::EventInfo;
+using OHOS::HDI::Codec::V2_0::CodecEventType;
+using OHOS::HDI::Codec::V2_0::CodecStateType;
+using OHOS::HDI::Codec::V2_0::CodecCommandType;
+using OHOS::HDI::Codec::V2_0::CodecStateType;
+using OHOS::HDI::Codec::V2_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V2_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V2_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V2_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V2_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -237,7 +237,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V1_0::CodecTunnelSetupType &tunnelSetup)
+                                              OHOS::HDI::Codec::V2_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -400,7 +400,9 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
-    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
+    OMXBufferAppPrivateData priv{};
+    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_),
+                                     &bufferHdrType, portIndex, &priv, buffer.allocLen);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return err;
@@ -416,6 +418,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
+    codecBuffer->SetBufferId(bufferId);
     {
         std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
@@ -488,6 +491,13 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
         return err;
+    }
+    if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
+        OMXBufferAppPrivateData privateData;
+        memset(&privateData, 0, sizeof(privateData));
+        privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
+        privateData.param = static_cast<void *>(&buffer.alongParam[0]);
+        bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 
     err = OMX_EmptyThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);

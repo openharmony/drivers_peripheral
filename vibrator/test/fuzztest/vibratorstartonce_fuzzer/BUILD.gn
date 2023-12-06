@@ -18,8 +18,8 @@ module_output_path = "hdf/vibrator"
 
 ohos_fuzztest("VibratorStartOnceFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "vibratorstartonce_fuzzer"
-  include_dirs = [ "vibratorstartonce_fuzzer" ]
+  fuzz_config_file = "../vibratorstartonce_fuzzer"
+  include_dirs = [ "../vibratorstartonce_fuzzer" ]
   cflags = [
     "-g",
     "-O0",

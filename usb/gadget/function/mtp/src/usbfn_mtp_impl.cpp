@@ -14,7 +14,7 @@
  */
 
 #include "usbfn_mtp_impl.h"
-
+#include <unistd.h>
 #include <cinttypes>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -115,7 +115,8 @@ constexpr uint32_t BULK_OUT_TIMEOUT_JIFFIES = 0; /* sync timeout, set to 0 means
 constexpr uint32_t INTR_IN_TIMEOUT_JIFFIES = 0;  /* sync timeout, set to 0 means wait forever */
 constexpr uint64_t MTP_MAX_FILE_SIZE = 0xFFFFFFFFULL;
 constexpr uint32_t WRITE_FILE_TEMP_SLICE = 100 * 1024; /* 100KB */
-
+static constexpr int32_t WAIT_UDC_MAX_LOOP = 3;
+static constexpr uint32_t WAIT_UDC_TIME = 100000;
 enum UsbMtpNeedZeroLengthPacket {
     ZLP_NO_NEED = 0, /* no need send ZLP */
     ZLP_NEED,        /* need send ZLP */
@@ -616,8 +617,12 @@ void UsbfnMtpImpl::UsbMtpDeviceResume(struct UsbMtpDevice *mtpDev)
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
 {
+    if (mtpDev == nullptr || mtpDev->initFlag == false) {
+        HDF_LOGE("%{public}s: no init", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     struct UsbMtpPort *mtpPort = mtpDev->mtpPort;
-    if (mtpPort == nullptr || mtpDev == nullptr || mtpDev->initFlag == false) {
+    if (mtpPort == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -630,8 +635,12 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev)
 
 int32_t UsbfnMtpImpl::UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev)
 {
+    if (mtpDev == nullptr || mtpDev->initFlag == false) {
+        HDF_LOGE("%{public}s: no init", __func__);
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
     struct UsbMtpPort *mtpPort = mtpDev->mtpPort;
-    if (mtpPort == nullptr || mtpDev == nullptr || mtpDev->initFlag == false) {
+    if (mtpPort == nullptr) {
         HDF_LOGE("%{public}s: no init", __func__);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
@@ -696,6 +705,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachPipe(struct UsbMtpInterface &iface)
     HDF_LOGI("%{public}s: interface: idx=%{public}hhu numPipes=%{public}hhu ifClass=%{public}hhu subclass=%{public}hhu "
         "protocol=%{public}hhu cfgIndex=%{public}hhu", __func__, fnIface->info.index, fnIface->info.numPipes,
         fnIface->info.interfaceClass, fnIface->info.subclass, fnIface->info.protocol, fnIface->info.configIndex);
+    uint32_t repetIdx = 0;
     for (uint32_t i = 0; i < fnIface->info.numPipes; ++i) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
@@ -724,6 +734,11 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachPipe(struct UsbMtpInterface &iface)
                 }
                 break;
             default:
+                if (repetIdx < WAIT_UDC_MAX_LOOP) {
+                    usleep(WAIT_UDC_TIME);
+                    i--;
+                }
+                repetIdx++;
                 HDF_LOGE("%{public}s: pipe type %{public}d don't support", __func__, pipeInfo.type);
                 break;
         }
