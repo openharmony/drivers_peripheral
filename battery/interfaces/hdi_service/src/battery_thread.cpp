@@ -221,10 +221,10 @@ bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
 
 bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", msg);
     auto iter = powerUeventMap_.find(msg);
     if (iter != powerUeventMap_.end()) {
         while (*msg++) {}
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", msg);
         for (auto& uevent : iter->second) {
             std::regex r(uevent);
             if (std::regex_match(msg, r)) {
