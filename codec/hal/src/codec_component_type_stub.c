@@ -699,46 +699,32 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
         return HDF_ERR_INVALID_PARAM;
     }
 
-    switch (cmdId) {
-        case CMD_GET_COMPONENT_VERSION:
-            return SerStubGetComponentVersion(serviceImpl, data, reply);
-        case CMD_SEND_COMMAND:
-            return SerStubSendCommand(serviceImpl, data, reply);
-        case CMD_GET_PARAMETER:
-            return SerStubGetParameter(serviceImpl, data, reply);
-        case CMD_SET_PARAMETER:
-            return SerStubSetParameter(serviceImpl, data, reply);
-        case CMD_GET_CONFIG:
-            return SerStubGetConfig(serviceImpl, data, reply);
-        case CMD_SET_CONFIG:
-            return SerStubSetConfig(serviceImpl, data, reply);
-        case CMD_GET_EXTENSION_INDEX:
-            return SerStubGetExtensionIndex(serviceImpl, data, reply);
-        case CMD_GET_STATE:
-            return SerStubGetState(serviceImpl, data, reply);
-        case CMD_COMPONENT_TUNNEL_REQUEST:
-            return SerStubComponentTunnelRequest(serviceImpl, data, reply);
-        case CMD_USE_BUFFER:
-            return SerStubUseBuffer(serviceImpl, data, reply);
-        case CMD_ALLOCATE_BUFFER:
-            return SerStubAllocateBuffer(serviceImpl, data, reply);
-        case CMD_FREE_BUFFER:
-            return SerStubFreeBuffer(serviceImpl, data, reply);
-        case CMD_EMPTY_THIS_BUFFER:
-            return SerStubEmptyThisBuffer(serviceImpl, data, reply);
-        case CMD_FILL_THIS_BUFFER:
-            return SerStubFillThisBuffer(serviceImpl, data, reply);
-        case CMD_SET_CALLBACKS:
-            return SerStubSetCallbacks(serviceImpl, data, reply);
-        case CMD_COMPONENT_DE_INIT:
-            return SerStubComponentDeInit(serviceImpl, data, reply);
-        case CMD_USE_EGL_IMAGE:
-            return SerStubUseEglImage(serviceImpl, data, reply);
-        case CMD_COMPONENT_ROLE_ENUM:
-            return SerStubComponentRoleEnum(serviceImpl, data, reply);
-        default:
-            CODEC_LOGE("not support cmd %{public}d", cmdId);
-            return HDF_ERR_INVALID_PARAM;
+    typedef int32_t(*SerStubFunc)(struct CodecComponentType*, struct HdfSBuf*, struct HdfSBuf*);
+    SerStubFunc func[CMD_COMPONENT_ROLE_ENUM + 1] = {NULL};
+    func[CMD_GET_COMPONENT_VERSION] = SerStubGetComponentVersion;
+    func[CMD_SEND_COMMAND] = SerStubSendCommand;
+    func[CMD_GET_PARAMETER] = SerStubGetParameter;
+    func[CMD_SET_PARAMETER] = SerStubSetParameter;
+    func[CMD_GET_CONFIG] = SerStubGetConfig;
+    func[CMD_SET_CONFIG] = SerStubSetConfig;
+    func[CMD_GET_EXTENSION_INDEX] = SerStubGetExtensionIndex;
+    func[CMD_GET_STATE] = SerStubGetState;
+    func[CMD_COMPONENT_TUNNEL_REQUEST] = SerStubComponentTunnelRequest;
+    func[CMD_USE_BUFFER] = SerStubUseBuffer;
+    func[CMD_ALLOCATE_BUFFER] = SerStubAllocateBuffer;
+    func[CMD_FREE_BUFFER] = SerStubFreeBuffer;
+    func[CMD_EMPTY_THIS_BUFFER] = SerStubEmptyThisBuffer;
+    func[CMD_FILL_THIS_BUFFER] = SerStubFillThisBuffer;
+    func[CMD_SET_CALLBACKS] = SerStubSetCallbacks;
+    func[CMD_COMPONENT_DE_INIT] = SerStubComponentDeInit;
+    func[CMD_USE_EGL_IMAGE] = SerStubUseEglImage;
+    func[CMD_COMPONENT_ROLE_ENUM] = SerStubComponentRoleEnum;
+
+    if(func[cmdId] != NULL) {
+        return func[cmdId](serviceImpl, data, reply);
+    } else {
+        CODEC_LOGE("not support cmd %{public}d", cmdId);
+        return HDF_ERR_INVALID_PARAM;
     }
 }
 
