@@ -18,7 +18,7 @@
 #include "v1_1/icamera_device.h"
 
 namespace OHOS {
-#define RAW_DATA_SIZE_MAX 256
+const size_t RAW_DATA_SIZE_MAX = 256;
 const size_t THRESHOLD = 10;
 
 enum DeviceCmdId {
@@ -34,7 +34,7 @@ enum DeviceCmdId {
 
 void FuncGetDefaultSettings(const uint8_t *rawData, size_t size)
 {
-    if (size >= SIZE_MAX) {
+    if (size >= RAW_DATA_SIZE_MAX) {
         return;
     }
     std::vector<uint8_t> abilityVec = {};
@@ -54,7 +54,7 @@ void FuncGetStreamOperator_V1_1(const uint8_t *rawData, size_t size)
 
 void FuncUpdateSettings(const uint8_t *rawData, size_t size)
 {
-    if (size >= SIZE_MAX) {
+    if (size >= RAW_DATA_SIZE_MAX) {
         return;
     }
     std::vector<uint8_t> abilityVec = {};

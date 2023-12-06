@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_DEVICE_FUZZER_H
-#define CAMERA_DEVICE_FUZZER_H
+#ifndef STREAM_OPERATOR_FUZZER_H
+#define STREAM_OPERATOR_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "camerahost_fuzzer"
+#define FUZZ_PROJECT_NAME "streamoperator_fuzzer"
 #include "common.h"
-#include "v1_1/istream_operator.h"
+#include "v1_2/istream_operator.h"
 namespace OHOS {
     std::shared_ptr<OHOS::Camera::CameraManager> cameraTest = nullptr;
 }

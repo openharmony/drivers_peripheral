@@ -231,7 +231,8 @@ int32_t CameraManager::TestCameraHostCallback::OnCameraEvent(const std::string& 
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId)
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureStarted(
+    int32_t captureId, const std::vector<int32_t> &streamId)
 {
     for (auto it : streamId) {
         CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d", captureId, it);
@@ -239,7 +240,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted(int32_t captureId
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureEnded(int32_t captureId,
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureEnded(int32_t captureId,
     const std::vector<CaptureEndedInfo> &infos)
 {
     for (auto it : infos) {
@@ -249,7 +250,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureEnded(int32_t captureId,
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureError(int32_t captureId,
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureError(int32_t captureId,
     const std::vector<CaptureErrorInfo> &infos)
 {
     for (auto it : infos) {
@@ -259,7 +260,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureError(int32_t captureId,
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t captureId,
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t captureId,
     const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
     (void)timestamp;
@@ -269,7 +270,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t captureId,
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStartedV1_2(int32_t captureId,
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureStartedV1_2(int32_t captureId,
     const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
 {
     for (auto it : infos) {
