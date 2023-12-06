@@ -23,7 +23,7 @@ namespace V1_1 {
 int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
 {
     struct HdfSensorEvents event;
-
+    int32_t ret;
     if (sensorCallback_ == nullptr) {
         HDF_LOGE("%{public}s sensorCallback_ is NULL", __func__);
         return HDF_FAILURE;
@@ -36,13 +36,30 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
     event.mode = eventVdi.mode;
     event.data = eventVdi.data;
     event.dataLen = eventVdi.dataLen;
-
-    int32_t ret = sensorCallback_->OnDataEvent(event);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s OnDataEvent failed, error code is %{public}d", __func__, ret);
+    std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
+    std::unordered_map<int, SensorClientInfo> client;
+    if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
+        HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
+        return HDF_FAILURE;
     }
-
-    return ret;
+    sptr<ISensorCallback> callback;
+    if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
+        HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
+        return HDF_FAILURE;
+    }
+    for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
+        sensorClientInfo_ = client[*it];
+        callback = sensorClientInfo_.GetReportDataCb();
+        if (callback == nullptr) {
+            HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
+            continue;
+        }
+        ret = callback->OnDataEvent(event);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+        }
+    }
+    return HDF_SUCCESS;
 }
 
 sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()

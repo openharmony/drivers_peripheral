@@ -21,6 +21,7 @@
 #include <mutex>
 #include <vector>
 #include <string>
+#include <map>
 
 #include <json/json.h>
 #include "nocopyable.h"
@@ -28,35 +29,54 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 class BatteryConfig : public NoCopyable {
 public:
-    struct LightConf {
+    struct LightConfig {
         int32_t beginSoc;
         int32_t endSoc;
         uint32_t rgb;
     };
+
+    struct ChargerConfig {
+        std::string currentPath;
+        std::string voltagePath;
+        std::string chargeTypePath;
+    };
+
+    struct ChargeSceneConfig {
+        std::string supportPath;
+        std::string type;
+        std::string expectValue;
+        std::string getPath;
+        std::string setPath;
+    };
     static BatteryConfig& GetInstance();
     static void DestroyInstance();
     bool ParseConfig();
-    bool IsExist(std::string key) const;
-    int32_t GetInt(std::string key, int32_t defVal = 0) const;
-    std::string GetString(std::string key, std::string defVal = "") const;
-    const std::vector<LightConf>& GetLightConf() const;
+    const std::vector<LightConfig>& GetLightConfig() const;
+    const BatteryConfig::ChargerConfig& GetChargerConfig() const;
+    const std::map<std::string, BatteryConfig::ChargeSceneConfig>& GetChargeSceneConfigMap() const;
+    const std::map<std::string, std::vector<std::string>>& GetUeventList() const;
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
-    void ParseConfInner();
-    void ParseLightConf(std::string level);
-    Json::Value FindConf(const std::string& key) const;
+    void ParseConfInner(const Json::Value& config);
+    void ParseLightConfig(const Json::Value& lightConfig);
+    void ParseChargeSceneConfig(const Json::Value& chargeSceneConfig);
+    void ParseChargerConfig(const Json::Value& chargerConfig);
+    void ParseUeventConfig(const Json::Value& ueventConfig);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
-    Json::Value GetValue(std::string key) const;
-    Json::Value config_;
-    std::vector<BatteryConfig::LightConf> lightConf_;
+    Json::Value GetValue(const Json::Value& config, std::string key) const;
+    bool isValidJsonString(const Json::Value& config) const;
+    std::vector<BatteryConfig::LightConfig> lightConfig_;
+    BatteryConfig::ChargerConfig chargerConfig_;
+    std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<BatteryConfig> instance_;
+    std::map<std::string, std::vector<std::string>> ueventMap_;
 };
-}  // namespace V1_2
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

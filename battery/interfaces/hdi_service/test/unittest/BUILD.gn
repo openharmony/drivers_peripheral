@@ -43,7 +43,7 @@ ohos_unittest("test_hdisrv") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../../../../interface/battery/v1_2:libbattery_stub_1.2",
+    "../../../../../../interface/battery/v2_0:libbattery_stub_2.0",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -70,7 +70,7 @@ ohos_unittest("hdi_unittest_battery") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_battery:libbattery_proxy_1.2",
+      "drivers_interface_battery:libbattery_proxy_2.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",

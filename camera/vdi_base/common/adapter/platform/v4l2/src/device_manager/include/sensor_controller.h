@@ -34,6 +34,8 @@ public:
     RetCode PowerDown();
     RetCode Configure(std::shared_ptr<CameraMetadata> meta);
     RetCode ConfigFps(std::shared_ptr<CameraMetadata> meta);
+    RetCode ConfigStart();
+    RetCode ConfigStop();
     RetCode Start(int buffCont, DeviceFormat& format);
     RetCode Stop();
 
@@ -50,12 +52,18 @@ public:
 private:
     RetCode SendSensorMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode SendAEMetaData(common_metadata_header_t *data);
+    RetCode SendAELockMetaData(common_metadata_header_t *data);
     RetCode SendAWBMetaData(common_metadata_header_t *data);
+    RetCode SendAWBLockMetaData(common_metadata_header_t *data);
     RetCode SendExposureMetaData(common_metadata_header_t *data);
+    RetCode SendExposureModeMetaData(common_metadata_header_t *data);
+    RetCode SendExposureAutoModeMetaData(common_metadata_header_t *data);
     RetCode SendFocusMetaData(common_metadata_header_t *data);
+    RetCode SendFocusRegionsMetaData(common_metadata_header_t *data);
     RetCode SendMeterMetaData(common_metadata_header_t *data);
     RetCode SendFlashMetaData(common_metadata_header_t *data);
     RetCode SendFpsMetaData(common_metadata_header_t *data);
+    RetCode SetFocusRegions(common_metadata_header_t *data);
     RetCode GetSensorMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode GetAEMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode GetAWBMetaData(std::shared_ptr<CameraMetadata> meta);
@@ -112,6 +120,8 @@ private:
     static std::map<int32_t, uint32_t> tagV4L2CidMap_;
     static std::map<int32_t, TagFunType> tagMethodMap_;
     std::vector<int32_t> fpsRange_;
+    bool configState_ = false;
+    bool is3aAeLock_ = false;
 };
 } // namespace OHOS::Camera
 #endif

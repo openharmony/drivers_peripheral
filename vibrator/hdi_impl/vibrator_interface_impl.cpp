@@ -82,6 +82,8 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorModeVdi mode)
         tmp = VIBRATOR_MODE_ONCE;
     } else if (mode == VDI_VIBRATOR_MODE_PRESET) {
         tmp = VIBRATOR_MODE_PRESET;
+    } else if (mode == VDI_VIBRATOR_MODE_HDHAPTIC) {
+        tmp = VIBRATOR_MODE_HDHAPTIC;
     } else if (mode == VDI_VIBRATOR_MODE_BUTT) {
         tmp = VIBRATOR_MODE_BUTT;
     } else {
@@ -186,6 +188,54 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
     if (vibratorInterface == nullptr || vibratorInterface->IsVibratorRunning == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::PlayHapticPattern(const HapticPaketVdi& pkgVdi)
+{
+    HDF_LOGI("%{public}s: Enter the PlayHapticPattern function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->PlayHapticPattern == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& hapticCapacityVdi)
+{
+    HDF_LOGI("%{public}s: Enter the GetHapticCapacity function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->GetHapticCapacity == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+    struct HapticCapacity hapticCapacity;
+    int32_t ret = vibratorInterface->GetHapticCapacity(&hapticCapacity);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+    hapticCapacityVdi.isSupportHdHaptic = hapticCapacity.isSupportHdHaptic;
+    hapticCapacityVdi.isSupportPresetMapping = hapticCapacity.isSupportPresetMapping;
+    hapticCapacityVdi.isSupportTimeDelay = hapticCapacity.isSupportTimeDelay;
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t mode, int32_t& startUpTime)
+{
+    HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->GetHapticStartUpTime == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = vibratorInterface->GetHapticStartUpTime(mode, &startUpTime);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
     return HDF_SUCCESS;

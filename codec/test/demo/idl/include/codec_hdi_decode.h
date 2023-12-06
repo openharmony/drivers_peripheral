@@ -28,21 +28,23 @@
 #include <OMX_VideoExt.h>
 #include <securec.h>
 #include "codec_hdi_callback.h"
+#include "codec_omx_ext.h"
 #include "codec_utils.h"
 #include "command_parse.h"
 #include "hdf_log.h"
-#include "v1_0/codec_types.h"
-#include "v1_0/icodec_callback.h"
-#include "v1_0/icodec_component.h"
-#include "v1_0/icodec_component_manager.h"
+#include "sys/mman.h"
+#include "v2_0/codec_types.h"
+#include "v2_0/icodec_callback.h"
+#include "v2_0/icodec_component.h"
+#include "v2_0/icodec_component_manager.h"
 #include "v1_0/include/idisplay_buffer.h"
 
-using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V2_0::OmxCodecBuffer;
 class CodecHdiDecode : public ICodecHdiCallBackBase,
                        public std::enable_shared_from_this<CodecHdiDecode> {
     enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
     struct BufferInfo {
-        std::shared_ptr<OHOS::HDI::Codec::V1_0::OmxCodecBuffer> omxBuffer;
+        std::shared_ptr<OHOS::HDI::Codec::V2_0::OmxCodecBuffer> omxBuffer;
         std::shared_ptr<OHOS::Ashmem> avSharedPtr;
         PortIndex portIndex;
         BufferHandle *bufferHandle;
@@ -86,10 +88,10 @@ public:
     void FreeBuffers();
     void Run();
     void Release();
-    int32_t OnEmptyBufferDone(const struct OHOS::HDI::Codec::V1_0::OmxCodecBuffer &buffer) override;
-    int32_t OnFillBufferDone(const struct OHOS::HDI::Codec::V1_0::OmxCodecBuffer &buffer) override;
-    int32_t EventHandler(OHOS::HDI::Codec::V1_0::CodecEventType event,
-        const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
+    int32_t OnEmptyBufferDone(const struct OHOS::HDI::Codec::V2_0::OmxCodecBuffer &buffer) override;
+    int32_t OnFillBufferDone(const struct OHOS::HDI::Codec::V2_0::OmxCodecBuffer &buffer) override;
+    int32_t EventHandler(OHOS::HDI::Codec::V2_0::CodecEventType event,
+        const OHOS::HDI::Codec::V2_0::EventInfo &info) override;
     void WaitForStatusChanged();
     void OnStatusChanged();
     bool ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount);
@@ -99,6 +101,11 @@ private:
     int32_t UseBufferOnPort(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseBufferHandle(int bufferCount, int bufferSize);
     int32_t CheckAndUseBufferHandle();
+    int32_t CheckAndUseDMABuffer();
+    int32_t CreateBufferHandle();
+    int32_t UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize);
+    bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferIndo, bool &endFlag);
+    int32_t CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType);
     int GetYuvSize();
     int32_t ConfigPortDefine();
     bool FillAllTheBuffer();
@@ -117,11 +124,12 @@ private:
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponent> client_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecCallback> callback_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponentManager> omxMgr_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecComponent> client_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecCallback> callback_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecComponentManager> omxMgr_;
     uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is buferid
+    std::map<int, void *> addrs_;
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;
     std::mutex lockInputBuffers_;
@@ -130,6 +138,7 @@ private:
     bool exit_;
     codecMime codecMime_;
     bool useBufferHandle_;
+    bool useDMABuffer_;
     int count_;
     static CodecUtil *util_;
     static constexpr uint32_t alignment_ = 16;

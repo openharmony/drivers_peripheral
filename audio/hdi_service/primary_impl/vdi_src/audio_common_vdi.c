@@ -46,6 +46,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     vdiAttrs->format = (enum AudioFormatVdi)attrs->format;
     vdiAttrs->sampleRate = attrs->sampleRate;
     vdiAttrs->channelCount = attrs->channelCount;
+    vdiAttrs->channelLayout = attrs->channelLayout;
     vdiAttrs->period = attrs->period;
     vdiAttrs->frameSize = attrs->frameSize;
     vdiAttrs->isBigEndian = attrs->isBigEndian;
@@ -58,6 +59,7 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
     if (vdiAttrs->type == AUDIO_VDI_OFFLOAD) {
         vdiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
         vdiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
+        vdiAttrs->offloadInfo.channelLayout = attrs->offloadInfo.channelLayout;
         vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;
@@ -406,6 +408,7 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
     vdiAttrs->format = (enum AudioFormatVdi)attrs->format;
     vdiAttrs->sampleRate = attrs->sampleRate;
     vdiAttrs->channelCount = attrs->channelCount;
+    vdiAttrs->channelLayout = attrs->channelLayout;
     vdiAttrs->period = attrs->period;
     vdiAttrs->frameSize = attrs->frameSize;
     vdiAttrs->isBigEndian = attrs->isBigEndian;
@@ -418,6 +421,7 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
     if (vdiAttrs->type == AUDIO_VDI_OFFLOAD) {
         vdiAttrs->offloadInfo.sampleRate = attrs->offloadInfo.sampleRate;
         vdiAttrs->offloadInfo.channelCount = attrs->offloadInfo.channelCount;
+        vdiAttrs->offloadInfo.channelLayout = attrs->offloadInfo.channelLayout;
         vdiAttrs->offloadInfo.bitRate = attrs->offloadInfo.bitRate;
         vdiAttrs->offloadInfo.bitWidth = attrs->offloadInfo.bitWidth;
         vdiAttrs->offloadInfo.format = (enum AudioFormatVdi)attrs->offloadInfo.format;

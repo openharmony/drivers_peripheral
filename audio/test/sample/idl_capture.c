@@ -32,19 +32,18 @@
 #include "ioservstat_listener.h"
 #include "osal_mem.h"
 #include "svcmgr_ioservice.h"
-#include "v1_0/iaudio_manager.h"
-#include "v1_0/audio_types.h"
+#include "v2_0/iaudio_manager.h"
+#include "v2_0/audio_types.h"
 
 #define MOVE_LEFT_NUM                   8
 #define AUDIO_CHANNELCOUNT              2
 #define AUDIO_SAMPLE_RATE_48K           48000
 #define PATH_LEN                        256
-#define BUFFER_PERIOD_SIZE              (4 * 1024)
+#define BUFFER_PERIOD_SIZE              3840
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE  4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX                      0x7fffffff
 #define BUFFER_SIZE_BASE                1024
-#define AUDIO_BUFF_SIZE                 (1024 * 16)
 #define PCM_8_BIT                       8
 #define PCM_16_BIT                      16
 #define AUDIO_TOTALSIZE_15M             (1024 * 15)
@@ -55,6 +54,8 @@
 #define EXT_PARAMS_MAXLEN               107
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
+#define AUDIO_CAPTURE_STREAM_ID         14
+#define AUDIO_ROUTE_NODE_LEN            1
 
 struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
@@ -113,6 +114,7 @@ struct ProcessCaptureMenuSwitchList {
 
 static int32_t g_closeEnd = 0;
 bool g_isDirect = true;
+static int g_voiceCallType = 0;
 
 static int32_t CheckInputName(int type, void *val)
 {
@@ -180,7 +182,8 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->isSignedData = true;
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
-    captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
+    captureAttrs->silenceThreshold = 0;
+    captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
 
@@ -319,8 +322,8 @@ static int32_t FrameStartCapture(const struct StrParaCapture *param)
     if (param == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t bufferSize = AUDIO_BUFF_SIZE;
-    uint64_t requestBytes = AUDIO_BUFF_SIZE;
+    uint32_t bufferSize = BUFFER_PERIOD_SIZE;
+    uint64_t requestBytes = BUFFER_PERIOD_SIZE;
     uint64_t totalSize = 0;
     uint32_t failCount = 0;
 
@@ -485,6 +488,41 @@ static int32_t RecordingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
+static int32_t UpdateAudioRoute()
+{
+    struct AudioRouteNode source = {
+        .ext.device.type = PIN_IN_MIC,
+        .ext.device.desc = (char *)"pin_in_mic",
+        .ext.device.moduleId = 0,
+        .portId = 0,
+        .role = AUDIO_PORT_SOURCE_ROLE,
+        .type = AUDIO_PORT_DEVICE_TYPE,
+    };
+
+    struct AudioRouteNode sink = {
+        .portId = 0,
+        .role = AUDIO_PORT_SINK_ROLE,
+        .type = AUDIO_PORT_MIX_TYPE,
+        .ext.mix.moduleId = 0,
+        .ext.mix.streamId = AUDIO_CAPTURE_STREAM_ID,
+        .ext.device.desc = (char *)"",
+    };
+
+    struct AudioRoute route = {
+        .sources = &source,
+        .sourcesLen = AUDIO_ROUTE_NODE_LEN,
+        .sinks = &sink,
+        .sinksLen = AUDIO_ROUTE_NODE_LEN,
+    };
+
+    int routeHandle = 0;
+    int32_t ret = g_adapter->UpdateAudioRoute(g_adapter, &route, &routeHandle);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("UpdateAudioRoute failed");
+    }
+    return ret;
+}
+
 static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
 {
     if (captureTemp == NULL) {
@@ -495,6 +533,10 @@ static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
     struct IAudioCapture *capture = NULL;
     int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture, &g_captureId);
     if (capture == NULL || ret < 0) {
+        return HDF_FAILURE;
+    }
+
+    if (UpdateAudioRoute() < 0) {
         return HDF_FAILURE;
     }
 
@@ -580,6 +622,27 @@ static int32_t SelectLoadingMode(void)
             g_isDirect = true;
             break;
     }
+    return HDF_SUCCESS;
+}
+
+static int32_t SelectAudioInputType(void)
+{
+    system("clear");
+    int choice = 0;
+    g_voiceCallType = 0;
+
+    PrintAudioInputTypeMenu();
+    printf("Please enter your choice: ");
+
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+    if (ret < 0) {
+        return HDF_FAILURE;
+    }
+
+    if ((choice >= 0) && (choice <= 7)) { // 7. the max value of audio input type
+        g_voiceCallType = 1 << choice;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -711,6 +774,11 @@ static int32_t InitParam(void)
 {
     if (SelectLoadingMode() < 0) {
         AUDIO_FUNC_LOGE("SelectLoadingMode failed!");
+        return HDF_FAILURE;
+    }
+
+    if (SelectAudioInputType() < 0) {
+        AUDIO_FUNC_LOGE("SelectAudioInputType failed!");
         return HDF_FAILURE;
     }
 

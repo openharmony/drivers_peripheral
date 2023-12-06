@@ -21,11 +21,15 @@
 #include "param_wrapper.h"
 #include "hilog/log.h"
 
+#undef LOG_DOMAIN
+#undef LOG_TAG
+#define LOG_DOMAIN 0xD002500
+#define LOG_TAG "hdf_partitionslot_manager"
+
 namespace OHOS {
 namespace HDI {
 namespace Partitionslot {
 namespace V1_0 {
-#define  HILOG_LOG_TAG           hdf_partitionslot_manager
 
 constexpr int32_t UPDATE_PARTITION_B = 2;
 

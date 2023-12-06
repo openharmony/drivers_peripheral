@@ -129,6 +129,18 @@ void FillFuzzAuthSolution(Parcel &parcel, AuthSolution &authSolution)
     IAM_LOGI("success");
 }
 
+void FillFuzzAuthSolutionV1_2(Parcel &parcel, AuthSolutionV1_2 &authSolution)
+{
+    authSolution.userId = parcel.ReadInt32();
+    authSolution.authTrustLevel = parcel.ReadUint32();
+    authSolution.authType = static_cast<AuthType>(parcel.ReadInt32());
+    authSolution.executorSensorHint = parcel.ReadUint32();
+    FillFuzzUint8Vector(parcel, authSolution.challenge);
+    authSolution.callerName = parcel.ReadString();
+    authSolution.apiVersion = parcel.ReadInt32();
+    IAM_LOGI("success");
+}
+
 void FillFuzzExecutorSendMsg(Parcel &parcel, ExecutorSendMsg &executorSendMsg)
 {
     executorSendMsg.executorIndex = parcel.ReadUint32();
@@ -168,6 +180,15 @@ void FillFuzzEnrollParam(Parcel &parcel, EnrollParam &enrollParam)
 {
     enrollParam.authType = static_cast<AuthType>(parcel.ReadInt32());
     enrollParam.executorSensorHint = parcel.ReadUint32();
+    IAM_LOGI("success");
+}
+
+void FillFuzzEnrollParamV1_2(Parcel &parcel, EnrollParamV1_2 &enrollParam)
+{
+    enrollParam.authType = static_cast<AuthType>(parcel.ReadInt32());
+    enrollParam.executorSensorHint = parcel.ReadUint32();
+    enrollParam.callerName = parcel.ReadString();
+    enrollParam.apiVersion = parcel.ReadInt32();
     IAM_LOGI("success");
 }
 
@@ -284,6 +305,19 @@ void FuzzBeginEnrollmentV1_1(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzBeginEnrollmentV1_2(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    int32_t userId = parcel.ReadInt32();
+    std::vector<uint8_t> authToken;
+    FillFuzzUint8Vector(parcel, authToken);
+    EnrollParamV1_2 paramV1_2;
+    FillFuzzEnrollParamV1_2(parcel, paramV1_2);
+    ScheduleInfoV1_1 info;
+    FillFuzzScheduleInfoV1_1(parcel, info);
+    g_service.BeginEnrollmentV1_2(userId, authToken, paramV1_2, info);
+    IAM_LOGI("end");
+}
 
 void FuzzUpdateEnrollmentResult(Parcel &parcel)
 {
@@ -389,6 +423,18 @@ void FuzzBeginAuthenticationV1_1(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzBeginAuthenticationV1_2(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    uint64_t contextId = parcel.ReadUint64();
+    AuthSolutionV1_2 param;
+    FillFuzzAuthSolutionV1_2(parcel, param);
+    std::vector<ScheduleInfoV1_1> scheduleInfos;
+    FillFuzzScheduleInfoV1_1Vector(parcel, scheduleInfos);
+    g_service.BeginAuthenticationV1_2(contextId, param, scheduleInfos);
+    IAM_LOGI("end");
+}
+
 void FuzzUpdateAuthenticationResult(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -486,7 +532,7 @@ FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOp
     FuzzGetSecureInfo, FuzzDeleteUser, FuzzEnforceDeleteUser, FuzzBeginAuthentication, FuzzUpdateAuthenticationResult,
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
     FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzBeginEnrollmentV1_1, FuzzBeginAuthenticationV1_1,
-    FuzzBeginIdentificationV1_1 };
+    FuzzBeginIdentificationV1_1, FuzzBeginAuthenticationV1_2, FuzzBeginEnrollmentV1_2};
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {

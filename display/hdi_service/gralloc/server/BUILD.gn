@@ -43,7 +43,7 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "graphic_chipsetsdk:surface" ]
+  external_deps += [ "graphic_surface:surface" ]
 
   shlib_type = "hdi"
 

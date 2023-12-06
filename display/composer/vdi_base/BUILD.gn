@@ -65,7 +65,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
     "drivers_interface_display:display_composer_idl_headers",
-    "graphic_chipsetsdk:buffer_handle",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:hitrace_meter",

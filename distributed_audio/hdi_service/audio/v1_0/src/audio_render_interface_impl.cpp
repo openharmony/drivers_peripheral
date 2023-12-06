@@ -80,7 +80,9 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
         float rate = GetFadeRate(currentFrame_ * newFrameLength + k, durationFrame * newFrameLength);
         frame[k] = currentFrame_ == durationFrame - 1 ? frame[k] : static_cast<int16_t>(rate * frame[k]);
     }
-    DHLOGI("Fade-in frame[currentFrame: %d].", currentFrame_);
+    if (currentFrame_ < MAX_FRAME_COUNT) {
+        DHLOGI("Fade-in frame[currentFrame: %d].", currentFrame_);
+    }
     ++currentFrame_;
     currentFrame_ = currentFrame_ >= durationFrame ? durationFrame - 1 : currentFrame_;
 
@@ -122,7 +124,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     DHLOGD("Render audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastRenderStartTime_)) {
-        DHLOGE("This time render frame spend: %lld, The interval of render frame this time and the last time: %lld",
+        DHLOGE("This time render frame spend: %lld us, The interval of this time and the last time: %lld us",
             endTime - startTime, startTime - lastRenderStartTime_);
     }
     lastRenderStartTime_ = startTime;
@@ -231,7 +233,7 @@ int32_t AudioRenderInterfaceImpl::Stop()
         return HDF_FAILURE;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_RESTART.c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_PAUSE.c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");

@@ -24,8 +24,7 @@
           "hdf_core",
           "hilog",
           "c_utils",
-          "drivers_interface_secure_element",
-          "nfc_ca"
+          "drivers_interface_secure_element"
         ],
         "third_party": [
         ]

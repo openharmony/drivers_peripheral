@@ -17,8 +17,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <algorithm>
-#include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -29,7 +29,7 @@
 #include "hdi_test_render_utils.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 using namespace OHOS::HDI::Display::TEST;
 
 const int SLEEP_CONT_100 = 100;
@@ -108,7 +108,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 0.125f },
             .color = GREEN,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
 
@@ -119,7 +119,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = RED,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
     {
@@ -129,7 +129,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0, 1.0f, 0.125f },
             .color = GREEN,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     },
     {
@@ -139,7 +139,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_VIDEO = {
         {
             .rectRatio = { 0, 0.875f, 1.0f, 0.125f },
             .color = YELLOW,
-            .compositionType = COMPOSITION_VIDEO
+            .compositionType = Composer::V1_0::CompositionType::COMPOSITION_VIDEO
         },
     }
 };

@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 constexpr int32_t MAX_SYSFS_SIZE = 64;
 constexpr int32_t MAX_BUFF_SIZE = 128;
@@ -86,7 +86,12 @@ inline void PowerSupplyProvider::Trim(char* str)
         return;
     }
 
-    str[strcspn(str, "\n")] = 0;
+    int32_t strc = strcspn(str, "\n");
+    if (strc < 0 || strc >= strlen(str)) {
+        return;
+    }
+
+    str[strc] = 0;
 }
 
 inline void PowerSupplyProvider::CapacityAssigner(const char* str, struct BatterydInfo* info)
@@ -265,7 +270,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 {
     int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file");
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file");
         return HDF_ERR_IO;
     }
 
@@ -293,14 +298,19 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
     std::string onlineNode = "USB";
     int32_t ret;
     int32_t online;
-    std::string onlinePath;
-
+    std::string onlinePath = path_ + "/" + onlineNode + "/" + "online";
+    ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
+    online = ParseInt(buf);
     auto iter = nodeNames_.begin();
-    while (iter != nodeNames_.end()) {
+    while (!online && iter != nodeNames_.end()) {
+        if (*iter == "USB") {
+            iter++;
+            continue;
+        }
         onlinePath = path_ + "/" + *iter + "/" + "online";
         ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
         if (ret != HDF_SUCCESS) {
-            BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed in loop, ret: %{public}d", ret);
+            BATTERY_HILOGD(FEATURE_BATT_INFO, "read online path failed in loop, ret: %{public}d", ret);
         }
         online = ParseInt(buf);
         if (online) {
@@ -310,13 +320,11 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         iter++;
     }
 
-    ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
         return;
     }
 
-    online = ParseInt(buf);
     if (!online) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "charger is not online, so no type return");
         return;
@@ -581,18 +589,19 @@ void PowerSupplyProvider::InitChargerSysfs()
 {
     auto& batteryConfig = BatteryConfig::GetInstance();
     batteryConfig.ParseConfig();
-    std::string mockCurrentLimitPath = batteryConfig.GetString("charger.current_limit.path");
-    std::string mockVoltageLimitPath = batteryConfig.GetString("charger.voltage_limit.path");
-    std::string mockChargeTypePath = batteryConfig.GetString("charger.type.path");
-
+    BatteryConfig::ChargerConfig chargerConfig = batteryConfig.GetChargerConfig();
+    
+    std::string mockCurrentLimitPath = chargerConfig.currentPath;
     if (access(mockCurrentLimitPath.c_str(), 0) == -1) {
         CreateFile(mockCurrentLimitPath, "0");
     }
 
+    std::string mockVoltageLimitPath = chargerConfig.voltagePath;
     if (access(mockVoltageLimitPath.c_str(), 0) == -1) {
         CreateFile(mockVoltageLimitPath, "0");
     }
 
+    std::string mockChargeTypePath = chargerConfig.chargeTypePath;
     if (access(mockChargeTypePath.c_str(), 0) == -1) {
         CreateFile(mockChargeTypePath, "0");
     }
@@ -975,7 +984,8 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
         }
         chargeLimitStr = chargeLimitStr + (iter.protocol + " " + std::to_string(iter.value) + "\n");
     }
-    int32_t ret = WriteChargingLimit(limitPath, chargeLimitStr);
+
+    int32_t ret = SetConfigByPath(limitPath, chargeLimitStr);
     if (ret < HDF_SUCCESS) {
         return ret;
     }
@@ -983,16 +993,58 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::WriteChargingLimit(std::string chargingLimitPath, std::string& str)
+int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std::string& value)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "Enter");
-    std::fstream out(chargingLimitPath, std::ios::out | std::ios::trunc);
-    out << str;
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath enter, path: %{public}s, value:%{public}s",
+        path.c_str(), value.c_str());
+    if (path.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "the featurePath is empty");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    std::fstream out(path, std::ios::out | std::ios::trunc);
+    out << value;
     out.close();
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
+
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;
 }
-}  // namespace V1_2
+
+int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::string& result)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath enter, path: %{public}s", path.c_str());
+    if (path.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "the featurePath is empty");
+        result = "";
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    char buf[MAX_BUFF_SIZE] = {0};
+    int32_t ret = ReadBatterySysfsToBuff(path.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "read config failed, path: %{public}s", path.c_str());
+        result = "";
+        return ret;
+    }
+    Trim(buf);
+    result = buf;
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath exit, value:%{public}s", result.c_str());
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::CheckPathExists(const std::string& path, bool& result)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists enter, path: %{public}s", path.c_str());
+    if (path.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "the path is empty");
+        result = false;
+        return HDF_ERR_INVALID_PARAM;
+    }
+    result = access(path.c_str(), F_OK) == 0;
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists exit, value:%{public}d", result);
+    return HDF_SUCCESS;
+}
+}  // namespace V2_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

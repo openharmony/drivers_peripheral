@@ -52,7 +52,6 @@ ohos_systemtest("test_battery_sys_test") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "hilog:libhilog",
-    "ipc:ipc_core",
   ]
 }
 

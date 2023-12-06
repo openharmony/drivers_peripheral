@@ -20,6 +20,8 @@
 #include "v1_1/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_callback_vdi.h"
+#include "sensor_client_info.h"
+#include "sensor_clients_manager.h"
 
 namespace OHOS {
 namespace HDI {
@@ -43,6 +45,8 @@ public:
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
     int32_t ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event) override;
     int32_t GetSensorVdiImpl();
+
+    std::mutex sensorCbMutex_;
 private:
     ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;

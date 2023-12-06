@@ -23,9 +23,12 @@
 #include "metadata_controller.h"
 #include "metadata_utils.h"
 #include "camera_dump.h"
+#ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
-
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
+#else
+#define HDF_CAMERA_TRACE
+#endif
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
     PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceVdiImpl::OnRequestTimeout, this))
 
@@ -128,8 +131,10 @@ int32_t CameraDeviceVdiImpl::UpdateSettings(const std::vector<uint8_t> &settings
 
     std::shared_ptr<CameraMetadata> updateSettings;
     MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
+
     CameraDumper &dumper = CameraDumper::GetInstance();
-    dumper.DumpMetadata(updateSettings, "updatesetting");
+    dumper.DumpMetadata("updatesetting", ENABLE_METADATA, updateSettings);
+
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.UpdateSettingsConfig(updateSettings);
     DFX_LOCAL_HITRACE_END;
@@ -387,8 +392,10 @@ void CameraDeviceVdiImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata
     uint64_t timestamp = GetCurrentLocalTimeStamp();
     std::vector<uint8_t> result;
     MetadataUtils::ConvertMetadataToVec(metadata, result);
+
     CameraDumper &dumper = CameraDumper::GetInstance();
-    dumper.DumpMetadata(metadata, "reportmeta");
+    dumper.DumpMetadata("reportmeta", ENABLE_METADATA, metadata);
+
     cameraDeciceCallback_->OnResult(timestamp, result);
 }
 

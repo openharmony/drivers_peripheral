@@ -20,7 +20,7 @@
 #include "v1_0/secure_element_interface_stub.h"
 
 #ifdef SECURE_ELEMENT_USE_CA
-#include "secure_element_ca.h"
+#include "secure_element_ca_proxy.h"
 #endif
 
 #define HDF_LOG_TAG hdf_se
@@ -58,7 +58,7 @@ static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGE("%{public}s: Enter", __func__);
 #ifdef SECURE_ELEMENT_USE_CA
-    int ret = VendorSecureElementCaInit();
+    int ret = OHOS::HDI::SecureElement::SecureElementCaProxy::GetInstance().VendorSecureElementCaInit();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("%{public}s: Failed", __func__);
         return HDF_ERR_INVALID_PARAM;

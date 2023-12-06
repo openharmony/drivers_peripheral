@@ -22,6 +22,7 @@
 
 #include "v1_0/intell_voice_engine_types.h"
 #include "v1_0/iintell_voice_engine_manager.h"
+#include "v1_0/iintell_voice_data_opr_callback.h"
 #include "i_engine.h"
 
 namespace OHOS {
@@ -31,12 +32,25 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineManager;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterType;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
+using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceDataOprCallback;
+using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceDataOprType;
 
 using GetEngineManagerHalInstFunc = IEngineManager *(*)();
 
 struct IntellVoiceEngineManagerPriv {
     void *handle { nullptr };
     GetEngineManagerHalInstFunc getEngineManagerHalInst { nullptr };
+};
+
+class DataOprListener : public IDataOprListener {
+public:
+    DataOprListener(sptr<IIntellVoiceDataOprCallback> cb);
+    ~DataOprListener();
+    int32_t OnDataOprEvent(IntellVoiceDataOprType type, const OprDataInfo &inData, OprDataInfo &outData) override;
+private:
+    sptr<Ashmem> CreateAshmemFromOprData(const OprDataInfo &data, const std::string &name);
+    int32_t FillOprDataFromAshmem(const sptr<Ashmem> &ashmem, OprDataInfo &data);
+    sptr<IIntellVoiceDataOprCallback> cb_;
 };
 
 class IntellVoiceEngineManagerImpl : public IIntellVoiceEngineManager {
@@ -48,6 +62,7 @@ public:
     int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor& descriptor,
         sptr<IIntellVoiceEngineAdapter>& adapter) override;
     int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor& descriptor) override;
+    int32_t SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback>& dataOprCallback) override;
 
 private:
     int32_t LoadVendorLib();

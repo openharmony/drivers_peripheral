@@ -26,18 +26,38 @@
 #include "devhost_dump_reg.h"
 #include "hdf_sbuf.h"
 #include "ibuffer.h"
+#include <iostream>
 
 namespace OHOS::Camera {
 enum DumpType {
     MedataType,
-    BufferType
+    BufferType,
+    OpenType
 };
+
+const std::string ENABLE_DQ_BUFFER_DUMP = "enableDQBufDump";
+const std::string ENABLE_UVC_NODE = "enableUVCNodeBufferDump";
+const std::string ENABLE_UVC_NODE_CONVERTED = "enableUVCNodeConvertedBufferDump";
+const std::string ENABLE_EXIF_NODE_CONVERTED = "enableExifNodeConvertedBufferDump";
+const std::string ENABLE_FACE_NODE_CONVERTED = "enableFaceNodeConvertedBufferDump";
+const std::string ENABLE_FORK_NODE_CONVERTED = "enableForkNodeConvertedBufferDump";
+const std::string ENABLE_RKFACE_NODE_CONVERTED = "enableRKFaceNodeConvertedBufferDump";
+const std::string ENABLE_RKEXIF_NODE_CONVERTED = "enableRKExifNodeConvertedBufferDump";
+const std::string ENABLE_CODEC_NODE_CONVERTED = "enableCodecNodeConvertedBufferDump";
+const std::string ENABLE_RKCODEC_NODE_CONVERTED = "enableRKCodecNodeConvertedBufferDump";
+const std::string ENABLE_STREAM_TUNNEL = "enableSreamTunnelBufferDump";
+const std::string ENABLE_METADATA = "enableMetadataDump";
+const std::string PREVIEW_INTERVAL = "previewInterval";
+const std::string CAPTURE_INTERVAL = "captureInterval";
 
 class CameraDumper {
 public:
     ~CameraDumper ();
-    bool DumpBuffer(const std::shared_ptr<IBuffer>& buffer);
-    bool DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata, std::string tag = "camera");
+    bool DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer);
+    bool DumpStart();
+    bool ReadDumpConfig();
+    bool IsDumpCommandOpened(std::string type);
+    bool DumpMetadata(std::string name, std::string type, const std::shared_ptr<CameraMetadata>& metadata);
     void ShowDumpMenu(struct HdfSBuf *reply);
     void CameraHostDumpProcess(struct HdfSBuf *data, struct HdfSBuf *reply);
     static CameraDumper& GetInstance()
@@ -63,6 +83,7 @@ private:
     std::mutex terminateLock_;
     bool terminate_ = true;
     std::unique_ptr<std::thread> handleThread_ = nullptr;
+    int32_t dumpCount_ = 0;
 };
 
 int32_t CameraDumpEvent(struct HdfSBuf *data, struct HdfSBuf *reply);

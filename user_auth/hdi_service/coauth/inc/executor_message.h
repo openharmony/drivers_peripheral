@@ -46,7 +46,7 @@ typedef struct ExecutorMsg {
 ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv);
 ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg);
 void DestoryExecutorResultInfo(ExecutorResultInfo *result);
-ResultCode GetExecutorMsgList(uint32_t authPropertyMode, LinkedList **executorMsg);
+ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedList **executorMsg);
 
 #ifdef __cplusplus
 }

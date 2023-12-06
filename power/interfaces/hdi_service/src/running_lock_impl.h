@@ -33,6 +33,7 @@ class RunningLockImpl {
 public:
     static int32_t Hold(const RunningLockInfo &info, PowerHdfState state);
     static int32_t Unhold(const RunningLockInfo &info);
+    static void Clean();
     static uint32_t GetCount(RunningLockType type);
     static std::string GetRunningLockTag(RunningLockType type);
     static void SetDefaultTimeOutMs(int32_t timeOutMs);

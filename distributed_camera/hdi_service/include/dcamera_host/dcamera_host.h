@@ -24,6 +24,7 @@
 #include "v1_0/dcamera_types.h"
 #include "v1_0/types.h"
 #include "constants.h"
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -70,6 +71,11 @@ private:
             }
         }
     };
+    class DCameraHostRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
+    sptr<DCameraHostRecipient> dCameraHostRecipient_;
     static AutoRelease autoRelease_;
     static OHOS::sptr<DCameraHost> instance_;
 

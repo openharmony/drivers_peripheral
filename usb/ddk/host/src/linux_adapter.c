@@ -1107,7 +1107,6 @@ static int32_t AdapterAttachKernelDriver(const struct UsbDeviceHandle *handle, u
     }
     HDF_LOGI("%{public}s ret = %{public}d, errno = %{public}d ", __func__, ret, errno);
     return ret;
-
 }
 
 static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber)
@@ -1448,8 +1447,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
 
     return ret;
 }
-
-
 
 static struct UsbOsAdapterOps g_usbAdapter = {
     .init = AdapterInit,

@@ -21,6 +21,9 @@
 #include "display_log.h"
 #include "hdf_log.h"
 #include "hdf_trace.h"
+#ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
+    #include "display_dump_service.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_SRV"
@@ -34,8 +37,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-namespace V1_0 {
-extern "C" IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_1::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -43,39 +45,68 @@ extern "C" IDisplayComposer* DisplayComposerImplGetInstance(void)
 DisplayComposerService::DisplayComposerService()
     : libHandle_(nullptr),
     cacheMgr_(nullptr),
-    createVdiFunc_(nullptr),
-    destroyVdiFunc_(nullptr),
     currentBacklightLevel_(0),
-    vdiImpl_(nullptr),
-    cmdResponser_(nullptr),
     hotPlugCb_(nullptr),
-    vBlankCb_(nullptr)
+    vBlankCb_(nullptr),
+    modeCb_(nullptr),
+    seamlessChangeCb_(nullptr),
+    vdiImpl_(nullptr),
+    destroyVdiFunc_(nullptr),
+    cmdResponser_(nullptr),
+    vdiImplV1_1_(nullptr),
+    destroyVdiFuncV1_1_(nullptr),
+    cmdResponserV1_1_(nullptr),
+    refreshCb_(nullptr)
 {
-    int32_t ret = LoadVdi();
-    if (ret == HDF_SUCCESS) {
-        vdiImpl_ = createVdiFunc_();
-        CHECK_NULLPOINTER_RETURN(vdiImpl_);
-        cacheMgr_ = DeviceCacheManager::GetInstance();
-        CHECK_NULLPOINTER_RETURN(cacheMgr_);
-        cmdResponser_ = HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
-        CHECK_NULLPOINTER_RETURN(cmdResponser_);
-    } else {
+    int32_t ret = LoadVdiSo();
+    if (ret != HDF_SUCCESS) {
         DISPLAY_LOGE("Load composer VDI failed, lib: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
+        return;
     }
+
+    ret = LoadVdiV1_1();
+    if (ret != HDF_SUCCESS) {
+        ret = LoadVdiV1_0();
+    }
+
+    if (ret != HDF_SUCCESS) {
+        dlclose(libHandle_);
+        libHandle_ = nullptr;
+        DISPLAY_LOGE("Load composer VDI function failed");
+    }
+
+    HidumperInit();
 }
 
 DisplayComposerService::~DisplayComposerService()
 {
     cmdResponser_ = nullptr;
+    cmdResponserV1_1_ = nullptr;
+
     if ((destroyVdiFunc_ != nullptr) && (vdiImpl_ != nullptr)) {
         destroyVdiFunc_(vdiImpl_);
     }
+
+    if ((destroyVdiFuncV1_1_ != nullptr) && (vdiImplV1_1_ != nullptr)) {
+        destroyVdiFuncV1_1_(vdiImplV1_1_);
+    }
+
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
     }
 }
 
-int32_t DisplayComposerService::LoadVdi()
+void DisplayComposerService::HidumperInit()
+{
+#ifdef DISPLAY_COMPOSER_SERVICE_HIDUMPER
+    VdiDumper& dumper = VdiDumper::GetInstance();
+    dumper.SetDumpInfoFunc(reinterpret_cast<GetDumpInfoFunc>(dlsym(libHandle_, "GetDumpInfo")));
+    dumper.SetConfigFunc(reinterpret_cast<UpdateConfigFunc>(dlsym(libHandle_, "UpdateConfig")));
+    (void)DevHostRegisterDumpHost(ComposerDumpEvent);
+#endif
+}
+
+int32_t DisplayComposerService::LoadVdiSo()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
@@ -96,13 +127,20 @@ int32_t DisplayComposerService::LoadVdi()
 #endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createVdiFunc_ = reinterpret_cast<CreateComposerVdiFunc>(dlsym(libHandle_, "CreateComposerVdi"));
-    if (createVdiFunc_ == nullptr) {
+    return HDF_SUCCESS;
+}
+
+int32_t DisplayComposerService::LoadVdiV1_0()
+{
+    CreateComposerVdiFunc createVdiFunc = nullptr;
+    const char* errStr = nullptr;
+
+    createVdiFunc = reinterpret_cast<CreateComposerVdiFunc>(dlsym(libHandle_, "CreateComposerVdi"));
+    if (createVdiFunc == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            DISPLAY_LOGE("composer CreateComposerVdi dlsym error: %{public}s", errStr);
+            DISPLAY_LOGE("CreateVdiFuncV1_0 dlsym error: %{public}s", errStr);
         }
-        dlclose(libHandle_);
         return HDF_FAILURE;
     }
 
@@ -110,11 +148,51 @@ int32_t DisplayComposerService::LoadVdi()
     if (destroyVdiFunc_ == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            DISPLAY_LOGE("composer DestroyComposerVdi dlsym error: %{public}s", errStr);
+            DISPLAY_LOGE("DestroyVdiFuncV1_0 dlsym error: %{public}s", errStr);
         }
-        dlclose(libHandle_);
         return HDF_FAILURE;
     }
+
+    vdiImpl_ = createVdiFunc();
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    cacheMgr_ = DeviceCacheManager::GetInstance();
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    cmdResponser_ = V1_0::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
+    return HDF_SUCCESS;
+}
+
+int32_t DisplayComposerService::LoadVdiV1_1()
+{
+    CreateComposerVdiFuncV1_1 createVdiFunc = nullptr;
+    const char* errStr = nullptr;
+
+    createVdiFunc = reinterpret_cast<CreateComposerVdiFuncV1_1>(dlsym(libHandle_, "CreateComposerVdiV1_1"));
+    if (createVdiFunc == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            DISPLAY_LOGE("CreateVdiFuncV1_1 dlsym error: %{public}s", errStr);
+        }
+        return HDF_FAILURE;
+    }
+
+    destroyVdiFuncV1_1_ = reinterpret_cast<DestroyComposerVdiFuncV1_1>(dlsym(libHandle_, "DestroyComposerVdiV1_1"));
+    if (destroyVdiFuncV1_1_ == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            DISPLAY_LOGE("DestroyVdiFuncV1_1 dlsym error: %{public}s", errStr);
+        }
+        return HDF_FAILURE;
+    }
+
+    vdiImplV1_1_ = createVdiFunc();
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_FAILURE);
+    vdiImpl_ = dynamic_cast<IDisplayComposerVdi*>(vdiImplV1_1_);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    cacheMgr_ = DeviceCacheManager::GetInstance();
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    cmdResponserV1_1_ = V1_1::HdiDisplayCmdResponser::Create(vdiImplV1_1_, cacheMgr_);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
     return HDF_SUCCESS;
 }
 
@@ -230,7 +308,7 @@ int32_t DisplayComposerService::SetDisplayMode(uint32_t devId, uint32_t modeId)
     return ret;
 }
 
-int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerStatus& status)
+int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus& status)
 {
     DISPLAY_TRACE;
 
@@ -240,7 +318,7 @@ int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerS
     return ret;
 }
 
-int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, DispPowerStatus status)
+int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, V1_0::DispPowerStatus status)
 {
     DISPLAY_TRACE;
 
@@ -393,7 +471,6 @@ int32_t DisplayComposerService::CreateLayer(uint32_t devId, const LayerInfo& lay
 int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
 {
     DISPLAY_TRACE;
-
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->DestroyLayer(devId, layerId);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -406,11 +483,92 @@ int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
     return devCache->RemoveLayerCache(layerId);
 }
 
+int32_t DisplayComposerService::RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->RegSeamlessChangeCallback(OnSeamlessChange, this);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    if (ret == HDF_SUCCESS) {
+        seamlessChangeCb_ = cb;
+    }
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->GetDisplaySupportedModesExt(devId, modes);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+void DisplayComposerService::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("data is nullptr");
+        return;
+    }
+
+    sptr<IModeCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->modeCb_;
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnMode(modeId, vBlankPeriod);
+}
+
+int32_t DisplayComposerService::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->SetDisplayModeAsync(devId, modeId, OnMode, this);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    if (ret == HDF_SUCCESS) {
+        modeCb_ = cb;
+    }
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->GetDisplayVBlankPeriod(devId, period);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+void DisplayComposerService::OnSeamlessChange(uint32_t devId, void* data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("data is nullptr");
+        return;
+    }
+
+    sptr<ISeamlessChangeCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->seamlessChangeCb_;
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnSeamlessChange(devId);
+}
+
 int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>>& request)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(request, HDF_FAILURE);
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = cmdResponser_->InitCmdRequest(request);
+    int32_t ret = HDF_FAILURE;
+
+    if (cmdResponserV1_1_ != nullptr) {
+        ret = cmdResponserV1_1_->InitCmdRequest(request);
+    } else if (cmdResponser_ != nullptr) {
+        ret = cmdResponser_->InitCmdRequest(request);
+    }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
@@ -418,20 +576,108 @@ int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQu
 int32_t DisplayComposerService::CmdRequest(
     uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt, std::vector<HdifdInfo>& outFds)
 {
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
+    int32_t ret = HDF_FAILURE;
+
+    if (cmdResponserV1_1_ != nullptr) {
+        ret = cmdResponserV1_1_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
+    } else if (cmdResponser_ != nullptr) {
+        ret = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
+    }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 
 int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply)
 {
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = cmdResponser_->GetCmdReply(reply);
+    int32_t ret = HDF_FAILURE;
+
+    if (cmdResponserV1_1_ != nullptr) {
+        ret = cmdResponserV1_1_->GetCmdReply(reply);
+    } else if (cmdResponser_ != nullptr) {
+        ret = cmdResponser_->GetCmdReply(reply);
+    }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
-} // namespace V1_0
+
+int32_t DisplayComposerService::SetLayerPerFrameParameter(uint32_t devId, uint32_t layerId, const std::string& key,
+    std::vector<int8_t>& value)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->SetLayerPerFrameParameter(devId, layerId, key, value);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetSupportedLayerPerFrameParameterKey(std::vector<std::string>& keys)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->GetSupportedLayerPerFrameParameterKey(keys);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::SetDisplayOverlayResolution(uint32_t devId, uint32_t width, uint32_t height)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->SetDisplayOverlayResolution(devId, width, height);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+void DisplayComposerService::OnRefresh(uint32_t devId, void *data)
+{
+    if (data == nullptr) {
+        DISPLAY_LOGE("cb data is nullptr");
+        return;
+    }
+
+    sptr<IRefreshCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->refreshCb_;
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("remoteCb is nullptr");
+        return;
+    }
+    remoteCb->OnRefresh(devId);
+}
+
+int32_t DisplayComposerService::RegRefreshCallback(const sptr<IRefreshCallback>& cb)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->RegRefreshCallback(OnRefresh, this);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    if (ret == HDF_SUCCESS) {
+        refreshCb_ = cb;
+    }
+    return ret;
+}
+
+int32_t DisplayComposerService::GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->GetDisplaySupportedColorGamuts(devId, gamuts);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+
+int32_t DisplayComposerService::GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    int32_t ret = vdiImplV1_1_->GetHDRCapabilityInfos(devId, info);
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
 } // namespace Composer
 } // namespace Display
 } // namespace HDI

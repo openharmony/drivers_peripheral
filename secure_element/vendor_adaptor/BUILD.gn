@@ -15,10 +15,11 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../secure_element.gni")
 
 ohos_shared_library("se_vendor_adaptor") {
-  include_dirs = []
   sources = [ "se_vendor_adaptions.cpp" ]
 
   public_deps = []
+
+  deps = []
 
   cflags = []
   defines = []
@@ -34,7 +35,7 @@ ohos_shared_library("se_vendor_adaptor") {
 
   if (drivers_peripheral_secure_element_use_ca) {
     defines += [ "SECURE_ELEMENT_USE_CA" ]
-    external_deps += [ "nfc_ca:secure_element_ca" ]
+    deps += [ "../secure_element_ca_proxy:secure_element_ca_proxy" ]
   }
 
   install_images = [ chipset_base_dir ]
