@@ -29,6 +29,7 @@ enum DeviceCmdId {
     CAMERA_DEVICE_GET_ENABLED_RESULTS,
     CAMERA_DEVICE_ENABLE_RESULT,
     CAMERA_DEVICE_DISABLE_RESULT,
+    CAMERA_DEVICE_GET_STATUS,
     CAMERA_DEVICE_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
@@ -97,6 +98,20 @@ void FuncDisableResult(const uint8_t *rawData, size_t size)
     cameraTest->cameraDeviceV1_1->DisableResult(result);
 }
 
+void FuncGetStatus(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    std::vector<uint8_t> result = {};
+    std::vector<uint8_t> resultOut = {};
+    uint8_t *data = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData));
+    result.push_back(*data);
+
+    if (nullptr == cameraTest->cameraDeviceV1_2) {
+        return;
+    }
+    cameraTest->cameraDeviceV1_2->GetStatus(result, resultOut);
+}
+
 static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     CAMERA_LOGI("DeviceFuncSwitch start, the cmd is:%{public}u", cmd);
@@ -128,6 +143,10 @@ static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
         }
         case CAMERA_DEVICE_DISABLE_RESULT: {
             FuncDisableResult(rawData, size);
+            break;
+        }
+        case CAMERA_DEVICE_GET_STATUS: {
+            FuncGetStatus(rawData, size);
             break;
         }
         default: {
