@@ -875,8 +875,7 @@ int32_t RawDetachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
         HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("devHandle->detachedInterfaces = %{public}llu, interfaceNumber = %{public}u",
-        devHandle->detachedInterfaces, interfaceNumber);
+    HDF_LOGI("interfaceNumber = %{public}u", interfaceNumber);
     if (((devHandle->detachedInterfaces) & (1U << interfaceNumber)) != 0) {
         return HDF_SUCCESS;
     }
@@ -901,8 +900,7 @@ int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
         HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("zhaozhen: devHandle->attachedInterfaces = %{public}llu, interfaceNumber = %{public}u",
-        devHandle->attachedInterfaces, interfaceNumber);
+    HDF_LOGI("interfaceNumber = %{public}u", interfaceNumber);
     if (((devHandle->attachedInterfaces) & (1U << interfaceNumber)) != 0) {
         return HDF_SUCCESS;
     }
