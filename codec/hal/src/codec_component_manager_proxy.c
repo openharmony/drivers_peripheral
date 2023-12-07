@@ -131,7 +131,7 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     return HDF_SUCCESS;
 }
 
-static int32_t FillHdfSBufData(HdfSBuf *data, char *compName, int64_t appData, struct CodecCallbackType *callback)
+static int32_t FillHdfSBufData(struct HdfSBuf *data, char *compName, int64_t appData, struct CodecCallbackType *callback)
 {
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         CODEC_LOGE("write interface token failed");
