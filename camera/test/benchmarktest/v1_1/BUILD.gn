@@ -13,8 +13,12 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+# NOSORT
 import("../../../camera.gni")
+
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 module_output_path = "drivers_peripheral_camera/camera"
 camera_include_path = "//drivers/peripheral/camera/test/hdi/"
 
