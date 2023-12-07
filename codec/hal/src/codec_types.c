@@ -471,7 +471,7 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
         IF_CONDITION_TRUE_BREAK(!HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight));
 
         return true;
-    } while(0)
+    } while(0);
     
     CODEC_LOGE("read HdfSBuf data failed!");
     return false;
