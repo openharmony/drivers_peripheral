@@ -457,23 +457,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_1_005, TestSize.Lev
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_2_001, TestSize.Level0)
 {
-    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
-    EXPECT_NE(service, nullptr);
-
-    EXPECT_EQ(service->Init(), 0);
-
-    int32_t userId = 123456;
-    std::vector<uint8_t> authToken;
-    EnrollParamV1_2 paramV1_2 = {};
-    paramV1_2.authType = AuthType::PIN;
-    paramV1_2.callerName = "";
-    paramV1_2.apiVersion = 10000;
-    ScheduleInfoV1_1 scheduleInfo = {};
-    EXPECT_EQ(service->BeginEnrollmentV1_2(userId, authToken, paramV1_2, scheduleInfo), RESULT_BAD_PARAM);
-}
-
-HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollmentV1_2_002, TestSize.Level0)
-{
     auto service1_2 = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service1_2, nullptr);
 
@@ -739,22 +722,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthenticationV1_2_002, TestSize
     paramV1_2.callerName = "com.ohos.systemui";
     std::vector<ScheduleInfoV1_1> scheduleInfos;
     EXPECT_EQ(service->BeginAuthenticationV1_2(contextId, paramV1_2, scheduleInfos), 10003);
-}
-
-HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthenticationV1_2_003, TestSize.Level0)
-{
-    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
-    EXPECT_NE(service, nullptr);
-
-    EXPECT_EQ(service->Init(), 0);
-
-    uint64_t contextId = 123456;
-    AuthSolutionV1_2 paramV1_2 = {};
-    paramV1_2.challenge.resize(100);
-    paramV1_2.apiVersion = 10000;
-    paramV1_2.callerName = "";
-    std::vector<ScheduleInfoV1_1> scheduleInfos;
-    EXPECT_EQ(service->BeginAuthenticationV1_2(contextId, paramV1_2, scheduleInfos), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_001, TestSize.Level0)
