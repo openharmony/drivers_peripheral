@@ -183,6 +183,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
     captureAttrs->silenceThreshold = 0;
+    captureAttrs->streamId = AUDIO_CAPTURE_STREAM_ID;
     captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
