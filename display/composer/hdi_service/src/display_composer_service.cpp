@@ -601,7 +601,7 @@ int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32
 }
 
 int32_t DisplayComposerService::SetLayerPerFrameParameter(uint32_t devId, uint32_t layerId, const std::string& key,
-    std::vector<int8_t>& value)
+    const std::vector<int8_t>& value)
 {
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
