@@ -19,11 +19,15 @@ if (is_standard_system) {
     include_dirs = [
       "./service_common",
       "../../client/include",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/utils",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa_supplicant",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa_supplicant_lib",
     ]
     sources = [
       "service_common/wpa_common_cmd.c",
+      "service_common/wpa_p2p_cmd.c",
       "wpa_interface_service.c",
     ]
 
