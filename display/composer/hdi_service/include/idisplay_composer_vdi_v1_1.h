@@ -37,7 +37,7 @@ class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     virtual int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, ModeCallback cb, void *data) = 0;
     virtual int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period) = 0;
     virtual int32_t SetLayerPerFrameParameter(uint32_t devId, uint32_t layerId, const std::string& key,
-         std::vector<int8_t>& value) = 0;
+        const std::vector<int8_t>& value) = 0;
     virtual int32_t GetSupportedLayerPerFrameParameterKey(std::vector<std::string>& keys) = 0;
     virtual int32_t SetDisplayOverlayResolution(uint32_t devId, uint32_t width, uint32_t height) = 0;
     virtual int32_t RegRefreshCallback(RefreshCallback cb, void* data) = 0;
