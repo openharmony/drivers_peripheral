@@ -64,7 +64,7 @@ public:
     int32_t SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb) override;
     int32_t GetDisplayVBlankPeriod(uint32_t devId, uint64_t &period) override;
     int32_t SetLayerPerFrameParameter(uint32_t devId, uint32_t layerId, const std::string& key,
-         std::vector<int8_t>& value)  override;
+        const std::vector<int8_t>& value)  override;
     int32_t GetSupportedLayerPerFrameParameterKey(std::vector<std::string>& keys) override;
     int32_t SetDisplayOverlayResolution(uint32_t devId, uint32_t width, uint32_t height) override;
     int32_t GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts) override;
