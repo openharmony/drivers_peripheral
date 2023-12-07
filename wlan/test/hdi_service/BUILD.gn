@@ -22,12 +22,13 @@ module_output_path = "drivers_peripheral_wlan/wlan"
 ohos_unittest("WlanHdiServiceTestC") {
   module_out_path = module_output_path
   sources = [
+    "p2p_callback_impl.c",
+    "p2p_hdi_direct_test.cpp",
     "wlan_callback_impl.c",
     "wlan_hdi_direct_test.cpp",
     "wlan_hdi_hal_services_c_test.cpp",
     "wpa_callback_impl.c",
     "wpa_hdi_direct_test.cpp",
-    "wpa_hdi_hal_services_c_test.cpp",
   ]
 
   deps = [

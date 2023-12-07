@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "wpa_common_cmd.h"
+#include "wpa_p2p_cmd.h"
 #include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
@@ -25,7 +26,8 @@
 #include "main.h"
 #include "wps_supplicant.h"
 #include "bssid_ignore.h"
-#include "config.h"
+#include "wpa_supplicant/config.h"
+#include "common/defs.h"
 #include "v1_0/iwpa_callback.h"
 #include "v1_0/iwpa_interface.h"
 #include "wpa_client.h"
@@ -1629,6 +1631,55 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
             break;
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
+            break;
+        case WPA_EVENT_DEVICE_FOUND:
+            ret = ProcessEventP2pDeviceFound(pos, (struct P2pDeviceInfoParam *)data, ifName);
+            break;
+        case WPA_EVENT_DEVICE_LOST:
+            ret = ProcessEventP2pDeviceLost(pos, (struct P2pDeviceLostParam *)data, ifName);
+            break;
+        case WPA_EVENT_GO_NEGOTIATION_REQUEST:
+            ret = ProcessEventP2pGoNegotiationRequest(pos, (struct P2pGoNegotiationRequestParam *)data, ifName);
+            break;
+        case WPA_EVENT_GO_NEGOTIATION_COMPLETED:
+            ret = ProcessEventP2pGoNegotiationCompleted(pos, (struct P2pGoNegotiationCompletedParam *)data, ifName);
+            break;
+        case WPA_EVENT_INVITATION_RECEIVED:
+            ret = ProcessEventP2pInvitationReceived(pos, (struct P2pInvitationReceivedParam *)data, ifName);
+            break;
+        case WPA_EVENT_INVITATION_RESULT:
+            ret = ProcessEventP2pInvitationResult(pos, (struct P2pInvitationResultParam *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_FORMATION_SUCCESS:
+            ret = ProcessEventP2pGroupFormationSuccess(pos, ifName);
+            break;
+        case WPA_EVENT_GROUP_FORMATION_FAILURE:
+            ret = ProcessEventP2pGroupFormationFailure(pos, (char *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_START:
+            ret = ProcessEventP2pGroupStarted(pos, (struct P2pGroupStartedParam *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_REMOVED:
+            ret = ProcessEventP2pGroupRemoved(pos, (struct P2pGroupRemovedParam *)data, ifName);
+            break;
+        case WPA_EVENT_PROVISION_DISCOVERY_COMPLETED:
+            ret = ProcessEventP2pProvisionDiscoveryCompleted(pos, (struct P2pProvisionDiscoveryCompletedParam *)data,
+                ifName);
+            break;
+        case WPA_EVENT_FIND_STOPPED:
+            ret = ProcessEventP2pFindStopped(pos, ifName);
+            break;
+        case WPA_EVENT_SERV_DISC_REQ:
+            ret = ProcessEventP2pServDiscReq(pos, (struct P2pServDiscReqInfoParam *)data, ifName);
+            break;
+        case WPA_EVENT_SERV_DISC_RESP:
+            ret = ProcessEventP2pServDiscResp(pos, (struct P2pServDiscRespParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_CONNECT_STATE:
+            ret = ProcessEventP2pStaConnectState(pos, (struct P2pStaConnectStateParam *)data, ifName);
+            break;
+        case WPA_EVENT_IFACE_CREATED:
+            ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
             break;
         default:
             HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
