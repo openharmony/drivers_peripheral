@@ -12,10 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/peripheral/camera/camera.gni")
-import("../../../../../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
-import("../../../../../camera_usb.gni")
 
+# NOSORT
+import("../../../../../../../camera.gni")
+
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
+import("../../../../../camera_usb.gni")
 config("v4l2_config") {
   visibility = [ ":*" ]
 

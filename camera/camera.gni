@@ -20,6 +20,7 @@ if (defined(ohos_lite)) {
 camera_path = "//drivers/peripheral/camera/vdi_base/common/"
 current_path = "."
 test_path = "//drivers/peripheral/camera/test"
+hdf_core_path = "//drivers/hdf_core"
 enable_camera_device_utest = false
 
 use_hitrace = false

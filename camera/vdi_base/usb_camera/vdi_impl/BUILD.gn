@@ -11,12 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/camera/camera.gni")
-import("../camera_usb.gni")
-
 import("//build/ohos.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
+# NOSORT
+import("../../../camera.gni")
+
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
+import("../camera_usb.gni")
 config("camhdi_impl_config") {
   visibility = [ ":*" ]
   cflags = [
