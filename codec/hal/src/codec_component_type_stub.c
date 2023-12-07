@@ -698,6 +698,10 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
         CODEC_LOGE("interface token check failed");
         return HDF_ERR_INVALID_PARAM;
     }
+    if (cmdId < 0 || cmdId > CMD_COMPONENT_ROLE_ENUM) {
+        CODEC_LOGE("not support cmd %{public}d", cmdId);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     typedef int32_t(*SerStubFunc)(struct CodecComponentType*, struct HdfSBuf*, struct HdfSBuf*);
     SerStubFunc func[CMD_COMPONENT_ROLE_ENUM + 1] = {NULL};
