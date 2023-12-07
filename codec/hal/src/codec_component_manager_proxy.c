@@ -149,6 +149,7 @@ static int32_t FillHdfSBufData(struct HdfSBuf *data, char *compName, int64_t app
         CODEC_LOGE("write callback failed!");
         return HDF_ERR_INVALID_PARAM;
     }
+    return HDF_SUCCESS;
 }
 
 static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
