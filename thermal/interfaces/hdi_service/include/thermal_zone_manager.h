@@ -78,6 +78,11 @@ public:
         thermalCb_ = thermalCb;
     }
 
+    const sptr<IThermalCallback>& GetThermalEventCb()
+    {
+        return thermalCb_;
+    }
+
     void DelThermalEventCb()
     {
         thermalCb_ = nullptr;
@@ -86,6 +91,11 @@ public:
     void SetFanEventCb(const sptr<IFanCallback> &fanCb)
     {
         fanCb_ = fanCb;
+    }
+
+    const sptr<IFanCallback>& GetFanEventCb()
+    {
+        return fanCb_;
     }
 
     void DelFanEventCb()
