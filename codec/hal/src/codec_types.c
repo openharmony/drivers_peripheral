@@ -464,6 +464,6 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
     IF_CONDITION_FALSE_RETURN_FALSE(memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap)) == EOK);
     IF_CONDITION_FALSE_RETURN_FALSE(HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight));
 
-    CODEC_LOGE("read HdfSBuf data success!");
+    CODEC_LOGI("read HdfSBuf data success!");
     return true;
 }
