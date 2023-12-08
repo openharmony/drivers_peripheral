@@ -19,29 +19,29 @@
 #include <iproxy_broker.h>
 #include "hdf_log.h"
 #include "isensor_callback_vdi.h"
-#include "v1_1/isensor_interface.h"
-#include "v1_1/sensor_types.h"
+#include "v2_0/isensor_interface.h"
+#include "v2_0/sensor_types.h"
 #include "sensor_clients_manager.h"
 #include "sensor_client_info.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 
-class SensorCallbackVdi : public ISensorCallbackVdi {
+class SensorCallbackVdi : public OHOS::HDI::Sensor::V1_1::ISensorCallbackVdi {
 public:
     SensorCallbackVdi() = default;
     virtual ~SensorCallbackVdi() = default;
     explicit SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
-    int32_t OnDataEventVdi(const HdfSensorEventsVdi& eventVdi) override;
+    int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
 private:
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
 };
 
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

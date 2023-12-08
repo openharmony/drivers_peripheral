@@ -183,6 +183,8 @@ struct SensorInformation {
     float power;          /**< Sensor power */
     int64_t minDelay;     /**< Minimum sample period allowed in microseconds */
     int64_t maxDelay;     /**< Maxmum sample period allowed in microseconds */
+    uint32_t fifoMaxEventCount; /**< Maxmum number of events of this sensor that could be batched */
+    uint32_t reserved;    /**< Reserved fields */
 };
 
 /**
