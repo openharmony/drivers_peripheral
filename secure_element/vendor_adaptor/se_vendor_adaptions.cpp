@@ -30,6 +30,8 @@ namespace SecureElement {
 static sptr<ISecureElementCallback> g_callbackV1_0 = nullptr;
 #ifdef SECURE_ELEMENT_USE_CA
 static const int RES_BUFFER_MAX_LENGTH = 512;
+static const uint16_t SW1_OFFSET = 2;
+static const uint16_t SW2_OFFSET = 1;
 #endif
 
 SeVendorAdaptions::SeVendorAdaptions() {}
@@ -45,6 +47,7 @@ int32_t SeVendorAdaptions::init(const sptr<ISecureElementCallback>& clientCallba
         return HDF_ERR_INVALID_PARAM;
     }
 #ifdef SECURE_ELEMENT_USE_CA
+    openedChannelCount_ = 0;
     int ret = SecureElementCaProxy::GetInstance().VendorSecureElementCaInit();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("VendorSecureElementCaInit failed ret %{public}u", ret);
@@ -106,6 +109,19 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openLogicalChannel failed ret %{public}u", ret);
+        if (openedChannelCount_ == 0) {
+            HDF_LOGI("openLogicalChannel: openedChannelCount_ = %{public}d, Uninit", openedChannelCount_);
+            SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
+        }
+        return HDF_SUCCESS;
+    }
+    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= SW1_OFFSET
+        && channelNumber < MAX_CHANNEL_NUM - 1 && !openedChannels_[channelNumber]) {
+        if ((response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)
+            || response[resLen - SW2_OFFSET] == 0x62 || response[resLen - SW2_OFFSET] == 0x63) {
+            openedChannels_[channelNumber] = true;
+            openedChannelCount_++;
+        }
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
@@ -132,6 +148,17 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openBasicChannel failed ret %{public}u", ret);
+        if (openedChannelCount_ == 0) {
+            HDF_LOGI("openBasicChannel failed: openedChannelCount_ = %{public}d, Uninit", openedChannelCount_);
+            SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
+        }
+        return HDF_SUCCESS;
+    }
+    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= SW1_OFFSET && !openedChannels_[0]) {
+        if (response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00) {
+            openedChannels_[0] = true;
+            openedChannelCount_++;
+        }
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
@@ -146,6 +173,16 @@ int32_t SeVendorAdaptions::closeChannel(uint8_t channelNumber, SecureElementStat
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("closeChannel failed ret %{public}u", ret);
+        return HDF_SUCCESS;
+    }
+    HDF_LOGI("closeChannel: channelNumber = %{public}d", channelNumber);
+    if (channelNumber < MAX_CHANNEL_NUM - 1 && openedChannels_[channelNumber]) {
+        openedChannels_[channelNumber] = false;
+        openedChannelCount_--;
+    }
+    if (openedChannelCount_ == 0) {
+        HDF_LOGI("closeChannel: openedChannelCount_ = %{public}d, Uninit", openedChannelCount_);
+        SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
     }
 #endif
     status = SecureElementStatus::SE_SUCCESS;
