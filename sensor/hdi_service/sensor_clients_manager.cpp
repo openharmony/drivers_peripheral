@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
@@ -89,6 +89,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 
 void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
         HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
@@ -189,7 +190,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

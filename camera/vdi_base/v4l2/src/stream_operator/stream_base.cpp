@@ -351,6 +351,13 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     } else {
         do {
             rc = DeliverBuffer();
+            {
+                std::unique_lock<std::mutex> l(wtLock_);
+                if (waitingList_.empty()) {
+                    CAMERA_LOGI("Capture stream [id:%{public}d] stop deliver buffer.", streamId_);
+                    break;
+                }
+            }
         } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
     }
 
