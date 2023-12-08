@@ -704,25 +704,30 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
     }
 
     typedef int32_t(*SerStubFunc)(struct CodecComponentType*, struct HdfSBuf*, struct HdfSBuf*);
-    SerStubFunc func[CMD_COMPONENT_ROLE_ENUM + 1] = {NULL};
-    func[CMD_GET_COMPONENT_VERSION] = SerStubGetComponentVersion;
-    func[CMD_SEND_COMMAND] = SerStubSendCommand;
-    func[CMD_GET_PARAMETER] = SerStubGetParameter;
-    func[CMD_SET_PARAMETER] = SerStubSetParameter;
-    func[CMD_GET_CONFIG] = SerStubGetConfig;
-    func[CMD_SET_CONFIG] = SerStubSetConfig;
-    func[CMD_GET_EXTENSION_INDEX] = SerStubGetExtensionIndex;
-    func[CMD_GET_STATE] = SerStubGetState;
-    func[CMD_COMPONENT_TUNNEL_REQUEST] = SerStubComponentTunnelRequest;
-    func[CMD_USE_BUFFER] = SerStubUseBuffer;
-    func[CMD_ALLOCATE_BUFFER] = SerStubAllocateBuffer;
-    func[CMD_FREE_BUFFER] = SerStubFreeBuffer;
-    func[CMD_EMPTY_THIS_BUFFER] = SerStubEmptyThisBuffer;
-    func[CMD_FILL_THIS_BUFFER] = SerStubFillThisBuffer;
-    func[CMD_SET_CALLBACKS] = SerStubSetCallbacks;
-    func[CMD_COMPONENT_DE_INIT] = SerStubComponentDeInit;
-    func[CMD_USE_EGL_IMAGE] = SerStubUseEglImage;
-    func[CMD_COMPONENT_ROLE_ENUM] = SerStubComponentRoleEnum;
+    static SerStubFunc func[CMD_COMPONENT_ROLE_ENUM + 1] = {
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        SerStubGetComponentVersion,
+        SerStubSendCommand,
+        SerStubGetParameter,
+        SerStubSetParameter,
+        SerStubGetConfig,
+        SerStubSetConfig,
+        SerStubGetExtensionIndex,
+        SerStubGetState,
+        SerStubComponentTunnelRequest,
+        SerStubUseBuffer,
+        SerStubAllocateBuffer,
+        SerStubFreeBuffer,
+        SerStubEmptyThisBuffer,
+        SerStubFillThisBuffer,
+        SerStubSetCallbacks,
+        SerStubComponentDeInit,
+        SerStubUseEglImage,
+        SerStubComponentRoleEnum
+    };
 
     if(func[cmdId] != NULL) {
         return func[cmdId](serviceImpl, data, reply);
