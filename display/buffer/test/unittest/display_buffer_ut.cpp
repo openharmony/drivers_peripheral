@@ -266,10 +266,6 @@ int32_t DisplayBufferUt::AllocMemTest(AllocInfo& info)
             return ret;
         }
         MetadataTest(*buffer);
-        if (ret != DISPLAY_SUCCESS) {
-            HDF_LOGE("MetadataTest failed");
-            return ret;
-        }
         void *vAddr = displayBuffer_->Mmap(*buffer);
         if (vAddr == nullptr) {
             HDF_LOGE("Mmap failed");
