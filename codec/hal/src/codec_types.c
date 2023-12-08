@@ -23,7 +23,7 @@
 
 #define IF_CONDITION_FALSE_RETURN_FALSE(cond) \
     if (!cond) { \
-        CODEC_LOGE("%{public}s: [%{public}d]", __FUNCTION__, __LINE__);
+        CODEC_LOGE("error at %{public}s: [%{public}d]", __FUNCTION__, __LINE__);
         return false; \
     }
 
