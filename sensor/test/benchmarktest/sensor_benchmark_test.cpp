@@ -76,7 +76,6 @@ BENCHMARK_F(SensorBenchmarkTest, GetAllSensorInfo)(benchmark::State &state)
 
     for (auto _ : state) {
         ret = g_sensorInterface->GetAllSensorInfo(g_info);
-        HDF_LOGI("g_info.size() is %{public}lu", g_info.size());
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
