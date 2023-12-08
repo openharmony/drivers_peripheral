@@ -33,12 +33,12 @@ void CameraFlashlightUtTestV1_2::TearDown(void)
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_025
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_001
  * @tc.desc:SetCallbackV1_2, Callback object = nullptr;
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_025, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_001, TestSize.Level1)
 {
     int32_t ret;
     // step 1: get serviceV1_2
@@ -52,12 +52,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_025, TestSize.Le
 
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_026
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_002
  * @tc.desc:SetCallbackV1_2, Callback object exits;
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_026, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_002, TestSize.Level1)
 {
     int32_t ret;
     // step 1: get serviceV1_2
@@ -71,12 +71,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_026, TestSize.Le
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_027
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_003
  * @tc.desc:SetFlashlightV1_2, turn off the flashlight with the camera closed
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_027, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_003, TestSize.Level1)
 {
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -96,12 +96,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_027, TestSize.Le
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_028
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_004
  * @tc.desc:SetFlashlightV1_2, turn on the flashlight with the camera closed
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_028, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_004, TestSize.Level1)
 {
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -121,12 +121,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_028, TestSize.Le
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_029
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_005
  * @tc.desc:Turn on the flashlight with the camera open
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_029, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_005, TestSize.Level1)
 {
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -152,12 +152,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_029, TestSize.Le
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_030
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_006
  * @tc.desc:Turn off the flashlight with the camera open
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_030, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Level1)
 {
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -184,12 +184,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_030, TestSize.Le
 }
 
 /**
- * @tc.name:Camera_Flashlight_Hdi_V1_2_031
+ * @tc.name:Camera_Flashlight_Hdi_V1_2_007
  * @tc.desc:Turn off the flashlight with the camera closed
  * @tc.size:MediumTest
  * @tc.type:Function
 */
-HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_031, TestSize.Level1)
+HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Level1)
 {
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
