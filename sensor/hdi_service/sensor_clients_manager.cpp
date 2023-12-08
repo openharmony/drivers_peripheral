@@ -89,6 +89,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 
 void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
         HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
