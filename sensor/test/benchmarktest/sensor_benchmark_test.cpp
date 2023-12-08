@@ -76,6 +76,7 @@ BENCHMARK_F(SensorBenchmarkTest, GetAllSensorInfo)(benchmark::State &state)
 
     for (auto _ : state) {
         ret = g_sensorInterface->GetAllSensorInfo(g_info);
+        HDF_LOGI("g_info.size() is %{public}d", g_info.size());
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -149,7 +150,8 @@ BENCHMARK_F(SensorBenchmarkTest, Enable)(benchmark::State &state)
     EXPECT_GT(g_info.size(), 0);
 
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
+            iter.sensorId, iter.sensorName.c_str(), iter.power);
         ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         for (auto _ : state) {
@@ -185,7 +187,8 @@ BENCHMARK_F(SensorBenchmarkTest, Disable)(benchmark::State &state)
     EXPECT_GT(g_info.size(), 0);
 
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
+            iter.sensorId, iter.sensorName.c_str(), iter.power);
         ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->Enable(iter.sensorId);
@@ -221,7 +224,8 @@ BENCHMARK_F(SensorBenchmarkTest, SetBatch)(benchmark::State &state)
 
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
+            iter.sensorId, iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
             ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
@@ -255,7 +259,8 @@ BENCHMARK_F(SensorBenchmarkTest, SetMode)(benchmark::State &state)
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
+            iter.sensorId, iter.sensorName.c_str(), iter.power);
         ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         for (auto _ : state) {
@@ -291,7 +296,8 @@ BENCHMARK_F(SensorBenchmarkTest, SetOption)(benchmark::State &state)
     int32_t ret;
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
+        HDF_LOGI("get sensoriId[%{public}d], info name[%{public}s], power[%{public}f]\n\r",
+            iter.sensorId, iter.sensorName.c_str(), iter.power);
         for (auto _ : state) {
             ret = g_sensorInterface->SetOption(iter.sensorId, OPTION);
             EXPECT_EQ(SENSOR_SUCCESS, ret);
