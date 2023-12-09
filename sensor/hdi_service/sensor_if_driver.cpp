@@ -19,11 +19,11 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
-#include "v2_0/sensor_interface_stub.h"
+#include "v1_1/sensor_interface_stub.h"
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V1_1;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioService;

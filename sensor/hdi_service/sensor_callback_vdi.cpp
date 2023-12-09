@@ -18,9 +18,9 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V1_1 {
 
-int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
+int32_t SensorCallbackVdi::OnDataEventVdi(const HdfSensorEventsVdi& eventVdi)
 {
     struct HdfSensorEvents event;
     int32_t ret;
@@ -68,7 +68,7 @@ sptr<IRemoteObject> SensorCallbackVdi::HandleCallbackDeath()
 
     return remote;
 }
-} // V2_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS

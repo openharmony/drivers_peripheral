@@ -16,9 +16,9 @@
 #include "sensorsetoption_fuzzer.h"
 #include "hdf_base.h"
 #include "sensor_impl.h"
-#include "v2_0/sensor_interface_proxy.h"
+#include "v1_1/sensor_interface_proxy.h"
 
-using namespace OHOS::HDI::Sensor::V2_0;
+using namespace OHOS::HDI::Sensor::V1_1;
 
 namespace OHOS {
     bool SensorSetOptionFuzzTest(const uint8_t* data, size_t size)

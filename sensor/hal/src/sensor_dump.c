@@ -93,8 +93,7 @@ int32_t SensorShowList(struct HdfSBuf *reply)
             sensorList->sensorInfoEntry[index].accuracy,
             sensorList->sensorInfoEntry[index].power,
             sensorList->sensorInfoEntry[index].minDelay,
-            sensorList->sensorInfoEntry[index].maxDelay,
-            sensorList->sensorInfoEntry[index].fifoMaxEventCount);
+            sensorList->sensorInfoEntry[index].maxDelay);
         if (ret < DUMP_SUCCESS) {
             HDF_LOGE("%{publuc}s: sprintf sensorList is failed\n", __func__);
             return DUMP_FAILURE;

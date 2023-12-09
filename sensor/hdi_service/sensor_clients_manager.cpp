@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V1_1 {
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
@@ -190,7 +190,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
-} // V2_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS

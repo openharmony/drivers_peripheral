@@ -171,7 +171,6 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
         hdfSensorInfo.power = tmp->power;
         hdfSensorInfo.minDelay = tmp->minDelay;
         hdfSensorInfo.maxDelay = tmp->maxDelay;
-        hdfSensorInfo.fifoMaxEventCount = tmp->fifoMaxEventCount;
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
