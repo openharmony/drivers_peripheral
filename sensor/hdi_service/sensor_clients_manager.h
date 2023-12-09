@@ -19,14 +19,14 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
-#include "v2_0/isensor_interface.h"
+#include "v1_1/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_client_info.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V1_1 {
 
 
 class SensorClientsManager {
@@ -61,7 +61,7 @@ struct BestSensorConfig {
     int32_t reportInterval;
 };
 
-} // V2_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS

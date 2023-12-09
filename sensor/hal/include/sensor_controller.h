@@ -51,8 +51,6 @@ struct SensorBasicInformation {
     int32_t power;          /* Sensor power */
     int64_t minDelay;       /* Minimum sample period allowed in nanoseconds */
     int64_t maxDelay;       /* Maxmum sample period allowed in nanoseconds */
-    uint32_t fifoMaxEventCount; /**< Maxmum number of events of this sensor that could be batched */
-    uint32_t reserved;      /**< Reserved fields */
 };
 
 void GetSensorDeviceMethods(struct SensorInterface *device);

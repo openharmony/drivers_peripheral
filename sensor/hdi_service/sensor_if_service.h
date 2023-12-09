@@ -17,7 +17,7 @@
 #define HDI_SENSOR_IF_SERVICE_H
 
 #include <map>
-#include "v2_0/isensor_interface.h"
+#include "v1_1/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_callback_vdi.h"
 #include "sensor_client_info.h"
@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V2_0 {
+namespace V1_1 {
 
 using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
 
@@ -48,11 +48,11 @@ public:
 
     std::mutex sensorCbMutex_;
 private:
-    OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
+    ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
     GroupIdCallBackMap callbackMap = {};
 };
-} // V2_0
+} // V1_1
 } // Sensor
 } // HDI
 } // OHOS
