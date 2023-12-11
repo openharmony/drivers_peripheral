@@ -1269,12 +1269,12 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_046, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Hdi_V1_2_048
+ * @tc.name: Camera_Hdi_V1_2_047
  * @tc.desc: OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_RANGE
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_047, TestSize.Level1)
 {
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get Stream Operator
@@ -1325,6 +1325,73 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_048
+ * @tc.desc: OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_RANGE, all value
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
+
+    for (size_t i = 1; i < entry.count - 1; i++) {
+        // Get Stream Operator
+        cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
+        cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
+            cameraTest->streamOperator_V1_1);
+        EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+        // preview streamInfo
+        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+        // capture streamInfo
+        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+        // video streamInfo
+        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+        // create and commitstreams
+        cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+        cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+            static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::PORTRAIT),
+            cameraTest->abilityVec);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+        //update settings
+        std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+        float physicalApertureValue = entry.data.f[i];
+        meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
+        std::vector<uint8_t> setting;
+        MetadataUtils::ConvertMetadataToVec(meta, setting);
+        cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+        // start capture
+        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+        cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture,
+		    cameraTest->captureIdVideo};
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+        sleep(1);
+    }
 }
 
 /**
