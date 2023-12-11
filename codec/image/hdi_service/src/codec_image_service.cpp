@@ -68,7 +68,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
     CODEC_LOGI("servcie impl!");
-    if (inBuffer.fenceFd > 0) {
+    if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
     CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
@@ -79,7 +79,7 @@ int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecAllocateInBuffer");
     CODEC_LOGI("servcie impl, size [%{public}d]", size);
-    if (inBuffer.fenceFd > 0) {
+    if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
     CHECK_AND_RETURN_RET_LOG(size != 0, HDF_ERR_INVALID_PARAM, "buffer size is 0");
@@ -98,7 +98,7 @@ int32_t CodecImageService::FreeInBuffer(const CodecImageBuffer& inBuffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecFreeInBuffer");
     CODEC_LOGI("servcie impl, bufferId [%{public}d]", inBuffer.id);
-    if (inBuffer.fenceFd > 0) {
+    if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
     if (inBuffer.bufferRole == CODEC_IMAGE_JPEG) {
