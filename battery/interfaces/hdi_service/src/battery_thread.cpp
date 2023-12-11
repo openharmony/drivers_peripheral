@@ -15,18 +15,20 @@
 
 #include "battery_thread.h"
 #include <cerrno>
+#include <regex>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <linux/netlink.h>
 #include "hdf_base.h"
+#include "battery_config.h"
 #include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_2 {
+namespace V2_0 {
 namespace {
 constexpr int32_t UEVENT_BUFF_SIZE = (64 * 1024);
 constexpr int32_t UEVENT_RESERVED_SIZE = 2;
@@ -103,6 +105,10 @@ void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
 
 int32_t BatteryThread::InitUevent()
 {
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    batteryConfig.ParseConfig();
+    powerUeventMap_ = batteryConfig.GetUeventList();
+
     ueventFd_ = OpenUeventSocket();
     if (ueventFd_ == INVALID_FD) {
         BATTERY_HILOGE(COMP_HDI, "open uevent socket failed, fd is invalid");
@@ -156,13 +162,15 @@ void BatteryThread::UeventCallback(void* service)
     // msg separator
     msg[len] = '\0';
     msg[len + 1] = '\0';
-    if (!IsPowerSupplyEvent(msg)) {
+    std::string powerUevent;
+    if (!MatchPowerUevent(msg, powerUevent)) {
         return;
     }
-    UpdateBatteryInfo(service);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", powerUevent.c_str());
+    UpdateBatteryInfo(service, powerUevent);
 }
 
-void BatteryThread::UpdateBatteryInfo(void* service)
+void BatteryThread::UpdateBatteryInfo(void* service, const std::string& powerUevent)
 {
     BatteryInfo event = {};
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
@@ -186,6 +194,7 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     event.curNow = batteryInfo->curNow_;
     event.remainEnergy = batteryInfo->remainEnergy_;
     event.totalEnergy = batteryInfo->totalEnergy_;
+    event.uevent = powerUevent;
 
     if (g_callback != nullptr) {
         g_callback->Update(event);
@@ -194,15 +203,36 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     }
 }
 
-bool BatteryThread::IsPowerSupplyEvent(const char* msg)
+bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
 {
     while (*msg) {
         if (!strcmp(msg, POWER_SUPPLY.c_str())) {
+            powerUevent = POWER_SUPPLY;
+            return true;
+        }
+        if (CheckPowerUevent(msg, powerUevent)) {
             return true;
         }
         while (*msg++) {} // move to next
     }
 
+    return false;
+}
+
+bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
+{
+    auto iter = powerUeventMap_.find(msg);
+    if (iter != powerUeventMap_.end()) {
+        while (*msg++) {}
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "PowerUevent msg:%{public}s", msg);
+        for (auto& uevent : iter->second) {
+            std::regex r(uevent);
+            if (std::regex_match(msg, r)) {
+                powerUevent = msg;
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -251,7 +281,7 @@ void BatteryThread::Run(void* service)
     pthread_setname_np(batteryThread.native_handle(), "battery_thread");
     batteryThread.detach();
 }
-} // namespace V1_2
+} // namespace V2_0
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

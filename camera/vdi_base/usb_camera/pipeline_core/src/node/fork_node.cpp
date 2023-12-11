@@ -14,6 +14,7 @@
 #include "fork_node.h"
 #include "securec.h"
 #include "codec_node.h"
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 PcForkNode::PcForkNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -76,7 +77,10 @@ RetCode PcForkNode::Stop(const int32_t streamId)
         return RC_OK;
     }
 
-    DrainForkBufferPool();
+    if (bufferPool_ != nullptr) {
+        bufferPool_->SetForkBufferId(-1);
+        DrainForkBufferPool();
+    }
 
     streamRunning_ = false;
 
@@ -102,14 +106,15 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
-            if (forkBuffer->GetEncodeType() == ENCODE_TYPE_H264 &&
-                forkBuffer->GetFormat() == CAMERA_FORMAT_YCRCB_420_SP) {
-                CodecNode::Yuv422ToYuv420(buffer, forkBuffer);
-            } else if (memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
-                buffer->GetVirAddress(), buffer->GetSize()) != 0) {
-                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                CAMERA_LOGW("PcForkNode::memcpy_s failed.");
+            if (forkBuffer->GetEncodeType() == ENCODE_TYPE_NULL) {
+                forkBuffer->SetFormat(CAMERA_FORMAT_YCRCB_420_SP);
+                CAMERA_LOGD("forkBuffer EncodeType is NULL, change Format to CAMERA_FORMAT_YCRCB_420_SP");
             }
+            bufferPool_->setSFBuffer(buffer);
+
+            CameraDumper& dumper = CameraDumper::GetInstance();
+            dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
+
             for (auto& it : outPutPorts_) {
                 if (it->format_.streamId_ != streamId_) {
                     continue;

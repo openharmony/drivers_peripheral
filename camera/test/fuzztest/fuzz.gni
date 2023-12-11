@@ -11,60 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/features.gni")
-import("//build/ohos.gni")
-import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("../../camera.gni")
-module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
-
-include_dirs = [
-  "$camera_path/include",
-  "$camera_path/../../interfaces/include",
-  "$camera_path/../../interfaces/hdi_ipc",
-  "$camera_path/../../interfaces/hdi_ipc/utils/include",
-  "$camera_path/../../interfaces/hdi_ipc/callback/host/include",
-  "$camera_path/../../interfaces/hdi_ipc/callback/device/include",
-  "$camera_path/../../interfaces/hdi_ipc/callback/operator/include",
-  "$camera_path/include",
-  "$camera_path/../v4l2",
-  "$camera_path/../v4l2/include",
-  "$camera_path/../v4l2/include/camera_host",
-  "$camera_path/../v4l2/include/camera_device",
-  "$camera_path/../v4l2/include/stream_operator",
-  "$camera_path/../v4l2/include/offline_stream_operator",
-  "$camera_path/device_manager/include/",
-  "$camera_path/device_manager/include/mpi",
-  "$camera_path/pipeline_core/utils",
-  "$camera_path/pipeline_core/pipeline_impl/include",
-  "$camera_path/pipeline_core/host_stream/include",
-  "$camera_path/pipeline_core/include",
-  "$camera_path/pipeline_core/ipp/include",
-  "$camera_path/pipeline_core/nodes/include",
-  "$camera_path/utils/event",
-  "$camera_path/../v4l2/src/stream_operator/stream_tunnel/standard",
-]
-
-cflags = [
-  "-g",
-  "-O0",
-  "-fno-omit-frame-pointer",
-]
-
-deps = [
-  "$board_camera_path/device_manager:camera_device_manager",
-  "$board_camera_path/pipeline_core:camera_pipeline_core",
-  "$camera_path/../../hdi_service/v1_0:camera_host_service_1.0",
-  "$camera_path/buffer_manager:camera_buffer_manager",
-  "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
-  "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
-]
-
-external_deps = [
-  "drivers_interface_camera:metadata",
-  "hdf_core:libhdf_ipc_adapter",
-  "hdf_core:libhdf_utils",
-  "hdf_core:libhdi",
-  "hilog:libhilog",
-  "ipc:ipc_core",
-]
+declare_args() {
+  fuzztest_enable_bule_environment = false
+}

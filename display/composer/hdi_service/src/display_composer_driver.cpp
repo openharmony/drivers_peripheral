@@ -17,14 +17,12 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/display_composer_stub.h"
+#include "v1_1/display_composer_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002500
-
-using namespace OHOS::HDI::Display::Composer::V1_0;
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
@@ -75,15 +73,15 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
     hdfDisplayComposerHost->ioService.Open = NULL;
     hdfDisplayComposerHost->ioService.Release = NULL;
 
-    auto serviceImpl = IDisplayComposer::Get(true);
+    auto serviceImpl = OHOS::HDI::Display::Composer::V1_1::IDisplayComposer::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get the implement of service", __func__);
         delete hdfDisplayComposerHost;
         return HDF_FAILURE;
     }
 
-    hdfDisplayComposerHost->stub =
-        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IDisplayComposer::GetDescriptor());
+    hdfDisplayComposerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        OHOS::HDI::Display::Composer::V1_1::IDisplayComposer::GetDescriptor());
     if (hdfDisplayComposerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfDisplayComposerHost;

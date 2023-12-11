@@ -40,6 +40,10 @@
 #include <thread>
 #include <unistd.h>
 
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+#include "power_config.h"
+#endif
+
 namespace OHOS {
 namespace HDI {
 namespace Power {
@@ -50,7 +54,7 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
-static std::chrono::milliseconds waitTime_(100); // {100ms};
+static std::chrono::milliseconds waitTime_(1000); // {1000ms};
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
 static std::condition_variable g_suspendCv;
@@ -92,6 +96,12 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipow
         AddPowerDeathRecipient(g_callback);
         g_isHdiStart = true;
     }
+
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    powerConfig.ParseConfig();
+#endif
+
     return HDF_SUCCESS;
 }
 
@@ -180,6 +190,7 @@ void NotifyCallback(int code)
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
+    HDF_LOGI("stop suspend");
     g_suspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
@@ -187,6 +198,7 @@ int32_t PowerInterfaceImpl::StopSuspend()
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
+    HDF_LOGI("force suspend");
     g_suspendRetry = false;
 
     NotifyCallback(CMD_ON_SUSPEND);
@@ -194,6 +206,8 @@ int32_t PowerInterfaceImpl::ForceSuspend()
     DoSuspend();
     g_powerState = PowerHdfState::AWAKE;
     NotifyCallback(CMD_ON_WAKEUP);
+
+    StartSuspend();
     return HDF_SUCCESS;
 }
 
@@ -251,7 +265,9 @@ int32_t PowerInterfaceImpl::RemovePowerDeathRecipient(const sptr<IPowerHdiCallba
 
 void PowerInterfaceImpl::PowerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
+    HDF_LOGI("PowerDeathRecipient OnRemoteDied");
     powerInterfaceImpl_->UnRegister();
+    RunningLockImpl::Clean();
 }
 
 void LoadStringFd(int32_t fd, std::string &content)
@@ -334,6 +350,38 @@ int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
     return RunningLockImpl::Unhold(info);
+}
+
+int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
+{
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
+    if (sceneConfigMap.empty()) {
+        HDF_LOGE("sceneConfigMap is empty");
+        return HDF_FAILURE;
+    }
+
+    std::string getPath{""};
+    std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
+    if (it != sceneConfigMap.end()) {
+        getPath = (it -> second).getPath;
+        HDF_LOGI("getPath = %{public}s", getPath.c_str());
+    } else {
+        HDF_LOGW("wakeuo_cause getPath does not exist");
+        return HDF_FAILURE;
+    }
+
+    UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
+    if (wakeupCauseFd < 0) {
+        return HDF_FAILURE;
+    }
+    LoadStringFd(wakeupCauseFd, reason);
+    return HDF_SUCCESS;
+#else
+    HDF_LOGW("wakrup cause path not config");
+    return HDF_FAILURE;
+#endif
 }
 } // namespace V1_1
 } // namespace Power

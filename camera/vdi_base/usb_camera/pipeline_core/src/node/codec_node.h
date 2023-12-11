@@ -37,15 +37,12 @@ public:
     RetCode ConfigJpegOrientation(common_metadata_header_t* data);
     RetCode ConfigJpegQuality(common_metadata_header_t* data);
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
-    static void Yuv422ToYuv420(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& bufferYuv420);
 private:
     void EncodeJpegToMemory(uint8_t* image, int width, int height,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
     void Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer);
     void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);
 
-    static uint32_t                       previewWidth_;
-    static uint32_t                       previewHeight_;
     uint32_t jpegRotation_;
     uint32_t jpegQuality_;
 };

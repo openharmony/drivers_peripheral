@@ -112,6 +112,10 @@ int32_t ThermalInterfaceImpl::Init()
 
 int32_t ThermalInterfaceImpl::SetCpuFreq(int32_t freq)
 {
+    if (freq <= 0) {
+        THERMAL_HILOGE(COMP_HDI, "invalid freq %{public}d", freq);
+        return HDF_FAILURE;
+    }
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->CpuRequest(freq);
         if (ret != HDF_SUCCESS) {
@@ -124,6 +128,10 @@ int32_t ThermalInterfaceImpl::SetCpuFreq(int32_t freq)
 
 int32_t ThermalInterfaceImpl::SetGpuFreq(int32_t freq)
 {
+    if (freq <= 0) {
+        THERMAL_HILOGE(COMP_HDI, "invalid freq %{public}d", freq);
+        return HDF_FAILURE;
+    }
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->GpuRequest(freq);
         if (ret != HDF_SUCCESS) {
@@ -136,6 +144,10 @@ int32_t ThermalInterfaceImpl::SetGpuFreq(int32_t freq)
 
 int32_t ThermalInterfaceImpl::SetBatteryCurrent(int32_t current)
 {
+    if (current <= 0) {
+        THERMAL_HILOGE(COMP_HDI, "invalid current %{public}d", current);
+        return HDF_FAILURE;
+    }
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->ChargerRequest(current);
         if (ret != HDF_SUCCESS) {
@@ -157,6 +169,10 @@ int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 
 int32_t ThermalInterfaceImpl::IsolateCpu(int32_t num)
 {
+    if (num <= 0) {
+        THERMAL_HILOGE(COMP_HDI, "invalid num %{public}d", num);
+        return HDF_FAILURE;
+    }
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->IsolateCpu(num);
         if (ret != HDF_SUCCESS) {
@@ -169,7 +185,7 @@ int32_t ThermalInterfaceImpl::IsolateCpu(int32_t num)
 
 int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj)
 {
-    if (thermalZoneMgr_ == nullptr) {
+    if (thermalZoneMgr_ == nullptr || callbackObj == nullptr) {
         return HDF_FAILURE;
     }
 
@@ -181,7 +197,7 @@ int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj
 
 int32_t ThermalInterfaceImpl::Unregister()
 {
-    if (thermalZoneMgr_ == nullptr) {
+    if (thermalZoneMgr_ == nullptr || thermalZoneMgr_->GetThermalEventCb() == nullptr) {
         return HDF_FAILURE;
     }
 
@@ -191,7 +207,7 @@ int32_t ThermalInterfaceImpl::Unregister()
 
 int32_t ThermalInterfaceImpl::RegisterFanCallback(const sptr<IFanCallback>& callbackObj)
 {
-    if (thermalZoneMgr_ == nullptr) {
+    if (thermalZoneMgr_ == nullptr || callbackObj == nullptr) {
         return HDF_FAILURE;
     }
 
@@ -203,7 +219,7 @@ int32_t ThermalInterfaceImpl::RegisterFanCallback(const sptr<IFanCallback>& call
 
 int32_t ThermalInterfaceImpl::UnregisterFanCallback()
 {
-    if (thermalZoneMgr_ == nullptr) {
+    if (thermalZoneMgr_ == nullptr || thermalZoneMgr_->GetFanEventCb() == nullptr) {
         return HDF_FAILURE;
     }
 

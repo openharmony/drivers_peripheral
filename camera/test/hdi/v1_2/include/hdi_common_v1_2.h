@@ -29,8 +29,8 @@
 #include "v1_2/types.h"
 #include "metadata_utils.h"
 #include "v1_2/icamera_host.h"
-#include "v1_1/icamera_device.h"
-#include "v1_1/istream_operator.h"
+#include "v1_2/icamera_device.h"
+#include "v1_2/istream_operator.h"
 #include "v1_2/camera_host_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
 #include "display_format.h"
@@ -39,7 +39,8 @@
 namespace OHOS::Camera {
 enum CameraUtConstants {
     UT_SLEEP_TIME = 2,
-    UT_SECOND_TIMES,
+    UT_SECOND_TIMES = 3,
+    UT_SECOND_TIMES_MAX = 100,
     UT_TUNNEL_MODE = 5,
     UT_DATA_SIZE = 8,
     UT_PREVIEW_SIZE = 3112960,
@@ -49,13 +50,25 @@ enum ImageDataSaveSwitch {
     SWITCH_OFF,
     SWITCH_ON,
 };
+
+enum CameraIds {
+    DEVICE_0, // rear camera
+    DEVICE_1, // front camera
+    DEVICE_2,
+    DEVICE_3,
+    DEVICE_4,
+    DEVICE_5,
+    DEVICE_6,
+};
+
 using namespace OHOS::HDI::Camera::V1_0;
 class Test {
 public:
     void Init();
-    void Open();
+    void Open(int cameraId);
+    void OpenCameraV1_2(int cameraId);
     void Close();
-    void GetCameraMetadata();
+    void GetCameraMetadata(int cameraId);
     void DefaultPreview(
         std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultCapture(
@@ -84,10 +97,14 @@ public:
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_2 = nullptr;
     OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfos;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
@@ -132,6 +149,8 @@ public:
 
     int32_t rc;
     bool status;
+    float statusV1_2;
+    static FlashlightStatus statusCallback;
     std::vector<std::string> cameraIds;
     std::vector<uint8_t> abilityVec = {};
     std::shared_ptr<CameraMetadata> ability = nullptr;
@@ -220,6 +239,18 @@ public:
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
     };
 
+    class TestStreamOperatorCallbackV1_2 : public OHOS::HDI::Camera::V1_2::IStreamOperatorCallback {
+    public:
+        TestStreamOperatorCallbackV1_2() = default;
+        virtual ~TestStreamOperatorCallbackV1_2() = default;
+        int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
+        int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
+        int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
+        int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
+        int32_t OnCaptureStartedV1_2(int32_t captureId,
+            const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
+    };
+
     class TestCameraHostCallback : public ICameraHostCallback {
     public:
         TestCameraHostCallback() = default;
@@ -227,6 +258,17 @@ public:
 
         int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
         int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+        int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
+    };
+
+    class TestCameraHostCallbackV1_2 : public OHOS::HDI::Camera::V1_2::ICameraHostCallback {
+    public:
+        TestCameraHostCallbackV1_2() = default;
+        virtual ~TestCameraHostCallbackV1_2() = default;
+
+        int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
+        int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+        int32_t OnFlashlightStatusV1_2(FlashlightStatus status) override;
         int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
     };
 };

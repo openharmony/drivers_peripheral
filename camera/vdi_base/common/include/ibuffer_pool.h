@@ -17,6 +17,7 @@
 #define HOS_CAMERA_IBUFFER_POOL_H
 
 #include "ibuffer.h"
+#include <map>
 
 namespace OHOS::Camera {
 class IBufferPool {
@@ -55,6 +56,10 @@ public:
     virtual void NotifyStart() = 0;
     virtual void ClearBuffers() = 0;
     virtual uint32_t GetIdleBufferCount() = 0;
+    virtual void setSFBuffer(std::shared_ptr<IBuffer>& buffer) = 0;
+    virtual std::map<int32_t, uint8_t*> getSFBuffer(int32_t index) = 0;
+    virtual int32_t GetForkBufferId() = 0;
+    virtual void SetForkBufferId(int32_t index) = 0;
 };
 } // namespace OHOS::Camera
 

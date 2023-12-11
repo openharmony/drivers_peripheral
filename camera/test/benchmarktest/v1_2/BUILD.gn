@@ -13,8 +13,12 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+# NOSORT
 import("../../../camera.gni")
+
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
 module_output_path = "drivers_peripheral_camera/camera"
 camera_include_path = "//drivers/peripheral/camera/test/hdi/"
 
@@ -67,7 +71,7 @@ ohos_benchmarktest("hdf_camera_benchmark_test_v1_2") {
   external_deps += [
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
   public_configs = [ ":hdf_camera_benchmark_test_config" ]

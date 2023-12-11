@@ -14,8 +14,6 @@
  */
 
 #include "stream_operator_fuzzer.h"
-#include "camera.h"
-#include "v1_1/istream_operator.h"
 
 namespace OHOS {
 const size_t THRESHOLD = 10;
@@ -23,6 +21,8 @@ const size_t THRESHOLD = 10;
 enum HostCmdId {
     STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1,
     STREAM_OPERATOR_COMMITSTREAM_V1_1,
+    STREAM_OPERATOR_UPDATESTREAMS,
+    STREAM_OPERATOR_END,
 };
 
 enum BitOperat {
@@ -47,6 +47,9 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
 
 void IsStreamSupprotedApi(const uint8_t *&rawData)
 {
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
     std::vector<uint8_t> abilityVec = {};
     uint8_t *data = const_cast<uint8_t *>(rawData);
     abilityVec.push_back(*data);
@@ -65,12 +68,33 @@ void IsStreamSupprotedApi(const uint8_t *&rawData)
     streamInfosV1_1.push_back(*streamInfoCapture);
     HDI::Camera::V1_0::StreamSupportType pType;
 
-    cameraTest->streamOperator_V1_1->IsStreamsSupported_V1_1(
+    cameraTest->streamOperator_V1_2->IsStreamsSupported_V1_1(
         *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec,
         streamInfosV1_1, pType);
 }
 
-static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
+void UpdateStreams(const uint8_t *rawData)
+{
+    if (rawData == nullptr) {
+        return false;
+    }
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfoV1_1->v1_0.stream_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.width_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.heigth_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.format_ = Camera::PIXEL_FMT_YCRCB_420_SP;
+    cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.dataspace_ = Camera::OHOS_CAMERA_SRGB_FULL;
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+    cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
+}
+
+static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 {
     switch (cmd) {
         case STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1: {
@@ -78,13 +102,19 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *&rawData)
             break;
         }
         case STREAM_OPERATOR_COMMITSTREAM_V1_1: {
+            cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+            cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(
+                cameraTest->streamOperatorCallbackV1_2, cameraTest->streamOperator_V1_2);
             std::vector<uint8_t> abilityVec = {};
             uint8_t *data = const_cast<uint8_t *>(rawData);
             abilityVec.push_back(*data);
-            cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+            cameraTest->streamOperator_V1_2->CommitStreams_V1_1(
                 *reinterpret_cast<const HDI::Camera::V1_1::OperationMode_V1_1 *>(rawData), abilityVec);
             break;
         }
+        case STREAM_OPERATOR_UPDATESTREAMS:
+            UpdateStreams(rawData);
+            break;
         default:
             return;
     }
@@ -101,16 +131,18 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->Init();
+    cameraTest->InitV1_2();
     if (cameraTest->serviceV1_1 == nullptr) {
         return false;
     }
-    cameraTest->Open();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    cameraTest->OpenCameraV1_2();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return false;
     }
 
-    HostFuncSwitch(cmd, rawData);
+    for (cmd = 0; cmd < STREAM_OPERATOR_END; cmd++) {
+        HostFuncSwitch(cmd, rawData);
+    }
     cameraTest->Close();
     return true;
 }

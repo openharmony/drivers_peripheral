@@ -15,7 +15,7 @@
 
 #include "codeccommon_fuzzer.h"
 
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 
 namespace OHOS {
 namespace Codec {

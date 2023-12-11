@@ -43,6 +43,7 @@ enum AudioPortPinVdi {
     PIN_VDI_OUT_DAUDIO_DEFAULT = 1 << 7,
     PIN_VDI_OUT_HEADPHONE = 1 << 8,
     PIN_VDI_OUT_USB_HEADSET = 1 << 9,
+    PIN_VDI_OUT_BLUETOOTH_A2DP = 1 << 10,
     PIN_VDI_IN_MIC = 1 << 27 | 1 << 0,
     PIN_VDI_IN_HS_MIC = 1 << 27 | 1 << 1,
     PIN_VDI_IN_LINEIN = 1 << 27 | 1 << 2,
@@ -60,6 +61,7 @@ enum AudioCategoryVdi {
     AUDIO_VDI_IN_CALL = 3,
     AUDIO_VDI_MMAP_NOIRQ = 4,
     AUDIO_VDI_OFFLOAD = 5,
+    AUDIO_VDI_MULTI_CHANNEL = 6,
     AUDIO_VDI_CATEGORY_BUTT,
 };
 
@@ -83,10 +85,18 @@ enum AudioFormatVdi {
 };
 
 enum AudioChannelMaskVdi {
-    AUDIO_VDI_CHANNEL_FRONT_LEFT = 1,
-    AUDIO_VDI_CHANNEL_FRONT_RIGHT = 2,
-    AUDIO_VDI_CHANNEL_MONO = 1,
+    AUDIO_VDI_CHANNEL_DEFAULT = 0,
     AUDIO_VDI_CHANNEL_STEREO = 3,
+    AUDIO_VDI_CHANNEL_MONO = 4,
+    AUDIO_VDI_CHANNEL_2POINT1 = 11,
+    AUDIO_VDI_CHANNEL_QUAD = 51,
+    AUDIO_VDI_CHANNEL_3POINT0POINT2 = 206158430215,
+    AUDIO_VDI_CHANNEL_5POINT1 = 1551,
+    AUDIO_VDI_CHANNEL_6POINT1 = 1807,
+    AUDIO_VDI_CHANNEL_7POINT1 = 1599,
+    AUDIO_VDI_CHANNEL_5POINT1POINT2 = 206158431759,
+    AUDIO_VDI_CHANNEL_5POINT1POINT4 = 185871,
+    AUDIO_VDI_CHANNEL_7POINT1POINT2 = 206158431807,
     AUDIO_VDI_CHANNEL_MASK_BUTT,
 };
 
@@ -181,7 +191,7 @@ enum AudioPortTypeVdi {
     AUDIO_VDI_PORT_DEVICE_TYPE = 1,
     AUDIO_VDI_PORT_MIX_TYPE = 2,
     AUDIO_VDI_PORT_SESSION_TYPE = 3,
-     AUDIO_VDI_PORT_TYPE_BUTT,
+    AUDIO_VDI_PORT_TYPE_BUTT,
 };
 
 enum AudioSessionTypeVdi {
@@ -229,6 +239,7 @@ enum AudioExtParamKeyVdi {
     AUDIO_VDI_EXT_PARAM_KEY_STATUS = 5,
     AUDIO_VDI_EXT_PARAM_KEY_USB_DEVICE = 101,
     AUDIO_VDI_EXT_PARAM_KEY_PERF_INFO = 201,
+    AUDIO_VDI_EXT_PARAM_KEY_MMI = 301,
     AUDIO_VDI_EXT_PARAM_KEY_LOWPOWER = 1000,
     AUDIO_VDI_EXT_PARAM_KEY_BUTT,
 };
@@ -270,11 +281,16 @@ enum AudioInputTypeVdi {
     AUDIO_VDI_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1,
     AUDIO_VDI_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2,
     AUDIO_VDI_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3,
+    AUDIO_VDI_INPUT_VOICE_UPLINK_TYPE        = 1 << 4,
+    AUDIO_VDI_INPUT_VOICE_DOWNLINK_TYPE      = 1 << 5,
+    AUDIO_VDI_INPUT_VOICE_CALL_TYPE          = 1 << 6,
+    AUDIO_VDI_INPUT_CAMCORDER_TYPE           = 1 << 7,
 };
 
 struct AudioOffloadInfoVdi {
     uint32_t sampleRate;
     uint32_t channelCount;
+    uint64_t channelLayout;
     uint32_t bitRate;
     uint32_t bitWidth;
     enum AudioFormatVdi format;
@@ -288,6 +304,7 @@ struct AudioSampleAttributesVdi {
     enum AudioFormatVdi format;
     uint32_t sampleRate;
     uint32_t channelCount;
+    uint64_t channelLayout;
     uint32_t period;
     uint32_t frameSize;
     bool isBigEndian;

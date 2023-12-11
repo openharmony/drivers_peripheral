@@ -125,8 +125,10 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
                 extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
             }
         }
+
         CameraDumper& dumper = CameraDumper::GetInstance();
-        dumper.DumpBuffer(buffer);
+        dumper.DumpBuffer("BeforeFlushSurface", ENABLE_STREAM_TUNNEL, buffer);
+
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         stats_.FlushBufferResult(ret);
         frameCount_++;
@@ -188,7 +190,7 @@ void StreamTunnel::NotifyStart()
 void StreamTunnel::WaitForAllBufferReturned()
 {
     std::unique_lock<std::mutex> l(finishLock_);
-    auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 200); // 200ms
+    auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 300); // 200ms
     if (!finishCV_.wait_until(l, timeout, [this] {
             CAMERA_LOGD("restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
             return restBuffers.load(std::memory_order_acquire) == 0;

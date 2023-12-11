@@ -73,6 +73,10 @@ public:
     virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) = 0;
+
+public:
+    int32_t wide_;
+    int32_t high_;
 };
 
 

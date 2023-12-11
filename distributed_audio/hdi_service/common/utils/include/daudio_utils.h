@@ -19,6 +19,8 @@
 #include <fstream>
 #include <string>
 
+#include "cJSON.h"
+
 #define AUDIO_MS_PER_SECOND 1000
 #define AUDIO_US_PER_SECOND 1000000
 #define AUDIO_NS_PER_SECOND ((int64_t)1000000000)
@@ -58,6 +60,10 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
 void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
 
 int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::string>> &keys, std::string &content);
+
+bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys);
+
+std::string ParseStringFromArgs(std::string args, const char *key);
 
 bool CheckIsNum(const std::string &jsonString);
 } // DistributedHardware

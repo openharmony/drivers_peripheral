@@ -26,12 +26,10 @@
         "c_utils",
         "ipc",
         "drivers_interface_display",
-        "graphic_chipsetsdk",
+        "graphic_surface",
         "init",
         "memory_utils",
-        "hitrace",
-        "googletest",
-        "thirdparty_benchmark"
+        "hitrace"
       ],
       "third_party": [
         "libdrm"

@@ -24,9 +24,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
-static sptr<IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -169,7 +169,7 @@ int32_t TestSetGetDisplayPowerStatus(uint32_t devId)
         HDF_LOGE("%{public}s: CONVERT_TABLE_POWER_STATUS length is equal to 0", __func__);
         return DISPLAY_FAILURE;
     }
-    DispPowerStatus status = CONVERT_TABLE_POWER_STATUS[GetData<uint32_t>() % len];
+    Composer::V1_0::DispPowerStatus status = CONVERT_TABLE_POWER_STATUS[GetData<uint32_t>() % len];
     int32_t ret = g_composerInterface->SetDisplayPowerStatus(devId, status);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function SetDisplayPowerStatus failed", __func__);
@@ -358,6 +358,48 @@ int32_t TestCommit(uint32_t devId)
     return ret;
 }
 
+int TestGetDisplaySupportedModesExt(uint32_t devId)
+{
+    std::vector<DisplayModeInfoExt> modes;
+    modes.push_back(GetData<DisplayModeInfoExt>());
+    int32_t ret = g_composerInterface->GetDisplaySupportedModesExt(devId, modes);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: GetDisplaySupportedModesExt failed", __func__);
+    }
+    return ret;
+}
+
+int TestSetDisplayModeAsync(uint32_t devId)
+{
+    uint32_t modeid = GetData<uint32_t>();
+    ModeCallback callback = GetData<ModeCallback>();
+    int32_t ret = g_composerInterface->SetDisplayModeAsync(devId, modeid, callback);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: SetDisplayModeAsync failed", __func__);
+    }
+    return ret;
+}
+
+int TestGetDisplayVBlankPeriod(uint32_t devId)
+{
+    uint64_t period = GetData<uint64_t>();
+    int32_t ret = g_composerInterface->GetDisplayVBlankPeriod(devId, period);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: GetDisplayVBlankPeriod failed", __func__);
+    }
+    return ret;
+}
+
+int TestRegSeamlessChangeCallback(uint32_t devId)
+{
+    SeamlessChangeCallback callback = GetData<SeamlessChangeCallback>();
+    int32_t ret = g_composerInterface->RegSeamlessChangeCallback(callback, nullptr);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: SetDisplayModeAsync failed", __func__);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -376,6 +418,10 @@ TestFuncs g_testFuncs = {
     TestDestroyVirtualDisplay,
     TestSetVirtualDisplayBuffer,
     TestSetDisplayProperty,
+    TestGetDisplaySupportedModesExt,
+    TestSetDisplayModeAsync,
+    TestGetDisplayVBlankPeriod,
+    TestRegSeamlessChangeCallback,
     TestCommit,
 };
 
@@ -388,7 +434,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
     // initialize service
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_1::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;

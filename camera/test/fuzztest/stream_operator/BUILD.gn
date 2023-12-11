@@ -11,16 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
-
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../camera.gni")
 
 module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
-config("camhdi_host_config") {
+config("stream_operator_config") {
   visibility = [ ":*" ]
   cflags_cc = [
     "-DGST_DISABLE_DEPRECATED",
@@ -41,7 +40,7 @@ ohos_fuzztest("stream_operator_fuzztest") {
   include_dirs = [
     # common includes
     "../common/include",
-    "$camera_test_path/v1_1/include",
+    "$camera_test_path/v1_2/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
     "$camera_path/../../interfaces/include",
@@ -71,12 +70,12 @@ ohos_fuzztest("stream_operator_fuzztest") {
 
   external_deps += [
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_camera:libcamera_proxy_1.1",
+    "drivers_interface_camera:libcamera_proxy_1.2",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
-  public_configs = [ ":camhdi_host_config" ]
+  public_configs = [ ":stream_operator_config" ]
 }
 
 group("fuzztest") {

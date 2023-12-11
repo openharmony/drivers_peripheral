@@ -104,6 +104,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_PEDOMETER                   = 266,   /**< Pedometer sensor */
     SENSOR_TYPE_POSTURE                     = 267,   /**< Posture sensor */
     SENSOR_TYPE_HEADPOSTURE                 = 268,   /**< Headposture sensor */
+    SENSOR_TYPE_DROP_DETECT                 = 269,   /**< Drop detection sensor */
     SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR = 277,   /**< Geomagnetic rotation vector sensor */
     SENSOR_TYPE_HEART_RATE                  = 278,   /**< Heart rate sensor */
     SENSOR_TYPE_DEVICE_ORIENTATION          = 279,   /**< Device orientation sensor */
@@ -182,6 +183,8 @@ struct SensorInformation {
     float power;          /**< Sensor power */
     int64_t minDelay;     /**< Minimum sample period allowed in microseconds */
     int64_t maxDelay;     /**< Maxmum sample period allowed in microseconds */
+    uint32_t fifoMaxEventCount; /**< Maxmum number of events of this sensor that could be batched */
+    uint32_t reserved;    /**< Reserved fields */
 };
 
 /**

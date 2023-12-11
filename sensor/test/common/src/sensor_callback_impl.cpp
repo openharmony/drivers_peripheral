@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
-namespace V1_1 {
+namespace V2_0 {
 uint32_t SensorCallbackImpl::sensorDataFlag = 1;
 namespace {
     struct SensorValueRange {
@@ -118,7 +118,7 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
     OsalMemFree(origin);
     return HDF_SUCCESS;
 }
-} // V1_1
+} // V2_0
 } // Sensor
 } // HDI
 } // OHOS

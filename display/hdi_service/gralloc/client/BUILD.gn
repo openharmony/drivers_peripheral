@@ -58,7 +58,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    external_deps += [ "graphic_chipsetsdk:buffer_handle" ]
+    external_deps += [ "graphic_surface:buffer_handle" ]
     subsystem_name = "hdf"
     part_name = "drivers_interface_display"
   }

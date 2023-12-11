@@ -19,13 +19,16 @@
 #include <servmgr_hdi.h>
 #include <vector>
 #include "codec_function_utils.h"
-#include "v1_0/codec_callback_service.h"
+#include "v2_0/codec_callback_service.h"
+
+#define ERR_COUNT (-1)
+#define ERR_COUNT_2 (10000)
 
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
 using OHOS::HDI::Base::NativeBuffer;
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
@@ -35,7 +38,7 @@ constexpr AvCodecRole ROLE = MEDIA_ROLETYPE_VIDEO_AVC;
 static sptr<ICodecComponent> g_component = nullptr;
 static sptr<ICodecCallback> g_callback = nullptr;
 static sptr<ICodecComponentManager> g_manager = nullptr;
-static OHOS::HDI::Codec::V1_0::CodecVersionType g_version;
+static OHOS::HDI::Codec::V2_0::CodecVersionType g_version;
 static std::string g_compName = "";
 
 class CodecHdiOmxDecTest : public testing::Test {
@@ -110,6 +113,9 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
     auto ret = g_component->SendCommand(CODEC_COMMAND_STATE_SET, CODEC_STATE_IDLE, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
+    std::vector<int8_t> inParam, outParam;
+    ret = g_component->GetParameter(OMX_IndexMax, inParam, outParam);
+    ASSERT_TRUE(ret != HDF_SUCCESS);
     OMX_PARAM_PORTDEFINITIONTYPE param;
     func_->GetPortParameter(g_component, PortIndex::INDEX_INPUT, param);
     auto err = func_->UseBufferOnPort(g_component, PortIndex::INDEX_INPUT, param.nBufferCountActual,
@@ -146,4 +152,14 @@ HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiEmptyAndFillBufferTest_001, TestSize.Lev
     ASSERT_TRUE(err);
 }
 
+HWTEST_F(CodecHdiOmxDecTest, HdfCodecHdiGetComponentCapabilityListTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    int32_t count = ERR_COUNT_2;
+    std::vector<CodecCompCapability> capList;
+    auto err = g_manager->GetComponentCapabilityList(capList, count);
+    count = ERR_COUNT;
+    err = g_manager->GetComponentCapabilityList(capList, count);
+    ASSERT_TRUE(err != HDF_SUCCESS);
+}
 }  // namespace

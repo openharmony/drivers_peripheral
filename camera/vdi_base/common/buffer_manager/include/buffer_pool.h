@@ -46,6 +46,10 @@ public:
     void NotifyStart() override;
     void ClearBuffers() override;
     uint32_t GetIdleBufferCount() override;
+    void setSFBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    std::map<int32_t, uint8_t*> getSFBuffer(int32_t index) override;
+    int32_t GetForkBufferId() override;
+    void SetForkBufferId(int32_t index) override;
 
 private:
     RetCode PrepareBuffer();
@@ -66,6 +70,9 @@ private:
     std::shared_ptr<IBufferAllocator> bufferAllocator_ = nullptr;
     std::list<std::shared_ptr<IBuffer>> idleList_ = {};
     std::list<std::shared_ptr<IBuffer>> busyList_ = {};
+    std::map<int32_t, uint8_t*> sfBuffer_;
+    std::map<int32_t, uint32_t> sfSize_;
+    int32_t forkBufferId_ = -1;
 };
 } // namespace OHOS::Camera
 #endif

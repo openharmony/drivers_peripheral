@@ -20,7 +20,7 @@
 #include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
-#include "v1_0/iaudio_manager.h"
+#include "v2_0/iaudio_manager.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRV
 

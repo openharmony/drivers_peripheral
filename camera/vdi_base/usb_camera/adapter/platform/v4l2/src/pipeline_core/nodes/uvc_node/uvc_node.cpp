@@ -101,8 +101,8 @@ RetCode UvcNode::Start(const int32_t streamId)
     for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = it->format_.w_;
-        format.fmtdesc.height = it->format_.h_;
+        format.fmtdesc.width = wide_;
+        format.fmtdesc.height = high_;
         int bufCnt = it->format_.bufferCount_;
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -110,6 +110,7 @@ RetCode UvcNode::Start(const int32_t streamId)
             return RC_ERROR;
         }
     }
+    isAdjust_ = true;
     if (meta_ != nullptr) {
         sensorController_->ConfigFps(meta_);
     }

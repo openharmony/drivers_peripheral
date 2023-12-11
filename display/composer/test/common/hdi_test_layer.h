@@ -16,18 +16,18 @@
 #ifndef HDI_TEST_LAYER_H
 #define HDI_TEST_LAYER_H
 #include <queue>
-#include "v1_0/display_composer_type.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
 class HdiGrallocBuffer {
 public:
-    HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, PixelFormat fmt);
+    HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, Composer::V1_0::PixelFormat fmt);
     ~HdiGrallocBuffer();
     BufferHandle* Get() const
     {
@@ -65,7 +65,7 @@ public:
     {
         return id_;
     }
-    CompositionType GetCompType() const
+    Composer::V1_0::CompositionType GetCompType() const
     {
         return compType_;
     }
@@ -80,7 +80,7 @@ public:
     void SetLayerPosition(const IRect& rect);
     void SetLayerCrop(const IRect& rect);
     void SetZorder(uint32_t zorder);
-    void SetCompType(CompositionType type);
+    void SetCompType(Composer::V1_0::CompositionType type);
     void SetReleaseFence(int fd);
     void SetAlpha(LayerAlpha alpha);
     void SetBlendType(BlendType type);
@@ -96,9 +96,9 @@ private:
     LayerInfo layerInfo_ = { 0 };
 
 #ifdef DISPLAY_COMMUNITY
-    CompositionType compType_ = COMPOSITION_CLIENT;
+    Composer::V1_0::CompositionType compType_ = Composer::V1_0::CompositionType::COMPOSITION_CLIENT;
 #else
-    CompositionType compType_ = COMPOSITION_DEVICE;
+    Composer::V1_0::CompositionType compType_ = Composer::V1_0::CompositionType::COMPOSITION_DEVICE;
 #endif // DISPLAY_COMMUNITY
     IRect displayRect_ = { 0 };
     IRect cropRect_ = { 0 };

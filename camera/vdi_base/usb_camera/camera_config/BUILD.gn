@@ -11,10 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/camera/vdi_base/usb_camera/camera_usb.gni")
-import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
 
+# NOSORT
+import("../../../camera.gni")
+
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
+import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
+import("../camera_usb.gni")
 hc_gen_c("generate_source") {
   sources = [
     "./pipeline_core/config.hcs",
