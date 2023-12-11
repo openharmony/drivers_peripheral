@@ -26,14 +26,19 @@ config("camhdi_at_test_config") {
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
+    "--coverage",
   ]
+  ldflags = [ "--coverage" ]
 }
 
 ohos_unittest("camera_test_hdi_V1_2") {
   testonly = true
   module_out_path = module_output_path
   sources = [
+    "$camera_test_path/v1_2/src/camera_flashlight_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_hdi_uttest_v1_2.cpp",
+    "$camera_test_path/v1_2/src/camera_stream_uttest_v1_2.cpp",
+    "$camera_test_path/v1_2/src/front_camera_hdi_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/hdi_common_v1_2.cpp",
   ]
 
@@ -71,7 +76,7 @@ ohos_unittest("camera_test_hdi_V1_2") {
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_proxy_1.2",
     "drivers_interface_camera:metadata",
-    "graphic_chipsetsdk:surface",
+    "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
   public_configs = [ ":camhdi_at_test_config" ]

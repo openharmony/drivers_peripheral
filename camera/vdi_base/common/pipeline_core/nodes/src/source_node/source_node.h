@@ -42,12 +42,13 @@ protected:
     public:
         PortHandler() = default;
         virtual ~PortHandler() = default;
-        explicit PortHandler(std::shared_ptr<IPort>& p);
+        explicit PortHandler(std::shared_ptr<IPort>& p, bool isResize);
         RetCode StartCollectBuffers();
         RetCode StopCollectBuffers();
         RetCode StartDistributeBuffers();
         RetCode StopDistributeBuffers();
         void OnBuffer(std::shared_ptr<IBuffer>& buffer);
+        void setWideAndHigh(int32_t wide, int32_t high);
 
     private:
         void CollectBuffers();
@@ -69,6 +70,11 @@ protected:
         std::mutex rblock;
         std::list<std::shared_ptr<IBuffer>> respondBufferList = {};
         std::mutex cltLock;
+        int count_ = 0;
+        std::map<int32_t, uint8_t*> cBuffer;
+        bool isResize_ = false;
+        int32_t maxWide_ = 0;
+        int32_t maxHigh_ = 0;
     };
 
     std::mutex hndl_ = {};
@@ -77,6 +83,7 @@ protected:
     std::mutex requestLock_;
     std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
     std::string cameraIds_;
+    bool isAdjust_ = false;
 };
 } // namespace OHOS::Camera
 #endif

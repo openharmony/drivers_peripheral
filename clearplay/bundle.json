@@ -1,0 +1,81 @@
+{
+  "name": "@ohos/drivers_peripheral_clearplay",
+  "description": "clearplay drm device driver",
+  "version": "4.0",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/clearplay"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "drivers_peripheral_clearplay",
+    "subsystem": "hdf",
+    "syscap": [],
+    "adapted_system_type": ["standard"],
+    "rom": "675KB",
+    "ram": "7400KB",
+    "deps": {
+      "components": [
+        "bounds_checking_function",
+        "drivers_interface_drm",
+        "c_utils",
+        "hdf_core",
+        "hilog",
+        "ipc"
+      ],
+      "third_party": [
+        "openssl",
+	"cJSON"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/clearplay:clearplay_entry"
+      ],
+      "inner_kits": [
+        {
+          "type":"so",
+          "name": "//drivers/peripheral/clearplay/hdi_service:libmedia_key_system_factory_clearplay_service_1.0",
+            "header": {
+              "header_files": [
+                "imedia_decrypt_module.h",
+                "imedia_key_session_callback.h",
+                "imedia_key_session.h",
+                "imedia_key_system_callback.h",
+                "imedia_key_system_factory.h",
+                "imedia_key_system.h",
+                "ioem_certificate.h",
+                "media_decrypt_module_proxy.h",
+                "media_decrypt_module_stub.h",
+                "media_key_session_callback_proxy.h",
+                "media_key_session_callback_stub.h",
+                "media_key_session_proxy.h",
+                "media_key_session_stub.h",
+                "media_key_system_callback_proxy.h",
+                "media_key_system_callback_stub.h",
+                "media_key_system_factory_proxy.h",
+                "media_key_system_factory_stub.h",
+                "media_key_system_proxy.h",
+                "media_key_system_stub.h",
+                "media_key_system_types.h",
+                "oem_certificate_proxy.h",
+                "oem_certificate_stub.h"
+              ],
+              "header_base": "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"
+          }
+        },
+        {
+          "type":"so",
+          "name": "//drivers/peripheral/clearplay/interfaces:libclearplay_driver",
+            "header": {
+              "header_files": [
+              ],
+              "header_base": "//drivers/peripheral/clearplay/interfaces/include/drm/v1_0"
+          }
+        }
+      ]
+    }
+  }
+}

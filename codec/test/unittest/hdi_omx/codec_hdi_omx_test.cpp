@@ -276,6 +276,7 @@ public:
     {
         if (manager_ != nullptr && component_ != nullptr) {
             manager_->DestroyComponent(componentId_);
+            CodecComponentTypeRelease(component_);
         }
         if (callback_ != nullptr) {
             CodecCallbackTypeRelease(callback_);

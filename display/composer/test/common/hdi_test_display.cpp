@@ -21,9 +21,9 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
-using namespace OHOS::HDI::Display::Composer::V1_0;
-    HdiTestDisplay::HdiTestDisplay(uint32_t id, sptr<IDisplayComposerInterface> device)
-        : id_(id), device_(device), currentFb_(nullptr)
+using namespace OHOS::HDI::Display::Composer::V1_1;
+HdiTestDisplay::HdiTestDisplay(uint32_t id, sptr<Composer::V1_1::IDisplayComposerInterface> device)
+    : id_(id), device_(device), currentFb_(nullptr)
 {
 }
 
@@ -47,7 +47,7 @@ int32_t HdiTestDisplay::Init()
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("can not get the mode of id : %{public}u", activeModeId_));
 
-    ret = device_->SetDisplayPowerStatus(id_, DispPowerStatus::POWER_STATUS_ON);
+    ret = device_->SetDisplayPowerStatus(id_, Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("SetDisplayPowerStatus failed, id_ : %{public}u", id_));
 
@@ -58,7 +58,7 @@ int32_t HdiTestDisplay::Init()
     LayerInfo layerinfo = {0};
     layerinfo.width = currentMode_.width;
     layerinfo.height = currentMode_.height;
-    layerinfo.pixFormat = PIXEL_FMT_BGRA_8888;
+    layerinfo.pixFormat = Composer::V1_0::PIXEL_FMT_BGRA_8888;
     const uint32_t CLIENT_LAYER_ID = 0xffffffff; // invalid id
     clientLayer_ = std::make_unique<HdiTestLayer>(layerinfo, CLIENT_LAYER_ID, id_);
     ret = clientLayer_->Init();
@@ -105,7 +105,7 @@ std::shared_ptr<HdiTestLayer> HdiTestDisplay::CreateHdiTestLayer(uint32_t w, uin
 {
     const int32_t BPP = 32;
 
-    LayerInfo info = {w, h, LAYER_TYPE_GRAPHIC, BPP, PIXEL_FMT_RGBA_8888};
+    LayerInfo info = {w, h, LAYER_TYPE_GRAPHIC, BPP, Composer::V1_0::PIXEL_FMT_RGBA_8888};
     return CreateHdiTestLayer(info);
 }
 
@@ -121,7 +121,7 @@ int32_t HdiTestDisplay::RefreshLayersCompType()
     for (uint32_t i = 0; i < layers.size(); i++) {
         DISPLAY_TEST_LOGD(" the layer id %{public}u ", layers[i]);
         std::shared_ptr<HdiTestLayer> layer = GetLayerFromId(layers[i]);
-        layer->SetCompType(static_cast<CompositionType>(types[i]));
+        layer->SetCompType(static_cast<Composer::V1_0::CompositionType>(types[i]));
     }
     return DISPLAY_SUCCESS;
 }

@@ -720,11 +720,43 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKCodec#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 1;
             }
             out_port_1 :: port_spec {
                 name = "out1";
+                peerPortName = "in0";
+                peerPortNodeName = "RKScale#1";
+                direction = 1;
+            }
+        }
+        RKScale_1 :: node_spec {
+            name = "RKScale#0";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out0";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
+                peerPortName = "in0";
+                peerPortNodeName = "RKCodec#0";
+                direction = 1;
+            }
+        }
+        RKScale_2 :: node_spec {
+            name = "RKScale#1";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out1";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
                 peerPortName = "in0";
                 peerPortNodeName = "ipp#0";
                 direction = 1;
@@ -735,8 +767,8 @@ root {
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
-                peerPortName = "out1";
-                peerPortNodeName = "fork#0";
+                peerPortName = "out0";
+                peerPortNodeName = "RKScale#1";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -752,7 +784,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "fork#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -841,11 +873,43 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKCodec#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 1;
             }
             out_port_1 :: port_spec {
                 name = "out1";
+                peerPortName = "in0";
+                peerPortNodeName = "RKScale#1";
+                direction = 1;
+            }
+        }
+        RKScale_1 :: node_spec {
+            name = "RKScale#0";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out0";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
+                peerPortName = "in0";
+                peerPortNodeName = "RKCodec#0";
+                direction = 1;
+            }
+        }
+        RKScale_2 :: node_spec {
+            name = "RKScale#1";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out1";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
                 peerPortName = "in0";
                 peerPortNodeName = "ipp#0";
                 direction = 1;
@@ -856,8 +920,8 @@ root {
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
-                peerPortName = "out1";
-                peerPortNodeName = "fork#0";
+                peerPortName = "out0";
+                peerPortNodeName = "RKScale#1";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -873,7 +937,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "fork#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -1478,11 +1542,43 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKCodec#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 1;
             }
             out_port_1 :: port_spec {
                 name = "out1";
+                peerPortName = "in0";
+                peerPortNodeName = "RKScale#1";
+                direction = 1;
+            }
+        }
+        RKScale_1 :: node_spec {
+            name = "RKScale#0";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out0";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
+                peerPortName = "in0";
+                peerPortNodeName = "RKCodec#0";
+                direction = 1;
+            }
+        }
+        RKScale_2 :: node_spec {
+            name = "RKScale#1";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out1";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
                 peerPortName = "in0";
                 peerPortNodeName = "stability#0";
                 direction = 1;
@@ -1493,8 +1589,8 @@ root {
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
-                peerPortName = "out1";
-                peerPortNodeName = "fork#0";
+                peerPortName = "out0";
+                peerPortNodeName = "RKScale#1";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -1510,7 +1606,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "fork#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -1583,11 +1679,43 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKCodec#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 1;
             }
             out_port_1 :: port_spec {
                 name = "out1";
+                peerPortName = "in0";
+                peerPortNodeName = "RKScale#1";
+                direction = 1;
+            }
+        }
+        RKScale_1 :: node_spec {
+            name = "RKScale#0";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out0";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
+                peerPortName = "in0";
+                peerPortNodeName = "RKCodec#0";
+                direction = 1;
+            }
+        }
+        RKScale_2 :: node_spec {
+            name = "RKScale#1";
+            status = "new";
+            in_port_0 :: port_spec {
+                name = "in0";
+                peerPortName = "out1";
+                peerPortNodeName = "fork#0";
+                direction = 0;
+            }
+            out_port_0 :: port_spec {
+                name = "out0";
                 peerPortName = "in0";
                 peerPortNodeName = "stability#0";
                 direction = 1;
@@ -1598,8 +1726,8 @@ root {
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
-                peerPortName = "out1";
-                peerPortNodeName = "fork#0";
+                peerPortName = "out0";
+                peerPortNodeName = "RKScale#1";
                 direction = 0;
             }
             out_port_0 :: port_spec {
@@ -1615,7 +1743,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "fork#0";
+                peerPortNodeName = "RKScale#0";
                 direction = 0;
             }
             out_port_0 :: port_spec {

@@ -14,6 +14,7 @@
 #include "uvc_node.h"
 #include <unistd.h>
 #include "metadata_controller.h"
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -101,8 +102,8 @@ RetCode UvcNode::Start(const int32_t streamId)
     for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = it->format_.w_;
-        format.fmtdesc.height = it->format_.h_;
+        format.fmtdesc.width = wide_;
+        format.fmtdesc.height = high_;
         int bufCnt = it->format_.bufferCount_;
         rc = sensorController_->Start(bufCnt, format);
         if (rc == RC_ERROR) {
@@ -110,9 +111,11 @@ RetCode UvcNode::Start(const int32_t streamId)
             return RC_ERROR;
         }
     }
+    isAdjust_ = true;
     if (meta_ != nullptr) {
         sensorController_->ConfigFps(meta_);
     }
+
     rc = SourceNode::Start(streamId);
     return rc;
 }
@@ -176,9 +179,11 @@ void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
     }
     constexpr uint32_t DEVICE_STREAM_ID = 0;
     if (sensorController_ != nullptr) {
+        sensorController_->ConfigStart();
         if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
             sensorController_->Configure(metadata);
         }
+        sensorController_->ConfigStop();
     } else {
         CAMERA_LOGE("UvcNode sensorController_ is null");
     }
@@ -225,9 +230,12 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         return;
     }
 
+    CameraDumper& dumper = CameraDumper::GetInstance();
+    dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer);
+
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
-        buffer->GetWidth(), buffer->GetHeight());
+        wide_, high_);
     int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),
         static_cast<uint8_t *>(jBuf), buffer->GetSize());
     if (ret == 0) {
@@ -238,10 +246,11 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
     free(jBuf);
 
+    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer);
+
     SourceNode::DeliverBuffer(buffer);
     return;
 }
-
 
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {

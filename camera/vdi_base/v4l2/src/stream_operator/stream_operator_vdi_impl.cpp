@@ -22,9 +22,12 @@
 #include "camera_host_config.h"
 #include "metadata_utils.h"
 #include "camera_dump.h"
+#ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
-
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
+#else
+#define HDF_CAMERA_TRACE
+#endif
 
 namespace OHOS::Camera {
 StreamOperatorVdiImpl::StreamOperatorVdiImpl(const OHOS::sptr<IStreamOperatorVdiCallback> &callback,
@@ -497,8 +500,10 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
+
     CameraDumper &dumper = CameraDumper::GetInstance();
-    dumper.DumpMetadata(captureSetting, "capturesetting");
+    dumper.DumpMetadata("capturesetting", ENABLE_METADATA, captureSetting);
+
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
                                          info.enableShutterCallback_, isStreaming);

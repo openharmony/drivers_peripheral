@@ -291,6 +291,11 @@ int32_t RilImpl::SendDataSleepMode(
     return TaskSchedule(&Telephony::HRilManager::SendDataSleepMode, slotId, serialId, dataSleepInfo);
 }
 
+int32_t RilImpl::CleanAllConnections(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::CleanAllConnections, slotId, serialId);
+}
+
 // Modem
 int32_t RilImpl::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {
@@ -561,6 +566,11 @@ int32_t RilImpl::SimAuthentication(int32_t slotId, int32_t serialId, const SimAu
 int32_t RilImpl::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key)
 {
     return TaskSchedule(&Telephony::HRilManager::UnlockSimLock, slotId, serialId, lockType, key);
+}
+
+int32_t RilImpl::SendSimMatchedOperatorInfo(int32_t slotId, int32_t serialId, const NcfgOperatorInfo &ncfgOperatorInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendSimMatchedOperatorInfo, slotId, serialId, ncfgOperatorInfo);
 }
 
 // Sms

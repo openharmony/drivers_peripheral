@@ -73,6 +73,7 @@ private:
     AudioManagerInterfaceImpl();
     int32_t NotifyFwk(const DAudioDevEvent &event);
     int32_t CreateAdapter(const std::string &adpName, const uint32_t devId, const sptr<IDAudioCallback> &callback);
+    sptr<IRemoteObject> GetRemote(const std::string &adpName);
 
 private:
     class Deletor {
@@ -98,7 +99,7 @@ private:
     struct HdfDeviceObject *deviceObject_ = nullptr;
     std::mutex adapterMapMtx_;
     std::map<std::string, sptr<AudioAdapterInterfaceImpl>> mapAudioAdapter_;
-    sptr<IRemoteObject> remote_;
+    std::map<std::string, sptr<IDAudioCallback>> mapAudioCallback_;
 };
 } // V1_0
 } // Audio

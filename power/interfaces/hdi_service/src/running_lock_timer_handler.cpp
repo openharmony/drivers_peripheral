@@ -121,6 +121,19 @@ void RunningLockTimerHandler::UnregisterTimer(uint32_t timerId)
         handlerTimer_->Unregister(timerId);
     }
 }
+
+void RunningLockTimerHandler::Clean()
+{
+    if (handlerTimer_ != nullptr) {
+        handlerTimer_->Shutdown();
+        for (auto &timer : runninglockTimerMap_) {
+            timer.second.clear();
+        }
+        runninglockTimerMap_.clear();
+        handlerTimer_ = nullptr;
+    }
+}
+
 } // namespace V1_1
 } // namespace Power
 } // namespace HDI

@@ -41,3 +41,11 @@ void BluetoothA2dpSrcObserver::OnConfigurationChanged
         callbacks_->OnConfigurationChanged(device, info, error);
     }
 }
+
+void BluetoothA2dpSrcObserver::OnMediaStackChanged(const OHOS::bluetooth::RawAddress &device, int action)
+{
+    HDF_LOGI("BluetoothA2dpSrcObserver::OnMediaStackChanged");
+    if ((callbacks_ != nullptr) && (callbacks_->OnMediaStackChanged)) {
+        callbacks_->OnMediaStackChanged(device, action);
+    }
+}

@@ -18,6 +18,7 @@
 #include <mutex>
 #include <hdf_base.h>
 #include "securec.h"
+#include <set>
 
 #include "iam_logger.h"
 #include "iam_ptr.h"
@@ -215,6 +216,16 @@ static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in,
     }
 }
 
+static int32_t CopyAuthSolutionV1_2ToV1_0(const AuthSolutionV1_2 &in, AuthSolution &out)
+{
+    out.userId = in.userId;
+    out.authTrustLevel = in.authTrustLevel;
+    out.authType = in.authType;
+    out.executorSensorHint = in.executorSensorHint;
+    out.challenge = std::move(in.challenge);
+    return RESULT_SUCCESS;
+}
+
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
     std::vector<ScheduleInfo> &infos)
 {
@@ -222,6 +233,20 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::vector<ScheduleInfoV1_1> infosV1_1;
     int32_t ret = BeginAuthenticationV1_1(contextId, param, infosV1_1);
     CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
+    std::vector<ScheduleInfoV1_1> &infos)
+{
+    IAM_LOGI("start");
+    AuthSolution param;
+    int32_t ret = CopyAuthSolutionV1_2ToV1_0(paramV1_2, param);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("AuthSolution copy failed");
+        return ret;
+    }
+    ret = BeginAuthenticationV1_1(contextId, param, infos);
     return ret;
 }
 
@@ -285,7 +310,7 @@ int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfo
     return RESULT_SUCCESS;
 }
 
-static int32_t CreateExecutorCommand(AuthResultInfo &info)
+static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
     AuthPropertyMode authPropMode;
@@ -296,7 +321,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
     } else {
         return RESULT_SUCCESS;
     }
-    ResultCode ret = GetExecutorMsgList(authPropMode, &executorSendMsg);
+    ResultCode ret = GetExecutorMsgList(userId, authPropMode, &executorSendMsg);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("get executor msg failed");
         return ret;
@@ -379,12 +404,12 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         }
     }
     DestoryBuffer(authResult.rootSecret);
-    if (authTokenHal.tokenDataPlain.authType != PIN_AUTH) {
+    if (authResult.authType != PIN_AUTH) {
         IAM_LOGI("type not pin");
         return RESULT_SUCCESS;
     }
     IAM_LOGI("type pin");
-    return CreateExecutorCommand(info);
+    return CreateExecutorCommand(authResult.userId, info);
 }
 
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
@@ -513,7 +538,7 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
             result = RESULT_TRUST_LEVEL_NOT_SUPPORT;
             continue;
         }
-        IAM_LOGE("get valid authType:%{public}d", authType);
+        IAM_LOGI("get valid authType:%{public}d", authType);
         validTypes.push_back(authType);
     }
     if (validTypes.empty()) {
@@ -542,6 +567,17 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     std::lock_guard<std::mutex> lock(g_mutex);
     return CloseEditSession();
 }
+
+int32_t UserAuthInterfaceService::BeginEnrollmentV1_2(int32_t userId, const std::vector<uint8_t> &authToken,
+    const EnrollParamV1_2 &paramV1_2, ScheduleInfoV1_1 &infoV1_1)
+{
+    IAM_LOGI("start");
+    EnrollParam param;
+    param.authType = paramV1_2.authType;
+    param.executorSensorHint = paramV1_2.executorSensorHint;
+    return BeginEnrollmentV1_1(userId, authToken, param, infoV1_1);
+}
+
 
 int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vector<uint8_t> &authToken,
     const EnrollParam &param, ScheduleInfo &info)

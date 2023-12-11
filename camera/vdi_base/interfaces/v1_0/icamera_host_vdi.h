@@ -65,7 +65,24 @@ public:
     static sptr<ICameraHostVdi> Get(bool isStub = false);
     static sptr<ICameraHostVdi> Get(const std::string &serviceName, bool isStub = false);
 
-    virtual int32_t SetCallback(const sptr<ICameraHostVdiCallback> &callbackObj) = 0;
+    virtual int32_t SetCallback(const sptr<ICameraHostVdiCallback> &callbackObj)
+    {
+        sptr<CameraHostCallBackDeathRecipient> callBackDeathRecipient =
+                                                new CameraHostCallBackDeathRecipient(this);
+
+        const sptr<IRemoteObject> remote = callbackObj->Remote();
+        if (nullptr == remote) {
+            CAMERA_LOGE("No remote of hostcallback, set deathcallback fail.");
+
+            return VDI::Camera::V1_0::INVALID_ARGUMENT;
+        }
+
+        bool res = remote->AddDeathRecipient(callBackDeathRecipient);
+        if (!res) {
+            return VDI::Camera::V1_0::INVALID_ARGUMENT;
+        }
+        return VDI::Camera::V1_0::NO_ERROR;
+    }
 
     virtual int32_t GetCameraIds(std::vector<std::string> &cameraIds) = 0;
 
@@ -78,26 +95,6 @@ public:
 
     virtual int32_t CloseAllCameras() = 0;
 };
-
-int32_t ICameraHostVdi::SetCallback(const sptr<ICameraHostVdiCallback> &callbackObj)
-{
-    sptr<CameraHostCallBackDeathRecipient> callBackDeathRecipient =
-                                            new CameraHostCallBackDeathRecipient(this);
-
-    const sptr<IRemoteObject> remote = callbackObj->Remote();
-    if (nullptr == remote) {
-        CAMERA_LOGE("No remote of hostcallback, set deathcallback fail.");
-
-        return VDI::Camera::V1_0::INVALID_ARGUMENT;
-    }
-
-    bool res = remote->AddDeathRecipient(callBackDeathRecipient);
-    if (!res) {
-        return VDI::Camera::V1_0::INVALID_ARGUMENT;
-    }
-    return VDI::Camera::V1_0::NO_ERROR;
-}
-
 
 struct VdiWrapperCameraHost {
     struct HdfVdiBase base;

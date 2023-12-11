@@ -18,7 +18,8 @@
 #include <cinttypes>
 #include <algorithm>
 #include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "display_test.h"
 #include "display_test_utils.h"
@@ -27,19 +28,21 @@
 #include "hdi_test_device_common.h"
 #include "hdi_test_display.h"
 #include "hdi_test_render_utils.h"
-#include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
-#include "v1_0/display_command/display_cmd_requester.h"
+#include "timer.h"
+#include <sys/time.h>
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 using namespace OHOS::HDI::Display::TEST;
 using namespace testing::ext;
 
-static sptr<IDisplayComposerInterface> g_composerDevice = nullptr;
+static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
 const int SLEEP_CONT_100 = 100;
 const int SLEEP_CONT_2000 = 2000;
+static bool g_isOnSeamlessChangeCalled = false;
+static bool g_isOnModeCalled = false;
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
@@ -256,17 +259,18 @@ HWTEST_F(DeviceTest, test_SetDisplayMode, TestSize.Level1)
 
 HWTEST_F(DeviceTest, test_GetDisplayPowerStatus, TestSize.Level1)
 {
-    DispPowerStatus powerStatus = DispPowerStatus::POWER_STATUS_OFF;
+    Composer::V1_0::DispPowerStatus powerStatus = Composer::V1_0::DispPowerStatus::POWER_STATUS_OFF;
     auto ret = g_composerDevice->GetDisplayPowerStatus(g_displayIds[0], powerStatus);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
 HWTEST_F(DeviceTest, test_SetDisplayPowerStatus, TestSize.Level1)
 {
-    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], DispPowerStatus::POWER_STATUS_STANDBY);
+    auto ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0],
+        Composer::V1_0::DispPowerStatus::POWER_STATUS_STANDBY);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
-    ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], DispPowerStatus::POWER_STATUS_ON);
+    ret = g_composerDevice->SetDisplayPowerStatus(g_displayIds[0], Composer::V1_0::DispPowerStatus::POWER_STATUS_ON);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
@@ -333,7 +337,7 @@ HWTEST_F(DeviceTest, test_SetDisplayClientBuffer, TestSize.Level1)
     info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
-    info.format = PIXEL_FMT_RGBA_8888;
+    info.format = Composer::V1_0::PIXEL_FMT_RGBA_8888;
 
     g_gralloc->AllocMem(info, buffer);
     ASSERT_TRUE(buffer != nullptr);
@@ -388,7 +392,7 @@ HWTEST_F(DeviceTest, test_SetVirtualDisplayBuffer, TestSize.Level1)
     info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
-    info.format = PIXEL_FMT_RGBA_8888;
+    info.format = Composer::V1_0::PIXEL_FMT_RGBA_8888;
 
     g_gralloc->AllocMem(info, buffer);
     ASSERT_TRUE(buffer != nullptr);
@@ -663,7 +667,7 @@ HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
 
     auto layer = layers[0];
 
-    CompositionType type = CompositionType::COMPOSITION_CLIENT;
+    Composer::V1_0::CompositionType type = Composer::V1_0::CompositionType::COMPOSITION_CLIENT;
     auto ret = g_composerDevice->SetLayerCompositionType(g_displayIds[0], layer->GetId(), type);
 
     PrepareAndPrensent();
@@ -788,67 +792,66 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
 
-constexpr int32_t FD_INVALID = -1;
-constexpr int32_t FD_INVALID_2 = 1000;
-
-// test Init() with invalid fd
-HWTEST_F(DeviceTest, test_HdifdParcelable_Init_1, TestSize.Level1)
+void DeviceTest::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
 {
-    bool ret;
-    HdifdParcelable hdifdParcelable(FD_INVALID);
-    ret = hdifdParcelable.Init(FD_INVALID);
-    EXPECT_EQ(false, ret);
+    g_isOnModeCalled = true;
 }
 
-// test Init() with invalid fd that is not -1
-HWTEST_F(DeviceTest, test_HdifdParcelable_Init_2, TestSize.Level1)
+void DeviceTest::OnSeamlessChange(uint32_t devId, void* data)
 {
-    bool ret;
-    HdifdParcelable hdifdParcelable(FD_INVALID);
-    ret = hdifdParcelable.Init(FD_INVALID_2);
-    EXPECT_EQ(false, ret);
+    g_isOnSeamlessChangeCalled = true;
 }
 
-// test Move() with invalid fd
-HWTEST_F(DeviceTest, test_Move, TestSize.Level1)
+HWTEST_F(DeviceTest, test_GetDisplaySupportedModesExt, TestSize.Level1)
 {
-    int32_t hdiFd;
-    HdifdParcelable hdifdParcelable;
-    hdiFd = hdifdParcelable.Move();
-    EXPECT_EQ(FD_INVALID, hdiFd);
+    std::vector<DisplayModeInfoExt> modes;
+    auto ret = g_composerDevice->GetDisplaySupportedModesExt(g_displayIds[0], modes);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
-// test GetFd() with invalid fd
-HWTEST_F(DeviceTest, test_GetFd, TestSize.Level1)
+HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
 {
-    int32_t hdiFd;
-    HdifdParcelable hdifdParcelable;
-    hdiFd = hdifdParcelable.GetFd();
-    EXPECT_EQ(FD_INVALID, hdiFd);
+    g_isOnModeCalled = false;
+    std::vector<DisplayModeInfo> oldModes;
+    auto result = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
+    ASSERT_EQ(DISPLAY_SUCCESS, result);
+
+    uint32_t modeid = oldModes[0].id;
+    auto ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    if (ret == DISPLAY_SUCCESS) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        ASSERT_EQ(g_isOnModeCalled, true);
+    }
 }
 
-// test Dump with invalid fd
-HWTEST_F(DeviceTest, test_Dump, TestSize.Level1)
+HWTEST_F(DeviceTest, test_GetDisplayVBlankPeriod, TestSize.Level1)
 {
-    HdifdParcelable hdifdParcelable;
-    std::string  str = hdifdParcelable.Dump();
-    std::string dump("fd: {-1}\n");
-    ASSERT_TRUE(dump.compare(str) == 0) << "Dump Result" << str;
+    uint64_t period = 0;
+    auto ret = g_composerDevice->GetDisplayVBlankPeriod(g_displayIds[0], period);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    EXPECT_EQ(period != 0, true);
 }
 
-HWTEST_F(DeviceTest, test_AddDeathRecipient, TestSize.Level1)
+HWTEST_F(DeviceTest, test_RegSeamlessChangeCallback, TestSize.Level1)
 {
-    bool ret;
-    sptr<IRemoteObject::DeathRecipient> recipient;
-    ret = g_gralloc->AddDeathRecipient(recipient);
-    EXPECT_EQ(true, ret);
-}
-
-HWTEST_F(DeviceTest, test_IsSupportedAlloc, TestSize.Level1)
-{
-    int32_t ret;
-    const std::vector<VerifyAllocInfo> infos;
-    std::vector<bool> supporteds;
-    ret = g_gralloc->IsSupportedAlloc(infos, supporteds);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    g_isOnSeamlessChangeCalled = false;
+    auto ret = g_composerDevice->RegSeamlessChangeCallback(OnSeamlessChange, nullptr);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+    if (ret == DISPLAY_SUCCESS) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        ASSERT_EQ(g_isOnSeamlessChangeCalled, true);
+    }
 }

@@ -43,6 +43,12 @@ public:
         return HDF_SUCCESS;
     }
 
+    int32_t SetDataOprListener(std::shared_ptr<IDataOprListener> listener)
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
     static IntellVoiceEngineManager *GetInstance()
     {
         static IntellVoiceEngineManager manager;

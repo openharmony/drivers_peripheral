@@ -25,10 +25,12 @@
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
 struct IWiFiSta *g_staFeature = NULL;
+struct IWiFiP2p *g_p2pFeature = NULL;
 struct IWiFiBaseFeature *g_baseFeature = NULL;
 static uint32_t g_wifiCount = 0;
 static uint32_t g_apFeatureCount = 0;
 static uint32_t g_staFeatureCount = 0;
+static uint32_t g_p2pFeatureCount = 0;
 const uint32_t RESET_TIME = 3;
 #define DEFAULT_COMBO_SIZE 10
 #define WLAN_FREQ_MAX_NUM 14
@@ -115,6 +117,17 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
             ifeature->type = g_staFeature->baseFeature.type;
             ifeature->ifName = strdup((g_staFeature->baseFeature).ifName);
         }
+    } else if (type == PROTOCOL_80211_IFTYPE_P2P_DEVICE) {
+        ret = g_wifi->createFeature(type, (struct IWiFiBaseFeature **)&g_p2pFeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to create p2p feature, errorCode: %{public}d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        if (g_p2pFeature != NULL) {
+            g_p2pFeatureCount++;
+            ifeature->type = g_p2pFeature->baseFeature.type;
+            ifeature->ifName = strdup((g_p2pFeature->baseFeature).ifName);
+        }
     } else {
         HDF_LOGE("%{public}s: wlan type is Invalid", __func__);
     }
@@ -168,6 +181,23 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
         }
         ret = g_wifi->destroyFeature(&(g_staFeature->baseFeature));
         g_staFeature = NULL;
+    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_P2P_DEVICE) {
+        if (g_p2pFeature == NULL) {
+            HDF_LOGE("%{public}s g_p2pFeature is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        g_p2pFeatureCount--;
+        if (g_p2pFeatureCount > 0) {
+            HDF_LOGI("%{public}s: p2pFeature is used!", __func__);
+            return HDF_SUCCESS;
+        }
+        ret = strcpy_s((g_p2pFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: failed to copy the ifName! ret: %{public}d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        ret = g_wifi->destroyFeature(&(g_p2pFeature->baseFeature));
+        g_p2pFeature = NULL;
     } else {
         HDF_LOGE("%{public}s: wlan type is invalid", __func__);
     }
@@ -234,6 +264,12 @@ static int32_t GetBasefeature(const struct HdfFeatureInfo *ifeature, struct IWiF
             return HDF_FAILURE;
         }
         *baseFeature = &(g_staFeature->baseFeature);
+    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_P2P_DEVICE) {
+        if (g_p2pFeature == NULL) {
+            HDF_LOGE("%{public}s g_p2pFeature is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        *baseFeature = &(g_p2pFeature->baseFeature);
     } else {
         HDF_LOGE("%{public}s: wlan type is Invalid, featureType is %{public}d", __func__, ifeature->type);
         return HDF_FAILURE;
@@ -386,6 +422,9 @@ int32_t WlanInterfaceGetIfNamesByChipId(struct IWlanInterface *self, uint8_t chi
     } else if (g_apFeature != NULL) {
         HDF_LOGD("%{public}s g_apFeature is not NULL!", __func__);
         ret = g_apFeature->baseFeature.getIfNamesByChipId(chipId, &name, num);
+    } else if (g_p2pFeature != NULL) {
+        HDF_LOGD("%{public}s g_p2pFeature is not NULL!", __func__);
+        ret = g_p2pFeature->baseFeature.getIfNamesByChipId(chipId, &name, num);
     } else {
         HDF_LOGE("%{public}s: ap and sta feature is Invalid.", __func__);
         ret = HDF_FAILURE;
@@ -752,7 +791,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGD("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
@@ -779,7 +818,7 @@ static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMs
         }
         ret = pos->callbackObj->WifiNetlinkMessage(pos->callbackObj, recvMsg, recvMsgLen);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGD("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);

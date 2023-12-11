@@ -1,0 +1,12 @@
+{
+    "scene" :{
+        "wakeuo_cause": {
+            "get": {
+                "path": ""
+            },
+            "set": {
+                "path": ""
+            }
+        }
+    }
+}

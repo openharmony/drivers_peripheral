@@ -29,15 +29,17 @@
 #include <securec.h>
 #include "codec_hdi_callback.h"
 #include "codec_utils.h"
+#include "codec_omx_ext.h"
 #include "command_parse.h"
 #include "hdf_log.h"
-#include "v1_0/codec_types.h"
-#include "v1_0/icodec_callback.h"
-#include "v1_0/icodec_component.h"
-#include "v1_0/icodec_component_manager.h"
+#include "sys/mman.h"
+#include "v2_0/codec_types.h"
+#include "v2_0/icodec_callback.h"
+#include "v2_0/icodec_component.h"
+#include "v2_0/icodec_component_manager.h"
 #include "v1_0/include/idisplay_buffer.h"
 
-using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
+using OHOS::HDI::Codec::V2_0::OmxCodecBuffer;
 class CodecHdiEncode : public ICodecHdiCallBackBase,
                        public std::enable_shared_from_this<CodecHdiEncode> {
     enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
@@ -83,8 +85,8 @@ public:
     bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer) override;
     int32_t OnFillBufferDone(const struct OmxCodecBuffer &buffer) override;
-    int32_t EventHandler(OHOS::HDI::Codec::V1_0::CodecEventType event,
-        const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
+    int32_t EventHandler(OHOS::HDI::Codec::V2_0::CodecEventType event,
+        const OHOS::HDI::Codec::V2_0::EventInfo &info) override;
 
 private:
     int32_t ConfigBitMode();
@@ -93,6 +95,9 @@ private:
     int GetFreeBufferId();
     int32_t ConfigPortDefine();
     int32_t CheckAndUseBufferHandle();
+    int32_t CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType);
+    int32_t CheckAndUseDMABuffer();
+    int32_t UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseDynaBuffer(int bufferCount, int bufferSize);
     bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag);
     int32_t CreateBufferHandle();
@@ -108,11 +113,12 @@ private:
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponent> client_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecCallback> callback_;
-    OHOS::sptr<OHOS::HDI::Codec::V1_0::ICodecComponentManager> omxMgr_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecComponent> client_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecCallback> callback_;
+    OHOS::sptr<OHOS::HDI::Codec::V2_0::ICodecComponentManager> omxMgr_;
     uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is bufferID
+    std::map<int, const void *> addrs_;
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;
     std::mutex lockInputBuffers_;
@@ -122,6 +128,7 @@ private:
     std::map<int, BufferHandle *> bufferHandles_;
     std::list<int> freeBufferHandles_;
     bool useBufferHandle_;
+    bool useDMABuffer_;
     static CodecUtil *util_;
     static constexpr uint32_t alignment_ = 16;
     static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *gralloc_;

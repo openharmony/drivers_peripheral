@@ -18,7 +18,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "codec_log_wrapper.h"
-using namespace OHOS::HDI::Codec::V1_0;
+using namespace OHOS::HDI::Codec::V2_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {

@@ -17,6 +17,7 @@
 #define HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
 
 #include <memory>
+#include <set>
 #include "iremote_object.h"
 #include "v1_0/iintell_voice_trigger_adapter.h"
 #include "i_trigger.h"
@@ -76,7 +77,7 @@ private:
 
 private:
     std::unique_ptr<ITrigger> adapter_ = nullptr;
-    int32_t handle_;
+    std::set<int32_t> handleSet_;
 };
 }  // namespace Trigger
 }  // namespace IntelligentVoice

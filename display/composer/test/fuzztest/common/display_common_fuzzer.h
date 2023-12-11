@@ -17,8 +17,8 @@
 #define DISPLAY_COMMON_FUZZER_H
 
 #include "v1_0/include/idisplay_buffer.h"
-#include "v1_0/include/idisplay_composer_interface.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_1/include/idisplay_composer_interface.h"
+#include "v1_1/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "buffer_handle.h"
 #include "hdf_log.h"
@@ -84,7 +84,7 @@ const LayerType CONVERT_TABLE_LAYER_TYPE[] = {
     LAYER_TYPE_BUTT,
 };
 
-const DispPowerStatus CONVERT_TABLE_POWER_STATUS[] = {
+const Composer::V1_0::DispPowerStatus CONVERT_TABLE_POWER_STATUS[] = {
     POWER_STATUS_ON, POWER_STATUS_STANDBY,
     POWER_STATUS_SUSPEND, POWER_STATUS_OFF,
     POWER_STATUS_BUTT,
@@ -107,7 +107,7 @@ const TransformType CONVERT_TABLE_ROTATE[] = {
     ROTATE_BUTT,
 };
 
-const CompositionType CONVERT_TABLE_COMPOSITION[] = {
+const Composer::V1_0::CompositionType CONVERT_TABLE_COMPOSITION[] = {
     COMPOSITION_CLIENT,
     COMPOSITION_DEVICE,
     COMPOSITION_CURSOR,

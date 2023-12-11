@@ -129,6 +129,9 @@ private:
                                        std::vector<DeviceFormat>& deviceFormat);
     void ConvertAbilityStreamAvailableExtendConfigurationsToOhos(std::shared_ptr<CameraMetadata> metadata,
                                                                  const std::vector<DeviceFormat>& deviceFormat);
+    void ConvertAbilityMeterModesToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
+    void ConvertAbilityAWBModesToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
+    void ConvertAbilityExposureTimeToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
     void AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraMetadata> metadata,
                                           std::vector<DeviceFormat>& deviceFormat);
     void AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata);

@@ -240,3 +240,17 @@ void FileClose(FILE **file)
     return;
 }
 
+void PrintAudioInputTypeMenu(void)
+{
+    printf(" ================= Audio Input Type =============== \n");
+    printf("| 0. mic input type                                |\n");
+    printf("| 1. speech wakeup input type                      |\n");
+    printf("| 2. voice communication input typ                 |\n");
+    printf("| 3. voice recognition input type                  |\n");
+    printf("| 4. voice uplink input type                       |\n");
+    printf("| 5. voice downlink input type                     |\n");
+    printf("| 6. voice call input type                         |\n");
+    printf("| 7. camcorder input type                          |\n");
+    printf("| other. default input type                        |\n");
+    printf(" ================================================== \n");
+}

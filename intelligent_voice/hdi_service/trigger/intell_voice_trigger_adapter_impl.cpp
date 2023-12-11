@@ -89,20 +89,35 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
     }
 
     TriggerModel triggerModel(model.type, model.uid, modelData);
-    handle_ = handle;
-    return adapter_->LoadIntellVoiceTriggerModel(triggerModel, cb, cookie, handle);
+    int32_t ret = adapter_->LoadIntellVoiceTriggerModel(triggerModel, cb, cookie, handle);
+    if (ret != 0) {
+        INTELLIGENT_VOICE_LOGE("failed to load model, ret:%{public}d", ret);
+        return ret;
+    }
+
+    handleSet_.insert(handle);
+    return ret;
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::UnloadModel(int32_t handle)
 {
     MemoryGuard memoryGuard;
-    return adapter_->UnloadIntellVoiceTriggerModel(handle);
+    int32_t ret = adapter_->UnloadIntellVoiceTriggerModel(handle);
+    if (ret != 0) {
+        INTELLIGENT_VOICE_LOGE("failed to unload model");
+        return ret;
+    }
+
+    auto it = handleSet_.find(handle);
+    if (it != handleSet_.end()) {
+        handleSet_.erase(it);
+    }
+    return ret;
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::Start(int32_t handle)
 {
     MemoryGuard memoryGuard;
-    handle_ = handle;
     return adapter_->Start(handle);
 }
 
@@ -159,8 +174,11 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(const sptr<IIntellVoi
 
 void IntellVoiceTriggerAdapterImpl::Clean()
 {
-    Stop(handle_);
-    UnloadModel(handle_);
+    MemoryGuard memoryGuard;
+    for (auto it = handleSet_.begin(); it != handleSet_.end();) {
+        (void)adapter_->UnloadIntellVoiceTriggerModel(*it);
+        it = handleSet_.erase(it);
+    }
 }
 }  // namespace Trigger
 }  // namespace IntelligentVoice

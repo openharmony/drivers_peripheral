@@ -20,7 +20,10 @@
 #include "hilog/log.h"
 #include "display_log.h"
 
-#define HDF_LOG_TAG    metadata_service
+#undef LOG_TAG
+#define LOG_TAG "METADATA_SRV"
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002500
 
 namespace OHOS {
 namespace HDI {
@@ -62,7 +65,7 @@ int32_t MetadataService::LoadVdi()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
-        HDF_LOGI("%{public}s: mapper load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
+        HDF_LOGI("%{public}s: metadata load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
     }
 #ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
@@ -82,7 +85,7 @@ int32_t MetadataService::LoadVdi()
     if (createVdi_ == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: mapper CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+            HDF_LOGE("%{public}s: metadata CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
         }
         dlclose(libHandle_);
         return HDF_FAILURE;
@@ -92,7 +95,7 @@ int32_t MetadataService::LoadVdi()
     if (destroyVdi_ == nullptr) {
         errStr = dlerror();
         if (errStr != nullptr) {
-            HDF_LOGE("%{public}s: mapper DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+            HDF_LOGE("%{public}s: metadata DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
         }
         dlclose(libHandle_);
         return HDF_FAILURE;
@@ -106,7 +109,7 @@ int32_t MetadataService::RegisterBuffer(const sptr<NativeBuffer>& handle)
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->RegisterBuffer(*handle->GetBufferHandle());
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -115,7 +118,7 @@ int32_t MetadataService::SetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetMetadata(*handle->GetBufferHandle(), key, value);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -124,7 +127,7 @@ int32_t MetadataService::GetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetMetadata(*handle->GetBufferHandle(), key, value);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -133,7 +136,7 @@ int32_t MetadataService::ListMetadataKeys(const sptr<NativeBuffer>& handle, std:
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->ListMetadataKeys(*handle->GetBufferHandle(), keys);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
     return HDF_SUCCESS;
 }
 
@@ -142,7 +145,7 @@ int32_t MetadataService::EraseMetadataKey(const sptr<NativeBuffer>& handle, uint
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->EraseMetadataKey(*handle->GetBufferHandle(), key);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
     return HDF_SUCCESS;
 }
 
