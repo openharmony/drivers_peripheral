@@ -131,6 +131,27 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     return HDF_SUCCESS;
 }
 
+static int32_t FillHdfSBufData(struct HdfSBuf *data, char *compName, int64_t appData, struct CodecCallbackType *callback)
+{
+    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
+        CODEC_LOGE("write interface token failed");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(data, compName)) {
+        CODEC_LOGE("write paramName failed!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteInt64(data, appData)) {
+        CODEC_LOGE("write appData failed!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (HdfSbufWriteRemoteService(data, callback->remote) != 0) {
+        CODEC_LOGE("write callback failed!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
                                int64_t appData, struct CodecCallbackType *callback)
 {
@@ -142,27 +163,13 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
-        CODEC_LOGE("write interface token failed");
+    int32_t ret = FillHdfSBufData(data, compName, appData, callback);
+    if (ret != HDF_SUCCESS) {
         ReleaseSbuf(data, reply);
-        return HDF_FAILURE;
+        return ret;
     }
-    if (!HdfSbufWriteString(data, compName)) {
-        CODEC_LOGE("write paramName failed!");
-        ReleaseSbuf(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteInt64(data, appData)) {
-        CODEC_LOGE("write appData failed!");
-        ReleaseSbuf(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (HdfSbufWriteRemoteService(data, callback->remote) != 0) {
-        CODEC_LOGE("write callback failed!");
-        ReleaseSbuf(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    int32_t ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
+    
+    ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                        CMD_CREATE_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("call failed! error code is %{public}d", ret);
