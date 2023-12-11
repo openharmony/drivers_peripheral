@@ -21,6 +21,12 @@
 #include "codec_omx_ext.h"
 #include "codec_log_wrapper.h"
 
+#define IF_FALSE_PRINT_MSG_RETURN_FALSE(cond, msg) \
+    if (!(cond)) { \
+        CODEC_LOGE(msg); \
+        return false; \
+    }
+
 static bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
 {
     if (handle == NULL) {
@@ -406,68 +412,36 @@ bool RangeValueBlockUnmarshalling(struct HdfSBuf *data, RangeValue *dataBlock)
 
 bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCapability *dataBlock)
 {
-    if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->role)) {
-        CODEC_LOGE("write dataBlock->role failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->type)) {
-        CODEC_LOGE("write dataBlock->type failed!");
-        return false;
-    }
-
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt32(data, (int32_t)dataBlock->role),
+        "write dataBlock->role failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt32(data, (int32_t)dataBlock->type),
+        "write dataBlock->type failed!");
     for (uint32_t i = 0; i < NAME_LENGTH; i++) {
-        if (!HdfSbufWriteUint8(data, (uint8_t)(dataBlock->compName)[i])) {
-            CODEC_LOGE("write (dataBlock->compName)[i] failed!");
-            return false;
-        }
+        IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteUint8(data, (uint8_t)(dataBlock->compName)[i]),
+            "write (dataBlock->compName)[i] failed!");
     }
-
     for (uint32_t i = 0; i < PROFILE_NUM; i++) {
-        if (!HdfSbufWriteInt32(data, (dataBlock->supportProfiles)[i])) {
-            CODEC_LOGE("write (dataBlock->supportProfiles)[i] failed!");
-            return false;
-        }
+        IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt32(data, (dataBlock->supportProfiles)[i]),
+            "write (dataBlock->supportProfiles)[i] failed!");
     }
-
-    if (!HdfSbufWriteInt32(data, dataBlock->maxInst)) {
-        CODEC_LOGE("write dataBlock->maxInst failed!");
-        return false;
-    }
-
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt32(data, dataBlock->maxInst),
+        "write dataBlock->maxInst failed!");
     int8_t isSoftwareCodec = dataBlock->isSoftwareCodec ? 1 : 0;
-    bool ret = HdfSbufWriteInt8(data, isSoftwareCodec);
-    if (!ret) {
-        CODEC_LOGE("write dataBlock->isSoftwareCodec failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteInt32(data, dataBlock->processModeMask)) {
-        CODEC_LOGE("write dataBlock->processModeMask failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteUint32(data, dataBlock->capsMask)) {
-        CODEC_LOGE("write dataBlock->capsMask failed!");
-        return false;
-    }
-
-    if (!RangeValueBlockMarshalling(data, &dataBlock->bitRate)) {
-        CODEC_LOGE("write dataBlock->bitRate failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap))) {
-        CODEC_LOGE("write dataBlock->port failed!");
-        return false;
-    }
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt8(data, isSoftwareCodec),
+        "write dataBlock->isSoftwareCodec failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt32(data, dataBlock->processModeMask),
+        "write dataBlock->processModeMask failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteUint32(data, dataBlock->capsMask),
+        "write dataBlock->capsMask failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(RangeValueBlockMarshalling(data, &dataBlock->bitRate),
+        "write dataBlock->bitRate failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap)),
+        "write dataBlock->port failed!");
     int8_t canSwapWidthHeight = dataBlock->canSwapWidthHeight ? 1 : 0;
-    ret = HdfSbufWriteInt8(data, canSwapWidthHeight);
-    if (!ret) {
-        CODEC_LOGE("write dataBlock->canSwapWidthHeight failed!");
-        return false;
-    }
-
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufWriteInt8(data, canSwapWidthHeight),
+        "write dataBlock->canSwapWidthHeight failed!");
+ 
+    CODEC_LOGI("write HdfSBuf data success!");
     return true;
 }
 
@@ -477,66 +451,34 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
         return false;
     }
 
-    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role) ||
-        !HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
-        CODEC_LOGE("read dataBlock->role or dataBlock->type failed!");
-        return false;
-    }
-
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt32(data, (int32_t *)&dataBlock->role) &&
+                                    HdfSbufReadInt32(data, (int32_t *)&dataBlock->type),
+                                    "read dataBlock->role or dataBlock->type failed!");
     for (uint32_t i = 0; i < NAME_LENGTH; i++) {
-        if (!HdfSbufReadUint8(data, (uint8_t *)&(dataBlock->compName)[i])) {
-            CODEC_LOGE("read compName[i] failed!");
-            return false;
-        }
+        IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadUint8(data, (uint8_t *)&(dataBlock->compName)[i]),
+            "read compName[i] failed!");
     }
-
     for (uint32_t j = 0; j < PROFILE_NUM; j++) {
-        if (!HdfSbufReadInt32(data, &(dataBlock->supportProfiles)[j])) {
-            CODEC_LOGE("read supportProfiles[i] failed!");
-            return false;
-        }
+        IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt32(data, &(dataBlock->supportProfiles)[j]),
+            "read supportProfiles[i] failed!");
     }
-
-    if (!HdfSbufReadInt32(data, &dataBlock->maxInst)) {
-        CODEC_LOGE("read dataBlock->maxInst failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->isSoftwareCodec)) {
-        CODEC_LOGE("read dataBlock->isSoftwareCodec failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadInt32(data, &dataBlock->processModeMask)) {
-        CODEC_LOGE("read dataBlock->processModeMask failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadUint32(data, &dataBlock->capsMask)) {
-        CODEC_LOGE("read dataBlock->capsMask failed!");
-        return false;
-    }
-
-    if (!RangeValueBlockUnmarshalling(data, &dataBlock->bitRate)) {
-        CODEC_LOGE("read &dataBlock->bitRate failed!");
-        return false;
-    }
-
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt32(data, &dataBlock->maxInst),
+        "read dataBlock->maxInst failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt8(data, (int8_t *)&dataBlock->isSoftwareCodec),
+        "read dataBlock->isSoftwareCodec failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt32(data, &dataBlock->processModeMask),
+        "read dataBlock->processModeMask failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadUint32(data, &dataBlock->capsMask),
+        "read dataBlock->capsMask failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(RangeValueBlockUnmarshalling(data, &dataBlock->bitRate),
+        "read &dataBlock->bitRate failed!");
     const PortCap *portCp = (const PortCap *)HdfSbufReadUnpadBuffer(data, sizeof(PortCap));
-    if (portCp == NULL) {
-        CODEC_LOGE("read portCp failed!");
-        return false;
-    }
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(portCp != NULL, "read portCp failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap)) == EOK,
+        "memcpy_s dataBlock->port failed!");
+    IF_FALSE_PRINT_MSG_RETURN_FALSE(HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight),
+        "read dataBlock->canSwapWidthHeight failed!");
 
-    if (memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap)) != EOK) {
-        CODEC_LOGE("memcpy_s dataBlock->port failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight)) {
-        CODEC_LOGE("read dataBlock->canSwapWidthHeight failed!");
-        return false;
-    }
-
+    CODEC_LOGI("read HdfSBuf data success!");
     return true;
 }
