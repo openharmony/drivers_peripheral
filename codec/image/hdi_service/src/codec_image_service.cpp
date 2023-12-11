@@ -16,6 +16,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_image_service.h"
 #include "hitrace_meter.h"
+#include <stdio.h>
 
 namespace OHOS {
 namespace HDI {
@@ -66,6 +67,9 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
     const CodecJpegDecInfo& decInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
+    if (inBuffer.fenceFd > 0) {
+        close(inBuffer.fenceFd);
+    }
     CODEC_LOGI("servcie impl!");
     CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
     return jpegImpl_->DoJpegDecode(inBuffer, outBuffer, decInfo);
@@ -74,6 +78,9 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
 int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t size, CodecImageRole role)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecAllocateInBuffer");
+    if (inBuffer.fenceFd > 0) {
+        close(inBuffer.fenceFd);
+    }
     CODEC_LOGI("servcie impl, size [%{public}d]", size);
     CHECK_AND_RETURN_RET_LOG(size != 0, HDF_ERR_INVALID_PARAM, "buffer size is 0");
     CHECK_AND_RETURN_RET_LOG(size <= CODEC_IMAGE_MAX_BUFFER_SIZE, HDF_ERR_INVALID_PARAM, "buffer size is too large");
@@ -90,6 +97,9 @@ int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t
 int32_t CodecImageService::FreeInBuffer(const CodecImageBuffer& inBuffer)
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecFreeInBuffer");
+    if (inBuffer.fenceFd > 0) {
+        close(inBuffer.fenceFd);
+    }
     CODEC_LOGI("servcie impl, bufferId [%{public}d]", inBuffer.id);
     if (inBuffer.bufferRole == CODEC_IMAGE_JPEG) {
         CHECK_AND_RETURN_RET_LOG(jpegImpl_ != nullptr, HDF_FAILURE, "jpegImpl_ is null");
