@@ -221,7 +221,7 @@ void ScaleNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (bufferPool_->GetForkBufferId() != -1) {
         if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
             ScaleConver(buffer);
-        } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
+        } else if (buffer->GetFormat() == CAMERA_FORMAT_YCRCB_420_SP) {
             ScaleConverToYuv420(buffer);
         } else {
             PreviewScaleConver(buffer);
