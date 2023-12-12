@@ -28,7 +28,11 @@
         "hilog",
         "c_utils",
         "drivers_interface_light",
-        "hitrace"
+        "hitrace",
+        "hilog_lite"
+      ],
+      "third_party": [
+        "bounds_checking_function"
       ]
     },
     "build": {
