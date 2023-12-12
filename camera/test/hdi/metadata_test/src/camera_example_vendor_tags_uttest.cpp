@@ -42,7 +42,8 @@ void CameraExampleVendorTagsTest::TearDown(void)
 HWTEST_F(CameraExampleVendorTagsTest, Camera_Example_Vendor_Tags_001, TestSize.Level1)
 {
     printf("CameraExampleVendorTagsTest Camera_Example_Vendor_Tags_001 start...\n");
-    CameraVendorTagExample cameraVendorTagExample;
+    auto cameraVendorTagExample = std::make_shared<OHOS::Camera::CameraVendorTagExample>();
     std::vector<vendorTag_t> tagVec {};
-    cameraVendorTagExample.GetAllVendorTags(tagVec);
+    cameraVendorTagExample->GetAllVendorTags(tagVec);
+    cameraVendorTagExample->GetVendorTagCount();
 }
