@@ -20,7 +20,8 @@
           "hdf_core",
           "hilog",
           "drivers_interface_distributed_audio",
-          "c_utils"
+          "c_utils",
+          "samgr"
         ],
         "third_party": [
           "cJSON"
