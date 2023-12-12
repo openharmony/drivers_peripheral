@@ -152,6 +152,10 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_02, TestSize.Lev
     EXPECT_NE(handle0, nullptr);
     auto bufferHandleSeq0 = make_shared<BufferHandleSequenceable>(handle0);
     bufferHandleSeq0->SetBufferHandle(handle0);
+    BufferHandle bufferHandle;
+    bufferHandle.reserveFds = 1;
+    bufferHandle.reserveInts = 2;
+    new BufferHandleSequenceable(bufferHandle);
 }
 
 /**
