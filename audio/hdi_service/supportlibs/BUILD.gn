@@ -123,7 +123,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-
+    license_file = "//third_party/alsa-lib/README.OpenSource"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -182,7 +182,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-
+    license_file = "//third_party/alsa-lib/README.OpenSource"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
