@@ -340,6 +340,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
+
         Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
@@ -699,12 +700,17 @@ void V4L2DeviceManager::ConvertAbilityMeterModesToOhos(std::shared_ptr<CameraMet
 {
     std::vector<uint8_t> abilityMeterModesVector;
 
-    if (deviceControl.id == V4L2_EXPOSURE_METERING_SPOT) {
-        abilityMeterModesVector.push_back(OHOS_CAMERA_SPOT_METERING);
-    } else if (deviceControl.id == V4L2_EXPOSURE_METERING_MATRIX) {
-        abilityMeterModesVector.push_back(OHOS_CAMERA_REGION_METERING);
-    } else if (deviceControl.id == V4L2_EXPOSURE_METERING_AVERAGE) {
-        abilityMeterModesVector.push_back(OHOS_CAMERA_OVERALL_METERING);
+    for (int i = 0; i < deviceControl.menu.size(); i++) {
+        if (deviceControl.menu[i].id != V4L2_CID_EXPOSURE_METERING) {
+            continue;
+        }
+        if (deviceControl.menu[i].index == V4L2_EXPOSURE_METERING_SPOT) {
+            abilityMeterModesVector.push_back(OHOS_CAMERA_SPOT_METERING);
+        } else if (deviceControl.menu[i].index == V4L2_EXPOSURE_METERING_MATRIX) {
+            abilityMeterModesVector.push_back(OHOS_CAMERA_REGION_METERING);
+        } else if (deviceControl.menu[i].index == V4L2_EXPOSURE_METERING_AVERAGE) {
+            abilityMeterModesVector.push_back(OHOS_CAMERA_OVERALL_METERING);
+        }
     }
 
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_METER_MODES, abilityMeterModesVector);
@@ -715,16 +721,21 @@ void V4L2DeviceManager::ConvertAbilityAWBModesToOhos(std::shared_ptr<CameraMetad
 {
     std::vector<uint8_t> abilityAWBModesVector;
 
-    if (deviceControl.id == V4L2_WHITE_BALANCE_AUTO) {
-        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_AUTO);
-    } else if (deviceControl.id == V4L2_WHITE_BALANCE_MANUAL) {
-        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_OFF);
-    } else if (deviceControl.id == V4L2_WHITE_BALANCE_DAYLIGHT) {
-        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_DAYLIGHT);
-    } else if (deviceControl.id == V4L2_WHITE_BALANCE_CLOUDY) {
-        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT);
-    } else if (deviceControl.id == V4L2_WHITE_BALANCE_SHADE) {
-        abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_SHADE);
+    for (int i = 0; i < deviceControl.menu.size(); i++) {
+        if (deviceControl.menu[i].id != V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE) {
+            continue;
+        }
+        if (deviceControl.menu[i].index == V4L2_WHITE_BALANCE_MANUAL) {
+            abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_OFF);
+        } else if (deviceControl.menu[i].index == V4L2_WHITE_BALANCE_AUTO) {
+            abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_AUTO);
+        } else if (deviceControl.menu[i].index == V4L2_WHITE_BALANCE_DAYLIGHT) {
+            abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_DAYLIGHT);
+        } else if (deviceControl.menu[i].index == V4L2_WHITE_BALANCE_CLOUDY) {
+            abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT);
+        } else if (deviceControl.menu[i].index == V4L2_WHITE_BALANCE_SHADE) {
+            abilityAWBModesVector.push_back(OHOS_CAMERA_AWB_MODE_SHADE);
+        }
     }
 
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_AWB_MODES, abilityAWBModesVector);
@@ -733,10 +744,12 @@ void V4L2DeviceManager::ConvertAbilityAWBModesToOhos(std::shared_ptr<CameraMetad
 void V4L2DeviceManager::ConvertAbilityExposureTimeToOhos(std::shared_ptr<CameraMetadata> metadata,
     const DeviceControl& deviceControl)
 {
-    std::vector<uint8_t> abilityExposureTimeVector;
+    std::vector<int32_t> abilityExposureTimeVector;
 
     if (deviceControl.id == V4L2_CID_EXPOSURE_ABSOLUTE) {
-        abilityExposureTimeVector.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+        abilityExposureTimeVector.push_back(deviceControl.minimum);
+        CAMERA_LOGE("V4L2DeviceManager::ConvertAbilityExposureTimeToOhos deviceControl.maximum is %{public}d", deviceControl.maximum);
+        abilityExposureTimeVector.push_back(deviceControl.maximum);
     }
 
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_TIME, abilityExposureTimeVector);

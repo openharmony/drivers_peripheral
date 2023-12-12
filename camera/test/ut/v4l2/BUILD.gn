@@ -108,6 +108,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/camera_fps_test.cpp",
       "$ut_root_path/v4l2/camera_preview_test.cpp",
       "$ut_root_path/v4l2/camera_stabili_test.cpp",
+      "$ut_root_path/v4l2/camera_vendor_tag_test.cpp",
       "$ut_root_path/v4l2/camera_video_test.cpp",
       "$ut_root_path/v4l2/double_preview_test.cpp",
       "$ut_root_path/v4l2/hdfcamera_facedetect.cpp",
@@ -117,7 +118,6 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/usb_camera_3a_test.cpp",
       "$ut_root_path/v4l2/usb_camera_test.cpp",
       "$ut_root_path/v4l2/usb_camera_test_mult.cpp",
-      "$ut_root_path/v4l2/usb_camera_vendor_tag_test.cpp",
     ]
 
     include_dirs = [

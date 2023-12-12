@@ -29,7 +29,8 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    bool RunCamera3A(TestMetadata& metadata);
+    bool RunCamera3AWithCapture(TestMetadata& metadata);
+    bool RunCamera3AWithVideo(TestMetadata& metadata);
 
     std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
     std::shared_ptr<CameraAbility> ability_ = nullptr;
