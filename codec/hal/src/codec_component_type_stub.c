@@ -729,7 +729,7 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
         SerStubComponentRoleEnum
     };
 
-    if(func[cmdId] != NULL) {
+    if (func[cmdId] != NULL) {
         return func[cmdId](serviceImpl, data, reply);
     } else {
         CODEC_LOGE("not support cmd %{public}d", cmdId);
