@@ -28,7 +28,11 @@
         "hilog",
         "c_utils",
         "hitrace",
-        "drivers_interface_vibrator"
+        "drivers_interface_vibrator",
+        "hilog_lite"
+      ],
+      "third_party": [
+        "bounds_checking_function"
       ]
     },
     "build": {
