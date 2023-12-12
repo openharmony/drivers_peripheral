@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef USB_CAMERA_VENDOR_TAG_TEST_H
-#define USB_CAMERA_VENDOR_TAG_TEST_H
+#ifndef CAMERA_VENDOR_TAG_TEST_H
+#define CAMERA_VENDOR_TAG_TEST_H
 
 #include "test_camera_base.h"
 
-class UtestUSBCameraVebdorTagTest : public testing::Test {
+class UtestCameraVendorTagTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
