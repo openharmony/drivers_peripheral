@@ -1062,6 +1062,7 @@ ERROR_ALLOC_REQ:
     EcmFreePipes(ecm);
 ERROR_GET_PIPES:
     UsbFreeNotifyReqeust(ecm);
+    return ret;
 }
 
 static int32_t EcmInit(struct EcmDevice *ecm)
