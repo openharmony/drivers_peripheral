@@ -460,6 +460,19 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
     return ret;
 }
 
+void UsbFnAdapterPipeCreateAndClose(int32_t fdEp0, struct UsbFnConfiguration * const usbFnConfig,int32_t iCount) 
+{
+    if (UsbFnAdapterCreatPipes(fdEp0, usbFnConfig->functions[iCount]) != HDF_SUCCESS) {
+        goto FAIL2;
+    }
+
+    if (UsbFnAdapterClosePipe(fdEp0) != HDF_SUCCESS) {
+        goto FAIL2;
+    }
+FAIL2:
+    UsbFnAdapterClosePipe(fdEp0);
+}
+
 static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration * const usbFnConfig, int32_t cmd,
     struct FconfigString * const gadgetName, struct FconfigString * const configName)
 {
@@ -501,18 +514,9 @@ static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration 
         if (fd < 0) {
             goto FAIL;
         }
-
-        if (UsbFnAdapterCreatPipes(fdEp0, usbFnConfig->functions[iCount]) != HDF_SUCCESS) {
-            goto FAIL2;
-        }
-
-        if (UsbFnAdapterClosePipe(fdEp0) != HDF_SUCCESS) {
-            goto FAIL2;
-        }
+        UsbFnAdapterPipeCreateAndClose(fdEp0, usbFnConfig, iCount);
     }
     return 0;
-FAIL2:
-    UsbFnAdapterClosePipe(fdEp0);
 FAIL:
     UsbFnMemFree(funcInfo.funcName.s);
     return -1;

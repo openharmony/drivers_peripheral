@@ -1236,50 +1236,8 @@ static void UsbFreeNotifyReqeust(struct AcmDevice *acm)
     }
 }
 
-static int32_t UsbSerialInit(struct AcmDevice *acm)
+static void UsbAllocRequests(struct AcmDevice *acm, int32_t ret)
 {
-    struct UsbSession *session = NULL;
-    UsbRawHandle *devHandle = NULL;
-    int32_t ret;
-
-    if (acm->initFlag) {
-        HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
-        return HDF_SUCCESS;
-    }
-
-    ret = UsbRawInit(NULL);
-    if (ret) {
-        HDF_LOGE("%s:%d UsbRawInit failed", __func__, __LINE__);
-        return HDF_ERR_IO;
-    }
-    acm->session = session;
-
-    devHandle = UsbRawOpenDevice(session, acm->busNum, acm->devAddr);
-    if (devHandle == NULL) {
-        HDF_LOGE("%s:%d UsbRawOpenDevice failed", __func__, __LINE__);
-        ret = HDF_FAILURE;
-        goto ERR_OPEN_DEVICE;
-    }
-    acm->devHandle = devHandle;
-    ret = UsbGetConfigDescriptor(devHandle, &acm->config);
-    if (ret) {
-        HDF_LOGE("%s:%d UsbGetConfigDescriptor failed", __func__, __LINE__);
-        ret = HDF_FAILURE;
-        goto ERR_GET_DESC;
-    }
-    ret = UsbParseConfigDescriptor(acm, acm->config);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d UsbParseConfigDescriptor failed", __func__, __LINE__);
-        ret = HDF_FAILURE;
-        goto ERR_PARSE_DESC;
-    }
-
-    ret = AcmWriteBufAlloc(acm);
-    if (ret < 0) {
-        HDF_LOGE("%s:%d AcmWriteBufAlloc failed", __func__, __LINE__);
-        ret = HDF_FAILURE;
-        goto ERR_ALLOC_WRITE_BUF;
-    }
     ret = UsbAllocWriteRequests(acm);
     if (ret < 0) {
         HDF_LOGE("%s:%d UsbAllocWriteRequests failed", __func__, __LINE__);
@@ -1312,13 +1270,12 @@ static int32_t UsbSerialInit(struct AcmDevice *acm)
         HDF_LOGE("%s:%d UsbRawSubmitRequest failed", __func__, __LINE__);
         goto ERR_SUBMIT_REQ;
     }
-
-    acm->initFlag = true;
-
-    HDF_LOGD("%s:%d=========================OK", __func__, __LINE__);
-
-    return HDF_SUCCESS;
-
+    ret = AcmWriteBufAlloc(acm);
+    if (ret < 0) {
+        HDF_LOGE("%s:%d AcmWriteBufAlloc failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
+        goto ERR_ALLOC_WRITE_BUF;
+    }   
 ERR_SUBMIT_REQ:
     UsbStopIo(acm);
 ERR_START_IO:
@@ -1331,6 +1288,46 @@ ERR_ALLOC_WRITE_REQS:
     AcmWriteBufFree(acm);
 ERR_ALLOC_WRITE_BUF:
     UsbReleaseInterfaces(acm);
+}
+
+static int32_t UsbSerialInit(struct AcmDevice *acm)
+{
+    struct UsbSession *session = NULL;
+    UsbRawHandle *devHandle = NULL;
+    int32_t ret;
+    if (acm->initFlag) {
+        HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
+        return HDF_SUCCESS;
+    }
+    ret = UsbRawInit(NULL);
+    if (ret) {
+        HDF_LOGE("%s:%d UsbRawInit failed", __func__, __LINE__);
+        return HDF_ERR_IO;
+    }
+    acm->session = session;
+    devHandle = UsbRawOpenDevice(session, acm->busNum, acm->devAddr);
+    if (devHandle == NULL) {
+        HDF_LOGE("%s:%d UsbRawOpenDevice failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
+        goto ERR_OPEN_DEVICE;
+    }
+    acm->devHandle = devHandle;
+    ret = UsbGetConfigDescriptor(devHandle, &acm->config);
+    if (ret) {
+        HDF_LOGE("%s:%d UsbGetConfigDescriptor failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
+        goto ERR_GET_DESC;
+    }
+    ret = UsbParseConfigDescriptor(acm, acm->config);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s:%d UsbParseConfigDescriptor failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
+        goto ERR_PARSE_DESC;
+    }
+    UsbAllocRequests(acm, ret);
+    acm->initFlag = true;
+    HDF_LOGD("%s:%d=========================OK", __func__, __LINE__);
+    return HDF_SUCCESS;
 ERR_PARSE_DESC:
     UsbRawFreeConfigDescriptor(acm->config);
     acm->config = NULL;
@@ -1338,7 +1335,6 @@ ERR_GET_DESC:
     (void)UsbRawCloseDevice(devHandle);
 ERR_OPEN_DEVICE:
     UsbRawExit(acm->session);
-
     return ret;
 }
 
