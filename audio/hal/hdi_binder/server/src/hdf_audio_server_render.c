@@ -15,6 +15,7 @@
 #include "hdf_audio_server_render.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
+#include "hdf_audio_server_manager.h"
 #include "osal_mutex.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
