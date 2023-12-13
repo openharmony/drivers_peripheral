@@ -734,8 +734,8 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
     return;
 }
 
-static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *ecm, struct UsbCdcNotification *dr,
-    unsigned int currentSize, uint32_t expectedSize) 
+static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *ecm, struct UsbCdcNotification *dr, 
+    unsigned int currentSize, uint32_t expectedSize)
 {
     if (currentSize >= expectedSize) {
         EcmProcessNotification(ecm, (unsigned char *)dr);
@@ -745,8 +745,6 @@ static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *
     if ((UsbSubmitRequestAsync(req) != HDF_SUCCESS) && (UsbSubmitRequestAsync(req) != -EPERM)) {
         HDF_LOGE("%{public}s: usb_submit_urb failed", __func__);
     }
-EXIT:
-    HDF_LOGE("%{public}s: exit", __func__);
 }
 
 static void EcmCtrlIrq(struct UsbRequest *req)
@@ -792,7 +790,9 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         ecm->nbIndex += copySize;
         currentSize = ecm->nbIndex;
     }
-  EcmNotificationAndRequest(req, ecm, dr, currentSize, expectedSize);
+    EcmNotificationAndRequest(req, ecm, dr, currentSize, expectedSize);
+EXIT:
+    HDF_LOGE("%{public}s: exit", __func__);
 }
 
 static void EcmReadBulk(struct UsbRequest *req)
@@ -1035,7 +1035,7 @@ ERROR:
     return HDF_FAILURE;
 }
 
-static int32_t EcmGetPipesAndRequest(struct EcmDevice *ecm) 
+static int32_t EcmGetPipesAndRequest(struct EcmDevice *ecm, int32_t ret)
 {
     ret = EcmGetPipes(ecm);
     if (ret != HDF_SUCCESS) {
@@ -1060,7 +1060,7 @@ static int32_t EcmGetPipesAndRequest(struct EcmDevice *ecm)
     return HDF_SUCCESS;
 ERROR_ALLOC_REQ:
     EcmFreePipes(ecm);
-ERROR_GET_PIPES: 
+ERROR_GET_PIPES:
 }
 
 static int32_t EcmInit(struct EcmDevice *ecm)
@@ -1102,7 +1102,7 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
         goto ERROR_SELECT_SETTING;
     }
-     EcmGetPipesAndRequest(ecm);  
+    EcmGetPipesAndRequest(ecm, ret);
 ERROR_SELECT_SETTING:
     EcmCloseInterfaces(ecm);
 ERROR_OPEN_INTERFACES:

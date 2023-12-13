@@ -403,7 +403,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = BeginProcess(g_endNum);
     if (ret != HDF_SUCCESS) {
         PrintErrorLog(ret);
-    }   
+    }
     CloseDevice();
     return ret;
 }
