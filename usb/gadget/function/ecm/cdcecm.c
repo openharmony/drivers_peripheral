@@ -111,6 +111,10 @@ static uint32_t UsbEcmStartRx(struct UsbEcm *port)
             break;
         }
         port->readStarted++;
+        /* if ecm is disconnect, abort immediately */
+        if (port->ecm == NULL) {
+            break;
+        }
     }
     return port->readStarted;
 }
