@@ -427,8 +427,9 @@ static int32_t UsbEcmWrite(struct UsbEcm *port, struct HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
-void UsbFnNotifyRequest(struct UsbFnRequest *req, struct UsbEcmDevice *ecm) 
+void UsbFnNotifyRequest(struct UsbFnRequest *req, struct UsbEcmDevice *ecm)
 {
+    int32_t status;
     ecm->notifyReq = NULL;
     status = UsbFnSubmitRequestAsync(req);
     if (status < 0) {
@@ -442,7 +443,6 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
     struct UsbFnRequest *req = ecm->notifyReq;
     struct UsbCdcNotification *event = NULL;
     uint32_t *data = NULL;
-    int32_t status;
 
     if (!req) {
         return;
