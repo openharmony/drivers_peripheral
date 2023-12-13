@@ -72,6 +72,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
+  license_file = "//third_party/openmax/README.OpenSource"
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -131,6 +132,7 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
+  license_file = "//third_party/openmax/README.OpenSource"
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
 }
@@ -168,6 +170,7 @@ ohos_shared_library("libcodec_hdi_omx_client") {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
+  license_file = "//third_party/openmax/README.OpenSource"
   install_images = [ system_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
@@ -194,6 +197,7 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  license_file = "//third_party/openmax/README.OpenSource"
   defines = [ "LOG_TAG_HDI_CLIENT" ]
   install_images = [ chipset_base_dir ]
   innerapi_tags = [ "passthrough" ]
