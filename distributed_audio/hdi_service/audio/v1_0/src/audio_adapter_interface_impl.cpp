@@ -790,7 +790,7 @@ int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, 
 int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &condition)
 {
     std::string::size_type position = condition.find_first_of(";");
-    int32_t len = position - static_cast<size_t>(TYPE_CONDITION);
+    int32_t len = static_cast<int32_t>(position) - TYPE_CONDITION;
     if (len < 0 || len > MAX_EVENT_DIGITS || position == std::string::npos) {
         DHLOGE("Position is illegal or not find split word");
         return ERR_DH_AUDIO_HDF_FAIL;
