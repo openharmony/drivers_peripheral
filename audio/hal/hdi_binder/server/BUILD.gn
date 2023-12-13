@@ -32,6 +32,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "src/hdf_audio_server_capture.c",
       "src/hdf_audio_server_common.c",
       "src/hdf_audio_server_render.c",
+      "src/hdf_audio_server_manager.c",
       "src/hdf_audio_usb_server.c",
     ]
 
@@ -72,6 +73,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "src/hdf_audio_server_capture.c",
       "src/hdf_audio_server_common.c",
       "src/hdf_audio_server_render.c",
+      "src/hdf_audio_server_manager.c",
     ]
 
     if (is_standard_system) {
