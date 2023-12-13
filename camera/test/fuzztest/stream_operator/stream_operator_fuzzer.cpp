@@ -47,7 +47,7 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
 
 void IsStreamSupprotedApi(const uint8_t *&rawData)
 {
-    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
     std::vector<uint8_t> abilityVec = {};
@@ -76,17 +76,16 @@ void IsStreamSupprotedApi(const uint8_t *&rawData)
 void UpdateStreams(const uint8_t *rawData)
 {
     if (rawData == nullptr) {
-        return false;
+        return;
     }
-    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
         cameraTest->streamOperator_V1_2);
     int *data = const_cast<int *>(reinterpret_cast<const int *>(rawData));
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfoV1_1->v1_0.stream_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.streamId_ = data[0];
     cameraTest->streamInfoV1_1->v1_0.width_ = data[0];
-    cameraTest->streamInfoV1_1->v1_0.heigth_ = data[0];
+    cameraTest->streamInfoV1_1->v1_0.height_ = data[0];
     cameraTest->streamInfoV1_1->v1_0.format_ = Camera::PIXEL_FMT_YCRCB_420_SP;
     cameraTest->streamInfoV1_1->v1_0.tunneledMode_ = data[0];
     cameraTest->streamInfoV1_1->v1_0.dataspace_ = Camera::OHOS_CAMERA_SRGB_FULL;
@@ -102,7 +101,8 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
             break;
         }
         case STREAM_OPERATOR_COMMITSTREAM_V1_1: {
-            cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+            cameraTest->streamOperatorCallbackV1_2 =
+                new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
             cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(
                 cameraTest->streamOperatorCallbackV1_2, cameraTest->streamOperator_V1_2);
             std::vector<uint8_t> abilityVec = {};
