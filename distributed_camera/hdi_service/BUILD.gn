@@ -120,6 +120,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   install_images = [ chipset_base_dir ]
