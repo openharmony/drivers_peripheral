@@ -407,26 +407,9 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
     return RC_OK;
 }
 
-RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd command, const int* args)
+void SetCtrlByCondition(int32_t fd, AdapterCmd command, const int* args,
+    int &rc, std::shared_ptr<HosV4L2Control> myControl_)
 {
-    int32_t fd;
-    int rc = 0;
-    if (args == nullptr) {
-        CAMERA_LOGE("HosV4L2Dev::UpdateSetting: args is NULL\n");
-        return RC_ERROR;
-    }
-    if (myControl_ == nullptr) {
-        myControl_ = std::make_shared<HosV4L2Control>();
-        if (myControl_ == nullptr) {
-            CAMERA_LOGE("HosV4L2Dev::UpdateSetting: myControl_ make_shared is NULL\n");
-            return RC_ERROR;
-        }
-    }
-    fd = GetCurrentFd(cameraID);
-    if (fd < 0) {
-        CAMERA_LOGE("UpdateSetting: GetCurrentFd error\n");
-        return RC_ERROR;
-    }
     switch (command) {
         case CMD_EXPOSURE_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_AUTO, *args);
@@ -470,6 +453,29 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
         default:
             break;
     }
+}
+
+RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd command, const int* args)
+{
+    int32_t fd;
+    int rc = 0;
+    if (args == nullptr) {
+        CAMERA_LOGE("HosV4L2Dev::UpdateSetting: args is NULL\n");
+        return RC_ERROR;
+    }
+    if (myControl_ == nullptr) {
+        myControl_ = std::make_shared<HosV4L2Control>();
+        if (myControl_ == nullptr) {
+            CAMERA_LOGE("HosV4L2Dev::UpdateSetting: myControl_ make_shared is NULL\n");
+            return RC_ERROR;
+        }
+    }
+    fd = GetCurrentFd(cameraID);
+    if (fd < 0) {
+        CAMERA_LOGE("UpdateSetting: GetCurrentFd error\n");
+        return RC_ERROR;
+    }
+    SetCtrlByCondition(fd, command, args, rc, myControl_);
     if (rc != RC_OK) {
         return RC_ERROR;
     }

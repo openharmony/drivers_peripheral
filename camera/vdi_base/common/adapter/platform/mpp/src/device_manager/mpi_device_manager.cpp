@@ -260,6 +260,67 @@ ControllerId MpiDeviceManager::CheckControllerId(std::string controllerName)
     return DM_C_MAX;
 }
 
+void ConnectViVpss(RetCode &rc, int32_t port, int32_t connectPort)
+{
+    std::shared_ptr<VpssController> vpss =
+        std::static_pointer_cast<VpssController>(GetController(DM_M_VPSS, DM_C_VPSS));
+    if (vpss != nullptr) {
+        if (vpss->GetStartVpssState() != true) {
+            CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VPSS), RC_ERROR, RC_ERROR);
+        }
+        sysObject_->ViBindVpss(port, port, connectPort, connectPort);
+        rc = RC_OK;
+    }
+}
+
+void ConnectViVo(RetCode &rc)
+{
+    std::shared_ptr<VoController> vo = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO));
+    if (vo != nullptr) {
+        if (vo->GetStartVoState() != true) {
+            CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VO), RC_ERROR, RC_ERROR);
+        }
+        rc = RC_OK;
+    }
+}
+
+void ConnectViVenc(RetCode &rc)
+{
+    std::shared_ptr<VencController> venc =
+        std::static_pointer_cast<VencController>(GetController(DM_M_VENC, DM_C_VENC));
+    if (venc != nullptr) {
+        if (venc->GetStartVencState() != true) {
+            CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VENC), RC_ERROR, RC_ERROR);
+        }
+        rc = RC_OK;
+    }
+}
+
+void ConnectVpssVo(RetCode &rc, int32_t port, int32_t connectPort)
+{
+    std::shared_ptr<VoController> vo = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO));
+    if (vo != nullptr) {
+        if (vo->GetStartVoState() != true) {
+            CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VO), RC_ERROR, RC_ERROR);
+        }
+        sysObject_->VpssBindVo(port, port, connectPort, connectPort);
+        rc = RC_OK;
+    }
+}
+
+void ConnectVpssVenc(RetCode &rc)
+{
+    std::shared_ptr<VencController> venc =
+        std::static_pointer_cast<VencController>(GetController(DM_M_VENC, DM_C_VENC));
+    if (venc != nullptr) {
+        if ((std::static_pointer_cast<VencController>(GetController(DM_M_VENC,
+            DM_C_VENC)))->GetStartVencState() != true) {
+            CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VENC), RC_ERROR, RC_ERROR);
+        }
+        rc = RC_OK;
+    }
+}
+
 RetCode MpiDeviceManager::Connect(std::string controller,
                                   std::string portNum,
                                   std::string connectController,
@@ -276,65 +337,21 @@ RetCode MpiDeviceManager::Connect(std::string controller,
     RetCode rc = RC_ERROR;
     constexpr uint32_t coefficient = 2;
     switch (static_cast<uint32_t>(controllerId) << (coefficient + connectControllerId)) {
-        case DM_C_VI << (coefficient + DM_C_VPSS): {
-            std::shared_ptr<VpssController> vpss =
-                std::static_pointer_cast<VpssController>(GetController(DM_M_VPSS,
-                                                                       DM_C_VPSS));
-            if (vpss != nullptr) {
-                if (vpss->GetStartVpssState() != true) {
-                    CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VPSS), RC_ERROR, RC_ERROR);
-                }
-                sysObject_->ViBindVpss(port, port, connectPort, connectPort);
-                rc = RC_OK;
-            }
+        case DM_C_VI << (coefficient + DM_C_VPSS):
+            ConnectViVpss(rc, port, connectPort);
             break;
-        }
-        case DM_C_VI << (coefficient + DM_C_VO): {
-            std::shared_ptr<VoController> vo = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO));
-            if (vo != nullptr) {
-                if (vo->GetStartVoState() != true) {
-                    CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VO), RC_ERROR, RC_ERROR);
-                }
-                rc = RC_OK;
-            }
+        case DM_C_VI << (coefficient + DM_C_VO):
+            ConnectViVo(rc);
             break;
-        }
-        case DM_C_VI << (coefficient + DM_C_VENC): {
-            std::shared_ptr<VencController> venc =
-                std::static_pointer_cast<VencController>(GetController(DM_M_VENC,
-                                                                       DM_C_VENC));
-            if (venc != nullptr) {
-                if (venc->GetStartVencState() != true) {
-                    CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VENC), RC_ERROR, RC_ERROR);
-                }
-                rc = RC_OK;
-            }
+        case DM_C_VI << (coefficient + DM_C_VENC):
+            ConnectViVenc(rc);
             break;
-        }
-        case DM_C_VPSS << (coefficient + DM_C_VO): {
-            std::shared_ptr<VoController> vo = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO));
-            if (vo != nullptr) {
-                if (vo->GetStartVoState() != true) {
-                    CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VO), RC_ERROR, RC_ERROR);
-                }
-                sysObject_->VpssBindVo(port, port, connectPort, connectPort);
-                rc = RC_OK;
-            }
+        case DM_C_VPSS << (coefficient + DM_C_VO):
+            ConnectVpssVo(rc, port, connectPort);
             break;
-        }
-        case DM_C_VPSS << (coefficient + DM_C_VENC): {
-            std::shared_ptr<VencController> venc =
-                std::static_pointer_cast<VencController>(GetController(DM_M_VENC,
-                                                                       DM_C_VENC));
-            if (venc != nullptr) {
-                if ((std::static_pointer_cast<VencController>(GetController(DM_M_VENC,
-                    DM_C_VENC)))->GetStartVencState() != true) {
-                    CHECK_IF_EQUAL_RETURN_VALUE(StartNode(DM_C_VENC), RC_ERROR, RC_ERROR);
-                }
-                rc = RC_OK;
-            }
+        case DM_C_VPSS << (coefficient + DM_C_VENC):
+            ConnectVpssVenc(rc);
             break;
-        }
         default: {
             return RC_ERROR;
         }
@@ -393,46 +410,30 @@ RetCode MpiDeviceManager::StartNode(ControllerId controllerId)
     switch (controllerId) {
         case DM_C_VI: {
             rc = std::static_pointer_cast<ViController>(GetController(DM_M_VI, DM_C_VI))->ConfigVi();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             rc = std::static_pointer_cast<ViController>(GetController(DM_M_VI, DM_C_VI))->StartVi();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             break;
         }
         case DM_C_VO: {
             rc = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO))->ConfigVo();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             rc = std::static_pointer_cast<VoController>(GetController(DM_M_VO, DM_C_VO))->StartVo();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             break;
         }
         case DM_C_VPSS: {
             rc = std::static_pointer_cast<VpssController>(GetController(DM_M_VPSS, DM_C_VPSS))->ConfigVpss();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             rc = std::static_pointer_cast<VpssController>(GetController(DM_M_VPSS, DM_C_VPSS))->StartVpss();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             break;
         }
         case DM_C_VENC: {
             rc = std::static_pointer_cast<VencController>(GetController(DM_M_VENC, DM_C_VENC))->ConfigVenc();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             rc = std::static_pointer_cast<VencController>(GetController(DM_M_VENC, DM_C_VENC))->StartVenc();
-            if (rc == RC_ERROR) {
-                return rc;
-            }
+            CHECK_IF_EQUAL_RETURN_VALUE(rc, RC_ERROR, rc);
             break;
         }
         default:
