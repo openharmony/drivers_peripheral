@@ -316,9 +316,8 @@ static void ShowHelp(char *name)
         __func__, name);
 }
 
-int32_t main(int32_t argc, char *argv[])
+static void FillParamData(int32_t argc, char *argv[])
 {
-    int32_t ret;
     if (argc == 6) {
         g_busNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
         g_devAddr = (unsigned int)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
@@ -340,17 +339,30 @@ int32_t main(int32_t argc, char *argv[])
         ShowHelp(argv[0]);
         return -1;
     }
-    OsalSemInit(&sem, 0);
+}
 
+static void PrintErrorLog(int32_t ret)
+{
+ if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
+            remove it and test again! ret=%{public}d", __func__, ret);
+    }
+}
+
+int32_t main(int32_t argc, char *argv[])
+{
+    int32_t ret;
+    FillParamData(argc, argv[]);
+    OsalSemInit(&sem, 0);
     g_fd = OpenDevice();
     if (g_fd < 0) {
         ret = -1;
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = ClaimInterface(g_ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     struct OsalThread urbReapProcess;
@@ -365,7 +377,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
@@ -380,7 +392,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
@@ -390,14 +402,8 @@ int32_t main(int32_t argc, char *argv[])
 
     ret = BeginProcess(g_endNum);
     if (ret != HDF_SUCCESS) {
-        goto ERR;
-    }
-
-ERR:
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
-            remove it and test again! ret=%{public}d", __func__, ret);
-    }
+        PrintErrorLog(ret);
+    }   
     CloseDevice();
     return ret;
 }
