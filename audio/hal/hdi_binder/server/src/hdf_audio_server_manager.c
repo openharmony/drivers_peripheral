@@ -158,7 +158,6 @@ int32_t AudioAdapterListGetAdapterCapture(const char *adapterName,
         return HDF_ERR_INVALID_PARAM;
     }
 
-
     int32_t num = ServerManageGetAdapterNum(g_serverAdapterNum);
     for (i = 0; i < num; i++) {
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
