@@ -48,6 +48,7 @@ ohos_fuzztest("UnloadAdapterFuzzTest") {
     "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
     "hdf_core:libhdf_host",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   defines = [

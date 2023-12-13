@@ -54,6 +54,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   if (distributed_audio_extension) {
