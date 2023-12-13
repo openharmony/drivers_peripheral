@@ -116,6 +116,7 @@ ohos_shared_library("libusb_driver") {
       "hdf_core:libhdi",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "samgr:samgr_proxy",
     ]
   } else {
     external_deps = [
