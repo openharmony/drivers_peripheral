@@ -343,7 +343,7 @@ static void FillParamData(int32_t argc, char *argv[])
 
 static void PrintErrorLog(int32_t ret)
 {
- if (ret != HDF_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
             remove it and test again! ret=%{public}d", __func__, ret);
     }

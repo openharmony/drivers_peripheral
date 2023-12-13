@@ -460,7 +460,7 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
     return ret;
 }
 
-void UsbFnAdapterPipeCreateAndClose(int32_t fdEp0, struct UsbFnConfiguration * const usbFnConfig, int32_t iCount) 
+void UsbFnAdapterPipeCreateAndClose(int32_t fdEp0, struct UsbFnConfiguration * const usbFnConfig, int32_t iCount)
 {
     if (UsbFnAdapterCreatPipes(fdEp0, usbFnConfig->functions[iCount]) != HDF_SUCCESS) {
         goto FAIL2;

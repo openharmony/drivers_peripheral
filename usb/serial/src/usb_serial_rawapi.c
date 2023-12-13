@@ -1275,7 +1275,7 @@ static void UsbAllocRequests(struct AcmDevice *acm, int32_t ret)
         HDF_LOGE("%s:%d AcmWriteBufAlloc failed", __func__, __LINE__);
         ret = HDF_FAILURE;
         goto ERR_ALLOC_WRITE_BUF;
-    }  
+    }
 ERR_SUBMIT_REQ:
     UsbStopIo(acm);
 ERR_START_IO:

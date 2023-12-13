@@ -734,7 +734,7 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
     return;
 }
 
-static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *ecm, struct UsbCdcNotification *dr, 
+static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *ecm, struct UsbCdcNotification *dr,
     unsigned int currentSize, uint32_t expectedSize)
 {
     if (currentSize >= expectedSize) {
@@ -1061,6 +1061,7 @@ static int32_t EcmGetPipesAndRequest(struct EcmDevice *ecm, int32_t ret)
 ERROR_ALLOC_REQ:
     EcmFreePipes(ecm);
 ERROR_GET_PIPES:
+    UsbFreeNotifyReqeust(ecm);
 }
 
 static int32_t EcmInit(struct EcmDevice *ecm)

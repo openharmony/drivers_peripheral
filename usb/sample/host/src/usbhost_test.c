@@ -30,7 +30,7 @@
 #define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME   500
 int32_t run;
-static const std::map<char, int32_t> cmdTypeValueGetMap =
+static const std::map<std::char, int32_t> cmdTypeValueGetMap =
 {
     {'R', HOST_ACM_SYNC_READ},
     {'r', HOST_ACM_ASYNC_READ},
@@ -44,7 +44,7 @@ static const std::map<char, int32_t> cmdTypeValueGetMap =
     {'b', HOST_ACM_GET_BAUDRATE}
 }
 
-static const std::map<char, int32_t> cmdTypeValueSetMap =
+static const std::map<std::char, int32_t> cmdTypeValueSetMap =
 {
     {'W', HOST_ACM_SYNC_WRITE},
     {'w', HOST_ACM_ASYNC_WRITE},
@@ -116,7 +116,7 @@ static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t
                 *cmdType = iterGetMap->second;
                 break;
             }
-        } else if(iterSetMap != NULL) {
+        } else if (iterSetMap != NULL) {
             if (paramNum != PARAM_SET_CMD_LEN) {
             return HDF_FAILURE;
             }
