@@ -40,9 +40,13 @@ sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
 
 void SensorClientInfo::SetPeriodCount(int32_t sensorId, int32_t periodCount){
     periodCountMap_[sensorId] = periodCount;
+    curCountMap_[sensorId] = 0;
 }
 
 bool SensorClientInfo::IsNeedReportData(int32_t sensorId) {
+    if (periodCountMap_.find(sensorId) == periodCountMap_.end()) {
+        return true;
+    }
     curCountMap_[sensorId]++;
     if (curCountMap_[sensorId] % periodCountMap_[sensorId] == 0) {
         curCountMap_[sensorId] = 0;
