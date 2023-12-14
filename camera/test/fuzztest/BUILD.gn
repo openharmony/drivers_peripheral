@@ -79,6 +79,7 @@ group("camera_hdi_fuzztest") {
   deps += [
     "camera_device:fuzztest",
     "camera_host:fuzztest",
+    "defferred_delivery_image:fuzztest",
     "stream_operator:fuzztest",
   ]
 }

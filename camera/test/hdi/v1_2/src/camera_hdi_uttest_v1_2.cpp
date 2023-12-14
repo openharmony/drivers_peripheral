@@ -54,6 +54,158 @@ bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
 }
 
 /**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001, TestSize.Level1)
+{
+    bool isExit = false;
+    // stub codes
+    std::vector<uint8_t> cameraModesVector;
+    cameraModesVector.push_back(OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    cameraModesVector.push_back(OHOS::HDI::Camera::V1_2::MOVING_IMAGE);
+    cameraTest->ability->addEntry(OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,
+        cameraModesVector.data(), cameraModesVector.size());
+
+    // real test
+    isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+    isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::MOVING_IMAGE);
+    EXPECT_EQ(isExit, true);
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002, TestSize.Level1)
+{
+    int ret = 0;
+    bool isExit = false;
+    // real test
+    isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+
+    // get DefferredImageTestInit
+    ret = cameraTest->DefferredImageTestInit();
+    EXPECT_EQ(ret, 0);
+    if (ret != 0) {
+        CAMERA_LOGE("DefferredImageTestInit Fail, exit!!!");
+        printf("DefferredImageTestInit Fail, exit!!!\r\n");
+    }
+
+    // take photo using deferred image delivery
+    auto meta = std::make_shared<CameraSetting>(100, 100);
+    uint8_t value = OHOS::HDI::Camera::V1_2::STILL_IMAGE;
+    meta->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &value, sizeof(value));
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    TakePhotoWithTags(meta);
+
+    // image deferred delivery process
+    int taskCount = 0;
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE, taskCount);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(taskCount, 1);
+    ASSERT_EQ(pendingImages.size(), 1);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
+    EXPECT_EQ(ret, 0);
+
+    // process the first image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003, TestSize.Level1)
+{
+    int ret = 0;
+
+    // real test
+    bool isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY, OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+
+    // get DefferredImageTestInit
+    ret = cameraTest->DefferredImageTestInit();
+    EXPECT_EQ(ret, 0);
+    if (ret != 0) {
+        CAMERA_LOGE("DefferredImageTestInit Fail, exit!!!");
+        printf("DefferredImageTestInit Fail, exit!!!\r\n");
+    }
+
+    // take three photo using deferred image delivery
+    auto meta = std::make_shared<CameraSetting>(100, 100);
+    uint8_t value = OHOS::HDI::Camera::V1_2::STILL_IMAGE;
+    meta->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &value, sizeof(value));
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    // take photo three times
+    TakePhotoWithTags(meta);
+    TakePhotoWithTags(meta);
+    TakePhotoWithTags(meta);
+
+    // image deferred delivery process
+    int taskCount = 0;
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE, taskCount);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(taskCount, 1);
+    ASSERT_EQ(pendingImages.size(), 3);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
+    EXPECT_EQ(ret, 0);
+
+    // process the first image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
+
+    // process the second image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[1]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
+
+     // process the third image, and test the Interrupt, Reset, RemoveImage Interfaces
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[2]);
+    ret = cameraTest->imageProcessSession_->Interrupt();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->Reset();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->RemoveImage(pendingImages[2]);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->countError_, 0);
+}
+
+/**
  * @tc.name: Camera_Device_Hdi_V1_2_001
  * @tc.desc: OHOS_ABILITY_SKETCH_ENABLE_RATIO
  * @tc.size: MediumTest
