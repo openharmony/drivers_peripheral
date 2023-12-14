@@ -516,7 +516,7 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     return AUDIO_HAL_SUCCESS;
 }
 
-static int32_t HdiServiceReleaseAudioManagerObject(const struct HdfDeviceIoClient *client,
+int32_t HdiServiceReleaseAudioManagerObject(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     (void)data;
