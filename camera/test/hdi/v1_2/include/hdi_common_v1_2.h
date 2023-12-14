@@ -32,6 +32,7 @@
 #include "v1_2/icamera_device.h"
 #include "v1_2/istream_operator.h"
 #include "v1_2/camera_host_proxy.h"
+#include "v1_2/image_process_service_proxy.h"
 #include "v1_0/ioffline_stream_operator.h"
 #include "display_format.h"
 #include "iconsumer_surface.h"
@@ -65,6 +66,7 @@ using namespace OHOS::HDI::Camera::V1_0;
 class Test {
 public:
     void Init();
+    int32_t DefferredImageTestInit();
     void Open(int cameraId);
     void OpenCameraV1_2(int cameraId);
     void Close();
@@ -118,6 +120,10 @@ public:
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoVideo = nullptr;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoSketch = nullptr;
     std::shared_ptr<CaptureInfo> captureInfo = nullptr;
+    sptr<OHOS::HDI::Camera::V1_2::IImageProcessSession> imageProcessSession_ = nullptr;
+    sptr<OHOS::HDI::Camera::V1_2::IImageProcessService> imageProcessService_ = nullptr;
+    class TestImageProcessCallback;
+    sptr<TestImageProcessCallback> imageProcessCallback_ = nullptr;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
@@ -270,6 +276,23 @@ public:
         int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
         int32_t OnFlashlightStatusV1_2(FlashlightStatus status) override;
         int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
+    };
+
+    class TestImageProcessCallback : public OHOS::HDI::Camera::V1_2::IImageProcessCallback {
+    public:
+        int32_t coutProcessDone_ = 0;
+        int32_t coutStatusChanged_ = 0;
+        int32_t countError_ = 0;
+        std::string curImageId_;
+        int32_t curErrorCode_ = 0;
+        OHOS::HDI::Camera::V1_2::ImageBufferInfo curImageBufferInfo_;
+        OHOS::HDI::Camera::V1_2::SessionStatus curStatus_;
+        TestImageProcessCallback() = default;
+        virtual ~TestImageProcessCallback() = default;
+        int32_t OnProcessDone(const std::string& imageId,
+            const OHOS::HDI::Camera::V1_2::ImageBufferInfo& buffer) override;
+        int32_t OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status) override;
+        int32_t OnError(const std::string& imageId, int32_t errorCode) override;
     };
 };
 }
