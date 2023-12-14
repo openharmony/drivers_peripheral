@@ -1095,3 +1095,176 @@ TEST_F(UtestUSBCameraTest, camera_usb_0033)
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_EXPOSURE_TIME
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0034)
+{
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_EXPOSURE_TIME, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "log OHOS_ABILITY_EXPOSURE_TIME: count is " << (int)entry.count << std::endl;
+        std::cout << "log exposure time value: [" << entry.data.i32[0] << ", " << entry.data.i32[1] << "]" <<std::endl;
+        std::cout << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "OHOS_ABILITY_EXPOSURE_TIME is not support" << std::endl;
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_AE_LOCK
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0035)
+{
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AE_LOCK, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "supported ae lock list:";
+        for (int i = 0; i < entry.count; i++) {
+            std::cout << " " << static_cast<int>(entry.data.u8[i]);
+        }
+        std::cout << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "OHOS_ABILITY_AE_LOCK is not support" << std::endl;
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_AWB_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0036)
+{
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AWB_MODES, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "supported awb mode list:";
+        for (int i = 0; i < entry.count; i++) {
+            std::cout << " " << static_cast<int>(entry.data.u8[i]);
+        }
+        std::cout << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "OHOS_ABILITY_AWB_MODES is not support" << std::endl;
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_AWB_LOCK
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0037)
+{
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AWB_LOCK, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "supported awb list list:";
+        for (int i = 0; i < entry.count; i++) {
+            std::cout << " " << static_cast<int>(entry.data.u8[i]);
+        }
+        std::cout << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "OHOS_ABILITY_AWB_LOCK is not support" << std::endl;
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_METER_MODES
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0038)
+{
+    std::vector<std::string> usbCameraIds;
+    cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
+    if (usbCameraIds.size() > 1) { // 2:usb camera quantity
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
+    }
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_METER_MODES, &entry);
+    if (ret == CAM_META_SUCCESS) {
+        std::cout << "supported meter list list:";
+        for (int i = 0; i < entry.count; i++) {
+            std::cout << " " << static_cast<int>(entry.data.u8[i]);
+        }
+        std::cout << std::endl;
+    } else if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::cout << "OHOS_ABILITY_METER_MODES is not support" << std::endl;
+    }
+}
