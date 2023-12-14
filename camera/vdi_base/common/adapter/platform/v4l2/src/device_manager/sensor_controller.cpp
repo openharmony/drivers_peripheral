@@ -695,15 +695,13 @@ RetCode SensorController::SendExposureMetaData(common_metadata_header_t *data)
 RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
-    uint8_t exposureMode = 0;
-    uint8_t aeLock = 0;
     camera_metadata_item_t entry;
-    bool isAutoMode = false;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
     if (ret == 0) {
-        exposureMode = *(entry.data.u8);
+        uint8_t aeLock = 0;
+        bool isAutoMode = false;
+        uint8_t exposureMode = *(entry.data.u8);
         int exposureVal = V4L2_EXPOSURE_AUTO;
-
         if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_MANUAL) {
             exposureVal = V4L2_EXPOSURE_MANUAL;
         } else if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO) {
@@ -713,22 +711,15 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             exposureVal = V4L2_EXPOSURE_AUTO;
             isAutoMode = true;
         }
-
         int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_LOCK, &entry);
         if (ret == 0) {
             aeLock = *(entry.data.u8);
         }
-
         if (aeLock == 0) {
             int curLock = 0;
             auto queryResult = sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
-            if (exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED) {
-                // set the position of AE bit to 1;
-                curLock |= V4L2_LOCK_EXPOSURE;
-            } else {
-                curLock &= ~V4L2_LOCK_EXPOSURE;
-            }
-
+            curLock = exposureMode == OHOS_CAMERA_EXPOSURE_MODE_LOCKED ?
+                curLock | V4L2_LOCK_EXPOSURE : curLock & ~V4L2_LOCK_EXPOSURE;
             if (queryResult == RC_OK) {
                 rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, &curLock);
                 CAMERA_LOGI("Set CMD_EXPOSURE_LOCK [%{public}d]", exposureMode);
@@ -736,7 +727,6 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
                     CAMERA_LOGE("Send CMD_EXPOSURE_LOCK fail");
                 }
             }
-
             if (isAutoMode == true) {
                 rc = SendExposureAutoModeMetaData(data);
             } else {
