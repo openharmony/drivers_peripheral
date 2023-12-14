@@ -516,6 +516,25 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     return AUDIO_HAL_SUCCESS;
 }
 
+static int32_t HdiServiceReleaseAudioManagerObject(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    (void)data;
+    (void)reply;
+    (void)client;
+    AUDIO_FUNC_LOGI();
+
+    if (g_descs == NULL) {
+        AUDIO_FUNC_LOGI("g_descs is NULL");
+        return AUDIO_HAL_SUCCESS;
+    }
+
+    AudioAdapterReleaseDescs(g_descs, AudioServerGetAdapterNum());
+
+    g_descs = NULL;
+    return AUDIO_HAL_SUCCESS;
+}
+
 static int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameCase,
     enum AudioPortDirection portFlag, struct AudioPort *renderPort, const int size)
 {
@@ -1609,25 +1628,6 @@ static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    return AUDIO_HAL_SUCCESS;
-}
-
-static int32_t HdiServiceReleaseAudioManagerObject(const struct HdfDeviceIoClient *client,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    (void)data;
-    (void)reply;
-    (void)client;
-    AUDIO_FUNC_LOGI();
-
-    if (g_descs == NULL) {
-        AUDIO_FUNC_LOGI("g_descs is NULL");
-        return AUDIO_HAL_SUCCESS;
-    }
-
-    AudioAdapterReleaseDescs(g_descs, AudioServerGetAdapterNum());
-
-    g_descs = NULL;
     return AUDIO_HAL_SUCCESS;
 }
 
