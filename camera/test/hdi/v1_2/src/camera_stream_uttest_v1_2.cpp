@@ -19,6 +19,9 @@ using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
 
+constexpr uint32_t ITEM_CAPACITY = 100;
+constexpr uint32_t DATA_CAPACITY = 2000;
+constexpr uint32_t DATA_COUNT = 1;
 void CameraStreamUtTestV1_2::SetUpTestCase(void) {}
 void CameraStreamUtTestV1_2::TearDownTestCase(void) {}
 void CameraStreamUtTestV1_2::SetUp(void)
@@ -70,4 +73,166 @@ HWTEST_F(CameraStreamUtTestV1_2, Camera_Stream_Hdi_V1_2_036, TestSize.Level1)
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+/**
+ * @tc.name:Camera_Stream_Hdi_V1_2_053
+ * @tc.desc:auto exposure
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraStreamUtTestV1_2, Camera_Stream_Hdi_V1_2_053, TestSize.Level1)
+{
+    //Get Stream Operator
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    //preview streamInfo
+    cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
+    
+    //capture streamInfo
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    
+    //create and commit stream
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::NIGHT),
+        cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    
+    //start capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    
+    //wait for auto exposuring end
+    sleep(10);
+    
+    //stop stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name:Camera_Stream_Hdi_V1_2_054
+ * @tc.desc:manual exposure
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraStreamUtTestV1_2, Camera_Stream_Hdi_V1_2_054, TestSize.Level1)
+{
+    //update settings
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    int32_t manualExposureTime = 8000;
+    meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &manualExposureTime, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    
+    //Get Stream Operator
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    //preview streamInfo
+    cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
+    
+    //capture streamInfo
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    
+    //create and commit stream
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::NIGHT),
+        cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    
+    //start capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    
+    //wait for manual exposuring end
+    sleep(10);
+    
+    //stop stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name:Camera_Stream_Hdi_V1_2_055
+ * @tc.desc:manual exposure and then confirmCapture
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraStreamUtTestV1_2, Camera_Stream_Hdi_V1_2_055, TestSize.Level1)
+{
+    //update settings
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    int32_t manualExposureTime = 8000;
+    meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &manualExposureTime, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    //Get Stream Operator
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    //preview streamInfo
+    cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
+    
+    //capture streamInfo
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+    
+    //create and commit stream
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_2->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::NIGHT),
+        cameraTest->abilityVec);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    
+    //start capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    
+    //wait for manual exposuring end confirmCapture
+    sleep(UT_SLEEP_TIME);
+    EXPECT_NE(cameraTest->streamOperator_V1_2, nullptr);
+    cameraTest->streamOperator_V1_2->ConfirmCapture(cameraTest->streamIdCapture);
+    sleep(UT_SLEEP_TIME);
+    
+    //stop stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
