@@ -19,7 +19,7 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "v1_0/iintell_voice_trigger_manager.h"
+#include "v1_1/iintell_voice_trigger_manager.h"
 #include "i_trigger.h"
 
 namespace OHOS {
@@ -36,17 +36,21 @@ struct IntellVoiceTriggerManagerPriv {
 };
 
 class IntellVoiceTriggerManagerImpl :
-    public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerManager {
+    public OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerManager {
 public:
     IntellVoiceTriggerManagerImpl();
     ~IntellVoiceTriggerManagerImpl();
 
     int32_t LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
-         sptr<IIntellVoiceTriggerAdapter> &adapter) override;
+        sptr<OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter> &adapter) override;
+    int32_t LoadAdapter_V1_1(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
+        sptr<OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerAdapter> &adapter) override;
 
     int32_t UnloadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor) override;
 
 private:
+    template<typename T>
+    int32_t LoadIntellVoiceTriggerAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor, sptr<T> &adapter);
     int32_t LoadVendorLib();
     void UnloadVendorLib();
 
