@@ -140,5 +140,25 @@ BENCHMARK_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)(
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, UpdateStreams_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: ConfirmCapture
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, ConfirmCapture_benchmark_001)(
+    benchmark::State &st)
+{
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    for (auto _ : st) {
+        cameraTest->streamOperator_V1_2->ConfirmCapture(cameraTest->streamIdCapture);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, ConfirmCapture_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 BENCHMARK_MAIN();
 

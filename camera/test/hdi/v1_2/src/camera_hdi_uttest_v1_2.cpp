@@ -1619,3 +1619,31 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_051, TestSize.Level1)
     //清除测试回调函数
     OHOS::Camera::Test::resultCallback_ = nullptr;
 }
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_052
+ * @tc.desc: OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, OHOS_CONTROL_MANUAL_EXPOSURE_TIME
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, &entry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    for (size_t i = 0; i < entry.count; i++) {
+        printf("OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME:%d\n", entry.data.i32[i]);
+        
+        //update settings
+        std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+        int32_t manualExposureTime = entry.data.i32[i];
+        meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &manualExposureTime, DATA_COUNT);
+        std::vector<uint8_t> setting;
+        MetadataUtils::ConvertMetadataToVec(meta, setting);
+        cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    }
+}
