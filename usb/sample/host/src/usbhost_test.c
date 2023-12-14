@@ -30,7 +30,7 @@
 #define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME   500
 int32_t run;
-static const std::map<std::char, int32_t> cmdTypeValueGetMap =
+static const std::map<char, int32_t> g_cmdTypeValueGetMap =
 {
     {'R', HOST_ACM_SYNC_READ},
     {'r', HOST_ACM_ASYNC_READ},
@@ -44,7 +44,7 @@ static const std::map<std::char, int32_t> cmdTypeValueGetMap =
     {'b', HOST_ACM_GET_BAUDRATE}
 }
 
-static const std::map<std::char, int32_t> cmdTypeValueSetMap =
+static const std::map<char, int32_t> g_cmdTypeValueSetMap =
 {
     {'W', HOST_ACM_SYNC_WRITE},
     {'w', HOST_ACM_ASYNC_WRITE},
@@ -97,8 +97,8 @@ static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t
 
     uint32_t len = strlen(cmdParam);
     for (uint32_t i = 0; i < len; i++) {
-        auto iterGetMap = cmdTypeValueGetMap.find(cmdParam[i]);
-        auto iterSetMap = cmdTypeValueSetMap.find(cmdParam[i]);
+        auto iterGetMap = g_cmdTypeValueGetMap.find(cmdParam[i]);
+        auto iterSetMap = g_cmdTypeValueSetMap.find(cmdParam[i]);
         if (strcmp(cmdParam[i], 'A') == 0) {
             strcpy_s(apiType, DATA_MAX_LEN, "-SDK");
             break;
@@ -112,7 +112,7 @@ static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t
             if (paramNum != PARAM_GET_CMD_LEN) {
             return HDF_FAILURE;
             }
-            if (iterGetMap != cmdTypeValueGetMap.end()) {
+            if (iterGetMap != g_cmdTypeValueGetMap.end()) {
                 *cmdType = iterGetMap->second;
                 break;
             }
@@ -120,7 +120,7 @@ static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t
             if (paramNum != PARAM_SET_CMD_LEN) {
             return HDF_FAILURE;
             }
-            if (iterSetMap != cmdTypeValueSetMap.end()) {
+            if (iterSetMap != g_cmdTypeValueSetMap.end()) {
                 *cmdType = iterSetMap->second;
                 break;
             }
