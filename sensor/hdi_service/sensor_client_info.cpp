@@ -38,6 +38,19 @@ sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
     return pollCallback_;
 }
 
+void SensorClientInfo::SetPeriodCount(int32_t sensorId, int32_t periodCount){
+    periodCountMap_[sensorId] = periodCount;
+}
+
+bool SensorClientInfo::IsNeedReportData(int32_t sensorId) {
+    curCountMap_[sensorId]++;
+    if (curCountMap_[sensorId] % periodCountMap_[sensorId] == 0) {
+        curCountMap_[sensorId] = 0;
+        return true;
+    }
+    return false;
+}
+
 } // V2_0
 } // Sensor
 } // HDI

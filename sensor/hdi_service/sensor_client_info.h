@@ -34,8 +34,12 @@ public:
         : pollCallback_(callbackObj) {};
     void SetReportDataCb(const sptr<ISensorCallback> &callbackObj);
     sptr<ISensorCallback> GetReportDataCb();
+    bool IsNeedReportData(int32_t sensorId);
+    void SetPeriodCount(int32_t sensorId, int32_t periodCount);
 private:
     sptr<ISensorCallback> pollCallback_;
+    std::unordered_map<int32_t, int32_t> periodCountMap_;
+    std::unordered_map<int32_t, int32_t> curCountMap_;
 };
 
 } // V2_0

@@ -47,6 +47,7 @@ public:
     std::mutex clientsMutex_;
     std::mutex sensorUsedMutex_;
     std::mutex sensorConfigMutex_;
+    void SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval);
 private:
     SensorClientsManager();
     static SensorClientsManager *instance;

@@ -49,6 +49,9 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     }
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
+        if(!sensorClientInfo_.IsNeedReportData(event.sensorId)){
+            continue;
+        }
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
             HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
