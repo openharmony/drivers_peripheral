@@ -760,7 +760,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     }
     /* start the transfer when the buffer is almost full: */
     /* (buffer_size / avail_min) * avail_min */
-    ret = snd_pcm_sw_params_set_start_threshold(handle, swparams, (g_bufferSize / g_periodSize) * g_periodSize);
+    ret = snd_pcm_sw_params_set_start_threshold(handle, swparams, 1);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to set start threshold mode for capture: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
