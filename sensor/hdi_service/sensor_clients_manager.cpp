@@ -200,7 +200,7 @@ void SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportIn
 
     auto it = clients_[groupId].find(serviceId);
     int32_t periodCount = reportInterval / this.reportInterval;
-    it.SetPeriodCount(sensorId,periodCount);
+    it.SetPeriodCount(sensorId, periodCount);
 }
 
 } // V2_0
