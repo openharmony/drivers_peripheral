@@ -86,10 +86,22 @@ IntellVoiceTriggerManagerImpl::~IntellVoiceTriggerManagerImpl()
 }
 
 int32_t IntellVoiceTriggerManagerImpl::LoadAdapter(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
-    sptr<IIntellVoiceTriggerAdapter> &adapter)
+    sptr<OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter> &adapter)
+{
+    return LoadIntellVoiceTriggerAdapter(descriptor, adapter);
+}
+
+int32_t IntellVoiceTriggerManagerImpl::LoadAdapter_V1_1(const IntellVoiceTriggerAdapterDsecriptor &descriptor,
+    sptr<OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerAdapter> &adapter)
+{
+    return LoadIntellVoiceTriggerAdapter(descriptor, adapter);
+}
+
+template<typename T>
+int32_t IntellVoiceTriggerManagerImpl::LoadIntellVoiceTriggerAdapter(
+    const IntellVoiceTriggerAdapterDsecriptor &descriptor, sptr<T> &adapter)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-
     if (inst_ == nullptr) {
         INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
@@ -110,8 +122,7 @@ int32_t IntellVoiceTriggerManagerImpl::LoadAdapter(const IntellVoiceTriggerAdapt
         return HDF_FAILURE;
     }
 
-    adapter = sptr<IIntellVoiceTriggerAdapter>(new (std::nothrow) IntellVoiceTriggerAdapterImpl(
-        std::move(triggerAdapterDevice)));
+    adapter = sptr<T>(new (std::nothrow) IntellVoiceTriggerAdapterImpl(std::move(triggerAdapterDevice)));
     if (adapter == nullptr) {
         INTELLIGENT_VOICE_LOGE("new adapter failed");
         return HDF_ERR_MALLOC_FAIL;

@@ -117,6 +117,7 @@ int32_t IntellVoiceTriggerAdapterImpl::UnloadModel(int32_t handle)
 
 int32_t IntellVoiceTriggerAdapterImpl::Start(int32_t handle)
 {
+    INTELLIGENT_VOICE_LOGE("Start");
     MemoryGuard memoryGuard;
     return adapter_->Start(handle);
 }
@@ -125,6 +126,21 @@ int32_t IntellVoiceTriggerAdapterImpl::Stop(int32_t handle)
 {
     MemoryGuard memoryGuard;
     return adapter_->Stop(handle);
+}
+
+int32_t IntellVoiceTriggerAdapterImpl::SetParams(const std::string &key, const std::string &value)
+{
+    INTELLIGENT_VOICE_LOGI("enter");
+    MemoryGuard memoryGuard;
+    return adapter_->SetParams(key, value);
+}
+
+int32_t IntellVoiceTriggerAdapterImpl::GetParams(const std::string &key, std::string &value)
+{
+    INTELLIGENT_VOICE_LOGI("enter");
+    MemoryGuard memoryGuard;
+    value = adapter_->GetParams(key);
+    return 0;
 }
 
 int32_t IntellVoiceTriggerAdapterImpl::GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData)
@@ -175,7 +191,9 @@ bool IntellVoiceTriggerAdapterImpl::RegisterDeathRecipient(const sptr<IIntellVoi
 void IntellVoiceTriggerAdapterImpl::Clean()
 {
     MemoryGuard memoryGuard;
+    INTELLIGENT_VOICE_LOGI("enter");
     for (auto it = handleSet_.begin(); it != handleSet_.end();) {
+        INTELLIGENT_VOICE_LOGI("unload model, id is %{public}d", *it);
         (void)adapter_->UnloadIntellVoiceTriggerModel(*it);
         it = handleSet_.erase(it);
     }
