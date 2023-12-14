@@ -15,7 +15,6 @@
 
 #include "osal_thread.h"
 #include "signal.h"
-#include <string.h>
 #include "usbhost_ddk_test.h"
 
 #define HDF_LOG_TAG USB_HOST_DDK_TEST
@@ -30,28 +29,6 @@
 #define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME   500
 int32_t run;
-static const std::map<char, int32_t> g_cmdTypeValueGetMap =
-{
-    {'R', HOST_ACM_SYNC_READ},
-    {'r', HOST_ACM_ASYNC_READ},
-    {'c', HOST_ACM_CTRL_CLASS_SYNC},
-    {'s', HOST_ACM_CTRL_GET_STATUS},
-    {'C', HOST_ACM_CTRL_SYNC_DESCRIPTOR},
-    {'d', HOST_ACM_CTRL_ASYNC_DESCRIPTOR},
-    {'g', HOST_ACM_CTRL_GET_CONFIGURATION},
-    {'i', HOST_ACM_CTRL_GET_INTERFACE},
-    {'S', HOST_ACM_SPEED_TEST},
-    {'b', HOST_ACM_GET_BAUDRATE}
-}
-
-static const std::map<char, int32_t> g_cmdTypeValueSetMap =
-{
-    {'W', HOST_ACM_SYNC_WRITE},
-    {'w', HOST_ACM_ASYNC_WRITE},
-    {'B', HOST_ACM_SET_BAUDRATE},
-    {'I', HOST_ACM_ADD_INTERFACE},
-    {'D', HOST_ACM_REMOVE_INTERFACE}
-}
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
 static struct OsalThread g_Getchar;
@@ -89,47 +66,120 @@ static void TestHelp(void)
 
 static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t *cmdType, char *apiType)
 {
-    bool isInvalid = cmdParam == NULL || cmdType == NULL || apiType == NULL || strlen(cmdParam) < PARAM_CMD_LENGTH;
-    if (isInvalid) {
+    if ((cmdParam == NULL) || (cmdType == NULL) || (apiType == NULL) || (strlen(cmdParam) < PARAM_CMD_LENGTH)) {
         HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     uint32_t len = strlen(cmdParam);
     for (uint32_t i = 0; i < len; i++) {
-        auto iterGetMap = g_cmdTypeValueGetMap.find(cmdParam[i]);
-        auto iterSetMap = g_cmdTypeValueSetMap.find(cmdParam[i]);
-        if (strcmp(cmdParam[i], 'A') == 0) {
-            strcpy_s(apiType, DATA_MAX_LEN, "-SDK");
-            break;
-        } else if (strcmp(cmdParam[i], 'a') == 0) {
-            strcpy_s(apiType, DATA_MAX_LEN, "-RAW");
-            break;
-        } else if (strcmp(cmdParam[i], 'E') == 0) {
-            strcpy_s(apiType, DATA_MAX_LEN, "-ECM");
-            break;
-        } else if (iterGetMap != NULL) {
-            if (paramNum != PARAM_GET_CMD_LEN) {
-            return HDF_FAILURE;
-            }
-            if (iterGetMap != g_cmdTypeValueGetMap.end()) {
-                *cmdType = iterGetMap->second;
+        switch (cmdParam[i]) {
+            case 'A':
+                strcpy_s(apiType, DATA_MAX_LEN, "-SDK");
                 break;
-            }
-        } else if (iterSetMap != NULL) {
-            if (paramNum != PARAM_SET_CMD_LEN) {
-            return HDF_FAILURE;
-            }
-            if (iterSetMap != g_cmdTypeValueSetMap.end()) {
-                *cmdType = iterSetMap->second;
+            case 'a':
+                strcpy_s(apiType, DATA_MAX_LEN, "-RAW");
                 break;
-            }
-        } else if (strcmp(cmdParam[i], '-') == 0) {
-            break;
-        } else {
-            return HDF_FAILURE;
+            case 'E':
+                strcpy_s(apiType, DATA_MAX_LEN, "-ECM");
+                break;
+            case 'R':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_SYNC_READ;
+                break;
+            case 'W':
+                if (paramNum != PARAM_SET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_SYNC_WRITE;
+                break;
+            case 'r':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_ASYNC_READ;
+                break;
+            case 'w':
+                if (paramNum != PARAM_SET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_ASYNC_WRITE;
+                break;
+            case 'c':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_CLASS_SYNC;
+                break;
+            case 's':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_GET_STATUS;
+                break;
+            case 'C':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_SYNC_DESCRIPTOR;
+                break;
+            case 'd':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_ASYNC_DESCRIPTOR;
+                break;
+            case 'g':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_GET_CONFIGURATION;
+                break;
+            case 'i':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_CTRL_GET_INTERFACE;
+                break;
+            case 'S':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_SPEED_TEST;
+                break;
+            case 'B':
+                if (paramNum != PARAM_SET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_SET_BAUDRATE;
+                break;
+            case 'b':
+                if (paramNum != PARAM_GET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_GET_BAUDRATE;
+                break;
+            case 'I':
+                if (paramNum != PARAM_SET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_ADD_INTERFACE;
+                break;
+            case 'D':
+                if (paramNum != PARAM_SET_CMD_LEN) {
+                    return HDF_FAILURE;
+                }
+                *cmdType = HOST_ACM_REMOVE_INTERFACE;
+                break;
+            case '-':
+                break;
+            default:
+                return HDF_FAILURE;
         }
     }
+
     return HDF_SUCCESS;
 }
 
