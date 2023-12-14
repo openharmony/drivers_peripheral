@@ -190,6 +190,21 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
+void SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        return;
+    }
+
+    auto it = clients_[groupId].find(serviceId);
+    int32_t periodCount = reportInterval / this.reportInterval;
+    it.SetPeriodCount(sensorId,periodCount);
+    HDF_LOGI("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
+    return;
+}
+
 } // V2_0
 } // Sensor
 } // HDI
