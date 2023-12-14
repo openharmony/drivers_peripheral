@@ -30,6 +30,8 @@
 #define MIC          "MIC"
 #define HS_MIC       "micHs"
 #define EARPIECE     "earpiece"
+#define BLUETOOTH_SCO     "Bluetooth"
+#define BLUETOOTH_SCO_HEADSET     "Bluetooth_SCO_Headset"
 #define JSON_UNPRINT 1
 
 #define OUTPUT_MASK   0xFFF
@@ -110,6 +112,10 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
             return HS_MIC;
         case PIN_OUT_EARPIECE:
             return EARPIECE;
+        case PIN_OUT_BLUETOOTH_SCO:
+            return BLUETOOTH_SCO;
+        case PIN_IN_BLUETOOTH_SCO_HEADSET:
+            return BLUETOOTH_SCO_HEADSET;
         default:
             AUDIO_FUNC_LOGE("UseCase not support!");
             break;
@@ -351,7 +357,8 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0) {
+    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0 
+    || strcasecmp(cJsonObj->string, BLUETOOTH_SCO_HEADSET) == 0 ) {
         return HDF_SUCCESS;
     }
 
@@ -376,6 +383,12 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret |= SetMatchRenderDevicePath(PIN_OUT_SPEAKER, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_OFF);
 #endif
             break;
+        case PIN_OUT_EARPIECE:
+            /* 1、open earpiece */
+            ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, EARPIECE, AUDIO_DEV_ON);
+        case PIN_OUT_BLUETOOTH_SCO:
+            /* 1、open bluetooth */
+            ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, BLUETOOTH_SCO, AUDIO_DEV_ON);
         default:
             ret = SetMatchRenderOtherDevicePath(tpins, renderParam, cJsonObj, AUDIO_DEV_ON);
             break;
@@ -578,7 +591,8 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0) {
+    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0
+    || strcasecmp(cJsonObj->string, EARPIECE) == 0  || strcasecmp(cJsonObj->string, BLUETOOTH_SCO) == 0 ) {
         return HDF_SUCCESS;
     }
 
@@ -604,6 +618,9 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
             ret |= SetMatchCaptureDevicePath(captureParam, cJsonObj, PIN_IN_MIC, MIC, AUDIO_DEV_OFF);
 #endif
             break;
+        case PIN_IN_BLUETOOTH_SCO_HEADSET:
+            /* 1、open bluetooth sco headset mic */
+            ret = SetMatchCaptureDevicePath(captureParam, cJsonObj, tpins, BLUETOOTH_SCO_HEADSET, AUDIO_DEV_ON);
         default:
             ret = SetMatchCaptureOtherDevicePath(captureParam, cJsonObj, tpins, AUDIO_DEV_ON);
             break;
