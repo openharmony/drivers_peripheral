@@ -54,6 +54,8 @@ public:
     virtual int32_t UnloadIntellVoiceTriggerModel(int32_t handle) = 0;
     virtual int32_t Start(int32_t handle) = 0;
     virtual int32_t Stop(int32_t handle) = 0;
+    virtual int32_t SetParams(const std::string &key, const std::string &value) = 0;
+    virtual std::string GetParams(const std::string &key) = 0;
 };
 
 class ITriggerManager {

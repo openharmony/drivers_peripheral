@@ -18,6 +18,7 @@
 #include <functional>
 #include <memory>
 #include "v1_0/intell_voice_engine_types.h"
+#include "v1_1/intell_voice_engine_types.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
@@ -27,7 +28,7 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::StartInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
-using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceDataOprType;
+using OHOS::HDI::IntelligentVoice::Engine::V1_1::IntellVoiceDataOprType;
 
 using IntellVoiceStatus = int32_t;
 
