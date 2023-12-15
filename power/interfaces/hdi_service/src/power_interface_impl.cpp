@@ -83,6 +83,10 @@ extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    powerConfig.ParseConfig();
+#endif
     if (!g_isHdiStart) {
         g_callback = ipowerHdiCallback;
         if (g_callback == nullptr) {
@@ -96,11 +100,6 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipow
         AddPowerDeathRecipient(g_callback);
         g_isHdiStart = true;
     }
-
-#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
-    auto& powerConfig = PowerConfig::GetInstance();
-    powerConfig.ParseConfig();
-#endif
 
     return HDF_SUCCESS;
 }
@@ -357,20 +356,13 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
-    if (sceneConfigMap.empty()) {
-        HDF_LOGE("sceneConfigMap is empty");
-        return HDF_FAILURE;
-    }
-
-    std::string getPath{""};
     std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
-    if (it != sceneConfigMap.end()) {
-        getPath = (it -> second).getPath;
-        HDF_LOGI("getPath = %{public}s", getPath.c_str());
-    } else {
+    if (it == sceneConfigMap.end()) {
         HDF_LOGW("wakeuo_cause getPath does not exist");
         return HDF_FAILURE;
     }
+    std::string getPath = (it -> second).getPath;
+    HDF_LOGI("getPath = %{public}s", getPath.c_str());
 
     UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
     if (wakeupCauseFd < 0) {
