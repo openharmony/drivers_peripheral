@@ -22,6 +22,7 @@ enum HostCmdId {
     STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1,
     STREAM_OPERATOR_COMMITSTREAM_V1_1,
     STREAM_OPERATOR_UPDATESTREAMS,
+    STREAM_OPERATOR_CONFIRMCAPTURE,
     STREAM_OPERATOR_END,
 };
 
@@ -45,7 +46,7 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
         (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
 }
 
-void IsStreamSupprotedApi(const uint8_t *&rawData)
+void IsStreamSupportedApi(const uint8_t *&rawData)
 {
     cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
     cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
@@ -63,7 +64,7 @@ void IsStreamSupprotedApi(const uint8_t *&rawData)
     extendedStreamInfo.dataspace = 0;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfoCapture = nullptr;
     streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    streamInfoCapture->v1_0 = *reinterpret_cast<const struct HDI::Camera::V1_0::StreamInfo*>(rawData);
+    streamInfoCapture->v1_0 = {};
     streamInfoCapture->extendedStreamInfos = {extendedStreamInfo};
     streamInfosV1_1.push_back(*streamInfoCapture);
     HDI::Camera::V1_0::StreamSupportType pType;
@@ -93,11 +94,19 @@ void UpdateStreams(const uint8_t *rawData)
     cameraTest->rc = cameraTest->streamOperator_V1_2->UpdateStreams(cameraTest->streamInfosV1_1);
 }
 
+void funcConfirmCapture(const uint8_t *rawData)
+{
+    cameraTest->streamOperatorCallbackV1_2 = new OHOS::Camera::CameraManager::TestStreamOperatorCallbackV1_2();
+    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStreamOperator_V1_2(cameraTest->streamOperatorCallbackV1_2,
+        cameraTest->streamOperator_V1_2);
+    cameraTest->streamOperator_V1_2->ConfirmCapture(*rawData);
+}
+
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 {
     switch (cmd) {
         case STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1: {
-            IsStreamSupprotedApi(rawData);
+            IsStreamSupportedApi(rawData);
             break;
         }
         case STREAM_OPERATOR_COMMITSTREAM_V1_1: {
@@ -114,6 +123,9 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
         }
         case STREAM_OPERATOR_UPDATESTREAMS:
             UpdateStreams(rawData);
+            break;
+        case STREAM_OPERATOR_CONFIRMCAPTURE:
+            funcConfirmCapture(rawData);
             break;
         default:
             return;
@@ -132,7 +144,7 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
     cameraTest->InitV1_2();
-    if (cameraTest->serviceV1_1 == nullptr) {
+    if (cameraTest->serviceV1_2 == nullptr) {
         return false;
     }
     cameraTest->OpenCameraV1_2();
