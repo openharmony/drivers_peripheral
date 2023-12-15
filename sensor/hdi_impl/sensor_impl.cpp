@@ -328,6 +328,21 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &
     return ret;
 }
 
+int32_t SensorImpl::SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
+{
+    HDF_LOGI("%{public}s: Enter the SdcSensorActive function, sensorId is %{public}d", __func__, sensorId);
+    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SdcSensorActive);
+
+    StartTrace(HITRACE_TAG_SENSORS, "SdcSensorActive");
+    int32_t ret = sensorInterface->SdcSensorActive(sensorId, enabled, rateLevel);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
+}
+
 int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
 {
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Unregister);
