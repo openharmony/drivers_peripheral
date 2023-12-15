@@ -408,7 +408,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
         return RC_ERROR;
     }
 
-    memset_s(&nls, sizeof(nls), 0, sizeof(nls));
+    (void)memset_s(&nls, sizeof(nls), 0, sizeof(nls));
     nls.nl_family = AF_NETLINK;
     nls.nl_pid = getpid();
     nls.nl_groups = 1;
