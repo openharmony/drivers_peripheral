@@ -816,16 +816,32 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
 {
     g_isOnModeCalled = false;
     std::vector<DisplayModeInfo> oldModes;
-    auto result = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
-    ASSERT_EQ(DISPLAY_SUCCESS, result);
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = RED
+        }
+    };
+
+    // 先注册VBlankCallback
+    uint32_t ret = g_composerDevice->RegDisplayVBlankCallback(g_displayIds[0], TestVBlankCallback, nullptr);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
+
+    ret = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
+    ASSERT_EQ(DISPLAY_SUCCESS, ret);
+    ASSERT_EQ(oldModes.size() > 0, true);
 
     uint32_t modeid = oldModes[0].id;
-    auto ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
+    ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
     if (ret == DISPLAY_SUCCESS) {
+        std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+        ASSERT_TRUE((layers.size() > 0));
+        PrepareAndPrensent(); // 送显
+
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         ASSERT_EQ(g_isOnModeCalled, true);
     }
