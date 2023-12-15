@@ -17,6 +17,7 @@
 #include "osal_mem.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
+#include "hdf_audio_server_manager.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 #define INTERNEL_INPUT_STEAM_ID 1
