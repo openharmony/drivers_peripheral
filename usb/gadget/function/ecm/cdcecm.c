@@ -427,12 +427,22 @@ static int32_t UsbEcmWrite(struct UsbEcm *port, struct HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
+void UsbFnNotifyRequest(struct UsbFnRequest *req, struct UsbEcmDevice *ecm)
+{
+    int32_t status;
+    ecm->notifyReq = NULL;
+    status = UsbFnSubmitRequestAsync(req);
+    if (status < 0) {
+        ecm->notifyReq = req;
+        HDF_LOGD("notify --> %d\n", status);
+    }
+}
+
 static void EcmDoNotify(struct UsbEcmDevice *ecm)
 {
     struct UsbFnRequest *req = ecm->notifyReq;
     struct UsbCdcNotification *event = NULL;
     uint32_t *data = NULL;
-    int32_t status;
 
     if (!req) {
         return;
@@ -480,13 +490,7 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
     }
     event->bmRequestType = 0xA1;
     event->wIndex = CPU_TO_LE16(ecm->ctrlId);
-
-    ecm->notifyReq = NULL;
-    status = UsbFnSubmitRequestAsync(req);
-    if (status < 0) {
-        ecm->notifyReq = req;
-        HDF_LOGD("notify --> %d\n", status);
-    }
+    UsbFnNotifyRequest(req, ecm);
 }
 
 static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)

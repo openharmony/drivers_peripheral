@@ -734,6 +734,19 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
     return;
 }
 
+static void EcmNotificationAndRequest(struct UsbRequest *req, struct EcmDevice *ecm, struct UsbCdcNotification *dr,
+    unsigned int currentSize, uint32_t expectedSize)
+{
+    if (currentSize >= expectedSize) {
+        EcmProcessNotification(ecm, (unsigned char *)dr);
+        ecm->nbIndex = 0;
+    }
+
+    if ((UsbSubmitRequestAsync(req) != HDF_SUCCESS) && (UsbSubmitRequestAsync(req) != -EPERM)) {
+        HDF_LOGE("%{public}s: usb_submit_urb failed", __func__);
+    }
+}
+
 static void EcmCtrlIrq(struct UsbRequest *req)
 {
     struct EcmDevice *ecm = (struct EcmDevice *)req->compInfo.userData;
@@ -777,15 +790,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         ecm->nbIndex += copySize;
         currentSize = ecm->nbIndex;
     }
-    if (currentSize >= expectedSize) {
-        EcmProcessNotification(ecm, (unsigned char *)dr);
-        ecm->nbIndex = 0;
-    }
-
-    if ((UsbSubmitRequestAsync(req) != HDF_SUCCESS) && (UsbSubmitRequestAsync(req) != -EPERM)) {
-        HDF_LOGE("%{public}s: usb_submit_urb failed", __func__);
-    }
-
+    EcmNotificationAndRequest(req, ecm, dr, currentSize, expectedSize);
 EXIT:
     HDF_LOGE("%{public}s: exit", __func__);
 }
@@ -1030,6 +1035,36 @@ ERROR:
     return HDF_FAILURE;
 }
 
+static int32_t EcmGetPipesAndRequest(struct EcmDevice *ecm, int32_t ret)
+{
+    ret = EcmGetPipes(ecm);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: EcmGetPipes failed", __func__);
+        goto ERROR_GET_PIPES;
+    }
+
+    ret = EcmAllocIntReq(ecm);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: EcmAllocIntReq failed", __func__);
+        goto ERROR_ALLOC_REQ;
+    }
+    if (false) {
+        EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER,
+            USB_DDK_CDC_PACKET_TYPE_DIRECTED | USB_DDK_CDC_PACKET_TYPE_BROADCAST, NULL, 0);
+        ret = UsbSubmitRequestAsync(ecm->notifyReq);
+        if (ret != HDF_SUCCESS) {
+            return ret;
+        }
+    }
+    ecm->initFlag = true;
+    return HDF_SUCCESS;
+ERROR_ALLOC_REQ:
+    EcmFreePipes(ecm);
+ERROR_GET_PIPES:
+    UsbFreeNotifyReqeust(ecm);
+    return ret;
+}
+
 static int32_t EcmInit(struct EcmDevice *ecm)
 {
     int32_t ret;
@@ -1069,32 +1104,7 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
         goto ERROR_SELECT_SETTING;
     }
-
-    ret = EcmGetPipes(ecm);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: EcmGetPipes failed", __func__);
-        goto ERROR_GET_PIPES;
-    }
-
-    ret = EcmAllocIntReq(ecm);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: EcmAllocIntReq failed", __func__);
-        goto ERROR_ALLOC_REQ;
-    }
-    if (false) {
-        EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER,
-            USB_DDK_CDC_PACKET_TYPE_DIRECTED | USB_DDK_CDC_PACKET_TYPE_BROADCAST, NULL, 0);
-        ret = UsbSubmitRequestAsync(ecm->notifyReq);
-        if (ret != HDF_SUCCESS) {
-            return ret;
-        }
-    }
-    ecm->initFlag = true;
-    return HDF_SUCCESS;
-
-ERROR_ALLOC_REQ:
-    EcmFreePipes(ecm);
-ERROR_GET_PIPES:
+    EcmGetPipesAndRequest(ecm, ret);
 ERROR_SELECT_SETTING:
     EcmCloseInterfaces(ecm);
 ERROR_OPEN_INTERFACES:
