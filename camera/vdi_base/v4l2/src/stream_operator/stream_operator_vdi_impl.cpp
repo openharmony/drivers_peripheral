@@ -676,11 +676,16 @@ void StreamOperatorVdiImpl::OnCaptureStarted(int32_t captureId, const std::vecto
 void StreamOperatorVdiImpl::OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo> &infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
-    callback_->OnCaptureEnded(captureId, infos);
+    int32_t ret = callback_->OnCaptureEnded(captureId, infos);
+    if (ret != 0) {
+        CAMERA_LOGE("OnCaptureEnded captureId: %{public}d failed, ret = %{public}d", captureId, ret);
+        return;
+    }
 
     std::lock_guard<std::mutex> l(requestLock_);
     auto itr = requestMap_.find(captureId);
     if (itr == requestMap_.end()) {
+        CAMERA_LOGE("OnCaptureEnded captureId: %{public}d not found request", captureId);
         return;
     }
     requestMap_.erase(itr);
