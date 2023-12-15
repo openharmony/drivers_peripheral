@@ -48,6 +48,7 @@ public:
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
     int32_t Register(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) override;
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) override;
+    int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     void OnRemoteDied(const wptr<IRemoteObject> &object);
 private:
     const SensorInterface *sensorInterface;

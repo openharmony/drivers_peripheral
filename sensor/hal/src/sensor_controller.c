@@ -468,6 +468,14 @@ ERROR:
     return HDF_FAILURE;
 }
 
+static int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
+{
+    (void)sensorId;
+    (void)enabled;
+    (void)rateLevel;
+    return HDF_SUCCESS;
+}
+
 void GetSensorDeviceMethods(struct SensorInterface *device)
 {
     CHECK_NULL_PTR_RETURN(device);
@@ -480,4 +488,5 @@ void GetSensorDeviceMethods(struct SensorInterface *device)
     device->ReadData = ReadData;
     device->Register = Register;
     device->Unregister = Unregister;
+    device->SdcSensorActive = SdcSensorActive;
 }
