@@ -19,7 +19,7 @@
 #include <memory>
 #include <set>
 #include "iremote_object.h"
-#include "v1_0/iintell_voice_trigger_adapter.h"
+#include "v1_1/iintell_voice_trigger_adapter.h"
 #include "i_trigger.h"
 
 namespace OHOS {
@@ -58,7 +58,7 @@ private:
     ServiceDiedCallback callback_ = nullptr;
 };
 
-class IntellVoiceTriggerAdapterImpl : public OHOS::HDI::IntelligentVoice::Trigger::V1_0::IIntellVoiceTriggerAdapter {
+class IntellVoiceTriggerAdapterImpl : public OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerAdapter {
 public:
     explicit IntellVoiceTriggerAdapterImpl(std::unique_ptr<ITrigger> adapter);
     ~IntellVoiceTriggerAdapterImpl();
@@ -69,6 +69,8 @@ public:
     int32_t UnloadModel(int32_t handle) override;
     int32_t Start(int32_t handle) override;
     int32_t Stop(int32_t handle) override;
+    int32_t SetParams(const std::string &key, const std::string &value) override;
+    int32_t GetParams(const std::string &key, std::string &value) override;
     void Clean();
 
 private:

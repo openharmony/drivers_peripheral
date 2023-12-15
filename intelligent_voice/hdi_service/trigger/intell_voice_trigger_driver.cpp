@@ -17,12 +17,12 @@
 #include <hdf_device_desc.h>
 #include "intell_voice_log.h"
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/intell_voice_trigger_manager_stub.h"
+#include "v1_1/intell_voice_trigger_manager_stub.h"
 
 #undef HDF_LOG_TAG
 #define HDF_LOG_TAG "IntellVoiceTriggerDriver"
 
-using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_0;
+using namespace OHOS::HDI::IntelligentVoice::Trigger::V1_1;
 
 struct HdfIntellVoiceTriggerManagerHost {
     struct IDeviceIoService ioService;
@@ -70,7 +70,7 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
     hdfIntellVoiceTriggerManagerHost->ioService.Open = NULL;
     hdfIntellVoiceTriggerManagerHost->ioService.Release = NULL;
 
-    auto serviceImpl = IIntellVoiceTriggerManager::Get(true);
+    auto serviceImpl = OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerManager::Get(true);
     if (serviceImpl == nullptr) {
         INTELLIGENT_VOICE_LOGE("failed to get of implement service");
         delete hdfIntellVoiceTriggerManagerHost;
@@ -78,7 +78,7 @@ static int HdfIntellVoiceTriggerManagerDriverBind(struct HdfDeviceObject *device
     }
 
     hdfIntellVoiceTriggerManagerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IIntellVoiceTriggerManager::GetDescriptor());
+        OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerManager::GetDescriptor());
     if (hdfIntellVoiceTriggerManagerHost->stub == nullptr) {
         INTELLIGENT_VOICE_LOGE("failed to get stub object");
         delete hdfIntellVoiceTriggerManagerHost;

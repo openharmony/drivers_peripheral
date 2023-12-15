@@ -21,19 +21,20 @@
 #include <string>
 
 #include "v1_0/intell_voice_engine_types.h"
-#include "v1_0/iintell_voice_engine_manager.h"
-#include "v1_0/iintell_voice_data_opr_callback.h"
+#include "v1_1/intell_voice_engine_types.h"
+#include "v1_1/iintell_voice_engine_manager.h"
+#include "v1_1/iintell_voice_data_opr_callback.h"
 #include "i_engine.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
 namespace Engine {
-using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineManager;
+using OHOS::HDI::IntelligentVoice::Engine::V1_1::IIntellVoiceEngineManager;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterType;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
-using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceDataOprCallback;
-using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceDataOprType;
+using OHOS::HDI::IntelligentVoice::Engine::V1_1::IIntellVoiceDataOprCallback;
+using OHOS::HDI::IntelligentVoice::Engine::V1_1::IntellVoiceDataOprType;
 
 using GetEngineManagerHalInstFunc = IEngineManager *(*)();
 
