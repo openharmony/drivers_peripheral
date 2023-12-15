@@ -98,7 +98,7 @@ bool BluetoothAddress::GetConstantAddress(char *address, int len)
         return false;
     }
 
-    using GetMacFun = int (*)(char*, int);
+    using GetMacFun = int (*)(unsigned int, char*, int);
     GetMacFun getMac = reinterpret_cast<GetMacFun>(dlsym(libMac, GET_BT_MAC_SYMBOL_NAME));
     if (getMac == nullptr) {
        HDF_LOGE("GetConstantAddress dlsym error");
@@ -106,7 +106,7 @@ bool BluetoothAddress::GetConstantAddress(char *address, int len)
        return false;
     }
 
-    int ret = getMac(address, len);
+    int ret = getMac(MAC_TYPE_BLUETOOTH, address, len);
     HDF_LOGI("GetConstantAddress ret: %{public}d", ret);
     dlclose(libMac);
     return (ret == 0);
