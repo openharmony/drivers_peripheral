@@ -33,7 +33,7 @@ RetCode FlashManager::CreateController(ControllerId controllerId, std::string ha
             }
             rc = flash->Init();
             if (rc == RC_OK) {
-            flashList_.push_back(flash);
+                flashList_.push_back(flash);
             }
         }
     }
