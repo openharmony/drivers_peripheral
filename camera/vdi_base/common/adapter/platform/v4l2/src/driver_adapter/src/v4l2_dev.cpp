@@ -277,7 +277,10 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
         }
         epollevent.events = EPOLLIN;
         epollevent.data.fd = fd;
-        epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
+        int ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
+        if (ret < 0) {
+            CAMERA_LOGE("add fd=%{public}d to epoll failed, ret=%{public}d, errno=%{public}d", fd, ret, errno);
+        }
 
         std::lock_guard<std::mutex> l(epollLock_);
         epollEvent_.push_back(epollevent);
@@ -286,7 +289,12 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
         epollevent = {};
         epollevent.events = EPOLLIN;
         epollevent.data.fd = eventFd_;
-        epoll_ctl(epollFd_, EPOLL_CTL_ADD, eventFd_, &epollevent);
+        ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, eventFd_, &epollevent);
+        if (ret < 0) {
+            CAMERA_LOGE("add eventFd_=%{public}d to epoll failed, ret=%{public}d, errno=%{public}d",
+                eventFd_, ret, errno);
+            return RC_ERROR;
+        }
     } else {
         epollevent.events = EPOLLIN;
         epollevent.data.fd = fd;
@@ -294,7 +302,11 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
         std::lock_guard<std::mutex> l(epollLock_);
         epollEvent_.push_back(epollevent);
 
-        epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
+        int ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
+        if (ret < 0) {
+            CAMERA_LOGE("add fd = %{public}d to epoll failed, ret=%{public}d, errno=%{public}d", fd, ret, errno);
+            return RC_ERROR;
+        }
     }
     return RC_OK;
 }
@@ -310,7 +322,10 @@ void HosV4L2Dev::EraseEpoll(int fd)
     });
     if (itr != epollEvent_.end()) {
         struct epoll_event event = *itr;
-        epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, &event);
+        int ret = epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, &event);
+        if (ret < 0) {
+            CAMERA_LOGE("del fd=%{public}d to epoll failed, ret=%{public}d, errno=%{public}d", fd, ret, errno);
+        }
         std::lock_guard<std::mutex> l(epollLock_);
         epollEvent_.erase(itr);
     }
@@ -383,7 +398,10 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
     if (streamNum == 0) {
         CAMERA_LOGD("waiting loopBuffers stop\n");
         uint64_t one = 1;
-        write(eventFd_, &one, sizeof(one));
+        ssize_t ret = write(eventFd_, &one, sizeof(one));
+        if (ret != sizeof(one)) {
+            CAMERA_LOGE("HosV4L2Dev::StopStream write failed, ret = %{public}d\n", ret);
+        }
         streamThread_->join();
         close(eventFd_);
         CAMERA_LOGD("waiting loopBuffers exit\n");
