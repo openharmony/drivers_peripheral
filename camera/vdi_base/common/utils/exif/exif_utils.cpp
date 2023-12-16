@@ -61,47 +61,64 @@ static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len
     return entry;
 }
 
-uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
-    double number, LatOrLong latOrLongType)
+uint32_t ExifUtils::GetGpsRef(LatOrLong latOrLongType, double number, char *gpsRef, int length)
 {
-    ExifEntry *entry = nullptr;
-    char gpsRef[2] = {0}; // Index
-    ExifRational gpsRational[3]; // Index
     char north[2] = "N";
     char south[2] = "S";
     char east[2] = "E";
     char west[2] = "W";
-    int32_t degree = 0;
-    int32_t minute = 0;
-    int32_t second = 0;
+
+    if (gpsRef == nullptr) {
+        CAMERA_LOGE("%{public}s gpsRef is null.", __FUNCTION__);
+        return RC_ERROR;
+    }
 
     if (latOrLongType == LATITUDE_TYPE) {
         if (number > 0) {
-            if (strncpy_s(gpsRef, sizeof(gpsRef), north, strlen(north)) != 0) {
+            if (strncpy_s(gpsRef, length, north, strlen(north)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
             }
         } else {
             number = abs(number);
-            if (strncpy_s(gpsRef, sizeof(gpsRef), south, strlen(south)) != 0) {
+            if (strncpy_s(gpsRef, length, south, strlen(south)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
             }
         }
     } else {
         if (number > 0) {
-            if (strncpy_s(gpsRef, sizeof(gpsRef), east, strlen(east)) != 0) {
+            if (strncpy_s(gpsRef, length, east, strlen(east)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
             }
         } else {
             number = abs(number);
-            if (strncpy_s(gpsRef, sizeof(gpsRef), west, strlen(west)) != 0) {
+            if (strncpy_s(gpsRef, length, west, strlen(west)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
             }
         }
     }
+
+    return RC_OK;
+}
+
+uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
+    double number, LatOrLong latOrLongType)
+{
+    ExifEntry *entry = nullptr;
+    char gpsRef[2] = {0}; // Index
+    ExifRational gpsRational[3]; // Index
+    int32_t degree = 0;
+    int32_t minute = 0;
+    int32_t second = 0;
+
+    if (GetGpsRef(latOrLongType, number, gpsRef, sizeof(gpsRef)) != RC_OK) {
+        CAMERA_LOGE("%{public}s exif GetGpsRef failed.", __FUNCTION__);
+        return RC_ERROR;
+    }
+
     ConvertGpsDataToDms(number, &degree, &minute, &second);
     gpsRational[0].numerator = degree; // Index
     gpsRational[0].denominator = 1;
@@ -220,8 +237,42 @@ uint32_t ExifUtils::PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBuff
     return RC_OK;
 }
 
-uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
-    void *address, int32_t &outPutSize)
+static uint32_t ExifUtils::SetExifData(exif_data info, ExifData *exif,
+    unsigned char *exifData, unsigned int *exifDataLength)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(exif, RC_ERROR);
+
+    exif_data_set_option(exif, EXIF_DATA_OPTION_FOLLOW_SPECIFICATION);
+    exif_data_set_data_type(exif, EXIF_DATA_TYPE_COMPRESSED);
+    exif_data_set_byte_order(exif, FILE_BYTE_ORDER);
+    if (AddLatOrLongInfo(exif, info.latitude, LATITUDE_TYPE) != RC_OK) {
+        return RC_ERROR;
+    }
+    if (AddLatOrLongInfo(exif, info.longitude, LONGITUDE_TYPE) != RC_OK) {
+        return RC_ERROR;
+    }
+    if (AddAltitudeInfo(exif, info.altitude) != RC_OK) {
+        return RC_ERROR;
+    }
+    exif_data_save_data(exif, &exifData, exifDataLength);
+
+    return RC_OK;
+}
+
+void ExifUtils::FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffer,
+    ExifData *exif, unsigned char *exifData)
+{
+    if (dataBuffer != nullptr) {
+        free(dataBuffer);
+    }
+    if (tempBuffer != nullptr) {
+        free(tempBuffer);
+    }
+    free(exifData);
+    exif_data_unref(exif);    
+}
+
+uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &outPutSize)
 {
     int32_t ret = RC_ERROR;
     unsigned char *exifData = nullptr;
@@ -231,8 +282,6 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
     unsigned char *tempBuffer = nullptr;
     int32_t totalTempBufferSize = 0;
     int32_t dataBufferSize = info.frame_size;
-    double latitudeNumber = info.latitude;
-    double longitudeNumber = info.longitude;
     constexpr uint32_t exifBlockLength = 2;
 
     exif = exif_data_new();
@@ -240,19 +289,11 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
         CAMERA_LOGE("%{public}s exif new failed.", __FUNCTION__);
         return ret;
     }
-    exif_data_set_option(exif, EXIF_DATA_OPTION_FOLLOW_SPECIFICATION);
-    exif_data_set_data_type(exif, EXIF_DATA_TYPE_COMPRESSED);
-    exif_data_set_byte_order(exif, FILE_BYTE_ORDER);
-    if (AddLatOrLongInfo(exif, latitudeNumber, LATITUDE_TYPE) != RC_OK) {
-        return RC_ERROR;
+
+    if (SetExifData(info, exif, exifData, &exifDataLength) != RC_OK) {
+        CAMERA_LOGE("%{public}s exif SetExifData failed.", __FUNCTION__);
+        return ret;
     }
-    if (AddLatOrLongInfo(exif, longitudeNumber, LONGITUDE_TYPE) != RC_OK) {
-        return RC_ERROR;
-    }
-    if (AddAltitudeInfo(exif, info.altitude) != RC_OK) {
-        return RC_ERROR;
-    }
-    exif_data_save_data(exif, &exifData, &exifDataLength);
 
     dataBuffer = static_cast<unsigned char *>(malloc(dataBufferSize));
     if (!dataBuffer) {
@@ -281,14 +322,7 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
     }
 
 error:
-    if (dataBuffer != nullptr) {
-        free(dataBuffer);
-    }
-    if (tempBuffer != nullptr) {
-        free(tempBuffer);
-    }
-    free(exifData);
-    exif_data_unref(exif);
+    FreeResource(dataBuffer, tempBuffer, exif, exifData);
 
     return ret;
 }

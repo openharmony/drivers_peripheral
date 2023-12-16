@@ -120,6 +120,49 @@ void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpec
     }
 }
 
+RetCode StreamPipelineStrategy::SetNodeSpec(const PipelineSpec& pipe,
+    G_PIPELINE_SPEC_DATA_TYPE& pipeSpecPtr, NodeSpec& nodeSpec)
+{
+    PortInfo info {
+        .name_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].name),
+        .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortName),
+        .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortNodeName)
+    };
+    CAMERA_LOGV("read node %{public}s", info.peerPortNodeName_.c_str());
+
+    std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].streamType),
+        G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
+    PortFormat format {};
+ 
+    if (typeId) {
+        int32_t streamId = hostStreamMgr_->DesignateStreamIdForType(typeId.value());
+        HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfo(streamId);
+        PortFormat f = SetPortFormat(pipeSpecPtr, typeId, j, k, hostStreamInfo);
+        if (!f.needAllocation_) {
+            f.bufferPoolId_ = static_cast<int64_t>(hostStreamInfo.bufferPoolId_);
+        }
+        format = f;
+        nodeSpec.streamId_ = hostStreamInfo.streamId_;
+    } else if (pipeSpecPtr->nodeSpec[j].portSpec[k].direction == 1) {
+        if (SetUpBasicOutPortFormat(pipe, info, format) != RC_OK) {
+            return RC_ERROR;
+        }
+    } else {
+        if (SetUpBasicInPortFormat(nodeSpec, format) != RC_OK) {
+            return RC_ERROR;
+        }
+    }
+
+    struct PortSpec portSpec {
+        .direction_ = pipeSpecPtr->nodeSpec[j].portSpec[k].direction,
+        .info_ = info,
+        .format_ = format,
+    };
+    nodeSpec.portSpecSet_.push_back(portSpec);
+
+    return RC_OK;
+}
+
 RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, PipelineSpec& pipe)
 {
     std::string keyStr = ConstructKeyStrIndex(mode);
@@ -137,42 +180,10 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
             .type_ = std::string(pipeSpecPtr->nodeSpec[j].streamType)
         };
         for (int k = pipeSpecPtr->nodeSpec[j].portSpecSize - 1; k >= 0; k--) {
-            PortInfo info {
-                .name_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].name),
-                .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortName),
-                .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortNodeName)
-            };
-            CAMERA_LOGV("read node %{public}s", info.peerPortNodeName_.c_str());
-
-            std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].streamType),
-                G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
-            PortFormat format {};
-
-            if (typeId) {
-                int32_t streamId = hostStreamMgr_->DesignateStreamIdForType(typeId.value());
-                HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfo(streamId);
-                PortFormat f = SetPortFormat(pipeSpecPtr, typeId, j, k, hostStreamInfo);
-                if (!f.needAllocation_) {
-                    f.bufferPoolId_ =
-                        static_cast<int64_t>(hostStreamInfo.bufferPoolId_);
-                }
-                format = f;
-                nodeSpec.streamId_ = hostStreamInfo.streamId_;
-            } else if (pipeSpecPtr->nodeSpec[j].portSpec[k].direction == 1) {
-                if (SetUpBasicOutPortFormat(pipe, info, format) != RC_OK) {
-                    return RC_ERROR;
-                }
-            } else {
-                if (SetUpBasicInPortFormat(nodeSpec, format) != RC_OK) {
-                    return RC_ERROR;
-                }
+            if (SetNodeSpec(pipe, pipeSpecPtr, nodeSpec) != RC_OK) {
+                CAMERA_LOGI("SelectPipelineSpec failed.\n");
+                return RC_ERROR;
             }
-            struct PortSpec portSpec {
-                .direction_ = pipeSpecPtr->nodeSpec[j].portSpec[k].direction,
-                .info_ = info,
-                .format_ = format,
-            };
-            nodeSpec.portSpecSet_.push_back(portSpec);
         }
         pipe.nodeSpecSet_.push_back(nodeSpec);
     }
