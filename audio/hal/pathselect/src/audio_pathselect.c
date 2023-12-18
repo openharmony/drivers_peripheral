@@ -25,12 +25,12 @@
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 #endif
 
-#define SPEAKER      "Speaker"
-#define HEADPHONES   "Headphones"
-#define MIC          "MIC"
-#define HS_MIC       "micHs"
-#define EARPIECE     "earpiece"
-#define BLUETOOTH_SCO     "Bluetooth"
+#define SPEAKER                   "Speaker"
+#define HEADPHONES                "Headphones"
+#define MIC                       "MIC"
+#define HS_MIC                    "micHs"
+#define EARPIECE                  "earpiece"
+#define BLUETOOTH_SCO             "Bluetooth"
 #define BLUETOOTH_SCO_HEADSET     "Bluetooth_SCO_Headset"
 #define JSON_UNPRINT 1
 
@@ -357,8 +357,8 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0 
-    || strcasecmp(cJsonObj->string, BLUETOOTH_SCO_HEADSET) == 0 ) {
+    if (strcasecmp(cJsonObj->string, MIC) == 0 || strcasecmp(cJsonObj->string, HS_MIC) == 0 || 
+        strcasecmp(cJsonObj->string, BLUETOOTH_SCO_HEADSET) == 0) {
         return HDF_SUCCESS;
     }
 
@@ -591,8 +591,8 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         return HDF_FAILURE;
     }
 
-    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0
-    || strcasecmp(cJsonObj->string, EARPIECE) == 0  || strcasecmp(cJsonObj->string, BLUETOOTH_SCO) == 0 ) {
+    if (strcasecmp(cJsonObj->string, SPEAKER) == 0 || strcasecmp(cJsonObj->string, HEADPHONES) == 0 || 
+        strcasecmp(cJsonObj->string, EARPIECE) == 0  || strcasecmp(cJsonObj->string, BLUETOOTH_SCO) == 0) {
         return HDF_SUCCESS;
     }
 
