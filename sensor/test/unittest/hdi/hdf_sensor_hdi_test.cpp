@@ -23,6 +23,7 @@
 #include "v2_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
+#include <hdf_log.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
@@ -77,8 +78,10 @@ namespace {
     constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr int32_t SENSOR_INTERVAL1 = 200000000;
     constexpr int32_t SENSOR_INTERVAL2 = 20000000;
+    constexpr int32_t SENSOR_INTERVAL3 = 60000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
+    constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
     constexpr int32_t ABNORMAL_SENSORID = -1;
 }
 
@@ -444,4 +447,72 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
         ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
+}
+
+/**
+  * @tc.name: SetSensorBatch0001
+  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_GT(g_info.size(), 0);
+    int32_t sensorId = g_info[0].sensorId;
+
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL1);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Enable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    OsalMSleep(SENSOR_WAIT_TIME2);
+
+    ret = g_sensorInterface->Disable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+    SensorCallbackImpl::sensorDataFlag = 1;
+}
+
+/**
+  * @tc.name: SetSensorBatch0001
+  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_GT(g_info.size(), 0);
+    int32_t sensorId = g_info[0].sensorId;
+
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL3);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Enable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    OsalMSleep(SENSOR_WAIT_TIME2);
+
+    ret = g_sensorInterface->Disable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+    SensorCallbackImpl::sensorDataFlag = 1;
 }
