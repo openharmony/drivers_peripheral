@@ -330,12 +330,24 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         return HDF_FAILURE;
     }
 
+    std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis
     StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
-    int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfos);
+    int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfoVdis);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s GetSdcSensorInfo failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
+
+    for (auto sdcSensorInfoVdi : sdcSensorInfoVdis) {
+        SdcSensorInfo sdcSensorInfo;
+        sdcSensorInfo.offset = sdcSensorInfoVdi.offset;
+        sdcSensorInfo.type = sdcSensorInfoVdi.type;
+        sdcSensorInfo.ddrSize = sdcSensorInfoVdi.ddrSize;
+        sdcSensorInfo.minRateLevel = (int)sdcSensorInfoVdi.minRateLevel;
+        sdcSensorInfo.maxRateLevel = (int)sdcSensorInfoVdi.maxRateLevel;
+        sdcSensorInfo.reserved = sdcSensorInfoVdi.reserved;
+        sdcSensorInfos.push_back(std::move(sdcSensorInfo));
+    }
 
     return ret;
 }

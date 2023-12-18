@@ -349,10 +349,22 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInf
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
-    int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfoVdis);
+    SdcSensorInfo sdcSensorInfos;
+    int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
+    for (auto sdcSensorInfo : sdcSensorInfos) {
+        SdcSensorInfoVdi sdcSensorInfoVdi;
+        sdcSensorInfoVdi.offset = sdcSensorInfo.offset;
+        sdcSensorInfoVdi.type = sdcSensorInfo.type;
+        sdcSensorInfoVdi.ddrSize = sdcSensorInfo.ddrSize;
+        sdcSensorInfoVdi.minRateLevel = (int)sdcSensorInfo.minRateLevel;
+        sdcSensorInfoVdi.maxRateLevel = (int)sdcSensorInfo.maxRateLevel;
+        sdcSensorInfoVdi.reserved = sdcSensorInfo.reserved;
+        sdcSensorInfoVdis.push_back(std::move(sdcSensorInfoVdi));
     }
 
     return ret;
