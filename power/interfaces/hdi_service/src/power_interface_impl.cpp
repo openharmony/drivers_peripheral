@@ -83,10 +83,6 @@ extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
-    auto& powerConfig = PowerConfig::GetInstance();
-    powerConfig.ParseConfig();
-#endif
     if (!g_isHdiStart) {
         g_callback = ipowerHdiCallback;
         if (g_callback == nullptr) {
@@ -355,6 +351,7 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
+    powerConfig.ParseConfig();
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
     std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
     if (it == sceneConfigMap.end()) {
