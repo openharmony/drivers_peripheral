@@ -457,6 +457,7 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
 {
+    HDF_LOGI("enter the ReportFrequencyTest0001 function");
     ASSERT_NE(nullptr, g_sensorInterface);
 
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -464,6 +465,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
 
     EXPECT_GT(g_info.size(), 0);
     int32_t sensorId = g_info[0].sensorId;
+    HDF_LOGI("sensorId is %{public}d",sensorId);
 
     ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL1);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
@@ -491,6 +493,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
 {
+    HDF_LOGI("enter the ReportFrequencyTest0002 function");
     ASSERT_NE(nullptr, g_sensorInterface);
 
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
@@ -498,6 +501,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
 
     EXPECT_GT(g_info.size(), 0);
     int32_t sensorId = g_info[0].sensorId;
+    HDF_LOGI("sensorId is %{public}d",sensorId);
 
     ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL3);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
