@@ -275,7 +275,7 @@ uint32_t BufferPool::GetIdleBufferCount()
 }
 void BufferPool::setSFBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    sfBuffer_.insert(std::make_pair(buffer->GetIndex(), (uint8_t *)buffer->GetVirAddress()));
+    sfBuffer_.insert(std::make_pair(buffer->GetIndex(), static_cast<uint8_t *>(buffer->GetVirAddress())));
     sfSize_.insert(std::make_pair(buffer->GetIndex(), buffer->GetSize()));
     forkBufferId_ = buffer->GetIndex();
 }
