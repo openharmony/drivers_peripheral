@@ -489,7 +489,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
-HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
+HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_sensorInterface);
 
