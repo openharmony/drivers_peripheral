@@ -14,7 +14,7 @@
  */
 #include "camera_example_vendor_tags_uttest.h"
 #include <vector>
-#include "drivers/interface/camera/metadata/src/camera_example_vendor_tags.cpp"
+#include "drivers/peripheral/camera/vdi_base/common/metadata_manager/src/camera_example_vendor_tags.cpp"
 
 using namespace OHOS;
 using namespace std;

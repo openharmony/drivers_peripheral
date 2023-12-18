@@ -82,4 +82,19 @@ if (!defined(ohos_lite)) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_camera"
   }
+
+  ohos_shared_library("camera_example_vendor_tag_impl") {
+    install_enable = false
+    cflags = [
+      "-fPIC",
+      "-Wall",
+    ]
+    cflags_cc = cflags
+    include_dirs = [ "./include" ]
+    sources = [ "src/camera_example_vendor_tags.cpp" ]
+    external_deps = [ "drivers_interface_camera:metadata" ]
+
+    part_name = "drivers_peripheral_camera"
+    subsystem_name = "hdf"
+  }
 }
