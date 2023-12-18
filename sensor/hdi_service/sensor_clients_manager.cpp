@@ -190,7 +190,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
-void SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
+void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
     std::unique_lock<std::mutex> lock(clientsMutex_);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
