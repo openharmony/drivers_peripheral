@@ -303,7 +303,8 @@ int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents>
     return HDF_SUCCESS;
 }
 
-int32_t SensorIfService::SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel){
+int32_t SensorIfService::SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
+{
     HDF_LOGI("%{public}s: Enter the SdcSensorActive function, sensorId is %{public}d, enabled is %{public}u, \
              rateLevel is %{public}u", __func__, sensorId, enabled, rateLevel);
     if (sensorVdiImpl_ == nullptr) {
@@ -315,6 +316,24 @@ int32_t SensorIfService::SdcSensorActive(int32_t sensorId, bool enabled, int32_t
     int32_t ret = sensorVdiImpl_->SdcSensorActive(sensorId, enabled, rateLevel);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SdcSensorActive failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
+int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfos)
+{
+    HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
+    int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfos);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s GetSdcSensorInfo failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
 

@@ -42,6 +42,24 @@ struct HdfSensorInformationVdi {
     uint32_t reserved;
 };
 
+enum SdcRateLevelVdi {
+    SDC_RATE_STOP,
+    SDC_RATE_NORMAL,
+    SDC_RATE_GEN_FAST,
+    SDC_RATE_FAST,
+    SDC_RATE_FASTER,
+    SDC_RATE_VERY_FAST,
+};
+
+struct SdcSensorInfoVdi {
+    uint64_t offset;
+    int32_t type;
+    int32_t ddrSize;
+    SdcRateLevelVdi minRateLevel;
+    SdcRateLevelVdi maxRateLevel;
+    int32_t reserved;
+};
+
 class ISensorInterfaceVdi {
 public:
     virtual ~ISensorInterfaceVdi() = default;
@@ -55,6 +73,7 @@ public:
     virtual int32_t Register(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
     virtual int32_t Unregister(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
     virtual int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel) = 0;
+    virtual int32_t GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis) = 0;
 };
 
 struct WrapperSensorVdi {
