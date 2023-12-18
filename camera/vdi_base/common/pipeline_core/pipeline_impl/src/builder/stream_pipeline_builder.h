@@ -17,6 +17,7 @@
 #include "host_stream_mgr.h"
 #include "config_parser.h"
 #include "no_copyable.h"
+#include <set>
 
 namespace OHOS::Camera {
 class StreamPipelineBuilder : public NoCopyable, ConfigParser {
@@ -31,6 +32,8 @@ public:
 protected:
     std::shared_ptr<HostStreamMgr> hostStreamMgr_ = nullptr;
     std::shared_ptr<Pipeline> pipeline_ = nullptr;
+private:
+    void SetMaxSize(const std::set<std::vector<int32_t>>& sizeSet);
 };
 }
 #endif

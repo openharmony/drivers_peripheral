@@ -41,6 +41,8 @@ protected:
     virtual RetCode SelectPipelineSpec(const int32_t& mode, PipelineSpec& pipe);
     void PrintConnection(const NodeSpec& n);
     RetCode CombineSpecs(PipelineSpec& pipe);
+    RetCode SetNodeSpec(const PipelineSpec& pipe, G_PIPELINE_SPEC_DATA_TYPE& pipeSpecPtr,
+        NodeSpec& nodeSpec, int nodeIndex, int portIndexc);
 
 protected:
     std::shared_ptr<HostStreamMgr> hostStreamMgr_ = nullptr;
