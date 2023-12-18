@@ -162,12 +162,10 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest006, TestSize.Level1)
 HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
 {
     std::string testName = "HdfPowerHdiTest007";
-    int32_t ret;
+    int32_t ret = g_powerInterface->GetWakeupReason(testName);
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
-    ret = g_powerInterface->GetWakeupReason(testName);
     EXPECT_EQ(0, ret);
 #else
-    ret = g_powerInterface->GetWakeupReason(testName);
     EXPECT_NE(0, ret);
 #endif
 }
