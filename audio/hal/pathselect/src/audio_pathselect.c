@@ -386,9 +386,11 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
         case PIN_OUT_EARPIECE:
             /* 1、open earpiece */
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, EARPIECE, AUDIO_DEV_ON);
+            break;
         case PIN_OUT_BLUETOOTH_SCO:
             /* 1、open bluetooth */
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, BLUETOOTH_SCO, AUDIO_DEV_ON);
+            break;
         default:
             ret = SetMatchRenderOtherDevicePath(tpins, renderParam, cJsonObj, AUDIO_DEV_ON);
             break;
@@ -621,6 +623,7 @@ static int32_t AudioCaptureParseDevice(struct AudioHwCaptureParam *captureParam,
         case PIN_IN_BLUETOOTH_SCO_HEADSET:
             /* 1、open bluetooth sco headset mic */
             ret = SetMatchCaptureDevicePath(captureParam, cJsonObj, tpins, BLUETOOTH_SCO_HEADSET, AUDIO_DEV_ON);
+            break;
         default:
             ret = SetMatchCaptureOtherDevicePath(captureParam, cJsonObj, tpins, AUDIO_DEV_ON);
             break;
