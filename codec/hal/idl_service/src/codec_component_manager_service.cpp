@@ -16,6 +16,7 @@
 #include "codec_component_manager_service.h"
 #include <hdf_base.h>
 #include <atomic>
+#include <hitrace_meter.h>
 #include "codec_component_config.h"
 #include "codec_component_service.h"
 #include "codec_log_wrapper.h"
@@ -72,6 +73,7 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
                                                       const std::string &compName, int64_t appData,
                                                       const sptr<ICodecCallback> &callbacks)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecCreateComponent");
     CODEC_LOGD("compName[%{public}s]", compName.c_str());
     CHECK_AND_RETURN_RET_LOG(callbacks != nullptr, HDF_ERR_INVALID_PARAM, "callbacks is null");
     std::shared_ptr<ComponentNode> node = std::make_shared<ComponentNode>(callbacks, appData, mgr_);
@@ -96,6 +98,7 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
 
 int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecDestroyComponent");
     std::unique_lock<std::mutex> autoLock(mutex_);
     CODEC_LOGI("componentId[%{public}d]", componentId);
     auto iter = componentMap_.find(componentId);
