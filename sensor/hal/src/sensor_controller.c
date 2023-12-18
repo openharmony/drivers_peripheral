@@ -476,6 +476,12 @@ static int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel
     return HDF_SUCCESS;
 }
 
+static int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfos)
+{
+    (void)sdcSensorInfos;
+    return HDF_SUCCESS;
+}
+
 void GetSensorDeviceMethods(struct SensorInterface *device)
 {
     CHECK_NULL_PTR_RETURN(device);
