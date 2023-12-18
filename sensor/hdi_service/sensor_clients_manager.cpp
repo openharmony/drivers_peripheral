@@ -192,15 +192,19 @@ SensorClientsManager* SensorClientsManager::GetInstance()
 
 void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
     std::unique_lock<std::mutex> lock(clientsMutex_);
+    auto it = sensorConfig_.find(sensorId);
+    if (it == sensorConfig_.end()) {
+        return;
+    }
+    int32_t periodCount = reportInterval / it->second.reportInterval;
+
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
-
-    auto it = clients_[groupId].find(serviceId);
-    int32_t periodCount = reportInterval / this->reportInterval;
-    it -> second.SetPeriodCount(sensorId, periodCount);
+    auto client = clients_[groupId].find(serviceId);
+    client -> second.SetPeriodCount(sensorId, periodCount);
 }
 
 } // V2_0
