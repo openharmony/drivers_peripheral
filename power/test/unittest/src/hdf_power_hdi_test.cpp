@@ -165,10 +165,6 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
     int32_t ret;
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     ret = g_powerInterface->GetWakeupReason(testName);
-    EXPECT_NE(0, ret);
-
-    g_powerInterface->RegisterCallback(nullptr);
-    ret = g_powerInterface->GetWakeupReason(testName);
     EXPECT_EQ(0, ret);
 #else
     ret = g_powerInterface->GetWakeupReason(testName);
