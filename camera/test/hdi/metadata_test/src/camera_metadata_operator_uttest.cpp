@@ -455,3 +455,16 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_DeleteCameraMetadat
     ret = DeleteCameraMetadataItemByIndex(metaData->get(), 0);
     EXPECT_EQ(ret, 0);
 }
+
+/**
+ * @tc.name: Camera_metedate_opertor_027
+ * @tc.desc: metadataHeader == nullptr
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level1)
+{
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_027 start...");
+    std::vector<vendorTag_t>tagVec;
+    GetAllVendorTags(tagVec);
+}
