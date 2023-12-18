@@ -13,7 +13,6 @@
 
 #include "inode.h"
 #include "stream_pipeline_builder.h"
-#include <set>
 
 namespace OHOS::Camera {
 StreamPipelineBuilder::StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr>& streamMgr,

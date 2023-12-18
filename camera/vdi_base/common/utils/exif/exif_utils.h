@@ -61,6 +61,7 @@ private:
     static uint32_t IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferSize, void *address);
     static uint32_t PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBufferSize, unsigned char *exifData,
         unsigned int exifDataLength, data_info sourceData);
+    static uint32_t GetGpsRef(LatOrLong latOrLongType, double number, char *gpsRef, int length);
     static uint32_t SetExifData(exif_data info, ExifData *exif,
         unsigned char *exifData, unsigned int *exifDataLength);
     static void FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffer,

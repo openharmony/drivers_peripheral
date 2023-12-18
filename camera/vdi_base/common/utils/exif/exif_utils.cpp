@@ -237,7 +237,7 @@ uint32_t ExifUtils::PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBuff
     return RC_OK;
 }
 
-static uint32_t ExifUtils::SetExifData(exif_data info, ExifData *exif,
+uint32_t ExifUtils::SetExifData(exif_data info, ExifData *exif,
     unsigned char *exifData, unsigned int *exifDataLength)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(exif, RC_ERROR);
@@ -269,7 +269,7 @@ void ExifUtils::FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffe
         free(tempBuffer);
     }
     free(exifData);
-    exif_data_unref(exif);    
+    exif_data_unref(exif);
 }
 
 uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &outPutSize)

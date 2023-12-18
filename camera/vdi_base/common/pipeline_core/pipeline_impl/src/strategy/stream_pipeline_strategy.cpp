@@ -121,29 +121,29 @@ void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpec
 }
 
 RetCode StreamPipelineStrategy::SetNodeSpec(const PipelineSpec& pipe,
-    G_PIPELINE_SPEC_DATA_TYPE& pipeSpecPtr, NodeSpec& nodeSpec)
+    G_PIPELINE_SPEC_DATA_TYPE& pipeSpecPtr, NodeSpec& nodeSpec, int nodeIndex, int portIndex)
 {
     PortInfo info {
-        .name_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].name),
-        .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortName),
-        .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peerPortNodeName)
+        .name_ = std::string(pipeSpecPtr->nodeSpec[nodeIndex].portSpec[portIndex].name),
+        .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[nodeIndex].portSpec[portIndex].peerPortName),
+        .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[nodeIndex].portSpec[portIndex].peerPortNodeName)
     };
     CAMERA_LOGV("read node %{public}s", info.peerPortNodeName_.c_str());
 
-    std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].streamType),
+    std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[nodeIndex].streamType),
         G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
     PortFormat format {};
  
     if (typeId) {
         int32_t streamId = hostStreamMgr_->DesignateStreamIdForType(typeId.value());
         HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfo(streamId);
-        PortFormat f = SetPortFormat(pipeSpecPtr, typeId, j, k, hostStreamInfo);
+        PortFormat f = SetPortFormat(pipeSpecPtr, typeId, nodeIndex, portIndex, hostStreamInfo);
         if (!f.needAllocation_) {
             f.bufferPoolId_ = static_cast<int64_t>(hostStreamInfo.bufferPoolId_);
         }
         format = f;
         nodeSpec.streamId_ = hostStreamInfo.streamId_;
-    } else if (pipeSpecPtr->nodeSpec[j].portSpec[k].direction == 1) {
+    } else if (pipeSpecPtr->nodeSpec[nodeIndex].portSpec[portIndex].direction == 1) {
         if (SetUpBasicOutPortFormat(pipe, info, format) != RC_OK) {
             return RC_ERROR;
         }
@@ -154,7 +154,7 @@ RetCode StreamPipelineStrategy::SetNodeSpec(const PipelineSpec& pipe,
     }
 
     struct PortSpec portSpec {
-        .direction_ = pipeSpecPtr->nodeSpec[j].portSpec[k].direction,
+        .direction_ = pipeSpecPtr->nodeSpec[nodeIndex].portSpec[portIndex].direction,
         .info_ = info,
         .format_ = format,
     };
@@ -180,7 +180,7 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
             .type_ = std::string(pipeSpecPtr->nodeSpec[j].streamType)
         };
         for (int k = pipeSpecPtr->nodeSpec[j].portSpecSize - 1; k >= 0; k--) {
-            if (SetNodeSpec(pipe, pipeSpecPtr, nodeSpec) != RC_OK) {
+            if (SetNodeSpec(pipe, pipeSpecPtr, nodeSpec, j, k) != RC_OK) {
                 CAMERA_LOGI("SelectPipelineSpec failed.\n");
                 return RC_ERROR;
             }
