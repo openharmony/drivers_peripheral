@@ -14,6 +14,7 @@
  */
 
 #include "sensor_client_info.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -59,7 +60,7 @@ void SensorClientInfo::SetPeriodCount(int32_t sensorId, int32_t periodCount){
                            std::to_string(it->second);
     }
     curCountMap_Msg += "}";
-    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "+
+    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "
              "curCountMap_ is %{public}s", __func__, serviceId, periodCountMap_Msg.c_str(), curCountMap_Msg.c_str());
 }
 
@@ -86,7 +87,7 @@ bool SensorClientInfo::IsNeedReportData(int32_t sensorId) {
                            std::to_string(it->second);
     }
     curCountMap_Msg += "}";
-    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "+
+    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "
              "curCountMap_ is %{public}s", __func__, serviceId, periodCountMap_Msg.c_str(), curCountMap_Msg.c_str());
     if (curCountMap_[sensorId] % periodCountMap_[sensorId] == 0) {
         curCountMap_[sensorId] = 0;
