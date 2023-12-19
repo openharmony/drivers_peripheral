@@ -119,7 +119,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 {
                     std::lock_guard<std::mutex> l(requestLock_);
                     CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d, queue size:%{public}u",
-                        id, captureRequests_[id].count());
+                        id, captureRequests_.count(id));
                     if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
                         forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
                     } else {
@@ -145,7 +145,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 RetCode PcForkNode::Capture(const int32_t streamId, const int32_t captureId)
 {
     CAMERA_LOGV("PcForkNode::received a request from stream [id:%{public}d], queue size:%{public}u",
-        streamId, captureRequests_[streamId].count());
+        streamId, captureRequests_.count(streamId));
 
     for (auto& in : inPutPorts_) {
         CAMERA_LOGI("PcForkNode::Capture in->format_.streamId_ = %{public}d", in->format_.streamId_);
