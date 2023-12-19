@@ -351,7 +351,7 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInf
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
     struct SdcSensorInfo sdcSensorInfos[DEFUALT_SDC_SENSOR_INFO_SIZE];
-    int32_t ret = sensorInterface->GetSdcSensorInfo(&sdcSensorInfos);
+    int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
