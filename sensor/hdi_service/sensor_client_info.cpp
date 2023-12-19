@@ -39,45 +39,35 @@ sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
     return pollCallback_;
 }
 
-void SensorClientInfo::SetPeriodCount(int32_t sensorId, int32_t periodCount){
-    periodCountMap_[sensorId] = periodCount;
-    curCountMap_[sensorId] = 0;
-    std::string periodCountMap_Msg = "{";
-    for (auto it = periodCountMap_.begin(); it != periodCountMap_.end(); ++it) {
-        if (it != periodCountMap_.begin()) {
-            periodCountMap_Msg +=", ";
-        }
-        periodCountMap_Msg += std::to_string(it->first) + "->" +
-                              std::to_string(it->second);
-    }
-    periodCountMap_Msg += "}";
-    std::string curCountMap_Msg = "{";
-    for (auto it = curCountMap_.begin(); it != curCountMap_.end(); ++it) {
-        if (it != curCountMap_.begin()) {
-            curCountMap_Msg +=", ";
-        }
-        curCountMap_Msg += std::to_string(it->first) + "->" +
-                           std::to_string(it->second);
-    }
-    curCountMap_Msg += "}";
-    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "
-             "curCountMap_ is %{public}s", __func__, serviceId, periodCountMap_Msg.c_str(), curCountMap_Msg.c_str());
-}
-
-bool SensorClientInfo::IsNeedReportData(int32_t sensorId) {
-    if (periodCountMap_.find(sensorId) == periodCountMap_.end()) {
-        return true;
+bool SensorClientInfo::IsNotNeedReportData(int32_t sensorId)
+{
+    if (sensorConfigMap_.find(sensorId) == sensorConfigMap_.end()) {
+        return false;
     }
     curCountMap_[sensorId]++;
-    std::string periodCountMap_Msg = "{";
-    for (auto it = periodCountMap_.begin(); it != periodCountMap_.end(); ++it) {
-        if (it != periodCountMap_.begin()) {
-            periodCountMap_Msg +=", ";
-        }
-        periodCountMap_Msg += std::to_string(it->first) + "->" +
-                              std::to_string(it->second);
+    int64_t samplingInterval;
+    int64_t reportInterval;
+    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
+    int32_t periodCount = sensorConfigMap_[sensorId].reportInterval / reportInterval;
+    PrintLog();
+    if (curCountMap_[sensorId] >= periodCount) {
+        curCountMap_[sensorId] = 0;
+        return false;
     }
-    periodCountMap_Msg += "}";
+    return true;
+}
+
+void SensorClientInfo::PrintLog()
+{
+    std::string sensorConfigMap_Msg = "{";
+    for (auto it = sensorConfigMap_.begin(); it != sensorConfigMap_.end(); ++it) {
+        if (it != sensorConfigMap_.begin()) {
+            sensorConfigMap_Msg +=", ";
+        }
+        sensorConfigMap_Msg += std::to_string(it->first) + "->{" +
+            std::to_string(it->second.samplingInterval) + "," +std::to_string(it->second.reportInterval) + "}";
+    }
+    sensorConfigMap_Msg += "}";
     std::string curCountMap_Msg = "{";
     for (auto it = curCountMap_.begin(); it != curCountMap_.end(); ++it) {
         if (it != curCountMap_.begin()) {
@@ -87,13 +77,8 @@ bool SensorClientInfo::IsNeedReportData(int32_t sensorId) {
                            std::to_string(it->second);
     }
     curCountMap_Msg += "}";
-    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now periodCountMap_ is %{public}s, "
-             "curCountMap_ is %{public}s", __func__, serviceId, periodCountMap_Msg.c_str(), curCountMap_Msg.c_str());
-    if (curCountMap_[sensorId] % periodCountMap_[sensorId] == 0) {
-        curCountMap_[sensorId] = 0;
-        return true;
-    }
-    return false;
+    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now sensorConfigMap_ is %{public}s, "
+             "curCountMap_ is %{public}s", __func__, serviceId, sensorConfigMap_Msg.c_str(), curCountMap_Msg.c_str());
 }
 
 } // V2_0

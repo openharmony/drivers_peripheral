@@ -197,13 +197,6 @@ void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t servic
     if (it == sensorConfig_.end()) {
         return;
     }
-    int32_t periodCount = reportInterval / it->second.reportInterval;
-    HDF_LOGI("%{public}s: service %{public}d reportInterval is %{public}s", __func__, serviceId,
-             std::to_string(reportInterval).c_str());
-    HDF_LOGI("%{public}s: service %{public}d sensorConfig_->second.reportInterval is %{public}s", __func__, serviceId,
-             std::to_string(it->second.reportInterval).c_str());
-    HDF_LOGI("%{public}s: service %{public}d periodCount is %{public}s", __func__, serviceId,
-             std::to_string(periodCount).c_str());
 
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
@@ -211,7 +204,10 @@ void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t servic
         return;
     }
     auto client = clients_[groupId].find(serviceId);
-    client -> second.SetPeriodCount(sensorId, periodCount);
+    SensorConfig sensorConfig = {0, reportInterval};
+    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
+    client -> second.curCountMap_[sensorId] = 0;
+    client -> second.PrintLog();
 }
 
 } // V2_0
