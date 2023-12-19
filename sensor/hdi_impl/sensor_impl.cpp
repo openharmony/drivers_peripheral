@@ -24,6 +24,7 @@
 #include "sensor_dump.h"
 
 #define HDF_LOG_TAG uhdf_sensor_service
+#define DEFUALT_SDC_SENSOR_INFO_SIZE 10
 
 namespace OHOS {
 namespace HDI {
@@ -349,7 +350,7 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInf
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
-    struct SdcSensorInfo sdcSensorInfos[];
+    struct SdcSensorInfo sdcSensorInfos[DEFUALT_SDC_SENSOR_INFO_SIZE];
     int32_t ret = sensorInterface->GetSdcSensorInfo(&sdcSensorInfos);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
