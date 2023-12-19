@@ -35,7 +35,7 @@ public:
         : pollCallback_(callbackObj) {};
     void SetReportDataCb(const sptr<ISensorCallback> &callbackObj);
     sptr<ISensorCallback> GetReportDataCb();
-    bool IsNeedReportData(int32_t sensorId);
+    bool IsNotNeedReportData(int32_t sensorId);
     std::unordered_map<int32_t, struct SensorConfig> sensorConfigMap_;
     std::unordered_map<int32_t, int32_t> curCountMap_;
     void PrintLog();
