@@ -59,6 +59,9 @@ T GetData()
 */
 std::string GetStringFromData(int strlen)
 {
+    if (strlen < 1) {
+        strlen = 1;
+    }
     char cstr[strlen];
     cstr[strlen - 1] = '\0';
     for (int i = 0; i < strlen - 1; i++) {
@@ -412,8 +415,8 @@ int TestGetSupportedLayerPerFrameParameterKey(uint32_t devId)
 
 int TestSetDisplayOverlayResolution(uint32_t devId)
 {
-    const int32_t width = GetData<int32_t>() % WIDTH;
-    const int32_t height = GetData<int32_t>() % HEIGHT;
+    uint32_t width = GetData<uint32_t>() % WIDTH;
+    uint32_t height = GetData<uint32_t>() % HEIGHT;
     int32_t ret = g_composerInterface->SetDisplayOverlayResolution(devId, width, height);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
@@ -421,10 +424,13 @@ int TestSetDisplayOverlayResolution(uint32_t devId)
     return ret;
 }
 
+static void TestRefreshCallback(uint32_t devId, void* data)
+{
+}
+
 int TestRegRefreshCallback(uint32_t devId)
 {
-    RefreshCallback callback = GetData<RefreshCallback>();
-    int32_t ret = g_composerInterface->RegRefreshCallback(callback, nullptr);
+    int32_t ret = g_composerInterface->RegRefreshCallback(TestRefreshCallback, nullptr);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
     }
@@ -434,7 +440,6 @@ int TestRegRefreshCallback(uint32_t devId)
 int TestGetDisplaySupportedColorGamuts(uint32_t devId)
 {
     std::vector<ColorGamut> gamuts;
-    gamuts.push_back(GetData<ColorGamut>());
     int32_t ret = g_composerInterface->GetDisplaySupportedColorGamuts(devId, gamuts);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
