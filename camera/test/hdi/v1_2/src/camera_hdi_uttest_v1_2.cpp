@@ -102,6 +102,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_00
     if (ret != 0) {
         CAMERA_LOGE("DefferredImageTestInit Fail, exit!!!");
         printf("DefferredImageTestInit Fail, exit!!!\r\n");
+        return;
     }
 
     // take photo using deferred image delivery
@@ -154,6 +155,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_00
     if (ret != 0) {
         CAMERA_LOGE("DefferredImageTestInit Fail, exit!!!");
         printf("DefferredImageTestInit Fail, exit!!!\r\n");
+        return;
     }
 
     // take three photo using deferred image delivery
