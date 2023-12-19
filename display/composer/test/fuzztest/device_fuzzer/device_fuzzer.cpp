@@ -400,6 +400,58 @@ int TestRegSeamlessChangeCallback(uint32_t devId)
     return ret;
 }
 
+int TestGetSupportedLayerPerFrameParameterKey(uint32_t devId)
+{
+    std::vector<std::string> keys;
+    int32_t ret = g_composerInterface->GetSupportedLayerPerFrameParameterKey(keys);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestSetDisplayOverlayResolution(uint32_t devId)
+{
+    const int32_t width = GetData<int32_t>() % WIDTH;
+    const int32_t height = GetData<int32_t>() % HEIGHT;
+    int32_t ret = g_composerInterface->SetDisplayOverlayResolution(devId, width, height);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestRegRefreshCallback(uint32_t devId)
+{
+    RefreshCallback callback = GetData<RefreshCallback>();
+    int32_t ret = g_composerInterface->RegRefreshCallback(callback, nullptr);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestGetDisplaySupportedColorGamuts(uint32_t devId)
+{
+    std::vector<ColorGamut> gamuts;
+    gamuts.push_back(GetData<ColorGamut>());
+    int32_t ret = g_composerInterface->GetDisplaySupportedColorGamuts(devId, gamuts);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestGetHDRCapabilityInfos(uint32_t devId)
+{
+    HDRCapability info = { 0 };
+    int32_t ret = g_composerInterface->GetHDRCapabilityInfos(devId, info);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -422,6 +474,11 @@ TestFuncs g_testFuncs = {
     TestSetDisplayModeAsync,
     TestGetDisplayVBlankPeriod,
     TestRegSeamlessChangeCallback,
+    TestGetSupportedLayerPerFrameParameterKey,
+    TestSetDisplayOverlayResolution,
+    TestRegRefreshCallback,
+    TestGetDisplaySupportedColorGamuts,
+    TestGetHDRCapabilityInfos,
     TestCommit,
 };
 

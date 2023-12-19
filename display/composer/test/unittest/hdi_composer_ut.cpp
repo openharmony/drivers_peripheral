@@ -855,3 +855,85 @@ HWTEST_F(DeviceTest, test_RegSeamlessChangeCallback, TestSize.Level1)
         ASSERT_EQ(g_isOnSeamlessChangeCalled, true);
     }
 }
+
+HWTEST_F(DeviceTest, test_SetLayerPerFrameParameter, TestSize.Level1)
+{
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = GREEN
+        },
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+    auto layer = layers[0];
+    std::string key = "FilmFilter";
+    std::vector<int8_t> value = { 1 };
+    auto ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("SetLayerPerFrameParameter not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetSupportedLayerPerFrameParameterKey, TestSize.Level1)
+{
+    std::vector<std::string> keys;
+    auto ret = g_composerDevice->GetSupportedLayerPerFrameParameterKey(keys);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("GetSupportedLayerPerFrameParameterKey not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayOverlayResolution, TestSize.Level1)
+{
+    DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
+    auto ret = g_composerDevice->SetDisplayOverlayResolution(g_displayIds[0], mode.width, mode.height);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("SetDisplayOverlayResolution not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+static void TestRefreshCallback(uint32_t devId, void* data)
+{
+}
+
+HWTEST_F(DeviceTest, test_RegRefreshCallback, TestSize.Level1)
+{
+    auto ret = g_composerDevice->RegRefreshCallback(TestRefreshCallback, nullptr);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("RegRefreshCallback not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetDisplaySupportedColorGamuts, TestSize.Level1)
+{
+    std::vector<ColorGamut> gamuts = {
+        COLOR_GAMUT_INVALID
+    };
+    auto ret = g_composerDevice->GetDisplaySupportedColorGamuts(g_displayIds[0], gamuts);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("GetDisplaySupportedColorGamuts not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetHDRCapabilityInfos, TestSize.Level1)
+{
+    HDRCapability info = { 0 };
+    auto ret = g_composerDevice->GetHDRCapabilityInfos(g_displayIds[0], info);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGE("GetHDRCapabilityInfos not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
