@@ -203,7 +203,7 @@ struct SensorInterface {
      * @since 4.1
      * @version 2.0
      */
-    int32_t (*GetSdcSensorInfo)(struct SdcSensorInfo[] *sdcSensorInfos);
+    int32_t (*GetSdcSensorInfo)(struct SdcSensorInfo *sdcSensorInfos[]);
 };
 
 /**
