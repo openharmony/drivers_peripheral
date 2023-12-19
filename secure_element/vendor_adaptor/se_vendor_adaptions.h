@@ -44,13 +44,6 @@ public:
         SecureElementStatus& status) override;
 
     int32_t reset(SecureElementStatus& status) override;
-
-private:
-#ifdef SECURE_ELEMENT_USE_CA
-    static const uint16_t MAX_CHANNEL_NUM = 4;
-    uint16_t openedChannelCount_ = 0;
-    bool openedChannels_[MAX_CHANNEL_NUM] = {false, false, false, false};
-#endif
 };
 } // SecureElement
 } // HDI

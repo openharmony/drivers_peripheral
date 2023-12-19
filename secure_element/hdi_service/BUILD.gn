@@ -54,7 +54,7 @@ ohos_shared_library("se_hdi_driver") {
   ]
 
   if (drivers_peripheral_secure_element_use_ca) {
-    defines += [ "SECURE_ELEMENT_USE_CA" ]
+    defines += [ "SE_DRIVER_USE_CA" ]
     deps += [ "../secure_element_ca_proxy:secure_element_ca_proxy" ]
   }
 
