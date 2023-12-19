@@ -445,7 +445,7 @@ static void ReadMetadataRational(camera_metadata_item_t &entry, MessageParcel &d
 }
 bool UtilsDataStub::ReadMetadata(camera_metadata_item_t &entry, MessageParcel &data)
 {
-    switch(entry.data_type) {
+    switch (entry.data_type) {
         case META_TYPE_BYTE:
             ReadMetadataUInt8(entry, data);
             break;
