@@ -54,23 +54,6 @@ T GetData()
     return object;
 }
 
-/*
-* get a string from g_data
-*/
-std::string GetStringFromData(int strlen)
-{
-    if (strlen < 1) {
-        strlen = 1;
-    }
-    char cstr[strlen];
-    cstr[strlen - 1] = '\0';
-    for (int i = 0; i < strlen - 1; i++) {
-        cstr[i] = GetData<char>();
-    }
-    std::string str(cstr);
-    return str;
-}
-
 static int32_t GetAllocInfo(AllocInfo& info)
 {
     uint32_t lenUsage = GetArrLength(CONVERT_TABLE_USAGE);
