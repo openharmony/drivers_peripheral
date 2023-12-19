@@ -41,7 +41,7 @@
 #ifndef SENSOR_IF_H
 #define SENSOR_IF_H
 
-#include <cstdbool>
+#include <stdbool.h>
 #include "sensor_type.h"
 
 #ifdef __cplusplus
