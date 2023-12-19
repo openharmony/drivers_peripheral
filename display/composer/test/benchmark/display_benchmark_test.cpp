@@ -453,12 +453,13 @@ BENCHMARK_F(DisplayBenchmarkTest, SetLayerPerFrameParameterTest)(benchmark::Stat
     uint32_t layerId;
     std::string key = "FilmFilter";
     std::vector<int8_t> value = { 1 };
+    uint32_t bufferCount = 3;
+    ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, bufferCount, layerId);
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
     for (auto _ : state) {
-        uint32_t bufferCount = 3;
-        ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, bufferCount, layerId);
-        EXPECT_EQ(DISPLAY_SUCCESS, ret);
         ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layerId, key, value);
     }
+    g_composerDevice->DestroyLayer(g_displayIds[0], layerId);
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
@@ -534,9 +535,7 @@ BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegRefreshCallbackTest)->
 BENCHMARK_F(DisplayBenchmarkTest, GetDisplaySupportedColorGamutsTest)(benchmark::State &state)
 {
     int32_t ret;
-    std::vector<ColorGamut> gamuts = {
-        COLOR_GAMUT_INVALID
-    };
+    std::vector<ColorGamut> gamuts;
     for (auto _ : state) {
         ret = g_composerDevice->GetDisplaySupportedColorGamuts(g_displayIds[0], gamuts);
     }
