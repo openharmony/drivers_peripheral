@@ -29,6 +29,14 @@ extern "C" {
 #define IFNAMSIZ 16
 #define WIFI_REASON_LENGTH 32
 #define WIFI_SSID_LENGTH 132
+
+#define WIFI_P2P_DEVICE_TYPE_LENGTH 64
+#define WIFI_P2P_DEVICE_NAME_LENGTH 128
+#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 32
+#define WIFI_P2P_PASSWORD_SIZE 128
+#define WIFI_P2P_GROUP_IFNAME_LENGTH 128
+#define WIFI_PIN_CODE_LENGTH 8
+#define WIFI_P2P_TLVS_LENGTH 256
 #define WIFI_BSSID_LEN 6
 
 typedef enum {
@@ -41,11 +49,27 @@ typedef enum {
     WPA_EVENT_WPS_OVERLAP,
     WPA_EVENT_WPS_TIMEMOUT,
     WPA_EVENT_RECV_SCAN_RESULT,
+    WPA_EVENT_DEVICE_FOUND,
+    WPA_EVENT_DEVICE_LOST,
+    WPA_EVENT_GO_NEGOTIATION_REQUEST,
+    WPA_EVENT_GO_NEGOTIATION_COMPLETED,
+    WPA_EVENT_INVITATION_RECEIVED,
+    WPA_EVENT_INVITATION_RESULT,
+    WPA_EVENT_GROUP_FORMATION_SUCCESS,
+    WPA_EVENT_GROUP_FORMATION_FAILURE,
+    WPA_EVENT_GROUP_START,
+    WPA_EVENT_GROUP_REMOVED,
+    WPA_EVENT_PROVISION_DISCOVERY_COMPLETED,
+    WPA_EVENT_FIND_STOPPED,
+    WPA_EVENT_SERV_DISC_REQ,
+    WPA_EVENT_SERV_DISC_RESP,
+    WPA_EVENT_STA_CONNECT_STATE,
+    WPA_EVENT_IFACE_CREATED,
 } WpaCallBackEventType;
 
 enum WpaClientType {
-    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 */
-    WIFI_WPA_TO_HAL_CLIENT = 1023,
+    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<26 */
+    WIFI_WPA_TO_HAL_CLIENT = 33554431,
     WIFI_WPA_CLIENT_BUTT
 };
 
@@ -88,6 +112,95 @@ struct WpaAssociateRejectParam {
 
 struct WpaRecvScanResultParam {
     unsigned int scanId;
+};
+
+struct P2pDeviceInfoParam {
+    unsigned char srcAddress[ETH_ADDR_LEN];
+    unsigned char p2pDeviceAddress[ETH_ADDR_LEN];
+    unsigned char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
+    unsigned char deviceName[WIFI_P2P_DEVICE_NAME_LENGTH];
+    int configMethods;
+    int deviceCapabilities;
+    int groupCapabilities;
+    unsigned char wfdDeviceInfo[WIFI_P2P_WFD_DEVICE_INFO_LENGTH];
+    unsigned int wfdLength;
+    unsigned char operSsid[WIFI_P2P_DEVICE_NAME_LENGTH];
+};
+
+struct P2pDeviceLostParam {
+    unsigned char p2pDeviceAddress[ETH_ADDR_LEN];
+    int  networkId;
+};
+
+struct P2pGoNegotiationRequestParam {
+    unsigned char srcAddress[ETH_ADDR_LEN];
+    int passwordId;
+};
+
+struct P2pGoNegotiationCompletedParam {
+    int status;
+};
+
+struct P2pInvitationReceivedParam {
+    int type; /* 0:Received, 1:Accepted */
+    int persistentNetworkId;
+    int operatingFrequency;
+    unsigned char srcAddress[ETH_ADDR_LEN];
+    unsigned char goDeviceAddress[ETH_ADDR_LEN];
+    unsigned char bssid[ETH_ADDR_LEN];
+};
+
+struct P2pInvitationResultParam {
+    int status;
+    unsigned char bssid[ETH_ADDR_LEN];
+};
+
+struct P2pGroupStartedParam {
+    int isGo;
+    int isPersistent;
+    int frequency;
+    unsigned char groupIfName[WIFI_P2P_GROUP_IFNAME_LENGTH];
+    unsigned char ssid[WIFI_SSID_LENGTH];
+    unsigned char psk[WIFI_P2P_PASSWORD_SIZE];
+    unsigned char passphrase[WIFI_P2P_PASSWORD_SIZE];
+    unsigned char goDeviceAddress[ETH_ADDR_LEN];
+};
+
+struct P2pGroupRemovedParam {
+    int isGo;
+    unsigned char groupIfName[WIFI_P2P_GROUP_IFNAME_LENGTH];
+};
+
+struct P2pProvisionDiscoveryCompletedParam {
+    int isRequest;
+    int provDiscStatusCode;
+    int configMethods;
+    unsigned char p2pDeviceAddress[ETH_ADDR_LEN];
+    unsigned char generatedPin[WIFI_PIN_CODE_LENGTH];
+};
+
+struct P2pServDiscRespParam {
+    int updateIndicator;
+    unsigned char srcAddress[ETH_ADDR_LEN];
+    unsigned char tlvs[WIFI_P2P_TLVS_LENGTH];
+};
+
+struct P2pStaConnectStateParam {
+    int state;
+    unsigned char srcAddress[ETH_ADDR_LEN];
+    unsigned char p2pDeviceAddress[ETH_ADDR_LEN];
+};
+
+struct P2pServDiscReqInfoParam {
+    int freq;
+    int dialogToken;
+    int updateIndic;
+    unsigned char mac[ETH_ADDR_LEN];
+    unsigned char tlvs[WIFI_P2P_TLVS_LENGTH];
+};
+
+struct P2pIfaceCreatedParam {
+    int isGo;
 };
 
 typedef int32_t (*OnReceiveFunc)(uint32_t event, void *data, const char *ifName);
