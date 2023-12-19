@@ -868,9 +868,16 @@ HWTEST_F(DeviceTest, test_SetLayerPerFrameParameter, TestSize.Level1)
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
     auto layer = layers[0];
-    std::string key = "FilmFilter";
+    DISPLAY_TEST_LOGD("support key: FilmFilter ArsrDoEnhance SDRBrightnessRatio \
+        BrightnessNit ViewGroupHasValidAlpha SourceCropTuning");
+    std::string key;
     std::vector<int8_t> value = { 1 };
+    key = "NotSupportKey";
     auto ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    ASSERT_EQ(ret, -1) << "key not support, ret:" << ret;
+    key = "FilmFilter";
+    ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    ASSERT_EQ(ret, 0) << "key support, ret:" << ret;
     if (ret == DISPLAY_NOT_SUPPORT) {
         DISPLAY_TEST_LOGE("SetLayerPerFrameParameter not support");
         return;
@@ -916,9 +923,7 @@ HWTEST_F(DeviceTest, test_RegRefreshCallback, TestSize.Level1)
 
 HWTEST_F(DeviceTest, test_GetDisplaySupportedColorGamuts, TestSize.Level1)
 {
-    std::vector<ColorGamut> gamuts = {
-        COLOR_GAMUT_INVALID
-    };
+    std::vector<ColorGamut> gamuts;
     auto ret = g_composerDevice->GetDisplaySupportedColorGamuts(g_displayIds[0], gamuts);
     if (ret == DISPLAY_NOT_SUPPORT) {
         DISPLAY_TEST_LOGE("GetDisplaySupportedColorGamuts not support");
