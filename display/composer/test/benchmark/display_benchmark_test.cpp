@@ -46,6 +46,7 @@ public:
     void TearDown(const ::benchmark::State &state);
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
     static void OnseamlessChange(uint32_t devId, void* data);
+    static void TestRefreshCallback(uint32_t devId, void* data);
 };
 
 void DisplayBenchmarkTest::TearDown(const ::benchmark::State &state)
@@ -58,6 +59,10 @@ void DisplayBenchmarkTest::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* 
 }
 
 void DisplayBenchmarkTest::OnseamlessChange(uint32_t devId, void* data)
+{
+}
+
+void DisplayBenchmarkTest::TestRefreshCallback(uint32_t devId, void* data)
 {
 }
 
@@ -435,6 +440,133 @@ BENCHMARK_F(DisplayBenchmarkTest, RegSeamlessChangeCallbackTest)(benchmark::Stat
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegSeamlessChangeCallbackTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetLayerPerFrameParameterTest
+  * @tc.desc: Benchmarktest for interface SetLayerPerFrameParameter.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetLayerPerFrameParameterTest)(benchmark::State &state)
+{
+    int32_t ret;
+    LayerInfo layerInfo;
+    uint32_t layerId;
+    std::string key = "FilmFilter";
+    std::vector<int8_t> value = { 1 };
+    for (auto _ : state) {
+        uint32_t bufferCount = 3;
+        ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, bufferCount, layerId);
+        EXPECT_EQ(DISPLAY_SUCCESS, ret);
+        ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layerId, key, value);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetLayerPerFrameParameterTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetSupportedLayerPerFrameParameterKeyTest
+  * @tc.desc: Benchmarktest for interface GetSupportedLayerPerFrameParameterKey.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetSupportedLayerPerFrameParameterKeyTest)(benchmark::State &state)
+{
+    int32_t ret;
+    std::vector<std::string> keys;
+    for (auto _ : state) {
+        ret = g_composerDevice->GetSupportedLayerPerFrameParameterKey(keys);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetSupportedLayerPerFrameParameterKeyTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: SetDisplayOverlayResolutionTest
+  * @tc.desc: Benchmarktest for interface SetDisplayOverlayResolution.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetDisplayOverlayResolutionTest)(benchmark::State &state)
+{
+    int32_t ret;
+    DisplayModeInfo mode = HdiTestDevice::GetInstance().GetFirstDisplay()->GetCurrentMode();
+    for (auto _ : state) {
+        ret = g_composerDevice->SetDisplayOverlayResolution(g_displayIds[0], mode.width, mode.height);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, SetDisplayOverlayResolutionTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: RegRefreshCallbackTest
+  * @tc.desc: Benchmarktest for interface RegRefreshCallback.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, RegRefreshCallbackTest)(benchmark::State &state)
+{
+    int32_t ret;
+    for (auto _ : state) {
+        ret = g_composerDevice->RegRefreshCallback(TestRefreshCallback, nullptr);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegRefreshCallbackTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetDisplaySupportedColorGamutsTest
+  * @tc.desc: Benchmarktest for interface GetDisplaySupportedColorGamuts.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetDisplaySupportedColorGamutsTest)(benchmark::State &state)
+{
+    int32_t ret;
+    std::vector<ColorGamut> gamuts = {
+        COLOR_GAMUT_INVALID
+    };
+    for (auto _ : state) {
+        ret = g_composerDevice->GetDisplaySupportedColorGamuts(g_displayIds[0], gamuts);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplaySupportedColorGamutsTest)->
+    Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetHDRCapabilityInfosTest
+  * @tc.desc: Benchmarktest for interface GetHDRCapabilityInfos.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, GetHDRCapabilityInfosTest)(benchmark::State &state)
+{
+    int32_t ret;
+    HDRCapability info = { 0 };
+    for (auto _ : state) {
+        ret = g_composerDevice->GetHDRCapabilityInfos(g_displayIds[0], info);
+    }
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetHDRCapabilityInfosTest)->
     Iterations(30)->Repetitions(3)->ReportAggregatesOnly();
 
 /**
