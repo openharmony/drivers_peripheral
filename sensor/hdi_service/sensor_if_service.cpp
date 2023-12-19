@@ -332,7 +332,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         return HDF_FAILURE;
     }
 
-    std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis;
+    std::vector<SdcSensorInfoVdi> sdcSensorInfoVdis;
     StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
     int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfoVdis);
     if (ret != SENSOR_SUCCESS) {
