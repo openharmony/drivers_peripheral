@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include "v2_0/isensor_interface.h"
 #include "isensor_interface_vdi.h"
+#include "sensor_clients_manager.h"
 
 namespace OHOS {
 namespace HDI {
@@ -35,11 +36,16 @@ public:
     void SetReportDataCb(const sptr<ISensorCallback> &callbackObj);
     sptr<ISensorCallback> GetReportDataCb();
     bool IsNeedReportData(int32_t sensorId);
-    void SetPeriodCount(int32_t sensorId, int32_t periodCount);
+    std::unordered_map<int32_t, struct SensorConfig> sensorConfigMap_;
+    std::unordered_map<int32_t, int32_t> curCountMap_;
 private:
     sptr<ISensorCallback> pollCallback_;
-    std::unordered_map<int32_t, int32_t> periodCountMap_;
-    std::unordered_map<int32_t, int32_t> curCountMap_;
+    void PrintLog();
+};
+
+struct SensorConfig {
+    int32_t samplingInterval;
+    int32_t reportInterval;
 };
 
 } // V2_0
