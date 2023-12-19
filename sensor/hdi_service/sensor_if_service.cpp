@@ -195,6 +195,8 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
     } else {
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
         uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+        HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
         SensorClientsManager::GetInstance()->SetClientPeriodCount(sensorId, serviceId, reportInterval);
     }
     FinishTrace(HITRACE_TAG_HDF);
