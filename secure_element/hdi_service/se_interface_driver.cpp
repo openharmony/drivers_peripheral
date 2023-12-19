@@ -19,7 +19,7 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/secure_element_interface_stub.h"
 
-#ifdef SECURE_ELEMENT_USE_CA
+#ifdef SE_DRIVER_USE_CA
 #include "secure_element_ca_proxy.h"
 #endif
 
@@ -57,7 +57,7 @@ static int32_t SeInterfaceDriverDispatch(struct HdfDeviceIoClient* client, int c
 static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGE("%{public}s: Enter", __func__);
-#ifdef SECURE_ELEMENT_USE_CA
+#ifdef SE_DRIVER_USE_CA
     int ret = OHOS::HDI::SecureElement::SecureElementCaProxy::GetInstance().VendorSecureElementCaInit();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("%{public}s: Failed", __func__);
