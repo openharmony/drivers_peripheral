@@ -345,8 +345,8 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         sdcSensorInfo.offset = sdcSensorInfoVdi.offset;
         sdcSensorInfo.type = sdcSensorInfoVdi.type;
         sdcSensorInfo.ddrSize = sdcSensorInfoVdi.ddrSize;
-        sdcSensorInfo.minRateLevel = (SdcRateLevel)sdcSensorInfoVdi.minRateLevel;
-        sdcSensorInfo.maxRateLevel = (SdcRateLevel)sdcSensorInfoVdi.maxRateLevel;
+        sdcSensorInfo.minRateLevel = sdcSensorInfoVdi.minRateLevel;
+        sdcSensorInfo.maxRateLevel = sdcSensorInfoVdi.maxRateLevel;
         sdcSensorInfo.reserved = sdcSensorInfoVdi.reserved;
         sdcSensorInfos.push_back(std::move(sdcSensorInfo));
     }

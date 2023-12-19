@@ -218,8 +218,8 @@ struct SdcSensorInfo {
     uint64_t offset;
     int32_t type;
     int32_t ddrSize;
-    SdcRateLevel minRateLevel;
-    SdcRateLevel maxRateLevel;
+    int32_t minRateLevel;
+    int32_t maxRateLevel;
     int32_t reserved;
 };
 
