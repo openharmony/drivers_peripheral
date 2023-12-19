@@ -749,6 +749,20 @@ static int32_t ProcessEventScanAborted(struct HdfWlanRemoteNode *node, uint32_t 
     return ret;
 }
 
+static int32_t ProcessEventActionReceived(struct HdfWlanRemoteNode *node, uint32_t event,
+    WifiActionData *wifiActionData, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+
+    if (node == NULL || wifiActionData == NULL || ifName == NULL || node->callbackObj == NULL ||
+        node->callbackObj->WifiNetlinkMessage == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = node->callbackObj->WifiNetlinkMessage(node->callbackObj, wifiActionData->data, wifiActionData->dataLen);
+    return ret;
+}
+
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfWlanRemoteNode *pos = NULL;
@@ -785,6 +799,9 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
             case WIFI_EVENT_SCAN_ABORTED:
                 ret = ProcessEventScanAborted(pos, event, ifName);
+                break;
+            case WIFI_EVENT_ACTION_RECEIVED:
+                ret = ProcessEventActionReceived(pos, event, (WifiActionData *)data, ifName);
                 break;
             default:
                 HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
@@ -1518,6 +1535,46 @@ int32_t WlanInterfaceResetToFactoryMacAddress(struct IWlanInterface *self, const
 
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get name failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceSendActionFrame(struct IWlanInterface *self, const char *ifName, uint32_t freq,
+    const uint8_t *frameData, uint32_t frameDataLen)
+{
+    int32_t ret;
+    (void)self;
+    if (ifName == NULL || freq == 0 || frameData == NULL || frameDataLen == 0) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL || g_wifi->sendActionFrame == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->sendActionFrame is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->sendActionFrame(ifName, freq, frameData, frameDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceRegisterActionFrameReceiver(struct IWlanInterface *self, const char *ifName,
+    const uint8_t *match, uint32_t matchLen)
+{
+    int32_t ret;
+    (void)self;
+    if (ifName == NULL || match == NULL || matchLen == 0) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL || g_wifi->registerActionFrameReceiver == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->registerActionFrameReceiver is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->registerActionFrameReceiver(ifName, match, matchLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed!, error code: %{public}d", __func__, ret);
     }
     return ret;
 }
