@@ -191,6 +191,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
 }
 
 void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
+    HDF_LOGI("%{public}s: service %{public}d enter the SetClientPeriodCount function", __func__, serviceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
