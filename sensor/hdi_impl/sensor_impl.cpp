@@ -344,14 +344,14 @@ int32_t SensorImpl::SdcSensorActive(int32_t sensorId, bool enabled, int32_t rate
     return ret;
 }
 
-int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis)
+int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdis)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
     struct SdcSensorInfo sdcSensorInfos[DEFUALT_SDC_SENSOR_INFO_SIZE];
-    int32_t ret = sensorInterface->GetSdcSensorInfo(&&sdcSensorInfos);
+    int32_t ret = sensorInterface->GetSdcSensorInfo(&sdcSensorInfos);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
