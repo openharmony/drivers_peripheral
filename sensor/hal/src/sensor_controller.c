@@ -495,4 +495,5 @@ void GetSensorDeviceMethods(struct SensorInterface *device)
     device->Register = Register;
     device->Unregister = Unregister;
     device->SdcSensorActive = SdcSensorActive;
+    device->GetSdcSensorInfo = GetSdcSensorInfo;
 }

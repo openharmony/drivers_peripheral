@@ -27,6 +27,8 @@ constexpr int ENABLE_SENSOR = 1;
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
+using namespace OHOS::HDI::Sensor::V1_1;
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
@@ -330,7 +332,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         return HDF_FAILURE;
     }
 
-    std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis
+    std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis;
     StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
     int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfoVdis);
     if (ret != SENSOR_SUCCESS) {
@@ -343,8 +345,8 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         sdcSensorInfo.offset = sdcSensorInfoVdi.offset;
         sdcSensorInfo.type = sdcSensorInfoVdi.type;
         sdcSensorInfo.ddrSize = sdcSensorInfoVdi.ddrSize;
-        sdcSensorInfo.minRateLevel = (int)sdcSensorInfoVdi.minRateLevel;
-        sdcSensorInfo.maxRateLevel = (int)sdcSensorInfoVdi.maxRateLevel;
+        sdcSensorInfo.minRateLevel = (SdcRateLevel)sdcSensorInfoVdi.minRateLevel;
+        sdcSensorInfo.maxRateLevel = (SdcRateLevel)sdcSensorInfoVdi.maxRateLevel;
         sdcSensorInfo.reserved = sdcSensorInfoVdi.reserved;
         sdcSensorInfos.push_back(std::move(sdcSensorInfo));
     }
