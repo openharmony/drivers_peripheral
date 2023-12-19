@@ -357,65 +357,116 @@ bool UtilsDataStub::WriteMetadata(const camera_metadata_item_t &entry, MessagePa
     return true;
 }
 
+static void ReadMetadataUInt8(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<uint8_t> buffers;
+    data.ReadUInt8Vector(&buffers);
+    entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
+    if (entry.data.u8 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.u8[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataInt32(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int32_t> buffers;
+    data.ReadInt32Vector(&buffers);
+    entry.data.i32 = new(std::nothrow) int32_t[entry.count];
+    if (entry.data.i32 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.i32[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataUInt32(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<uint32_t> buffers;
+    data.ReadUInt32Vector(&buffers);
+    entry.data.ui32 = new(std::nothrow) uint32_t[entry.count];
+    if (entry.data.ui32 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.ui32[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataFloat(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<float> buffers;
+    data.ReadFloatVector(&buffers);
+    entry.data.f = new(std::nothrow) float[entry.count];
+    if (entry.data.f != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.f[i] = buffers.at(i);
+        }
+    }
+} 
+
+static void ReadMetadataInt64(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int64_t> buffers;
+    data.ReadInt64Vector(&buffers);
+    entry.data.i64 = new(std::nothrow) int64_t[entry.count];
+    if (entry.data.i64 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.i64[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataDouble(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<double> buffers;
+    data.ReadDoubleVector(&buffers);
+    entry.data.d = new(std::nothrow) double[entry.count];
+    if (entry.data.d != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.d[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataRational(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int32_t> buffers;
+    data.ReadInt32Vector(&buffers);
+    entry.data.r = new(std::nothrow) camera_rational_t[entry.count];
+    if (entry.data.r != nullptr) {
+        for (size_t i = 0, j = 0;
+            i < entry.count && j < static_cast<size_t>(buffers.size() - 1);
+            i++, j += 2) { // 2:Take two elements from the buffer vector container
+            entry.data.r[i].numerator = buffers.at(j);
+            entry.data.r[i].denominator = buffers.at(j + 1);
+        }
+    }
+}
 bool UtilsDataStub::ReadMetadata(camera_metadata_item_t &entry, MessageParcel &data)
 {
-    if (entry.data_type == META_TYPE_BYTE) {
-        std::vector<uint8_t> buffers;
-        data.ReadUInt8Vector(&buffers);
-        entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
-        if (entry.data.u8 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.u8[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_INT32) {
-        std::vector<int32_t> buffers;
-        data.ReadInt32Vector(&buffers);
-        entry.data.i32 = new(std::nothrow) int32_t[entry.count];
-        if (entry.data.i32 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.i32[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_FLOAT) {
-        std::vector<float> buffers;
-        data.ReadFloatVector(&buffers);
-        entry.data.f = new(std::nothrow) float[entry.count];
-        if (entry.data.f != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.f[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_INT64) {
-        std::vector<int64_t> buffers;
-        data.ReadInt64Vector(&buffers);
-        entry.data.i64 = new(std::nothrow) int64_t[entry.count];
-        if (entry.data.i64 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.i64[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_DOUBLE) {
-        std::vector<double> buffers;
-        data.ReadDoubleVector(&buffers);
-        entry.data.d = new(std::nothrow) double[entry.count];
-        if (entry.data.d != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.d[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_RATIONAL) {
-        std::vector<int32_t> buffers;
-        data.ReadInt32Vector(&buffers);
-        entry.data.r = new(std::nothrow) camera_rational_t[entry.count];
-        if (entry.data.r != nullptr) {
-            for (size_t i = 0, j = 0;
-                i < entry.count && j < static_cast<size_t>(buffers.size() - 1);
-                i++, j += 2) { // 2:Take two elements from the buffer vector container
-                entry.data.r[i].numerator = buffers.at(j);
-                entry.data.r[i].denominator = buffers.at(j + 1);
-            }
-        }
+    switch(entry.data_type){
+        case META_TYPE_BYTE:
+            ReadMetadataUInt8(entry, data);
+            break;
+        case META_TYPE_INT32:
+            ReadMetadataInt32(entry, data);
+            break;
+        case META_TYPE_UINT32:
+            ReadMetadataUInt32(entry, data);
+            break;
+        case META_TYPE_FLOAT:
+            ReadMetadataFloat(entry, data);
+            break;
+        case META_TYPE_INT64:
+            ReadMetadataInt64(entry, data);
+            break;
+        case META_TYPE_DOUBLE:
+            ReadMetadataDouble(entry, data);
+            break;
+        case META_TYPE_RATIONAL:
+            ReadMetadataRational(entry, data);
+            break;
     }
     return true;
 }
