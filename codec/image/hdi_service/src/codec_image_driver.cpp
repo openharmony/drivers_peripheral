@@ -52,7 +52,11 @@ static int32_t CodecImageDriverDispatch(struct HdfDeviceIoClient *client, int cm
 static int HdfCodecImageDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("driver init start");
-    CodecImageConfig::GetInstance()->Init(*(deviceObject->property));
+    if (deviceObject->property != nullptr) {
+        CodecImageConfig::GetInstance()->Init(*(deviceObject->property));
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
     return HDF_SUCCESS;
 }
 
