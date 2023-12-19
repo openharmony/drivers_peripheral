@@ -97,8 +97,8 @@ int32_t Test::DefferredImageTestInit()
     // get ImageProcessService
     imageProcessService_ = OHOS::HDI::Camera::V1_2::ImageProcessServiceProxy::Get(serviceName, false);
     if (imageProcessService_ == nullptr) {
-        CAMERA_LOGE("mageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
-        printf("mageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
+        CAMERA_LOGE("ImageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
+        printf("ImageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
         return -1;
     }
     imageProcessCallback_ = new OHOS::Camera::Test::TestImageProcessCallback();
