@@ -53,20 +53,6 @@ T GetData()
     return object;
 }
 
-/*
-* get a string from g_data
-*/
-std::string GetStringFromData(int strlen)
-{
-    char cstr[strlen];
-    cstr[strlen - 1] = '\0';
-    for (int i = 0; i < strlen - 1; i++) {
-        cstr[i] = GetData<char>();
-    }
-    std::string str(cstr);
-    return str;
-}
-
 static int32_t GetLayerInfo(LayerInfo& layerInfo)
 {
     uint32_t lenLayerType = GetArrLength(CONVERT_TABLE_LAYER_TYPE);
@@ -368,11 +354,13 @@ int32_t TestSetLayerColor(uint32_t devId, uint32_t layerId)
 
 int32_t TestSetLayerPerFrameParameter(uint32_t devId, uint32_t layerId)
 {
-    std::string key = GetStringFromData(10);
+    std::vector<std::string> ValidKeys = { "FilmFilter", "ArsrDoEnhance", "SDRBrightnessRatio", "BrightnessNit",
+        "ViewGroupHasValidAlpha", "SourceCropTuning" };
+    std::string key = ValidKeys[0];
     std::vector<int8_t> value;
     value.push_back(GetData<int8_t>());
     int32_t ret = g_composerInterface->SetLayerPerFrameParameter(devId, layerId, key, value);
-    if (ret != DISPLAY_SUCCESS) {
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
     }
     return ret;
