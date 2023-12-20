@@ -47,7 +47,7 @@ bool SensorClientInfo::IsNotNeedReportData(int32_t sensorId)
     curCountMap_[sensorId]++;
     int64_t samplingInterval;
     int64_t reportInterval;
-    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
+    OHOS::HDI::Sensor::V2_0::SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     int32_t periodCount = sensorConfigMap_[sensorId].reportInterval / reportInterval;
     PrintLog();
     if (curCountMap_[sensorId] >= periodCount) {
