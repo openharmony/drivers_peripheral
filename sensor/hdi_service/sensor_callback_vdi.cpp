@@ -49,7 +49,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     }
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
-        if(sensorClientInfo_.IsNotNeedReportData(event.sensorId)){
+        if (SensorClientsManager::GetInstance()->IsNotNeedReportData(sensorClientInfo_, event.sensorId)) {
             continue;
         }
         callback = sensorClientInfo_.GetReportDataCb();
