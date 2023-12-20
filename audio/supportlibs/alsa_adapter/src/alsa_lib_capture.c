@@ -741,6 +741,8 @@ static int32_t SetHWParams(
 static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
 {
     int32_t ret;
+    /* The time when the application starts reading data */ 
+    snd_pcm_sframes_t startThresholdSize = 1; 
 
     if (handle == NULL || swparams == NULL) {
         AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
@@ -758,9 +760,8 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
         AUDIO_FUNC_LOGE("error: g_periodSize cannot be zero!");
         return HDF_FAILURE;
     }
-    /* start the transfer when the buffer is almost full: */
-    /* (buffer_size / avail_min) * avail_min */
-    ret = snd_pcm_sw_params_set_start_threshold(handle, swparams, (g_bufferSize / g_periodSize) * g_periodSize);
+    /* start the transfer when the buffer is 1 frames: */
+    ret = snd_pcm_sw_params_set_start_threshold(handle, swparams, startThresholdSize);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to set start threshold mode for capture: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
