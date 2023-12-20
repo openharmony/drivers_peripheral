@@ -477,7 +477,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
-    std::vector<SdcSensorInfo> sdcSensorInfos;
+    std::vector<V2_0::SdcSensorInfo> sdcSensorInfos;
     int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
     std::string infoMsg="{";
