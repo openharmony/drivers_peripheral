@@ -376,7 +376,7 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
         HDF_LOGW("wakeuo_cause getPath does not exist");
         return HDF_FAILURE;
     }
-    std::string getPath = (it -> second).getPath;
+    std::string getPath = (it->second).getPath;
     HDF_LOGI("getPath = %{public}s", getPath.c_str());
 
     UniqueFd wakeupCauseFd(TEMP_FAILURE_RETRY(open(getPath.c_str(), O_RDONLY | O_CLOEXEC)));
