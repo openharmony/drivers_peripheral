@@ -487,12 +487,12 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
             infoMsg += ", ";
         }
         infoMsg += "{";
-        infoMsg += "offset = " + std::to_string(offset) +", ";
-        infoMsg += "type = " + std::to_string(type) +", ";
-        infoMsg += "ddrSize = " + std::to_string(ddrSize) +", ";
-        infoMsg += "minRateLevel = " + std::to_string(minRateLevel) +", ";
-        infoMsg += "maxRateLevel = " + std::to_string(maxRateLevel) +", ";
-        infoMsg += "reserved = " + std::to_string(reserved);
+        infoMsg += "offset = " + std::to_string(it.offset) +", ";
+        infoMsg += "type = " + std::to_string(it.type) +", ";
+        infoMsg += "ddrSize = " + std::to_string(it.ddrSize) +", ";
+        infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) +", ";
+        infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) +", ";
+        infoMsg += "reserved = " + std::to_string(it.reserved);
         infoMsg += "}";
     }
     infoMsg += "}";
