@@ -67,6 +67,10 @@ int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *
 int32_t WlanInterfaceGetApBandwidth(struct IWlanInterface *self, const char *ifName,
     uint8_t *bandwidth);
 int32_t WlanInterfaceResetToFactoryMacAddress(struct IWlanInterface *self, const char *ifName);
+int32_t WlanInterfaceSendActionFrame(struct IWlanInterface *self, const char *ifName, uint32_t freq,
+    const uint8_t *frameData, uint32_t frameDataLen);
+int32_t WlanInterfaceRegisterActionFrameReceiver(struct IWlanInterface *self, const char *ifName,
+    const uint8_t *match, uint32_t matchLen);
 int32_t WlanInterfaceWifiConstruct(void);
 int32_t WlanInterfaceWifiDestruct(void);
 #endif
