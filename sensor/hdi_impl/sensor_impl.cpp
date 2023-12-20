@@ -344,7 +344,7 @@ int32_t SensorImpl::SetSdcSensorActive(int32_t sensorId, bool enabled, int32_t r
     return ret;
 }
 
-int32_t SensorImpl::SetSdcSensorActive(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdis)
+int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdis)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
