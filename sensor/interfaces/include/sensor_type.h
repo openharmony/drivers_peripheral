@@ -163,15 +163,6 @@ enum SensorGroupType {
     SENSOR_GROUP_TYPE_MAX,          /**< Maximum sensor type*/
 };
 
-enum SdcRateLevel {
-    SDC_RATE_STOP,
-    SDC_RATE_NORMAL,
-    SDC_RATE_GEN_FAST,
-    SDC_RATE_FAST,
-    SDC_RATE_FASTER,
-    SDC_RATE_VERY_FAST,
-};
-
 /**
  * @brief Defines basic sensor information.
  *

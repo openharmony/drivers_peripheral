@@ -305,7 +305,7 @@ int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents>
     return HDF_SUCCESS;
 }
 
-int32_t SensorIfService::SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
+int32_t SensorIfService::SetSdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
 {
     HDF_LOGI("%{public}s: Enter the SdcSensorActive function, sensorId is %{public}d, enabled is %{public}u, \
              rateLevel is %{public}u", __func__, sensorId, enabled, rateLevel);

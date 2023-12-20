@@ -44,7 +44,7 @@ public:
     int32_t Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj) override;
     int32_t ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event) override;
-    int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel) override;
+    int32_t SetSdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfos) override;
     int32_t GetSensorVdiImpl();
 

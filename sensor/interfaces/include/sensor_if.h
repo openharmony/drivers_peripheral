@@ -192,7 +192,7 @@ struct SensorInterface {
      * @since 4.1
      * @version 2.0
      */
-    int32_t (*SdcSensorActive)(int32_t sensorId, bool enabled, int32_t rateLevel);
+    int32_t (*SetSdcSensorActive)(int32_t sensorId, bool enabled, int32_t rateLevel);
 
     /**
      * @brief Obtain sensor information for SDC
