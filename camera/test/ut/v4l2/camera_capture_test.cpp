@@ -225,16 +225,9 @@ HWTEST_F(CameraCaptureTest, camera_capture_010, TestSize.Level1)
     // Configure two streams of information
     EXPECT_EQ(true, cameraBase_->cameraDevice != nullptr);
     cameraBase_->AchieveStreamOperator();
-    // start stream
-    cameraBase_->intents = {PREVIEW};
-    cameraBase_->StartStream(cameraBase_->intents);
-    // Start capture
-    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
-
     // Configure capture stream information
-    cameraBase_->intents = {STILL_CAPTURE};
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
     cameraBase_->StartStream(cameraBase_->intents);
-    // Start capture
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
     cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
     sleep(2);
