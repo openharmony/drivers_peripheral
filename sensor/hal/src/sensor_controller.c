@@ -468,7 +468,7 @@ ERROR:
     return HDF_FAILURE;
 }
 
-static int32_t SdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
+static int32_t SetSdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel)
 {
     (void)sensorId;
     (void)enabled;
@@ -494,6 +494,6 @@ void GetSensorDeviceMethods(struct SensorInterface *device)
     device->ReadData = ReadData;
     device->Register = Register;
     device->Unregister = Unregister;
-    device->SdcSensorActive = SdcSensorActive;
+    device->SetSdcSensorActive = SetSdcSensorActive;
     device->GetSdcSensorInfo = GetSdcSensorInfo;
 }
