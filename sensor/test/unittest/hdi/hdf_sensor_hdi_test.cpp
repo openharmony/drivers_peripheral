@@ -447,18 +447,18 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: SdcSensorActive
+  * @tc.name: SetSdcSensorActive
   * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
-HWTEST_F(HdfSensorHdiTest, SdcSensorActive, TestSize.Level1)
+HWTEST_F(HdfSensorHdiTest, SetSdcSensorActive, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        int32_t ret = g_sensorInterface->SdcSensorActive(iter.sensorId, true, 0);
+        int32_t ret = g_sensorInterface->SetSdcSensorActive(iter.sensorId, true, 0);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId, false, 0);
