@@ -341,6 +341,24 @@ static int32_t GetStationInfoInner(const char *ifName, StationInfo *info, const 
     return GetStationInfo(ifName, info, mac, macLen);
 }
 
+static int32_t SendActionFrameInner(const char *ifName, uint32_t freq, const uint8_t *frameData, uint32_t frameDataLen)
+{
+    if (ifName == NULL || freq == 0 || frameData == NULL || frameDataLen == 0) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return WifiSendActionFrame(ifName, freq, frameData, frameDataLen);
+}
+
+static int32_t RegisterActionFrameReceiverInner(const char *ifName, const uint8_t *match, uint32_t matchLen)
+{
+    if (ifName == NULL || match == NULL || matchLen == 0) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return WifiRegisterActionFrameReceiver(ifName, match, matchLen);
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -501,6 +519,22 @@ static int32_t WifiGetStationInfo(const char *ifName, StationInfo *info, const u
     return ret;
 }
 
+static int32_t SendActionFrame(const char *ifName, uint32_t freq, const uint8_t *frameData, uint32_t frameDataLen)
+{
+    HalMutexLock();
+    int32_t ret = SendActionFrameInner(ifName, freq, frameData, frameDataLen);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t RegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen)
+{
+    HalMutexLock();
+    int32_t ret = RegisterActionFrameReceiverInner(ifName, match, matchLen);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -532,6 +566,8 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.registerHid2dCallback = HalRegisterHid2dCallback;
         singleWifiInstance.unregisterHid2dCallback = HalUnregisterHid2dCallback;
         singleWifiInstance.getStationInfo = WifiGetStationInfo;
+        singleWifiInstance.sendActionFrame = SendActionFrame;
+        singleWifiInstance.registerActionFrameReceiver = RegisterActionFrameReceiver;
         InitIWiFiList();
         isInited = true;
     }
