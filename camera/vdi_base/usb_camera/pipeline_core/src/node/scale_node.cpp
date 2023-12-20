@@ -42,9 +42,9 @@ RetCode ScaleNode::Start(const int32_t streamId)
 {
     CAMERA_LOGI("ScaleNode::Start streamId = %{public}d\n", streamId);
     uint64_t bufferPoolId = 0;
-
-    outPutPorts_ = GetOutPorts();
-    for (auto& out : outPutPorts_) {
+    
+    std::vector<std::shared_ptr<IPort>> outPutPortsVector = GetOutPorts();
+    for (auto& out : outPutPortsVector) {
         bufferPoolId = out->format_.bufferPoolId_;
     }
 
