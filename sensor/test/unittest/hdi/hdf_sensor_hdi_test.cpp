@@ -447,21 +447,21 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: SetSdcSensorActive
+  * @tc.name: SetSdcSensor
   * @tc.desc: Read event data for the specified sensor.
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
   */
-HWTEST_F(HdfSensorHdiTest, SetSdcSensorActive, TestSize.Level1)
+HWTEST_F(HdfSensorHdiTest, SetSdcSensor, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        int32_t ret = g_sensorInterface->SetSdcSensorActive(iter.sensorId, true, 0);
+        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, 0);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorInterface->Disable(iter.sensorId, false, 0);
+        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, 0);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -477,7 +477,28 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
-    std::vector<SdcSensorInfo> sdcSensorInfos
+    std::vector<SdcSensorInfo> sdcSensorInfos;
     int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
+    std::string infoMsg="{";
+    for (auto it : sdcSensorInfos) {
+        if (infoMsg != "{") {
+            infoMsg += ", ";
+        }
+        infoMsg += "{";
+        infoMsg += "offset = " + std::to_string(offset) +", ";
+        infoMsg += "type = " + std::to_string(type) +", ";
+        infoMsg += "ddrSize = " + std::to_string(ddrSize) +", ";
+        infoMsg += "minRateLevel = " + std::to_string(minRateLevel) +", ";
+        infoMsg += "maxRateLevel = " + std::to_string(maxRateLevel) +", ";
+        infoMsg += "reserved = " + std::to_string(reserved);
+        infoMsg += "}";
+    }
+    infoMsg += "}";
+    printf("sdcSensorInfos = %s", infoMsg.c_str());
 }
+
+
+
+
+

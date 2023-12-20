@@ -63,7 +63,7 @@ public:
     virtual int32_t SetOption(int32_t sensorId, uint32_t option) = 0;
     virtual int32_t Register(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
     virtual int32_t Unregister(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
-    virtual int32_t SetSdcSensorActive(int32_t sensorId, bool enabled, int32_t rateLevel) = 0;
+    virtual int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel) = 0;
     virtual int32_t GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdis) = 0;
 };
 
