@@ -80,7 +80,7 @@ uint32_t ExifUtils::GetGpsRef(LatOrLong latOrLongType, double number, char *gpsR
                 return RC_ERROR;
             }
         } else {
-            number = abs(number);
+            abs(number);
             if (strncpy_s(gpsRef, length, south, strlen(south)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
@@ -93,7 +93,7 @@ uint32_t ExifUtils::GetGpsRef(LatOrLong latOrLongType, double number, char *gpsR
                 return RC_ERROR;
             }
         } else {
-            number = abs(number);
+            abs(number);
             if (strncpy_s(gpsRef, length, west, strlen(west)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;

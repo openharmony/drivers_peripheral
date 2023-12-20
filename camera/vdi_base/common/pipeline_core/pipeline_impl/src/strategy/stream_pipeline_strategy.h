@@ -42,7 +42,7 @@ protected:
     void PrintConnection(const NodeSpec& n);
     RetCode CombineSpecs(PipelineSpec& pipe);
     RetCode SetNodeSpec(const PipelineSpec& pipe, G_PIPELINE_SPEC_DATA_TYPE& pipeSpecPtr,
-        NodeSpec& nodeSpec, int nodeIndex, int portIndexc);
+        NodeSpec& nodeSpec, int nodeIndex, int portIndex);
 
 protected:
     std::shared_ptr<HostStreamMgr> hostStreamMgr_ = nullptr;
