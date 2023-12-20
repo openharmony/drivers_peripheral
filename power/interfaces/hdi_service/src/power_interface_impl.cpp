@@ -77,7 +77,26 @@ bool g_isHdiStart = false;
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    return new (std::nothrow) PowerInterfaceImpl();
+    using OHOS::HDI::Power::V1_1::PowerInterfaceImpl;
+    PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
+    if (service == nullptr) {
+        return nullptr;
+    }
+
+    if (service->Init() != HDF_SUCCESS) {
+        delete service;
+        return nullptr;
+    }
+    return service;
+}
+
+int32_t PowerInterfaceImpl::Init()
+{
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    auto& powerConfig = PowerConfig::GetInstance();
+    powerConfig.ParseConfig();
+#endif
+    return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback)
@@ -351,7 +370,6 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
 {
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
-    powerConfig.ParseConfig();
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap= powerConfig.GetPowerSceneConfigMap();
     std::map<std::string, PowerConfig::PowerSceneConfig>::iterator it = sceneConfigMap.find("wakeuo_cause");
     if (it == sceneConfigMap.end()) {
