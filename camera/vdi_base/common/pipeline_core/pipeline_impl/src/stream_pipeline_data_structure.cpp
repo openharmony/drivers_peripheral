@@ -17,6 +17,7 @@
 #include <dlfcn.h>
 #include "stream_pipeline_data_structure.h"
 #include "hdf_base.h"
+#include "camera.h"
 namespace OHOS::Camera {
 #ifdef __ARCH64__
 #define PIPELINE_CONFIG_LIB_PATH HDF_LIBRARY_DIR"64/libcamera_pipeline_config.z.so"
@@ -27,38 +28,55 @@ namespace OHOS::Camera {
 using HdfGetModuleConfigRootFunc = const struct HdfConfigRoot* (*)(void);
 using HdfGetPipelineSpecsModuleConfigRootFunc = const struct HdfConfigPipelineSpecsRoot* (*)(void);
 
-extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
+extern "C" void* GetHandle()
 {
-    void* handle = ::dlopen(PIPELINE_CONFIG_LIB_PATH, RTLD_NOW);
+    static void* handle = ::dlopen(PIPELINE_CONFIG_LIB_PATH, RTLD_NOW);
     char* errStr = dlerror();
     if (errStr) {
         return nullptr;
     }
-    HdfGetModuleConfigRootFunc HdfGetModuleConfigRootF =
-        reinterpret_cast<HdfGetModuleConfigRootFunc>(dlsym(handle, "HdfGetModuleConfigRoot"));
-    errStr = dlerror();
-    if (errStr) {
-        return nullptr;
+    return handle;
+}
+
+extern "C" const struct HdfConfigRoot* HdfGetModuleConfigRoot(void)
+{
+    static const struct HdfConfigRoot* pHdfConfigRoot = nullptr;
+    if (pHdfConfigRoot == nullptr) {
+        void* handle = GetHandle();
+        if (!handle) {
+            return nullptr;
+        }
+        HdfGetModuleConfigRootFunc HdfGetModuleConfigRootF =
+            reinterpret_cast<HdfGetModuleConfigRootFunc>(dlsym(handle, "HdfGetModuleConfigRoot"));
+        char* errStr = dlerror();
+        if (errStr) {
+            return nullptr;
+        }
+        pHdfConfigRoot = HdfGetModuleConfigRootF();
     }
 
-    return HdfGetModuleConfigRootF();
+    return pHdfConfigRoot;
 }
 
 extern "C" const struct HdfConfigPipelineSpecsRoot* HdfGetPipelineSpecsModuleConfigRoot(void)
 {
-    void* handle = ::dlopen(PIPELINE_CONFIG_LIB_PATH, RTLD_NOW);
-    char* errStr = dlerror();
-    if (errStr) {
-        return nullptr;
-    }
-    HdfGetPipelineSpecsModuleConfigRootFunc HdfGetPipelineSpecsModuleConfigRootF =
-        reinterpret_cast<HdfGetPipelineSpecsModuleConfigRootFunc>(dlsym(handle, "HdfGetPipelineSpecsModuleConfigRoot"));
-    errStr = dlerror();
-    if (errStr) {
-        return nullptr;
+    static const struct HdfConfigPipelineSpecsRoot* pHdfConfigPipelineSpecsRoot = nullptr;
+    if (pHdfConfigPipelineSpecsRoot == nullptr) {
+        void* handle = GetHandle();
+        if (!handle) {
+            return nullptr;
+        }
+        HdfGetPipelineSpecsModuleConfigRootFunc HdfGetPipelineSpecsModuleConfigRootF =
+            reinterpret_cast<HdfGetPipelineSpecsModuleConfigRootFunc>(
+                dlsym(handle, "HdfGetPipelineSpecsModuleConfigRoot"));
+        char* errStr = dlerror();
+        if (errStr) {
+            return nullptr;
+        }
+        pHdfConfigPipelineSpecsRoot = HdfGetPipelineSpecsModuleConfigRootF();
     }
 
-    return HdfGetPipelineSpecsModuleConfigRootF();
+    return pHdfConfigPipelineSpecsRoot;
 }
 }
 #endif
