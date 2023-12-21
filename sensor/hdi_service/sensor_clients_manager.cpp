@@ -181,8 +181,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
         return true;
     }
-    SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId);
-    BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId);
+    SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId)->sencond;
+    BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId)->sencond;
     int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
     curCountMap_[sensorId]++;
 
