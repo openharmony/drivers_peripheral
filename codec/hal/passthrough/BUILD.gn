@@ -60,6 +60,11 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
     "src/codec_component_manager.c",
   ]
   defines = [ "CODEC_HAL_PASSTHROUGH" ]
+  if (target_cpu == "arm64") {
+    defines += [ "__ARM64__" ]
+  } else if (target_cpu == "riscv64") {
+    defines += [ "__RISCV64__" ]
+  }
 
   if (is_standard_system) {
     external_deps = [
