@@ -125,7 +125,11 @@ std::shared_ptr<AlgoPlugin> IppAlgoParser::ConstructPlugin(const DeviceResourceN
 
     std::string nodeName = std::string(path);
     if (path[0] != '/') {
+#if defined(__riscv)
+        nodeName = nodeName.insert(0, HDF_LIBRARY_DIR "64/");
+#else
         nodeName = nodeName.insert(0, HDF_LIBRARY_DIR "/");
+#endif
     }
     std::shared_ptr<AlgoPlugin> plugin = std::make_shared<AlgoPlugin>(name, description, algoModeMap_[mode], nodeName);
     if (plugin == nullptr) {
