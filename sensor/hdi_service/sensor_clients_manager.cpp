@@ -187,21 +187,21 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     sensorClientInfo.curCountMap_[sensorId]++;
 
     std::string sensorConfigMsg = "[";
-    for (auto it : sensorClientInfo.sensorConfigMap_) {
+    for (auto it = sensorClientInfo.sensorConfigMap_.begin(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
         if (sensorConfigMsg != "[") {
             sensorConfigMsg += ", ";
         }
-        sensorConfigMsg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
+        sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
     }
     sensorConfigMsg += "]";
     HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 
     std::string bestSensorConfigMsg = "[";
-    for (auto it : sensorConfig_) {
+    for (auto it = sensorConfig_.begin(); it != sensorConfig_.end(); ++it) {
         if (bestSensorConfigMsg != "[") {
             bestSensorConfigMsg += ", ";
         }
-        bestSensorConfigMsg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
+        bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
     }
     bestSensorConfigMsg += "]";
     HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
@@ -209,11 +209,11 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
     std::string curCountMap_Msg = "[";
-    for (auto it : sensorClientInfo.curCountMap_) {
+    for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
         if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
         }
-        curCountMap_Msg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
+        curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
     }
     curCountMap_Msg += "]";
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
@@ -223,23 +223,6 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         return false;
     }
     return true;
-}
-
-std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
-{
-    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
-    return sensorUsed_;
-}
-
-SensorClientsManager* SensorClientsManager::GetInstance()
-{
-    if (instance == nullptr) {
-        std::unique_lock<std::mutex> lock(instanceMutex_);
-        if (instance == nullptr) {
-            instance = new SensorClientsManager();
-        }
-    }
-    return instance;
 }
 
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
@@ -257,6 +240,23 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client -> second.sensorConfigMap_.[sensorId] = sensorConfig;
     client -> second.curCountMap_[sensorId] = 0;
+}
+
+std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
+{
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    return sensorUsed_;
+}
+
+SensorClientsManager* SensorClientsManager::GetInstance()
+{
+    if (instance == nullptr) {
+        std::unique_lock<std::mutex> lock(instanceMutex_);
+        if (instance == nullptr) {
+            instance = new SensorClientsManager();
+        }
+    }
+    return instance;
 }
 
 } // V2_0
