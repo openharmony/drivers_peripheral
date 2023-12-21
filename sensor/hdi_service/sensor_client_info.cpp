@@ -57,30 +57,6 @@ bool SensorClientInfo::IsNotNeedReportData(int32_t sensorId)
     return true;
 }
 
-void SensorClientInfo::PrintLog()
-{
-    std::string sensorConfigMap_Msg = "{";
-    for (auto it = sensorConfigMap_.begin(); it != sensorConfigMap_.end(); ++it) {
-        if (it != sensorConfigMap_.begin()) {
-            sensorConfigMap_Msg +=", ";
-        }
-        sensorConfigMap_Msg += std::to_string(it->first) + "->{" +
-            std::to_string(it->second.samplingInterval) + "," +std::to_string(it->second.reportInterval) + "}";
-    }
-    sensorConfigMap_Msg += "}";
-    std::string curCountMap_Msg = "{";
-    for (auto it = curCountMap_.begin(); it != curCountMap_.end(); ++it) {
-        if (it != curCountMap_.begin()) {
-            curCountMap_Msg +=", ";
-        }
-        curCountMap_Msg += std::to_string(it->first) + "->" +
-                           std::to_string(it->second);
-    }
-    curCountMap_Msg += "}";
-    HDF_LOGI("%{public}s: enter the SetPeriodCount function, now sensorConfigMap_ is %{public}s, "
-             "curCountMap_ is %{public}s", __func__, serviceId, sensorConfigMap_Msg.c_str(), curCountMap_Msg.c_str());
-}
-
 } // V2_0
 } // Sensor
 } // HDI
