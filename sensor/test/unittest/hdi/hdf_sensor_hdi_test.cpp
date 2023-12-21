@@ -483,9 +483,9 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     std::vector<V2_0::SdcSensorInfo> sdcSensorInfo;
     int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
-    std::string infoMsg="{";
+    std::string infoMsg="[";
     for (auto it : sdcSensorInfo) {
-        if (infoMsg != "{") {
+        if (infoMsg != "[") {
             infoMsg += ", ";
         }
         infoMsg += "{";
@@ -498,7 +498,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
         infoMsg += "reserved = " + std::to_string(it.reserved);
         infoMsg += "}";
     }
-    infoMsg += "}";
+    infoMsg += "]";
     HDF_LOGI("%{public}s: sdcSensorInfo = %{public}s", __func__, infoMsg.c_str());
 }
 
