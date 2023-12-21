@@ -238,7 +238,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
     auto client = clients_[groupId].find(serviceId);
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
-    client -> second.sensorConfigMap_.[sensorId] = sensorConfig;
+    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
     client -> second.curCountMap_[sensorId] = 0;
 }
 
