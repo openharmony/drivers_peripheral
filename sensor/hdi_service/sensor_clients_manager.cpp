@@ -190,6 +190,24 @@ SensorClientsManager* SensorClientsManager::GetInstance()
     return instance;
 }
 
+bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId){
+    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
+        return true;
+    }
+    if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
+        return true;
+    }
+    SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId);
+    BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId);
+    int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
+    curCountMap_[sensorId]++;
+    if (curCountMap_[sensorId] >= periodCount) {
+        curCountMap_[sensorId] = 0;
+        return false;
+    }
+    return true;
+}
+
 void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
     HDF_LOGI("%{public}s: service %{public}d enter the SetClientPeriodCount function", __func__, serviceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
