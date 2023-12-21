@@ -82,6 +82,7 @@ namespace {
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t ABNORMAL_SENSORID = -1;
+    constexpr int32_t RATE_LEVEL = 1;
 }
 
 class HdfSensorHdiTest : public testing::Test {
@@ -460,10 +461,10 @@ HWTEST_F(HdfSensorHdiTest, SetSdcSensor, TestSize.Level1)
 
     EXPECT_GT(g_info.size(), 0);
     for (auto iter : g_info) {
-        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, 0);
+        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, RATE_LEVEL);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
-        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, 0);
+        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, RATE_LEVEL);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
@@ -493,6 +494,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
         infoMsg += "ddrSize = " + std::to_string(it.ddrSize) +", ";
         infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) +", ";
         infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) +", ";
+        infoMsg += "memAddr = " + std::to_string(it.memAddr) +", ";
         infoMsg += "reserved = " + std::to_string(it.reserved);
         infoMsg += "}";
     }
