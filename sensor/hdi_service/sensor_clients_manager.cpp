@@ -173,8 +173,26 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     return true;
 }
 
+void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
+                                                 int64_t &reportInterval)
+{
+    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function", __func__, serviceId);
+
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        return;
+    }
+
+    auto client = clients_[groupId].find(serviceId);
+    SensorConfig sensorConfig = {samplingInterval, reportInterval};
+    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
+    client -> second.curCountMap_[sensorId] = 0;
+}
+
 bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId)
 {
+    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, sensorClientInfo is %{public}p", __func__, serviceId, &sensorClientInfo);
     if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
         return true;
     }
@@ -190,7 +208,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
         }
-        curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> count = " + std::to_string(it->second) + "}";
+        curCountMap_Msg += std::to_string(it->first) + "->" + std::to_string(it->second);
     }
     curCountMap_Msg += "]";
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
@@ -202,7 +220,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (sensorConfigMsg != "[") {
             sensorConfigMsg += ", ";
         }
-        sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
+        sensorConfigMsg += std::to_string(it->first) + "->{" + std::to_string(it->second.samplingInterval) + ", " + std::to_string(it->second.reportInterval) + "}";
     }
     sensorConfigMsg += "]";
     HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
@@ -212,7 +230,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (bestSensorConfigMsg != "[") {
             bestSensorConfigMsg += ", ";
         }
-        bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
+        bestSensorConfigMsg += std::to_string(it->first) + "->{" + std::to_string(it->second.samplingInterval) + ", " + std::to_string(it->second.reportInterval) + "}";
     }
     bestSensorConfigMsg += "]";
     HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
@@ -234,23 +252,6 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         return false;
     }
     return true;
-}
-
-void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
-                                                 int64_t &reportInterval)
-{
-    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function", __func__, serviceId);
-
-    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
-    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
-        return;
-    }
-
-    auto client = clients_[groupId].find(serviceId);
-    SensorConfig sensorConfig = {samplingInterval, reportInterval};
-    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
-    client -> second.curCountMap_[sensorId] = 0;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
