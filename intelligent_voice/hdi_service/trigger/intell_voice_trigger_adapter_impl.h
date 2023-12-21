@@ -17,7 +17,9 @@
 #define HDI_DEVICE_INTELL_VOICE_TRIGGER_ADAPTER_IMPL_H
 
 #include <memory>
+#include <mutex>
 #include <set>
+#include <unordered_map>
 #include "iremote_object.h"
 #include "v1_1/iintell_voice_trigger_adapter.h"
 #include "i_trigger.h"
@@ -42,20 +44,22 @@ private:
 
 class IntellVoiceDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    using ServiceDiedCallback = std::function<void()>;
-    explicit IntellVoiceDeathRecipient(ServiceDiedCallback callback) : callback_(callback) {};
+    using ServiceDiedCallback = std::function<void(IRemoteObject *)>;
+    IntellVoiceDeathRecipient(ServiceDiedCallback callback, IRemoteObject *remote)
+        : callback_(callback), remote_(remote) {};
     ~IntellVoiceDeathRecipient() override = default;
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override
     {
         (void)remote;
         if (callback_ != nullptr) {
-            callback_();
+            callback_(remote_);
         }
     }
 
 private:
     ServiceDiedCallback callback_ = nullptr;
+    IRemoteObject *remote_ = nullptr;
 };
 
 class IntellVoiceTriggerAdapterImpl : public OHOS::HDI::IntelligentVoice::Trigger::V1_1::IIntellVoiceTriggerAdapter {
@@ -71,15 +75,19 @@ public:
     int32_t Stop(int32_t handle) override;
     int32_t SetParams(const std::string &key, const std::string &value) override;
     int32_t GetParams(const std::string &key, std::string &value) override;
-    void Clean();
 
 private:
     int32_t GetModelDataFromAshmem(sptr<Ashmem> ashmem, std::vector<uint8_t> &modelData);
-    bool RegisterDeathRecipient(const sptr<IIntellVoiceTriggerCallback> &triggerCallback);
+    bool RegisterDeathRecipient(int32_t handle, const sptr<IIntellVoiceTriggerCallback> &triggerCallback);
+    void DeregisterDeathRecipient(int32_t handle);
+    void Clean(IRemoteObject *remote);
 
 private:
     std::unique_ptr<ITrigger> adapter_ = nullptr;
-    std::set<int32_t> handleSet_;
+    std::mutex mutex_;
+    std::unordered_map<int32_t, sptr<IIntellVoiceTriggerCallback>> handleToCallbackMap_;
+    std::unordered_map<IRemoteObject *, std::set<int32_t>> callbackToHandleMap_;
+    std::unordered_map<IRemoteObject *, sptr<IRemoteObject::DeathRecipient>> deathRecipientMap_;
 };
 }  // namespace Trigger
 }  // namespace IntelligentVoice
