@@ -153,4 +153,20 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest006, TestSize.Level1)
     auto it = unLock.find(testName);
     EXPECT_TRUE(it != std::string::npos);
 }
+
+/**
+  * @tc.name: HdfPowerHdiTest007
+  * @tc.desc: check GetWakeupReason
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
+{
+    std::string testName = "HdfPowerHdiTest007";
+    int32_t ret = g_powerInterface->GetWakeupReason(testName);
+#ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
+    EXPECT_EQ(0, ret);
+#else
+    EXPECT_NE(0, ret);
+#endif
+}
 }

@@ -31,6 +31,8 @@ class PowerInterfaceImpl : public IPowerInterface {
 public:
     ~PowerInterfaceImpl() override {};
 
+    int32_t Init();
+
     int32_t RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback) override;
 
     int32_t StartSuspend() override;
