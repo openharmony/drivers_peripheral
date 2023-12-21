@@ -14,7 +14,6 @@
  */
 
 #include "sensor_client_info.h"
-#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
