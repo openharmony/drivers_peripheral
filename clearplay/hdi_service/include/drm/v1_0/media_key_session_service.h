@@ -71,10 +71,10 @@ public:
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
     int32_t SetKeySessionServiceCallback(sptr<KeySessionServiceCallback> callback);
+    sptr<Session> session_;
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
-    sptr<Session> session_;
     SecurityLevel level_;
     sptr<OHOS::HDI::Drm::V1_0::MediaDecryptModuleService> decryptModule_;
     sptr<KeySessionServiceCallback> sessionCallback_;

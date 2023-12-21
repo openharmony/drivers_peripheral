@@ -48,6 +48,7 @@ ohos_unittest("camera_metadata_operator_ut") {
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
     "$camera_path/../../interfaces/include",
+    "$camera_path/metadata_manager/include",
     "$camera_path/include",
   ]
 
