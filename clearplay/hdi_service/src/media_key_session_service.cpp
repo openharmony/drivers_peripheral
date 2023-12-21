@@ -124,6 +124,7 @@ int32_t MediaKeySessionService::ProcessLicenseResponse(const std::vector<uint8_t
                 offlineKeyMutex_.unlock();
                 return ret;
             }
+            session_->keyIdStatusMap[licenseId] = OFFLINELICENSE_STATUS_USABLE;
             offlineKeyMutex_.unlock();
         }
     }
@@ -192,10 +193,7 @@ int32_t MediaKeySessionService::ProcessOfflineReleaseResponse(const std::vector<
     std::string keyIdBase64 = Encode(keyIdString);
     auto it = offlineKeyIdAndKeyValueBase64_.find(keyIdBase64);
     if (it != offlineKeyIdAndKeyValueBase64_.end()) {
-        offlineKeyIdAndKeyValueBase64_.erase(it);
-        std::string tmpValue = "";
-        std::vector<uint8_t> value(tmpValue.begin(), tmpValue.end());
-        session_->setKeyIdAndKeyValue(licenseId, value);
+        session_->keyIdStatusMap[licenseId] = OFFLINELICENSE_STATUS_INACTIVE;
         offlineKeyMutex_.unlock();
         HDF_LOGI("%{public}s: end", __func__);
         return HDF_SUCCESS;
@@ -226,6 +224,7 @@ int32_t MediaKeySessionService::RestoreOfflineLicense(const std::vector<uint8_t>
         HDF_LOGE("%{public}s: do not find offline license, licenseId: %{public}s", __func__, licenseId.data());
         return HDF_FAILURE;
     }
+    session_->keyIdStatusMap[licenseId] = OFFLINELICENSE_STATUS_USABLE;
     std::string keyValueString = Decode(offlineKeyIdAndKeyValueBase64_[keyIdBase64]);
     std::vector<uint8_t> value(keyValueString.begin(), keyValueString.end());
     offlineKeyIdAndKeyValueBase64_.clear();
@@ -236,7 +235,7 @@ int32_t MediaKeySessionService::RestoreOfflineLicense(const std::vector<uint8_t>
         vdiCallbackObj->SendEvent(EVENTTYPE_EXPIRATIONUPDATE, 0, data);
     }
     HDF_LOGI("%{public}s: end", __func__);
-    return session_->setKeyIdAndKeyValue(licenseId, value);
+    return ret;
 }
 
 int32_t MediaKeySessionService::GetSecurityLevel(SecurityLevel &level)

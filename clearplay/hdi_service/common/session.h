@@ -34,6 +34,7 @@ public:
     int32_t setKeyIdAndKeyValue(const std::vector<uint8_t> &keyId, const std::vector<uint8_t> &keyValue);
     int32_t getKeyValueByKeyId(const std::vector<uint8_t> &keyId, std::vector<uint8_t> &keyValue);
     std::vector<std::pair<std::vector<uint8_t>, std::vector<uint8_t>>> keyIdAndKeyValue_;
+    std::map<std::vector<uint8_t>, OfflineLicenseStatus> keyIdStatusMap;
 };
 } // V1_0
 } // Drm
