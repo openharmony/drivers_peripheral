@@ -405,6 +405,7 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(
     for (uint i = 0; i < outFences.size(); i++) {
         int32_t dupFd = outFences[i];
         sptr<HdifdParcelable> hdifd(new HdifdParcelable());
+        CHECK_NULLPOINTER_RETURN_VALUE(hdifd, HDF_FAILURE);
         hdifd->Init(dupFd);
         fences.push_back(hdifd);
     }
@@ -436,10 +437,12 @@ int32_t DisplayComposerService::SetVirtualDisplayBuffer(
 {
     DISPLAY_TRACE;
 
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(fence, HDF_FAILURE);
     BufferHandle* handle = buffer->GetBufferHandle();
     int32_t inFence = fence->GetFd();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetVirtualDisplayBuffer(devId, *handle, inFence);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
