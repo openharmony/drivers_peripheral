@@ -48,6 +48,7 @@ struct SdcSensorInfoVdi {
     int32_t ddrSize;
     int32_t minRateLevel;
     int32_t maxRateLevel;
+    uint64_t memAddr;
     int32_t reserved;
 };
 
