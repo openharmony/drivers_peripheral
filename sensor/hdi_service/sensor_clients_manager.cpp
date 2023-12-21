@@ -191,7 +191,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (sensorConfigMsg != "[") {
             sensorConfigMsg += ", ";
         }
-        sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
+        sensorConfigMsg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
     }
     sensorConfigMsg += "]";
     HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
@@ -201,7 +201,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (bestSensorConfigMsg != "[") {
             bestSensorConfigMsg += ", ";
         }
-        bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
+        bestSensorConfigMsg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
     }
     bestSensorConfigMsg += "]";
     HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
@@ -213,7 +213,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
         }
-        curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}";
+        curCountMap_Msg += "sensorId = " + std::to_string(it.first) + "-> {samplingInterval = " + std::to_string(it.second.samplingInterval) + ", reportInterval = " + std::to_string(it.second.reportInterval) + "}";
     }
     curCountMap_Msg += "]";
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
