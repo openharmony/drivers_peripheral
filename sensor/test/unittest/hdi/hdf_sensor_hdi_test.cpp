@@ -23,6 +23,7 @@
 #include "v2_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
+#include "hdf_log.h"
 
 using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V2_0;
@@ -488,7 +489,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
         }
         infoMsg += "{";
         infoMsg += "offset = " + std::to_string(it.offset) +", ";
-        infoMsg += "type = " + std::to_string(it.type) +", ";
+        infoMsg += "sensorId = " + std::to_string(it.sensorId) +", ";
         infoMsg += "ddrSize = " + std::to_string(it.ddrSize) +", ";
         infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) +", ";
         infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) +", ";
@@ -496,7 +497,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
         infoMsg += "}";
     }
     infoMsg += "}";
-    printf("sdcSensorInfo = %s", infoMsg.c_str());
+    HDF_LOGI("%{public}s: sdcSensorInfo = %{public}s", __func__, infoMsg.c_str());
 }
 
 
