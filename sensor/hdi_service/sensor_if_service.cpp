@@ -121,8 +121,8 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         sensorInfo.power = it.power;
         sensorInfo.minDelay = it.minDelay;
         sensorInfo.maxDelay = it.maxDelay;
-        info.push_back(std::move(sensorInfo));
         sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
+        info.push_back(std::move(sensorInfo));
     }
 
     return HDF_SUCCESS;

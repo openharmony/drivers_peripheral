@@ -85,7 +85,8 @@ int32_t SensorShowList(struct HdfSBuf *reply)
             accuracy: %f \n\r \
             power:    %f \n\r \
             minDelay: %" PRId64 "\n\r \
-            maxDelay: %" PRId64 "\n\r",
+            maxDelay: %" PRId64 "\n\r \
+            fifoMaxEventCount: %d \n\r",
             sensorList->sensorInfoEntry[index].sensorName,
             sensorList->sensorInfoEntry[index].sensorId,
             sensorStatus[sensorList->sensorInfoEntry[index].sensorId],
