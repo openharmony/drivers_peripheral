@@ -369,11 +369,14 @@ int TestGetDisplaySupportedModesExt(uint32_t devId)
     return ret;
 }
 
+void TestModeCallback(uint32_t modeId, uint64_t vBlankPeriod, void* data)
+{
+}
+
 int TestSetDisplayModeAsync(uint32_t devId)
 {
     uint32_t modeid = GetData<uint32_t>();
-    ModeCallback callback = GetData<ModeCallback>();
-    int32_t ret = g_composerInterface->SetDisplayModeAsync(devId, modeid, callback);
+    int32_t ret = g_composerInterface->SetDisplayModeAsync(devId, modeid, TestModeCallback);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: SetDisplayModeAsync failed", __func__);
     }
@@ -390,10 +393,13 @@ int TestGetDisplayVBlankPeriod(uint32_t devId)
     return ret;
 }
 
+void TestSeamlessChangeCallback(uint32_t devId, void* data)
+{
+}
+
 int TestRegSeamlessChangeCallback(uint32_t devId)
 {
-    SeamlessChangeCallback callback = GetData<SeamlessChangeCallback>();
-    int32_t ret = g_composerInterface->RegSeamlessChangeCallback(callback, nullptr);
+    int32_t ret = g_composerInterface->RegSeamlessChangeCallback(TestSeamlessChangeCallback, nullptr);
     if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
         HDF_LOGE("%{public}s: SetDisplayModeAsync failed", __func__);
     }
