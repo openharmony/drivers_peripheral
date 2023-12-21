@@ -292,7 +292,7 @@ public:
         int32_t OnProcessDone(const std::string& imageId,
             const OHOS::HDI::Camera::V1_2::ImageBufferInfo& buffer) override;
         int32_t OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status) override;
-        int32_t OnError(const std::string& imageId, int32_t errorCode) override;
+        int32_t OnError(const std::string& imageId, OHOS::HDI::Camera::V1_2::ErrorCode errorCode) override;
     };
 };
 }
