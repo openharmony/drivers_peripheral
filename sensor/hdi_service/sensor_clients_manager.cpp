@@ -176,7 +176,9 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
                                                  int64_t &reportInterval)
 {
-    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function", __func__, serviceId);
+    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
+             "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
+             std::to_string(samplingInterval).c_str(), std::to_string(reportInterval).c_str());
 
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
@@ -188,11 +190,21 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client -> second.sensorConfigMap_[sensorId] = sensorConfig;
     client -> second.curCountMap_[sensorId] = 0;
+
+    std::string sensorConfigMsg = "[";
+    for (auto it = client -> second.sensorConfigMap_.begin(); it != client -> second.sensorConfigMap_.end(); ++it) {
+        if (sensorConfigMsg != "[") {
+            sensorConfigMsg += ", ";
+        }
+        sensorConfigMsg += std::to_string(it->first) + "->{" + std::to_string(it->second.samplingInterval) + ", " + std::to_string(it->second.reportInterval) + "}";
+    }
+    sensorConfigMsg += "]";
+    HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 }
 
 bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId)
 {
-    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, sensorClientInfo is %{public}p", __func__, serviceId, &sensorClientInfo);
+    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, sensorClientInfo is %{public}p", __func__, &sensorClientInfo);
     if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
         return true;
     }
