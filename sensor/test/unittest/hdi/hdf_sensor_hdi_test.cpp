@@ -501,8 +501,3 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     infoMsg += "]";
     HDF_LOGI("%{public}s: sdcSensorInfo = %{public}s", __func__, infoMsg.c_str());
 }
-
-
-
-
-
