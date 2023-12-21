@@ -26,7 +26,11 @@
         "c_utils",
         "hdf_core",
         "hilog",
+        "hilog_lite",
         "drivers_interface_input"
+      ],
+      "third_party": [
+        "bounds_checking_function"
       ]
     },
     "build": {
