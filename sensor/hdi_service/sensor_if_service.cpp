@@ -347,6 +347,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         info.ddrSize = infoVdi.ddrSize;
         info.minRateLevel = infoVdi.minRateLevel;
         info.maxRateLevel = infoVdi.maxRateLevel;
+        info.memAddr = infoVdi.memAddr;
         info.reserved = infoVdi.reserved;
         sdcSensorInfo.push_back(std::move(info));
     }
