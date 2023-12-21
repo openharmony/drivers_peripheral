@@ -72,6 +72,8 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.GetSignalPollInfo = WlanInterfaceGetSignalPollInfo;
     service->interface.GetApBandwidth = WlanInterfaceGetApBandwidth;
     service->interface.ResetToFactoryMacAddress = WlanInterfaceResetToFactoryMacAddress;
+    service->interface.SendActionFrame = WlanInterfaceSendActionFrame;
+    service->interface.RegisterActionFrameReceiver = WlanInterfaceRegisterActionFrameReceiver;
     return &service->interface;
 }
 
