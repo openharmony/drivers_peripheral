@@ -476,9 +476,9 @@ static int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
     return HDF_SUCCESS;
 }
 
-static int32_t GetSdcSensorInfo(struct SdcSensorInfo sdcSensorInfos[])
+static int32_t GetSdcSensorInfo(struct SdcSensorInfo sdcSensorInfo[])
 {
-    (void)sdcSensorInfos;
+    (void)sdcSensorInfo;
     return HDF_SUCCESS;
 }
 

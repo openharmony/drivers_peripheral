@@ -24,7 +24,7 @@
 #include "sensor_dump.h"
 
 #define HDF_LOG_TAG uhdf_sensor_service
-#define DEFUALT_SDC_SENSOR_INFO_SIZE 10
+#define DEFUALT_SDC_SENSOR_INFO_SIZE 2
 
 namespace OHOS {
 namespace HDI {
@@ -344,28 +344,28 @@ int32_t SensorImpl::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLev
     return ret;
 }
 
-int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdis)
+int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
-    struct SdcSensorInfo sdcSensorInfos[DEFUALT_SDC_SENSOR_INFO_SIZE];
-    int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
+    struct SdcSensorInfo sdcSensorInfo[DEFUALT_SDC_SENSOR_INFO_SIZE];
+    int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
-    for (auto sdcSensorInfo : sdcSensorInfos) {
-        SdcSensorInfoVdi sdcSensorInfoVdi;
-        sdcSensorInfoVdi.offset = sdcSensorInfo.offset;
-        sdcSensorInfoVdi.type = sdcSensorInfo.type;
-        sdcSensorInfoVdi.ddrSize = sdcSensorInfo.ddrSize;
-        sdcSensorInfoVdi.minRateLevel = sdcSensorInfo.minRateLevel;
-        sdcSensorInfoVdi.maxRateLevel = sdcSensorInfo.maxRateLevel;
-        sdcSensorInfoVdi.reserved = sdcSensorInfo.reserved;
-        sdcSensorInfoVdis.push_back(std::move(sdcSensorInfoVdi));
+    for (auto info : sdcSensorInfo) {
+        SdcSensorInfoVdi infoVdi;
+        infoVdi.offset = info.offset;
+        infoVdi.sensorId = info.sensorId;
+        infoVdi.ddrSize = info.ddrSize;
+        infoVdi.minRateLevel = info.minRateLevel;
+        infoVdi.maxRateLevel = info.maxRateLevel;
+        infoVdi.reserved = info.reserved;
+        sdcSensorInfoVdi.push_back(std::move(infoVdi));
     }
 
     return ret;
