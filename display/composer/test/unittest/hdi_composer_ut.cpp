@@ -878,6 +878,10 @@ HWTEST_F(DeviceTest, test_SetLayerPerFrameParameter, TestSize.Level1)
     std::vector<int8_t> value = { 1 };
     key = "NotSupportKey";
     auto ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("SetLayerPerFrameParameter not support");
+        return;
+    }
     ASSERT_EQ(ret, -1) << "key not support, ret:" << ret;
     key = ValidKeys[0];
     ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
