@@ -215,7 +215,6 @@ void IntellVoiceTriggerAdapterImpl::DeregisterDeathRecipient(int32_t handle)
     sptr<IIntellVoiceTriggerCallback> callback = callbackIter->second;
     handleToCallbackMap_.erase(callbackIter);
 
-
     sptr<IRemoteObject> object = OHOS::HDI::hdi_objcast<IIntellVoiceTriggerCallback>(callback);
     if (object == nullptr) {
         INTELLIGENT_VOICE_LOGE("object is nullptr");
