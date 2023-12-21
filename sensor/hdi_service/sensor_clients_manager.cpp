@@ -187,8 +187,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     curCountMap_[sensorId]++;
 
     std::string sensorConfigMsg = "[";
-    for (auto it = sensorConfig.start(); it != sensorConfig.end(); ++it) {
-        if (it != sensorConfig.start()) {
+    for (auto it = sensorClientInfo.sensorConfigMap_.start(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
+        if (it != sensorClientInfo.sensorConfigMap_.start()) {
             sensorConfigMsg += ", ";
         }
         sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
@@ -197,8 +197,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 
     std::string bestSensorConfigMsg = "[";
-    for (auto it = bestSensorConfig.start(); it != bestSensorConfig.end(); ++it) {
-        if (it != bestSensorConfig.start()) {
+    for (auto it = sensorConfig_.start(); it != sensorConfig_.end(); ++it) {
+        if (it != sensorConfig_.start()) {
             bestSensorConfigMsg += ", ";
         }
         bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
