@@ -184,6 +184,17 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId)->second;
     BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId)->second;
     int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
+
+    std::string curCountMap_Msg = "[";
+    for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
+        if (curCountMap_Msg != "[") {
+            curCountMap_Msg += ", ";
+        }
+        curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> count = " + std::to_string(it->second) + "}";
+    }
+    curCountMap_Msg += "]";
+    HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
+
     sensorClientInfo.curCountMap_[sensorId]++;
 
     std::string sensorConfigMsg = "[";
@@ -208,7 +219,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
 
     HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
-    std::string curCountMap_Msg = "[";
+    curCountMap_Msg = "[";
     for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
         if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
