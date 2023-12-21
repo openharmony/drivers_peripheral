@@ -57,6 +57,7 @@ enum BatteryManagerLogLabel {
     COMP_FWK = 1,
     COMP_SVC = 2,
     COMP_HDI = 3,
+    // Write to kmsg log
     COMP_DRV = 4,
     // Feature labels, use to mark major features
     FEATURE_CHARGING,
@@ -85,7 +86,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel BATTERY_LABEL[LABEL_END] = {
     {LOG_CORE, DOMAIN_FRAMEWORK,         "BatteryFwk"     },
     {LOG_CORE, DOMAIN_SERVICE,           "BatterySvc"     },
     {LOG_CORE, DOMAIN_HDI,               "BatteryHdi"     },
-    {LOG_CORE, DOMAIN_DRIVER,            "BatteryDrv"     },
+    {LOG_KMSG, DOMAIN_DRIVER,            "BatteryDrv"     },
     {LOG_CORE, DOMAIN_FEATURE_CHARGING,  "BatteryCharging"},
     {LOG_CORE, DOMAIN_FEATURE_BATT_INFO, "BatteryInfo"    },
     {LOG_CORE, DOMAIN_TEST,              "BatteryTest"    },
