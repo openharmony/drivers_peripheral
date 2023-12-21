@@ -197,7 +197,7 @@ struct SensorInterface {
     /**
      * @brief Obtain sensor information for SDC
      *
-     * @param sdcSensorInfos Indicates the data of the SDC type.
+     * @param sdcSensorInfo Indicates the data of the SDC type.
      * @return Returns <b>0</b> if the event data is obtained; returns a negative value otherwise.
      *
      * @since 4.1
