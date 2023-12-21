@@ -823,7 +823,6 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
     uint32_t modeid = oldModes[0].id;
     auto ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
     if (ret == DISPLAY_NOT_SUPPORT) {
-        DISPLAY_TEST_LOGD("SetDisplayModeAsync not support");
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
