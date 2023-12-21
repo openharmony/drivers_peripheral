@@ -39,24 +39,6 @@ sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
     return pollCallback_;
 }
 
-bool SensorClientInfo::IsNotNeedReportData(int32_t sensorId)
-{
-    if (sensorConfigMap_.find(sensorId) == sensorConfigMap_.end()) {
-        return false;
-    }
-    curCountMap_[sensorId]++;
-    int64_t samplingInterval;
-    int64_t reportInterval;
-    OHOS::HDI::Sensor::V2_0::SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-    int32_t periodCount = sensorConfigMap_[sensorId].reportInterval / reportInterval;
-    PrintLog();
-    if (curCountMap_[sensorId] >= periodCount) {
-        curCountMap_[sensorId] = 0;
-        return false;
-    }
-    return true;
-}
-
 } // V2_0
 } // Sensor
 } // HDI

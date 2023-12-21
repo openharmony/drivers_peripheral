@@ -208,24 +208,21 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     return true;
 }
 
-void SensorClientsManager::SetClientPeriodCount(int32_t sensorId, int32_t serviceId, int64_t &reportInterval){
-    HDF_LOGI("%{public}s: service %{public}d enter the SetClientPeriodCount function", __func__, serviceId);
-    std::unique_lock<std::mutex> lock(clientsMutex_);
-    auto it = sensorConfig_.find(sensorId);
-    if (it == sensorConfig_.end()) {
-        return;
-    }
+void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
+                                                 int64_t &reportInterval)
+{
+    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function", __func__, serviceId);
 
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
+
     auto client = clients_[groupId].find(serviceId);
-    SensorConfig sensorConfig = {0, reportInterval};
-    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
+    SensorConfig sensorConfig = {samplingInterval, reportInterval};
+    client -> second.sensorConfigMap_.[sensorId] = sensorConfig;
     client -> second.curCountMap_[sensorId] = 0;
-    client -> second.PrintLog();
 }
 
 } // V2_0
