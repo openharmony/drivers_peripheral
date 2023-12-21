@@ -86,6 +86,7 @@ public:
     void DoWithEventDeviceAdd(int32_t &epollFd, int32_t &fd, string devPath);
     void SendHotPlugEvent(uint32_t &type, uint32_t &index, uint32_t status);
     void DoWithEventDeviceDel(int32_t &epollFd, uint32_t &index);
+    void ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg, size_t iCount);
     // InputManager
     RetStatus ScanDevice(InputDevDesc *staArr, uint32_t arrLen);
     RetStatus OpenDevice(uint32_t deviceIndex);
