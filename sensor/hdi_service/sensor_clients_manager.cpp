@@ -187,8 +187,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     curCountMap_[sensorId]++;
 
     std::string sensorConfigMsg = "[";
-    for (auto it = sensorClientInfo.sensorConfigMap_.start(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
-        if (it != sensorClientInfo.sensorConfigMap_.start()) {
+    for (auto it : sensorClientInfo.sensorConfigMap_) {
+        if (sensorConfigMsg != "[") {
             sensorConfigMsg += ", ";
         }
         sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
@@ -197,8 +197,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 
     std::string bestSensorConfigMsg = "[";
-    for (auto it = sensorConfig_.start(); it != sensorConfig_.end(); ++it) {
-        if (it != sensorConfig_.start()) {
+    for (auto it : sensorConfig_) {
+        if (bestSensorConfigMsg != "[") {
             bestSensorConfigMsg += ", ";
         }
         bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
@@ -209,8 +209,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
     std::string curCountMap_Msg = "[";
-    for (auto it = curCountMap_.start(); it != curCountMap_.end(); ++it) {
-        if (it != curCountMap_.start()) {
+    for (auto it : curCountMap_.start()) {
+        if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
         }
         curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
