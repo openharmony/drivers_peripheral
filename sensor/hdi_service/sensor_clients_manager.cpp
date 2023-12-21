@@ -194,7 +194,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         sensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
     }
     sensorConfigMsg += "]";
-    HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg);
+    HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 
     std::string bestSensorConfigMsg = "[";
     for (auto it = bestSensorConfig.start(); it != bestSensorConfig.end(); ++it) {
@@ -204,9 +204,9 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         bestSensorConfigMsg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
     }
     bestSensorConfigMsg += "]";
-    HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg);
+    HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
 
-    HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg);
+    HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
     std::string curCountMap_Msg = "[";
     for (auto it = curCountMap_.start(); it != curCountMap_.end(); ++it) {
@@ -216,7 +216,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> {samplingInterval = " + std::to_string(it->second.samplingInterval) + ", reportInterval = " + std::to_string(it->second.reportInterval) + "}",
     }
     curCountMap_Msg += "]";
-    HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount));
+    HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
 
     if (curCountMap_[sensorId] >= periodCount) {
         curCountMap_[sensorId] = 0;
