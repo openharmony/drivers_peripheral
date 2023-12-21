@@ -348,6 +348,36 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*getStationInfo)(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
+
+    /**
+     * @brief Send action frame data.
+     *
+     * @param ifName Indicates the NIC name.
+     * @param freq Indicates the send channel frequency.
+     * @param frameData Indicates the action frame data.
+     * @param frameDataLen Indicates the action frame data length.
+     *
+     * @return Returns <b>0</b> if get station information successful; returns a negative value otherwise.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*sendActionFrame)(const char *ifName, uint32_t freq, const uint8_t *frameData,
+        uint32_t frameDataLen);
+
+    /**
+     * @brief Register action frame receiver.
+     *
+     * @param ifName Indicates the NIC name.
+     * @param match Indicates the data matching action frame.
+     * @param matchLen Indicates the matching data length.
+     *
+     * @return Returns <b>0</b> if get station information successful; returns a negative value otherwise.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*registerActionFrameReceiver)(const char *ifName, const uint8_t *match, uint32_t matchLen);
 };
 
 /**

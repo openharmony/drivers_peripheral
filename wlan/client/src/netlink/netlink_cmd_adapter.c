@@ -70,6 +70,7 @@
 #define CMD_SET_DYNAMIC_DBAC_MODE "SET_DYNAMIC_DBAC_MODE"
 #define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
 #define CMD_GET_AP_BANDWIDTH      "GET_AP_BANDWIDTH"
+#define CMD_SET_RX_MGMT_REMAIN_ON_CHANNEL "RX_MGMT_REMAIN_ON_CHANNEL"
 
 #define P2P_BUF_SIZE              64
 #define MAX_PRIV_CMD_SIZE         4096
@@ -248,6 +249,49 @@ static void DisconnectCmdSocket(void)
     g_wifiHalInfo.cmdSock = NULL;
 }
 
+static int32_t NoSeqCheck(struct nl_msg *msg, void *arg)
+{
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+    struct NetworkInfoResult networkInfo;
+    char *ifName = NULL;
+    uint32_t ifidx = -1;
+    uint32_t i;
+    int ret;
+
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
+        genlmsg_attrlen(hdr, 0), NULL);
+    if (hdr->cmd != NL80211_CMD_FRAME) {
+        return NL_OK;
+    }
+    if (attr[NL80211_ATTR_FRAME] == NULL) {
+        return NL_OK;
+    }
+    if (attr[NL80211_ATTR_IFINDEX] == NULL) {
+        return NL_OK;
+    }
+    ifidx = nla_get_u32(attr[NL80211_ATTR_IFINDEX]);
+    ret = GetUsableNetworkInfo(&networkInfo);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: get usable network information failed", __FUNCTION__);
+        return NL_OK;
+    }
+    for (i = 0; i < networkInfo.nums; i++) {
+        if (ifidx == if_nametoindex(networkInfo.infos[i].name)) {
+            if (strncpy_s(ifName, IFNAMSIZ, networkInfo.infos[i].name, strlen(networkInfo.infos[i].name)) != EOK) {
+                HILOG_ERROR(LOG_CORE, "%s: strncpy_s ifName failed", __FUNCTION__);
+                return NL_OK;
+            }
+            break;
+        }
+    }
+    WifiActionData actionData;
+    actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
+    actionData.dataLen = nla_len(attr[NL80211_ATTR_FRAME]);
+    WifiEventReport(ifName, WIFI_EVENT_ACTION_RECEIVED, &actionData);
+    return NL_OK;
+}
+
 static int32_t CmdSocketErrorHandler(struct sockaddr_nl *nla, struct nlmsgerr *err, void *arg)
 {
     int32_t *ret = (int32_t *)arg;
@@ -281,6 +325,7 @@ static struct nl_cb *NetlinkSetCallback(const RespHandler handler, int32_t *erro
         HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
         return NULL;
     }
+    nl_cb_set(cb, NL_CB_SEQ_CHECK, NL_CB_CUSTOM, NoSeqCheck, NULL);
     nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, error);
     nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, error);
     nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, error);
@@ -1810,14 +1855,44 @@ static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
+static int32_t SetRxRemainOnChannel(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen;
+    uint16_t state;
+
+    cmdLen = strlen(CMD_SET_RX_MGMT_REMAIN_ON_CHANNEL);
+    if ((cmdLen + len) >= P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s", CMD_SET_RX_MGMT_REMAIN_ON_CHANNEL);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: snprintf failed!, ret = %{public}d", __FUNCTION__, ret);
+        return RET_CODE_FAILURE;
+    }
+    cmdLen = ret;
+    ret = memcpy_s(cmdBuf + cmdLen + 1, P2P_BUF_SIZE - cmdLen - 1, data, len);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: memcpy failed!, ret = %{public}d", __FUNCTION__, ret);
+        return RET_CODE_FAILURE;
+    }
+    if ((GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS) || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
+
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
+}
+
 int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
 {
     int32_t ret;
-
-    if (strcmp(ifName, STR_WLAN0) != EOK) {
-        HILOG_ERROR(LOG_CORE, "%{public}s: %{public}s is not supported", __FUNCTION__, ifName);
-        return RET_CODE_NOT_SUPPORT;
-    }
     switch (param->cmdId) {
         case CMD_CLOSE_GO_CAC:
             ret = DisableNextCacOnce(ifName);
@@ -1833,6 +1908,9 @@ int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam
             break;
         case CMD_ID_CTRL_ROAM_CHANNEL:
             ret = SetP2pScenes(ifName, param->buf, param->bufLen);
+            break;
+        case CMD_ID_RX_REMAIN_ON_CHANNEL:
+            ret = SetRxRemainOnChannel(ifName, param->buf, param->bufLen);
             break;
         default:
             HILOG_ERROR(LOG_CORE, "%{public}s: Invalid command id", __FUNCTION__);
@@ -2728,6 +2806,104 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
             break;
         }
         ret = NetlinkSendCmdSync(msg, SignalInfoHandler, signalResult);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
+static int32_t SendActionFrameHandler(struct nl_msg *msg, void *arg)
+{
+    return NL_SKIP;
+}
+
+int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *frameData, uint32_t frameDataLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    uint64_t cookie;
+    if (ifName == NULL || freq == 0 || frameData == NULL || frameDataLen == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_FRAME, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_WIPHY_FREQ, freq) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 freq failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put_flag(msg, NL80211_ATTR_OFFCHANNEL_TX_OK) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 offchannel failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put(msg, NL80211_ATTR_FRAME, frameData, frameDataLen) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 frameData failed", __FUNCTION__);
+            break;
+        }
+        cookie = 0;
+        ret = NetlinkSendCmdSync(msg, WifiSendActionFrameHandler, &cookie);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
+int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    if (ifName == NULL || match == NULL || matchLen == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_REGISTER_FRAME, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put(msg, NL80211_ATTR_FRAME_MATCH, match, matchLen) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 frameData failed", __FUNCTION__);
+            break;
+        }
+        cookie = 0;
+        ret = NetlinkSendCmdSync(msg, NULL, NULL);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
         }
