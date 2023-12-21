@@ -478,11 +478,11 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
-    std::vector<V2_0::SdcSensorInfo> sdcSensorInfos;
-    int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfos);
+    std::vector<V2_0::SdcSensorInfo> sdcSensorInfo;
+    int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
     std::string infoMsg="{";
-    for (auto it : sdcSensorInfos) {
+    for (auto it : sdcSensorInfo) {
         if (infoMsg != "{") {
             infoMsg += ", ";
         }
@@ -496,7 +496,7 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
         infoMsg += "}";
     }
     infoMsg += "}";
-    printf("sdcSensorInfos = %s", infoMsg.c_str());
+    printf("sdcSensorInfo = %s", infoMsg.c_str());
 }
 
 
