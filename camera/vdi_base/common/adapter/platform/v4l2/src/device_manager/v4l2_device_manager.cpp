@@ -748,7 +748,8 @@ void V4L2DeviceManager::ConvertAbilityExposureTimeToOhos(std::shared_ptr<CameraM
 
     if (deviceControl.id == V4L2_CID_EXPOSURE_ABSOLUTE) {
         abilityExposureTimeVector.push_back(deviceControl.minimum);
-        CAMERA_LOGE("V4L2DeviceManager::ConvertAbilityExposureTimeToOhos deviceControl.maximum is %{public}d", deviceControl.maximum);
+        CAMERA_LOGE("V4L2DeviceManager::ConvertAbilityExposureTimeToOhos deviceControl.maximum is %{public}d",
+            deviceControl.maximum);
         abilityExposureTimeVector.push_back(deviceControl.maximum);
     }
 
