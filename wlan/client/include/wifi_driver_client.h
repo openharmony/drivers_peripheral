@@ -182,8 +182,8 @@ typedef struct {
 enum WifiClientType {
     /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<13 */
     WIFI_KERNEL_TO_WPA_CLIENT = 11519,
-    /* 1<<17 | 1<<16 | 1<<15 | 1<<5 | 1<<4 */
-    WIFI_KERNEL_TO_HAL_CLIENT = 229424,
+    /* 1<<19 | 1<<17 | 1<<16 | 1<<15 | 1<<5 | 1<<4 */
+    WIFI_KERNEL_TO_HAL_CLIENT = 753712,
     WIFI_CLIENT_BUTT
 };
 

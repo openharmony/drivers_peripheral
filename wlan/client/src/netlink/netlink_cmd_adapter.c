@@ -253,11 +253,6 @@ static int32_t NoSeqCheck(struct nl_msg *msg, void *arg)
 {
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
-    struct NetworkInfoResult networkInfo;
-    char *ifName = NULL;
-    uint32_t ifidx = -1;
-    uint32_t i;
-    int ret;
 
     nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
         genlmsg_attrlen(hdr, 0), NULL);
@@ -267,28 +262,12 @@ static int32_t NoSeqCheck(struct nl_msg *msg, void *arg)
     if (attr[NL80211_ATTR_FRAME] == NULL) {
         return NL_OK;
     }
-    if (attr[NL80211_ATTR_IFINDEX] == NULL) {
-        return NL_OK;
-    }
-    ifidx = nla_get_u32(attr[NL80211_ATTR_IFINDEX]);
-    ret = GetUsableNetworkInfo(&networkInfo);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: get usable network information failed", __FUNCTION__);
-        return NL_OK;
-    }
-    for (i = 0; i < networkInfo.nums; i++) {
-        if (ifidx == if_nametoindex(networkInfo.infos[i].name)) {
-            if (strncpy_s(ifName, IFNAMSIZ, networkInfo.infos[i].name, strlen(networkInfo.infos[i].name)) != EOK) {
-                HILOG_ERROR(LOG_CORE, "%s: strncpy_s ifName failed", __FUNCTION__);
-                return NL_OK;
-            }
-            break;
-        }
-    }
+
     WifiActionData actionData;
     actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
     actionData.dataLen = nla_len(attr[NL80211_ATTR_FRAME]);
-    WifiEventReport(ifName, WIFI_EVENT_ACTION_RECEIVED, &actionData);
+    HILOG_INFO(LOG_CORE, "%s: received action frame data", __FUNCTION__);
+    WifiEventReport(STR_P2P0, WIFI_EVENT_ACTION_RECEIVED, &actionData);
     return NL_OK;
 }
 
@@ -2814,7 +2793,7 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     return ret;
 }
 
-static int32_t SendActionFrameHandler(struct nl_msg *msg, void *arg)
+static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     return NL_SKIP;
 }
@@ -2856,7 +2835,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 offchannel failed", __FUNCTION__);
             break;
         }
-        if (nla_put(msg, NL80211_ATTR_FRAME, frameData, frameDataLen) != RET_CODE_SUCCESS) {
+        if (nla_put(msg, NL80211_ATTR_FRAME, frameDataLen, frameData) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 frameData failed", __FUNCTION__);
             break;
         }
@@ -2898,14 +2877,13 @@ int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
             break;
         }
-        if (nla_put(msg, NL80211_ATTR_FRAME_MATCH, match, matchLen) != RET_CODE_SUCCESS) {
+        if (nla_put(msg, NL80211_ATTR_FRAME_MATCH, matchLen, match) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 frameData failed", __FUNCTION__);
             break;
         }
-        cookie = 0;
         ret = NetlinkSendCmdSync(msg, NULL, NULL);
         if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: register cmd failed", __FUNCTION__);
         }
     } while (0);
     nlmsg_free(msg);
