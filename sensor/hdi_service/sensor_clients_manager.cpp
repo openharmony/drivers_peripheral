@@ -173,24 +173,8 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     return true;
 }
 
-std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
+bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId)
 {
-    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
-    return sensorUsed_;
-}
-
-SensorClientsManager* SensorClientsManager::GetInstance()
-{
-    if (instance == nullptr) {
-        std::unique_lock<std::mutex> lock(instanceMutex_);
-        if (instance == nullptr) {
-            instance = new SensorClientsManager();
-        }
-    }
-    return instance;
-}
-
-bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId){
     if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
         return true;
     }
@@ -239,6 +223,23 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         return false;
     }
     return true;
+}
+
+std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
+{
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    return sensorUsed_;
+}
+
+SensorClientsManager* SensorClientsManager::GetInstance()
+{
+    if (instance == nullptr) {
+        std::unique_lock<std::mutex> lock(instanceMutex_);
+        if (instance == nullptr) {
+            instance = new SensorClientsManager();
+        }
+    }
+    return instance;
 }
 
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
