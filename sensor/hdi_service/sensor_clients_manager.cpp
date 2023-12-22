@@ -188,17 +188,18 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
     auto client = clients_[groupId].find(serviceId);
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
-    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
-    client -> second.curCountMap_[sensorId] = 0;
+    client -> second.serviceConfigMap_[serviceId][sensorId] = sensorConfig;
+    client -> second.curCountMap_[serviceId][sensorId] = 0;
 }
 
-bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t sensorId)
+bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, uint32_t serviceId, int32_t sensorId)
 {
-    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, sensorClientInfo is %{public}p", __func__, &sensorClientInfo);
-    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
+    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, sensorClientInfo is %{public}p, "
+             "serviceId is %{public}s", __func__, &sensorClientInfo, std::to_string(serviceId).c_str());
+    if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
         return true;
     }
-    if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
+    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
         return true;
     }
     SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId)->second;
