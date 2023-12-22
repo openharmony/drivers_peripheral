@@ -199,16 +199,18 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
         return true;
     }
-    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
+    if (sensorClientInfo.serviceConfigMap_.find(serviceId) == sensorClientInfo.serviceConfigMap_.end() ||
+            sensorClientInfo.serviceConfigMap_.find(serviceId).find(sensorId) ==
+            sensorClientInfo.serviceConfigMap_.find(serviceId).end()) {
         return true;
     }
-    SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId)->second;
+    SensorConfig sensorConfig = sensorClientInfo.serviceConfigMap_.find(serviceId).find(sensorId)->second;
     BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId)->second;
     int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
 
-    sensorClientInfo.curCountMap_[sensorId]++;
-    if (sensorClientInfo.curCountMap_[sensorId] >= periodCount) {
-        sensorClientInfo.curCountMap_[sensorId] = 0;
+    sensorClientInfo.curCountMap_[serviceId][sensorId]++;
+    if (sensorClientInfo.curCountMap_[serviceId][sensorId] >= periodCount) {
+        sensorClientInfo.curCountMap_[serviceId][sensorId] = 0;
         HDF_LOGI("%{public}s curCount has been set 0", __func__);
         return false;
     }
