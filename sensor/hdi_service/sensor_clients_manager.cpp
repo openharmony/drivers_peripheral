@@ -261,6 +261,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
 
     if (sensorClientInfo.curCountMap_[sensorId] >= periodCount) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
+        HDF_LOGI("%{public}s curCount has been set 0", __func__);
         return false;
     }
     return true;
