@@ -111,13 +111,14 @@ void SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     int32_t id = buffer->GetStreamId();
     {
         std::lock_guard<std::mutex> l(requestLock_);
-        CAMERA_LOGV("deliver a buffer to stream id:%{public}d, queue size:%{public}u",
-            id, captureRequests_[id].size());
+        CAMERA_LOGV("deliver a buffer to stream id:%{public}d", id);
         if (captureRequests_.count(id) == 0) {
+            CAMERA_LOGV("queue size: 0");
             buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
         } else if (captureRequests_[id].empty()) {
             buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
         } else {
+            CAMERA_LOGV("queue size:%{public}u", captureRequests_[id].size());
             buffer->SetCaptureId(captureRequests_[id].front());
             captureRequests_[id].pop_front();
         }
