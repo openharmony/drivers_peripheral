@@ -61,6 +61,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         }
+        HDF_LOGI("%{public}s Sensor OnDataEvent success, sensorId is %{public}d", __func__, event.sensorId);
     }
     return HDF_SUCCESS;
 }
