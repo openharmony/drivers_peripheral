@@ -254,7 +254,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
         if (curCountMap_Msg != "[") {
             curCountMap_Msg += ", ";
         }
-        curCountMap_Msg += "sensorId = " + std::to_string(it->first) + "-> count = " + std::to_string(it->second) + "}";
+        curCountMap_Msg += std::to_string(it->first) + "->" + std::to_string(it->second) + "}";
     }
     curCountMap_Msg += "]";
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
