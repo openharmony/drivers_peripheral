@@ -68,6 +68,8 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
                 ", sensorConfigMap_=" + sensorConfigMsg +
                 ", curCountMap_=" + curCountMap_Msg + "}";
     }
+    clientMsg += "]";
+    HDF_LOGI("%{public}s clientMsg is %{public}s", __func__, clientMsg.c_str());
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
