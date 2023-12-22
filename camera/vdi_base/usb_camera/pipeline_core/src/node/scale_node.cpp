@@ -77,21 +77,20 @@ RetCode ScaleNode::Flush(const int32_t streamId)
 void ScaleNode::PreviewScaleConver(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGI("ScaleNode::Yuv422ToRGBA8888 buffer == nullptr");
+        CAMERA_LOGE("ScaleNode::PreviewScaleConver buffer == nullptr");
         return;
     }
 
     AVFrame *pFrameRGBA = nullptr;
     AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    pFrameRGBA = av_frame_alloc();
 
     uint8_t* temp = (uint8_t*)buffer->GetVirAddress();
     std::map<int32_t, uint8_t*> sizeVirMap = bufferPool_->getSFBuffer(buffer->GetIndex());
     if (sizeVirMap.empty()) {
-        CAMERA_LOGI("ScaleNode::Yuv420ToRGBA8888 sizeVirMap buffer == nullptr");
         return;
     }
+    pFrameYUV = av_frame_alloc();
+    pFrameRGBA = av_frame_alloc();
     uint8_t* virBUffer = sizeVirMap.begin()->second;
     int32_t virSize = sizeVirMap.begin()->first;
     buffer->SetVirAddress(virBUffer);
@@ -122,20 +121,20 @@ void ScaleNode::PreviewScaleConver(std::shared_ptr<IBuffer>& buffer)
 void ScaleNode::ScaleConver(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGI("ScaleNode::Yuv422ToRGBA8888 buffer == nullptr");
+        CAMERA_LOGE("ScaleNode::ScaleConver buffer == nullptr");
         return;
     }
 
     AVFrame *pFrameRGBA = nullptr;
     AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    pFrameRGBA = av_frame_alloc();
 
     std::map<int32_t, uint8_t*> sizeVirMap = bufferPool_->getSFBuffer(bufferPool_->GetForkBufferId());
     if (sizeVirMap.empty()) {
-        CAMERA_LOGI("ScaleNode::Yuv420ToRGBA8888 sizeVirMap buffer == nullptr");
+        CAMERA_LOGE("ScaleNode::ScaleConver sizeVirMap buffer == nullptr");
         return;
     }
+    pFrameYUV = av_frame_alloc();
+    pFrameRGBA = av_frame_alloc();
     uint8_t* temp = sizeVirMap.begin()->second;
 
     avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
@@ -163,7 +162,7 @@ void ScaleNode::ScaleConver(std::shared_ptr<IBuffer>& buffer)
 void ScaleNode::ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGI("ScaleNode::Yuv422ToRGBA8888 buffer == nullptr");
+        CAMERA_LOGE("ScaleNode::ScaleConverToYuv420 buffer == nullptr");
         return;
     }
 
@@ -174,7 +173,7 @@ void ScaleNode::ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer)
 
     std::map<int32_t, uint8_t*> sizeVirMap = bufferPool_->getSFBuffer(bufferPool_->GetForkBufferId());
     if (sizeVirMap.empty()) {
-        CAMERA_LOGI("ScaleNode::Yuv420ToRGBA8888 sizeVirMap buffer == nullptr");
+        CAMERA_LOGE("ScaleNode::ScaleConverToYuv420 sizeVirMap buffer == nullptr");
         return;
     }
     uint8_t* temp = sizeVirMap.begin()->second;
@@ -216,12 +215,12 @@ void ScaleNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     int32_t id = buffer->GetStreamId();
-    CAMERA_LOGE("ScaleNode::DeliverBuffer StreamId %{public}d", id);
+    CAMERA_LOGI("ScaleNode::DeliverBuffer StreamId %{public}d", id);
 
     if (bufferPool_->GetForkBufferId() != -1) {
         if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
             ScaleConver(buffer);
-        } else if (buffer->GetFormat() == CAMERA_FORMAT_YCRCB_420_SP) {
+        } else if (buffer->GetFormat() == CAMERA_FORMAT_YCRCB_420_SP || bufferPool_->GetIsFork() == true) {
             ScaleConverToYuv420(buffer);
         } else {
             PreviewScaleConver(buffer);

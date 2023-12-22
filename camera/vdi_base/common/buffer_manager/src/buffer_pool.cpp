@@ -307,4 +307,14 @@ void BufferPool::SetForkBufferId(int32_t index)
 {
     forkBufferId_ = index;
 }
+
+bool BufferPool::GetIsFork()
+{
+    return isFork_;
+}
+
+void BufferPool::SetIsFork(bool isFork)
+{
+    isFork_ = isFork;
+}
 } // namespace OHOS::Camera
