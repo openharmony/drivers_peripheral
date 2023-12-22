@@ -64,7 +64,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         }
         curCountMap_Msg += "]";
         clientMsg += "{serviceId=" + std::to_string(it->first) +
-                ", &=" + std::to_string(&it->second) +
+                ", &=" + std::to_string(reinterpret_cast<uintptr_t>(&it->second)) +
                 ", sensorConfigMap_=" + sensorConfigMsg +
                 ", curCountMap_=" + curCountMap_Msg + "}";
     }
