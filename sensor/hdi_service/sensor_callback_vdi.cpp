@@ -78,8 +78,10 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         if (SensorClientsManager::GetInstance()->IsNotNeedReportData(sensorClientInfo_, event.sensorId)) {
+            HDF_LOGI("%{public}s IsNotNeedReportData return true", __func__);
             continue;
         }
+        HDF_LOGI("%{public}s IsNotNeedReportData return false", __func__);
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
             HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
