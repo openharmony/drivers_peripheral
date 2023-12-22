@@ -77,6 +77,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     }
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
+        HDF_LOGE("%{public}s serviceId is %{public}d, client[*it] is %{public}p", __func__, *it, &client[*it]);
         if (SensorClientsManager::GetInstance()->IsNotNeedReportData(client[*it], event.sensorId)) {
             HDF_LOGI("%{public}s IsNotNeedReportData return true", __func__);
             continue;
