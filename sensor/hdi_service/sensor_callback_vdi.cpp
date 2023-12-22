@@ -42,34 +42,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
         return HDF_FAILURE;
     }
-    std::string clientMsg = "[";
-    for (auto it = client.begin(); it != client.end(); ++it) {
-        if (clientMsg != "[") {
-            clientMsg += ", ";
-        }
-        std::string sensorConfigMsg = "[";
-        for (auto it2 = it -> second.sensorConfigMap_.begin(); it2 != it -> second.sensorConfigMap_.end(); ++it2) {
-            if (sensorConfigMsg != "[") {
-                sensorConfigMsg += ", ";
-            }
-            sensorConfigMsg += std::to_string(it2->first) + "->{" + std::to_string(it2->second.samplingInterval) + ", " + std::to_string(it2->second.reportInterval) + "}";
-        }
-        sensorConfigMsg += "]";
-        std::string curCountMap_Msg = "[";
-        for (auto it3 = it -> second.curCountMap_.begin(); it3 != it -> second.curCountMap_.end(); ++it3) {
-            if (curCountMap_Msg != "[") {
-                curCountMap_Msg += ", ";
-            }
-            curCountMap_Msg += std::to_string(it3->first) + "->" + std::to_string(it3->second);
-        }
-        curCountMap_Msg += "]";
-        clientMsg += "{serviceId=" + std::to_string(it->first) +
-                ", &=" + std::to_string(reinterpret_cast<uintptr_t>(&it->second)) +
-                ", sensorConfigMap_=" + sensorConfigMsg +
-                ", curCountMap_=" + curCountMap_Msg + "}";
-    }
-    clientMsg += "]";
-    HDF_LOGI("%{public}s clientMsg is %{public}s", __func__, clientMsg.c_str());
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
@@ -78,10 +50,8 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         if (SensorClientsManager::GetInstance()->IsNotNeedReportData(sensorClientInfo_, event.sensorId)) {
-            HDF_LOGI("%{public}s IsNotNeedReportData return true", __func__);
             continue;
         }
-        HDF_LOGI("%{public}s IsNotNeedReportData return false", __func__);
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
             HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
