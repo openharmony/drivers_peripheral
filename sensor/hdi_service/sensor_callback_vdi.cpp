@@ -42,6 +42,32 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
         return HDF_FAILURE;
     }
+    std::string clientMsg = "[";
+    for (auto it = client.begin(); it != client.end(); ++it) {
+        if (clientMsg != "[") {
+            clientMsg += ", ";
+        }
+        std::string sensorConfigMsg = "[";
+        for (auto it2 = it -> second.sensorConfigMap_.begin(); it2 != it -> second.sensorConfigMap_.end(); ++it2) {
+            if (sensorConfigMsg != "[") {
+                sensorConfigMsg += ", ";
+            }
+            sensorConfigMsg += std::to_string(it2->first) + "->{" + std::to_string(it2->second.samplingInterval) + ", " + std::to_string(it2->second.reportInterval) + "}";
+        }
+        sensorConfigMsg += "]";
+        std::string curCountMap_Msg = "[";
+        for (auto it3 = it -> second.curCountMap_.begin(); it3 != it -> second.curCountMap_.end(); ++it3) {
+            if (curCountMap_Msg != "[") {
+                curCountMap_Msg += ", ";
+            }
+            curCountMap_Msg += std::to_string(it3->first) + "->" + std::to_string(it3->second);
+        }
+        curCountMap_Msg += "]";
+        clientMsg += "{serviceId=" + std::to_string(it->first) +
+                ", &=" + std::to_string(&it->second) +
+                ", sensorConfigMap_=" + sensorConfigMsg +
+                ", curCountMap_=" + curCountMap_Msg + "}";
+    }
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
