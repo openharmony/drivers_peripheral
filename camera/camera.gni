@@ -23,10 +23,7 @@ test_path = "//drivers/peripheral/camera/test"
 hdf_core_path = "//drivers/hdf_core"
 enable_camera_device_utest = false
 
-use_hitrace = false
-if (use_hitrace) {
-  defines += [ "HITRACE_LOG_ENABLED" ]
-}
+use_hitrace = true
 
 if (defined(ohos_lite)) {
   defines += [ "CAMERA_BUILT_ON_OHOS_LITE" ]
