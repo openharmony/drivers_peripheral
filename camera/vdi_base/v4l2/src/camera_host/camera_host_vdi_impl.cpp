@@ -21,8 +21,12 @@
 
 #include "v1_0/icamera_host_vdi_callback.h"
 #include "camera_dump.h"
+#ifdef HITRACE_LOG_ENABLED
 #include "hdf_trace.h"
 #define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
+#else
+#define HDF_CAMERA_TRACE
+#endif
 
 namespace OHOS::Camera {
 
