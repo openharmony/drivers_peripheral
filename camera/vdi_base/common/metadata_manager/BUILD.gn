@@ -67,7 +67,7 @@ if (!defined(ohos_lite)) {
         "ipc:ipc_single",
       ]
       if (use_hitrace) {
-        external_deps += [ "hitrace:libhitrace" ]
+        external_deps += [ "hitrace:hitrace_meter" ]
       }
     } else {
       external_deps = [ "hilog:libhilog" ]
