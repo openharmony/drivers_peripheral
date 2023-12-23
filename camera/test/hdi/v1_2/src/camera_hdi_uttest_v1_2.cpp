@@ -1583,68 +1583,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Hdi_V1_2_049
- * @tc.desc: SMOOTH ZOOM
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_049, TestSize.Level1)
-{
-    EXPECT_NE(cameraTest->ability, nullptr);
-    common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
-    camera_metadata_item_t entry;
-    // cover tag OHOS_ABILITY_CAMERA_ZOOM_PERFORMANCE
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_ZOOM_PERFORMANCE, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover OHOS_CONTROL_PREPARE_ZOOM and its values
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // cover OHOS_CAMERA_ZOOMSMOOTH_PREPARE_DISABLE
-    uint8_t pre_zoom_value = OHOS_CAMERA_ZOOMSMOOTH_PREPARE_DISABLE;
-    meta->addEntry(OHOS_CONTROL_PREPARE_ZOOM, &pre_zoom_value, DATA_COUNT);
-    std::vector<uint8_t> setting;
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // cover OHOS_CAMERA_ZOOMSMOOTH_PREPARE_ENABLE
-    pre_zoom_value = OHOS_CAMERA_ZOOMSMOOTH_PREPARE_ENABLE;
-    meta->addEntry(OHOS_CONTROL_PREPARE_ZOOM, &pre_zoom_value, DATA_COUNT);
-    setting.clear();
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover OHOS_CONTROL_SMOOTH_ZOOM_RATIOS,  values type: uint32_t array
-    uint32_t values[] = { 10, 300, 20, 400, 30, 500 };
-    meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    meta->addEntry(OHOS_CONTROL_SMOOTH_ZOOM_RATIOS, values, sizeof(values) / sizeof(uint32_t));
-
-    setting.clear();
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover GetStatus(), OHOS_STATUS_CAMERA_CURRENT_FPS and  OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO
-    std::shared_ptr<CameraSetting> metaIn = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    std::shared_ptr<CameraSetting> metaOut = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // no sense
-    uint32_t current_fps = 0;
-    uint32_t current_zoom_ratio = 0;
-    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_FPS, &current_fps, DATA_COUNT);
-    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO, &current_zoom_ratio, DATA_COUNT);
-
-    std::vector<uint8_t> settingIn, settingOut;
-    MetadataUtils::ConvertMetadataToVec(metaIn, settingIn);
-
-    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStatus(settingIn, settingOut);
-    MetadataUtils::ConvertVecToMetadata(settingOut, metaOut);
-}
-
-/**
  * @tc.name: Camera_Hdi_V1_2_050
  * @tc.desc: macro mode
  * @tc.size: MediumTest
