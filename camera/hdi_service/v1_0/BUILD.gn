@@ -132,16 +132,17 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
         "ipc:ipc_single",
       ]
-      if (use_hitrace) {
-        external_deps += [ "hitrace:libhitracechain" ]
-      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+
+    if (use_hitrace) {
+      external_deps += [ "hitrace:hitrace_meter" ]
+    }
+
     external_deps += [
       "drivers_interface_camera:libcamera_stub_1.0",
       "drivers_interface_camera:metadata",
-      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
     shlib_type = "hdi"
@@ -174,19 +175,19 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hilog:libhilog",
-        "hitrace:hitrace_meter",
         "ipc:ipc_single",
       ]
-      if (use_hitrace) {
-        external_deps += [ "hitrace:libhitracechain" ]
-      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+
+    if (use_hitrace) {
+      external_deps += [ "hitrace:hitrace_meter" ]
+    }
+
     external_deps += [
       "drivers_interface_camera:libcamera_stub_1.0",
       "drivers_interface_camera:metadata",
-      "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
 
