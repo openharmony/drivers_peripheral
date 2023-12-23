@@ -37,7 +37,8 @@
     "build": {
       "sub_component": [
         "//drivers/peripheral/wlan:wlan_entry",
-        "//drivers/peripheral/wlan/wpa:wpa_entry"
+        "//drivers/peripheral/wlan/wpa:wpa_entry",
+        "//drivers/peripheral/wlan/hostapd:hostapd_entry"
       ],
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"
@@ -59,6 +60,15 @@
               "wpa_client.h"
             ],
             "header_base": "//drivers/peripheral/wlan/wpa/client/include"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/wlan/hostapd/client:hostapd_hdi_client",
+          "header": {
+            "header_files": [
+              "hostapd_client.h"
+            ],
+          "header_base": "//drivers/peripheral/wlan/hostapd/client/include"
           }
         }
       ]
