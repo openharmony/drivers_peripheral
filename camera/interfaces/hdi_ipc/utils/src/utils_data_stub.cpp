@@ -225,6 +225,9 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbili
 void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t tagCount = data.ReadInt32();
+    int32_t metadataSize = 0;
+    constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
+    
     if (tagCount <= 0) {
         return;
     }
@@ -234,7 +237,6 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata tagCount is more than supported value");
     }
 
-    int32_t metadataSize = 0;
     std::vector<camera_metadata_item_t> entrys;
     for (int32_t i = 0; i < tagCount; i++) {
         camera_metadata_item_t entry;
