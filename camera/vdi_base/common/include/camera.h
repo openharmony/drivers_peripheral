@@ -31,8 +31,8 @@
 #include <string>
 #include "camera_metadata_info.h"
 
-#ifdef HITRACE_LOG_ENABLED
-#include "hitracechain.h"
+#ifdef HITRACE_DFX_ENABLED
+#include "hitrace/hitracechain.h"
 #define DFX_LOCAL_HITRACE_BEGIN     \
     HiviewDFX::HiTraceId _trace_id; \
     _trace_id = OHOS::HiviewDFX::HiTraceChain::Begin(__FUNCTION__, HITRACE_FLAG_DEFAULT)
@@ -40,7 +40,7 @@
 #else
 #define DFX_LOCAL_HITRACE_BEGIN
 #define DFX_LOCAL_HITRACE_END
-#endif // HITRACE_LOG_ENABLED
+#endif // HITRACE_DFX_ENABLED
 
 namespace OHOS {
 namespace Camera {
