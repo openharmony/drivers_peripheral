@@ -229,6 +229,11 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         return;
     }
 
+    if (tagCount > MAX_SUPPORTED_TAGS) {
+        tagCount = MAX_SUPPORTED_TAGS;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata tagCount is more than supported value");
+    }
+
     int32_t metadataSize = 0;
     std::vector<camera_metadata_item_t> entrys;
     for (int32_t i = 0; i < tagCount; i++) {
