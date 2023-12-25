@@ -114,11 +114,12 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 int32_t id = forkBuffer->GetStreamId();
                 {
                     std::lock_guard<std::mutex> l(requestLock_);
-                    CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d, queue size:%{public}u",
-                        id, captureRequests_[id].size());
+                    CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d", id);
                     if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
+                        CAMERA_LOGV("queue size: 0");
                         forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
                     } else {
+                        CAMERA_LOGV("queue size:%{public}u", captureRequests_[id].size());
                         forkBuffer->SetCaptureId(captureRequests_[id].front());
                         captureRequests_[id].pop_front();
                     }
