@@ -23,6 +23,10 @@ using namespace OHOS::Camera;
 constexpr int32_t ITERATION_FREQUENCY = 100;
 constexpr int32_t REPETITION_FREQUENCY = 3;
 
+constexpr uint32_t ITEM_CAPACITY = 100;
+constexpr uint32_t DATA_CAPACITY = 2000;
+constexpr uint32_t DATA_COUNT = 1;
+
 void CameraBenchmarkTest::SetUp(const ::benchmark::State &state)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
@@ -158,6 +162,35 @@ BENCHMARK_F(CameraBenchmarkTest, ConfirmCapture_benchmark_001)(
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, ConfirmCapture_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: GetStatus
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, GetStatus_benchmark_001)(
+    benchmark::State &st)
+{
+    // cover GetStatus(), OHOS_STATUS_CAMERA_CURRENT_FPS and  OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO
+    std::shared_ptr<CameraSetting> metaIn = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    std::shared_ptr<CameraSetting> metaOut = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    // no sense
+    uint32_t current_fps = 0;
+    uint32_t current_zoom_ratio = 0;
+    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_FPS, &current_fps, DATA_COUNT);
+    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO, &current_zoom_ratio, DATA_COUNT);
+
+    std::vector<uint8_t> settingIn, settingOut;
+    MetadataUtils::ConvertMetadataToVec(metaIn, settingIn);
+
+    for (auto _ : st) {
+        cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStatus(settingIn, settingOut);
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, GetStatus_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
 BENCHMARK_MAIN();
