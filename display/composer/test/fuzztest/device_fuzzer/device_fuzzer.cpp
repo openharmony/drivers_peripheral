@@ -54,20 +54,6 @@ T GetData()
     return object;
 }
 
-/*
-* get a string from g_data
-*/
-std::string GetStringFromData(int strlen)
-{
-    char cstr[strlen];
-    cstr[strlen - 1] = '\0';
-    for (int i = 0; i < strlen - 1; i++) {
-        cstr[i] = GetData<char>();
-    }
-    std::string str(cstr);
-    return str;
-}
-
 static int32_t GetAllocInfo(AllocInfo& info)
 {
     uint32_t lenUsage = GetArrLength(CONVERT_TABLE_USAGE);
@@ -406,6 +392,60 @@ int TestRegSeamlessChangeCallback(uint32_t devId)
     return ret;
 }
 
+int TestGetSupportedLayerPerFrameParameterKey(uint32_t devId)
+{
+    std::vector<std::string> keys;
+    int32_t ret = g_composerInterface->GetSupportedLayerPerFrameParameterKey(keys);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestSetDisplayOverlayResolution(uint32_t devId)
+{
+    uint32_t width = GetData<uint32_t>() % WIDTH;
+    uint32_t height = GetData<uint32_t>() % HEIGHT;
+    int32_t ret = g_composerInterface->SetDisplayOverlayResolution(devId, width, height);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+static void TestRefreshCallback(uint32_t devId, void* data)
+{
+}
+
+int TestRegRefreshCallback(uint32_t devId)
+{
+    int32_t ret = g_composerInterface->RegRefreshCallback(TestRefreshCallback, nullptr);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestGetDisplaySupportedColorGamuts(uint32_t devId)
+{
+    std::vector<ColorGamut> gamuts;
+    int32_t ret = g_composerInterface->GetDisplaySupportedColorGamuts(devId, gamuts);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int TestGetHDRCapabilityInfos(uint32_t devId)
+{
+    HDRCapability info = { 0 };
+    int32_t ret = g_composerInterface->GetHDRCapabilityInfos(devId, info);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -428,6 +468,11 @@ TestFuncs g_testFuncs = {
     TestSetDisplayModeAsync,
     TestGetDisplayVBlankPeriod,
     TestRegSeamlessChangeCallback,
+    TestGetSupportedLayerPerFrameParameterKey,
+    TestSetDisplayOverlayResolution,
+    TestRegRefreshCallback,
+    TestGetDisplaySupportedColorGamuts,
+    TestGetHDRCapabilityInfos,
     TestCommit,
 };
 

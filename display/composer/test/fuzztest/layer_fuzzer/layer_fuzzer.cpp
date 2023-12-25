@@ -23,9 +23,9 @@
 
 namespace OHOS {
 using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_1;
 
-static sptr<IDisplayComposerInterface> g_composerInterface = nullptr;
+static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerInterface = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_bufferInterface = nullptr;
 
 static bool g_isInit = false;
@@ -352,6 +352,20 @@ int32_t TestSetLayerColor(uint32_t devId, uint32_t layerId)
     return ret;
 }
 
+int32_t TestSetLayerPerFrameParameter(uint32_t devId, uint32_t layerId)
+{
+    std::vector<std::string> ValidKeys = { "FilmFilter", "ArsrDoEnhance", "SDRBrightnessRatio", "BrightnessNit",
+        "ViewGroupHasValidAlpha", "SourceCropTuning" };
+    std::string key = ValidKeys[0];
+    std::vector<int8_t> value;
+    value.push_back(GetData<int8_t>());
+    int32_t ret = g_composerInterface->SetLayerPerFrameParameter(devId, layerId, key, value);
+    if ((ret != DISPLAY_SUCCESS) && (ret != DISPLAY_NOT_SUPPORT)) {
+        HDF_LOGE("%{public}s: failed with ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 typedef int32_t (*TestFuncs[])(uint32_t, uint32_t);
 
 TestFuncs g_testFuncs = {
@@ -367,6 +381,7 @@ TestFuncs g_testFuncs = {
     TestSetLayerCompositionType,
     TestSetLayerBlendType,
     TestSetLayerColor,
+    TestSetLayerPerFrameParameter,
     TestSetLayerMaskInfo
 };
 
@@ -378,7 +393,7 @@ bool FuzzTest(const uint8_t* rawData, size_t size)
 
     if (!g_isInit) {
         g_isInit = true;
-        g_composerInterface = IDisplayComposerInterface::Get();
+        g_composerInterface = Composer::V1_1::IDisplayComposerInterface::Get();
         if (g_composerInterface == nullptr) {
             HDF_LOGE("%{public}s: get IDisplayComposerInterface failed", __func__);
             return false;
