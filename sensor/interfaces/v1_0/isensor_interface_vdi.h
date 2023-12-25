@@ -38,6 +38,8 @@ struct HdfSensorInformationVdi {
     float power;
     int64_t minDelay;
     int64_t maxDelay;
+    uint32_t fifoMaxEventCount;
+    uint32_t reserved;
 };
 
 class ISensorInterfaceVdi {
