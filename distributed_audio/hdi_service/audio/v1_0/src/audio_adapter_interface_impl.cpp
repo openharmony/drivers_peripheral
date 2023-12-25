@@ -754,11 +754,10 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
 
 int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, std::string &param)
 {
-    int renderId = 0; // fromaudio framwork
     sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        audioRender = renderDevs_[renderId].second;
+        audioRender = renderDevs_[0].second; // from audioframwork
     }
     if (audioRender == nullptr) {
         DHLOGE("Render has not been created.");
@@ -804,17 +803,65 @@ int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &
     return static_cast<VolumeEventType>(type);
 }
 
+int32_t AudioAdapterInterfaceImpl::ParseDhIdFromJson(const std::string &args)
+{
+    DHLOGI("Parse distributed hardward Id from args : %s", args.c_str());
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        return -1;
+    }
+    if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return -1;
+    }
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, KEY_DH_ID);
+    if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
+    cJSON_Delete(jParam);
+    DHLOGI("Parsed dhId is: %d.", dhId);
+    return dhId;
+}
+
+int32_t AudioAdapterInterfaceImpl::ConvertString2Int(std::string val)
+{
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return -1;
+    }
+    return std::stoi(val);
+}
+
+sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::GetRenderImpl(const std::string &content)
+{
+    int32_t dhId = ParseDhIdFromJson(content);
+    if (dhId < 0) {
+        DHLOGE("Failed to parse dhardware id.");
+        return nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        for (auto renderDev : renderDevs_) {
+            if (renderDev.first == dhId) {
+                return renderDev.second;
+            }
+        }
+    }
+    DHLOGE("Render has not been created.");
+    return nullptr;
+}
+
 int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &event)
 {
     DHLOGI("Vol change (%s).", event.content.c_str());
-    int renderId = 0; // daudio SA
-    sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
-    {
-        std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        audioRender = renderDevs_[renderId].second;
-    }
+    sptr<AudioRenderInterfaceImplBase> audioRender = GetRenderImpl(event.content);
     if (audioRender == nullptr) {
-        DHLOGE("Render has not been created.");
+        DHLOGE("Render is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
     int32_t vol = AUDIO_DEFAULT_MIN_VOLUME_LEVEL;
