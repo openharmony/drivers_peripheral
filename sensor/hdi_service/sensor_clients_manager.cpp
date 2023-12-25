@@ -186,10 +186,10 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
         return;
     }
 
-    auto client = clients_[groupId].find(serviceId);
+    auto &client = clients_[groupId].find(serviceId)->second;
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
-    client -> second.sensorConfigMap_[sensorId] = sensorConfig;
-    client -> second.curCountMap_[sensorId] = 0;
+    client.sensorConfigMap_[sensorId] = sensorConfig;
+    client.curCountMap_[sensorId] = 0;
 }
 
 bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
