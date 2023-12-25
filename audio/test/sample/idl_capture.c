@@ -54,8 +54,12 @@
 #define EXT_PARAMS_MAXLEN               107
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
+#ifndef AUDIO_FEATURE_COMMUNITY
 #define AUDIO_CAPTURE_STREAM_ID         14
 #define AUDIO_ROUTE_NODE_LEN            1
+#else
+#define AUDIO_BUFF_SIZE                 (1024 * 16)
+#endif
 
 struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
@@ -182,8 +186,11 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
     captureAttrs->isSignedData = true;
     captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
     captureAttrs->stopThreshold = INT_32_MAX;
+    captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
+#ifndef AUDIO_FEATURE_COMMUNITY
     captureAttrs->silenceThreshold = 0;
     captureAttrs->streamId = AUDIO_CAPTURE_STREAM_ID;
+#endif
     captureAttrs->sourceType = g_voiceCallType;
     return 0;
 }
@@ -323,8 +330,13 @@ static int32_t FrameStartCapture(const struct StrParaCapture *param)
     if (param == NULL) {
         return HDF_FAILURE;
     }
+#ifndef AUDIO_FEATURE_COMMUNITY
     uint32_t bufferSize = BUFFER_PERIOD_SIZE;
     uint64_t requestBytes = BUFFER_PERIOD_SIZE;
+#else
+    uint32_t bufferSize = AUDIO_BUFF_SIZE;
+    uint64_t requestBytes = AUDIO_BUFF_SIZE;
+#endif
     uint64_t totalSize = 0;
     uint32_t failCount = 0;
 
@@ -489,6 +501,7 @@ static int32_t RecordingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
+#ifndef AUDIO_FEATURE_COMMUNITY
 static int32_t UpdateAudioRoute()
 {
     struct AudioRouteNode source = {
@@ -523,6 +536,7 @@ static int32_t UpdateAudioRoute()
     }
     return ret;
 }
+#endif
 
 static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
 {
@@ -536,10 +550,11 @@ static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
     if (capture == NULL || ret < 0) {
         return HDF_FAILURE;
     }
-
+#ifndef AUDIO_FEATURE_COMMUNITY
     if (UpdateAudioRoute() < 0) {
         return HDF_FAILURE;
     }
+#endif
 
     ret = capture->Start((void *)capture);
     if (ret < 0) {
