@@ -81,7 +81,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         msg += "serviceId is " + std::to_string(*it) + ", client[*it] is " + std::to_string(reinterpret_cast<uintptr_t>(&client[*it])) + "\n";
         sensorClientInfo_.curCountMap_[sensorId]++;
         client[*it].curCountMap_[sensorId]++;
-        if (SensorClientsManager::GetInstance()->IsNotNeedReportData(client[*it], event.sensorId)) {
+        if (SensorClientsManager::GetInstance()->IsNotNeedReportData(*it, event.sensorId)) {
             HDF_LOGI("%{public}s IsNotNeedReportData return true", __func__);
             continue;
         }
