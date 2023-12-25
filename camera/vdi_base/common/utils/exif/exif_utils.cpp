@@ -329,6 +329,7 @@ error:
 
 void ExifUtils::ConvertGpsDataToDms(double number, int32_t *degrees, int32_t *minutes, int32_t *seconds)
 {
+    number = abs(number);
     double  approximateNumber = 0.0;
     constexpr uint32_t timePeriod = 60;
     constexpr uint32_t roundingValue = 5;

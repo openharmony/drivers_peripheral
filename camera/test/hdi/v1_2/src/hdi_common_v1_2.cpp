@@ -695,7 +695,8 @@ int32_t Test::TestImageProcessCallback::OnStatusChanged(OHOS::HDI::Camera::V1_2:
     return 0;
 }
 
-int32_t Test::TestImageProcessCallback::OnError(const std::string& imageId, int32_t errorCode)
+int32_t Test::TestImageProcessCallback::OnError(const std::string& imageId,
+    OHOS::HDI::Camera::V1_2::ErrorCode errorCode)
 {
     CAMERA_LOGI("imageId: %{public}s, errorCode: %{public}d", imageId.c_str(), errorCode);
     curImageId_ = imageId;

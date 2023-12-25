@@ -56,14 +56,15 @@ int32_t OfflineStreamOperatorVdiImpl::ReleaseStreams(const std::vector<int32_t> 
     DFX_LOCAL_HITRACE_BEGIN;
 
     for (auto it : streamIds) {
-        RetCode ret = offlineStreamMap_[it]->Release();
-        if (ret != RC_OK) {
-            CAMERA_LOGE("release stream %{public}d failed", it);
-        }
-
-        {
-            std::lock_guard<std::mutex> l(lock_);
-            offlineStreamMap_.erase(it);
+        if (offlineStreamMap_.find(it) != offlineStreamMap_.end()) {
+            RetCode ret = offlineStreamMap_[it]->Release();
+            if (ret != RC_OK) {
+                CAMERA_LOGE("release stream %{public}d failed", it);
+            }
+            {
+                std::lock_guard<std::mutex> l(lock_);
+                offlineStreamMap_.erase(it);
+            }
         }
     }
 
