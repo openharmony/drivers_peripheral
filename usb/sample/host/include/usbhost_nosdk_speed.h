@@ -47,6 +47,16 @@
 #define USBDEVFS_SUBMITURB        _IOR('U', 10, struct UsbAdapterUrb)
 #define USBDEVFS_REAPURBNDELAY    _IOW('U', 13, void *)
 
+typedef enum {
+    TEST_ZERO_TYPE = 0,
+    TEST_ONE_TYPE,
+    TEST_TWO_TYPE,
+    TEST_THREE_TYPE,
+    TEST_FOUR_TYPE,
+    TEST_FIVE_TYPE,
+    TEST_SIX_TYPE,
+} TestCountType;
+
 struct UsbIsoPacketDesc {
     unsigned int length;
     unsigned int actualLength;
