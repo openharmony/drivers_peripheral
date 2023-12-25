@@ -225,7 +225,8 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
     curCountMap_Msg += "]";
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
 
-    sensorClientInfo.curCountMap_[sensorId]++;
+    periodCount = 10;
+    sensorClientInfo.curCountMap_[sensorId] = sensorClientInfo.curCountMap_[sensorId] + 2;
 
     std::string sensorConfigMsg = "[";
     for (auto it = sensorClientInfo.sensorConfigMap_.begin(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
