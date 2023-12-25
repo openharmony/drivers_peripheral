@@ -19,7 +19,7 @@ ohos_shared_library("libsensor_interface_service_2.0") {
   include_dirs = [
     ".",
     "../interfaces/include",
-    "../interfaces/v1_1",
+    "../interfaces/v1_0",
   ]
 
   sources = [

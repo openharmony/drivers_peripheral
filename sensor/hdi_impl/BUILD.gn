@@ -18,7 +18,7 @@ import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libhdi_sensor_impl") {
   include_dirs = [
     "../interfaces/include/",
-    "../interfaces/v1_1",
+    "../interfaces/v1_0",
     "../hal/include",
   ]
 
