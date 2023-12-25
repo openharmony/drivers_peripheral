@@ -71,7 +71,7 @@ float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_
 }
 
 int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
-    int8_t* frameData, const size_t frameLength)
+    int8_t *frameData, const size_t frameLength)
 {
     int16_t* frame = reinterpret_cast<int16_t *>(frameData);
     const size_t newFrameLength = frameLength / 2;
@@ -80,8 +80,8 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
         float rate = GetFadeRate(currentFrame_ * newFrameLength + k, durationFrame * newFrameLength);
         frame[k] = currentFrame_ == durationFrame - 1 ? frame[k] : static_cast<int16_t>(rate * frame[k]);
     }
-    if (currentFrame_ < MAX_FRAME_COUNT) {
-        DHLOGI("Fade-in frame[currentFrame: %d].", currentFrame_);
+    if (currentFrame_ < durationFrame - 1) {
+        DHLOGD("Fade-in frame[currentFrame: %d].", currentFrame_);
     }
     ++currentFrame_;
     currentFrame_ = currentFrame_ >= durationFrame ? durationFrame - 1 : currentFrame_;
