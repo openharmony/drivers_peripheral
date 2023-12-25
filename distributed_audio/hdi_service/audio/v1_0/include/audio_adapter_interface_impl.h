@@ -137,6 +137,9 @@ private:
     int32_t GetVolFromEvent(const std::string &content, const std::string &key, int32_t &vol);
     int32_t ConvertMsg2Code(const std::string &msg);
     std::string GetVolumeChangeString(const std::string &args);
+    int32_t ParseDhIdFromJson(const std::string &args);
+    int32_t ConvertString2Int(std::string val);
+    sptr<AudioRenderInterfaceImplBase> GetRenderImpl(const std::string &content);
 
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
