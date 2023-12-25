@@ -202,20 +202,20 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     }
 
     auto &sensorClientInfo = clients_[groupId].find(serviceId)->sencond;
-    if (sensorClientInfo..sensorConfigMap_.find(sensorId) == sensorClientInfo..sensorConfigMap_.end()) {
+    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
         return true;
     }
     if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
         return true;
     }
-    SensorConfig sensorConfig = sensorClientInfo..sensorConfigMap_.find(sensorId)->second;
+    SensorConfig sensorConfig = sensorClientInfo.sensorConfigMap_.find(sensorId)->second;
     BestSensorConfig bestSensorConfig = sensorConfig_.find(sensorId)->second;
     int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
 
-    sensorClientInfo..curCountMap_[sensorId]++;
+    sensorClientInfo.curCountMap_[sensorId]++;
 
     std::string sensorConfigMsg = "";
-    for (auto it = sensorClientInfo..sensorConfigMap_.begin(); it != sensorClientInfo..sensorConfigMap_.end(); ++it) {
+    for (auto it = sensorClientInfo.sensorConfigMap_.begin(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
         sensorConfigMsg += "\n" + std::to_string(it->first) + "->{" +
                 std::to_string(it->second.samplingInterval) + ", " +
                 std::to_string(it->second.reportInterval) + "}";
@@ -233,12 +233,12 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
     std::string curCountMap_Msg = "";
-    for (auto it = sensorClientInfo..curCountMap_.begin(); it != sensorClientInfo..curCountMap_.end(); ++it) {
+    for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
         curCountMap_Msg += "\n" + std::to_string(it->first) + "->" + std::to_string(it->second) + "}";
     }
     HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
-    if (sensorClientInfo..curCountMap_[sensorId] >= periodCount) {
-        sensorClientInfo..curCountMap_[sensorId] = 0;
+    if (sensorClientInfo.curCountMap_[sensorId] >= periodCount) {
+        sensorClientInfo.curCountMap_[sensorId] = 0;
         HDF_LOGI("%{public}s curCount has been set 0, serviceId is %{public}d, sensorId is %{public}d", __func__, serviceId, sensorId);
         return false;
     }
