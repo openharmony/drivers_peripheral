@@ -59,13 +59,8 @@ int32_t Session::getKeyRequest(const std::vector<uint8_t> &indexInfo, const std:
 int32_t Session::setKeyIdAndKeyValue(const std::vector<uint8_t> &keyId, const std::vector<uint8_t> &keyValue)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    for (auto &idValuePair : keyIdAndKeyValue_) {
-        if (idValuePair.first == keyId) {
-            idValuePair.second = keyValue;
-            return HDF_SUCCESS;
-        }
-    }
     keyIdAndKeyValue_.push_back(make_pair(keyId, keyValue));
+    keyIdStatusMap[keyId] = OFFLINELICENSE_STATUS_USABLE;
     return HDF_SUCCESS;
 }
 
