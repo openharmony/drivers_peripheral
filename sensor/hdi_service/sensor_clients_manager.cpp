@@ -194,7 +194,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
 bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
 {
-    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, serviceId is %{public}d", __func__, serviceId);
+//    HDF_LOGI("%{public}s: enter the IsNotNeedReportData function, serviceId is %{public}d", __func__, serviceId);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
@@ -214,35 +214,35 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
 
     sensorClientInfo.curCountMap_[sensorId]++;
 
-    std::string sensorConfigMsg = "\n";
-    for (auto it = sensorClientInfo.sensorConfigMap_.begin(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
-        sensorConfigMsg += " " + std::to_string(it->first) + "->{" +
-                std::to_string(it->second.samplingInterval) + ", " +
-                std::to_string(it->second.reportInterval) + "}";
-    }
-    HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
+//    std::string sensorConfigMsg = "\n";
+//    for (auto it = sensorClientInfo.sensorConfigMap_.begin(); it != sensorClientInfo.sensorConfigMap_.end(); ++it) {
+//        sensorConfigMsg += " " + std::to_string(it->first) + "->{" +
+//                std::to_string(it->second.samplingInterval) + ", " +
+//                std::to_string(it->second.reportInterval) + "}";
+//    }
+//    HDF_LOGI("%{public}s sensorConfigMsg = %{public}s", __func__ ,sensorConfigMsg.c_str());
 
-    std::string bestSensorConfigMsg = "\n";
-    for (auto it = sensorConfig_.begin(); it != sensorConfig_.end(); ++it) {
-        if (sensorClientInfo.sensorConfigMap_.find(it->first) == sensorClientInfo.sensorConfigMap_.end()) {
-            continue;
-        }
-        bestSensorConfigMsg += " " + std::to_string(it->first) + "->{" +
-                std::to_string(it->second.samplingInterval) + ", " +
-                std::to_string(it->second.reportInterval) + "}";
-    }
-    HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
+//    std::string bestSensorConfigMsg = "\n";
+//    for (auto it = sensorConfig_.begin(); it != sensorConfig_.end(); ++it) {
+//        if (sensorClientInfo.sensorConfigMap_.find(it->first) == sensorClientInfo.sensorConfigMap_.end()) {
+//            continue;
+//        }
+//        bestSensorConfigMsg += " " + std::to_string(it->first) + "->{" +
+//                std::to_string(it->second.samplingInterval) + ", " +
+//                std::to_string(it->second.reportInterval) + "}";
+//    }
+//    HDF_LOGI("%{public}s bestSensorConfigMsg = %{public}s", __func__ ,bestSensorConfigMsg.c_str());
 
     HDF_LOGI("%{public}s periodCount = %{public}s", __func__ , std::to_string(periodCount).c_str());
 
     std::string curCountMap_Msg = "\n";
-    for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
-        curCountMap_Msg += " " + std::to_string(it->first) + "->" + std::to_string(it->second) + "}";
-    }
-    HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
+//    for (auto it = sensorClientInfo.curCountMap_.begin(); it != sensorClientInfo.curCountMap_.end(); ++it) {
+//        curCountMap_Msg += " " + std::to_string(it->first) + "->" + std::to_string(it->second) + "}";
+//    }
+//    HDF_LOGI("%{public}s curCountMap_Msg = %{public}s", __func__ ,curCountMap_Msg.c_str());
     if (sensorClientInfo.curCountMap_[sensorId] >= periodCount) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
-        HDF_LOGI("%{public}s curCount has been set 0, serviceId is %{public}d, sensorId is %{public}d", __func__, serviceId, sensorId);
+//        HDF_LOGI("%{public}s curCount has been set 0, serviceId is %{public}d, sensorId is %{public}d", __func__, serviceId, sensorId);
         return false;
     }
     return true;
