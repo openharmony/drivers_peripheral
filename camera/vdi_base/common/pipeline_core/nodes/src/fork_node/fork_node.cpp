@@ -13,6 +13,7 @@
 
 #include "fork_node.h"
 #include "securec.h"
+#include <thread>
 
 namespace OHOS::Camera {
 ForkNode::ForkNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -61,6 +62,16 @@ RetCode ForkNode::Start(const int32_t streamId)
         return RC_ERROR;
     }
 
+    forkThread_ = std::make_shared<std::thread>([this] () {
+        while (!stopForkThread_) {
+            DeliverBufferToNextNode();
+        }
+    });
+    if (forkThread_ == nullptr) {
+        CAMERA_LOGE("create thread worker DeliverBufferToNextNode() failed!!!");
+        return RC_ERROR;
+    }
+
     streamId_ = id;
     streamRunning_ = true;
 
@@ -73,6 +84,16 @@ RetCode ForkNode::Stop(const int32_t streamId)
 
     if (!streamRunning_) {
         return RC_OK;
+    }
+
+    {
+        std::unique_lock<std::mutex> l(bufferMtx);
+        stopForkThread_ = true;
+        bqcv_.notify_all();
+    }
+
+    if (forkThread_ != nullptr) {
+        forkThread_->join();
     }
 
     DrainForkBufferPool();
@@ -106,27 +127,9 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
                 CAMERA_LOGW("memcpy_s failed.");
             }
-            for (auto& it : outPutPorts_) {
-                if (it->format_.streamId_ != streamId_) {
-                    continue;
-                }
-                CAMERA_LOGI("deliver fork buffer for streamid = %{public}d", it->format_.streamId_);
-                int32_t id = forkBuffer->GetStreamId();
-                {
-                    std::lock_guard<std::mutex> l(requestLock_);
-                    CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d", id);
-                    if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
-                        CAMERA_LOGV("queue size: 0");
-                        forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                    } else {
-                        CAMERA_LOGV("queue size:%{public}u", captureRequests_[id].size());
-                        forkBuffer->SetCaptureId(captureRequests_[id].front());
-                        captureRequests_[id].pop_front();
-                    }
-                }
-                it->DeliverBuffer(forkBuffer);
-                break;
-            }
+            std::lock_guard<std::mutex> l(mtx_);
+            bufferQueue_.push(forkBuffer);
+            bqcv_.notify_one();
         }
     }
 
@@ -159,6 +162,40 @@ RetCode ForkNode::Capture(const int32_t streamId, const int32_t captureId)
     }
 
     return RC_OK;
+}
+
+void ForkNode::DeliverBufferToNextNode()
+{
+    {
+        std::unique_lock<std::mutex> l(bufferMtx);
+        bqcv_.wait(l, [this] { return stopForkThread_ || !bufferQueue_.empty(); });
+    }
+
+    mtx_.lock();
+    if (bufferQueue_.empty()) {
+        mtx_.unlock();
+        return;
+    }
+    std::shared_ptr<IBuffer> forkBuffer = bufferQueue_.front();
+    bufferQueue_.pop();
+    mtx_.unlock();
+    for (auto& it : outPutPorts_) {
+        if (it->format_.streamId_ != streamId_) {
+            continue;
+        }
+        int32_t id = forkBuffer->GetStreamId();
+        {
+            std::lock_guard<std::mutex> l(requestLock_);
+            if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
+                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+            } else {
+                forkBuffer->SetCaptureId(captureRequests_[id].front());
+                captureRequests_[id].pop_front();
+            }
+        }
+        it->DeliverBuffer(forkBuffer);
+        break;
+    }
 }
 
 RetCode ForkNode::CancelCapture(const int32_t streamId)
