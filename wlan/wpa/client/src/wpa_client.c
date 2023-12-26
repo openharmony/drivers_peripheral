@@ -114,7 +114,8 @@ void WpaEventReport(const char *ifName, uint32_t event, void *data)
     pthread_mutex_lock(&g_wpaCallbackMutex);
 
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_wpaCallbackEventMap[i] != NULL && (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0) &&
+        if (g_wpaCallbackEventMap[i] != NULL && ((strstr(ifName, g_wpaCallbackEventMap[i]->ifName))
+            || (strcmp(g_wpaCallbackEventMap[i]->ifName, ifName) == 0)) &&
             (((1 << event) & g_wpaCallbackEventMap[i]->eventType) != 0)) {
             HDF_LOGI("%s: send event = %u, ifName = %s", __FUNCTION__, event, ifName);
             callbackEventMap[i] = g_wpaCallbackEventMap[i]->onRecFunc;
