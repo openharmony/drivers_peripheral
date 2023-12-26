@@ -480,21 +480,21 @@ HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
     ASSERT_NE(nullptr, g_sensorInterface);
 
     EXPECT_GT(g_info.size(), 0);
-    std::vector<V2_0::SdcSensorInfo> sdcSensorInfo;
+    std::vector<OHOS::HDI::Sensor::V2_0::SdcSensorInfo> sdcSensorInfo;
     int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
-    std::string infoMsg="[";
+    std::string infoMsg = "[";
     for (auto it : sdcSensorInfo) {
         if (infoMsg != "[") {
             infoMsg += ", ";
         }
         infoMsg += "{";
-        infoMsg += "offset = " + std::to_string(it.offset) +", ";
-        infoMsg += "sensorId = " + std::to_string(it.sensorId) +", ";
-        infoMsg += "ddrSize = " + std::to_string(it.ddrSize) +", ";
-        infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) +", ";
-        infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) +", ";
-        infoMsg += "memAddr = " + std::to_string(it.memAddr) +", ";
+        infoMsg += "offset = " + std::to_string(it.offset) + ", ";
+        infoMsg += "sensorId = " + std::to_string(it.sensorId) + ", ";
+        infoMsg += "ddrSize = " + std::to_string(it.ddrSize) + ", ";
+        infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) + ", ";
+        infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) + ", ";
+        infoMsg += "memAddr = " + std::to_string(it.memAddr) + ", ";
         infoMsg += "reserved = " + std::to_string(it.reserved);
         infoMsg += "}";
     }
