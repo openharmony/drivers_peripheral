@@ -15,6 +15,11 @@
 
 #include "utils_data_stub.h"
 
+static constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
+static constexpr uint32_t MAX_SUPPORTED_ITEMS = 1000;
+static constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
+static constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
+
 namespace OHOS::Camera {
 bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t> &cameraAbility)
 {
@@ -175,10 +180,6 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbili
     uint32_t tagCount = 0;
     uint32_t itemCapacity = 0;
     uint32_t dataCapacity = 0;
-    constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
-    constexpr uint32_t MAX_SUPPORTED_ITEMS = 1000;
-    constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
-    constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
 
     ReadData<uint32_t>(tagCount, index, cameraAbility);
     if (tagCount > MAX_SUPPORTED_TAGS) {
@@ -227,6 +228,11 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
     int32_t tagCount = data.ReadInt32();
     if (tagCount <= 0) {
         return;
+    }
+
+    if (tagCount > MAX_SUPPORTED_TAGS) {
+        tagCount = MAX_SUPPORTED_TAGS;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata tagCount is more than supported value");
     }
 
     int32_t metadataSize = 0;
@@ -486,5 +492,4 @@ void UtilsDataStub::EntryDataToBuffer(const camera_metadata_item_t &entry, void 
     } else if (entry.data_type == META_TYPE_RATIONAL) {
         *buffer = static_cast<void*>(entry.data.r);
     }
-}
 }
