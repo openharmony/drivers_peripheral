@@ -27,8 +27,6 @@ constexpr int ENABLE_SENSOR = 1;
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
-using namespace OHOS::HDI::Sensor::V1_1;
-
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
@@ -332,7 +330,7 @@ int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorI
         return HDF_FAILURE;
     }
 
-    std::vector<SdcSensorInfoVdi> sdcSensorInfoVdi;
+    std::vector<OHOS::HDI::Sensor::V1_1::SdcSensorInfoVdi> sdcSensorInfoVdi;
     StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
     int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfoVdi);
     if (ret != SENSOR_SUCCESS) {
