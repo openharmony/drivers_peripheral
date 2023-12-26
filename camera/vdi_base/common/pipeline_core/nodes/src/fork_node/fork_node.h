@@ -15,6 +15,7 @@
 #define HOS_CAMERA_FORK_NODE_H
 
 #include <vector>
+#include <queue>
 #include <condition_variable>
 #include "device_manager_adapter.h"
 #include "utils.h"
@@ -34,8 +35,13 @@ public:
     RetCode Flush(const int32_t streamId);
 private:
     void DrainForkBufferPool();
+    void DeliverBufferToNextNode();
     std::mutex                            mtx_;
+    std::queue<std::shared_ptr<IBuffer>>  bufferQueue_ = {};
+    std::condition_variable               bqcv_;
+    std::mutex                            bufferMtx;
     std::shared_ptr<std::thread>          forkThread_ = nullptr;
+    std::atomic_bool                      stopForkThread_ = false;
     std::vector<std::shared_ptr<IPort>>   inPutPorts_;
     std::vector<std::shared_ptr<IPort>>   outPutPorts_;
     std::atomic_bool                      streamRunning_ = false;
