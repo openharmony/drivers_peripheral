@@ -350,7 +350,7 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInf
     CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
-    struct SdcSensorInfo sdcSensorInfo[DEFUALT_SDC_SENSOR_INFO_SIZE];
+    struct SdcSensorInfo sdcSensorInfo[DEFAULT_SDC_SENSOR_INFO_SIZE];
     int32_t ret = sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
