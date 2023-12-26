@@ -450,7 +450,7 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: SetSensorBatch0001
+  * @tc.name: ReportFrequencyTest0001
   * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
@@ -486,7 +486,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: SetSensorBatch0001
+  * @tc.name: ReportFrequencyTest0002
   * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
   * @tc.type: FUNC
   * @tc.require: #I4L3LF
@@ -519,4 +519,50 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
 
     EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
     SensorCallbackImpl::sensorDataFlag = 1;
+}
+
+/**
+  * @tc.name: ReportFrequencyTest0003
+  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
+{
+    HDF_LOGI("enter the ReportFrequencyTest0003 function");
+    auto reportFunction = [](int64_t reportInterval) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+
+        int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_GT(g_info.size(), 0);
+        int32_t sensorId = g_info[0].sensorId;
+        HDF_LOGI("sensorId is %{public}d",sensorId);
+
+        ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, reportInterval);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Enable(sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        OsalMSleep(SENSOR_WAIT_TIME2);
+
+        ret = g_sensorInterface->Disable(sensorId);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+        EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+        SensorCallbackImpl::sensorDataFlag = 1;
+    };
+
+    std::thread t1(reportFunction, 100000000);
+    std::thread t2(reportFunction, 300000000);
+    std::thread t3(reportFunction, 600000000);
+
+    t1.join();
+    t2.join();
+    t3.join();
 }
