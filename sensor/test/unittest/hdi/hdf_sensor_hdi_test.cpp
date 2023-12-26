@@ -25,7 +25,6 @@
 #include "sensor_callback_impl.h"
 #include "hdf_log.h"
 
-using namespace OHOS::HDI::Sensor;
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
 
