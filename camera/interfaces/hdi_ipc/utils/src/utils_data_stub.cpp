@@ -226,7 +226,7 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbili
 void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t tagCount = data.ReadInt32();
-    
+
     if (tagCount <= 0) {
         return;
     }
