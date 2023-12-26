@@ -50,7 +50,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         if (SensorClientsManager::GetInstance()->IsNotNeedReportData(*it, event.sensorId)) {
-            HDF_LOGI("%{public}s Sensor NotNeedReportData, sensorId is %{public}d", __func__, event.sensorId);
             continue;
         }
         callback = sensorClientInfo_.GetReportDataCb();
@@ -62,7 +61,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         }
-        HDF_LOGI("%{public}s Sensor OnDataEvent success, sensorId is %{public}d", __func__, event.sensorId);
+        HDF_LOGI("%{public}s Sensor OnDataEvent success, service Id is %{public}d, sensorId is %{public}d", __func__, *it, event.sensorId);
     }
     return HDF_SUCCESS;
 }
