@@ -24,7 +24,7 @@
 #include "sensor_dump.h"
 
 #define HDF_LOG_TAG uhdf_sensor_service
-#define DEFUALT_SDC_SENSOR_INFO_SIZE 2
+#define DEFAULT_SDC_SENSOR_INFO_SIZE 2
 
 namespace OHOS {
 namespace HDI {
