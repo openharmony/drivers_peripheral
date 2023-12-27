@@ -560,4 +560,53 @@ int32_t Test::TestCameraHostCallback::OnCameraEvent(const std::string& cameraId,
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
+int32_t Test::DefferredImageTestInit()
+{
+    constexpr const char* serviceName = "camera_image_process_service";
+    constexpr const int userId = 100;
+    // get ImageProcessService
+    imageProcessService_ = OHOS::HDI::Camera::V1_2::ImageProcessServiceProxy::Get(serviceName, false);
+    if (imageProcessService_ == nullptr) {
+        std::cout << "DefferredImageTestInit fail, imageProcessService_ == nullptr" << std::endl;
+        return -1;
+    }
+    imageProcessCallback_ = new OHOS::Camera::Test::TestImageProcessCallback();
+    if (imageProcessCallback_ == nullptr) {
+        std::cout << "DefferredImageTestInit fail, imageProcessCallback_ == nullptr" << std::endl;
+        return -1;
+    }
+    imageProcessService_->CreateImageProcessSession(userId, imageProcessCallback_, imageProcessSession_);
+    if (imageProcessSession_ == nullptr) {
+        std::cout << "DefferredImageTestInit fail, imageProcessSession_ == nullptr" << std::endl;
+        return -1;
+    }
+    return 0;
+}
+int32_t Test::TestImageProcessCallback::OnProcessDone(const std::string& imageId,
+    const OHOS::HDI::Camera::V1_2::ImageBufferInfo& buffer)
+{
+    CAMERA_LOGI("imageId: %{public}s", imageId.c_str());
+    coutProcessDone_++;
+    curImageId_ = imageId;
+    curImageBufferInfo_ = buffer;
+    return 0;
+}
+
+int32_t Test::TestImageProcessCallback::OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status)
+{
+    CAMERA_LOGI("status: %{public}d", status);
+    curStatus_ = status;
+    coutStatusChanged_++;
+    return 0;
+}
+
+int32_t Test::TestImageProcessCallback::OnError(const std::string& imageId, \
+    OHOS::HDI::Camera::V1_2::ErrorCode errorCode)
+{
+    CAMERA_LOGI("imageId: %{public}s, errorCode: %{public}d", imageId.c_str(), errorCode);
+    curImageId_ = imageId;
+    curErrorCode_ = errorCode;
+    countError_++;
+    return 0;
+}
 }
