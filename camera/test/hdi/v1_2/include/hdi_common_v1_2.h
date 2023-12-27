@@ -124,6 +124,7 @@ public:
     sptr<OHOS::HDI::Camera::V1_2::IImageProcessService> imageProcessService_ = nullptr;
     class TestImageProcessCallback;
     sptr<TestImageProcessCallback> imageProcessCallback_ = nullptr;
+    std::vector<std::string> pendingImageIds_;
     int previewFormat = PIXEL_FMT_YCRCB_420_SP;
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
