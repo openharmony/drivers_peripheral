@@ -250,7 +250,7 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
 
 int32_t GetInputDeviceTypeInfo(const string &devName)
 {
-    int32_t type {INDEV_TYPE_UNKNOWN};
+    uint32_t type {INDEV_TYPE_UNKNOWN};
     if (devName.find("input_mt_wrapper") != std::string::npos) {
         type = INDEV_TYPE_TOUCH;
     } else if ((devName.find("Keyboard") != std::string::npos) &&
@@ -289,7 +289,7 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
         (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
         (void)GetInputDeviceInfo(fd, detailInfo.get());
         auto sDevName = string(detailInfo->attrSet.devName);
-        int32_t type = GetInputDeviceTypeInfo(sDevName);
+        uint32_t type = GetInputDeviceTypeInfo(sDevName);
         if (type == INDEV_TYPE_UNKNOWN) {
             continue;
         }
