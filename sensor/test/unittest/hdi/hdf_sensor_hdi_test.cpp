@@ -24,6 +24,7 @@
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 #include <hdf_log.h>
+#include <unistd.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
@@ -557,12 +558,42 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
         EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
         SensorCallbackImpl::sensorDataFlag = 1;
     };
+    // 创建第一个子进程
+    pid_t pid1 = fork();
+    if (pid1 == -1) {
+        printf("Error creating first child process\n");
+    } else if (pid1 == 0) {
+        // 子进程执行的代码
+        printf("This is the first child process, with PID: %d\n", getpid());
+        reportFunction(100000000);
+    } else {
+        // 父进程执行的代码
+        printf("This is the parent process, with PID: %d\n", getpid());
+    }
 
-    std::thread t1(reportFunction, 100000000);
-    std::thread t2(reportFunction, 300000000);
-    std::thread t3(reportFunction, 600000000);
+    // 创建第二个子进程
+    pid_t pid2 = fork();
+    if (pid2 == -1) {
+        printf("Error creating second child process\n");
+    } else if (pid2 == 0) {
+        // 子进程执行的代码
+        printf("This is the second child process, with PID: %d\n", getpid());
+        reportFunction(300000000);
+    } else {
+        // 父进程执行的代码
+        printf("This is the parent process, with PID: %d\n", getpid());
+    }
 
-    t1.join();
-    t2.join();
-    t3.join();
+    // 创建第三个子进程
+    pid_t pid3 = fork();
+    if (pid3 == -1) {
+        printf("Error creating third child process\n");
+    } else if (pid3 == 0) {
+        // 子进程执行的代码
+        printf("This is the third child process, with PID: %d\n", getpid());
+        reportFunction(600000000);
+    } else {
+        // 父进程执行的代码
+        printf("This is the parent process, with PID: %d\n", getpid());
+    }
 }
