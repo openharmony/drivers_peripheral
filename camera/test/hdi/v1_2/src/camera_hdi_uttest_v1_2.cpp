@@ -1218,7 +1218,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_035, TestSize.Level1)
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 2: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    rc = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    rc = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(rc, 0);
     // step 3: open the cameraDevice
     cameraTest->OpenCameraV1_2(DEVICE_0);
