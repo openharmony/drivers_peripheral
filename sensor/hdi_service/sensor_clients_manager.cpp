@@ -212,9 +212,6 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     int32_t periodCount = sensorConfig.reportInterval / bestSensorConfig.reportInterval;
     sensorClientInfo.curCountMap_[sensorId]++;
     HDF_LOGI("%{public}s Sensor IsNotNeedReportData? service Id is %{public}d, sensorId is %{public}d, "
-             "sensorConfig is %{public}s, bestSensorConfig is %{public}s", __func__, serviceId, sensorId,
-             std::to_string(sensorConfig.reportInterval).c_str(), std::to_string(bestSensorConfig.reportInterval).c_str());
-    HDF_LOGI("%{public}s Sensor IsNotNeedReportData? service Id is %{public}d, sensorId is %{public}d, "
              "curCount is %{public}d, periodCount is %{public}d", __func__, serviceId, sensorId,
              sensorClientInfo.curCountMap_[sensorId], periodCount);
     if (sensorClientInfo.curCountMap_[sensorId] >= periodCount) {
