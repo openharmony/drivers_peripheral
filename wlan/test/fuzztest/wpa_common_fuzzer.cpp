@@ -84,9 +84,9 @@ void FuzzWpaInterfaceScan(struct IWpaInterface *interface, const uint8_t *rawDat
 void FuzzWpaInterfaceScanResult(struct IWpaInterface *interface, const uint8_t *rawData)
 {
     const char *ifName = reinterpret_cast<const char *>(rawData);
-    unsigned char Buf[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+    unsigned char buf[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     uint32_t bufLen = ETH_ADDR_LEN;
-    interface->ScanResult(interface, ifName, Buf, &bufLen);
+    interface->ScanResult(interface, ifName, buf, &bufLen);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
