@@ -31,26 +31,31 @@ static std::mutex g_mutex;
 
 void CleanResourceOfDiedService(sptr<IRemoteObject> object, wptr<CodecComponentManagerService> managerService)
 {
-    std::lock_guard<std::mutex> lk(g_mutex);
+    std::unique_lock<std::mutex> lk(g_mutex, std::defer_lock);
 
+    lk.lock();
     auto remoteComps = g_remoteCompsMap.find(object.GetRefPtr());
     if (remoteComps == g_remoteCompsMap.end()) {
         CODEC_LOGE("can not find remote service in g_remoteCompsMap!");
+        lk.unlock();
         return;
     }
+    lk.unlock();
 
     std::set<uint32_t> compIds = remoteComps->second;
     for (auto id = compIds.begin(); id != compIds.end(); id++) {
         managerService->DestroyComponent(*id);
     }
+    lk.lock();
     g_remoteCompsMap.erase(remoteComps);
+    lk.unlock();
     CODEC_LOGI("Clean died remoteService resource success!");
 }
 
 void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_t componentId,
                                    wptr<CodecComponentManagerService> service)
 {
-    std::lock_guard<std::mutex> lk(g_mutex);
+    std::unique_lock<std::mutex> lk(g_mutex);
 
     const sptr<OHOS::IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ICodecCallback>(callbacks);
     g_compRemoteMap.emplace(std::make_pair(componentId, remote.GetRefPtr()));
@@ -78,6 +83,8 @@ void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_
 
 void RemoveMapperOfDestoryedComponent(uint32_t componentId)
 {
+    std::unique_lock<std::mutex> lk(g_mutex);
+
     auto compRemote = g_compRemoteMap.find(componentId);
     if (compRemote == g_compRemoteMap.end()) {
         return;
