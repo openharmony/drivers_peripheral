@@ -175,7 +175,7 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_007)
     const int64_t sensorExposure = 8888;
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
-        std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add failed" << std::endl;
+        std::cout << "addEntry failed" << std::endl;
         return;
     }
     std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add success" << std::endl;

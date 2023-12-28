@@ -310,7 +310,6 @@ HWTEST_F(CameraStreamUtTestV1_2, Camera_Stream_Hdi_V1_2_056, TestSize.Level1)
 
     // cover GetStatus(), OHOS_STATUS_CAMERA_CURRENT_FPS and  OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO
     std::shared_ptr<CameraSetting> metaIn = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    std::shared_ptr<CameraSetting> metaOut = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
     // no sense
     uint32_t current_fps = 0;
     uint32_t current_zoom_ratio = 0;

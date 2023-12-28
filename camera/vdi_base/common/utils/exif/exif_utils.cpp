@@ -80,7 +80,6 @@ uint32_t ExifUtils::GetGpsRef(LatOrLong latOrLongType, double number, char *gpsR
                 return RC_ERROR;
             }
         } else {
-            abs(number);
             if (strncpy_s(gpsRef, length, south, strlen(south)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
@@ -93,7 +92,6 @@ uint32_t ExifUtils::GetGpsRef(LatOrLong latOrLongType, double number, char *gpsR
                 return RC_ERROR;
             }
         } else {
-            abs(number);
             if (strncpy_s(gpsRef, length, west, strlen(west)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
                 return RC_ERROR;
@@ -238,7 +236,7 @@ uint32_t ExifUtils::PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBuff
 }
 
 uint32_t ExifUtils::SetExifData(exif_data info, ExifData *exif,
-    unsigned char *exifData, unsigned int *exifDataLength)
+    unsigned char **exifData, unsigned int *exifDataLength)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(exif, RC_ERROR);
 
@@ -254,7 +252,7 @@ uint32_t ExifUtils::SetExifData(exif_data info, ExifData *exif,
     if (AddAltitudeInfo(exif, info.altitude) != RC_OK) {
         return RC_ERROR;
     }
-    exif_data_save_data(exif, &exifData, exifDataLength);
+    exif_data_save_data(exif, exifData, exifDataLength);
 
     return RC_OK;
 }
@@ -290,7 +288,7 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &ou
         return ret;
     }
 
-    if (SetExifData(info, exif, exifData, &exifDataLength) != RC_OK) {
+    if (SetExifData(info, exif, &exifData, &exifDataLength) != RC_OK) {
         CAMERA_LOGE("%{public}s exif SetExifData failed.", __FUNCTION__);
         return ret;
     }
