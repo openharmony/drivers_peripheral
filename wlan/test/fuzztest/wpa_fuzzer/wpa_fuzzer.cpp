@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <errno.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdlib>
 #include "securec.h"
 #include "v1_0/iwpa_interface.h"
 #include "wpa_fuzzer.h"
