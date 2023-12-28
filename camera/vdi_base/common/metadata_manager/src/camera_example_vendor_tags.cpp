@@ -32,14 +32,11 @@ const vendorTag_t* EXAMPLE_VENDOR_TAG_INFO[EXAMPLE_SECTION_COUNT] = {
 
 uint32_t CameraVendorTagExample::GetVendorTagCount()
 {
-    int32_t section;
-    uint32_t start;
-    uint32_t end;
     uint32_t count = 0;
 
-    for (section = 0; section < EXAMPLE_SECTION_COUNT; section++) {
-        start = EXAMPLE_VENDOR_SECTION_BOUNDS[section][0];
-        end = EXAMPLE_VENDOR_SECTION_BOUNDS[section][1];
+    for (int32_t section = 0; section < EXAMPLE_SECTION_COUNT; section++) {
+        uint32_t start = EXAMPLE_VENDOR_SECTION_BOUNDS[section][0];
+        uint32_t end = EXAMPLE_VENDOR_SECTION_BOUNDS[section][1];
         count += end - start;
     }
     return count;
@@ -67,15 +64,10 @@ int32_t CameraVendorTagExample::GetVendorTagType(const uint32_t tag)
 
 void CameraVendorTagExample::GetAllVendorTags(std::vector<vendorTag_t>& tagVec)
 {
-    int32_t section;
-    uint32_t start;
-    uint32_t end;
-    uint32_t tag;
-
-    for (section = 0; section < EXAMPLE_SECTION_COUNT; section++) {
-        start = EXAMPLE_VENDOR_SECTION_BOUNDS[section][0];
-        end = EXAMPLE_VENDOR_SECTION_BOUNDS[section][1];
-        for (tag = start; tag < end; tag++) {
+    for (int32_t section = 0; section < EXAMPLE_SECTION_COUNT; section++) {
+        uint32_t start = EXAMPLE_VENDOR_SECTION_BOUNDS[section][0];
+        uint32_t end = EXAMPLE_VENDOR_SECTION_BOUNDS[section][1];
+        for (uint32_t tag = start; tag < end; tag++) {
             vendorTag_t info {};
             info.tagId = tag;
             info.tagName = GetVendorTagName(tag);
