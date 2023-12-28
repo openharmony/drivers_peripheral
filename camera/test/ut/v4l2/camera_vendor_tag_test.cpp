@@ -14,7 +14,11 @@
  */
 
 #include "camera_vendor_tag_test.h"
+
+#include <dlfcn.h>
 #include "camera_example_vendor_tags.h"
+
+const char* g_exampleVendorTagLib = "libcamera_example_vendor_tag_impl.z.so";
 
 void UtestCameraVendorTagTest::SetUpTestCase(void)
 {}
@@ -155,6 +159,13 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_006)
 
 TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_007)
 {
+    void* libHandle = dlopen(g_exampleVendorTagLib, RTLD_LAZY);
+    if (libHandle == nullptr) {
+        GTEST_SKIP() << "please push " << g_exampleVendorTagLib << " to the device." << std::endl;
+    } else {
+        dlclose(libHandle);
+    }
+
     // Get the device manager
     cameraBase_->OpenUsbCamera();
     ability_ = cameraBase_->GetCameraAbility();
@@ -197,6 +208,13 @@ TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_007)
 
 TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_008)
 {
+    void* libHandle = dlopen(g_exampleVendorTagLib, RTLD_LAZY);
+    if (libHandle == nullptr) {
+        GTEST_SKIP() << "please push " << g_exampleVendorTagLib << " to the device." << std::endl;
+    } else {
+        dlclose(libHandle);
+    }
+
     std::vector<vendorTag_t> tagVec {};
     auto ret = GetAllVendorTags(tagVec);
     for (auto tag : tagVec) {

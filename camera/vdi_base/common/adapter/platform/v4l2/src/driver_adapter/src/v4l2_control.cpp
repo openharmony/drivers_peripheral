@@ -146,7 +146,7 @@ RetCode HosV4L2Control::V4L2SetCtrl(int fd, unsigned int id, int value)
     struct v4l2_control ctrl;
     int rc;
 
-    CAMERA_LOGD("HosV4L2Control::V4L2SetCtrl value = %d\n", value);
+    CAMERA_LOGD("HosV4L2Control::V4L2SetCtrl id = %d, value = %d\n", id, value);
 
     ctrl.id = id;
     ctrl.value = value;
