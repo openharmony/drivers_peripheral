@@ -63,7 +63,7 @@ private:
         unsigned int exifDataLength, data_info sourceData);
     static uint32_t GetGpsRef(LatOrLong latOrLongType, double number, char *gpsRef, int length);
     static uint32_t SetExifData(exif_data info, ExifData *exif,
-        unsigned char *exifData, unsigned int *exifDataLength);
+        unsigned char **exifData, unsigned int *exifDataLength);
     static void FreeResource(unsigned char *dataBuffer, unsigned char *tempBuffer,
         ExifData *exif, unsigned char *exifData);
 };
