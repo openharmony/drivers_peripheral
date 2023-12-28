@@ -52,6 +52,21 @@ int32_t UsbdPort::IfCanSwitch(int32_t portId, int32_t powerRole, int32_t dataRol
     return HDF_SUCCESS;
 }
 
+int32_t UsbdPort::OpenPortFile(int32_t flags)
+{
+    if (path_.empty()) {
+        return HDF_FAILURE;
+    }
+
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(path_.c_str(), pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return open(pathBuf, flags);
+}
+
 int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mode)
 {
     std::string modeStr;
@@ -75,29 +90,54 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
     }
 
     uint32_t len = modeStr.size();
-    if (path_.empty()) {
-        return HDF_FAILURE;
-    }
-
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(path_.c_str(), pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: path conversion failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    int32_t fd = open(pathBuf, O_WRONLY | O_TRUNC);
+    int32_t fd = OpenPortFile(O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
         return HDF_FAILURE;
     }
 
-    int32_t ret = write(fd, modeStr.c_str(), len);
+    int32_t ret = write(fd,Z modeStr.c_str(), len);
     close(fd);
     if (ret < 0) {
         HDF_LOGE("%{public}s: write  error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+}
+
+int32_t UsbdPort::ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &mode)
+{
+    int32_t fd = OpenPortFile(O_RDONLY);
+    if (fd < 0) {
+        HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
+        return HDF_FAILURE;
+    }
+
+    char modeBuf[PATH_MAX] = {'\0'};
+    int32_t ret = read(fd, modeBuf, PATH_MAX);
+    close(fd);
+
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: read error: %s", __func__, path_.c_str());
+        return HDF_FAILURE;
+    }
+
+    if (strcmp(modeBuf, PORT_MODE_HOST_STR) == 0) {
+        powerRole = POWER_ROLE_SOURCE;
+        dataRole = DATA_ROLE_HOST;
+        mode = PORT_MODE_HOST;
+        return HDF_SUCCESS;
+    }
+
+    if (strcmp(modeBuf, PORT_MODE_DEVICE_STR) == 0) {
+        powerRole = POWER_ROLE_SINK;
+        dataRole = DATA_ROLE_DEVICE;
+        mode = PORT_MODE_DEVICE;
+        return HDF_SUCCESS;
+    }
+
+    HDF_LOGE("%{public}s: read invalid mode: %{public}s", __func__, modeBuf);
+    return HDF_FAILURE;
 }
 
 void UsbdPort::setPortPath(const std::string &path)
@@ -154,6 +194,7 @@ int32_t UsbdPort::SetPort(
 
 int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode)
 {
+    (void)ReadPortFile(currentPortInfo_.powerRole, currentPortInfo_.dataRole, currentPortInfo_.mode);
     portId = currentPortInfo_.portId;
     powerRole = currentPortInfo_.powerRole;
     dataRole = currentPortInfo_.dataRole;
