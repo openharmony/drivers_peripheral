@@ -168,10 +168,12 @@ bool UtestUSBCamera3ATest::RunCamera3AWithCapture(TestMetadata& metadata)
     int ohosTag = metadata.tag;
     const uint8_t tagVal = metadata.value;
     if (!meta->addEntry(ohosTag, &tagVal, 1)) {
-        std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add failed" << std::endl;
+        std::cout << GetCameraMetadataItemName(ohosTag) << " tag(" << ohosTag << ") value(" <<
+            static_cast<int>(tagVal) << ") add failed" << std::endl;
         return false;
     }
-    std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << " add success" << std::endl;
+    std::cout << GetCameraMetadataItemName(ohosTag) << " tag(" << ohosTag << ") value(" << static_cast<int>(tagVal) <<
+        ") add succesed" << std::endl;
     const int32_t deviceStreamId = 0;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
@@ -217,10 +219,12 @@ bool UtestUSBCamera3ATest::RunCamera3AWithVideo(TestMetadata& metadata)
     int ohosTag = metadata.tag;
     const uint8_t tagVal = metadata.value;
     if (!meta->addEntry(ohosTag, &tagVal, 1)) {
-        std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add failed" << std::endl;
+        std::cout << GetCameraMetadataItemName(ohosTag) << "tag(" << ohosTag << ") value(" <<
+            static_cast<int>(tagVal) << ") add failed" << std::endl;
         return false;
     }
-    std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << " add success" << std::endl;
+    std::cout << GetCameraMetadataItemName(ohosTag) << "tag(" << ohosTag << ") value(" << static_cast<int>(tagVal) <<
+        ") add succesed" << std::endl;
     const int32_t deviceStreamId = 0;
     meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
