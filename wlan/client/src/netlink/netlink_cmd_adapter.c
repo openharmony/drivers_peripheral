@@ -265,7 +265,7 @@ static int32_t NoSeqCheck(struct nl_msg *msg, void *arg)
 
     WifiActionData actionData;
     actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
-    actionData.dataLen = nla_len(attr[NL80211_ATTR_FRAME]);
+    actionData.dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
     HILOG_INFO(LOG_CORE, "%s: received action frame data", __FUNCTION__);
     WifiEventReport(STR_P2P0, WIFI_EVENT_ACTION_RECEIVED, &actionData);
     return NL_OK;
@@ -1851,7 +1851,7 @@ static int32_t SetRxRemainOnChannel(const char *ifName, const int8_t *data, uint
         HILOG_ERROR(LOG_CORE, "%{public}s: snprintf failed!, ret = %{public}d", __FUNCTION__, ret);
         return RET_CODE_FAILURE;
     }
-    cmdLen = ret;
+    cmdLen = (uint32_t)ret;
     ret = memcpy_s(cmdBuf + cmdLen + 1, P2P_BUF_SIZE - cmdLen - 1, data, len);
     if (ret < RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy failed!, ret = %{public}d", __FUNCTION__, ret);
