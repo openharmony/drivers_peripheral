@@ -41,6 +41,7 @@
 #ifndef SENSOR_IF_H
 #define SENSOR_IF_H
 
+#include <stdbool.h>
 #include "sensor_type.h"
 
 #ifdef __cplusplus
@@ -179,6 +180,30 @@ struct SensorInterface {
      * @version 1.0
      */
     int32_t (*ReadData)(int32_t sensorId, struct SensorEvents *event);
+
+    /**
+     * @brief Obtain the sensor event data in the small system.
+     *
+     * @param sensorId Indicates the sensor ID. For details, see {@link SensorTypeTag}.
+     * @param enabled Indicates if the value is enabled.
+     * @param rateLevel Indicates rateClass.
+     * @return Returns <b>0</b> if the event data is obtained; returns a negative value otherwise.
+     *
+     * @since 4.1
+     * @version 2.0
+     */
+    int32_t (*SetSdcSensor)(int32_t sensorId, bool enabled, int32_t rateLevel);
+
+    /**
+     * @brief Obtain sensor information for SDC
+     *
+     * @param sdcSensorInfo Indicates the data of the SDC type.
+     * @return Returns <b>0</b> if the event data is obtained; returns a negative value otherwise.
+     *
+     * @since 4.1
+     * @version 2.0
+     */
+    int32_t (*GetSdcSensorInfo)(struct SdcSensorInfo sdcSensorInfo[]);
 };
 
 /**
