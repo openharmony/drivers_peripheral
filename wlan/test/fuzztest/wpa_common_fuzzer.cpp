@@ -314,7 +314,6 @@ void FuzzWpaInterfaceWifiStatus(struct IWpaInterface *interface, const uint8_t *
     struct HdiWpaCmdStatus wifiStatus;
     (void)memset_s(&wifiStatus, sizeof(struct HdiWpaCmdStatus), 0, sizeof(struct HdiWpaCmdStatus));
 
-
     interface->WifiStatus(interface, ifName, &wifiStatus);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
