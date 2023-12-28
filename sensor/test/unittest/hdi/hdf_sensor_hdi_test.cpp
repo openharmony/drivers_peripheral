@@ -79,8 +79,8 @@ namespace {
     constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr int32_t SENSOR_INTERVAL1 = 200000000;
     constexpr int32_t SENSOR_INTERVAL2 = 20000000;
-    constexpr int32_t SENSOR_INTERVAL3 = 400000000;
-    constexpr int32_t SENSOR_INTERVAL4 = 600000000;
+    constexpr int32_t SENSOR_INTERVAL3 = 100000000;
+    constexpr int32_t SENSOR_INTERVAL4 = 300000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
