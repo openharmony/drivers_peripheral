@@ -880,6 +880,60 @@ HWTEST_F(AudioAdapterInterfaceImpTest, getEventTypeFromCondition_002, TestSize.L
 }
 
 /**
+ * @tc.name: ParseDhIdFromJson_001
+ * @tc.desc: Verify the ParseDhIdFromJson function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, ParseDhIdFromJson_001, TestSize.Level1)
+{
+    std::string jsonArgs = "";
+    EXPECT_EQ(-1, AdapterTest_->ParseDhIdFromJson(jsonArgs));
+}
+
+/**
+ * @tc.name: ConvertString2Int_001
+ * @tc.desc: Verify the ConvertString2Int function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, ConvertString2Int_001, TestSize.Level1)
+{
+    std::string valueStr = "";
+    int value = 0;
+
+    for (int i = 1; i < 10; i++) {
+        valueStr += std::to_string(i);
+        value = value * 10 + i;
+        EXPECT_EQ(value, AdapterTest_->ConvertString2Int(valueStr));
+    }
+    valueStr = "1ab";
+    value = -1;
+    EXPECT_EQ(value, AdapterTest_->ConvertString2Int(valueStr));
+}
+
+/**
+ * @tc.name: GetRenderImpl_001
+ * @tc.desc: Verify the GetRenderImpl function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(AudioAdapterInterfaceImpTest, GetRenderImpl_001, TestSize.Level1)
+{
+    std::string content = "";
+    EXPECT_EQ(nullptr, AdapterTest_->GetRenderImpl(content));
+
+    content = "{\"dhId\":\"1\"}";
+    AudioDeviceDescriptor desc;
+    AudioSampleAttributes attrs;
+    const int dhId = 1;
+    const std::string adpName = "abc";
+    auto audioRender = new AudioRenderInterfaceImpl(adpName, desc, attrs, nullptr);
+    AdapterTest_->renderDevs_[0] = std::make_pair(dhId, audioRender);
+    EXPECT_NE(nullptr, AdapterTest_->GetRenderImpl(content));
+}
+
+/**
  * @tc.name: HandleVolumeChangeEvent_001
  * @tc.desc: Verify the HandleVolumeChangeEvent function.
  * @tc.type: FUNC
