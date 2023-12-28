@@ -193,5 +193,134 @@ BENCHMARK_F(CameraBenchmarkTest, GetStatus_benchmark_001)(
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, GetStatus_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
     Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
 
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_001)(
+    benchmark::State &st)
+{
+    int taskCount = 0;
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->rc = cameraTest->imageProcessSession_->GetCoucurrency(\
+                OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE, taskCount);
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_001)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_002)(
+    benchmark::State &st)
+{
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->rc = cameraTest->imageProcessSession_->SetExecutionMode(\
+                OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_002)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_003)(
+    benchmark::State &st)
+{
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->rc = cameraTest->imageProcessSession_->Reset();
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_003)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_004)(
+    benchmark::State &st)
+{
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->rc = cameraTest->imageProcessSession_->Interrupt();
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_004)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_005)(
+    benchmark::State &st)
+{
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->imageProcessSession_->GetPendingImages(cameraTest->pendingImageIds_);
+            for (auto imageId : cameraTest->pendingImageIds_) {
+                cameraTest->rc = cameraTest->imageProcessSession_->ProcessImage(imageId);
+            }
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_005)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
+/**
+  * @tc.name: Defferred Image
+  * @tc.desc: benchmark
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_006)(
+    benchmark::State &st)
+{
+    int ret = cameraTest->DefferredImageTestInit();
+    for (auto _ : st) {
+        if (ret == 0) {
+            cameraTest->imageProcessSession_->GetPendingImages(cameraTest->pendingImageIds_);
+            for (auto imageId : cameraTest->pendingImageIds_) {
+                cameraTest->rc = cameraTest->imageProcessSession_->RemoveImage(imageId);
+            }
+        }
+    }
+}
+BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_006)->Iterations(ITERATION_FREQUENCY)->
+    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
+
 BENCHMARK_MAIN();
 
