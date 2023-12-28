@@ -207,6 +207,23 @@ struct SensorEvents {
 };
 
 /**
+ * @brief Defines SDC reports data object operations to the node.
+ *
+ * The reported sensor data includes the offset, type, ddrSize, minRateLevel, maxRateLevel, reserved, memAddr.
+ *
+ * @since 4.1
+ */
+struct SdcSensorInfo {
+    uint64_t offset;
+    int32_t sensorId;
+    int32_t ddrSize;
+    int32_t minRateLevel;
+    int32_t maxRateLevel;
+    uint64_t memAddr;
+    int32_t reserved;
+};
+
+/**
  * @brief Defines the callback for reporting sensor data. This callback needs to be registered when
  * a sensor user subscribes to sensor data. Only after the sensor is enabled, the sensor data subscriber can receive
  * sensor data. For details, see {@link SensorInterface}.

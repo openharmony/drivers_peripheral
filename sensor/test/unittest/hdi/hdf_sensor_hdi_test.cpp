@@ -23,6 +23,7 @@
 #include "v2_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
+#include "hdf_log.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;
@@ -80,6 +81,7 @@ namespace {
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t ABNORMAL_SENSORID = -1;
+    constexpr int32_t RATE_LEVEL = 1;
 }
 
 class HdfSensorHdiTest : public testing::Test {
@@ -444,4 +446,57 @@ HWTEST_F(HdfSensorHdiTest, ReadSensorData0001, TestSize.Level1)
         ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
+}
+
+/**
+  * @tc.name: SetSdcSensor
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SetSdcSensor, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->SetSdcSensor(iter.sensorId, true, RATE_LEVEL);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(SENSOR_WAIT_TIME);
+        ret = g_sensorInterface->SetSdcSensor(iter.sensorId, false, RATE_LEVEL);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+/**
+  * @tc.name: GetSdcSensorInfo
+  * @tc.desc: Read event data for the specified sensor.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, GetSdcSensorInfo, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    EXPECT_GT(g_info.size(), 0);
+    std::vector<OHOS::HDI::Sensor::V2_0::SdcSensorInfo> sdcSensorInfo;
+    int32_t ret = g_sensorInterface->GetSdcSensorInfo(sdcSensorInfo);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    std::string infoMsg = "[";
+    for (auto it : sdcSensorInfo) {
+        if (infoMsg != "[") {
+            infoMsg += ", ";
+        }
+        infoMsg += "{";
+        infoMsg += "offset = " + std::to_string(it.offset) + ", ";
+        infoMsg += "sensorId = " + std::to_string(it.sensorId) + ", ";
+        infoMsg += "ddrSize = " + std::to_string(it.ddrSize) + ", ";
+        infoMsg += "minRateLevel = " + std::to_string(it.minRateLevel) + ", ";
+        infoMsg += "maxRateLevel = " + std::to_string(it.maxRateLevel) + ", ";
+        infoMsg += "memAddr = " + std::to_string(it.memAddr) + ", ";
+        infoMsg += "reserved = " + std::to_string(it.reserved);
+        infoMsg += "}";
+    }
+    infoMsg += "]";
+    HDF_LOGI("%{public}s: sdcSensorInfo = %{public}s", __func__, infoMsg.c_str());
 }
