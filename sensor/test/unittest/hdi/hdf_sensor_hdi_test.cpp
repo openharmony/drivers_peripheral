@@ -79,7 +79,8 @@ namespace {
     constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr int32_t SENSOR_INTERVAL1 = 200000000;
     constexpr int32_t SENSOR_INTERVAL2 = 20000000;
-    constexpr int32_t SENSOR_INTERVAL3 = 600000000;
+    constexpr int32_t SENSOR_INTERVAL3 = 400000000;
+    constexpr int32_t SENSOR_INTERVAL4 = 600000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
@@ -505,6 +506,42 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
     HDF_LOGI("sensorId is %{public}d",sensorId);
 
     ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL3);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Enable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    OsalMSleep(SENSOR_WAIT_TIME2);
+
+    ret = g_sensorInterface->Disable(sensorId);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+    SensorCallbackImpl::sensorDataFlag = 1;
+}
+
+/**
+  * @tc.name: ReportFrequencyTest0003
+  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
+{
+    HDF_LOGI("enter the ReportFrequencyTest0003 function");
+    ASSERT_NE(nullptr, g_sensorInterface);
+
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+
+    EXPECT_GT(g_info.size(), 0);
+    int32_t sensorId = g_info[0].sensorId;
+    HDF_LOGI("sensorId is %{public}d",sensorId);
+
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL4);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     ret = g_sensorInterface->Enable(sensorId);
