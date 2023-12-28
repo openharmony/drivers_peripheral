@@ -119,7 +119,7 @@ static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
         return;
     }
     data = nla_data(attr[NL80211_ATTR_VENDOR_DATA]);
-    len = nla_len(attr[NL80211_ATTR_VENDOR_DATA]);
+    len = (uint32_t)nla_len(attr[NL80211_ATTR_VENDOR_DATA]);
 
     QcaWifiEventScanDoneProcess(ifName, (struct nlattr *)data, len);
 }
@@ -431,10 +431,10 @@ void *EventThread(void *para)
         if (ret < 0) {
             HILOG_ERROR(LOG_CORE, "%s: fail poll", __FUNCTION__);
             break;
-        } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLERR) {
+        } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLERR) {
             HILOG_ERROR(LOG_CORE, "%s: event socket get POLLERR event", __FUNCTION__);
             break;
-        } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
+        } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
                 break;
             }
