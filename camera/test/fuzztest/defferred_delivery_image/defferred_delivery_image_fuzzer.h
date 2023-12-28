@@ -16,7 +16,7 @@
 #ifndef CAMERA_DEVICE_FUZZER_H
 #define CAMERA_DEVICE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "camerahost_fuzzer"
+#define FUZZ_PROJECT_NAME "defferred_delivery_image_fuzzer"
 #include "common.h"
 #include "v1_2/image_process_service_proxy.h"
 #include "v1_2/iimage_process_session.h"
@@ -25,7 +25,7 @@ namespace OHOS {
     std::shared_ptr<OHOS::Camera::CameraManager> cameraTest_ = nullptr;
     sptr<OHOS::HDI::Camera::V1_2::IImageProcessService> imageProcessService_ = nullptr;
     sptr<OHOS::HDI::Camera::V1_2::IImageProcessSession> imageProcessSession_ = nullptr;
-    std::vector<std::string> imageIds_;
+    std::vector<std::string> pendingImageIds_;
     class TestImageProcessCallback : public OHOS::HDI::Camera::V1_2::IImageProcessCallback {
     public:
         TestImageProcessCallback() = default;
@@ -39,7 +39,7 @@ namespace OHOS {
         {
             return 0;
         };
-        int32_t OnError(const std::string& imageId, int32_t errorCode) override
+        int32_t OnError(const std::string& imageId, OHOS::HDI::Camera::V1_2::ErrorCode errorCode) override
         {
             return 0;
         };

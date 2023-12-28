@@ -45,19 +45,27 @@ bool GetConcurrencyApi(const uint8_t *rawData)
     return true;
 }
 
+bool SetExecutionModeApi(const uint8_t *rawData)
+{
+    int taskCount;
+    imageProcessSession_->SetExecutionMode(
+        static_cast<OHOS::HDI::Camera::V1_2::ExecutionMode>(ConvertUint32(rawData)));
+    return true;
+}
+
 bool GetPendingImagesApi(const uint8_t *rawData)
 {
     (void) rawData;
-    imageProcessSession_->GetPendingImages(imageIds_);
+    imageProcessSession_->GetPendingImages(pendingImageIds_);
     return true;
 }
 
 bool ProcessImageApi(const uint8_t *rawData)
 {
-    int imagesCount = imageIds_.size();
+    int imagesCount = pendingImageIds_.size();
     std::string imageId;
     if (imagesCount != 0) {
-        imageId = imageIds_[rawData[0] % imagesCount];
+        imageId = pendingImageIds_[rawData[0] % imagesCount];
     }
     imageProcessSession_->ProcessImage(imageId);
     return true;
@@ -65,10 +73,10 @@ bool ProcessImageApi(const uint8_t *rawData)
 
 bool RemoveImageApi(const uint8_t *rawData)
 {
-    int imagesCount = imageIds_.size();
+    int imagesCount = pendingImageIds_.size();
     std::string imageId;
     if (imagesCount != 0) {
-        imageId = imageIds_[rawData[0] % imagesCount];
+        imageId = pendingImageIds_[rawData[0] % imagesCount];
     }
     imageProcessSession_->RemoveImage(imageId);
     return true;
@@ -88,21 +96,15 @@ bool ResetApi(const uint8_t *rawData)
     return true;
 }
 
-bool Foo(const uint8_t *rawData)
-{
-    int x = rawData[0];
-    return x * x;
-}
-
 typedef bool (*TestFuncDef)(const uint8_t *rawData);
 static TestFuncDef g_allTestFunc[] = {
     GetConcurrencyApi,
     GetPendingImagesApi,
+    SetExecutionModeApi,
     ProcessImageApi,
     RemoveImageApi,
     InterruptApi,
     ResetApi,
-    Foo,
 };
 
 
@@ -125,11 +127,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest_ = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest_->Init();
+    cameraTest_->InitV1_2();
     if (cameraTest_->serviceV1_1 == nullptr) {
         return false;
     }
-    cameraTest_->Open();
+    cameraTest_->OpenCameraV1_2();
     if (cameraTest_->cameraDeviceV1_1 == nullptr) {
         return false;
     }
