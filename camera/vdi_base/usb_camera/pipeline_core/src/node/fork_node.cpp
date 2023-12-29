@@ -111,6 +111,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                 CAMERA_LOGD("forkBuffer EncodeType is NULL, change Format to CAMERA_FORMAT_YCRCB_420_SP");
             }
             bufferPool_->setSFBuffer(buffer);
+            bufferPool_->SetIsFork(true);
 
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
