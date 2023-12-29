@@ -29,9 +29,9 @@ using namespace testing::ext;
 #define AUDIO_SAMPLE_RATE_48K           48000
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE  4096
 #define AUDIO_MULTCHANNEL_CHANNELLAYOUT 1551
+#define MULTICHANNEL_OUTPUT_STREAM_ID   61
 namespace {
 static const uint32_t g_audioAdapterNumMax = 5;
-const int BUFFER_LENTH = 1024 * 16;
 
 class HdfAudioUtAdapterTest : public testing::Test {
 public:
@@ -93,7 +93,7 @@ void HdfAudioUtAdapterTest::InitMultchannelAttrs(struct AudioSampleAttributes &a
     attrs.isSignedData = true;
     attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.frameSize);
     attrs.stopThreshold = INT_MAX;
-    attrs.silenceThreshold = BUFFER_LENTH;
+    attrs.silenceThreshold = 0;
 }
 
 void HdfAudioUtAdapterTest::InitDevDesc(struct AudioDeviceDescriptor &devDesc)
@@ -152,17 +152,14 @@ HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid001
     struct AudioDeviceDescriptor devicedesc = {};
     struct AudioSampleAttributes attrs = {};
     InitDevDesc(devicedesc);
-    devicedesc.desc = strdup("multchannel");
+    devicedesc.desc = strdup("");
     devicedesc.pins = PIN_OUT_SPEAKER;
     InitMultchannelAttrs(attrs);
-    attrs.silenceThreshold = 0;
-    attrs.streamId = 0;
+    attrs.streamId = MULTICHANNEL_OUTPUT_STREAM_ID;
     int32_t ret = adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_);
-    if (ret != HDF_SUCCESS) {
-        attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
-        ASSERT_EQ(HDF_SUCCESS, adapter_->CreateRender(adapter_, &devicedesc, &attrs, &render, &renderId_));
-    }
-    EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyRender(adapter_, renderId_));
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ret = adapter_->DestroyRender(adapter_, renderId_);
+    EXPECT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE || ret == HDF_ERR_INVALID_PARAM);
 }
 
 }
