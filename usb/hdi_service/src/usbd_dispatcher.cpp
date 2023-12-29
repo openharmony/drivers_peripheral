@@ -88,7 +88,7 @@ int32_t UsbdDispatcher::UsbControlSetUp(UsbControlParams *controlParams, UsbCont
     controlReq->directon = controlParams->directon;
     controlReq->request = controlParams->request;
     controlReq->value = controlParams->value;
-    controlReq->index = *(static_cast<uint16_t *>(controlParams->data));
+    controlReq->index = controlParams->index;
     controlReq->buffer = controlParams->data;
     controlReq->length = static_cast<uint32_t>(controlParams->size);
     return HDF_SUCCESS;
