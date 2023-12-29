@@ -126,6 +126,7 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
             bufferPool_->setSFBuffer(buffer);
+            bufferPool_->SetIsFork(true);
             std::lock_guard<std::mutex> l(mtx_);
             bufferQueue_.push(forkBuffer);
             bqcv_.notify_one();

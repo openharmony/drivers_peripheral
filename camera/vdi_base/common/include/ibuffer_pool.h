@@ -60,6 +60,8 @@ public:
     virtual std::map<int32_t, uint8_t*> getSFBuffer(int32_t index) = 0;
     virtual int32_t GetForkBufferId() = 0;
     virtual void SetForkBufferId(int32_t index) = 0;
+    virtual bool GetIsFork() = 0;
+    virtual void SetIsFork(bool isFork) = 0;
 };
 } // namespace OHOS::Camera
 
