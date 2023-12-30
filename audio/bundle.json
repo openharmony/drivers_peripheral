@@ -24,8 +24,7 @@
             "drivers_peripheral_audio_feature_community",
             "drivers_peripheral_audio_feature_effect",
             "drivers_peripheral_audio_feature_double_pnp_detect",
-            "drivers_peripheral_audio_feature_offload",
-            "drivers_peripheral_audio_feature_multchannel"
+            "drivers_peripheral_audio_feature_offload"
         ],
         "adapted_system_type": ["standard", "small"],
         "rom": "1035KB",
