@@ -1388,7 +1388,7 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     return RET_CODE_SUCCESS;
 }
 
-static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
+static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, const WiphyInfo *wiphyInfo)
 {
     struct nlattr *nest = NULL;
     int32_t i;
@@ -1400,10 +1400,20 @@ static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
             return RET_CODE_FAILURE;
         }
         for (i = 0; i < scan->numSsids; i++) {
+            if (i >= wiphyInfo->scanCapabilities.maxNumScanSsids) {
+                HILOG_INFO(LOG_CORE, "%s: Skip hidden ssid for scan", __FUNCTION__);
+            }
             nla_put(msg, i + 1, scan->ssids[i].ssidLen, scan->ssids[i].ssid);
         }
         nla_nest_end(msg, nest);
     }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t CmdScanPutFreqsMsg(struct nl_msg *msg, const WifiScan *scan)
+{
+    struct nlattr *nest = NULL;
+    int32_t i;
 
     if (scan->freqs) {
         nest = nla_nest_start(msg, NL80211_ATTR_SCAN_FREQUENCIES);
@@ -1415,6 +1425,34 @@ static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
             nla_put_u32(msg, i + 1, scan->freqs[i]);
         }
         nla_nest_end(msg, nest);
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
+{
+    uint32_t wiphyIndex;
+    WiphyInfo wiphyInfo;
+
+    if (memset_s(&wiphyInfo, sizeof(wiphyInfo), 0, sizeof(wiphyInfo)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s wiphyInfo failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (GetWiphyIndex(ifName, &wiphyIndex) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: GetWiphyIndex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (GetWiphyInfo(wiphyIndex, &wiphyInfo) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: GetWiphyInfo failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    if (CmdScanPutSsidsMsg(msg, scan, &wiphyInfo) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
+    }
+
+    if (CmdScanPutFreqsMsg(msg, scan) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
     }
 
     if (scan->extraIes) {
