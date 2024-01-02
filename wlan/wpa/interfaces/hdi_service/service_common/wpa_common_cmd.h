@@ -17,6 +17,7 @@
 
 #include "../wpa_impl.h"
 #include <pthread.h>
+#include "utils/common.h"
 
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
@@ -103,6 +104,9 @@ int32_t WpaInterfaceGetWepTxKeyIdx(struct IWpaInterface *self, const char *ifNam
 int32_t WpaInterfaceGetRequirePmf(struct IWpaInterface *self, const char *ifName, int *enable);
 int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifName, const char *countryCode);
 
+void StrSafeCopy(char *dst, unsigned len, const char *src);
+int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
+const char *macToStr(const u8 *addr);
 struct StWpaMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];

@@ -14,6 +14,7 @@
  */
 
 #include "sensor_callback_vdi.h"
+#include "sensor_clients_manager.h"
 
 namespace OHOS {
 namespace HDI {
@@ -61,6 +62,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         ret = callback->OnDataEvent(event);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+            SensorClientsManager::GetInstance()->IsUpadateSensorState(event.sensorId, *it, false);
         }
         if (successService != "") {
             successService += ",";

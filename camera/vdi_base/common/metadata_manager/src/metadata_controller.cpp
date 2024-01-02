@@ -24,11 +24,13 @@ const std::vector<int32_t> DATA_BASE = {
     OHOS_SENSOR_EXPOSURE_TIME,
     OHOS_CONTROL_EXPOSURE_MODE,
     OHOS_CONTROL_AE_EXPOSURE_COMPENSATION,
+    OHOS_CONTROL_AE_LOCK,
     OHOS_CONTROL_FOCUS_MODE,
     OHOS_CONTROL_METER_MODE,
     OHOS_CONTROL_FLASH_MODE,
     OHOS_CONTROL_FPS_RANGES,
     OHOS_CONTROL_AWB_MODE,
+    OHOS_CONTROL_AWB_LOCK,
     OHOS_CONTROL_AF_REGIONS,
     OHOS_CONTROL_METER_POINT,
     OHOS_CONTROL_VIDEO_STABILIZATION_MODE,
@@ -112,11 +114,13 @@ void MetadataController::AddEnabledAbility(const std::vector<int32_t> &abilityMe
             case OHOS_SENSOR_EXPOSURE_TIME:             // fallthrough
             case OHOS_CONTROL_EXPOSURE_MODE:            // fallthrough
             case OHOS_CONTROL_AE_EXPOSURE_COMPENSATION: // fallthrough
+            case OHOS_CONTROL_AE_LOCK:                  // fallthrough
             case OHOS_CONTROL_FOCUS_MODE:               // fallthrough
             case OHOS_CONTROL_METER_MODE:               // fallthrough
             case OHOS_CONTROL_FLASH_MODE:               // fallthrough
             case OHOS_CONTROL_FPS_RANGES:               // fallthrough
             case OHOS_CONTROL_AWB_MODE:                 // fallthrough
+            case OHOS_CONTROL_AWB_LOCK:                 // fallthrough
             case OHOS_CONTROL_AF_REGIONS:               // fallthrough
             case OHOS_CONTROL_METER_POINT:              // fallthrough
             case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: // fallthrough
@@ -359,10 +363,12 @@ bool MetadataController::IsChangeTagData(
     bool result = false;
     switch (key) {
         case OHOS_CONTROL_AWB_MODE:       // fallthrough
+        case OHOS_CONTROL_AWB_LOCK:       // fallthrough
         case OHOS_CONTROL_FOCUS_MODE:     // fallthrough
         case OHOS_CONTROL_FOCUS_STATE:    // fallthrough
         case OHOS_CONTROL_EXPOSURE_MODE:  // fallthrough
         case OHOS_CONTROL_EXPOSURE_STATE: // fallthrough
+        case OHOS_CONTROL_AE_LOCK:        // fallthrough
         case OHOS_CONTROL_FLASH_MODE:     // fallthrough
         case OHOS_CONTROL_METER_MODE:     // fallthrough
         case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: {

@@ -67,6 +67,7 @@ void SecureElementCaProxy::InitFunc()
         }
     }
     vendorSecureElementCaInitFunc_ = loader_->FindTheFunc<VendorSecureElementCaInitT>(CA_INIT_SYMBOL);
+    vendorSecureElementCaUninitFunc_ = loader_->FindTheFunc<VendorSecureElementCaUninitT>(CA_UNINIT_SYMBOL);
     vendorSecureElementCaGetAtrFunc_ = loader_->FindTheFunc<VendorSecureElementCaGetAtrT>(CA_GET_ATR_SYMBOL);
     vendorSecureElementCaOpenLogicalChannelFunc_ =
         loader_->FindTheFunc<VendorSecureElementCaOpenLogicalChannelT>(CA_OPEN_LOGICAL_SYMBOL);
@@ -87,6 +88,11 @@ void SecureElementCaProxy::InitFunc()
 int SecureElementCaProxy::VendorSecureElementCaInit() const
 {
     CA_FUNCTION_INVOKE_RETURN(vendorSecureElementCaInitFunc_);
+}
+
+int SecureElementCaProxy::VendorSecureElementCaUninit() const
+{
+    CA_FUNCTION_INVOKE_RETURN(vendorSecureElementCaUninitFunc_);
 }
 
 int SecureElementCaProxy::VendorSecureElementCaGetAtr(uint8_t *rsp, uint32_t *rspLen) const

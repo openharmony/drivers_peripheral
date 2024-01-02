@@ -13,20 +13,31 @@
 
 #include "inode.h"
 #include "stream_pipeline_builder.h"
-#include <set>
 
 namespace OHOS::Camera {
 StreamPipelineBuilder::StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr>& streamMgr,
     const std::shared_ptr<Pipeline>& p) : hostStreamMgr_(streamMgr), pipeline_(p)
 {
 }
+
+void StreamPipelineBuilder::SetMaxSize(const std::set<std::vector<int32_t>>& sizeSet)
+{
+    std::vector<int32_t> max(2);
+    for (auto i : sizeSet) {
+        if (i[0] * i[1] > max[0] * max[1]) {
+            max[0] = i[0];
+            max[1] = i[1];
+        }
+    }
+    pipeline_->wide_ = max[0];
+    pipeline_->high_ = max[1];
+}
+
 std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<PipelineSpec>& pipelineSpec,
     const std::string &cameraId)
 {
-    if (pipelineSpec == nullptr) {
-        CAMERA_LOGI("pipelineSpec nullptr~ \n");
-        return nullptr;
-    }
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipelineSpec, nullptr);
+
     CAMERA_LOGI("------------------------Node Instantiation Begin-------------\n");
     RetCode re = RC_OK;
     std::set<std::vector<int32_t>> sizeSet;
@@ -59,35 +70,21 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
                 if (peerNode != pipeline_->nodes_.end()) {
                     std::shared_ptr<IPort> peerPort = (*peerNode)->GetPort(portSpec.info_.peerPortName_);
                     re = peerPort->SetFormat(portSpec.format_);
-                    if (re != RC_OK) {
-                        return nullptr;
-                    }
+                    CHECK_IF_NOT_EQUAL_RETURN_VALUE(re, RC_OK, nullptr);
                     std::shared_ptr<IPort> port = newNode->GetPort(portSpec.info_.name_);
                     re = port->SetFormat(portSpec.format_);
-                    if (re != RC_OK) {
-                        return nullptr;
-                    }
+                    CHECK_IF_NOT_EQUAL_RETURN_VALUE(re, RC_OK, nullptr);
                     re = port->Connect(peerPort);
-                    if (re != RC_OK) {
-                        return nullptr;
-                    }
+                    CHECK_IF_NOT_EQUAL_RETURN_VALUE(re, RC_OK, nullptr);
                     re = peerPort->Connect(port);
-                    if (re != RC_OK) {
-                        return nullptr;
-                    }
+                    CHECK_IF_NOT_EQUAL_RETURN_VALUE(re, RC_OK, nullptr);
                 }
             }
         }
     }
-    std::vector<int32_t> max(2);
-    for (auto i : sizeSet) {
-        if (i[0] * i[1] > max[0] * max[1]) {
-            max[0] = i[0];
-            max[1] = i[1];
-        }
-    }
-    pipeline_->wide_ = max[0];
-    pipeline_->high_ = max[1];
+
+    SetMaxSize(sizeSet);
+
     CAMERA_LOGI("------------------------Node Instantiation End-------------\n");
     return pipeline_;
 }

@@ -127,8 +127,7 @@ int32_t MetadataService::GetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetMetadata(*handle->GetBufferHandle(), key, value);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, ret, DISPLAY_LOGE(" fail"));
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t MetadataService::ListMetadataKeys(const sptr<NativeBuffer>& handle, std::vector<uint32_t>& keys)

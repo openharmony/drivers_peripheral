@@ -124,7 +124,7 @@ sample编译命令：./build.sh --product-name rk3568 --build-target clearplay_t
 int main(int argc, char *argv[])
 {
     // data init
-    std::string clearPlayUuid = "E79628B6406A6724DCD5A1DA50B53E80";
+    std::string clearPlayUuid = "com.drm.clearplay";
     bool isSupported = false;
 
     // create key system factory

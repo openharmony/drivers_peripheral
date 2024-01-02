@@ -41,8 +41,9 @@ private:
 
 private:
     std::vector<uint8_t> address_;
-    static constexpr const char *BT_MAC_LIB = "libbt_mac.z.so";
-    static constexpr const char *GET_BT_MAC_SYMBOL_NAME = "GetBtMac";
+    static constexpr const char *BT_MAC_LIB = "libnb_mac.z.so";
+    static constexpr const char *GET_BT_MAC_SYMBOL_NAME = "GetConstantMac";
+    static constexpr unsigned int MAC_TYPE_BLUETOOTH = 1;
 };
 }  // namespace Hci
 }  // namespace Bluetooth

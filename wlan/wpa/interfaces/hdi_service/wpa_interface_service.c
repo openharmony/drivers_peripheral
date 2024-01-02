@@ -20,6 +20,7 @@
 #include "v1_0/iwpa_callback.h"
 #include "v1_0/iwpa_interface.h"
 #include "wpa_common_cmd.h"
+#include "wpa_p2p_cmd.h"
 #include "wpa_impl.h"
 
 struct WpaInterfaceService {
@@ -71,6 +72,50 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
     service->interface.GetWepTxKeyIdx = WpaInterfaceGetWepTxKeyIdx;
     service->interface.GetRequirePmf = WpaInterfaceGetRequirePmf;
     service->interface.SetCountryCode = WpaInterfaceSetCountryCode;
+
+    service->interface.P2pSetSsidPostfixName = WpaInterfaceP2pSetSsidPostfixName;
+    service->interface.P2pSetWpsDeviceType = WpaInterfaceP2pSetWpsDeviceType;
+    service->interface.P2pSetWpsConfigMethods = WpaInterfaceP2pSetWpsConfigMethods;
+    service->interface.P2pSetGroupMaxIdle = WpaInterfaceP2pSetGroupMaxIdle;
+    service->interface.P2pSetWfdEnable = WpaInterfaceP2pSetWfdEnable;
+    service->interface.P2pSetPersistentReconnect = WpaInterfaceP2pSetPersistentReconnect;
+    service->interface.P2pSetWpsSecondaryDeviceType = WpaInterfaceP2pSetWpsSecondaryDeviceType;
+    service->interface.P2pSetupWpsPbc = WpaInterfaceP2pSetupWpsPbc;
+    service->interface.P2pSetupWpsPin = WpaInterfaceP2pSetupWpsPin;
+    service->interface.P2pSetPowerSave = WpaInterfaceP2pSetPowerSave;
+    service->interface.P2pSetDeviceName = WpaInterfaceP2pSetDeviceName;
+    service->interface.P2pSetWfdDeviceConfig = WpaInterfaceP2pSetWfdDeviceConfig;
+    service->interface.P2pSetRandomMac = WpaInterfaceP2pSetRandomMac;
+    service->interface.P2pStartFind = WpaInterfaceP2pStartFind;
+    service->interface.P2pSetExtListen = WpaInterfaceP2pSetExtListen;
+    service->interface.P2pSetListenChannel = WpaInterfaceP2pSetListenChannel;
+    service->interface.P2pProvisionDiscovery = WpaInterfaceP2pProvisionDiscovery;
+    service->interface.P2pAddGroup = WpaInterfaceP2pAddGroup;
+    service->interface.P2pAddService = WpaInterfaceP2pAddService;
+    service->interface.P2pRemoveService = WpaInterfaceP2pRemoveService;
+    service->interface.P2pStopFind = WpaInterfaceP2pStopFind;
+    service->interface.P2pFlush = WpaInterfaceP2pFlush;
+    service->interface.P2pFlushService = WpaInterfaceP2pFlushService;
+    service->interface.P2pRemoveNetwork = WpaInterfaceP2pRemoveNetwork;
+    service->interface.P2pSetGroupConfig = WpaInterfaceP2pSetGroupConfig;
+    service->interface.P2pInvite = WpaInterfaceP2pInvite;
+    service->interface.P2pReinvoke = WpaInterfaceP2pReinvoke;
+    service->interface.P2pGetDeviceAddress = WpaInterfaceP2pGetDeviceAddress;
+    service->interface.P2pReqServiceDiscovery = WpaInterfaceP2pReqServiceDiscovery;
+    service->interface.P2pCancelServiceDiscovery = WpaInterfaceP2pCancelServiceDiscovery;
+    service->interface.P2pRespServerDiscovery = WpaInterfaceP2pRespServerDiscovery;
+    service->interface.P2pConnect = WpaInterfaceP2pConnect;
+    service->interface.P2pHid2dConnect = WpaInterfaceP2pHid2dConnect;
+    service->interface.P2pSetServDiscExternal = WpaInterfaceP2pSetServDiscExternal;
+    service->interface.P2pRemoveGroup = WpaInterfaceP2pRemoveGroup;
+    service->interface.P2pCancelConnect = WpaInterfaceP2pCancelConnect;
+    service->interface.P2pGetGroupConfig = WpaInterfaceP2pGetGroupConfig;
+    service->interface.P2pAddNetwork = WpaInterfaceP2pAddNetwork;
+    service->interface.P2pGetPeer = WpaInterfaceP2pGetPeer;
+    service->interface.P2pGetGroupCapability = WpaInterfaceP2pGetGroupCapability;
+    service->interface.P2pListNetworks = WpaInterfaceP2pListNetworks;
+    service->interface.P2pSaveConfig = WpaInterfaceP2pSaveConfig;
+
     return &service->interface;
 }
 

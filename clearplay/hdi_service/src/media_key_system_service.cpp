@@ -195,13 +195,17 @@ int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t
     }
     keyIdBase64.erase(std::remove(keyIdBase64.begin(), keyIdBase64.end(), '\0'), keyIdBase64.end());
     if (offlineKeyIdAndKeyValueBase64_.find(keyIdBase64) == offlineKeyIdAndKeyValueBase64_.end()) {
-        licenseStatus = OFFLINELICENSE_STATUS_INACTIVE;
+        licenseStatus = OFFLINELICENSE_STATUS_UNKNOWN;
         offlineKeyMutex_.unlock();
         return HDF_SUCCESS;
     }
-    offlineKeyIdAndKeyValueBase64_.clear();
+    for (auto it = mediaKeySessionMap_.begin(); it != mediaKeySessionMap_.end(); ++it) {
+        if (it->second == false) {
+            continue;
+        }
+        licenseStatus = it->first->session_->keyIdStatusMap[licenseId];
+    }
     offlineKeyMutex_.unlock();
-    licenseStatus = OFFLINELICENSE_STATUS_USABLE;
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -224,6 +228,12 @@ int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t> &
         if (ret != HDF_SUCCESS) {
             offlineKeyMutex_.unlock();
             return ret;
+        }
+        for (auto it = mediaKeySessionMap_.begin(); it != mediaKeySessionMap_.end(); ++it) {
+            if (it->second == false) {
+                continue;
+            }
+            it->first->session_->keyIdStatusMap[licenseId] = OFFLINELICENSE_STATUS_UNKNOWN;
         }
         offlineKeyMutex_.unlock();
         HDF_LOGI("%{public}s: end", __func__);

@@ -88,6 +88,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_COLOR               = 14,  /**< Color sensor */
     SENSOR_TYPE_SAR                 = 15,  /**< SAR sensor */
     SENSOR_TYPE_AMBIENT_LIGHT1      = 16,  /**< Secondary ambient light sensor*/
+    SENSOR_TYPE_HALL1               = 17,  /**< Secondary hall effect sensor */
     SENSOR_TYPE_MEDICAL_BEGIN       = 128, /**< The begin of medical sensorId enumeration value range */
     SENSOR_TYPE_MEDICAL_END         = 160, /**< The end of medical sensorId enumeration value range */
     SENSOR_TYPE_PHYSICAL_MAX        = 255, /**< Maximum type of a physical sensor */
@@ -203,6 +204,23 @@ struct SensorEvents {
     int32_t mode;      /**< Sensor data reporting mode */
     uint8_t *data;     /**< Sensor data address */
     uint32_t dataLen;  /**< Sensor data length */
+};
+
+/**
+ * @brief Defines SDC reports data object operations to the node.
+ *
+ * The reported sensor data includes the offset, type, ddrSize, minRateLevel, maxRateLevel, reserved, memAddr.
+ *
+ * @since 4.1
+ */
+struct SdcSensorInfo {
+    uint64_t offset;
+    int32_t sensorId;
+    int32_t ddrSize;
+    int32_t minRateLevel;
+    int32_t maxRateLevel;
+    uint64_t memAddr;
+    int32_t reserved;
 };
 
 /**

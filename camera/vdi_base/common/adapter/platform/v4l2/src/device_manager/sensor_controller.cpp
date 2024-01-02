@@ -519,14 +519,10 @@ RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> met
     RetCode rc = SendAWBMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendAWBMetaData fail");
-    } else {
-        CAMERA_LOGE("SendAWBMetaData success");
     }
     rc = SendAWBLockMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendAWBLockMetaData fail");
-    } else {
-        CAMERA_LOGE("SendAWBLockMetaData success");
     }
     rc = SendExposureMetaData(data);
     if (rc == RC_ERROR) {
@@ -588,7 +584,6 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
-        CAMERA_LOGI("%s Send CMD_AWB_MODE awbMode = %{public}d", __FUNCTION__, awbMode);
         int awbModeVal = V4L2_WHITE_BALANCE_AUTO;
         // Can not find tag for OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT and OHOS_CAMERA_AWB_MODE_TWILIGHT
         // in V4L2, so set V4L2_WHITE_BALANCE_AUTO.
@@ -614,14 +609,12 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
             awbModeVal = V4L2_WHITE_BALANCE_SHADE;
         }
 
-        CAMERA_LOGI("Set CMD_AWB_MODE GetName = [%{public}s]", GetName().c_str());
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, &awbModeVal);
-        CAMERA_LOGI("%s Set CMD_AWB_MODE [%{public}d]", __FUNCTION__, awbModeVal);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send V4L2_CID_AUTO_WHITE_BALANCE fail", __FUNCTION__);
-            return rc;
+        CAMERA_LOGI("Set CMD_AWB_MODE [%{public}d]", awbModeVal);
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_AWB_MODE value=%{public}d success", awbModeVal);
         } else {
-            CAMERA_LOGI("%{public}s Send V4L2_CID_AUTO_WHITE_BALANCE success", __FUNCTION__);
+            CAMERA_LOGE("Send OHOS_CONTROL_AWB_MODE value=%{public}d failed", awbModeVal);
         }
     }
     return rc;
@@ -635,8 +628,6 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_LOCK, &entry);
     if (ret == 0) {
         awbLock = *(entry.data.u8);
-        CAMERA_LOGI("%s Send CMD_AWB_LOCK awbLock = %{public}d", __FUNCTION__, awbLock);
-
         int curLock = 0;
         sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
         if (awbLock == OHOS_CAMERA_AWB_LOCK_ON) {
@@ -646,14 +637,12 @@ RetCode SensorController::SendAWBLockMetaData(common_metadata_header_t *data)
             // set the position of AWB bit to 0;
             curLock &= ~V4L2_LOCK_WHITE_BALANCE;
         }
-        CAMERA_LOGI("Set CMD_AWB_LOCK GetName = [%{public}s]", GetName().c_str());
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_LOCK, &curLock);
-        CAMERA_LOGI("%s Set CMD_AWB_LOCK [%{public}d]", __FUNCTION__, awbLock);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send OHOS_CONTROL_AWB_LOCK fail", __FUNCTION__);
-            return rc;
+        CAMERA_LOGI("Set CMD_AWB_LOCK [%{public}d]", awbLock);
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_AWB_LOCK value=%{public}d success", curLock);
         } else {
-            CAMERA_LOGI("%{public}s Send OHOS_CONTROL_AWB_LOCK success", __FUNCTION__);
+            CAMERA_LOGE("Send OHOS_CONTROL_AWB_LOCK value=%{public}d failed", curLock);
         }
     }
     return rc;
@@ -672,8 +661,10 @@ RetCode SensorController::SendExposureMetaData(common_metadata_header_t *data)
         exposureTime = *(entry.data.i64);
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPOTIME, (int*)&exposureTime);
         CAMERA_LOGI("Set CMD_AE_EXPOTIME [%{public}d]", exposureTime);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send CMD_AE_EXPOTIME fail");
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_SENSOR_EXPOSURE_TIME value=%{public}d success", exposureTime);
+        } else {
+            CAMERA_LOGE("Send OHOS_SENSOR_EXPOSURE_TIME value=%{public}d failed", exposureTime);
         }
     }
 
@@ -732,8 +723,10 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             } else {
                 rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
                 CAMERA_LOGI("Set CMD_EXPOSURE_MODE [%{public}d]", exposureMode);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("Send CMD_EXPOSURE_MODE fail");
+                if (rc == RC_OK) {
+                    CAMERA_LOGI("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d success", exposureVal);
+                } else {
+                    CAMERA_LOGE("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d failed", exposureVal);
                 }
             }
         }
@@ -744,7 +737,6 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
 RetCode SensorController::SendExposureAutoModeMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
-
     uint8_t exposureMode = 0;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
@@ -765,8 +757,10 @@ RetCode SensorController::SendExposureAutoModeMetaData(common_metadata_header_t 
             exposureVal = V4L2_EXPOSURE_APERTURE_PRIORITY;
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
         }
-        if (rc == RC_ERROR) {
-            CAMERA_LOGI("Set CMD_EXPOSURE_MODE fail");
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d success", exposureVal);
+        } else {
+            CAMERA_LOGE("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d failed", exposureVal);
         }
     }
     return rc;
@@ -780,8 +774,6 @@ RetCode SensorController::SendAELockMetaData(common_metadata_header_t *data)
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_LOCK, &entry);
     if (ret == 0) {
         aeLock = *(entry.data.u8);
-        CAMERA_LOGI("%s Send CMD_AE_LOCK aeLock = %{public}d", __FUNCTION__, aeLock);
-
         int curLock = 0;
         sensorVideo_->QuerySetting(GetName(), V4L2_CID_3A_LOCK, &curLock);
         if (aeLock == OHOS_CAMERA_AE_LOCK_ON) {
@@ -792,14 +784,12 @@ RetCode SensorController::SendAELockMetaData(common_metadata_header_t *data)
             curLock &= ~V4L2_LOCK_EXPOSURE;
         }
 
-        CAMERA_LOGI("Set CMD_AE_LOCK GetName = [%{public}s]", GetName().c_str());
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_LOCK, &curLock);
-        CAMERA_LOGI("%s Set CMD_AE_LOCK [%{public}d]", __FUNCTION__, aeLock);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send OHOS_CONTROL_AWB_LOCK fail", __FUNCTION__);
-            return rc;
+        CAMERA_LOGI("Set CMD_AE_LOCK [%{public}d]", aeLock);
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_AE_LOCK value=%{public}d success", curLock);
         } else {
-            CAMERA_LOGI("%{public}s Send OHOS_CONTROL_AWB_LOCK success", __FUNCTION__);
+            CAMERA_LOGE("Send OHOS_CONTROL_AE_LOCK value=%{public}d failed", curLock);
         }
     }
     return rc;
@@ -825,8 +815,10 @@ RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
         if (queryResult == RC_OK) {
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_LOCK, &curLock);
             CAMERA_LOGI("Set CMD_FOCUS_LOCK [%{public}d]", focusMode);
-            if (rc == RC_ERROR) {
-                CAMERA_LOGE("Send CMD_FOCUS_LOCK fail");
+            if (rc == RC_OK) {
+                CAMERA_LOGI("Send OHOS_CONTROL_FOCUS_MODE value=%{public}d success", focusMode);
+            } else {
+                CAMERA_LOGE("Send OHOS_CONTROL_FOCUS_MODE value=%{public}d failed", focusMode);
             }
         }
 
@@ -843,8 +835,10 @@ RetCode SensorController::SendFocusMetaData(common_metadata_header_t *data)
 
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_FOCUS_AUTO, &focusVal);
         CAMERA_LOGI("Set CMD_FOCUS_AUTO [%{public}d]", focusMode);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send CMD_FOCUS_AUTO fail");
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_FOCUS_MODE value=[%{public}d] success", focusMode);
+        } else {
+            CAMERA_LOGI("Send OHOS_CONTROL_FOCUS_MODE value=[%{public}d] failed", focusMode);
         }
 
         focusVal = 1;
@@ -904,8 +898,10 @@ RetCode SensorController::SendMeterMetaData(common_metadata_header_t *data)
         }
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_METER_MODE, &meterModeVal);
         CAMERA_LOGI("Set CMD_METER_MODE [%{public}d]", meterMode);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("Send CMD_METER_MODE fail");
+        if (rc == RC_OK) {
+            CAMERA_LOGI("Send OHOS_CONTROL_METER_MODE value=%{public}d success", meterModeVal);
+        } else {
+            CAMERA_LOGE("Send OHOS_CONTROL_METER_MODE value=%{public}d failed", meterModeVal);
         }
     }
 

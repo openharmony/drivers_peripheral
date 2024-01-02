@@ -15,6 +15,11 @@
 
 #include "utils_data_stub.h"
 
+static constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
+static constexpr uint32_t MAX_SUPPORTED_ITEMS = 1000;
+static constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
+static constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
+
 namespace OHOS::Camera {
 bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t> &cameraAbility)
 {
@@ -175,10 +180,6 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t> &cameraAbili
     uint32_t tagCount = 0;
     uint32_t itemCapacity = 0;
     uint32_t dataCapacity = 0;
-    constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
-    constexpr uint32_t MAX_SUPPORTED_ITEMS = 1000;
-    constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
-    constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
 
     ReadData<uint32_t>(tagCount, index, cameraAbility);
     if (tagCount > MAX_SUPPORTED_TAGS) {
@@ -227,6 +228,11 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
     int32_t tagCount = data.ReadInt32();
     if (tagCount <= 0) {
         return;
+    }
+
+    if (tagCount > MAX_SUPPORTED_TAGS) {
+        tagCount = MAX_SUPPORTED_TAGS;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata tagCount is more than supported value");
     }
 
     int32_t metadataSize = 0;
@@ -357,65 +363,116 @@ bool UtilsDataStub::WriteMetadata(const camera_metadata_item_t &entry, MessagePa
     return true;
 }
 
+static void ReadMetadataUInt8(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<uint8_t> buffers;
+    data.ReadUInt8Vector(&buffers);
+    entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
+    if (entry.data.u8 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.u8[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataInt32(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int32_t> buffers;
+    data.ReadInt32Vector(&buffers);
+    entry.data.i32 = new(std::nothrow) int32_t[entry.count];
+    if (entry.data.i32 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.i32[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataUInt32(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<uint32_t> buffers;
+    data.ReadUInt32Vector(&buffers);
+    entry.data.ui32 = new(std::nothrow) uint32_t[entry.count];
+    if (entry.data.ui32 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.ui32[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataFloat(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<float> buffers;
+    data.ReadFloatVector(&buffers);
+    entry.data.f = new(std::nothrow) float[entry.count];
+    if (entry.data.f != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.f[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataInt64(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int64_t> buffers;
+    data.ReadInt64Vector(&buffers);
+    entry.data.i64 = new(std::nothrow) int64_t[entry.count];
+    if (entry.data.i64 != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.i64[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataDouble(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<double> buffers;
+    data.ReadDoubleVector(&buffers);
+    entry.data.d = new(std::nothrow) double[entry.count];
+    if (entry.data.d != nullptr) {
+        for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
+            entry.data.d[i] = buffers.at(i);
+        }
+    }
+}
+
+static void ReadMetadataRational(camera_metadata_item_t &entry, MessageParcel &data)
+{
+    std::vector<int32_t> buffers;
+    data.ReadInt32Vector(&buffers);
+    entry.data.r = new(std::nothrow) camera_rational_t[entry.count];
+    if (entry.data.r != nullptr) {
+        for (size_t i = 0, j = 0;
+            i < entry.count && j < static_cast<size_t>(buffers.size() - 1);
+            i++, j += 2) { // 2:Take two elements from the buffer vector container
+            entry.data.r[i].numerator = buffers.at(j);
+            entry.data.r[i].denominator = buffers.at(j + 1);
+        }
+    }
+}
 bool UtilsDataStub::ReadMetadata(camera_metadata_item_t &entry, MessageParcel &data)
 {
-    if (entry.data_type == META_TYPE_BYTE) {
-        std::vector<uint8_t> buffers;
-        data.ReadUInt8Vector(&buffers);
-        entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
-        if (entry.data.u8 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.u8[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_INT32) {
-        std::vector<int32_t> buffers;
-        data.ReadInt32Vector(&buffers);
-        entry.data.i32 = new(std::nothrow) int32_t[entry.count];
-        if (entry.data.i32 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.i32[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_FLOAT) {
-        std::vector<float> buffers;
-        data.ReadFloatVector(&buffers);
-        entry.data.f = new(std::nothrow) float[entry.count];
-        if (entry.data.f != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.f[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_INT64) {
-        std::vector<int64_t> buffers;
-        data.ReadInt64Vector(&buffers);
-        entry.data.i64 = new(std::nothrow) int64_t[entry.count];
-        if (entry.data.i64 != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.i64[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_DOUBLE) {
-        std::vector<double> buffers;
-        data.ReadDoubleVector(&buffers);
-        entry.data.d = new(std::nothrow) double[entry.count];
-        if (entry.data.d != nullptr) {
-            for (size_t i = 0; i < entry.count && i < buffers.size(); i++) {
-                entry.data.d[i] = buffers.at(i);
-            }
-        }
-    } else if (entry.data_type == META_TYPE_RATIONAL) {
-        std::vector<int32_t> buffers;
-        data.ReadInt32Vector(&buffers);
-        entry.data.r = new(std::nothrow) camera_rational_t[entry.count];
-        if (entry.data.r != nullptr) {
-            for (size_t i = 0, j = 0;
-                i < entry.count && j < static_cast<size_t>(buffers.size() - 1);
-                i++, j += 2) { // 2:Take two elements from the buffer vector container
-                entry.data.r[i].numerator = buffers.at(j);
-                entry.data.r[i].denominator = buffers.at(j + 1);
-            }
-        }
+    switch (entry.data_type) {
+        case META_TYPE_BYTE:
+            ReadMetadataUInt8(entry, data);
+            break;
+        case META_TYPE_INT32:
+            ReadMetadataInt32(entry, data);
+            break;
+        case META_TYPE_UINT32:
+            ReadMetadataUInt32(entry, data);
+            break;
+        case META_TYPE_FLOAT:
+            ReadMetadataFloat(entry, data);
+            break;
+        case META_TYPE_INT64:
+            ReadMetadataInt64(entry, data);
+            break;
+        case META_TYPE_DOUBLE:
+            ReadMetadataDouble(entry, data);
+            break;
+        case META_TYPE_RATIONAL:
+            ReadMetadataRational(entry, data);
+            break;
     }
     return true;
 }
@@ -435,5 +492,4 @@ void UtilsDataStub::EntryDataToBuffer(const camera_metadata_item_t &entry, void 
     } else if (entry.data_type == META_TYPE_RATIONAL) {
         *buffer = static_cast<void*>(entry.data.r);
     }
-}
 }

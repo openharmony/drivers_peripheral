@@ -13,28 +13,32 @@
  * limitations under the License.
  */
 
-#include "usb_camera_vendor_tag_test.h"
+#include "camera_vendor_tag_test.h"
+
+#include <dlfcn.h>
 #include "camera_example_vendor_tags.h"
 
-void UtestUSBCameraVebdorTagTest::SetUpTestCase(void)
+const char* g_exampleVendorTagLib = "libcamera_example_vendor_tag_impl.z.so";
+
+void UtestCameraVendorTagTest::SetUpTestCase(void)
 {}
 
-void UtestUSBCameraVebdorTagTest::TearDownTestCase(void)
+void UtestCameraVendorTagTest::TearDownTestCase(void)
 {}
 
-void UtestUSBCameraVebdorTagTest::SetUp(void)
+void UtestCameraVendorTagTest::SetUp(void)
 {
     if (cameraBase_ == nullptr)
     cameraBase_ = std::make_shared<TestCameraBase>();
     cameraBase_->UsbInit();
 }
 
-void UtestUSBCameraVebdorTagTest::TearDown(void)
+void UtestCameraVendorTagTest::TearDown(void)
 {
     cameraBase_->Close();
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_001)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_001)
 {
     constexpr int itemCapacitySize = 30;
     constexpr int dataCapacitySize = 2000;
@@ -54,7 +58,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_001)
     EXPECT_EQ(entry.data.u8[0], sensorMode);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_002)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_002)
 {
     ability_ = cameraBase_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
@@ -84,7 +88,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_002)
     EXPECT_EQ(entry.data.u8[0], newSensorMode);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_003)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_003)
 {
     constexpr int itemCapacitySize = 30;
     constexpr int dataCapacitySize = 2000;
@@ -95,7 +99,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_003)
     EXPECT_EQ(ret, false);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_004)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_004)
 {
     constexpr int itemCapacitySize = 30;
     constexpr int dataCapacitySize = 2000;
@@ -122,7 +126,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_004)
     EXPECT_EQ(entry.data.i64[0], newSensorExposure);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_005)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_005)
 {
     constexpr int itemCapacitySize = 30;
     constexpr int dataCapacitySize = 2000;
@@ -142,7 +146,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_005)
     EXPECT_EQ(entry.data.i64[0], sensorExposure);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_006)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_006)
 {
     constexpr int itemCapacitySize = 30;
     constexpr int dataCapacitySize = 2000;
@@ -153,8 +157,15 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_006)
     EXPECT_EQ(ret, false);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_007)
 {
+    void* libHandle = dlopen(g_exampleVendorTagLib, RTLD_LAZY);
+    if (libHandle == nullptr) {
+        GTEST_SKIP() << "please push " << g_exampleVendorTagLib << " to the device." << std::endl;
+    } else {
+        dlclose(libHandle);
+    }
+
     // Get the device manager
     cameraBase_->OpenUsbCamera();
     ability_ = cameraBase_->GetCameraAbility();
@@ -175,7 +186,7 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
     const int64_t sensorExposure = 8888;
     int ohosTag = EXAMPLE_VENDOR_SENSOR_EXPOSURE;
     if (!meta->addEntry(ohosTag, &sensorExposure, 1)) {
-        std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add failed" << std::endl;
+        std::cout << "addEntry failed" << std::endl;
         return;
     }
     std::cout << GetCameraMetadataItemName(ohosTag) << "(" << ohosTag << ")" << "add success" << std::endl;
@@ -195,8 +206,15 @@ TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_007)
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
 }
 
-TEST_F(UtestUSBCameraVebdorTagTest, camera_usb_vendor_tag_008)
+TEST_F(UtestCameraVendorTagTest, camera_vendor_tag_008)
 {
+    void* libHandle = dlopen(g_exampleVendorTagLib, RTLD_LAZY);
+    if (libHandle == nullptr) {
+        GTEST_SKIP() << "please push " << g_exampleVendorTagLib << " to the device." << std::endl;
+    } else {
+        dlclose(libHandle);
+    }
+
     std::vector<vendorTag_t> tagVec {};
     auto ret = GetAllVendorTags(tagVec);
     for (auto tag : tagVec) {

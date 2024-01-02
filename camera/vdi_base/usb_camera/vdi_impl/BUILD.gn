@@ -131,9 +131,10 @@ ohos_shared_library("camera_daemon") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
-  if (use_hitrace) {
-    external_deps += [ "hitrace:libhitracechain" ]
-  }
+
+  #  if (use_hitrace) {
+  #    external_deps += [ "hitrace:libhitracechain" ]
+  #  }
 
   public_configs = [ ":camhdi_impl_config" ]
   install_images = [ chipset_base_dir ]

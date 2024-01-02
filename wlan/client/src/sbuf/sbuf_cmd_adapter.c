@@ -1153,6 +1153,23 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     return ret;
 }
 
+int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *frameData, uint32_t frameDataLen)
+{
+    (void)ifName;
+    (void)freq;
+    (void)frameData;
+    (void)frameDataLen;
+    return RET_CODE_NOT_SUPPORT;
+}
+
+int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen)
+{
+    (void)ifName;
+    (void)match;
+    (void)matchLen;
+    return RET_CODE_NOT_SUPPORT;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }

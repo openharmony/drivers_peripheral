@@ -38,7 +38,6 @@ private:
     void PreviewScaleConver(std::shared_ptr<IBuffer>& buffer);
     void ScaleConver(std::shared_ptr<IBuffer>& buffer);
     void ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer);
-    std::vector<std::shared_ptr<IPort>>   outPutPorts_;
     std::shared_ptr<IBufferPool>          bufferPool_ = nullptr;    // buffer pool of branch stream
 };
 } // namespace OHOS::Camera

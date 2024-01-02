@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+input_driver_path = "//drivers/peripheral/input"
+
 declare_args() {
   drivers_peripheral_input_feature_model = false
   drivers_peripheral_input_feature_udriver = false

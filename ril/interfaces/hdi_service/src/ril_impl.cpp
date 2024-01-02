@@ -426,6 +426,11 @@ int32_t RilImpl::GetRrcConnectionState(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::GetRrcConnectionState, slotId, serialId);
 }
 
+int32_t RilImpl::GetNrSsbId(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNrSsbId, slotId, serialId);
+}
+
 int32_t RilImpl::SetCallback(const sptr<V1_1::IRilCallback> &rilCallback)
 {
     return HDF_SUCCESS;

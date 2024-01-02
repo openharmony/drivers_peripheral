@@ -16,5 +16,6 @@ group("hdf_wlan_fuzztest") {
   deps = [
     "ap_fuzzer:ap_fuzztest",
     "sta_fuzzer:sta_fuzztest",
+    "wpa_fuzzer:wpa_fuzztest",
   ]
 }

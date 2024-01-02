@@ -190,6 +190,10 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     dCameraDeviceMap_[dCameraId] = dcameraDevice;
     DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
     dhBaseHashDCamIdMap_.emplace(dcameraBase, dCameraId);
+    if (callback == nullptr) {
+        DHLOGE("DCameraHost::SetProviderCallback failed, callback is null");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     dcameraDevice->SetProviderCallback(callback);
 
     if (dCameraHostCallback_ != nullptr) {

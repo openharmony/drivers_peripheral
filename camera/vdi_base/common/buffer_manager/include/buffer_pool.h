@@ -50,6 +50,8 @@ public:
     std::map<int32_t, uint8_t*> getSFBuffer(int32_t index) override;
     int32_t GetForkBufferId() override;
     void SetForkBufferId(int32_t index) override;
+    bool GetIsFork() override;
+    void SetIsFork(bool isFork) override;
 
 private:
     RetCode PrepareBuffer();
@@ -73,6 +75,7 @@ private:
     std::map<int32_t, uint8_t*> sfBuffer_;
     std::map<int32_t, uint32_t> sfSize_;
     int32_t forkBufferId_ = -1;
+    bool isFork_ = false;
 };
 } // namespace OHOS::Camera
 #endif

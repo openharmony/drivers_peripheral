@@ -249,6 +249,8 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
 static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
 {
     int32_t ret;
+    /* The time when the application starts reading data */ 
+    snd_pcm_sframes_t startThresholdSize = 1; 
     snd_pcm_sw_params_t *swParams = NULL;
     snd_pcm_t *handle = cardIns->pcmHandle;
     struct AlsaCapture *captureIns = (struct AlsaCapture *)cardIns;
@@ -266,10 +268,8 @@ static int32_t SetSWParams(struct AlsaSoundCard *cardIns)
         AUDIO_FUNC_LOGE("error: g_periodSize cannot be zero!");
         return HDF_FAILURE;
     }
-    /* start the transfer when the buffer is almost full: */
-    /* (buffer_size / avail_min) * avail_min */
-    ret = snd_pcm_sw_params_set_start_threshold(handle, swParams,
-        (captureIns->bufferSize / captureIns->periodSize) * captureIns->periodSize);
+    /* start the transfer when the buffer is 1 frames */
+    ret = snd_pcm_sw_params_set_start_threshold(handle, swParams, startThresholdSize);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Unable to set start threshold mode for capture: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;

@@ -201,6 +201,13 @@ void BatteryThread::UpdateBatteryInfo(void* service, const std::string& powerUev
     } else {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "g_callback is nullptr");
     }
+
+    BATTERY_HILOGI(COMP_DRV, "battery c=%{public}d, v=%{public}d, c=%{public}d, t=%{public}d, "
+        "h=%{public}d, pt=%{public}d, cs=%{public}d, pmc=%{public}d, "
+        "pmv=%{public}d, cc=%{public}d, p=%{public}d, re=%{public}d, te=%{public}d",
+        event.capacity, event.voltage, event.curNow, event.temperature, event.healthState,
+        event.pluggedType, event.chargeState, event.pluggedMaxCurrent, event.pluggedMaxVoltage,
+        event.chargeCounter, event.present, event.remainEnergy, event.totalEnergy);
 }
 
 bool BatteryThread::MatchPowerUevent(const char* msg, std::string& powerUevent)
