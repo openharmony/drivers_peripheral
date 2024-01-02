@@ -43,7 +43,7 @@ public:
     bool IsNeedCloseSensor(int sensorId, int serviceId);
     void OpenSensor(int sensorId, int serviceId);
     void UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
-    void GetServiceId(int groupId, int &serviceId, const sptr<ISensorCallback> &callbackObj);
+    int GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj);
     static SensorClientsManager* GetInstance();
     std::mutex clientsMutex_;
     std::mutex sensorUsedMutex_;
