@@ -133,7 +133,7 @@ int Hex2byte(const char *hex)
     if (b < 0) {
         return HDF_FAILURE;
     }
-    return (a << HDI_POS_FOURTH) | b;
+    return ((uint32_t)a << HDI_POS_FOURTH) | b;
 }
 
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
