@@ -146,9 +146,9 @@ void Test::OpenCameraV1_2(int cameraId)
 
         EXPECT_NE(serviceV1_2, nullptr);
         if (cameraId == DEVICE_1) {
-            rc = serviceV1_2->OpenCameraV1_2(cameraIds[1], deviceCallback, cameraDeviceV1_2);
+            rc = serviceV1_2->OpenCamera_V1_2(cameraIds[1], deviceCallback, cameraDeviceV1_2);
         } else {
-            rc = serviceV1_2->OpenCameraV1_2(cameraIds[0], deviceCallback, cameraDeviceV1_2);
+            rc = serviceV1_2->OpenCamera_V1_2(cameraIds[0], deviceCallback, cameraDeviceV1_2);
         }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
         EXPECT_NE(cameraDeviceV1_2, nullptr);
@@ -609,7 +609,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t captureId,
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStartedV1_2(int32_t captureId,
+int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted_V1_2(int32_t captureId,
     const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
 {
     for (auto it : infos) {
@@ -670,7 +670,7 @@ int32_t Test::TestCameraHostCallbackV1_2::OnCameraEvent(const std::string& camer
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatusV1_2(FlashlightStatus status)
+int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatus_V1_2(FlashlightStatus status)
 {
     CAMERA_LOGE("status: %{public}d", status);
     Test::statusCallback = status;
