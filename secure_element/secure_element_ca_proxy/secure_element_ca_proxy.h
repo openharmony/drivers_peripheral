@@ -47,6 +47,7 @@ public:
     }
 
     int VendorSecureElementCaInit() const;
+    int VendorSecureElementCaUninit() const;
     int VendorSecureElementCaGetAtr(uint8_t *rsp, uint32_t *rspLen) const;
     int VendorSecureElementCaOpenLogicalChannel(
         uint8_t *aid, uint32_t len, uint8_t p2, uint8_t *rsp, uint32_t *rspLen, uint32_t *channelNum) const;
@@ -90,6 +91,7 @@ private:
     };
 
     using VendorSecureElementCaInitT = int (*)(void);
+    using VendorSecureElementCaUninitT = int (*)(void);
     using VendorSecureElementCaGetAtrT = int (*)(uint8_t *rsp, uint32_t *rspLen);
     using VendorSecureElementCaOpenLogicalChannelT = int (*)(uint8_t *aid, uint32_t len, uint8_t p2, uint8_t *rsp,
                                                             uint32_t *rspLen, uint32_t *channelNum);
@@ -98,6 +100,7 @@ private:
     using VendorSecureElementCaTransmitT = int (*)(uint8_t *cmd, uint32_t cmdLen, uint8_t *rsp, uint32_t *rspLen);
     const char *const LIB_NAME = "libsecure_element_ca.z.so";
     const char *const CA_INIT_SYMBOL = "VendorSecureElementCaInit";
+    const char *const CA_UNINIT_SYMBOL = "VendorSecureElementCaUninit";
     const char *const CA_GET_ATR_SYMBOL = "VendorSecureElementCaGetAtr";
     const char *const CA_OPEN_LOGICAL_SYMBOL = "VendorSecureElementCaOpenLogicalChannel";
     const char *const CA_OPEN_BASIC_SYMBOL = "VendorSecureElementCaOpenBasicChannel";
@@ -108,6 +111,7 @@ private:
 
     void InitFunc();
     VendorSecureElementCaInitT vendorSecureElementCaInitFunc_{nullptr};
+    VendorSecureElementCaUninitT vendorSecureElementCaUninitFunc_{nullptr};
     VendorSecureElementCaGetAtrT vendorSecureElementCaGetAtrFunc_{nullptr};
     VendorSecureElementCaOpenLogicalChannelT vendorSecureElementCaOpenLogicalChannelFunc_{nullptr};
     VendorSecureElementCaOpenBasicChannelT vendorSecureElementCaOpenBasicChannelFunc_{nullptr};

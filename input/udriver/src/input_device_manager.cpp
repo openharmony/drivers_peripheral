@@ -93,58 +93,78 @@ vector<string> InputDeviceManager::GetFiles(string path)
     return fileList;
 }
 
+void InputDeviceManager::ReportEventPkg(int32_t iFd, InputEventPackage **iEvtPkg, size_t iCount)
+{
+    if (iEvtPkg == nullptr) {
+        HDF_LOGE("%{public}s: param invalid, line: %{public}d", __func__, __LINE__);
+        return;
+    }
+    for (auto &callbackFunc : reportEventPkgCallback_) {
+        uint32_t index {0};
+        auto ret = FindIndexFromFd(iFd, &index);
+        if (callbackFunc.second != nullptr && ret != INPUT_FAILURE) {
+            callbackFunc.second->EventPkgCallback(const_cast<const InputEventPackage **>(iEvtPkg), iCount, index);
+        }
+    }
+    return;
+}
+
+int32_t CheckReadResult(int32_t readResult)
+{
+    if (readResult == 0 || (readResult < 0 && errno == ENODEV)) {
+        return INPUT_FAILURE;
+    }
+    if (readResult < 0) {
+        if (errno != EAGAIN && errno != EINTR) {
+            HDF_LOGE("%{public}s: could not get event (errno = %{public}d)", __func__, errno);
+        }
+        return INPUT_FAILURE;
+    }
+    if ((readResult % sizeof(struct input_event)) != 0) {
+        HDF_LOGE("%{public}s: could not get one event size %{public}lu readResult size: %{public}d", __func__,
+            sizeof(struct input_event), readResult);
+        return INPUT_FAILURE;
+    }
+    return INPUT_SUCCESS;
+}
+
 // read action
 void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t size)
 {
     int32_t readLen = read(fd, event, sizeof(struct input_event) * size);
-
-    if (readLen == 0 || (readLen < 0 && errno == ENODEV)) {
+    if (CheckReadResult(readLen) == INPUT_FAILURE) {
         return;
-    } else if (readLen < 0) {
-        if (errno != EAGAIN && errno != EINTR) {
-            HDF_LOGE("%{public}s: could not get event (errno = %{public}d)", __func__, errno);
-        }
-    } else if ((readLen % sizeof(struct input_event)) != 0) {
-        HDF_LOGE("%{public}s: could not get one event size %{public}lu  readLen size: %{public}d", __func__,
-            sizeof(struct input_event), readLen);
-    } else {
-        size_t count = size_t(readLen) / sizeof(struct input_event);
-        InputEventPackage **evtPkg = (InputEventPackage **)OsalMemAlloc(sizeof(InputEventPackage *) * count);
-        if (evtPkg == nullptr) {
+    }
+    size_t count = size_t(readLen) / sizeof(struct input_event);
+    InputEventPackage **evtPkg = (InputEventPackage **)OsalMemAlloc(sizeof(InputEventPackage *) * count);
+    if (evtPkg == nullptr) {
+        HDF_LOGE("%{public}s: OsalMemAlloc failed, line: %{public}d", __func__, __LINE__);
+        return;
+    }
+    for (size_t i = 0; i < count; i++) {
+        struct input_event &iEvent = event[i];
+        // device action events happened
+        *(evtPkg + i) = (InputEventPackage *)OsalMemAlloc(sizeof(InputEventPackage));
+        if (evtPkg[i] == nullptr) {
             HDF_LOGE("%{public}s: OsalMemAlloc failed, line: %{public}d", __func__, __LINE__);
+            FreeEventPkgs(evtPkg, i);
+            free(evtPkg);
+            evtPkg = nullptr;
             return;
         }
-        for (size_t i = 0; i < count; i++) {
-            struct input_event &iEvent = event[i];
-            // device action events happened
-            *(evtPkg + i) = (InputEventPackage *)OsalMemAlloc(sizeof(InputEventPackage));
-            if (evtPkg[i] == nullptr) {
-                HDF_LOGE("%{public}s: OsalMemAlloc failed, line: %{public}d", __func__, __LINE__);
-                FreeEventPkgs(evtPkg, i);
-                free(evtPkg);
-                evtPkg = nullptr;
-                return;
-            }
-            evtPkg[i]->type = iEvent.type;
-            evtPkg[i]->code = iEvent.code;
-            evtPkg[i]->value = iEvent.value;
-            evtPkg[i]->timestamp = (uint64_t)iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND +
-                                    (uint64_t)iEvent.time.tv_usec;
-        }
-        for (auto &callbackFunc : reportEventPkgCallback_) {
-            uint32_t index {0};
-            auto ret = FindIndexFromFd(fd, &index);
-            if (callbackFunc.second != nullptr && ret != INPUT_FAILURE) {
-                callbackFunc.second->EventPkgCallback(const_cast<const InputEventPackage **>(evtPkg), count, index);
-            }
-        }
-        for (size_t i = 0; i < count; i++) {
-            OsalMemFree(evtPkg[i]);
-            evtPkg[i] = nullptr;
-        }
-        OsalMemFree(evtPkg);
-        evtPkg = nullptr;
+        evtPkg[i]->type = iEvent.type;
+        evtPkg[i]->code = iEvent.code;
+        evtPkg[i]->value = iEvent.value;
+        evtPkg[i]->timestamp = (uint64_t)iEvent.time.tv_sec * MS_THOUSAND * MS_THOUSAND +
+                               (uint64_t)iEvent.time.tv_usec;
     }
+    ReportEventPkg(fd, evtPkg, count);
+    for (size_t i = 0; i < count; i++) {
+        OsalMemFree(evtPkg[i]);
+        evtPkg[i] = nullptr;
+    }
+    OsalMemFree(evtPkg);
+    evtPkg = nullptr;
 }
 
 // open input device node
@@ -228,59 +248,65 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
     return INPUT_SUCCESS;
 }
 
+int32_t GetInputDeviceTypeInfo(const string &devName)
+{
+    uint32_t type {INDEV_TYPE_UNKNOWN};
+    if (devName.find("input_mt_wrapper") != std::string::npos) {
+        type = INDEV_TYPE_TOUCH;
+    } else if ((devName.find("Keyboard") != std::string::npos) &&
+               (devName.find("Headset") == std::string::npos)) {
+        type = INDEV_TYPE_KEYBOARD;
+    } else if (devName.find("Mouse") != std::string::npos) {
+        type = INDEV_TYPE_MOUSE;
+    } else if ((devName.find("_gpio_key") != std::string::npos) ||
+               (devName.find("ponkey_on") != std::string::npos)) {
+        type = INDEV_TYPE_KEY;
+    } else if (devName.find("Touchpad") != std::string::npos) {
+        type = INDEV_TYPE_TOUCHPAD;
+    }
+    return type;
+}
+
 void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
 {
     inputDevList_.clear();
     std::vector<std::string> flist = GetFiles(devPath_);
     std::shared_ptr<InputDeviceInfo> detailInfo;
     InputDevListNode inputDevList {};
-    uint32_t type {INDEV_TYPE_UNKNOWN};
 
     for (unsigned i = 0; i < flist.size(); i++) {
         string devPathNode = devPath_ + "/" + flist[i];
         std::string::size_type n = devPathNode.find("event");
-        if (n != std::string::npos) {
-            auto fd = OpenInputDevice(devPathNode);
-            if (fd < 0) {
-                HDF_LOGE("%{public}s: open node failed", __func__);
-                continue;
-            }
-            detailInfo = std::make_shared<InputDeviceInfo>();
-            (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
-            (void)GetInputDeviceInfo(fd, detailInfo.get());
-            auto sDevName = string(detailInfo->attrSet.devName);
-            if (sDevName.find("input_mt_wrapper") != std::string::npos) {
-                type = INDEV_TYPE_TOUCH;
-            } else if ((sDevName.find("Keyboard") != std::string::npos) &&
-                       (sDevName.find("Headset") == std::string::npos)) {
-                type = INDEV_TYPE_KEYBOARD;
-            } else if (sDevName.find("Mouse") != std::string::npos) {
-                type = INDEV_TYPE_MOUSE;
-            } else if ((sDevName.find("_gpio_key") != std::string::npos) ||
-                (sDevName.find("ponkey_on") != std::string::npos)) {
-                type = INDEV_TYPE_KEY;
-            } else if (sDevName.find("Touchpad") != std::string::npos) {
-                type = INDEV_TYPE_TOUCHPAD;
-            } else {
-                continue;
-            }
-            if (type != INDEV_TYPE_UNKNOWN) {
-                inputDevList.index = devIndex_;
-                inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
-                inputDevList.fd = fd;
-                detailInfo->devIndex = devIndex_;
-                detailInfo->devType = type;
-                if (memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
-                    devPathNode.c_str(), devPathNode.length()) != EOK ||
-                    memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
-                    sizeof(InputDeviceInfo)) != EOK) {
-                    HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
-                    return;
-                }
-                inputDevList_.insert_or_assign(devIndex_, inputDevList);
-                devIndex_ += 1;
-            }
+        if (n == std::string::npos) {
+            continue;
         }
+        auto fd = OpenInputDevice(devPathNode);
+        if (fd < 0) {
+            HDF_LOGE("%{public}s: open node failed", __func__);
+            continue;
+        }
+        detailInfo = std::make_shared<InputDeviceInfo>();
+        (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
+        (void)GetInputDeviceInfo(fd, detailInfo.get());
+        auto sDevName = string(detailInfo->attrSet.devName);
+        uint32_t type = GetInputDeviceTypeInfo(sDevName);
+        if (type == INDEV_TYPE_UNKNOWN) {
+            continue;
+        }
+        inputDevList.index = devIndex_;
+        inputDevList.status = INPUT_DEVICE_STATUS_OPENED;
+        inputDevList.fd = fd;
+        detailInfo->devIndex = devIndex_;
+        detailInfo->devType = type;
+        if (memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
+            devPathNode.c_str(), devPathNode.length()) != EOK ||
+            memcpy_s(&inputDevList.detailInfo, sizeof(InputDeviceInfo), detailInfo.get(),
+            sizeof(InputDeviceInfo)) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed, line: %{public}d", __func__, __LINE__);
+            return;
+        }
+        inputDevList_.insert_or_assign(devIndex_, inputDevList);
+        devIndex_ += 1;
     }
 }
 

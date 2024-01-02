@@ -54,7 +54,8 @@ typedef enum {
     CMD_SET_GO_CSA_CHANNEL,
     CMD_SET_GO_RADAR_DETECT,
     CMD_ID_MCC_STA_P2P_QUOTA_TIME,
-    CMD_ID_CTRL_ROAM_CHANNEL
+    CMD_ID_CTRL_ROAM_CHANNEL,
+    CMD_ID_RX_REMAIN_ON_CHANNEL,
 } ProjectionScreenCmd;
 
 /* common related interface */
@@ -104,7 +105,8 @@ typedef enum {
     WIFI_EVENT_RESET_DRIVER = 15,
     WIFI_EVENT_SCAN_RESULTS,
     WIFI_EVENT_SCAN_ABORTED,
-    WIFI_EVENT_BUTT
+    WIFI_EVENT_BUTT,
+    WIFI_EVENT_ACTION_RECEIVED,
 } WifiEventType;
 
 typedef enum {
@@ -180,8 +182,8 @@ typedef struct {
 enum WifiClientType {
     /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<13 */
     WIFI_KERNEL_TO_WPA_CLIENT = 11519,
-    /* 1<<17 | 1<<16 | 1<<15 | 1<<5 | 1<<4 */
-    WIFI_KERNEL_TO_HAL_CLIENT = 229424,
+    /* 1<<19 | 1<<17 | 1<<16 | 1<<15 | 1<<5 | 1<<4 */
+    WIFI_KERNEL_TO_HAL_CLIENT = 753712,
     WIFI_CLIENT_BUTT
 };
 
@@ -347,6 +349,8 @@ int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
 int32_t WifiStopPnoScan(const char *ifName);
 int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult);
 int32_t ClientGetApBandwidth(const char *ifName, uint8_t *bandwidth);
+int32_t WifiSendActionFrame(const char *ifName, uint32_t txChannel, const uint8_t *frameData, uint32_t frameDataLen);
+int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen);
 
 /* wpa related interface */
 #define MAX_NR_CIPHER_SUITES 5

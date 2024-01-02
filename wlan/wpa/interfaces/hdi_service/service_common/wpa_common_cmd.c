@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "wpa_common_cmd.h"
+#include "wpa_p2p_cmd.h"
 #include <securec.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
@@ -25,7 +26,8 @@
 #include "main.h"
 #include "wps_supplicant.h"
 #include "bssid_ignore.h"
-#include "config.h"
+#include "wpa_supplicant/config.h"
+#include "common/defs.h"
 #include "v1_0/iwpa_callback.h"
 #include "v1_0/iwpa_interface.h"
 #include "wpa_client.h"
@@ -141,14 +143,16 @@ int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
         return HDF_ERR_INVALID_PARAM;
     }
     HDF_LOGD("%{public}s: srcLen =%{public}d ", __func__, srcLen);
-    *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * srcLen);
-    if (*dst == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc fail!", __func__);
-        return HDF_FAILURE;
-    }
-    if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
-        return HDF_FAILURE;
+    if (srcLen > 0) {
+        *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * srcLen);
+        if (*dst == NULL) {
+            HDF_LOGE("%{public}s: OsalMemCalloc fail!", __func__);
+            return HDF_FAILURE;
+        }
+        if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
+            return HDF_FAILURE;
+        }
     }
     *dstLen = srcLen;
     return HDF_SUCCESS;
@@ -302,7 +306,6 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
 {
     struct wpa_supplicant *wpaSupp;
     char cmd[CMD_SIZE] = {0};
-    int pos = -1;
     int32_t ret = HDF_FAILURE;
 
     (void)self;
@@ -322,20 +325,8 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
     if (value != NULL) {
         HDF_LOGE("%{public}s value =%{public}s", __func__, value);
     }
-        for (unsigned i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
-        if (strcmp(g_wpaSsidFields[i].fieldName, name) == 0) {
-            pos = i;
-            HDF_LOGE("%{public}s pos =%{public}d", __func__, pos);
-            break;
-        }
-    }
-    if (CalcQuotationMarksFlag(pos, value) == QUOTATION_MARKS_FLAG_YES) {
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%d %s \"%s\"",
-            networkId, name, value);
-    } else {
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%d %s %s",
-            networkId, name, value);
-    }
+        networkId, name, value);
     ret = wpa_supplicant_ctrl_iface_set_network(wpaSupp, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s set network fail!", __func__);
@@ -445,7 +436,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "LIST_NETWORKS");
-    if (ret != HDF_SUCCESS) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s set network fail!", __func__);
         return HDF_FAILURE;
     }
@@ -613,27 +604,35 @@ static void WapDealWifiStatus(char *reply, struct HdiWpaCmdStatus *status)
         char *value = strtok_r(NULL, "\n", &savedPtr);
         if (strcmp(key, "bssid") == 0) {
             uint8_t tmpBssid[ETH_ADDR_LEN + 1] = {0};
-            HDF_LOGI("%{public}s key include bssid", __func__);
+            HDF_LOGI("%{public}s key include bssid value=%{public}s", __func__, value);
             hwaddr_aton(value, tmpBssid);
+            status->bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+            status->bssidLen = ETH_ADDR_LEN + 1;
             StrSafeCopy((char *)status->bssid, ETH_ADDR_LEN + 1, (char *)tmpBssid);
         } else if (strcmp(key, "freq") == 0) {
             status->freq = atoi(value);
             HDF_LOGI("%{public}s status->freq= %{public}d", __func__, status->freq);
         } else if (strcmp(key, "ssid") == 0) {
-            HDF_LOGI("%{public}s key include ssid", __func__);
+            HDF_LOGI("%{public}s key include ssid value=%{public}s", __func__, value);
+            status->ssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * strlen(value));
+            status->ssidLen = strlen(value);
             StrSafeCopy((char *)status->ssid, strlen(value), value);
             printf_decode((u8 *)status->ssid, strlen(value), (char *)status->ssid);
         } else if (strcmp(key, "id") == 0) {
             status->id = atoi(value);
             HDF_LOGI("%{public}s status->id= %{public}d", __func__, status->id);
         } else if (strcmp(key, "key_mgmt") == 0) {
-            HDF_LOGI("%{public}s key include key_mgmt", __func__);
+            HDF_LOGI("%{public}s key include key_mgmt value=%{public}s", __func__, value);
+            status->keyMgmt = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * strlen(value));
+            status->keyMgmtLen = strlen(value);
             StrSafeCopy((char *)status->keyMgmt, strlen(value), value);
         } else if (strcmp(key, "address") == 0) {
             uint8_t tmpAddress[ETH_ADDR_LEN +1] = {0};
             HDF_LOGD("%{public}s key include address value=%{public}s", __func__, value);
             hwaddr_aton(value, tmpAddress);
             HDF_LOGD("%{public}s key include tmpAddress=%{public}s", __func__, (char *)tmpAddress);
+            status->address = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+            status->addressLen = ETH_ADDR_LEN + 1;
             StrSafeCopy((char *)status->address, ETH_ADDR_LEN + 1, (char *)tmpAddress);
         }
         key = strtok_r(NULL, "=", &savedPtr);
@@ -647,8 +646,7 @@ int32_t WpaInterfaceWifiStatus(struct IWpaInterface *self, const char *ifName, s
     int replyLen;
     struct wpa_supplicant *wpaSupp;
     HDF_LOGI("%{public}s enter WpaInterfaceWifiStatus!", __func__);
-    if (ifName == NULL || status == NULL || status->bssid == NULL || status->bssid == NULL
-        || status->keyMgmt == NULL || status->ssid == NULL) {
+    if (ifName == NULL || status == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -662,14 +660,16 @@ int32_t WpaInterfaceWifiStatus(struct IWpaInterface *self, const char *ifName, s
     } else {
         HDF_LOGE("%{public}s wpaSupp is NULL", __func__);
     }
+    status->bssidLen = 0;
+    status->ssidLen = 0;
+    status->keyMgmtLen = 0;
+    status->addressLen = 0;
     WapDealWifiStatus(reply, status);
-    if (strcmp((char *)status->address, "") == 0) {
+    if (status->addressLen == 0) {
         HDF_LOGE("%{public}s key not include address", __func__);
-        return HDF_FAILURE;
     }
-    if (strcmp((char *)status->bssid, "") == 0) {
-        HDF_LOGE("%{public}s key not include ssid", __func__);
-        return HDF_FAILURE;
+    if (status->bssidLen == 0) {
+        HDF_LOGE("%{public}s key not include bssid", __func__);
     }
     HDF_LOGI("%{public}s WpaInterfaceWifiStatus success", __func__);
     return HDF_SUCCESS;
@@ -792,12 +792,13 @@ int32_t WpaInterfaceWpsPinMode(struct IWpaInterface *self, const char *ifName,
         }
     }
     ret = wpa_supplicant_ctrl_iface_wps_pin(wpaSupp, cmd, reply, REPLY_SIZE);
-    if (ret == HDF_SUCCESS) {
+    if (ret > 0) {
         *pinCode = atoi(reply);
     } else {
         HDF_LOGE("%{public}s wps pin fail!", __func__);
+        return HDF_FAILURE;
     }
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t WpaInterfaceWpsCancel(struct IWpaInterface *self, const char *ifName)
@@ -874,7 +875,7 @@ int32_t WpaInterfaceGetNetwork(struct IWpaInterface *self, const char *ifName,
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%d %s", networkId, param);
-    if (ret != HDF_SUCCESS) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s get network fail!", __func__);
         return HDF_FAILURE;
     }
@@ -921,7 +922,7 @@ int32_t WpaInterfaceSetSuspendMode(struct IWpaInterface *self, const char *ifNam
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, " %s %d ", "SETSUSPENDMODE", mode);
-    if (ret != HDF_SUCCESS) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s set suspend mode fail!", __func__);
         return HDF_FAILURE;
     }
@@ -1165,7 +1166,7 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "COUNTRY %s", countryCode);
-    if (ret != HDF_SUCCESS) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s set country code fail!", __func__);
         return HDF_FAILURE;
     }
@@ -1630,6 +1631,55 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
             break;
+        case WPA_EVENT_DEVICE_FOUND:
+            ret = ProcessEventP2pDeviceFound(pos, (struct P2pDeviceInfoParam *)data, ifName);
+            break;
+        case WPA_EVENT_DEVICE_LOST:
+            ret = ProcessEventP2pDeviceLost(pos, (struct P2pDeviceLostParam *)data, ifName);
+            break;
+        case WPA_EVENT_GO_NEGOTIATION_REQUEST:
+            ret = ProcessEventP2pGoNegotiationRequest(pos, (struct P2pGoNegotiationRequestParam *)data, ifName);
+            break;
+        case WPA_EVENT_GO_NEGOTIATION_COMPLETED:
+            ret = ProcessEventP2pGoNegotiationCompleted(pos, (struct P2pGoNegotiationCompletedParam *)data, ifName);
+            break;
+        case WPA_EVENT_INVITATION_RECEIVED:
+            ret = ProcessEventP2pInvitationReceived(pos, (struct P2pInvitationReceivedParam *)data, ifName);
+            break;
+        case WPA_EVENT_INVITATION_RESULT:
+            ret = ProcessEventP2pInvitationResult(pos, (struct P2pInvitationResultParam *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_FORMATION_SUCCESS:
+            ret = ProcessEventP2pGroupFormationSuccess(pos, ifName);
+            break;
+        case WPA_EVENT_GROUP_FORMATION_FAILURE:
+            ret = ProcessEventP2pGroupFormationFailure(pos, (char *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_START:
+            ret = ProcessEventP2pGroupStarted(pos, (struct P2pGroupStartedParam *)data, ifName);
+            break;
+        case WPA_EVENT_GROUP_REMOVED:
+            ret = ProcessEventP2pGroupRemoved(pos, (struct P2pGroupRemovedParam *)data, ifName);
+            break;
+        case WPA_EVENT_PROVISION_DISCOVERY_COMPLETED:
+            ret = ProcessEventP2pProvisionDiscoveryCompleted(pos, (struct P2pProvisionDiscoveryCompletedParam *)data,
+                ifName);
+            break;
+        case WPA_EVENT_FIND_STOPPED:
+            ret = ProcessEventP2pFindStopped(pos, ifName);
+            break;
+        case WPA_EVENT_SERV_DISC_REQ:
+            ret = ProcessEventP2pServDiscReq(pos, (struct P2pServDiscReqInfoParam *)data, ifName);
+            break;
+        case WPA_EVENT_SERV_DISC_RESP:
+            ret = ProcessEventP2pServDiscResp(pos, (struct P2pServDiscRespParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_CONNECT_STATE:
+            ret = ProcessEventP2pStaConnectState(pos, (struct P2pStaConnectStateParam *)data, ifName);
+            break;
+        case WPA_EVENT_IFACE_CREATED:
+            ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
+            break;
         default:
             HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
             break;
@@ -1860,19 +1910,7 @@ int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifNam
 
 static int32_t StopWpaSupplicant(void)
 {
-    struct wpa_global *wpa_g;
-    int32_t ret;
-
-    wpa_g = getWpaGlobal();
-    if (wpa_g == NULL) {
-        HDF_LOGE("%{public}s: wpa_g is null.", __func__);
-        return HDF_FAILURE;
-    }
-    wpa_supplicant_terminate_proc(wpa_g);
-    ret = pthread_join(g_tid, NULL);
-    if (ret == HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: WpaMainThread has been killed.", __func__);
-    }
+    /*Do nothing here,waiting for IWpaInterfaceReleaseInstance to destroy the wpa service. */
     HDF_LOGI("%{public}s: wpa_supplicant stop successfully!", __func__);
     return HDF_SUCCESS;
 }

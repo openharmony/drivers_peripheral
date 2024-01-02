@@ -88,6 +88,31 @@ void Test::Init()
     EXPECT_EQ(ret, 0);
 }
 
+int32_t Test::DefferredImageTestInit()
+{
+    constexpr const char* serviceName = "camera_image_process_service";
+    constexpr const int userId = 100;
+    int ret = 0;
+
+    // get ImageProcessService
+    imageProcessService_ = OHOS::HDI::Camera::V1_2::ImageProcessServiceProxy::Get(serviceName, false);
+    if (imageProcessService_ == nullptr) {
+        CAMERA_LOGE("ImageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
+        printf("ImageProcessServiceProxy::Get Fail, imageProcessService is nullptr");
+        return -1;
+    }
+    imageProcessCallback_ = new OHOS::Camera::Test::TestImageProcessCallback();
+    EXPECT_NE(imageProcessCallback_, nullptr);
+    ret = imageProcessService_->CreateImageProcessSession(userId, imageProcessCallback_, imageProcessSession_);
+    EXPECT_EQ(ret, 0);
+    if (imageProcessSession_ == nullptr) {
+        CAMERA_LOGE("CreateImageProcessSession Fail, imageProcessSession is nullptr: %{public}d", ret);
+        printf("CreateImageProcessSession Fail, imageProcessSession is nullptr: %d\r\n", ret);
+        return -1;
+    }
+    return 0;
+}
+
 void Test::Open(int cameraId)
 {
     if (cameraDevice == nullptr) {
@@ -652,4 +677,31 @@ int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatusV1_2(FlashlightStatu
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
+int32_t Test::TestImageProcessCallback::OnProcessDone(const std::string& imageId,
+    const OHOS::HDI::Camera::V1_2::ImageBufferInfo& buffer)
+{
+    CAMERA_LOGI("imageId: %{public}s", imageId.c_str());
+    coutProcessDone_++;
+    curImageId_ = imageId;
+    curImageBufferInfo_ = buffer;
+    return 0;
 }
+
+int32_t Test::TestImageProcessCallback::OnStatusChanged(OHOS::HDI::Camera::V1_2::SessionStatus status)
+{
+    CAMERA_LOGI("status: %{public}d", status);
+    curStatus_ = status;
+    coutStatusChanged_++;
+    return 0;
+}
+
+int32_t Test::TestImageProcessCallback::OnError(const std::string& imageId,
+    OHOS::HDI::Camera::V1_2::ErrorCode errorCode)
+{
+    CAMERA_LOGI("imageId: %{public}s, errorCode: %{public}d", imageId.c_str(), errorCode);
+    curImageId_ = imageId;
+    curErrorCode_ = errorCode;
+    countError_++;
+    return 0;
+}
+} // OHOS::Camera

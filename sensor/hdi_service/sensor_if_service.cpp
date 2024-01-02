@@ -121,8 +121,8 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         sensorInfo.power = it.power;
         sensorInfo.minDelay = it.minDelay;
         sensorInfo.maxDelay = it.maxDelay;
-        info.push_back(std::move(sensorInfo));
         sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
+        info.push_back(std::move(sensorInfo));
     }
 
     return HDF_SUCCESS;
@@ -303,6 +303,56 @@ int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents>
     }
 
     return HDF_SUCCESS;
+}
+
+int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
+{
+    HDF_LOGI("%{public}s: Enter the SetSdcSensor function, sensorId is %{public}d, enabled is %{public}u, \
+             rateLevel is %{public}u", __func__, sensorId, enabled, rateLevel);
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
+    int32_t ret = sensorVdiImpl_->SetSdcSensor(sensorId, enabled, rateLevel);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s SetSdcSensor failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
+int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo)
+{
+    HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    std::vector<OHOS::HDI::Sensor::V1_1::SdcSensorInfoVdi> sdcSensorInfoVdi;
+    StartTrace(HITRACE_TAG_HDF, "GetSdcSensorInfo");
+    int32_t ret = sensorVdiImpl_->GetSdcSensorInfo(sdcSensorInfoVdi);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s GetSdcSensorInfo failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    for (auto infoVdi : sdcSensorInfoVdi) {
+        SdcSensorInfo info;
+        info.offset = infoVdi.offset;
+        info.sensorId = infoVdi.sensorId;
+        info.ddrSize = infoVdi.ddrSize;
+        info.minRateLevel = infoVdi.minRateLevel;
+        info.maxRateLevel = infoVdi.maxRateLevel;
+        info.memAddr = infoVdi.memAddr;
+        info.reserved = infoVdi.reserved;
+        sdcSensorInfo.push_back(std::move(info));
+    }
+
+    return ret;
 }
 
 extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)

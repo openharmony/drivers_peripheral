@@ -132,7 +132,6 @@ uint32_t HeapBufferAllocator::CalculateSize(const uint32_t width,
             yuv420 size= w * h * 3 / 2
         */
             return width * height * 3 / 2; // 3:Fixed calculated value of yuv 2:Fixed calculated value of yuv
-            break;
         case CAMERA_FORMAT_YCBCR_422_P:
         case CAMERA_FORMAT_YUV_422_I:
         case CAMERA_FORMAT_YCBCR_422_SP:
@@ -146,7 +145,6 @@ uint32_t HeapBufferAllocator::CalculateSize(const uint32_t width,
             yuv422 size= w * h * 2
         */
             return width * height * 2; // 2:Fixed calculated value of yuv
-            break;
         default:
             break;
     }

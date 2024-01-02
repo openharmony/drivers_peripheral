@@ -78,7 +78,7 @@ void DcameraAddDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    sptr<IDCameraProviderCallback> callback(new MockDCameraProviderCallbackImpl(deviceId, dhId));
+    sptr<IDCameraProviderCallback> callback;
 
     DCameraHost::GetInstance()->AddDCameraDevice(dhBase, abilityInfo, callback);
 }

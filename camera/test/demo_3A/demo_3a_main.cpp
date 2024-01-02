@@ -29,6 +29,7 @@ static void Usage(FILE* fp)
             "-w | --auto white balance  Auto White Balance\n"
             "-g | --exposure lock       Auto Exposure Lock\n"
             "-i | --white balance lock  Auto White Balance Lock\n"
+            "-v | --white balance lock  Video test\n"
             "-q | --quit                stop preview and quit this app\n");
 }
 
@@ -36,7 +37,8 @@ const static struct option LONG_OPTIONS[] = {
     {"help", no_argument, nullptr, 'h'}, {"capture", no_argument, nullptr, 'c'},
     {"ae", no_argument, nullptr, 'e'}, {"af", no_argument, nullptr, 'f'},
     {"awb", no_argument, nullptr, 'w'}, {"ael", no_argument, nullptr, 'g'},
-    {"awbl", no_argument, nullptr, 'i'}, {nullptr, 0, nullptr, 0}
+    {"awbl", no_argument, nullptr, 'i'}, {"video", no_argument, nullptr, 'v'},
+    {nullptr, 0, nullptr, 0}
 };
 
 static int PutMenuAndGetChr(void)
@@ -123,6 +125,26 @@ static void CaptureTest(const std::shared_ptr<OhosCameraDemo>& mainDemo)
     }
 }
 
+static void VideoTest(const std::shared_ptr<OhosCameraDemo>& mainDemo)
+{
+    RetCode rc = RC_OK;
+    constexpr size_t delayTime = 5;
+
+    PreviewOff(mainDemo);
+    mainDemo->StartDualStreams(STREAM_ID_VIDEO);
+    mainDemo->CaptureOnDualStreams(STREAM_ID_VIDEO);
+
+    sleep(delayTime);
+    mainDemo->CaptureOff(CAPTURE_ID_PREVIEW, CAPTURE_PREVIEW);
+    mainDemo->CaptureOff(CAPTURE_ID_VIDEO, CAPTURE_VIDEO);
+    mainDemo->ReleaseAllStream();
+
+    rc = PreviewOn(0, mainDemo);
+    if (rc != RC_OK) {
+        CAMERA_LOGE("main test: video PreviewOn() error please -q exit demo");
+    }
+}
+
 static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
     const int argc, char** argv)
 {
@@ -156,6 +178,10 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
                 break;
             case 'i':
                 mainDemo->SetAWBLock();
+                c = PutMenuAndGetChr();
+                break;
+            case 'v':
+                VideoTest(mainDemo);
                 c = PutMenuAndGetChr();
                 break;
             case 'q':

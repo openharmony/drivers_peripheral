@@ -316,41 +316,53 @@ static void ShowHelp(char *name)
         __func__, name);
 }
 
+static void FillParamData(int32_t argc, char *argv[])
+{
+    if (argc == TEST_SIX_TYPE) {
+        g_busNum = (unsigned int)strtoul(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
+        g_devAddr = (unsigned int)strtoul(argv[TEST_TWO_TYPE], NULL, STRTOL_BASE); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)strtoul(argv[TEST_THREE_TYPE], NULL, STRTOL_BASE);  // 3 means get third char of argv
+        g_endNum = (unsigned char)strtoul(argv[TEST_FOUR_TYPE], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
+        if ((g_endNum >> ENDPOINT_IN_OFFSET) != 0) {                // the offset value is 7
+            g_printData = (strncmp(argv[TEST_FIVE_TYPE], "printdata", TEST_ONE_TYPE)) ? false : true;
+        }
+    } else if (argc == TEST_FIVE_TYPE) {
+        g_busNum = (unsigned int)strtoul(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
+        g_devAddr = (unsigned int)strtoul(argv[TEST_TWO_TYPE], NULL, STRTOL_BASE); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)strtoul(argv[TEST_THREE_TYPE], NULL, STRTOL_BASE);  // 3 means get third char of argv
+        g_endNum = (unsigned char)strtoul(argv[TEST_FOUR_TYPE], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
+    } else if (argc == TEST_THREE_TYPE) {
+        g_ifaceNum = (unsigned int)strtoul(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
+        g_endNum = (unsigned char)strtoul(argv[TEST_TWO_TYPE], NULL, STRTOL_BASE); // 2 means get second char of argv
+    } else {
+        HDF_LOGE("%{public}s: parameter error!", __func__);
+        ShowHelp(argv[TEST_ZERO_TYPE]);
+        return HDF_FAILURE;
+    }
+}
+
+static void PrintErrorLog(int32_t ret)
+{
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
+            remove it and test again! ret=%{public}d", __func__, ret);
+    }
+}
+
 int32_t main(int32_t argc, char *argv[])
 {
     int32_t ret;
-    if (argc == 6) {
-        g_busNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
-        g_devAddr = (unsigned int)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
-        g_ifaceNum = (unsigned int)strtoul(argv[3], NULL, STRTOL_BASE);  // 3 means get third char of argv
-        g_endNum = (unsigned char)strtoul(argv[4], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
-        if ((g_endNum >> 7) != 0) {                // the offset value is 7
-            g_printData = (strncmp(argv[5], "printdata", 1)) ? false : true;
-        }
-    } else if (argc == 5) {
-        g_busNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
-        g_devAddr = (unsigned int)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
-        g_ifaceNum = (unsigned int)strtoul(argv[3], NULL, STRTOL_BASE);  // 3 means get third char of argv
-        g_endNum = (unsigned char)strtoul(argv[4], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
-    } else if (argc == 3) {
-        g_ifaceNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
-        g_endNum = (unsigned char)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
-    } else {
-        HDF_LOGE("%{public}s: parameter error!", __func__);
-        ShowHelp(argv[0]);
-        return -1;
-    }
+    FillParamData(argc, argv[]);
     OsalSemInit(&sem, 0);
-
     g_fd = OpenDevice();
     if (g_fd < 0) {
         ret = -1;
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = ClaimInterface(g_ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     struct OsalThread urbReapProcess;
@@ -365,7 +377,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
@@ -380,7 +392,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
-        goto ERR;
+        PrintErrorLog(ret);
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
@@ -390,13 +402,7 @@ int32_t main(int32_t argc, char *argv[])
 
     ret = BeginProcess(g_endNum);
     if (ret != HDF_SUCCESS) {
-        goto ERR;
-    }
-
-ERR:
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not, \
-            remove it and test again! ret=%{public}d", __func__, ret);
+        PrintErrorLog(ret);
     }
     CloseDevice();
     return ret;

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef USB_CAMERA_VENDOR_TAG_TEST_H
-#define USB_CAMERA_VENDOR_TAG_TEST_H
+#ifndef HID_DDK_FUZZER_H
+#define HID_DDK_FUZZER_H
 
-#include "test_camera_base.h"
+#define FUZZ_PROJECT_NAME "hidddk_fuzzer"
 
-class UtestUSBCameraVebdorTagTest : public testing::Test {
-public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp(void);
-    void TearDown(void);
-    std::shared_ptr<TestCameraBase> cameraBase_ = nullptr;
-    std::shared_ptr<CameraAbility> ability_ = nullptr;
-};
 #endif

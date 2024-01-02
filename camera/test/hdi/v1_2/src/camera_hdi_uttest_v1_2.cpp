@@ -54,6 +54,175 @@ bool IsTagValueExistsU8(std::shared_ptr<CameraMetadata> ability, uint32_t tag, u
 }
 
 /**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_001, TestSize.Level1)
+{
+    bool isExit = false;
+    // stub codes
+    std::vector<uint8_t> cameraModesVector;
+    cameraModesVector.push_back(OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    cameraModesVector.push_back(OHOS::HDI::Camera::V1_2::MOVING_IMAGE);
+    cameraTest->ability->addEntry(OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,
+        cameraModesVector.data(), cameraModesVector.size());
+
+    // real test
+    isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+    isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::MOVING_IMAGE);
+    EXPECT_EQ(isExit, true);
+}
+
+void CameraHdiUtTestV1_2::TakePhoteWithDefferredImage(int PhotoCount)
+{
+    auto meta = std::make_shared<CameraSetting>(100, 100);
+    uint8_t value = OHOS::HDI::Camera::V1_2::STILL_IMAGE;
+    meta->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &value, sizeof(value));
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+    cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // take photo
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    for (int i = 0; i < PhotoCount; i++) {
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    }
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002, TestSize.Level1)
+{
+    int ret = 0;
+    bool isImageProcessServiceExist = true;
+
+    // real test
+    bool isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY,\
+        OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+
+    // get DefferredImageTestInit
+    ret = cameraTest->DefferredImageTestInit();
+    EXPECT_EQ(ret, 0);
+    if (ret != 0) {
+        CAMERA_LOGE("DefferredImageTestInit Fail!!!");
+        printf("DefferredImageTestInit Fail!!!\r\n");
+        isImageProcessServiceExist = false;
+    }
+
+    // take photo using deferred image delivery
+    TakePhoteWithDefferredImage(1);
+
+    // image deferred delivery process
+    ASSERT_EQ(isImageProcessServiceExist, true);
+    int taskCount = 0;
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE, taskCount);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(taskCount, 1);
+    ASSERT_EQ(pendingImages.size(), 1);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
+    EXPECT_EQ(ret, 0);
+
+    // process the first image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003
+ * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_003, TestSize.Level1)
+{
+    int ret = 0;
+    bool isImageProcessServiceExist = true;
+
+    // real test
+    bool isExit = IsTagValueExistsU8(cameraTest->ability,\
+        OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY, OHOS::HDI::Camera::V1_2::STILL_IMAGE);
+    EXPECT_EQ(isExit, true);
+
+    // get DefferredImageTestInit
+    ret = cameraTest->DefferredImageTestInit();
+    EXPECT_EQ(ret, 0);
+    if (ret != 0) {
+        CAMERA_LOGE("DefferredImageTestInit Fail");
+        printf("DefferredImageTestInit Fail\r\n");
+        isImageProcessServiceExist = false;
+    }
+
+    // take three photo using deferred image delivery, three times
+    TakePhoteWithDefferredImage(3);
+
+    ASSERT_EQ(isImageProcessServiceExist, true);
+    // image deferred delivery process
+    int taskCount = 0;
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::BALANCED, taskCount);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(taskCount, 1);
+    ASSERT_EQ(pendingImages.size(), 3);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::BALANCED);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::LOW_POWER);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
+    EXPECT_EQ(ret, 0);
+
+    // process the first image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
+
+    // process the second image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[1]);
+    EXPECT_EQ(ret, 0);
+    sleep(3);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
+
+     // process the third image, and test the Interrupt, Reset, RemoveImage Interfaces
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[2]);
+    ret = cameraTest->imageProcessSession_->Interrupt();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->Reset();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->RemoveImage(pendingImages[2]);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->countError_, 0);
+}
+
+/**
  * @tc.name: Camera_Device_Hdi_V1_2_001
  * @tc.desc: OHOS_ABILITY_SKETCH_ENABLE_RATIO
  * @tc.size: MediumTest
@@ -957,32 +1126,24 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
-    // is streams supported V1_1
-    std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-    std::vector<uint8_t> modeSettingVec;
-    MetadataUtils::ConvertMetadataToVec(modeSetting, modeSettingVec);
-    StreamSupportType pType;
-    cameraTest->rc = cameraTest->streamOperator_V1_1->IsStreamsSupported_V1_1(
-        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SUPER_STAB),
-        modeSettingVec, cameraTest->streamInfosV1_1, pType);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    // Capture streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
     // create and commitstreams
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
-        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SUPER_STAB),
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::NORMAL),
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    sleep(UT_SECOND_TIMES);
 
-    // start capture
+    // start capture preview, video capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
 
     // wait to stop
     uint32_t waitTime = 0;
@@ -1429,68 +1590,6 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
 }
 
 /**
- * @tc.name: Camera_Hdi_V1_2_049
- * @tc.desc: SMOOTH ZOOM
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_049, TestSize.Level1)
-{
-    EXPECT_NE(cameraTest->ability, nullptr);
-    common_metadata_header_t* data = cameraTest->ability->get();
-    EXPECT_NE(data, nullptr);
-    camera_metadata_item_t entry;
-    // cover tag OHOS_ABILITY_CAMERA_ZOOM_PERFORMANCE
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_ZOOM_PERFORMANCE, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover OHOS_CONTROL_PREPARE_ZOOM and its values
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // cover OHOS_CAMERA_ZOOMSMOOTH_PREPARE_DISABLE
-    uint8_t pre_zoom_value = OHOS_CAMERA_ZOOMSMOOTH_PREPARE_DISABLE;
-    meta->addEntry(OHOS_CONTROL_PREPARE_ZOOM, &pre_zoom_value, DATA_COUNT);
-    std::vector<uint8_t> setting;
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // cover OHOS_CAMERA_ZOOMSMOOTH_PREPARE_ENABLE
-    pre_zoom_value = OHOS_CAMERA_ZOOMSMOOTH_PREPARE_ENABLE;
-    meta->addEntry(OHOS_CONTROL_PREPARE_ZOOM, &pre_zoom_value, DATA_COUNT);
-    setting.clear();
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover OHOS_CONTROL_SMOOTH_ZOOM_RATIOS,  values type: uint32_t array
-    uint32_t values[] = { 10, 300, 20, 400, 30, 500 };
-    meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    meta->addEntry(OHOS_CONTROL_SMOOTH_ZOOM_RATIOS, values, sizeof(values) / sizeof(uint32_t));
-
-    setting.clear();
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
-    // cover GetStatus(), OHOS_STATUS_CAMERA_CURRENT_FPS and  OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO
-    std::shared_ptr<CameraSetting> metaIn = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    std::shared_ptr<CameraSetting> metaOut = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    // no sense
-    uint32_t current_fps = 0;
-    uint32_t current_zoom_ratio = 0;
-    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_FPS, &current_fps, DATA_COUNT);
-    metaIn->addEntry(OHOS_STATUS_CAMERA_CURRENT_ZOOM_RATIO, &current_zoom_ratio, DATA_COUNT);
-
-    std::vector<uint8_t> settingIn, settingOut;
-    MetadataUtils::ConvertMetadataToVec(metaIn, settingIn);
-
-    cameraTest->rc = cameraTest->cameraDeviceV1_2->GetStatus(settingIn, settingOut);
-    MetadataUtils::ConvertVecToMetadata(settingOut, metaOut);
-}
-
-/**
  * @tc.name: Camera_Hdi_V1_2_050
  * @tc.desc: macro mode
  * @tc.size: MediumTest
@@ -1618,4 +1717,32 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_051, TestSize.Level1)
 
     //清除测试回调函数
     OHOS::Camera::Test::resultCallback_ = nullptr;
+}
+
+/**
+ * @tc.name: Camera_Hdi_V1_2_052
+ * @tc.desc: OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, OHOS_CONTROL_MANUAL_EXPOSURE_TIME
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME, &entry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    for (size_t i = 0; i < entry.count; i++) {
+        printf("OHOS_ABILITY_NIGHT_MODE_SUPPORTED_EXPOSURE_TIME:%d\n", entry.data.i32[i]);
+        
+        //update settings
+        std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+        int32_t manualExposureTime = entry.data.i32[i];
+        meta->addEntry(OHOS_CONTROL_MANUAL_EXPOSURE_TIME, &manualExposureTime, DATA_COUNT);
+        std::vector<uint8_t> setting;
+        MetadataUtils::ConvertMetadataToVec(meta, setting);
+        cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    }
 }

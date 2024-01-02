@@ -25,8 +25,6 @@
 #undef HDF_LOG_TAG
 #define HDF_LOG_TAG "IntelligentVoiceEngineManagerImpl"
 
-using namespace OHOS::HDI::IntelligentVoice::Engine::V1_0;
-
 namespace OHOS {
 namespace IntelligentVoice {
 namespace Engine {
@@ -139,6 +137,7 @@ int32_t IntellVoiceEngineManagerImpl::ReleaseAdapter(const IntellVoiceEngineAdap
 int32_t IntellVoiceEngineManagerImpl::SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback>& dataOprCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    INTELLIGENT_VOICE_LOGI("enter");
 
     if (inst_ == nullptr) {
         INTELLIGENT_VOICE_LOGE("inst is nullptr");
@@ -171,9 +170,9 @@ int32_t DataOprListener::OnDataOprEvent(IntellVoiceDataOprType type, const OprDa
     }
 
     sptr<Ashmem> inMem = nullptr;
-    if (type == ENCRYPT_TYPE) {
+    if (type == OHOS::HDI::IntelligentVoice::Engine::V1_1::ENCRYPT_TYPE) {
         inMem = CreateAshmemFromOprData(inData, "EnryptInIntellVoiceData");
-    } else if (type == DECRYPT_TYPE) {
+    } else if (type == OHOS::HDI::IntelligentVoice::Engine::V1_1::DECRYPT_TYPE) {
         inMem = CreateAshmemFromOprData(inData, "DeryptInIntellVoiceData");
     } else {
         INTELLIGENT_VOICE_LOGE("invalid type:%{public}d", type);

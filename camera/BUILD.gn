@@ -35,6 +35,7 @@ if (defined(ohos_lite)) {
     } else {
       deps = [
         "hdi_service/v1_0:camera_host_service_1.0",
+        "vdi_base/common/metadata_manager:camera_example_vendor_tag_impl",
         "vdi_base/common/utils:peripheral_camera_utils",
         "vdi_base/usb_camera:usb_camera_vdi_impl",
       ]

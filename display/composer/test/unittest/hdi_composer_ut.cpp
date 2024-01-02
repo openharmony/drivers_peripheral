@@ -807,6 +807,7 @@ HWTEST_F(DeviceTest, test_GetDisplaySupportedModesExt, TestSize.Level1)
     std::vector<DisplayModeInfoExt> modes;
     auto ret = g_composerDevice->GetDisplaySupportedModesExt(g_displayIds[0], modes);
     if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("GetDisplaySupportedModesExt not support");
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
@@ -816,16 +817,32 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
 {
     g_isOnModeCalled = false;
     std::vector<DisplayModeInfo> oldModes;
-    auto result = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
-    ASSERT_EQ(DISPLAY_SUCCESS, result);
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = RED
+        }
+    };
+
+    // 先注册VBlankCallback
+    uint32_t ret = g_composerDevice->RegDisplayVBlankCallback(g_displayIds[0], TestVBlankCallback, nullptr);
+    ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
+
+    ret = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
+    ASSERT_EQ(DISPLAY_SUCCESS, ret);
+    ASSERT_EQ(oldModes.size() > 0, true);
 
     uint32_t modeid = oldModes[0].id;
-    auto ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
+    ret = g_composerDevice->SetDisplayModeAsync(g_displayIds[0], modeid, OnMode);
     if (ret == DISPLAY_NOT_SUPPORT) {
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
     if (ret == DISPLAY_SUCCESS) {
+        std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+        ASSERT_TRUE((layers.size() > 0));
+        PrepareAndPrensent(); // 送显
+
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         ASSERT_EQ(g_isOnModeCalled, true);
     }
@@ -836,6 +853,7 @@ HWTEST_F(DeviceTest, test_GetDisplayVBlankPeriod, TestSize.Level1)
     uint64_t period = 0;
     auto ret = g_composerDevice->GetDisplayVBlankPeriod(g_displayIds[0], period);
     if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("GetDisplayVBlankPeriod not support");
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
@@ -847,6 +865,7 @@ HWTEST_F(DeviceTest, test_RegSeamlessChangeCallback, TestSize.Level1)
     g_isOnSeamlessChangeCalled = false;
     auto ret = g_composerDevice->RegSeamlessChangeCallback(OnSeamlessChange, nullptr);
     if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("RegSeamlessChangeCallback not support");
         return;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
@@ -854,4 +873,95 @@ HWTEST_F(DeviceTest, test_RegSeamlessChangeCallback, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         ASSERT_EQ(g_isOnSeamlessChangeCalled, true);
     }
+}
+
+HWTEST_F(DeviceTest, test_SetLayerPerFrameParameter, TestSize.Level1)
+{
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = GREEN
+        },
+    };
+
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+    auto layer = layers[0];
+    std::vector<std::string> ValidKeys = { "FilmFilter", "ArsrDoEnhance", "SDRBrightnessRatio", "BrightnessNit",
+        "ViewGroupHasValidAlpha", "SourceCropTuning" };
+    std::string key;
+    std::vector<int8_t> value = { 1 };
+    key = "NotSupportKey";
+    auto ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("SetLayerPerFrameParameter not support");
+        return;
+    }
+    ASSERT_EQ(ret, -1) << "key not support, ret:" << ret;
+    key = ValidKeys[0];
+    ret = g_composerDevice->SetLayerPerFrameParameter(g_displayIds[0], layer->GetId(), key, value);
+    ASSERT_EQ(ret, 0) << "key support, ret:" << ret;
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("SetLayerPerFrameParameter not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetSupportedLayerPerFrameParameterKey, TestSize.Level1)
+{
+    std::vector<std::string> keys;
+    auto ret = g_composerDevice->GetSupportedLayerPerFrameParameterKey(keys);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("GetSupportedLayerPerFrameParameterKey not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_SetDisplayOverlayResolution, TestSize.Level1)
+{
+    DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
+    auto ret = g_composerDevice->SetDisplayOverlayResolution(g_displayIds[0], mode.width, mode.height);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("SetDisplayOverlayResolution not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+static void TestRefreshCallback(uint32_t devId, void* data)
+{
+}
+
+HWTEST_F(DeviceTest, test_RegRefreshCallback, TestSize.Level1)
+{
+    auto ret = g_composerDevice->RegRefreshCallback(TestRefreshCallback, nullptr);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("RegRefreshCallback not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetDisplaySupportedColorGamuts, TestSize.Level1)
+{
+    std::vector<ColorGamut> gamuts;
+    auto ret = g_composerDevice->GetDisplaySupportedColorGamuts(g_displayIds[0], gamuts);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("GetDisplaySupportedColorGamuts not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+HWTEST_F(DeviceTest, test_GetHDRCapabilityInfos, TestSize.Level1)
+{
+    HDRCapability info = { 0 };
+    auto ret = g_composerDevice->GetHDRCapabilityInfos(g_displayIds[0], info);
+    if (ret == DISPLAY_NOT_SUPPORT) {
+        DISPLAY_TEST_LOGD("GetHDRCapabilityInfos not support");
+        return;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }

@@ -468,6 +468,20 @@ ERROR:
     return HDF_FAILURE;
 }
 
+static int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
+{
+    (void)sensorId;
+    (void)enabled;
+    (void)rateLevel;
+    return HDF_SUCCESS;
+}
+
+static int32_t GetSdcSensorInfo(struct SdcSensorInfo sdcSensorInfo[])
+{
+    (void)sdcSensorInfo;
+    return HDF_SUCCESS;
+}
+
 void GetSensorDeviceMethods(struct SensorInterface *device)
 {
     CHECK_NULL_PTR_RETURN(device);
@@ -480,4 +494,6 @@ void GetSensorDeviceMethods(struct SensorInterface *device)
     device->ReadData = ReadData;
     device->Register = Register;
     device->Unregister = Unregister;
+    device->SetSdcSensor = SetSdcSensor;
+    device->GetSdcSensorInfo = GetSdcSensorInfo;
 }
