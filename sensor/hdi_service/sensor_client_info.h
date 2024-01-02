@@ -35,6 +35,7 @@ public:
     void SetReportDataCb(const sptr<ISensorCallback> &callbackObj);
     sptr<ISensorCallback> GetReportDataCb();
     std::unordered_map<int32_t, struct SensorConfig> sensorConfigMap_;
+    std::unordered_map<int32_t, int32_t> periodCountMap_;
     std::unordered_map<int32_t, int32_t> curCountMap_;
 private:
     sptr<ISensorCallback> pollCallback_;
