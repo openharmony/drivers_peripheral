@@ -329,21 +329,6 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &
     return ret;
 }
 
-int32_t SensorImpl::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
-{
-    HDF_LOGI("%{public}s: Enter the SetSdcSensor function, sensorId is %{public}d", __func__, sensorId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetSdcSensor);
-
-    StartTrace(HITRACE_TAG_SENSORS, "SetSdcSensor");
-    int32_t ret = sensorInterface->SetSdcSensor(sensorId, enabled, rateLevel);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
-    }
-
-    return ret;
-}
-
 int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
