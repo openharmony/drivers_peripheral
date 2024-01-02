@@ -34,7 +34,7 @@ void CameraFlashlightUtTestV1_2::TearDown(void)
 
 /**
  * @tc.name:Camera_Flashlight_Hdi_V1_2_001
- * @tc.desc:SetCallbackV1_2, Callback object = nullptr;
+ * @tc.desc:SetCallback_V1_2, Callback object = nullptr;
  * @tc.size:MediumTest
  * @tc.type:Function
 */
@@ -46,14 +46,14 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_001, TestSize.Le
     EXPECT_NE(cameraTest->serviceV1_2, nullptr);
     CAMERA_LOGI("V1_2::ICameraHost get success");
     // step 2: set callback object which is nullptr
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, HDI::Camera::V1_2::INVALID_ARGUMENT);
 }
 
 
 /**
  * @tc.name:Camera_Flashlight_Hdi_V1_2_002
- * @tc.desc:SetCallbackV1_2, Callback object exits;
+ * @tc.desc:SetCallback_V1_2, Callback object exits;
  * @tc.size:MediumTest
  * @tc.type:Function
 */
@@ -66,13 +66,13 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_002, TestSize.Le
     CAMERA_LOGI("V1_2::ICameraHost get success");
     // step 2: set callback object which is exits
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
 }
 
 /**
  * @tc.name:Camera_Flashlight_Hdi_V1_2_003
- * @tc.desc:SetFlashlightV1_2, turn off the flashlight with the camera closed
+ * @tc.desc:SetFlashlight_V1_2, turn off the flashlight with the camera closed
  * @tc.size:MediumTest
  * @tc.type:Function
 */
@@ -82,12 +82,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_003, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
     // step 2: turn off the flashlight
     if (cameraTest->cameraDevice == nullptr) {
         cameraTest->statusV1_2 = 0.0f;
-        cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+        cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         // delay for obtaining statucCallback
         sleep(UT_SECOND_TIMES);
@@ -97,7 +97,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_003, TestSize.Le
 
 /**
  * @tc.name:Camera_Flashlight_Hdi_V1_2_004
- * @tc.desc:SetFlashlightV1_2, turn on the flashlight with the camera closed
+ * @tc.desc:SetFlashlight_V1_2, turn on the flashlight with the camera closed
  * @tc.size:MediumTest
  * @tc.type:Function
 */
@@ -107,12 +107,12 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_004, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
     // step 2: turn on the flashlight
     if (cameraTest->cameraDevice == nullptr) {
         cameraTest->statusV1_2 = 1.0f;
-        cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+        cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         // delay for obtaining statucCallback
         sleep(UT_SECOND_TIMES);
@@ -132,7 +132,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_005, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
     // step 2: open the cameraDevice
     cameraTest->Open(DEVICE_0);
@@ -141,7 +141,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_005, TestSize.Le
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     // step 3: turn on the flashlight
     cameraTest->statusV1_2 = 1.0f;
-    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::DEVICE_CONFLICT);
     EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_UNAVAILABLE);
     // step 4: close the cameraDevice
@@ -163,7 +163,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
     // step 2: open the cameraDevice
     cameraTest->Open(DEVICE_0);
@@ -172,7 +172,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Le
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     // step 3: turn off the flashlight
     cameraTest->statusV1_2 = 0.0f;
-    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::DEVICE_CONFLICT);
     // step 4: close the cameraDevice
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -195,7 +195,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    ret = cameraTest->serviceV1_2->SetCallbackV1_2(cameraTest->hostCallbackV1_2);
+    ret = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_EQ(ret, 0);
     // step 2: open the cameraDevice
     cameraTest->Open(DEVICE_0);
@@ -204,7 +204,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     // step 3: turn on the flashlight
     cameraTest->statusV1_2 = 1.0f;
-    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::DEVICE_CONFLICT);
     // step 4: close the cameraDevice
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -214,7 +214,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 5: trun off the flashlight
     cameraTest->statusV1_2 = 0.0f;
-    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlightV1_2(cameraTest->statusV1_2);
+    cameraTest->rc = cameraTest->serviceV1_2->SetFlashlight_V1_2(cameraTest->statusV1_2);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_2::NO_ERROR);
     // delay for obtaining statusCallback
     sleep(UT_SECOND_TIMES);
