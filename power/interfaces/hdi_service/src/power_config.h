@@ -44,7 +44,7 @@ private:
     void ParseConfInner(const Json::Value& config);
     bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
     Json::Value GetValue(const Json::Value& config, std::string key) const;
-    void ParseSceneConfig(const Json::Value& chargerConfig);
+    void ParseSceneConfig(const Json::Value& sceneConfig);
     bool isValidJsonString(const Json::Value& config) const;
     std::map<std::string, PowerConfig::PowerSceneConfig> sceneConfigMap_;
     static std::mutex mutex_;
