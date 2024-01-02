@@ -95,8 +95,8 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         for (auto &entry : clients_[HDF_TRADITIONAL_SENSOR_TYPE]) {
             auto &client = entry->second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
-                int32_t periodCount = client.sensorConfigMap_.find(sensorId).reportInterval /
-                        sensorConfig_.find(sensorId).reportInterval;
+                int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.reportInterval /
+                        sensorConfig_.find(sensorId)->second.reportInterval;
                 client.periodCountMap_[sensorId] = periodCount;
             }
         }
@@ -206,8 +206,8 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     auto &client = clients_[groupId].find(serviceId)->second;
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client.sensorConfigMap_[sensorId] = sensorConfig;
-    if (sensorConfig_.find(sensorId) != sensorConfig_.end()){
-        int32_t periodCount = reportInterval / sensorConfig_.find(sensorId).reportInterval;
+    if (sensorConfig_.find(sensorId) != sensorConfig_.end()) {
+        int32_t periodCount = reportInterval / sensorConfig_.find(sensorId)->second.reportInterval;
         client.periodCountMap_[sensorId] = periodCount;
     }
     client.curCountMap_[sensorId] = 0;
@@ -234,7 +234,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     sensorClientInfo.curCountMap_[sensorId]++;
     HDF_LOGI("%{public}s Sensor IsNotNeedReportData? service Id is %{public}d, sensorId is %{public}d, "
              "curCount is %{public}d, periodCount is %{public}d", __func__, serviceId, sensorId,
-             sensorClientInfo.curCountMap_[sensorId], periodCount);
+             sensorClientInfo.curCountMap_[sensorId], sensorClientInfo.periodCountMap_[sensorId]);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
         return false;

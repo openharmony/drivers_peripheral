@@ -315,8 +315,9 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
 
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
+    int32_t ret;
     if (enabled) {
-        int32_t ret = this.SetBatch(sensorId, 0, rateLevel);
+        ret = this->SetBatch(sensorId, 0, rateLevel);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
         }
@@ -325,7 +326,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
             HDF_LOGE("%{public}s SetSdcSensor enable failed, error code is %{public}d", __func__, ret);
         }
     } else {
-        int32_t ret = this.Disable(sensorId);
+        ret = this->Disable(sensorId);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
         }
