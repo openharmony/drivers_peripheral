@@ -89,10 +89,11 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         needUpdateEachClient = true;
     }
     if (needUpdateEachClient) {
-        if (IsClientsEmpty(int HDF_TRADITIONAL_SENSOR_TYPE)) {
+        if (IsClientsEmpty(HDF_TRADITIONAL_SENSOR_TYPE)) {
             return;
         }
-        for (auto &client : clients_[HDF_TRADITIONAL_SENSOR_TYPE]) {
+        for (auto &entry : clients_[HDF_TRADITIONAL_SENSOR_TYPE]) {
+            auto &client = entry->second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
                 int32_t periodCount = client.sensorConfigMap_.find(sensorId).reportInterval /
                         sensorConfig_.find(sensorId).reportInterval;
