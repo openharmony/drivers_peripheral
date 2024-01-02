@@ -319,7 +319,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
     int32_t ret;
     if (enabled) {
-        int64_t reportInterval =COMMON_REPORT_FREQUENCY / rateLevel;
+        int64_t reportInterval = COMMON_REPORT_FREQUENCY / rateLevel;
         ret = this->SetBatch(sensorId, SAMPLING_INTERVAL, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
