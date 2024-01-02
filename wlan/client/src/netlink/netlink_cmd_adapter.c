@@ -197,6 +197,9 @@ struct FreqListNode {
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
+static int32_t GetWiphyInfo(const uint32_t wiphyIndex, WiphyInfo *wiphyInfo);
+static int32_t GetWiphyIndex(const char *ifName, uint32_t *wiphyIndex);
+
 static struct nl_sock *OpenNetlinkSocket(void)
 {
     struct nl_sock *sock = NULL;
@@ -1430,7 +1433,7 @@ static int32_t CmdScanPutFreqsMsg(struct nl_msg *msg, const WifiScan *scan)
     return RET_CODE_SUCCESS;
 }
 
-static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
+static int32_t CmdScanPutMsg(const char *ifName, struct nl_msg *msg, const WifiScan *scan)
 {
     uint32_t wiphyIndex;
     WiphyInfo wiphyInfo;
@@ -1487,7 +1490,7 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_TRIGGER_SCAN, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     do {
-        ret = CmdScanPutMsg(msg, scan);
+        ret = CmdScanPutMsg(ifName, msg, scan);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: put msg failed", __FUNCTION__);
             break;
