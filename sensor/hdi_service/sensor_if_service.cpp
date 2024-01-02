@@ -370,7 +370,7 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
         callbackMap.erase(groupId);
     }
     std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
-    for (auto iter:sensorEnabled) {
+    for (auto iter : sensorEnabled) {
         if (iter.second.find(serviceId) != iter.second.end()) {
             HDF_LOGI("%{public}s: ssensorId[%{public}d]", __func__, iter.first);
             SensorClientsManager::GetInstance()->IsNeedCloseSensor(iter.first, serviceId);
@@ -421,28 +421,11 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
         return;
     }
 
-    int32_t groupId = TRADITIONAL_SENSOR_TYPE;
-    auto traditionIter = callbackMap.find(groupId);
-    if (traditionIter != callbackMap.end()) {
-        auto callBackIter =
-        find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
-        [&callbackObject](const sptr<ISensorCallback> &callbackRegistered) {
-            return callbackObject.GetRefPtr() ==
-                (OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered)).GetRefPtr();
-        });
-        if (callBackIter != callbackMap[groupId].end()) {
-            int32_t serviceId;
-            SensorClientsManager::GetInstance()->GetServiceId(groupId, serviceId, *callBackIter);
-            int32_t ret = RemoveCallbackMap(groupId, serviceId, *callBackIter);
-            if (ret != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: traditional Unregister failed groupId[%{public}d]", __func__, groupId);
-            }
+    for (int32_t groupId = TRADITIONAL_SENSOR_TYPE; groupId < SENSOR_GROUP_TYPE_MAX; groupId++) {
+        auto groupIdIter = callbackMap.find(groupId);
+        if (groupIdIter != callbackMap.end()) {
+            return;
         }
-    }
-
-    groupId = MEDICAL_SENSOR_TYPE;
-    auto medicalIter = callbackMap.find(groupId);
-    if (medicalIter != callbackMap.end()) {
         auto callBackIter =
         find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
         [&callbackObject](const sptr<ISensorCallback> &callbackRegistered) {
@@ -450,11 +433,13 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
                 (OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered)).GetRefPtr();
         });
         if (callBackIter != callbackMap[groupId].end()) {
-            int32_t serviceId;
-            SensorClientsManager::GetInstance()->GetServiceId(groupId, serviceId, *callBackIter);
+            int32_t serviceId = SensorClientsManager::GetInstance()->GetServiceId(groupId, *callBackIter);
+            if (serviceId == HDF_FAILURE) {
+                HDF_LOGE("%{public}s: GetServiceId failed", __func__);
+            }
             int32_t ret = RemoveCallbackMap(groupId, serviceId, *callBackIter);
             if (ret != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: medical Unregister failed groupId[%{public}d]", __func__, groupId);
+                HDF_LOGE("%{public}s: Unregister failed groupId[%{public}d]", __func__, groupId);
             }
         }
     }
