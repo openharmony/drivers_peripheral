@@ -214,6 +214,9 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
 bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
 {
+    if (!IsSensorOnChange(sensorId)) {
+        return false;
+    }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
