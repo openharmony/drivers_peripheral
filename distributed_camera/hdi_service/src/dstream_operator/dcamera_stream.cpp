@@ -195,6 +195,11 @@ DCamRetCode DCameraStream::GetNextRequest()
         .timeout = 0
     };
 
+    if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
+        config.width = JPEG_MAX_SIZE;
+        config.height = 1;
+        config.format = GraphicPixelFormat::GRAPHIC_PIXEL_FMT_BLOB;
+    }
     OHOS::SurfaceError surfaceError = dcStreamProducer_->RequestBuffer(surfaceBuffer, syncFence, config);
     if (surfaceError == OHOS::SURFACE_ERROR_NO_BUFFER) {
         DHLOGE("No available buffer to request in surface.");
@@ -205,7 +210,12 @@ DCamRetCode DCameraStream::GetNextRequest()
         DHLOGE("Get producer buffer failed. [streamId = %d] [sfError = %d]", dcStreamInfo_->streamId_, surfaceError);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
+    return SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
+}
 
+DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceBuffer> &surfaceBuffer,
+    OHOS::sptr<OHOS::SyncFence> &syncFence)
+{
     std::shared_ptr<DImageBuffer> imageBuffer = std::make_shared<DImageBuffer>();
     RetCode ret = DBufferManager::SurfaceBufferToDImageBuffer(surfaceBuffer, imageBuffer);
     if (ret != RC_OK) {
@@ -226,10 +236,10 @@ DCamRetCode DCameraStream::GetNextRequest()
 
     auto itr = bufferConfigMap_.find(imageBuffer);
     if (itr == bufferConfigMap_.end()) {
+        int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
         auto bufferCfg = std::make_tuple(surfaceBuffer, usage);
         bufferConfigMap_.insert(std::make_pair(imageBuffer, bufferCfg));
     }
-
     return DCamRetCode::SUCCESS;
 }
 
