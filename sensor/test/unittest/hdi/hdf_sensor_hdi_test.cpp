@@ -85,7 +85,7 @@ namespace {
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
     constexpr int32_t ABNORMAL_SENSORID = -1;
-    constexpr int32_t RATE_LEVEL = 1;
+    constexpr int32_t RATE_LEVEL = 50;
 }
 
 class HdfSensorHdiTest : public testing::Test {
