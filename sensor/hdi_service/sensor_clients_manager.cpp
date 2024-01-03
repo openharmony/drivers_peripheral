@@ -93,7 +93,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
             return;
         }
         for (auto &entry : clients_[HDF_TRADITIONAL_SENSOR_TYPE]) {
-            auto &client = entry->second;
+            auto &client = entry.second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
                 int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.reportInterval /
                         sensorConfig_.find(sensorId)->second.reportInterval;
@@ -225,12 +225,6 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     }
 
     auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
-    if (sensorClientInfo.sensorConfigMap_.find(sensorId) == sensorClientInfo.sensorConfigMap_.end()) {
-        return true;
-    }
-    if (sensorConfig_.find(sensorId) == sensorConfig_.end()) {
-        return true;
-    }
     sensorClientInfo.curCountMap_[sensorId]++;
     HDF_LOGI("%{public}s Sensor IsNotNeedReportData? service Id is %{public}d, sensorId is %{public}d, "
              "curCount is %{public}d, periodCount is %{public}d", __func__, serviceId, sensorId,
