@@ -147,6 +147,6 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         sleep(1);
-	cameraTest->streamInfosV1_1.clear();
+	    cameraTest->streamInfosV1_1.clear();
     }
 }
