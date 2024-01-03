@@ -66,6 +66,11 @@ ohos_shared_library("libcodec_hdi_omx_server") {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
+  if (target_cpu == "arm64") {
+    defines += [ "__ARM64__" ]
+  } else if (target_cpu == "riscv64") {
+    defines += [ "__RISCV64__" ]
+  }
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
@@ -95,6 +100,11 @@ ohos_shared_library("libcodec_hdi_omx_client") {
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+  if (target_cpu == "arm64") {
+    defines = [ "__ARM64__" ]
+  } else if (target_cpu == "riscv64") {
+    defines = [ "__RISCV64__" ]
   }
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

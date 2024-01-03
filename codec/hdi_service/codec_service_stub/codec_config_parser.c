@@ -20,7 +20,7 @@
 #include "hdf_log.h"
 
 #define HDF_LOG_TAG "codec_config_parser"
-#ifdef __ARM64__
+#if defined(__ARM64__) || defined(__RISCV64__)
 #define MASK_NUM_LIMIT  64
 #else
 #define MASK_NUM_LIMIT  32

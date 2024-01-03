@@ -297,7 +297,11 @@ typedef struct {
  * @brief Defines the codec capability.
  */
 #define PROFILE_NUM 256 /** Size of the profile array supported. */
+#if defined(__riscv) && __riscv_xlen == 64
+#define NAME_LENGTH 128  /** Size of the component name. */
+#else
 #define NAME_LENGTH 32  /** Size of the component name. */
+#endif
 typedef struct {
     AvCodecMime mime;                     /**< MIME type */
     CodecType type;                       /**< Codec type */
