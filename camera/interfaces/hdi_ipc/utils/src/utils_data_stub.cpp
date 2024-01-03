@@ -493,3 +493,4 @@ void UtilsDataStub::EntryDataToBuffer(const camera_metadata_item_t &entry, void 
         *buffer = static_cast<void*>(entry.data.r);
     }
 }
+}
