@@ -33,7 +33,7 @@ using namespace testing::ext;
 namespace {
 static const uint32_t g_audioAdapterNumMax = 5;
 
-class HdfAudioUtAdapterTest : public testing::Test {
+class HdfAudioUtAdapterMultiTest : public testing::Test {
 public:
     struct IAudioManager *manager_ = nullptr;
     struct IAudioAdapter *adapter_ = nullptr;
@@ -48,7 +48,7 @@ public:
     void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen);
 };
 
-void HdfAudioUtAdapterTest::AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
+void HdfAudioUtAdapterMultiTest::AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
 {
     if (dataBlock == nullptr) {
         return;
@@ -68,7 +68,7 @@ void HdfAudioUtAdapterTest::AudioAdapterDescriptorFree(struct AudioAdapterDescri
     }
 }
 
-void HdfAudioUtAdapterTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
+void HdfAudioUtAdapterMultiTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
 {
     if ((descsLen > 0) && (descs != nullptr) && ((*descs) != nullptr)) {
         for (uint32_t i = 0; i < descsLen; i++) {
@@ -79,7 +79,7 @@ void HdfAudioUtAdapterTest::ReleaseAdapterDescs(struct AudioAdapterDescriptor **
     }
 }
 
-void HdfAudioUtAdapterTest::InitMultchannelAttrs(struct AudioSampleAttributes &attrs)
+void HdfAudioUtAdapterMultiTest::InitMultchannelAttrs(struct AudioSampleAttributes &attrs)
 {
     attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
     attrs.channelCount = AUDIO_MULTCHANNEL_CHANNELCOUNT;
@@ -96,7 +96,7 @@ void HdfAudioUtAdapterTest::InitMultchannelAttrs(struct AudioSampleAttributes &a
     attrs.silenceThreshold = 0;
 }
 
-void HdfAudioUtAdapterTest::InitDevDesc(struct AudioDeviceDescriptor &devDesc)
+void HdfAudioUtAdapterMultiTest::InitDevDesc(struct AudioDeviceDescriptor &devDesc)
 {
     ASSERT_NE(adapterDescs_, nullptr);
     ASSERT_NE(adapterDescs_->ports, nullptr);
@@ -108,7 +108,7 @@ void HdfAudioUtAdapterTest::InitDevDesc(struct AudioDeviceDescriptor &devDesc)
     }
 }
 
-void HdfAudioUtAdapterTest::SetUp()
+void HdfAudioUtAdapterMultiTest::SetUp()
 {
     uint32_t size = g_audioAdapterNumMax;
     manager_ = IAudioManagerGet(false);
@@ -134,7 +134,7 @@ void HdfAudioUtAdapterTest::SetUp()
     }
 }
 
-void HdfAudioUtAdapterTest::TearDown()
+void HdfAudioUtAdapterMultiTest::TearDown()
 {
     ASSERT_NE(manager_, nullptr);
     ASSERT_NE(adapter_, nullptr);
@@ -146,7 +146,7 @@ void HdfAudioUtAdapterTest::TearDown()
     manager_ = nullptr;
 }
 
-HWTEST_F(HdfAudioUtAdapterTest, HdfAudioAdapterMultchannelCreateRenderIsvalid001, TestSize.Level1)
+HWTEST_F(HdfAudioUtAdapterMultiTest, HdfAudioAdapterMultchannelCreateRenderIsvalid001, TestSize.Level1)
 {
     struct IAudioRender *render = nullptr;
     struct AudioDeviceDescriptor devicedesc = {};
