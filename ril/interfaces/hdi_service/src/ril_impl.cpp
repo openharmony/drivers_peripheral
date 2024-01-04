@@ -680,6 +680,9 @@ int32_t RilImpl::AddRilDeathRecipient(const sptr<IRilCallback> &callback)
 
 int32_t RilImpl::RemoveRilDeathRecipient(const sptr<IRilCallback> &callback)
 {
+    if (callback == nullptr) {
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IRilCallback>(callback);
     if (!remote->RemoveDeathRecipient(g_deathRecipient)) {
         HDF_LOGI("RemoveRilDeathRecipient fail");
