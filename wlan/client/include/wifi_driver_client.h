@@ -351,6 +351,8 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
 int32_t ClientGetApBandwidth(const char *ifName, uint8_t *bandwidth);
 int32_t WifiSendActionFrame(const char *ifName, uint32_t txChannel, const uint8_t *frameData, uint32_t frameDataLen);
 int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen);
+int32_t WifiSetPowerSaveMode(const char *ifName, int32_t frequency, int32_t mode);
+int32_t WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable);
 
 /* wpa related interface */
 #define MAX_NR_CIPHER_SUITES 5
