@@ -21,6 +21,8 @@
 #define HDF_LOG_TAG USB_INTERFACE_POOL
 
 static int32_t g_usbRequestObjectId = 0;
+const int32_t BIT_WIDTH = 8;
+
 static HDF_STATUS IfFreePipeObj(struct UsbPipe *pipeObj)
 {
     HDF_STATUS ret = HDF_SUCCESS;
@@ -328,6 +330,26 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     return interfacePos;
 }
 
+bool CheckInterfacePoolValid(struct UsbInterfacePool *interfacePoolPos)
+{
+    struct UsbInterfacePool *interfacePoolPosNext = CONTAINER_OF(interfacePoolPos->object.entry.next,
+        struct UsbInterfacePool, object.entry);
+    if (sizeof(void *) == BIT_WIDTH) {
+        if (sizeof(interfacePoolPosNext->object.entry) == 0 ||
+            (uintptr_t)(&interfacePoolPosNext->object.entry) == UINT64_MAX) {
+                HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
+                return false;
+            }
+    } else {
+        if (sizeof(interfacePoolPosNext->object.entry) == 0 ||
+            (uintptr_t)(&interfacePoolPosNext->object.entry) == UINT32_MAX) {
+                HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
+                return false;
+            }
+    }
+    return true;
+}
+
 static struct UsbInterfacePool *IfFindInterfacePool(
     const struct UsbSession *session, struct UsbPoolQueryPara queryPara, bool refCountFlag)
 {
@@ -372,6 +394,10 @@ static struct UsbInterfacePool *IfFindInterfacePool(
                 AdapterAtomicInc(&interfacePoolPos->refCount);
             }
 
+            break;
+        }
+        if (!CheckInterfacePoolValid(interfacePoolPos)) {
+            HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
             break;
         }
     }
