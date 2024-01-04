@@ -253,12 +253,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
 
 bool SensorClientsManager::IsSensorContinues(int sensorId)
 {
-    auto it = std::find(continuesSensor.begin(), continuesSensor.end(), sensorId);
-
-    if (it != continuesSensor.end()) {
-        return true;
-    }
-    return false;
+    return std::find(continuesSensor.begin(), continuesSensor.end(), sensorId) != continuesSensor.end();
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
