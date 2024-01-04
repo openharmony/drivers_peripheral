@@ -121,6 +121,7 @@ struct FamilyData {
 struct WifiHalInfo {
     struct nl_sock *cmdSock;
     struct nl_sock *eventSock;
+    struct nl_sock *ctrlSock;
     int32_t familyId;
 
     // thread controller info
@@ -252,26 +253,30 @@ static void DisconnectCmdSocket(void)
     g_wifiHalInfo.cmdSock = NULL;
 }
 
-static int32_t NoSeqCheck(struct nl_msg *msg, void *arg)
+static int32_t ConnectCtrlSocket(void)
 {
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
-    struct nlattr *attr[NL80211_ATTR_MAX + 1];
-
-    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
-    if (hdr->cmd != NL80211_CMD_FRAME) {
-        return NL_OK;
-    }
-    if (attr[NL80211_ATTR_FRAME] == NULL) {
-        return NL_OK;
+    g_wifiHalInfo.ctrlSock = OpenNetlinkSocket();
+    if (g_wifiHalInfo.ctrlSock == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to open ctrl socket", __FUNCTION__);
+        return RET_CODE_FAILURE;
     }
 
-    WifiActionData actionData;
-    actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
-    actionData.dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
-    HILOG_INFO(LOG_CORE, "%s: received action frame data", __FUNCTION__);
-    WifiEventReport(STR_P2P0, WIFI_EVENT_ACTION_RECEIVED, &actionData);
-    return NL_OK;
+    // send find familyId result to Controller
+    g_wifiHalInfo.familyId = genl_ctrl_resolve(g_wifiHalInfo.ctrlSock, NL80211_GENL_NAME);
+    if (g_wifiHalInfo.familyId < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to resolve family", __FUNCTION__);
+        CloseNetlinkSocket(g_wifiHalInfo.ctrlSock);
+        g_wifiHalInfo.ctrlSock = NULL;
+        return RET_CODE_FAILURE;
+    }
+    HILOG_INFO(LOG_CORE, "%s: family id: %d", __FUNCTION__, g_wifiHalInfo.familyId);
+    return RET_CODE_SUCCESS;
+}
+
+static void DisconnectCtrlSocket(void)
+{
+    CloseNetlinkSocket(g_wifiHalInfo.ctrlSock);
+    g_wifiHalInfo.ctrlSock = NULL;
 }
 
 static int32_t CmdSocketErrorHandler(struct sockaddr_nl *nla, struct nlmsgerr *err, void *arg)
@@ -307,7 +312,6 @@ static struct nl_cb *NetlinkSetCallback(const RespHandler handler, int32_t *erro
         HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
         return NULL;
     }
-    nl_cb_set(cb, NL_CB_SEQ_CHECK, NL_CB_CUSTOM, NoSeqCheck, NULL);
     nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, error);
     nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, error);
     nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, error);
@@ -536,6 +540,7 @@ static int32_t WifiMsgRegisterEventListener(void)
     struct WifiThreadParam threadParam;
 
     threadParam.eventSock = g_wifiHalInfo.eventSock;
+    threadParam.ctrlSock = g_wifiHalInfo.ctrlSock;
     threadParam.familyId = g_wifiHalInfo.familyId;
     threadParam.status = &g_wifiHalInfo.status;
 
@@ -594,6 +599,11 @@ int32_t WifiDriverClientInit(void)
         goto err_cmd;
     }
 
+    if (ConnectCtrlSocket() != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: connect ctrl socket failed", __FUNCTION__);
+        goto err_ctrl;
+    }
+
     if (ConnectEventSocket() != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: connect event socket failed", __FUNCTION__);
         goto err_event;
@@ -608,6 +618,8 @@ int32_t WifiDriverClientInit(void)
 err_reg:
     DisconnectEventSocket();
 err_event:
+    DisconnectCtrlSocket();
+err_ctrl:
     DisconnectCmdSocket();
 err_cmd:
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
@@ -624,6 +636,12 @@ void WifiDriverClientDeinit(void)
         HILOG_ERROR(LOG_CORE, "%s: cmd socket not inited", __FUNCTION__);
     } else {
         DisconnectCmdSocket();
+    }
+
+    if (g_wifiHalInfo.ctrlSock == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: ctrl socket not inited", __FUNCTION__);
+    } else {
+        DisconnectCtrlSocket();
     }
 
     if (g_wifiHalInfo.eventSock == NULL) {
@@ -2835,6 +2853,43 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     return ret;
 }
 
+static int32_t WifiAbortScan(const char *ifName)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    if (ifName == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_ABORT_SCAN, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, NULL, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: abort scan failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
 static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     return NL_SKIP;
@@ -2854,6 +2909,11 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
     if (interfaceId == 0) {
         HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
         return RET_CODE_FAILURE;
+    }
+    ret = WifiAbortScan(STR_WLAN0);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: wifi abort scan failed", __FUNCTION__);
+        return ret;
     }
     msg = nlmsg_alloc();
     if (msg == NULL) {
@@ -2884,7 +2944,7 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
         cookie = 0;
         ret = NetlinkSendCmdSync(msg, WifiSendActionFrameHandler, &cookie);
         if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: send action failed", __FUNCTION__);
         }
     } while (0);
     nlmsg_free(msg);
@@ -2923,10 +2983,16 @@ int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match
             HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 frameData failed", __FUNCTION__);
             break;
         }
-        ret = NetlinkSendCmdSync(msg, NULL, NULL);
-        if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: register cmd failed", __FUNCTION__);
+        if (g_wifiHalInfo.ctrlSock == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: ctrlSock is NULL", __FUNCTION__);
+            break;
         }
+        ret = nl_send_auto(g_wifiHalInfo.ctrlSock, msg);
+        if (ret < 0) {
+            HILOG_ERROR(LOG_CORE, "%s: register ctrl sock failed", __FUNCTION__);
+            break;
+        }
+        ret = RET_CODE_SUCCESS;
     } while (0);
     nlmsg_free(msg);
     return ret;
