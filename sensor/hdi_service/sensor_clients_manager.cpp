@@ -24,7 +24,7 @@ namespace Sensor {
 namespace V2_0 {
 
 namespace {
-    const int continuesSensor[] = {
+    const std::vector<int> continuesSensor = {
             1,
             2,
             6,
