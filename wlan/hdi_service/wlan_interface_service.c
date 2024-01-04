@@ -74,6 +74,8 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.ResetToFactoryMacAddress = WlanInterfaceResetToFactoryMacAddress;
     service->interface.SendActionFrame = WlanInterfaceSendActionFrame;
     service->interface.RegisterActionFrameReceiver = WlanInterfaceRegisterActionFrameReceiver;
+    service->interface.SetPowerSaveMode = WlanInterfaceSetPowerSaveMode;
+    service->interface.SetDpiMarkRule = WlanInterfaceSetDpiMarkRule;
     return &service->interface;
 }
 

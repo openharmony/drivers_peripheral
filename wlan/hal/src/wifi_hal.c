@@ -359,6 +359,36 @@ static int32_t RegisterActionFrameReceiverInner(const char *ifName, const uint8_
     return WifiRegisterActionFrameReceiver(ifName, match, matchLen);
 }
 
+static int32_t SetPowerSaveModeInner(const char *ifName, int32_t frequency, int32_t mode)
+{
+    if (ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return WifiSetPowerSaveMode(ifName, frequency, mode);
+}
+
+static int32_t SetPowerSaveMode(const char *ifName, int32_t frequency, int32_t mode)
+{
+    HalMutexLock();
+    int32_t ret = SetPowerSaveModeInner(ifName, frequency, mode);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t SetDpiMarkRuleInner(int32_t uid, int32_t protocol, int32_t enable)
+{
+    return WifiSetDpiMarkRule(uid, protocol, enable);
+}
+
+static int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    HalMutexLock();
+    int32_t ret = SetDpiMarkRuleInner(uid, protocol, enable);
+    HalMutexUnlock();
+    return ret;
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -568,6 +598,8 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.getStationInfo = WifiGetStationInfo;
         singleWifiInstance.sendActionFrame = SendActionFrame;
         singleWifiInstance.registerActionFrameReceiver = RegisterActionFrameReceiver;
+        singleWifiInstance.setPowerSaveMode = SetPowerSaveMode;
+        singleWifiInstance.setDpiMarkRule = SetDpiMarkRule;
         InitIWiFiList();
         isInited = true;
     }
