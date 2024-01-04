@@ -185,3 +185,51 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_004, TestSize.Level1)
     ret = MetadataUtils::ConvertMetadataToVec(metaData3, metaVec);
     EXPECT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: Metadata_Utils_005
+ * @tc.desc: ConvertVecToMetadata
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
+{
+    //item.count = MAX_SUPPORTED_ITEMS + 1
+    vector<uint8_t> metaVec = {232, 3, 0, 0, 16, 39, 0, 0, 160, 134, 1, 0};
+    metaVec.resize(28);
+    metaVec[24] = 113;
+    metaVec[25] = 23;
+    metaVec[26] = 0;
+    metaVec[27] = 0;
+    auto metaData = make_shared<CameraMetadata>(MAX_ITEM_CAPACITY, MAX_DATA_CAPACITY);
+    MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+
+    //dataCapacity = MAX_DATA_CAPACITY + 1
+    metaVec[8] = 161;
+    MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+
+    //itemCapacity = MAX_ITEM_CAPACITY + 1
+    metaVec[4] = 17;
+    MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+
+    //tagCount = MAX_SUPPORTED_TAGS + 1
+    metaVec[0] = 233;
+    MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
+}
+
+/**
+ * @tc.name: Metadata_Utils_006
+ * @tc.desc: DecodeFromString
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_006, TestSize.Level1)
+{
+    //DecodeFromString::totalLen < headerLength
+    std::string str = "test";
+    auto metaData = MetadataUtils::DecodeFromString(str);
+
+    //DecodeFromString::totalLen < ((decodeData - &setting[0]) + itemLen)
+    str = "CameraMetadataUtilsTest.Metadata_Utils_006";
+    metaData = MetadataUtils::DecodeFromString(str);
+}
