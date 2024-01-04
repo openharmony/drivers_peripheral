@@ -31,7 +31,7 @@
 
 #define OUI_QCA 0x001374
 
-#define LISTEN_FD_NUMS 1
+#define LISTEN_FD_NUMS 2
 #define EVENT_SOCKET_INDEX 0
 #define CTRL_SOCKET_INDEX 1
 #define CTRL_SOCKET_WRITE_SIDE 0
@@ -404,9 +404,82 @@ static int HandleEvent(struct nl_sock *sock)
     return ret;
 }
 
+static int32_t CtrlNoSeqCheck(struct nl_msg *msg, void *arg)
+{
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
+        genlmsg_attrlen(hdr, 0), NULL);
+    
+    if (hdr->cmd != NL80211_CMD_FRAME) {
+        return NL_OK;
+    }
+    if (attr[NL80211_ATTR_FRAME] == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: failed to get frame data", __FUNCTION__);
+        return NL_OK;
+    }
+
+    WifiActionData actionData;
+    actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
+    actionData.dataLen = nla_len(attr[NL80211_ATTR_FRAME]);
+    HILOG_INFO(LOG_CORE, "%s: receive data len = %{public}d", __FUNCTION__, actionData.dataLen);
+    WifiEventReport("p2p0", WIFI_EVENT_ACTION_RECEIVED, &actionData);
+    return NL_OK;
+}
+
+static int32_t CtrlSocketErrorHandler(struct sockaddr_nl *nla, struct nlmsgerr *err, void *arg)
+{
+    int32_t *ret = (int32_t *)arg;
+    *ret = err->error;
+    HILOG_ERROR(LOG_CORE, "%s: ctrl sock error ret = %{public}d", __FUNCTION__, *ret);
+    return NL_SKIP;
+}
+
+static int32_t CtrlSocketFinishHandler(struct nl_msg *msg, void *arg)
+{
+    int32_t *ret = (int32_t *)arg;
+    HILOG_ERROR(LOG_CORE, "%s: ctrl sock finish ret = %{public}d", __FUNCTION__, *ret);
+    *ret = 0;
+    return NL_SKIP;
+}
+
+static int32_t CtrlSocketAckHandler(struct nl_msg *msg, void *arg)
+{
+    int32_t *err = (int32_t *)arg;
+    HILOG_ERROR(LOG_CORE, "%s: ctrl sock ack ret = %{public}d", __FUNCTION__, *err);
+    *err = 0;
+    return NL_STOP;
+}
+
+static int HandleCtrlEvent(struct nl_sock *sock)
+{
+    int ret;
+    struct nl_cb *cb;
+    int error;
+
+    cb = nl_cb_alloc(NL_CB_DEFAULT);
+    if (cb == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: alloc ctrl cb failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    nl_cb_set(cb, NL_CB_SEQ_CHECK, NL_CB_CUSTOM, CtrlNoSeqCheck, NULL);
+    nl_cb_err(cb, NL_CB_CUSTOM, CtrlSocketErrorHandler, &error);
+    nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CtrlSocketFinishHandler, &error);
+    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CtrlSocketAckHandler, &error);
+
+    ret = nl_recvmsgs(sock, cb);
+
+    nl_cb_put(cb);
+    cb = NULL;
+    return ret;
+}
+
 void *EventThread(void *para)
 {
     struct nl_sock *eventSock = NULL;
+    struct nl_sock *ctrlSock = NULL;
     struct pollfd pollFds[LISTEN_FD_NUMS] = {0};
     struct WifiThreadParam *threadParam = NULL;
     int ret;
@@ -418,6 +491,7 @@ void *EventThread(void *para)
     } else {
         threadParam = (struct WifiThreadParam *)para;
         eventSock = threadParam->eventSock;
+        ctrlSock = threadParam->ctrlSock;
         g_familyId = threadParam->familyId;
         status = threadParam->status;
         *status = THREAD_RUN;
@@ -425,6 +499,8 @@ void *EventThread(void *para)
 
     pollFds[EVENT_SOCKET_INDEX].fd = nl_socket_get_fd(eventSock);
     pollFds[EVENT_SOCKET_INDEX].events = POLLIN | POLLERR;
+    pollFds[CTRL_SOCKET_INDEX].fd = nl_socket_get_fd(ctrlSock);
+    pollFds[CTRL_SOCKET_INDEX].events = POLLIN;
 
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
@@ -436,6 +512,11 @@ void *EventThread(void *para)
             break;
         } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
+                break;
+            }
+        } else if ((uint32_t)pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
+            HILOG_INFO(LOG_CORE, "%s: ctrl socket get POLLIN event", __FUNCTION__);
+            if (HandleCtrlEvent(ctrlSock) != RET_CODE_SUCCESS) {
                 break;
             }
         }
