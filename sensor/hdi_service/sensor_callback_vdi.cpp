@@ -48,7 +48,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
         return HDF_FAILURE;
     }
-    std::string successService = "";
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         sensorClientInfo_ = client[*it];
         if (SensorClientsManager::GetInstance()->IsNotNeedReportData(*it, event.sensorId)) {
@@ -64,12 +63,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
             HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
             SensorClientsManager::GetInstance()->IsUpadateSensorState(event.sensorId, *it, false);
         }
-        if (successService != "") {
-            successService += ",";
-        }
-        successService += std::to_string(*it);
     }
-    HDF_LOGI("%{public}s Sensor OnDataEvent success, service Id is %{public}s", __func__, successService.c_str());
     return HDF_SUCCESS;
 }
 
