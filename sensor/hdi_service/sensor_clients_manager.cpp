@@ -24,21 +24,7 @@ namespace Sensor {
 namespace V2_0 {
 
 namespace {
-    const std::vector<int> continuesSensor = {
-            1,
-            2,
-            6,
-            15,
-            256,
-            257,
-            258,
-            259,
-            261,
-            262,
-            263,
-            277,
-            281
-    };
+    const std::vector<int> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 277, 281};
 }
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
