@@ -244,9 +244,6 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
 
     auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
     sensorClientInfo.curCountMap_[sensorId]++;
-    HDF_LOGI("%{public}s Sensor IsNotNeedReportData? service Id is %{public}d, sensorId is %{public}d, "
-             "curCount is %{public}d, periodCount is %{public}d", __func__, serviceId, sensorId,
-             sensorClientInfo.curCountMap_[sensorId], sensorClientInfo.periodCountMap_[sensorId]);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
         return false;
