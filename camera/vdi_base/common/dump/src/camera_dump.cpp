@@ -125,7 +125,7 @@ bool CameraDumper::IsDumpCommandOpened(std::string type)
 
 bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer)
 {
-    if (!IsDumpCommandOpened(type) || (buffer == nullptr)) {
+    if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
 
@@ -182,7 +182,7 @@ bool CameraDumper::DumpMetadata(std::string name, std::string type,
         return false;
     }
 
-    if (!IsDumpCommandOpened(type)) {
+    if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type)) {
         return false;
     }
 
