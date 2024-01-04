@@ -93,10 +93,11 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         needUpdateEachClient = true;
     }
     if (needUpdateEachClient) {
-        if (IsClientsEmpty(HDF_TRADITIONAL_SENSOR_TYPE)) {
+        int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+        if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
             return;
         }
-        for (auto &entry : clients_[HDF_TRADITIONAL_SENSOR_TYPE]) {
+        for (auto &entry : clients_[groupId]) {
             auto &client = entry.second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
                 int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.reportInterval /
@@ -197,6 +198,7 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
                                                  int64_t &reportInterval)
 {
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
              "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
              std::to_string(samplingInterval).c_str(), std::to_string(reportInterval).c_str());
