@@ -23,6 +23,24 @@ namespace HDI {
 namespace Sensor {
 namespace V2_0 {
 
+namespace {
+    const int continuesSensor[] = {
+            1,
+            2,
+            6,
+            15,
+            256,
+            257,
+            258,
+            259,
+            261,
+            262,
+            263,
+            277,
+            281
+    };
+}
+
 SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
 
@@ -215,7 +233,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
 bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
 {
-    if (!IsSensorOnChange(sensorId)) {
+    if (!IsSensorContinues(sensorId)) {
         return false;
     }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
@@ -234,6 +252,16 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
         return false;
     }
     return true;
+}
+
+bool SensorClientsManager::IsSensorContinues(int sensorId)
+{
+    auto it = std::find(continuesSensor.begin(), continuesSensor.end(), sensorId);
+
+    if (it != continuesSensor.end()) {
+        return true;
+    }
+    return false;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
