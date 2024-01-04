@@ -130,7 +130,10 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     }
 
     uint32_t size = buffer->GetSize();
-    size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
+    const std::string DqBufferName = "DQBuffer";
+    if (name != DqBufferName) {
+        size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
+    }
 
     std::stringstream ss;
     std::string fileName;
@@ -159,7 +162,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
         ss >> fileName;
         fileName += "_umpVideo.yuv";
 #else
-        fileName += "_dumpVideo.h264";
+        fileName += "dumpVideo.h264";
 #endif
     } else {
         if (dumpCount_ % previewInterval != 0) {
