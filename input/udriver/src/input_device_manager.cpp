@@ -248,7 +248,7 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
     return INPUT_SUCCESS;
 }
 
-int32_t GetInputDeviceTypeInfo(const string &devName)
+uint32_t GetInputDeviceTypeInfo(const string &devName)
 {
     uint32_t type {INDEV_TYPE_UNKNOWN};
     if (devName.find("input_mt_wrapper") != std::string::npos) {
