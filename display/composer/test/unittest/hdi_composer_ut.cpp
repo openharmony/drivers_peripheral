@@ -88,7 +88,7 @@ static std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint
     return layer;
 }
 
-static int PrepareAndPrensent()
+static int PrepareAdnCommit()
 {
     int ret;
     DISPLAY_TEST_LOGD();
@@ -164,7 +164,7 @@ static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<Layer
 static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
     uint32_t checkType = HdiCompositionCheck::CHECK_VERTEX)
 {
-    int ret = PrepareAndPrensent();
+    int ret = PrepareAdnCommit();
     ASSERT_TRUE((ret == DISPLAY_SUCCESS));
     if ((GetFirstDisplay()->SnapShot()) != nullptr) {
         HdiTestDevice::GetInstance().GetGrallocInterface()->InvalidateCache(*(GetFirstDisplay()->SnapShot()));
@@ -440,7 +440,7 @@ HWTEST_F(DeviceTest, test_SetLayerCrop, TestSize.Level1)
     HdiGrallocBuffer* handle = layer->GetBackBuffer(); // the backbuffer has not present now
     ASSERT_TRUE((handle != nullptr));
     auto splitRects = SplitBuffer(*(handle->Get()), splitColors);
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     for (uint32_t i = 0; i < splitRects.size(); i++) {
         settings[0].color = splitColors[i];
         layer->SetLayerCrop(splitRects[i]);
@@ -498,13 +498,13 @@ HWTEST_F(DeviceTest, test_SetLayerPreMulti, TestSize.Level1)
 
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     auto layer = layers[0];
     bool preMul = true;
     auto ret = g_composerDevice->SetLayerPreMulti(g_displayIds[0], layer->GetId(), preMul);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     HdiTestDevice::GetInstance().Clear();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -536,7 +536,7 @@ HWTEST_F(DeviceTest, test_SetLayerAlpha, TestSize.Level1)
     alpha.alpha1 = 0;
     layer->SetAlpha(alpha);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     HdiTestDevice::GetInstance().Clear();
 
     DestroyLayer(layer);
@@ -557,7 +557,7 @@ HWTEST_F(DeviceTest, test_SetLayerRegion, TestSize.Level1)
     IRect rect = {0, 0, WIDTH, HEIGHT};
     auto ret = g_composerDevice->SetLayerRegion(g_displayIds[0], layer->GetId(), rect);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
     DestroyLayer(layer);
@@ -584,7 +584,7 @@ HWTEST_F(DeviceTest, test_SetLayerDirtyRegion, TestSize.Level1)
     vRects.push_back(rect);
     auto ret = g_composerDevice->SetLayerDirtyRegion(g_displayIds[0], layer->GetId(), vRects);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     HdiTestDevice::GetInstance().Clear();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
@@ -604,21 +604,21 @@ HWTEST_F(DeviceTest, test_SetLayerTransformMode, TestSize.Level1)
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     auto layer = layers[0];
 
     TransformType type = TransformType::ROTATE_90;
     auto ret = g_composerDevice->SetLayerTransformMode(g_displayIds[0], layer->GetId(), type);
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     type = TransformType::ROTATE_180;
     ret = g_composerDevice->SetLayerTransformMode(g_displayIds[0], layer->GetId(), type);
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     type = TransformType::ROTATE_270;
     ret = g_composerDevice->SetLayerTransformMode(g_displayIds[0], layer->GetId(), type);
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -636,7 +636,7 @@ HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
 
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     auto layer = layers[0];
 
     const int32_t WIDTH = 500;
@@ -645,7 +645,7 @@ HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
     std::vector<IRect> regions = {};
     regions.push_back(region);
     auto ret = g_composerDevice->SetLayerVisibleRegion(g_displayIds[0], layer->GetId(), regions);
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -673,7 +673,7 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
             deletingList);
         return result;
     });
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -697,7 +697,7 @@ HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
     Composer::V1_0::CompositionType type = Composer::V1_0::CompositionType::COMPOSITION_CLIENT;
     auto ret = g_composerDevice->SetLayerCompositionType(g_displayIds[0], layer->GetId(), type);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -721,7 +721,7 @@ HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
     BlendType type = BlendType::BLEND_NONE;
     auto ret = g_composerDevice->SetLayerBlendType(g_displayIds[0], layer->GetId(), type);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -745,7 +745,7 @@ HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
     MaskInfo maskInfo = MaskInfo::LAYER_HBM_SYNC;
     auto ret = g_composerDevice->SetLayerMaskInfo(g_displayIds[0], layer->GetId(), maskInfo);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -779,7 +779,7 @@ HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
 
     auto ret = g_composerDevice->SetLayerColor(g_displayIds[0], layer->GetId(), layerColor);
 
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
@@ -798,7 +798,7 @@ HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
     auto layer = layers[0];
-    PrepareAndPrensent();
+    PrepareAdnCommit();
 
     sleep(1);
     auto ret = g_composerDevice->DestroyLayer(g_displayIds[0], layer->GetId());
@@ -825,7 +825,7 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     };
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
-    PrepareAndPrensent();
+    PrepareAdnCommit();
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // 100ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
     ret = display->SetDisplayVsyncEnabled(false);
@@ -886,7 +886,7 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS) {
         std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
         ASSERT_TRUE((layers.size() > 0));
-        PrepareAndPrensent(); // 送显
+        PrepareAdnCommit(); // 送显
 
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
         ASSERT_EQ(g_isOnModeCalled, true);
