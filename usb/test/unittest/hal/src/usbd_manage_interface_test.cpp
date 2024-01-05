@@ -28,6 +28,7 @@ const int SLEEP_TIME = 3;
 const uint8_t BUS_NUM_INVALID = 255;
 const uint8_t DEV_ADDR_INVALID = 255;
 const uint8_t INTERFACEID_OK = 1;
+const uint8_t INTERFACEID_OK_NEW = 0;
 const uint8_t INTERFACEID_INVALID = 255;
 
 using namespace testing::ext;
@@ -101,7 +102,7 @@ void UsbdManageInterfaceTest::TearDown(void) {}
  */
 HWTEST_F(UsbdManageInterfaceTest, UsbdManageInterface001, TestSize.Level1)
 {
-    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t interfaceId = INTERFACEID_OK_NEW;
     struct UsbDev dev = dev_;
     int32_t ret = -1;
     for (; interfaceId < INTERFACEID_INVALID; interfaceId++) {
@@ -237,7 +238,7 @@ HWTEST_F(UsbdManageInterfaceTest, UsbdManageInterface008, TestSize.Level1)
  */
 HWTEST_F(UsbdManageInterfaceTest, UsbdManageInterface009, TestSize.Level1)
 {
-    uint8_t interfaceId = INTERFACEID_OK;
+    uint8_t interfaceId = INTERFACEID_OK_NEW;
     struct UsbDev dev = dev_;
         int32_t ret = -1;
     for (; interfaceId < INTERFACEID_INVALID; interfaceId++) {

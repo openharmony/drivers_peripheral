@@ -254,7 +254,7 @@ public:
         int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
         int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
-        int32_t OnCaptureStartedV1_2(int32_t captureId,
+        int32_t OnCaptureStarted_V1_2(int32_t captureId,
             const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
     };
 
@@ -275,7 +275,7 @@ public:
 
         int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
         int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
-        int32_t OnFlashlightStatusV1_2(FlashlightStatus status) override;
+        int32_t OnFlashlightStatus_V1_2(FlashlightStatus status) override;
         int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
     };
 

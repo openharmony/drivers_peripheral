@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -13,32 +13,17 @@
  * limitations under the License.
  */
 
-#include "sensor_client_info.h"
+#ifndef CAMERA_PRELAUNCH_UTTEST_V1_2_H
+#define CAMERA_PRELAUNCH_UTTEST_V1_2_H
 
-namespace OHOS {
-namespace HDI {
-namespace Sensor {
-namespace V2_0 {
+#include "hdi_common_v1_2.h"
 
-SensorClientInfo::SensorClientInfo()
-{
-}
-
-SensorClientInfo::~SensorClientInfo()
-{
-}
-
-void SensorClientInfo::SetReportDataCb(const sptr<ISensorCallback> &callbackObj)
-{
-    pollCallback_ = callbackObj;
-}
-
-const sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
-{
-    return pollCallback_;
-}
-
-} // V2_0
-} // Sensor
-} // HDI
-} // OHOS
+class CameraPrelaunchUtTestV1_2 : public testing::Test {
+public:
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp(void);
+    void TearDown(void);
+    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+};
+#endif

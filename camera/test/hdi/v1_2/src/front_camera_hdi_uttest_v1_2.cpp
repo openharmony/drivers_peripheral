@@ -62,11 +62,6 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_001, TestSize.Le
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
-    // video streamInfo
-    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-
     // create and commitstreams
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -87,11 +82,10 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_001, TestSize.Le
     // start capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
 
     // stop stream
-    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture, cameraTest->captureIdVideo};
-    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
@@ -128,11 +122,6 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
         cameraTest->DefaultInfosCapture(cameraTest->streamInfoV1_1);
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
-        // video streamInfo
-        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-        cameraTest->DefaultInfosVideo(cameraTest->streamInfoV1_1);
-        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
-
         // create and commitstreams
         cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -153,12 +142,11 @@ HWTEST_F(FrontCameraHdiUtTestV1_2, Front_Camera_Device_Hdi_V1_2_002, TestSize.Le
         // start capture
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
         cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
-        cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
 
-        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture,
-		    cameraTest->captureIdVideo};
-        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture, cameraTest->streamIdVideo};
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         sleep(1);
+        cameraTest->streamInfosV1_1.clear();
     }
 }

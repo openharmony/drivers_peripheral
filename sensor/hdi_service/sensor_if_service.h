@@ -47,9 +47,15 @@ public:
     int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo) override;
     int32_t GetSensorVdiImpl();
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
 
     std::mutex sensorCbMutex_;
 private:
+    int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
+    int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
+    void  RemoveDeathNotice(int32_t sensorType);
+    int32_t AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
+    int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
     OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
     GroupIdCallBackMap callbackMap = {};

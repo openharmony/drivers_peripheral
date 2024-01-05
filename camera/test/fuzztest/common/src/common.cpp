@@ -102,7 +102,7 @@ void CameraManager::OpenCameraV1_2()
         GetCameraMetadata();
         deviceCallback = new OHOS::Camera::CameraManager::DemoCameraDeviceCallback();
 
-        rc = serviceV1_2->OpenCameraV1_2(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
+        rc = serviceV1_2->OpenCamera_V1_2(cameraIds.front(), deviceCallback, cameraDeviceV1_2);
         if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDeviceV1_2 == nullptr) {
             CAMERA_LOGE("openCamera V1_1 failed, rc = %{public}d", rc);
             return;
@@ -270,7 +270,7 @@ int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t ca
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureStartedV1_2(int32_t captureId,
+int32_t CameraManager::TestStreamOperatorCallbackV1_2::OnCaptureStarted_V1_2(int32_t captureId,
     const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
 {
     for (auto it : infos) {
