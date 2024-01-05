@@ -24,7 +24,9 @@
 #include "callback_death_recipient.h"
 
 constexpr int DISABLE_SENSOR = 0;
+constexpr int REPORT_INTERVAL = 0;
 constexpr int ENABLE_SENSOR = 1;
+constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
@@ -192,6 +194,8 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 {
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
     SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -484,9 +488,22 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
 
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
-    int32_t ret = sensorVdiImpl_->SetSdcSensor(sensorId, enabled, rateLevel);
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s SetSdcSensor failed, error code is %{public}d", __func__, ret);
+    int32_t ret;
+    if (enabled) {
+        int64_t samplingInterval = COMMON_REPORT_FREQUENCY / rateLevel;
+        ret = SetBatch(sensorId, samplingInterval, REPORT_INTERVAL);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
+        }
+        ret = sensorVdiImpl_->Enable(sensorId);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s SetSdcSensor enable failed, error code is %{public}d", __func__, ret);
+        }
+    } else {
+        ret = Disable(sensorId);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
+        }
     }
     FinishTrace(HITRACE_TAG_HDF);
 
