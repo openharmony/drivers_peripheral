@@ -41,6 +41,17 @@ SensorClientsManager::~SensorClientsManager()
     sensorConfig_.clear();
 }
 
+int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
+{
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    for (auto &iter : clients_[groupId]) {
+        if (iter.second.GetReportDataCb() == callbackObj) {
+            return iter.first;
+        }
+    }
+    return HDF_FAILURE;
+}
+
 void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);

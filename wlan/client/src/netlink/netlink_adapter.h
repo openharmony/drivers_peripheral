@@ -32,6 +32,7 @@ typedef int32_t (*RespHandler)(struct nl_msg *msg, void *data);
 
 struct WifiThreadParam {
     struct nl_sock *eventSock;
+    struct nl_sock *ctrlSock;
     int familyId;
     enum ThreadStatus *status;
 };

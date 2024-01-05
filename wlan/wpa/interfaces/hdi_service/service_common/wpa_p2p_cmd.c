@@ -47,7 +47,7 @@ int Hex2Dec(const char *str)
     if (str == NULL || strncasecmp(str, "0x", strlen("0x")) != 0) {
         return 0;
     }
-    int result = 0;
+    uint32_t result = 0;
     const char *tmp = str + strlen("0x");
     while (*tmp != '\0') {
         result <<= HEX_TO_DEC_MOVING;
@@ -1725,7 +1725,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         return HDF_FAILURE;
     }
     infoList->infos = (struct HdiP2pNetworkInfo *)OsalMemCalloc(sizeof(struct HdiP2pNetworkInfo) * infoList->infoNum);
-    infoList->infosLen = infoList->infoNum;
+    infoList->infosLen = (uint32_t)infoList->infoNum;
     char *tmpBuf = token + 1;
     char *savedPtr = NULL;
     token = strtok_r(tmpBuf, "\n", &savedPtr);

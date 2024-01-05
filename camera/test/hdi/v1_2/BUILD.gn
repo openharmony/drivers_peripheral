@@ -37,6 +37,7 @@ ohos_unittest("camera_test_hdi_V1_2") {
   sources = [
     "$camera_test_path/v1_2/src/camera_flashlight_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_hdi_uttest_v1_2.cpp",
+    "$camera_test_path/v1_2/src/camera_prelaunch_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/camera_stream_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/front_camera_hdi_uttest_v1_2.cpp",
     "$camera_test_path/v1_2/src/hdi_common_v1_2.cpp",

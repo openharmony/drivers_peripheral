@@ -19,7 +19,6 @@
 #include <mutex>
 #include <iproxy_broker.h>
 #include <hdf_log.h>
-#include "callback_death_recipient.h"
 #include "hitrace_meter.h"
 #include "sensor_dump.h"
 
@@ -33,9 +32,7 @@ namespace V1_1 {
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallbackVdi>>>;
-    using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
     GroupIdCallBackMap g_groupIdCallBackMap;
-    CallBackDeathRecipientMap g_callBackDeathRecipientMap;
     std::mutex g_mutex;
 } // namespace
 
@@ -93,30 +90,8 @@ int32_t MedicalSensorDataCallback(const struct SensorEvents *event)
     return SENSOR_SUCCESS;
 }
 
-void  SensorImpl::RemoveDeathNotice(int32_t sensorType)
-{
-    auto iter = g_groupIdCallBackMap.find(sensorType);
-    if (iter != g_groupIdCallBackMap.end()) {
-        for (auto callback : g_groupIdCallBackMap[sensorType]) {
-            const sptr<IRemoteObject> &remote = callback->HandleCallbackDeath();
-            auto recipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
-            if (recipientIter != g_callBackDeathRecipientMap.end()) {
-                bool removeResult = remote->RemoveDeathRecipient(recipientIter->second);
-                if (!removeResult) {
-                    HDF_LOGE("%{public}s: sensor destroyed, callback RemoveSensorDeathRecipient fail", __func__);
-                }
-            }
-        }
-    }
-}
-
 SensorImpl::~SensorImpl()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-
-    RemoveDeathNotice(TRADITIONAL_SENSOR_TYPE);
-    RemoveDeathNotice(MEDICAL_SENSOR_TYPE);
-
     FreeSensorInterfaceInstance();
 }
 
@@ -279,19 +254,11 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &ca
                 return lhs == rhs;
             });
         if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
-            int32_t addResult = AddSensorDeathRecipient(callbackObj);
-            if (addResult != SENSOR_SUCCESS) {
-                return HDF_FAILURE;
-            }
             g_groupIdCallBackMap[groupId].push_back(callbackObj);
         }
         return SENSOR_SUCCESS;
     }
 
-    int32_t addResult = AddSensorDeathRecipient(callbackObj);
-    if (addResult != SENSOR_SUCCESS) {
-        return HDF_FAILURE;
-    }
     int32_t ret = HDF_FAILURE;
     StartTrace(HITRACE_TAG_SENSORS, "Register");
     if (groupId == TRADITIONAL_SENSOR_TYPE) {
@@ -302,10 +269,7 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &ca
 
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
-        int32_t removeResult = RemoveSensorDeathRecipient(callbackObj);
-        if (removeResult != SENSOR_SUCCESS) {
-            HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId);
-        }
+        HDF_LOGE("%{public}s: Register fail, groupId[%{public}d]", __func__, groupId);
         return ret;
     }
     std::vector<sptr<ISensorCallbackVdi>> remoteVec;
@@ -388,10 +352,6 @@ int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
      * from the vector
      */
     if (g_groupIdCallBackMap[groupId].size() > CALLBACK_CTOUNT_THRESHOLD) {
-        int32_t removeResult = RemoveSensorDeathRecipient(*callBackIter);
-        if (removeResult != SENSOR_SUCCESS) {
-            HDF_LOGE("%{public}s: callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId);
-        }
         g_groupIdCallBackMap[groupId].erase(callBackIter);
         return SENSOR_SUCCESS;
     }
@@ -408,89 +368,9 @@ int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
         return ret;
     }
 
-    int32_t removeResult = RemoveSensorDeathRecipient(*callBackIter);
-    if (removeResult != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s: last callback RemoveSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId);
-    }
     g_groupIdCallBackMap.erase(groupId);
 
     return ret;
-}
-
-int32_t SensorImpl::AddSensorDeathRecipient(const sptr<ISensorCallbackVdi> &callbackObj)
-{
-    sptr<CallBackDeathRecipient> callBackDeathRecipient = new CallBackDeathRecipient(this);
-    if (callBackDeathRecipient == nullptr) {
-        HDF_LOGE("%{public}s: new CallBackDeathRecipient fail", __func__);
-        return HDF_FAILURE;
-    }
-    const sptr<IRemoteObject> &remote = callbackObj->HandleCallbackDeath();
-    bool result = remote->AddDeathRecipient(callBackDeathRecipient);
-    if (!result) {
-        HDF_LOGE("%{public}s: AddDeathRecipient fail", __func__);
-        return HDF_FAILURE;
-    }
-    g_callBackDeathRecipientMap[remote.GetRefPtr()] = callBackDeathRecipient;
-    return SENSOR_SUCCESS;
-}
-
-int32_t SensorImpl::RemoveSensorDeathRecipient(const sptr<ISensorCallbackVdi> &callbackObj)
-{
-    const sptr<IRemoteObject> &remote = callbackObj->HandleCallbackDeath();
-    auto callBackDeathRecipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
-    if (callBackDeathRecipientIter == g_callBackDeathRecipientMap.end()) {
-        HDF_LOGE("%{public}s: not find recipient", __func__);
-        return HDF_FAILURE;
-    }
-    bool result = remote->RemoveDeathRecipient(callBackDeathRecipientIter->second);
-    g_callBackDeathRecipientMap.erase(callBackDeathRecipientIter);
-    if (!result) {
-        HDF_LOGE("%{public}s: RemoveDeathRecipient fail", __func__);
-        return HDF_FAILURE;
-    }
-    return SENSOR_SUCCESS;
-}
-
-void SensorImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
-{
-    HDF_LOGI("%{public}s: sensor OnRemoteDied enter", __func__);
-    std::lock_guard<std::mutex> lock(g_mutex);
-    sptr<IRemoteObject> callbackObject = object.promote();
-    if (callbackObject == nullptr) {
-        return;
-    }
-
-    int32_t groupId = TRADITIONAL_SENSOR_TYPE;
-    auto traditionIter = g_groupIdCallBackMap.find(groupId);
-    if (traditionIter != g_groupIdCallBackMap.end()) {
-        auto callBackIter =
-        find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
-        [&callbackObject](const sptr<ISensorCallbackVdi> &callbackRegistered) {
-            return callbackObject.GetRefPtr() == (callbackRegistered->HandleCallbackDeath()).GetRefPtr();
-        });
-        if (callBackIter != g_groupIdCallBackMap[groupId].end()) {
-            int32_t ret = UnregisterImpl(groupId, callbackObject.GetRefPtr());
-            if (ret != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: traditional Unregister failed groupId[%{public}d]", __func__, groupId);
-            }
-        }
-    }
-
-    groupId = MEDICAL_SENSOR_TYPE;
-    auto medicalIter = g_groupIdCallBackMap.find(groupId);
-    if (medicalIter != g_groupIdCallBackMap.end()) {
-        auto callBackIter =
-        find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
-        [&callbackObject](const sptr<ISensorCallbackVdi> &callbackRegistered) {
-            return callbackObject.GetRefPtr() == (callbackRegistered->HandleCallbackDeath()).GetRefPtr();
-        });
-        if (callBackIter != g_groupIdCallBackMap[groupId].end()) {
-            int32_t ret = UnregisterImpl(groupId, callbackObject.GetRefPtr());
-            if (ret != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: medical Unregister failed groupId[%{public}d]", __func__, groupId);
-            }
-        }
-    }
 }
 
 static int32_t CreateSensorVdiInstance(struct HdfVdiBase *vdiBase)

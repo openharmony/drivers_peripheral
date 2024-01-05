@@ -77,7 +77,7 @@ void FuncSetFlashlight(const uint8_t *rawData, size_t size)
 void FuncSetFlashlightV1_2(const uint8_t *rawData, size_t size)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
-    cameraTest->serviceV1_2->SetFlashlightV1_2(*(reinterpret_cast<float *>(data)));
+    cameraTest->serviceV1_2->SetFlashlight_V1_2(*(reinterpret_cast<float *>(data)));
 }
 
 void FuncNotifyDeviceStateChangeInfo(const uint8_t *rawData, size_t size)

@@ -58,6 +58,8 @@ private:
     DCamRetCode CancelDCameraBuffer();
     DCamRetCode FlushDCameraBuffer(const DCameraBuffer &buffer);
     uint64_t GetVideoTimeStamp();
+    DCamRetCode SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceBuffer> &surfaceBuffer,
+        OHOS::sptr<OHOS::SyncFence> &syncFence);
 
 private:
     int32_t index_ = -1;
