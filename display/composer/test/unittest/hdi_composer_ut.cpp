@@ -181,7 +181,6 @@ static void DestroyLayer(std::shared_ptr<HdiTestLayer> layer)
         DISPLAY_TEST_LOGD("DestroyLayer fail or not support, ret: %{public}d", ret);
         return;
     }
-    
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
 }
 
