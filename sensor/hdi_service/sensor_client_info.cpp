@@ -33,7 +33,7 @@ void SensorClientInfo::SetReportDataCb(const sptr<ISensorCallback> &callbackObj)
     pollCallback_ = callbackObj;
 }
 
-sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
+const sptr<ISensorCallback> SensorClientInfo::GetReportDataCb()
 {
     return pollCallback_;
 }

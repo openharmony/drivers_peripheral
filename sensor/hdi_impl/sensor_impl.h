@@ -50,13 +50,9 @@ public:
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) override;
     int32_t SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel) override;
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInfoVdi) override;
-    void OnRemoteDied(const wptr<IRemoteObject> &object);
 private:
     const SensorInterface *sensorInterface;
-    int32_t AddSensorDeathRecipient(const sptr<ISensorCallbackVdi> &callbackObj);
-    int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallbackVdi> &callbackObj);
     int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
-    void RemoveDeathNotice(int32_t sensorType);
 };
 } // V1_1
 } // Sensor
