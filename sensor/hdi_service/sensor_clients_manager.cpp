@@ -100,8 +100,8 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         for (auto &entry : clients_[groupId]) {
             auto &client = entry.second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
-                int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.reportInterval /
-                        sensorConfig_.find(sensorId)->second.reportInterval;
+                int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval /
+                        sensorConfig_.find(sensorId)->second.samplingInterval;
                 client.periodCountMap_[sensorId] = periodCount;
             }
         }
@@ -213,7 +213,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client.sensorConfigMap_[sensorId] = sensorConfig;
     if (sensorConfig_.find(sensorId) != sensorConfig_.end()) {
-        int32_t periodCount = reportInterval / sensorConfig_.find(sensorId)->second.reportInterval;
+        int32_t periodCount = samplingInterval / sensorConfig_.find(sensorId)->second.samplingInterval;
         client.periodCountMap_[sensorId] = periodCount;
     }
     client.curCountMap_[sensorId] = 0;

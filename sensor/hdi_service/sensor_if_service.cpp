@@ -23,7 +23,7 @@
 #include <hdf_remote_service.h>
 
 constexpr int DISABLE_SENSOR = 0;
-constexpr int SAMPLING_INTERVAL = 0;
+constexpr int REPORT_INTERVAL = 0;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
 
@@ -319,8 +319,8 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
     int32_t ret;
     if (enabled) {
-        int64_t reportInterval = COMMON_REPORT_FREQUENCY / rateLevel;
-        ret = SetBatch(sensorId, SAMPLING_INTERVAL, reportInterval);
+        int64_t samplingInterval = COMMON_REPORT_FREQUENCY / rateLevel;
+        ret = SetBatch(sensorId, samplingInterval, REPORT_INTERVAL);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
         }
