@@ -79,8 +79,8 @@ namespace {
     constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr int64_t SENSOR_INTERVAL1 = 200000000;
     constexpr int64_t SENSOR_INTERVAL2 = 20000000;
-    constexpr int64_t SENSOR_INTERVAL3 = 100000000;
-    constexpr int64_t SENSOR_INTERVAL4 = 300000000;
+    constexpr int64_t SENSOR_INTERVAL3 = 40000000;
+    constexpr int64_t SENSOR_INTERVAL4 = 20000000;
     constexpr int32_t SENSOR_POLL_TIME = 1;
     constexpr int32_t SENSOR_WAIT_TIME = 100;
     constexpr int32_t SENSOR_WAIT_TIME2 = 20000;
@@ -523,7 +523,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0001, TestSize.Level1)
     int32_t sensorId = g_info[0].sensorId;
     HDF_LOGI("sensorId is %{public}d", sensorId);
 
-    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL4, SENSOR_INTERVAL1);
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL1, SENSOR_INTERVAL1);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     ret = g_sensorInterface->Enable(sensorId);
@@ -559,7 +559,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0002, TestSize.Level1)
     int32_t sensorId = g_info[0].sensorId;
     HDF_LOGI("sensorId is %{public}d", sensorId);
 
-    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL2, SENSOR_INTERVAL1);
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL3, SENSOR_INTERVAL1);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     ret = g_sensorInterface->Enable(sensorId);
@@ -595,7 +595,7 @@ HWTEST_F(HdfSensorHdiTest, ReportFrequencyTest0003, TestSize.Level1)
     int32_t sensorId = g_info[0].sensorId;
     HDF_LOGI("sensorId is %{public}d", sensorId);
 
-    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL3, SENSOR_INTERVAL1);
+    ret = g_sensorInterface->SetBatch(sensorId, SENSOR_INTERVAL4, SENSOR_INTERVAL1);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
     ret = g_sensorInterface->Enable(sensorId);
