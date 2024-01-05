@@ -447,7 +447,11 @@ HWTEST_F(DeviceTest, test_SetLayerCrop, TestSize.Level1)
         PresentAndCheck(settings);
     }
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerZorder, TestSize.Level1)
@@ -508,7 +512,11 @@ HWTEST_F(DeviceTest, test_SetLayerPreMulti, TestSize.Level1)
     HdiTestDevice::GetInstance().Clear();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerAlpha, TestSize.Level1)
@@ -539,7 +547,11 @@ HWTEST_F(DeviceTest, test_SetLayerAlpha, TestSize.Level1)
     PrepareAndPrensent();
     HdiTestDevice::GetInstance().Clear();
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerRegion, TestSize.Level1)
@@ -560,7 +572,11 @@ HWTEST_F(DeviceTest, test_SetLayerRegion, TestSize.Level1)
     PrepareAndPrensent();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerDirtyRegion, TestSize.Level1)
@@ -589,7 +605,11 @@ HWTEST_F(DeviceTest, test_SetLayerDirtyRegion, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerTransformMode, TestSize.Level1)
@@ -622,7 +642,11 @@ HWTEST_F(DeviceTest, test_SetLayerTransformMode, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
@@ -649,7 +673,11 @@ HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
@@ -677,7 +705,11 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
@@ -701,7 +733,11 @@ HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
@@ -725,7 +761,11 @@ HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
@@ -749,7 +789,11 @@ HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
@@ -783,7 +827,11 @@ HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 
+<<<<<<< HEAD
     DestroyLayer(layer);
+=======
+    TestDestroyLayer(layer);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
@@ -837,7 +885,11 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // 100ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 
+<<<<<<< HEAD
     DestroyLayer(layers[0]);
+=======
+    TestDestroyLayer(layers[0]);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
 }
 
 void DeviceTest::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
@@ -894,7 +946,11 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
         ASSERT_EQ(g_isOnModeCalled, true);
 
+<<<<<<< HEAD
         DestroyLayer(layers[0]);
+=======
+        TestDestroyLayer(layers[0]);
+>>>>>>> 4e03bb9f791bcd1a0f11af7190619882ca5990d3
     }
 }
 
