@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "wpa_common_fuzzer.h"
-
+1
 #define WLAN_FREQ_MAX_NUM 35
 #define ETH_ADDR_LEN 6
 #define BITS_NUM_24 24

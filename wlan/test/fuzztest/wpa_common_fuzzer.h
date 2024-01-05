@@ -20,7 +20,7 @@
 #include "v1_0/iwpa_interface.h"
 #include "securec.h"
 #include <osal_mem.h>
-
+1
 #define HDF_LOG_TAG HDF_WIFI_CORE
 #define IFNAMSIZ 16
 constexpr int32_t OFFSET = 4;
