@@ -23,6 +23,10 @@ namespace HDI {
 namespace Sensor {
 namespace V2_0 {
 
+namespace {
+    const std::vector<int32_t> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
+}
+
 SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
 
@@ -86,7 +90,10 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 {
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
+    bool needUpdateEachClient = false;
     if (it != sensorConfig_.end()) {
+        needUpdateEachClient = samplingInterval <= it->second.samplingInterval ||
+                reportInterval <= it->second.reportInterval;
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
          : it->second.samplingInterval;
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
@@ -94,6 +101,21 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     } else {
         BestSensorConfig config = {samplingInterval, reportInterval};
         sensorConfig_.emplace(sensorId, config);
+        needUpdateEachClient = true;
+    }
+    if (needUpdateEachClient) {
+        int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+        if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
+            return;
+        }
+        for (auto &entry : clients_[groupId]) {
+            auto &client = entry.second;
+            if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
+                int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval /
+                        sensorConfig_.find(sensorId)->second.samplingInterval;
+                client.periodCountMap_[sensorId] = periodCount;
+            }
+        }
     }
     return;
 }
@@ -182,6 +204,57 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     }
     client = it->second;
     return true;
+}
+
+void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
+                                                 int64_t &reportInterval)
+{
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
+             "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
+             std::to_string(samplingInterval).c_str(), std::to_string(reportInterval).c_str());
+
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        return;
+    }
+
+    auto &client = clients_[groupId].find(serviceId)->second;
+    SensorConfig sensorConfig = {samplingInterval, reportInterval};
+    client.sensorConfigMap_[sensorId] = sensorConfig;
+    if (sensorConfig_.find(sensorId) != sensorConfig_.end()) {
+        int32_t periodCount = samplingInterval / sensorConfig_.find(sensorId)->second.samplingInterval;
+        client.periodCountMap_[sensorId] = periodCount;
+    }
+    client.curCountMap_[sensorId] = 0;
+}
+
+bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
+{
+    if (!IsSensorContinues(sensorId)) {
+        return false;
+    }
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
+        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        return false;
+    }
+    auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
+    if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
+        return false;
+    }
+    sensorClientInfo.curCountMap_[sensorId]++;
+    if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
+        sensorClientInfo.curCountMap_[sensorId] = 0;
+        return false;
+    }
+    return true;
+}
+
+bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
+{
+    return std::find(continuesSensor.begin(), continuesSensor.end(), sensorId) != continuesSensor.end();
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
