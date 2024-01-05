@@ -33,7 +33,7 @@ public:
     explicit SensorClientInfo(const sptr<ISensorCallback> &callbackObj)
         : pollCallback_(callbackObj) {};
     void SetReportDataCb(const sptr<ISensorCallback> &callbackObj);
-    sptr<ISensorCallback> GetReportDataCb();
+    const sptr<ISensorCallback> GetReportDataCb();
 private:
     sptr<ISensorCallback> pollCallback_;
 };
