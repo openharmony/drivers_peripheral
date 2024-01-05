@@ -19,7 +19,7 @@
 #include "v1_0/iwpa_interface.h"
 #include "wpa_fuzzer.h"
 #include "wpa_common_fuzzer.h"
-
+1
 namespace OHOS {
 namespace WIFI {
 constexpr size_t THRESHOLD = 10;
