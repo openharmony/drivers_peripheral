@@ -24,7 +24,7 @@ namespace Sensor {
 namespace V2_0 {
 
 namespace {
-    const std::vector<int> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
+    const std::vector<int32_t> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
 }
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
@@ -238,10 +238,12 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
-        return true;
+        return false;
     }
-
     auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
+    if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
+        return false;
+    }
     sensorClientInfo.curCountMap_[sensorId]++;
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
@@ -250,7 +252,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     return true;
 }
 
-bool SensorClientsManager::IsSensorContinues(int sensorId)
+bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
 {
     return std::find(continuesSensor.begin(), continuesSensor.end(), sensorId) != continuesSensor.end();
 }
