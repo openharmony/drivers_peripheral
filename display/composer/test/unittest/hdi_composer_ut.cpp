@@ -173,6 +173,14 @@ static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
     }
 }
 
+static void TestDestroyLayer(std::shared_ptr<HdiTestLayer> layer)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+    g_composerDevice->DestroyLayer(g_displayIds[0], layer->GetId());
+    PrepareAndPrensent();
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+}
+
 void DeviceTest::SetUpTestCase()
 {
     int ret = HdiTestDevice::GetInstance().InitDevice();
@@ -435,6 +443,8 @@ HWTEST_F(DeviceTest, test_SetLayerCrop, TestSize.Level1)
         layer->SetLayerCrop(splitRects[i]);
         PresentAndCheck(settings);
     }
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerZorder, TestSize.Level1)
@@ -494,6 +504,8 @@ HWTEST_F(DeviceTest, test_SetLayerPreMulti, TestSize.Level1)
     PrepareAndPrensent();
     HdiTestDevice::GetInstance().Clear();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerAlpha, TestSize.Level1)
@@ -523,6 +535,8 @@ HWTEST_F(DeviceTest, test_SetLayerAlpha, TestSize.Level1)
 
     PrepareAndPrensent();
     HdiTestDevice::GetInstance().Clear();
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerRegion, TestSize.Level1)
@@ -542,6 +556,8 @@ HWTEST_F(DeviceTest, test_SetLayerRegion, TestSize.Level1)
 
     PrepareAndPrensent();
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerDirtyRegion, TestSize.Level1)
@@ -569,6 +585,8 @@ HWTEST_F(DeviceTest, test_SetLayerDirtyRegion, TestSize.Level1)
     HdiTestDevice::GetInstance().Clear();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerTransformMode, TestSize.Level1)
@@ -600,6 +618,8 @@ HWTEST_F(DeviceTest, test_SetLayerTransformMode, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
@@ -625,6 +645,8 @@ HWTEST_F(DeviceTest, test_SetLayerVisibleRegion, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
@@ -651,6 +673,8 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
@@ -673,6 +697,8 @@ HWTEST_F(DeviceTest, test_SetLayerCompositionType, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
@@ -695,6 +721,8 @@ HWTEST_F(DeviceTest, test_SetLayerBlendType, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
@@ -717,6 +745,8 @@ HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
@@ -749,6 +779,8 @@ HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    TestDestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
@@ -771,6 +803,8 @@ HWTEST_F(DeviceTest, test_DestroyLayer, TestSize.Level1)
     PrepareAndPrensent();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
 }
 
 HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
@@ -783,13 +817,25 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
     ret = display->SetDisplayVsyncEnabled(true);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
+
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = PINK
+        },
+    };
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+    PrepareAndPrensent();
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // 100ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
     usleep(SLEEP_CONT_100 * SLEEP_CONT_2000); // wait for 100ms avoid the last vsync.
-    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
+    ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // 100ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
+
+    TestDestroyLayer(layers[0]);
 }
 
 void DeviceTest::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data)
@@ -825,7 +871,7 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
     };
 
     // 先注册VBlankCallback
-    uint32_t ret = g_composerDevice->RegDisplayVBlankCallback(g_displayIds[0], TestVBlankCallback, nullptr);
+    auto ret = g_composerDevice->RegDisplayVBlankCallback(g_displayIds[0], TestVBlankCallback, nullptr);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
 
     ret = g_composerDevice->GetDisplaySupportedModes(g_displayIds[0], oldModes);
@@ -843,8 +889,10 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
         ASSERT_TRUE((layers.size() > 0));
         PrepareAndPrensent(); // 送显
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
         ASSERT_EQ(g_isOnModeCalled, true);
+
+        TestDestroyLayer(layers[0]);
     }
 }
 

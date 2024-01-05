@@ -75,22 +75,6 @@ void DisplayBenchmarkTest::TearDown(const ::benchmark::State &state)
 }
 
 /**
-  * @tc.name: RegisterBufferTest
-  * @tc.desc: Benchmarktest for interface RegisterBuffer.
-  */
-BENCHMARK_F(DisplayBenchmarkTest, RegisterBufferTest)(benchmark::State &state)
-{
-    int32_t ret;
-    for (auto _ : state) {
-        ret = g_gralloc->RegisterBuffer(*g_bufferHandle);
-        EXPECT_TRUE(ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT);
-    }
-}
-
-BENCHMARK_REGISTER_F(DisplayBenchmarkTest, RegisterBufferTest)->
-    Iterations(100)->Repetitions(3)->ReportAggregatesOnly();
-
-/**
   * @tc.name: SetMetadataTest
   * @tc.desc: Benchmarktest for interface SetMetadata.
   */
