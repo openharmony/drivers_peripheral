@@ -40,6 +40,7 @@
 #include "hilog/log.h"
 #include "netlink_adapter.h"
 #include "hdf_dlist.h"
+#include "parameter.h"
 
 #define VENDOR_ID 0x001A11
 
@@ -100,6 +101,11 @@ static inline uint32_t BIT(uint8_t x)
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + ((c) > 255 ? 255 : (c)))
 #endif
+
+#define SUBCHIP_WIFI_PROP "ohos.boot.odm.conn.schiptype"
+#define SUPPORT_COEXCHIP "bisheng"
+#define SUBCHIP_WIFI_PROP_LEN 10
+#define SUPPORT_COEXCHIP_LEN 7
 
 // vendor attr
 enum AndrWifiAttr {
@@ -875,6 +881,19 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
     return ret;
 }
 
+static bool NetLinkGetChipProp(void)
+{
+    char preValue[SUBCHIP_WIFI_PROP_LEN] = { 0 };
+    int errCode = GetParameter(SUBCHIP_WIFI_PROP, 0, preValue, SUBCHIP_WIFI_PROP_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, SUPPORT_COEXCHIP, SUPPORT_COEXCHIP_LEN) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
 {
     int32_t ret;
@@ -896,9 +915,10 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         }
         if (strncmp(result->infos[i].name, STR_WLAN0, strlen(STR_WLAN0)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
-            result->infos[i].supportMode[WIFI_IFTYPE_AP] = 1;
+            result->infos[i].supportMode[WIFI_IFTYPE_AP] = NetLinkGetChipProp() ? 0 : 1;
         } else if (strncmp(result->infos[i].name, STR_WLAN1, strlen(STR_WLAN1)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
+            result->infos[i].supportMode[WIFI_IFTYPE_AP] = NetLinkGetChipProp() ? 1 : 0;
         } else if (strncmp(result->infos[i].name, STR_P2P0, strlen(STR_P2P0)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_DEVICE] = 1;
         } else if (strncmp(result->infos[i].name, STR_P2P0_X, strlen(STR_P2P0_X)) == 0) {
