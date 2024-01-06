@@ -35,7 +35,7 @@ struct DListHead *GetNetworkHead(void)
 int32_t HalCmdGetAvailableNetwork(void)
 {
     int32_t ret;
-    struct NetworkInfoResult networkInfo;
+    struct NetworkInfoResult networkInfo = { 0 };
     uint32_t i;
 
     ret = GetUsableNetworkInfo(&networkInfo);
