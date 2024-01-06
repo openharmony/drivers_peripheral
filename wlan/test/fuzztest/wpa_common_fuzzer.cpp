@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #define BITS_NUM_24 24
 #define BITS_NUM_16 16
 #define BITS_NUM_8 8
+#define REPLY_SIZE 1024
 
 static uint32_t g_wpaTestSize = 0;
 struct IWpaCallback *g_wpaCallbackObj = nullptr;
@@ -71,6 +72,19 @@ bool PreProcessRawData(const uint8_t *rawData, size_t size, uint8_t *tmpRawData,
         return false;
     }
     return true;
+}
+
+/* **********Wpa Interface********** */
+void FuzzWpaInterfaceStart(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    interface->Start(interface);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceStop(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    interface->Stop(interface);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
 void FuzzWpaInterfaceScan(struct IWpaInterface *interface, const uint8_t *rawData)
@@ -382,5 +396,442 @@ void FuzzWpaInterfaceGetConnectionCapabilities(struct IWpaInterface *interface, 
     (void)memset_s(&connectionCap, sizeof(struct ConnectionCapabilities), 0, sizeof(struct ConnectionCapabilities));
 
     interface->GetConnectionCapabilities(interface, ifName, &connectionCap);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceAddWpaIface(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *configname = "/data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf";
+    interface->AddWpaIface(interface, ifName, configname);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceRemoveWpaIface(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->RemoveWpaIface(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+
+/* **********P2p Interface********** */
+void FuzzWpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *name = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetSsidPostfixName(interface, ifName, name);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *type = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetWpsDeviceType(interface, ifName, type);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetWpsConfigMethods(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *methods = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetWpsConfigMethods(interface, ifName, methods);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetGroupMaxIdle(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t time = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetGroupMaxIdle(interface, ifName, time);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetWfdEnable(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetWfdEnable(interface, ifName, enable);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetPersistentReconnect(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t status = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetPersistentReconnect(interface, ifName, status);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *type = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetWpsSecondaryDeviceType(interface, ifName, type);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetupWpsPbc(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *address = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetupWpsPbc(interface, ifName, address);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetupWpsPin(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *address = reinterpret_cast<const char *>(rawData);
+    const char *pin = reinterpret_cast<const char *>(rawData);
+    char result[32] = {0};
+    uint32_t resultLen = *const_cast<uint32_t *>(reinterpret_cast<const uint32_t *>(rawData));
+
+
+    interface->P2pSetupWpsPin(interface, ifName, address, pin, result, resultLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetPowerSave(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetPowerSave(interface, ifName, enable);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetDeviceName(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *name = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetDeviceName(interface, ifName, name);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetWfdDeviceConfig(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *config = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetWfdDeviceConfig(interface, ifName, config);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetRandomMac(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetRandomMac(interface, ifName, networkId);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pStartFind(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t timeout = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pStartFind(interface, ifName, timeout);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetExtListen(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t enable = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    int32_t period = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    int32_t interval = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetExtListen(interface, ifName, enable, period, interval);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetListenChannel(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t channel = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    int32_t regClass = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetListenChannel(interface, ifName, channel, regClass);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pProvisionDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *peerBssid = reinterpret_cast<const char *>(rawData);
+    int32_t mode = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pProvisionDiscovery(interface, ifName, peerBssid, mode);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pAddGroup(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t isPersistent = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    int32_t freq = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pAddGroup(interface, ifName, isPersistent, networkId, freq);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pServiceInfo info;
+    (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
+    info.mode = 0;
+    info.version = 0;
+    const int nameLen = 32;
+    info.nameLen = nameLen;
+    info.name = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * nameLen);
+    strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
+
+    interface->P2pAddService(interface, ifName, &info);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pServiceInfo info;
+    (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
+
+    interface->P2pRemoveService(interface, ifName, &info);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pStopFind(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pStopFind(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pFlush(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pFlush(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pFlushService(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pFlushService(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pRemoveNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pRemoveNetwork(interface, ifName, networkId);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetGroupConfig(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    const char *name = reinterpret_cast<const char *>(rawData);
+    const char *value = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSetGroupConfig(interface, ifName, networkId, name, value);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pInvite(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *peerBssid = reinterpret_cast<const char *>(rawData);
+    const char *goBssid = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pInvite(interface, ifName, peerBssid, goBssid);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pReinvoke(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *bssid = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pReinvoke(interface, ifName, networkId, bssid);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    char deviceAddress[32] = {0};
+    uint32_t deviceAddressLen = *const_cast<uint32_t *>(reinterpret_cast<const uint32_t *>(rawData));
+
+    interface->P2pGetDeviceAddress(interface, ifName, deviceAddress, deviceAddressLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    char *replyDisc = (char *)calloc(REPLY_SIZE, sizeof(char));
+    uint32_t replyDiscLen = REPLY_SIZE;
+    struct HdiP2pReqService reqService;
+    (void)memset_s(&reqService, sizeof(struct HdiP2pReqService), 0, sizeof(struct HdiP2pReqService));
+    reqService.bssidLen = ETH_ADDR_LEN;
+    reqService.bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (reqService.bssidLen));
+    reqService.bssid[0] = 0x12;
+    reqService.bssid[1] = 0x34;
+    reqService.bssid[2] = 0x56;
+    reqService.bssid[3] = 0x78;
+    reqService.bssid[4] = 0xab;
+    reqService.bssid[5] = 0xcd;
+
+    interface->P2pReqServiceDiscovery(interface, ifName, &reqService, replyDisc, replyDiscLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pCancelServiceDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *id = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pCancelServiceDiscovery(interface, ifName, id);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pServDiscReqInfo info;
+    (void)memset_s(&info, sizeof(struct HdiP2pServDiscReqInfo), 0, sizeof(struct HdiP2pServDiscReqInfo));
+
+    interface->P2pRespServerDiscovery(interface, ifName, &info);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pConnect(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pConnectInfo info;
+    (void)memset_s(&info, sizeof(struct HdiP2pConnectInfo), 0, sizeof(struct HdiP2pConnectInfo));
+    char *replyPin = (char *)calloc(REPLY_SIZE, sizeof(char));
+    uint32_t replyPinLen = REPLY_SIZE;
+
+    interface->P2pConnect(interface, ifName, &info, replyPin, replyPinLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pHid2dConnect(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiHid2dConnectInfo info;
+    (void)memset_s(&info, sizeof(struct HdiHid2dConnectInfo), 0, sizeof(struct HdiHid2dConnectInfo));
+
+    interface->P2pHid2dConnect(interface, ifName, &info);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSetServDiscExternal(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t mode = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pSetServDiscExternal(interface, ifName, mode);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pRemoveGroup(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *groupName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pRemoveGroup(interface, ifName, groupName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pCancelConnect(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pCancelConnect(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pGetGroupConfig(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    const char *param = reinterpret_cast<const char *>(rawData);
+    char value[32] = {0};
+    uint32_t valueLen = *const_cast<uint32_t *>(reinterpret_cast<const uint32_t *>(rawData));
+
+    interface->P2pGetGroupConfig(interface, ifName, networkId, param, value, valueLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pAddNetwork(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t networkId = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pAddNetwork(interface, ifName, &networkId);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pGetPeer(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *bssid = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pDeviceInfo info;
+    (void)memset_s(&info, sizeof(struct HdiP2pDeviceInfo), 0, sizeof(struct HdiP2pDeviceInfo));
+
+    interface->P2pGetPeer(interface, ifName, bssid, &info);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pGetGroupCapability(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *bssid = reinterpret_cast<const char *>(rawData);
+    int32_t cap = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->P2pGetGroupCapability(interface, ifName, bssid, &cap);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pListNetworks(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    struct HdiP2pNetworkList infoList;
+    (void)memset_s(&infoList, sizeof(struct HdiP2pNetworkList), 0, sizeof(struct HdiP2pNetworkList));
+
+    interface->P2pListNetworks(interface, ifName, &infoList);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceP2pSaveConfig(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->P2pSaveConfig(interface, ifName);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
