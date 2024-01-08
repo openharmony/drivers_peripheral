@@ -191,6 +191,9 @@ int32_t LoadCodecExInfoFromHcs(const struct DeviceResourceNode *node, CodecExInf
     for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         if (GetGroupExInfosNumber(node, codecGroupsNodeName[index], &codecNum) == HDF_SUCCESS) {
             codecExInfoGroup = codecExInfoGroups[index];
+            if (codecExInfoGroup == NULL) {
+                continue;
+            }
             if (codecNum > 0) {
                 codecExInfoGroup->num = codecNum;
                 codecExInfoGroup->exInfo = (CodecExInfo *)OsalMemAlloc(sizeof(CodecExInfo) * codecNum);
@@ -234,6 +237,9 @@ int32_t ClearExInfoGroup(CodecExInfoGroups *exInfos)
     };
     for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         codecExInfoGroup = codecExInfoGroups[index];
+        if (codecExInfoGroup == NULL) {
+            continue;
+        }
         if (codecExInfoGroup->exInfo != NULL) {
             OsalMemFree(codecExInfoGroup->exInfo);
             codecExInfoGroup->exInfo = NULL;
