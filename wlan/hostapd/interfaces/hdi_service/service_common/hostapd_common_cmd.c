@@ -210,6 +210,10 @@ int32_t HostapdInterfaceSetApPasswd(struct IHostapdInterface *self, const char *
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wpa_passphrase %s", pass);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set password!", __func__);
@@ -236,6 +240,10 @@ int32_t HostapdInterfaceSetApName(struct IHostapdInterface *self, const char *if
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "ssid %s", name);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set name!", __func__);
@@ -273,6 +281,10 @@ int32_t HostapdInterfaceSetApWpaValue(struct IHostapdInterface *self, const char
         default:
             HDF_LOGE("Unknown encryption type!");
             return ret;
+    }
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, Type = %{public}d", __func__, cmd, securityType);
+        return HDF_FAILURE;
     }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret == 0 && securityType != NONE) {
@@ -335,6 +347,10 @@ int32_t HostapdInterfaceSetApBand(struct IHostapdInterface *self, const char *if
             return HDF_FAILURE;
         }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "hw_mode %s", hwMode);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set AP bandwith!", __func__);
@@ -361,6 +377,10 @@ int32_t HostapdInterfaceSetAp80211n(struct IHostapdInterface *self, const char *
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "ieee80211n %d", value);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set Ap80211n!", __func__);
@@ -387,6 +407,10 @@ int32_t HostapdInterfaceSetApWmm(struct IHostapdInterface *self, const char *ifN
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wmm_enabled %d", value);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
@@ -413,6 +437,10 @@ int32_t HostapdInterfaceSetApChannel(struct IHostapdInterface *self, const char 
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "channel %d", channel);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
@@ -439,6 +467,10 @@ int32_t HostapdInterfaceSetApMaxConn(struct IHostapdInterface *self, const char 
         return HDF_FAILURE;
     }
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "max_num_sta %d", maxConn);
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = hostapd_ctrl_iface_set(hostApd, cmd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
@@ -451,7 +483,6 @@ int32_t HostapdInterfaceSetMacFilter(struct IHostapdInterface *self, const char 
     const char *mac, int32_t id)
 {
     struct hostapd_data *hostApd;
-    int32_t ret = HDF_FAILURE;
 
     (void)self;
     if (ifName == NULL || mac == NULL) {
@@ -469,7 +500,7 @@ int32_t HostapdInterfaceSetMacFilter(struct IHostapdInterface *self, const char 
         HDF_LOGE("%{public}s: Hostapd add mac success!", __func__);
     } else {
         HDF_LOGE("%{public}s: Hostapd failed to add mac!", __func__);
-        return ret = HDF_FAILURE;
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -513,11 +544,13 @@ int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self, const char *
     hostApd = getHostapd();
     if (hostApd == NULL) {
         HDF_LOGE("%{public}s hostapd is null.", __func__);
+        free(reqBuf);
         return HDF_FAILURE;
     }
     ret = hostapd_ctrl_iface_sta_first(hostApd, reqBuf, BUFFSIZE_REQUEST);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Hostapd failed to get first sta!", __func__);
+        free(reqBuf);
         return HDF_FAILURE;
     }
     do {
@@ -543,8 +576,8 @@ int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self, const char *
         }
         if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%s", reqBuf) < 0) {
             HDF_LOGE("%{public}s: Hostapd failed to get sta infos!", __func__);
+            free(reqBuf);
             return HDF_FAILURE;
-            break;
         }
     } while (hostapd_ctrl_iface_sta_next(hostApd, cmd, reqBuf, BUFFSIZE_REQUEST));
     free(reqBuf);
