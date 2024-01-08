@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
+import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 TEST_ROOT_DIR = "../../.."
 
@@ -25,8 +25,8 @@ ohos_fuzztest("HostapdFuzzTest") {
   fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/hostapd_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/wlan/hostapd/interfaces/hdi_service",
-    "//drivers/peripheral/wlan/hostapd/interfaces/hdi_service/service_common",
+    "$TEST_ROOT_DIR/hostapd/interfaces/hdi_service",
+    "$TEST_ROOT_DIR/hostapd/interfaces/hdi_service/service_common",
     "$TEST_ROOT_DIR/interfaces/include",
     "$TEST_ROOT_DIR/test/fuzztest",
     "./service_common",
@@ -35,20 +35,18 @@ ohos_fuzztest("HostapdFuzzTest") {
     "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/hostapd",
   ]
 
-  deps = [
-    "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service"
-  ]
+  deps = [ "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service" ]
 
   defines = [ "__OHOS__USER__" ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_wlan:libhostapd_proxy_1.0",
+    "drivers_interface_wlan:libhostapd_stub_1.0",
     "drivers_interface_wlan:libwlan_proxy_1.2",
+    "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
-    "c_utils:utils",
-    "drivers_interface_wlan:libhostapd_stub_1.0",
-    "drivers_interface_wlan:libhostapd_proxy_1.0",
-    "hdf_core:libhdf_host",
     "wpa_supplicant:wpa",
   ]
 
