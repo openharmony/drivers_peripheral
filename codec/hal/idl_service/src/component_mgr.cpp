@@ -42,6 +42,10 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
         return err;
     }
     auto core = iter->second;
+    if (core == NULL) {
+        CODEC_LOGE("can not find core of comonentName");
+        return HDF_FAILURE;
+    }
     OMX_HANDLETYPE handle = nullptr;
     std::string name(componentName);
     err = core->GetHandle(handle, name, appData, *callbacks);
@@ -88,6 +92,10 @@ void ComponentMgr::AddSoftComponent()
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
     auto core = std::make_shared<CodecOMXCore>();
+    if (core == NULL) {
+        CODEC_LOGE("fail to init CodecOMXCore");
+        return HDF_FAILURE;
+    }
     core->Init(libName);
     std::lock_guard<std::mutex> lk(mutex_);
     cores_.emplace_back(core);
