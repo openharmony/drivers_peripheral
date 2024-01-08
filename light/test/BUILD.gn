@@ -43,7 +43,7 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_light_feature_community) {
       deps += [
         "unittest/hdi:hdf_unittest_hdi_light",
-        "unittest/hdi:hdf_unittest_hdi_light_common"
+        "unittest/hdi:hdf_unittest_hdi_light_common",
       ]
     }
   }
