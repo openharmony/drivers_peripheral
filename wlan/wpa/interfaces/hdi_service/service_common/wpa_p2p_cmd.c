@@ -1074,14 +1074,14 @@ int32_t WpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *self, const char *
     const int replySize = REPLY_SIZE;
     char *reply = (char *)malloc(replySize);
     struct wpa_supplicant *wpaSupp;
+    if (reply == NULL) {
+        HDF_LOGE("%{public}s reply is NULL!", __func__);
+        return HDF_FAILURE;
+    }
     if (ifName == NULL || deviceAddress == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         free(reply);
         return HDF_ERR_INVALID_PARAM;
-    }
-    if (reply == NULL) {
-        HDF_LOGE("%{public}s reply is NULL!", __func__);
-        return HDF_FAILURE;
     }
     int32_t ret = 0;
     (void)self;
