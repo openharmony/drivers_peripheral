@@ -1102,13 +1102,25 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_033, TestSize.Level1)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
+static void UpdateSettingsForSuperStabMode(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    bool isTagExitst = IsTagValueExistsU8(cameraTest->ability,
+        OHOS_ABILITY_VIDEO_STABILIZATION_MODES,
+        OHOS_CAMERA_VIDEO_STABILIZATION_HIGH);
+    EXPECT_EQ(isTagExitst, true);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t stabControl = OHOS_CAMERA_VIDEO_STABILIZATION_HIGH;
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &stabControl, DATA_COUNT);
+    // ability meta data serialization for updating
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    CAMERA_LOGD("Macro mode is set enabled.");
+}
+
 HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level1)
 {
-    // Check SUPER_STAB in OHOS_ABLITY_CAMERA_MODES tag
-    bool superStabModeFlag = IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES,
-        OHOS::HDI::Camera::V1_2::SUPER_STAB);
-    EXPECT_EQ(superStabModeFlag, true);
-
     // Get Stream Operator
     cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
@@ -1132,6 +1144,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
     // create and commitstreams
+    UpdateSettingsForSuperStabMode(cameraTest);
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -1140,7 +1153,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_SuperStub01, TestSize.Level
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
-    // start capture preview, video capture
+    // start preview, video and capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);

@@ -47,7 +47,6 @@ bool GetConcurrencyApi(const uint8_t *rawData)
 
 bool SetExecutionModeApi(const uint8_t *rawData)
 {
-    int taskCount;
     imageProcessSession_->SetExecutionMode(
         static_cast<OHOS::HDI::Camera::V1_2::ExecutionMode>(ConvertUint32(rawData)));
     return true;
