@@ -111,59 +111,63 @@ static int32_t CheckBmpInfo(const OsdBitMapInfo *bmpInfo)
     return DISPLAY_SUCCESS;
 }
 
+static FILE * OpenPicFile(const int8_t *fileName, OsdBitMapFileHeader *fileHeader, OsdBitMapInfo *info)
+{
+    char realPath[PATH_MAX] = {0};
+    if (GetBmpInfo(fileName, fileHeader, info) < 0) {
+        return NULL;
+    }
+    if (CheckBmpInfo(info) != DISPLAY_SUCCESS) {
+        /* only support 1555.8888  888 bitmap */
+        HDF_LOGE("%s: bitmap format not supported", __func__);
+        return NULL;
+    }
+    if (realpath((char*)fileName, realPath) == NULL) {
+        printf("%s: file %s does not exist\n", __func__, fileName);
+        return NULL;
+    }
+
+    return fopen((const char*)realPath, "rb");
+}
+
 static int32_t LoadPicToBuffer(const int8_t *fileName, OsdLogo *videoLogo, OsdColorFmt enFmt,
                                uint8_t **outBuf, uint32_t *stride)
 {
     FILE *file = NULL;
     OsdBitMapFileHeader bmpFileHeader;
     OsdBitMapInfo       bmpInfo;
-    uint32_t h;
     uint64_t byteNum;
-    char realPath[PATH_MAX] = {0};
-
-    if (GetBmpInfo(fileName, &bmpFileHeader, &bmpInfo) < 0) {
-        return DISPLAY_FAILURE;
-    }
-    if (CheckBmpInfo(&bmpInfo) != DISPLAY_SUCCESS) {
-        /* only support 1555.8888  888 bitmap */
-        HDF_LOGE("%s: bitmap format not supported", __func__);
-        return DISPLAY_FAILURE;
-    }
-    videoLogo->bpp = bmpInfo.header.bitCnt / EIGHT_BITS_PER_PIXEL;
-    if (realpath((char*)fileName, realPath) == NULL) {
-        printf("%s: file %s does not exist\n", __func__, fileName);
-        return DISPLAY_FAILURE;
-    }
-    if ((file = fopen((const char*)realPath, "rb")) == NULL) {
+    
+    file = OpenPicFile(fileName, &bmpFileHeader, &bmpInfo);
+    if (file == NULL) {
         HDF_LOGE("%s: Open file failure: %s", __func__, fileName);
         return DISPLAY_FAILURE;
     }
+    videoLogo->bpp = bmpInfo.header.bitCnt / EIGHT_BITS_PER_PIXEL;
     videoLogo->width = bmpInfo.header.width;
     videoLogo->height = ((bmpInfo.header.height > 0) ? bmpInfo.header.height :
                         (-bmpInfo.header.height));
     *stride = videoLogo->width * videoLogo->bpp;
-    h = videoLogo->height;
     if ((*stride % FOUR_BITS_PER_PIXEL) != 0) {
         *stride = (*stride & 0xfffc) + FOUR_BITS_PER_PIXEL;
     }
+
+    byteNum = videoLogo->height * (*stride);
+    if (byteNum > UINT32_MAX) {
+        HDF_LOGE("%s: buffer size is beyond param's limit", __func__);
+        fclose(file);
+        return DISPLAY_FAILURE;
+    }
     /* RGB8888 or RGB1555 */
-    *outBuf = (uint8_t*)malloc(videoLogo->height * (*stride));
+    *outBuf = (uint8_t*)malloc(byteNum);
     if (*outBuf == NULL) {
         HDF_LOGE("%s: not enough memory to malloc", __func__);
         fclose(file);
         return DISPLAY_FAILURE;
     }
     fseek(file, bmpFileHeader.offBits, 0);
-    byteNum = h * (*stride);
-    if (byteNum > UINT32_MAX) {
-        HDF_LOGE("%s: buffer size is beyond param's limit", __func__);
-        fclose(file);
-        free(*outBuf);
-        *outBuf = NULL;
-        return DISPLAY_FAILURE;
-    }
     if (fread((*outBuf), 1, byteNum, file) != byteNum) {
-        HDF_LOGE("%s: fread %u*%u error", __func__, h, *stride);
+        HDF_LOGE("%s: fread %u*%u error", __func__, videoLogo->height, *stride);
         fclose(file);
         free(*outBuf);
         *outBuf = NULL;
