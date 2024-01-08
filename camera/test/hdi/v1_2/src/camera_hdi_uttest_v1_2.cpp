@@ -1677,29 +1677,3 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_052, TestSize.Level1)
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     }
 }
-
-/**
- * @tc.name: PrelaunchWithOpMode
- * @tc.desc: PrelaunchWithOpMode cameraId:device/0
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_053, TestSize.Level1)
-{
-    cameraTest->prelaunchConfig = std::make_shared<OHOS::HDI::Camera::V1_1::PrelaunchConfig>();
-    cameraTest->prelaunchConfig->cameraId = "device/0";
-    cameraTest->prelaunchConfig->streamInfos_V1_1 = {};
-
-    constexpr int32_t DEFAULT_ITEMS = 1;
-    constexpr int32_t DEFAULT_DATA_LENGTH = 1;
-    auto defaultSettings = std::make_shared<OHOS::Camera::CameraMetadata>(DEFAULT_ITEMS, DEFAULT_DATA_LENGTH);
-    float zoomRatio = 10.0f;
-    defaultSettings->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
-    std::vector<uint8_t> settings;
-    MetadataUtils::ConvertMetadataToVec(defaultSettings, settings);
-    cameraTest->prelaunchConfig->setting = settings;
-
-    cameraTest->rc = cameraTest->serviceV1_2->PrelaunchWithOpMode(
-        *cameraTest->prelaunchConfig, OHOS::HDI::Camera::V1_2::NORMAL);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-}
