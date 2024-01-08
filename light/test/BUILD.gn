@@ -31,7 +31,7 @@ if (defined(ohos_lite)) {
 
   group("hdf_test_light") {
     testonly = true
-    deps = [ "unittest/hdi:hdf_unittest_hdi_light_common" ]
+    deps = []
     if (drivers_peripheral_light_feature_model) {
       deps += [
         "benchmarktest:hdf_light_benchmark_test",
@@ -41,7 +41,10 @@ if (defined(ohos_lite)) {
     }
 
     if (drivers_peripheral_light_feature_community) {
-      deps += [ "unittest/hdi:hdf_unittest_hdi_light" ]
+      deps += [
+        "unittest/hdi:hdf_unittest_hdi_light",
+        "unittest/hdi:hdf_unittest_hdi_light_common",
+      ]
     }
   }
 }
