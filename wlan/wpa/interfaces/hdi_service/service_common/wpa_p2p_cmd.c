@@ -349,7 +349,10 @@ int32_t WpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *self, con
     }
 
     ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "sec_device_type %s", type);
-
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = wpa_supplicant_ctrl_iface_set(wpaSupp, cmd);
     if (ret < 0) {
         HDF_LOGE("%{public}s P2pSetWpsSecondaryDeviceType fail! ret=%d", __func__, ret);
@@ -420,7 +423,10 @@ int32_t WpaInterfaceP2pSetupWpsPin(struct IWpaInterface *self, const char *ifNam
     } else {
         ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%s", address);
     }
-
+    if (ret < EOK) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
     ret = wpa_supplicant_ctrl_iface_wps_pin(wpaSupp, cmd, result, resultLen);
     strcpy_s(result, resultLen, "test result");
     if (ret < 0) {
@@ -1068,13 +1074,14 @@ int32_t WpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *self, const char *
     const int replySize = REPLY_SIZE;
     char *reply = (char *)malloc(replySize);
     struct wpa_supplicant *wpaSupp;
-    if (ifName == NULL || deviceAddress == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (reply == NULL) {
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
+    }
+    if (ifName == NULL || deviceAddress == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        free(reply);
+        return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = 0;
     (void)self;
