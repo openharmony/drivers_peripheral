@@ -79,9 +79,6 @@ int32_t CodecImageService::AllocateInBuffer(CodecImageBuffer& inBuffer, uint32_t
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecAllocateInBuffer");
     CODEC_LOGI("servcie impl, size [%{public}d]", size);
-    if (inBuffer.fenceFd >= 0) {
-        close(inBuffer.fenceFd);
-    }
     CHECK_AND_RETURN_RET_LOG(size != 0, HDF_ERR_INVALID_PARAM, "buffer size is 0");
     CHECK_AND_RETURN_RET_LOG(size <= CODEC_IMAGE_MAX_BUFFER_SIZE, HDF_ERR_INVALID_PARAM, "buffer size is too large");
     inBuffer.bufferRole = role;
