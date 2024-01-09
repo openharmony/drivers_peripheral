@@ -108,34 +108,6 @@ void StrSafeCopy(char *dst, unsigned len, const char *src)
     return;
 }
 
-static int Hex2num(char c)
-{
-    if (c >= '0' && c <= '9') {
-        return c - '0';
-    }
-    if (c >= 'a' && c <= 'f') {
-        return c - 'a' + HDI_POS_TEN;
-    }
-    if (c >= 'A' && c <= 'F') {
-        return c - 'A' + HDI_POS_TEN;
-    }
-    return HDF_FAILURE;
-}
-
-int Hex2byte(const char *hex)
-{
-    int a, b;
-    a = Hex2num(*hex++);
-    if (a < 0) {
-        return HDF_FAILURE;
-    }
-    b = Hex2num(*hex++);
-    if (b < 0) {
-        return HDF_FAILURE;
-    }
-    return ((uint32_t)a << HDI_POS_FOURTH) | b;
-}
-
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
 {
     if (src == NULL || dst == NULL || dstLen == NULL) {
