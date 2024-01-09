@@ -44,6 +44,10 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
         return HDF_ERR_MALLOC_FAIL;
     }
     tempNode->node = std::make_shared<ComponentNode>(callbacks, appData, compName);
+    if (tempNode->node == nullptr) {
+        CODEC_LOGE("fail to init ComponentNode");
+        return HDF_FAILURE;
+    }
     auto err = g_mgr.CreateComponentInstance(compName, &ComponentNode::callbacks_, tempNode->node.get(), &comp);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("create component instance err[%{public}d]", err);
