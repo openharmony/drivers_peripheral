@@ -31,8 +31,20 @@ struct HdfCodecComponentTypeHost {
 static int32_t CodecComponentTypeDriverDispatch(struct HdfDeviceIoClient *client, int32_t cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (client->device == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         CONTAINER_OF(client->device->service, struct HdfCodecComponentTypeHost, ioservice);
+    if (omxcomponenttypeHost == NULL) {
+        CODEC_LOGE("null pointer");
+        return HDF_FAILURE;
+    }
     if (omxcomponenttypeHost->service == NULL || omxcomponenttypeHost->service->stub.OnRemoteRequest == NULL) {
         CODEC_LOGE("invalid service obj");
         return HDF_ERR_INVALID_OBJECT;
@@ -90,6 +102,10 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
 static void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     CODEC_LOGI("HdfCodecComponentTypeDriverRelease enter.");
+    if (deviceObject == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         CONTAINER_OF(deviceObject->service, struct HdfCodecComponentTypeHost, ioservice);
     OmxComponentManagerSeriveRelease(omxcomponenttypeHost->service);
