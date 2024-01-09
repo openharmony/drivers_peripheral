@@ -683,11 +683,6 @@ static int32_t WriteDeviceDescriptor(
         if (ret != HDF_SUCCESS) {
             return HDF_ERR_INVALID_PARAM;
         }
-        ret = UsbFnWriteDesString(
-            devName, strings[i]->language, "serialnumber", strings[i]->strings[desc->iSerialNumber].s);
-        if (ret != HDF_SUCCESS) {
-            return HDF_ERR_INVALID_PARAM;
-        }
     }
     return 0;
 }
