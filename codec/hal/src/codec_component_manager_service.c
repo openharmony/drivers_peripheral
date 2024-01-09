@@ -42,6 +42,10 @@ static struct RemoteServiceDeathRecipient g_deathRecipient = {
 static void AddDeathRecipientForService(struct CodecCallbackType *callbacks, uint32_t componentId,
                                         struct CodecComponentNode *codecNode)
 {
+    if (callbacks == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return;
+    }
     bool needAdd = RegisterService(callbacks, componentId, codecNode);
     if (needAdd) {
         CODEC_LOGI("add deathRecipient for remoteService!");
