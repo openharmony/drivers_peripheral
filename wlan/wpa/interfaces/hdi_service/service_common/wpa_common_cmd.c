@@ -586,18 +586,18 @@ static void WapDealWifiStatus(char *reply, struct HdiWpaCmdStatus *status)
             HDF_LOGI("%{public}s status->freq= %{public}d", __func__, status->freq);
         } else if (strcmp(key, "ssid") == 0) {
             HDF_LOGI("%{public}s key include ssid value=%{public}s", __func__, value);
-            status->ssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * strlen(value));
+            status->ssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(value) + 1));
             status->ssidLen = strlen(value);
-            StrSafeCopy((char *)status->ssid, strlen(value), value);
-            printf_decode((u8 *)status->ssid, strlen(value), (char *)status->ssid);
+            StrSafeCopy((char *)status->ssid, strlen(value) + 1, value);
+            printf_decode((u8 *)status->ssid, strlen(value) + 1, (char *)status->ssid);
         } else if (strcmp(key, "id") == 0) {
             status->id = atoi(value);
             HDF_LOGI("%{public}s status->id= %{public}d", __func__, status->id);
         } else if (strcmp(key, "key_mgmt") == 0) {
             HDF_LOGI("%{public}s key include key_mgmt value=%{public}s", __func__, value);
-            status->keyMgmt = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * strlen(value));
+            status->keyMgmt = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (strlen(value) + 1));
             status->keyMgmtLen = strlen(value);
-            StrSafeCopy((char *)status->keyMgmt, strlen(value), value);
+            StrSafeCopy((char *)status->keyMgmt, strlen(value) + 1, value);
         } else if (strcmp(key, "address") == 0) {
             uint8_t tmpAddress[ETH_ADDR_LEN +1] = {0};
             HDF_LOGD("%{public}s key include address value=%{public}s", __func__, value);
@@ -1668,7 +1668,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     head = &HdfWpaStubDriver()->remoteListHead;
     HDF_LOGD("%s: enter HdfWpaCallbackFun event =%d", __FUNCTION__, event);
-    if (data == NULL || ifName == NULL) {
+    if (ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
         (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
         return HDF_ERR_INVALID_PARAM;

@@ -43,6 +43,7 @@ if (is_standard_system) {
       "-fno-common",
       "-fno-strict-aliasing",
       "-DCONFIG_CTRL_IFACE",
+      "-DCONFIG_P2P",
       "-DCONFIG_WEP",
       "-DCONFIG_WPS",
     ]
