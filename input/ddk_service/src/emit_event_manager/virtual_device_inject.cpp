@@ -22,9 +22,18 @@ namespace OHOS {
 namespace ExternalDeviceManager {
 VirtualDeviceInject::VirtualDeviceInject(std::shared_ptr<VirtualDevice> virtualDevice)
 {
-    virtualDevice->SetUp();
+    if (virtualDevice != nullptr) {
+        virtualDevice->SetUp();
+    } else {
+        HDF_LOGE("%{public}s: virtualDevice is nullptr", __func__);
+    }
+    
     injectThread_ = std::make_unique<InjectThread>(virtualDevice);
-    injectThread_->Start();
+    if (injectThread_ != nullptr) {
+        injectThread_->Start();
+    } else {
+        HDF_LOGE("%{public}s: injectThread_ is nullptr", __func__);
+    }
 }
 
 VirtualDeviceInject::~VirtualDeviceInject()

@@ -15,6 +15,7 @@
 
 #include "inject_thread.h"
 #include <sys/prctl.h>
+#include <hdf_log.h>
 
 #define HDF_LOG_TAG inject_thread
 
@@ -44,7 +45,11 @@ void InjectThread::Start()
 void InjectThread::RunThread(void *param)
 {
     InjectThread *thread = (InjectThread *)param;
-    thread->InjectFunc();
+    if (thread != nullptr) {
+        thread->InjectFunc();
+    } else {
+        HDF_LOGE("%{public}s: thread is nullptr", __func__);
+    }
 }
 
 void InjectThread::InjectFunc()
