@@ -63,7 +63,7 @@ int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::st
 
 bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys);
 
-std::string ParseStringFromArgs(const std::string args, const char *key);
+std::string ParseStringFromArgs(const std::string &args, const char *key);
 
 bool CheckIsNum(const std::string &jsonString);
 } // DistributedHardware
