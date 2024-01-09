@@ -76,6 +76,10 @@ static int32_t ReadArray(struct HdfSBuf *data, int8_t **array, uint32_t *arrayLe
 
 static int32_t ReadEventInfo(struct HdfSBuf *data, struct EventInfo *info)
 {
+    if (info == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     if (!HdfSbufReadInt64(data, &info->appData)) {
         CODEC_LOGE("read appData failed!");
@@ -101,12 +105,20 @@ static int32_t ReadEventInfo(struct HdfSBuf *data, struct EventInfo *info)
 
 static void ReleaseEventInfo(struct EventInfo *info)
 {
+    if (info == NULL) {
+        CODEC_LOGE("can not free info");
+        return;
+    }
     FreeMem(info->eventData, info->eventDataLen);
 }
 
 static int32_t SerStubEventHandler(struct CodecCallbackType *serviceImpl,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     enum OMX_EVENTTYPE event;
     struct EventInfo info = {0};
@@ -163,6 +175,10 @@ static int32_t SerStubEmptyBufferDone(struct CodecCallbackType *serviceImpl,
 static int32_t SerStubFillBufferDone(struct CodecCallbackType *serviceImpl,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     int64_t appData = 0;
     struct OmxCodecBuffer buffer;
