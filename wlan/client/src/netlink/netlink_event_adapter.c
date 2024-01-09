@@ -422,7 +422,7 @@ static int32_t CtrlNoSeqCheck(struct nl_msg *msg, void *arg)
 
     WifiActionData actionData;
     actionData.data = nla_data(attr[NL80211_ATTR_FRAME]);
-    actionData.dataLen = nla_len(attr[NL80211_ATTR_FRAME]);
+    actionData.dataLen = (uint32_t)nla_len(attr[NL80211_ATTR_FRAME]);
     HILOG_INFO(LOG_CORE, "%s: receive data len = %{public}d", __FUNCTION__, actionData.dataLen);
     WifiEventReport("p2p0", WIFI_EVENT_ACTION_RECEIVED, &actionData);
     return NL_OK;
