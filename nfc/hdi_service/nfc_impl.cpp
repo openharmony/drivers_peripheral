@@ -151,12 +151,12 @@ int32_t NfcImpl::PowerCycle(NfcStatus &status)
 
 int32_t NfcImpl::Close(NfcStatus &status)
 {
+    int ret = adaptor_.VendorClose(false);
     g_callbackV1_1 = nullptr;
     if (callbacks_ != nullptr) {
         RemoveNfcDeathRecipient(callbacks_);
         callbacks_ = nullptr;
     }
-    int ret = adaptor_.VendorClose(true);
     if (ret == 0) {
         status = NfcStatus::OK;
         return HDF_SUCCESS;
