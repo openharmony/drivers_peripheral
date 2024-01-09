@@ -124,12 +124,7 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
         AUDIO_FUNC_LOGE("hwRender is invalid");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
-    } else {
-        AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
-        return AUDIO_ERR_NOT_SUPPORT;
-    }
+    
     if (hwRender->devDataHandle == NULL) {
         AUDIO_FUNC_LOGE("RenderStart Bind Fail!");
         return AUDIO_ERR_INTERNAL;
@@ -144,6 +139,12 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
     int32_t ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_STOP);
     hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
+    if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
+        AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
+    } else {
+        AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
+        return AUDIO_ERR_NOT_SUPPORT;
+    }
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
         return AUDIO_ERR_INTERNAL;
