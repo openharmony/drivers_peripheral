@@ -63,6 +63,10 @@ static int32_t CodecComponentTypeSetParameter(struct CodecComponentType *self,
     CODEC_LOGI("service impl, index [%{public}x]!", index);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
+    if (service == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t err = OmxAdapterSetParameter(service->codecNode, index, paramStruct, paramStructLen);
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("index [%{public}u], ret value [%{public}x]!", index, err);
@@ -128,6 +132,10 @@ static int32_t CodecComponentTypeUseBuffer(struct CodecComponentType *self,
     CODEC_LOGI("service impl, portIndex: [%{public}d]!", portIndex);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
+    if (service == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return OmxAdapterUseBuffer(service->codecNode, portIndex, buffer);
 }
 
@@ -137,6 +145,10 @@ static int32_t CodecComponentTypeAllocateBuffer(struct CodecComponentType *self,
     CODEC_LOGI("service impl, portIndex: [%{public}d]!", portIndex);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
+    if (service == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return OmxAdapterAllocateBuffer(service->codecNode, portIndex, buffer);
 }
 
@@ -178,6 +190,10 @@ static int32_t CodecComponentTypeComponentDeInit(struct CodecComponentType *self
     CODEC_LOGI("service impl!");
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
+    if (service == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return OmxAdapterDeInit(service->codecNode);
 }
 
@@ -196,6 +212,10 @@ static int32_t CodecComponentTypeComponentRoleEnum(struct CodecComponentType *se
     CODEC_LOGI("service impl!");
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
+    if (service == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     return OmxAdapterComponentRoleEnum(service->codecNode, role, roleLen, index);
 }
 
