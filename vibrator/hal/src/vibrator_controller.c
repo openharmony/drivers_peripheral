@@ -129,7 +129,6 @@ static int32_t ValidityJudgment(uint32_t duration, uint16_t intensity, int16_t f
         return VIBRATOR_NOT_PERIOD;
     }
 
-    CHECK_NULL_PTR_RETURN_VALUE(priv->vibratorInfoEntry, HDF_FAILURE);
     if ((priv->vibratorInfoEntry.isSupportIntensity == 0) || (intensity < priv->vibratorInfoEntry.intensityMinValue) ||
         (intensity > priv->vibratorInfoEntry.intensityMaxValue)) {
         HDF_LOGE("%s:intensity not supported", __func__);
@@ -336,7 +335,9 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     static struct VibratorInterface vibratorDevInstance;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
-    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
+    if (priv == NULL) {
+        return &vibratorDevInstance;
+    }
     if (priv->initState) {
         return &vibratorDevInstance;
     }
