@@ -52,7 +52,6 @@ static int32_t MotionInterfaceDriverDispatch(struct HdfDeviceIoClient *client, i
         HDF_LOGE("%{public}s:hdfMotionInterfaceHost->stub is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGD("%{public}s:dataParcel[%{public}p], replyParcel[%{public}p]", __func__, dataParcel, replyParcel);
 
     return hdfMotionInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
