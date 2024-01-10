@@ -15,7 +15,8 @@
     "features": [
       "drivers_peripheral_input_feature_model",
       "drivers_peripheral_input_feature_udriver",
-      "drivers_peripheral_input_feature_lite_support_test"
+      "drivers_peripheral_input_feature_lite_support_test",
+      "drivers_peripheral_input_feature_support_ddk"
     ],
     "adapted_system_type": ["standard", "small"],
     "rom": "630KB",
