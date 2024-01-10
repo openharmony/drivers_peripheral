@@ -31,18 +31,20 @@ if (defined(ohos_lite)) {
 
   group("hdf_test_input") {
     testonly = true
-    deps = [
-      "benchmarktest:hdf_input_benchmark_test",
-      "benchmarktest:hid_ddk_benchmark_test",
-      "fuzztest/hidddk_fuzzer:fuzztest",
-      "unittest/ddk:hid_ddk_unittest",
-    ]
+    deps = [ "benchmarktest:hdf_input_benchmark_test" ]
 
     if (drivers_peripheral_input_feature_model) {
       deps += [ "unittest/hdi:hdi_unittest_input" ]
     }
     if (drivers_peripheral_input_feature_udriver) {
       deps += [ "unittest/udriver:input_udriver_unittest" ]
+    }
+    if (drivers_peripheral_input_feature_support_ddk) {
+      deps += [
+        "benchmarktest:hid_ddk_benchmark_test",
+        "fuzztest/hidddk_fuzzer:fuzztest",
+        "unittest/ddk:hid_ddk_unittest",
+      ]
     }
   }
 }
