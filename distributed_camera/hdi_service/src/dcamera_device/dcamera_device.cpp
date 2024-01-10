@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,25 +27,27 @@ namespace OHOS {
 namespace DistributedHardware {
 using ErrorCallback = std::function<void (ErrorType, int32_t)>;
 using ResultCallback = std::function<void (uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)>;
-DCameraDevice::DCameraDevice(const DHBase &dhBase, const std::string &abilityInfo)
+DCameraDevice::DCameraDevice(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+    const std::string &sourceAbilityInfo)
     : isOpened_(false),
       dCameraId_(GenerateCameraId(dhBase)),
       dhBase_(dhBase),
-      dCameraAbilityInfo_(abilityInfo),
+      dCameraAbilityInfo_(sinkAbilityInfo),
+      sourceAbilityInfo_(sourceAbilityInfo),
       dCameraDeviceCallback_(nullptr),
       dCameraStreamOperator_(nullptr),
       dMetadataProcessor_(nullptr)
 {
     DHLOGI("DCameraDevice construct");
-    Init(abilityInfo);
+    Init(sinkAbilityInfo, sourceAbilityInfo);
 }
 
-void DCameraDevice::Init(const std::string &abilityInfo)
+void DCameraDevice::Init(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo)
 {
     if (dMetadataProcessor_ == nullptr) {
         dMetadataProcessor_ = std::make_shared<DMetadataProcessor>();
     }
-    dMetadataProcessor_->InitDCameraAbility(abilityInfo);
+    dMetadataProcessor_->InitDCameraAbility(sinkAbilityInfo, sourceAbilityInfo);
 }
 
 DCamRetCode DCameraDevice::CreateDStreamOperator()
@@ -58,7 +60,8 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
         }
     }
 
-    DCamRetCode ret = dCameraStreamOperator_->InitOutputConfigurations(dhBase_, dCameraAbilityInfo_);
+    DCamRetCode ret = dCameraStreamOperator_->InitOutputConfigurations(dhBase_, dCameraAbilityInfo_,
+        sourceAbilityInfo_);
     if (ret != SUCCESS) {
         DHLOGE("Init distributed camera stream operator failed, ret=%d.", ret);
         return ret;
