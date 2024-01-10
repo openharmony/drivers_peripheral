@@ -47,6 +47,20 @@ enum CameraUtConstants {
     UT_PREVIEW_SIZE = 3112960,
 };
 
+enum Numbers {
+    ZERO,
+    ONE,
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT,
+    NINE,
+    TEN,
+};
+
 enum ImageDataSaveSwitch {
     SWITCH_OFF,
     SWITCH_ON,
