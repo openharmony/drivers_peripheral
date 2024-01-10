@@ -68,6 +68,7 @@ int32_t EmitEventManager::DestroyDevice(uint32_t deviceId)
         HDF_LOGE("%{public}s device is not exit", __func__);
         return HID_DDK_FAILURE;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
     virtualDeviceMap_.erase(deviceId);
     lastDeviceId_ = deviceId;
     return HID_DDK_SUCCESS;
@@ -78,7 +79,7 @@ int32_t EmitEventManager::GetCurDeviceId(void)
     if (virtualDeviceMap_.count(lastDeviceId_) == 0) {
         return lastDeviceId_;
     }
-    int32_t id = virtualDeviceMap_.size();
+    uint32_t id = virtualDeviceMap_.size();
     while (virtualDeviceMap_.count(id) != 0 && virtualDeviceMap_.size() < MAX_VIRTUAL_DEVICE_NUM) {
         id++;
     }

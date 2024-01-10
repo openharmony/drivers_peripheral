@@ -158,7 +158,7 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     struct input_event event {};
     event.type = type;
     event.code = code;
-    event.value = value;
+    event.value = (int32_t)value;
     HDF_LOGW("%{public}s type:%{public}d code:%{public}d value:%{public}d",
         __func__, event.type, event.code, event.value);
 #ifndef __MUSL__
