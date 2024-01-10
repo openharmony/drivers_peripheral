@@ -41,6 +41,7 @@ private:
     EmitEventManager &operator=(EmitEventManager &&) = delete;
 
     std::map<uint32_t, std::unique_ptr<VirtualDeviceInject>> virtualDeviceMap_;
+    std::mutex mutex_;
     uint32_t lastDeviceId_ = 0;
 };
 } // namespace ExternalDeviceManager
