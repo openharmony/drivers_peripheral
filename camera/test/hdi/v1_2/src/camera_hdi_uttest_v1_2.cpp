@@ -104,6 +104,19 @@ void CameraHdiUtTestV1_2::TakePhoteWithDefferredImage(int PhotoCount)
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
 
+void CameraHdiUtTestV1_2::RemovePendingImages()
+{
+    std::vector<std::string> pendingImages;
+    int ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    if (pendingImages.size() != 0) {
+        for (auto imageId = pendingImages.begin(); imageId != pendingImages.end(); ++imageId) {
+            ret = cameraTest->imageProcessSession_->RemoveImage(*imageId);
+            EXPECT_EQ(ret, 0);
+        }
+    }
+}
+
 /**
  * @tc.name:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
  * @tc.desc:Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_002
@@ -129,28 +142,61 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_00
         printf("DefferredImageTestInit Fail!!!\r\n");
         isImageProcessServiceExist = false;
     }
-
+    // 如果存在未处理的图片，则删除未处理的图片
+    RemovePendingImages();
     // take photo using deferred image delivery
     TakePhoteWithDefferredImage(1);
 
     // image deferred delivery process
     ASSERT_EQ(isImageProcessServiceExist, true);
     int taskCount = 0;
-    std::vector<std::string> pendingImages;
     ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE, taskCount);
+    EXPECT_EQ(ret, 0);
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
+    EXPECT_EQ(ret, 0);
+    EXPECT_GE(taskCount, 1);
+    // 拍照的第一张图不走二段式，走后台
+    ASSERT_EQ(pendingImages.size(), 0);
+}
+
+void CameraHdiUtTestV1_2::ProcessPendingImages(int ret)
+{
+    // image deferred delivery process
+    int taskCount = 0;
+    std::vector<std::string> pendingImages;
+    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::BALANCED, taskCount);
     EXPECT_EQ(ret, 0);
     ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
     EXPECT_EQ(ret, 0);
     EXPECT_GE(taskCount, 1);
-    ASSERT_EQ(pendingImages.size(), 1);
+    // 拍照的第一张图不走二段式，走后台
+    ASSERT_EQ(pendingImages.size(), TWO);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::BALANCED);
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::LOW_POWER);
+    EXPECT_EQ(ret, 0);
     ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
     EXPECT_EQ(ret, 0);
-
     // process the first image
     ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
     EXPECT_EQ(ret, 0);
-    sleep(3);
-    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
+    sleep(UT_SECOND_TIMES);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, TWO);
+    // process the second image
+    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[1]);
+    EXPECT_EQ(ret, 0);
+    sleep(UT_SECOND_TIMES);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, THREE);
+    // process the third image, and test the Interrupt, Reset, RemoveImage Interfaces
+    ret = cameraTest->imageProcessSession_->Interrupt();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->Reset();
+    EXPECT_EQ(ret, 0);
+    ret = cameraTest->imageProcessSession_->RemoveImage(pendingImages[1]);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, THREE);
+    EXPECT_EQ(cameraTest->imageProcessCallback_->countError_, 0);
 }
 
 /**
@@ -163,12 +209,10 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_00
 {
     int ret = 0;
     bool isImageProcessServiceExist = true;
-
     // real test
     bool isExit = IsTagValueExistsU8(cameraTest->ability,\
         OHOS_ABILITY_DEFERRED_IMAGE_DELIVERY, OHOS::HDI::Camera::V1_2::STILL_IMAGE);
     EXPECT_EQ(isExit, true);
-
     // get DefferredImageTestInit
     ret = cameraTest->DefferredImageTestInit();
     EXPECT_EQ(ret, 0);
@@ -177,49 +221,13 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_Defferred_Delivery_Image_00
         printf("DefferredImageTestInit Fail\r\n");
         isImageProcessServiceExist = false;
     }
-
+    // 如果存在未处理的图片，则删除未处理的图片
+    RemovePendingImages();
     // take three photo using deferred image delivery, three times
     TakePhoteWithDefferredImage(3);
-
     ASSERT_EQ(isImageProcessServiceExist, true);
-    // image deferred delivery process
-    int taskCount = 0;
-    std::vector<std::string> pendingImages;
-    ret = cameraTest->imageProcessSession_->GetCoucurrency(OHOS::HDI::Camera::V1_2::BALANCED, taskCount);
-    EXPECT_EQ(ret, 0);
-    ret = cameraTest->imageProcessSession_->GetPendingImages(pendingImages);
-    EXPECT_EQ(ret, 0);
-    EXPECT_GE(taskCount, 1);
-    ASSERT_EQ(pendingImages.size(), 3);
-    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::BALANCED);
-    EXPECT_EQ(ret, 0);
-    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::LOW_POWER);
-    EXPECT_EQ(ret, 0);
-    ret = cameraTest->imageProcessSession_->SetExecutionMode(OHOS::HDI::Camera::V1_2::HIGH_PREFORMANCE);
-    EXPECT_EQ(ret, 0);
-
-    // process the first image
-    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[0]);
-    EXPECT_EQ(ret, 0);
-    sleep(3);
-    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 1);
-
-    // process the second image
-    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[1]);
-    EXPECT_EQ(ret, 0);
-    sleep(3);
-    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
-
-     // process the third image, and test the Interrupt, Reset, RemoveImage Interfaces
-    ret = cameraTest->imageProcessSession_->ProcessImage(pendingImages[2]);
-    ret = cameraTest->imageProcessSession_->Interrupt();
-    EXPECT_EQ(ret, 0);
-    ret = cameraTest->imageProcessSession_->Reset();
-    EXPECT_EQ(ret, 0);
-    ret = cameraTest->imageProcessSession_->RemoveImage(pendingImages[2]);
-    EXPECT_EQ(ret, 0);
-    EXPECT_EQ(cameraTest->imageProcessCallback_->coutProcessDone_, 2);
-    EXPECT_EQ(cameraTest->imageProcessCallback_->countError_, 0);
+    // 进行二段式处理拍照图片
+    ProcessPendingImages(ret);
 }
 
 /**
