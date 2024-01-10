@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,7 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         DHLOGE("DCameraProvider::EnableDCameraDevice, devId or dhId is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    DHLOGI("DCameraProvider::EnableDCameraDevice for {devId: %s, dhId: %s, abilityInfo length: %d}.",
+    DHLOGI("DCameraProvider::EnableDCameraDevice for {devId: %s, dhId: %s, sinkAbilityInfo length: %d}.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), abilityInfo.length());
 
     if (abilityInfo.empty() || abilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
@@ -67,7 +67,28 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
     }
-    DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, abilityInfo, callbackObj);
+
+    JSONCPP_STRING errs;
+    Json::CharReaderBuilder readerBuilder;
+    Json::Value rootValue;
+
+    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(),
+        &rootValue, &errs) || !rootValue.isObject()) {
+        DHLOGE("Input sink ablity info is not json object.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
+    if (!rootValue["SinkAbility"].isObject() && !rootValue["SourceAbility"].isObject()) {
+        DHLOGE("Get ability error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    Json::Value sinkRootValue = rootValue["SinkAbility"];
+    Json::Value srcRootValue = rootValue["SourceAbility"];
+    std::string sinkAbilityInfo = sinkRootValue.toStyledString();
+    std::string sourceAbilityInfo = srcRootValue.toStyledString();
+
+    DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, sinkAbilityInfo, sourceAbilityInfo, callbackObj);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("DCameraProvider::EnableDCameraDevice failed, ret = %d.", ret);
     }

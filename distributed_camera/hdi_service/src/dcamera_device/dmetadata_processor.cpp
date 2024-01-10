@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,15 +23,16 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInfo)
+DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilityInfo,
+    const std::string &sourceAbilityInfo)
 {
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;
     Json::Value rootValue;
 
     std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(), &rootValue, &errs) &&
-        rootValue.isObject()) {
+    if (jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(),
+        &rootValue, &errs) && rootValue.isObject()) {
         if (rootValue.isMember("MetaData") && rootValue["MetaData"].isString()) {
             std::string metadataStr = rootValue["MetaData"].asString();
             if (!metadataStr.empty()) {
@@ -53,7 +54,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
     }
 
     if (OHOS::Camera::GetCameraMetadataItemCount(dCameraAbility_->get()) <= 0) {
-        DCamRetCode ret = InitDCameraDefaultAbilityKeys(abilityInfo);
+        DCamRetCode ret = InitDCameraDefaultAbilityKeys(sinkAbilityInfo);
         if (ret != SUCCESS) {
             DHLOGE("Init distributed camera defalult abilily keys failed.");
             dCameraAbility_ = nullptr;
@@ -61,7 +62,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         }
     }
 
-    DCamRetCode ret = InitDCameraOutputAbilityKeys(abilityInfo);
+    DCamRetCode ret = InitDCameraOutputAbilityKeys(sinkAbilityInfo, sourceAbilityInfo);
     if (ret != SUCCESS) {
         DHLOGE("Init distributed camera output abilily keys failed.");
         dCameraAbility_ = nullptr;
@@ -155,15 +156,15 @@ void DMetadataProcessor::SetFpsRanges()
     AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
 }
 
-DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string &abilityInfo)
+DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string &sinkAbilityInfo)
 {
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;
     Json::Value rootValue;
 
     std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(), &rootValue, &errs) &&
-        rootValue.isObject()) {
+    if (jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(), &rootValue,
+        &errs) && rootValue.isObject()) {
         if (rootValue.isMember("ProtocolVer") && rootValue["ProtocolVer"].isString()) {
             protocolVersion_ = rootValue["ProtocolVer"].asString();
         }
@@ -219,24 +220,31 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     return SUCCESS;
 }
 
-DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &abilityInfo)
+DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo,
+    const std::string &sourceAbilityInfo)
 {
-    std::map<int, std::vector<DCResolution>> supportedFormats = GetDCameraSupportedFormats(abilityInfo);
+    std::map<int, std::vector<DCResolution>> sinkSupportedFormats = GetDCameraSupportedFormats(sinkAbilityInfo, true);
+    std::map<int, std::vector<DCResolution>> srcSupportedFormats = GetDCameraSupportedFormats(sourceAbilityInfo, false);
 
-    std::vector<int32_t> streamConfigurations;
-    std::map<int, std::vector<DCResolution>>::iterator iter;
-    for (iter = supportedFormats.begin(); iter != supportedFormats.end(); ++iter) {
-        std::vector<DCResolution> resolutionList = iter->second;
-        for (auto resolution : resolutionList) {
-            DHLOGI("DMetadataProcessor::supported formats: { format=%d, width=%d, height=%d }", iter->first,
-                resolution.width_, resolution.height_);
-            streamConfigurations.push_back(iter->first);
-            streamConfigurations.push_back(resolution.width_);
-            streamConfigurations.push_back(resolution.height_);
-        }
+    std::vector<int32_t> sinkStreamConfigs;
+    InitBasicConfigTag(sinkSupportedFormats, srcSupportedFormats, sinkStreamConfigs,
+        sinkAbilityInfo, sourceAbilityInfo);
+    std::vector<int32_t> sinkExtendStreamConfigs;
+    camera_metadata_item_t item;
+    int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(),
+        OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &item);
+    if (ret == CAM_META_SUCCESS && item.count != 0) {
+        sinkExtendStreamConfigs.push_back(item.data.i32[0]);
     }
-    UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, streamConfigurations.data(),
-        streamConfigurations.size());
+    InitExtendConfigTag(sinkSupportedFormats, srcSupportedFormats, sinkExtendStreamConfigs,
+        sinkAbilityInfo, sourceAbilityInfo);
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // mode eof
+
+    UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, sinkStreamConfigs.data(),
+        sinkStreamConfigs.size());
+
+    UpdateAbilityEntry(OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, sinkExtendStreamConfigs.data(),
+        sinkExtendStreamConfigs.size());
 
     UpdateAbilityEntry(OHOS_SENSOR_INFO_MAX_FRAME_DURATION, &MAX_FRAME_DURATION, 1);
 
@@ -249,6 +257,149 @@ DCamRetCode DMetadataProcessor::InitDCameraOutputAbilityKeys(const std::string &
     return SUCCESS;
 }
 
+void DMetadataProcessor::InitBasicConfigTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
+    std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs,
+    const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo)
+{
+    std::map<int, std::vector<DCResolution>>::iterator iter;
+    for (iter = sinkSupportedFormats.begin(); iter != sinkSupportedFormats.end(); ++iter) {
+        std::vector<DCResolution> resolutionList = iter->second;
+        for (auto resolution : resolutionList) {
+            DHLOGI("DMetadataProcessor::sink supported formats: { format=%d, width=%d, height=%d }", iter->first,
+                resolution.width_, resolution.height_);
+            sinkStreamConfigs.push_back(iter->first);
+            sinkStreamConfigs.push_back(resolution.width_);
+            sinkStreamConfigs.push_back(resolution.height_);
+        }
+    }
+
+    if (sinkAbilityInfo != sourceAbilityInfo) {
+        AddSrcConfigToSinkOfBasicTag(sinkSupportedFormats, srcSupportedFormats, sinkStreamConfigs);
+    }
+}
+
+void DMetadataProcessor::AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
+    std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs)
+{
+    std::vector<int> formats;
+    for (const auto &format : srcSupportedFormats) {
+        if (find(sinkPhotoFormats_.begin(), sinkPhotoFormats_.end(), format.first) == sinkPhotoFormats_.end()) {
+            formats.push_back(format.first);
+        }
+    }
+
+    for (const auto &format : formats) {
+        for (const auto &resolution : srcSupportedFormats[format]) {
+            std::vector<DCResolution> resolutionList;
+            if (sinkSupportedFormats.count(format) > 0) {
+                resolutionList = sinkSupportedFormats[format];
+            }
+            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
+                continue;
+            }
+            sinkStreamConfigs.push_back(format);
+            sinkStreamConfigs.push_back(resolution.width_);
+            sinkStreamConfigs.push_back(resolution.height_);
+        }
+    }
+}
+
+void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
+    std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkExtendStreamConfigs,
+    const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo)
+{
+    sinkExtendStreamConfigs.push_back(EXTEND_PREVIEW); // preview
+    std::map<int, std::vector<DCResolution>>::iterator previewIter;
+    for (previewIter = sinkPreviewProfiles_.begin(); previewIter != sinkPreviewProfiles_.end(); ++previewIter) {
+        std::vector<DCResolution> resolutionList = previewIter->second;
+        for (auto resolution : resolutionList) {
+            DHLOGI("sink extend supported preview formats: { format=%d, width=%d, height=%d }",
+                previewIter->first, resolution.width_, resolution.height_);
+            AddConfigs(sinkExtendStreamConfigs, previewIter->first, resolution.width_, resolution.height_, PREVIEW_FPS);
+        }
+    }
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // preview eof
+
+    sinkExtendStreamConfigs.push_back(EXTEND_VIDEO); // video
+    std::map<int, std::vector<DCResolution>>::iterator videoIter;
+    for (videoIter = sinkVideoProfiles_.begin(); videoIter != sinkVideoProfiles_.end(); ++videoIter) {
+        std::vector<DCResolution> resolutionList = videoIter->second;
+        for (auto resolution : resolutionList) {
+            DHLOGI("sink extend supported video formats: { format=%d, width=%d, height=%d }",
+                videoIter->first, resolution.width_, resolution.height_);
+            AddConfigs(sinkExtendStreamConfigs, videoIter->first, resolution.width_, resolution.height_, VIDEO_FPS);
+        }
+    }
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // video eof
+
+    sinkExtendStreamConfigs.push_back(EXTEND_PHOTO); // photo
+    std::map<int, std::vector<DCResolution>>::iterator photoIter;
+    for (photoIter = sinkPhotoProfiles_.begin(); photoIter != sinkPhotoProfiles_.end(); ++photoIter) {
+        std::vector<DCResolution> resolutionList = photoIter->second;
+        for (auto resolution : resolutionList) {
+            DHLOGI("sink extend supported photo formats: { format=%d, width=%d, height=%d }",
+                photoIter->first, resolution.width_, resolution.height_);
+            AddConfigs(sinkExtendStreamConfigs, photoIter->first, resolution.width_, resolution.height_, PHOTO_FPS);
+        }
+    }
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // photo eof
+
+    if (sinkAbilityInfo != sourceAbilityInfo) {
+        std::vector<int32_t> formats;
+        for (const auto &format : srcSupportedFormats) {
+            if (find(sinkPhotoFormats_.begin(), sinkPhotoFormats_.end(), format.first) == sinkPhotoFormats_.end()) {
+                formats.push_back(format.first);
+            }
+        }
+        for (const auto &format : formats) {
+            AddSrcConfigsToSinkOfExtendTag(sinkExtendStreamConfigs, format);
+        }
+    }
+}
+
+void DMetadataProcessor::AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format)
+{
+    if (srcPreviewProfiles_.count(format) > 0) {
+        sinkExtendStreamConfigs.push_back(EXTEND_PREVIEW); // preview
+        for (const auto &resolution : srcPreviewProfiles_[format]) {
+            std::vector<DCResolution> resolutionList;
+            if (sinkPreviewProfiles_.count(format) > 0) {
+                resolutionList = sinkPreviewProfiles_[format];
+            }
+            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
+                continue;
+            }
+            AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, PREVIEW_FPS);
+        }
+        sinkExtendStreamConfigs.push_back(EXTEND_EOF); // preview eof
+    } else if (srcVideoProfiles_.count(format) > 0) {
+        sinkExtendStreamConfigs.push_back(EXTEND_VIDEO); // video
+        for (const auto &resolution : srcVideoProfiles_[format]) {
+            std::vector<DCResolution> resolutionList;
+            if (sinkVideoProfiles_.count(format) > 0) {
+                resolutionList = sinkVideoProfiles_[format];
+            }
+            if (find(resolutionList.begin(), resolutionList.end(), resolution) != resolutionList.end()) {
+                continue;
+            }
+            AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, VIDEO_FPS);
+        }
+        sinkExtendStreamConfigs.push_back(EXTEND_EOF); // video eof
+    }
+}
+
+void DMetadataProcessor::AddConfigs(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format,
+    int32_t width, int32_t height, int32_t fps)
+{
+    sinkExtendStreamConfigs.push_back(format);
+    sinkExtendStreamConfigs.push_back(width);
+    sinkExtendStreamConfigs.push_back(height);
+    sinkExtendStreamConfigs.push_back(fps); // fixedfps
+    sinkExtendStreamConfigs.push_back(fps); // minfps
+    sinkExtendStreamConfigs.push_back(fps); // maxfps
+    sinkExtendStreamConfigs.push_back(EXTEND_EOF); // eof
+}
+
 DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, size_t size)
 {
     if (dCameraAbility_ == nullptr) {
@@ -258,7 +409,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
 
     camera_metadata_item_t item;
     int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
-    if (ret) {
+    if (ret != CAM_META_SUCCESS) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
             DHLOGE("Add tag %u failed.", tag);
             return FAILED;
@@ -276,12 +427,7 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
 
     camera_metadata_item_t item;
     int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
-    if (ret) {
-        if (!dCameraAbility_->addEntry(tag, data, size)) {
-            DHLOGE("Add tag %u failed.", tag);
-            return FAILED;
-        }
-    } else {
+    if (ret == CAM_META_SUCCESS) {
         if (!dCameraAbility_->updateEntry(tag, data, size)) {
             DHLOGE("Update tag %u failed.", tag);
             return FAILED;
@@ -569,7 +715,7 @@ void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item
 }
 
 void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
-    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink)
 {
     for (const auto &format : formats) {
         std::string formatStr = std::to_string(format);
@@ -580,14 +726,15 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
             DHLOGE("Resolution or %s error.", formatStr.c_str());
             continue;
         }
-        GetNodeSupportedResolution(format, formatStr, rootNode, supportedFormats, rootValue);
+        GetNodeSupportedResolution(format, rootNode, supportedFormats, rootValue, isSink);
     }
 }
 
-void DMetadataProcessor::GetNodeSupportedResolution(int format, std::string formatStr, const std::string rootNode,
-    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue)
+void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::string rootNode,
+    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink)
 {
     std::vector<DCResolution> resolutionVec;
+    std::string formatStr = std::to_string(format);
     uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
     for (uint32_t i = 0; i < size; i++) {
         if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
@@ -602,11 +749,9 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, std::string form
         }
         uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
         uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
-        if (height == 0 || width == 0 ||
-            ((rootNode == "Photo") &&
-                ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
-            ((rootNode != "Photo") &&
-                (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
+        if (height == 0 || width == 0 || ((rootNode == "Photo") &&
+            ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+            ((rootNode != "Photo") && (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
             continue;
         }
         DCResolution resolution(width, height);
@@ -623,10 +768,34 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, std::string form
             maxPhotoResolution_.width_ = resolutionVec[0].width_;
             maxPhotoResolution_.height_ = resolutionVec[0].height_;
         }
+        StoreSinkAndSrcConfig(format, rootNode, isSink, resolutionVec);
     }
 }
 
-std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupportedFormats(const std::string &abilityInfo)
+void DMetadataProcessor::StoreSinkAndSrcConfig(int format, const std::string rootNode, const bool isSink,
+    std::vector<DCResolution> &resolutionVec)
+{
+    if (isSink) {
+        if (rootNode == "Photo") {
+            sinkPhotoProfiles_[format] = resolutionVec;
+        } else if (rootNode == "Preview") {
+            sinkPreviewProfiles_[format] = resolutionVec;
+        } else if (rootNode == "Video") {
+            sinkVideoProfiles_[format] = resolutionVec;
+        }
+    } else {
+        if (rootNode == "Photo") {
+            srcPhotoProfiles_[format] = resolutionVec;
+        } else if (rootNode == "Preview") {
+            srcPreviewProfiles_[format] = resolutionVec;
+        } else if (rootNode == "Video") {
+            srcVideoProfiles_[format] = resolutionVec;
+        }
+    }
+}
+
+std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupportedFormats(
+    const std::string &abilityInfo, const bool isSink)
 {
     std::map<int, std::vector<DCResolution>> supportedFormats;
     JSONCPP_STRING errs;
@@ -634,18 +803,18 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
     Json::Value rootValue;
 
     std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(), &rootValue, &errs) ||
-        !rootValue.isObject()) {
+    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(),
+        &rootValue, &errs) || !rootValue.isObject()) {
         return supportedFormats;
     }
-    ParsePhotoFormats(rootValue, supportedFormats);
-    ParsePreviewFormats(rootValue, supportedFormats);
-    ParseVideoFormats(rootValue, supportedFormats);
+    ParsePhotoFormats(rootValue, supportedFormats, isSink);
+    ParsePreviewFormats(rootValue, supportedFormats, isSink);
+    ParseVideoFormats(rootValue, supportedFormats, isSink);
     return supportedFormats;
 }
 
 void DMetadataProcessor::ParsePhotoFormats(Json::Value& rootValue,
-    std::map<int, std::vector<DCResolution>>& supportedFormats)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
     if (!rootValue.isMember("Photo") || !rootValue["Photo"].isMember("OutputFormat") ||
         !rootValue["Photo"]["OutputFormat"].isArray() || rootValue["Photo"]["OutputFormat"].size() == 0 ||
@@ -660,11 +829,14 @@ void DMetadataProcessor::ParsePhotoFormats(Json::Value& rootValue,
             photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
         }
     }
-    GetEachNodeSupportedResolution(photoFormats, "Photo", supportedFormats, rootValue);
+    if (isSink) {
+        sinkPhotoFormats_ = photoFormats;
+    }
+    GetEachNodeSupportedResolution(photoFormats, "Photo", supportedFormats, rootValue, isSink);
 }
 
 void DMetadataProcessor::ParsePreviewFormats(Json::Value& rootValue,
-    std::map<int, std::vector<DCResolution>>& supportedFormats)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
     if (!rootValue.isMember("Preview") || !rootValue["Preview"].isMember("OutputFormat") ||
         !rootValue["Preview"]["OutputFormat"].isArray() || rootValue["Preview"]["OutputFormat"].size() == 0 ||
@@ -679,11 +851,11 @@ void DMetadataProcessor::ParsePreviewFormats(Json::Value& rootValue,
             previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
         }
     }
-    GetEachNodeSupportedResolution(previewFormats, "Preview", supportedFormats, rootValue);
+    GetEachNodeSupportedResolution(previewFormats, "Preview", supportedFormats, rootValue, isSink);
 }
 
 void DMetadataProcessor::ParseVideoFormats(Json::Value& rootValue,
-    std::map<int, std::vector<DCResolution>>& supportedFormats)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
     if (!rootValue.isMember("Video") || !rootValue["Video"].isMember("OutputFormat") ||
         !rootValue["Video"]["OutputFormat"].isArray() || rootValue["Video"]["OutputFormat"].size() == 0 ||
@@ -698,7 +870,7 @@ void DMetadataProcessor::ParseVideoFormats(Json::Value& rootValue,
             videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
         }
     }
-    GetEachNodeSupportedResolution(videoFormats, "Video", supportedFormats, rootValue);
+    GetEachNodeSupportedResolution(videoFormats, "Video", supportedFormats, rootValue, isSink);
 }
 
 void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *metadata)

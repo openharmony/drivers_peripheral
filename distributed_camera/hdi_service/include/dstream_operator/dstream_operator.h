@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,9 @@ public:
     int32_t ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
         const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperator> &offlineOperator) override;
 
-    DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo);
+    DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+        const std::string &sourceAbilityInfo);
+    std::vector<DCEncodeType> ParseEncoderTypes(Json::Value& rootValue);
     DCamRetCode ParsePhotoFormats(Json::Value& rootValue);
     DCamRetCode ParsePreviewFormats(Json::Value& rootValue);
     DCamRetCode ParseVideoFormats(Json::Value& rootValue);
@@ -136,6 +138,8 @@ private:
 
     DHBase dhBase_;
     std::vector<DCEncodeType> dcSupportedCodecType_;
+    std::vector<DCEncodeType> sourceEncodeTypes_;
+
     std::map<DCSceneType, std::vector<int>> dcSupportedFormatMap_;
     std::map<int, std::vector<DCResolution>> dcSupportedPhotoResolutionMap_;
     std::map<int, std::vector<DCResolution>> dcSupportedPreviewResolutionMap_;

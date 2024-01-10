@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -165,8 +165,8 @@ int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
-    const sptr<IDCameraProviderCallback> &callback)
+DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo,
+    const std::string &sourceAbilityInfo, const sptr<IDCameraProviderCallback> &callback)
 {
     if (IsDhBaseInfoInvalid(dhBase)) {
         DHLOGE("DCameraHost::AddDCameraDevice, devId or dhId is invalid.");
@@ -175,12 +175,17 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     DHLOGI("DCameraHost::AddDCameraDevice for {devId: %s, dhId: %s}",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
-    if (abilityInfo.empty() || abilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
-        DHLOGE("DCameraHost::AddDCameraDevice, input abilityInfo is invalid.");
+    if (sinkAbilityInfo.empty() || sinkAbilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
+        DHLOGE("DCameraHost::AddDCameraDevice, input sinkAbilityInfo is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, abilityInfo));
+    if (sourceAbilityInfo.empty() || sourceAbilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
+        DHLOGE("DCameraHost::AddDCameraDevice, input sourceAbilityInfo is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
+        sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
         DHLOGE("DCameraHost::AddDCameraDevice, create dcamera device failed.");
         return DCamRetCode::INVALID_ARGUMENT;

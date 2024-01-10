@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,8 +31,9 @@ void DcameraDeviceCloseFuzzTest(const uint8_t* data, size_t size)
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    const std::string abilityInfo(reinterpret_cast<const char*>(data), size);
-    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, abilityInfo));
+    const std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    const std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
+    OHOS::sptr<DCameraDevice> dcameraDevice(new DCameraDevice(dhBase, sinkAbilityInfo, srcAbilityInfo));
     if (dcameraDevice == nullptr) {
         return;
     }
