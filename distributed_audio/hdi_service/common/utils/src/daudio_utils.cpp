@@ -270,7 +270,7 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
     return true;
 }
 
-std::string ParseStringFromArgs(const std::string args, const char *key)
+std::string ParseStringFromArgs(const std::string &args, const char *key)
 {
     DHLOGD("ParseStringFrom Args : %s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());

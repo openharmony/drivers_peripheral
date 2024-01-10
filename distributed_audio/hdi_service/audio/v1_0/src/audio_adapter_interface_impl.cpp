@@ -15,6 +15,7 @@
 
 #include "audio_adapter_interface_impl.h"
 
+#include <algorithm>
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <sstream>
@@ -846,10 +847,10 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::GetRenderImpl(cons
     }
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        for (auto renderDev : renderDevs_) {
-            if (renderDev.first == dhId) {
-                return renderDev.second;
-            }
+        auto renderDev = find_if(renderDevs_.begin(), renderDevs_.end(),
+            [dhId](std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>> item) { return item.first == dhId; });
+        if (renderDev != renderDevs_.end()) {
+            return renderDev->second;
         }
     }
     DHLOGE("Render has not been created.");
