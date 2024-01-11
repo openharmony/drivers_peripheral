@@ -82,6 +82,9 @@ CodecBuffer* BufferManager::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
 
 void BufferManager::ConstructTimespec(struct timespec *time, uint32_t timeoutMs)
 {
+    if (time == nullptr) {
+        return;
+    }
     memset_s(time, sizeof(timespec), 0, sizeof(timespec));
     clock_gettime(CLOCK_REALTIME, time);
     time->tv_sec += static_cast<int32_t>(timeoutMs) / HDF_KILO_UNIT;
