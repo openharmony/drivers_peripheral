@@ -145,7 +145,9 @@ static int32_t ComponentManagerDestoryComponent(uint32_t componentId)
             break;
         }
         CodecComponentTypeRelease(&pos->info->instance);
-        *pos->comp = NULL;
+        if (pos->comp != NULL) {
+            *pos->comp = NULL;
+        }
         DListRemove(&pos->node);
         OsalMemFree(pos);
         pos = NULL;

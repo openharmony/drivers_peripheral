@@ -49,6 +49,9 @@ int32_t GetBasicInfoByCompName(uint8_t *info, const char *compName)
 
     for (groupIndex = 0; groupIndex < CODEC_CAPABLITY_GROUP_NUM; groupIndex++) {
         group = codeExInfoGroups[groupIndex];
+        if (group == NULL) {
+            continue;
+        }
         for (infoIndex = 0; infoIndex < group->num; infoIndex++) {
             exInfo = &group->exInfo[infoIndex];
             if (strcmp(compName, exInfo->compName) == 0) {

@@ -34,6 +34,10 @@ static void FreeMem(int8_t *mem, uint32_t memLen)
 static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                           struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct CompVerInfo verInfo;
     ret = memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
@@ -56,6 +60,10 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl
 
 static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     enum OMX_COMMANDTYPE cmd;
     uint32_t param = 0;
@@ -161,6 +169,10 @@ static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struc
 
 static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t index = 0;
     int8_t *paramStruct = NULL;
@@ -359,6 +371,10 @@ static int32_t SerStubGetState(struct CodecComponentType *serviceImpl, struct Hd
 static int32_t SerStubComponentTunnelRequest(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                              struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t port = 0;
     int32_t tunneledComp = 0;
@@ -592,6 +608,10 @@ static int32_t SerStubComponentDeInit(struct CodecComponentType *serviceImpl, st
 
 static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    } 
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;

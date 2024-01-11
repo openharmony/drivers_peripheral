@@ -39,6 +39,10 @@ static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
 static int32_t CodecCallbackTypeProxyCall(struct CodecCallbackType *self, int32_t id, struct HdfSBuf *data,
                                           struct HdfSBuf *reply)
 {
+    if (self == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (self->remote == NULL || self->remote->dispatcher == NULL || self->remote->dispatcher->Dispatch == NULL) {
         CODEC_LOGE("obj is null");
         return HDF_ERR_INVALID_OBJECT;
@@ -131,6 +135,10 @@ static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self
 static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                                      const struct OmxCodecBuffer *buffer)
 {
+    if (self == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
 
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);

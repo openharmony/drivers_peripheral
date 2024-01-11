@@ -72,6 +72,9 @@ int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 
     for (groupIndex = 0; groupIndex < CODEC_CAPABLITY_GROUP_NUM; groupIndex++) {
         group = codeCapGroups[groupIndex];
+        if (group == NULL) {
+            continue;
+        }
         for (capIndex = 0; (capIndex < group->num) && (count > 0); capIndex++) {
             cap = &group->capablitis[capIndex];
             capList[curCount++] = *cap;
