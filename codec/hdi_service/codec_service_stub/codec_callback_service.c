@@ -37,6 +37,9 @@ int CodecCallbackOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, in
 
 void CodecCallbackServiceConstruct(struct ICodecCallback *service)
 {
+    if (service == NULL) {
+        return;
+    }
     service->callback.OnEvent = CodecCallbackOnEvent;
     service->callback.InputBufferAvailable = CodecCallbackInputBufferAvailable;
     service->callback.OutputBufferAvailable = CodecCallbackOutputBufferAvailable;
