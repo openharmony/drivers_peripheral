@@ -42,7 +42,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
         return err;
     }
     auto core = iter->second;
-    if (core == NULL) {
+    if (core == nullptr) {
         CODEC_LOGE("can not find core of comonentName");
         return HDF_FAILURE;
     }
@@ -92,7 +92,7 @@ void ComponentMgr::AddSoftComponent()
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
     auto core = std::make_shared<CodecOMXCore>();
-    if (core == NULL) {
+    if (core == nullptr) {
         CODEC_LOGE("fail to init CodecOMXCore");
         return;
     }
