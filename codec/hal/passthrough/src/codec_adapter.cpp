@@ -76,7 +76,10 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
     }
 
     tempNode->node = std::make_shared<ComponentNode>(comp, exInfo);
-
+    if (tempNode->node == NULL) {
+        HDF_LOGE("fail to init ComponentNode");
+        return HDF_FAILURE;
+    }
     ret = tempNode->node->SetCallbacks(callbacks, appData);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s SetCallbacks error", __func__);

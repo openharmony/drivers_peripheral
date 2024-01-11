@@ -28,6 +28,10 @@ typedef void (*SERVICE_CONSTRUCT_FUNC)(struct OmxComponentManager *);
 static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                       struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t num = serviceImpl->GetComponentNum();
     if (!HdfSbufWriteInt32(reply, num)) {
         CODEC_LOGE("write num failed!");
@@ -39,6 +43,10 @@ static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl,
 static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                                 struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t count = 0;
     int32_t err = HDF_SUCCESS;
     CodecCompCapability *caps = NULL;
@@ -97,6 +105,10 @@ static int32_t ReadParamsForCreateComponent(struct HdfSBuf *data, char **compNam
 static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                       struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = HDF_SUCCESS;
     struct CodecComponentType *component = NULL;
     uint32_t componentId = 0;
@@ -113,6 +125,10 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
         return ret;
     }
     ret = serviceImpl->CreateComponent(&component, &componentId, compName, appData, callback);
+    if (component == NULL) {
+        CODEC_LOGE("fail to create component");
+        return ret;
+    }
     if (compName != NULL) {
         OsalMemFree(compName);
         compName = NULL;
@@ -139,6 +155,10 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
 static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                        struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid paramter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t componentId = 0;
     if (!HdfSbufReadUint32(data, &componentId)) {
         CODEC_LOGE("read componentId failed!");
