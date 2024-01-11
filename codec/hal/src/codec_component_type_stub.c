@@ -611,7 +611,7 @@ static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct
     if (serviceImpl == NULL) {
         CODEC_LOGE("invalid parameter");
         return HDF_ERR_INVALID_PARAM;
-    } 
+    }
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
