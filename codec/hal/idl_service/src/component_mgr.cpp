@@ -94,7 +94,7 @@ void ComponentMgr::AddComponentByLibName(const char *libName)
     auto core = std::make_shared<CodecOMXCore>();
     if (core == NULL) {
         CODEC_LOGE("fail to init CodecOMXCore");
-        return HDF_FAILURE;
+        return;
     }
     core->Init(libName);
     std::lock_guard<std::mutex> lk(mutex_);
