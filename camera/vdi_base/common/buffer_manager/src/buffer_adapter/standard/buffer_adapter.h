@@ -73,23 +73,25 @@ public:
     // convert camera format to pixel format. inline implementation to avoid duplicate code
     static PixelFormat CameraFormatToPixelFormat(const uint32_t cameraFormat)
     {
-        PixelFormat format = PIXEL_FMT_BUTT;
+        PixelFormat format = PIXEL_FMT_YCRCB_420_P;
         auto itr = cameraFormatToPixelFormat_.find(cameraFormat);
         if (itr != cameraFormatToPixelFormat_.end()) {
             format = itr->second;
+        } else {
+            CAMERA_LOGI("not find cameraFormat = %{public}u, use default format", cameraFormat);
         }
-
         return format;
     }
     // convert pixel format to camera format. inline implementation to avoid duplicate code
     static uint32_t PixelFormatToCameraFormat(const PixelFormat format)
     {
-        uint32_t cameraFormat = CAMERA_FORMAT_INVALID;
+        uint32_t cameraFormat = CAMERA_FORMAT_YCRCB_420_P;
         auto itr = pixelFormatToCameraFormat_.find(format);
         if (itr != pixelFormatToCameraFormat_.end()) {
             cameraFormat = itr->second;
+        } else {
+            CAMERA_LOGI("not find format = %{public}u, use default format", static_cast<uint32_t>(format));
         }
-
         return cameraFormat;
     }
 
