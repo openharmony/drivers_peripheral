@@ -43,7 +43,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
     }
     int size = OHOS::AshmemGetSize(codecBuffer.fd);
     std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(codecBuffer.fd, size);
-    if (sharedMem == NULL) {
+    if (sharedMem == nullptr) {
         CODEC_LOGE("Failed to init sharedMem");
         return nullptr;
     }
