@@ -36,7 +36,7 @@ bool RegisterService(struct CodecCallbackType *callbacks, uint32_t componentId,
     std::lock_guard<std::mutex> lk(g_mutex);
     if (callbacks == NULL) {
         CODEC_LOGE("invalid parameter");
-        return HDF_ERR_INVALID_PARAM;
+        return false;
     }
     uint32_t remotePid =  static_cast<uint32_t>(HdfRemoteGetCallingPid());
     auto comps = g_pidCompsMap.find(remotePid);
