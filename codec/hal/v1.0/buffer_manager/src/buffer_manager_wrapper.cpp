@@ -40,6 +40,10 @@ static CodecBuffer* GetInputDataBufferImpl(const struct BufferManagerWrapper *bu
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
+    if (bufferManagerWrapper->inputBufferManager == nullptr) {
+        HDF_LOGE("%{public}s: invalid params!", __func__);
+        return nullptr;
+    }
 
     CodecBuffer *buffer =
         (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, false);
@@ -75,6 +79,10 @@ static void PutUsedInputDataBufferImpl(const struct BufferManagerWrapper *buffer
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
+    if (bufferManagerWrapper->inputBufferManager == nullptr) {
+        HDF_LOGE("%{public}s: invalid params!", __func__);
+        return;
+    }
 
     (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(buffer);
 }
@@ -107,6 +115,10 @@ static CodecBuffer* GetUsedOutputDataBufferImpl(const struct BufferManagerWrappe
                                                 uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
+        HDF_LOGE("%{public}s: invalid params!", __func__);
+        return nullptr;
+    }
+    if (bufferManagerWrapper->outputBufferManager == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
@@ -161,6 +173,12 @@ struct BufferManagerWrapper* GetBufferManager(void)
 
 void DeleteBufferManager(struct BufferManagerWrapper **ppBufferManager)
 {
+    if (ppBufferManager == nullptr) {
+        return;
+    }
+    if (*ppBufferManager == nullptr) {
+        return;
+    }
     delete reinterpret_cast<BufferManager*>((*ppBufferManager)->inputBufferManager);
     delete reinterpret_cast<BufferManager*>((*ppBufferManager)->outputBufferManager);
     delete *ppBufferManager;
