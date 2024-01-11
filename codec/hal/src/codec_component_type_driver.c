@@ -104,7 +104,7 @@ static void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObj
     CODEC_LOGI("HdfCodecComponentTypeDriverRelease enter.");
     if (deviceObject == NULL) {
         CODEC_LOGE("invalid paramter");
-        return HDF_ERR_INVALID_PARAM;
+        return;
     }
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         CONTAINER_OF(deviceObject->service, struct HdfCodecComponentTypeHost, ioservice);
