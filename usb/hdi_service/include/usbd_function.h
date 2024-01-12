@@ -26,23 +26,24 @@
 #define USB_FUNCTION_MTP     (1 << 3)
 #define USB_FUNCTION_PTP     (1 << 4)
 #define USB_FUNCTION_RNDIS   (1 << 5)
-#define USB_FUNCTION_STORAGE (1 << 9)
+#define USB_FUNCTION_MANUFACTURE (1 << 10)
 #define USB_FUNCTION_SUPPORT                                                                        \
     (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_MTP | USB_FUNCTION_PTP | \
-        USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE)
+        USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE | USB_FUNCTION_MANUFACTURE)
 
 #define DEV_SERVICE_NAME "usbfn"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
 
-#define SYS_USB_CONFIGFS       "sys.usb.configfs"
-#define SYS_USB_CONFIG         "sys.usb.config"
-#define HDC_CONFIG_OFF         "none"
-#define HDC_CONFIG_ON          "hdc"
-#define HDC_CONFIG_RNDIS       "rndis"
-#define HDC_CONFIG_STORAGE     "storage"
-#define HDC_CONFIG_RNDIS_HDC   "rndis_hdc"
-#define HDC_CONFIG_STORAGE_HDC "storage_hdc"
+#define SYS_USB_CONFIGFS                "sys.usb.configfs"
+#define SYS_USB_CONFIG                  "sys.usb.config"
+#define HDC_CONFIG_OFF                  "none"
+#define HDC_CONFIG_ON                   "hdc"
+#define HDC_CONFIG_RNDIS                "rndis"
+#define HDC_CONFIG_STORAGE              "storage"
+#define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
+#define HDC_CONFIG_STORAGE_HDC          "storage_hdc"
+#define HDC_CONFIG_MANUFACTURE_HDC      "manufacture_hdc"
 #define HDC_CONFIGFS_OFF       "0"
 #define HDC_CONFIGFS_ON        "1"
 
@@ -79,6 +80,7 @@ private:
     static int32_t SetFunctionToStorage();
     static int32_t SetFunctionToRndisHdc();
     static int32_t SetFunctionToStorageHdc();
+    static int32_t SetFunctionToManufactureHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
     static int32_t UsbdEnableDevice();
     static int32_t UsbdWaitUdc();

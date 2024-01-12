@@ -170,6 +170,16 @@ int32_t UsbdFunction::SetFunctionToRndisHdc()
     return HDF_SUCCESS;
 }
 
+int32_t UsbdFunction::SetFunctionToManufactureHdc()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_MANUFACTURE_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add manufacture hdc config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdFunction::SetFunctionToStorageHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE_HDC);
@@ -345,6 +355,9 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns)
         case USB_FUNCTION_STORAGE | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set storage hdc", __func__);
             return UsbdFunction::SetFunctionToStorageHdc();
+        case USB_FUNCTION_MANUFACTURE | USB_FUNCTION_HDC:
+            HDF_LOGI("%{public}s: set manufacture hdc", __func__);
+            return UsbdFunction::SetFunctionToManufactureHdc();
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
             return UsbdEnableDevice();
