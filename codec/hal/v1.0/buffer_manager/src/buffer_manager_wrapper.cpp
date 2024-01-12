@@ -173,10 +173,7 @@ struct BufferManagerWrapper* GetBufferManager(void)
 
 void DeleteBufferManager(struct BufferManagerWrapper **ppBufferManager)
 {
-    if (ppBufferManager == nullptr) {
-        return;
-    }
-    if (*ppBufferManager == nullptr) {
+    if (ppBufferManager == nullptr || *ppBufferManager == nullptr) {
         return;
     }
     delete reinterpret_cast<BufferManager*>((*ppBufferManager)->inputBufferManager);
