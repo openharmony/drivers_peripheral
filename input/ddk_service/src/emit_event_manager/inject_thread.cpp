@@ -44,7 +44,7 @@ void InjectThread::Start()
 
 void InjectThread::RunThread(void *param)
 {
-    InjectThread *thread = (InjectThread *)param;
+    InjectThread *thread = reinterpret_cast<InjectThread *>(param);
     if (thread != nullptr) {
         thread->InjectFunc();
     } else {
