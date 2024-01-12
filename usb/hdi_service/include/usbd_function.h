@@ -26,6 +26,7 @@
 #define USB_FUNCTION_MTP     (1 << 3)
 #define USB_FUNCTION_PTP     (1 << 4)
 #define USB_FUNCTION_RNDIS   (1 << 5)
+#define USB_FUNCTION_STORAGE (1 << 9)
 #define USB_FUNCTION_MANUFACTURE (1 << 10)
 #define USB_FUNCTION_SUPPORT                                                                        \
     (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_MTP | USB_FUNCTION_PTP | \
