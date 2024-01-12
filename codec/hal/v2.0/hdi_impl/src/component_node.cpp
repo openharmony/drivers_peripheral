@@ -471,7 +471,10 @@ int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
         CODEC_LOGE("GetBufferById return false");
         return err;
     }
-
+    if (codecBuffer == nullptr) {
+        CODEC_LOGE("fail to get codecBuffer");
+        return err;
+    }
     err = codecBuffer->FillOmxBuffer(buffer, *bufferHdrType);
     if (err != HDF_SUCCESS) {
         CODEC_LOGE("FillOmxBuffer err [%{public}d]", err);

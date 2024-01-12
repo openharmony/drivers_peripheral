@@ -76,7 +76,7 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
     }
 
     tempNode->node = std::make_shared<ComponentNode>(comp, exInfo);
-    if (tempNode->node == NULL) {
+    if (tempNode->node == nullptr) {
         HDF_LOGE("fail to init ComponentNode");
         return HDF_FAILURE;
     }

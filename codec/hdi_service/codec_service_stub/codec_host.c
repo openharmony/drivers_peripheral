@@ -28,6 +28,10 @@ static int32_t CodecServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
 
 static void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
 {
+    if (deviceObject == NULL) {
+        HDF_LOGE("invalid parameter");
+        return;
+    }
     struct IDeviceIoService *testService = deviceObject->service;
     OsalMemFree(testService);
     ClearCapabilityGroup();
@@ -37,7 +41,10 @@ static void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
 static int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecDriverBind enter!");
-
+    if (deviceObject == NULL) {
+        HDF_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct IDeviceIoService *ioService = (struct IDeviceIoService *)OsalMemAlloc(sizeof(struct IDeviceIoService));
     if (ioService == NULL) {
         HDF_LOGE("HdfCodecDriverBind OsalMemAlloc IDeviceIoService failed!");
@@ -59,6 +66,10 @@ static int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
 static int HdfCodecDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfSampleDriverCInit enter, new hdi impl");
+    if (deviceObject == NULL) {
+        HDF_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (LoadCodecCapabilityFromHcs(deviceObject->property) != HDF_SUCCESS) {
         HDF_LOGE("LoadCodecCapabilityFromHcs failed");
         ClearCapabilityGroup();
