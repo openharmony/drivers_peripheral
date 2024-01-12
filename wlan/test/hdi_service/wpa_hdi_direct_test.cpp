@@ -413,4 +413,21 @@ HWTEST_F(HdfWpaHostDirectTest, SetCountryCodeTest_033, TestSize.Level1)
     rc = g_wpaObj->SetCountryCode(g_wpaObj, nullptr, "01");
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
 }
+
+HWTEST_F(HdfWpaHostDirectTest, ReassociateTest_034, TestSize.Level1)
+{
+    int32_t rc = g_wpaObj->Reassociate(g_wpaObj, IFNAME);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    rc = g_wpaObj->Reassociate(g_wpaObj, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+}
+
+HWTEST_F(HdfWpaHostDirectTest, StaShellCmdTest_035, TestSize.Level1)
+{
+    const char *cmd = "SET external_sim 1";
+    int32_t rc = g_wpaObj->StaShellCmd(g_wpaObj, IFNAME, cmd);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    rc = g_wpaObj->StaShellCmd(g_wpaObj, nullptr, cmd);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+}
 };

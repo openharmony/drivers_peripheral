@@ -86,6 +86,8 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
 
 void HostapdEventReport(const char *ifName, uint32_t event, void *data);
 
+int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifName, const char *cmd);
+
 struct StApMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];

@@ -52,6 +52,7 @@ struct IHostapdInterface *HostapdInterfaceImplGetInstance(void)
     service->interface.DisassociateSta = HostapdInterfaceDisassociateSta;
     service->interface.RegisterEventCallback = HostapdInterfaceRegisterEventCallback;
     service->interface.UnregisterEventCallback = HostapdInterfaceUnregisterEventCallback;
+    service->interface.HostApdShellCmd = HostApdInterfaceShellCmd;
     return &service->interface;
 }
 
