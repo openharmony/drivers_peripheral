@@ -29,11 +29,6 @@ const TestMetadata CAMERA_3A_TEST_SETS[] = {
         .tag =OHOS_CONTROL_EXPOSURE_MODE,
         .value = OHOS_CAMERA_EXPOSURE_MODE_AUTO
     },
-    {
-        .tag =OHOS_CONTROL_EXPOSURE_MODE,
-        .value = OHOS_CAMERA_EXPOSURE_MODE_LOCKED
-    },
-
     // test OHOS_CONTROL_AE_LOCK
     {
         .tag =OHOS_CONTROL_AE_LOCK,
@@ -61,21 +56,10 @@ const TestMetadata CAMERA_3A_TEST_SETS[] = {
         .tag =OHOS_CONTROL_FOCUS_MODE,
         .value = OHOS_CAMERA_FOCUS_MODE_LOCKED
     },
-
-    // test OHOS_SENSOR_EXPOSURE_TIME
-    {
-        .tag =OHOS_SENSOR_EXPOSURE_TIME,
-        .value = 1
-    },
-
     // test OHOS_CONTROL_METER_MODE
     {
         .tag =OHOS_CONTROL_METER_MODE,
         .value = OHOS_CAMERA_SPOT_METERING
-    },
-    {
-        .tag =OHOS_CONTROL_METER_MODE,
-        .value = OHOS_CAMERA_REGION_METERING
     },
     {
         .tag =OHOS_CONTROL_METER_MODE,
@@ -94,6 +78,10 @@ const TestMetadata CAMERA_3A_TEST_SETS[] = {
     {
         .tag =OHOS_CONTROL_AWB_MODE,
         .value = OHOS_CAMERA_AWB_MODE_INCANDESCENT
+    },
+    {
+        .tag =OHOS_CONTROL_AWB_MODE,
+        .value = OHOS_CAMERA_AWB_MODE_FLUORESCENT
     },
     {
         .tag =OHOS_CONTROL_AWB_MODE,
@@ -263,3 +251,162 @@ TEST_P(UtestUSBCamera3ATest, VideoTest)
 }
 
 INSTANTIATE_TEST_SUITE_P(Test3A, UtestUSBCamera3ATest, ::testing::ValuesIn(CAMERA_3A_TEST_SETS));
+
+/**
+  * @tc.name: USB Camera 3A
+  * @tc.desc: set OHOS_SENSOR_EXPOSURE_TIME
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCamera3ATest, usb_camera_3a_001)
+{
+    cameraBase_->OpenUsbCamera();
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+
+    cameraBase_->AchieveStreamOperator();
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(itemCapacity, dataCapacity);
+
+    int ohosTag = OHOS_SENSOR_EXPOSURE_TIME;
+    const int tagVal = 100;
+    if (!meta->addEntry(ohosTag, &tagVal, 1)) {
+        GTEST_SKIP();
+    }
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+  * @tc.name: USB Camera 3A
+  * @tc.desc: set OHOS_CAMERA_SPOT_METERING first, then set OHOS_CAMERA_REGION_METERING
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCamera3ATest, usb_camera_3a_002)
+{
+    cameraBase_->OpenUsbCamera();
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+
+    cameraBase_->AchieveStreamOperator();
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
+        itemCapacity, dataCapacity);
+
+    int ohosTag = OHOS_CONTROL_METER_MODE;
+    uint8_t tagVal = OHOS_CAMERA_OVERALL_METERING;
+    if (!meta->addEntry(ohosTag, &tagVal, 1)) {
+        GTEST_SKIP();
+    }
+
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    tagVal = OHOS_CAMERA_REGION_METERING;
+    std::vector<uint8_t> valVector;
+    valVector.push_back(tagVal);
+    if (!meta->updateEntry(ohosTag, valVector.data(), valVector.size())) {
+        CAMERA_LOGE("update %{public}s failed", GetCameraMetadataItemName(ohosTag));
+    }
+
+    setting.clear();
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+  * @tc.name: USB Camera 3A
+  * @tc.desc: set OHOS_CONTROL_AE_LOCK first, then set OHOS_CAMERA_EXPOSURE_MODE_LOCKED
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCamera3ATest, usb_camera_3a_003)
+{
+    cameraBase_->OpenUsbCamera();
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+
+    cameraBase_->AchieveStreamOperator();
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(itemCapacity, dataCapacity);
+
+    int ohosTag = OHOS_CONTROL_AE_LOCK;
+    const uint8_t tagVal = OHOS_CAMERA_AE_LOCK_OFF;
+    if (!meta->addEntry(ohosTag, &tagVal, 1)) {
+        GTEST_SKIP();
+    }
+
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    ohosTag = OHOS_CONTROL_EXPOSURE_MODE;
+    const uint8_t newTagVal = OHOS_CAMERA_EXPOSURE_MODE_LOCKED;
+    if (!meta->addEntry(ohosTag, &newTagVal, 1)) {
+        GTEST_SKIP();
+    }
+
+    setting.clear();
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+}
