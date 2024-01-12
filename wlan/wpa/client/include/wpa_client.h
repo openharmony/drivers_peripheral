@@ -65,11 +65,13 @@ typedef enum {
     WPA_EVENT_SERV_DISC_RESP,
     WPA_EVENT_STA_CONNECT_STATE,
     WPA_EVENT_IFACE_CREATED,
+    WPA_EVENT_STA_AUTH_REJECT,
+    WPA_EVENT_STA_NOTIFY
 } WpaCallBackEventType;
 
 enum WpaClientType {
     /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<26 */
-    WIFI_WPA_TO_HAL_CLIENT = 33554431,
+    WIFI_WPA_TO_HAL_CLIENT = 134217727,
     WIFI_WPA_CLIENT_BUTT
 };
 
@@ -108,6 +110,13 @@ struct WpaAssociateRejectParam {
     unsigned char bssid[WIFI_BSSID_LEN];
     int statusCode;
     int timeOut;
+};
+
+struct WpaAuthRejectParam {
+    unsigned char bssid[WIFI_BSSID_LEN];
+    unsigned short authType;
+    unsigned short authTransaction;
+    unsigned short statusCode;
 };
 
 struct WpaRecvScanResultParam {
