@@ -45,7 +45,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
     auto core = iter->second;
     if (core == nullptr) {
         CODEC_LOGE("null point");
-        return;
+        return HDF_FAILURE;
     }
     OMX_HANDLETYPE handle = nullptr;
     std::string name(componentName);
