@@ -39,7 +39,17 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
     codecBuffer.allocLen = sizeof(DynamicBuffer);
 
     CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
+    if (buffer == nullptr) {
+        CODEC_LOGE("fail to new CodecDynaBuffer");
+        return nullptr;
+    }
     buffer->dynaBuffer_ = std::make_shared<DynamicBuffer>();
+    if (buffer->dynaBuffer_ == nullptr) {
+        CODEC_LOGE("fail to new DynamicBuffer");
+        delete buffer;
+        buffer = nullptr;
+        return nullptr;
+    }
     buffer->dynaBuffer_->bufferHandle = bufferHandle;
     return sptr<ICodecBuffer>(buffer);
 }
