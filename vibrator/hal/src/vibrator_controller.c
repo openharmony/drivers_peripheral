@@ -39,11 +39,10 @@ static int32_t SendVibratorMsg(uint32_t cmd, struct HdfSBuf *msg, struct HdfSBuf
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
-    if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
-        priv->ioService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: para invalid", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
+    CHECK_NULL_PTR_RETURN_VALUE(priv->ioService, HDF_FAILURE);
+    CHECK_NULL_PTR_RETURN_VALUE(priv->ioService->dispatcher, HDF_FAILURE);
+    CHECK_NULL_PTR_RETURN_VALUE(priv->ioService->dispatcher->Dispatch, HDF_FAILURE);
 
     int32_t ret = priv->ioService->dispatcher->Dispatch(&priv->ioService->object, cmd, msg, reply);
     if (ret != HDF_SUCCESS) {
@@ -56,6 +55,7 @@ static int32_t SendVibratorMsg(uint32_t cmd, struct HdfSBuf *msg, struct HdfSBuf
 
 static int32_t ReadVibratorInfo(struct HdfSBuf *reply, struct VibratorDevice *priv)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
     uint32_t len;
     struct VibratorInfo *buf = NULL;
 
@@ -87,6 +87,8 @@ static int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo)
         return HDF_FAILURE;
     }
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
 
     (void)OsalMutexLock(&priv->mutex);
     struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
@@ -121,6 +123,7 @@ static int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo)
 static int32_t ValidityJudgment(uint32_t duration, uint16_t intensity, int16_t frequency)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
     if (duration == 0) {
         HDF_LOGE("%s:invalid vibration period", __func__);
         return VIBRATOR_NOT_PERIOD;
@@ -194,6 +197,7 @@ static int32_t StartOnce(uint32_t duration)
 {
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
 
     (void)OsalMutexLock(&priv->mutex);
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
@@ -224,6 +228,7 @@ static int32_t Start(const char *effect)
 {
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
 
     if (effect == NULL) {
         HDF_LOGE("%s: start vibrator effect type invalid", __func__);
@@ -258,6 +263,7 @@ static int32_t Start(const char *effect)
 
 static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
 {
+    CHECK_NULL_PTR_RETURN_VALUE(effectInfo, HDF_FAILURE);
     for (int i = 0; i < EFFECT_TYPE_MAX; i++) {
         if (!strcmp(effect, g_effectmap[i].effectName)) {
             effectInfo->isSupportEffect = g_effectmap[i].issupport;
@@ -277,6 +283,7 @@ static int32_t Stop(enum VibratorMode mode)
     }
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
 
     (void)OsalMutexLock(&priv->mutex);
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
@@ -305,14 +312,13 @@ static int32_t Stop(enum VibratorMode mode)
 
 static int32_t PlayHapticPattern(struct HapticPaket *pkg)
 {
-    HDF_LOGE("%{public}s: pkg->time = %{public}d", __func__, pkg->time);
+    (void)pkg;
     return HDF_SUCCESS;
 }
 
 static int32_t GetHapticCapacity(struct HapticCapacity *hapticCapacity)
 {
-    hapticCapacity->isSupportTimeDelay = 1;
-    HDF_LOGE("%{public}s: hapticCapacity->isSupportHdHaptic = %{public}d", __func__, hapticCapacity->isSupportHdHaptic);
+    (void)hapticCapacity;
     return HDF_SUCCESS;
 }
 
@@ -329,6 +335,9 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     static struct VibratorInterface vibratorDevInstance;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
+    if (priv == NULL) {
+        return &vibratorDevInstance;
+    }
     if (priv->initState) {
         return &vibratorDevInstance;
     }
@@ -359,6 +368,8 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
 int32_t FreeVibratorInterfaceInstance(void)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    CHECK_NULL_PTR_RETURN_VALUE(priv, HDF_FAILURE);
 
     if (!priv->initState) {
         HDF_LOGD("%s: vibrator instance had released", __func__);
