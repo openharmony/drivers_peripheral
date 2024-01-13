@@ -97,7 +97,7 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
         OsalMemFree(omxcomponenttypeHost);
         return HDF_FAILURE;
     }
-    
+
     deviceObject->service = &omxcomponenttypeHost->ioservice;
     return HDF_SUCCESS;
 }
