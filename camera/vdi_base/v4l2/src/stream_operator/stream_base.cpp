@@ -76,9 +76,7 @@ RetCode StreamBase::ConfigStream(StreamConfiguration& config)
 RetCode StreamBase::CommitStream()
 {
     std::unique_lock<std::mutex> l(smLock_);
-    if (state_ != STREAM_STATE_IDLE) {
-        return RC_ERROR;
-    }
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_ERROR);
 
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipelineCore_, RC_ERROR);
 
@@ -105,26 +103,16 @@ RetCode StreamBase::CommitStream()
             poolId_ = mgr->GenerateBufferPoolId();
             CHECK_IF_EQUAL_RETURN_VALUE(poolId_, 0, RC_ERROR);
             bufferPool_ = mgr->GetBufferPool(poolId_);
-            if (bufferPool_ == nullptr) {
-                CAMERA_LOGE("stream [id:%{public}d] get buffer pool failed.", streamId_);
-                return RC_ERROR;
-            }
+            CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
         }
-
         info.bufferPoolId_ = poolId_;
         info.bufferCount_ = GetBufferCount();
         RetCode rc = bufferPool_->Init(streamConfig_.width, streamConfig_.height, streamConfig_.usage,
                                        streamConfig_.format, GetBufferCount(), CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
-        if (rc != RC_OK) {
-            CAMERA_LOGE("stream [id:%{public}d] initialize buffer pool failed.", streamId_);
-            return RC_ERROR;
-        }
-    }
 
-    RetCode rc = hostStreamMgr_->CreateHostStream(info, [this](std::shared_ptr<IBuffer> buffer) {
-        HandleResult(buffer);
-        return;
-    });
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    }
+    RetCode rc = hostStreamMgr_->CreateHostStream(info, [this](auto buffer) { HandleResult(buffer); });
     if (rc != RC_OK) {
         CAMERA_LOGE("commit stream [id:%{public}d] to pipeline failed.", streamId_);
         return RC_ERROR;
@@ -132,7 +120,6 @@ RetCode StreamBase::CommitStream()
     CAMERA_LOGI("commit a stream to pipeline id[%{public}d], w[%{public}d], h[%{public}d], poolId[%{public}llu], \
         encodeType = %{public}d", info.streamId_, info.width_, info.height_, info.bufferPoolId_, info.encodeType_);
     state_ = STREAM_STATE_ACTIVE;
-
     return RC_OK;
 }
 
@@ -183,14 +170,11 @@ RetCode StreamBase::StopStream()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
     std::unique_lock<std::mutex> l(smLock_);
-    if (state_ == STREAM_STATE_IDLE) {
-        CAMERA_LOGI("stream [id:%{public}d], no need to stop", streamId_);
-        return RC_OK;
-    }
+
     CAMERA_LOGI("stop stream [id:%{public}d] begin", streamId_);
+    CHECK_IF_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_OK);
 
     state_ = STREAM_STATE_IDLE;
-
     tunnel_->NotifyStop();
     cv_.notify_one();
     if (handler_ != nullptr) {
@@ -210,20 +194,10 @@ RetCode StreamBase::StopStream()
     }
 
     RetCode rc = pipeline_->Flush({streamId_});
-    if (rc != RC_OK) {
-        CAMERA_LOGE("stream [id:%{public}d], pipeline flush failed", streamId_);
-        return RC_ERROR;
-    }
-
-    CAMERA_LOGI("stream [id:%{public}d] is waiting buffers returned", streamId_);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
     tunnel_->WaitForAllBufferReturned();
-    CAMERA_LOGI("stream [id:%{public}d], all buffers are returned.", streamId_);
-
     rc = pipeline_->Stop({streamId_});
-    if (rc != RC_OK) {
-        CAMERA_LOGE("stream [id:%{public}d], pipeline stop failed", streamId_);
-        return RC_ERROR;
-    }
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
 
     if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty() && messenger_ != nullptr) {
         std::shared_ptr<ICaptureMessage> endMessage =
@@ -232,7 +206,6 @@ RetCode StreamBase::StopStream()
         CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
         messenger_->SendMessage(endMessage);
     }
-
     CAMERA_LOGI("stop stream [id:%{public}d] end", streamId_);
     isFirstRequest = true;
     inTransitList_.clear();
@@ -475,14 +448,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
         messenger_->SendMessage(shutterMessage);
     }
-
-    bool isEnded = false;
-    if (!request->IsContinous()) {
-        isEnded = true;
-    } else if (request->NeedCancel()) {
-        isEnded = true;
-    }
-
+    bool isEnded = !request->IsContinous() || request->NeedCancel();
     {
         // inTransitList_ may has multiple copies of continious-capture request, we just need erase one of them.
         std::unique_lock<std::mutex> l(tsLock_);
@@ -492,7 +458,6 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 break;
             }
         }
-
         if (isEnded) {
             // if this is the last request of capture, send CaptureEndedMessage.
             auto it = std::find(inTransitList_.begin(), inTransitList_.end(), request);
@@ -500,14 +465,12 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 std::shared_ptr<ICaptureMessage> endMessage =
                     std::make_shared<CaptureEndedMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
                                                           request->GetOwnerCount(), tunnel_->GetFrameCount());
-                CAMERA_LOGV("end of stream [%d], ready to send end message, capture id = %d",
-                    streamId_, request->GetCaptureId());
+                CAMERA_LOGV("end of stream [%d], capture id = %d", streamId_, request->GetCaptureId());
                 messenger_->SendMessage(endMessage);
                 pipeline_->CancelCapture({streamId_});
             }
         }
     }
-
     ReceiveBuffer(buffer);
     return RC_OK;
 }
