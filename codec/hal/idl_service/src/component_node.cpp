@@ -393,8 +393,8 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
         bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+        portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     }
-    portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return err;
 }
 
@@ -421,13 +421,13 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
-    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     {
+        std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
         bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+        portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     }
-    portIndexMap_.emplace(std::make_pair(bufferHdrType, portIndex));
     return OMX_ErrorNone;
 }
 
@@ -637,7 +637,6 @@ void ComponentNode::ReleaseOMXResource()
 
 int32_t ComponentNode::ReleaseAllBuffer()
 {
-    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iter = bufferHeaderMap_.begin();
     for (; iter != bufferHeaderMap_.end(); iter++) {
         OMX_BUFFERHEADERTYPE *bufferHdrType = iter->first;
