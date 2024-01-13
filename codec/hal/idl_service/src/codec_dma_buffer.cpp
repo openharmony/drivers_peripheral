@@ -33,7 +33,7 @@ sptr<ICodecBuffer> CodecDMABuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     if (codecBuffer.fd < 0) {
         CODEC_LOGE("codecBuffer.fd is invalid");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
 
     CodecDMABuffer *buffer = new CodecDMABuffer(codecBuffer);
@@ -44,7 +44,7 @@ sptr<ICodecBuffer> CodecDMABuffer::Allocate(struct OmxCodecBuffer &codecBuffer, 
 {
     if (omxBuffer.pAppPrivate == nullptr) {
         CODEC_LOGE("omxBuffer.pAppPrivate is invalid!");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
     codecBuffer.bufferType = CODEC_BUFFER_TYPE_DMA_MEM_FD;
     codecBuffer.offset = 0;

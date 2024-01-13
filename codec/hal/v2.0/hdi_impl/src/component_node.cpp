@@ -359,7 +359,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
     int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
-    if (err != OMX_ErrorNone) {
+    if (err != OMX_ErrorNone || bufferHdrType == nullptr) {
         CODEC_LOGE("OMX_AllocateBuffer error, err = %{public}x", err);
         return err;
     }
@@ -444,7 +444,7 @@ int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
     int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     sptr<ICodecBuffer> codecBuffer = nullptr;
-    if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
+    if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType) || codecBuffer == nullptr) {
         CODEC_LOGE("GetBufferById return false");
         return err;
     }

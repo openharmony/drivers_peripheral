@@ -73,7 +73,10 @@ static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObj
 static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
 {
     CODEC_LOGI("HdfCodecComponentTypeDriverBind enter.");
-
+    if (deviceObject == NULL) {
+        HDF_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
         (struct HdfCodecComponentTypeHost *)OsalMemAlloc(sizeof(struct HdfCodecComponentTypeHost));
     if (omxcomponenttypeHost == NULL) {
@@ -94,7 +97,7 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
         OsalMemFree(omxcomponenttypeHost);
         return HDF_FAILURE;
     }
-
+    
     deviceObject->service = &omxcomponenttypeHost->ioservice;
     return HDF_SUCCESS;
 }
