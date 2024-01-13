@@ -243,26 +243,6 @@ BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_002)->Iterati
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_003)(
-    benchmark::State &st)
-{
-    int ret = cameraTest->DefferredImageTestInit();
-    for (auto _ : st) {
-        if (ret == 0) {
-            cameraTest->rc = cameraTest->imageProcessSession_->Reset();
-        }
-    }
-}
-BENCHMARK_REGISTER_F(CameraBenchmarkTest, DefferredImage_benchmark_003)->Iterations(ITERATION_FREQUENCY)->
-    Repetitions(REPETITION_FREQUENCY)->ReportAggregatesOnly();
-
-/**
-  * @tc.name: Defferred Image
-  * @tc.desc: benchmark
-  * @tc.level: Level0
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
 BENCHMARK_F(CameraBenchmarkTest, DefferredImage_benchmark_004)(
     benchmark::State &st)
 {
