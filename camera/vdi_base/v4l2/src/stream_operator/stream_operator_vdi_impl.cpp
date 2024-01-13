@@ -239,21 +239,15 @@ int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<VdiStreamInfo> &s
         }
         std::shared_ptr<IStream> stream = StreamFactory::Instance().CreateShared(
             IStream::g_availableStreamType[it.intent_], it.streamId_, it.intent_, pipelineCore_, messenger_);
-        if (stream == nullptr) {
-            CAMERA_LOGE("create stream [id = %{public}d] failed.", it.streamId_);
-            return INSUFFICIENT_RESOURCES;
-        }
+
+        CHECK_IF_PTR_NULL_RETURN_VALUE(stream, INSUFFICIENT_RESOURCES);
+
         StreamConfiguration scg;
         StreamInfoToStreamConfiguration(scg, it);
         RetCode rc = stream->ConfigStream(scg);
-        if (rc != RC_OK) {
-            CAMERA_LOGE("configure stream %{public}d failed", it.streamId_);
-            return INVALID_ARGUMENT;
-        }
-        if (it.bufferQueue_ == nullptr) {
-            CAMERA_LOGE("stream [id:%{public}d] bufferQueue_ is nullptr", it.streamId_);
-            return INVALID_ARGUMENT;
-        }
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, INVALID_ARGUMENT);
+        CHECK_IF_PTR_NULL_RETURN_VALUE(it.bufferQueue_, INVALID_ARGUMENT);
+
         if (!scg.tunnelMode && (it.bufferQueue_)->producer_ != nullptr) {
             CAMERA_LOGE("stream [id:%{public}d] is not tunnel mode, can't bind a buffer producer", it.streamId_);
             return INVALID_ARGUMENT;
@@ -268,10 +262,8 @@ int32_t StreamOperatorVdiImpl::CreateStreams(const std::vector<VdiStreamInfo> &s
                 return INVALID_ARGUMENT;
             }
         }
-        {
-            std::lock_guard<std::mutex> l(streamLock_);
-            streamMap_[stream->GetStreamId()] = stream;
-        }
+        std::lock_guard<std::mutex> l(streamLock_);
+        streamMap_[stream->GetStreamId()] = stream;
         CAMERA_LOGI("create stream success [id:%{public}d] [type:%{public}s]", stream->GetStreamId(),
                     IStream::g_availableStreamType[it.intent_].c_str());
     }
@@ -339,17 +331,15 @@ int32_t StreamOperatorVdiImpl::CommitStreams(VdiOperationMode mode, const std::v
     std::shared_ptr<CameraMetadata> setting;
     MetadataUtils::ConvertVecToMetadata(modeSetting, setting);
     DynamicStreamSwitchMode method = streamPipeline_->CheckStreamsSupported(mode, setting, configs);
-    if (method == DYNAMIC_STREAM_SWITCH_NOT_SUPPORT) {
-        return INVALID_ARGUMENT;
-    }
-    if (method == DYNAMIC_STREAM_SWITCH_NEED_INNER_RESTART) {
-        std::lock_guard<std::mutex> l(streamLock_);
-        for (auto it : streamMap_) {
-            it.second->StopStream();
-        }
-    }
+    CHECK_IF_EQUAL_RETURN_VALUE(method, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT, INVALID_ARGUMENT);
     {
         std::lock_guard<std::mutex> l(streamLock_);
+        if (method == DYNAMIC_STREAM_SWITCH_NEED_INNER_RESTART) {
+            for (auto it : streamMap_) {
+                it.second->StopStream();
+            }
+        }
+
         for (auto it : streamMap_) {
             if (it.second->CommitStream() != RC_OK) {
                 CAMERA_LOGE("commit stream [id = %{public}d] failed.", it.first);
@@ -358,24 +348,17 @@ int32_t StreamOperatorVdiImpl::CommitStreams(VdiOperationMode mode, const std::v
         }
     }
     RetCode rc = streamPipeline_->PreConfig(setting);
-    if (rc != RC_OK) {
-        CAMERA_LOGE("prepare mode settings failed");
-        return DEVICE_ERROR;
-    }
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, DEVICE_ERROR);
+
     auto dev = std::static_pointer_cast<CameraDeviceVdiImpl>(device_.lock());
     CHECK_IF_PTR_NULL_RETURN_VALUE(dev, RC_ERROR);
     std::string cameraId;
     dev->GetCameraId(cameraId);
-    int32_t mode1 = mode;
-    CameraHostConfig *config = CameraHostConfig::GetInstance();
-    if (config->SearchUsbCameraId(cameraId)) {
-        mode1 = 2; // 2:uvc mode
-    }
+    // 2:uvc mode
+    int32_t mode1 = CameraHostConfig::GetInstance()->SearchUsbCameraId(cameraId) ? 2 : mode;
+
     rc = streamPipeline_->CreatePipeline(mode1);
-    if (rc != RC_OK) {
-        CAMERA_LOGE("create pipeline failed.");
-        return INVALID_ARGUMENT;
-    }
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, INVALID_ARGUMENT);
 
     DFX_LOCAL_HITRACE_END;
     return VDI::Camera::V1_0::NO_ERROR;
