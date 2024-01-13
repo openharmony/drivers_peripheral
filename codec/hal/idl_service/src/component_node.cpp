@@ -77,9 +77,9 @@ OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &Componen
                                               &ComponentNode::OnFillBufferDone};
 
 ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData, std::shared_ptr<ComponentMgr> &mgr)
-    : omxCallback_(callbacks),
+    : comp_(nullptr),
+      omxCallback_(callbacks),
       appData_(appData),
-      comp_(nullptr),
       bufferIdCount_(0),
       mgr_(mgr)
 {
