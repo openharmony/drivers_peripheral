@@ -67,6 +67,10 @@ static int32_t WriteArray(struct HdfSBuf *data, int8_t *array, uint32_t arrayLen
 
 static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo *info)
 {
+    if (info == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!HdfSbufWriteInt64(data, info->appData)) {
         CODEC_LOGE("write appData failed!");
         return HDF_ERR_INVALID_PARAM;
@@ -92,6 +96,10 @@ static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo *info)
 static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE event,
                                                   struct EventInfo *info)
 {
+    if (self == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
 
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
@@ -180,6 +188,10 @@ static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *s
 static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *self, int64_t appData,
                                                     const struct OmxCodecBuffer *buffer)
 {
+    if (self == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
 
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
@@ -220,6 +232,10 @@ static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *se
 
 static void CodecCallbackTypeProxyConstruct(struct CodecCallbackType *instance)
 {
+    if (instance == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return;
+    }
     instance->EventHandler = CodecCallbackTypeProxyEventHandler;
     instance->EmptyBufferDone = CodecCallbackTypeProxyEmptyBufferDone;
     instance->FillBufferDone = CodecCallbackTypeProxyFillBufferDone;

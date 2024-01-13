@@ -77,19 +77,17 @@ OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &Componen
                                               &ComponentNode::OnFillBufferDone};
 
 ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData, std::shared_ptr<ComponentMgr> &mgr)
+    : omxCallback_(callbacks),
+      appData_(appData),
+      comp_(nullptr),
+      bufferIdCount_(0),
+      mgr_(mgr)
 {
-    omxCallback_ = callbacks;
-    appData_ = appData;
-    comp_ = nullptr;
-    codecBufferMap_.clear();
-    bufferHeaderMap_.clear();
-    portIndexMap_.clear();
-    bufferIdCount_ = 0;
-    mgr_ = mgr;
 }
 
 ComponentNode::~ComponentNode()
 {
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     omxCallback_ = nullptr;
     bufferHeaderPortMap_.clear();
     codecBufferMap_.clear();
@@ -423,8 +421,8 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     {
-        std::unique_lock<std::shared_mutex> lk(mapMutex_);
         codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
         bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
         bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
@@ -531,6 +529,7 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
 
 uint32_t ComponentNode::GenerateBufferId()
 {
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     uint32_t bufferId = 0;
     do {
         if (++bufferIdCount_ == 0) {
@@ -545,13 +544,13 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 {
     if (buffer == nullptr) {
         CODEC_LOGE("Buffer is null");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
     std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
         CODEC_LOGE("Can not find bufferID");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
 
     uint32_t bufferId = iterHead->second;
@@ -610,6 +609,7 @@ const std::map<OMX_BUFFERHEADERTYPE *, uint32_t> &ComponentNode::GetBufferMapCou
 
 void ComponentNode::ReleaseOMXResource()
 {
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     if (codecBufferMap_.size() == 0) {
         return;
     }
@@ -637,6 +637,7 @@ void ComponentNode::ReleaseOMXResource()
 
 int32_t ComponentNode::ReleaseAllBuffer()
 {
+    std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iter = bufferHeaderMap_.begin();
     for (; iter != bufferHeaderMap_.end(); iter++) {
         OMX_BUFFERHEADERTYPE *bufferHdrType = iter->first;

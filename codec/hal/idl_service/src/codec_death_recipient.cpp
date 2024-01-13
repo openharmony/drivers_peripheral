@@ -67,7 +67,7 @@ void RegisterDeathRecipientService(const sptr<ICodecCallback> callbacks, uint32_
         return;
     }
 
-    const sptr<CodecDeathRecipient> deathCallBack = new CodecDeathRecipient(service);
+    const sptr<CodecDeathRecipient> deathCallBack(new CodecDeathRecipient(service));
     bool ret = remote->AddDeathRecipient(deathCallBack);
     if (!ret) {
         CODEC_LOGE("RemoteService add deathRecipient fail!");

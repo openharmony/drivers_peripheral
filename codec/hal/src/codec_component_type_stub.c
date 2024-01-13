@@ -117,6 +117,10 @@ static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct
 
 static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t paramIndex = 0;
     int8_t *paramStruct = NULL;
@@ -220,6 +224,10 @@ static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struc
 
 static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t index = 0;
     int8_t *cfgStruct = NULL;
@@ -272,6 +280,10 @@ static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct H
 
 static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t index = 0;
     int8_t *cfgStruct = NULL;
@@ -320,6 +332,10 @@ static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct H
 static int32_t SerStubGetExtensionIndex(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                         struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     char *paramName = NULL;
     uint32_t indexType = 0;
@@ -351,6 +367,10 @@ static int32_t SerStubGetExtensionIndex(struct CodecComponentType *serviceImpl, 
 
 static int32_t SerStubGetState(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     enum OMX_STATETYPE state;
 
@@ -417,6 +437,10 @@ static int32_t SerStubComponentTunnelRequest(struct CodecComponentType *serviceI
 
 static int32_t SerStubUseBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
@@ -455,6 +479,10 @@ static int32_t SerStubUseBuffer(struct CodecComponentType *serviceImpl, struct H
 static int32_t SerStubAllocateBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                      struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
@@ -489,6 +517,10 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentType *serviceImpl, str
 
 static int32_t SerStubFreeBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint32_t portIndex = 0;
     struct OmxCodecBuffer buffer;
@@ -520,6 +552,10 @@ static int32_t SerStubFreeBuffer(struct CodecComponentType *serviceImpl, struct 
 static int32_t SerStubEmptyThisBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                       struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct OmxCodecBuffer buffer;
     InitOmxCodecBuffer(&buffer);
@@ -545,6 +581,10 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentType *serviceImpl, st
 static int32_t SerStubFillThisBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                      struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct OmxCodecBuffer buffer;
     InitOmxCodecBuffer(&buffer);
@@ -569,6 +609,10 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentType *serviceImpl, str
 
 static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     struct CodecCallbackType *callback = NULL;
     int64_t appData = 0;
@@ -596,6 +640,10 @@ static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struc
 static int32_t SerStubComponentDeInit(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                       struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
 
     ret = serviceImpl->ComponentDeInit(serviceImpl);
@@ -669,6 +717,10 @@ static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct
 static int32_t SerStubComponentRoleEnum(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
                                         struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     uint8_t *role = NULL;
     uint32_t roleLen = 0;
@@ -714,6 +766,10 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
                                                         int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecComponentType *serviceImpl = (struct CodecComponentType *)remote;
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->AsObject(serviceImpl), data)) {
         CODEC_LOGE("interface token check failed");
         return HDF_ERR_INVALID_PARAM;
@@ -763,6 +819,9 @@ static struct HdfRemoteService *CodecComponentTypeAsObject(struct CodecComponent
         return NULL;
     }
     struct CodecComponentTypeStub *stub = CONTAINER_OF(self, struct CodecComponentTypeStub, interface);
+    if (stub == NULL) {
+        return NULL;
+    }
     return stub->remote;
 }
 

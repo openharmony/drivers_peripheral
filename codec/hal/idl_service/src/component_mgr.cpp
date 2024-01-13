@@ -125,6 +125,7 @@ void ComponentMgr::CleanComponent()
 
 int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const std::string compName)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     auto iter = compoentsCore_.find(compName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component[%{public}s] in core", compName.c_str());
