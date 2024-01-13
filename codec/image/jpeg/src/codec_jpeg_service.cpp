@@ -80,7 +80,12 @@ int32_t CodecJpegService::AllocateJpegInBuffer(CodecImageBuffer& inBuffer, uint3
     inBuffer.fenceFd = -1;
     CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "error = [%{public}d]", ret);
     inBuffer.buffer = new NativeBuffer(bufferHandle);
-    CHECK_AND_RETURN_RET_LOG(inBuffer.buffer != nullptr, HDF_FAILURE, "jpeg new NativeBuffer fail!");
+    if (inBuffer.buffer == nullptr) {
+        CODEC_LOGE("jpeg new NativeBuffer fail!");
+        ret = core_->FreeInBuffer(bufferHandle);
+        CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "free bufferhandle fail, error = [%{public}d]", ret);
+        return HDF_FAILURE;
+    }
     std::lock_guard<std::mutex> lk(mutex_);
     inBuffer.id = GetNextBufferId();
     bufferHandleMap_.emplace(std::make_pair(inBuffer.id, bufferHandle));
