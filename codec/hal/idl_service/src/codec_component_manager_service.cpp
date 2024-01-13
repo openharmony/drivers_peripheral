@@ -113,7 +113,6 @@ int32_t CodecComponentManagerService::DestroyComponent(uint32_t componentId)
 
 uint32_t CodecComponentManagerService::GetNextComponentId(void)
 {
-    std::unique_lock<std::mutex> autoLock(mutex_);
     uint32_t tempId = 0;
     do {
         tempId = ++componentId_;
