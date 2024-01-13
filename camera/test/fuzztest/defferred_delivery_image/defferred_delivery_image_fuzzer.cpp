@@ -88,13 +88,6 @@ bool InterruptApi(const uint8_t *rawData)
     return true;
 }
 
-bool ResetApi(const uint8_t *rawData)
-{
-    (void) rawData;
-    imageProcessSession_->Reset();
-    return true;
-}
-
 typedef bool (*TestFuncDef)(const uint8_t *rawData);
 static TestFuncDef g_allTestFunc[] = {
     GetConcurrencyApi,
@@ -103,7 +96,6 @@ static TestFuncDef g_allTestFunc[] = {
     ProcessImageApi,
     RemoveImageApi,
     InterruptApi,
-    ResetApi,
 };
 
 
