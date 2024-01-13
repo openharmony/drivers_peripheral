@@ -71,6 +71,10 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
 
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (pos->service == service) {
+            if (pos->eventCb == NULL) {
+                HDF_LOGE("%s: param is null", __func__);
+                return INPUT_NULL_PTR;
+            }
             pos->eventCb->EventPkgCallback((const InputEventPackage **)pkgs, count, pos->payload.devIndex);
         }
     }
@@ -195,6 +199,10 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     if (!ret) {
         HDF_LOGE("%s: read sbuf failed", __func__);
         return INPUT_FAILURE;
+    }
+    if (manager->hostDev.hostCb == NULL) {
+        HDF_LOGE("%s: param is null", __func__);
+        return INPUT_NULL_PTR;
     }
     manager->hostDev.hostCb->HotPlugCallback((const InputHotPlugEvent *)event);
     return INPUT_SUCCESS;
