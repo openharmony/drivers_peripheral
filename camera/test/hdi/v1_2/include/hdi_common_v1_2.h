@@ -121,7 +121,8 @@ public:
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_2 = nullptr;
-    OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
+    class DemoCameraDeviceCallback;
+    OHOS::sptr<DemoCameraDeviceCallback> deviceCallback = nullptr;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfos;
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> streamInfosV1_1;
     std::shared_ptr<OHOS::HDI::Camera::V1_1::PrelaunchConfig> prelaunchConfig = nullptr;
@@ -240,6 +241,7 @@ public:
 
     class DemoCameraDeviceCallback : public ICameraDeviceCallback {
     public:
+        std::shared_ptr<CameraMetadata> resultMeta = nullptr;
         DemoCameraDeviceCallback() = default;
         virtual ~DemoCameraDeviceCallback() = default;
 

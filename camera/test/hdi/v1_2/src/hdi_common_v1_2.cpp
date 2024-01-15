@@ -626,9 +626,8 @@ int32_t Test::DemoCameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg
 
 int32_t Test::DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t> &result)
 {
+    MetadataUtils::ConvertVecToMetadata(result, resultMeta);
     if (Test::resultCallback_) {
-        std::shared_ptr<CameraMetadata> resultMeta;
-        MetadataUtils::ConvertVecToMetadata(result, resultMeta);
         Test::resultCallback_(timestamp, resultMeta);
     }
     return HDI::Camera::V1_0::NO_ERROR;
