@@ -22,6 +22,12 @@
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+
+#define LOG_DOMAIN 0xD000306
+
 using namespace std;
 
 namespace OHOS {

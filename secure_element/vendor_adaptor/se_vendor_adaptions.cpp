@@ -24,6 +24,12 @@
 
 #define HDF_LOG_TAG hdf_se
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+
+#define LOG_DOMAIN 0xD000305
+
 namespace OHOS {
 namespace HDI {
 namespace SecureElement {
