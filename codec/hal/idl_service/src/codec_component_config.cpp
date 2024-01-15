@@ -119,7 +119,6 @@ CodecComponentConfig *CodecComponentConfig::GetInstance()
 
 int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 {
-    std::unique_lock<std::mutex> lock(g_mutex);
     count = static_cast<int32_t>(capList_.size());
     CODEC_LOGD("enter, count = %{public}d", count);
     return HDF_SUCCESS;
@@ -127,7 +126,6 @@ int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 
 int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count)
 {
-    std::unique_lock<std::mutex> lock(g_mutex);
     CODEC_LOGD("count[%{public}d], size[%{public}zu]", count, capList_.size());
     if (count <= 0) {
         CODEC_LOGE("count[%{public}d] is invalid", count);
@@ -164,7 +162,6 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
         isVideoGroup = false;
     }
 
-    std::unique_lock<std::mutex> lock(g_mutex);
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode)
     {
         CodecCompCapability cap;
