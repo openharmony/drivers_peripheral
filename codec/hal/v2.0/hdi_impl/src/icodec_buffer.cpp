@@ -33,7 +33,7 @@ ICodecBuffer::~ICodecBuffer()
 
 sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer)
 {
-    sptr<ICodecBuffer> buffer = nullptr;
+    sptr<ICodecBuffer> buffer = sptr<ICodecBuffer>();
     switch (codecBuffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
             buffer = CodecShareBuffer::Create(codecBuffer);
@@ -53,7 +53,7 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
 
 sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer)
 {
-    sptr<ICodecBuffer> buffer = nullptr;
+    sptr<ICodecBuffer> buffer = sptr<ICodecBuffer>();
     if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         buffer = CodecShareBuffer::Allocate(codecBuffer);
     } else {
