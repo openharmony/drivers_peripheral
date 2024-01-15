@@ -435,7 +435,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     int32_t err = OMX_ErrorBadParameter;
-    sptr<ICodecBuffer> codecBufer = nullptr;
+    sptr<ICodecBuffer> codecBufer = sptr<ICodecBuffer>();
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     if (!GetBufferById(buffer.bufferId, codecBufer, bufferHdrType)) {
         CODEC_LOGE(" GetBufferById return false");
@@ -484,7 +484,7 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    sptr<ICodecBuffer> codecBuffer = nullptr;
+    sptr<ICodecBuffer> codecBuffer = sptr<ICodecBuffer>();
     if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
         CODEC_LOGE(" GetBufferById return false");
         return err;
@@ -511,7 +511,7 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    sptr<ICodecBuffer> codecBuffer = nullptr;
+    sptr<ICodecBuffer> codecBuffer = sptr<ICodecBuffer>();
     if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
         CODEC_LOGE("GetBufferById return false");
         return err;
