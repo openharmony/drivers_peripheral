@@ -258,6 +258,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
+    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = AddCallbackMap(groupId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -292,6 +293,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGI("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
+    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = RemoveCallbackMap(groupId, serviceId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -320,7 +322,6 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
 
 int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
     auto groupCallBackIter = callbackMap.find(groupId);
     if (groupCallBackIter != callbackMap.end()) {
         auto callBackIter =
@@ -349,7 +350,6 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallb
 
 int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
     auto groupIdCallBackIter = callbackMap.find(groupId);
     if (groupIdCallBackIter == callbackMap.end()) {
         HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
@@ -375,9 +375,23 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
     }
     std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
     for (auto iter : sensorEnabled) {
-        if (iter.second.find(serviceId) != iter.second.end()) {
-            HDF_LOGI("%{public}s: ssensorId[%{public}d]", __func__, iter.first);
-            SensorClientsManager::GetInstance()->IsNeedCloseSensor(iter.first, serviceId);
+        if (iter.second.find(serviceId) == iter.second.end()) {
+            continue;
+        }
+        HDF_LOGI("%{public}s: sensorId[%{public}d]", __func__, iter.first);
+        if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(iter.first, serviceId, DISABLE_SENSOR)) {
+            continue;
+        }
+        std::unordered_map<int, std::set<int>> sensorUsed = SensorClientsManager::GetInstance()->GetSensorUsed();
+        if (sensorUsed.find(iter.first) == sensorUsed.end()) {
+            if (sensorVdiImpl_ == nullptr) {
+                HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+                return HDF_FAILURE;
+            }
+            int32_t ret = sensorVdiImpl_->Disable(iter.first);
+            if (ret != SENSOR_SUCCESS) {
+                HDF_LOGE("%{public}s Disable failed, error code is %{public}d", __func__, ret);
+            }
         }
     }
     return SENSOR_SUCCESS;
@@ -427,7 +441,7 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
 
     for (int32_t groupId = TRADITIONAL_SENSOR_TYPE; groupId < SENSOR_GROUP_TYPE_MAX; groupId++) {
         auto groupIdIter = callbackMap.find(groupId);
-        if (groupIdIter != callbackMap.end()) {
+        if (groupIdIter == callbackMap.end()) {
             return;
         }
         auto callBackIter =
