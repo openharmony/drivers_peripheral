@@ -65,7 +65,7 @@ OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &Componen
 
 ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData, const std::string &compName)
     : comp_(nullptr),
-      omxCallback_(callback)
+      omxCallback_(callback),
       appData_(appData),
       bufferIdCount_(0),
       name_(compName)
