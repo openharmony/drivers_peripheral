@@ -78,6 +78,9 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
     int sharedFD = AshmemCreate(nullptr, codecBuffer.allocLen);
 
     std::shared_ptr<Ashmem> sharedMemory = std::make_shared<Ashmem>(sharedFD, codecBuffer.allocLen);
+    if (sharedMemory == nullptr) {
+        return OHOS::sptr<ICodecBuffer>();
+    }
     codecBuffer.type = READ_WRITE_TYPE;
     bool mapd = false;
     if (codecBuffer.type == READ_WRITE_TYPE) {
@@ -87,7 +90,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
     }
     if (!mapd) {
         CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
-        return nullptr;
+        return OHOS::sptr<ICodecBuffer>();
     }
     codecBuffer.offset = 0;
     codecBuffer.filledLen = 0;

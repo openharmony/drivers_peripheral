@@ -33,7 +33,7 @@ using OHOS::Codec::Omx::ComponentNode;
 extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 {
     std::call_once(m_serviceFlag, [] {
-        g_codecManagerService = new (std::nothrow) CodecComponentManagerService();
+        g_codecManagerService = sptr<CodecComponentManagerService>(new CodecComponentManagerService());
         CodecDfxService::GetInstance().SetComponentManager(g_codecManagerService);
         OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->CodecCompCapabilityInit();
     });
@@ -84,7 +84,7 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
         return err;
     }
 
-    sptr<ICodecComponent> codecComponent = new CodecComponentService(node, mgr_, compName);
+    sptr<ICodecComponent> codecComponent(new CodecComponentService(node, mgr_, compName));
     std::unique_lock<std::mutex> autoLock(mutex_);
     componentId = GetNextComponentId();
     componentMap_.emplace(std::make_pair(componentId, codecComponent));
