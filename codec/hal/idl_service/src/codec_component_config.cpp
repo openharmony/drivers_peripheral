@@ -90,7 +90,6 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
                                                 NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
                                                 NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS };
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
-    std::unique_lock<std::mutex> lock(g_mutex);
     for (int index = 0; index < count; index++) {
         GetGroupCapabilities(codecGroupsNodeName[index]);
     }
@@ -165,6 +164,7 @@ int32_t CodecComponentConfig::GetGroupCapabilities(const std::string &nodeName)
         isVideoGroup = false;
     }
 
+    std::unique_lock<std::mutex> lock(g_mutex);
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode)
     {
         CodecCompCapability cap;
