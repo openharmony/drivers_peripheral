@@ -25,7 +25,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     struct HdfSensorEvents event;
     int32_t ret;
     if (sensorCallback_ == nullptr) {
-        HDF_LOGE("%{public}s sensorCallback_ is NULL", __func__);
+        HDF_LOGD("%{public}s sensorCallback_ is NULL", __func__);
         return HDF_FAILURE;
     }
 
@@ -39,12 +39,12 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
-        HDF_LOGE("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
+        HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
         return HDF_FAILURE;
     }
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
-        HDF_LOGE("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
+        HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
         return HDF_FAILURE;
     }
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
@@ -57,12 +57,12 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         }
         callback = sensorClientInfo_.GetReportDataCb();
         if (callback == nullptr) {
-            HDF_LOGE("%{public}s the callback of %{public}d is nullptr", __func__, *it);
+            HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, *it);
             continue;
         }
         ret = callback->OnDataEvent(event);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+            HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         }
     }
     return HDF_SUCCESS;
