@@ -266,13 +266,13 @@ static void InitBufferHandle(struct gbm_bo *bo, int fd, const AllocInfo *info, P
     bufferHandle->fd = fd;
     bufferHandle->reserveFds = 0;
     bufferHandle->reserveInts = 0;
-    bufferHandle->stride = hdi_gbm_bo_get_stride(bo);
-    bufferHandle->width = hdi_gbm_bo_get_width(bo);
-    bufferHandle->height = hdi_gbm_bo_get_height(bo);
+    bufferHandle->stride = HdiGbmBoGetStride(bo);
+    bufferHandle->width = HdiGbmBoGetWidth(bo);
+    bufferHandle->height = HdiGbmBoGetHeight(bo);
     bufferHandle->usage = info->usage;
     bufferHandle->format = info->format;
     bufferHandle->virAddr = nullptr;
-    bufferHandle->size = hdi_gbm_bo_get_size(bo);
+    bufferHandle->size = HdiGbmBoGetSize(bo);
 }
 
 int32_t GbmAllocMem(const AllocInfo *info, BufferHandle **buffer)
