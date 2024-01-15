@@ -378,7 +378,6 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
         if (iter.second.find(serviceId) == iter.second.end()) {
             continue;
         }
-        HDF_LOGI("%{public}s: sensorId[%{public}d]", __func__, iter.first);
         if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(iter.first, serviceId, DISABLE_SENSOR)) {
             continue;
         }
