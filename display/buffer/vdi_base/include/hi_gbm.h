@@ -88,10 +88,10 @@ struct gbm_device *HdiGbmCreateDevice(int fd);
 void HdiGbmDeviceDestroy(struct gbm_device *gbm);
 struct gbm_bo *HdiGbmBoCreate(struct gbm_device *gbm, uint32_t width, uint32_t height,
     uint32_t format, uint32_t usage);
-uint32_t hdi_gbm_bo_get_stride(struct gbm_bo *bo);
-uint32_t hdi_gbm_bo_get_width(struct gbm_bo *bo);
-uint32_t hdi_gbm_bo_get_height(struct gbm_bo *bo);
-uint32_t hdi_gbm_bo_get_size(struct gbm_bo *bo);
+uint32_t HdiGbmBoGetStride(struct gbm_bo *bo);
+uint32_t HdiGbmBoGetWidth(struct gbm_bo *bo);
+uint32_t HdiGbmBoGetHeight(struct gbm_bo *bo);
+uint32_t HdiGbmBoGetSize(struct gbm_bo *bo);
 void HdiGbmBoDestroy(struct gbm_bo *bo);
 int HdiGbmBoGetFd(struct gbm_bo *bo);
 } // namespace DISPLAY

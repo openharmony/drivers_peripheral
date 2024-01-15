@@ -160,25 +160,25 @@ void HdiGbmDeviceDestroy(struct gbm_device *gbm)
     free(gbm);
 }
 
-uint32_t hdi_gbm_bo_get_stride(struct gbm_bo *bo)
+uint32_t HdiGbmBoGetStride(struct gbm_bo *bo)
 {
     DISPLAY_CHK_RETURN((bo == nullptr), 0, DISPLAY_LOGE("the bo is null"));
     return bo->stride;
 }
 
-uint32_t hdi_gbm_bo_get_width(struct gbm_bo *bo)
+uint32_t HdiGbmBoGetWidth(struct gbm_bo *bo)
 {
     DISPLAY_CHK_RETURN((bo == nullptr), 0, DISPLAY_LOGE("the bo is null"));
     return bo->width;
 }
 
-uint32_t hdi_gbm_bo_get_height(struct gbm_bo *bo)
+uint32_t HdiGbmBoGetHeight(struct gbm_bo *bo)
 {
     DISPLAY_CHK_RETURN((bo == nullptr), 0, DISPLAY_LOGE("the bo is null"));
     return bo->height;
 }
 
-uint32_t hdi_gbm_bo_get_size(struct gbm_bo *bo)
+uint32_t HdiGbmBoGetSize(struct gbm_bo *bo)
 {
     DISPLAY_CHK_RETURN((bo == nullptr), 0, DISPLAY_LOGE("the bo is null"));
     return bo->size;
