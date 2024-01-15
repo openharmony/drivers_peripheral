@@ -278,7 +278,7 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
     }
     CodecOMXCore *core;
     auto err = g_mgr.GetCoreOfComponent(core, compName);
-    if (err != HDF_SUCCESS) {
+    if (err != HDF_SUCCESS || core == nullptr) {
         CODEC_LOGE("core is null");
         return err;
     }

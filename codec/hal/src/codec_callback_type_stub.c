@@ -145,6 +145,10 @@ static int32_t SerStubEventHandler(struct CodecCallbackType *serviceImpl,
 static int32_t SerStubEmptyBufferDone(struct CodecCallbackType *serviceImpl,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret;
     int64_t appData = 0;
     struct OmxCodecBuffer buffer;
@@ -208,6 +212,10 @@ static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecCallbackType *serviceImpl = (struct CodecCallbackType*)service;
+    if (serviceImpl == NULL) {
+        CODEC_LOGE("invalid parameter");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->remote, data)) {
         CODEC_LOGE("check interface token failed");
         return HDF_ERR_INVALID_PARAM;
