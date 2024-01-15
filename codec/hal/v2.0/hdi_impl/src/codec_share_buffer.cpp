@@ -44,13 +44,13 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
     int shardFd = (int)reinterpret_cast<uintptr_t>(codecBuffer.buffer);
     if (shardFd < 0) {
         CODEC_LOGE("shardFd < 0");
-        return nullptr;
+        return OHOS::sptr<ICodecBuffer>();
     }
     int size = OHOS::AshmemGetSize(shardFd);
     std::shared_ptr<OHOS::Ashmem> sharedMem = std::make_shared<OHOS::Ashmem>(shardFd, size);
     if (sharedMem == nullptr) {
         CODEC_LOGE("fail to init sharedMem");
-        return nullptr;
+        return OHOS::sptr<ICodecBuffer>();
     }
     bool mapd = false;
     if (codecBuffer.type == READ_WRITE_TYPE) {
@@ -60,7 +60,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
     }
     if (!mapd) {
         CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
-        return nullptr;
+        return OHOS::sptr<ICodecBuffer>();
     }
 
     codecBuffer.buffer = nullptr;
