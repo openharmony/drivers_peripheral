@@ -557,7 +557,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
     auto iter = codecBufferMap_.find(bufferId);
     if (iter == codecBufferMap_.end()) {
         CODEC_LOGE("Can not find bufferInfo by bufferId = %{public}d", bufferId);
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
     return iter->second;
 }

@@ -90,6 +90,7 @@ void CodecComponentConfig::Init(const DeviceResourceNode &node)
                                                 NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
                                                 NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS };
     int count = sizeof(codecGroupsNodeName) / sizeof(std::string);
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (int index = 0; index < count; index++) {
         GetGroupCapabilities(codecGroupsNodeName[index]);
     }
@@ -119,6 +120,7 @@ CodecComponentConfig *CodecComponentConfig::GetInstance()
 
 int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 {
+    std::unique_lock<std::mutex> lock(g_mutex);
     count = static_cast<int32_t>(capList_.size());
     CODEC_LOGD("enter, count = %{public}d", count);
     return HDF_SUCCESS;
@@ -126,6 +128,7 @@ int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 
 int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count)
 {
+    std::unique_lock<std::mutex> lock(g_mutex);
     CODEC_LOGD("count[%{public}d], size[%{public}zu]", count, capList_.size());
     if (count <= 0) {
         CODEC_LOGE("count[%{public}d] is invalid", count);
