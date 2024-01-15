@@ -63,7 +63,6 @@ private:
     DeviceResourceNode node_;
     std::vector<CodecCompCapability> capList_;
     static CodecComponentConfig config_;
-    std::mutex g_mutex;
 };
 }  // namespace Omx
 }  // namespace Codec
