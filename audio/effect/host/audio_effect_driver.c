@@ -16,10 +16,10 @@
 #include "hdf_base.h"
 #include "hdf_device_object.h"
 #include "hdf_dlist.h"
-#include "hdf_log.h"
 #include "osal_mem.h"
 #include "stub_collector.h"
 #include "v1_0/ieffect_model.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 

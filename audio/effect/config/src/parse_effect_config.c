@@ -25,8 +25,8 @@
 #include "osal_mem.h"
 #include "securec.h"
 
-#include "hdf_log.h"
 #include "parse_effect_config.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_EFFECT_NUM_MAX 32
 #define HDF_EFFECT_CONFIG_SIZE_MAX ((HDF_EFFECT_NUM_MAX) * 1024)

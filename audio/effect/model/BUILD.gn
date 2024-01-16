@@ -29,6 +29,7 @@ if (!defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "../config/include/",
       "//third_party/cJSON/",
+      "$hdf_audio_path/hdi_service/vendor_interface/utils",
     ]
 
     defines = []
