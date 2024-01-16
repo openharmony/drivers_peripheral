@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 #include "hdf_log.h"
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002512
 
 #ifndef AUDIO_HDF_LOG
 #define AUDIO_FUNC_LOGD(fmt, arg...) do { \

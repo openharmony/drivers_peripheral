@@ -18,9 +18,9 @@
 #include "effect_host_common.h"
 #include "v1_0/effect_types_vdi.h"
 #include "v1_0/effect_factory.h"
-#include "hdf_log.h"
 #include "osal_mem.h"
 #include "parse_effect_config.h"
+#include "audio_uhdf_log.h"
 
 #define AUDIO_EFFECT_CONFIG  HDF_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
