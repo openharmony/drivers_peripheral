@@ -64,14 +64,12 @@ OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &Componen
                                               &ComponentNode::OnFillBufferDone};
 
 ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData, const std::string &compName)
+    : comp_(nullptr),
+      omxCallback_(callback),
+      appData_(appData),
+      bufferIdCount_(0),
+      name_(compName)
 {
-    appData_ = appData;
-    comp_ = nullptr;
-    codecBufferMap_.clear();
-    bufferHeaderMap_.clear();
-    omxCallback_ = callback;
-    bufferIdCount_ = 0;
-    name_ = compName;
 }
 
 ComponentNode::~ComponentNode()
@@ -81,6 +79,7 @@ ComponentNode::~ComponentNode()
         CodecCallbackTypeRelease(omxCallback_);
         omxCallback_ = nullptr;
     }
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     if (codecBufferMap_.size() != 0) {
         ReleaseOMXResource();
     }
@@ -487,6 +486,7 @@ int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
 
 uint32_t ComponentNode::GenerateBufferId()
 {
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     uint32_t bufferId = 0;
     do {
         if (++bufferIdCount_ == 0) {
@@ -501,20 +501,20 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 {
     if (buffer == nullptr) {
         CODEC_LOGE("buffer is null");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
     std::shared_lock<std::shared_mutex> lk(mapMutex_);
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
         CODEC_LOGE("can not find bufferID");
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
 
     uint32_t nBufferID = iterHead->second;
     auto iter = codecBufferMap_.find(nBufferID);
     if (iter == codecBufferMap_.end()) {
         CODEC_LOGE("can not find bufferInfo by nBufferID = %{public}d", nBufferID);
-        return nullptr;
+        return sptr<ICodecBuffer>();
     }
     return iter->second;
 }
