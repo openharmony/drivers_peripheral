@@ -62,6 +62,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
 
 int32_t ComponentMgr::DeleteComponentInstance(OMX_COMPONENTTYPE *component)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     int32_t err = OMX_ErrorInvalidComponent;
     for (size_t i = 0; i < components_.size(); i++) {
         if (components_[i].handle == component) {
@@ -125,6 +126,7 @@ void ComponentMgr::CleanComponent()
 
 int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const char *componentName)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     auto iter = compoentsCore_.find(componentName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component[%{public}s] in core", componentName);
