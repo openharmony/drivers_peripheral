@@ -28,7 +28,7 @@
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_SRV"
 #undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002500
+#define LOG_DOMAIN 0xD002515
 
 #undef DISPLAY_TRACE
 #define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
