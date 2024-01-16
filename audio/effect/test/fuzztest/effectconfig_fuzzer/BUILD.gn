@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../../audio.gni")
+hdf_audio_path = "./../../../.."
 
 module_output_path = "drivers_peripheral_audio/drivers_peripheral_audio"
 effect_config_path = "../../../config"
@@ -29,6 +30,7 @@ ohos_fuzztest("EffectConfigFuzzTest") {
   include_dirs = [
     "$effect_config_path/include",
     "//third_party/cJSON/",
+    "$hdf_audio_path/hdi_service/vendor_interface/utils",
   ]
 
   deps = [ "//third_party/cJSON:cjson" ]
