@@ -542,7 +542,7 @@ RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> met
     }
     rc = SendMeterMetaData(data);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("endMeterMetaData fail");
+        CAMERA_LOGE("SendMeterMetaData fail");
     }
     rc = SendFlashMetaData(data);
     if (rc == RC_ERROR) {
@@ -597,6 +597,14 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
             awbModeVal = V4L2_WHITE_BALANCE_MANUAL;
         }
 
+        if (awbMode == OHOS_CAMERA_AWB_MODE_INCANDESCENT) {
+            awbModeVal = V4L2_WHITE_BALANCE_INCANDESCENT;
+        }
+
+        if (awbMode == OHOS_CAMERA_AWB_MODE_FLUORESCENT) {
+            awbModeVal = V4L2_WHITE_BALANCE_FLUORESCENT;
+        }
+
         if (awbMode == OHOS_CAMERA_AWB_MODE_DAYLIGHT) {
             awbModeVal = V4L2_WHITE_BALANCE_DAYLIGHT;
         }
@@ -610,7 +618,7 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
         }
 
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, &awbModeVal);
-        CAMERA_LOGI("Set CMD_AWB_MODE [%{public}d]", awbModeVal);
+        CAMERA_LOGI("Set CMD_AWB_MODE [%{public}d]", awbMode);
         if (rc == RC_OK) {
             CAMERA_LOGI("Send OHOS_CONTROL_AWB_MODE value=%{public}d success", awbModeVal);
         } else {
