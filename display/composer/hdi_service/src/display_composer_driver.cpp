@@ -22,7 +22,7 @@
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002500
+#define LOG_DOMAIN 0xD002515
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
