@@ -349,7 +349,7 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
 void InputDeviceManager::DeleteDevListNode(int index)
 {
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
-        if (it->first == index) {
+        if (it->first == (uint32_t)index) {
             it = inputDevList_.erase(it);
             devIndex_ -= 1;
         } else {
