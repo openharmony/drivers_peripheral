@@ -21,6 +21,11 @@
 extern "C" {
 #endif
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002514
+
 #ifdef HDF_LOG_TAG
 #undef HDF_LOG_TAG
 #endif
