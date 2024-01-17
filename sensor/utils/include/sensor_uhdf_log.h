@@ -16,7 +16,7 @@
 #ifndef SENSOR_UHDF_LOG_H
 #define SENSOR_UHDF_LOG_H
 
-#include "sensor_uhdf_log.h"
+#include "hdf_log.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN

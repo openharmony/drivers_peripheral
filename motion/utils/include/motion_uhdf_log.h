@@ -16,7 +16,7 @@
 #ifndef MOTION_UHDF_LOG_H
 #define MOTION_UHDF_LOG_H
 
-#include "motion_uhdf_log.h"
+#include "hdf_log.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
