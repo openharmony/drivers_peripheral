@@ -24,6 +24,7 @@ ohos_unittest("hdi_unittest_sensor") {
   include_dirs = [
     "../../../interfaces/include",
     "../../common/include",
+    "../../../utils/include",
   ]
 
   sources = [

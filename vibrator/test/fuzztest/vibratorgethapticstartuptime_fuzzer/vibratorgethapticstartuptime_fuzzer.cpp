@@ -16,7 +16,7 @@
 #include "vibratorgethapticstartuptime_fuzzer.h"
 #include "hdf_base.h"
 #include "v1_2/vibrator_interface_proxy.h"
-#include "vibrator_uhdf_log.h"
+#include "hdf_log.h"
 #include <securec.h>
 
 using namespace OHOS::HDI::Vibrator::V1_2;

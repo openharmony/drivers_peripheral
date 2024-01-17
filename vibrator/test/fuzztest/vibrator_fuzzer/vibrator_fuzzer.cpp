@@ -16,7 +16,7 @@
 #include "vibrator_fuzzer.h"
 #include <cstddef>
 #include <cstdint>
-#include "vibrator_uhdf_log.h"
+#include "hdf_log.h"
 #include "v1_1/vibrator_interface_stub.h"
 
 using namespace OHOS::HDI::Vibrator::V1_1;

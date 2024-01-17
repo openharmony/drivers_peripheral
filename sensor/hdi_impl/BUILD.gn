@@ -19,6 +19,7 @@ ohos_shared_library("libhdi_sensor_impl") {
   include_dirs = [
     "../interfaces/include/",
     "../interfaces/v1_0",
+    "../utils/include",
     "../hal/include",
   ]
 

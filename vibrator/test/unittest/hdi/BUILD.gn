@@ -19,7 +19,10 @@ import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 module_output_path = "hdf/vibrator"
 ohos_unittest("hdf_unittest_hdi_vibrator") {
   module_out_path = module_output_path
-  include_dirs = [ "../../../interfaces/include" ]
+  include_dirs = [
+    "../../../interfaces/include",
+    "../../../utils/include",
+  ]
 
   sources = [ "hdf_vibrator_hdi_test.cpp" ]
   cflags = [

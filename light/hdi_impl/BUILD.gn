@@ -19,6 +19,7 @@ ohos_shared_library("libhdi_light_impl") {
   include_dirs = [
     ".",
     "../interfaces/v1_0/",
+    "../utils/include",
     "../hal/include",
   ]
   sources = [ "light_interface_impl.cpp" ]

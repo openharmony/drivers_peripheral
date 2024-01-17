@@ -10,7 +10,7 @@
 #include <securec.h>
 #include "device_resource_if.h"
 #include "hdf_base.h"
-#include "vibrator_uhdf_log.h"
+#include "hdf_log.h"
 #include "i2c_if.h"
 #include "hdf_workqueue.h"
 #include "osal_mutex.h"
