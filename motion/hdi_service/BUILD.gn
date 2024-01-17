@@ -53,9 +53,7 @@ ohos_shared_library("libmotion_interface_service_1.1") {
 }
 
 ohos_shared_library("libmotion_driver") {
-  include_dirs = [
-    "../utils/include",
-  ]
+  include_dirs = [ "../utils/include" ]
   sources = [ "motion_if_driver.cpp" ]
 
   cflags = [
