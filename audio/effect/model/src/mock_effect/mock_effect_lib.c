@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "hdf_log.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "v1_0/effect_types_vdi.h"
 #include "v1_0/ieffect_control_vdi.h"
 #include "v1_0/effect_factory.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_EFFECT_NAME_LEN      64
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
