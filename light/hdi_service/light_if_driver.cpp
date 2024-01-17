@@ -15,7 +15,7 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
+#include "light_uhdf_log.h"
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "v1_0/light_interface_stub.h"

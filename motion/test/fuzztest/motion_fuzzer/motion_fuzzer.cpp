@@ -16,7 +16,7 @@
 #include "motion_fuzzer.h"
 #include <cstddef>
 #include <cstdint>
-#include "hdf_log.h"
+#include "motion_uhdf_log.h"
 #include "v1_1/motion_interface_stub.h"
 
 using namespace OHOS::HDI::Motion::V1_1;

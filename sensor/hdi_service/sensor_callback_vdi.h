@@ -17,7 +17,7 @@
 #define HDI_SENSOR_CALLBACK_VDI_H
 
 #include <iproxy_broker.h>
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "isensor_callback_vdi.h"
 #include "v2_0/isensor_interface.h"
 #include "v2_0/sensor_types.h"

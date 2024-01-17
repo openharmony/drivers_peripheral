@@ -15,7 +15,7 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
+#include "motion_uhdf_log.h"
 #include <hdf_sbuf_ipc.h>
 #include "v1_1/motion_interface_stub.h"
 
