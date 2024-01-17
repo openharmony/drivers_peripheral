@@ -16,7 +16,7 @@
 #ifndef VIBRATOR_UHDF_LOG_H
 #define VIBRATOR_UHDF_LOG_H
 
-#include "vibrator_uhdf_log.h"
+#include "hdf_log.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
