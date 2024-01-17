@@ -16,11 +16,11 @@
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
-#include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
 #include "v2_0/iaudio_manager.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRV
 

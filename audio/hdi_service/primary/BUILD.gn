@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("../../audio.gni")
+hdf_hdi_service_path = "./.."
 
 ohos_shared_library("audio_primary_driver") {
   sources = [ "audio_manager_driver.c" ]
@@ -29,6 +30,7 @@ ohos_shared_library("audio_primary_driver") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   external_deps += [ "drivers_interface_audio:libaudio_stub_2.0" ]
@@ -54,6 +56,7 @@ ohos_shared_library("audio_manager_service_2.0") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
   external_deps += [ "drivers_interface_audio:libaudio_stub_2.0" ]
 

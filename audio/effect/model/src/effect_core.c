@@ -25,8 +25,8 @@
 
 #include "effect_core.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "osal_mem.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 

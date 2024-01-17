@@ -16,10 +16,10 @@
 #include "effect_host_common.h"
 
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "v1_0/effect_types.h"
 #include "v1_0/effect_types_vdi.h"
 #include "v1_0/ieffect_control_vdi.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 

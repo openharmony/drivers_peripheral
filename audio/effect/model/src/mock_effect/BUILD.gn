@@ -22,6 +22,7 @@ if (!defined(ohos_lite)) {
       "$hdf_audio_path/interfaces/effect",
       "../../include",
       "//third_party/bounds_checking_function/include",
+      "$hdf_audio_path/hdi_service/vendor_interface/utils",
     ]
 
     defines = []

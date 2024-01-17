@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+hdf_audio_path = "./../.."
 
 ohos_shared_library("effect_model_service") {
   sources = [ "audio_effect_driver.c" ]
@@ -29,6 +30,7 @@ ohos_shared_library("effect_model_service") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  include_dirs = [ "$hdf_audio_path/hdi_service/vendor_interface/utils" ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
