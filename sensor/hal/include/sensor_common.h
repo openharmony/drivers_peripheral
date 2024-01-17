@@ -17,6 +17,7 @@
 #define HDI_SENSOR_COMMON_H
 
 #include <stdio.h>
+#include "sensor_uhdf_log.h"
 
 #define CHECK_NULL_PTR_RETURN_VALUE(ptr, ret) do { \
     if ((ptr) == NULL) { \
