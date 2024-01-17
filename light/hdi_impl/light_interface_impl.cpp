@@ -15,7 +15,7 @@
 
 #include "light_interface_impl.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
+#include "light_uhdf_log.h"
 #include "devhost_dump_reg.h"
 #include "light_dump.h"
 #include "light_if.h"

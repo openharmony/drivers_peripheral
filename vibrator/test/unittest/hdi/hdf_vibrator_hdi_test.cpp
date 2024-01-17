@@ -21,7 +21,7 @@
 #include "osal_time.h"
 #include "v1_2/ivibrator_interface.h"
 #include "vibrator_type.h"
-#include "hdf_log.h"
+#include "vibrator_uhdf_log.h"
 
 using namespace OHOS::HDI::Vibrator;
 using namespace OHOS::HDI::Vibrator::V1_2;

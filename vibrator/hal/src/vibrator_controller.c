@@ -16,7 +16,7 @@
 #include "vibrator_controller.h"
 #include <securec.h>
 #include "hdf_base.h"
-#include "hdf_log.h"
+#include "vibrator_uhdf_log.h"
 #include "osal_mem.h"
 
 #define HDF_LOG_TAG uhdf_vibrator_service

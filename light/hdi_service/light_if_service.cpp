@@ -15,7 +15,7 @@
 
 #include "light_if_service.h"
 #include <hdf_base.h>
-#include "hdf_log.h"
+#include "light_uhdf_log.h"
 #include "hitrace_meter.h"
 
 #define HDF_LOG_TAG   "uhdf_light_service"

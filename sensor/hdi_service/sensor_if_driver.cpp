@@ -15,7 +15,7 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
+#include "sensor_uhdf_log.h"
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
