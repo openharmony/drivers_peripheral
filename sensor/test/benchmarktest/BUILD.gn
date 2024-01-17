@@ -23,6 +23,7 @@ ohos_benchmarktest("hdf_sensor_benchmark_test") {
 
   include_dirs = [
     "../../interfaces/include",
+    "../../utils/include",
     "../common/include",
   ]
 

@@ -21,6 +21,7 @@
 #include "sensor_common.h"
 #include "sensor_manager.h"
 #include "sensor_type.h"
+#include "sensor_uhdf_log.h"
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 

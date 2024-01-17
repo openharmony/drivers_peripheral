@@ -20,6 +20,7 @@ ohos_shared_library("libsensor_interface_service_2.0") {
     ".",
     "../interfaces/include",
     "../interfaces/v1_0",
+    "../utils/include",
   ]
 
   sources = [
@@ -62,7 +63,10 @@ ohos_shared_library("libsensor_interface_service_2.0") {
 }
 
 ohos_shared_library("libsensor_driver") {
-  include_dirs = [ "../interfaces/include/" ]
+  include_dirs = [
+    "../interfaces/include/",
+    "../utils/include",
+  ]
   sources = [ "sensor_if_driver.cpp" ]
 
   cflags = [
