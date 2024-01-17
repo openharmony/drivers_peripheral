@@ -16,7 +16,7 @@
 #include "sensor_dump.h"
 #include <inttypes.h>
 #include "devhost_dump_reg.h"
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "sensor_channel.h"
 #include "sensor_controller.h"
 #include "sensor_manager.h"

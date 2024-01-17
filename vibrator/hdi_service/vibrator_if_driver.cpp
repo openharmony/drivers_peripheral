@@ -16,7 +16,7 @@
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
-#include <hdf_log.h>
+#include "vibrator_uhdf_log.h"
 #include <osal_mem.h>
 #include "v1_2/vibrator_interface_stub.h"
 

@@ -18,7 +18,7 @@
 
 #include "v1_1/imotion_interface.h"
 #include "imotion_callback_vdi.h"
-#include "hdf_log.h"
+#include "motion_uhdf_log.h"
 #include "refbase.h"
 
 namespace OHOS {

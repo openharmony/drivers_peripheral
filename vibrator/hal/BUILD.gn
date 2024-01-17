@@ -27,6 +27,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "../interfaces/include",
+      "../utils/include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -59,6 +60,7 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "include",
+      "../utils/include",
       "//third_party/bounds_checking_function/include",
     ]
 

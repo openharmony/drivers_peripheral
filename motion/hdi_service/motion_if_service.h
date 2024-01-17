@@ -17,7 +17,7 @@
 #define OHOS_HDI_MOTION_V1_1_MOTIONIFSERVICE_H
 
 #include "imotion_interface_vdi.h"
-#include "hdf_log.h"
+#include "motion_uhdf_log.h"
 #include "motion_callback_vdi.h"
 #include "v1_1/imotion_interface.h"
 

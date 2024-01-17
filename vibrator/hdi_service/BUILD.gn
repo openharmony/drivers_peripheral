@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
       "../interfaces/include/",
       ".",
       "../interfaces/v1_1/",
+      "../utils/include",
     ]
     sources = [ "vibrator_if_service.cpp" ]
     deps = [ "../hal:hdi_vibrator" ]
@@ -60,7 +61,10 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("libvibrator_driver") {
-    include_dirs = [ "../interfaces/include/" ]
+    include_dirs = [
+      "../interfaces/include/",
+      "../utils/include",
+    ]
     sources = [ "vibrator_if_driver.cpp" ]
 
     cflags = [

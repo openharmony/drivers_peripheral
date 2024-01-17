@@ -23,7 +23,7 @@
 #include "v2_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include <unistd.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
