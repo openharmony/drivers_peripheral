@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "sensor_clients_manager.h"
 
 #define HDF_LOG_TAG uhdf_sensor_service

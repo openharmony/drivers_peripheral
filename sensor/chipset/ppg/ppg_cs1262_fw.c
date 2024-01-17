@@ -8,7 +8,7 @@
 
 #include <securec.h>
 #include "osal_file.h"
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "ppg_cs1262.h"
 
 #define PPG_CONFIG_START_MAGIC 0x1262

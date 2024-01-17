@@ -16,7 +16,7 @@
 #include "sensor_if_service.h"
 #include <refbase.h>
 #include <cinttypes>
-#include "hdf_log.h"
+#include "sensor_uhdf_log.h"
 #include "hitrace_meter.h"
 #include "sensor_type.h"
 #include "sensor_callback_vdi.h"

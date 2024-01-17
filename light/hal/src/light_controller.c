@@ -21,7 +21,7 @@
 #include "hdf_base.h"
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
-#include "hdf_log.h"
+#include "light_uhdf_log.h"
 #include "light_dump.h"
 #include "light_if.h"
 #include "light_type.h"

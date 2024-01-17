@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include "devhost_dump_reg.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
+#include "light_uhdf_log.h"
 #include "light_controller.h"
 #include "light_type.h"
 

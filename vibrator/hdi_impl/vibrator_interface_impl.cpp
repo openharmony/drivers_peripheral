@@ -17,7 +17,7 @@
 #include <securec.h>
 #include <string>
 #include <hdf_base.h>
-#include <hdf_log.h>
+#include "vibrator_uhdf_log.h"
 #include "vibrator_if.h"
 
 #define HDF_LOG_TAG    uhdf_vibrator_service

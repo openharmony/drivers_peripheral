@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <iproxy_broker.h>
-#include <hdf_log.h>
+#include "sensor_uhdf_log.h"
 #include "hitrace_meter.h"
 #include "sensor_dump.h"
 

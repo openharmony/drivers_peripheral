@@ -15,7 +15,7 @@
 
 #include "vibrator_if_service.h"
 #include <hdf_base.h>
-#include "hdf_log.h"
+#include "vibrator_uhdf_log.h"
 #include "hitrace_meter.h"
 
 #define HDF_LOG_TAG    "uhdf_vibrator_service"

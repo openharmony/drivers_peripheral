@@ -16,7 +16,7 @@
 #include "light_fuzzer.h"
 #include <cstddef>
 #include <cstdint>
-#include "hdf_log.h"
+#include "light_uhdf_log.h"
 #include "v1_0/light_interface_stub.h"
 
 using namespace OHOS::HDI::Light::V1_0;
