@@ -16,7 +16,7 @@
 #include "sensor_fuzzer.h"
 #include <cstddef>
 #include <cstdint>
-#include hdf_log.h"
+#include "hdf_log.h"
 #include "v2_0/sensor_interface_stub.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
