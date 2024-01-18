@@ -2269,6 +2269,7 @@ int32_t ProcessEventP2pInvitationReceived(struct HdfWpaRemoteNode *node,
     if ((hdiP2pInvitationReceivedParam == NULL) || (WpaFillP2pInvitationReceivedParam(
         invitationReceivedParam, hdiP2pInvitationReceivedParam) != HDF_SUCCESS)) {
         HDF_LOGE("%{public}s: hdiP2pInvitationReceivedParam is NULL or invitationReceivedParam fialed!", __func__);
+        return ret;
     } else {
         ret = node->callbackObj->OnEventInvitationReceived(node->callbackObj, hdiP2pInvitationReceivedParam, ifName);
     }
@@ -2290,6 +2291,7 @@ int32_t ProcessEventP2pInvitationResult(struct HdfWpaRemoteNode *node,
     if ((hdiP2pInvitationResultParam == NULL) || (WpaFillP2pInvitationResultParam(
         invitationResultParam, hdiP2pInvitationResultParam) != HDF_SUCCESS)) {
         HDF_LOGE("%{public}s: hdiP2pInvitationResultParam is NULL or invitationResultParam fialed!", __func__);
+        return ret;
     } else {
         ret = node->callbackObj->OnEventInvitationResult(node->callbackObj, hdiP2pInvitationResultParam, ifName);
     }
