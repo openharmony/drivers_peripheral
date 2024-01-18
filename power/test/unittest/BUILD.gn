@@ -22,7 +22,10 @@ power_hdi_service_path = "../../interfaces/hdi_service"
 ohos_unittest("hdi_unittest_power") {
   module_out_path = module_output_path
 
-  include_dirs = [ "../../interfaces/hdi_service/include" ]
+  include_dirs = [
+    "../../interfaces/hdi_service/include",
+    "../../utils/include",
+  ]
 
   sources = [ "src/hdf_power_hdi_test.cpp" ]
 
@@ -55,6 +58,7 @@ ohos_unittest("hdi_unittest_power_runninglock") {
   include_dirs = [
     "${power_hdi_service_path}/src",
     "mock",
+    "../../utils/include",
   ]
 
   sources = [

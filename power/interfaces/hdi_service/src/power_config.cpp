@@ -16,7 +16,7 @@
 #include "power_config.h"
 #include "string_ex.h"
 #include "config_policy_utils.h"
-#include "hdf_log.h"
+#include "power_hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
