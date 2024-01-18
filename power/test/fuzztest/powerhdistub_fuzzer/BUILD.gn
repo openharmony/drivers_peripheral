@@ -17,7 +17,10 @@ import("//build/test.gni")
 ohos_fuzztest("PowerHdiStubFuzzTest") {
   module_out_path = "drivers_peripheral_power/drivers_peripheral_power"
   fuzz_config_file = "."
-  include_dirs = [ "../../../interfaces/hdi_service/src" ]
+  include_dirs = [
+    "../../../interfaces/hdi_service/src",
+    "../../../utils/include",
+  ]
   cflags = [
     "-g",
     "-O0",

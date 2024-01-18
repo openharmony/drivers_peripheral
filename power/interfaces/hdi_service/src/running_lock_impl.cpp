@@ -16,7 +16,7 @@
 #include "running_lock_impl.h"
 
 #include "hdf_base.h"
-#include "hdf_log.h"
+#include "power_hdf_log.h"
 #include "system_operation.h"
 
 namespace OHOS {
