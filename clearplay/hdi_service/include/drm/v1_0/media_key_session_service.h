@@ -35,29 +35,28 @@ class KeySessionServiceCallback;
 class MediaKeySessionService : public OHOS::HDI::Drm::V1_0::IMediaKeySession {
 public:
     MediaKeySessionService();
-    MediaKeySessionService(SecurityLevel level);
+    MediaKeySessionService(ContentProtectionLevel level);
     virtual ~MediaKeySessionService() = default;
 
-    int32_t GenerateLicenseRequest(const LicenseRequestInfo& licenseRequestInfo,
-         LicenseRequest& licenseRequest) override;
+    int32_t GenerateMediaKeyRequest(const MediaKeyRequestInfo& mediaKeyRequestInfo,
+         MediaKeyRequest& mediaKeyRequest) override;
 
-    int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
-         std::vector<uint8_t>& licenseId) override;
+    int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediaKeyResponse,
+         std::vector<uint8_t>& mediaKeyId) override;
 
-    int32_t CheckLicenseStatus(std::map<std::string,
-         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) override;
+    int32_t CheckMediaKeyStatus(std::map<std::string, std::string>& mediaKeyStatus) override;
 
-    int32_t RemoveLicense() override;
+    int32_t ClearMediaKeys() override;
 
-    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId,
+    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediaKeyId,
          std::vector<uint8_t>& releaseRequest) override;
 
-    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId,
+    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediaKeyId,
          const std::vector<uint8_t>& response) override;
 
-    int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) override;
+    int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) override;
 
-    int32_t GetSecurityLevel(SecurityLevel& level) override;
+    int32_t GetContentProtectionLevel(ContentProtectionLevel& level) override;
 
     int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) override;
 
@@ -75,7 +74,7 @@ public:
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
-    SecurityLevel level_;
+    ContentProtectionLevel level_;
     sptr<OHOS::HDI::Drm::V1_0::MediaDecryptModuleService> decryptModule_;
     sptr<KeySessionServiceCallback> sessionCallback_;
     std::mutex offlineKeyMutex_;

@@ -35,26 +35,25 @@ public:
         return true;
     }
 
-    int32_t GenerateLicenseRequest(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
-         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest) override;
+    int32_t GenerateMediaKeyRequest(const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& mediaKeyRequestInfo,
+         OHOS::HDI::Drm::V1_0::MediaKeyRequest& mediaKeyRequest) override;
 
-    int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
-         std::vector<uint8_t>& licenseId) override;
+    int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediaKeyResponse,
+         std::vector<uint8_t>& mediaKeyId) override;
 
-    int32_t CheckLicenseStatus(std::map<std::string,
-         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) override;
+    int32_t CheckMediaKeyStatus(std::map<std::string, std::string>& mediaKeyStatus) override;
 
-    int32_t RemoveLicense() override;
+    int32_t ClearMediaKeys() override;
 
-    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId,
+    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediaKeyId,
          std::vector<uint8_t>& releaseRequest) override;
 
-    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId,
+    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediaKeyId,
          const std::vector<uint8_t>& response) override;
 
-    int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) override;
+    int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) override;
 
-    int32_t GetSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) override;
+    int32_t GetContentProtectionLevel(OHOS::HDI::Drm::V1_0::ContentProtectionLevel& level) override;
 
     int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) override;
 
@@ -66,26 +65,27 @@ public:
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
-    static int32_t GenerateLicenseRequest_(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
-         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest, const sptr<IRemoteObject> remote);
+    static int32_t GenerateMediaKeyRequest_(const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& mediaKeyRequestInfo,
+         OHOS::HDI::Drm::V1_0::MediaKeyRequest& mediaKeyRequest, const sptr<IRemoteObject> remote);
 
-    static int32_t ProcessLicenseResponse_(const std::vector<uint8_t>& licenseResponse, std::vector<uint8_t>& licenseId,
+    static int32_t ProcessMediaKeyResponse_(const std::vector<uint8_t>& mediaKeyResponse,
+         std::vector<uint8_t>& mediaKeyId, const sptr<IRemoteObject> remote);
+
+    static int32_t CheckMediaKeyStatus_(std::map<std::string, std::string>& mediaKeyStatus,
          const sptr<IRemoteObject> remote);
 
-    static int32_t CheckLicenseStatus_(std::map<std::string,
-         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus, const sptr<IRemoteObject> remote);
+    static int32_t ClearMediaKeys_(const sptr<IRemoteObject> remote);
 
-    static int32_t RemoveLicense_(const sptr<IRemoteObject> remote);
-
-    static int32_t GetOfflineReleaseRequest_(const std::vector<uint8_t>& licenseId,
+    static int32_t GetOfflineReleaseRequest_(const std::vector<uint8_t>& mediaKeyId,
          std::vector<uint8_t>& releaseRequest, const sptr<IRemoteObject> remote);
 
-    static int32_t ProcessOfflineReleaseResponse_(const std::vector<uint8_t>& licenseId,
+    static int32_t ProcessOfflineReleaseResponse_(const std::vector<uint8_t>& mediaKeyId,
          const std::vector<uint8_t>& response, const sptr<IRemoteObject> remote);
 
-    static int32_t RestoreOfflineLicense_(const std::vector<uint8_t>& licenseId, const sptr<IRemoteObject> remote);
+    static int32_t RestoreOfflineMediaKeys_(const std::vector<uint8_t>& mediaKeyId, const sptr<IRemoteObject> remote);
 
-    static int32_t GetSecurityLevel_(OHOS::HDI::Drm::V1_0::SecurityLevel& level, const sptr<IRemoteObject> remote);
+    static int32_t GetContentProtectionLevel_(OHOS::HDI::Drm::V1_0::ContentProtectionLevel& level,
+         const sptr<IRemoteObject> remote);
 
     static int32_t RequiresSecureDecoderModule_(const std::string& mimeType, bool& required,
          const sptr<IRemoteObject> remote);
