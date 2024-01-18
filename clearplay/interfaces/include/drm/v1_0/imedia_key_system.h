@@ -61,16 +61,16 @@ enum {
     CMD_MEDIA_KEY_SYSTEM_SET_CONFIGURATION_STRING = 2,
     CMD_MEDIA_KEY_SYSTEM_GET_CONFIGURATION_BYTE_ARRAY = 3,
     CMD_MEDIA_KEY_SYSTEM_SET_CONFIGURATION_BYTE_ARRAY = 4,
-    CMD_MEDIA_KEY_SYSTEM_GET_METRICS = 5,
-    CMD_MEDIA_KEY_SYSTEM_GET_MAX_SECURITY_LEVEL = 6,
+    CMD_MEDIA_KEY_SYSTEM_GET_STATISTICS = 5,
+    CMD_MEDIA_KEY_SYSTEM_GET_MAX_CONTENT_PROTECTION_LEVEL = 6,
     CMD_MEDIA_KEY_SYSTEM_GENERATE_KEY_SYSTEM_REQUEST = 7,
     CMD_MEDIA_KEY_SYSTEM_PROCESS_KEY_SYSTEM_RESPONSE = 8,
     CMD_MEDIA_KEY_SYSTEM_GET_OEM_CERTIFICATE_STATUS = 9,
     CMD_MEDIA_KEY_SYSTEM_SET_CALLBACK = 10,
     CMD_MEDIA_KEY_SYSTEM_CREATE_MEDIA_KEY_SESSION = 11,
-    CMD_MEDIA_KEY_SYSTEM_GET_OFFLINE_LICENSE_IDS = 12,
-    CMD_MEDIA_KEY_SYSTEM_GET_OFFLINE_LICENSE_STATUS = 13,
-    CMD_MEDIA_KEY_SYSTEM_REMOVE_OFFLINE_LICENSE = 14,
+    CMD_MEDIA_KEY_SYSTEM_GET_OFFLINE_MEDIA_KEY_IDS = 12,
+    CMD_MEDIA_KEY_SYSTEM_GET_OFFLINE_MEDIA_KEY_STATUS = 13,
+    CMD_MEDIA_KEY_SYSTEM_CLEAR_OFFLINE_MEDIA_KEYS = 14,
     CMD_MEDIA_KEY_SYSTEM_GET_OEM_CERTIFICATE = 15,
     CMD_MEDIA_KEY_SYSTEM_DESTROY = 16,
 };
@@ -89,9 +89,9 @@ public:
 
     virtual int32_t SetConfigurationByteArray(const std::string& name, const std::vector<uint8_t>& value) = 0;
 
-    virtual int32_t GetMetrics(std::map<std::string, std::string>& metrics) = 0;
+    virtual int32_t GetStatistics(std::map<std::string, std::string>& statistics) = 0;
 
-    virtual int32_t GetMaxSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
+    virtual int32_t GetMaxContentProtectionLevel(OHOS::HDI::Drm::V1_0::ContentProtectionLevel& level) = 0;
 
     virtual int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) = 0;
 
@@ -101,15 +101,15 @@ public:
 
     virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback) = 0;
 
-    virtual int32_t CreateMediaKeySession(OHOS::HDI::Drm::V1_0::SecurityLevel level,
+    virtual int32_t CreateMediaKeySession(OHOS::HDI::Drm::V1_0::ContentProtectionLevel level,
          sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) = 0;
 
-    virtual int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) = 0;
+    virtual int32_t GetOfflineMediaKeyIds(std::vector<std::vector<uint8_t>>& mediaKeyIds) = 0;
 
-    virtual int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
-         OHOS::HDI::Drm::V1_0::OfflineLicenseStatus& licenseStatus) = 0;
+    virtual int32_t GetOfflineMediaKeyStatus(const std::vector<uint8_t>& mediaKeyId,
+         OHOS::HDI::Drm::V1_0::OfflineMediaKeyStatus& mediaKeyStatus) = 0;
 
-    virtual int32_t RemoveOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
+    virtual int32_t ClearOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) = 0;
 
     virtual int32_t GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate>& oemCert) = 0;
 

@@ -38,9 +38,9 @@ public:
 
     int32_t SetConfigurationByteArray(const std::string& name, const std::vector<uint8_t>& value) override;
 
-    int32_t GetMetrics(std::map<std::string, std::string>& metrics) override;
+    int32_t GetStatistics(std::map<std::string, std::string>& statistics) override;
 
-    int32_t GetMaxSecurityLevel(SecurityLevel& level) override;
+    int32_t GetMaxContentProtectionLevel(ContentProtectionLevel& level) override;
 
     int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
 
@@ -50,15 +50,15 @@ public:
 
     int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& systemCallback) override;
 
-    int32_t CreateMediaKeySession(SecurityLevel level,
+    int32_t CreateMediaKeySession(ContentProtectionLevel level,
          sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) override;
 
-    int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) override;
+    int32_t GetOfflineMediaKeyIds(std::vector<std::vector<uint8_t>>& mediaKeyIds) override;
 
-    int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId,
-         OfflineLicenseStatus& licenseStatus) override;
+    int32_t GetOfflineMediaKeyStatus(const std::vector<uint8_t>& mediaKeyId,
+         OfflineMediaKeyStatus& mediaKeyStatus) override;
 
-    int32_t RemoveOfflineLicense(const std::vector<uint8_t>& licenseId) override;
+    int32_t ClearOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) override;
 
     int32_t GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate>& oemCert) override;
 

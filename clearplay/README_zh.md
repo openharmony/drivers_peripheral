@@ -34,7 +34,7 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
 
   | 功能描述                         | 接口名称                                                     |
   | -------------------------------- | ------------------------------------------------------------ |
-  | 查询设备是否支持uuid/媒体类型/安全级别对应的插件     | int32_t IsMediaKeySystemSupported(const std::string& uuid, const std::string& mimeType, SecurityLevel level, bool& isSupported) |
+  | 查询设备是否支持uuid/媒体类型/安全级别对应的插件     | int32_t IsMediaKeySystemSupported(const std::string& uuid, const std::string& mimeType, ContentProtectionLevel level, bool& isSupported) |
   | 创建MediaKeySysem对象                             | int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) |
   | 获取插件版本                                      | int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) |
  
@@ -48,17 +48,17 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
   | 根据配置类型和属性名获取对应配置值，包括输出保护状态、设备属性、支持的最大会话数、当前会话数                          | int32_t GetConfigurationByteArray(const std::string& name, std::vector<uint8_t>& value) |
   | 根据配置类型和属性名设置对应配置值                           | int32_t SetConfigurationByteArray(const std::string& name, const std::vector<uint8_t>& value) |
   | 获取DRM度量值                                              | int32_t GetMetrics(std::map<std::string, std::string>& metrics) |
-  | 获取MediaKeySystem最大安全级别                              | int32_t GetMaxSecurityLevel(SecurityLevel& level) |
+  | 获取MediaKeySystem最大安全级别                              | int32_t GetMaxContentProtectionLevel(ContentProtectionLevel& level) |
   | 生成设备证书获取请求                                        | int32_t GenerateKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) |
   | 解析设备证书获取响应                                        | int32_t ProcessKeySystemResponse(const std::vector<uint8_t>& response) |
   | 获取证书状态                                               | int32_t GetOemCertificateStatus(CertificateStatus& status) |
   | 注册和取消注册MediaKeySystem监听时事件                      | int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemCallback>& callback) |
-  | 根据安全级别创建会话                                        | int32_t CreateMediaKeySession(SecurityLevel level,
+  | 根据安全级别创建会话                                        | int32_t CreateMediaKeySession(ContentProtectionLevel level,
   sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) |
   | 创建会话                                                   | int32_t CreateMediaKeySessionDefault(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession>& keySession) |
-  | 获取所有离线密钥或密钥组索引                                 | int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) |
-  | 获取所有离线密钥或密钥组索引                                 | int32_t GetOfflineLicenseIds(std::vector<std::vector<uint8_t>>& licenseIds) |
-  | 获取指定离线密钥或密钥组状态                                 | int32_t GetOfflineLicenseStatus(const std::vector<uint8_t>& licenseId, OfflineLicenseStatus& licenseStatus) |
+  | 获取所有离线密钥或密钥组索引                                 | int32_t GetOfflineMediaKeyIds(std::vector<std::vector<uint8_t>>& mediakeyIds) |
+  | 获取所有离线密钥或密钥组索引                                 | int32_t GetOfflineMediaKeyIds(std::vector<std::vector<uint8_t>>& mediakeyIds) |
+  | 获取指定离线密钥或密钥组状态                                 | int32_t GetOfflineMediaKeyStatus(const std::vector<uint8_t>& mediakeyId, OfflineMediaKeyStatus& mediakeyStatus) |
   | 获取OEM证书                                                | int32_t GetOemCertificate(sptr<OHOS::HDI::Drm::V1_0::IOemCertificate>& oemCert) |
   | 释放MediaKeySystem                                         | int32_t Destroy() |
 
@@ -67,15 +67,15 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
 
   | 功能描述                         | 接口名称                                                     |
   | -------------------------------- | ------------------------------------------------------------ |
-  | 生成一个许可证获取请求             | int32_t GenerateLicenseRequest(const LicenseRequestInfo& licenseRequestInfo,
-  LicenseRequest& licenseRequest) |
-  | 解析许可证获取响应                 | int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse, std::vector<uint8_t>& licenseId) | 
-  | 检查当前会话的许可证状态            | int32_t CheckLicenseStatus(std::map<std::string, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) |
-  | 移除当前会话下所有许可证            | int32_t RemoveLicense() |
-  | 生成离线密钥释放请求                | int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId, std::vector<uint8_t>& releaseRequest) |
-  | 解析离线密钥释放响应                | int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId, const std::vector<uint8_t>& response) |
-  | 恢复离线密钥和密钥组，并加载到当前会话中                           | int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) |
-  | 获取KeySession安全级别              | int32_t GetSecurityLevel(SecurityLevel& level) |
+  | 生成一个许可证获取请求             | int32_t GenerateMediaKeyRequest(const MediaKeyRequestInfo& mediakeyRequestInfo,
+  MediaKeyRequest& mediakeyRequest) |
+  | 解析许可证获取响应                 | int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediakeyResponse, std::vector<uint8_t>& mediakeyId) | 
+  | 检查当前会话的许可证状态            | int32_t CheckMediaKeyStatus(std::map<std::string, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& mediakeyStatus) |
+  | 移除当前会话下所有许可证            | int32_t RemoveMediaKey() |
+  | 生成离线密钥释放请求                | int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediakeyId, std::vector<uint8_t>& releaseRequest) |
+  | 解析离线密钥释放响应                | int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediakeyId, const std::vector<uint8_t>& response) |
+  | 恢复离线密钥和密钥组，并加载到当前会话中                           | int32_t RestoreOfflineMediaKey(const std::vector<uint8_t>& mediakeyId) |
+  | 获取KeySession安全级别              | int32_t GetContentProtectionLevel(ContentProtectionLevel& level) |
   | 查询是否支持安全解码                 | int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) |
   | 注册和取消注册监听事件               | int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback>& callback) |
   | 获取解密模块                        | int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule>& decryptModule) |
@@ -95,7 +95,7 @@ OpenHarmony ClearPlay驱动对上实现媒体版权保护（DRM）的HDI（Hardw
   | 功能描述                       | 接口名称                                                     |
   | ------------------------------| ------------------------------------------------------------ |
   | HDI MediaKeySession事件监听接口                  | int32_t SendEvent(EventType eventType, int32_t extra, const std::vector<uint8_t>& data) |
-  | HDI MediaKeySession事件监听接口，密钥状态改变     | int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense) |
+  | HDI MediaKeySession事件监听接口，密钥状态改变     | int32_t SendEventKeyChange(const std::map<std::vector<uint8_t>, OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodMediaKey) |
 
 - imedia_key_system_callback.h
 
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     std::vector<uint8_t> inputValue;
     std::vector<uint8_t> outputValue;
     std::map<std::string, std::string> metric;
-    SecurityLevel level = SECURE_UNKNOWN;
+    ContentProtectionLevel level = SECURE_UNKNOWN;
     sptr<OHOS::HDI::Drm::V1_0::IKeySession> key_session_1;
     sptr<OHOS::HDI::Drm::V1_0::IKeySession> key_session_2;
     sptr<OHOS::HDI::Drm::V1_0::IKeySession> key_session_3;
@@ -193,8 +193,8 @@ int main(int argc, char *argv[])
         printf("key: %s, value: %s\n", pair.first.c_str(), pair.second.c_str());
     }
 
-    // GetSecurityLevel
-    printf("result of GetSecurityLevel: %d, expect: -1\n", media_key_system->GetSecurityLevel(level));
+    // GetContentProtectionLevel
+    printf("result of GetContentProtectionLevel: %d, expect: -1\n", media_key_system->GetContentProtectionLevel(level));
 
     // CreateKeySession
     /*
@@ -212,12 +212,12 @@ int main(int argc, char *argv[])
     media_key_system->CreateKeySession(HW_SECURE_DECODE, key_session_4);
     printf("CreateKeySession\n");
 
-    // GetSecurityLevel
-    printf("\ntest GetSecurityLevel\n");
-    media_key_system->GetSecurityLevel(level);
+    // GetContentProtectionLevel
+    printf("\ntest GetContentProtectionLevel\n");
+    media_key_system->GetContentProtectionLevel(level);
     printf("level: %d, expect: 4\n", level);
     key_session_4->Close();
-    media_key_system->GetSecurityLevel(level);
+    media_key_system->GetContentProtectionLevel(level);
     printf("level: %d, expect: 3\n", level);
 
     // GenerateKeySystemRequest
@@ -255,13 +255,13 @@ int main(int argc, char *argv[])
     media_key_system->CreateKeySession(SECURE_UNKNOWN, key_session);
     printf("CreateKeySession\n");
 
-    // ProcessLicenseResponse
-    printf("\ntest ProcessLicenseResponse\n");
+    // ProcessMediaKeyResponse
+    printf("\ntest ProcessMediaKeyResponse\n");
     std::string responseString = "key1:1234567812345678";
     std::vector<uint8_t> response(responseString.begin(), responseString.end());
     std::vector<uint8_t> keyId;
 
-    key_session->ProcessLicenseResponse(response, keyId);
+    key_session->ProcessMediaKeyResponse(response, keyId);
     printf("keyid: %s, expect: key1\n", keyId.data());
 
     // GetMediaDecryptModule
