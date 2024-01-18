@@ -208,7 +208,7 @@ HWTEST_F(HdfWpaHostDirectTest, WifiStatusTest_016, TestSize.Level1)
     (void)memset_s(
         &wifiStatus, sizeof(struct HdiWpaCmdStatus), 0, sizeof(struct HdiWpaCmdStatus));
     int32_t rc = g_wpaObj->WifiStatus(g_wpaObj, IFNAME, &wifiStatus);
-    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wpaObj->WifiStatus(g_wpaObj, IFNAME, nullptr);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
     rc = g_wpaObj->WifiStatus(g_wpaObj, nullptr, &wifiStatus);
