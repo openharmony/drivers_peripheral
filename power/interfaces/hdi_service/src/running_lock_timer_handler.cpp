@@ -15,7 +15,7 @@
 #include "running_lock_timer_handler.h"
 
 #include "common_timer_errors.h"
-#include "hdf_log.h"
+#include "power_hdf_log.h"
 
 namespace OHOS {
 namespace HDI {

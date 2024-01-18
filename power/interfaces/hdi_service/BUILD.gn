@@ -15,6 +15,7 @@ import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../power.gni")
 
 ohos_shared_library("libpower_interface_service_1.1") {
+  include_dirs = [ "../../utils/include" ]
   sources = [
     "src/power_interface_impl.cpp",
     "src/running_lock_counter.cpp",
