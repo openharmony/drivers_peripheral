@@ -18,7 +18,7 @@
 #include "hisysevent.h"
 #include "hdf_base.h"
 #include "system_operation.h"
-#include "hdf_log.h"
+#include "power_hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
