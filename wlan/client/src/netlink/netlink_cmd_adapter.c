@@ -873,6 +873,7 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
                 HILOG_ERROR(LOG_CORE, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
             }
+            HILOG_INFO(LOG_CORE, "%{public}s: ifName = %{public}s", __FUNCTION__, ifName);
             infoResult->nums++;
         }
         free(namelist[i]);
@@ -905,7 +906,7 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         return ret;
     }
 
-    HILOG_INFO(LOG_CORE, "%s: wifi iface num %d", __FUNCTION__, result->nums);
+    HILOG_INFO(LOG_CORE, "%{public}s: wifi iface num %{public}d", __FUNCTION__, result->nums);
     for (i = 0; i < result->nums; ++i) {
         ret = memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode), 0,
             sizeof(result->infos[i].supportMode));
