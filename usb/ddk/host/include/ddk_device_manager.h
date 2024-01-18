@@ -32,6 +32,7 @@ const struct UsbPnpNotifyMatchInfoTable *DdkDevMgrCreateDevice(const char *devic
 int32_t DdkDevMgrRemoveDevice(int32_t busNum, int32_t devNum, struct UsbPnpNotifyMatchInfoTable *info);
 int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv);
 int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *priv);
+bool DdkDevMgrGetGadgetLinkStatus();
 #ifdef __cplusplus
 }
 #endif
