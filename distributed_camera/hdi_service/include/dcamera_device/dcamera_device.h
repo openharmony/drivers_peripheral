@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ namespace DistributedHardware {
 using namespace OHOS::HDI::Camera::V1_0;
 class DCameraDevice : public ICameraDevice {
 public:
-    DCameraDevice(const DHBase &dhBase, const std::string &abilityInfo);
+    DCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo, const std::string& sourceAbilityInfo);
     DCameraDevice() = default;
     virtual ~DCameraDevice() = default;
     DCameraDevice(const DCameraDevice &other) = delete;
@@ -62,7 +62,7 @@ public:
     bool IsOpened();
 
 private:
-    void Init(const std::string &abilityInfo);
+    void Init(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
     DCamRetCode CreateDStreamOperator();
     std::string GenerateCameraId(const DHBase &dhBase);
     void NotifyStartCaptureError();
@@ -73,6 +73,7 @@ private:
     std::string dCameraId_;
     DHBase dhBase_;
     std::string dCameraAbilityInfo_;
+    std::string sourceAbilityInfo_;
     OHOS::sptr<ICameraDeviceCallback> dCameraDeviceCallback_;
     OHOS::sptr<IDCameraProviderCallback> dCameraProviderCallback_;
     OHOS::sptr<DStreamOperator> dCameraStreamOperator_;
