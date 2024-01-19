@@ -125,29 +125,29 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
         AUDIO_FUNC_LOGE("hwRender is invalid");
         ret = AUDIO_ERR_INVALID_PARAM;
     }
-    
-    if (hwRender->devDataHandle == NULL) {
-        AUDIO_FUNC_LOGE("RenderStart Bind Fail!");
-        ret = AUDIO_ERR_INTERNAL;
-    }
+    do {
+        if (hwRender->devDataHandle == NULL) {
+            AUDIO_FUNC_LOGE("RenderStart Bind Fail!");
+            ret = AUDIO_ERR_INTERNAL;
+            break;
+        }
 
-    InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
-    if (ret == AUDIO_SUCCESS) {
+        InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
         if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
             AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
             ret = AUDIO_ERR_INTERNAL;
+            break;
         }
-    }
-    if (ret == AUDIO_SUCCESS) {
         ret =
             (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_STOP);
         hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
         if (ret < 0) {
             AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
             ret = AUDIO_ERR_INTERNAL;
-        }
-    }  
-
+            break;
+        }  
+    } while (0)
+    
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
     } else {
