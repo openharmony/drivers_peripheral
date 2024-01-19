@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,7 +85,7 @@ void DStreamOperatorTest::TearDownTestCase(void)
 void DStreamOperatorTest::SetUp(void)
 {
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
-    dMetadataProcessor->InitDCameraAbility(TEST_ABILITY_VALUE);
+    dMetadataProcessor->InitDCameraAbility(TEST_ABILITY_VALUE, TEST_ABILITY_VALUE);
     dstreamOperator_ =  new (std::nothrow) DStreamOperator(dMetadataProcessor);
 }
 
@@ -106,7 +106,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_001, TestSize.Level1)
     DHBase dhBase;
     dhBase.deviceId_ = TEST_DEV_ID;
     dhBase.dhId_ = TEST_CAM_ID;
-    DCamRetCode rc = dstreamOperator_->InitOutputConfigurations(dhBase, TEST_ABILITY_VALUE);
+    DCamRetCode rc = dstreamOperator_->InitOutputConfigurations(dhBase, TEST_ABILITY_VALUE, TEST_ABILITY_VALUE);
     EXPECT_EQ(rc, SUCCESS);
 }
 

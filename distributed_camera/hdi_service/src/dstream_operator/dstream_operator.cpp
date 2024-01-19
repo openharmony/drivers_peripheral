@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -541,7 +541,8 @@ void DStreamOperator::GetCameraAttr(Json::Value &rootValue, std::string formatSt
     }
 }
 
-DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo)
+DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+    const std::string &sourceAbilityInfo)
 {
     dhBase_ = dhBase;
     JSONCPP_STRING errs;
@@ -549,23 +550,23 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
     Json::Value rootValue;
 
     std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(), &rootValue, &errs) ||
-        !rootValue.isObject()) {
-        DHLOGE("Input ablity info is not json object.");
+    if (!jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(),
+        &rootValue, &errs) || !rootValue.isObject()) {
+        DHLOGE("Input sink ablity info is not json object.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (!rootValue.isMember("CodecType") || !rootValue["CodecType"].isArray() ||
-        rootValue["CodecType"].size() == 0 || rootValue["CodecType"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("CodecType error.");
+    Json::Value srcRootValue;
+    if (!jsonReader->parse(sourceAbilityInfo.c_str(), sourceAbilityInfo.c_str() + sourceAbilityInfo.length(),
+        &srcRootValue, &errs) || !srcRootValue.isObject()) {
+        DHLOGE("Input source ablity info is not json object.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    uint32_t size = rootValue["CodecType"].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["CodecType"][i]).isString()) {
-            std::string codeType = (rootValue["CodecType"][i]).asString();
-            dcSupportedCodecType_.push_back(ConvertDCEncodeType(codeType));
-        }
+    dcSupportedCodecType_ = ParseEncoderTypes(rootValue);
+    sourceEncodeTypes_ = ParseEncoderTypes(srcRootValue);
+    if (dcSupportedCodecType_.empty() || sourceEncodeTypes_.empty()) {
+        DHLOGE("Get CodeType failed.");
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
@@ -584,6 +585,26 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         return DEVICE_NOT_INIT;
     }
     return SUCCESS;
+}
+
+std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(Json::Value& rootValue)
+{
+    std::vector<DCEncodeType> enCoders;
+    if (!rootValue.isMember("CodecType") || !rootValue["CodecType"].isArray() ||
+        (rootValue["CodecType"].size() == 0) || (rootValue["CodecType"].size() > JSON_ARRAY_MAX_SIZE)) {
+        DHLOGE("Get CodecType error.");
+        return enCoders;
+    }
+    uint32_t size = rootValue["CodecType"].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if (!(rootValue["CodecType"][i]).isString()) {
+            DHLOGE("Get CodecType error.");
+            return enCoders;
+        }
+        std::string codeType = (rootValue["CodecType"][i]).asString();
+        enCoders.push_back(ConvertDCEncodeType(codeType));
+    }
+    return enCoders;
 }
 
 DCamRetCode DStreamOperator::ParsePhotoFormats(Json::Value& rootValue)
@@ -1002,8 +1023,12 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
     }
 
     if ((tempResolution.width_ == 0) || (tempResolution.height_ == 0)) {
-        captureInfo->width_ = MAX_SUPPORT_PREVIEW_WIDTH;
-        captureInfo->height_ = MAX_SUPPORT_PREVIEW_HEIGHT;
+        DHLOGI("DStreamOperator::ChooseSuitableResolution, captureInfo. width = %d, height = %d. ", captureInfo->width_,
+            captureInfo->height_);
+        if (supportedResolutionList.size() > 0) {
+            captureInfo->width_ = supportedResolutionList[supportedResolutionList.size() - 1].width_;
+            captureInfo->height_ = supportedResolutionList[supportedResolutionList.size() - 1].height_;
+        }
     } else {
         captureInfo->width_ = tempResolution.width_;
         captureInfo->height_ = tempResolution.height_;
@@ -1020,15 +1045,12 @@ void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStr
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
     if ((streamInfo.at(0))->type_ == DCStreamType::CONTINUOUS_FRAME) {
-        if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
-            DCEncodeType::ENCODE_TYPE_H265)) {
+        if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(), DCEncodeType::ENCODE_TYPE_H265) &&
+            count(sourceEncodeTypes_.begin(), sourceEncodeTypes_.end(), DCEncodeType::ENCODE_TYPE_H265)) {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_H265;
-        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
-            DCEncodeType::ENCODE_TYPE_H264)) {
+        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(), DCEncodeType::ENCODE_TYPE_H264) &&
+            count(sourceEncodeTypes_.begin(), sourceEncodeTypes_.end(), DCEncodeType::ENCODE_TYPE_H264)) {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
-        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
-            DCEncodeType::ENCODE_TYPE_MPEG4_ES)) {
-            captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_MPEG4_ES;
         } else {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,8 +50,8 @@ public:
          sptr<ICameraDevice> &device) override;
     int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
 
-    DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
-        const sptr<IDCameraProviderCallback> &callback);
+    DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+        const std::string &sourceAbilityInfo, const sptr<IDCameraProviderCallback> &callback);
     DCamRetCode RemoveDCameraDevice(const DHBase &dhBase);
     OHOS::sptr<DCameraDevice> GetDCameraDeviceByDHBase(const DHBase &dhBase);
     void NotifyDCameraStatus(const DHBase &dhBase, int32_t result);

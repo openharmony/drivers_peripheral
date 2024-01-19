@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,9 +32,10 @@ void DstreamCommitStreamsFuzzTest(const uint8_t* data, size_t size)
     OperationMode mode = NORMAL;
     std::vector<uint8_t> modeSetting;
 
-    std::string abilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
-    dMetadataProcessor->InitDCameraAbility(abilityInfo);
+    dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo, srcAbilityInfo);
     OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));
 
     dCameraStreamOperator->CommitStreams(mode, modeSetting);
