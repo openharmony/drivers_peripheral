@@ -410,3 +410,62 @@ TEST_F(UtestUSBCamera3ATest, usb_camera_3a_003)
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
     EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
 }
+
+/**
+  * @tc.name: USB Camera 3A
+  * @tc.desc: set OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO first, then set OHOS_CAMERA_FOCUS_MODE_MANUAL
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCamera3ATest, usb_camera_3a_004)
+{
+    cameraBase_->OpenUsbCamera();
+    ability_ = cameraBase_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+
+    cameraBase_->AchieveStreamOperator();
+    cameraBase_->intents = {PREVIEW, STILL_CAPTURE};
+    cameraBase_->StartStream(cameraBase_->intents);
+
+    const uint32_t itemCapacity = 100;
+    const uint32_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
+        itemCapacity, dataCapacity);
+
+    int ohosTag = OHOS_CONTROL_FOCUS_MODE;
+    uint8_t tagVal = OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO;
+    if (!meta->addEntry(ohosTag, &tagVal, 1)) {
+        GTEST_SKIP();
+    }
+
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    tagVal = OHOS_CAMERA_FOCUS_MODE_MANUAL;
+    std::vector<uint8_t> valVector;
+    valVector.push_back(tagVal);
+    if (!meta->updateEntry(ohosTag, valVector.data(), valVector.size())) {
+        CAMERA_LOGE("update %{public}s failed", GetCameraMetadataItemName(ohosTag));
+    }
+
+    setting.clear();
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraBase_->rc = (CamRetCode)cameraBase_->cameraDevice->UpdateSettings(setting);
+    if (cameraBase_->rc != HDI::Camera::V1_0::NO_ERROR) {
+        GTEST_SKIP();
+    }
+
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+    EXPECT_EQ(cameraBase_->rc, HDI::Camera::V1_0::NO_ERROR);
+}
