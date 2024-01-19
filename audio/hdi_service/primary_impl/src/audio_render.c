@@ -119,39 +119,44 @@ int32_t AudioRenderStart(struct IAudioRender *handle)
 int32_t AudioRenderStop(struct IAudioRender *handle)
 {
     AUDIO_FUNC_LOGD("Enter.");
+    int32_t ret = AUDIO_SUCCESS;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is invalid");
-        return AUDIO_ERR_INVALID_PARAM;
+        ret = AUDIO_ERR_INVALID_PARAM;
     }
     
     if (hwRender->devDataHandle == NULL) {
         AUDIO_FUNC_LOGE("RenderStart Bind Fail!");
-        return AUDIO_ERR_INTERNAL;
+        ret = AUDIO_ERR_INTERNAL;
     }
 
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
-    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
-        return AUDIO_ERR_INTERNAL;
+    if (ret == AUDIO_SUCCESS) {
+        if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+            AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
+            ret = AUDIO_ERR_INTERNAL;
+        }
     }
+    if (ret == AUDIO_SUCCESS) {
+        ret =
+            (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_STOP);
+        hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
+            ret = AUDIO_ERR_INTERNAL;
+        }
+    }  
 
-    int32_t ret =
-        (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_STOP);
-    hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
     } else {
         AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
-        return AUDIO_ERR_NOT_SUPPORT;
-    }
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
-        return AUDIO_ERR_INTERNAL;
+        ret = AUDIO_ERR_NOT_SUPPORT;
     }
 
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Stop");
-    return AUDIO_SUCCESS;
+    return ret;
 }
 
 int32_t AudioRenderPause(struct IAudioRender *handle)
