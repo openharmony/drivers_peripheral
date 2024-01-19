@@ -123,7 +123,7 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is invalid");
-        ret = AUDIO_ERR_INVALID_PARAM;
+        return AUDIO_ERR_INVALID_PARAM;
     }
     do {
         if (hwRender->devDataHandle == NULL) {
