@@ -45,8 +45,6 @@ private:
     int32_t RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj);
 
     void ResetAgnssDeathRecipient();
-
-    void UnloadAgnssDevice();
 };
 class AgnssCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
