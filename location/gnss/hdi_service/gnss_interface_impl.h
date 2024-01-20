@@ -57,8 +57,6 @@ private:
     int32_t RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj);
 
     void ResetGnssDeathRecipient();
-    
-    void UnloadGnssDevice();
 };
 
 class GnssCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
