@@ -135,7 +135,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         HDF_LOGE("%{public}s : Stop failed!", __FUNCTION__);
         result = false;
     }
-    IWpaInterfaceReleaseInstance(g_wpaServiceName, g_wpaObj, false);
+    IWpaInterfaceReleaseInstance(g_wpaServiceName, g_wpaObj, true);
     OsalMemFree(tmpRawData);
     return result;
 }
