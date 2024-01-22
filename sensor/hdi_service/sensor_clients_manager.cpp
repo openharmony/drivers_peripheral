@@ -25,6 +25,15 @@ namespace V2_0 {
 
 namespace {
     const std::vector<int32_t> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
+    const std::vector<int32_t> continuesSensor = {HDF_SENSOR_TYPE_ACCELEROMETER, HDF_SENSOR_TYPE_GYROSCOPE,
+                                                  HDF_SENSOR_TYPE_MAGNETIC_FIELD, HDF_SENSOR_TYPE_SAR,
+                                                  HDF_SENSOR_TYPE_ORIENTATION, HDF_SENSOR_TYPE_GRAVITY,
+                                                  HDF_SENSOR_TYPE_LINEAR_ACCELERATION, HDF_SENSOR_TYPE_ROTATION_VECTOR,
+                                                  HDF_SENSOR_TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+                                                  HDF_SENSOR_TYPE_GAME_ROTATION_VECTOR,
+                                                  HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, HDF_SENSOR_TYPE_DROP_DETECT,
+                                                  HDF_SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
+                                                  HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
 }
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
@@ -223,10 +232,11 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     auto &client = clients_[groupId].find(serviceId)->second;
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client.sensorConfigMap_[sensorId] = sensorConfig;
-    if (sensorConfig_.find(sensorId) != sensorConfig_.end()) {
-        int32_t periodCount = samplingInterval / sensorConfig_.find(sensorId)->second.samplingInterval;
-        client.periodCountMap_[sensorId] = periodCount;
-    }
+    int64_t bestSamplingInterval = samplingInterval;
+    int64_t bestReportInterval = reportInterval;
+    SetSensorBestConfig(sensorId, bestSamplingInterval, bestReportInterval);
+    int32_t periodCount = samplingInterval / bestSamplingInterval;
+    client.periodCountMap_[sensorId] = periodCount;
     client.curCountMap_[sensorId] = 0;
 }
 
