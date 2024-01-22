@@ -111,6 +111,10 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         sensorConfig_.emplace(sensorId, config);
         needUpdateEachClient = true;
     }
+    it = sensorConfig_.find(sensorId);
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
+        it->second.reportInterval);
     if (needUpdateEachClient) {
         int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
         if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
@@ -120,7 +124,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
             auto &client = entry.second;
             if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
                 int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval /
-                        sensorConfig_.find(sensorId)->second.samplingInterval;
+                        it->second.samplingInterval;
                 client.periodCountMap_[sensorId] = periodCount;
             }
         }
@@ -139,6 +143,8 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     return;
 }
 
