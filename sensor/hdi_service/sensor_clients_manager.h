@@ -62,8 +62,8 @@ private:
 };
 
 struct BestSensorConfig {
-    int32_t samplingInterval;
-    int32_t reportInterval;
+    int64_t samplingInterval;
+    int64_t reportInterval;
 };
 
 } // V2_0
