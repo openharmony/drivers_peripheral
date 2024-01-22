@@ -51,6 +51,11 @@ namespace Camera {
 
 #define HDF_LOG_TAG camera_hdi_service
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002513
+
 #define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
