@@ -124,6 +124,10 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 void SensorClientsManager::UpdateEachClient(int sensorId, int64_t samplingInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
+    if (samplingInterval == 0) {
+        HDF_LOGE("%{public}s: error, samplingInterval is 0, sensorId is %{public}d", __func__, sensorId);
+        return;
+    }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return;
@@ -246,7 +250,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     int64_t bestReportInterval = reportInterval;
     SetSensorBestConfig(sensorId, bestSamplingInterval, bestReportInterval);
     if (bestSamplingInterval == 0) {
-        HDF_LOGE("%{public}s: error, bestSamplingInterval is 0", __func__, serviceId);
+        HDF_LOGE("%{public}s: error, bestSamplingInterval is 0, sensorId is %{public}d", __func__, sensorId);
         return;
     }
     int32_t periodCount = samplingInterval / bestSamplingInterval;
