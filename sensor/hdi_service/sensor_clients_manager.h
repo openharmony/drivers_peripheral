@@ -51,6 +51,7 @@ public:
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
     bool IsSensorContinues(int sensorId);
+    void UpdateEachClient(int sensorId, int64_t samplingInterval);
 private:
     SensorClientsManager();
     static SensorClientsManager *instance;

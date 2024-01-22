@@ -116,20 +116,25 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
         it->second.reportInterval);
     if (needUpdateEachClient) {
-        int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
-        if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
-            return;
-        }
-        for (auto &entry : clients_[groupId]) {
-            auto &client = entry.second;
-            if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
-                int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval /
-                        it->second.samplingInterval;
-                client.periodCountMap_[sensorId] = periodCount;
-            }
-        }
+        UpdateEachClient(sensorId, it->second.samplingInterval);
     }
     return;
+}
+
+void SensorClientsManager::UpdateEachClient(int sensorId, int64_t samplingInterval)
+{
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
+        return;
+    }
+    for (auto &entry : clients_[groupId]) {
+        auto &client = entry.second;
+        if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
+            int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
+            client.periodCountMap_[sensorId] = periodCount;
+        }
+    }
 }
 
 void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
@@ -230,7 +235,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        HDF_LOGE("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
 
@@ -240,6 +245,10 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     int64_t bestSamplingInterval = samplingInterval;
     int64_t bestReportInterval = reportInterval;
     SetSensorBestConfig(sensorId, bestSamplingInterval, bestReportInterval);
+    if (bestSamplingInterval == 0) {
+        HDF_LOGE("%{public}s: error, bestSamplingInterval is 0", __func__, serviceId);
+        return;
+    }
     int32_t periodCount = samplingInterval / bestSamplingInterval;
     client.periodCountMap_[sensorId] = periodCount;
     client.curCountMap_[sensorId] = 0;
@@ -252,7 +261,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        HDF_LOGE("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return false;
     }
     auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
