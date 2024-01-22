@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "ddk_pnp_listener_mgr.h"
+#include "ddk_device_manager.h"
 #include "device_resource_if.h"
 #include "hdf_slist.h"
 #include "hisysevent.h"
@@ -1652,7 +1653,7 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
-    if (!isGadgetConnected_) {
+    if ((!isGadgetConnected_) && (!DdkDevMgrGetGadgetLinkStatus())) {
         HDF_LOGE("%{public}s:gadget is not connected", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
