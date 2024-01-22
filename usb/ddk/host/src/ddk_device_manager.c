@@ -287,6 +287,39 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
 
     return HDF_SUCCESS;
 }
+bool DdkDevMgrGetGadgetLinkStatus()
+{
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_gadgetStatePath, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        return false;
+    }
+
+    if (strncmp(USB_GADGET_STATE_PATH, pathBuf, strlen(USB_GADGET_STATE_PATH)) != 0) {
+        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        return false;
+    }
+
+    int32_t fd = open(pathBuf, O_RDONLY | O_CLOEXEC);
+    if (fd == -1) {
+        HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, g_gadgetStatePath, errno);
+        return false;
+    }
+
+    char buf[STATE_STRING_LENGTH] = {0};
+    ssize_t numRead = read(fd, buf, STATE_STRING_LENGTH);
+    close(fd);
+    if (numRead <= 0) {
+        HDF_LOGE("%{public}s: read state failed errno:%{public}d", __func__, errno);
+        return false;
+    }
+    HDF_LOGE("%{public}s: read status:%{public}s", __func__, buf);
+    if ((strncmp(buf, "CONNECTED", strlen("CONNECTED")) == 0) ||
+        (strncmp(buf, "CONFIGURED", strlen("CONFIGURED")) == 0)) {
+        return true;
+    }
+    return false;
+}
 #else                                                                           // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 struct HdfIoService *g_usbPnpSrv = NULL;
 #define HDF_USB_INFO_MAX_SIZE (127 * sizeof(struct UsbPnpNotifyMatchInfoTable)) // 127  is max deivce num
@@ -399,5 +432,19 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
         }
     }
     return HDF_SUCCESS;
+}
+
+bool DdkDevMgrGetGadgetLinkStatus()
+{
+    int32_t gadgetStatus = 0;
+    if (DdkDevMgrGetGadgetStatus(&gadgetStatus) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkDevMgrGetGadgetStatus failed", __func__);
+        return false;
+    }
+    // gadget add
+    if (gadgetStatus != 0) {
+        return gadgetStatus == USB_PNP_DRIVER_GADGET_ADD ? true : false;
+    }
+    return false;
 }
 #endif                                                                          // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
