@@ -15,6 +15,7 @@
 
 #include "sensor_uhdf_log.h"
 #include "sensor_clients_manager.h"
+#include <cinttypes>
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
@@ -112,8 +113,8 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         needUpdateEachClient = true;
     }
     it = sensorConfig_.find(sensorId);
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],
-        "reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],\
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
         it->second.reportInterval);
     if (needUpdateEachClient) {
         UpdateEachClient(sensorId, it->second.samplingInterval);
@@ -152,8 +153,8 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],
-        "reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],\
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     return;
 }
 
