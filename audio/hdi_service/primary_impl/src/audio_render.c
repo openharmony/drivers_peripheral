@@ -146,7 +146,7 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
             ret = AUDIO_ERR_INTERNAL;
             break;
         }  
-    } while (0)
+    } while (0);
     
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
