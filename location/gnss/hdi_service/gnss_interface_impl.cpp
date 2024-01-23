@@ -39,10 +39,11 @@ namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
-constexpr const char* GNSS_SERVICE_NAME = "gnss_interface_service";
+const int32_t MAX_CALLBACK_SIZE = 1;
 LocationCallBackMap g_locationCallBackMap;
 GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
 std::mutex g_mutex;
+std::mutex g_deathMutex;
 } // namespace
 
 extern "C" IGnssInterface* GnssInterfaceImplGetInstance(void)
@@ -57,6 +58,7 @@ static void LocationUpdate(GnssLocation* location)
         return;
     }
     HDF_LOGI("%{public}s:LocationUpdate.", __func__);
+    std::unique_lock<std::mutex> lock(g_mutex);
     LocationInfo locationNew;
     locationNew.latitude = location->latitude;
     locationNew.longitude = location->longitude;
@@ -80,6 +82,7 @@ static void StatusCallback(uint16_t* status)
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
         return;
     }
+    std::unique_lock<std::mutex> lock(g_mutex);
     GnssWorkingStatus gnssStatus = static_cast<GnssWorkingStatus>(*status);
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -99,6 +102,7 @@ static void SvStatusCallback(GnssSatelliteStatus* svInfo)
         HDF_LOGE("%{public}s:satellites_num == 0.", __func__);
         return;
     }
+    std::unique_lock<std::mutex> lock(g_mutex);
     SatelliteStatusInfo svStatus;
     svStatus.satellitesNumber = svInfo->satellitesNum;
     for (unsigned int i = 0; i < svInfo->satellitesNum; i++) {
@@ -124,6 +128,7 @@ static void NmeaCallback(int64_t timestamp, const char* nmea, int length)
         HDF_LOGE("%{public}s:nmea is nullptr.", __func__);
         return;
     }
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -203,17 +208,15 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:invalid callbackObj", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
     if (remote == nullptr) {
         HDF_LOGE("%{public}s:invalid remote", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto callBackIter = g_locationCallBackMap.find(remote.GetRefPtr());
-    if (callBackIter != g_locationCallBackMap.end()) {
-        const sptr<IRemoteObject>& lhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
-        const sptr<IRemoteObject>& rhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callBackIter->second);
-        return lhs == rhs ? HDF_SUCCESS : HDF_FAILURE;
+    if (g_locationCallBackMap.size() >= MAX_CALLBACK_SIZE) {
+        HDF_LOGE("%{public}s:gnss has been enabled already", __func__);
+        return HDF_SUCCESS;
     }
     static GnssCallbackStruct gnssCallback;
     GetGnssCallbackMethods(&gnssCallback);
@@ -222,8 +225,12 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    AddGnssDeathRecipient(callbackObj);
     int ret = gnssInterface->enable_gnss(&gnssCallback);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("enable_gnss failed.");
+        return HDF_FAILURE;
+    }
+    AddGnssDeathRecipient(callbackObj);
     g_locationCallBackMap[remote.GetRefPtr()] = callbackObj;
     return ret;
 }
@@ -231,7 +238,7 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
 int32_t GnssInterfaceImpl::DisableGnss()
 {
     HDF_LOGI("%{public}s.", __func__);
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(g_mutex);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
@@ -315,12 +322,14 @@ int32_t GnssInterfaceImpl::AddGnssDeathRecipient(const sptr<IGnssCallback>& call
         HDF_LOGE("%{public}s: GnssInterfaceImpl add deathRecipient fail", __func__);
         return HDF_FAILURE;
     }
+    std::unique_lock<std::mutex> lock(g_deathMutex);
     g_gnssCallBackDeathRecipientMap[remote.GetRefPtr()] = death;
     return HDF_SUCCESS;
 }
 
 int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj)
 {
+    std::unique_lock<std::mutex> lock(g_deathMutex);
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
     auto iter = g_gnssCallBackDeathRecipientMap.find(remote.GetRefPtr());
     if (iter == g_gnssCallBackDeathRecipientMap.end()) {
@@ -339,7 +348,7 @@ int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& c
 
 void GnssInterfaceImpl::ResetGnssDeathRecipient()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_locationCallBackMap) {
         const auto& callback = iter.second;
         if (callback != nullptr) {
@@ -348,26 +357,12 @@ void GnssInterfaceImpl::ResetGnssDeathRecipient()
     }
 }
 
-void GnssInterfaceImpl::UnloadGnssDevice()
-{
-    auto devmgr = IDeviceManager::Get();
-    if (devmgr == nullptr) {
-        HDF_LOGE("fail to get devmgr.");
-        return;
-    }
-    if (devmgr->UnloadDevice(GNSS_SERVICE_NAME) != 0) {
-        HDF_LOGE("unload gnss service failed!");
-    }
-    return;
-}
-
 void GnssInterfaceImpl::ResetGnss()
 {
     HDF_LOGI("%{public}s called.", __func__);
     ResetGnssDeathRecipient();
     StopGnss(GNSS_START_TYPE_NORMAL);
     DisableGnss();
-    UnloadGnssDevice();
 }
 } // V1_0
 } // Gnss
