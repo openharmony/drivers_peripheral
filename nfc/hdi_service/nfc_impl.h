@@ -36,6 +36,8 @@ public:
     int32_t PowerCycle(NfcStatus &status) override;
     int32_t Close(NfcStatus &status) override;
     int32_t Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStatus &status) override;
+    int32_t IoctlWithResponse(NfcCommand cmd, const std::vector<uint8_t> &data, std::vector<uint8_t> &response,
+        NfcStatus &status) override;
     int32_t GetVendorConfig(NfcVendorConfig &config, NfcStatus &status) override;
     int32_t DoFactoryReset(NfcStatus &status) override;
     int32_t Shutdown(NfcStatus &status) override;
