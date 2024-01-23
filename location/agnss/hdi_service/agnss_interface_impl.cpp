@@ -35,10 +35,10 @@ namespace {
 using AgnssCallBackMap = std::unordered_map<IRemoteObject*, sptr<IAGnssCallback>>;
 using AgnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
-constexpr const char* AGNSS_SERVICE_NAME = "agnss_interface_service";
 AgnssCallBackMap g_agnssCallBackMap;
 AgnssDeathRecipientMap g_agnssCallBackDeathRecipientMap;
 std::mutex g_mutex;
+std::mutex g_deathMutex;
 uint32_t g_refInfoType; // reference loction info type
 const int MAC_LEN = 6;
 } // namespace
@@ -58,7 +58,7 @@ static void OnStatusChangedCb(const AGnssStatusInfo* status)
     AGnssDataLinkRequest agnssStatus;
     agnssStatus.agnssType = static_cast<AGnssUserPlaneProtocol>(status->agnssType);
     agnssStatus.setUpType = static_cast<DataLinkSetUpType>(status->connStatus);
-
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -70,6 +70,7 @@ static void OnStatusChangedCb(const AGnssStatusInfo* status)
 static void GetSetidCb(uint16_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -81,6 +82,7 @@ static void GetSetidCb(uint16_t type)
 static void GetRefLocationidCb(uint32_t type)
 {
     HDF_LOGI("%{public}s, type=%{public}d", __func__, type);
+    std::unique_lock<std::mutex> lock(g_mutex);
     g_refInfoType = type;
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
@@ -109,7 +111,6 @@ AGnssInterfaceImpl::AGnssInterfaceImpl()
 AGnssInterfaceImpl::~AGnssInterfaceImpl()
 {
     ResetAgnssDeathRecipient();
-    g_agnssCallBackMap.clear();
 }
 
 int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbackObj)
@@ -119,12 +120,12 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
         HDF_LOGE("%{public}s:invalid callbackObj", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
     if (remote == nullptr) {
         HDF_LOGE("%{public}s:invalid remote", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    std::unique_lock<std::mutex> lock(g_mutex);
     auto callBackIter = g_agnssCallBackMap.find(remote.GetRefPtr());
     if (callBackIter != g_agnssCallBackMap.end()) {
         const sptr<IRemoteObject>& lhs = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
@@ -253,12 +254,14 @@ int32_t AGnssInterfaceImpl::AddAgnssDeathRecipient(const sptr<IAGnssCallback>& c
         HDF_LOGE("%{public}s: AGnssInterfaceImpl add deathRecipient fail", __func__);
         return HDF_FAILURE;
     }
+    std::unique_lock<std::mutex> lock(g_deathMutex);
     g_agnssCallBackDeathRecipientMap[remote.GetRefPtr()] = death;
     return HDF_SUCCESS;
 }
 
 int32_t AGnssInterfaceImpl::RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj)
 {
+    std::unique_lock<std::mutex> lock(g_deathMutex);
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
     auto iter = g_agnssCallBackDeathRecipientMap.find(remote.GetRefPtr());
     if (iter == g_agnssCallBackDeathRecipientMap.end()) {
@@ -277,7 +280,7 @@ int32_t AGnssInterfaceImpl::RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>
 
 void AGnssInterfaceImpl::ResetAgnssDeathRecipient()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_agnssCallBackMap) {
         const auto& callback = iter.second;
         if (callback != nullptr) {
@@ -286,25 +289,12 @@ void AGnssInterfaceImpl::ResetAgnssDeathRecipient()
     }
 }
 
-void AGnssInterfaceImpl::UnloadAgnssDevice()
-{
-    auto devmgr = IDeviceManager::Get();
-    if (devmgr == nullptr) {
-        HDF_LOGE("fail to get devmgr.");
-        return;
-    }
-    if (devmgr->UnloadDevice(AGNSS_SERVICE_NAME) != 0) {
-        HDF_LOGE("unload agnss service failed!");
-    }
-    return;
-}
-
 void AGnssInterfaceImpl::ResetAgnss()
 {
     HDF_LOGI("%{public}s called.", __func__);
     ResetAgnssDeathRecipient();
+    std::unique_lock<std::mutex> lock(g_mutex);
     g_agnssCallBackMap.clear();
-    UnloadAgnssDevice();
 }
 } // V1_0
 } // Agnss
