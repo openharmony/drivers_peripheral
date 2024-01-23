@@ -891,6 +891,40 @@ static void AudioInitRenderInstanceVdi(struct IAudioRender *render)
     render->SetBufferSize = AudioRenderSetbufferSize;
 }
 
+struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    uint32_t *rendrId)
+{
+    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+        AUDIO_FUNC_LOGI("render type is mmap");
+        return NULL;
+    }
+    uint32_t index = 0;
+    struct AudioRenderPrivVdi *renderPriv = AudioRenderGetPrivVdi();
+    if (renderPriv == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return NULL;
+    }
+
+    if (renderPriv->renderCnt == 0) {
+        AUDIO_FUNC_LOGI("no render created");
+        return NULL;
+    }
+
+    for (index = 0; index < AUDIO_VDI_STREAM_NUM_MAX; index++) {
+        if ((renderPriv->renderInfos[index] != NULL) &&
+            (renderPriv->renderInfos[index]->desc.pins == pin) &&
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (renderPriv->renderInfos[index]->sampleRate == attrs->sampleRate) &&
+            (renderPriv->renderInfos[index]->channelCount == attrs->channelCount)) {
+            *rendrId = renderPriv->renderInfos[index]->renderId;
+            renderPriv->renderInfos[index]->usrCount++;
+            return &renderPriv->renderInfos[index]->render;
+        }
+    }
+
+    return NULL;
+}
+
 static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 {
     uint32_t renderId = AUDIO_VDI_STREAM_NUM_MAX;
