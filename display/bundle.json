@@ -28,7 +28,6 @@
         "drivers_interface_display",
         "graphic_surface",
         "init",
-        "memory_utils",
         "hitrace"
       ],
       "third_party": [
