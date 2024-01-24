@@ -22,6 +22,7 @@ namespace V2_0 {
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
+    HDF_LOGD("%{public}s enter the OnDataEventVdi function, sensorId is %{public}d", __func__, eventVdi.sensorId);
     struct HdfSensorEvents event;
     int32_t ret;
     if (sensorCallback_ == nullptr) {
@@ -63,6 +64,8 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
         ret = callback->OnDataEvent(event);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+        } else {
+            HDF_LOGD("%{public}s Sensor OnDataEvent success, serviceId is %{public}d", __func__, *it);
         }
     }
     return HDF_SUCCESS;
