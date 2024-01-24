@@ -53,7 +53,7 @@ ohos_fuzztest("DestroyRenderFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DestroyRenderFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 }
 

@@ -45,7 +45,7 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_1.0") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   install_images = [ chipset_base_dir ]
