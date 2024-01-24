@@ -53,7 +53,7 @@ namespace {
     struct SensorValueRange g_alsRange[] = {{10000000, 0}};
     struct SensorValueRange g_pedometerRange[] = {{10000, 0}};
     struct SensorValueRange g_proximityRange[] = {{5, 0}};
-    struct SensorValueRange g_hallRange[] = {{1, 0}};
+    struct SensorValueRange g_hallRange[] = {{2, 0}};
     struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
     struct SensorValueRange g_magneticRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
     struct SensorValueRange g_gyroscopeRange[] = {{35, -35}, {35, -35}, {35, -35}};
@@ -66,7 +66,7 @@ namespace {
         {SENSOR_TYPE_ACCELEROMETER, "accelerometer",  1, 3, g_accelRange},
         {SENSOR_TYPE_PEDOMETER, "pedometer", 1, 1, g_pedometerRange},
         {SENSOR_TYPE_PROXIMITY, "proximity",  0, 1, g_proximityRange},
-        {SENSOR_TYPE_HALL, "hallrometer",  0, 1, g_hallRange},
+        {SENSOR_TYPE_HALL, "hallrometer",  1, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer",  1, 2, g_barometerRange},
         {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 1, g_alsRange},
         {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer",  1, 3, g_magneticRange},
