@@ -235,6 +235,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     if (!IsSensorContinues(sensorId)) {
         return false;
     }
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
@@ -265,8 +266,8 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 
 SensorClientsManager* SensorClientsManager::GetInstance()
 {
+    std::unique_lock<std::mutex> lock(instanceMutex_);
     if (instance == nullptr) {
-        std::unique_lock<std::mutex> lock(instanceMutex_);
         if (instance == nullptr) {
             instance = new SensorClientsManager();
         }
