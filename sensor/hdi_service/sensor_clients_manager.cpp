@@ -210,7 +210,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
                                                  int64_t &reportInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
+    HDF_LOGD("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
              "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
              std::to_string(samplingInterval).c_str(), std::to_string(reportInterval).c_str());
 
