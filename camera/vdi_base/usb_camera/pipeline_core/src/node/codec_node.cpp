@@ -22,6 +22,7 @@ extern "C" {
 #include "libavutil/frame.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 #endif // DEVICE_USAGE_FFMPEG_ENABLE
 }
 
@@ -251,10 +252,15 @@ void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
         buffer->SetEsFrameSize(0);
     }
 
-    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)temp, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
+    /*avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)temp, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
         buffer->GetHeight());
     avpicture_fill((AVPicture *)pFrameRGBA, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_RGBA,
-        buffer->GetWidth(), buffer->GetHeight());
+        buffer->GetWidth(), buffer->GetHeight());*/
+
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, (uint8_t *)temp, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
+        buffer->GetHeight(), 1);
+    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_RGBA,
+        buffer->GetWidth(), buffer->GetHeight(), 1);
 
     struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
         buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGBA, SWS_BILINEAR, 0, 0, 0);
@@ -298,10 +304,15 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     pFrameYUV = av_frame_alloc();
     m_pFrameRGB = av_frame_alloc();
 
-    avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
+    /*avpicture_fill((AVPicture *)pFrameYUV, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
         buffer->GetWidth(), buffer->GetHeight());
     avpicture_fill((AVPicture *)m_pFrameRGB, (uint8_t *)temp, AV_PIX_FMT_RGB24,
-        buffer->GetWidth(), buffer->GetHeight());
+        buffer->GetWidth(), buffer->GetHeight());*/
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
+        buffer->GetWidth(), buffer->GetHeight(), 1);
+    av_image_fill_arrays(m_pFrameRGB->data, m_pFrameRGB->linesize, (uint8_t *)temp, AV_PIX_FMT_RGB24,
+        buffer->GetWidth(), buffer->GetHeight(), 1);
+
     struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
         buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGB24, SWS_BILINEAR, 0, 0, 0);
 

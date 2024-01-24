@@ -22,6 +22,7 @@ extern "C" {
 #include "libavutil/frame.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 }
 
 namespace OHOS::Camera {
@@ -96,9 +97,12 @@ void ScaleNode::PreviewScaleConver(std::shared_ptr<IBuffer>& buffer)
     buffer->SetVirAddress(virBUffer);
     buffer->SetSize(virSize);
 
-    avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
+    /*avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
     avpicture_fill((AVPicture *)pFrameRGBA, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
-                   buffer->GetWidth(), buffer->GetHeight());
+                   buffer->GetWidth(), buffer->GetHeight());*/
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, temp, AV_PIX_FMT_YUYV422, wide_, high_, 1);
+    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
+                   buffer->GetWidth(), buffer->GetHeight(), 1);
 
     struct SwsContext* imgCtx = sws_getContext(wide_, high_, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
                                                buffer->GetHeight(), AV_PIX_FMT_YUYV422, SWS_BILINEAR, 0, 0, 0);
@@ -137,10 +141,12 @@ void ScaleNode::ScaleConver(std::shared_ptr<IBuffer>& buffer)
     pFrameRGBA = av_frame_alloc();
     uint8_t* temp = sizeVirMap.begin()->second;
 
-    avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
+    /*avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
     avpicture_fill((AVPicture *)pFrameRGBA, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
-                   buffer->GetWidth(), buffer->GetHeight());
-
+                   buffer->GetWidth(), buffer->GetHeight());*/
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, temp, AV_PIX_FMT_YUYV422, wide_, high_, 1);
+    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
+                   buffer->GetWidth(), buffer->GetHeight(), 1);
     struct SwsContext* imgCtx = sws_getContext(wide_, high_, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
                                                buffer->GetHeight(), AV_PIX_FMT_YUYV422, SWS_BILINEAR, 0, 0, 0);
 
@@ -178,10 +184,12 @@ void ScaleNode::ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer)
     }
     uint8_t* temp = sizeVirMap.begin()->second;
 
-    avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
+    /*avpicture_fill((AVPicture *)pFrameYUV, temp, AV_PIX_FMT_YUYV422, wide_, high_);
     avpicture_fill((AVPicture *)pFrameRGBA, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_NV21,
-                   buffer->GetWidth(), buffer->GetHeight());
-
+                   buffer->GetWidth(), buffer->GetHeight());*/
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, temp, AV_PIX_FMT_YUYV422, wide_, high_, 1);
+    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_NV21,
+                   buffer->GetWidth(), buffer->GetHeight(), 1);
     struct SwsContext* imgCtx = sws_getContext(wide_, high_, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
                                                buffer->GetHeight(), AV_PIX_FMT_NV21, SWS_BILINEAR, 0, 0, 0);
 
