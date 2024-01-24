@@ -1438,10 +1438,10 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_PHYSICAL_APERTURE_RANGE, &entry);
-    float entryValues[] = { entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
-        entry.data.f[14], entry.data.f[18] };
 
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        float entryValues[] = { entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
+            entry.data.f[14], entry.data.f[18] };
         for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
             // Get Stream Operator
             cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
