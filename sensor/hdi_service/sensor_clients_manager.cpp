@@ -268,9 +268,7 @@ SensorClientsManager* SensorClientsManager::GetInstance()
 {
     std::unique_lock<std::mutex> lock(instanceMutex_);
     if (instance == nullptr) {
-        if (instance == nullptr) {
-            instance = new SensorClientsManager();
-        }
+        instance = new SensorClientsManager();
     }
     return instance;
 }
