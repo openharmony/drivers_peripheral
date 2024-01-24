@@ -34,6 +34,8 @@ namespace {
                                                   HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, HDF_SENSOR_TYPE_DROP_DETECT,
                                                   HDF_SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
                                                   HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
+    constexpr int64_t ERROR_INTERVAL = 0;
+    constexpr int32_t INIT_CUR_COUNT = 0;
 }
 
 SensorClientsManager* SensorClientsManager::instance = nullptr;
@@ -99,10 +101,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 {
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
-    bool needUpdateEachClient = false;
     if (it != sensorConfig_.end()) {
-        needUpdateEachClient = samplingInterval <= it->second.samplingInterval ||
-                reportInterval <= it->second.reportInterval;
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
          : it->second.samplingInterval;
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
@@ -110,23 +109,20 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     } else {
         BestSensorConfig config = {samplingInterval, reportInterval};
         sensorConfig_.emplace(sensorId, config);
-        needUpdateEachClient = true;
     }
     it = sensorConfig_.find(sensorId);
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],\
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
         it->second.reportInterval);
-    if (needUpdateEachClient) {
-        UpdateEachClient(sensorId, it->second.samplingInterval);
-    }
     return;
 }
 
-void SensorClientsManager::UpdateEachClient(int sensorId, int64_t samplingInterval)
+void SensorClientsManager::UpdateEachClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    if (samplingInterval == 0) {
-        HDF_LOGE("%{public}s: error, samplingInterval is 0, sensorId is %{public}d", __func__, sensorId);
+    if (samplingInterval <= ERROR_INTERVAL || reportInterval <= ERROR_INTERVAL) {
+        HDF_LOGE("%{public}s: error, sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
         return;
     }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
@@ -135,9 +131,14 @@ void SensorClientsManager::UpdateEachClient(int sensorId, int64_t samplingInterv
     }
     for (auto &entry : clients_[groupId]) {
         auto &client = entry.second;
+        if (client.curCountMap_.find(sensorId) == client.curCountMap_.end()) {
+            curCountMap_[sensorId] = INIT_CUR_COUNT;
+        }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
-            client.periodCountMap_[sensorId] = periodCount;
+            if (periodCount < client.periodCountMap_[sensorId]) {
+                client.periodCountMap_[sensorId] = periodCount;
+            }
         }
     }
 }
@@ -247,16 +248,6 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     auto &client = clients_[groupId].find(serviceId)->second;
     SensorConfig sensorConfig = {samplingInterval, reportInterval};
     client.sensorConfigMap_[sensorId] = sensorConfig;
-    int64_t bestSamplingInterval = samplingInterval;
-    int64_t bestReportInterval = reportInterval;
-    SetSensorBestConfig(sensorId, bestSamplingInterval, bestReportInterval);
-    if (bestSamplingInterval == 0) {
-        HDF_LOGE("%{public}s: error, bestSamplingInterval is 0, sensorId is %{public}d", __func__, sensorId);
-        return;
-    }
-    int32_t periodCount = samplingInterval / bestSamplingInterval;
-    client.periodCountMap_[sensorId] = periodCount;
-    client.curCountMap_[sensorId] = 0;
 }
 
 bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
