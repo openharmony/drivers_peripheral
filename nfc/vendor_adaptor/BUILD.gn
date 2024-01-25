@@ -18,7 +18,6 @@ ohos_shared_library("nfc_vendor_adaptor") {
   sources = [ "nfc_vendor_adaptions.cpp" ]
 
   cflags = []
-
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nfc:nfc_idl_headers",
