@@ -186,6 +186,26 @@ int32_t NfcImpl::Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStat
     return HDF_FAILURE;
 }
 
+int32_t NfcImpl::IoctlWithResponse(NfcCommand cmd, const std::vector<uint8_t> &data,
+    std::vector<uint8_t> &response, NfcStatus &status)
+{
+    if (data.empty()) {
+        HDF_LOGE("NfcImpl::IoctlWithResponse, data is nullptr!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (data.size() > VENDOR_IOCTL_INPUT_MAX_LEN) {
+        HDF_LOGE("NfcImpl::IoctlWithResponse, dataLen is invalid!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int ret = adaptor_.VendorIoctlWithResponse(cmd, (void*)&data[0], response);
+    if (ret == 0) {
+        status = NfcStatus::OK;
+        return HDF_SUCCESS;
+    }
+    status = NfcStatus::FAILED;
+    return HDF_FAILURE;
+}
+
 int32_t NfcImpl::GetVendorConfig(NfcVendorConfig &config, NfcStatus &status)
 {
     if (adaptor_.VendorGetConfig(config) != HDF_SUCCESS) {

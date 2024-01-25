@@ -53,8 +53,8 @@ using namespace OHOS::HDI;
 
 enum {
     CMD_OEM_CERTIFICATE_GET_VERSION = 0,
-    CMD_OEM_CERTIFICATE_GET_OEM_PROVISION_REQUEST = 1,
-    CMD_OEM_CERTIFICATE_PROVIDE_OEM_PROVISION_RESPONSE = 2,
+    CMD_OEM_CERTIFICATE_GENERATE_OEM_KEY_SYSTEM_REQUEST = 1,
+    CMD_OEM_CERTIFICATE_PROCESS_OEM_KEY_SYSTEM_RESPONSE = 2,
 };
 
 class IOemCertificate : public HdiBase {
@@ -63,9 +63,9 @@ public:
 
     virtual ~IOemCertificate() = default;
 
-    virtual int32_t GetOemProvisionRequest(std::string& defaultUrl, std::vector<uint8_t>& request) = 0;
+    virtual int32_t GenerateOemKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) = 0;
 
-    virtual int32_t ProvideOemProvisionResponse(const std::vector<uint8_t>& response) = 0;
+    virtual int32_t ProcessOemKeySystemResponse(const std::vector<uint8_t>& response) = 0;
 
     virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
     {

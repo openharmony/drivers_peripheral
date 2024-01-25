@@ -29,7 +29,7 @@ const size_t SYSTEM_ID_SIZE = 16;
 
 int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<uint8_t>> &keyIds);
 
-int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
+int32_t generateRequest(const MediaKeyType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
     std::string *request);
 
 int32_t findSubVector(const std::vector<uint8_t> &main, const std::vector<uint8_t> &sub);
