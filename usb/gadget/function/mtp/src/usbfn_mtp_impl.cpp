@@ -706,10 +706,10 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceParseEachPipe(struct UsbMtpInterface &iface)
         "protocol=%{public}hhu cfgIndex=%{public}hhu", __func__, fnIface->info.index, fnIface->info.numPipes,
         fnIface->info.interfaceClass, fnIface->info.subclass, fnIface->info.protocol, fnIface->info.configIndex);
     uint32_t repetIdx = 0;
-    for (uint32_t i = 0; i < fnIface->info.numPipes; ++i) {
+    for (int32_t i = 0; i < fnIface->info.numPipes; ++i) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
-        int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
+        int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, static_cast<uint8_t>(i), &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: get pipe info error", __func__);
             return ret;
