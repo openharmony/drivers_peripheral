@@ -23,7 +23,7 @@ ohos_shared_library("libfingerprint_auth_interface_service_1.1") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "include",
     "../common/logs",
@@ -54,7 +54,7 @@ ohos_shared_library("libfingerprint_auth_driver") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "include",
     "../common/logs",
