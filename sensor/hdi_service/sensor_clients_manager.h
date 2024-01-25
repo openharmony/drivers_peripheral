@@ -53,7 +53,6 @@ public:
     bool IsSensorContinues(int sensorId);
 private:
     SensorClientsManager();
-    static SensorClientsManager *instance;
     static std::mutex instanceMutex_;
     std::unordered_map<int32_t, std::unordered_map<int, SensorClientInfo>> clients_;
     std::unordered_map<int32_t, std::set<int32_t>> sensorUsed_;

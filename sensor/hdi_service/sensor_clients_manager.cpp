@@ -27,7 +27,6 @@ namespace {
     const std::vector<int32_t> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
 }
 
-SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
 
 SensorClientsManager::SensorClientsManager()
@@ -210,7 +209,7 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
                                                  int64_t &reportInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
-    HDF_LOGI("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
+    HDF_LOGD("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
              "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
              std::to_string(samplingInterval).c_str(), std::to_string(reportInterval).c_str());
 
@@ -235,6 +234,7 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     if (!IsSensorContinues(sensorId)) {
         return false;
     }
+    std::unique_lock<std::mutex> lock(clientsMutex_);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
@@ -265,12 +265,7 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 
 SensorClientsManager* SensorClientsManager::GetInstance()
 {
-    if (instance == nullptr) {
-        std::unique_lock<std::mutex> lock(instanceMutex_);
-        if (instance == nullptr) {
-            instance = new SensorClientsManager();
-        }
-    }
+    static SensorClientsManager *instance = new SensorClientsManager();
     return instance;
 }
 
