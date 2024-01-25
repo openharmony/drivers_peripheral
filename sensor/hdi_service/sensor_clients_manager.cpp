@@ -132,7 +132,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
             if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
-                periodCount < client.periodCountMap_[sensorId]) {
+                periodCount > client.periodCountMap_[sensorId]) {
                 client.periodCountMap_[sensorId] = periodCount;
             }
         }
