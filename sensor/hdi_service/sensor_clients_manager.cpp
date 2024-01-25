@@ -110,11 +110,6 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
         BestSensorConfig config = {samplingInterval, reportInterval};
         sensorConfig_.emplace(sensorId, config);
     }
-    it = sensorConfig_.find(sensorId);
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],\
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, it->second.samplingInterval,
-        it->second.reportInterval);
-    return;
 }
 
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
@@ -155,8 +150,6 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],\
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     return;
 }
 
