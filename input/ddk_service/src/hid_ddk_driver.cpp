@@ -100,7 +100,7 @@ static void HdfHidDdkDriverRelease(struct HdfDeviceObject *deviceObject)
     }
 }
 
-struct HdfDriverEntry g_hidddkDriverEntry = {
+static struct HdfDriverEntry g_hidddkDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "",
     .Bind = HdfHidDdkDriverBind,
