@@ -117,7 +117,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     return;
 }
 
-void SensorClientsManager::UpdateEachClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
+void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval <= ERROR_INTERVAL) {
@@ -136,7 +136,8 @@ void SensorClientsManager::UpdateEachClientPeriodCount(int sensorId, int64_t sam
         }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
-            if (periodCount < client.periodCountMap_[sensorId]) {
+            if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
+                periodCount < client.periodCountMap_[sensorId]) {
                 client.periodCountMap_[sensorId] = periodCount;
             }
         }
