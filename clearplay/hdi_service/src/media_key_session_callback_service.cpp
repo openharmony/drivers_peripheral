@@ -36,10 +36,10 @@ int32_t MediaKeySessionCallbackService::SendEvent(EventType eventType, int32_t e
 }
 
 int32_t MediaKeySessionCallbackService::SendEventKeyChange(const std::map<std::vector<uint8_t>,
-    OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool hasNewGoodLicense)
+    OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& keyStatus, bool newKeysAvailable)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    keySessionCallback_->SendEventKeyChange(keyStatus, hasNewGoodLicense);
+    keySessionCallback_->SendEventKeyChange(keyStatus, newKeysAvailable);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }

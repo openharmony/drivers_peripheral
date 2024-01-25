@@ -56,14 +56,14 @@ using namespace OHOS::HDI;
 
 enum {
     CMD_MEDIA_KEY_SESSION_GET_VERSION = 0,
-    CMD_MEDIA_KEY_SESSION_GENERATE_LICENSE_REQUEST = 1,
-    CMD_MEDIA_KEY_SESSION_PROCESS_LICENSE_RESPONSE = 2,
-    CMD_MEDIA_KEY_SESSION_CHECK_LICENSE_STATUS = 3,
-    CMD_MEDIA_KEY_SESSION_REMOVE_LICENSE = 4,
+    CMD_MEDIA_KEY_SESSION_GENERATE_MEDIA_KEY_REQUEST = 1,
+    CMD_MEDIA_KEY_SESSION_PROCESS_MEDIA_KEY_RESPONSE = 2,
+    CMD_MEDIA_KEY_SESSION_CHECK_MEDIA_KEY_STATUS = 3,
+    CMD_MEDIA_KEY_SESSION_CLEAR_MEDIA_KEYS = 4,
     CMD_MEDIA_KEY_SESSION_GET_OFFLINE_RELEASE_REQUEST = 5,
     CMD_MEDIA_KEY_SESSION_PROCESS_OFFLINE_RELEASE_RESPONSE = 6,
-    CMD_MEDIA_KEY_SESSION_RESTORE_OFFLINE_LICENSE = 7,
-    CMD_MEDIA_KEY_SESSION_GET_SECURITY_LEVEL = 8,
+    CMD_MEDIA_KEY_SESSION_RESTORE_OFFLINE_MEDIA_KEYS = 7,
+    CMD_MEDIA_KEY_SESSION_GET_CONTENT_PROTECTION_LEVEL = 8,
     CMD_MEDIA_KEY_SESSION_REQUIRES_SECURE_DECODER_MODULE = 9,
     CMD_MEDIA_KEY_SESSION_SET_CALLBACK = 10,
     CMD_MEDIA_KEY_SESSION_GET_MEDIA_DECRYPT_MODULE = 11,
@@ -76,26 +76,25 @@ public:
 
     virtual ~IMediaKeySession() = default;
 
-    virtual int32_t GenerateLicenseRequest(const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& licenseRequestInfo,
-         OHOS::HDI::Drm::V1_0::LicenseRequest& licenseRequest) = 0;
+    virtual int32_t GenerateMediaKeyRequest(const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& mediaKeyRequestInfo,
+         OHOS::HDI::Drm::V1_0::MediaKeyRequest& mediaKeyRequest) = 0;
 
-    virtual int32_t ProcessLicenseResponse(const std::vector<uint8_t>& licenseResponse,
-         std::vector<uint8_t>& licenseId) = 0;
+    virtual int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediaKeyResponse,
+         std::vector<uint8_t>& mediaKeyId) = 0;
 
-    virtual int32_t CheckLicenseStatus(std::map<std::string,
-         OHOS::HDI::Drm::V1_0::MediaKeySessionKeyStatus>& licenseStatus) = 0;
+    virtual int32_t CheckMediaKeyStatus(std::map<std::string, std::string>& mediaKeyStatus) = 0;
 
-    virtual int32_t RemoveLicense() = 0;
+    virtual int32_t ClearMediaKeys() = 0;
 
-    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& licenseId,
+    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediaKeyId,
          std::vector<uint8_t>& releaseRequest) = 0;
 
-    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& licenseId,
+    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediaKeyId,
          const std::vector<uint8_t>& response) = 0;
 
-    virtual int32_t RestoreOfflineLicense(const std::vector<uint8_t>& licenseId) = 0;
+    virtual int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) = 0;
 
-    virtual int32_t GetSecurityLevel(OHOS::HDI::Drm::V1_0::SecurityLevel& level) = 0;
+    virtual int32_t GetContentProtectionLevel(OHOS::HDI::Drm::V1_0::ContentProtectionLevel& level) = 0;
 
     virtual int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) = 0;
 

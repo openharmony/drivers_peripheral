@@ -27,9 +27,9 @@ public:
     OemCertificateService() = default;
     virtual ~OemCertificateService() = default;
 
-    int32_t GetOemProvisionRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
+    int32_t GenerateOemKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
 
-    int32_t ProvideOemProvisionResponse(const std::vector<uint8_t>& response) override;
+    int32_t ProcessOemKeySystemResponse(const std::vector<uint8_t>& response) override;
 
 };
 } // V1_0

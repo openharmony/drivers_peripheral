@@ -133,7 +133,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     return HDF_SUCCESS;
 }
 
-int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
+int32_t generateRequest(const MediaKeyType keyType, const std::vector<std::vector<uint8_t>> &keyIds,
     std::string *request)
 {
     // begin
@@ -150,9 +150,9 @@ int32_t generateRequest(const LicenseType keyType, const std::vector<std::vector
         request->append(encodedKeyId);
         request->append("\"");
     }
-    if (keyType == LICENSE_TYPE_ONLINE) {
+    if (keyType == MEDIA_KEY_TYPE_ONLINE) {
         request->append("],\"type\":\"temporary\"}");
-    } else if (keyType == LICENSE_TYPE_OFFLINE) {
+    } else if (keyType == MEDIA_KEY_TYPE_OFFLINE) {
         request->append("],\"type\":\"persistent-license\"}");
     } else {
         return HDF_ERR_INVALID_PARAM;

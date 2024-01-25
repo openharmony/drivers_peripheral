@@ -44,9 +44,9 @@ public:
 
     static int32_t MediaKeySystemStubSetConfigurationByteArray_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetMetrics_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetStatistics_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetMaxSecurityLevel_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetMaxContentProtectionLevel_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
     static int32_t MediaKeySystemStubGenerateKeySystemRequest_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
@@ -58,11 +58,11 @@ public:
 
     static int32_t MediaKeySystemStubCreateMediaKeySession_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOfflineLicenseIds_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOfflineMediaKeyIds_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubGetOfflineLicenseStatus_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubGetOfflineMediaKeyStatus_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
-    static int32_t MediaKeySystemStubRemoveOfflineLicense_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
+    static int32_t MediaKeySystemStubClearOfflineMediaKeys_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
     static int32_t MediaKeySystemStubGetOemCertificate_(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem> impl);
 
@@ -79,9 +79,9 @@ private:
 
     int32_t MediaKeySystemStubSetConfigurationByteArray(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetMetrics(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetStatistics(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetMaxSecurityLevel(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetMaxContentProtectionLevel(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
     int32_t MediaKeySystemStubGenerateKeySystemRequest(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
@@ -93,11 +93,11 @@ private:
 
     int32_t MediaKeySystemStubCreateMediaKeySession(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOfflineLicenseIds(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOfflineMediaKeyIds(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubGetOfflineLicenseStatus(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubGetOfflineMediaKeyStatus(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
-    int32_t MediaKeySystemStubRemoveOfflineLicense(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
+    int32_t MediaKeySystemStubClearOfflineMediaKeys(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 
     int32_t MediaKeySystemStubGetOemCertificate(MessageParcel& mediaKeySystemData, MessageParcel& mediaKeySystemReply, MessageOption& mediaKeySystemOption);
 

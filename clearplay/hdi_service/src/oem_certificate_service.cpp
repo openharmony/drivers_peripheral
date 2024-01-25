@@ -23,14 +23,14 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-int32_t OemCertificateService::GetOemProvisionRequest(std::string &defaultUrl, std::vector<uint8_t> &request)
+int32_t OemCertificateService::GenerateOemKeySystemRequest(std::string &defaultUrl, std::vector<uint8_t> &request)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t OemCertificateService::ProvideOemProvisionResponse(const std::vector<uint8_t> &response)
+int32_t OemCertificateService::ProcessOemKeySystemResponse(const std::vector<uint8_t> &response)
 {
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);

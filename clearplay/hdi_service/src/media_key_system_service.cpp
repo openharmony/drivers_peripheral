@@ -80,7 +80,7 @@ int32_t MediaKeySystemService::SetConfigurationByteArray(const std::string &name
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetMetrics(std::map<std::string, std::string> &metrics)
+int32_t MediaKeySystemService::GetStatistics(std::map<std::string, std::string> &statistics)
 {
     HDF_LOGI("%{public}s: start", __func__);
     mediaKeySessionMutex_.lock();
@@ -93,19 +93,19 @@ int32_t MediaKeySystemService::GetMetrics(std::map<std::string, std::string> &me
     }
     mediaKeySessionMutex_.unlock();
 
-    metrics[versionName] = "clearplay";
-    metrics[currentSessionNumName] = std::to_string(sessionNum);
-    metrics[decryptNumberName] = std::to_string(decryptNumber);
-    metrics[errorDecryptNumberName] = std::to_string(errorDecryptNumber);
+    statistics[versionName] = "clearplay";
+    statistics[currentSessionNumName] = std::to_string(sessionNum);
+    statistics[decryptNumberName] = std::to_string(decryptNumber);
+    statistics[errorDecryptNumberName] = std::to_string(errorDecryptNumber);
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetMaxSecurityLevel(SecurityLevel &level)
+int32_t MediaKeySystemService::GetMaxContentProtectionLevel(ContentProtectionLevel &level)
 {
     HDF_LOGI("%{public}s: start", __func__);
 
-    level = OHOS::HDI::Drm::V1_0::SecurityLevel::SW_SECURE_CRYPTO;
+    level = OHOS::HDI::Drm::V1_0::ContentProtectionLevel::SW_SECURE_CRYPTO;
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -122,7 +122,6 @@ int32_t MediaKeySystemService::GenerateKeySystemRequest(std::string &defaultUrl,
         std::vector<uint8_t> data(eventData.begin(), eventData.end());
         vdiCallbackObj->SendEvent(EVENTTYPE_PROVISIONREQUIRED, 0, data);
     }
-
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -136,7 +135,7 @@ int32_t MediaKeySystemService::ProcessKeySystemResponse(const std::vector<uint8_
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::CreateMediaKeySession(SecurityLevel level,
+int32_t MediaKeySystemService::CreateMediaKeySession(ContentProtectionLevel level,
     sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> &keySession)
 {
     HDF_LOGI("%{public}s: start", __func__);
@@ -161,7 +160,7 @@ int32_t MediaKeySystemService::CreateMediaKeySession(SecurityLevel level,
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint8_t>> &licenseIds)
+int32_t MediaKeySystemService::GetOfflineMediaKeyIds(std::vector<std::vector<uint8_t>> &licenseIds)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -181,8 +180,8 @@ int32_t MediaKeySystemService::GetOfflineLicenseIds(std::vector<std::vector<uint
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t> &licenseId,
-    OfflineLicenseStatus &licenseStatus)
+int32_t MediaKeySystemService::GetOfflineMediaKeyStatus(const std::vector<uint8_t> &licenseId,
+    OfflineMediaKeyStatus &licenseStatus)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -195,7 +194,7 @@ int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t
     }
     keyIdBase64.erase(std::remove(keyIdBase64.begin(), keyIdBase64.end(), '\0'), keyIdBase64.end());
     if (offlineKeyIdAndKeyValueBase64_.find(keyIdBase64) == offlineKeyIdAndKeyValueBase64_.end()) {
-        licenseStatus = OFFLINELICENSE_STATUS_UNKNOWN;
+        licenseStatus = OFFLINE_MEDIA_KEY_STATUS_UNKNOWN;
         offlineKeyMutex_.unlock();
         return HDF_SUCCESS;
     }
@@ -210,7 +209,7 @@ int32_t MediaKeySystemService::GetOfflineLicenseStatus(const std::vector<uint8_t
     return HDF_SUCCESS;
 }
 
-int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t> &licenseId)
+int32_t MediaKeySystemService::ClearOfflineMediaKeys(const std::vector<uint8_t> &licenseId)
 {
     HDF_LOGI("%{public}s: start", __func__);
     offlineKeyMutex_.lock();
@@ -233,7 +232,7 @@ int32_t MediaKeySystemService::RemoveOfflineLicense(const std::vector<uint8_t> &
             if (it->second == false) {
                 continue;
             }
-            it->first->session_->keyIdStatusMap[licenseId] = OFFLINELICENSE_STATUS_UNKNOWN;
+            it->first->session_->keyIdStatusMap[licenseId] = OFFLINE_MEDIA_KEY_STATUS_UNKNOWN;
         }
         offlineKeyMutex_.unlock();
         HDF_LOGI("%{public}s: end", __func__);
@@ -290,11 +289,6 @@ int32_t MediaKeySystemService::CloseKeySessionService(sptr<MediaKeySessionServic
     }
     mediaKeySessionMap_.erase(it);
     mediaKeySessionMutex_.unlock();
-    if (vdiCallbackObj != nullptr) {
-        std::string eventData = "KEYSESSION LOST";
-        std::vector<uint8_t> data(eventData.begin(), eventData.end());
-        vdiCallbackObj->SendEvent(EVENTTYPE_KEYSESSION_LOST, 0, data);
-    }
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
