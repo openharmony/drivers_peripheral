@@ -194,7 +194,6 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 {
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
-    int64_t originalSamplingInterval = samplingInterval;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
     SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
@@ -209,9 +208,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
     } else {
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
-        if (samplingInterval < originalSamplingInterval){
-            SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
-        }
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
     }
     FinishTrace(HITRACE_TAG_HDF);
 
