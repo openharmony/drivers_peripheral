@@ -1336,10 +1336,10 @@ static int32_t AcmParseEachPipe(struct UsbAcmDevice *acm, struct UsbAcmInterface
 {
     struct UsbFnInterface *fnIface = iface->fn;
     uint32_t repetIdx = 0;
-    for (uint32_t i = 0; i < fnIface->info.numPipes; i++) {
+    for (int32_t i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
-        int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
+        int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, (uint8_t)i, &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: get pipe info error", __func__);
             return ret;
