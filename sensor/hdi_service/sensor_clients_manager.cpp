@@ -27,7 +27,6 @@ namespace {
     const std::vector<int32_t> continuesSensor = {1, 2, 6, 15, 256, 257, 258, 259, 261, 262, 263, 269, 277, 281};
 }
 
-SensorClientsManager* SensorClientsManager::instance = nullptr;
 std::mutex SensorClientsManager::instanceMutex_;
 
 SensorClientsManager::SensorClientsManager()
@@ -266,10 +265,7 @@ std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUs
 
 SensorClientsManager* SensorClientsManager::GetInstance()
 {
-    std::unique_lock<std::mutex> lock(instanceMutex_);
-    if (instance == nullptr) {
-        instance = new SensorClientsManager();
-    }
+    static SensorClientsManager *instance = new SensorClientsManager();
     return instance;
 }
 
