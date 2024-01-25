@@ -54,32 +54,30 @@ namespace V1_0 {
 
 using namespace OHOS;
 
-enum SecurityLevel : int32_t {
+enum ContentProtectionLevel : int32_t {
     SECURE_UNKNOWN = 0,
     SW_SECURE_CRYPTO,
-    SW_SECURE_DECODE,
     HW_SECURE_CRYPTO,
-    HW_SECURE_DECODE,
-    HW_SECURE_ALL,
+    HW_ENHANCED_SECURE_CRYPTO,
+    HW_SECURE_MAX,
 };
 
-enum RequestType : int32_t {
-    REQUESTTYPE_UNKNOWN = 0,
-    REQUEST_TYPE_INITIAL,
-    REQUEST_TYPE_RENEWAL,
-    REQUEST_TYPE_RELEASE,
-    REQUEST_TYPE_NONE,
-    REQUEST_TYPE_UPDATE,
+enum MediaKeyRequestType : int32_t {
+    MEDIA_KEY_REQUEST_TYPE_UNKNOWN = 0,
+    MEDIA_KEY_REQUEST_TYPE_INITIAL,
+    MEDIA_KEY_REQUEST_TYPE_RENEWAL,
+    MEDIA_KEY_REQUEST_TYPE_RELEASE,
+    MEDIA_KEY_REQUEST_TYPE_NONE,
+    MEDIA_KEY_REQUEST_TYPE_UPDATE,
 };
 
 enum EventType : int32_t {
     EVENTTYPE_PROVISIONREQUIRED = 0,
-    EVENTTYPE_KEYNEEDED,
+    EVENTTYPE_KEYREQUIRED,
     EVENTTYPE_KEYEXPIRED,
     EVENTTYPE_VENDOR_DEFINED,
     EVENTTYPE_EXPIRATIONUPDATE,
     EVENTTYPE_KEYCHANGE,
-    EVENTTYPE_KEYSESSION_LOST,
 };
 
 enum CryptoAlgorithmType : int32_t {
@@ -91,15 +89,15 @@ enum CryptoAlgorithmType : int32_t {
     ALGTYPE_SM4_CTR,
 };
 
-enum OfflineLicenseStatus : int32_t {
-    OFFLINELICENSE_STATUS_UNKNOWN = 0,
-    OFFLINELICENSE_STATUS_USABLE,
-    OFFLINELICENSE_STATUS_INACTIVE,
+enum OfflineMediaKeyStatus : int32_t {
+    OFFLINE_MEDIA_KEY_STATUS_UNKNOWN = 0,
+    OFFLINE_MEDIA_KEY_STATUS_USABLE,
+    OFFLINE_MEDIA_KEY_STATUS_INACTIVE,
 };
 
-enum LicenseType : int32_t {
-    LICENSE_TYPE_ONLINE = 0,
-    LICENSE_TYPE_OFFLINE,
+enum MediaKeyType : int32_t {
+    MEDIA_KEY_TYPE_OFFLINE = 0,
+    MEDIA_KEY_TYPE_ONLINE,
 };
 
 enum CertificateStatus : int32_t {
@@ -107,7 +105,7 @@ enum CertificateStatus : int32_t {
     CERT_STATUS_NOT_PROVISIONED,
     CERT_STATUS_EXPIRED,
     CERT_STATUS_INVALID,
-    CERT_STATUS_GET_FAILED,
+    CERT_STATUS_UNAVAILABLE,
 };
 
 enum MediaKeySessionKeyStatus : int32_t {
@@ -119,17 +117,17 @@ enum MediaKeySessionKeyStatus : int32_t {
     MEDIA_KEY_SESSION_KEY_STATUS_USABLE_IN_FUTURE,
 };
 
-struct LicenseRequestInfo {
-    OHOS::HDI::Drm::V1_0::LicenseType licenseType;
+struct MediaKeyRequestInfo {
+    OHOS::HDI::Drm::V1_0::MediaKeyType mediaKeyType;
     std::string mimeType;
     std::vector<uint8_t> initData;
     std::map<std::string, std::string> optionalData;
 };
 
-struct LicenseRequest {
-    OHOS::HDI::Drm::V1_0::RequestType requestType;
-    std::vector<uint8_t> mData;
-    std::string mDefaultUrl;
+struct MediaKeyRequest {
+    OHOS::HDI::Drm::V1_0::MediaKeyRequestType requestType;
+    std::vector<uint8_t> data;
+    std::string defaultUrl;
 };
 
 struct Pattern {
@@ -154,15 +152,19 @@ struct DrmBuffer {
     uint32_t bufferType;
     int fd;
     uint32_t bufferLen;
+    uint32_t allocLen;
+    uint32_t filledLen;
+    uint32_t offset;
+    uint32_t sharedMemType;
 };
 
-bool LicenseRequestInfoBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::LicenseRequestInfo& dataBlock);
+bool MediaKeyRequestInfoBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& dataBlock);
 
-bool LicenseRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::LicenseRequestInfo& dataBlock);
+bool MediaKeyRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& dataBlock);
 
-bool LicenseRequestBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::LicenseRequest& dataBlock);
+bool MediaKeyRequestBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::MediaKeyRequest& dataBlock);
 
-bool LicenseRequestBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::LicenseRequest& dataBlock);
+bool MediaKeyRequestBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::MediaKeyRequest& dataBlock);
 
 bool PatternBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::Pattern& dataBlock);
 

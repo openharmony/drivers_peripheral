@@ -43,6 +43,13 @@ const std::string DEFAULT_FUNC_NAME_SUFFIX = "";
 
 const std::string NFC_HAL_SO_PREFIX = "libnfc_hal_impl_";
 const std::string NFC_HAL_SO_SUFFIX = ".z.so";
+const unsigned int VENDOR_IOCTL_TOTAL_LEN = 256;
+const unsigned int VENDOR_IOCTL_INOUT_DATA_LEN = 128;
+const unsigned int VENDOR_IOCTL_OUTPUT_LEN_INDEX = 128;
+const unsigned int VENDOR_IOCTL_OUTPUT_START_INDEX = 129;
+const unsigned int VENDOR_IOCTL_INPUT_LEN_INDEX = 0;
+const unsigned int VENDOR_IOCTL_INPUT_START_INDEX = 1;
+const unsigned int VENDOR_IOCTL_INPUT_MAX_LEN = 128;
 
 struct NfcHalInterface {
     int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
@@ -76,6 +83,7 @@ public:
     int VendorControlGranted(void) override;
     int VendorPowerCycle(void) override;
     int VendorIoctl(long arg, void *pData) override;
+    int VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal) override;
     int VendorGetConfig(V1_1::NfcVendorConfig &config) override;
     int VendorFactoryReset(void) override;
     int VendorShutdownCase(void) override;

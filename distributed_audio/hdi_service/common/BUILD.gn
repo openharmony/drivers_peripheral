@@ -36,7 +36,7 @@ ohos_shared_library("libdaudio_hdf_utils") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   install_images = [ chipset_base_dir ]

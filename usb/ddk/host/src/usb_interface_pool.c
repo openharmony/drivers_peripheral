@@ -20,6 +20,12 @@
 
 #define HDF_LOG_TAG USB_INTERFACE_POOL
 
+#ifdef LP64
+    #define INVALID_PTR 0xFFFFFFFFFFFFFFFF
+#else
+    #define INVALID_PTR 0xFFFFFFFF
+#endif
+
 static int32_t g_usbRequestObjectId = 0;
 const int32_t BIT_WIDTH = 8;
 
@@ -330,24 +336,43 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     return interfacePos;
 }
 
-bool CheckInterfacePoolValid(struct UsbInterfacePool *interfacePoolPos)
+bool CheckInterfacePoolValid(struct DListHead *head)
 {
-    struct UsbInterfacePool *interfacePoolPosNext = CONTAINER_OF(interfacePoolPos->object.entry.next,
-        struct UsbInterfacePool, object.entry);
-    if (sizeof(void *) == BIT_WIDTH) {
-        if (sizeof(interfacePoolPosNext->object.entry) == 0 ||
-            (uintptr_t)(&interfacePoolPosNext->object.entry) == UINT64_MAX) {
-                HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
-                return false;
-            }
-    } else {
-        if (sizeof(interfacePoolPosNext->object.entry) == 0 ||
-            (uintptr_t)(&interfacePoolPosNext->object.entry) == UINT32_MAX) {
-                HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
-                return false;
-            }
+    struct UsbInterfacePool *interfacePoolPosNext = CONTAINER_OF(head->next, struct UsbInterfacePool, object.entry);
+    if (interfacePoolPosNext == NULL || (uintptr_t)interfacePoolPosNext == INVALID_PTR) {
+        HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
+        return false;
     }
     return true;
+}
+
+bool FoundInterfacePool(struct UsbInterfacePool *interfacePoolPos, struct UsbPoolQueryPara queryPara, 
+    bool refCountFlag)
+{
+    bool found = false;
+    switch (queryPara.type) {
+        case USB_POOL_NORMAL_TYPE:
+            if ((interfacePoolPos->busNum == queryPara.busNum) &&
+                (interfacePoolPos->devAddr == queryPara.usbAddr)) {
+                found = true;
+            }
+            break;
+        case USB_POOL_OBJECT_ID_TYPE:
+            if (interfacePoolPos->object.objectId == queryPara.objectId) {
+                found = true;
+            }
+            break;
+        default:
+            break;
+    }
+
+    if (found) {
+        if (refCountFlag) {
+            AdapterAtomicInc(&interfacePoolPos->refCount);
+        }
+    }
+
+    return found;
 }
 
 static struct UsbInterfacePool *IfFindInterfacePool(
@@ -371,32 +396,18 @@ static struct UsbInterfacePool *IfFindInterfacePool(
         return NULL;
     }
 
+    if (!CheckInterfacePoolValid(ifacePoolList)) {
+        OsalMutexUnlock((struct OsalMutex *)&session->lock);
+        HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
+        return NULL;
+    }
     DLIST_FOR_EACH_ENTRY_SAFE(
         interfacePoolPos, interfacePoolTemp, ifacePoolList, struct UsbInterfacePool, object.entry) {
-        switch (queryPara.type) {
-            case USB_POOL_NORMAL_TYPE:
-                if ((interfacePoolPos->busNum == queryPara.busNum) &&
-                    (interfacePoolPos->devAddr == queryPara.usbAddr)) {
-                    found = true;
-                }
-                break;
-            case USB_POOL_OBJECT_ID_TYPE:
-                if (interfacePoolPos->object.objectId == queryPara.objectId) {
-                    found = true;
-                }
-                break;
-            default:
-                break;
-        }
-
-        if (found) {
-            if (refCountFlag) {
-                AdapterAtomicInc(&interfacePoolPos->refCount);
-            }
-
+        if (FoundInterfacePool(interfacePoolPos, queryPara, refCountFlag)) {
+            found = true;
             break;
         }
-        if (!CheckInterfacePoolValid(interfacePoolPos)) {
+        if (!CheckInterfacePoolValid(&interfacePoolPos->object.entry)) {
             HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
             break;
         }

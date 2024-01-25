@@ -36,16 +36,16 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t OemCertificateStubGetOemProvisionRequest_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
+    static int32_t OemCertificateStubGenerateOemKeySystemRequest_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
-    static int32_t OemCertificateStubProvideOemProvisionResponse_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
+    static int32_t OemCertificateStubProcessOemKeySystemResponse_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
     static int32_t OemCertificateStubGetVersion_(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption, sptr<OHOS::HDI::Drm::V1_0::IOemCertificate> impl);
 
 private:
-    int32_t OemCertificateStubGetOemProvisionRequest(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
+    int32_t OemCertificateStubGenerateOemKeySystemRequest(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 
-    int32_t OemCertificateStubProvideOemProvisionResponse(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
+    int32_t OemCertificateStubProcessOemKeySystemResponse(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 
     int32_t OemCertificateStubGetVersion(MessageParcel& oemCertificateData, MessageParcel& oemCertificateReply, MessageOption& oemCertificateOption);
 

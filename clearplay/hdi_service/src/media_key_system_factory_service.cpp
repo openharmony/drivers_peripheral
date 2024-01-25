@@ -48,7 +48,7 @@ MediaKeySystemFactoryService::~MediaKeySystemFactoryService()
 }
 
 int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::string &uuid, const std::string &mimeType,
-    SecurityLevel level, bool &isSupported)
+    ContentProtectionLevel level, bool &isSupported)
 {
     HDF_LOGI("%{public}s: start", __func__);
     if (IsClearPlayUuid(uuid) != true) {
@@ -62,8 +62,7 @@ int32_t MediaKeySystemFactoryService::IsMediaKeySystemSupported(const std::strin
         isSupported = false;
         return HDF_SUCCESS;
     }
-    if (level != SECURE_UNKNOWN && level != SW_SECURE_CRYPTO && level != SW_SECURE_DECODE &&
-        level != HW_SECURE_CRYPTO && level != HW_SECURE_DECODE && level != HW_SECURE_ALL) {
+    if (level < SECURE_UNKNOWN || level > HW_SECURE_MAX) {
         isSupported = false;
         return HDF_SUCCESS;
     }
