@@ -19,6 +19,7 @@
 #include <hdf_log.h>
 #include <iostream>
 #include <string>
+#include "securec.h"
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
@@ -258,6 +259,32 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *pData)
         return HDF_FAILURE;
     }
     int ret = nfcHalInf.nfcHalIoctl(arg, pData);
+    return ret;
+}
+
+int NfcVendorAdaptions::VendorIoctlWithResponse(long arg, void *pData, std::vector<uint8_t> &pRetVal)
+{
+    if (nfcHalInf.nfcHalIoctl == nullptr) {
+        HDF_LOGE("%{public}s: Function null.", __func__);
+        return HDF_FAILURE;
+    }
+    if (pData == nullptr) {
+        HDF_LOGE("%{public}s: input param null.", __func__);
+        return HDF_FAILURE;
+    }
+    uint8_t inOutData[VENDOR_IOCTL_TOTAL_LEN] = { 0 };
+    if (memcpy_s(inOutData, VENDOR_IOCTL_TOTAL_LEN, pData, VENDOR_IOCTL_INOUT_DATA_LEN) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s pData failed.", __func__);
+        return HDF_FAILURE;
+    }
+    int ret = nfcHalInf.nfcHalIoctl(arg, inOutData);
+    if (ret == HDF_SUCCESS) {
+        uint8_t* pTmp = inOutData;
+        int i;
+        for (i = 0; i <= pTmp[VENDOR_IOCTL_OUTPUT_LEN_INDEX]; i++) {
+            pRetVal.push_back(pTmp[VENDOR_IOCTL_OUTPUT_LEN_INDEX + i]);
+        }
+    }
     return ret;
 }
 
