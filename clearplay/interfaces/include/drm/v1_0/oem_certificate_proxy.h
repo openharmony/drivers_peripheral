@@ -35,16 +35,16 @@ public:
         return true;
     }
 
-    int32_t GetOemProvisionRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
+    int32_t GenerateOemKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
 
-    int32_t ProvideOemProvisionResponse(const std::vector<uint8_t>& response) override;
+    int32_t ProcessOemKeySystemResponse(const std::vector<uint8_t>& response) override;
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
-    static int32_t GetOemProvisionRequest_(std::string& defaultUrl, std::vector<uint8_t>& request,
+    static int32_t GenerateOemKeySystemRequest_(std::string& defaultUrl, std::vector<uint8_t>& request,
          const sptr<IRemoteObject> remote);
 
-    static int32_t ProvideOemProvisionResponse_(const std::vector<uint8_t>& response, const sptr<IRemoteObject> remote);
+    static int32_t ProcessOemKeySystemResponse_(const std::vector<uint8_t>& response, const sptr<IRemoteObject> remote);
 
     static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
 

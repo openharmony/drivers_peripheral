@@ -23,7 +23,7 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-int32_t Session::getKeyRequest(const std::vector<uint8_t> &indexInfo, const std::string &mimeType, LicenseType keyType,
+int32_t Session::getKeyRequest(const std::vector<uint8_t> &indexInfo, const std::string &mimeType, MediaKeyType keyType,
     std::map<std::string, std::string> optionalData, std::vector<uint8_t> *keyRequest)
 {
     std::vector<std::vector<uint8_t>> keyIds;
@@ -60,14 +60,15 @@ int32_t Session::setKeyIdAndKeyValue(const std::vector<uint8_t> &keyId, const st
 {
     HDF_LOGI("%{public}s: start", __func__);
     keyIdAndKeyValue_.push_back(make_pair(keyId, keyValue));
-    keyIdStatusMap[keyId] = OFFLINELICENSE_STATUS_USABLE;
+    keyIdStatusMap[keyId] = OFFLINE_MEDIA_KEY_STATUS_USABLE;
+    HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t Session::getKeyValueByKeyId(const std::vector<uint8_t> &keyId, std::vector<uint8_t> &keyValue)
 {
     for (auto &idValuePair : keyIdAndKeyValue_) {
-        if (idValuePair.first == keyId && keyIdStatusMap[keyId] == OFFLINELICENSE_STATUS_USABLE) {
+        if (idValuePair.first == keyId && keyIdStatusMap[keyId] == OFFLINE_MEDIA_KEY_STATUS_USABLE) {
             keyValue = idValuePair.second;
             return HDF_SUCCESS;
         }

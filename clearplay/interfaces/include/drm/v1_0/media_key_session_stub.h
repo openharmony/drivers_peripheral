@@ -36,21 +36,21 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t MediaKeySessionStubGenerateLicenseRequest_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubGenerateMediaKeyRequest_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
-    static int32_t MediaKeySessionStubProcessLicenseResponse_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubProcessMediaKeyResponse_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
-    static int32_t MediaKeySessionStubCheckLicenseStatus_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubCheckMediaKeyStatus_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
-    static int32_t MediaKeySessionStubRemoveLicense_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubClearMediaKeys_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
     static int32_t MediaKeySessionStubGetOfflineReleaseRequest_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
     static int32_t MediaKeySessionStubProcessOfflineReleaseResponse_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
-    static int32_t MediaKeySessionStubRestoreOfflineLicense_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubRestoreOfflineMediaKeys_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
-    static int32_t MediaKeySessionStubGetSecurityLevel_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
+    static int32_t MediaKeySessionStubGetContentProtectionLevel_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
     static int32_t MediaKeySessionStubRequiresSecureDecoderModule_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
@@ -63,21 +63,21 @@ public:
     static int32_t MediaKeySessionStubGetVersion_(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySession> impl);
 
 private:
-    int32_t MediaKeySessionStubGenerateLicenseRequest(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubGenerateMediaKeyRequest(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
-    int32_t MediaKeySessionStubProcessLicenseResponse(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubProcessMediaKeyResponse(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
-    int32_t MediaKeySessionStubCheckLicenseStatus(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubCheckMediaKeyStatus(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
-    int32_t MediaKeySessionStubRemoveLicense(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubClearMediaKeys(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
     int32_t MediaKeySessionStubGetOfflineReleaseRequest(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
     int32_t MediaKeySessionStubProcessOfflineReleaseResponse(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
-    int32_t MediaKeySessionStubRestoreOfflineLicense(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubRestoreOfflineMediaKeys(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
-    int32_t MediaKeySessionStubGetSecurityLevel(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
+    int32_t MediaKeySessionStubGetContentProtectionLevel(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
     int32_t MediaKeySessionStubRequiresSecureDecoderModule(MessageParcel& mediaKeySessionData, MessageParcel& mediaKeySessionReply, MessageOption& mediaKeySessionOption);
 
