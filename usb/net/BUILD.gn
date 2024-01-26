@@ -79,17 +79,15 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
     "include",
   ]
 
-  deps = [
-    "./../ddk:libusb_ddk_host"
-  ]
+  deps = [ "./../ddk:libusb_ddk_host" ]
 
   if (is_standard_system) {
     external_deps = [
+      "./../ddk:libusb_pnp_manager",
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "./../ddk:libusb_pnp_manager"
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
