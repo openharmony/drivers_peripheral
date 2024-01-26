@@ -72,19 +72,16 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
     "./../../../hdf_core/framework/model/usb/include",
-    "./../../../hdf_core/framework/model/network/common/netdevice",
-    "./../../../hdf_core/framework/include/net/",
     "include",
   ]
 
-  deps = [ "./../ddk:libusb_ddk_host" ]
+  deps = [ "./../ddk:libusb_ddk_host", "./../ddk:libusb_pnp_manager" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "${usb_driver_path}/ddk:libusb_pnp_manager",
       "hilog:libhilog",
     ]
   } else {
