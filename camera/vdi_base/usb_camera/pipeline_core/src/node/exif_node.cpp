@@ -165,7 +165,7 @@ RetCode RKExifNode::SetGpsInfoMetadata(common_metadata_header_t *data)
 
 RetCode RKExifNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("RKExifNode::Capture");
+    CAMERA_LOGV("RKExifNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
     return RC_OK;
 }
 
