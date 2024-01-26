@@ -51,6 +51,7 @@ public:
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
     bool IsSensorContinues(int sensorId);
+    void UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval);
 private:
     SensorClientsManager();
     static std::mutex instanceMutex_;
@@ -60,8 +61,8 @@ private:
 };
 
 struct BestSensorConfig {
-    int32_t samplingInterval;
-    int32_t reportInterval;
+    int64_t samplingInterval;
+    int64_t reportInterval;
 };
 
 } // V2_0
