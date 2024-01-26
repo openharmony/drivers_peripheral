@@ -1297,6 +1297,39 @@ int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t *co
     return ret;
 }
 
+
+int32_t RawUsbControlMsg(const struct UsbDeviceHandle *devHandle,  struct UsbControlRequestData *ctrlData)
+{
+    int32_t ret;
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (devHandle == NULL || ctrlData == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (!osAdapterOps->usbControlMsg) {
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    ret = osAdapterOps->usbControlMsg(devHandle, ctrlData);
+    return ret;
+}
+
+int32_t RawUsbGetUsbSpeed(const struct UsbDeviceHandle *devHandle)
+{
+    int32_t ret;
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (devHandle == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (!osAdapterOps->getUsbSpeed) {
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    ret = osAdapterOps->getUsbSpeed(devHandle);
+    return ret;
+}
+
 int32_t RawSetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t configuration)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();

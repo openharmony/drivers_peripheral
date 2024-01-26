@@ -54,3 +54,43 @@ ohos_shared_library("libusbhost_ecm") {
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
 }
+
+group("usbhost_rndis_rawapi") {
+  deps = [ ":libusbhost_rndis_rawapi" ]
+}
+
+ohos_shared_library("libusbhost_rndis_rawapi") {
+  sources = [
+    "src/rndis_rawapi.c",
+    "src/usb_net_host.c",
+  ]
+  include_dirs = [
+    "./../ddk/common/include",
+    "./../ddk/host/include",
+    "./../interfaces/ddk/common",
+    "./../interfaces/ddk/host",
+    "./../gadget/function/include",
+    "./../../../hdf_core/framework/model/usb/include",
+    "./../../../hdf_core/framework/model/network/common/netdevice",
+    "./../../../hdf_core/framework/include/net/",
+    "include",
+  ]
+
+  deps = [ "./../ddk:libusb_ddk_host" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
