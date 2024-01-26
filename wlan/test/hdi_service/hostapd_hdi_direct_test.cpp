@@ -267,4 +267,20 @@ HWTEST_F(HdfHostapdHostDirectTest, DisassociateStaTest_014, TestSize.Level1)
     rc = g_hostapdObj->DisassociateSta(g_hostapdObj, IFNAME, nullptr, 1);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
 }
+
+/**
+ * @tc.name: HostApdShellCmdTest_015
+ * @tc.desc: Wifi hdi HostApdShellCmd function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostDirectTest, HostApdShellCmdTest_015, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, IFNAME, "");
+    ASSERT_EQ(rc, HDF_FAILURE);
+    rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, nullptr, "");
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, IFNAME, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+}
 };

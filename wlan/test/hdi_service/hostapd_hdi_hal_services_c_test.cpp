@@ -235,4 +235,16 @@ HWTEST_F(HdfHostapdHostCTest, DisassociateStaTest_013, TestSize.Level1)
     int32_t rc = g_hostapdObj->DisassociateSta(g_hostapdObj, IFNAME, "34:3a:20:32:fb:31", 1);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: HostApdShellCmdTest_015
+ * @tc.desc: Wifi hdi HostApdShellCmd function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostCTest, HostApdShellCmdTest_015, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, IFNAME, "");
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
 };

@@ -139,6 +139,20 @@ static int32_t WpaCallbackScanResult(struct IWpaCallback *self,
     return HDF_SUCCESS;
 }
 
+static int32_t WpaCallbackAuthReject(struct IWpaCallback *self,
+    const struct HdiWpaAuthRejectParam *authRejectParam, const char *ifName)
+{
+    (void)self;
+    if (ifName == NULL || authRejectParam == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("WpaCallbackAuthReject: bssid=" MACSTR " statusCode=%{public}hd,authType=%{public}hd,authTransaction="
+              "%{public}hd", MAC2STR(authRejectParam->bssid), authRejectParam->statusCode, authRejectParam->authType,
+              authRejectParam->authTransaction);
+    return HDF_SUCCESS;
+}
+
 struct IWpaCallback *WpaCallbackServiceGet(void)
 {
     struct WpaCallbackService *service =
@@ -157,6 +171,7 @@ struct IWpaCallback *WpaCallbackServiceGet(void)
     service->interface.OnEventWpsOverlap = WpaCallbackWpsOverlap;
     service->interface.OnEventWpsTimeout = WpaCallbackWpsTimeout;
     service->interface.OnEventScanResult = WpaCallbackScanResult;
+    service->interface.OnEventAuthReject = WpaCallbackAuthReject;
     return &service->interface;
 }
 
