@@ -13,7 +13,6 @@
 
 import("//build/ohos.gni")
 import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
-import("./../usb.gni")
 group("usbhost_ecm") {
   deps = [ ":libusbhost_ecm" ]
 }
@@ -61,7 +60,7 @@ group("usbhost_rndis_rawapi") {
 }
 
 ohos_shared_library("libusbhost_rndis_rawapi") {
-sanitize = {
+  sanitize = {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
@@ -80,7 +79,10 @@ sanitize = {
     "include",
   ]
 
-  deps = [ "./../ddk:libusb_ddk_host", "./../ddk:libusb_pnp_manager" ]
+  deps = [
+    "./../ddk:libusb_ddk_host",
+    "./../ddk:libusb_pnp_manager",
+  ]
 
   if (is_standard_system) {
     external_deps = [
