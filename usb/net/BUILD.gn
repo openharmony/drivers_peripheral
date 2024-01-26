@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../usb.gni")
 group("usbhost_ecm") {
   deps = [ ":libusbhost_ecm" ]
 }
@@ -55,6 +56,20 @@ ohos_shared_library("libusbhost_ecm") {
   part_name = "drivers_peripheral_usb"
 }
 
+config("rndis_public_config") {
+	include_dirs = [
+	"./../ddk/common/include",
+	"./../ddk/host/include",
+	"./../interfaces/ddk/common",
+	"./../interfaces/ddk/host",
+	"./../gadget/function/include",
+	"./../../../hdf_core/framework/model/usb/include",
+	"./../../../hdf_core/framework/model/network/common/netdevice",
+	"./../../../hdf_core/framework/include/net/",
+	"include",
+  ]
+}
+
 group("usbhost_rndis_rawapi") {
   deps = [ ":libusbhost_rndis_rawapi" ]
 }
@@ -67,23 +82,17 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
   }
   sources = [
     "src/rndis_rawapi.c",
-    "src/usb_net_host.c",
+    "src/usb_net_host.c"
   ]
-  include_dirs = [
-    "./../ddk/common/include",
-    "./../ddk/host/include",
-    "./../interfaces/ddk/common",
-    "./../interfaces/ddk/host",
-    "./../gadget/function/include",
-    "./../../../hdf_core/framework/model/usb/include",
-    "include",
-  ]
+ 
+  public_configs = [ ":rndis_public_config" ]
 
-  deps = [ "./../ddk:libusb_ddk_host" ]
+  deps = [ "./../ddk:libusb_ddk_host",
+          "${usb_driver_path}/ddk:libusb_pnp_manager"
+         ]
 
   if (is_standard_system) {
     external_deps = [
-      "./../ddk:libusb_pnp_manager",
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
