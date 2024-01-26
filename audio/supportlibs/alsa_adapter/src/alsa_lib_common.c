@@ -613,10 +613,38 @@ static snd_mixer_elem_t *AudioFindElement(const char *mixerCtlName, snd_mixer_el
     return element;
 }
 
+#ifdef PRODUCT_DAYU800
+int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement, snd_pcm_stream_t stream)
+{
+
+
+    const char *mixerCtrlLeftVolName;
+    const char *mixerCtrlRightVolName;
+
+    if (cardIns == NULL || pcmElement == NULL) {
+        AUDIO_FUNC_LOGE("The parameter is empty.");
+        return HDF_FAILURE;
+    }
+
+    if (stream == SND_PCM_STREAM_PLAYBACK) {
+        mixerCtrlLeftVolName = "ES8156 DAC";
+        mixerCtrlRightVolName = "ES8156 DAC";
+    } else {
+        mixerCtrlLeftVolName = "ES7210 ADC1_DIRECT_GAIN";
+        mixerCtrlRightVolName = "ES7210 ADC1_DIRECT_GAIN";
+    }
+
+
+    cardIns->ctrlLeftVolume = AudioFindElement(mixerCtrlLeftVolName, pcmElement);
+    cardIns->ctrlRightVolume = AudioFindElement(mixerCtrlRightVolName, pcmElement);
+
+    return HDF_SUCCESS;
+}
+#else
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement)
 {
-    const char *mixerCtrlLeftVolName = "DACL";
-    const char *mixerCtrlRightVolName = "DACR";
+    const char *mixerCtrlLeftVolName = "ES8156 DAC";
+    const char *mixerCtrlRightVolName = "ES8156 DAC";
 
     if (cardIns == NULL || pcmElement == NULL) {
         AUDIO_FUNC_LOGE("The parameter is empty.");
@@ -628,6 +656,9 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
 
     return HDF_SUCCESS;
 }
+#endif
+
+
 
 int32_t AudioMixerSetCtrlMode(
     struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item)
