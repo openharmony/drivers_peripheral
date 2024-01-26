@@ -260,7 +260,6 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
     HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
-    VdiCamRetCode ret = VDI::Camera::V1_0::NO_ERROR;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     for (auto &metaType : results) {
         auto itr = std::find(enabledResults_.begin(), enabledResults_.end(), metaType);
