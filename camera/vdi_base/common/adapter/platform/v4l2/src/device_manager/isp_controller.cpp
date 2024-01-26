@@ -74,6 +74,10 @@ RetCode IspController::Stop()
 
 RetCode IspController::Configure(std::shared_ptr<CameraMetadata> meta)
 {
+    if (meta == nullptr || meta->get() == nullptr) {
+        CAMERA_LOGE("IspController::Configure meta is invalid");
+        return RC_ERROR;
+    }
     return RC_OK;
 }
 } // namespace OHOS::Camera

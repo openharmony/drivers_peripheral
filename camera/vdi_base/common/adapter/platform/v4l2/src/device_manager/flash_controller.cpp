@@ -51,13 +51,23 @@ RetCode FlashController::PowerDown()
 
 RetCode FlashController::SetFlashlight(FlashMode flashMode, bool enable)
 {
+    CAMERA_LOGD("FlashController::SetFlashlight flashMode is %{public}d and enable is %{public}d", flashMode, enable);
     return RC_OK;
 }
 
-void FlashController::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {}
+void FlashController::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+{
+    if (abilityMetaDataTag.size() == 0) {
+        CAMERA_LOGE("%{public}s abilityMetaDataTag is empty", __FUNCTION__);
+    }
+}
 
 RetCode FlashController::GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
 {
+    if (meta == nullptr || meta->get() == nullptr) {
+        CAMERA_LOGE("FlashController::GetAbilityMetaData meta is invalid");
+        return RC_ERROR;
+    }
     return RC_OK;
 }
 } // namespace OHOS::Camera

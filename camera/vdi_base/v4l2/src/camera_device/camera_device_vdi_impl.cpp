@@ -268,7 +268,7 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
             enabledResults_.erase(itr);
         } else {
             CAMERA_LOGW("enabled result is not found. [metaType = %{public}d]", metaType);
-            ret = INVALID_ARGUMENT;
+            return INVALID_ARGUMENT;
         }
     }
     MetadataController &metaDataController = MetadataController::GetInstance();

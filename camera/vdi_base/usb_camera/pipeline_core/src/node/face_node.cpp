@@ -74,12 +74,17 @@ void RKFaceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 RetCode RKFaceNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     (void)meta;
+    if (meta == nullptr || meta->get() == nullptr) {
+        CAMERA_LOGE("%{public}s meta is invalid", __FUNCTION__);
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("%{public}s streamId = %{public}d", __FUNCTION__, streamId);
     return RC_OK;
 }
 
 RetCode RKFaceNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("RKFaceNode::Capture");
+    CAMERA_LOGV("RKFaceNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
     return RC_OK;
 }
 
@@ -161,7 +166,8 @@ RetCode RKFaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata
 {
     int bufferSize = outPutBuffer->GetSize();
     int metadataSize = metadata->get()->size;
-    CAMERA_LOGI("outPutBuffer.size=%{public}d  and metadataSize=%{public}d ", bufferSize, metadataSize);
+    CAMERA_LOGI("outPutBuffer.size = %{public}d dataSize = %{public}d and metadataSize = %{public}d",
+        bufferSize, dataSize, metadataSize);
     int ret = 0;
     ret = memset_s(outPutBuffer->GetVirAddress(),  bufferSize, 0,  bufferSize);
     if (ret != RC_OK) {
