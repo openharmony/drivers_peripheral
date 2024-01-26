@@ -61,6 +61,11 @@ group("usbhost_rndis_rawapi") {
 }
 
 ohos_shared_library("libusbhost_rndis_rawapi") {
+sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+  }
   sources = [
     "src/rndis_rawapi.c",
     "src/usb_net_host.c",
