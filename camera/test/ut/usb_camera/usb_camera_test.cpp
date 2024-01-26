@@ -1735,3 +1735,61 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
         EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_POSITION_OTHER);
     }
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Commit 2 streams together, width = 1280, height = 720, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0053)
+{
+    cameraBase_->OpenUsbCamera();
+    if (!g_usbCameraExit) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    cameraBase_->AchieveStreamOperator();
+    if (cameraBase_->streamCustomerPreview_ == nullptr) {
+        cameraBase_->streamCustomerPreview_ = std::make_shared<StreamCustomer>();
+    }
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = cameraBase_->STREAM_ID_PREVIEW;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 720; // 720:picture height
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = PREVIEW;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(cameraBase_->streamCustomerPreview_->CreateProducer());
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfo);
+    if (cameraBase_->streamCustomerCapture_ == nullptr) {
+        cameraBase_->streamCustomerCapture_ = std::make_shared<StreamCustomer>();
+    }
+    StreamInfo streamInfoCapture = {};
+    streamInfoCapture.streamId_ = cameraBase_->STREAM_ID_CAPTURE;
+    streamInfoCapture.width_ = 1280; // 1280:picture width
+    streamInfoCapture.height_ = 720; // 720:picture height
+    streamInfoCapture.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfoCapture.dataspace_ = 8; // 8:picture dataspace
+    streamInfoCapture.intent_ = STILL_CAPTURE;
+    streamInfoCapture.encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfoCapture.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(
+        cameraBase_->streamCustomerCapture_->CreateProducer());
+    ASSERT_NE(streamInfoCapture.bufferQueue_, nullptr);
+    streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfoCapture);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_PREVIEW, cameraBase_->CAPTURE_ID_PREVIEW, false, true);
+    cameraBase_->StartCapture(cameraBase_->STREAM_ID_CAPTURE, cameraBase_->CAPTURE_ID_CAPTURE, false, true);
+    cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
+    cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
+    cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
