@@ -75,10 +75,10 @@ RetCode RKFaceNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     (void)meta;
     if (meta == nullptr || meta->get() == nullptr) {
-        CAMERA_LOGE("%{public}s meta is invalid", __FUNCTION__);
+        CAMERA_LOGE("RKFaceNode::Config meta is invalid");
         return RC_ERROR;
     }
-    CAMERA_LOGD("%{public}s streamId = %{public}d", __FUNCTION__, streamId);
+    CAMERA_LOGD("RKFaceNode::Config streamId = %{public}d", streamId);
     return RC_OK;
 }
 
