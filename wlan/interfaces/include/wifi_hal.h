@@ -378,6 +378,34 @@ struct IWiFi {
      * @version 1.2
      */
     int32_t (*registerActionFrameReceiver)(const char *ifName, const uint8_t *match, uint32_t matchLen);
+
+    /**
+     * @brief set power save manager mode.
+     *
+     * @param ifName Indicates the NIC name.
+     * @param frequency Indicates connected ap frequency.
+     * @param mode Indicates power save mode, 3(enable power save), 4(disable power save).
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value if the operation fails.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*setPowerSaveMode)(const char *ifName, int32_t frequency, int32_t mode);
+
+    /**
+     * @brief set dpi mark rule.
+     *
+     * @param uid Indicates target app uid.
+     * @param protocol Indicates target protocol type, tcp/udp.
+     * @param enable Indicates enable/disable dpi mark rule.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value if the operation fails.
+     *
+     * @since 4.1
+     * @version 1.2
+     */
+    int32_t (*setDpiMarkRule)(int32_t uid, int32_t protocol, int32_t enable);
 };
 
 /**

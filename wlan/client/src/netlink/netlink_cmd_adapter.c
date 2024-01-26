@@ -35,6 +35,7 @@
 #include <linux/sockios.h>
 #include <linux/wireless.h>
 #include <linux/version.h>
+#include <osal_mem.h>
 
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
@@ -72,6 +73,7 @@
 #define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
 #define CMD_GET_AP_BANDWIDTH      "GET_AP_BANDWIDTH"
 #define CMD_SET_RX_MGMT_REMAIN_ON_CHANNEL "RX_MGMT_REMAIN_ON_CHANNEL"
+#define CMD_SET_STA_PM_ON        "SET_STA_PM_ON"
 
 #define P2P_BUF_SIZE              64
 #define MAX_PRIV_CMD_SIZE         4096
@@ -81,6 +83,12 @@
 #define HIGH_LIMIT_FREQ_5G        5900
 #define INTERFACE_UP              0x1 /* interface is up */
 #define MAX_INTERFACE_NAME_SIZE   16
+#define MAX_CMD_LEN               64
+#define DPI_MSG_LEN               4
+#define NETLINK_HW_DPI            25
+#define TP_TYPE_TCP               6
+#define TP_TYPE_UDP               17
+#define WZRY_MARK_NUM             0x5a
 
 static inline uint32_t BIT(uint8_t x)
 {
@@ -201,6 +209,52 @@ struct FreqListNode {
     int32_t freq;
     struct DListHead entry;
 };
+
+struct HwCommMsgT {
+    struct nlmsghdr hdr;
+    int opt;
+    char data[1];
+};
+
+typedef enum {
+    DMR_MT_BEGIN = 0,
+    DMR_MT_TP, /* matching transport protocol */
+    DMR_MT_END,
+}DmrMatchTypeT;
+
+/* DPI rule format */
+typedef struct {
+    DmrMatchTypeT ruleType;
+    /* ruleBody varies according to ruleType */
+    union {
+        uint8_t matchTpVal;
+    } ruleBody;
+    uint32_t markNum;
+} DpiRuleT;
+
+typedef struct {
+    uint32_t dmrAppUid;
+    uint32_t dmrMplkNetid;
+    uint32_t dmrMplkStrategy;
+    DpiRuleT dmrRule;
+} DpiMarkRuleT;
+
+typedef enum {
+    NETLINK_REG_TO_KERNEL = 0,
+    NETLINK_UNREG_TO_KERNEL,
+    NETLINK_CMD_TO_KERNEL,
+    NETLINK_SET_RULE_TO_KERNEL,
+    NETLINK_STOP_MARK,
+    NETLINK_START_MARK,
+    NETLINK_MPLK_BIND_NETWORK,
+    NETLINK_MPLK_UNBIND_NETWORK,
+    NETLINK_MPLK_RESET_SOCKET,
+    NETLINK_MPLK_CLOSE_SOCKET,
+    NETLINK_HID2D_TYPE,
+    NETLINK_DEL_RULE_TO_KERNEL,
+    NETLINK_SET_RULE_TO_KERNEL_EX,
+    NETLINK_SET_TCP_RECOVER_TO_KERNEL,
+} NtlCmdTypeT;
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
@@ -3017,4 +3071,146 @@ int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match
     } while (0);
     nlmsg_free(msg);
     return ret;
+}
+
+int32_t WifiSetPowerSaveMode(const char *ifName, int32_t frequency, int32_t mode)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[MAX_CMD_LEN] = {0};
+    uint32_t cmdLen;
+    uint16_t state;
+    cmdLen = strlen(CMD_SET_STA_PM_ON);
+    if (cmdLen >= MAX_CMD_LEN - 1) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large.", __FUNCTION__);
+        return ret;
+    }
+
+    ret = snprintf_s(cmdBuf, MAX_CMD_LEN, MAX_CMD_LEN - 1, "%s %d", CMD_SET_STA_PM_ON, mode);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
+        return RET_CODE_FAILURE;
+    }
+
+    if (GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    WifiPrivCmd out = {0};
+    out.buf = buf;
+    out.size = MAX_PRIV_CMD_SIZE;
+    return SendCommandToDriver(cmdBuf, MAX_CMD_LEN, ifName, &out);
+}
+
+int g_dpiNtlFd = -1;
+
+static int32_t NtlLinkInit()
+{
+    struct sockaddr_nl ntlAddr;
+    int fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_HW_DPI);
+    if (fd < 0) {
+        HILOG_ERROR(LOG_CORE, "Cant create netlink socket, err: %{public}s", strerror(errno));
+        return RET_CODE_FAILURE;
+    }
+
+    memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr));
+    ntlAddr.nl_family = AF_NETLINK;
+    ntlAddr.nl_pid = getpid();
+    ntlAddr.nl_groups = 0;
+
+    if (bind(fd, (struct sockaddr*)&ntlAddr, sizeof(ntlAddr)) != 0) {
+        HILOG_ERROR(LOG_CORE, "Cant bind netlink socket.");
+        close(fd);
+        return RET_CODE_FAILURE;
+    }
+
+    return fd;
+}
+
+static int32_t SendMsgToKernel(unsigned short nlmsgType, int opt, char *data, int datalen, int skfd)
+{
+    struct sockaddr_nl ntlAddr;
+    struct HwCommMsgT *ntlMsg = NULL;
+    unsigned int len = datalen + sizeof(struct HwCommMsgT);
+    int ret = -1;
+    if (len <= 0) {
+        return RET_CODE_FAILURE;
+    }
+
+    ntlMsg = (struct HwCommMsgT *)OsalMemAlloc(len);
+    if (ntlMsg == NULL) {
+        return RET_CODE_FAILURE;
+    }
+
+    memset_s(&ntlAddr, sizeof(ntlAddr), 0, sizeof(ntlAddr));
+    ntlAddr.nl_family = AF_NETLINK;
+    ntlAddr.nl_pid = 0;
+    ntlAddr.nl_groups = 0;
+
+    memset_s(ntlMsg, len, 0, len);
+    ntlMsg->hdr.nlmsg_len = NLMSG_LENGTH(DPI_MSG_LEN + datalen + 1);
+    ntlMsg->hdr.nlmsg_flags = 0;
+    ntlMsg->hdr.nlmsg_type = nlmsgType;
+    ntlMsg->hdr.nlmsg_pid = (unsigned int)(getpid());
+    ntlMsg->opt = opt;
+
+    if (data != NULL && datalen != 0) {
+        memcpy_s(ntlMsg->data, datalen, data, datalen);
+    }
+    ret = sendto(skfd, ntlMsg, ntlMsg->hdr.nlmsg_len, 0, (struct sockaddr*)&ntlAddr, sizeof(ntlAddr));
+    free(ntlMsg);
+    return ret;
+}
+
+int32_t WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    DpiMarkRuleT dmr;
+    if (g_dpiNtlFd < 0) {
+        g_dpiNtlFd = NtlLinkInit();
+        if (g_dpiNtlFd < 0) {
+            HILOG_ERROR(LOG_CORE, "Failed to initialize netlink socket.");
+            return RET_CODE_FAILURE;
+        }
+
+        HILOG_INFO(LOG_CORE, "Netlink socket created OK.");
+        if (SendMsgToKernel(NETLINK_REG_TO_KERNEL, 0, NULL, 0, g_dpiNtlFd) < 0) {
+            close(g_dpiNtlFd);
+            g_dpiNtlFd = -1;
+            HILOG_ERROR(LOG_CORE, "Failed to register to kernel.");
+            return RET_CODE_FAILURE;
+        }
+    }
+
+    if (enable == 0) {
+        if (SendMsgToKernel(NETLINK_STOP_MARK, 0, NULL, 0, g_dpiNtlFd) < 0) {
+            close(g_dpiNtlFd);
+            g_dpiNtlFd = -1;
+            HILOG_ERROR(LOG_CORE, "Failed to send msg to kernel.");
+            return RET_CODE_FAILURE;
+        }
+        HILOG_INFO(LOG_CORE, "Disable Dpi.");
+        return RET_CODE_SUCCESS;
+    } else {
+        if (SendMsgToKernel(NETLINK_START_MARK, 0, NULL, 0, g_dpiNtlFd) < 0) {
+            close(g_dpiNtlFd);
+            g_dpiNtlFd = -1;
+            HILOG_ERROR(LOG_CORE, "Failed to send msg to kernel.");
+            return RET_CODE_FAILURE;
+        }
+    }
+
+    dmr.dmrAppUid = (unsigned int)uid;
+    dmr.dmrRule.ruleType = DMR_MT_TP;
+    dmr.dmrRule.ruleBody.matchTpVal = protocol;
+    dmr.dmrRule.markNum = WZRY_MARK_NUM;
+
+    if (SendMsgToKernel(NETLINK_SET_RULE_TO_KERNEL, 0, (char *)&dmr, sizeof(dmr), g_dpiNtlFd) < 0) {
+        close(g_dpiNtlFd);
+        g_dpiNtlFd = -1;
+        HILOG_ERROR(LOG_CORE, "Failed to add rule.");
+        return RET_CODE_FAILURE;
+    }
+
+    HILOG_INFO(LOG_CORE, "SetDpiMarkRule OK.");
+    return RET_CODE_SUCCESS;
 }
