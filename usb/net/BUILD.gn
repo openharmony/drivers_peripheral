@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../usb.gni")
 group("usbhost_ecm") {
   deps = [ ":libusbhost_ecm" ]
 }
@@ -83,6 +84,7 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
+      "${usb_driver_path}/ddk:libusb_pnp_manager",
       "hilog:libhilog",
     ]
   } else {
