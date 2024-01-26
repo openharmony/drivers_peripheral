@@ -1579,6 +1579,47 @@ int32_t WlanInterfaceRegisterActionFrameReceiver(struct IWlanInterface *self, co
     return ret;
 }
 
+int32_t WlanInterfaceSetPowerSaveMode(struct IWlanInterface *self, const char * ifName, int32_t frequency, int32_t mode)
+{
+    int32_t ret;
+    (void)self;
+
+    HDF_LOGI("Enter %{public}s.", __FUNCTION__);
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (g_wifi == NULL || g_wifi->setPowerSaveMode == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setPowerSaveMode is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = g_wifi->setPowerSaveMode(ifName, frequency, mode);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceSetDpiMarkRule(struct IWlanInterface *self, int32_t uid, int32_t protocol, int32_t enable)
+{
+    int32_t ret;
+    (void)self;
+
+    HDF_LOGI("Enter %{public}s.", __FUNCTION__);
+    if (g_wifi == NULL || g_wifi->setDpiMarkRule == NULL) {
+        HDF_LOGE("%{public}s g_wifi or g_wifi->setDpiMarkRule is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = g_wifi->setDpiMarkRule(uid, protocol, enable);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanInterfaceWifiConstruct(void)
 {
     int32_t ret;

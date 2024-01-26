@@ -1170,6 +1170,24 @@ int32_t WifiRegisterActionFrameReceiver(const char *ifName, const uint8_t *match
     return RET_CODE_NOT_SUPPORT;
 }
 
+int32_t WifiSetPowerSaveMode(const char *ifName, int32_t frequency, int32_t mode)
+{
+    (void)ifName;
+    (void)frequency;
+    (void)mode;
+
+    return RET_CODE_NOT_SUPPORT;
+}
+
+int32_t WifiSetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    (void)uid;
+    (void)protocol;
+    (void)enable;
+
+    return RET_CODE_NOT_SUPPORT;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }
