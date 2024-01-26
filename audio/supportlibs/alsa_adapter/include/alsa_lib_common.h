@@ -125,7 +125,13 @@ int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsa
 int32_t DestroyCardList(void);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);
 int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns);
+
+#ifdef PRODUCT_DAYU800
+int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement, snd_pcm_stream_t stream);
+#else
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement);
+#endif
+
 int32_t AudioMixerSetCtrlMode(
     struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item);
 snd_mixer_elem_t *AudioUsbFindElement(snd_mixer_t *mixer);

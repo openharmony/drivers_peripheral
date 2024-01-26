@@ -87,6 +87,8 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
+    defines = [ "PRODUCT_DAYU800" ]
+
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
     if (drivers_peripheral_audio_alsa_lib) {
@@ -112,7 +114,7 @@ if (defined(ohos_lite)) {
     deps = []
 
     if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     if (drivers_peripheral_audio_alsa_lib) {
@@ -144,6 +146,8 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
+    defines = [ "PRODUCT_DAYU800" ]
+
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
     if (drivers_peripheral_audio_alsa_lib) {
@@ -170,7 +174,7 @@ if (defined(ohos_lite)) {
     deps = []
 
     if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     if (drivers_peripheral_audio_alsa_lib) {
