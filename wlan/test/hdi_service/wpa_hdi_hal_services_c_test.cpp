@@ -590,4 +590,40 @@ HWTEST_F(HdfWpaHostCTest, SetCountryCodeTest_033, TestSize.Level1)
         ASSERT_EQ(rc, HDF_SUCCESS);
     }
 }
+
+HWTEST_F(HdfWpaHostCTest, ReassociateTest_034, TestSize.Level1)
+{
+    int networkId = 0;
+
+    int32_t rc = g_wpaObj->AddWpaIface(g_wpaObj, IFNAME, CONFNAME);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wpaObj->AddNetwork(g_wpaObj, IFNAME, &networkId);
+        printf("networkId = %d\n", networkId);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->SetNetwork(g_wpaObj, IFNAME, networkId, "ssid", "WIFI_5G");
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->SetNetwork(g_wpaObj, IFNAME, networkId, "key_mgmt", "WPA-PSK");
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->SetNetwork(g_wpaObj, IFNAME, networkId, "psk", "123456789");
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->SelectNetwork(g_wpaObj, IFNAME, networkId);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->Reassociate(g_wpaObj, IFNAME);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+        rc = g_wpaObj->RemoveWpaIface(g_wpaObj, IFNAME);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
+}
+
+HWTEST_F(HdfWpaHostCTest, StaShellCmdTest_035, TestSize.Level1)
+{
+    const char *cmd = "SET external_sim 1";
+    int32_t rc = g_wpaObj->AddWpaIface(g_wpaObj, IFNAME, CONFNAME);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wpaObj->StaShellCmd(g_wpaObj, IFNAME, cmd);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
+}
 };

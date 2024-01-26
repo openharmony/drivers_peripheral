@@ -72,6 +72,8 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
     service->interface.GetWepTxKeyIdx = WpaInterfaceGetWepTxKeyIdx;
     service->interface.GetRequirePmf = WpaInterfaceGetRequirePmf;
     service->interface.SetCountryCode = WpaInterfaceSetCountryCode;
+    service->interface.Reassociate = WpaInterfaceReassociate;
+    service->interface.StaShellCmd = WpaInterfaceStaShellCmd;
 
     service->interface.P2pSetSsidPostfixName = WpaInterfaceP2pSetSsidPostfixName;
     service->interface.P2pSetWpsDeviceType = WpaInterfaceP2pSetWpsDeviceType;
