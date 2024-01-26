@@ -71,12 +71,10 @@ void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType c
     const int logLevel = 2;
     const std::string &tag = runninglockNotifyStr_.at(changeType);
     const std::string bundleName = "";
-    int32_t ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "RUNNINGLOCK",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "RUNNINGLOCK",
         HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "PID", info.pid, "UID", info.uid, "STATE", static_cast<int32_t>(state), "TYPE", type_, "NAME", info.name,
         "BUNDLENAME", bundleName, "LOG_LEVEL", logLevel, "TAG", tag);
-    HDF_LOGW("name = %{public}s, tag=%{public}s, PID=%{public}d, UID=%{public}d, ret=%{public}d", info.name.c_str(),
-        tag.c_str(), info.pid, info.uid, ret);
 }
 } // namespace V1_1
 } // namespace Power

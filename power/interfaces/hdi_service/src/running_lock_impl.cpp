@@ -37,8 +37,10 @@ std::mutex RunningLockImpl::mutex_;
 int32_t RunningLockImpl::defaultTimeOutMs_ = DEFAULT_TIMEOUT;
 std::unique_ptr<RunningLockTimerHandler> RunningLockImpl::timerHandler_ = nullptr;
 std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> RunningLockImpl::lockCounters_ = {};
+sptr<IPowerRunningLockCallback> g_iPowerRunningLockCallback = nullptr;
 
-int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state)
+int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state,
+    uint64_t lockid, const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (info.name.empty()) {
@@ -68,13 +70,15 @@ int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state)
         if (timerHandler_ == nullptr) {
             timerHandler_ = std::make_unique<RunningLockTimerHandler>();
         }
-        std::function<void()> unholdFunc = std::bind(&RunningLockImpl::Unhold, filledInfo);
+        std::function<void()> unholdFunc = std::bind(&RunningLockImpl::Unhold, filledInfo, lockid, bundleName);
         timerHandler_->RegisterRunningLockTimer(filledInfo, unholdFunc);
     }
+    RunningLockImpl::NotifyChanged(filledInfo, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_ADD");
     return HDF_SUCCESS;
 }
 
-int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
+int32_t RunningLockImpl::Unhold(const RunningLockInfo &info,
+    uint64_t lockid, const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (info.name.empty()) {
@@ -96,6 +100,9 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
     }
     std::shared_ptr<RunningLockCounter> lockCounter = iterator->second;
     int32_t status = lockCounter->Decrease(filledInfo);
+    if (status == HDF_SUCCESS) {
+        RunningLockImpl::NotifyChanged(filledInfo, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_REMOVE");
+    }
     return status;
 }
 
@@ -190,6 +197,46 @@ std::string RunningLockImpl::GetRunningLockTag(RunningLockType type)
         }
     }
 }
+
+void RunningLockImpl::RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback>
+        &iPowerRunningLockCallback)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    g_iPowerRunningLockCallback = iPowerRunningLockCallback;
+    HDF_LOGI("RegisterRunningLockCallback success");
+}
+
+void RunningLockImpl::UnRegisterRunningLockCallback()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    g_iPowerRunningLockCallback = nullptr;
+    HDF_LOGI("UnRegisterRunningLockCallback success");
+}
+
+void RunningLockImpl::NotifyChanged(const RunningLockInfo &info,
+    const uint64_t &lockid, const std::string &bundleName, const std::string &tag)
+{
+    int32_t pid = info.pid;
+    int32_t uid = info.uid;
+    int32_t type = static_cast<int32_t>(info.type);
+    std::string name = info.name;
+    auto now = std::chrono::system_clock::now();
+    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    std::string message;
+    message.append("LOCKID=").append(std::to_string(lockid))
+            .append(" PID=").append(std::to_string(pid))
+            .append(" UID=").append(std::to_string(uid))
+            .append(" TYPE=").append(std::to_string(type))
+            .append(" NAME=").append(name)
+            .append(" BUNDLENAME=").append(bundleName)
+            .append(" TAG=").append(tag)
+            .append(" TIMESTAMP=").append(std::to_string(timestamp));
+    HDF_LOGI("runninglock message: %{public}s, timeout: %{public}d", message.c_str(), info.timeoutMs);
+    if (g_iPowerRunningLockCallback != nullptr) {
+        g_iPowerRunningLockCallback->HandleRunningLockMessage(message);
+    }
+}
+
 } // namespace V1_1
 } // namespace Power
 } // namespace HDI

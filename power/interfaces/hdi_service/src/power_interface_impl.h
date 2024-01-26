@@ -35,6 +35,11 @@ public:
 
     int32_t RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback) override;
 
+    int32_t RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback>
+        &iPowerRunningLockCallback) override;
+
+    int32_t UnRegisterRunningLockCallback() override;
+
     int32_t StartSuspend() override;
 
     int32_t StopSuspend() override;
@@ -50,6 +55,12 @@ public:
     int32_t HoldRunningLock(const RunningLockInfo &info) override;
 
     int32_t UnholdRunningLock(const RunningLockInfo &info) override;
+
+    int32_t HoldRunningLockExt(const RunningLockInfo &info,
+        uint64_t lockid, const std::string &bundleName) override;
+
+    int32_t UnholdRunningLockExt(const RunningLockInfo &info,
+        uint64_t lockid, const std::string &bundleName) override;
 
     int32_t GetWakeupReason(std::string &reason) override;
 
