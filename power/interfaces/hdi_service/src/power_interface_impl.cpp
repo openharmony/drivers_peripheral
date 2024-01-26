@@ -130,6 +130,22 @@ int32_t PowerInterfaceImpl::UnRegister()
     return HDF_SUCCESS;
 }
 
+int32_t PowerInterfaceImpl::RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback>
+    &iPowerRunningLockCallback)
+{
+    if (iPowerRunningLockCallback != nullptr) {
+        UnRegisterRunningLockCallback();
+    }
+    RunningLockImpl::RegisterRunningLockCallback(iPowerRunningLockCallback);
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
+{
+    RunningLockImpl::UnRegisterRunningLockCallback();
+    return HDF_SUCCESS;
+}
+
 int32_t PowerInterfaceImpl::StartSuspend()
 {
     HDF_LOGI("start suspend");
@@ -376,6 +392,18 @@ int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
     return RunningLockImpl::Unhold(info);
+}
+
+int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
+    uint64_t lockid, const std::string &bundleName)
+{
+    return RunningLockImpl::Hold(info, g_powerState, lockid, bundleName);
+}
+
+int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
+    uint64_t lockid, const std::string &bundleName)
+{
+    return RunningLockImpl::Unhold(info, lockid, bundleName);
 }
 
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
