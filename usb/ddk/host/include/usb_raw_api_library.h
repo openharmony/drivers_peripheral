@@ -142,6 +142,8 @@ void RawAttachKernelDriver(struct UsbDeviceHandle *devHandle, uint8_t interfaceN
 int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 int32_t RawDetachInterface(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 
+int32_t RawUsbControlMsg(const struct UsbDeviceHandle *devHandle,  struct UsbControlRequestData *ctrlData);
+int32_t RawUsbGetUsbSpeed(const struct UsbDeviceHandle *devHandle);
 #ifdef __cplusplus
 }
 #endif
