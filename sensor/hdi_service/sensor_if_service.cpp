@@ -208,6 +208,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
     } else {
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
     }
     FinishTrace(HITRACE_TAG_HDF);
 
