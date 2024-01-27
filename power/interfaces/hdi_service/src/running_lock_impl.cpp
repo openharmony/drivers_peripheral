@@ -140,7 +140,8 @@ bool RunningLockImpl::IsValidType(RunningLockType type, PowerHdfState state)
         case PowerHdfState::SLEEP:
             return false;
         case PowerHdfState::INACTIVE:
-            return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION;
+            return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
+                type == RUNNINGLOCK_BACKGROUND_AUDIO;
         case PowerHdfState::AWAKE:
             return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
                 type == RUNNINGLOCK_BACKGROUND_AUDIO || type == RUNNINGLOCK_BACKGROUND_SPORT ||
