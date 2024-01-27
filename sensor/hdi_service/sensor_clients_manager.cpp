@@ -150,7 +150,7 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
     HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorBestConfig, samplingInterval is %{public}s, "
-             "reportInterval is %{public}s", __func__, serviceId, sensorId, std::to_string(samplingInterval).c_str(),
+             "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
     return;
 }
