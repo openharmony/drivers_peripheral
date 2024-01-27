@@ -56,18 +56,6 @@ ohos_shared_library("libusbhost_ecm") {
   part_name = "drivers_peripheral_usb"
 }
 
-config("rndis_public_config") {
-  include_dirs = [
-    "./../ddk/common/include",
-    "./../ddk/host/include",
-    "./../interfaces/ddk/common",
-    "./../interfaces/ddk/host",
-    "./../gadget/function/include",
-    "//drivers/hdf_core/framework/model/usb/include",
-    "include",
-  ]
-}
-
 group("usbhost_rndis_rawapi") {
   deps = [ ":libusbhost_rndis_rawapi" ]
 }
@@ -83,11 +71,19 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
     "src/usb_net_host.c",
   ]
 
-  public_configs = [ ":rndis_public_config" ]
+  include_dirs = [
+    "./../ddk/common/include",
+    "./../ddk/host/include",
+    "./../interfaces/ddk/common",
+    "./../interfaces/ddk/host",
+    "./../gadget/function/include",
+    "./../../../hdf_core/framework/model/usb/include",
+    "include",
+  ]
 
   deps = [
     "${usb_driver_path}/ddk:libusb_ddk_host",
-    "${usb_driver_path}/ddk:libusb_pnp_manager"
+    "${usb_driver_path}/ddk:libusb_pnp_manager",
   ]
 
   if (is_standard_system) {
@@ -95,7 +91,7 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hilog:libhilog"
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
