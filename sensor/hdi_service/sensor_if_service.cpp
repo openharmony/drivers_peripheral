@@ -100,7 +100,7 @@ int32_t SensorIfService::Init()
 
 int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
-    HDF_LOGI("%{public}s: Enter the GetAllSensorInfo function.", __func__);
+    HDF_LOGD("%{public}s: Enter the GetAllSensorInfo function.", __func__);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
@@ -143,7 +143,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
 int32_t SensorIfService::Enable(int32_t sensorId)
 {
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
+    HDF_LOGD("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
@@ -169,7 +169,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
 int32_t SensorIfService::Disable(int32_t sensorId)
 {
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
+    HDF_LOGD("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         return HDF_SUCCESS;
@@ -192,7 +192,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
 
 int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
@@ -217,7 +217,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 
 int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
 {
-    HDF_LOGI("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
+    HDF_LOGD("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
         __func__, sensorId, mode);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -236,7 +236,7 @@ int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
 
 int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
 {
-    HDF_LOGI("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
+    HDF_LOGD("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
         __func__, sensorId, option);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -257,7 +257,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
 {
     int32_t ret = HDF_SUCCESS;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
+    HDF_LOGD("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
     std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = AddCallbackMap(groupId, callbackObj);
@@ -292,7 +292,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
 int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
-    HDF_LOGI("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
+    HDF_LOGD("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
     std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = RemoveCallbackMap(groupId, serviceId, callbackObj);
@@ -301,7 +301,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     }
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
     if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
-        HDF_LOGI("%{public}s: clients is not empty, do not unregister", __func__);
+        HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
         return HDF_SUCCESS;
     }
 
@@ -483,7 +483,7 @@ void  SensorIfService::RemoveDeathNotice(int32_t sensorType)
 
 int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents> &event)
 {
-    HDF_LOGI("%{public}s: Enter the ReadData function", __func__);
+    HDF_LOGD("%{public}s: Enter the ReadData function", __func__);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
@@ -494,7 +494,7 @@ int32_t SensorIfService::ReadData(int32_t sensorId, std::vector<HdfSensorEvents>
 
 int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t rateLevel)
 {
-    HDF_LOGI("%{public}s: Enter the SetSdcSensor function, sensorId is %{public}d, enabled is %{public}u, \
+    HDF_LOGD("%{public}s: Enter the SetSdcSensor function, sensorId is %{public}d, enabled is %{public}u, \
              rateLevel is %{public}u", __func__, sensorId, enabled, rateLevel);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -526,7 +526,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
 
 int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo)
 {
-    HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
+    HDF_LOGD("%{public}s: Enter the GetSdcSensorInfo function", __func__);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;

@@ -72,13 +72,13 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, cons
             return;
         }
         clients_[groupId].emplace(serviceId, callbackObj);
-        HDF_LOGI("%{public}s: service %{public}d insert the callback", __func__, serviceId);
+        HDF_LOGD("%{public}s: service %{public}d insert the callback", __func__, serviceId);
         return;
     }
 
     auto it = clients_[groupId].find(serviceId);
     it -> second.SetReportDataCb(callbackObj);
-    HDF_LOGI("%{public}s: service %{public}d update the callback", __func__, serviceId);
+    HDF_LOGD("%{public}s: service %{public}d update the callback", __func__, serviceId);
 
     return;
 }
@@ -87,13 +87,13 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGI("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
+        HDF_LOGD("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
         return;
     }
 
     auto it = clients_[groupId].find(serviceId);
     clients_[groupId].erase(it);
-    HDF_LOGI("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
+    HDF_LOGD("%{public}s: service: %{public}d, UnRegisterCB Success", __func__, serviceId);
     return;
 }
 
@@ -144,12 +144,15 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
-        HDF_LOGI("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
+        HDF_LOGD("%{public}s: sensor: %{public}d is enabled first time", __func__, sensorId);
         return;
     }
     
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
+    HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorBestConfig, samplingInterval is %{public}s, "
+             "reportInterval is %{public}s", __func__, serviceId, sensorId, std::to_string(samplingInterval).c_str(),
+             std::to_string(reportInterval).c_str());
     return;
 }
 
@@ -158,20 +161,20 @@ void SensorClientsManager::OpenSensor(int sensorId, int serviceId)
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     std::set<int> service = {serviceId};
     sensorUsed_.emplace(sensorId, service);
-    HDF_LOGI("%{public}s: service: %{public}d enabled sensor %{public}d", __func__,  serviceId, sensorId);
+    HDF_LOGD("%{public}s: service: %{public}d enabled sensor %{public}d", __func__,  serviceId, sensorId);
 }
 
 bool SensorClientsManager::IsNeedOpenSensor(int sensorId, int serviceId)
 {
     auto it = sensorUsed_.find(sensorId);
     if (it == sensorUsed_.end()) {
-        HDF_LOGI("%{public}s: sensor %{public}d is enabled by service: %{public}d", __func__,  sensorId, serviceId);
+        HDF_LOGD("%{public}s: sensor %{public}d is enabled by service: %{public}d", __func__,  sensorId, serviceId);
         return true;
     }
     auto service = sensorUsed_[sensorId].find(serviceId);
     if (service == sensorUsed_[sensorId].end()) {
         sensorUsed_[sensorId].insert(serviceId);
-        HDF_LOGI("%{public}s: service: %{public}d enabled sensor %{public}d", __func__,  serviceId, sensorId);
+        HDF_LOGD("%{public}s: service: %{public}d enabled sensor %{public}d", __func__,  serviceId, sensorId);
     }
     return false;
 }
@@ -187,7 +190,7 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
     if (sensorUsed_[sensorId].empty()) {
         sensorUsed_.erase(sensorId);
         sensorConfig_.erase(sensorId);
-        HDF_LOGI("%{public}s: disabled sensor %{public}d", __func__, sensorId);
+        HDF_LOGD("%{public}s: disabled sensor %{public}d", __func__, sensorId);
         return true;
     }
     return false;
