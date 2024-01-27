@@ -157,6 +157,7 @@ RetCode CodecNode::ConfigJpegQuality(common_metadata_header_t* data)
 
 RetCode CodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
+    CAMERA_LOGD("CodecNode::Config streamid = %{public}d", streamId);
     if (meta == nullptr) {
         CAMERA_LOGE("meta is nullptr");
         return RC_ERROR;
@@ -358,7 +359,7 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode CodecNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("CodecNode::Capture");
+    CAMERA_LOGV("CodecNode::Capture streamid = %{public}d and captureId = %{public}d", streamId, captureId);
     return RC_OK;
 }
 
