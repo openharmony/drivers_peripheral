@@ -66,11 +66,6 @@ int32_t MediaKeySessionService::ProcessMediaKeyResponse(const std::vector<uint8_
     std::vector<uint8_t> &licenseId)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    if (vdiCallbackObj != nullptr) {
-        std::string eventData = "KEY CHANGE";
-        std::vector<uint8_t> data(eventData.begin(), eventData.end());
-        vdiCallbackObj->SendEvent(EVENTTYPE_KEYCHANGE, 0, data);
-    }
     licenseId.clear();
     size_t commaPos = 0;
     std::vector<std::vector<uint8_t>> keyIdAndValuePairs;
@@ -131,6 +126,13 @@ int32_t MediaKeySessionService::ProcessMediaKeyResponse(const std::vector<uint8_
             session_->keyIdStatusMap[licenseId] = OFFLINE_MEDIA_KEY_STATUS_USABLE;
             offlineKeyMutex_.unlock();
         }
+    }
+    if (vdiCallbackObj != nullptr) {
+        std::vector<uint8_t> licenseIdVec(licenseId.begin(), licenseId.end());
+        std::map<std::vector<uint8_t>, MediaKeySessionKeyStatus> keyStatus;
+        MediaKeySessionKeyStatus status = MEDIA_KEY_SESSION_KEY_STATUS_USABLE;
+        keyStatus.insert(std::make_pair(licenseIdVec, status));
+        vdiCallbackObj->SendEventKeyChange(keyStatus, true);
     }
 
     HDF_LOGI("%{public}s: end", __func__);
