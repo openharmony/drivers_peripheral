@@ -25,6 +25,7 @@ if (drivers_peripheral_input_feature_udriver) {
     include_dirs = [
       "$INPUT_ROOT_DIR/udriver/include",
       "$INPUT_ROOT_DIR/interfaces/include",
+      "$INPUT_ROOT_DIR/utils/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
 

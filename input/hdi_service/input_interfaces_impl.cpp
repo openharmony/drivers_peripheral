@@ -15,10 +15,10 @@
 
 #include "input_interfaces_impl.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <iproxy_broker.h>
 #include <mutex>
 #include <securec.h>
+#include "input_uhdf_log.h"
 #include "input_manager.h"
 #include "input_type.h"
 #include "osal_mem.h"
