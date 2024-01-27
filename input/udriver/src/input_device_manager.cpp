@@ -31,7 +31,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <vector>
-#include "hdf_log.h"
+#include "input_uhdf_log.h"
 #include "osal_mem.h"
 #include "securec.h"
 

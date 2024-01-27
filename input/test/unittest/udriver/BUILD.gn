@@ -51,6 +51,7 @@ ohos_unittest("input_udriver_unittest") {
 
   include_dirs = [
     "$hdi_input_base_path/interfaces/include",
+    "$hdi_input_base_path/utils/include",
     "$hdi_input_base_path/udriver/include",
   ]
 
