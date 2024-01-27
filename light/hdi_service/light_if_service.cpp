@@ -81,7 +81,7 @@ int32_t LightIfService::Init()
 
 int32_t LightIfService::GetLightInfo(std::vector<HdfLightInfo>& info)
 {
-    HDF_LOGI("%{public}s: Enter the GetLightInfo function.", __func__);
+    HDF_LOGD("%{public}s: Enter the GetLightInfo function.", __func__);
     if (lightVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: lightVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -114,7 +114,7 @@ int32_t LightIfService::GetLightInfo(std::vector<HdfLightInfo>& info)
 
 int32_t LightIfService::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
 {
-    HDF_LOGI("%{public}s: Enter the TurnOnLight function, lightId is %{public}d", __func__, lightId);
+    HDF_LOGD("%{public}s: Enter the TurnOnLight function, lightId is %{public}d", __func__, lightId);
     if (lightVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: lightVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -144,7 +144,7 @@ int32_t LightIfService::TurnOnLight(int32_t lightId, const HdfLightEffect& effec
 
 int32_t LightIfService::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors)
 {
-    HDF_LOGI("%{public}s: Enter the TurnOnMultiLights function, lightId is %{public}d", __func__, lightId);
+    HDF_LOGD("%{public}s: Enter the TurnOnMultiLights function, lightId is %{public}d", __func__, lightId);
     std::vector<HdfLightColorVdi> colorVdi;
     if (lightVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: lightVdiImpl_ is nullptr", __func__);
@@ -175,7 +175,7 @@ int32_t LightIfService::TurnOnMultiLights(int32_t lightId, const std::vector<Hdf
 
 int32_t LightIfService::TurnOffLight(int32_t lightId)
 {
-    HDF_LOGI("%{public}s: Enter the TurnOffLight function, lightId is %{public}d", __func__, lightId);
+    HDF_LOGD("%{public}s: Enter the TurnOffLight function, lightId is %{public}d", __func__, lightId);
     if (lightVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: lightVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
