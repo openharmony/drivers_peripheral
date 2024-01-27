@@ -274,7 +274,7 @@ int32_t CameraDeviceVdiImpl::DisableResult(const std::vector<int32_t> &results)
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.DelEnabledAbility(results);
     DFX_LOCAL_HITRACE_END;
-    return VDI::Camera::V1_0::NO_ERROR;
+    return ret;
 }
 
 int32_t CameraDeviceVdiImpl::Close()

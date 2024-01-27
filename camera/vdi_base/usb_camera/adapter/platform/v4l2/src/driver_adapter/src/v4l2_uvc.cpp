@@ -214,7 +214,7 @@ void HosV4L2UVC::V4L2UvcEnmeDevices()
 
 const char* HosV4L2UVC::V4L2GetUsbValue(const char* key, const char* str, int len)
 {
-    if (key == nullptr || str == nullptr || len <= 0 || strlen(key) > len) {
+    if (key == nullptr || str == nullptr || len <= 0 || static_cast<int>(strlen(key)) > len) {
         return nullptr;
     }
 
@@ -232,8 +232,8 @@ const char* HosV4L2UVC::V4L2GetUsbValue(const char* key, const char* str, int le
 void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     std::string& devnode, char* buf, unsigned int len)
 {
-    int lineLen;
-    int pos = 0;
+    uint32_t lineLen;
+    uint32_t pos = 0;
     const char* retVal;
 
     CAMERA_LOGD("UVC:V4L2GetUsbString enter\n");

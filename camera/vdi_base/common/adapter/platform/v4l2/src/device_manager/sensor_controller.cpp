@@ -978,6 +978,7 @@ RetCode SensorController::SendFpsMetaData(common_metadata_header_t *data)
 
 RetCode SensorController::Flush(int32_t streamId)
 {
+    CAMERA_LOGD("SensorController::Flush streamId = %{public}d", streamId);
     return sensorVideo_->Flush(GetName());
 }
 

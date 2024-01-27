@@ -24,7 +24,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
     int ret;
     int count = 0;
 
-    if (numControls != control.size()) {
+    if (numControls != static_cast<int>(control.size())) {
         CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls numControls != control.size()\n");
         return RC_ERROR;
     }
@@ -74,7 +74,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
     int count = 0;
     auto iter = control.begin();
 
-    if (numControls != control.size()) {
+    if (numControls != static_cast<int>(control.size())) {
         CAMERA_LOGE("HosV4L2Control::V4L2GetCtrls numControls != control.size()\n");
         return RC_ERROR;
     }
@@ -224,9 +224,8 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
         if (qCtrl.type == V4L2_CTRL_TYPE_MENU) {
             struct v4l2_querymenu menu = {};
             V4l2Menu menuTemp = {};
-
-            for (menu.index = qCtrl.minimum;
-                    menu.index <= qCtrl.maximum;
+            for (menu.index = static_cast<uint32_t>(qCtrl.minimum);
+                    menu.index <= static_cast<uint32_t>(qCtrl.maximum);
                     menu.index++) {
                 menu.id = qCtrl.id;
                 rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
@@ -270,8 +269,8 @@ int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, 
         struct v4l2_querymenu menu = {};
         V4l2Menu mTemp = {};
 
-        for (menu.index = queryCtrl.minimum;
-                menu.index <= queryCtrl.maximum;
+        for (menu.index = static_cast<uint32_t>(queryCtrl.minimum);
+                menu.index <= static_cast<uint32_t>(queryCtrl.maximum);
                 menu.index++) {
             menu.id = queryCtrl.id;
             rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
