@@ -30,6 +30,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "$INPUT_ROOT_DIR/hal/include",
       "$INPUT_ROOT_DIR/interfaces/include",
+      "$INPUT_ROOT_DIR/utils/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
@@ -64,6 +65,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$INPUT_ROOT_DIR/hal/include",
       "$INPUT_ROOT_DIR/interfaces/include",
+      "$INPUT_ROOT_DIR/utils/include",
     ]
     sources = [ "./common/hdi_input_test.cpp" ]
     cflags = [

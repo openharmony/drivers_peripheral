@@ -18,6 +18,7 @@ import("./../input.gni")
 ohos_shared_library("libinput_interfaces_service_1.0") {
   include_dirs = [
     "$INPUT_ROOT_DIR/interfaces/include/",
+    "$INPUT_ROOT_DIR/utils/include",
     "$INPUT_ROOT_DIR/hal/include/",
     "//third_party/FreeBSD/sys/dev/evdev",
   ]

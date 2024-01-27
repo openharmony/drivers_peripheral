@@ -15,8 +15,8 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+#include "input_uhdf_log.h"
 #include "v1_0/input_interfaces_stub.h"
 
 using namespace OHOS::HDI::Input::V1_0;
