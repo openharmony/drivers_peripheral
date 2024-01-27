@@ -19,9 +19,9 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include "osal_time.h"
 #include "v1_0/iinput_interfaces.h"
+#include "input_uhdf_log.h"
 #include "input_type.h"
 #include "input_callback_impl.h"
 

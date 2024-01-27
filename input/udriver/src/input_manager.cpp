@@ -22,7 +22,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "hdf_io_service_if.h"
-#include "hdf_log.h"
+#include "input_uhdf_log.h"
 #include "input_device_manager.h"
 #include "osal_mem.h"
 

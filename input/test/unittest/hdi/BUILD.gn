@@ -24,6 +24,7 @@ ohos_unittest("hdi_unittest_input") {
     "$INPUT_ROOT_DIR/hdi_service",
     "$INPUT_ROOT_DIR/interfaces/include",
     "$INPUT_ROOT_DIR/interfaces",
+    "$INPUT_ROOT_DIR/utils/include",
     "$INPUT_ROOT_DIR/test/common/include",
     "//third_party/FreeBSD/sys/dev/evdev",
   ]
