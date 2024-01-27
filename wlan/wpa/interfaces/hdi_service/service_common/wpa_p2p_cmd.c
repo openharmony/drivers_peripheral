@@ -2448,21 +2448,17 @@ int32_t ProcessEventP2pServDiscResp(struct HdfWpaRemoteNode *node,
 int32_t ProcessEventP2pStaConnectState(struct HdfWpaRemoteNode *node,
     struct P2pStaConnectStateParam *staConnectStateParam, const char *ifName)
 {
-    struct HdiP2pStaConnectStateParam *hdiP2pStaConnectStateParam = NULL;
+    struct HdiP2pStaConnectStateParam hdiP2pStaConnectStateParam;
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaConnectState == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pStaConnectStateParam = (struct HdiP2pStaConnectStateParam *)OsalMemCalloc(
-        sizeof(struct P2pStaConnectStateParam));
-    if ((hdiP2pStaConnectStateParam == NULL) || (WpaFillP2pStaConnectStateParam(
-        staConnectStateParam, hdiP2pStaConnectStateParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pStaConnectStateParam(staConnectStateParam, &hdiP2pStaConnectStateParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pStaConnectStateParam is NULL or staConnectStateParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventStaConnectState(node->callbackObj, hdiP2pStaConnectStateParam, ifName);
+        ret = node->callbackObj->OnEventStaConnectState(node->callbackObj, &hdiP2pStaConnectStateParam, ifName);
     }
-    HdiP2pStaConnectStateParamFree(hdiP2pStaConnectStateParam, true);
     return ret;
 }
 
