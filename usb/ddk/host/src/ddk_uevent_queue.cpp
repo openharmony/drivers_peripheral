@@ -152,8 +152,8 @@ void TaskQueue::Init(void)
 {
     pthread_setname_np(pthread_self(), "ueventTaskQueue");
     auto taskWork = [this]() -> void {
-        std::unique_lock<std::mutex> uniqueLock(queueLock_);
         while (threadRun_) {
+        std::unique_lock<std::mutex> uniqueLock(queueLock_);
             conditionVariable_.wait(uniqueLock, [this] {
                 return (taskQueue_.size() > 0 || !threadRun_);
             });
