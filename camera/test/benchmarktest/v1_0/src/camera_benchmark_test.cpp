@@ -109,10 +109,8 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_GetCameraAbility_benchmark_004)(
 {
     cameraTest->rc = cameraTest->service->GetCameraIds(cameraTest->cameraIds);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-    for (int i = 0; i < cameraTest->cameraIds.size(); i++) {
-        for (auto _ : st) {
-            cameraTest->rc = cameraTest->service->GetCameraAbility(cameraTest->cameraIds[i], cameraTest->abilityVec);
-        }
+    for (auto _ : st) {
+        cameraTest->rc = cameraTest->service->GetCameraAbility(cameraTest->cameraIds.front(), cameraTest->abilityVec);
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_GetCameraAbility_benchmark_004)->
