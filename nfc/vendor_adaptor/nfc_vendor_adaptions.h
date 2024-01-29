@@ -49,7 +49,7 @@ const unsigned int VENDOR_IOCTL_OUTPUT_LEN_INDEX = 128;
 const unsigned int VENDOR_IOCTL_OUTPUT_START_INDEX = 129;
 const unsigned int VENDOR_IOCTL_INPUT_LEN_INDEX = 0;
 const unsigned int VENDOR_IOCTL_INPUT_START_INDEX = 1;
-const unsigned int VENDOR_IOCTL_INPUT_MAX_LEN = 128;
+const unsigned int VENDOR_IOCTL_INPUT_MIN_LEN = 128;
 
 struct NfcHalInterface {
     int (*nfcHalOpen)(NfcStackCallbackT *pCback, NfcStackDataCallbackT *pDataCback);
