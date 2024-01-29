@@ -23,6 +23,7 @@
 #include "running_lock_counter.h"
 #include "running_lock_timer_handler.h"
 #include "v1_1/power_types.h"
+#include "v1_1/ipower_running_lock_callback.h"
 #include "v1_1/running_lock_types.h"
 
 namespace OHOS {
@@ -31,12 +32,21 @@ namespace Power {
 namespace V1_1 {
 class RunningLockImpl {
 public:
-    static int32_t Hold(const RunningLockInfo &info, PowerHdfState state);
-    static int32_t Unhold(const RunningLockInfo &info);
+    static int32_t Hold(const RunningLockInfo &info, PowerHdfState state, 
+        uint64_t lockid = 0, const std::string &bundleName = "");
+    static int32_t Unhold(const RunningLockInfo &info,
+        uint64_t lockid = 0, const std::string &bundleName = "");
     static void Clean();
     static uint32_t GetCount(RunningLockType type);
     static std::string GetRunningLockTag(RunningLockType type);
     static void SetDefaultTimeOutMs(int32_t timeOutMs);
+
+    static void RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback>
+        &iPowerRunningLockCallback);
+    static void UnRegisterRunningLockCallback();
+
+    static void NotifyChanged(const RunningLockInfo &info,
+        const uint64_t &lockid, const std::string &bundleName, const std::string &tag);
 
 private:
     static bool IsValidType(RunningLockType type, PowerHdfState state = PowerHdfState::AWAKE);
