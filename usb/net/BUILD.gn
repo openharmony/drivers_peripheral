@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../usb.gni")
 group("usbhost_ecm") {
   deps = [ ":libusbhost_ecm" ]
 }
@@ -34,6 +35,7 @@ ohos_shared_library("libusbhost_ecm") {
     "./../gadget/function/include",
     "./../../../hdf_core/framework/model/usb/include",
     "include",
+    "${usb_driver_path}/utils/include",
   ]
 
   deps = [ "./../ddk:libusb_ddk_host" ]

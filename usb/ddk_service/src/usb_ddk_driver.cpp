@@ -18,6 +18,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usb_ddk_driver
 

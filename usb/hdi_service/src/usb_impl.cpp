@@ -35,6 +35,7 @@
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
 #include "usbd_port.h"
+#include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 

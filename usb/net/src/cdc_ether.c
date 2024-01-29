@@ -23,6 +23,7 @@
 #include "osal_time.h"
 #include "securec.h"
 #include "usb_ddk_interface.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_HOST_ECM
 
