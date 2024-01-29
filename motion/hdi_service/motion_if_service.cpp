@@ -80,7 +80,7 @@ int32_t MotionIfService::Init()
 
 int32_t MotionIfService::EnableMotion(int32_t motionType)
 {
-    HDF_LOGD("%{public}s: Enter the EnableMotion function, motionType is %{public}d" , __func__, motionType);
+    HDF_LOGD("%{public}s: Enter the EnableMotion function, motionType is %{public}d", __func__, motionType);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -102,7 +102,7 @@ int32_t MotionIfService::EnableMotion(int32_t motionType)
 
 int32_t MotionIfService::DisableMotion(int32_t motionType)
 {
-    HDF_LOGD("%{public}s: Enter the DisableMotion function, motionType is %{public}d" , __func__, motionType);
+    HDF_LOGD("%{public}s: Enter the DisableMotion function, motionType is %{public}d", __func__, motionType);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
