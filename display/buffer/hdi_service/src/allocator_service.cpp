@@ -64,7 +64,7 @@ int32_t AllocatorService::LoadVdi()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
-        HDF_LOGI("%{public}s: allocator load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
+        HDF_LOGD("%{public}s: allocator load vdi, clear earlier dlerror: %{public}s", __func__, errStr);
     }
 #ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_BUFFER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
@@ -72,10 +72,10 @@ int32_t AllocatorService::LoadVdi()
         DISPLAY_LOGE("display buffer load vendor vdi default library failed: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
 #endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
         libHandle_ = dlopen(DISPLAY_BUFFER_VDI_LIBRARY, RTLD_LAZY);
-        DISPLAY_LOGI("display buffer load vendor vdi library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+        DISPLAY_LOGD("display buffer load vendor vdi library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
 #ifdef BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     } else {
-        DISPLAY_LOGI("display buffer load vendor vdi default library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
+        DISPLAY_LOGD("display buffer load vendor vdi default library: %{public}s", DISPLAY_BUFFER_VDI_LIBRARY);
     }
 #endif // BUFFER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);

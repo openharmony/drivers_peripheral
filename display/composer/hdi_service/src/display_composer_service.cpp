@@ -110,7 +110,7 @@ int32_t DisplayComposerService::LoadVdiSo()
 {
     const char* errStr = dlerror();
     if (errStr != nullptr) {
-        DISPLAY_LOGI("composer load vdi, clear earlier dlerror: %{public}s", errStr);
+        DISPLAY_LOGD("composer load vdi, clear earlier dlerror: %{public}s", errStr);
     }
 #ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     libHandle_ = dlopen(DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY, RTLD_LAZY);
@@ -119,10 +119,10 @@ int32_t DisplayComposerService::LoadVdiSo()
             DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
 #endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
         libHandle_ = dlopen(DISPLAY_COMPOSER_VDI_LIBRARY, RTLD_LAZY);
-        DISPLAY_LOGI("composer load vendor vdi library: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
+        DISPLAY_LOGD("composer load vendor vdi library: %{public}s", DISPLAY_COMPOSER_VDI_LIBRARY);
 #ifdef COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     } else {
-        DISPLAY_LOGI("composer load vendor vdi default library: %{public}s", DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
+        DISPLAY_LOGD("composer load vendor vdi default library: %{public}s", DISPLAY_COMPOSER_VDI_DEFAULT_LIBRARY);
     }
 #endif // COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
