@@ -100,14 +100,14 @@ int32_t SensorIfService::Init()
     return ret;
 }
 
-sptr<SensorCallbackVdi> SensorIfService::SensorCbInit(int32_t groupId)
+void SensorIfService::SensorCbInit(int32_t groupId)
 {
     if (groupId == TRADITIONAL_SENSOR_TYPE) {
         traditionalCb = nullptr;
-        return traditionalCb;
+        return;
     }
     medicalCb = nullptr;
-    return medicalCb;
+    return;
 }
 
 sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag)
@@ -296,6 +296,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
             return HDF_FAILURE;
         }
         StartTrace(HITRACE_TAG_HDF, "Register");
+        SensorCbInit(groupId);
         sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, REGISTER_SENSOR);
         if (sensorCb == nullptr) {
             HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);

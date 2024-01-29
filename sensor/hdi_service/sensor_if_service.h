@@ -56,7 +56,7 @@ private:
     void  RemoveDeathNotice(int32_t sensorType);
     int32_t AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
     int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
-    sptr<SensorCallbackVdi> SensorCbInit(int32_t groupId);
+    void SensorCbInit(int32_t groupId);
     sptr<SensorCallbackVdi> GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag);
     OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
