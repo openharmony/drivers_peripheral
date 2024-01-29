@@ -22,6 +22,7 @@
 #include "usb_impl.h"
 #include "usbd_dispatcher.h"
 #include "v1_0/usb_interface_stub.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG Usbd
 

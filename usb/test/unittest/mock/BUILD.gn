@@ -26,6 +26,7 @@ config("module_private_config") {
     "./../../../gadget/function/include",
     "//third_party/googletest/googlemock/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/utils/include",
   ]
 }
 
@@ -64,7 +65,10 @@ ohos_unittest("device_auto_test") {
     "src/usbd_device_auto_test.cpp",
   ]
 
-  include_dirs = [ "${usb_driver_path}/test/UsbSubscriberTest" ]
+  include_dirs = [
+    "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/utils/include",
+  ]
 
   configs = [ ":module_private_config" ]
 

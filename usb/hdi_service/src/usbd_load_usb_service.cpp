@@ -24,6 +24,7 @@
 #include "osal_thread.h"
 #include "osal_time.h"
 #include "securec.h"
+#include "usbd_wrapper.h"
 
 using namespace OHOS;
 using namespace std;

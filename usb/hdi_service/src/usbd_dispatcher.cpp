@@ -20,6 +20,7 @@
 #include "usb_impl.h"
 #include "usb_interface_pool.h"
 #include "v1_0/iusbd_subscriber.h"
+#include "usbd_wrapper.h"
 
 namespace OHOS {
 namespace HDI {
