@@ -59,6 +59,7 @@ private:
     static std::mutex instanceMutex_;
     std::unordered_map<int32_t, std::unordered_map<int, SensorClientInfo>> clients_;
     std::unordered_map<int32_t, std::set<int32_t>> sensorUsed_;
+    std::unordered_map<int32_t, std::set<int32_t>> sensorSDCUsed_;
     std::unordered_map<int32_t, struct BestSensorConfig> sensorConfig_;
 };
 
