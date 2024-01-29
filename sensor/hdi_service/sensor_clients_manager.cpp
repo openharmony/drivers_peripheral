@@ -35,6 +35,7 @@ namespace {
                                                   HDF_SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
                                                   HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
     constexpr int64_t ERROR_INTERVAL = 0;
+    constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
 }
 
@@ -151,6 +152,25 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
     HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorBestConfig, samplingInterval is %{public}s, "
+             "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
+             std::to_string(reportInterval).c_str());
+    return;
+}
+
+void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
+{
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    auto it = sensorConfig_.find(sensorId);
+    if (it == sensorConfig_.end()) {
+        samplingInterval = STOP_INTERVAL;
+        reportInterval = STOP_INTERVAL;
+        HDF_LOGD("%{public}s: sensor: %{public}d has no best config", __func__, sensorId);
+        return;
+    }
+
+    samplingInterval = it->second.samplingInterval;
+    reportInterval = it->second.reportInterval;
+    HDF_LOGD("%{public}s: sensorId is %{public}d, after GetSensorBestConfig, samplingInterval is %{public}s, "
              "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
     return;
