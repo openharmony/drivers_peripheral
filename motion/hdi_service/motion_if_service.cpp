@@ -72,7 +72,7 @@ int32_t MotionIfService::Init()
 
     int32_t ret = motionVdiImpl_->InitMotion();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s impl init failed,error code is %{public}d" , __func__, ret);
+        HDF_LOGE("%{public}s impl init failed,error code is %{public}d", __func__, ret);
     }
     
     return ret;
@@ -115,7 +115,7 @@ int32_t MotionIfService::DisableMotion(int32_t motionType)
     StartTrace(HITRACE_TAG_HDF, "DisableMotion");
     int32_t ret = motionVdiImpl_->DisableMotion(motionType);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Disable failed, error code is %{public}d" , __func__, ret);
+        HDF_LOGE("%{public}s: Disable failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
 
