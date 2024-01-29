@@ -25,6 +25,8 @@
 
 constexpr int DISABLE_SENSOR = 0;
 constexpr int REPORT_INTERVAL = 0;
+constexpr int UNREGISTER_SENSOR = 0;
+constexpr int REGISTER_SENSOR = 1;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
 
@@ -96,6 +98,30 @@ int32_t SensorIfService::Init()
     }
 
     return ret;
+}
+
+void SensorIfService::SensorCbInit(int32_t groupId)
+{
+    if (groupId == TRADITIONAL_SENSOR_TYPE) {
+        traditionalCb = nullptr;
+        return;
+    }
+    medicalCb = nullptr;
+    return;
+}
+
+sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag)
+{
+    if (groupId == TRADITIONAL_SENSOR_TYPE) {
+        if (cbFlag) {
+            sptr<SensorCallbackVdi> traditionalCb = new SensorCallbackVdi(callbackObj);
+        }
+        return traditionalCb;
+    }
+    if (cbFlag) {
+        sptr<SensorCallbackVdi> medicalCb = new SensorCallbackVdi(callbackObj);
+    }
+    return medicalCb;
 }
 
 int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
@@ -270,7 +296,12 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
             return HDF_FAILURE;
         }
         StartTrace(HITRACE_TAG_HDF, "Register");
-        sptr<SensorCallbackVdi> sensorCb = new SensorCallbackVdi(callbackObj);
+        SensorCbInit(groupId);
+        sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, REGISTER_SENSOR);
+        if (sensorCb == nullptr) {
+            HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
+            return HDF_FAILURE;
+        }
         ret = sensorVdiImpl_->Register(groupId, sensorCb);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Register failed, error code is %{public}d", __func__, ret);
@@ -311,7 +342,11 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     }
 
     StartTrace(HITRACE_TAG_HDF, "Unregister");
-    sptr<SensorCallbackVdi> sensorCb = new SensorCallbackVdi(callbackObj);
+    sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, UNREGISTER_SENSOR);
+    if (sensorCb == nullptr) {
+        HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
+        return HDF_FAILURE;
+    }
     int32_t ret = sensorVdiImpl_->Unregister(groupId, sensorCb);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
@@ -442,7 +477,7 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
     for (int32_t groupId = TRADITIONAL_SENSOR_TYPE; groupId < SENSOR_GROUP_TYPE_MAX; groupId++) {
         auto groupIdIter = callbackMap.find(groupId);
         if (groupIdIter == callbackMap.end()) {
-            return;
+            continue;
         }
         auto callBackIter =
         find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
@@ -458,6 +493,23 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
             int32_t ret = RemoveCallbackMap(groupId, serviceId, *callBackIter);
             if (ret != SENSOR_SUCCESS) {
                 HDF_LOGE("%{public}s: Unregister failed groupId[%{public}d]", __func__, groupId);
+            }
+            if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
+                HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
+                continue;
+            }
+            if (sensorVdiImpl_ == nullptr) {
+                HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+                continue;
+            }
+            sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, *callBackIter, UNREGISTER_SENSOR);
+            if (sensorCb == nullptr) {
+                HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
+                continue;
+            }
+            ret = sensorVdiImpl_->Unregister(groupId, sensorCb);
+            if (ret != SENSOR_SUCCESS) {
+                HDF_LOGE("%{public}s: Unregister failed, error code is %{public}d", __func__, ret);
             }
         }
     }
