@@ -35,6 +35,7 @@ public:
     void ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
     void ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
     void SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
+    void GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
     bool IsClientsEmpty(int groupId);
