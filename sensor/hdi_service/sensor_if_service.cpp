@@ -505,7 +505,14 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     int32_t ret;
     if (enabled) {
         int64_t samplingInterval = COMMON_REPORT_FREQUENCY / rateLevel;
-        ret = SetBatch(sensorId, samplingInterval, REPORT_INTERVAL);
+        int64_t reportInterval = REPORT_INTERVAL;
+        SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
+        ret = sensorVdiImpl_->SetBatch(sensorId, samplingInterval, reportInterval);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
+        }
+        SensorClientsManager::GetInstance()->GetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
+        ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSdcSensor setBatch failed, error code is %{public}d", __func__, ret);
         }
