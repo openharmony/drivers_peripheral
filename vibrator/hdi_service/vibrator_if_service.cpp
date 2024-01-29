@@ -82,7 +82,7 @@ int32_t VibratorIfService::Init()
 
 int32_t VibratorIfService::StartOnce(uint32_t duration)
 {
-    HDF_LOGI("%{public}s: Enter the StartOnce function, duration is %{public}u", __func__, duration);
+    HDF_LOGD("%{public}s: Enter the StartOnce function, duration is %{public}u", __func__, duration);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -100,7 +100,7 @@ int32_t VibratorIfService::StartOnce(uint32_t duration)
 
 int32_t VibratorIfService::Start(const std::string &effectType)
 {
-    HDF_LOGI("%{public}s: Enter the Start function", __func__);
+    HDF_LOGD("%{public}s: Enter the Start function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -118,7 +118,7 @@ int32_t VibratorIfService::Start(const std::string &effectType)
 
 int32_t VibratorIfService::Stop(HdfVibratorMode mode)
 {
-    HDF_LOGI("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
+    HDF_LOGD("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -148,7 +148,7 @@ int32_t VibratorIfService::Stop(HdfVibratorMode mode)
 
 int32_t VibratorIfService::StopV1_2(int32_t mode)
 {
-    HDF_LOGI("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
+    HDF_LOGD("%{public}s: Enter the Stop function, mode: %{public}d", __func__, mode);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -180,7 +180,7 @@ int32_t VibratorIfService::StopV1_2(int32_t mode)
 
 int32_t VibratorIfService::GetVibratorInfo(std::vector<HdfVibratorInfo> &vibratorInfo)
 {
-    HDF_LOGI("%{public}s: Enter the GetVibratorInfo function.", __func__);
+    HDF_LOGD("%{public}s: Enter the GetVibratorInfo function.", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -215,7 +215,7 @@ int32_t VibratorIfService::GetVibratorInfo(std::vector<HdfVibratorInfo> &vibrato
 
 int32_t VibratorIfService::EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency)
 {
-    HDF_LOGI("%{public}s: duration is %{public}u, intensity is %{public}u, frequency is %{public}d.",
+    HDF_LOGD("%{public}s: duration is %{public}u, intensity is %{public}u, frequency is %{public}d.",
         __func__, duration, intensity, frequency);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
@@ -234,7 +234,7 @@ int32_t VibratorIfService::EnableVibratorModulation(uint32_t duration, uint16_t 
 
 int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effect)
 {
-    HDF_LOGI("%{public}s: Enter the EnableCompositeEffect function.", __func__);
+    HDF_LOGD("%{public}s: Enter the EnableCompositeEffect function.", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -271,7 +271,7 @@ int32_t VibratorIfService::EnableCompositeEffect(const HdfCompositeEffect &effec
 
 int32_t VibratorIfService::GetEffectInfo(const std::string &effectType, HdfEffectInfo &effectInfo)
 {
-    HDF_LOGI("%{public}s: Enter the GetEffectInfo function.", __func__);
+    HDF_LOGD("%{public}s: Enter the GetEffectInfo function.", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -293,7 +293,7 @@ int32_t VibratorIfService::GetEffectInfo(const std::string &effectType, HdfEffec
 
 int32_t VibratorIfService::IsVibratorRunning(bool& state)
 {
-    HDF_LOGI("%{public}s: Enter the IsVibratorRunning function", __func__);
+    HDF_LOGD("%{public}s: Enter the IsVibratorRunning function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -311,7 +311,7 @@ int32_t VibratorIfService::IsVibratorRunning(bool& state)
 
 int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
 {
-    HDF_LOGI("%{public}s: Enter the PlayHapticPattern function", __func__);
+    HDF_LOGD("%{public}s: Enter the PlayHapticPattern function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -353,7 +353,7 @@ int32_t VibratorIfService::PlayHapticPattern(const HapticPaket& pkg)
 
 int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
 {
-    HDF_LOGI("%{public}s: Enter the GetHapticCapacity function", __func__);
+    HDF_LOGD("%{public}s: Enter the GetHapticCapacity function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -375,7 +375,7 @@ int32_t VibratorIfService::GetHapticCapacity(HapticCapacity& hapticCapacity)
 
 int32_t VibratorIfService::GetHapticStartUpTime(int32_t mode, int32_t& startUpTime)
 {
-    HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function", __func__);
+    HDF_LOGD("%{public}s: Enter the GetHapticStartUpTime function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
