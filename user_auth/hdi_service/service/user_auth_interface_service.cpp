@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_2/user_auth_interface_service.h"
+#include "v1_3/user_auth_interface_service.h"
 
 #include <mutex>
 #include <hdf_base.h>
@@ -358,8 +358,8 @@ static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info)
+static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
 {
     IAM_LOGI("start");
     if (scheduleResult.size() == 0) {
@@ -385,6 +385,8 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
     info.result = authResult.result;
     info.remainAttempts = authResult.remainTimes;
     info.lockoutDuration = authResult.freezingTime;
+    enrolledState.credentialDigest = authResult.credentialDigest;
+    enrolledState.credentialCount = authResult.credentialCount;
     if (info.result == RESULT_SUCCESS) {
         info.token.resize(sizeof(UserAuthTokenHal));
         if (memcpy_s(info.token.data(), info.token.size(), &authTokenHal, sizeof(authTokenHal)) != EOK) {
@@ -410,6 +412,21 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
     }
     IAM_LOGI("type pin");
     return CreateExecutorCommand(authResult.userId, info);
+}
+
+int32_t UserAuthInterfaceService::UpdateAuthenticationResultWithEnrolledState(uint64_t contextId, const std::vector<uint8_t> &scheduleResult,
+    AuthResultInfo &info, EnrolledState &enrolledState)
+{
+    IAM_LOGI("start");
+    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
+}
+
+int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info)
+{
+    IAM_LOGI("start");
+    EnrolledState enrolledState = {};
+    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
 }
 
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
@@ -937,6 +954,27 @@ int32_t UserAuthInterfaceService::GetAllExtUserInfo(std::vector<ExtUserInfo> &us
     }
 
     Free(userInfoResult);
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, AuthType authType, EnrolledState &info)
+{
+    IAM_LOGI("start");
+    EnrolledStateHal *enrolledStateHal = (EnrolledStateHal *) Malloc(sizeof(EnrolledStateHal));
+    if (enrolledStateHal == NULL) {
+        IAM_LOGE("malloc failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    int32_t ret = GetEnrolledStateFunc(userId, authType, enrolledStateHal);
+    if (ret != RESULT_SUCCESS) {
+        Free(enrolledStateHal);
+        IAM_LOGE("GetEnrolledState failed");
+        return ret;
+    }
+    info.credentialDigest = enrolledStateHal->credentialDigest;
+    info.credentialCount = enrolledStateHal->credentialCount;
+
+    Free(enrolledStateHal);
     return RESULT_SUCCESS;
 }
 } // Userauth
