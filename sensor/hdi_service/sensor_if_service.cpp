@@ -235,10 +235,10 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     if (mode == SDC){
         SensorClientsManager::GetInstance()->UpdateSensorSDCConfig(sensorId, samplingInterval, reportInterval);
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-        ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, reportInterval);
-        if (ret != SENSOR_SUCCESS) {
-            HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
-        }
+    }
+    ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, reportInterval);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
     }
     FinishTrace(HITRACE_TAG_HDF);
 
