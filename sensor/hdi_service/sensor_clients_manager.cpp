@@ -112,6 +112,21 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     }
 }
 
+void SensorClientsManager::UpdateSensorSDCConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
+{
+    std::unique_lock<std::mutex> lock(sensorSDCConfigMutex_);
+    auto it = sensorSDCConfig_.find(sensorId);
+    if (it != sensorSDCConfig_.end()) {
+        it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
+         : it->second.samplingInterval;
+        it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
+         : it->second.reportInterval;
+    } else {
+        BestSensorConfig config = {samplingInterval, reportInterval};
+        sensorSDCConfig_.emplace(sensorId, config);
+    }
+}
+
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
@@ -151,6 +166,23 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
     HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorBestConfig, samplingInterval is %{public}s, "
+             "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
+             std::to_string(reportInterval).c_str());
+    return;
+}
+
+void SensorClientsManager::SetSensorSDCBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
+{
+    std::unique_lock<std::mutex> lock(sensorSDCConfigMutex_);
+    auto it = sensorSDCConfig_.find(sensorId);
+    if (it == sensorSDCConfig_.end()) {
+        HDF_LOGD("%{public}s: sensor: %{public}d is enabled by sdc first time", __func__, sensorId);
+        return;
+    }
+
+    samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
+    reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
+    HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorSDCBestConfig, samplingInterval is %{public}s, "
              "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
     return;
