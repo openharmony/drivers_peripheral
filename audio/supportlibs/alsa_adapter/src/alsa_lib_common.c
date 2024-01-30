@@ -643,8 +643,8 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
 #else
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement)
 {
-    const char *mixerCtrlLeftVolName = "ES8156 DAC";
-    const char *mixerCtrlRightVolName = "ES8156 DAC";
+    const char *mixerCtrlLeftVolName = "DACL";
+    const char *mixerCtrlRightVolName = "DACR";
 
     if (cardIns == NULL || pcmElement == NULL) {
         AUDIO_FUNC_LOGE("The parameter is empty.");
