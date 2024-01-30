@@ -100,26 +100,16 @@ int32_t SensorIfService::Init()
     return ret;
 }
 
-void SensorIfService::SensorCbInit(int32_t groupId)
-{
-    if (groupId == TRADITIONAL_SENSOR_TYPE) {
-        traditionalCb = nullptr;
-        return;
-    }
-    medicalCb = nullptr;
-    return;
-}
-
 sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag)
 {
     if (groupId == TRADITIONAL_SENSOR_TYPE) {
         if (cbFlag) {
-            sptr<SensorCallbackVdi> traditionalCb = new SensorCallbackVdi(callbackObj);
+            traditionalCb = new SensorCallbackVdi(callbackObj);
         }
         return traditionalCb;
     }
     if (cbFlag) {
-        sptr<SensorCallbackVdi> medicalCb = new SensorCallbackVdi(callbackObj);
+        medicalCb = new SensorCallbackVdi(callbackObj);
     }
     return medicalCb;
 }
