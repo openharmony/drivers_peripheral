@@ -51,7 +51,7 @@ SensorClientsManager::~SensorClientsManager()
     clients_.clear();
     sensorUsed_.clear();
     sensorConfig_.clear();
-    sensorSDCConfig_.clear();
+    sdcSensorConfig_.clear();
 }
 
 int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
@@ -114,18 +114,18 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     }
 }
 
-void SensorClientsManager::UpdateSensorSDCConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
+void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
-    std::unique_lock<std::mutex> lock(sensorSDCConfigMutex_);
-    auto it = sensorSDCConfig_.find(sensorId);
-    if (it != sensorSDCConfig_.end()) {
+    std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
+    auto it = sdcSensorConfig_.find(sensorId);
+    if (it != sdcSensorConfig_.end()) {
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
          : it->second.samplingInterval;
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
          : it->second.reportInterval;
     } else {
         BestSensorConfig config = {samplingInterval, reportInterval};
-        sensorSDCConfig_.emplace(sensorId, config);
+        sdcSensorConfig_.emplace(sensorId, config);
     }
 }
 
@@ -173,18 +173,18 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
     return;
 }
 
-void SensorClientsManager::SetSensorSDCBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
+void SensorClientsManager::SetSdcSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
-    std::unique_lock<std::mutex> lock(sensorSDCConfigMutex_);
-    auto it = sensorSDCConfig_.find(sensorId);
-    if (it == sensorSDCConfig_.end()) {
+    std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
+    auto it = sdcSensorConfig_.find(sensorId);
+    if (it == sdcSensorConfig_.end()) {
         HDF_LOGD("%{public}s: sensor: %{public}d is enabled by sdc first time", __func__, sensorId);
         return;
     }
 
     samplingInterval = samplingInterval < it->second.samplingInterval ? samplingInterval : it->second.samplingInterval;
     reportInterval = reportInterval < it->second.reportInterval ? reportInterval : it->second.reportInterval;
-    HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSensorSDCBestConfig, samplingInterval is %{public}s, "
+    HDF_LOGD("%{public}s: sensorId is %{public}d, after SetSdcSensorBestConfig, samplingInterval is %{public}s, "
              "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
     return;
