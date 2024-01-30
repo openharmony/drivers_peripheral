@@ -26,7 +26,6 @@
 #include "hdf_log.h"
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
-#include "usbd_wrapper.h"
 
 #define UEVENT_MSG_LEN          2048
 #define UEVENT_SOCKET_GROUPS    0xffffffff
