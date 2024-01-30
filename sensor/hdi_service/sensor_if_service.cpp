@@ -286,7 +286,6 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
             return HDF_FAILURE;
         }
         StartTrace(HITRACE_TAG_HDF, "Register");
-        SensorCbInit(groupId);
         sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, callbackObj, REGISTER_SENSOR);
         if (sensorCb == nullptr) {
             HDF_LOGE("%{public}s: get sensorcb fail, groupId[%{public}d]", __func__, groupId);
