@@ -27,7 +27,7 @@ constexpr int DISABLE_SENSOR = 0;
 constexpr int REPORT_INTERVAL = 0;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
-constexpr enum BatchSeniorMode = {
+enum BatchSeniorMode {
         SA = 0,
         SDC = 1
 };
