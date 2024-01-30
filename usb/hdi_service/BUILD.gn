@@ -39,7 +39,11 @@ ohos_shared_library("libusb_interface_service_1.0") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "src/usb_impl.cpp",
@@ -94,7 +98,11 @@ ohos_shared_library("libusb_driver") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   sources = [ "src/usb_interface_driver.cpp" ]
 
