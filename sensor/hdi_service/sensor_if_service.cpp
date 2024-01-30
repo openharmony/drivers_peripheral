@@ -536,7 +536,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     int64_t reportInterval = REPORT_INTERVAL;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     if (enabled) {
-        ret = sensorVdiImpl_->SetBatchSenior(serviceId, sensorId, SDC, samplingInterval, reportInterval);
+        ret = SetBatchSenior(serviceId, sensorId, SDC, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SDC failed, error code is %{public}d", __func__, ret);
             return ret;
@@ -553,7 +553,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
             return ret;
         }
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-        ret = sensorVdiImpl_->SetBatchSenior(serviceId, sensorId, SA, samplingInterval, reportInterval);
+        ret = SetBatchSenior(serviceId, sensorId, SA, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
             return ret;
