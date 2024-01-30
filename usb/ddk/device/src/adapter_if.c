@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 #include "osal_time.h"
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG adapter_if
 #define SLEEP_DELAY 100000

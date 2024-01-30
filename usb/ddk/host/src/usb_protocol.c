@@ -15,7 +15,6 @@
 
 #include "usb_protocol.h"
 #include "usb_io_manage.h"
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_PROTOCOL
 

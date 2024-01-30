@@ -14,7 +14,6 @@
  */
 
 #include "usbfn_io_mgr.h"
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usbfn_io_mgr
 
