@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -34,7 +34,7 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
     "user_auth_hdi_fuzzer.cpp",
   ]
 
-  deps = [ "../common_fuzzer:libuser_auth_interface_service_1.2_fuzzer" ]
+  deps = [ "../common_fuzzer:libuser_auth_interface_service_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
