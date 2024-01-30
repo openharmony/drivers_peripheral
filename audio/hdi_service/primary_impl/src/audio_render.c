@@ -159,7 +159,6 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
     } else {
-        pthread_mutex_unlock(&g_mutex);
         AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
         ret = AUDIO_ERR_NOT_SUPPORT;
     }
