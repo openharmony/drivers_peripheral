@@ -36,6 +36,7 @@ public:
     void ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
     void SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
     void GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
+    void SetSensorSDCBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
     bool IsClientsEmpty(int groupId);
@@ -44,11 +45,13 @@ public:
     bool IsNeedCloseSensor(int sensorId, int serviceId);
     void OpenSensor(int sensorId, int serviceId);
     void UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
+    void UpdateSensorSDCConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
     int GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj);
     static SensorClientsManager* GetInstance();
     std::mutex clientsMutex_;
     std::mutex sensorUsedMutex_;
     std::mutex sensorConfigMutex_;
+    std::mutex sensorSDCConfigMutex_;
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
     bool IsSensorContinues(int sensorId);
@@ -59,6 +62,7 @@ private:
     std::unordered_map<int32_t, std::unordered_map<int, SensorClientInfo>> clients_;
     std::unordered_map<int32_t, std::set<int32_t>> sensorUsed_;
     std::unordered_map<int32_t, struct BestSensorConfig> sensorConfig_;
+    std::unordered_map<int32_t, struct BestSensorConfig> sensorSDCConfig_;
 };
 
 struct BestSensorConfig {
