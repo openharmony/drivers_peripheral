@@ -26,6 +26,9 @@ SensorClientInfo::SensorClientInfo()
 
 SensorClientInfo::~SensorClientInfo()
 {
+    sensorConfigMap_.clear();
+    periodCountMap_.clear();
+    curCountMap_.clear();
 }
 
 void SensorClientInfo::SetReportDataCb(const sptr<ISensorCallback> &callbackObj)

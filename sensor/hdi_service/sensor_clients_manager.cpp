@@ -50,6 +50,7 @@ SensorClientsManager::~SensorClientsManager()
     clients_.clear();
     sensorUsed_.clear();
     sensorConfig_.clear();
+    sensorSDCConfig_.clear();
 }
 
 int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
