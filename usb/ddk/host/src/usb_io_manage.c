@@ -228,6 +228,12 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
         goto ERROR;
     }
+    if (reqEntry->list.prev == NULL || reqEntry->list.next == NULL) {
+        ret = HDF_ERR_INVALID_OBJECT;
+        HDF_LOGE("%{public}s:%d list node is invalid", __func__, __LINE__);
+        OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
+        goto ERROR;
+    }
     DListRemove(&reqEntry->list);
     *request = (struct UsbHostRequest *)reqEntry;
     OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
