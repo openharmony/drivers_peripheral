@@ -19,9 +19,6 @@ group("hdi_audio") {
 
   if (defined(ohos_lite)) {
   } else {
-    if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
-      deps += []
-    }
     deps += [ "hdi_service:idl_audio" ]
   }
 }
