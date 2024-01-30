@@ -27,7 +27,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
     struct v4l2_fmtdesc enumFmtDesc = {};
     struct v4l2_frmsizeenum frmSize = {};
     struct v4l2_frmivalenum  fraMival = {};
-    constexpr uint32_t fmtMax = 50;
+    constexpr int32_t fmtMax = 50;
 
     for (i = 0; i < fmtMax; ++i) {
         enumFmtDesc.index = i;

@@ -306,7 +306,8 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info, void *address, int32_t &ou
     if (IsJpegPicture(dataBuffer, dataBufferSize, address) == RC_ERROR) {
         goto error;
     }
-    totalTempBufferSize = EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength + (dataBufferSize - IMAGE_DATA_OFFSET);
+    totalTempBufferSize = EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength +
+        (static_cast<uint32_t>(dataBufferSize) - IMAGE_DATA_OFFSET);
     tempBuffer = static_cast<unsigned char *>(malloc(totalTempBufferSize));
     if (!tempBuffer) {
         CAMERA_LOGE("%{public}s Allocate temp buf failed.", __FUNCTION__);
