@@ -244,6 +244,8 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
         FreeScanResult(scanResult);
         return NL_SKIP;
     }
+    HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d num:%{public}u scanResultCapacity:%{public}u", __FUNCTION__,
+        __LINE__, scanResults->num, scanResults->scanResultCapacity);
     WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULT, scanResult);
     scanResults->num++;
     if (scanResults->num == scanResults->scanResultCapacity) {
@@ -251,14 +253,14 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
         WifiScanResult *newScanResult = NULL;
         newScanResult = (WifiScanResult *)OsalMemCalloc(sizeof(WifiScanResult) * (scanResults->scanResultCapacity));
         if (newScanResult == NULL) {
-            HILOG_ERROR(LOG_CORE, "%s: newscanResult is NULL",  __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%{public}s: newscanResult is NULL",  __FUNCTION__);
             scanResults->scanResultCapacity -= INIT_SCAN_RES_NUM;
             scanResults->num = 0;
             return NL_SKIP;
         }
         if (memcpy_s((void *)newScanResult, sizeof(WifiScanResult) * (scanResults->scanResultCapacity),
             (void *)scanResults->scanResult, sizeof(WifiScanResult) * (scanResults->num)) != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: memcpy_s fail",  __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s fail",  __FUNCTION__);
         }
         OsalMemFree(scanResults->scanResult);
         scanResults->scanResult = newScanResult;
@@ -269,6 +271,7 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
 
 static void WifiEventScanResultProcess(const char *ifName)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int32_t ret;
     WifiScanResults scanResults = {0};
     WifiScanResultArg arg;
@@ -294,6 +297,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     HILOG_INFO(LOG_CORE, "%s: scanResults.num = %d", __FUNCTION__, scanResults.num);
     FreeScanResults(&scanResults);
     nlmsg_free(msg);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
 }
 
 static void WifiEventScanAbortedProcess(const char *ifName)
@@ -314,34 +318,35 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             WifiEventVendorProcess(ifName, attr);
             break;
         case NL80211_CMD_START_SCHED_SCAN:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_START_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_START_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
             break;
         case NL80211_CMD_SCHED_SCAN_RESULTS:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
             WifiEventScanResultProcess(ifName);
             break;
         case NL80211_CMD_SCHED_SCAN_STOPPED:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_STOPPED, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCHED_SCAN_STOPPED, cmd = %d", __FUNCTION__, cmd);
             break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_NEW_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_NEW_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
             WifiEventScanResultProcess(ifName);
             break;
         case NL80211_CMD_SCAN_ABORTED:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCAN_ABORTED, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCAN_ABORTED, cmd = %d", __FUNCTION__, cmd);
             WifiEventScanAbortedProcess(ifName);
             break;
         case NL80211_CMD_TRIGGER_SCAN:
-            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_TRIGGER_SCAN, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_TRIGGER_SCAN, cmd = %d", __FUNCTION__, cmd);
             break;
         default:
-            HILOG_INFO(LOG_CORE, "%s: not supported cmd, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%{public}s: not supported cmd, cmd = %d", __FUNCTION__, cmd);
             break;
     }
 }
 
 static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
     struct NetworkInfoResult networkInfo;
@@ -371,7 +376,7 @@ static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
             return NL_SKIP;
         }
     }
-
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return NL_SKIP;
 }
 
@@ -393,17 +398,20 @@ static struct nl_cb *CreateCb(void)
 
 static int HandleEvent(struct nl_sock *sock)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int ret;
     struct nl_cb *cb = CreateCb();
     if (cb == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: Create cb failed", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%{public}s: Create cb failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
     ret = nl_recvmsgs(sock, cb);
-
+    HILOG_INFO(LOG_CORE, "%{public}s, nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", __FUNCTION__, ret,
+        errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
@@ -457,13 +465,14 @@ static int32_t CtrlSocketAckHandler(struct nl_msg *msg, void *arg)
 
 static int HandleCtrlEvent(struct nl_sock *sock)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int ret;
     struct nl_cb *cb;
     int error;
 
     cb = nl_cb_alloc(NL_CB_DEFAULT);
     if (cb == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: alloc ctrl cb failed", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%{public}s: alloc ctrl cb failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
@@ -473,14 +482,17 @@ static int HandleCtrlEvent(struct nl_sock *sock)
     nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CtrlSocketAckHandler, &error);
 
     ret = nl_recvmsgs(sock, cb);
-
+    HILOG_INFO(LOG_CORE, "%{public}s, nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", __FUNCTION__, ret,
+        errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
 void *EventThread(void *para)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     struct nl_sock *eventSock = NULL;
     struct nl_sock *ctrlSock = NULL;
     struct pollfd pollFds[LISTEN_FD_NUMS] = {0};
@@ -507,24 +519,29 @@ void *EventThread(void *para)
 
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
+        HILOG_INFO(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d", ret);
         if (ret < 0) {
-            HILOG_ERROR(LOG_CORE, "%s: fail poll", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%{public}s: fail poll", __FUNCTION__);
             break;
         } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_CORE, "%s: event socket get POLLERR event", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%{public}s: event socket get POLLERR event", __FUNCTION__);
             break;
         } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
+            HILOG_INFO(LOG_CORE, "%{public}s: event socket get POLLIN event", __FUNCTION__);
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
+                HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event, HandleEvent break", __FUNCTION__);
                 break;
             }
         } else if ((uint32_t)pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
-            HILOG_INFO(LOG_CORE, "%s: ctrl socket get POLLIN event", __FUNCTION__);
+            HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event", __FUNCTION__);
             if (HandleCtrlEvent(ctrlSock) != RET_CODE_SUCCESS) {
+                HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event, HandleCtrlEvent break", __FUNCTION__);
                 break;
             }
         }
     }
 
     *status = THREAD_STOP;
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return NULL;
 }
