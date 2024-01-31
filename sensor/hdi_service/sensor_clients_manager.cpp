@@ -17,7 +17,7 @@
 #include "sensor_clients_manager.h"
 #include <cinttypes>
 
-#define HDF_LOG_TAG uhdf_sensor_service
+#define HDF_LOG_TAG uhdf_sensor_clients_manager
 
 namespace OHOS {
 namespace HDI {
