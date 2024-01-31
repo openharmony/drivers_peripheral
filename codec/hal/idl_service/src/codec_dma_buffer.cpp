@@ -81,7 +81,6 @@ int32_t CodecDMABuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-    codecBuffer.fd = -1;
 
     return HDF_SUCCESS;
 }
