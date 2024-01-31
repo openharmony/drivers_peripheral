@@ -19,12 +19,12 @@
 #define USBNET_NW                  16
 #define USBNET_NR                  44
 #define USB_CTRL_REQ_SIZE          256
-#define IFF_NOARP  				   1 << 7
+#define IFF_NOARP                  1 << 7
 
 #define USB_IO_THREAD_STACK_SIZE      8192
 #define USB_RAW_IO_SLEEP_MS_TIME      100
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME 3
-#define HARCH_LOG_TAG 				  "[-harch-hdf-]"
+#define HARCH_LOG_TAG                 "[-harch-hdf-]"
 
 #define HARCH_INFO_PRINT(fmt,...)  \
 do{ \
@@ -33,13 +33,13 @@ do{ \
 }while(0)
 
 enum UsbnetHostDeviceSpeed {
-  	USB_SPEED_UNKNOWN = 0,	    /* enumerating */
-  	USB_SPEED_LOW,              /* usb 1.1  1.5M */
-	USB_SPEED_FULL,		    /* usb 1.1  12M */
-  	USB_SPEED_HIGH,	            /* usb 2.0  480M*/
-	USB_SPEED_WIRELESS,
-  	USB_SPEED_SUPER,            /*usb 3.0 "5G"*/
- 	USB_SPEED_SUPER_PLUS,       /*usb 3.0 "10G"*/
+    USB_SPEED_UNKNOWN = 0,        /* enumerating */
+    USB_SPEED_LOW,                /* usb 1.1  1.5M */
+    USB_SPEED_FULL,               /* usb 1.1  12M */
+    USB_SPEED_HIGH,               /* usb 2.0  480M */
+    USB_SPEED_WIRELESS,
+    USB_SPEED_SUPER,              /* usb 3.0 "5G" */
+    USB_SPEED_SUPER_PLUS,         /* usb 3.0 "10G" */
 };
 
 //usb process
@@ -74,36 +74,36 @@ typedef enum {
 
 /* interface from UsbnetHost core to each USB networking link we handle */
 struct UsbnetHost {
-	//usb info
+    //usb info
     struct IDeviceIoService service;
-	struct HdfDeviceObject *deviceObject;
+    struct HdfDeviceObject *deviceObject;
 
-	uint8_t curInterfaceNumber;
-	uint8_t busNum;
+    uint8_t curInterfaceNumber;
+    uint8_t busNum;
     uint8_t devAddr;
-	struct UsbSession *session;
-	UsbRawHandle *devHandle;
-	struct UsbRawConfigDescriptor *config;
-	struct UsbRawInterfaceDescriptor *intf;
-	struct UsbRawEndpointDescriptor *status;
-	bool initFlag;
+    struct UsbSession *session;
+    UsbRawHandle *devHandle;
+    struct UsbRawConfigDescriptor *config;
+    struct UsbRawInterfaceDescriptor *intf;
+    struct UsbRawEndpointDescriptor *status;
+    bool initFlag;
     int32_t flags;
     uint8_t ctrlIface;
     uint8_t dataIface;
-	struct UsbEndpoint *statusEp;
+    struct UsbEndpoint *statusEp;
     struct UsbEndpoint *dataInEp;
     struct UsbEndpoint *dataOutEp;
     uint32_t xid;
-	//data process
+    //data process
     uint16_t rxQlen, txQlen;
     uint32_t canDmaSg:1;
-    uint8_t	*paddingPkt;
+    uint8_t    *paddingPkt;
     struct DListHead  readPool;
     struct DListHead  readQueue;
     struct DListHead  writePool;
     struct DListHead  writeQueue;
 
-	struct UsbHostWb wb[USBNET_NW];
+    struct UsbHostWb wb[USBNET_NW];
     struct OsalMutex writeLock;
     struct OsalMutex readLock;
     struct UsbRawRequest *readReq[USBNET_NR];
@@ -126,22 +126,22 @@ struct UsbnetHost {
     struct OsalMutex usbIoLock;
     UsbRawIoProcessStatusType usbIoStatus;
     struct OsalThread ioThread;
-	//net info
-	struct HdfIoService *hdfNetIoServ;
-	struct HdfDevEventlistener *hdfNetListener;
+    //net info
+    struct HdfIoService *hdfNetIoServ;
+    struct HdfDevEventlistener *hdfNetListener;
     struct UsbnetTransInfo net;
     struct OsalMutex sendNetLock;
-	//device info
-	struct UsbnetHostDriverInfo *driverInfo;
+    //device info
+    struct UsbnetHostDriverInfo *driverInfo;
 };
 
 /* interface from the device/framing level "minidriver" to core */
 struct UsbnetHostDriverInfo {
-	char	*description;
-	int32_t		flags;
-	/* init device ... can sleep, or cause probe() failure */
-	int32_t	(*bind)(struct UsbnetHost *);
-	void	(*unbind)(struct UsbnetHost *);
+    char    *description;
+    int32_t        flags;
+    /* init device ... can sleep, or cause probe() failure */
+    int32_t    (*bind)(struct UsbnetHost *);
+    void    (*unbind)(struct UsbnetHost *);
 };
 
 //net process
@@ -152,12 +152,12 @@ void UsbnetHostRelease(struct UsbnetHost *uNet);
 int32_t UsbnetHostGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConfigDescriptor **config);
 
 int32_t UsbnetHostWriteCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-			   uint16_t value, uint16_t index, const void *data, uint16_t size);
+               uint16_t value, uint16_t index, const void *data, uint16_t size);
 
 int32_t UsbnetHostWriteCmdAsync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-			   uint16_t value, uint16_t index, const void *data, uint16_t size);
+               uint16_t value, uint16_t index, const void *data, uint16_t size);
 
 int32_t UsbnetHostReadCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-			   uint16_t value, uint16_t index,  void *data, uint16_t size);
+               uint16_t value, uint16_t index,  void *data, uint16_t size);
 
 #endif

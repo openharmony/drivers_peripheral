@@ -85,10 +85,10 @@ static inline pid_t gettid()
 #define USBDEVFS_GET_SPEED          _IO('U', 31)
 
 struct UsbAdapterBulkTransfer {
-	unsigned int ep;
-	unsigned int len;
-	unsigned int timeout; /* in milliseconds */
-	void *data;
+    unsigned int ep;
+    unsigned int len;
+    unsigned int timeout; /* in milliseconds */
+    void *data;
 };
 
 struct UsbAdapterSetInterface {

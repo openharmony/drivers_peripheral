@@ -55,8 +55,8 @@ static int32_t UsbGetBulkEndpoint(struct UsbnetHost *usbNet, const struct UsbRaw
         usbNet->dataInEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
         usbNet->dataInEp->interval = endPoint->endpointDescriptor.bInterval;
         usbNet->dataInEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
-		HARCH_INFO_PRINT("usbNet->dataInEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
-				usbNet->dataInEp->addr, usbNet->dataInEp->interval, usbNet->dataInEp->maxPacketSize);
+        HARCH_INFO_PRINT("usbNet->dataInEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
+                usbNet->dataInEp->addr, usbNet->dataInEp->interval, usbNet->dataInEp->maxPacketSize);
     } else {
         /* get bulk out endpoint */
         usbNet->dataOutEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
@@ -67,22 +67,22 @@ static int32_t UsbGetBulkEndpoint(struct UsbnetHost *usbNet, const struct UsbRaw
         usbNet->dataOutEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
         usbNet->dataOutEp->interval = endPoint->endpointDescriptor.bInterval;
         usbNet->dataOutEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
-		HARCH_INFO_PRINT("usbNet->dataOutEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
-				usbNet->dataOutEp->addr, usbNet->dataOutEp->interval, usbNet->dataOutEp->maxPacketSize);
+        HARCH_INFO_PRINT("usbNet->dataOutEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
+                usbNet->dataOutEp->addr, usbNet->dataOutEp->interval, usbNet->dataOutEp->maxPacketSize);
     }
     return HDF_SUCCESS;
 }
 
 static void UsbParseConfigDescriptorProcess(struct UsbnetHost *usbNet, 
-														const struct UsbRawInterface *interface, uint8_t interfaceIndex)
+                                                        const struct UsbRawInterface *interface, uint8_t interfaceIndex)
 {
     uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
     uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
-	HARCH_INFO_PRINT("ifaceClass=%{public}d, numEndpoints=%{public}d", ifaceClass, numEndpoints); //import for ifaceClass
+    HARCH_INFO_PRINT("ifaceClass=%{public}d, numEndpoints=%{public}d", ifaceClass, numEndpoints); //import for ifaceClass
     switch (ifaceClass) {
         case USB_DDK_CLASS_WIRELESS_CONTROLLER: //USB_DDK_CLASS_COMM:
             usbNet->ctrlIface = interfaceIndex;
-			HARCH_INFO_PRINT("ctrlInface:%{public}d", interfaceIndex);
+            HARCH_INFO_PRINT("ctrlInface:%{public}d", interfaceIndex);
             usbNet->statusEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
             if (usbNet->statusEp == NULL) {
                 HDF_LOGE("%{public}s:%{public}d allocate endpoint failed", __func__, __LINE__);
@@ -92,20 +92,20 @@ static void UsbParseConfigDescriptorProcess(struct UsbnetHost *usbNet,
             usbNet->statusEp->addr = interface->altsetting->endPoint[0].endpointDescriptor.bEndpointAddress;
             usbNet->statusEp->interval = interface->altsetting->endPoint[0].endpointDescriptor.bInterval;
             usbNet->statusEp->maxPacketSize = interface->altsetting->endPoint[0].endpointDescriptor.wMaxPacketSize;
-			
-			HARCH_INFO_PRINT("usbNet->statusEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
-				usbNet->statusEp->addr, usbNet->statusEp->interval, usbNet->statusEp->maxPacketSize);
+            
+            HARCH_INFO_PRINT("usbNet->statusEp=[addr:%{public}#x, interval:%{public}d, maxPacketSize:%{public}hu]",
+                usbNet->statusEp->addr, usbNet->statusEp->interval, usbNet->statusEp->maxPacketSize);
             break;
         case USB_DDK_CLASS_CDC_DATA:
             usbNet->dataIface = interfaceIndex;
-			HARCH_INFO_PRINT("dataIface:%{public}d", interfaceIndex);
+            HARCH_INFO_PRINT("dataIface:%{public}d", interfaceIndex);
             for (uint8_t j = 0; j < numEndpoints; j++) {
                 const struct UsbRawEndpointDescriptor *endPoint = &interface->altsetting->endPoint[j];
                 if (UsbGetBulkEndpoint(usbNet, endPoint) != HDF_SUCCESS) {
-					HARCH_INFO_PRINT("");
+                    HARCH_INFO_PRINT("");
                     break;
                 }
-				HARCH_INFO_PRINT("");
+                HARCH_INFO_PRINT("");
             }
             break;
         default:
@@ -141,9 +141,9 @@ static int32_t UsbParseConfigDescriptor(struct UsbnetHost *usbNet)
  * RNDIS indicate messages.
  */
 static void HostRndisMsgIndicate(struct UsbnetHost *usbNet, struct rndis_indicate *msg,
-				int buflen)
+                int buflen)
 {
-	HARCH_INFO_PRINT("begin");
+    HARCH_INFO_PRINT("begin");
     uint32_t status = CPU_TO_LE32(msg->status);
     switch (status) {
     case RNDIS_STATUS_MEDIA_CONNECT:
@@ -173,16 +173,16 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
     HARCH_INFO_PRINT("begin");
     uint32_t msg_type = CPU_TO_LE32(buf->msg_type);
     uint32_t xid = 0;
-	
+    
     /* Issue the request; xid is unique, don't bother byteswapping it */
-	if (msg_type != RNDIS_MSG_HALT && msg_type != RNDIS_MSG_RESET) {
-		xid = usbNet->xid++;
-		if (!xid)
-			xid = usbNet->xid++;
-		buf->request_id = (__force __le32) xid;
-	}
+    if (msg_type != RNDIS_MSG_HALT && msg_type != RNDIS_MSG_RESET) {
+        xid = usbNet->xid++;
+        if (!xid)
+            xid = usbNet->xid++;
+        buf->request_id = (__force __le32) xid;
+    }
     HARCH_INFO_PRINT("msg_type= %{public}d, xid = %{public}d",msg_type, xid);
-	
+    
     int retval = UsbnetHostWriteCmdSync(usbNet,USB_DDK_CDC_SEND_ENCAPSULATED_COMMAND,
         USB_DDK_DIR_OUT|USB_DDK_TYPE_CLASS|USB_DDK_RECIP_INTERFACE, 0, usbNet->curInterfaceNumber,
         buf, CPU_TO_LE32(buf->msg_len));
@@ -191,17 +191,17 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
     HARCH_INFO_PRINT("retval = %{public}d",retval);
     if (retval < 0 || xid == 0)
     {
-		return retval;
+        return retval;
     }
     HARCH_INFO_PRINT("rndis xid %{public}d\n", xid);
 
-	uint32_t count = 0;
+    uint32_t count = 0;
     uint32_t request_id, msg_len, rsp, status;
     /* Poll the control channel; the request probably completed immediately */
     rsp = CPU_TO_LE32(buf->msg_type) | RNDIS_MSG_COMPLETION;
     for (count = 0; count < 10; count++) {
         HARCH_INFO_PRINT("count = %{public}d, buflen = %{public}d", count, buflen);
-		memset(buf, 0, CONTROL_BUFFER_SIZE);
+        memset(buf, 0, CONTROL_BUFFER_SIZE);
         retval= UsbnetHostWriteCmdSync(usbNet,USB_DDK_CDC_GET_ENCAPSULATED_RESPONSE,
                 USB_DDK_DIR_IN|USB_DDK_TYPE_CLASS|USB_DDK_RECIP_INTERFACE, 0, usbNet->curInterfaceNumber,
                 buf, buflen);
@@ -211,30 +211,30 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
         if (retval > 8)
         {
             msg_type = CPU_TO_LE32(buf->msg_type);
-			msg_len = CPU_TO_LE32(buf->msg_len);
-			status = CPU_TO_LE32(buf->status);
+            msg_len = CPU_TO_LE32(buf->msg_len);
+            status = CPU_TO_LE32(buf->status);
             request_id =  (__force uint32_t)buf->request_id;
             HARCH_INFO_PRINT("rndis reply msg_type = %{public}x,  msg_len = %{public}x, status = %{public}x, request_id = %{public}x", 
-					msg_type, msg_len, status, request_id);
+                    msg_type, msg_len, status, request_id);
 
             if (msg_type == rsp) {
-				if (request_id == xid) {
+                if (request_id == xid) {
                     HARCH_INFO_PRINT("rndis reply status %{public}08x\n", status);
                     HARCH_INFO_PRINT("rndis reply rsp %{public}08x\n", rsp);
-					if (rsp == RNDIS_MSG_RESET_C){
-						return HDF_SUCCESS;
+                    if (rsp == RNDIS_MSG_RESET_C){
+                        return HDF_SUCCESS;
                     }
 
-					if (RNDIS_STATUS_SUCCESS == status){
-						return HDF_SUCCESS;
+                    if (RNDIS_STATUS_SUCCESS == status){
+                        return HDF_SUCCESS;
                     }
 
-					HARCH_INFO_PRINT("rndis reply status %{public}08x\n", status);
-					return -EL3RST;
-				}
-				HARCH_INFO_PRINT("rndis reply id %{public}d expected %{public}d\n", request_id, xid);
-				/* then likely retry */
-			}else{
+                    HARCH_INFO_PRINT("rndis reply status %{public}08x\n", status);
+                    return -EL3RST;
+                }
+                HARCH_INFO_PRINT("rndis reply id %{public}d expected %{public}d\n", request_id, xid);
+                /* then likely retry */
+            }else{
                 HARCH_INFO_PRINT("unexpected rndis msg %{public}08x len %{public}d\n", CPU_TO_LE32(buf->msg_type), msg_len);
                 switch (msg_type)
                 {
@@ -265,12 +265,12 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
         }else
         {
             /* device probably issued a protocol stall; ignore */
-		    HARCH_INFO_PRINT("rndis response error = %{public}d", retval);
+            HARCH_INFO_PRINT("rndis response error = %{public}d", retval);
         }
-		OsalMSleep(40);
+        OsalMSleep(40);
     }
     HARCH_INFO_PRINT("rndis response timeout");
-	return HDF_ERR_TIMEOUT;
+    return HDF_ERR_TIMEOUT;
 }
 
 
@@ -294,52 +294,52 @@ int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid, uint3
 {
     HARCH_INFO_PRINT("begin");
     int retval;
-	union {
-		void			*buf;
-		struct rndis_msg_hdr	*header;
-		struct rndis_query	*get;
-		struct rndis_query_c	*get_c;
-	} u;
-	uint32_t off, len;
+    union {
+        void            *buf;
+        struct rndis_msg_hdr    *header;
+        struct rndis_query    *get;
+        struct rndis_query_c    *get_c;
+    } u;
+    uint32_t off, len;
     u.buf = buf;
-	memset(u.get, 0, sizeof *u.get + in_len);
-	u.get->msg_type = CPU_TO_LE32(RNDIS_MSG_QUERY);
-	u.get->msg_len = CPU_TO_LE32(sizeof *u.get + in_len);
-	u.get->oid = CPU_TO_LE32(oid);
-	u.get->len = CPU_TO_LE32(in_len);
-	u.get->offset = CPU_TO_LE32(20);
+    memset(u.get, 0, sizeof *u.get + in_len);
+    u.get->msg_type = CPU_TO_LE32(RNDIS_MSG_QUERY);
+    u.get->msg_len = CPU_TO_LE32(sizeof *u.get + in_len);
+    u.get->oid = CPU_TO_LE32(oid);
+    u.get->len = CPU_TO_LE32(in_len);
+    u.get->offset = CPU_TO_LE32(20);
 
     retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
-	HARCH_INFO_PRINT("retval = %{public}d",retval);
+    HARCH_INFO_PRINT("retval = %{public}d",retval);
     HARCH_INFO_PRINT("RNDIS_MSG_QUERY(0x%{public}08x) %{public}d\n", oid, retval);
     if (retval < 0) {
-		HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d\n", oid, retval);
-		return retval;
-	}
+        HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d\n", oid, retval);
+        return retval;
+    }
 
     off = CPU_TO_LE32(u.get_c->offset);
-	len = CPU_TO_LE32(u.get_c->len);
+    len = CPU_TO_LE32(u.get_c->len);
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
 
-	if ((off > CONTROL_BUFFER_SIZE - 8) || (len > CONTROL_BUFFER_SIZE - 8 - off))
+    if ((off > CONTROL_BUFFER_SIZE - 8) || (len > CONTROL_BUFFER_SIZE - 8 - off))
     {
-		goto response_error;
+        goto response_error;
     }
 
     if (*reply_len != -1 && len != *reply_len)
     {
-		goto response_error;
+        goto response_error;
     }
 
     *reply = (unsigned char *) &u.get_c->request_id + off;
-	*reply_len = len;
+    *reply_len = len;
 
     HARCH_INFO_PRINT("*reply_len = %{public}d, retval = %{public}d", len, retval);
-	return retval;
+    return retval;
 
 response_error:
-	HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n", oid, off, len);
+    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n", oid, off, len);
 
     return -EDOM;
 }
@@ -356,7 +356,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
 
     int retval = 0;
     //get data endpoints and control endpoints
-	HARCH_INFO_PRINT("");
+    HARCH_INFO_PRINT("");
     int32_t ret = UsbParseConfigDescriptor(usbNet);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbParseConfigDescriptor failed", __func__, __LINE__);
@@ -365,126 +365,126 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     }
 
     union {
-		void			*buf;
-		struct rndis_msg_hdr	*header;
-		struct rndis_init	*init;
-		struct rndis_init_c	*init_c;
-		struct rndis_query	*get;
-		struct rndis_query_c	*get_c;
-		struct rndis_set	*set;
-		struct rndis_set_c	*set_c;
-		struct rndis_halt	*halt;
-	} u;
+        void            *buf;
+        struct rndis_msg_hdr    *header;
+        struct rndis_init    *init;
+        struct rndis_init_c    *init_c;
+        struct rndis_query    *get;
+        struct rndis_query_c    *get_c;
+        struct rndis_set    *set;
+        struct rndis_set_c    *set_c;
+        struct rndis_halt    *halt;
+    } u;
 
-	u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
-	if (!u.buf)
+    u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
+    if (!u.buf)
     {
         HDF_LOGE( "u.buf can't be 0\n");
         retval = HDF_ERR_MALLOC_FAIL;
-		goto ERR_PARSE_DESC;
+        goto ERR_PARSE_DESC;
     }
 
-	u.init->msg_type = CPU_TO_LE32(RNDIS_MSG_INIT);
-	u.init->msg_len = CPU_TO_LE32(sizeof *u.init);
-	u.init->major_version = CPU_TO_LE32(1);
-	u.init->minor_version = CPU_TO_LE32(0);
+    u.init->msg_type = CPU_TO_LE32(RNDIS_MSG_INIT);
+    u.init->msg_len = CPU_TO_LE32(sizeof *u.init);
+    u.init->major_version = CPU_TO_LE32(1);
+    u.init->minor_version = CPU_TO_LE32(0);
    
-   	/* max transfer (in spec) is 0x4000 at full speed, but for
-	 * TX we'll stick to one Ethernet packet plus RNDIS framing.
-	 * For RX we handle drivers that zero-pad to end-of-packet.
-	 * Don't let userspace change these settings.
-	 *
-	 * NOTE: there still seems to be wierdness here, as if we need
-	 * to do some more things to make sure WinCE targets accept this.
-	 * They default to jumbograms of 8KB or 16KB, which is absurd
-	 * for such low data rates and which is also more than Linux
-	 * can usually expect to allocate for SKB data...
-	 */
-	usbNet->net.hardHeaderLen += sizeof (struct rndis_data_hdr); //net header
-	usbNet->net.hardMtu = usbNet->net.mtu + usbNet->net.hardHeaderLen;
+       /* max transfer (in spec) is 0x4000 at full speed, but for
+     * TX we'll stick to one Ethernet packet plus RNDIS framing.
+     * For RX we handle drivers that zero-pad to end-of-packet.
+     * Don't let userspace change these settings.
+     *
+     * NOTE: there still seems to be wierdness here, as if we need
+     * to do some more things to make sure WinCE targets accept this.
+     * They default to jumbograms of 8KB or 16KB, which is absurd
+     * for such low data rates and which is also more than Linux
+     * can usually expect to allocate for SKB data...
+     */
+    usbNet->net.hardHeaderLen += sizeof (struct rndis_data_hdr); //net header
+    usbNet->net.hardMtu = usbNet->net.mtu + usbNet->net.hardHeaderLen;
     HARCH_INFO_PRINT("hardHeaderLen = %{public}d, hardMtu = %{public}d\n", usbNet->net.hardHeaderLen, usbNet->net.hardMtu);
     //
-	usbNet->net.maxpacket = usbNet->dataOutEp->maxPacketSize;
+    usbNet->net.maxpacket = usbNet->dataOutEp->maxPacketSize;
     HARCH_INFO_PRINT("maxpacket = %{public}d\n", usbNet->net.maxpacket);
-	if (usbNet->net.maxpacket == 0) {
-		HDF_LOGE( "usbNet->maxpacket can't be 0\n");
-		retval = HDF_ERR_INVALID_PARAM;
-		goto ERR_RELEASE_BUF;
-	}
-	
-	usbNet->net.rxUrbSize = usbNet->net.hardMtu + (usbNet->net.maxpacket + 1);
+    if (usbNet->net.maxpacket == 0) {
+        HDF_LOGE( "usbNet->maxpacket can't be 0\n");
+        retval = HDF_ERR_INVALID_PARAM;
+        goto ERR_RELEASE_BUF;
+    }
+    
+    usbNet->net.rxUrbSize = usbNet->net.hardMtu + (usbNet->net.maxpacket + 1);
     HARCH_INFO_PRINT("rxUrbSize = %{public}d\n", usbNet->net.rxUrbSize);
-	usbNet->net.rxUrbSize &= ~(usbNet->net.maxpacket - 1);
+    usbNet->net.rxUrbSize &= ~(usbNet->net.maxpacket - 1);
 
     HARCH_INFO_PRINT("rxUrbSize = %{public}d\n", usbNet->net.rxUrbSize);
-	u.init->max_transfer_size = CPU_TO_LE32(usbNet->net.rxUrbSize);
+    u.init->max_transfer_size = CPU_TO_LE32(usbNet->net.rxUrbSize);
 
     retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
     if (retval < 0) {
-		/* it might not even be an RNDIS device!! */
-		HARCH_INFO_PRINT("RNDIS init failed, %{public}d", retval);
-		HDF_LOGE("RNDIS init failed, %{public}d", retval);
+        /* it might not even be an RNDIS device!! */
+        HARCH_INFO_PRINT("RNDIS init failed, %{public}d", retval);
+        HDF_LOGE("RNDIS init failed, %{public}d", retval);
         ret = HDF_FAILURE;
         goto ERR_RELEASE_BUF;
-	}
+    }
 
     uint32_t tmp = CPU_TO_LE32(u.init_c->max_transfer_size);
     if (tmp < usbNet->net.hardMtu) {
-		if (tmp <= usbNet->net.hardHeaderLen) {
+        if (tmp <= usbNet->net.hardHeaderLen) {
             HARCH_INFO_PRINT("RNDIS init failed, %{public}d", retval);
-			HDF_LOGE("usbNet can't take %{public}u byte packets (max %{public}u)\n", usbNet->net.hardMtu, tmp);
-			retval = HDF_ERR_INVALID_PARAM;
-			goto ERR_HALT_FAILED_AND_RELEASE;
-		}
+            HDF_LOGE("usbNet can't take %{public}u byte packets (max %{public}u)\n", usbNet->net.hardMtu, tmp);
+            retval = HDF_ERR_INVALID_PARAM;
+            goto ERR_HALT_FAILED_AND_RELEASE;
+        }
         HARCH_INFO_PRINT("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u\n", usbNet->net.hardMtu, tmp, tmp - usbNet->net.hardHeaderLen);
-		HDF_LOGW("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u\n", usbNet->net.hardMtu, tmp, tmp - usbNet->net.hardHeaderLen);
-		usbNet->net.hardMtu = tmp;
-		usbNet->net.mtu = usbNet->net.hardMtu - usbNet->net.hardHeaderLen;
-	}
+        HDF_LOGW("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u\n", usbNet->net.hardMtu, tmp, tmp - usbNet->net.hardHeaderLen);
+        usbNet->net.hardMtu = tmp;
+        usbNet->net.mtu = usbNet->net.hardMtu - usbNet->net.hardHeaderLen;
+    }
 
-	HARCH_INFO_PRINT(
-		"hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}zu, align %{public}d\n",
-		usbNet->net.hardMtu, tmp, usbNet->net.rxUrbSize,
-		1 << CPU_TO_LE32(u.init_c->packet_alignment));
-	
+    HARCH_INFO_PRINT(
+        "hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}zu, align %{public}d\n",
+        usbNet->net.hardMtu, tmp, usbNet->net.rxUrbSize,
+        1 << CPU_TO_LE32(u.init_c->packet_alignment));
+    
     /* Check physical medium */
-	__le32 *phym = NULL;
-    __le32	phym_unspec;
-	int reply_len = sizeof (*phym);
-	retval = HostRndisQuery(usbNet, u.buf,
-			     RNDIS_OID_GEN_PHYSICAL_MEDIUM,
-			     reply_len, (void **)&phym, &reply_len);
+    __le32 *phym = NULL;
+    __le32    phym_unspec;
+    int reply_len = sizeof (*phym);
+    retval = HostRndisQuery(usbNet, u.buf,
+                 RNDIS_OID_GEN_PHYSICAL_MEDIUM,
+                 reply_len, (void **)&phym, &reply_len);
 
-	if (retval != 0 || !phym) {
-		/* OID is optional so don't fail here. */
-		phym_unspec = CPU_TO_LE32(RNDIS_PHYSICAL_MEDIUM_UNSPECIFIED);
-		phym = &phym_unspec;
-	}
+    if (retval != 0 || !phym) {
+        /* OID is optional so don't fail here. */
+        phym_unspec = CPU_TO_LE32(RNDIS_PHYSICAL_MEDIUM_UNSPECIFIED);
+        phym = &phym_unspec;
+    }
 
     if ((usbNet->flags & FLAG_RNDIS_PHYM_WIRELESS) &&
-	    CPU_TO_LE32(*phym) != RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
-		HDF_LOGE("driver requires wireless physical medium, but device is not\n");
-		retval = HDF_ERR_NOPERM;
-		goto ERR_HALT_FAILED_AND_RELEASE;
-	}
+        CPU_TO_LE32(*phym) != RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
+        HDF_LOGE("driver requires wireless physical medium, but device is not\n");
+        retval = HDF_ERR_NOPERM;
+        goto ERR_HALT_FAILED_AND_RELEASE;
+    }
 
-	if ((usbNet->flags & FLAG_RNDIS_PHYM_NOT_WIRELESS) &&
-	    CPU_TO_LE32(*phym) == RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
-		HDF_LOGE("driver requires non-wireless physical medium, but device is wireless\n");
-		retval = HDF_ERR_NOPERM;
-		goto ERR_HALT_FAILED_AND_RELEASE;
-	}
+    if ((usbNet->flags & FLAG_RNDIS_PHYM_NOT_WIRELESS) &&
+        CPU_TO_LE32(*phym) == RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
+        HDF_LOGE("driver requires non-wireless physical medium, but device is wireless\n");
+        retval = HDF_ERR_NOPERM;
+        goto ERR_HALT_FAILED_AND_RELEASE;
+    }
 
     /* Get designated host ethernet address */
-	reply_len = MAC_ADDR_SIZE;
+    reply_len = MAC_ADDR_SIZE;
     unsigned char *bp;
-	retval = HostRndisQuery(usbNet, u.buf,RNDIS_OID_802_3_PERMANENT_ADDRESS, 
+    retval = HostRndisQuery(usbNet, u.buf,RNDIS_OID_802_3_PERMANENT_ADDRESS, 
                             48, (void **) &bp, &reply_len);
     if (retval< 0) {
         HDF_LOGE("rndis get ethaddr, %{public}d\n", retval);
         retval = HDF_ERR_NOPERM;
-		goto ERR_HALT_FAILED_AND_RELEASE;
-	}
+        goto ERR_HALT_FAILED_AND_RELEASE;
+    }
 
     HARCH_INFO_PRINT("bp 1= %{public}x",bp[0]);
     HARCH_INFO_PRINT("bp 2= %{public}x",bp[1]);
@@ -493,40 +493,40 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     HARCH_INFO_PRINT("bp 5= %{public}x",bp[4]);
     HARCH_INFO_PRINT("bp 6= %{public}x",bp[5]);
 
-	if (bp[0] & 0x02)
+    if (bp[0] & 0x02)
     {
         HARCH_INFO_PRINT("not GetmacAddr");
         usbNet->net.isGetmacAddr = 0;
         memset(usbNet->net.macAddr,0,sizeof(usbNet->net.macAddr));
     }
-	else
+    else
     {
         HARCH_INFO_PRINT("GetmacAddr");
         usbNet->net.isGetmacAddr = 1;
         etherAddrCopy(usbNet->net.macAddr, bp);
     }
 
-	/* set a nonzero filter to enable data transfers */
+    /* set a nonzero filter to enable data transfers */
     memset(u.set, 0, sizeof *u.set);
-	u.set->msg_type = CPU_TO_LE32(RNDIS_MSG_SET);
-	u.set->msg_len = CPU_TO_LE32(4 + sizeof *u.set);
-	u.set->oid = CPU_TO_LE32(RNDIS_OID_GEN_CURRENT_PACKET_FILTER);
-	u.set->len = CPU_TO_LE32(4);
-	u.set->offset = CPU_TO_LE32((sizeof *u.set) - 8);
-	*(__le32 *)(u.buf + sizeof *u.set) = CPU_TO_LE32(RNDIS_DEFAULT_FILTER);
-	retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
-	if (retval < 0) {
-		HDF_LOGE("rndis set packet filter, %{public}d", retval);
-		goto ERR_HALT_FAILED_AND_RELEASE;
-	}
+    u.set->msg_type = CPU_TO_LE32(RNDIS_MSG_SET);
+    u.set->msg_len = CPU_TO_LE32(4 + sizeof *u.set);
+    u.set->oid = CPU_TO_LE32(RNDIS_OID_GEN_CURRENT_PACKET_FILTER);
+    u.set->len = CPU_TO_LE32(4);
+    u.set->offset = CPU_TO_LE32((sizeof *u.set) - 8);
+    *(__le32 *)(u.buf + sizeof *u.set) = CPU_TO_LE32(RNDIS_DEFAULT_FILTER);
+    retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
+    if (retval < 0) {
+        HDF_LOGE("rndis set packet filter, %{public}d", retval);
+        goto ERR_HALT_FAILED_AND_RELEASE;
+    }
 
     OsalMemFree(u.buf);
     return  HDF_SUCCESS;
 
 ERR_HALT_FAILED_AND_RELEASE:
-	memset(u.halt, 0, sizeof *u.halt);
-	u.halt->msg_type = CPU_TO_LE32(RNDIS_MSG_HALT);
-	u.halt->msg_len = CPU_TO_LE32(sizeof *u.halt);
+    memset(u.halt, 0, sizeof *u.halt);
+    u.halt->msg_type = CPU_TO_LE32(RNDIS_MSG_HALT);
+    u.halt->msg_len = CPU_TO_LE32(sizeof *u.halt);
     (void) HostRndisCommand(usbNet,(void *)u.halt, CONTROL_BUFFER_SIZE);
 ERR_RELEASE_BUF:
     OsalMemFree(u.buf);
@@ -542,16 +542,16 @@ void HostRndisUnbind(struct UsbnetHost *usbNet)
     struct rndis_halt *halt = OsalMemAlloc(sizeof(struct rndis_halt));
 
     memset(halt, 0, sizeof *halt);
-	halt->msg_type = CPU_TO_LE32(RNDIS_MSG_HALT);
-	halt->msg_len = CPU_TO_LE32(sizeof *halt);
-	(void) HostRndisCommand(usbNet, (void *)halt, CONTROL_BUFFER_SIZE);
-	OsalMemFree(halt);
+    halt->msg_type = CPU_TO_LE32(RNDIS_MSG_HALT);
+    halt->msg_len = CPU_TO_LE32(sizeof *halt);
+    (void) HostRndisCommand(usbNet, (void *)halt, CONTROL_BUFFER_SIZE);
+    OsalMemFree(halt);
 }
 
 static struct UsbnetHostDriverInfo g_hostRndisInfo = {
-	.description =	"rndis device",
-	.bind =		HostRndisBind,
-	.unbind =	HostRndisUnbind,
+    .description =    "rndis device",
+    .bind =        HostRndisBind,
+    .unbind =    HostRndisUnbind,
 };
 
 static int32_t HostRndisDriverDeviceDispatch(
@@ -593,8 +593,8 @@ static int32_t HostRndisDriverBind(struct HdfDeviceObject *device)
 
     HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
     device->service = &(usbNet->service);
-	if (device->service == NULL) {
-		HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
+    if (device->service == NULL) {
+        HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
     }
 
     device->service->Dispatch = HostRndisDriverDeviceDispatch;
@@ -651,7 +651,7 @@ static void HostRndisDriverRelease(struct HdfDeviceObject *device)
     UsbnetHostRelease(usbNet);
     usbNet->driverInfo->unbind(usbNet);
 
-	//free momory
+    //free momory
     OsalMemFree(usbNet);
     return;
 }

@@ -29,15 +29,15 @@
 static inline void etherAddrCopy(uint8_t *dst, const uint8_t *src)
 {
 #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
-	*(uint32_t *)dst = *(const uint32_t *)src;
-	*(uint16_t *)(dst + 4) = *(const uint16_t *)(src + 4);
+    *(uint32_t *)dst = *(const uint32_t *)src;
+    *(uint16_t *)(dst + 4) = *(const uint16_t *)(src + 4);
 #else
-	uint16_t *a = (uint16_t *)dst;
-	const uint16_t *b = (const uint16_t *)src;
+    uint16_t *a = (uint16_t *)dst;
+    const uint16_t *b = (const uint16_t *)src;
 
-	a[0] = b[0];
-	a[1] = b[1];
-	a[2] = b[2];
+    a[0] = b[0];
+    a[1] = b[1];
+    a[2] = b[2];
 #endif
 }
 
