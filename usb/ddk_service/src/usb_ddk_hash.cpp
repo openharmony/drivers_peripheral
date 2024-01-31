@@ -19,7 +19,6 @@
 #include <iostream>
 
 #include "hdf_base.h"
-#include "usbd_wrapper.h"
 
 static std::unordered_map<uint64_t, InterfaceInfo> g_hashMap;
 std::mutex g_mapMutex;
