@@ -210,7 +210,7 @@ void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingIn
     return;
 }
 
-void EraseSdcSensorBestConfig(int sensorId)
+void SensorClientsManager::EraseSdcSensorBestConfig(int sensorId)
 {
     std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
