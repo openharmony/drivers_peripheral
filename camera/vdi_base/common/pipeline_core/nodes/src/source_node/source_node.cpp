@@ -173,6 +173,13 @@ SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p, bool isResize) :
 {
 }
 
+SourceNode::PortHandler::~PortHandler()
+{
+    CAMERA_LOGV("%{public}s, source node port handler dtor.", __FUNCTION__);
+    CollectorJoin();
+    DistributorJoin();
+}
+
 RetCode SourceNode::PortHandler::StartCollectBuffers()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(port, RC_ERROR);
@@ -208,10 +215,10 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     return RC_OK;
 }
 
-RetCode SourceNode::PortHandler::StopCollectBuffers()
+RetCode SourceNode::PortHandler::CollectorJoin()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
-    CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers enter");
+    CAMERA_LOGI("SourceNode::PortHandler::CollectorJoin enter");
     {
         std::unique_lock<std::mutex> l(cltLock);
         cltRun = false;
@@ -219,7 +226,16 @@ RetCode SourceNode::PortHandler::StopCollectBuffers()
     pool->NotifyStop();
     if (collector != nullptr) {
         collector->join();
+        collector.reset(nullptr);
     }
+    CAMERA_LOGI("SourceNode::PortHandler::collector::join exit");
+    return RC_OK;
+}
+
+RetCode SourceNode::PortHandler::StopCollectBuffers()
+{
+    RetCode rc = CollectorJoin();
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
 
     auto node = port->GetNode();
     if (node != nullptr) {
@@ -310,9 +326,9 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
     return RC_OK;
 }
 
-RetCode SourceNode::PortHandler::StopDistributeBuffers()
+RetCode SourceNode::PortHandler::DistributorJoin()
 {
-    CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers enter");
+    CAMERA_LOGV("SourceNode::PortHandler::DistributorJoin enter");
     {
         std::unique_lock<std::mutex> l(rblock);
         dbtRun = false;
@@ -320,7 +336,16 @@ RetCode SourceNode::PortHandler::StopDistributeBuffers()
     }
     if (distributor != nullptr) {
         distributor->join();
+        distributor.reset(nullptr);
     }
+    CAMERA_LOGV("SourceNode::PortHandler::DistributorJoin exit");
+    return RC_OK;
+}
+
+RetCode SourceNode::PortHandler::StopDistributeBuffers()
+{
+    RetCode rc = DistributorJoin();
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
     FlushBuffers(); // flush buffers after stopping distributor
     if (isResize_ == true) {
         for (auto iter : cBuffer) {
