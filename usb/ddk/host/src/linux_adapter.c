@@ -367,8 +367,7 @@ static int32_t AdapterUsbControlMsg(const struct UsbDeviceHandle *handle, struct
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = ioctl(handle->fd, USBDEVFS_CONTROL, ctrlData);
-    return ret;
+    return ioctl(handle->fd, USBDEVFS_CONTROL, ctrlData);
 }
 
 
@@ -379,8 +378,7 @@ static int32_t AdapterGetUsbSpeed(const struct UsbDeviceHandle *handle)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = ioctl(handle->fd, USBDEVFS_GET_SPEED, NULL);
-    return ret;
+    return ioctl(handle->fd, USBDEVFS_GET_SPEED, NULL);
 }
 
 static void OsFreeIsoUrbs(struct UsbHostRequest *request)
