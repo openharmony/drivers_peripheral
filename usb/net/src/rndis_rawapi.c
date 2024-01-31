@@ -240,18 +240,19 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                     case RNDIS_MSG_INDICATE:
                         HostRndisMsgIndicate(usbNet, (void *)buf, buflen);
                         break;
-                    case RNDIS_MSG_KEEPALIVE: 
-                        /* ping */
-                        struct rndis_keepalive_c *msg = (void *)buf;
-                        msg->msg_type = CPU_TO_LE32(RNDIS_MSG_KEEPALIVE_C);
-                        msg->msg_len = CPU_TO_LE32(sizeof *msg);
-                        msg->status = CPU_TO_LE32(RNDIS_STATUS_SUCCESS);
-                        retval= UsbnetHostWriteCmdSync(usbNet,USB_DDK_CDC_SEND_ENCAPSULATED_COMMAND,
-                                        USB_DDK_DIR_OUT|USB_DDK_TYPE_CLASS|USB_DDK_RECIP_INTERFACE, 0, usbNet->curInterfaceNumber,
-                                        msg, sizeof (*msg));
-                        HARCH_INFO_PRINT("retval = %{public}d",retval);
-                        if (retval < 0) {
-                            HARCH_INFO_PRINT("rndis keepalive err %{public}d\n", retval);
+                    case RNDIS_MSG_KEEPALIVE: {
+                            /* ping */
+                            struct rndis_keepalive_c *msg = (void *)buf;
+                            msg->msg_type = CPU_TO_LE32(RNDIS_MSG_KEEPALIVE_C);
+                            msg->msg_len = CPU_TO_LE32(sizeof *msg);
+                            msg->status = CPU_TO_LE32(RNDIS_STATUS_SUCCESS);
+                            retval= UsbnetHostWriteCmdSync(usbNet,USB_DDK_CDC_SEND_ENCAPSULATED_COMMAND,
+                                            USB_DDK_DIR_OUT|USB_DDK_TYPE_CLASS|USB_DDK_RECIP_INTERFACE, 0, usbNet->curInterfaceNumber,
+                                            msg, sizeof (*msg));
+                            HARCH_INFO_PRINT("retval = %{public}d",retval);
+                            if (retval < 0) {
+                                HARCH_INFO_PRINT("rndis keepalive err %{public}d\n", retval);
+                            }
                         }
                         break;
                     default:
