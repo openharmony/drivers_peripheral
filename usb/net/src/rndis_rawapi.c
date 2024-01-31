@@ -220,7 +220,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                 if (request_id == xid) {
                     HARCH_INFO_PRINT("rndis reply status %{public}08x\n", status);
                     HARCH_INFO_PRINT("rndis reply rsp %{public}08x\n", rsp);
-                    if (rsp == RNDIS_MSG_RESET_C){
+                    if (rsp == RNDIS_MSG_RESET_C) {
                         return HDF_SUCCESS;
                     }
 
@@ -233,7 +233,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                 }
                 HARCH_INFO_PRINT("rndis reply id %{public}d expected %{public}d\n", request_id, xid);
                 /* then likely retry */
-            }else {
+            } else {
                 HARCH_INFO_PRINT("unexpected rndis msg %{public}08x len %{public}d\n", CPU_TO_LE32(buf->msg_type), msg_len);
                 switch (msg_type) {
                     /* fault/event */
@@ -260,7 +260,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                         break;
                 }
             }
-        }else {
+        } else {
             /* device probably issued a protocol stall; ignore */
             HARCH_INFO_PRINT("rndis response error = %{public}d", retval);
         }
