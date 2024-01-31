@@ -56,9 +56,12 @@ private:
     void  RemoveDeathNotice(int32_t sensorType);
     int32_t AddCallbackMap(int32_t groupId, const sptr<ISensorCallback> &callbackObj);
     int32_t RemoveCallbackMap(int32_t groupId, int serviceId, const sptr<ISensorCallback> &callbackObj);
+    sptr<SensorCallbackVdi> GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag);
     OHOS::HDI::Sensor::V1_1::ISensorInterfaceVdi *sensorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
     GroupIdCallBackMap callbackMap = {};
+    sptr<SensorCallbackVdi> traditionalCb = nullptr;
+    sptr<SensorCallbackVdi> medicalCb = nullptr;
 };
 } // V2_0
 } // Sensor
