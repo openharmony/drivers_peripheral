@@ -132,7 +132,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval <= ERROR_INTERVAL) {
-        HDF_LOGE("%{public}s: error, sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        HDF_LOGE("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
         return;
     }
@@ -189,6 +189,7 @@ void SensorClientsManager::SetSdcSensorBestConfig(int sensorId, int64_t &samplin
     return;
 }
 
+
 void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
@@ -205,6 +206,19 @@ void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingIn
     HDF_LOGD("%{public}s: sensorId is %{public}d, after GetSensorBestConfig, samplingInterval is %{public}s, "
              "reportInterval is %{public}s", __func__, sensorId, std::to_string(samplingInterval).c_str(),
              std::to_string(reportInterval).c_str());
+    return;
+}
+
+void EraseSdcSensorBestConfig(int sensorId)
+{
+    std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
+    auto it = sdcSensorConfig_.find(sensorId);
+    if (it == sdcSensorConfig_.end()) {
+        HDF_LOGD("%{public}s: sensor: %{public}d sdcSensorBestConfig not exist, not need erase", __func__, sensorId);
+        return;
+    }
+    sdcSensorConfig_.erase(it);
+    HDF_LOGD("%{public}s: sensor: %{public}d config has been erase from sdcSensorConfig_", __func__, sensorId);
     return;
 }
 
@@ -314,10 +328,8 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
         return false;
     }
+    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     sensorClientInfo.curCountMap_[sensorId]++;
-    HDF_LOGD("%{public}s: service = %{public}d, sensorId = %{public}d, curCount/periodCount = %{public}d/%{public}d",
-             __func__, serviceId, sensorId, sensorClientInfo.curCountMap_[sensorId],
-             sensorClientInfo.periodCountMap_[sensorId]);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
         return false;

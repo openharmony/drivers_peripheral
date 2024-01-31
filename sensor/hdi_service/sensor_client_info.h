@@ -37,6 +37,7 @@ public:
     std::unordered_map<int32_t, struct SensorConfig> sensorConfigMap_;
     std::unordered_map<int32_t, int32_t> periodCountMap_;
     std::unordered_map<int32_t, int32_t> curCountMap_;
+    void PrintClientMapInfo(int32_t serviceId, int32_t sensorId);
 private:
     sptr<ISensorCallback> pollCallback_;
 };

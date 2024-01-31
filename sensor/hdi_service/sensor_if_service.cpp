@@ -562,6 +562,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
             return ret;
         }
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorId);
         ret = SetBatchSenior(serviceId, sensorId, SA, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
