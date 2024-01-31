@@ -177,8 +177,9 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
     /* Issue the request; xid is unique, don't bother byteswapping it */
     if (msg_type != RNDIS_MSG_HALT && msg_type != RNDIS_MSG_RESET) {
         xid = usbNet->xid++;
-        if (!xid)
+        if (!xid) {
             xid = usbNet->xid++;
+        }
         buf->request_id = (__force __le32) xid;
     }
     HARCH_INFO_PRINT("msg_type= %{public}d, xid = %{public}d",msg_type, xid);
@@ -189,8 +190,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
         
     UsbnetWriteLog((char *)buf, CPU_TO_LE32(buf->msg_len), 0);
     HARCH_INFO_PRINT("retval = %{public}d",retval);
-    if (retval < 0 || xid == 0)
-    {
+    if (retval < 0 || xid == 0) {
         return retval;
     }
     HARCH_INFO_PRINT("rndis xid %{public}d\n", xid);
@@ -208,8 +208,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
 
         HARCH_INFO_PRINT("retval = %{public}d",retval);
         UsbnetWriteLog((char *)buf, buflen, 0);
-        if (retval > 8)
-        {
+        if (retval > 8) {
             msg_type = CPU_TO_LE32(buf->msg_type);
             msg_len = CPU_TO_LE32(buf->msg_len);
             status = CPU_TO_LE32(buf->status);
@@ -225,7 +224,7 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                         return HDF_SUCCESS;
                     }
 
-                    if (RNDIS_STATUS_SUCCESS == status){
+                    if (RNDIS_STATUS_SUCCESS == status) {
                         return HDF_SUCCESS;
                     }
 
@@ -234,17 +233,15 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                 }
                 HARCH_INFO_PRINT("rndis reply id %{public}d expected %{public}d\n", request_id, xid);
                 /* then likely retry */
-            }else{
+            }else {
                 HARCH_INFO_PRINT("unexpected rndis msg %{public}08x len %{public}d\n", CPU_TO_LE32(buf->msg_type), msg_len);
-                switch (msg_type)
-                {
-                    case RNDIS_MSG_INDICATE: /* fault/event */
-                    {
+                switch (msg_type) {
+                    /* fault/event */
+                    case RNDIS_MSG_INDICATE:
                         HostRndisMsgIndicate(usbNet, (void *)buf, buflen);
                         break;
-                    }
                     case RNDIS_MSG_KEEPALIVE: 
-                    { /* ping */
+                        /* ping */
                         struct rndis_keepalive_c *msg = (void *)buf;
                         msg->msg_type = CPU_TO_LE32(RNDIS_MSG_KEEPALIVE_C);
                         msg->msg_len = CPU_TO_LE32(sizeof *msg);
@@ -253,17 +250,16 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
                                         USB_DDK_DIR_OUT|USB_DDK_TYPE_CLASS|USB_DDK_RECIP_INTERFACE, 0, usbNet->curInterfaceNumber,
                                         msg, sizeof (*msg));
                         HARCH_INFO_PRINT("retval = %{public}d",retval);
-                        if (retval < 0){
+                        if (retval < 0) {
                             HARCH_INFO_PRINT("rndis keepalive err %{public}d\n", retval);
                         }
                         break;
-                    }
                     default:
                         HARCH_INFO_PRINT("unexpected rndis msg %{public}08x len %{public}d\n", CPU_TO_LE32(buf->msg_type), msg_len);
+                        break;
                 }
             }
-        }else
-        {
+        }else {
             /* device probably issued a protocol stall; ignore */
             HARCH_INFO_PRINT("rndis response error = %{public}d", retval);
         }
@@ -322,13 +318,11 @@ int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid, uint3
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
 
-    if ((off > CONTROL_BUFFER_SIZE - 8) || (len > CONTROL_BUFFER_SIZE - 8 - off))
-    {
+    if ((off > CONTROL_BUFFER_SIZE - 8) || (len > CONTROL_BUFFER_SIZE - 8 - off)) {
         goto response_error;
     }
 
-    if (*reply_len != -1 && len != *reply_len)
-    {
+    if (*reply_len != -1 && len != *reply_len) {
         goto response_error;
     }
 
@@ -377,8 +371,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     } u;
 
     u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
-    if (!u.buf)
-    {
+    if (!u.buf) {
         HDF_LOGE( "u.buf can't be 0\n");
         retval = HDF_ERR_MALLOC_FAIL;
         goto ERR_PARSE_DESC;
@@ -493,14 +486,11 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     HARCH_INFO_PRINT("bp 5= %{public}x",bp[4]);
     HARCH_INFO_PRINT("bp 6= %{public}x",bp[5]);
 
-    if (bp[0] & 0x02)
-    {
+    if (bp[0] & 0x02) {
         HARCH_INFO_PRINT("not GetmacAddr");
         usbNet->net.isGetmacAddr = 0;
         memset(usbNet->net.macAddr,0,sizeof(usbNet->net.macAddr));
-    }
-    else
-    {
+    } else {
         HARCH_INFO_PRINT("GetmacAddr");
         usbNet->net.isGetmacAddr = 1;
         etherAddrCopy(usbNet->net.macAddr, bp);
@@ -624,12 +614,10 @@ static int32_t HostRndisDriverInit(struct HdfDeviceObject *device)
     struct UsbnetHost *usbNet = (struct UsbnetHost *)device->service;
     //net init
     ret = UsbnetHostProbe(usbNet); 
-    if (ret != HDF_SUCCESS)
-    {
+    if (ret != HDF_SUCCESS) {
         HARCH_INFO_PRINT("[-cbs-] UsbnetHostProbe error !");
     }
     //usb init
-
     return ret;
 }
 

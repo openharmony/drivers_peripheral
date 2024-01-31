@@ -138,9 +138,9 @@ struct UsbnetHost {
 /* interface from the device/framing level "minidriver" to core */
 struct UsbnetHostDriverInfo {
     char    *description;
-    int32_t        flags;
+    int32_t flags;
     /* init device ... can sleep, or cause probe() failure */
-    int32_t    (*bind)(struct UsbnetHost *);
+    int32_t (*bind)(struct UsbnetHost *);
     void    (*unbind)(struct UsbnetHost *);
 };
 
