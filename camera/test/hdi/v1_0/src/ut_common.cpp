@@ -96,6 +96,27 @@ void Test::GetCameraMetadata()
     if (ret == 0) {
         CAMERA_LOGI("get OHOS_CONTROL_AE_AVAILABLE_MODES success");
     }
+    camera_metadata_item_t connectEntry;
+    ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &connectEntry);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && connectEntry.data.u8 != nullptr && connectEntry.count > 0) {
+        uint8_t cameraConnectionType = *(connectEntry.data.u8);
+        if (static_cast<int>(cameraConnectionType) == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            CAMERA_LOGI("get OHOS_ABILITY_CAMERA_CONNECTION_TYPE success, this camera is usb camera.");
+            previewWidth = usbCamera_previewWidth;
+            previewHeight = usbCamera_previewHeight;
+            videoWidth = usbCamera_videoWidth;
+            videoHeight = usbCamera_videoHeight;
+            captureWidth = usbCamera_captureWidth;
+            captureHeight = usbCamera_captureHeight;
+            analyzeWidth = usbCamera_analyzeWidth;
+            analyzeHeight = usbCamera_analyzeHeight;
+            previewFormat = usbCamera_previewFormat;
+            videoFormat = usbCamera_videoFormat;
+            snapshotFormat = usbCamera_snapshotFormat;
+            analyzeFormat = usbCamera_analyzeFormat;
+            videoEncodeType = usbCamera_videoEncodeType;
+        }
+    }
 }
 
 void Test::Open()
@@ -179,7 +200,7 @@ void Test::DefaultInfosVideo(std::shared_ptr<StreamInfo> &infos)
     infos->format_ = videoFormat;
     infos->dataspace_ = UT_DATA_SIZE;
     infos->intent_ = StreamIntent::VIDEO;
-    infos->encodeType_ = ENCODE_TYPE_H265;
+    infos->encodeType_ = static_cast<OHOS::HDI::Camera::V1_0::EncodeType>(videoEncodeType);
     infos->tunneledMode_ = UT_TUNNEL_MODE;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_video =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
