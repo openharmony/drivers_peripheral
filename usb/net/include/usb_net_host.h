@@ -35,9 +35,9 @@ do{ \
 enum UsbnetHostDeviceSpeed {
   	USB_SPEED_UNKNOWN = 0,	    /* enumerating */
   	USB_SPEED_LOW,              /* usb 1.1  1.5M */
-    USB_SPEED_FULL,		        /* usb 1.1  12M */
-  	USB_SPEED_HIGH,				/* usb 2.0  480M*/
-    USB_SPEED_WIRELESS,
+	USB_SPEED_FULL,		    /* usb 1.1  12M */
+  	USB_SPEED_HIGH,	            /* usb 2.0  480M*/
+	USB_SPEED_WIRELESS,
   	USB_SPEED_SUPER,            /*usb 3.0 "5G"*/
  	USB_SPEED_SUPER_PLUS,       /*usb 3.0 "10G"*/
 };
