@@ -213,8 +213,9 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int32_t mode, int64_t samplingInterval,
                                         int64_t reportInterval)
 {
-    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+    HDF_LOGD("%{public}s: serviceId is %{public}d, sensorId is %{public}d, mode is %{public}d, samplingInterval is "
+             "[%{public}" PRId64 "], reportInterval is [%{public}" PRId64 "].", __func__, serviceId, sensorId, mode,
+             samplingInterval, reportInterval);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
@@ -243,8 +244,10 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
     }
     if (mode == SDC){
-        SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
+        SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     }
+    HDF_LOGD("%{public}s saSamplingInterval is %{public}d", __func__, saSamplingInterval);
     ret = sensorVdiImpl_->SetSaBatch(sensorId, saSamplingInterval, saReportInterval);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
