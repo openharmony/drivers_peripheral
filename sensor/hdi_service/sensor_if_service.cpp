@@ -221,22 +221,31 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     }
     StartTrace(HITRACE_TAG_HDF, "SetBatchSenior");
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
-    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-    SensorClientsManager::GetInstance()->SetSdcSensorBestConfig(sensorId, samplingInterval, reportInterval);
+
+    int64_t saSamplingInterval = samplingInterval;
+    int64_t saReportInterval = reportInterval;
+    int64_t sdcSamplingInterval = samplingInterval;
+    int64_t sdcReportInterval = reportInterval;
+
+    SensorClientsManager::GetInstance()->SetSensorBestConfig(sensorId, saSamplingInterval, saReportInterval);
+    SensorClientsManager::GetInstance()->SetSdcSensorBestConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
+
+    samplingInterval = saSamplingInterval < sdcSamplingInterval ? saSamplingInterval : sdcSamplingInterval;
+    reportInterval = saReportInterval < sdcReportInterval ? saReportInterval : sdcReportInterval;
+
     int32_t ret = sensorVdiImpl_->SetBatch(sensorId, samplingInterval, reportInterval);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
         return ret;
     }
     if (mode == SA){
-        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, samplingInterval, reportInterval);
+        SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
+        SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
     }
     if (mode == SDC){
         SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     }
-    ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, reportInterval);
+    ret = sensorVdiImpl_->SetSaBatch(sensorId, saSamplingInterval, saReportInterval);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
     }
