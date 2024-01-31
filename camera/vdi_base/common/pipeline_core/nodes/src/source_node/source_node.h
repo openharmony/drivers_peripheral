@@ -41,12 +41,14 @@ protected:
     class PortHandler {
     public:
         PortHandler() = default;
-        virtual ~PortHandler() = default;
+        ~PortHandler();
         explicit PortHandler(std::shared_ptr<IPort>& p, bool isResize);
         RetCode StartCollectBuffers();
         RetCode StopCollectBuffers();
         RetCode StartDistributeBuffers();
         RetCode StopDistributeBuffers();
+        RetCode CollectorJoin();
+        RetCode DistributorJoin();
         void OnBuffer(std::shared_ptr<IBuffer>& buffer);
         void setWideAndHigh(int32_t wide, int32_t high);
 
