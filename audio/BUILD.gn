@@ -20,9 +20,7 @@ group("hdi_audio") {
   if (defined(ohos_lite)) {
   } else {
     if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
-      deps += [
-        "hal/hdi_binder/server:hdi_audio_a2dp_server",
-      ]
+      deps += [ "hal/hdi_binder/server:hdi_audio_a2dp_server" ]
     }
     deps += [ "hdi_service:idl_audio" ]
   }
