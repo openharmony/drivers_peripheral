@@ -370,7 +370,6 @@ static int32_t AdapterUsbControlMsg(const struct UsbDeviceHandle *handle, struct
     return ioctl(handle->fd, USBDEVFS_CONTROL, ctrlData);
 }
 
-
 static int32_t AdapterGetUsbSpeed(const struct UsbDeviceHandle *handle)
 {
     if (handle == NULL || handle->dev == NULL) {
