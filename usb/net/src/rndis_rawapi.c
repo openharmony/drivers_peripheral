@@ -76,7 +76,7 @@ static int32_t UsbGetBulkEndpoint(struct UsbnetHost *usbNet, const struct UsbRaw
 static void UsbParseConfigDescriptorProcess(struct UsbnetHost *usbNet, 
                                                         const struct UsbRawInterface *interface, uint8_t interfaceIndex)
 {
-    uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
+    uint8_t ifaceClass   = interface->altsetting->interfaceDescriptor.bInterfaceClass;
     uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
     HARCH_INFO_PRINT("ifaceClass=%{public}d, numEndpoints=%{public}d", ifaceClass, numEndpoints); //import for ifaceClass
     switch (ifaceClass) {
@@ -154,9 +154,9 @@ static void HostRndisMsgIndicate(struct UsbnetHost *usbNet, struct rndis_indicat
         break;
     default:
         HARCH_INFO_PRINT("rndis indication: 0x%{public}08x\n", status);
+        /* fall-through */
     }
 }
-
 
 /*
  * RPC done RNDIS-style.  Caller guarantees:
@@ -292,16 +292,16 @@ int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid, uint3
     HARCH_INFO_PRINT("begin");
     int retval;
     union {
-        void            *buf;
-        struct rndis_msg_hdr    *header;
-        struct rndis_query    *get;
-        struct rndis_query_c    *get_c;
+        void *buf;
+        struct rndis_msg_hdr *header;
+        struct rndis_query *get;
+        struct rndis_query_c *get_c;
     } u;
     uint32_t off, len;
     u.buf = buf;
     memset(u.get, 0, sizeof *u.get + in_len);
     u.get->msg_type = CPU_TO_LE32(RNDIS_MSG_QUERY);
-    u.get->msg_len = CPU_TO_LE32(sizeof *u.get + in_len);
+    u.get->msg_len  = CPU_TO_LE32(sizeof *u.get + in_len);
     u.get->oid = CPU_TO_LE32(oid);
     u.get->len = CPU_TO_LE32(in_len);
     u.get->offset = CPU_TO_LE32(20);
@@ -348,10 +348,8 @@ response_error:
 static int32_t HostRndisBind(struct UsbnetHost *usbNet)
 {
     HARCH_INFO_PRINT("begin");
-
     int retval = 0;
     //get data endpoints and control endpoints
-    HARCH_INFO_PRINT("");
     int32_t ret = UsbParseConfigDescriptor(usbNet);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbParseConfigDescriptor failed", __func__, __LINE__);
@@ -360,15 +358,15 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     }
 
     union {
-        void            *buf;
-        struct rndis_msg_hdr    *header;
-        struct rndis_init    *init;
-        struct rndis_init_c    *init_c;
-        struct rndis_query    *get;
-        struct rndis_query_c    *get_c;
-        struct rndis_set    *set;
-        struct rndis_set_c    *set_c;
-        struct rndis_halt    *halt;
+        void *buf;
+        struct rndis_msg_hdr *header;
+        struct rndis_init *init;
+        struct rndis_init_c *init_c;
+        struct rndis_query *get;
+        struct rndis_query_c *get_c;
+        struct rndis_set *set;
+        struct rndis_set_c *set_c;
+        struct rndis_halt *halt;
     } u;
 
     u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
@@ -379,7 +377,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     }
 
     u.init->msg_type = CPU_TO_LE32(RNDIS_MSG_INIT);
-    u.init->msg_len = CPU_TO_LE32(sizeof *u.init);
+    u.init->msg_len  = CPU_TO_LE32(sizeof *u.init);
     u.init->major_version = CPU_TO_LE32(1);
     u.init->minor_version = CPU_TO_LE32(0);
    
@@ -534,15 +532,15 @@ void HostRndisUnbind(struct UsbnetHost *usbNet)
 
     memset(halt, 0, sizeof *halt);
     halt->msg_type = CPU_TO_LE32(RNDIS_MSG_HALT);
-    halt->msg_len = CPU_TO_LE32(sizeof *halt);
+    halt->msg_len  = CPU_TO_LE32(sizeof *halt);
     (void) HostRndisCommand(usbNet, (void *)halt, CONTROL_BUFFER_SIZE);
     OsalMemFree(halt);
 }
 
 static struct UsbnetHostDriverInfo g_hostRndisInfo = {
-    .description =    "rndis device",
-    .bind =        HostRndisBind,
-    .unbind =    HostRndisUnbind,
+    .description    =    "rndis device",
+    .bind           =    HostRndisBind,
+    .unbind         =    HostRndisUnbind,
 };
 
 static int32_t HostRndisDriverDeviceDispatch(

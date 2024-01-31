@@ -862,11 +862,11 @@ int32_t UsbnetHostGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConf
     HARCH_INFO_PRINT("iConfiguration = %{public}d", tmpConfig->configDescriptor.iConfiguration);
     HARCH_INFO_PRINT("bMaxPower = %{public}d", tmpConfig->configDescriptor.bMaxPower);
 
-    for(int i = 0;i < tmpConfig->configDescriptor.bNumInterfaces;i++){
+    for(int i = 0;i < tmpConfig->configDescriptor.bNumInterfaces;i++) {
         HARCH_INFO_PRINT("interface number = %{public}d",i);
-        for(int j = 0;j < tmpConfig->interface[i]->numAltsetting;j++){
+        for(int j = 0;j < tmpConfig->interface[i]->numAltsetting;j++) {
             HARCH_INFO_PRINT("altsetting number = %{public}d",j);
-            for(int k = 0;k < tmpConfig->interface[i]->altsetting->interfaceDescriptor.bNumEndpoints;k++){
+            for(int k = 0;k < tmpConfig->interface[i]->altsetting->interfaceDescriptor.bNumEndpoints;k++) {
                 HARCH_INFO_PRINT("bLength = %{public}d", 
                     tmpConfig->interface[i]->altsetting[j].endPoint[k].endpointDescriptor.bLength);
                 HARCH_INFO_PRINT("bDescriptorType = %{public}d", 
@@ -1325,7 +1325,7 @@ int UsbnetHostWriteCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqty
     HARCH_INFO_PRINT("usbfs: UsbRawControlMsg data = %{public}x\n", *(ctrlReq.data));
     int32_t ret = UsbRawControlMsg(usbNet->devHandle, &ctrlReq);
     HARCH_INFO_PRINT("%{public}d", ret);
-    if (ret < 0 ){
+    if (ret < 0 ) {
         return HDF_FAILURE;
     }
 
@@ -1376,18 +1376,18 @@ int UsbnetHostWriteCmdAsync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqt
 
     struct UsbControlRequestData ctrlReq = {};
     ctrlReq.requestType = reqtype;
-    ctrlReq.requestCmd = cmd;
-    ctrlReq.value = CPU_TO_LE16(value);
-    ctrlReq.index = CPU_TO_LE16(index);
-    ctrlReq.data = (unsigned char *)data;
-    ctrlReq.length =CPU_TO_LE16(size);
+    ctrlReq.requestCmd  = cmd;
+    ctrlReq.value   = CPU_TO_LE16(value);
+    ctrlReq.index   = CPU_TO_LE16(index);
+    ctrlReq.data    = (unsigned char *)data;
+    ctrlReq.length  = CPU_TO_LE16(size);
     ctrlReq.timeout = USB_CTRL_SET_TIMEOUT;
 
     struct UsbRawFillRequestData fillRequestData = {};
     fillRequestData.endPoint = 0;
     fillRequestData.callback = UsbnetHostCtrlReqCallback;
     fillRequestData.userData = (void *)usbNet;
-    fillRequestData.timeout = USB_CTRL_SET_TIMEOUT;
+    fillRequestData.timeout  = USB_CTRL_SET_TIMEOUT;
     fillRequestData.buffer = (unsigned char *) &ctrlReq;
     fillRequestData.length = sizeof(struct UsbControlRequestData) + size;
 
@@ -1430,11 +1430,11 @@ int UsbnetHostReadCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtyp
     
     struct UsbControlRequestData ctrlReq = {};
     ctrlReq.requestType = reqtype;
-    ctrlReq.requestCmd = cmd;
-    ctrlReq.value = CPU_TO_LE16(value);
-    ctrlReq.index = CPU_TO_LE16(index);
-    ctrlReq.data = (unsigned char *)data;
-    ctrlReq.length =CPU_TO_LE16(size);
+    ctrlReq.requestCmd  = cmd;
+    ctrlReq.value   = CPU_TO_LE16(value);
+    ctrlReq.index   = CPU_TO_LE16(index);
+    ctrlReq.data    = (unsigned char *)data;
+    ctrlReq.length  = CPU_TO_LE16(size);
     ctrlReq.timeout = USB_CTRL_SET_TIMEOUT;
 
     int32_t ret = UsbRawSendControlRequest(usbNet->ctrlReadReqSync, usbNet->devHandle, &ctrlReq);
@@ -1487,7 +1487,6 @@ void UsbnetHostRelease(struct UsbnetHost *usbNet)
         HARCH_INFO_PRINT("UsbRawCloseDevice");
         ret = UsbRawCloseDevice(usbNet->devHandle);
         HARCH_INFO_PRINT("UsbRawCloseDevice ret = %{public}d", ret);
-
     }
 
     if (usbNet->paddingPkt) {
@@ -1506,8 +1505,8 @@ void UsbnetHostRelease(struct UsbnetHost *usbNet)
         HARCH_INFO_PRINT("exit session");
         ret = UsbRawExit(usbNet->session);
         HARCH_INFO_PRINT("session exit ret = %{public}d", ret);
-
     }
+    
     OsalMutexDestroy(&usbNet->readLock);
     OsalMutexDestroy(&usbNet->writeLock);
     OsalMutexDestroy(&usbNet->sendNetLock);
