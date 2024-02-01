@@ -31,6 +31,7 @@
 #include "osal_time.h"
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usb_ddk_uevent
 

@@ -25,6 +25,7 @@
 
 #include "adapter_if.h"
 #include "usbfn_dev_mgr.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usbfn_cfg
 static struct DListHead g_cfgEntry = {0};

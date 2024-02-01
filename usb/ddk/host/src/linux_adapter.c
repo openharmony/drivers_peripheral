@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_LINUX_ADAPTER
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
