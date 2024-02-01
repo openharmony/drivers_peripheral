@@ -272,6 +272,7 @@ bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
         HDF_LOGE("%{public}s: sensor %{public}d has not been enabled by any sdc service", __func__, sensorId);
         return false;
     }
+    HDF_LOGE("%{public}s: sensor %{public}d has been enabled by sdc service %{public}d", __func__, sensorId, it->first);
     return true;
 }
 
