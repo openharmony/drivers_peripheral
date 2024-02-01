@@ -18,7 +18,6 @@
 #ifdef LOSCFG_DRIVERS_HDF_USB_PNP_NOTIFY
 #include "usb_pnp_notify.h"
 #endif
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_LITEOS_ADAPTER
 
