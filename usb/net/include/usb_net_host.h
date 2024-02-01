@@ -97,7 +97,7 @@ struct UsbnetHost {
     //data process
     uint16_t rxQlen, txQlen;
     uint32_t canDmaSg:1;
-    uint8_t    *paddingPkt;
+    uint8_t  *paddingPkt;
     struct DListHead  readPool;
     struct DListHead  readQueue;
     struct DListHead  writePool;

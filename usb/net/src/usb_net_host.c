@@ -388,6 +388,7 @@ static void UsbnetHostProcessNotification(const struct UsbnetHost *usbNet, const
             break;
         default:
             HARCH_INFO_PRINT("%{public}s-%{public}d received: index %{public}d len %{public}d\n", __func__, dr->bNotificationType, dr->wIndex, dr->wLength);
+            /* fall-through */
     }
 }
 
@@ -1155,7 +1156,7 @@ static int32_t OnUsbnetHostEventReceived(void *priv,  uint32_t id, struct HdfSBu
     switch (id) {
     case USB_NET_OPEN_USB:
         ret = UsbnetHostOpen(usbNet, data);
-           break;
+        break;
     case USB_NET_SEND_DATA_TO_USB:
         HARCH_INFO_PRINT("start send whole times = %{public}d, success Times = %{public}d",
             g_sendToUrbTimes, g_sendToUrbSuccessTimes);

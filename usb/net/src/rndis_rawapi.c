@@ -380,7 +380,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     u.init->major_version = CPU_TO_LE32(1);
     u.init->minor_version = CPU_TO_LE32(0);
    
-       /* max transfer (in spec) is 0x4000 at full speed, but for
+    /* max transfer (in spec) is 0x4000 at full speed, but for
      * TX we'll stick to one Ethernet packet plus RNDIS framing.
      * For RX we handle drivers that zero-pad to end-of-packet.
      * Don't let userspace change these settings.
@@ -394,8 +394,8 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     usbNet->net.hardHeaderLen += sizeof (struct rndis_data_hdr); //net header
     usbNet->net.hardMtu = usbNet->net.mtu + usbNet->net.hardHeaderLen;
     HARCH_INFO_PRINT("hardHeaderLen = %{public}d, hardMtu = %{public}d\n", usbNet->net.hardHeaderLen, usbNet->net.hardMtu);
-    //
     usbNet->net.maxpacket = usbNet->dataOutEp->maxPacketSize;
+    
     HARCH_INFO_PRINT("maxpacket = %{public}d\n", usbNet->net.maxpacket);
     if (usbNet->net.maxpacket == 0) {
         HDF_LOGE( "usbNet->maxpacket can't be 0\n");
@@ -440,7 +440,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     
     /* Check physical medium */
     __le32 *phym = NULL;
-    __le32    phym_unspec;
+    __le32 phym_unspec;
     int reply_len = sizeof (*phym);
     retval = HostRndisQuery(usbNet, u.buf,
                  RNDIS_OID_GEN_PHYSICAL_MEDIUM,
@@ -545,7 +545,6 @@ static struct UsbnetHostDriverInfo g_hostRndisInfo = {
 static int32_t HostRndisDriverDeviceDispatch(
     struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    
     return HDF_SUCCESS;
 }
 
@@ -588,7 +587,7 @@ static int32_t HostRndisDriverBind(struct HdfDeviceObject *device)
     device->service->Dispatch = HostRndisDriverDeviceDispatch;
     usbNet->deviceObject = device;
 
-    /*here need to choose device driver*/
+    /* here need to choose device driver */
     struct  UsbnetHostDriverInfo *driver = &g_hostRndisInfo;
     //function
     usbNet->driverInfo = driver;
