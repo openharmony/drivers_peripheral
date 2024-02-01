@@ -262,6 +262,16 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
     return false;
 }
 
+bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
+{
+    auto it = sdcSensorConfig_.find(sensorId);
+    if (it == sdcSensorConfig_.end()) {
+        HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
+        return false;
+    }
+    return true;
+}
+
 bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, bool isOpen)
 {
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
