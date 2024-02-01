@@ -18,7 +18,7 @@
 
 #include "alsa_lib_common.h"
 #include "audio_if_lib_capture.h"
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
 enum DataBitWidth {
     DATA_BIT_WIDTH8  =  8,      /* 8 bit witdth */
     DATA_BIT_WIDTH16 =  16,     /* 16 bit witdth */

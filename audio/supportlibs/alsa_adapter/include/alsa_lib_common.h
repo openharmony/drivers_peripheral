@@ -126,7 +126,7 @@ int32_t DestroyCardList(void);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);
 int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns);
 
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement, snd_pcm_stream_t stream);
 #else
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement);

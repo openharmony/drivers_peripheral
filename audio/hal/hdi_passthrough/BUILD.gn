@@ -58,7 +58,10 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 } else {
-  defines = [ "PRODUCT_DAYU800" ]
+    defines = []
+    if (drivers_peripheral_audio_non_standard_codec) {
+      defines += [ "NON_STANDARD_CODEC" ]
+    }
 
   if (!drivers_peripheral_audio_user_mode) {
     ohos_shared_library("hdi_audio") {

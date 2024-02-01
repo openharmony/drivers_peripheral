@@ -35,7 +35,7 @@ struct AudioManager *g_serverManager = NULL;
 
 int32_t g_serverAdapterNum = 0;
 struct AudioInfoInAdapter *g_renderAndCaptureManage = NULL;
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
 unsigned int g_codecFlag = 0;
 #endif
 static struct AudioEvent g_audioEventPnp = {
@@ -2272,7 +2272,7 @@ int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct H
 {
     unsigned int i;
     AUDIO_FUNC_LOGD("cmdId = %{public}d", cmdId);
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
     if (cmdId == AUDIO_HDI_RENDER_CREATE_RENDER) {
         g_codecFlag = 1;
     }
@@ -2302,7 +2302,7 @@ int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct H
             }
         }
     } else {
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
         if (g_codecFlag == 1) {
                 return AUDIO_HAL_SUCCESS;
         }

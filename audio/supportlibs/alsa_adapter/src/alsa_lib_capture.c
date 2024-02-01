@@ -473,7 +473,7 @@ static int32_t SetHWParamsSub(
         return ret;
     }
     /* set the sample format */
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
     if (pcmFormat == SND_PCM_FORMAT_S16_BE) {
         pcmFormat = SND_PCM_FORMAT_S16_LE;
     }
@@ -784,7 +784,7 @@ static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo
 
     snd_mixer_elem_t *pcmElement = snd_mixer_first_elem(mixer);
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
         ret = GetPriMixerCtlElement(cardIns, pcmElement, SND_PCM_STREAM_CAPTURE);
 #else
         ret = GetPriMixerCtlElement(cardIns, pcmElement);
@@ -891,7 +891,7 @@ int32_t AudioCaptureResetParams(snd_pcm_t *handle, struct AudioPcmHwParams audio
     return HDF_SUCCESS;
 }
 
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
 int32_t AudioDataBigEndianChange(char *srcData, uint32_t audioLen, enum DataBitWidth bitWidth)
 {
     uint64_t i;
@@ -905,7 +905,6 @@ int32_t AudioDataBigEndianChange(char *srcData, uint32_t audioLen, enum DataBitW
 
     changeData = srcData;
     pData = (uint32_t *)changeData;
-    AUDIO_FUNC_LOGE("wty audio_platform_base %s line: %d\n", __func__, __LINE__);
 
     switch (bitWidth) {
         case DATA_BIT_WIDTH8:
@@ -960,7 +959,7 @@ static int32_t CaptureDataCopy(struct AudioHwCaptureParam *handleData, char *buf
         AUDIO_FUNC_LOGE("memcpy frame data failed!");
         return HDF_FAILURE;
     }
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
     AudioDataBigEndianChange(handleData->frameCaptureMode.buffer, recvDataSize, DATA_BIT_WIDTH16);
 #endif
     handleData->frameCaptureMode.bufferSize = recvDataSize;

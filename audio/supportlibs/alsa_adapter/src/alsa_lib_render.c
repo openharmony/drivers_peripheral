@@ -976,7 +976,7 @@ static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo
             AUDIO_FUNC_LOGE("snd_mixer_first_elem failed.");
             return HDF_FAILURE;
         }
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
         ret = GetPriMixerCtlElement(cardIns, pcmElement, SND_PCM_STREAM_PLAYBACK);
 #else
         ret = GetPriMixerCtlElement(cardIns, pcmElement);
