@@ -180,7 +180,6 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     }
     int32_t ret;
     if (!SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
-        SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
         ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
