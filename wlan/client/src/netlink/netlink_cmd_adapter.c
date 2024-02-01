@@ -276,6 +276,12 @@ static struct nl_sock *OpenNetlinkSocket(void)
         nl_socket_free(sock);
         return NULL;
     }
+
+    if (nl_socket_set_nonblocking(sock) != 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to set nonblocking socket", __FUNCTION__);
+        nl_socket_free(sock);
+        return NULL;
+    }
     return sock;
 }
 
