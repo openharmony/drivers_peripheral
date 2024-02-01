@@ -25,13 +25,14 @@
 #include "ap/hostapd.h"
 #include "ap_ctrl_iface.h"
 #include "ap/ctrl_iface_ap.h"
-#include "ap_ctrl_iface.h"
+#include "ctrl_iface.h"
 #include "ap_main.h"
 #include "hostapd_client.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include "eap_server/eap_methods.h"
 
 pthread_t g_tid;
 
@@ -186,8 +187,17 @@ int32_t HostapdInterfaceStartAp(struct IHostapdInterface *self)
 
 int32_t HostapdInterfaceStopAp(struct IHostapdInterface *self)
 {
+    HDF_LOGI("%{public}s: enter HostapdInterfaceStopAp stop...", __func__);
+    struct hostapd_data *hostApd;
+
     (void)self;
-    /* Need IHostapdInterfaceReleaseInstance to stop hostapd service. */
+    hostApd = getHostapd();
+    if (hostApd == NULL) {
+        HDF_LOGE("%{public}s hostApd is null.", __func__);
+        return HDF_FAILURE;
+    }
+    eap_server_unregister_methods();
+    hostapd_ctrl_iface_deinit(hostApd);
     HDF_LOGI("%{public}s: hostapd stop successfully!", __func__);
     return HDF_SUCCESS;
 }
@@ -260,10 +270,14 @@ int32_t HostapdInterfaceSetApWpaValue(struct IHostapdInterface *self, const char
     int32_t ret = HDF_FAILURE;
 
     (void)self;
-    hostApd = getHostapd();
     if (ifName == NULL) {
         HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
+    }
+    hostApd = getHostapd();
+    if (hostApd == NULL) {
+        HDF_LOGE("%{public}s hostApd == NULL", __func__);
+        return HDF_FAILURE;
     }
     switch (securityType) {
         case NONE:
@@ -305,9 +319,10 @@ int32_t HostapdInterfaceSetApWpaValue(struct IHostapdInterface *self, const char
         ret = hostapd_ctrl_iface_set(hostApd, cmd);
     }
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set securityType!", __func__);
+        HDF_LOGE("%{public}s: Hostapd failed to set securityType, Type = %{public}d.", __func__, securityType);
         return HDF_FAILURE;
     }
+    HDF_LOGI("%{public}s:set securityType successfully, Type = %{public}d.", __func__, securityType);
     return HDF_SUCCESS;
 }
 
