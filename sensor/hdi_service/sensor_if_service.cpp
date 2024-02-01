@@ -178,9 +178,10 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
+    int32_t ret;
     if (!SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-        ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, samplingInterval);
+        ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
             return ret;
@@ -194,7 +195,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     }
 
     StartTrace(HITRACE_TAG_HDF, "Disable");
-    int32_t ret = sensorVdiImpl_->Disable(sensorId);
+    ret = sensorVdiImpl_->Disable(sensorId);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Disable failed, error code is %{public}d", __func__, ret);
     }
