@@ -31,6 +31,7 @@
 #include "string_ex.h"
 #include "usbd_type.h"
 #include "usbfn_mtp_impl.h"
+#include "usbd_wrapper.h"
 
 namespace OHOS {
 namespace HDI {

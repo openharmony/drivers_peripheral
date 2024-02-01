@@ -30,6 +30,7 @@ ohos_shared_library("libusbfn_cdcacm") {
     "./../../../interfaces/ddk/device",
     "./../../../interfaces/ddk/common",
     "../include",
+    "${usb_driver_path}/utils/include",
   ]
 
   sources = [ "cdcacm.c" ]

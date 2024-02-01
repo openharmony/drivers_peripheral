@@ -23,6 +23,14 @@
 #include "osal_time.h"
 #include "securec.h"
 #include "usb_ddk_interface.h"
+#ifndef USBD_WRAPPER_H
+#define USBD_WRAPPER_H
+// define Domain ID
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD002518
+#endif // USBD_WRAPPER_H
 
 #define HDF_LOG_TAG USB_HOST_ECM
 

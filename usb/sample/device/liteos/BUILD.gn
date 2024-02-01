@@ -12,9 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("./../../../usb.gni")
 
 ohos_executable("usb_dev_test") {
-  include_dirs = [ "//third_party/bounds_checking_function/include" ]
+  include_dirs = [
+    "//third_party/bounds_checking_function/include",
+    "${usb_driver_path}/utils/include",
+  ]
 
   sources = [
     "acm_speed_read.c",
