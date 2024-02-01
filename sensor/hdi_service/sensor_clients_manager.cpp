@@ -269,7 +269,7 @@ bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
 {
     auto it = sdcSensorConfig_.find(sensorId);
     if (it == sdcSensorConfig_.end()) {
-        HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
+        HDF_LOGE("%{public}s: sensor %{public}d has not been enabled by any sdc service", __func__, sensorId);
         return false;
     }
     return true;
