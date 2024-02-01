@@ -63,7 +63,7 @@ int32_t AudioCaptureStart(AudioHandle handle)
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
     if (hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
         char *tbuffer = (char *)OsalMemCalloc(FRAME_DATA);
         if (tbuffer == NULL) {

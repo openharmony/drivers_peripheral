@@ -613,7 +613,7 @@ static snd_mixer_elem_t *AudioFindElement(const char *mixerCtlName, snd_mixer_el
     return element;
 }
 
-#ifdef PRODUCT_DAYU800
+#ifdef NON_STANDARD_CODEC
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement, snd_pcm_stream_t stream)
 {
 

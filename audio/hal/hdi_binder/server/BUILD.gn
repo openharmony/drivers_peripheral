@@ -17,7 +17,11 @@ import("//drivers/peripheral/audio/audio.gni")
 
 if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
-    defines = [ "PRODUCT_DAYU800" ]
+    defines = []
+    if (drivers_peripheral_audio_non_standard_codec) {
+      defines += [ "NON_STANDARD_CODEC" ]
+    }
+
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -72,7 +76,11 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   }
 
   ohos_shared_library("hdi_audio_usb_server") {
-    defines = [ "PRODUCT_DAYU800" ]
+    defines = []
+    if (drivers_peripheral_audio_non_standard_codec) {
+      defines += [ "NON_STANDARD_CODEC" ]
+    }
+
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
