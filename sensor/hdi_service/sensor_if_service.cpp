@@ -176,6 +176,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     HDF_LOGD("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
+        HDF_LOGE("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
     }
     int32_t ret;
