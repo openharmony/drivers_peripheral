@@ -178,6 +178,15 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
+    if (!SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
+        SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
+        ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, samplingInterval);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
+            return ret;
+        }
+        return HDF_SUCCESS;
+    }
 
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -565,9 +574,9 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
         }
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
         SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorId);
-        ret = SetBatchSenior(serviceId, sensorId, SA, samplingInterval, reportInterval);
+        ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, samplingInterval);
         if (ret != SENSOR_SUCCESS) {
-            HDF_LOGE("%{public}s SetBatchSenior SA failed, error code is %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d", __func__, ret);
             return ret;
         }
     }

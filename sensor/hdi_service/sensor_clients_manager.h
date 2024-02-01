@@ -44,6 +44,7 @@ public:
     std::unordered_map<int32_t, std::set<int32_t>> GetSensorUsed();
     bool IsNeedOpenSensor(int sensorId, int serviceId);
     bool IsNeedCloseSensor(int sensorId, int serviceId);
+    bool IsExistSdcSensorEnable(int sensorId);
     void OpenSensor(int sensorId, int serviceId);
     void UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
     void UpdateSdcSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval);
