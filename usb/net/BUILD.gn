@@ -35,6 +35,7 @@ ohos_shared_library("libusbhost_ecm") {
     "./../gadget/function/include",
     "./../../../hdf_core/framework/model/usb/include",
     "include",
+    "${usb_driver_path}/utils/include",
   ]
 
   deps = [ "./../ddk:libusb_ddk_host" ]
