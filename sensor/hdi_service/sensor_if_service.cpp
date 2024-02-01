@@ -562,19 +562,19 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
             HDF_LOGE("%{public}s SetBatchSenior SDC failed, error code is %{public}d", __func__, ret);
             return ret;
         }
-        ret = Enable(sensorId);
+        ret = sensorVdiImpl_->Enable(sensorId);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Enable failed, error code is %{public}d", __func__, ret);
             return ret;
         }
     } else {
+        SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorId);
         ret = Disable(sensorId);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s Disable failed, error code is %{public}d", __func__, ret);
             return ret;
         }
         SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
-        SensorClientsManager::GetInstance()->EraseSdcSensorBestConfig(sensorId);
         ret = sensorVdiImpl_->SetSaBatch(sensorId, samplingInterval, samplingInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetSaBatch failed, error code is %{public}d", __func__, ret);
