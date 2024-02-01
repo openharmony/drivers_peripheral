@@ -29,7 +29,6 @@
 #include "osal_mem.h"
 #include "osal_mutex.h"
 #include "securec.h"
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usb_ddk_dev_mgr
 #define USB_GADGET_STATE_PATH "/sys/devices/virtual/"

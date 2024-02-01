@@ -19,7 +19,6 @@ config("ddk_public_config") {
   include_dirs = [
     "include/",
     "${usb_driver_path}/ddk/ndk/",
-    "${usb_driver_path}/utils/include",
   ]
 }
 
@@ -39,7 +38,6 @@ ohos_shared_library("libusb_ddk_service_1.0") {
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/ddk/host/include",
     "${hdf_framework_path}/model/usb/include",
-    "${usb_driver_path}/utils/include",
   ]
 
   configs = [ ":ddk_public_config" ]

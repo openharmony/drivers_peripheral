@@ -17,7 +17,6 @@
 #include "linux_adapter.h"
 #include "usb_io_manage.h"
 #include "usb_protocol.h"
-#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_INTERFACE_POOL
 

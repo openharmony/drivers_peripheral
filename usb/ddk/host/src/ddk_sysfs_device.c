@@ -23,7 +23,6 @@
 
 #include "hdf_log.h"
 #include "securec.h"
-#include "usbd_wrapper.h"
 
 #define SYSFS_PATH_LEN   128
 #define PROPERTY_MAX_LEN 128
