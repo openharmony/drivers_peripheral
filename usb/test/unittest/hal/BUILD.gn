@@ -22,6 +22,7 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/utils/include",
   ]
 }
 
@@ -59,7 +60,10 @@ ohos_unittest("test_device") {
     "src/usbd_device_test.cpp",
   ]
 
-  include_dirs = [ "${usb_driver_path}/test/UsbSubscriberTest" ]
+  include_dirs = [
+    "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/utils/include",
+  ]
 
   configs = [ ":module_private_config" ]
 
@@ -114,7 +118,10 @@ ohos_unittest("test_request") {
     "src/usbd_request_test.cpp",
   ]
 
-  include_dirs = [ "${usb_driver_path}/test/UsbSubscriberTest" ]
+  include_dirs = [
+    "${usb_driver_path}/test/UsbSubscriberTest",
+    "${usb_driver_path}/utils/include",
+  ]
 
   configs = [ ":module_private_config" ]
 

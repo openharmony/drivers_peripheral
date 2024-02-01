@@ -17,6 +17,7 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "usbd_function.h"
+#include "usbd_wrapper.h"
 
 namespace OHOS {
 namespace HDI {

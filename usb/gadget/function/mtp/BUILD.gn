@@ -29,6 +29,7 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
     "./../../../interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
+    "${usb_driver_path}/utils/include",
   ]
 
   deps = [ "${usb_driver_path}/ddk:libusb_ddk_device" ]
@@ -61,6 +62,7 @@ ohos_shared_library("libusbfn_mtp_driver") {
     "./../../../interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
+    "${usb_driver_path}/utils/include",
   ]
 
   deps = []

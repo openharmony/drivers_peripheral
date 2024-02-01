@@ -22,6 +22,7 @@ config("module_private_config") {
   include_dirs = [
     "${usb_driver_path}/test/UsbSubscriberTest",
     "${usb_driver_path}/hdi_service/include",
+    "${usb_driver_path}/utils/include",
   ]
 }
 
