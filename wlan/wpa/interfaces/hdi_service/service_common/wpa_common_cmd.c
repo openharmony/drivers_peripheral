@@ -1950,7 +1950,19 @@ int32_t WpaInterfaceRemoveWpaIface(struct IWpaInterface *self, const char *ifNam
 
 static int32_t StopWpaSupplicant(void)
 {
-    /*Do nothing here,waiting for IWpaInterfaceReleaseInstance to destroy the wpa service. */
+    struct wpa_global *wpa_g;
+    int32_t ret;
+
+    wpa_g = getWpaGlobal();
+    if (wpa_g == NULL) {
+        HDF_LOGE("%{public}s: wpa_g is null.", __func__);
+        return HDF_FAILURE;
+    }
+    wpa_supplicant_terminate_proc(wpa_g);
+    ret = pthread_join(g_tid, NULL);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: WpaMainThread has been killed.", __func__);
+    }
     HDF_LOGI("%{public}s: wpa_supplicant stop successfully!", __func__);
     return HDF_SUCCESS;
 }
