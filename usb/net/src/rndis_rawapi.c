@@ -270,7 +270,6 @@ int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct rndis_msg_hdr *buf, i
     return HDF_ERR_TIMEOUT;
 }
 
-
 /*
  * rndis_query:
  *

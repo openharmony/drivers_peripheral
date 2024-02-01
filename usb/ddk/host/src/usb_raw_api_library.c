@@ -1297,7 +1297,6 @@ int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t *co
     return ret;
 }
 
-
 int32_t RawUsbControlMsg(const struct UsbDeviceHandle *devHandle,  struct UsbControlRequestData *ctrlData)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();

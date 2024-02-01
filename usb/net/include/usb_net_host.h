@@ -28,7 +28,7 @@
 
 #define HARCH_INFO_PRINT(fmt,...)  \
 do{ \
-    if(1){\
+    if(0){\
         HDF_LOGI(HARCH_LOG_TAG"[%{public}s][%{public}d]:" fmt "\n",__FUNCTION__,__LINE__,##__VA_ARGS__);}\
 }while(0)
 
