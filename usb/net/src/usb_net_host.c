@@ -917,6 +917,7 @@ void UsbnetHostUpdateMaxQlen(struct UsbnetHost *usbNet)
             break;
         default:
             usbNet->rxQlen = usbNet->txQlen = 4;
+            /* fall-through */
     }
     HARCH_INFO_PRINT("usbNet->rxQlen = %{public}d, usbNet->txQlen = %{public}d, \
                usbNet->rxUrbSize = %{public}d, usbNet->hardMtu = %{public}d",
@@ -1194,9 +1195,6 @@ static int32_t UsbnetHostRegisterNet(struct UsbnetHost *usbNet)
     listener.priv = (void *)(usbNet->deviceObject);
 
     HARCH_INFO_PRINT("listener.priv addr = %{public}p",  &(listener.priv));
-
-
-    HARCH_INFO_PRINT("listener");
     if (HdfDeviceRegisterEventListener(serv, &listener) != HDF_SUCCESS) {
         HDF_LOGE("fail to register event listener");
         return HDF_FAILURE;

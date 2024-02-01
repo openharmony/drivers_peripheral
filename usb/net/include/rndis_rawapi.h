@@ -41,7 +41,6 @@
 /* Flags for driver_info::data */
 #define RNDIS_DRIVER_DATA_POLL_STATUS    1    /* poll status before control */
 
-
 /*
  * CONTROL uses CDC "encapsulated commands" with funky notifications.
  *  - control-out:  SEND_ENCAPSULATED
@@ -120,7 +119,7 @@ struct rndis_query {                /* OUT */
     __le32    oid;
     __le32    len;
     __le32    offset;
-/*?*/    __le32    handle;         /* zero */
+    __le32    handle;               /* zero */
 } __attribute__ ((packed));
 
 struct rndis_query_c {              /* IN */
@@ -141,10 +140,10 @@ struct rndis_set {                /* OUT */
     __le32    oid;
     __le32    len;
     __le32    offset;
-/*?*/    __le32    handle;                /* zero */
+    __le32    handle;               /* zero */
 } __attribute__ ((packed));
 
-struct rndis_set_c {                /* IN */
+struct rndis_set_c {               /* IN */
     /* header and: */
     __le32    msg_type;             /* RNDIS_MSG_SET_C */
     __le32    msg_len;
@@ -161,7 +160,7 @@ struct rndis_reset {            /* IN */
 
 struct rndis_reset_c {        /* OUT */
     /* header and: */
-    __le32    msg_type;            /* RNDIS_MSG_RESET_C */
+    __le32    msg_type;          /* RNDIS_MSG_RESET_C */
     __le32    msg_len;
     __le32    status;
     __le32    addressing_lost;
@@ -174,9 +173,9 @@ struct rndis_indicate {        /* IN (unrequested) */
     __le32    status;
     __le32    length;
     __le32    offset;
-/**/    __le32    diag_status;
+    __le32    diag_status;
     __le32    error_offset;
-/**/    __le32    message;
+    __le32    message;
 } __attribute__ ((packed));
 
 struct rndis_keepalive {    /* OUT (optionally IN) */

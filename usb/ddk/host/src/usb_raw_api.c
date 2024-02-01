@@ -131,7 +131,6 @@ int32_t UsbRawControlMsg(const UsbRawHandle * const devHandle, struct UsbControl
     return RawUsbControlMsg((const struct UsbDeviceHandle *)devHandle, ctrlData);
 }
 
-
 int32_t UsbRawGetUsbSpeed(const UsbRawHandle * const devHandle)
 {
     if ((devHandle == NULL)) {
