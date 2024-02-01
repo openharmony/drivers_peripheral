@@ -502,9 +502,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
     runinglockInfo.name = setLockName;
     runinglockInfo.timeoutMs = RUNNINGLOCK_TIMEOUT_NONE;
 
-    runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
 
@@ -524,6 +521,14 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
 
     runinglockInfo.name = setLockName + "notification.13";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
+    originCount = RunningLockImpl::GetCount(runinglockInfo.type);
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
+    EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
+
+    runinglockInfo.name = setLockName + "audio.13";
+    runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
     originCount = RunningLockImpl::GetCount(runinglockInfo.type);
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
     EXPECT_EQ(originCount + 1, RunningLockImpl::GetCount(runinglockInfo.type));
