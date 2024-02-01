@@ -616,8 +616,6 @@ static snd_mixer_elem_t *AudioFindElement(const char *mixerCtlName, snd_mixer_el
 #ifdef NON_STANDARD_CODEC
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement, snd_pcm_stream_t stream)
 {
-
-
     const char *mixerCtrlLeftVolName;
     const char *mixerCtrlRightVolName;
 
@@ -633,7 +631,6 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
         mixerCtrlLeftVolName = "ES7210 ADC1_DIRECT_GAIN";
         mixerCtrlRightVolName = "ES7210 ADC1_DIRECT_GAIN";
     }
-
 
     cardIns->ctrlLeftVolume = AudioFindElement(mixerCtrlLeftVolName, pcmElement);
     cardIns->ctrlRightVolume = AudioFindElement(mixerCtrlRightVolName, pcmElement);
@@ -657,8 +654,6 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
     return HDF_SUCCESS;
 }
 #endif
-
-
 
 int32_t AudioMixerSetCtrlMode(
     struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item)
