@@ -260,6 +260,9 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
         HDF_LOGD("%{public}s: disabled sensor %{public}d", __func__, sensorId);
         return true;
     }
+    for (auto sid : sensorUsed_[sensorId]) {
+        HDF_LOGD("%{public}s: sensor %{public}d also is enable by service %{public}d", __func__, sensorId, sid);
+    }
     return false;
 }
 
