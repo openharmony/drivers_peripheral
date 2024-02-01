@@ -245,8 +245,8 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     }
     if (mode == SDC){
         SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
-        SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     }
+    SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
     HDF_LOGD("%{public}s saSamplingInterval is %{public}d", __func__, saSamplingInterval);
     ret = sensorVdiImpl_->SetSaBatch(sensorId, saSamplingInterval, saReportInterval);
     if (ret != SENSOR_SUCCESS) {
