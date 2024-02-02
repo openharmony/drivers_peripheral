@@ -665,6 +665,20 @@ static int32_t ProcessEventApState(struct HdfHostapdRemoteNode *node,
     return ret;
 }
 
+int32_t ProcessEventHostapdNotify(struct HdfHostapdRemoteNode *node, char *notifyParam, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventHostApdNotify == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (strlen(notifyParam) == 0) {
+        ret = HDF_FAILURE;
+    }
+    return ret;
+}
+
 static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfHostapdRemoteNode *pos = NULL;
@@ -694,6 +708,9 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
                 break;
             case HOSTAPD_EVENT_AP_STATE:
                 ret = ProcessEventApState(pos, (struct HostapdApCbParm *)data, ifName);
+                break;
+            case HOSTAPD_EVENT_HOSTAPD_NOTIFY:
+                ret = ProcessEventHostapdNotify(pos, (char *)data, ifName);
                 break;
             default:
                 HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
@@ -800,5 +817,22 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
         }
     }
     (void)OsalMutexUnlock(&HdfHostapdStubDriver()->mutex);
+    return HDF_SUCCESS;
+}
+
+int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifName, const char *cmd)
+{
+    struct hostapd_data *hostApd;
+
+    (void)self;
+    if (ifName == NULL || cmd == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    hostApd = getHostapd();
+    if (hostApd == NULL) {
+        HDF_LOGE("%{public}s wpaSupp == NULL", __func__);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }

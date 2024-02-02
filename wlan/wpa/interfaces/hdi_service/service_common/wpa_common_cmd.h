@@ -103,6 +103,8 @@ int32_t WpaInterfaceGetWepKey(struct IWpaInterface *self, const char *ifName, in
 int32_t WpaInterfaceGetWepTxKeyIdx(struct IWpaInterface *self, const char *ifName, int *keyIdx);
 int32_t WpaInterfaceGetRequirePmf(struct IWpaInterface *self, const char *ifName, int *enable);
 int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifName, const char *countryCode);
+int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
+int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
 void StrSafeCopy(char *dst, unsigned len, const char *src);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);

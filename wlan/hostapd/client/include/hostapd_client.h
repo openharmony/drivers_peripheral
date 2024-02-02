@@ -30,7 +30,8 @@ extern "C" {
 
 typedef enum {
     HOSTAPD_EVENT_STA_JOIN = 0,
-    HOSTAPD_EVENT_AP_STATE
+    HOSTAPD_EVENT_AP_STATE,
+    HOSTAPD_EVENT_HOSTAPD_NOTIFY
 } HostapdCallBackEventType;
 
 enum HostapdClientType {
