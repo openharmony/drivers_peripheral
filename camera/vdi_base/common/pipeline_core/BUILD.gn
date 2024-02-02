@@ -77,7 +77,6 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
   sources = [
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node/v4l2_source_node.cpp",
-    "$camera_path/dump/src/camera_dump.cpp",
     "$camera_path/pipeline_core/host_stream/src/host_stream_impl.cpp",
     "$camera_path/pipeline_core/host_stream/src/host_stream_mgr_impl.cpp",
     "$camera_path/pipeline_core/ipp/src/algo_plugin.cpp",
