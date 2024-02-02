@@ -15,6 +15,8 @@
 
 #include "sensor_callback_vdi.h"
 
+#define HDF_LOG_TAG uhdf_sensor_callback_vdi
+
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
