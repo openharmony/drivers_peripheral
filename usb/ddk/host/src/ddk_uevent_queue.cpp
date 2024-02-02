@@ -54,6 +54,7 @@ class TaskQueue {
 public:
     TaskQueue() = default;
     void Init(void);
+    void UnInit(void);
     ~TaskQueue();
     int32_t AddTask(const DdkUeventTaskInfo &task);
 
@@ -171,10 +172,16 @@ void TaskQueue::Init(void)
     thd.detach();
 }
 
-TaskQueue::~TaskQueue()
+void TaskQueue::UnInit(void)
 {
     threadRun_ = false;
+    taskQueue_.clear();
     conditionVariable_.notify_one();
+}
+
+TaskQueue::~TaskQueue()
+{
+    Uninit();
 }
 
 int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
@@ -189,7 +196,7 @@ int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
     return HDF_SUCCESS;
 }
 
-TaskQueue g_taskQueue;
+static TaskQueue g_taskQueue;
 
 int32_t DdkUeventStartDispatchThread()
 {
