@@ -37,6 +37,7 @@ ohos_shared_library("libusb_ddk_host") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
     "./../interfaces/ddk/host",
+    "./../utils/include",
   ]
   sources = [
     "host/src/linux_adapter.c",
@@ -82,6 +83,7 @@ ohos_shared_library("libusb_pnp_manager") {
     "$hdf_framework_path/model/usb/include",
     "host/include",
     "device/include",
+    "./../utils/include",
   ]
   sources = [
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
@@ -133,6 +135,7 @@ ohos_shared_library("libusb_ddk_device") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/device",
     "./../interfaces/ddk/host",
+    "./../utils/include",
   ]
 
   sources = [
