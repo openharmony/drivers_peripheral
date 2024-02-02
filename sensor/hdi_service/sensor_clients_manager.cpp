@@ -267,9 +267,9 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
 
 bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
 {
+    std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
     if (it == sdcSensorConfig_.end()) {
-        HDF_LOGE("%{public}s: sensor %{public}d has not been enabled by any sdc service", __func__, sensorId);
         return false;
     }
     HDF_LOGE("%{public}s: sensor %{public}d has been enabled by sdc service %{public}d", __func__, sensorId, it->first);
