@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "usb_handle.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG adapter_if
 #define SLEEP_TIME  100000

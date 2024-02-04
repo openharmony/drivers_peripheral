@@ -29,6 +29,7 @@
 #include "osal_mem.h"
 #include "securec.h"
 #include "usb_ddk_pnp_loader.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG    usb_pnp_manager
 #define MODULENAMESIZE 128

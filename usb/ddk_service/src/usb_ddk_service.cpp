@@ -22,6 +22,7 @@
 #include "usb_ddk_hash.h"
 #include "usb_ddk_interface.h"
 #include "usb_raw_api.h"
+#include "usbd_wrapper.h"
 #define HDF_LOG_TAG usb_ddk_service
 
 namespace OHOS {
