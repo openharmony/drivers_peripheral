@@ -154,7 +154,7 @@ void TaskQueue::Init(void)
     pthread_setname_np(pthread_self(), "ueventTaskQueue");
     auto taskWork = [this]() -> void {
         while (threadRun_) {
-        std::unique_lock<std::mutex> uniqueLock(queueLock_);
+            std::unique_lock<std::mutex> uniqueLock(queueLock_);
             conditionVariable_.wait(uniqueLock, [this] {
                 return (taskQueue_.size() > 0 || !threadRun_);
             });
@@ -172,16 +172,22 @@ void TaskQueue::Init(void)
     thd.detach();
 }
 
+
+
 void TaskQueue::UnInit(void)
 {
     threadRun_ = false;
-    taskQueue_.clear();
     conditionVariable_.notify_one();
+
+    std::lock_guard<std::mutex> lock(queueLock_);
+    while (!taskQueue_.empty()) {
+        taskQueue_.pop();
+    }
 }
 
 TaskQueue::~TaskQueue()
 {
-    UnInit();
+    Uninit();
 }
 
 int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
