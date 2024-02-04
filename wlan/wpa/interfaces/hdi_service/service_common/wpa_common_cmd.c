@@ -898,12 +898,16 @@ int32_t WpaInterfaceSetSuspendMode(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s set suspend mode fail!", __func__);
         return HDF_FAILURE;
     }
-    #if defined(CONFIG_DRIVER_NL80211_HISI)
+
     char reply[REPLY_SIZE] = {0};
     ret = wpa_supplicant_driver_cmd(wpaSupp, cmd, reply, REPLY_SIZE);
-    #else
-    ret = HDF_FAILURE ;
-    #endif
+    if (ret >= 0) {
+        ret = HDF_SUCCESS;
+        HDF_LOGI("%{public}s SetSuspendMode success", __func__);
+    } else {
+        ret = HDF_FAILURE;
+        HDF_LOGE("%{public}s SetSuspendMode fail", __func__);
+    }
     return ret;
 }
 
@@ -1142,14 +1146,15 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s set country code fail!", __func__);
         return HDF_FAILURE;
     }
-    #if defined(CONFIG_DRIVER_NL80211_HISI)
     char reply[REPLY_SIZE] = {0};
     ret = wpa_supplicant_driver_cmd(wpaSupp, cmd, reply, REPLY_SIZE);
-    HDF_LOGI("%{public}s SetCountryCode  ret = %{public}d", __func__, ret);
-    #else
-    ret = HDF_FAILURE;
-    HDF_LOGE("%{public}s SetCountryCode fail", __func__);
-    #endif
+    if (ret >= 0) {
+        ret = HDF_SUCCESS;
+        HDF_LOGI("%{public}s SetCountryCode success", __func__);
+    } else {
+        ret = HDF_FAILURE;
+        HDF_LOGE("%{public}s SetCountryCode fail", __func__);
+    }
     return ret;
 }
 
@@ -1399,6 +1404,31 @@ static int32_t WpaFillWpaRecvScanResultParam(struct WpaRecvScanResultParam *recv
     return ret;
 }
 
+static int32_t WpaFillWpaAuthRejectParam(struct WpaAuthRejectParam *authRejectParam,
+    struct HdiWpaAuthRejectParam *hdiWpaAuthRejectParam)
+{
+    int32_t ret = HDF_SUCCESS;
+
+    if (authRejectParam == NULL || hdiWpaAuthRejectParam == NULL) {
+        HDF_LOGE("%{public}s: authRejectParam or hdiWpaAuthRejectParam is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    hdiWpaAuthRejectParam->statusCode = authRejectParam->statusCode;
+    hdiWpaAuthRejectParam->authType = authRejectParam->authType;
+    hdiWpaAuthRejectParam->authTransaction = authRejectParam->authTransaction;
+    if (FillData(&hdiWpaAuthRejectParam->bssid, &hdiWpaAuthRejectParam->bssidLen,
+        authRejectParam->bssid, ETH_ADDR_LEN) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill bssid fail!", __func__);
+            ret = HDF_FAILURE;
+    }
+    if (ret != HDF_SUCCESS) {
+        if (hdiWpaAuthRejectParam->bssid != NULL) {
+            OsalMemFree(hdiWpaAuthRejectParam->bssid);
+        }
+    }
+    return ret;
+}
+
 static int32_t ProcessEventWpaDisconnect(struct HdfWpaRemoteNode *node,
     struct WpaDisconnectParam *disconnectParam, const char *ifName)
 {
@@ -1572,6 +1602,38 @@ static int32_t ProcessEventWpaRecvScanResult(struct HdfWpaRemoteNode *node,
     return ret;
 }
 
+static int32_t ProcessEventWpaAuthReject(
+    struct HdfWpaRemoteNode *node, struct WpaAuthRejectParam *authRejectParam, const char *ifName)
+{
+    struct HdiWpaAuthRejectParam *hdiWpaAuthRejectParam = NULL;
+    int32_t ret = HDF_FAILURE;
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventAuthReject == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    hdiWpaAuthRejectParam =
+        (struct HdiWpaAuthRejectParam *)OsalMemCalloc(sizeof(struct HdiWpaAuthRejectParam));
+    if ((hdiWpaAuthRejectParam == NULL) ||
+        (WpaFillWpaAuthRejectParam(authRejectParam, hdiWpaAuthRejectParam) != HDF_SUCCESS)) {
+        HDF_LOGE("%{public}s: hdiWpaAuthRejectParam is NULL or authRejectParam fialed!", __func__);
+    } else {
+        ret = node->callbackObj->OnEventAuthReject(node->callbackObj, hdiWpaAuthRejectParam, ifName);
+    }
+    HdiWpaAuthRejectParamFree(hdiWpaAuthRejectParam, true);
+    return ret;
+}
+
+int32_t ProcessEventStaNotify(struct HdfWpaRemoteNode *node, char *notifyParam, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaNotify == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return ret;
+}
+
 static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
@@ -1651,6 +1713,12 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
             break;
         case WPA_EVENT_IFACE_CREATED:
             ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_AUTH_REJECT:
+            ret = ProcessEventWpaAuthReject(pos, (struct WpaAuthRejectParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_NOTIFY:
+            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
             break;
         default:
             HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
@@ -1924,5 +1992,59 @@ int32_t WpaInterfaceStop(struct IWpaInterface *self)
         return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: wpa_supplicant stop successfully!", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName)
+{
+    struct wpa_supplicant *wpaSupp;
+
+    (void)self;
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    wpaSupp = getWpaWlan();
+    if (wpaSupp == NULL) {
+        HDF_LOGE("%{public}s wpaSupp == NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (wpaSupp->wpa_state == WPA_INTERFACE_DISABLED) {
+        return HDF_FAILURE;
+    }
+    wpas_request_connection(wpaSupp);
+    return HDF_SUCCESS;
+}
+
+int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd)
+{
+    struct wpa_supplicant *wpaSupp;
+    size_t replyLen = 0;
+    char *buf;
+
+    (void)self;
+    if (ifName == NULL || cmd == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    wpaSupp = getWpaWlan();
+    if (wpaSupp == NULL) {
+        HDF_LOGE("%{public}s wpaSupp == NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    buf = (char *)malloc(CMD_SIZE);
+    if (buf == NULL) {
+        HDF_LOGE("%{public}s malloc failed!", __func__);
+        return HDF_FAILURE;
+    }
+    os_memcpy(buf, cmd, strlen(cmd));
+    char *reply = wpa_supplicant_ctrl_iface_process(wpaSupp, buf, &replyLen);
+    if (strcmp(reply, "FAIL\n") == 0 || reply == NULL) {
+        HDF_LOGE("%{public}s reply is NULL or FAIL!", __func__);
+        free(buf);
+        return HDF_FAILURE;
+    }
+    free(buf);
     return HDF_SUCCESS;
 }
