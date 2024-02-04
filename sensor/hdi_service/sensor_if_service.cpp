@@ -104,7 +104,8 @@ int32_t SensorIfService::Init()
     return ret;
 }
 
-sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj, bool cbFlag)
+sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr<ISensorCallback> &callbackObj,
+    bool cbFlag)
 {
     if (groupId == TRADITIONAL_SENSOR_TYPE) {
         if (cbFlag) {
@@ -265,11 +266,11 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         HDF_LOGE("%{public}s SetBatch failed, error code is %{public}d", __func__, ret);
         return ret;
     }
-    if (mode == SA){
+    if (mode == SA) {
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
     }
-    if (mode == SDC){
+    if (mode == SDC) {
         SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
     }
     SensorClientsManager::GetInstance()->GetSensorBestConfig(sensorId, samplingInterval, reportInterval);
