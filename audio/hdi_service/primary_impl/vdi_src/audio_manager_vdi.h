@@ -21,7 +21,7 @@
 
 #define AUDIO_VDI_ADAPTER_NUM_MAX  20 // Limit the number of sound cards supported to a maximum of 20
 #define AUDIO_VDI_PORT_NUM_MAX    10
-#define AUDIO_VDI_STREAM_NUM_MAX  6
+#define AUDIO_VDI_STREAM_NUM_MAX  10
 
 struct IAudioManager *AudioManagerCreateIfInstance(void);
 int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager);
