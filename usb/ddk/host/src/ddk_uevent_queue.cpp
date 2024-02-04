@@ -187,7 +187,7 @@ void TaskQueue::UnInit(void)
 
 TaskQueue::~TaskQueue()
 {
-    Uninit();
+    UnInit();
 }
 
 int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
