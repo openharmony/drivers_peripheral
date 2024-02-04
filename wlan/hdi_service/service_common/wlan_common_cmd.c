@@ -46,7 +46,7 @@ struct HdfWlanStubData *HdfStubDriver(void)
 int32_t WlanInterfaceStart(struct IWlanInterface *self)
 {
     int32_t ret;
-
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     (void)self;
     if (g_wifi == NULL || g_wifi->start == NULL) {
         HDF_LOGE("%{public}s: g_wifi or g_wifi->start is NULL", __func__);
@@ -58,13 +58,14 @@ int32_t WlanInterfaceStart(struct IWlanInterface *self)
     } else {
         g_wifiCount++;
     }
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
 int32_t WlanInterfaceStop(struct IWlanInterface *self)
 {
     int32_t ret;
-
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     (void)self;
     if (g_wifi == NULL || g_wifi->stop == NULL) {
         HDF_LOGE("%{public}s: g_wifi or g_wifi->stop is NULL", __func__);
@@ -79,6 +80,7 @@ int32_t WlanInterfaceStop(struct IWlanInterface *self)
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s stop WiFi failed! error code: %{public}d", __func__, ret);
     }
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
@@ -137,7 +139,7 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
 int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature)
 {
     int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
@@ -201,6 +203,7 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
     } else {
         HDF_LOGE("%{public}s: wlan type is invalid", __func__);
     }
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
@@ -684,6 +687,8 @@ static int32_t WlanFillScanResultsInfo(WifiScanResults *wifiScanResults, struct 
 static int32_t ProcessEventScanResult(struct HdfWlanRemoteNode *node, uint32_t event, WifiScanResult *wifiScanResult,
     const char *ifName)
 {
+    HDF_LOGI("hal enter %{public}s, line:%{public}d event:%{public}u ifName:%{public}s", __FUNCTION__, __LINE__, event,
+        ifName);
     struct HdfWifiScanResult *scanResult = NULL;
     int32_t ret = HDF_FAILURE;
 
@@ -698,12 +703,15 @@ static int32_t ProcessEventScanResult(struct HdfWlanRemoteNode *node, uint32_t e
         ret = node->callbackObj->ScanResult(node->callbackObj, event, scanResult, ifName);
     }
     HdfWifiScanResultFree(scanResult, true);
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
 static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t event,
     WifiScanResults *wifiScanResults, const char *ifName)
 {
+    HDF_LOGI("hal enter %{public}s, line:%{public}d event:%{public}u ifName:%{public}s", __FUNCTION__, __LINE__, event,
+        ifName);
     struct HdfWifiScanResults *scanResults = NULL;
     uint32_t size;
     int32_t ret = HDF_FAILURE;
@@ -733,6 +741,7 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
         ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
     }
     HdfWifiScanResultsFree(scanResults, true);
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
@@ -765,6 +774,7 @@ static int32_t ProcessEventActionReceived(struct HdfWlanRemoteNode *node, uint32
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = NULL;
     int32_t *code = NULL;
@@ -786,6 +796,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
             continue;
         }
+        HDF_LOGI("hal exit %{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
         switch (event) {
             case WIFI_EVENT_RESET_DRIVER:
                 code = (int32_t *)data;
@@ -808,10 +819,11 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGI("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
@@ -863,7 +875,7 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
     const char *ifName)
 {
     int32_t ret;
-
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
@@ -896,12 +908,14 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
     } while (0);
 
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return ret;
 }
 
 int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct IWlanCallback *cbFunc,
     const char *ifName)
 {
+    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int32_t ret;
 
     (void)self;
@@ -926,6 +940,7 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
+    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return HDF_SUCCESS;
 }
 
