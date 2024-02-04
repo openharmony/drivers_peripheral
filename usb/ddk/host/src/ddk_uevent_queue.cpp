@@ -54,6 +54,7 @@ class TaskQueue {
 public:
     TaskQueue() = default;
     void Init(void);
+    void UnInit(void);
     ~TaskQueue();
     int32_t AddTask(const DdkUeventTaskInfo &task);
 
@@ -153,7 +154,7 @@ void TaskQueue::Init(void)
     pthread_setname_np(pthread_self(), "ueventTaskQueue");
     auto taskWork = [this]() -> void {
         while (threadRun_) {
-        std::unique_lock<std::mutex> uniqueLock(queueLock_);
+            std::unique_lock<std::mutex> uniqueLock(queueLock_);
             conditionVariable_.wait(uniqueLock, [this] {
                 return (taskQueue_.size() > 0 || !threadRun_);
             });
@@ -171,10 +172,22 @@ void TaskQueue::Init(void)
     thd.detach();
 }
 
-TaskQueue::~TaskQueue()
+
+
+void TaskQueue::UnInit(void)
 {
     threadRun_ = false;
     conditionVariable_.notify_one();
+
+    std::lock_guard<std::mutex> lock(queueLock_);
+    while (!taskQueue_.empty()) {
+        taskQueue_.pop();
+    }
+}
+
+TaskQueue::~TaskQueue()
+{
+    UnInit();
 }
 
 int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
@@ -189,7 +202,7 @@ int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
     return HDF_SUCCESS;
 }
 
-TaskQueue g_taskQueue;
+static TaskQueue g_taskQueue;
 
 int32_t DdkUeventStartDispatchThread()
 {
