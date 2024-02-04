@@ -21,6 +21,7 @@
 #include "securec.h"
 #include "usbfn_cfg_mgr.h"
 #include "usbfn_io_mgr.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG    usbfn_dev_mgr
 #define SLEEP_TIME_OUT 100

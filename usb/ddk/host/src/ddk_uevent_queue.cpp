@@ -29,6 +29,7 @@
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
 #include "securec.h"
+#include "usbd_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {

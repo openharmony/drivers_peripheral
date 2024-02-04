@@ -15,6 +15,7 @@
 
 #include "usb_raw_api.h"
 #include "usb_raw_api_library.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG USB_RAW_API
 

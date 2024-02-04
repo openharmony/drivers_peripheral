@@ -19,6 +19,7 @@
 #include "usbfn_interface.h"
 #include "usbfn_io_mgr.h"
 #include "usbfn_request.h"
+#include "usbd_wrapper.h"
 
 #define HDF_LOG_TAG usbfn_sdk_if
 
