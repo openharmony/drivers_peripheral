@@ -56,7 +56,7 @@ public:
     std::mutex sdcSensorConfigMutex_;
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
-    bool IsSensorContinues(int32_t sensorId);
+    static bool IsSensorContinues(int32_t sensorId);
     void UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval);
 private:
     SensorClientsManager();

@@ -65,7 +65,10 @@ public:
     virtual int32_t Register(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
     virtual int32_t Unregister(int32_t groupId, const sptr<ISensorCallbackVdi>& callbackObj) = 0;
     virtual int32_t GetSdcSensorInfo(std::vector<SdcSensorInfoVdi>& sdcSensorInfo) { return HDF_SUCCESS; };
-    virtual int32_t SetSaBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval) { return HDF_SUCCESS; };
+    virtual int32_t SetSaBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
+    {
+        return HDF_SUCCESS;
+    };
 };
 
 struct WrapperSensorVdi {
