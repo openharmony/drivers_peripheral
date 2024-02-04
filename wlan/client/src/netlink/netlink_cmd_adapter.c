@@ -353,6 +353,7 @@ static int32_t PthreadMutexLock(void)
 
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int32_t rc;
     int32_t error;
     struct nl_cb *cb = NULL;
@@ -369,6 +370,8 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
+        HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d nl_send_auto cmdSock, rc=%{public}d", __FUNCTION__, __LINE__,
+            rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
@@ -384,9 +387,11 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         while (error > 0) {
             rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
             if (rc < 0) {
-                HILOG_ERROR(LOG_CORE, "%s: nl_recvmsgs failed: rc = %d, errno = %d, (%s)", __FUNCTION__, rc, errno,
-                    strerror(errno));
+                HILOG_ERROR(LOG_CORE, "%{public}s: nl_recvmsgs failed: rc=%{public}d, errno=%{public}d, (%{public}s)",
+                    __FUNCTION__, rc, errno, strerror(errno));
             }
+            HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d",
+                __FUNCTION__, __LINE__, rc, error);
         }
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
@@ -400,6 +405,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return rc;
 }
 
@@ -547,6 +553,7 @@ void DisconnectEventSocket(void)
 
 static int32_t WifiMsgRegisterEventListener(void)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     int32_t rc;
     int32_t count = 0;
     struct WifiThreadParam threadParam;
@@ -579,18 +586,21 @@ static int32_t WifiMsgRegisterEventListener(void)
             return RET_CODE_FAILURE;
         }
     }
-
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return RET_CODE_SUCCESS;
 }
 
 static void WifiMsgUnregisterEventListener(void)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     g_wifiHalInfo.status = THREAD_STOPPING;
     pthread_join(g_wifiHalInfo.thread, NULL);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
 }
 
 int32_t WifiDriverClientInit(void)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     if (g_wifiHalInfo.cmdSock != NULL) {
         HILOG_ERROR(LOG_CORE, "%s: already create cmd socket", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -625,7 +635,7 @@ int32_t WifiDriverClientInit(void)
         HILOG_ERROR(LOG_CORE, "%s: WifiMsgRegisterEventListener failed", __FUNCTION__);
         goto err_reg;
     }
-
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     return RET_CODE_SUCCESS;
 err_reg:
     DisconnectEventSocket();
@@ -642,6 +652,7 @@ err_mutex:
 
 void WifiDriverClientDeinit(void)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
     WifiMsgUnregisterEventListener();
 
     if (g_wifiHalInfo.cmdSock == NULL) {
@@ -664,6 +675,7 @@ void WifiDriverClientDeinit(void)
 
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
     DeinitEventcallbackMutex();
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
 }
 
 static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
