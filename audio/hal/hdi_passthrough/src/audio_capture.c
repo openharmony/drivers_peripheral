@@ -63,12 +63,24 @@ int32_t AudioCaptureStart(AudioHandle handle)
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+#ifdef NON_STANDARD_CODEC
+    if (hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
+        char *tbuffer = (char *)OsalMemCalloc(FRAME_DATA);
+        if (tbuffer == NULL) {
+            AUDIO_FUNC_LOGE("alloc Capture tbuffer Fail!");
+            return AUDIO_HAL_ERR_MALLOC_FAIL;
+        }
+        hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
+    }
+#else
     char *tbuffer = (char *)OsalMemCalloc(FRAME_DATA);
     if (tbuffer == NULL) {
         AUDIO_FUNC_LOGE("alloc Capture tbuffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
+#endif
+
     AudioLogRecord(INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Start");
     return AUDIO_HAL_SUCCESS;
 }

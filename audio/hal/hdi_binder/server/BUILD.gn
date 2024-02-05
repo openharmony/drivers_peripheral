@@ -17,6 +17,11 @@ import("//drivers/peripheral/audio/audio.gni")
 
 if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
+    defines = []
+    if (drivers_peripheral_audio_non_standard_codec) {
+      defines += [ "NON_STANDARD_CODEC" ]
+    }
+
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -50,7 +55,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
 
-    defines = []
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
@@ -72,6 +76,11 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   }
 
   ohos_shared_library("hdi_audio_usb_server") {
+    defines = []
+    if (drivers_peripheral_audio_non_standard_codec) {
+      defines += [ "NON_STANDARD_CODEC" ]
+    }
+
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",

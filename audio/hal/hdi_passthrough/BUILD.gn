@@ -58,6 +58,11 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 } else {
+  defines = []
+  if (drivers_peripheral_audio_non_standard_codec) {
+    defines += [ "NON_STANDARD_CODEC" ]
+  }
+
   if (!drivers_peripheral_audio_user_mode) {
     ohos_shared_library("hdi_audio") {
       sources = [
@@ -75,8 +80,6 @@ if (defined(ohos_lite)) {
         "//drivers/peripheral/audio/interfaces/include",
         "//third_party/bounds_checking_function/include",
       ]
-
-      defines = []
 
       if (drivers_peripheral_audio_hal_notsupport_pathselect) {
         defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
