@@ -28,7 +28,11 @@ ohos_shared_library("libusb_ddk_host") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "device/include",
@@ -77,7 +81,11 @@ ohos_shared_library("libusb_pnp_manager") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "$hdf_framework_path/model/usb/include",
@@ -127,7 +135,11 @@ ohos_shared_library("libusb_ddk_device") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "device/include",
