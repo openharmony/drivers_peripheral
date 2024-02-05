@@ -643,7 +643,7 @@ static int32_t ProcessEventStaJoin(struct HdfHostapdRemoteNode *node,
         if (hdiApCbParm->content == NULL) {
             HDF_LOGE("%{public}s: hdiApCbParm->content is NULL!", __func__);
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventStaJoin(node->callbackObj, hdiApCbParm, ifName);
         }
@@ -671,7 +671,7 @@ static int32_t ProcessEventApState(struct HdfHostapdRemoteNode *node,
         if (hdiApCbParm->content == NULL) {
             HDF_LOGE("%{public}s: hdiApCbParm is NULL!", __func__);
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventApState(node->callbackObj, hdiApCbParm, ifName);
         }
