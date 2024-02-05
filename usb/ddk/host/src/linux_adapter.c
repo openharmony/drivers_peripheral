@@ -149,17 +149,17 @@ static int32_t GetUsbDevicePath(struct UsbDevice *dev, char *pathBuf, size_t len
     }
 
     if (realpath(path, pathBuf) == NULL) {
-        HDF_LOGE("%{public}s: path conversion failed", __func__);
+        HDF_LOGE("%{public}s: path conversion failed, path: %{public}s", __func__, path);
         return HDF_FAILURE;
     }
 
     if (length < strlen(USB_DEV_FS_PATH)) {
-        HDF_LOGE("%{public}s: invalid length", __func__);
+        HDF_LOGE("%{public}s: invalid length, path: %{public}s", __func__, path);
         return HDF_FAILURE;
     }
 
     if (strncmp(USB_DEV_FS_PATH, pathBuf, strlen(USB_DEV_FS_PATH)) != 0) {
-        HDF_LOGE("%{public}s: The file path is incorrect", __func__);
+        HDF_LOGE("%{public}s: The file path is incorrect, path: %{public}s", __func__, path);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -488,7 +488,7 @@ static int32_t OsSubmitBulkRequestHandle(
         }
 
         if (i == 0) {
-            HDF_LOGE("submitUrb: ret=%d errno=%d urb->bufferLength=%d urb->endPoint=%d urb->type=%d", ret, errno,
+            HDF_LOGE("submitUrb: ret=%{public}d errno=%{public}d length=%d endPoint=%{public}d type=%{public}d", ret, errno,
                 urb->bufferLength, urb->endPoint, urb->type);
             return HDF_ERR_IO;
         }
