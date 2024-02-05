@@ -404,7 +404,9 @@ int32_t SensorIfService::AddCallbackMap(int32_t groupId, const sptr<ISensorCallb
         auto callBackIter =
             find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
             [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
-                return callbackObj == callbackRegistered;
+                const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
+                const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered);
+                return lhs == rhs;
             });
         if (callBackIter == callbackMap[groupId].end()) {
             int32_t addResult = AddSensorDeathRecipient(callbackObj);
@@ -435,7 +437,9 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
     auto callBackIter =
         find_if(callbackMap[groupId].begin(), callbackMap[groupId].end(),
         [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
-            return callbackObj == callbackRegistered;
+            const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
+            const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackRegistered);
+            return lhs == rhs;
         });
     if (callBackIter == callbackMap[groupId].end()) {
         HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
