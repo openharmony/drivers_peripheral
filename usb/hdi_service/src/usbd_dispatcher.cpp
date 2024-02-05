@@ -916,6 +916,10 @@ int32_t UsbdDispatcher::UsbdDeviceCreateAndAttach(const sptr<UsbImpl> &service, 
         HdfSListAdd(&service->devList_, &port->node);
         OsalMutexUnlock(&service->lock_);
         ret = FunAttachDevice(port, nullptr, nullptr);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s:FunAttachDevice error ret:%{public}d", __func__, ret);
+            HdfSListRemove(&service->devList_, &port->node);
+        }
         port = nullptr;
     } else {
         HDF_LOGE("%{public}s:createdevice error ret:%{public}d", __func__, ret);
