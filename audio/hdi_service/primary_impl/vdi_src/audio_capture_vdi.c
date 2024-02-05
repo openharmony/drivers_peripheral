@@ -72,7 +72,7 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrame, HDF_ERR_INVALID_PARAM);
 
-    HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi",0);
+    HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi", 0);
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {

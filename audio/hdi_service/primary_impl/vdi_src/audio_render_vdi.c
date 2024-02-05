@@ -92,7 +92,7 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
 
-    HdfAudioStartTrace("Hdi:AudioRenderFrameVdi",0);
+    HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
