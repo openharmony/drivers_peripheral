@@ -473,6 +473,11 @@ static int32_t SetHWParamsSub(
         return ret;
     }
     /* set the sample format */
+#ifdef NON_STANDARD_CODEC
+    if (pcmFormat == SND_PCM_FORMAT_S16_BE) {
+        pcmFormat = SND_PCM_FORMAT_S16_LE;
+    }
+#endif
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Sample format not available for capture: %{public}s", snd_strerror(ret));
@@ -779,7 +784,11 @@ static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo
 
     snd_mixer_elem_t *pcmElement = snd_mixer_first_elem(mixer);
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+#ifdef NON_STANDARD_CODEC
+        ret = GetPriMixerCtlElement(cardIns, pcmElement, SND_PCM_STREAM_CAPTURE);
+#else
         ret = GetPriMixerCtlElement(cardIns, pcmElement);
+#endif
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("Capture GetPriMixerCtlElement failed.");
             return ret;
@@ -882,6 +891,50 @@ int32_t AudioCaptureResetParams(snd_pcm_t *handle, struct AudioPcmHwParams audio
     return HDF_SUCCESS;
 }
 
+#ifdef NON_STANDARD_CODEC
+int32_t AudioDataBigEndianChange(char *srcData, uint32_t audioLen, enum DataBitWidth bitWidth)
+{
+    uint64_t i;
+    uint16_t framesize;
+    char *changeData;
+    uint32_t *pData;
+    if (srcData == NULL) {
+        AUDIO_FUNC_LOGE("srcData is NULL.");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    changeData = srcData;
+    pData = (uint32_t *)changeData;
+
+    switch (bitWidth) {
+        case DATA_BIT_WIDTH8:
+            return HDF_SUCCESS;
+        case DATA_BIT_WIDTH24:
+            framesize = 3; /* 3 byte , convert step is 3 byte */
+            for (i = 0; i < audioLen; i += framesize) {
+                // swap the first and the third byte, second and fourth unchanged
+                *pData = ((((*pData) >> 0x10) & 0x000000FF) |
+                          ((*pData) & 0xFF00FF00) |
+                          (((*pData) << 0x10) & 0x00FF0000));
+                changeData += framesize;
+                pData = (uint32_t *)changeData;
+            }
+            break;
+        case DATA_BIT_WIDTH16:
+        default:
+            framesize = 4; /* 2 byte, convert step is 4 byte */
+            for (i = 0; i < audioLen; i += framesize) {
+                // swap the first and second byte, swap the third and fourth byte
+                *pData = ((((*pData) << 0x08) & 0xFF00FF00) |
+                          (((*pData) >> 0x08) & 0x00FF00FF));
+                pData++;
+            }
+            break;
+    }
+    return HDF_SUCCESS;
+}
+#endif
+
 static int32_t CaptureDataCopy(struct AudioHwCaptureParam *handleData, char *buffer, uint64_t frames)
 {
     int32_t ret;
@@ -906,6 +959,9 @@ static int32_t CaptureDataCopy(struct AudioHwCaptureParam *handleData, char *buf
         AUDIO_FUNC_LOGE("memcpy frame data failed!");
         return HDF_FAILURE;
     }
+#ifdef NON_STANDARD_CODEC
+    AudioDataBigEndianChange(handleData->frameCaptureMode.buffer, recvDataSize, DATA_BIT_WIDTH16);
+#endif
     handleData->frameCaptureMode.bufferSize = recvDataSize;
     handleData->frameCaptureMode.bufferFrameSize = frames;
 

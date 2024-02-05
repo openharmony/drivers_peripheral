@@ -35,7 +35,9 @@ struct AudioManager *g_serverManager = NULL;
 
 int32_t g_serverAdapterNum = 0;
 struct AudioInfoInAdapter *g_renderAndCaptureManage = NULL;
-
+#ifdef NON_STANDARD_CODEC
+unsigned int g_codecFlag = 0;
+#endif
 static struct AudioEvent g_audioEventPnp = {
     .eventType = HDF_AUDIO_EVENT_UNKOWN,
     .deviceType = HDF_AUDIO_DEVICE_UNKOWN,
@@ -2270,6 +2272,15 @@ int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct H
 {
     unsigned int i;
     AUDIO_FUNC_LOGD("cmdId = %{public}d", cmdId);
+#ifdef NON_STANDARD_CODEC
+    if (cmdId == AUDIO_HDI_RENDER_CREATE_RENDER) {
+        g_codecFlag = 1;
+    }
+
+    if (cmdId == AUDIO_HDI_RENDER_STOP) {
+        g_codecFlag = 0;
+    }
+#endif
     if (client == NULL) {
         AUDIO_FUNC_LOGE("ControlDispatch: input para is NULL.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -2291,6 +2302,11 @@ int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct H
             }
         }
     } else {
+#ifdef NON_STANDARD_CODEC
+        if (g_codecFlag == 1) {
+                return AUDIO_HAL_SUCCESS;
+        }
+#endif
         for (i = 0; i < sizeof(g_hdiServiceDispatchCmdHandleCapList) /
             sizeof(g_hdiServiceDispatchCmdHandleCapList[0]); ++i) {
             if ((cmdId == (int)(g_hdiServiceDispatchCmdHandleCapList[i].cmd)) &&
