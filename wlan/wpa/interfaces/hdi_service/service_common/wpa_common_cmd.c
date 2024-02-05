@@ -678,7 +678,7 @@ const char *macToStr(const u8 *addr)
     const int macAddrIndexFive = 4;
     const int macAddrIndexSix = 5;
     static char macToStr[WIFI_BSSID_LENGTH];
-    if (os_snprintf(macToStr, sizeof(macToStr), "%02x:%02x:%02x:%02x:%02x:%02x", addr[macAddrIndexOne],
+    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x", addr[macAddrIndexOne],
         addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
         addr[macAddrIndexFive], addr[macAddrIndexSix]) < 0) {
         return NULL;
@@ -815,7 +815,7 @@ int32_t WpaInterfaceGetCountryCode(struct IWpaInterface *self, const char *ifNam
     }
     if (wpaSupp->conf->country[0] && wpaSupp->conf->country[1]) {
         char tmpCountryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
-        ret = os_snprintf(tmpCountryCode, WIFI_COUNTRY_CODE_MAXLEN + 1, "%c%c",
+        ret = snprintf_s(tmpCountryCode, WIFI_COUNTRY_CODE_MAXLEN + 1, WIFI_COUNTRY_CODE_MAXLEN, "%c%c",
             wpaSupp->conf->country[0], wpaSupp->conf->country[1]);
         HDF_LOGI("%{public}s: tmpCountryCode = %s", __func__, tmpCountryCode);
         if (strcpy_s(countryCode, countryCodeLen, tmpCountryCode) != EOK) {
@@ -1046,7 +1046,7 @@ int32_t WpaInterfaceGetPsk(struct IWpaInterface *self, const char *ifName, uint8
     wpaSupp = getWpaWlan();
     if ((wpaSupp != NULL) && (wpaSupp->current_ssid != NULL)) {
         *pskLen = sizeof(wpaSupp->current_ssid->psk);
-        os_memcpy(psk, wpaSupp->current_ssid->psk, *pskLen);
+        memcpy_s(psk, *pskLen, wpaSupp->current_ssid->psk, *pskLen);
         HDF_LOGI("%{public}s GetPsk  psk[0] = %{public}d", __func__, psk[0]);
         HDF_LOGI("%{public}s GetPsk  psk[1] = %{public}d", __func__, psk[1]);
         ret = HDF_SUCCESS ;
@@ -1071,7 +1071,7 @@ int32_t WpaInterfaceGetWepKey(struct IWpaInterface *self, const char *ifName, in
     wpaSupp = getWpaWlan();
     if ((wpaSupp != NULL) && (wpaSupp->current_ssid != NULL)) {
         *wepKeyLen = wpaSupp->current_ssid->wep_key_len[keyIdx];
-        os_memcpy(wepKey, wpaSupp->current_ssid->wep_key[keyIdx], *wepKeyLen);
+        memcpy_s(wepKey, *wepKeyLen, wpaSupp->current_ssid->wep_key[keyIdx], *wepKeyLen);
         HDF_LOGI("%{public}s GetWepKey  wepKey[0] = %{public}d", __func__, wepKey[0]);
         HDF_LOGI("%{public}s GetWepKey  wepKey[1] = %{public}d", __func__, wepKey[1]);
         ret = HDF_SUCCESS ;
@@ -2038,7 +2038,7 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
         HDF_LOGE("%{public}s malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    os_memcpy(buf, cmd, strlen(cmd));
+    memcpy_s(buf, CMD_SIZE, cmd, strlen(cmd));
     char *reply = wpa_supplicant_ctrl_iface_process(wpaSupp, buf, &replyLen);
     if (reply == NULL || strcmp(reply, "FAIL\n") == 0) {
         HDF_LOGE("%{public}s reply is NULL or FAIL!", __func__);
