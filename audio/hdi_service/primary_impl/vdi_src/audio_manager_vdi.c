@@ -300,6 +300,7 @@ static uint32_t AudioManagerVendorFindAdapterPos(struct IAudioManager *manager, 
 int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc,
     struct IAudioAdapter **adapter)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
@@ -348,6 +349,7 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
 static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(adapterName, HDF_ERR_INVALID_PARAM);
 
@@ -382,6 +384,7 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
 
 int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     uint32_t descIndex;
 
     if (manager == NULL) {
@@ -411,6 +414,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
 
 static int32_t AudioManagerLoadVendorLib(struct AudioManagerPrivVdi *priv)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     char *error = NULL;
     const char *hdiAudioVendorLibPath = HDF_LIBRARY_FULL_PATH("libaudio_primary_impl");
 
