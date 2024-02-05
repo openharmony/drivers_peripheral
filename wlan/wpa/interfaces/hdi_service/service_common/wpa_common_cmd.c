@@ -2040,7 +2040,7 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
     }
     os_memcpy(buf, cmd, strlen(cmd));
     char *reply = wpa_supplicant_ctrl_iface_process(wpaSupp, buf, &replyLen);
-    if (strcmp(reply, "FAIL\n") == 0 || reply == NULL) {
+    if (reply == NULL || strcmp(reply, "FAIL\n") == 0) {
         HDF_LOGE("%{public}s reply is NULL or FAIL!", __func__);
         free(buf);
         return HDF_FAILURE;
