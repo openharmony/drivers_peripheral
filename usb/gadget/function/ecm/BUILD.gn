@@ -24,7 +24,11 @@ ohos_shared_library("libusbfn_cdcecm") {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "./../../../interfaces/ddk/device",
