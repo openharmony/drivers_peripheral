@@ -34,7 +34,8 @@
                 "c_utils",
                 "hilog",
                 "hdf_core",
-                "drivers_interface_audio"
+                "drivers_interface_audio",
+                "hitrace"
             ],
             "third_party": [
                 "bounds_checking_function",

@@ -21,6 +21,7 @@
 #include "osal_mem.h"
 #include "securec.h"
 #include "audio_common_vdi.h"
+#include "audio_trace_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -62,6 +63,7 @@ struct IAudioRenderVdi *AudioGetVdiRenderByIdVdi(uint32_t renderId)
 
 int32_t AudioGetLatencyVdi(struct IAudioRender *render, uint32_t *ms)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(ms, HDF_ERR_INVALID_PARAM);
 
@@ -90,7 +92,9 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioRenderFrameVdi",0);
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         return ret;
@@ -101,6 +105,7 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
 
 int32_t AudioGetRenderPositionVdi(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(time, HDF_ERR_INVALID_PARAM);
@@ -121,6 +126,7 @@ int32_t AudioGetRenderPositionVdi(struct IAudioRender *render, uint64_t *frames,
 
 int32_t AudioSetRenderSpeedVdi(struct IAudioRender *render, float speed)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -139,6 +145,7 @@ int32_t AudioSetRenderSpeedVdi(struct IAudioRender *render, float speed)
 
 int32_t AudioGetRenderSpeedVdi(struct IAudioRender *render, float *speed)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(speed, HDF_ERR_INVALID_PARAM);
 
@@ -174,6 +181,7 @@ static int32_t AudioRenderCallbackVdi(enum  AudioCallbackTypeVdi type, void *res
 
 int32_t AudioRenderRegCallbackVdi(struct IAudioRender *render, struct IAudioCallback *audioCallback, int8_t cookie)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(audioCallback, HDF_ERR_INVALID_PARAM);
 
@@ -194,6 +202,7 @@ int32_t AudioRenderRegCallbackVdi(struct IAudioRender *render, struct IAudioCall
 
 int32_t AudioRenderSetChannelModeVdi(struct IAudioRender *render, enum AudioChannelMode mode)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -212,6 +221,7 @@ int32_t AudioRenderSetChannelModeVdi(struct IAudioRender *render, enum AudioChan
 
 int32_t AudioRenderGetChannelModeVdi(struct IAudioRender *render, enum AudioChannelMode *mode)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mode, HDF_ERR_INVALID_PARAM);
 
@@ -231,6 +241,7 @@ int32_t AudioRenderGetChannelModeVdi(struct IAudioRender *render, enum AudioChan
 
 int32_t AudioRenderDrainBufferVdi(struct IAudioRender *render, enum AudioDrainNotifyType *type)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(type, HDF_ERR_INVALID_PARAM);
 
@@ -250,6 +261,7 @@ int32_t AudioRenderDrainBufferVdi(struct IAudioRender *render, enum AudioDrainNo
 
 int32_t AudioRenderIsSupportsDrainVdi(struct IAudioRender *render, bool *support)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(support, HDF_ERR_INVALID_PARAM);
 
@@ -270,6 +282,7 @@ int32_t AudioRenderIsSupportsDrainVdi(struct IAudioRender *render, bool *support
 int32_t AudioRenderCheckSceneCapabilityVdi(struct IAudioRender *render, const struct AudioSceneDescriptor *scene,
     bool *supported)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
@@ -299,6 +312,7 @@ int32_t AudioRenderCheckSceneCapabilityVdi(struct IAudioRender *render, const st
 
 int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct AudioSceneDescriptor *scene)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
 
@@ -327,6 +341,7 @@ int32_t AudioRenderSelectSceneVdi(struct IAudioRender *render, const struct Audi
 
 int32_t AudioRenderSetMuteVdi(struct IAudioRender *render, bool mute)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -345,6 +360,7 @@ int32_t AudioRenderSetMuteVdi(struct IAudioRender *render, bool mute)
 
 int32_t AudioRenderGetMuteVdi(struct IAudioRender *render, bool *mute)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
 
@@ -364,6 +380,7 @@ int32_t AudioRenderGetMuteVdi(struct IAudioRender *render, bool *mute)
 
 int32_t AudioRenderSetVolumeVdi(struct IAudioRender *render, float volume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -382,6 +399,7 @@ int32_t AudioRenderSetVolumeVdi(struct IAudioRender *render, float volume)
 
 int32_t AudioRenderGetVolumeVdi(struct IAudioRender *render, float *volume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(volume, HDF_ERR_INVALID_PARAM);
 
@@ -401,6 +419,7 @@ int32_t AudioRenderGetVolumeVdi(struct IAudioRender *render, float *volume)
 
 int32_t AudioRenderGetGainThresholdVdi(struct IAudioRender *render, float *min, float *max)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(min, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(max, HDF_ERR_INVALID_PARAM);
@@ -421,6 +440,7 @@ int32_t AudioRenderGetGainThresholdVdi(struct IAudioRender *render, float *min, 
 
 int32_t AudioRenderGetGainVdi(struct IAudioRender *render, float *gain)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(gain, HDF_ERR_INVALID_PARAM);
 
@@ -440,6 +460,7 @@ int32_t AudioRenderGetGainVdi(struct IAudioRender *render, float *gain)
 
 int32_t AudioRenderSetGainVdi(struct IAudioRender *render, float gain)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -458,6 +479,7 @@ int32_t AudioRenderSetGainVdi(struct IAudioRender *render, float gain)
 
 int32_t AudioRenderGetFrameSizeVdi(struct IAudioRender *render, uint64_t *size)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(size, HDF_ERR_INVALID_PARAM);
 
@@ -477,6 +499,7 @@ int32_t AudioRenderGetFrameSizeVdi(struct IAudioRender *render, uint64_t *size)
 
 int32_t AudioRenderGetFrameCountVdi(struct IAudioRender *render, uint64_t *count)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(count, HDF_ERR_INVALID_PARAM);
 
@@ -496,6 +519,7 @@ int32_t AudioRenderGetFrameCountVdi(struct IAudioRender *render, uint64_t *count
 
 int32_t AudioRenderSetSampleAttributesVdi(struct IAudioRender *render, const struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
@@ -523,6 +547,7 @@ int32_t AudioRenderSetSampleAttributesVdi(struct IAudioRender *render, const str
 
 int32_t AudioRenderGetSampleAttributesVdi(struct IAudioRender *render, struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
@@ -550,6 +575,7 @@ int32_t AudioRenderGetSampleAttributesVdi(struct IAudioRender *render, struct Au
 
 int32_t AudioRenderGetCurrentChannelIdVdi(struct IAudioRender *render, uint32_t *channelId)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(channelId, HDF_ERR_INVALID_PARAM);
 
@@ -569,6 +595,7 @@ int32_t AudioRenderGetCurrentChannelIdVdi(struct IAudioRender *render, uint32_t 
 
 int32_t AudioRenderSetExtraParamsVdi(struct IAudioRender *render, const char *keyValueList)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
@@ -588,6 +615,7 @@ int32_t AudioRenderSetExtraParamsVdi(struct IAudioRender *render, const char *ke
 
 int32_t AudioRenderGetExtraParamsVdi(struct IAudioRender *render, char *keyValueList, uint32_t keyValueListLen)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
@@ -608,6 +636,7 @@ int32_t AudioRenderGetExtraParamsVdi(struct IAudioRender *render, char *keyValue
 int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize,
     struct AudioMmapBufferDescriptor *desc)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
 
@@ -637,6 +666,7 @@ int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize
 
 int32_t AudioRenderGetMmapPositionVdi(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     struct AudioTimeStampVdi vdiTime;
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
@@ -663,6 +693,7 @@ int32_t AudioRenderGetMmapPositionVdi(struct IAudioRender *render, uint64_t *fra
 
 int32_t AudioRenderAddAudioEffectVdi(struct IAudioRender *render, uint64_t effectid)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -687,6 +718,7 @@ int32_t AudioRenderRemoveAudioEffectVdi(struct IAudioRender *render, uint64_t ef
 
 int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *bufferSize)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -700,6 +732,7 @@ int32_t AudioRenderGetFrameBufferSizeVdi(struct IAudioRender *render, uint64_t *
 
 int32_t AudioRenderStartVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -718,6 +751,7 @@ int32_t AudioRenderStartVdi(struct IAudioRender *render)
 
 int32_t AudioRenderStopVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -736,6 +770,7 @@ int32_t AudioRenderStopVdi(struct IAudioRender *render)
 
 int32_t AudioRenderPauseVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -754,6 +789,7 @@ int32_t AudioRenderPauseVdi(struct IAudioRender *render)
 
 int32_t AudioRenderResumeVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -772,6 +808,7 @@ int32_t AudioRenderResumeVdi(struct IAudioRender *render)
 
 int32_t AudioRenderFlushVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -790,6 +827,7 @@ int32_t AudioRenderFlushVdi(struct IAudioRender *render)
 
 int32_t AudioRenderTurnStandbyModeVdi(struct IAudioRender *render)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -808,6 +846,7 @@ int32_t AudioRenderTurnStandbyModeVdi(struct IAudioRender *render)
 
 int32_t AudioRenderAudioDevDumpVdi(struct IAudioRender *render, int32_t range, int32_t fd)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
@@ -826,6 +865,7 @@ int32_t AudioRenderAudioDevDumpVdi(struct IAudioRender *render, int32_t range, i
 
 int32_t AudioRenderIsSupportsPauseAndResumeVdi(struct IAudioRender *render, bool *supportPause, bool *supportResume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
@@ -840,6 +880,7 @@ int32_t AudioRenderIsSupportsPauseAndResumeVdi(struct IAudioRender *render, bool
 
 int32_t AudioRenderSetbufferSize(struct IAudioRender *render, uint32_t size)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
     struct IAudioRenderVdi *vdiRender = renderInfo->vdiRender;
@@ -951,6 +992,7 @@ static uint32_t GetAvailableRenderId(struct AudioRenderPrivVdi *renderPriv)
 struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct IAudioRenderVdi *vdiRender, const struct AudioDeviceDescriptor *desc)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     struct IAudioRender *render = NULL;
     if (attrs == NULL || renderId == NULL || vdiRender == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio render is null");
@@ -1010,6 +1052,7 @@ uint32_t DecreaseRenderUsrCount(uint32_t renderId)
 
 void AudioDestroyRenderByIdVdi(uint32_t renderId)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (renderId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio vdiRender destroy render index fail, descIndex=%{public}d", renderId);
         return;

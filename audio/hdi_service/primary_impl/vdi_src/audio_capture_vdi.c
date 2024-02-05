@@ -21,6 +21,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_common_vdi.h"
+#include "audio_trace_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -71,7 +72,9 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrame, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioCaptureFrameVdi",0);
     int32_t ret = vdiCapture->CaptureFrame(vdiCapture, frame, frameLen, replyBytes);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture frame fail, ret=%{public}d", ret);
         return ret;
@@ -103,6 +106,7 @@ int32_t AudioGetCapturePositionVdi(struct IAudioCapture *capture, uint64_t *fram
 int32_t AudioCaptureCheckSceneCapabilityVdi(struct IAudioCapture *capture, const struct AudioSceneDescriptor* scene,
     bool* supported)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
@@ -132,6 +136,7 @@ int32_t AudioCaptureCheckSceneCapabilityVdi(struct IAudioCapture *capture, const
 
 int32_t AudioCaptureSelectSceneVdi(struct IAudioCapture *capture, const struct AudioSceneDescriptor* scene)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
 
@@ -160,6 +165,7 @@ int32_t AudioCaptureSelectSceneVdi(struct IAudioCapture *capture, const struct A
 
 int32_t AudioCaptureSetMuteVdi(struct IAudioCapture *capture, bool mute)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -178,6 +184,7 @@ int32_t AudioCaptureSetMuteVdi(struct IAudioCapture *capture, bool mute)
 
 int32_t AudioCaptureGetMuteVdi(struct IAudioCapture *capture, bool *mute)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
 
@@ -197,6 +204,7 @@ int32_t AudioCaptureGetMuteVdi(struct IAudioCapture *capture, bool *mute)
 
 int32_t AudioCaptureSetVolumeVdi(struct IAudioCapture *capture, float volume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -215,6 +223,7 @@ int32_t AudioCaptureSetVolumeVdi(struct IAudioCapture *capture, float volume)
 
 int32_t AudioCaptureGetVolumeVdi(struct IAudioCapture *capture, float *volume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(volume, HDF_ERR_INVALID_PARAM);
 
@@ -234,6 +243,7 @@ int32_t AudioCaptureGetVolumeVdi(struct IAudioCapture *capture, float *volume)
 
 int32_t AudioCaptureGetGainThresholdVdi(struct IAudioCapture *capture, float *min, float *max)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(min, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(max, HDF_ERR_INVALID_PARAM);
@@ -254,6 +264,7 @@ int32_t AudioCaptureGetGainThresholdVdi(struct IAudioCapture *capture, float *mi
 
 int32_t AudioCaptureGetGainVdi(struct IAudioCapture *capture, float *gain)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(gain, HDF_ERR_INVALID_PARAM);
 
@@ -291,6 +302,7 @@ int32_t AudioCaptureSetGainVdi(struct IAudioCapture *capture, float gain)
 
 int32_t AudioCaptureGetFrameSizeVdi(struct IAudioCapture *capture, uint64_t *size)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(size, HDF_ERR_INVALID_PARAM);
 
@@ -310,6 +322,7 @@ int32_t AudioCaptureGetFrameSizeVdi(struct IAudioCapture *capture, uint64_t *siz
 
 int32_t AudioCaptureGetFrameCountVdi(struct IAudioCapture *capture, uint64_t *count)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(count, HDF_ERR_INVALID_PARAM);
 
@@ -329,6 +342,7 @@ int32_t AudioCaptureGetFrameCountVdi(struct IAudioCapture *capture, uint64_t *co
 
 int32_t AudioCaptureSetSampleAttributesVdi(struct IAudioCapture *capture, const struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
@@ -356,6 +370,7 @@ int32_t AudioCaptureSetSampleAttributesVdi(struct IAudioCapture *capture, const 
 
 int32_t AudioCaptureGetSampleAttributesVdi(struct IAudioCapture *capture, struct AudioSampleAttributes *attrs)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
@@ -383,6 +398,7 @@ int32_t AudioCaptureGetSampleAttributesVdi(struct IAudioCapture *capture, struct
 
 int32_t AudioCaptureGetCurrentChannelIdVdi(struct IAudioCapture *capture, uint32_t *channelId)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(channelId, HDF_ERR_INVALID_PARAM);
 
@@ -402,6 +418,7 @@ int32_t AudioCaptureGetCurrentChannelIdVdi(struct IAudioCapture *capture, uint32
 
 int32_t AudioCaptureSetExtraParamsVdi(struct IAudioCapture *capture, const char *keyValueList)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
@@ -421,6 +438,7 @@ int32_t AudioCaptureSetExtraParamsVdi(struct IAudioCapture *capture, const char 
 
 int32_t AudioCaptureGetExtraParamsVdi(struct IAudioCapture *capture, char *keyValueList, uint32_t keyValueListLen)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
@@ -441,6 +459,7 @@ int32_t AudioCaptureGetExtraParamsVdi(struct IAudioCapture *capture, char *keyVa
 int32_t AudioCaptureReqMmapBufferVdi(struct IAudioCapture *capture, int32_t reqSize,
     struct AudioMmapBufferDescriptor *desc)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
 
@@ -471,6 +490,7 @@ int32_t AudioCaptureReqMmapBufferVdi(struct IAudioCapture *capture, int32_t reqS
 
 int32_t AudioCaptureGetMmapPositionVdi(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(time, HDF_ERR_INVALID_PARAM);
@@ -498,6 +518,7 @@ int32_t AudioCaptureGetMmapPositionVdi(struct IAudioCapture *capture, uint64_t *
 
 int32_t AudioCaptureAddAudioEffectVdi(struct IAudioCapture *capture, uint64_t effectid)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -516,6 +537,7 @@ int32_t AudioCaptureAddAudioEffectVdi(struct IAudioCapture *capture, uint64_t ef
 
 int32_t AudioCaptureRemoveAudioEffectVdi(struct IAudioCapture *capture, uint64_t effectid)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -534,6 +556,7 @@ int32_t AudioCaptureRemoveAudioEffectVdi(struct IAudioCapture *capture, uint64_t
 
 int32_t AudioCaptureGetFrameBufferSizeVdi(struct IAudioCapture *capture, uint64_t *bufferSize)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -553,6 +576,7 @@ int32_t AudioCaptureGetFrameBufferSizeVdi(struct IAudioCapture *capture, uint64_
 
 int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -571,6 +595,7 @@ int32_t AudioCaptureStartVdi(struct IAudioCapture *capture)
 
 int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -589,6 +614,7 @@ int32_t AudioCaptureStopVdi(struct IAudioCapture *capture)
 
 int32_t AudioCapturePauseVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -607,6 +633,7 @@ int32_t AudioCapturePauseVdi(struct IAudioCapture *capture)
 
 int32_t AudioCaptureResumeVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -625,6 +652,7 @@ int32_t AudioCaptureResumeVdi(struct IAudioCapture *capture)
 
 int32_t AudioCaptureFlushVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -643,6 +671,7 @@ int32_t AudioCaptureFlushVdi(struct IAudioCapture *capture)
 
 int32_t AudioCaptureTurnStandbyModeVdi(struct IAudioCapture *capture)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -661,6 +690,7 @@ int32_t AudioCaptureTurnStandbyModeVdi(struct IAudioCapture *capture)
 
 int32_t AudioCaptureAudioDevDumpVdi(struct IAudioCapture *capture, int32_t range, int32_t fd)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
     struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
@@ -679,6 +709,7 @@ int32_t AudioCaptureAudioDevDumpVdi(struct IAudioCapture *capture, int32_t range
 
 int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, bool *supportPause, bool *supportResume)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
@@ -758,6 +789,7 @@ static uint32_t GetAvailableCaptureId(struct AudioCapturePrivVdi *capturePriv)
 struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
     struct IAudioCaptureVdi *vdiCapture, const struct AudioDeviceDescriptor *desc)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (attrs == NULL || captureId == NULL || vdiCapture == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio capture is null");
         return NULL;
@@ -816,6 +848,7 @@ uint32_t DecreaseCaptureUsrCount(uint32_t captureId)
 
 void AudioDestroyCaptureByIdVdi(uint32_t captureId)
 {
+    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (captureId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio vdiCapture destroy capture index fail, captureId=%{public}d", captureId);
         return;
