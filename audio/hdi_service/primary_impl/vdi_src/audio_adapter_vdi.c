@@ -79,7 +79,6 @@ static struct IAudioAdapterVdi *AudioGetVdiAdapterVdi(const struct IAudioAdapter
 
 int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
@@ -244,7 +243,6 @@ int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t captureId
 int32_t AudioGetPortCapabilityVdi(struct IAudioAdapter *adapter, const struct AudioPort *port,
     struct AudioPortCapability* capability)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(port, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(capability, HDF_ERR_INVALID_PARAM);
@@ -279,7 +277,6 @@ int32_t AudioGetPortCapabilityVdi(struct IAudioAdapter *adapter, const struct Au
 int32_t AudioSetPassthroughModeVdi(struct IAudioAdapter *adapter, const struct AudioPort *port,
     enum AudioPortPassthroughMode mode)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(port, HDF_ERR_INVALID_PARAM);
 
@@ -309,7 +306,6 @@ int32_t AudioSetPassthroughModeVdi(struct IAudioAdapter *adapter, const struct A
 int32_t AudioGetPassthroughModeVdi(struct IAudioAdapter *adapter, const struct AudioPort *port,
     enum AudioPortPassthroughMode *mode)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(port, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mode, HDF_ERR_INVALID_PARAM);
@@ -339,7 +335,6 @@ int32_t AudioGetPassthroughModeVdi(struct IAudioAdapter *adapter, const struct A
 
 int32_t AudioGetDeviceStatusVdi(struct IAudioAdapter *adapter, struct AudioDeviceStatus *status)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(status, HDF_ERR_INVALID_PARAM);
 
@@ -361,7 +356,6 @@ int32_t AudioGetDeviceStatusVdi(struct IAudioAdapter *adapter, struct AudioDevic
 
 int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(route, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(routeHandle, HDF_ERR_INVALID_PARAM);
@@ -391,7 +385,6 @@ int32_t AudioUpdateAudioRouteVdi(struct IAudioAdapter *adapter, const struct Aud
 
 int32_t AudioReleaseAudioRouteVdi(struct IAudioAdapter *adapter, int32_t routeHandle)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
@@ -409,7 +402,6 @@ int32_t AudioReleaseAudioRouteVdi(struct IAudioAdapter *adapter, int32_t routeHa
 
 int32_t AudioSetMicMuteVdi(struct IAudioAdapter *adapter, bool mute)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
@@ -427,7 +419,6 @@ int32_t AudioSetMicMuteVdi(struct IAudioAdapter *adapter, bool mute)
 
 int32_t AudioGetMicMuteVdi(struct IAudioAdapter *adapter, bool *mute)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
 
@@ -446,7 +437,6 @@ int32_t AudioGetMicMuteVdi(struct IAudioAdapter *adapter, bool *mute)
 
 int32_t AudioSetVoiceVolumeVdi(struct IAudioAdapter *adapter, float volume)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
@@ -465,7 +455,6 @@ int32_t AudioSetVoiceVolumeVdi(struct IAudioAdapter *adapter, float volume)
 int32_t AudioSetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioExtParamKey key, const char *condition,
     const char *value)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(condition, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(value, HDF_ERR_INVALID_PARAM);
@@ -486,7 +475,6 @@ int32_t AudioSetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioExtParam
 int32_t AudioGetExtraParamsVdi(struct IAudioAdapter *adapter, enum AudioExtParamKey key, const char *condition,
     char *value, uint32_t valueLen)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(condition, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(value, HDF_ERR_INVALID_PARAM);
@@ -590,7 +578,6 @@ void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex)
 
 struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("create adapter error, descIndex=%{public}d", descIndex);
         return NULL;
@@ -624,7 +611,6 @@ struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAda
 
 void AudioReleaseAdapterVdi(uint32_t descIndex)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("adapter release fail descIndex=%{public}d", descIndex);
         return;
