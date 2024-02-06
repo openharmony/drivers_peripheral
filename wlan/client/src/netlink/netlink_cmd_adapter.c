@@ -407,7 +407,7 @@ static int32_t PthreadMutexLock(void)
 
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t rc;
     int32_t error;
     struct nl_cb *cb = NULL;
@@ -424,8 +424,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
-        HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d nl_send_auto cmdSock, rc=%{public}d", __FUNCTION__, __LINE__,
-            rc);
+        HILOG_INFO(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
@@ -441,11 +440,10 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         while (error > 0) {
             rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
             if (rc < 0) {
-                HILOG_ERROR(LOG_CORE, "%{public}s: nl_recvmsgs failed: rc=%{public}d, errno=%{public}d, (%{public}s)",
-                    __FUNCTION__, rc, errno, strerror(errno));
+                HILOG_ERROR(LOG_CORE, "nl_recvmsgs failed: rc=%{public}d, errno=%{public}d, (%{public}s)", rc, errno,
+                    strerror(errno));
             }
-            HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d",
-                __FUNCTION__, __LINE__, rc, error);
+            HILOG_INFO(LOG_CORE, "nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d", rc, error);
         }
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
@@ -459,7 +457,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return rc;
 }
 
@@ -607,7 +605,7 @@ void DisconnectEventSocket(void)
 
 static int32_t WifiMsgRegisterEventListener(void)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t rc;
     int32_t count = 0;
     struct WifiThreadParam threadParam;
@@ -640,21 +638,21 @@ static int32_t WifiMsgRegisterEventListener(void)
             return RET_CODE_FAILURE;
         }
     }
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return RET_CODE_SUCCESS;
 }
 
 static void WifiMsgUnregisterEventListener(void)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     g_wifiHalInfo.status = THREAD_STOPPING;
     pthread_join(g_wifiHalInfo.thread, NULL);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 int32_t WifiDriverClientInit(void)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     if (g_wifiHalInfo.cmdSock != NULL) {
         HILOG_ERROR(LOG_CORE, "%s: already create cmd socket", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -689,7 +687,7 @@ int32_t WifiDriverClientInit(void)
         HILOG_ERROR(LOG_CORE, "%s: WifiMsgRegisterEventListener failed", __FUNCTION__);
         goto err_reg;
     }
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return RET_CODE_SUCCESS;
 err_reg:
     DisconnectEventSocket();
@@ -706,7 +704,7 @@ err_mutex:
 
 void WifiDriverClientDeinit(void)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     WifiMsgUnregisterEventListener();
 
     if (g_wifiHalInfo.cmdSock == NULL) {
@@ -729,7 +727,7 @@ void WifiDriverClientDeinit(void)
 
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
     DeinitEventcallbackMutex();
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
@@ -2633,6 +2631,7 @@ static int32_t ConvertSetsToNetlinkmsg(struct nl_msg *msg, const char *ifName, c
 
 int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     uint32_t interfaceId;
     struct nl_msg *msg = NULL;
     int32_t ret = RET_CODE_FAILURE;
@@ -2648,6 +2647,7 @@ int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
         return RET_CODE_NOMEM;
     }
     do {
+        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_START_SCHED_SCAN");
         if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_ACK, NL80211_CMD_START_SCHED_SCAN, 0)) {
             HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
             break;
@@ -2666,11 +2666,13 @@ int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
         }
     } while (0);
     nlmsg_free(msg);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
 int32_t WifiStopPnoScan(const char *ifName)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     uint32_t interfaceId;
     struct nl_msg *msg = NULL;
     int32_t ret = RET_CODE_FAILURE;
@@ -2686,6 +2688,7 @@ int32_t WifiStopPnoScan(const char *ifName)
         return RET_CODE_NOMEM;
     }
     do {
+        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_STOP_SCHED_SCAN");
         if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_ACK, NL80211_CMD_STOP_SCHED_SCAN, 0)) {
             HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
             break;
@@ -2700,6 +2703,7 @@ int32_t WifiStopPnoScan(const char *ifName)
         }
     } while (0);
     nlmsg_free(msg);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
@@ -2741,6 +2745,7 @@ static int32_t GetAssociatedInfoHandler(struct nl_msg *msg, void *arg)
 
 static int32_t WifiGetAssociatedInfo(const char *ifName, AssociatedInfo *associatedInfo)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     struct nl_msg *msg = NULL;
     uint32_t interfaceId;
     int32_t ret = RET_CODE_FAILURE;
@@ -2756,6 +2761,7 @@ static int32_t WifiGetAssociatedInfo(const char *ifName, AssociatedInfo *associa
         return RET_CODE_NOMEM;
     }
     do {
+        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_GET_SCAN");
         if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0)) {
             HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
             break;
@@ -2770,6 +2776,7 @@ static int32_t WifiGetAssociatedInfo(const char *ifName, AssociatedInfo *associa
         }
     } while (0);
     nlmsg_free(msg);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
@@ -2948,6 +2955,7 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
 
 static int32_t WifiAbortScan(const char *ifName)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     int32_t ret = RET_CODE_FAILURE;
     struct nl_msg *msg = NULL;
     uint32_t interfaceId;
@@ -2966,6 +2974,7 @@ static int32_t WifiAbortScan(const char *ifName)
         return RET_CODE_NOMEM;
     }
     do {
+        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_ABORT_SCAN");
         if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_ABORT_SCAN, 0)) {
             HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
             break;
@@ -2980,6 +2989,7 @@ static int32_t WifiAbortScan(const char *ifName)
         }
     } while (0);
     nlmsg_free(msg);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
