@@ -77,7 +77,6 @@ ohos_shared_library("libusbhost_rndis_rawapi") {
     "./../interfaces/ddk/common",
     "./../interfaces/ddk/host",
     "./../gadget/function/include",
-    "./../../../hdf_core/framework/model/usb/include",
     "include",
   ]
 
