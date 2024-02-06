@@ -258,21 +258,25 @@ int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t 
 
 int32_t HalCmdStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
 {
+    HDF_LOGI("hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     int32_t ret;
     ret = WifiStartPnoScan(ifName, pnoSettings);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: WifiStartPnoScan failed", __FUNCTION__);
     }
+    HDF_LOGI("hal exit %{public}s ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 int32_t HalCmdStopPnoScan(const char *ifName)
 {
+    HDF_LOGI("hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
     int32_t ret;
     ret = WifiStopPnoScan(ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: WifiStopPnoScan failed", __FUNCTION__);
     }
+    HDF_LOGI("hal exit %{public}s ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 

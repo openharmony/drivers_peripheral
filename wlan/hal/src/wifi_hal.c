@@ -34,7 +34,7 @@ static bool g_wifiIsStarted = false;
 static int32_t StartInner(const struct IWiFi *iwifi)
 {
     int32_t ret;
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (iwifi == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -56,13 +56,13 @@ static int32_t StartInner(const struct IWiFi *iwifi)
         return ret;
     }
     g_wifiIsStarted = true;
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
 static int32_t StopInner(const struct IWiFi *iwifi)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (iwifi == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -74,7 +74,7 @@ static int32_t StopInner(const struct IWiFi *iwifi)
     WifiDriverClientDeinit();
     ClearIWiFiList();
     g_wifiIsStarted = false;
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
 
@@ -217,7 +217,7 @@ static int32_t DestroyFeatureInner(struct IWiFiBaseFeature *ifeature)
 
 static int32_t RegisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (onRecFunc == NULL || ifName == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -226,25 +226,25 @@ static int32_t RegisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *i
         HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
 
 static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (onRecFunc == NULL || ifName == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiUnregisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName);
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
 
 static int32_t RegisterHid2dCallbackInner(Hid2dCallback func, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     int32_t ret;
     if (func == NULL || ifName == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
@@ -254,19 +254,19 @@ static int32_t RegisterHid2dCallbackInner(Hid2dCallback func, const char *ifName
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: register hid2d callback fail!", __FUNCTION__);
     }
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
 static int32_t UnregisterHid2dCallbackInner(Hid2dCallback func, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (func == NULL || ifName == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     WifiUnregisterHid2dCallback(func, ifName);
-    HDF_LOGI("hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
 
@@ -402,227 +402,227 @@ static int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
 
 static int32_t Start(struct IWiFi *iwifi)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = StartInner(iwifi);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t Stop(struct IWiFi *iwifi)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = StopInner(iwifi);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t GetSupportFeature(uint8_t *supType, uint32_t size)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetSupportFeatureInner(supType, size);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t GetSupportCombo(uint64_t *combo, uint32_t size)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetSupportComboInner(combo, size);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t CreateFeature(int32_t type, struct IWiFiBaseFeature **ifeature)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = CreateFeatureInner(type, ifeature);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t GetFeatureByIfName(const char *ifName, struct IWiFiBaseFeature **ifeature)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = HalCmdGetFeatureByIfName(ifName, ifeature);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t DestroyFeature(struct IWiFiBaseFeature *ifeature)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = DestroyFeatureInner(ifeature);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t HalRegisterEventCallback(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = RegisterEventCallbackInner(onRecFunc, ifName);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = UnregisterEventCallbackInner(onRecFunc, ifName);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t HalRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = RegisterHid2dCallbackInner(func, ifName);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t HalUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = UnregisterHid2dCallbackInner(func, ifName);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = ResetDriverInner(chipId, ifName);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t GetNetDevInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetNetDevInfoInner(netDeviceInfoResult);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiGetPowerMode(const char *ifName, uint8_t *mode)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetPowerModeInner(ifName, mode);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiSetPowerMode(const char *ifName, uint8_t mode)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = SetPowerModeInner(ifName, mode);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiStartChannelMeas(const char *ifName, const struct MeasParam *measParam)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = StartChannelMeasInner(ifName, measParam);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetChannelMeasResultInner(ifName, measResult);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = SetProjectionScreenParamInner(ifName, param);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiSendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = SendCmdIoctlInner(ifName, cmdId, paramBuf, paramBufLen);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t WifiGetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = GetStationInfoInner(ifName, info, mac, macLen);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t SendActionFrame(const char *ifName, uint32_t freq, const uint8_t *frameData, uint32_t frameDataLen)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = SendActionFrameInner(ifName, freq, frameData, frameDataLen);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 static int32_t RegisterActionFrameReceiver(const char *ifName, const uint8_t *match, uint32_t matchLen)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     HalMutexLock();
     int32_t ret = RegisterActionFrameReceiverInner(ifName, match, matchLen);
     HalMutexUnlock();
-    HDF_LOGI("hal exit %{public}s, line:%{public}d ret:%{public}d", __FUNCTION__, __LINE__, ret);
+    HDF_LOGI("hal exit %{public}s, ret:%{public}d", __FUNCTION__, ret);
     return ret;
 }
 
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     static bool isInited = false;
     static struct IWiFi singleWifiInstance;
 
@@ -660,13 +660,13 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         isInited = true;
     }
     (*wifiInstance) = &singleWifiInstance;
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s, isInited:%{public}d", __FUNCTION__, isInited);
     return HDF_SUCCESS;
 }
 
 int32_t WifiDestruct(struct IWiFi **wifiInstance)
 {
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
     if (wifiInstance == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -676,7 +676,7 @@ int32_t WifiDestruct(struct IWiFi **wifiInstance)
         HDF_LOGE("%s: HalMutexDestroy failed, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    HDF_LOGI("hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
     return HDF_SUCCESS;
 }
 
