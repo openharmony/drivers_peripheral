@@ -138,6 +138,7 @@ void AudioUtRenderOffloadTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
     free(devDescriptorName_);
+    devDescriptorName_ = nullptr;
 
     if (adapter_ != nullptr) {
         adapter_->DestroyRender(adapter_, renderId_);
@@ -163,7 +164,7 @@ HWTEST_F(AudioUtRenderOffloadTest, RenderSetBufferSizeIsValid001, TestSize.Level
 {
     uint32_t size = AUDIO_OFFLOAD_BUFFER_SIZE;
     int32_t ret = render_->SetBufferSize(render_, size);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(ret == HDF_SUCCESS);
 }
 
 } // end of namespace
