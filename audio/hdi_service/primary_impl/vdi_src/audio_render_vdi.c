@@ -21,6 +21,7 @@
 #include "osal_mem.h"
 #include "securec.h"
 #include "audio_common_vdi.h"
+#include "audio_trace_vdi.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -90,7 +91,9 @@ int32_t AudioRenderFrameVdi(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
 
+    HdfAudioStartTrace("Hdi:AudioRenderFrameVdi", 0);
     int32_t ret = vdiRender->RenderFrame(vdiRender, frame, frameLen, replyBytes);
+    HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio render frame fail, ret=%{public}d", ret);
         return ret;
