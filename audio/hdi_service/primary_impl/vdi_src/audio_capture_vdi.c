@@ -819,7 +819,6 @@ uint32_t DecreaseCaptureUsrCount(uint32_t captureId)
 
 void AudioDestroyCaptureByIdVdi(uint32_t captureId)
 {
-    AUDIO_FUNC_LOGD("enter to %{public}s", __func__);
     if (captureId >= AUDIO_VDI_STREAM_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio vdiCapture destroy capture index fail, captureId=%{public}d", captureId);
         return;
