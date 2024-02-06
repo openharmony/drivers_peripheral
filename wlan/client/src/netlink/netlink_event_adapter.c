@@ -271,7 +271,7 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
 
 static void WifiEventScanResultProcess(const char *ifName)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t ret;
     WifiScanResults scanResults = {0};
     WifiScanResultArg arg;
@@ -297,7 +297,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     HILOG_INFO(LOG_CORE, "%s: scanResults.num = %d", __FUNCTION__, scanResults.num);
     FreeScanResults(&scanResults);
     nlmsg_free(msg);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 static void WifiEventScanAbortedProcess(const char *ifName)
@@ -313,40 +313,43 @@ static void WifiEventScanAbortedProcess(const char *ifName)
 
 static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
 {
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s cmd=%{public}d ifName=%{public}s", __FUNCTION__, cmd, ifName);
     switch (cmd) {
         case NL80211_CMD_VENDOR:
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_VENDOR");
             WifiEventVendorProcess(ifName, attr);
             break;
         case NL80211_CMD_START_SCHED_SCAN:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_START_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_START_SCHED_SCAN");
             break;
         case NL80211_CMD_SCHED_SCAN_RESULTS:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_SCHED_SCAN_RESULTS");
             WifiEventScanResultProcess(ifName);
             break;
         case NL80211_CMD_SCHED_SCAN_STOPPED:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCHED_SCAN_STOPPED, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_SCHED_SCAN_STOPPED");
             break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_NEW_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_NEW_SCAN_RESULTS");
             WifiEventScanResultProcess(ifName);
             break;
         case NL80211_CMD_SCAN_ABORTED:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_SCAN_ABORTED, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_SCAN_ABORTED");
             WifiEventScanAbortedProcess(ifName);
             break;
         case NL80211_CMD_TRIGGER_SCAN:
-            HILOG_INFO(LOG_CORE, "%{public}s: receive cmd NL80211_CMD_TRIGGER_SCAN, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_TRIGGER_SCAN");
             break;
         default:
-            HILOG_INFO(LOG_CORE, "%{public}s: not supported cmd, cmd = %d", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "not supported cmd");
             break;
     }
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
     struct NetworkInfoResult networkInfo;
@@ -360,7 +363,7 @@ static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
     if (attr[NL80211_ATTR_IFINDEX]) {
         ifidx = nla_get_u32(attr[NL80211_ATTR_IFINDEX]);
     }
-    HILOG_INFO(LOG_CORE, "%{public}s: ifidx = %{public}d", __FUNCTION__, ifidx);
+    HILOG_INFO(LOG_CORE, "ifidx = %{public}d", ifidx);
 
     ret = GetUsableNetworkInfo(&networkInfo);
     if (ret != RET_CODE_SUCCESS) {
@@ -376,7 +379,7 @@ static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
             return NL_SKIP;
         }
     }
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return NL_SKIP;
 }
 
@@ -398,7 +401,7 @@ static struct nl_cb *CreateCb(void)
 
 static int HandleEvent(struct nl_sock *sock)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int ret;
     struct nl_cb *cb = CreateCb();
     if (cb == NULL) {
@@ -407,11 +410,10 @@ static int HandleEvent(struct nl_sock *sock)
     }
 
     ret = nl_recvmsgs(sock, cb);
-    HILOG_INFO(LOG_CORE, "%{public}s, nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", __FUNCTION__, ret,
-        errno, strerror(errno));
+    HILOG_INFO(LOG_CORE, "nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", ret, errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
@@ -465,7 +467,7 @@ static int32_t CtrlSocketAckHandler(struct nl_msg *msg, void *arg)
 
 static int HandleCtrlEvent(struct nl_sock *sock)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int ret;
     struct nl_cb *cb;
     int error;
@@ -482,17 +484,16 @@ static int HandleCtrlEvent(struct nl_sock *sock)
     nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CtrlSocketAckHandler, &error);
 
     ret = nl_recvmsgs(sock, cb);
-    HILOG_INFO(LOG_CORE, "%{public}s, nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", __FUNCTION__, ret,
-        errno, strerror(errno));
+    HILOG_INFO(LOG_CORE, "nl_recvmsgs ret:%{public}d, errno:%{public}d %{public}s", ret, errno, strerror(errno));
     nl_cb_put(cb);
     cb = NULL;
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return ret;
 }
 
 void *EventThread(void *para)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     struct nl_sock *eventSock = NULL;
     struct nl_sock *ctrlSock = NULL;
     struct pollfd pollFds[LISTEN_FD_NUMS] = {0};
@@ -519,7 +520,7 @@ void *EventThread(void *para)
 
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
-        HILOG_INFO(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d", ret);
+        HILOG_INFO(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d status:%{public}d", ret, *status);
         if (ret < 0) {
             HILOG_ERROR(LOG_CORE, "%{public}s: fail poll", __FUNCTION__);
             break;
@@ -527,21 +528,19 @@ void *EventThread(void *para)
             HILOG_ERROR(LOG_CORE, "%{public}s: event socket get POLLERR event", __FUNCTION__);
             break;
         } else if ((uint32_t)pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
-            HILOG_INFO(LOG_CORE, "%{public}s: event socket get POLLIN event", __FUNCTION__);
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
-                HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event, HandleEvent break", __FUNCTION__);
+                HILOG_ERROR(LOG_CORE, "EventThread HandleEvent break");
                 break;
             }
         } else if ((uint32_t)pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
-            HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event", __FUNCTION__);
             if (HandleCtrlEvent(ctrlSock) != RET_CODE_SUCCESS) {
-                HILOG_INFO(LOG_CORE, "%{public}s: ctrl socket get POLLIN event, HandleCtrlEvent break", __FUNCTION__);
+                HILOG_ERROR(LOG_CORE, "EventThread HandleCtrlEvent break");
                 break;
             }
         }
     }
 
     *status = THREAD_STOP;
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s, line:%{public}d", __FUNCTION__, __LINE__);
+    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return NULL;
 }
