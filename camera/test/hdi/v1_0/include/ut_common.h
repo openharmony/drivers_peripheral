@@ -84,6 +84,7 @@ public:
     int videoFormat = PIXEL_FMT_YCRCB_420_SP;
     int snapshotFormat = PIXEL_FMT_YCRCB_420_SP;
     int analyzeFormat = PIXEL_FMT_YCRCB_420_SP;
+    int videoEncodeType = ENCODE_TYPE_H265;
     int streamIdPreview = 100;
     int streamIdCapture = 101;
     int captureWidth = 1280;
@@ -101,6 +102,19 @@ public:
     int snapshotWidth = 4160;
     int snapshotHeight = 3120;
     int streamIdAnalyze = 103;
+    int usbCamera_previewWidth = 640;
+    int usbCamera_previewHeight = 480;
+    int usbCamera_videoWidth = 1280;
+    int usbCamera_videoHeight = 960;
+    int usbCamera_captureWidth = 1280;
+    int usbCamera_captureHeight = 960;
+    int usbCamera_analyzeWidth = 640;
+    int usbCamera_analyzeHeight = 480;
+    int usbCamera_previewFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_videoFormat = PIXEL_FMT_YCRCB_420_SP;
+    int usbCamera_snapshotFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_analyzeFormat = PIXEL_FMT_RGBA_8888;
+    int usbCamera_videoEncodeType = ENCODE_TYPE_H264;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
     int32_t imageDataSaveSwitch = SWITCH_OFF;
