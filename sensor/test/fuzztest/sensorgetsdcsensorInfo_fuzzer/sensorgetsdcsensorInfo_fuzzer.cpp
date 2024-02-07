@@ -15,14 +15,15 @@
 
 #include "sensorgetsdcsensorInfo_fuzzer.h"
 #include "hdf_base.h"
-#include "sensor_impl.h"
 #include "v2_0/sensor_interface_proxy.h"
+#include <hdf_log.h>
+#include <securec.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace {
     struct AllParameters {
-        std::vector<SdcSensorInfo>& sdcSensorInfo;
+        std::vector<SdcSensorInfo> sdcSensorInfo;
     };
 }
 
@@ -37,7 +38,7 @@ namespace OHOS {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return false;
         }
-        if (!g_sensorInterface->GetSdcSensorInfo(params.sdcSensorInfo) {
+        if (!g_sensorInterface->GetSdcSensorInfo(params.sdcSensorInfo)) {
             result = true;
         }
         return result;

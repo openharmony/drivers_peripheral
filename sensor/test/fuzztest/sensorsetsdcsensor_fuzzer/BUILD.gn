@@ -41,6 +41,7 @@ ohos_fuzztest("SensorSetSdcSensorFuzzTest") {
     "c_utils:utils",
     "drivers_interface_sensor:libsensor_proxy_2.0",
     "hdf_core:libhdf_utils",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 }

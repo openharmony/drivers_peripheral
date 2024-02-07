@@ -15,8 +15,9 @@
 
 #include "sensorsetsdcsensor_fuzzer.h"
 #include "hdf_base.h"
-#include "sensor_impl.h"
 #include "v2_0/sensor_interface_proxy.h"
+#include <hdf_log.h>
+#include <securec.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 
