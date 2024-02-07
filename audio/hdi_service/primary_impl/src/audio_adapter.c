@@ -295,7 +295,7 @@ int32_t InitHwRenderParam(
     hwRender->renderParam.frameRenderMode.periodSize = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     hwRender->renderParam.frameRenderMode.periodCount = DEEP_BUFFER_RENDER_PERIOD_COUNT;
     hwRender->renderParam.frameRenderMode.renderhandle = (AudioHandle)hwRender;
-    pthread_mutex_init(&hwRender->renderParam.frameRenderMode.mutex,NULL);
+    pthread_mutex_init(&hwRender->renderParam.frameRenderMode.mutex, NULL);
     hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     return HDF_SUCCESS;
 }
