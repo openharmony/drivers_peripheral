@@ -678,8 +678,8 @@ const char *macToStr(const u8 *addr)
     const int macAddrIndexFive = 4;
     const int macAddrIndexSix = 5;
     static char macToStr[WIFI_BSSID_LENGTH];
-    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x", addr[macAddrIndexOne],
-        addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
+    if (snprintf_s(macToStr, sizeof(macToStr), sizeof(macToStr)-1, "%02x:%02x:%02x:%02x:%02x:%02x",
+        addr[macAddrIndexOne], addr[macAddrIndexTwo], addr[macAddrIndexThree], addr[macAddrIndexFour],
         addr[macAddrIndexFive], addr[macAddrIndexSix]) < 0) {
         return NULL;
     }
@@ -817,6 +817,10 @@ int32_t WpaInterfaceGetCountryCode(struct IWpaInterface *self, const char *ifNam
         char tmpCountryCode[WIFI_COUNTRY_CODE_MAXLEN + 1] = {0};
         ret = snprintf_s(tmpCountryCode, WIFI_COUNTRY_CODE_MAXLEN + 1, WIFI_COUNTRY_CODE_MAXLEN, "%c%c",
             wpaSupp->conf->country[0], wpaSupp->conf->country[1]);
+        if (ret < 0) {
+            HDF_LOGE("%{public}s: snprintf_s is fail", __func__);
+            return HDF_FAILURE;
+        }
         HDF_LOGI("%{public}s: tmpCountryCode = %s", __func__, tmpCountryCode);
         if (strcpy_s(countryCode, countryCodeLen, tmpCountryCode) != EOK) {
             HDF_LOGE("%{public}s: copy countryCode failed!", __func__);
@@ -2038,7 +2042,11 @@ int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, 
         HDF_LOGE("%{public}s malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    memcpy_s(buf, CMD_SIZE, cmd, strlen(cmd));
+    if (memcpy_s(buf, CMD_SIZE, cmd, strlen(cmd)) != EOK) {
+        HDF_LOGE("%{public}s memcpy_s is fail", __func__);
+        free(buf);
+        return HDF_FAILURE;
+    }
     char *reply = wpa_supplicant_ctrl_iface_process(wpaSupp, buf, &replyLen);
     if (reply == NULL || strcmp(reply, "FAIL\n") == 0) {
         HDF_LOGE("%{public}s reply is NULL or FAIL!", __func__);
