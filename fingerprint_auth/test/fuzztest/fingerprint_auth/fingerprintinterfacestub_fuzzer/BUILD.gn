@@ -32,12 +32,12 @@ ohos_fuzztest("FingerprintInterfaceStubFuzzTest") {
 
   sources = [ "fingerprint_auth_interface_stub_fuzzer.cpp" ]
 
-  deps = [ "../common_fuzzer:libfingerprint_auth_interface_service_1.1_fuzzer" ]
+  deps = [ "../common_fuzzer:libfingerprint_auth_interface_service_1.2_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers_1.1",
-    "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_1.1",
+    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers_1.2",
+    "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_1.2",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
