@@ -196,6 +196,12 @@ int32_t SensorIfService::Disable(int32_t sensorId)
         HDF_LOGE("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
     }
+
+    if (sensorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+        return HDF_FAILURE;
+    }
+    
     int32_t ret;
     if (SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
         ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
@@ -204,11 +210,6 @@ int32_t SensorIfService::Disable(int32_t sensorId)
             return ret;
         }
         return HDF_SUCCESS;
-    }
-
-    if (sensorVdiImpl_ == nullptr) {
-        HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
-        return HDF_FAILURE;
     }
 
     StartTrace(HITRACE_TAG_HDF, "Disable");
