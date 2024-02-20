@@ -132,10 +132,13 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         sb->GetExtraData()->ExtraGet(OHOS::Camera::timeStamp, timestamp);
         flushConfig_.timestamp = timestamp;
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
+        CAMERA_LOGI("FllushBuffer stream = [%{public}d], timestamp = [%{public}d], ret = [%{public}d]",
+            buffer->GetStreamId(), timestamp, ret);
         stats_.FlushBufferResult(ret);
         frameCount_++;
     } else {
         int ret = bufferQueue_->CancelBuffer(sb);
+        CAMERA_LOGI("CancelBuffer stream = [%{public}d], ret = [%{public}d]", buffer->GetStreamId(), ret);
         stats_.CancelBufferResult(ret);
     }
 
