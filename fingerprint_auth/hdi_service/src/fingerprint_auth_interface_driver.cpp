@@ -18,7 +18,7 @@
 #include <hdf_sbuf_ipc.h>
 
 #include "iam_logger.h"
-#include "v1_1/fingerprint_auth_interface_stub.h"
+#include "v1_2/fingerprint_auth_interface_stub.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
 
@@ -28,7 +28,7 @@ struct HdfFingerprintAuthInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface;
+using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_2::IFingerprintAuthInterface;
 
 int32_t FingerprintAuthInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
