@@ -33,8 +33,8 @@ ohos_shared_library("audio_primary_driver") {
   include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
   external_deps += [
-    "drivers_interface_audio:libaudio_stub_2.0",
     "bounds_checking_function:libsec_shared",
+    "drivers_interface_audio:libaudio_stub_2.0",
   ]
 
   shlib_type = "hdi"
