@@ -23,8 +23,8 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "hdf_core:libhdf_utils",
       "bounds_checking_function:libsec_shared",
+      "hdf_core:libhdf_utils",
     ]
     install_enable = false
     subsystem_name = "hdf"
