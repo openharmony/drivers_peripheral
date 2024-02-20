@@ -460,6 +460,7 @@ int32_t StreamOperatorVdiImpl::DetachBufferQueue(int32_t streamId)
 
 int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &info, bool isStreaming)
 {
+    CAMERA_LOGI("--- start Capture captureId = [%{public}d] ---", captureId) ;
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -506,6 +507,7 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
 
 int32_t StreamOperatorVdiImpl::CancelCapture(int32_t captureId)
 {
+    CAMERA_LOGI("--- start CancelCapture captureId = [%{public}d] ---", captureId) ;
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
