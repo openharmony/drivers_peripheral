@@ -43,8 +43,8 @@ if (!defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
     external_deps += [
-      "cJSON:cjson",
       "bounds_checking_function:libsec_shared",
+      "cJSON:cjson",
     ]
 
     install_images = [ chipset_base_dir ]
