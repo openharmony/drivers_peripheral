@@ -28,16 +28,15 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/primary_impl/include",
       "$hdf_audio_path/supportlibs/adm_adapter/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
     public_deps = [ "drivers_interface_audio:audio_idl_headers" ]
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared",
     ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -56,14 +55,14 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/primary_impl/include",
       "$hdf_audio_path/supportlibs/adm_adapter/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
-    external_deps = [ "hilog_lite:hilog_shared" ]
+    external_deps = [
+      "hilog_lite:hilog_shared",
+      "bounds_checking_function:libsec_shared",
+    ]
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
@@ -90,7 +89,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_hdi_service_path/primary_impl/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
@@ -123,6 +121,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
@@ -149,7 +148,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_hdi_service_path/primary_impl/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
@@ -182,6 +180,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
