@@ -15,7 +15,7 @@
 #ifndef WLAN_EXTEND_VDI_CMD_H
 #define WLAN_EXTEND_VDI_CMD_H
 
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "hdf_load_vdi.h"
 #include "wifi_hal.h"
 
@@ -28,6 +28,8 @@ struct WlanExtendInterfaceVdi {
         struct MeasChannelResult *measChannelResult);
     int32_t (*sendCmdIoctl)(struct IWlanInterface *self, const char *ifName, int32_t cmdId,
         const int8_t *paramBuf, uint32_t paramBufLen);
+    int32_t (*getCoexChannelList)(struct IWlanInterface *self, const char *ifName,
+        uint8_t *paramBuf, uint32_t *paramBufLen);
     int32_t (*registerHid2dCallback)(Hid2dCallbackFunc func, const char *ifName);
     int32_t (*unregisterHid2dCallback)(Hid2dCallbackFunc func, const char *ifName);
     int32_t (*wifiConstruct)(void);
