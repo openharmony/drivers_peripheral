@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     install_enable = false
     install_images = [ chipset_base_dir ]
