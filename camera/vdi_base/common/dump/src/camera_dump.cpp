@@ -405,4 +405,10 @@ void CameraDumper::StopCheckDiskInfo()
         handleThread_ = nullptr;
     }
 }
+
+CameraDumper& CameraDumper::GetInstance()
+{
+    static CameraDumper instance_;
+    return instance_;
+}
 } // namespace OHOS::Camera
