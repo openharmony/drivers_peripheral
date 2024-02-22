@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -45,13 +45,13 @@ ohos_unittest("UserAuthHdiTest") {
     "src/user_auth_interface_service_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libuser_auth_interface_service_1.2" ]
+  deps = [ "../../../hdi_service:libuser_auth_interface_service_1.3" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_proxy_1.2",
+    "drivers_interface_user_auth:libuser_auth_proxy_1.3",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
