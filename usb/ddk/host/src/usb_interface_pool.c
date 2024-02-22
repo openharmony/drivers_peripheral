@@ -337,10 +337,9 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     return interfacePos;
 }
 
-bool CheckInterfacePoolValid(struct DListHead *head)
+static bool CheckInterfacePoolValid(struct UsbInterfacePool *interfacePoolPtr)
 {
-    struct UsbInterfacePool *interfacePoolPosNext = CONTAINER_OF(head->next, struct UsbInterfacePool, object.entry);
-    if (interfacePoolPosNext == NULL || (uintptr_t)interfacePoolPosNext == INVALID_PTR) {
+    if (interfacePoolPtr == NULL || (uintptr_t)interfacePoolPtr == INVALID_PTR) {
         HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
         return false;
     }
@@ -397,21 +396,24 @@ static struct UsbInterfacePool *IfFindInterfacePool(
         return NULL;
     }
 
-    if (!CheckInterfacePoolValid(ifacePoolList)) {
+    interfacePoolPos = CONTAINER_OF(ifacePoolList->next, struct UsbInterfacePool, object.entry);
+    if (!CheckInterfacePoolValid(interfacePoolPos)) {
         OsalMutexUnlock((struct OsalMutex *)&session->lock);
         HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
         return NULL;
     }
-    DLIST_FOR_EACH_ENTRY_SAFE(
-        interfacePoolPos, interfacePoolTemp, ifacePoolList, struct UsbInterfacePool, object.entry) {
+    interfacePoolTemp = CONTAINER_OF(interfacePoolPos->object.entry.next, struct UsbInterfacePool, object.entry);
+    while (&(interfacePoolPos->object.entry) != (ifacePoolList)) {
         if (FoundInterfacePool(interfacePoolPos, queryPara, refCountFlag)) {
             found = true;
             break;
         }
-        if (!CheckInterfacePoolValid(&interfacePoolPos->object.entry)) {
+        if (!CheckInterfacePoolValid(interfacePoolTemp)) {
             HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
             break;
         }
+        interfacePoolPos = interfacePoolTemp;
+        interfacePoolTemp = CONTAINER_OF(interfacePoolPos->object.entry.next, struct UsbInterfacePool, object.entry);
     }
     OsalMutexUnlock((struct OsalMutex *)&session->lock);
 
