@@ -554,6 +554,7 @@ int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self, const char *
     (void)self;
     if (ifName == NULL || buf == NULL || reqBuf == NULL) {
         HDF_LOGE("%{public}s: Input parameter invalid or calloc failed!", __func__);
+        free(reqBuf);
         return HDF_ERR_INVALID_PARAM;
     }
     hostApd = getHostapd();
