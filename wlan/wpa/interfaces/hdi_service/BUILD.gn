@@ -26,8 +26,13 @@ if (is_standard_system) {
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa_supplicant_lib",
     ]
     sources = [
+      "service_common/hdi_wpa_common.c",
+      "service_common/hdi_wpa_hal.c",
       "service_common/wpa_common_cmd.c",
+      "service_common/wpa_hdi_util.c",
       "service_common/wpa_p2p_cmd.c",
+      "service_common/wpa_p2p_hal.c",
+      "service_common/wpa_supplicant_hal.c",
       "wpa_interface_service.c",
     ]
 
@@ -55,6 +60,7 @@ if (is_standard_system) {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "wpa_supplicant:wpa",
+      "wpa_supplicant:wpa_client_vendor",
     ]
 
     install_images = [ chipset_base_dir ]
