@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,6 +71,7 @@ void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint3
 void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId);
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
+ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 
 #ifdef __cplusplus
 }
