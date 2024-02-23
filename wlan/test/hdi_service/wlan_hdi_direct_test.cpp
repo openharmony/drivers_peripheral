@@ -105,7 +105,7 @@ HWTEST_F(HdfWifiDirectTest, GetSupportComboTest_002, TestSize.Level1)
 HWTEST_F(HdfWifiDirectTest, CreateFeatureTest_003, TestSize.Level1)
 {
     struct HdfFeatureInfo ifeature;
-    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+    int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
 
     (void)memset_s(&ifeature, sizeof(struct HdfFeatureInfo), 0, sizeof(struct HdfFeatureInfo));
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, nullptr);
@@ -691,7 +691,7 @@ HWTEST_F(HdfWifiDirectTest, ResetToFactoryMacAddressTest_027, TestSize.Level1)
  */
 HWTEST_F(HdfWifiDirectTest, SendActionFrameTest_028, TestSize.Level1)
 {
-    int32_t freq = ;
+    int32_t freq = WLAN_TX_POWER;
     uint32_t frameDataLen = DEFAULT_COMBO_SIZE;
     uint8_t frameData[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     const char *ifName = "wlan0";
