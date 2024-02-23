@@ -112,7 +112,7 @@ static int32_t DdkListenerMgrNotifyGadgetOne(void *priv)
 
 void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, enum UsbPnpNotifyServiceCmd cmd)
 {
-    HDF_LOGD("%{public}s: notify cmd:%{public}d, start.", __func__, cmd);
+    HDF_LOGI("%{public}s: notify cmd:%{public}d, start.", __func__, cmd);
     OsalMutexLock(&g_ddkListenerList.listMutex);
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
         HDF_LOGI("%{public}s: the listenerList is empty.", __func__);
