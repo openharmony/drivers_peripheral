@@ -486,6 +486,8 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
 
     ret = WifiGetSignalPollInfo(nullptr, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiGetSignalPollInfo(ifNameInvalid, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
@@ -533,9 +535,9 @@ HWTEST_F(WifiClientTest, WifiRegisterActionFrameReceiver001, TestSize.Level1)
     EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiRegisterActionFrameReceiver(ifNameInvalid, 0, matchLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, &mastch, matchLen);
+    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, &mastch, 0);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    WifiRegisterActionFrameReceiver(WifiEventCb, WIFI_KERNEL_TO_HAL_CLIENT, nullptr);
+    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, &mastch, matchLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
@@ -553,13 +555,15 @@ HWTEST_F(WifiClientTest, WifiSendActionFrame001, TestSize.Level1)
     uint32_t freq = RESET_TIME;
     uint32_t frameDataLen = RESET_TIME;
 
-    ret = WifiSendActionFrame(nullptr, &mastch, matchLen);
+    ret = WifiSendActionFrame(nullptr, freq, &frameData, frameDataLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiSendActionFrame(nullptr, &mastch, matchLen);
+    ret = WifiSendActionFrame(ifNameInvalid, 0, &frameData, frameDataLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiSendActionFrame(nullptr, &mastch, matchLen);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, frameDataLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    WifiSendActionFrame(WifiEventCb, WIFI_KERNEL_TO_HAL_CLIENT, nullptr);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, 0);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, frameDataLen);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
