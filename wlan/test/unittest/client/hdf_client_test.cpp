@@ -581,9 +581,9 @@ HWTEST_F(WifiClientTest, ClientGetApBandwidth001, TestSize.Level1)
 
     ret = ClientGetApBandwidth(nullptr, &bandwidth);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = ClientGetApBandwidth(ifName, nullptr);
+    ret = ClientGetApBandwidth(ifNameInvalid, nullptr);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = ClientGetApBandwidth(ifName, &bandwidth);
+    ret = ClientGetApBandwidth(ifNameInvalid, &bandwidth);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
@@ -597,7 +597,7 @@ HWTEST_F(WifiClientTest, SetProjectionScreenParam001, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
-    ProjectionScreenParam *param;
+    ProjectionScreenParam *param = nullptr;
     param->cmdId = CMD_ID_RX_REMAIN_ON_CHANNEL;
     param->buf[0] = 0;
     param->bufLen = 40;
@@ -615,7 +615,7 @@ HWTEST_F(WifiClientTest, SetProjectionScreenParam002, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
-    ProjectionScreenParam *param;
+    ProjectionScreenParam *param = nullptr;
     param->cmdId = CMD_ID_RX_REMAIN_ON_CHANNEL;
     param->buf[0] = 0;
     param->bufLen = 1;
