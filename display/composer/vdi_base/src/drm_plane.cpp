@@ -61,7 +61,10 @@ DrmPlane::~DrmPlane()
 int DrmPlane::GetCrtcProp(DrmDevice &drmDevice)
 {
     int32_t ret;
-    int32_t crtc_x, crtc_y, crtc_w, crtc_h;
+    int32_t crtc_x;
+    int32_t crtc_y;
+    int32_t crtc_w;
+    int32_t crtc_h;
     DrmProperty prop;
 
     ret = drmDevice.GetPlaneProperty(*this, PROP_CRTC_X_ID, prop);
@@ -93,7 +96,10 @@ int DrmPlane::GetCrtcProp(DrmDevice &drmDevice)
 int DrmPlane::GetSrcProp(DrmDevice &drmDevice)
 {
     int32_t ret;
-    int32_t src_x, src_y, src_w, src_h;
+    int32_t src_x;
+    int32_t src_y;
+    int32_t src_w;
+    int32_t src_h;
     DrmProperty prop;
 
     ret = drmDevice.GetPlaneProperty(*this, PROP_SRC_X_ID, prop);
