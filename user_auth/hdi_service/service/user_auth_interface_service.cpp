@@ -358,6 +358,41 @@ static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
     return RESULT_SUCCESS;
 }
 
+static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn, AuthResultInfo &infoOut,
+    EnrolledState &enrolledStateOut)
+{
+    infoOut.result = infoIn.result;
+    infoOut.remainAttempts = infoIn.remainTimes;
+    infoOut.lockoutDuration = infoIn.freezingTime;
+    enrolledStateOut.credentialDigest = infoIn.credentialDigest;
+    enrolledStateOut.credentialCount = infoIn.credentialCount;
+    if (infoOut.result == RESULT_SUCCESS) {
+        infoOut.token.resize(sizeof(UserAuthTokenHal));
+        if (memcpy_s(infoOut.token.data(), infoOut.token.size(), &authTokenIn, sizeof(UserAuthTokenHal)) != EOK) {
+                IAM_LOGE("copy authToken failed");
+                infoOut.token.clear();
+                return RESULT_BAD_COPY;
+        }
+        if (infoIn.rootSecret != nullptr) {
+            infoOut.rootSecret.resize(infoIn.rootSecret->contentSize);
+            if (memcpy_s(infoOut.rootSecret.data(), infoOut.rootSecret.size(),
+                infoIn.rootSecret->buf, infoIn.rootSecret->contentSize) != EOK) {
+                IAM_LOGE("copy secret failed");
+                infoOut.rootSecret.clear();
+                infoOut.token.clear();
+                return RESULT_BAD_COPY;
+            }
+        }
+    }
+    DestoryBuffer(infoIn.rootSecret);
+    if (infoIn.authType != PIN_AUTH) {
+        IAM_LOGI("type not pin");
+        return RESULT_SUCCESS;
+    }
+    IAM_LOGI("type pin");
+    return RESULT_SUCCESS;
+}
+
 static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
     const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
 {
@@ -382,40 +417,16 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
         IAM_LOGE("execute func failed");
         return ret;
     }
-    info.result = authResult.result;
-    info.remainAttempts = authResult.remainTimes;
-    info.lockoutDuration = authResult.freezingTime;
-    enrolledState.credentialDigest = authResult.credentialDigest;
-    enrolledState.credentialCount = authResult.credentialCount;
-    if (info.result == RESULT_SUCCESS) {
-        info.token.resize(sizeof(UserAuthTokenHal));
-        if (memcpy_s(info.token.data(), info.token.size(), &authTokenHal, sizeof(authTokenHal)) != EOK) {
-            IAM_LOGE("copy authToken failed");
-            info.token.clear();
-            return RESULT_BAD_COPY;
-        }
-        if (authResult.rootSecret != nullptr) {
-            info.rootSecret.resize(authResult.rootSecret->contentSize);
-            if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(),
-                authResult.rootSecret->buf, authResult.rootSecret->contentSize) != EOK) {
-                IAM_LOGE("copy secret failed");
-                info.rootSecret.clear();
-                info.token.clear();
-                return RESULT_BAD_COPY;
-            }
-        }
+    ret = CopyAuthResult(authResult, authTokenHal, info, enrolledState);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("Copy auth result failed");
+        return ret;
     }
-    DestoryBuffer(authResult.rootSecret);
-    if (authResult.authType != PIN_AUTH) {
-        IAM_LOGI("type not pin");
-        return RESULT_SUCCESS;
-    }
-    IAM_LOGI("type pin");
     return CreateExecutorCommand(authResult.userId, info);
 }
 
-int32_t UserAuthInterfaceService::UpdateAuthenticationResultWithEnrolledState(uint64_t contextId, const std::vector<uint8_t> &scheduleResult,
-    AuthResultInfo &info, EnrolledState &enrolledState)
+int32_t UserAuthInterfaceService::UpdateAuthenticationResultWithEnrolledState(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
 {
     IAM_LOGI("start");
     return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
