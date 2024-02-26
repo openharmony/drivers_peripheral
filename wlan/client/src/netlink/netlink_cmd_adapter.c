@@ -406,7 +406,7 @@ static int32_t PthreadMutexLock(void)
             usleep(WAITFORMUTEX);
         } else {
             HILOG_ERROR(LOG_CORE, "%s: pthread trylock timeout", __FUNCTION__);
-            return RET_CODE_SUCCESS;
+            return RET_CODE_FAILURE;
         }
     }
     return rc;
