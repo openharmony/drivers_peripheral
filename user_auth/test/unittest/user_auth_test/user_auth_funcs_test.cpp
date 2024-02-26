@@ -66,6 +66,14 @@ HWTEST_F(UserAuthFuncsTest, TestRequestAuthResultFunc, TestSize.Level0)
     result.rootSecret = CreateBufferBySize(10);
     EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, &result), RESULT_BAD_PARAM);
 }
+
+HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
+{
+    int32_t userId = 1;
+    uint32_t authType = 1;
+    EnrolledStateHal enrolledStateHal = {};
+    EXPECT_EQ(GetEnrolledStateFunc(userId, authType, &enrolledStateHal), RESULT_NOT_ENROLLED);
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

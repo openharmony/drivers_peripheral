@@ -22,7 +22,6 @@
 #include "idm_common.h"
 #include "user_sign_centre.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
