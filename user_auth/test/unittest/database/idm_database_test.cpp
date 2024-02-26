@@ -587,6 +587,46 @@ HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionUserId, TestSize.Level0)
     EXPECT_EQ(condition.userId, 50);
     EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_USER_ID, CREDENTIAL_CONDITION_USER_ID);
 }
+
+HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_001, TestSize.Level0)
+{
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    UserInfo userInfo = {};
+    userInfo.userId = 1;
+    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+
+    EnrolledStateHal enrolledState = {};
+    EXPECT_EQ(GetEnrolledState(0, 1, &enrolledState), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetEnrolledState(1, 1, &enrolledState), RESULT_NOT_ENROLLED);
+}
+
+HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_002, TestSize.Level0)
+{
+    const static int32_t expectCredentialCount = 2;
+    const static int32_t testEnrolledId = 2;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+
+    UserInfo userInfo = {};
+    userInfo.userId = 1;
+    userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
+    EnrolledInfoHal enrolledInfo = {1, testEnrolledId};
+    userInfo.enrolledInfoList->insert(userInfo.enrolledInfoList, static_cast<void *>(&enrolledInfo));
+    
+    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    CredentialInfoHal credentialInfo = {0, 0, 1, 0, 0, 0};
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo));
+    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 1, 1};
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+
+    EnrolledStateHal enrolledState = {};
+    EXPECT_EQ(GetEnrolledState(1, 1, &enrolledState), RESULT_SUCCESS);
+    EXPECT_EQ(enrolledState.credentialDigest, testEnrolledId);
+    EXPECT_EQ(enrolledState.credentialCount, expectCredentialCount);
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS
