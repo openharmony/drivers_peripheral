@@ -161,8 +161,8 @@ void TaskQueue::Init(void)
             if (taskQueue_.size() > 0) {
                 DdkUeventTaskInfo task = taskQueue_.front();
                 taskQueue_.pop();
-                DdkDispatchUevent(&task);
                 uniqueLock.unlock();
+                DdkDispatchUevent(&task);
             }
         }
     };
