@@ -1231,13 +1231,6 @@ int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool di
             port->busNum, port->devAddr);
         return HDF_FAILURE;
     }
-    if (port->devHandle[interfaceId] == nullptr) {
-        port->devHandle[interfaceId] = UsbOpenInterface(port->iface[interfaceId]);
-        if (port->devHandle[interfaceId] == nullptr) {
-            HDF_LOGE("%{public}s:UsbOpenInterface failed.", __func__);
-            return HDF_FAILURE;
-        }
-    }
     return HDF_SUCCESS;
 }
 
