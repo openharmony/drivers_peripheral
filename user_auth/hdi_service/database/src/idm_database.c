@@ -338,9 +338,10 @@ IAM_STATIC bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolle
 {
     LinkedListNode *temp = enrolledList->head;
     EnrolledInfoHal *enrolledInfo = NULL;
+    const static uint16_t num = 0xFFFF;
     while (temp != NULL) {
         enrolledInfo = (EnrolledInfoHal *)temp->data;
-        if (enrolledInfo != NULL && enrolledInfo->enrolledId == enrolledId) {
+        if ((enrolledInfo != NULL) && (enrolledInfo->enrolledId & num) == (enrolledId & num)) {
             return true;
         }
         temp = temp->next;
@@ -1046,7 +1047,7 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     }
     enrolledStateHal->credentialCount = credentialCount;
     LinkedListNode *enrolledInfoTemp = user->enrolledInfoList->head;
-    uint16_t num = 0xFFFF;
+    const static uint16_t num = 0xFFFF;
     while (enrolledInfoTemp != NULL) {
         EnrolledInfoHal *nodeInfo = enrolledInfoTemp->data;
         if (nodeInfo != NULL && nodeInfo->authType == authType) {
