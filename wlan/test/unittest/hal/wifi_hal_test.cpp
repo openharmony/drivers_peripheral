@@ -2266,6 +2266,6 @@ HWTEST_F(WifiHalTest, InitFeatureByType001, TestSize.Level1)
     struct IWiFiP2p *p2pFeature = nullptr;
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_P2P_DEVICE, nullptr);
     EXPECT_EQ(ret, HDF_FAILURE);
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_P2P_DEVICE, (struct IWiFiBaseFeature **)&p2pFeature);
+    g_wifi->createFeature(PROTOCOL_80211_IFTYPE_P2P_DEVICE, (struct IWiFiBaseFeature **)&p2pFeature);
 }
 }; // namespace HalTest
