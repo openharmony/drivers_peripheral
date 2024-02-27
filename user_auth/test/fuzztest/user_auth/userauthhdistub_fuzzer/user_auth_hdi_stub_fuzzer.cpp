@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,22 +20,22 @@
 
 #include "iam_logger.h"
 
-#include "v1_3/user_auth_interface_service.h"
-#include "v1_3/user_auth_interface_stub.h"
+#include "v1_2/user_auth_interface_service.h"
+#include "v1_2/user_auth_interface_stub.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
 #undef private
 
-using namespace OHOS::HDI::UserAuth::V1_3;
+using namespace OHOS::HDI::UserAuth::V1_2;
 
 namespace OHOS {
 namespace UserIam {
 namespace UserAuth {
 namespace {
 constexpr uint32_t USER_AUTH_HDI_CODE_MIN = 0;
-constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 30;
-const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v1_3.IUserAuthInterface";
+constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 28;
+const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v1_2.IUserAuthInterface";
 
 bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
 {
@@ -44,14 +44,14 @@ bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V1_3::IUserAuthInterface> serviceImpl =
-        OHOS::HDI::UserAuth::V1_3::IUserAuthInterface::Get(true);
+    sptr<OHOS::HDI::UserAuth::V1_2::IUserAuthInterface> serviceImpl =
+        OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:IUserAuthInterface::Get() failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceStub> userAuthInterfaceStub =
-        new OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceStub(serviceImpl);
+    sptr<OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceStub> userAuthInterfaceStub =
+        new OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceStub(serviceImpl);
     if (userAuthInterfaceStub == nullptr) {
         IAM_LOGE("%{public}s:new UserAuthInterfaceStub failed.", __func__);
         return false;
