@@ -22,6 +22,7 @@
 #include "idm_common.h"
 #include "user_sign_centre.h"
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,10 +38,26 @@ typedef struct AuthResult {
     uint16_t credentialCount;
 } AuthResult;
 
+typedef struct {
+    int32_t userId;
+    uint32_t authTrustLevel;
+    uint32_t authTypes[MAX_AUTH_TYPE_LEN];
+    uint32_t authTypeSize;
+    uint8_t challenge[CHALLENGE_LEN];
+    uint64_t reuseUnlockResultDuration;
+    uint32_t reuseUnlockResultMode;
+} ReuseUnlockInfoHal;
+
+typedef enum ReuseMode {
+    AUTH_TYPE_RELEVANT = 1,
+    AUTH_TYPE_IRRELEVANT = 2,
+} ReuseMode;
+
 ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result);
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken);
 
 #ifdef __cplusplus
 }

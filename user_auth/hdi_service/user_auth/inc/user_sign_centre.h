@@ -65,6 +65,8 @@ typedef struct {
 ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
 ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
+ResultCode GetUserAuthToken(const UserAuthTokenPlain *authTokenPlain, UserAuthTokenHal *authToken);
+ResultCode GetUnlockTokenPlain(UserAuthTokenPlain *unlockTokenPlain);
 
 #ifdef __cplusplus
 }

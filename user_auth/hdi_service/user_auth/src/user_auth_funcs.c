@@ -139,3 +139,55 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
 
     return RESULT_SUCCESS;
 }
+
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info, const UserAuthTokenPlain *tokenInfo)
+{
+    if ((GetSystemTime() - tokenInfo->tokenDataPlain.time) > info->reuseUnlockResultDuration) {
+        LOG_ERROR("reuse unlock check reuseUnlockResultDuration fail");
+        return RESULT_TOKEN_TIMEOUT;
+    }
+    if (info->userId != tokenInfo->tokenDataToEncrypt.userId) {
+        LOG_ERROR("reuse unlock check userId fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (info->authTrustLevel > tokenInfo->tokenDataPlain.authTrustLevel) {
+        LOG_ERROR("reuse unlock check authTrustLevel fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    bool checkAuthType = false;
+    if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT) {
+        for (uint32_t i = 0; i < info->authTypeSize; i++) {
+            if (info->authTypes[i] == tokenInfo->tokenDataPlain.authType) {
+                checkAuthType = true;
+            }
+        }
+    }
+    if (!checkAuthType) {
+        LOG_ERROR("reuse unlock check authType fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken)
+{
+    UserAuthTokenPlain unlockTokenPlain = {};
+    ResultCode ret = GetUnlockTokenPlain(&unlockTokenPlain);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get reuse unlock token failed");
+        goto EXIT;
+    }
+    ret = CheckReuseUnlockTokenValid(info, &unlockTokenPlain);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("check reuse unlock token failed");
+        goto EXIT;
+    }
+    ret = GetUserAuthToken(&unlockTokenPlain, authToken);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get reuse auth token failed");
+    }
+
+EXIT:
+    (void)memset_s(&unlockTokenPlain, sizeof(UserAuthTokenPlain), 0, sizeof(UserAuthTokenPlain));
+    return ret;
+}

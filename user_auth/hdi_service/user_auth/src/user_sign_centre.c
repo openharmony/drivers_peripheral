@@ -24,6 +24,7 @@
 #include "token_key.h"
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
+#define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
 
 #define AES_GCM_TOKEN_AAD "OH_authToken"
 #define AES_GCM_TOKEN_AAD_SIZE 12
@@ -33,6 +34,9 @@
 #else
 #define IAM_STATIC static
 #endif
+
+// Used to cache screenLock auth token plain.
+IAM_STATIC UserAuthTokenPlain g_unlockTokenPlain = {};
 
 IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
 {
@@ -175,20 +179,6 @@ ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPla
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataPlain(UserAuthContext *context, uint32_t authMode, UserAuthTokenHal *authToken)
-{
-    authToken->version = TOKEN_VERSION;
-    if (memcpy_s(authToken->tokenDataPlain.challenge, CHALLENGE_LEN, context->challenge, CHALLENGE_LEN) != EOK) {
-        LOG_ERROR("failed to copy challenge");
-        return RESULT_BAD_COPY;
-    }
-    authToken->tokenDataPlain.time = GetSystemTime();
-    authToken->tokenDataPlain.authTrustLevel = context->authTrustLevel;
-    authToken->tokenDataPlain.authType = context->authType;
-    authToken->tokenDataPlain.authMode = authMode;
-    return RESULT_SUCCESS;
-}
-
 IAM_STATIC ResultCode InitAesGcmParam(AesGcmParam *aesGcmParam, const HksAuthTokenKey *tokenKey)
 {
     int32_t ret = RESULT_GENERAL_ERROR;
@@ -242,31 +232,11 @@ IAM_STATIC ResultCode CopyTokenCipherParam(const Buffer *ciphertext, const Buffe
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetTokenDataToEncrypt(const UserAuthContext *context, uint64_t credentialId,
-    TokenDataToEncrypt *data)
+IAM_STATIC ResultCode GetUserAuthTokenData(const UserAuthTokenPlain *authTokenPlain,
+    const HksAuthTokenKey *tokenKey,  UserAuthTokenHal *authToken)
 {
-    EnrolledInfoHal enrolledInfo = {};
-    int32_t ret = GetEnrolledInfoAuthType(context->userId, context->authType, &enrolledInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get enrolled info failed");
-        return ret;
-    }
-    uint64_t secureUid;
-    ret = GetSecureUid(context->userId, &secureUid);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get secure uid failed");
-        return ret;
-    }
-    data->userId = context->userId;
-    data->secureUid = secureUid;
-    data->enrolledId = enrolledInfo.enrolledId;
-    data->credentialId = credentialId;
-    return ret;
-}
-
-IAM_STATIC ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
-    const HksAuthTokenKey *tokenKey)
-{
+    authToken->tokenDataPlain = authTokenPlain->tokenDataPlain;
+    authToken->version = TOKEN_VERSION;
     AesGcmParam aesGcmParam = {0};
     Buffer *ciphertext = NULL;
     Buffer *tag = NULL;
@@ -275,7 +245,7 @@ IAM_STATIC ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, U
         LOG_ERROR("InitAesGcmParam failed");
         goto EXIT;
     }
-    const Buffer plaintext = GetTmpBuffer((uint8_t *)data, sizeof(TokenDataToEncrypt), sizeof(TokenDataToEncrypt));
+    const Buffer plaintext = GetTmpBuffer((uint8_t *)(&authTokenPlain->tokenDataToEncrypt), sizeof(TokenDataToEncrypt), sizeof(TokenDataToEncrypt));
     ret = AesGcmEncrypt(&plaintext, &aesGcmParam, &ciphertext, &tag);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("AesGcmEncrypt failed");
@@ -294,21 +264,51 @@ EXIT:
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_t credentialId,
-    UserAuthTokenHal *authToken, const HksAuthTokenKey *tokenKey)
+IAM_STATIC ResultCode GetUserAuthTokenPlain(UserAuthContext *context, uint32_t authMode, uint64_t credentialId,
+    UserAuthTokenPlain *authTokenPlain)
 {
-    TokenDataToEncrypt data = {0};
-    int32_t ret = GetTokenDataToEncrypt(context, credentialId, &data);
+    if (memcpy_s(authTokenPlain->tokenDataPlain.challenge, CHALLENGE_LEN, context->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to copy challenge");
+        return RESULT_BAD_COPY;
+    }
+    EnrolledInfoHal enrolledInfo = {};
+    int32_t ret = GetEnrolledInfoAuthType(context->userId, context->authType, &enrolledInfo);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataToEncrypt failed");
+        LOG_ERROR("get enrolled info failed");
         return ret;
     }
-    ret = GetTokenDataCipherResult(&data, authToken, tokenKey);
+    uint64_t secureUid;
+    ret = GetSecureUid(context->userId, &secureUid);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataCipherResult failed");
+        LOG_ERROR("get secure uid failed");
+        return ret;
     }
-    (void)memset_s(&data, sizeof(TokenDataToEncrypt), 0, sizeof(TokenDataToEncrypt));
-    return ret;
+
+    authTokenPlain->tokenDataPlain.time = GetSystemTime();
+    authTokenPlain->tokenDataPlain.authTrustLevel = context->authTrustLevel;
+    authTokenPlain->tokenDataPlain.authType = context->authType;
+    authTokenPlain->tokenDataPlain.authMode = authMode;
+    authTokenPlain->tokenDataToEncrypt.userId = context->userId;
+    authTokenPlain->tokenDataToEncrypt.secureUid = secureUid;
+    authTokenPlain->tokenDataToEncrypt.enrolledId = enrolledInfo.enrolledId;
+    authTokenPlain->tokenDataToEncrypt.credentialId = credentialId;
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC void SetUnlockTokenPlain(const UserAuthTokenPlain *unlockTokenPlain)
+{
+    g_unlockTokenPlain = *unlockTokenPlain;
+}
+
+ResultCode GetUnlockTokenPlain(UserAuthTokenPlain *unlockTokenPlain)
+{
+    if ((GetSystemTime() - g_unlockTokenPlain.tokenDataPlain.time) > REUSED_UNLOCK_TOKEN_PERIOD) {
+        (void)memset_s(&g_unlockTokenPlain, sizeof(UserAuthTokenPlain), 0, sizeof(UserAuthTokenPlain));
+        LOG_ERROR("cached unlock token is time out");
+        return RESULT_TOKEN_TIMEOUT;
+    }
+    *unlockTokenPlain = g_unlockTokenPlain;
+    return RESULT_SUCCESS;
 }
 
 ResultCode GetTokenDataAndSign(UserAuthContext *context,
@@ -318,33 +318,54 @@ ResultCode GetTokenDataAndSign(UserAuthContext *context,
         LOG_ERROR("context or authToken is null");
         return RESULT_BAD_PARAM;
     }
+    UserAuthTokenPlain authTokenPlain = {};
+    ResultCode ret = GetUserAuthTokenPlain(context, authMode, credentialId, &authTokenPlain);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetUserAuthTokenPlain fail");
+        goto EXIT;
+    }
+    ret = GetUserAuthToken(&authTokenPlain, authToken);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetUserAuthToken fail");
+        (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+        goto EXIT;
+    }
+    if (context->isAuthResultCached) {
+        SetUnlockTokenPlain(&authTokenPlain);
+    }
+
+EXIT:
+    (void)memset_s(&authTokenPlain, sizeof(UserAuthTokenPlain), 0, sizeof(UserAuthTokenPlain));
+    return ret;
+}
+
+ResultCode GetUserAuthToken(const UserAuthTokenPlain *authTokenPlain, UserAuthTokenHal *authToken)
+{
+    if (authTokenPlain == NULL || authToken == NULL) {
+        LOG_ERROR("authTokenPlain or authToken is null");
+        return RESULT_BAD_PARAM;
+    }
     (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     HksAuthTokenKey tokenKey = {};
-    ResultCode ret = GetTokenKey(&tokenKey);
+    uint32_t ret = GetTokenKey(&tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetTokenKey fail");
-        goto FAIL;
+        goto EXIT;
     }
-    ret = GetTokenDataPlain(context, authMode, authToken);
+    ret = GetUserAuthTokenData(authTokenPlain, &tokenKey, authToken);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataPlain fail");
-        goto FAIL;
-    }
-    ret = GetTokenDataCipher(context, credentialId, authToken, &tokenKey);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataCipher fail");
-        goto FAIL;
+        LOG_ERROR("GetUserAuthTokenData fail");
+        goto EXIT;
     }
     ret = UserAuthTokenSign(authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("UserAuthTokenSign fail");
-        goto FAIL;
     }
-    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
-    return RESULT_SUCCESS;
 
-FAIL:
+EXIT:
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
-    (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+    if (ret != RESULT_SUCCESS) {
+        (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+    }
     return ret;
 }

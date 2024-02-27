@@ -75,6 +75,7 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthSolutionHal params)
     context->authTrustLevel = params.authTrustLevel;
     context->collectorSensorHint = params.executorSensorHint;
     context->scheduleList = CreateLinkedList(DestroyScheduleNode);
+    context->isAuthResultCached = params.isAuthResultCached;
     if (context->scheduleList == NULL) {
         LOG_ERROR("schedule list create failed");
         Free(context);

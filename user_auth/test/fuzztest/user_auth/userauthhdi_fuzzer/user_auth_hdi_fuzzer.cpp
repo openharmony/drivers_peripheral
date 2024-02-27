@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include "iam_logger.h"
 
 #include "user_auth_hdi.h"
-#include "v1_3/user_auth_interface_service.h"
+#include "v1_2/user_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
@@ -165,13 +165,6 @@ void FillFuzzAuthResultInfo(Parcel &parcel, AuthResultInfo &authResultInfo)
     authResultInfo.remainAttempts = parcel.ReadInt32();
     FillFuzzExecutorSendMsgVector(parcel, authResultInfo.msgs);
     FillFuzzUint8Vector(parcel, authResultInfo.token);
-    IAM_LOGI("success");
-}
-
-void FillFuzzEnrolledState(Parcel &parcel, EnrolledState &enrolledState)
-{
-    enrolledState.credentialDigest = parcel.ReadUint16();
-    enrolledState.credentialCount = parcel.ReadUint16();
     IAM_LOGI("success");
 }
 
@@ -454,20 +447,6 @@ void FuzzUpdateAuthenticationResult(Parcel &parcel)
     IAM_LOGI("end");
 }
 
-void FuzzUpdateAuthenticationResultWithEnrolledState(Parcel &parcel)
-{
-    IAM_LOGI("begin");
-    uint64_t contextId = parcel.ReadUint64();
-    std::vector<uint8_t> scheduleResult;
-    FillFuzzUint8Vector(parcel, scheduleResult);
-    AuthResultInfo info;
-    FillFuzzAuthResultInfo(parcel, info);
-    EnrolledState enrolledState;
-    FillFuzzEnrolledState(parcel, enrolledState);
-    g_service.UpdateAuthenticationResultWithEnrolledState(contextId, scheduleResult, info, enrolledState);
-    IAM_LOGI("end");
-}
-
 void FuzzCancelAuthentication(Parcel &parcel)
 {
     IAM_LOGI("begin");
@@ -547,26 +526,13 @@ void FuzzGetValidSolution(Parcel &parcel)
     IAM_LOGI("end");
 }
 
-void FuzzGetEnrolledState(Parcel &parcel)
-{
-    IAM_LOGI("begin");
-    int32_t userId = parcel.ReadInt32();
-    AuthType authType = static_cast<AuthType>(parcel.ReadInt32());
-    EnrolledState enrolledState;
-    FillFuzzEnrolledState(parcel, enrolledState);
-
-    g_service.GetEnrolledState(userId, authType, enrolledState);
-    IAM_LOGI("end");
-}
-
 using FuzzFunc = decltype(FuzzInit);
 FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOpenSession, FuzzCloseSession,
     FuzzBeginEnrollment, FuzzUpdateEnrollmentResult, FuzzCancelEnrollment, FuzzDeleteCredential, FuzzGetCredential,
     FuzzGetSecureInfo, FuzzDeleteUser, FuzzEnforceDeleteUser, FuzzBeginAuthentication, FuzzUpdateAuthenticationResult,
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
     FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzBeginEnrollmentV1_1, FuzzBeginAuthenticationV1_1,
-    FuzzBeginIdentificationV1_1, FuzzBeginAuthenticationV1_2, FuzzBeginEnrollmentV1_2,
-    FuzzUpdateAuthenticationResultWithEnrolledState, FuzzGetEnrolledState};
+    FuzzBeginIdentificationV1_1, FuzzBeginAuthenticationV1_2, FuzzBeginEnrollmentV1_2};
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {

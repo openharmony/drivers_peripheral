@@ -34,6 +34,7 @@ typedef struct UserAuthContext {
     uint32_t authTrustLevel;
     uint32_t collectorSensorHint;
     LinkedList *scheduleList;
+    bool isAuthResultCached ;
 } UserAuthContext;
 
 typedef struct {
@@ -43,6 +44,7 @@ typedef struct {
     uint32_t authType;
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
+    bool isAuthResultCached;
 } AuthSolutionHal;
 
 typedef struct IdentifyParam {

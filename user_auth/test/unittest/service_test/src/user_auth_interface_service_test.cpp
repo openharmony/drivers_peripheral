@@ -735,10 +735,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_001, TestS
     std::vector<uint8_t> scheduleResult;
     AuthResultInfo authResultInfo = {};
     EXPECT_EQ(service->UpdateAuthenticationResult(contextId, scheduleResult, authResultInfo), 8);
-
-    EnrolledState enrolledState = {};
-    EXPECT_EQ(service->UpdateAuthenticationResultWithEnrolledState(contextId, scheduleResult, authResultInfo,
-        enrolledState), 8);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_002, TestSize.Level0)
@@ -752,10 +748,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_002, TestS
     std::vector<uint8_t> scheduleResult(600000, 1);
     AuthResultInfo authResultInfo = {};
     EXPECT_EQ(service->UpdateAuthenticationResult(contextId, scheduleResult, authResultInfo), 10004);
-
-    EnrolledState enrolledState = {};
-    EXPECT_EQ(service->UpdateAuthenticationResultWithEnrolledState(contextId, scheduleResult, authResultInfo,
-        enrolledState), 10004);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_003, TestSize.Level0)
@@ -770,10 +762,6 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_003, TestS
     scheduleResult.resize(sizeof(ExecutorResultInfo));
     AuthResultInfo authResultInfo = {};
     EXPECT_EQ(service->UpdateAuthenticationResult(contextId, scheduleResult, authResultInfo), RESULT_GENERAL_ERROR);
-
-    EnrolledState enrolledState = {};
-    EXPECT_EQ(service->UpdateAuthenticationResultWithEnrolledState(contextId, scheduleResult, authResultInfo,
-        enrolledState), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestSize.Level0)
