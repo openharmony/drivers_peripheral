@@ -486,6 +486,8 @@ HWTEST_F(WifiClientTest, WifiGetSignalPollInfo001, TestSize.Level1)
 
     ret = WifiGetSignalPollInfo(nullptr, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiGetSignalPollInfo(ifNameInvalid, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = WifiGetSignalPollInfo(ifNameInvalid, &signalResult);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
@@ -514,5 +516,110 @@ HWTEST_F(WifiClientTest, WifiRegisterEventCallback001, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     WifiUnregisterEventCallback(nullptr, WIFI_KERNEL_TO_HAL_CLIENT, WLAN_IFNAME);
     WifiUnregisterEventCallback(WifiEventCb, WIFI_KERNEL_TO_HAL_CLIENT, nullptr);
+}
+
+/**
+ * @tc.name: WifiRegisterActionFrameReceiver001
+ * @tc.desc: Wifi register action frame function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiRegisterActionFrameReceiver001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    uint8_t mastch = 0;
+    uint32_t matchLen = RESET_TIME;
+
+    ret = WifiRegisterActionFrameReceiver(nullptr, &mastch, matchLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, 0, matchLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, &mastch, 0);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiRegisterActionFrameReceiver(ifNameInvalid, &mastch, matchLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+}
+
+/**
+ * @tc.name: WifiSendActionFrame001
+ * @tc.desc: Wifi send action frame function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiSendActionFrame001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    uint8_t frameData = 0;
+    uint32_t freq = RESET_TIME;
+    uint32_t frameDataLen = RESET_TIME;
+
+    ret = WifiSendActionFrame(nullptr, freq, &frameData, frameDataLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiSendActionFrame(ifNameInvalid, 0, &frameData, frameDataLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, frameDataLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, 0);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = WifiSendActionFrame(ifNameInvalid, freq, &frameData, frameDataLen);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+}
+
+/**
+ * @tc.name: ClientGetApBandwidth001
+ * @tc.desc: client get ap bandwidth function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, ClientGetApBandwidth001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    uint8_t bandwidth = 0;
+
+    ret = ClientGetApBandwidth(nullptr, &bandwidth);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = ClientGetApBandwidth(ifNameInvalid, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    ret = ClientGetApBandwidth(ifNameInvalid, &bandwidth);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+}
+
+/**
+ * @tc.name: SetProjectionScreenParam001
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, SetProjectionScreenParam001, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    ProjectionScreenParam *param = nullptr;
+    param->cmdId = CMD_ID_RX_REMAIN_ON_CHANNEL;
+    param->buf[0] = 0;
+    param->bufLen = 40;
+    ret = SetProjectionScreenParam(ifNameInvalid, param);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+}
+
+/**
+ * @tc.name: SetProjectionScreenParam001
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, SetProjectionScreenParam002, TestSize.Level1)
+{
+    int32_t ret;
+    const char *ifNameInvalid = "wlanTest";
+    ProjectionScreenParam *param = nullptr;
+    param->cmdId = CMD_ID_RX_REMAIN_ON_CHANNEL;
+    param->buf[0] = 0;
+    param->bufLen = 1;
+    ret = SetProjectionScreenParam(ifNameInvalid, param);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 };
