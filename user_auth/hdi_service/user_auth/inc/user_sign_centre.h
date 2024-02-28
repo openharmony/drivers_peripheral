@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,11 +62,17 @@ typedef struct {
     TokenDataToEncrypt tokenDataToEncrypt;
 } __attribute__((__packed__)) UserAuthTokenPlain;
 
+typedef struct {
+    bool isCached;
+    int32_t userId;
+    UserAuthTokenHal authToken;
+} __attribute__((__packed__)) UnlockAuthTokenCache;
+
 ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
 ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
-ResultCode GetUserAuthToken(const UserAuthTokenPlain *authTokenPlain, UserAuthTokenHal *authToken);
-ResultCode GetUnlockTokenPlain(UserAuthTokenPlain *unlockTokenPlain);
+ResultCode GetUnlockAuthToken(int32_t *userId, UserAuthTokenHal *authToken);
+ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken);
 
 #ifdef __cplusplus
 }

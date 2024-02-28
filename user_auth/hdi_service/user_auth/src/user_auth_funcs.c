@@ -140,29 +140,32 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info, const UserAuthTokenPlain *tokenInfo)
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info, int32_t userId,
+    UserAuthTokenHal *authToken)
 {
-    if ((GetSystemTime() - tokenInfo->tokenDataPlain.time) > info->reuseUnlockResultDuration) {
+    uint64_t time = GetSystemTime();
+    if (time < authToken->tokenDataPlain.time) {
+        LOG_ERROR("bad system time");
+        return RESULT_GENERAL_ERROR;
+    }
+    if ((time - authToken->tokenDataPlain.time) > info->reuseUnlockResultDuration) {
         LOG_ERROR("reuse unlock check reuseUnlockResultDuration fail");
         return RESULT_TOKEN_TIMEOUT;
     }
-    if (info->userId != tokenInfo->tokenDataToEncrypt.userId) {
+    if (info->userId != userId) {
         LOG_ERROR("reuse unlock check userId fail");
         return RESULT_GENERAL_ERROR;
     }
-    if (info->authTrustLevel > tokenInfo->tokenDataPlain.authTrustLevel) {
+    if (info->authTrustLevel > authToken->tokenDataPlain.authTrustLevel) {
         LOG_ERROR("reuse unlock check authTrustLevel fail");
         return RESULT_GENERAL_ERROR;
     }
-    bool checkAuthType = false;
     if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT) {
         for (uint32_t i = 0; i < info->authTypeSize; i++) {
-            if (info->authTypes[i] == tokenInfo->tokenDataPlain.authType) {
-                checkAuthType = true;
+            if (info->authTypes[i] == authToken->tokenDataPlain.authType) {
+                return RESULT_SUCCESS;
             }
         }
-    }
-    if (!checkAuthType) {
         LOG_ERROR("reuse unlock check authType fail");
         return RESULT_GENERAL_ERROR;
     }
@@ -171,23 +174,37 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info,
 
 ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken)
 {
-    UserAuthTokenPlain unlockTokenPlain = {};
-    ResultCode ret = GetUnlockTokenPlain(&unlockTokenPlain);
+    if (info == NULL || authToken == NULL || info->reuseUnlockResultDuration == 0 ||
+        info->reuseUnlockResultDuration > MAX_ALLOWABLE_REUSE_DURATION ||
+        (info->reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info->reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        LOG_ERROR("CheckReuseUnlockResultFunc bad param");
+        return RESULT_BAD_PARAM;
+    }
+    int32_t unlockUserId = 0;
+    ResultCode ret = GetUnlockAuthToken(&unlockUserId, authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get reuse unlock token failed");
         goto EXIT;
     }
-    ret = CheckReuseUnlockTokenValid(info, &unlockTokenPlain);
+    ret = CheckReuseUnlockTokenValid(info, unlockUserId, authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check reuse unlock token failed");
         goto EXIT;
     }
-    ret = GetUserAuthToken(&unlockTokenPlain, authToken);
+    authToken->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
+    if (memcpy_s(authToken->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("challenge copy failed");
+        ret = RESULT_BAD_COPY;
+        goto EXIT;
+    }
+    ret = ReuseUnlockTokenSign(authToken);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get reuse auth token failed");
+        goto EXIT;
     }
+    return ret;
 
 EXIT:
-    (void)memset_s(&unlockTokenPlain, sizeof(UserAuthTokenPlain), 0, sizeof(UserAuthTokenPlain));
+    (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     return ret;
 }
