@@ -520,6 +520,67 @@ ResultCode DestoryContextbyId(uint64_t contextId)
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC const CoAuthSchedule *GetCoAuthScheduleFromContext(const UserAuthContext *context, uint64_t scheduleId)
+{
+    if (context->scheduleList == NULL) {
+        LOG_ERROR("get null scheduleList");
+        return NULL;
+    }
+
+    LinkedListNode *tempNode = context->scheduleList->head;
+    while (tempNode != NULL) {
+        const CoAuthSchedule *schedule = tempNode->data;
+        if (schedule == NULL) {
+            LOG_ERROR("schedule is null, please check");
+            tempNode = tempNode->next;
+            continue;
+        }
+        if (schedule->scheduleId == scheduleId) {
+            return schedule;
+        }
+        tempNode = tempNode->next;
+    }
+
+    LOG_ERROR("no schedule exist");
+    return NULL;
+}
+
+IAM_STATIC ResultCode CheckAndSetContextAtl(
+    UserAuthContext *context, const CoAuthSchedule *schedule, ExecutorResultInfo *info)
+{
+    uint32_t atl = ATL0;
+    ResultCode ret = QueryScheduleAtl(schedule, info->capabilityLevel, &atl);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("QueryScheduleAtl fail");
+        return ret;
+    }
+    if (atl < context->authTrustLevel) {
+        LOG_ERROR("atl %u not satisfied, context atl:%u", atl, context->authTrustLevel);
+        return RESULT_TRUST_LEVEL_NOT_SUPPORT;
+    }
+    LOG_INFO("context atl %{public}u:%{public}u", context->authTrustLevel, atl);
+    context->authTrustLevel = atl;
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode CheckAndSetContextUserId(UserAuthContext *context, uint64_t credentialId, uint32_t authMode)
+{
+    int32_t userId = 0;
+    ResultCode ret = QueryCredentialUserId(credentialId, &userId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("query userId failed");
+        return ret;
+    }
+    if (authMode == SCHEDULE_MODE_IDENTIFY) {
+        context->userId = userId;
+    }
+    if (userId != context->userId) {
+        LOG_ERROR("userId is not matched");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
 ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
     uint32_t authMode)
 {
@@ -527,14 +588,14 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
     }
-    const CoAuthSchedule *schedule = GetCoAuthSchedule(info->scheduleId);
+    const CoAuthSchedule *schedule = GetCoAuthScheduleFromContext(context, info->scheduleId);
     if (schedule == NULL) {
-        LOG_ERROR("GetCoAuthSchedule failed");
+        LOG_ERROR("GetCoAuthScheduleFromContext failed");
         return RESULT_GENERAL_ERROR;
     }
-    ResultCode ret = QueryScheduleAtl(schedule, info->capabilityLevel, &context->authTrustLevel);
+    ResultCode ret = CheckAndSetContextAtl(context, schedule, info);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("QueryScheduleAtl failed");
+        LOG_ERROR("CheckAndSetContextAtl failed");
         return ret;
     }
     ret = RESULT_UNKNOWN;
@@ -553,18 +614,9 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         goto EXIT;
     }
     CredentialInfoHal *credentialNode = (CredentialInfoHal *)credList->head->data;
-    int32_t userId = 0;
-    ret = QueryCredentialUserId(credentialNode->credentialId, &userId);
+    ret = CheckAndSetContextUserId(context, credentialNode->credentialId, authMode);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("query userId failed");
-        goto EXIT;
-    }
-    if (authMode == SCHEDULE_MODE_IDENTIFY) {
-        context->userId = userId;
-    }
-    if (userId != context->userId) {
-        LOG_ERROR("userId is not matched");
-        ret = RESULT_GENERAL_ERROR;
+        LOG_ERROR("CheckAndSetContextUserId failed");
         goto EXIT;
     }
     *credentialId = credentialNode->credentialId;
