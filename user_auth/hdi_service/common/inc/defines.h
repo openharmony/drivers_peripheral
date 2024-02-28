@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,6 +86,7 @@ typedef enum ScheduleMode {
     SCHEDULE_MODE_ENROLL = 0,
     SCHEDULE_MODE_AUTH = 1,
     SCHEDULE_MODE_IDENTIFY = 2,
+    SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT = 3,
 } ScheduleMode;
 
 typedef enum AuthSubType {

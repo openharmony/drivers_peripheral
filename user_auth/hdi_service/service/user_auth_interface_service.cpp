@@ -15,6 +15,7 @@
 
 #include "v1_3/user_auth_interface_service.h"
 
+#include <cinttypes>
 #include <mutex>
 #include <hdf_base.h>
 #include "securec.h"
@@ -45,7 +46,6 @@ namespace {
 static std::mutex g_mutex;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
-const std::string SCREEN_LOCK_BUNDLENAME = "com.ohos.systemui";
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -217,48 +217,71 @@ static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in,
     }
 }
 
-static int32_t CopyAuthSolutionV1_2ToHal(uint64_t contextId, const AuthSolutionV1_2 &in, AuthSolutionHal &out)
+static void CopyAuthSolutionV1_0ToV1_2(const AuthSolution &in, AuthSolutionV1_2 &out)
 {
-    out.contextId = contextId;
     out.userId = in.userId;
     out.authTrustLevel = in.authTrustLevel;
-    out.authType = static_cast<uint32_t>(in.authType);
-    if (!in.challenge.empty() && memcpy_s(out.challenge, CHALLENGE_LEN, in.challenge.data(),
-        in.challenge.size()) != EOK) {
+    out.authType = in.authType;
+    out.executorSensorHint = in.executorSensorHint;
+    out.challenge = std::move(in.challenge);
+}
+
+int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
+    std::vector<ScheduleInfo> &infos)
+{
+    IAM_LOGI("start");
+    std::vector<ScheduleInfoV1_1> infosV1_1;
+    AuthSolutionV1_2 paramV1_2;
+    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
+    int32_t ret = BeginAuthenticationV1_2(contextId, paramV1_2, infosV1_1);
+    CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
+    return ret;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
+    uint64_t contextId, const AuthSolution &param, std::vector<ScheduleInfoV1_1> &infos)
+{
+    IAM_LOGI("start");
+    AuthSolutionV1_2 paramV1_2;
+    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
+    return BeginAuthenticationV1_2(contextId, paramV1_2, infos);
+}
+
+static int32_t CopyAuthSolutionV1_2ToHal(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
+    AuthSolutionHal &solutionHal)
+{
+    solutionHal.contextId = contextId;
+    solutionHal.userId = paramV1_2.userId;
+    solutionHal.authType = static_cast<uint32_t>(paramV1_2.authType);
+    solutionHal.authTrustLevel = paramV1_2.authTrustLevel;
+    if (!paramV1_2.challenge.empty() && memcpy_s(solutionHal.challenge, CHALLENGE_LEN, paramV1_2.challenge.data(),
+        paramV1_2.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    out.isAuthResultCached = false;
-    if (in.callerName == SCREEN_LOCK_BUNDLENAME) {
-        IAM_LOGE("auth result will be cached");
-        out.isAuthResultCached = true;
+    static const std::string screenLockBundleName = "B_com.ohos.systemui";
+    solutionHal.isAuthResultCached = false;
+    if (paramV1_2.callerName == screenLockBundleName) {
+        IAM_LOGI("auth result will be cached");
+        solutionHal.isAuthResultCached = true;
     }
     return RESULT_SUCCESS;
 }
 
-static int32_t CopyAuthSolutionV1_0ToHal(uint64_t contextId, const AuthSolution &in, AuthSolutionHal &out)
-{
-    out.contextId = contextId;
-    out.userId = in.userId;
-    out.authTrustLevel = in.authTrustLevel;
-    out.authType = static_cast<uint32_t>(in.authType);
-    if (!in.challenge.empty() && memcpy_s(out.challenge, CHALLENGE_LEN, in.challenge.data(),
-        in.challenge.size()) != EOK) {
-        IAM_LOGE("challenge copy failed");
-        return RESULT_BAD_COPY;
-    }
-    out.isAuthResultCached = false;
-    return RESULT_SUCCESS;
-}
-
-static int32_t BeginAuthenticationInner(const AuthSolutionHal &solutionIn,
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
     std::vector<ScheduleInfoV1_1> &infos)
 {
     IAM_LOGI("start");
     infos.clear();
+    AuthSolutionHal solutionHal = {};
+    int32_t ret = CopyAuthSolutionV1_2ToHal(contextId, paramV1_2, solutionHal);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("copy CopyAuthSolutionV1_2ToHal failed %{public}d", ret);
+        return ret;
+    }
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
-    int32_t ret = GenerateSolutionFunc(solutionIn, &schedulesGet);
+    ret = GenerateSolutionFunc(solutionHal, &schedulesGet);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("generate solution failed %{public}d", ret);
         return ret;
@@ -285,55 +308,11 @@ static int32_t BeginAuthenticationInner(const AuthSolutionHal &solutionIn,
         infos.push_back(temp);
         tempNode = tempNode->next;
     }
-    ret = SetArrayAttributeToExtraInfo(solutionIn.userId, infos);
+    ret = SetArrayAttributeToExtraInfo(solutionHal.userId, infos);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetArrayAttributeToExtraInfo fail");
     }
     DestroyLinkedList(schedulesGet);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
-    std::vector<ScheduleInfo> &infos)
-{
-    IAM_LOGI("start");
-    std::vector<ScheduleInfoV1_1> infosV1_1;
-    AuthSolutionHal paramHal;
-    int32_t ret = CopyAuthSolutionV1_0ToHal(contextId, param, paramHal);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("AuthSolution copy failed");
-        return ret;
-    }
-    ret = BeginAuthenticationInner(paramHal, infosV1_1);
-    CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(uint64_t contextId, const AuthSolution &param,
-    std::vector<ScheduleInfoV1_1> &infos)
-{
-    IAM_LOGI("start");
-    AuthSolutionHal paramHal;
-    int32_t ret = CopyAuthSolutionV1_0ToHal(contextId, param, paramHal);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("AuthSolution copy failed");
-        return ret;
-    }
-    ret = BeginAuthenticationInner(paramHal, infos);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &param,
-    std::vector<ScheduleInfoV1_1> &infos)
-{
-    IAM_LOGI("start");
-    AuthSolutionHal paramHal = {};
-    int32_t ret = CopyAuthSolutionV1_2ToHal(contextId, param, paramHal);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("AuthSolution copy failed");
-        return ret;
-    }
-    ret = BeginAuthenticationInner(paramHal, infos);
     return ret;
 }
 
@@ -1024,40 +1003,56 @@ int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, AuthType auth
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &info, std::vector<uint8_t> &token)
+int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &info, std::vector<uint8_t> &reuseResult)
 {
-    IAM_LOGI("start");
-    UserAuthTokenHal authToken = {};
+    IAM_LOGI("start reuseMode: %{public}u, reuseDuration: %{public}" PRIu64 ".", info.reuseUnlockResultMode,
+        info.reuseUnlockResultDuration);
+    if (info.authTypes.empty() || info.authTypes.size() > MAX_AUTH_TYPE_LEN ||
+        info.reuseUnlockResultDuration == 0 || info.reuseUnlockResultDuration > MAX_ALLOWABLE_REUSE_DURATION ||
+        (info.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        IAM_LOGE("checkReuseUnlockResult bad param");
+        return RESULT_BAD_PARAM;
+    }
+
+    ReuseUnlockResult resultTemp = {};
     ReuseUnlockInfoHal infoHal = {};
     infoHal.userId = info.userId;
     infoHal.authTrustLevel = info.authTrustLevel;
     infoHal.reuseUnlockResultDuration = info.reuseUnlockResultDuration;
     infoHal.reuseUnlockResultMode = info.reuseUnlockResultMode;
-    if (!info.challenge.empty() && memcpy_s(infoHal.challenge, CHALLENGE_LEN, info.challenge.data(),
-        info.challenge.size()) != EOK) {
+    if (!info.challenge.empty() &&
+        memcpy_s(infoHal.challenge, CHALLENGE_LEN, info.challenge.data(), info.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
-    }
-    //顶层authType校验
-    if (info.authTypes.size() > MAX_AUTH_TYPE_LEN) {
-        IAM_LOGE("invalid authTypes");
-        return RESULT_BAD_PARAM;
     }
     infoHal.authTypeSize = info.authTypes.size();
     for (uint32_t i = 0; i < info.authTypes.size(); i++) {
         infoHal.authTypes[i] = static_cast<uint32_t>(info.authTypes[i]);
     }
-    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, &authToken);
-    if (ret == RESULT_SUCCESS) {
-        token.resize(sizeof(UserAuthTokenHal));
-        if (memcpy_s(token.data(), token.size(), &authToken, sizeof(UserAuthTokenHal)) != EOK) {
-                IAM_LOGE("copy authToken failed");
-                token.clear();
-        }
+
+    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token);
+    if (ret != RESULT_SUCCESS) {
+        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
+        return ret;
     }
-    //认证时要不要清
-    (void)memset_s(&authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
-    return ret;
+    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
+    ret = GetEnrolledStateFunc(info.userId, resultTemp.authType, &resultTemp.enrolledState);
+    if (ret != RESULT_SUCCESS) {
+        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        IAM_LOGE("get enrolled state failed, ret:%{public}d", ret);
+        return ret;
+    }
+    reuseResult.resize(sizeof(ReuseUnlockResult));
+    if (memcpy_s(reuseResult.data(), sizeof(ReuseUnlockResult), &resultTemp, sizeof(ReuseUnlockResult)) != EOK) {
+        IAM_LOGE("copy authToken failed");
+        reuseResult.clear();
+        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        return RESULT_BAD_COPY;
+    }
+    IAM_LOGI("check reuse unlock result finish success");
+    (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+    return RESULT_SUCCESS;
 }
 } // Userauth
 } // HDI

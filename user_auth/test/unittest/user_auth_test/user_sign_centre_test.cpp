@@ -16,13 +16,16 @@
 #include <gtest/gtest.h>
 
 #include <cstring>
+#include "securec.h"
+#include <thread>
 
+#include "adaptor_memory.h"
 #include "adaptor_time.h"
 #include "token_key.h"
 #include "user_sign_centre.h"
 
 extern "C" {
-    extern LinkedList *g_userInfoList;
+    extern UnlockAuthTokenCache g_unlockAuthToken;
     extern bool IsTimeValid(const UserAuthTokenHal *userAuthToken);
     extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
     extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
@@ -30,6 +33,7 @@ extern "C" {
     extern ResultCode DecryptTokenCipher(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain,
         HksAuthTokenKey *tokenKey);
     extern ResultCode CheckUserAuthTokenHmac(const UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey);
+    extern void SetUnlockAuthToken(int32_t userId, const UserAuthTokenHal *unlockToken);
 }
 
 namespace OHOS {
@@ -149,6 +153,34 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_BAD_SIGN);
     EXPECT_EQ(UserAuthTokenSign(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_GENERAL_ERROR);
+}
+
+HWTEST_F(UserAuthSignTest, TestGetUnlockAuthToken, TestSize.Level0)
+{
+    int32_t userId = 0;
+    UserAuthTokenHal userAuthToken;
+    EXPECT_EQ(GetUnlockAuthToken(&userId, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetUnlockAuthToken(&userId, &userAuthToken), RESULT_GENERAL_ERROR);
+
+    int32_t userIdCached = 0;
+    UserAuthTokenHal userAuthTokenCached;
+    userAuthTokenCached.tokenDataPlain.time = GetSystemTime() + 600;
+    userAuthTokenCached.tokenDataPlain.authType = 1;
+    userAuthTokenCached.tokenDataPlain.authTrustLevel = ATL4;
+    SetUnlockAuthToken(userIdCached, &userAuthTokenCached);
+    EXPECT_EQ(GetUnlockAuthToken(&userId, &userAuthToken), RESULT_GENERAL_ERROR);
+
+    userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
+    SetUnlockAuthToken(userIdCached, &userAuthTokenCached);
+    EXPECT_EQ(GetUnlockAuthToken(&userId, &userAuthToken), RESULT_SUCCESS);
+    (void)memset_s(&g_unlockAuthToken, sizeof(UnlockAuthTokenCache), 0, sizeof(UnlockAuthTokenCache));
+}
+
+HWTEST_F(UserAuthSignTest, TestReuseUnlockTokenSign, TestSize.Level0)
+{
+    UserAuthTokenHal token = {};
+    EXPECT_EQ(ReuseUnlockTokenSign(nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(ReuseUnlockTokenSign(&token), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam

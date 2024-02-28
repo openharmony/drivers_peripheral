@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+const uint64_t MAX_ALLOWABLE_REUSE_DURATION = 5 * 60 * 1000;
 
 typedef struct AuthResult {
     int32_t userId;
@@ -46,6 +47,12 @@ typedef struct {
     uint64_t reuseUnlockResultDuration;
     uint32_t reuseUnlockResultMode;
 } ReuseUnlockInfoHal;
+
+typedef struct {
+    int32_t authType;
+    uint8_t token[AUTH_TOKEN_LEN];
+    EnrolledStateHal enrolledState;
+} ReuseUnlockResult;
 
 typedef enum ReuseMode {
     AUTH_TYPE_RELEVANT = 1,
