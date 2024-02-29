@@ -1694,8 +1694,8 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         int ret = FindCameraMetadataItem(data, OHOS_STATUS_MOON_CAPTURE_DETECTION, &entry);
         if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
             uint8_t value = entry.data.u8[0];
-            // 查询到状态， 检测状态到 微距模式可开启
-            if (OHOS_CAMERA_MACRO_ENABLE == value) {
+            // 查询到状态， 检测状态到 月亮模式可开启
+            if (OHOS_CAMERA_MOON_CAPTURE_BOOST_ENABLE == value) {
                 printf("Macro mode is set enabled.");
             } else {
                 printf("Macro mode is not enabled.");
