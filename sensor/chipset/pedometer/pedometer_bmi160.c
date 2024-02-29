@@ -52,7 +52,7 @@ static int32_t ReadBmi160PedometerRawData(struct SensorCfgData *data, struct Ped
     return HDF_SUCCESS;
 }
 
-int32_t ReadBmi160PedometerData(struct SensorCfgData *data)
+static int32_t ReadBmi160PedometerData(struct SensorCfgData *data)
 {
     int32_t ret;
     struct PedometerData rawData = { 0 };
@@ -124,7 +124,7 @@ static int32_t DispatchBMI160(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t PedometerBmi160BindDriver(struct HdfDeviceObject *device)
+static int32_t PedometerBmi160BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -142,7 +142,7 @@ int32_t PedometerBmi160BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t PedometerBmi160InitDriver(struct HdfDeviceObject *device)
+static int32_t PedometerBmi160InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct PedometerOpsCall ops;
@@ -180,7 +180,7 @@ int32_t PedometerBmi160InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void PedometerBmi160ReleaseDriver(struct HdfDeviceObject *device)
+static void PedometerBmi160ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 
