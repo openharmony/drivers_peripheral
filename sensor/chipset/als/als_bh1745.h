@@ -91,7 +91,6 @@ enum ExtendedAlsGainRegGroupIndex {
 };
 
 int32_t DetectAlsBim160Chip(struct SensorCfgData *data);
-int32_t ReadBh1745Data(struct SensorCfgData *data, struct SensorReportEvent *event);
 
 struct Bh1745DrvData {
     struct IDeviceIoService ioService;

@@ -85,7 +85,6 @@
 
 
 int32_t DetectBarometerBmp180Chip(struct SensorCfgData *data);
-int32_t ReadBmp180Data(struct SensorCfgData *data);
 
 struct Bmp180DrvData {
     struct IDeviceIoService ioService;
