@@ -126,13 +126,17 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_002, TestSize.Level1)
             std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 200);
             printf("OHOS_ABILITY_SCENE_PORTRAIT_EFFECT_TYPES : %d\n", entry.data.u8[i]);
             uint8_t value = entry.data.u8[i];
+
+            int32_t rotation = OHOS_CAMERA_JPEG_ROTATION_0;
+            meta->addEntry(OHOS_JPEG_ORIENTATION, &rotation, 1);
+
             meta->addEntry(OHOS_CONTROL_PORTRAIT_EFFECT_TYPE, &value, 1);
             std::vector<uint8_t> metaVec;
             MetadataUtils::ConvertMetadataToVec(meta, metaVec);
             cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
             EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
             CAMERA_LOGI("addEntry for OHOS_CONTROL_PORTRAIT_EFFECT_TYPE success!");
-            TakePhotoWithTags(meta);
+            TakePhotoWithTags(meta, OHOS::HDI::Camera::V1_1::PORTRAIT);
         }
     }
 }
@@ -253,10 +257,16 @@ HWTEST_F(CameraTagUtTestV1_1, Camera_Tag_Hdi_V1_1_009, TestSize.Level1)
 
 void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> meta)
 {
+    TakePhotoWithTags(meta, OHOS::HDI::Camera::V1_1::NORMAL);
+}
+
+void CameraTagUtTestV1_1::TakePhotoWithTags(std::shared_ptr<OHOS::Camera::CameraSetting> meta,
+                                            OHOS::HDI::Camera::V1_1::OperationMode_V1_1 mode)
+{
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
-    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->StartStream(cameraTest->intents, mode);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     sleep(1);

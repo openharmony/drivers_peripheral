@@ -152,6 +152,12 @@ void Test::Close()
     }
 }
 
+void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_1::OperationMode_V1_1 mode)
+{
+    (void)mode;
+    StartStream(intents);
+}
+
 void Test::StartStream(std::vector<StreamIntent> intents)
 {
     streamOperatorCallback = new TestStreamOperatorCallback();
