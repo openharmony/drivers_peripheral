@@ -19,8 +19,7 @@
           "hdf_core",
           "hilog",
           "c_utils",
-          "drivers_interface_nfc",
-          "init"
+          "drivers_interface_nfc"
         ],
         "third_party": []
       },
