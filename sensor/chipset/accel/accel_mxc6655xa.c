@@ -25,7 +25,7 @@
 
 static struct Mxc6655xaDrvData *g_mxc6655xaDrvData = NULL;
 
-struct Mxc6655xaDrvData *Mxc6655xaGetDrvData(void)
+static struct Mxc6655xaDrvData *Mxc6655xaGetDrvData(void)
 {
     return g_mxc6655xaDrvData;
 }
@@ -101,7 +101,7 @@ static int32_t ReadMxc6655xaRawData(struct SensorCfgData *data, struct AccelData
     return HDF_SUCCESS;
 }
 
-int32_t ReadMxc6655xaData(struct SensorCfgData *cfg, struct SensorReportEvent *event)
+static int32_t ReadMxc6655xaData(struct SensorCfgData *cfg, struct SensorReportEvent *event)
 {
     int32_t ret;
     struct AccelData rawData = { 0, 0, 0 };
@@ -164,7 +164,7 @@ static int32_t DispatchMXC6655xa(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Mxc6655xaBindDriver(struct HdfDeviceObject *device)
+static int32_t Mxc6655xaBindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -182,7 +182,7 @@ int32_t Mxc6655xaBindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Mxc6655xaInitDriver(struct HdfDeviceObject *device)
+static int32_t Mxc6655xaInitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct AccelOpsCall ops;
@@ -214,7 +214,7 @@ int32_t Mxc6655xaInitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Mxc6655xaReleaseDriver(struct HdfDeviceObject *device)
+static void Mxc6655xaReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 
