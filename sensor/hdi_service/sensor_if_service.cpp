@@ -600,7 +600,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
     int32_t ret;
-    int64_t samplingInterval = COMMON_REPORT_FREQUENCY / rateLevel;
+    int64_t samplingInterval = rateLevel == REPORT_INTERVAL ? REPORT_INTERVAL : COMMON_REPORT_FREQUENCY / rateLevel;
     int64_t reportInterval = REPORT_INTERVAL;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     if (enabled) {
