@@ -46,7 +46,7 @@ static int32_t ReadApds9960RawData(struct SensorCfgData *data, struct ProximityD
     return ret;
 }
 
-int32_t ReadApds9960Data(struct SensorCfgData *data)
+static int32_t ReadApds9960Data(struct SensorCfgData *data)
 {
     int32_t ret;
     int32_t tmp;
@@ -118,7 +118,7 @@ static int32_t DispatchApds9960(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Apds9960BindDriver(struct HdfDeviceObject *device)
+static int32_t Apds9960BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -136,7 +136,7 @@ int32_t Apds9960BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Apds996InitDriver(struct HdfDeviceObject *device)
+static int32_t Apds996InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct ProximityOpsCall ops;
@@ -175,7 +175,7 @@ int32_t Apds996InitDriver(struct HdfDeviceObject *device)
 }
 
 
-void Apds996ReleaseDriver(struct HdfDeviceObject *device)
+static void Apds996ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 
