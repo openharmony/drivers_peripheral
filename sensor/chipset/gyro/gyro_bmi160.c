@@ -73,7 +73,7 @@ static int32_t ReadBmi160GyroRawData(struct SensorCfgData *data, struct GyroData
     return ret;
 }
 
-int32_t ReadBmi160GyroData(struct SensorCfgData *data)
+static int32_t ReadBmi160GyroData(struct SensorCfgData *data)
 {
     int32_t ret;
     struct GyroData rawData = { 0, 0, 0 };
@@ -144,7 +144,7 @@ static int32_t DispatchBMI160(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t GyroBmi160BindDriver(struct HdfDeviceObject *device)
+static int32_t GyroBmi160BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -162,7 +162,7 @@ int32_t GyroBmi160BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t GyroBmi160InitDriver(struct HdfDeviceObject *device)
+static int32_t GyroBmi160InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct GyroOpsCall ops;
@@ -200,7 +200,7 @@ int32_t GyroBmi160InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void GyroBmi160ReleaseDriver(struct HdfDeviceObject *device)
+static void GyroBmi160ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 
