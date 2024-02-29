@@ -24,7 +24,6 @@ using namespace OHOS::HDI::Sensor::V2_0;
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-constexpr int32_t OFFSET = 4;
 constexpr int32_t ARRAY0 = 0;
 constexpr int32_t ARRAY1 = 1;
 constexpr int32_t ARRAY2 = 2;
