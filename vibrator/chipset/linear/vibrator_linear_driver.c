@@ -83,7 +83,7 @@ static int32_t DispatchLinearVibrator(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t BindLinearVibratorDriver(struct HdfDeviceObject *device)
+static int32_t BindLinearVibratorDriver(struct HdfDeviceObject *device)
 {
     struct VibratorLinearDriverData *drvData = NULL;
 
@@ -100,7 +100,7 @@ int32_t BindLinearVibratorDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t InitLinearVibratorDriver(struct HdfDeviceObject *device)
+static int32_t InitLinearVibratorDriver(struct HdfDeviceObject *device)
 {
     static struct VibratorOps ops;
     struct VibratorLinearDriverData *drvData = NULL;
@@ -140,7 +140,7 @@ int32_t InitLinearVibratorDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void ReleaseLinearVibratorDriver(struct HdfDeviceObject *device)
+static void ReleaseLinearVibratorDriver(struct HdfDeviceObject *device)
 {
     struct VibratorLinearDriverData *drvData = NULL;
 
