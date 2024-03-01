@@ -42,7 +42,7 @@ namespace V1_1 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MAX_FILE_NUM = 10;
-constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
+constexpr int32_t MAX_FILE_SIZE = 10 * 1024 * 1024;
 constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
