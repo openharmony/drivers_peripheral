@@ -400,7 +400,7 @@ RetCode HosV4L2Dev::StopStream(const std::string& cameraID)
         uint64_t one = 1;
         ssize_t ret = write(eventFd_, &one, sizeof(one));
         if (ret != sizeof(one)) {
-            CAMERA_LOGE("HosV4L2Dev::StopStream write failed, ret = %{public}d\n", ret);
+            CAMERA_LOGE("HosV4L2Dev::StopStream write failed, ret = %{public}zd\n", ret);
         }
         streamThread_->join();
         close(eventFd_);
