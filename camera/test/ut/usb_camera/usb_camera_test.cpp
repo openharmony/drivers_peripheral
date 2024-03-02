@@ -65,8 +65,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
-    if (cameraIds.size() > 0) {
+    // 1:number of connected cameras
+    if (cameraIds.size() > 1) {
         g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
     }
 }
 
@@ -624,6 +627,12 @@ TEST_F(UtestUSBCameraTest, camera_usb_0021)
     EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
+    }
+    // 1:number of connected cameras
+    if (cameraIds.size() > 1) {
+        g_usbCameraExit = true;
+    } else {
+        g_usbCameraExit = false;
     }
 }
 
