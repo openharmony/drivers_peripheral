@@ -66,11 +66,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
         std::cout << "cameraId = " << cameraId << std::endl;
     }
     // 1:number of connected cameras
-    if (cameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    g_usbCameraExit = cameraIds.size() > 1;
 }
 
 /**
@@ -629,11 +625,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0021)
         std::cout << "cameraId = " << cameraId << std::endl;
     }
     // 1:number of connected cameras
-    if (cameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    g_usbCameraExit = cameraIds.size() > 1;
 }
 
 /**
@@ -1014,11 +1006,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0032)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1052,11 +1041,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0033)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1093,11 +1079,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0034)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
 
     if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1148,11 +1131,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0035)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1183,11 +1163,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0036)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1214,11 +1191,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0037)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1250,11 +1224,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0038)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1286,11 +1257,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0039)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1323,11 +1291,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0040)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1360,11 +1325,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0041)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1394,11 +1356,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0042)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1431,11 +1390,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0043)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1462,11 +1418,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0044)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1493,11 +1446,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0045)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1524,11 +1474,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0046)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1556,11 +1503,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0047)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1595,11 +1539,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0048)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1630,11 +1571,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1662,11 +1600,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0050)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1694,11 +1629,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0051)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
@@ -1726,11 +1658,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0052)
     // Get the device manager
     std::vector<std::string> usbCameraIds;
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
-    if (usbCameraIds.size() > 1) {
-        g_usbCameraExit = true;
-    } else {
-        g_usbCameraExit = false;
-    }
+    // 1:number of connected cameras
+    g_usbCameraExit = usbCameraIds.size() > 1;
     for (int i = 0; i < usbCameraIds.size(); i++) {
         if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
