@@ -1081,7 +1081,6 @@ TEST_F(UtestUSBCameraTest, camera_usb_0034)
     cameraBase_->cameraHost->GetCameraIds(usbCameraIds);
     // 1:number of connected cameras
     g_usbCameraExit = usbCameraIds.size() > 1;
-
     if (!g_usbCameraExit) {
             GTEST_SKIP() << "No usb camera plugged in" << std::endl;
     }
