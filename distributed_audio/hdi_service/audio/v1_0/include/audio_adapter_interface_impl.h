@@ -42,6 +42,7 @@ using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::PortOperationMode;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortPin;
 
 typedef enum {
     STATUS_ONLINE = 0,
@@ -119,12 +120,15 @@ private:
     int32_t HandleFocusChangeEvent(const DAudioEvent &event);
     int32_t HandleRenderStateChangeEvent(const DAudioEvent &event);
     int32_t HandleVolumeChangeEvent(const DAudioEvent &event);
-    int32_t HandleSANotifyEvent(const DAudioEvent &event);
-    int32_t WaitForSANotify(const AudioDeviceEvent &event);
-    int32_t HandleDeviceClosed(const DAudioEvent &event);
+    int32_t HandleSANotifyEvent(const uint32_t streamId, const DAudioEvent &event);
+    int32_t WaitForSANotify(const uint32_t streamId, const AudioDeviceEvent &event);
+    int32_t HandleDeviceClosed(const uint32_t streamId, const DAudioEvent &event);
     int32_t getEventTypeFromCondition(const std::string& condition);
-    int32_t InsertRenderImpl(const sptr<AudioRenderInterfaceImplBase> &audioRender, const int32_t dhId,
-        uint32_t &renderId);
+    sptr<AudioRenderInterfaceImplBase> CreateRenderImpl(const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, int32_t renderId);
+    int32_t InsertRenderImpl(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
+        sptr<AudioRenderInterfaceImplBase> &audioRender, const int32_t dhId, uint32_t &renderId);
+    void DeleteRenderImpl(uint32_t renderId);
     int32_t InsertCapImpl(const sptr<AudioCaptureInterfaceImplBase> &audioCapture, const int32_t dhId,
         uint32_t &captureId);
     inline bool IsIdValid(const uint32_t id);
@@ -140,6 +144,8 @@ private:
     int32_t ParseDhIdFromJson(const std::string &args);
     int32_t ConvertString2Int(std::string val);
     sptr<AudioRenderInterfaceImplBase> GetRenderImpl(const std::string &content);
+    void SetSpkStatus(const uint32_t streamId, bool status);
+    bool GetSpkStatus(const uint32_t streamId);
 
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
@@ -167,7 +173,8 @@ private:
     std::mutex micWaitMutex_;
     std::condition_variable micWaitCond_;
 
-    bool isSpkOpened_ = false;
+    std::mutex spkStatusMutex_;
+    std::vector<bool> spkStatus_;
     int32_t errCode_ = -1;
     bool isMicOpened_ = false;
     bool spkNotifyFlag_ = false;

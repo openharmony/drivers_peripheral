@@ -46,6 +46,14 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
 
 #define DHLOGE(fmt, ...) HILOG_ERROR(LOG_CORE, \
     "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
+
+#define CHECK_NULL_RETURN(ptr, ret)             \
+    do {                                        \
+        if ((ptr) == nullptr) {                 \
+            DHLOGE("Address pointer is null");  \
+            return (ret);                       \
+        }                                       \
+    } while (0)
 } // Distributedaudio
 } // OHOS
 #endif
