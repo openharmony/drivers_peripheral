@@ -997,7 +997,6 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_042, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
-    bool flag;
 
     struct AdjustChannelInfo chanInfo;
     chanInfo.msgId = 5;
@@ -1007,8 +1006,7 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_042, TestSize.Level1)
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_CHAN_ADJUST, (const int8_t *)&chanInfo,
         sizeof(chanInfo));
     printf("SendCmdIoctl CHAN_ADJUST, rc=%d.\n", rc);
-    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT) || (rc == HDF_DEV_ERR_NETDOWN));
-    ASSERT_TRUE(flag);
+    ASSERT_FALSE(rc);
 }
 
 /**
