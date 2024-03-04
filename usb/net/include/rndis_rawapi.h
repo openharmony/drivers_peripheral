@@ -122,6 +122,12 @@ struct RndisQuery {                /* OUT */
     __le32    handle;               /* zero */
 } __attribute__ ((packed));
 
+struct RndisQueryParam {
+    void      *buf;
+    uint32_t  oid;
+    uint32_t  in_len;
+} __attribute__ ((packed));
+
 struct RndisQueryC {              /* IN */
     /* header and: */
     __le32    msgType;              /* RNDIS_MSG_QUERY_C */

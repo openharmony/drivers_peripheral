@@ -269,7 +269,7 @@ static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet,  struct HdfSBuf
     }
     size = bufSize;
     HARCH_INFO_PRINT("buf size = %{public}d, usbNet->dataOutEp->maxPacketSize = %{public}d",
-        bufSize,usbNet->dataOutEp->maxPacketSize);
+        bufSize, usbNet->dataOutEp->maxPacketSize);
 
     printf_char_buffer((char *)buf, CPU_TO_LE32(bufSize), false);
     UsbnetWriteLog((char *)buf, CPU_TO_LE32(bufSize), false);
@@ -726,7 +726,7 @@ static void UsbStopIo(struct UsbnetHost *usbNet)
     return;
 }
 
-int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
+static int32_t UsbnetHostAlloc(struct UsbnetHost *usbNet)
 {
     //1.write request
     int ret = UsbnetHostWriteBufAlloc(usbNet);
@@ -845,11 +845,11 @@ static void UsbnetHostPrintConfigDescriptor(struct UsbRawConfigDescriptor *tmpCo
     HARCH_INFO_PRINT("iConfiguration = %{public}d", tmpConfig->configDescriptor.iConfiguration);
     HARCH_INFO_PRINT("bMaxPower = %{public}d", tmpConfig->configDescriptor.bMaxPower);
 
-    for(int i = 0; i < tmpConfig->configDescriptor.bNumInterfaces; i++) {
+    for (int i = 0; i < tmpConfig->configDescriptor.bNumInterfaces; i++) {
         HARCH_INFO_PRINT("interface number = %{public}d", i);
-        for(int j = 0; j < tmpConfig->interface[i]->numAltsetting; j++) {
+        for (int j = 0; j < tmpConfig->interface[i]->numAltsetting; j++) {
             HARCH_INFO_PRINT("altsetting number = %{public}d", j);
-            for(int k = 0; k < tmpConfig->interface[i]->altsetting->interfaceDescriptor.bNumEndpoints; k++) {
+            for (int k = 0; k < tmpConfig->interface[i]->altsetting->interfaceDescriptor.bNumEndpoints; k++) {
                 HARCH_INFO_PRINT("bLength = %{public}d",
                     tmpConfig->interface[i]->altsetting[j].endPoint[k].endpointDescriptor.bLength);
                 HARCH_INFO_PRINT("bDescriptorType = %{public}d",
@@ -905,7 +905,7 @@ static int32_t UsbnetHostGetConfigDescriptor(UsbRawHandle *devHandle, struct Usb
 }
 
 /* must be called if hard_mtu or rx_urb_size changed */
-void UsbnetHostUpdateMaxQlen(struct UsbnetHost *usbNet)
+static void UsbnetHostUpdateMaxQlen(struct UsbnetHost *usbNet)
 {
     int32_t ret = UsbRawGetUsbSpeed(usbNet->devHandle);
     HARCH_INFO_PRINT("speed = %{public}d", ret);
@@ -961,8 +961,8 @@ static int32_t UsbnetHostInitObject(struct UsbnetHost *usbNet)
             //goto ERR_GET_DESC;
         }
 
-        HARCH_INFO_PRINT("net->mtu = %{public}d,dev->hardMtu= %{public}d ,net->hardHeaderLen = %{public}d",
-            usbNet->net.mtu, usbNet->net.hardMtu ,usbNet->net.hardHeaderLen);
+        HARCH_INFO_PRINT("net->mtu = %{public}d, dev->hardMtu= %{public}d ,net->hardHeaderLen = %{public}d",
+            usbNet->net.mtu, usbNet->net.hardMtu, usbNet->net.hardHeaderLen);
         /* maybe the remote can't receive an Ethernet MTU */
         if (usbNet->net.mtu > (usbNet->net.hardMtu - usbNet->net.hardHeaderLen)) {
             usbNet->net.mtu = usbNet->net.hardMtu - usbNet->net.hardHeaderLen;
@@ -986,7 +986,6 @@ static int32_t UsbnetHostInitObject(struct UsbnetHost *usbNet)
         if (!usbNet->paddingPkt) {
             HDF_LOGE("%{public}s:%{public}d OsalMemAlloc failed", __func__, __LINE__);
             ret = HDF_ERR_MALLOC_FAIL;
-            //goto ERR_GET_DESC;
             return ret;
         }
     }
