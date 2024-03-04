@@ -52,144 +52,144 @@
  * REVISIT some RNDIS implementations seem to have curious issues still
  * to be resolved.
  */
-struct rndis_msg_hdr {
-    __le32    msg_type;            /* RNDIS_MSG_* */
-    __le32    msg_len;
+struct RndisMsgHdr {
+    __le32    msgType;            /* RNDIS_MSG_* */
+    __le32    msgLen;
     /* followed by data that varies between messages */
-    __le32    request_id;
+    __le32    requestId;
     __le32    status;
     /* ... and more */
 } __attribute__ ((packed));
 
-struct rndis_data_hdr {
-    __le32    msg_type;         /* RNDIS_MSG_PACKET */
-    __le32    msg_len;          /* rndis_data_hdr + data_len + pad */
-    __le32    data_offset;      /* 36 -- right after header */
-    __le32    data_len;         /* ... real packet size */
+struct RndisDataHdr {
+    __le32    msgType;         /* RNDIS_MSG_PACKET */
+    __le32    msgLen;          /* RndisDataHdr + dataLen + pad */
+    __le32    dataOffset;      /* 36 -- right after header */
+    __le32    dataLen;         /* ... real packet size */
 
-    __le32    oob_data_offset;      /* zero */
-    __le32    oob_data_len;         /* zero */
-    __le32    num_oob;              /* zero */
-    __le32    packet_data_offset;   /* zero */
+    __le32    oobDataOffset;      /* zero */
+    __le32    oobDataLen;         /* zero */
+    __le32    numOob;              /* zero */
+    __le32    packetDataOffset;   /* zero */
 
-    __le32    packet_data_len;      /* zero */
-    __le32    vc_handle;            /* zero */
+    __le32    packetDataLen;      /* zero */
+    __le32    vcHandle;            /* zero */
     __le32    reserved;             /* zero */
 } __attribute__ ((packed));
 
-struct rndis_init {                /* OUT */
+struct RndisInit {                /* OUT */
     /* header and: */
-    __le32    msg_type;             /* RNDIS_MSG_INIT */
-    __le32    msg_len;              /* 24 */
-    __le32    request_id;
-    __le32    major_version;        /* of rndis (1.0) */
-    __le32    minor_version;
-    __le32    max_transfer_size;
+    __le32    msgType;             /* RNDIS_MSG_INIT */
+    __le32    msgLen;              /* 24 */
+    __le32    requestId;
+    __le32    majorVersion;        /* of rndis (1.0) */
+    __le32    minorVersion;
+    __le32    maxTransferSize;
 } __attribute__ ((packed));
 
-struct rndis_init_c {               /* IN */
+struct RndisInitC {               /* IN */
     /* header and: */
-    __le32    msg_type;                 /* RNDIS_MSG_INIT_C */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;                 /* RNDIS_MSG_INIT_C */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    status;
-    __le32    major_version;            /* of rndis (1.0) */
-    __le32    minor_version;
-    __le32    device_flags;
+    __le32    majorVersion;            /* of rndis (1.0) */
+    __le32    minorVersion;
+    __le32    deviceFlags;
     __le32    medium;                   /* zero == 802.3 */
-    __le32    max_packets_per_message;
-    __le32    max_transfer_size;
-    __le32    packet_alignment;         /* max 7; (1<<n) bytes */
-    __le32    af_list_offset;           /* zero */
-    __le32    af_list_size;             /* zero */
+    __le32    maxPacketsPerMessage;
+    __le32    maxTransferSize;
+    __le32    packetAlignment;         /* max 7; (1<<n) bytes */
+    __le32    afListOffset;           /* zero */
+    __le32    afListSize;             /* zero */
 } __attribute__ ((packed));
 
-struct rndis_halt {                    /* OUT (no reply) */
+struct RndisHalt {                    /* OUT (no reply) */
     /* header and: */
-    __le32    msg_type;                 /* RNDIS_MSG_HALT */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;                 /* RNDIS_MSG_HALT */
+    __le32    msgLen;
+    __le32    requestId;
 } __attribute__ ((packed));
 
-struct rndis_query {                /* OUT */
+struct RndisQuery {                /* OUT */
     /* header and: */
-    __le32    msg_type;             /* RNDIS_MSG_QUERY */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;             /* RNDIS_MSG_QUERY */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    oid;
     __le32    len;
     __le32    offset;
     __le32    handle;               /* zero */
 } __attribute__ ((packed));
 
-struct rndis_query_c {              /* IN */
+struct RndisQueryC {              /* IN */
     /* header and: */
-    __le32    msg_type;              /* RNDIS_MSG_QUERY_C */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;              /* RNDIS_MSG_QUERY_C */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    status;
     __le32    len;
     __le32    offset;
 } __attribute__ ((packed));
 
-struct rndis_set {                /* OUT */
+struct RndisSet {                /* OUT */
     /* header and: */
-    __le32    msg_type;            /* RNDIS_MSG_SET */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;            /* RNDIS_MSG_SET */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    oid;
     __le32    len;
     __le32    offset;
     __le32    handle;               /* zero */
 } __attribute__ ((packed));
 
-struct rndis_set_c {               /* IN */
+struct RndisSetC {               /* IN */
     /* header and: */
-    __le32    msg_type;             /* RNDIS_MSG_SET_C */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;             /* RNDIS_MSG_SET_C */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    status;
 } __attribute__ ((packed));
 
-struct rndis_reset {            /* IN */
+struct RndisReset {            /* IN */
     /* header and: */
-    __le32    msg_type;          /* RNDIS_MSG_RESET */
-    __le32    msg_len;
+    __le32    msgType;          /* RNDIS_MSG_RESET */
+    __le32    msgLen;
     __le32    reserved;
 } __attribute__ ((packed));
 
-struct rndis_reset_c {        /* OUT */
+struct RndisResetC {        /* OUT */
     /* header and: */
-    __le32    msg_type;          /* RNDIS_MSG_RESET_C */
-    __le32    msg_len;
+    __le32    msgType;          /* RNDIS_MSG_RESET_C */
+    __le32    msgLen;
     __le32    status;
-    __le32    addressing_lost;
+    __le32    addressingLost;
 } __attribute__ ((packed));
 
-struct rndis_indicate {        /* IN (unrequested) */
+struct RndisIndicate {        /* IN (unrequested) */
     /* header and: */
-    __le32    msg_type;         /* RNDIS_MSG_INDICATE */
-    __le32    msg_len;
+    __le32    msgType;         /* RNDIS_MSG_INDICATE */
+    __le32    msgLen;
     __le32    status;
     __le32    length;
     __le32    offset;
-    __le32    diag_status;
-    __le32    error_offset;
+    __le32    diagStatus;
+    __le32    errorOffset;
     __le32    message;
 } __attribute__ ((packed));
 
-struct rndis_keepalive {    /* OUT (optionally IN) */
+struct RndisKeepalive {    /* OUT (optionally IN) */
     /* header and: */
-    __le32    msg_type;            /* RNDIS_MSG_KEEPALIVE */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;            /* RNDIS_MSG_KEEPALIVE */
+    __le32    msgLen;
+    __le32    requestId;
 } __attribute__ ((packed));
 
-struct rndis_keepalive_c {      /* IN (optionally OUT) */
+struct RndisKeepaliveC {      /* IN (optionally OUT) */
     /* header and: */
-    __le32    msg_type;           /* RNDIS_MSG_KEEPALIVE_C */
-    __le32    msg_len;
-    __le32    request_id;
+    __le32    msgType;           /* RNDIS_MSG_KEEPALIVE_C */
+    __le32    msgLen;
+    __le32    requestId;
     __le32    status;
 } __attribute__ ((packed));
 
