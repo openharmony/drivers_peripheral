@@ -26,9 +26,9 @@
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME 3
 #define HARCH_LOG_TAG                 "[-harch-hdf-]"
 
-#define HARCH_INFO_PRINT(fmt,...) \
+#define HARCH_INFO_PRINT(fmt, ...) \
 do { \
-    if(0){ \
+    if (0){ \
         HDF_LOGI(HARCH_LOG_TAG"[%{public}s][%{public}d]:" fmt "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__);} \
 }while (0)
 
@@ -157,7 +157,7 @@ struct UsbnetHostCmdParam {
 void UsbnetWriteLog(char *buff, int size, int tag);
 
 //net process
-int32_t UsbnetHostProbe (struct UsbnetHost *uNet);
+int32_t UsbnetHostProbe(struct UsbnetHost *uNet);
 
 void UsbnetHostRelease(struct UsbnetHost *uNet);
 

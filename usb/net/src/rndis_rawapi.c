@@ -59,16 +59,16 @@
 
 /* define rndis union */
 union {
-   void *buf;
-   struct RndisMsgHdr *header;
-   struct RndisInit *init;
-   struct RndisInitC *initC;
-   struct RndisQuery *get;
-   struct RndisQueryC *getC;
-   struct RndisSet *set;
-   struct RndisSetC *setC;
-   struct RndisHalt *halt;
-} u;
+    void *buf;
+    struct RndisMsgHdr *header;
+    struct RndisInit *init;
+    struct RndisInitC *initC;
+    struct RndisQuery *get;
+    struct RndisQueryC *getC;
+    struct RndisSet *set;
+    struct RndisSetC *setC;
+    struct RndisHalt *halt;
+} g_u;
 
 static int32_t UsbGetBulkEndpoint(struct UsbnetHost **ppUsbNet, const struct UsbRawEndpointDescriptor *endPoint)
 {
@@ -207,7 +207,7 @@ static void UsbnetHostHandleNonRsp(struct UsbnetHost *usbNet,
                 cmdParam.data = msg;
                 cmdParam.size = sizeof(struct RndisKeepaliveC);
                 int32_t retval = UsbnetHostWriteCmdSync(usbNet, cmdParam);
-                HARCH_INFO_PRINT("retval = %{public}d",retval);
+                HARCH_INFO_PRINT("retval = %{public}d", retval);
                 if (retval < 0) {
                     HARCH_INFO_PRINT("rndis keepalive err %{public}d\n", retval);
                 }
@@ -306,7 +306,7 @@ static int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct RndisMsgHdr *b
         cmdParam.data = buf;
         cmdParam.size = buflen;
         retval= UsbnetHostWriteCmdSync(usbNet, cmdParam);
-        HARCH_INFO_PRINT("retval = %{public}d",retval);
+        HARCH_INFO_PRINT("retval = %{public}d", retval);
         UsbnetWriteLog((char *)buf, buflen, 0);
 
         if (retval > URB_LEGAL_ACTUAL_LENGTH) {
@@ -334,8 +334,7 @@ static int32_t HostRndisCommand(struct UsbnetHost *usbNet, struct RndisMsgHdr *b
  * nonsensical!) issue was found by sniffing protocol requests from the
  * ActiveSync 4.1 Windows driver.
  */
-static int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid,
-    uint32_t in_len, void **reply, int *replyLen)
+static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam queryParam, void **reply, int *replyLen)
 {
     HARCH_INFO_PRINT("begin");
     int retval;
@@ -344,26 +343,26 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid
         struct RndisMsgHdr *header;
         struct RndisQuery *get;
         struct RndisQueryC *getC;
-    } u;
+    } uq;
 
-    u.buf = buf;
-    memset(u.get, 0, sizeof(struct RndisQuery) + in_len);
-    u.get->msgType = CPU_TO_LE32(RNDIS_MSG_QUERY);
-    u.get->msgLen  = CPU_TO_LE32(sizeof(struct RndisQuery) + in_len);
-    u.get->oid = CPU_TO_LE32(oid);
-    u.get->len = CPU_TO_LE32(in_len);
-    u.get->offset = CPU_TO_LE32(UNION_GETOFFSET_NUMBER);
+    uq.buf = queryParam.buf;
+    memset_s(uq.get, sizeof(struct RndisQuery) + queryParam.in_len, 0, sizeof(struct RndisQuery) + queryParam.in_len);
+    uq.get->msgType = CPU_TO_LE32(RNDIS_MSG_QUERY);
+    uq.get->msgLen  = CPU_TO_LE32(sizeof(struct RndisQuery) + queryParam.in_len);
+    uq.get->oid = CPU_TO_LE32(queryParam.oid);
+    uq.get->len = CPU_TO_LE32(queryParam.in_len);
+    uq.get->offset = CPU_TO_LE32(UNION_GETOFFSET_NUMBER);
 
-    retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
+    retval = HostRndisCommand(usbNet, uq.header, CONTROL_BUFFER_SIZE);
     HARCH_INFO_PRINT("retval = %{public}d", retval);
-    HARCH_INFO_PRINT("RNDIS_MSG_QUERY(0x%{public}08x) %{public}d\n", oid, retval);
+    HARCH_INFO_PRINT("RNDIS_MSG_QUERY(0x%{public}08x) %{public}d\n", queryParam.oid, retval);
     if (retval < 0) {
-        HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d\n", oid, retval);
+        HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d\n", queryParam.oid, retval);
         return retval;
     }
 
-    uint32_t off = CPU_TO_LE32(u.getC->offset);
-    uint32_t len = CPU_TO_LE32(u.getC->len);
+    uint32_t off = CPU_TO_LE32(uq.getC->offset);
+    uint32_t len = CPU_TO_LE32(uq.getC->len);
 
     HARCH_INFO_PRINT("off = %{public}d, len = %{public}d, retval = %{public}d", off, len, retval);
     if ((off > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH) || (len > CONTROL_BUFFER_SIZE - UNION_OFFSET_LENGTH - off)) {
@@ -374,14 +373,14 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, void *buf, uint32_t oid
         goto response_error;
     }
 
-    *reply = (unsigned char *) &u.getC->requestId + off;
+    *reply = (unsigned char *) &uq.getC->requestId + off;
     *replyLen = len;
 
     HARCH_INFO_PRINT("*replyLen = %{public}d, retval = %{public}d", len, retval);
     return retval;
 
 response_error:
-    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n", oid, off, len);
+    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n", queryParam.oid, off, len);
 
     return -EDOM;
 }
@@ -419,7 +418,7 @@ static void HostRndisInitUsbnet(struct UsbnetHost **ppUsbNet, int32_t *retval)
 
 static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
 {
-    uint32_t tmp = CPU_TO_LE32(u.initC->maxTransferSize);
+    uint32_t tmp = CPU_TO_LE32(g_u.initC->maxTransferSize);
     if (tmp < (*ppUsbNet)->net.hardMtu) {
         if (tmp <= (*ppUsbNet)->net.hardHeaderLen) {
             HARCH_INFO_PRINT("RNDIS init failed, %{public}d", *retval);
@@ -434,19 +433,18 @@ static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
         (*ppUsbNet)->net.mtu = (*ppUsbNet)->net.hardMtu - (*ppUsbNet)->net.hardHeaderLen;
     }
     HARCH_INFO_PRINT("hard mtu %{public}u (%{public}u from usbNet), rx buflen %{public}zu, align %{public}d\n",
-        (*ppUsbNet)->net.hardMtu, tmp, (*ppUsbNet)->net.rxUrbSize, 1 << CPU_TO_LE32(u.initC->packetAlignment));
+        (*ppUsbNet)->net.hardMtu, tmp, (*ppUsbNet)->net.rxUrbSize, 1 << CPU_TO_LE32(g_u.initC->packetAlignment));
 }
 
 static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retval)
 {
     int replyLen = MAC_ADDR_SIZE;
     unsigned char *bp;
-    *retval = HostRndisQuery(*ppUsbNet, u.buf,RNDIS_OID_802_3_PERMANENT_ADDRESS,
-        RNDIS_QUERY_INPUT_LENGTH, (void **)&bp, &replyLen);
+    struct RndisQueryParam queryParam = {g_u.buf, RNDIS_OID_802_3_PERMANENT_ADDRESS, RNDIS_QUERY_INPUT_LENGTH};
+    *retval = HostRndisQuery(*ppUsbNet, queryParam, (void **)&bp, &replyLen);
     if (*retval < 0) {
         HDF_LOGE("rndis get ethaddr, %{public}d\n", *retval);
         *retval = HDF_ERR_NOPERM;
-        //goto ERR_HALT_FAILED_AND_RELEASE;
     }
 
     HARCH_INFO_PRINT("bp 1= %{public}x", bp[ZERO_INDEX]);
@@ -459,7 +457,7 @@ static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retva
     if (bp[0] & 0x02) {
         HARCH_INFO_PRINT("not GetmacAddr");
         (*ppUsbNet)->net.isGetmacAddr = 0;
-        size_t macAddrLen = sizeof((*ppUsbNet)->net.macAddr)/sizeof((*ppUsbNet)->net.macAddr[0]);
+        size_t macAddrLen = sizeof((*ppUsbNet)->net.macAddr) / sizeof((*ppUsbNet)->net.macAddr[0]);
         memset_s((*ppUsbNet)->net.macAddr, macAddrLen, 0, macAddrLen);
     } else {
         HARCH_INFO_PRINT("GetmacAddr");
@@ -474,7 +472,8 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
     __le32 phym_unspec;
     int replyLen = sizeof(__le32);
     /* Check physical medium */
-    *retval = HostRndisQuery(*ppUsbNet, u.buf, RNDIS_OID_GEN_PHYSICAL_MEDIUM, replyLen, (void **)&phym, &replyLen);
+    struct RndisQueryParam queryParam = {g_u.buf, RNDIS_OID_GEN_PHYSICAL_MEDIUM, replyLen};
+    *retval = HostRndisQuery(*ppUsbNet, queryParam, (void **)&phym, &replyLen);
     if (*retval != 0 || !phym) {
         /* OID is optional so don't fail here. */
         phym_unspec = CPU_TO_LE32(RNDIS_PHYSICAL_MEDIUM_UNSPECIFIED);
@@ -492,7 +491,6 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
         CPU_TO_LE32(*phym) == RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
         HDF_LOGE("driver requires non-wireless physical medium, but device is wireless\n");
         *retval = HDF_ERR_NOPERM;
-        //goto ERR_HALT_FAILED_AND_RELEASE;
     }
 
     /* Get designated host ethernet address */
@@ -502,19 +500,19 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
 static int32_t HostRndisInitUnion(struct UsbnetHost *usbNet, int32_t *retval)
 {
     int32_t ret = HDF_SUCCESS;
-    u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
-    if (!u.buf) {
-        HDF_LOGE("u.buf can't be 0\n");
+    g_u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
+    if (!g_u.buf) {
+        HDF_LOGE("g_u.buf can't be 0\n");
         ret = HDF_ERR_MALLOC_FAIL;
     }
 
-    u.init->msgType = CPU_TO_LE32(RNDIS_MSG_INIT);
-    u.init->msgLen  = CPU_TO_LE32(sizeof(struct RndisInit));
-    u.init->majorVersion = CPU_TO_LE32(1);
-    u.init->minorVersion = CPU_TO_LE32(0);
+    g_u.init->msgType = CPU_TO_LE32(RNDIS_MSG_INIT);
+    g_u.init->msgLen  = CPU_TO_LE32(sizeof(struct RndisInit));
+    g_u.init->majorVersion = CPU_TO_LE32(1);
+    g_u.init->minorVersion = CPU_TO_LE32(0);
 
-    u.init->maxTransferSize = CPU_TO_LE32((usbNet)->net.rxUrbSize);
-    *retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
+    g_u.init->maxTransferSize = CPU_TO_LE32((usbNet)->net.rxUrbSize);
+    *retval = HostRndisCommand(usbNet, g_u.header, CONTROL_BUFFER_SIZE);
     if (*retval < 0) {
         /* it might not even be an RNDIS device!! */
         HARCH_INFO_PRINT("RNDIS init failed, %{public}d", *retval);
@@ -528,19 +526,19 @@ static int32_t HostRndisEnableDataTransfers(struct UsbnetHost *usbNet)
 {
     int32_t ret = HDF_SUCCESS;
     /* set a nonzero filter to enable data transfers */
-    memset_s(u.set, sizeof(struct RndisSet), 0, sizeof(struct RndisSet));
-    u.set->msgType = CPU_TO_LE32(RNDIS_MSG_SET);
-    u.set->msgLen = CPU_TO_LE32(MSG_HEAD_LENGTH + sizeof(struct RndisSet));
-    u.set->oid = CPU_TO_LE32(RNDIS_OID_GEN_CURRENT_PACKET_FILTER);
-    u.set->len = CPU_TO_LE32(MSG_HEAD_LENGTH);
-    u.set->offset = CPU_TO_LE32(sizeof(struct RndisSet) - UNION_OFFSET_LENGTH);
-    *(__le32 *)(u.buf + sizeof(struct RndisSet)) = CPU_TO_LE32(RNDIS_DEFAULT_FILTER);
-    int32_t retval = HostRndisCommand(usbNet, u.header, CONTROL_BUFFER_SIZE);
+    memset_s(g_u.set, sizeof(struct RndisSet), 0, sizeof(struct RndisSet));
+    g_u.set->msgType = CPU_TO_LE32(RNDIS_MSG_SET);
+    g_u.set->msgLen = CPU_TO_LE32(MSG_HEAD_LENGTH + sizeof(struct RndisSet));
+    g_u.set->oid = CPU_TO_LE32(RNDIS_OID_GEN_CURRENT_PACKET_FILTER);
+    g_u.set->len = CPU_TO_LE32(MSG_HEAD_LENGTH);
+    g_u.set->offset = CPU_TO_LE32(sizeof(struct RndisSet) - UNION_OFFSET_LENGTH);
+    *(__le32 *)(g_u.buf + sizeof(struct RndisSet)) = CPU_TO_LE32(RNDIS_DEFAULT_FILTER);
+    int32_t retval = HostRndisCommand(usbNet, g_u.header, CONTROL_BUFFER_SIZE);
     if (retval < 0) {
         HDF_LOGE("rndis set packet filter, %{public}d", retval);
         ret = HDF_FAILURE;
     }
-    OsalMemFree(u.buf);
+    OsalMemFree(g_u.buf);
     return ret;
 }
 
@@ -552,13 +550,12 @@ static int32_t HostRndisEnableDataTransfers(struct UsbnetHost *usbNet)
 */
 static int32_t HostRndisBind(struct UsbnetHost *usbNet)
 {
-    HARCH_INFO_PRINT("begin");
     int32_t retval = 0;
-    //get data endpoints and control endpoints
     int32_t ret = UsbParseConfigDescriptor(&usbNet);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbParseConfigDescriptor failed", __func__, __LINE__);
-        goto ERR_PARSE_DESC;
+        UsbRawFreeConfigDescriptor(usbNet->config);
+        usbNet->config = NULL;
         return ret;
     }
 
@@ -571,11 +568,10 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     ret = HostRndisInitUnion(usbNet, &retval);
     if (ret == HDF_ERR_MALLOC_FAIL) {
         HDF_LOGE("%{public}s:%{public}d HostRndisInitUnion failed", __func__, __LINE__);
-        goto ERR_PARSE_DESC;
         return ret;
     } else if (ret == HDF_DEV_ERR_OP) {
         HDF_LOGE("%{public}s:%{public}d HostRndisInitUnion failed", __func__, __LINE__);
-        goto ERR_RELEASE_BUF;
+        OsalMemFree(g_u.buf);
         return ret;
     }
 
@@ -600,15 +596,10 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     }
     return ret;
 ERR_HALT_FAILED_AND_RELEASE:
-    memset_s(u.halt, sizeof(struct RndisHalt), 0, sizeof(struct RndisHalt));
-    u.halt->msgType = CPU_TO_LE32(RNDIS_MSG_HALT);
-    u.halt->msgLen = CPU_TO_LE32(sizeof *u.halt);
-    (void)HostRndisCommand(usbNet,(void *)u.halt, CONTROL_BUFFER_SIZE);
-ERR_RELEASE_BUF:
-    OsalMemFree(u.buf);
-ERR_PARSE_DESC:
-    UsbRawFreeConfigDescriptor(usbNet->config);
-    usbNet->config = NULL;
+    memset_s(g_u.halt, sizeof(struct RndisHalt), 0, sizeof(struct RndisHalt));
+    g_u.halt->msgType = CPU_TO_LE32(RNDIS_MSG_HALT);
+    g_u.halt->msgLen = CPU_TO_LE32(sizeof(struct RndisHalt));
+    (void)HostRndisCommand(usbNet, (void *)g_u.halt, CONTROL_BUFFER_SIZE);
     return HDF_FAILURE;
 }
 
@@ -619,7 +610,7 @@ static void HostRndisUnbind(struct UsbnetHost *usbNet)
 
     memset_s(halt, sizeof(struct RndisHalt), 0, sizeof(struct RndisHalt));
     halt->msgType = CPU_TO_LE32(RNDIS_MSG_HALT);
-    halt->msgLen  = CPU_TO_LE32(sizeof *halt);
+    halt->msgLen  = CPU_TO_LE32(sizeof(struct RndisHalt));
     (void) HostRndisCommand(usbNet, (void *)halt, CONTROL_BUFFER_SIZE);
     OsalMemFree(halt);
 }
