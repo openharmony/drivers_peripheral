@@ -12,29 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "hostapd_common_cmd.h"
+
 #include <securec.h>
 #include <hdf_base.h>
 #include <errno.h>
 #include <hdf_log.h>
 #include <osal_time.h>
 #include <osal_mem.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <string.h>
 #include "v1_0/ihostapd_callback.h"
 #include "v1_0/ihostapd_interface.h"
 #include "ap/ap_config.h"
 #include "ap/hostapd.h"
 #include "ap_ctrl_iface.h"
 #include "ap/ctrl_iface_ap.h"
-#include "ctrl_iface.h"
 #include "ap_main.h"
 #include "hostapd_client.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <dlfcn.h>
-#include <string.h>
-#include "eap_server/eap_methods.h"
+#include "hostapd_common_cmd.h"
 
 pthread_t g_tid;
+int32_t g_channel;
 
 struct HdfHostapdStubData *HdfHostapdStubDriver(void)
 {
@@ -89,18 +89,18 @@ static void *ApThreadMain(void *p)
     char *tmpArgv[MAX_WPA_MAIN_ARGC_NUM] = {0};
 
     if (p == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        HDF_LOGE("%{public}s: input parameter invalid", __func__);
         return NULL;
     }
     startCmd = (const char *)p;
-    HDF_LOGE("%{public}s: startCmd: %{public}s", __func__, startCmd);
+    HDF_LOGI("%{public}s: startCmd: %{public}s", __func__, startCmd);
     SplitCmdString(startCmd, &param);
     for (int i = 0; i < param.argc; i++) {
         tmpArgv[i] = param.argv[i];
         HDF_LOGE("%{public}s: tmpArgv[%{public}d]: %{public}s", __func__, i, tmpArgv[i]);
     }
     int ret = ap_main(param.argc, tmpArgv);
-    HDF_LOGI("%{public}s: run ap_main ret:%{public}d.", __func__, ret);
+    HDF_LOGI("%{public}s: run ap_main ret:%{public}d", __func__, ret);
     return NULL;
 }
 
@@ -109,7 +109,7 @@ static int32_t StartApMain(const char *moduleName, const char *startCmd)
     int32_t ret;
 
     if (moduleName == NULL || startCmd == NULL) {
-        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM ;
     }
     ret = pthread_create(&g_tid, NULL, ApThreadMain, (void *)startCmd);
@@ -118,30 +118,77 @@ static int32_t StartApMain(const char *moduleName, const char *startCmd)
         return HDF_FAILURE;
     }
     pthread_setname_np(g_tid, "ApMainThread");
-    HDF_LOGE("%{public}s: pthread_create ID: %{public}p.", __func__, (void*)g_tid);
+    HDF_LOGE("%{public}s: pthread_create ID: %{public}p", __func__, (void*)g_tid);
     usleep(WPA_SLEEP_TIME);
     return HDF_SUCCESS;
 }
 
-int32_t HostapdInterfaceEnableAp(struct IHostapdInterface *self, const char *ifName,
-    int32_t id)
+static int32_t StartHostapdHal(int id)
 {
-    struct hostapd_data *hostApd;
-    int32_t ret = HDF_FAILURE;
-
-    (void)self;
-    if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    HDF_LOGI("Ready to init HostapdHal");
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_enable(hostApd->iface);
+    return HDF_SUCCESS;
+}
+
+static int32_t StartHostapd(void)
+{
+    char startCmd[WIFI_MULTI_CMD_MAX_LEN] = {0};
+    char *p = startCmd;
+    int onceMove = 0;
+    int sumMove = 0;
+    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
+        WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, "%s", WPA_HOSTAPD_NAME);
+    if (onceMove < 0) {
+        HDF_LOGE("%{public}s:snprintf_s WPA_HOSTAPD_NAME fail", __func__);
+        return HDF_FAILURE;
+    }
+    p = p + onceMove;
+    sumMove = sumMove + onceMove;
+    int num;
+    const WifiHostapdHalDeviceInfo *cfg = GetWifiCfg(&num);
+    if (cfg == NULL) {
+        HDF_LOGE("%{public}s:cfg is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    for (int i = 0; i < num; i++) {
+        onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
+            WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, " %s", cfg[i].config);
+        if (onceMove < 0) {
+            HDF_LOGE("%{public}s:snprintf_s config fail", __func__);
+            return HDF_FAILURE;
+        }
+        p = p + onceMove;
+        sumMove = sumMove + onceMove;
+    }
+    HDF_LOGI("Cmd is %{public}s", startCmd);
+    int32_t ret = StartApMain(WPA_HOSTAPD_NAME, startCmd);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Enable Ap failed!", __func__);
+        HDF_LOGE("%{public}s:StartApMain error", __func__);
+        return ret;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t HostapdInterfaceEnableAp(struct IHostapdInterface *self, const char *ifNamce,
+    int32_t id)
+{
+    HDF_LOGI("Enter hdi %{public}s", __func__);
+    (void)self;
+    if (ifNamce == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
+    }
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
+        return HDF_FAILURE;
+    }
+    if (hostapdHalDevice->enableAp(id) != 0) {
+        HDF_LOGE("enableAp failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -150,22 +197,19 @@ int32_t HostapdInterfaceEnableAp(struct IHostapdInterface *self, const char *ifN
 int32_t HostapdInterfaceDisableAp(struct IHostapdInterface *self, const char *ifName,
     int32_t id)
 {
-    struct hostapd_data *hostApd;
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_disable(hostApd->iface);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Disable Ap failed!", __func__);
+    if (hostapdHalDevice->disableAp(id) != 0) {
+        HDF_LOGE("disableAp failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -173,60 +217,123 @@ int32_t HostapdInterfaceDisableAp(struct IHostapdInterface *self, const char *if
 
 int32_t HostapdInterfaceStartAp(struct IHostapdInterface *self)
 {
-    int32_t ret;
+    HDF_LOGI("Enter hdi %{public}s, this interface is discarded", __func__);
+    /*This interface has been discarded. Please use the new interface HostapdInterfaceStartApWithCmd*/
+    return HDF_FAILURE;
+}
 
+int32_t HostapdInterfaceStartApWithCmd(struct IHostapdInterface *self, const char *ifName, int id)
+{
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
-    ret = StartApMain(WPA_HOSTAPD_NAME, START_CMD);
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
+    }
+    int32_t ret;
+    ret = InitCfg(ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: InitCfg failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = StartHostapd();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: StartHostapd failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    HDF_LOGE("%{public}s: hostapd start successfully!", __func__);
+
+    if (StartHostapdHal(id) != HDF_SUCCESS) {
+        HDF_LOGE("StartHostapdHal failed");
+        return HDF_FAILURE;
+    }
+
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
+        return HDF_FAILURE;
+    }
+
+    if (GetIfaceState(ifName) == 0) {
+        ret = hostapdHalDevice->enableAp(id);
+        if (ret != 0) {
+            HDF_LOGE("enableAp failed, ret = %{public}d", ret);
+            return HDF_FAILURE;
+        }
+    }
+    HDF_LOGI("%{public}s: hostapd start successfully", __func__);
+    return HDF_SUCCESS;
+}
+
+static int32_t StopHostapdHal(int id)
+{
+    ReleaseHostapdDev(id);
     return HDF_SUCCESS;
 }
 
 int32_t HostapdInterfaceStopAp(struct IHostapdInterface *self)
 {
-    HDF_LOGI("%{public}s: enter HostapdInterfaceStopAp stop...", __func__);
-    struct hostapd_data *hostApd;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    int id = 0;
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    eap_server_unregister_methods();
-    hostapd_ctrl_iface_deinit(hostApd);
-    HDF_LOGI("%{public}s: hostapd stop successfully!", __func__);
+
+    if (hostapdHalDevice->stopAp(id) != 0) {
+        HDF_LOGE("stopAp failed");
+        return HDF_FAILURE;
+    }
+
+    if (StopHostapdHal(id) != HDF_SUCCESS) {
+        HDF_LOGE("StopHostapdHal failed");
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%{public}s: hostapd stop successfully", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t HostapdInterfaceReloadApConfigInfo(struct IHostapdInterface *self, const char *ifName,
+    int32_t id)
+{
+    HDF_LOGI("Enter hdi %{public}s", __func__);
+    (void)self;
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
+    }
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
+        return HDF_FAILURE;
+    }
+
+    if (hostapdHalDevice->reloadApConfigInfo(id) != 0) {
+        HDF_LOGE("reloadApConfigInfo failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t HostapdInterfaceSetApPasswd(struct IHostapdInterface *self, const char *ifName,
     const char *pass, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL || pass == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wpa_passphrase %s", pass);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set password!", __func__);
+
+    if (hostapdHalDevice->setApPasswd(pass, id) != 0) {
+        HDF_LOGE("setApPasswd failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -235,28 +342,20 @@ int32_t HostapdInterfaceSetApPasswd(struct IHostapdInterface *self, const char *
 int32_t HostapdInterfaceSetApName(struct IHostapdInterface *self, const char *ifName,
     const char *name, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL || name == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "ssid %s", name);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set name!", __func__);
+
+    if (hostapdHalDevice->setApName(name, id) != 0) {
+        HDF_LOGE("setApName failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -265,110 +364,42 @@ int32_t HostapdInterfaceSetApName(struct IHostapdInterface *self, const char *if
 int32_t HostapdInterfaceSetApWpaValue(struct IHostapdInterface *self, const char *ifName,
     int32_t securityType, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd == NULL", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    switch (securityType) {
-        case NONE:
-            // The authentication mode is NONE.
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wpa 0");
-            break;
-        case WPA_PSK:
-            // The authentication mode is WPA-PSK.
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wpa 1");
-            break;
-        case WPA2_PSK:
-            // The authentication mode is WPA2-PSK.
-            ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wpa 2");
-            break;
-        default:
-            HDF_LOGE("Unknown encryption type!");
-            return ret;
-    }
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, Type = %{public}d", __func__, cmd, securityType);
+
+    if (hostapdHalDevice->setApWpaValue(securityType, id) != 0) {
+        HDF_LOGE("setApWpaValue failed");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret == 0 && securityType != NONE) {
-        /*
-         * If the value of wpa is switched between 0, 1, and 2, the wpa_key_mgmt,
-         * wpa_pairwise, and rsn_pairwise attributes must be set. Otherwise, the
-         * enable or STA cannot be connected.
-         */
-        strcpy_s(cmd, sizeof(cmd), "wpa_key_mgmt WPA-PSK");
-        ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    }
-    if (ret == 0 && securityType == WPA_PSK) {
-        strcpy_s(cmd, sizeof(cmd), "wpa_pairwise CCMP");
-        ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    }
-    if (ret == 0 && securityType == WPA2_PSK) {
-        strcpy_s(cmd, sizeof(cmd), "rsn_pairwise CCMP");
-        ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    }
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set securityType, Type = %{public}d.", __func__, securityType);
-        return HDF_FAILURE;
-    }
-    HDF_LOGI("%{public}s:set securityType successfully, Type = %{public}d.", __func__, securityType);
     return HDF_SUCCESS;
 }
 
 int32_t HostapdInterfaceSetApBand(struct IHostapdInterface *self, const char *ifName,
     int32_t band, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    const char *hwMode = NULL;
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    switch (band) {
-        case AP_NONE_BAND:
-            /* Unknown frequency band. */
-            hwMode = "any";
-            break;
-        case AP_2GHZ_BAND:
-            /* BAND_2_4_GHZ. */
-            hwMode = "g";
-            break;
-        case AP_5GHZ_BAND:
-            /* BAND_5_GHZ. */
-            hwMode = "a";
-            break;
-        default:
-            HDF_LOGE("Invalid band!");
-            return HDF_FAILURE;
-        }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "hw_mode %s", hwMode);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set AP bandwith!", __func__);
+
+    if (hostapdHalDevice->setApBand(band, id) != 0) {
+        HDF_LOGE("setApBand failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -377,28 +408,20 @@ int32_t HostapdInterfaceSetApBand(struct IHostapdInterface *self, const char *if
 int32_t HostapdInterfaceSetAp80211n(struct IHostapdInterface *self, const char *ifName,
     int32_t value, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "ieee80211n %d", value);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set Ap80211n!", __func__);
+
+    if (hostapdHalDevice->setAp80211n(value, id) != 0) {
+        HDF_LOGE("setAp80211n failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -407,28 +430,20 @@ int32_t HostapdInterfaceSetAp80211n(struct IHostapdInterface *self, const char *
 int32_t HostapdInterfaceSetApWmm(struct IHostapdInterface *self, const char *ifName,
     int32_t value, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "wmm_enabled %d", value);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
+
+    if (hostapdHalDevice->setApWmm(value, id) != 0) {
+        HDF_LOGE("setApWmm failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -437,28 +452,20 @@ int32_t HostapdInterfaceSetApWmm(struct IHostapdInterface *self, const char *ifN
 int32_t HostapdInterfaceSetApChannel(struct IHostapdInterface *self, const char *ifName,
     int32_t channel, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "channel %d", channel);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
-        return HDF_FAILURE;
-    }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
+
+    if (hostapdHalDevice->setApChannel(channel, id) != 0) {
+        HDF_LOGE("setApChannel failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -467,28 +474,24 @@ int32_t HostapdInterfaceSetApChannel(struct IHostapdInterface *self, const char 
 int32_t HostapdInterfaceSetApMaxConn(struct IHostapdInterface *self, const char *ifName,
     int32_t maxConn, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "max_num_sta %d", maxConn);
-    if (ret < EOK) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{public}s, ret = %{public}d", __func__, cmd, ret);
+
+    if (hostapdHalDevice->setApMaxConn(maxConn, id) != 0) {
+        HDF_LOGE("setApMaxConn failed");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_set(hostApd, cmd);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to set ApWmm!", __func__);
+    if (hostapdHalDevice->setApMaxConnHw(maxConn, g_channel) != 0) {
+        HDF_LOGE("setApMaxConnHw failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -497,24 +500,20 @@ int32_t HostapdInterfaceSetApMaxConn(struct IHostapdInterface *self, const char 
 int32_t HostapdInterfaceSetMacFilter(struct IHostapdInterface *self, const char *ifName,
     const char *mac, int32_t id)
 {
-    struct hostapd_data *hostApd;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL || mac == NULL) {
-        HDF_LOGE("%{public}s: SetMacFilter or ifName is NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    if (!hostapd_ctrl_iface_acl_add_mac(
-        &hostApd->conf->deny_mac, &hostApd->conf->num_deny_mac, mac)) {
-        hostapd_disassoc_deny_mac(hostApd);
-        HDF_LOGE("%{public}s: Hostapd add mac success!", __func__);
-    } else {
-        HDF_LOGE("%{public}s: Hostapd failed to add mac!", __func__);
+
+    if (hostapdHalDevice->addBlocklist(mac, id) != 0) {
+        HDF_LOGE("addBlocklist failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -523,21 +522,20 @@ int32_t HostapdInterfaceSetMacFilter(struct IHostapdInterface *self, const char 
 int32_t HostapdInterfaceDelMacFilter(struct IHostapdInterface *self, const char *ifName,
     const char *mac, int32_t id)
 {
-    struct hostapd_data *hostApd;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL || mac == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    if (hostapd_ctrl_iface_acl_del_mac(
-        &hostApd->conf->deny_mac, &hostApd->conf->num_deny_mac, mac)) {
-        HDF_LOGE("%{public}s: Hostapd failed to delete the mac!", __func__);
+
+    if (hostapdHalDevice->delBlocklist(mac, id) != 0) {
+        HDF_LOGE("delBlocklist failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -546,80 +544,43 @@ int32_t HostapdInterfaceDelMacFilter(struct IHostapdInterface *self, const char 
 int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self, const char *ifName,
     char *buf, uint32_t bufLen, int32_t size, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    char cmd[CMD_SIZE] = {0};
-    int32_t ret = HDF_FAILURE;
-    char *reqBuf = (char *)calloc(BUFFSIZE_REQUEST, sizeof(char));
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
-    if (ifName == NULL || buf == NULL || reqBuf == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid or calloc failed!", __func__);
-        free(reqBuf);
-        return HDF_ERR_INVALID_PARAM;
+    if (ifName == NULL || buf == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostapd is null.", __func__);
-        free(reqBuf);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_sta_first(hostApd, reqBuf, BUFFSIZE_REQUEST);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to get first sta!", __func__);
-        free(reqBuf);
+
+    if (hostapdHalDevice->showConnectedDevList(buf, size, id) != 0) {
+        HDF_LOGE("showConnectedDevList failed");
         return HDF_FAILURE;
     }
-    do {
-        char *pos = reqBuf;
-        while (*pos != '\0' && *pos != '\n') {
-            /* return station info, first line is mac address */
-            pos++;
-        }
-        *pos = '\0';
-        if (strcmp(reqBuf, "") != 0) {
-            int bufLen = strlen(buf);
-            int staLen = strlen(reqBuf);
-            if (bufLen + staLen + 1 >= size) {
-                free(reqBuf);
-                reqBuf = NULL;
-                return HDF_SUCCESS;
-            }
-            buf[bufLen++] = ',';
-            for (int i = 0; i < staLen; ++i) {
-                buf[bufLen + i] = reqBuf[i];
-            }
-            buf[bufLen + staLen] = '\0';
-        }
-        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "%s", reqBuf) < 0) {
-            HDF_LOGE("%{public}s: Hostapd failed to get sta infos!", __func__);
-            free(reqBuf);
-            return HDF_FAILURE;
-        }
-    } while (hostapd_ctrl_iface_sta_next(hostApd, cmd, reqBuf, BUFFSIZE_REQUEST));
-    free(reqBuf);
-    reqBuf = NULL;
+    bufLen = strlen(buf);
     return HDF_SUCCESS;
 }
 
 int32_t HostapdInterfaceDisassociateSta(struct IHostapdInterface *self, const char *ifName,
     const char *mac, int32_t id)
 {
-    struct hostapd_data *hostApd;
-    int32_t ret = HDF_FAILURE;
-
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
     if (ifName == NULL || mac == NULL) {
-        HDF_LOGE("%{public}s: Input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s input parameter invalid", __func__);
+        return HDF_ERR_INVALID_PARAM ;
     }
-    hostApd = getHostapd();
-    if (hostApd == NULL) {
-        HDF_LOGE("%{public}s hostApd is null.", __func__);
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
     }
-    ret = hostapd_ctrl_iface_disassociate(hostApd, mac);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Hostapd failed to disassociate with sta!", __func__);
+
+    if (hostapdHalDevice->disConnectedDev(mac, id) != 0) {
+        HDF_LOGE("disConnectedDev failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -631,22 +592,26 @@ static int32_t ProcessEventStaJoin(struct HdfHostapdRemoteNode *node,
     struct HdiApCbParm *hdiApCbParm = NULL;
     int32_t ret = HDF_FAILURE;
 
-    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaJoin == NULL) {
-        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaJoin == NULL || apCbParm == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     hdiApCbParm = (struct HdiApCbParm *)OsalMemCalloc(sizeof(struct HdiApCbParm));
     if (hdiApCbParm == NULL) {
-        HDF_LOGE("%{public}s: hdiApCbParm is NULL!", __func__);
+        HDF_LOGE("%{public}s: hdiApCbParm OsalMemCalloc fail", __func__);
         return HDF_FAILURE;
     } else {
         hdiApCbParm->content = OsalMemCalloc(WIFI_HOSTAPD_CB_CONTENT_LENGTH);
         if (hdiApCbParm->content == NULL) {
-            HDF_LOGE("%{public}s: hdiApCbParm->content is NULL!", __func__);
+            HDF_LOGE("%{public}s: hdiApCbParm->content OsalMemCalloc fail", __func__);
+            HdiApCbParmFree(hdiApCbParm, true);
+            return HDF_FAILURE;
         } else {
             os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventStaJoin(node->callbackObj, hdiApCbParm, ifName);
+            HDF_LOGI("%{public}s: OnEventStaJoin send success, content is %{private}s", __func__,
+                hdiApCbParm->content);
         }
     }
     HdiApCbParmFree(hdiApCbParm, true);
@@ -659,22 +624,26 @@ static int32_t ProcessEventApState(struct HdfHostapdRemoteNode *node,
     struct HdiApCbParm *hdiApCbParm  = NULL;
     int32_t ret = HDF_FAILURE;
     
-    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventApState == NULL) {
-        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventApState == NULL || apCbParm == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     hdiApCbParm = (struct HdiApCbParm *)OsalMemCalloc(sizeof(struct HdiApCbParm));
     if (hdiApCbParm == NULL) {
-        HDF_LOGE("%{public}s: hdiApCbParm is NULL!", __func__);
+        HDF_LOGE("%{public}s: hdiApCbParm OsalMemCalloc fail", __func__);
         return HDF_FAILURE;
     } else {
         hdiApCbParm->content = OsalMemCalloc(WIFI_HOSTAPD_CB_CONTENT_LENGTH);
         if (hdiApCbParm->content == NULL) {
-            HDF_LOGE("%{public}s: hdiApCbParm is NULL!", __func__);
+            HDF_LOGE("%{public}s: hdiApCbParm->content OsalMemCalloc fail", __func__);
+            HdiApCbParmFree(hdiApCbParm, true);
+            return HDF_FAILURE;
         } else {
             os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventApState(node->callbackObj, hdiApCbParm, ifName);
+            HDF_LOGI("%{public}s: OnEventApState send success, content is %{private}s", __func__,
+                hdiApCbParm->content);
         }
     }
     HdiApCbParmFree(hdiApCbParm, true);
@@ -686,7 +655,11 @@ int32_t ProcessEventHostapdNotify(struct HdfHostapdRemoteNode *node, char *notif
     int32_t ret = HDF_FAILURE;
 
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventHostApdNotify == NULL) {
-        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (notifyParam == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (strlen(notifyParam) == 0) {
@@ -705,7 +678,7 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
     head = &HdfHostapdStubDriver()->remoteListHead;
     HDF_LOGD("%s: enter HdfHostapdCallbackFun event =%d ", __FUNCTION__, event);
     if (data == NULL || ifName == NULL) {
-        HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
+        HDF_LOGE("%{public}s: data or ifName is NULL", __func__);
         (void)OsalMutexUnlock(&HdfHostapdStubDriver()->mutex);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -746,7 +719,7 @@ static int32_t HdfHostapdAddRemoteObj(struct IHostapdCallback *self)
     struct DListHead *head = &HdfHostapdStubDriver()->remoteListHead;
 
     if (self == NULL) {
-        HDF_LOGE("%{public}s:self is null.", __func__);
+        HDF_LOGE("%{public}s:self is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!DListIsEmpty(head)) {
@@ -789,11 +762,12 @@ static void HdfHostapdDelRemoteObj(struct IHostapdCallback *self)
 int32_t HostapdInterfaceRegisterEventCallback(struct IHostapdInterface *self,
     struct IHostapdCallback *cbFunc, const char *ifName)
 {
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     int32_t ret = HDF_FAILURE;
 
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        HDF_LOGE("%{public}s: input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMutexLock(&HdfHostapdStubDriver()->mutex);
@@ -817,11 +791,12 @@ int32_t HostapdInterfaceRegisterEventCallback(struct IHostapdInterface *self,
 int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
     struct IHostapdCallback *cbFunc, const char *ifName)
 {
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     int32_t ret = HDF_FAILURE;
 
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        HDF_LOGE("%{public}s: input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMutexLock(&HdfHostapdStubDriver()->mutex);
@@ -838,16 +813,17 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
 
 int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifName, const char *cmd)
 {
+    HDF_LOGI("Enter hdi %{public}s", __func__);
     struct hostapd_data *hostApd;
 
     (void)self;
     if (ifName == NULL || cmd == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        HDF_LOGE("%{public}s: input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     hostApd = getHostapd();
     if (hostApd == NULL) {
-        HDF_LOGE("%{public}s wpaSupp == NULL", __func__);
+        HDF_LOGE("%{public}s hostApd is NULL", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
