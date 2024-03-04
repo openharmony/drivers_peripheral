@@ -380,7 +380,8 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     return retval;
 
 response_error:
-    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n", queryParam.oid, off, len);
+    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n",
+        queryParam.oid, off, len);
 
     return -EDOM;
 }
@@ -484,7 +485,6 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
         CPU_TO_LE32(*phym) != RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
         HDF_LOGE("driver requires wireless physical medium, but device is not\n");
         *retval = HDF_ERR_NOPERM;
-        //goto ERR_HALT_FAILED_AND_RELEASE;
     }
 
     if (((*ppUsbNet)->flags & FLAG_RNDIS_PHYM_NOT_WIRELESS) &&

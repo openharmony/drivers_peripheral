@@ -958,7 +958,6 @@ static int32_t UsbnetHostInitObject(struct UsbnetHost *usbNet)
             HDF_LOGE("%{public}s:%{public}d bind failed", __func__, __LINE__);
             ret = HDF_FAILURE;
             return ret;
-            //goto ERR_GET_DESC;
         }
 
         HARCH_INFO_PRINT("net->mtu = %{public}d, dev->hardMtu= %{public}d ,net->hardHeaderLen = %{public}d",
