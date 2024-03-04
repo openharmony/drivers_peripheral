@@ -6,7 +6,7 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 #ifndef RNDIS_HOST_H
-#define RNDIS_HOST_H 
+#define RNDIS_HOST_H
 
 /* Remote NDIS Versions */
 #define RNDIS_MAJOR_VERSION        0x00000001
