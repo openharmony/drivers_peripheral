@@ -85,7 +85,6 @@ static int32_t OpenDevice(void)
 
     HDF_LOGI("%{public}s: open file action", __func__);
     g_fd = open(path, O_RDWR);
-
     if (g_fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
     }

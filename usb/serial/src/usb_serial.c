@@ -1277,7 +1277,7 @@ static int32_t AcmCtrlIrqCheckSize(struct UsbRequest * const req, struct AcmDevi
         }
         unsigned int copySize = MIN(currentSize, expectedSize - acm->nbIndex);
         if (memcpy_s(&acm->notificationBuffer[acm->nbIndex], acm->nbSize - acm->nbIndex, req->compInfo.buffer,
-                copySize) != EOK) {
+            copySize) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memcpy_s failed", __func__, __LINE__);
         }
         acm->nbIndex += copySize;

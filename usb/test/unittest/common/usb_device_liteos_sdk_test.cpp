@@ -52,7 +52,7 @@ void UsbFnDeviceSdkTest::SetUp()
 
 void UsbFnDeviceSdkTest::TearDown()
 {
-   printf("%s\n", __func__);
+    printf("%s\n", __func__);
 }
 
 HWTEST_F(UsbFnDeviceSdkTest, UsbDeviceCreate001, TestSize.Level1)
