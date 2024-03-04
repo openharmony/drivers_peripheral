@@ -176,9 +176,10 @@ RetCode StreamBase::StopStream()
 
     state_ = STREAM_STATE_IDLE;
     tunnel_->NotifyStop();
-    cv_.notify_one();
+    cv_.notify_all();
+
     if (handler_ != nullptr) {
-        handler_->join();
+        handler_->detach();
         handler_ = nullptr;
     }
 
