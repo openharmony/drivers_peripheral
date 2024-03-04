@@ -616,7 +616,6 @@ static int32_t SerialSetBaudrate(struct SerialDevice *port, const struct HdfSBuf
 static int32_t SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *reply)
 {
     uint32_t baudRate = LE32_TO_CPU(port->lineCoding.dwDTERate);
-
     if (!HdfSbufWriteUint32(reply, baudRate)) {
         HDF_LOGE("%s:%d sbuf write buffer failed", __func__, __LINE__);
         return HDF_ERR_IO;

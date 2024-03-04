@@ -172,8 +172,6 @@ void TaskQueue::Init(void)
     thd.detach();
 }
 
-
-
 void TaskQueue::UnInit(void)
 {
     threadRun_ = false;
