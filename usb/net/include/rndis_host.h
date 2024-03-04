@@ -5,6 +5,8 @@
  * the GPL, or the BSD license, at your option.
  * See the LICENSE file in the root of this repository for complete details.
  */
+#ifndef RNDIS_HOST_H
+#define RNDIS_HOST_H 
 
 /* Remote NDIS Versions */
 #define RNDIS_MAJOR_VERSION        0x00000001
@@ -16,7 +18,7 @@
 #define RNDIS_DF_RAW_DATA               0x00000004U
 
 /*
- * Codes for "msg_type" field of rndis messages;
+ * Codes for "msgType" field of rndis messages;
  * only the data channel uses packet messages (maybe batched);
  * everything else goes on the control channel.
  */
@@ -391,3 +393,5 @@
 #define REMOTE_CONDIS_MP_DELETE_VC_CMPLT            0x80008002
 #define REMOTE_CONDIS_MP_ACTIVATE_VC_CMPLT          0x80008005
 #define REMOTE_CONDIS_MP_DEACTIVATE_VC_CMPLT        0x80008006
+
+#endif

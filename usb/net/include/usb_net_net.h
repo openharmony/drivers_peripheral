@@ -14,7 +14,9 @@
 
 #define DEFAULT_MTU          1500
 #define DEFAULT_NET_HEAD_LEN 14
-
+#define INDEX_ZERO  0
+#define INDEX_ONE   1
+#define INDEX_TWO   2
 /**
  * ether_addr_copy - Copy an Ethernet address
  * @dst: Pointer to a six-byte array Ethernet address destination
@@ -35,9 +37,9 @@ static inline void etherAddrCopy(uint8_t *dst, const uint8_t *src)
     uint16_t *a = (uint16_t *)dst;
     const uint16_t *b = (const uint16_t *)src;
 
-    a[0] = b[0];
-    a[1] = b[1];
-    a[2] = b[2];
+    a[INDEX_ZERO] = b[INDEX_ZERO];
+    a[INDEX_ONE]  = b[INDEX_ONE];
+    a[INDEX_TWO]  = b[INDEX_TWO];
 #endif
 }
 

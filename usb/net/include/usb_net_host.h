@@ -26,11 +26,11 @@
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME 3
 #define HARCH_LOG_TAG                 "[-harch-hdf-]"
 
-#define HARCH_INFO_PRINT(fmt,...)  \
-do{ \
-    if(0){\
-        HDF_LOGI(HARCH_LOG_TAG"[%{public}s][%{public}d]:" fmt "\n",__FUNCTION__,__LINE__,##__VA_ARGS__);}\
-}while(0)
+#define HARCH_INFO_PRINT(fmt,...) \
+do { \
+    if(0){ \
+        HDF_LOGI(HARCH_LOG_TAG"[%{public}s][%{public}d]:" fmt "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__);} \
+}while (0)
 
 enum UsbnetHostDeviceSpeed {
     USB_SPEED_UNKNOWN = 0,        /* enumerating */
@@ -96,7 +96,7 @@ struct UsbnetHost {
     uint32_t xid;
     //data process
     uint16_t rxQlen, txQlen;
-    uint32_t canDmaSg:1;
+    uint32_t canDmaSg : 1;
     uint8_t  *paddingPkt;
     struct DListHead  readPool;
     struct DListHead  readQueue;
@@ -144,20 +144,24 @@ struct UsbnetHostDriverInfo {
     void    (*unbind)(struct UsbnetHost *);
 };
 
+/* write or read command need param */
+struct UsbnetHostCmdParam {
+    uint8_t cmd;
+    uint8_t reqtype;
+    uint16_t value;
+    uint16_t index;
+    const void *data;
+    uint16_t size;
+};
+
+void UsbnetWriteLog(char *buff, int size, int tag);
+
 //net process
 int32_t UsbnetHostProbe (struct UsbnetHost *uNet);
+
 void UsbnetHostRelease(struct UsbnetHost *uNet);
 
 //usb process
-int32_t UsbnetHostGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConfigDescriptor **config);
-
-int32_t UsbnetHostWriteCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-               uint16_t value, uint16_t index, const void *data, uint16_t size);
-
-int32_t UsbnetHostWriteCmdAsync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-               uint16_t value, uint16_t index, const void *data, uint16_t size);
-
-int32_t UsbnetHostReadCmdSync(struct UsbnetHost *usbNet, uint8_t cmd, uint8_t reqtype,
-               uint16_t value, uint16_t index,  void *data, uint16_t size);
+int32_t UsbnetHostWriteCmdSync(struct UsbnetHost *usbNet, struct UsbnetHostCmdParam cmdParm);
 
 #endif
