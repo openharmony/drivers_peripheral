@@ -1012,7 +1012,7 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(&controlParams, buffer, length, static_cast<int32_t>(USB_DDK_DT_DEVICE) << TYPE_OFFSET_8, 0);
@@ -1021,8 +1021,8 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         HDF_LOGE("%{public}s:UsbControlTransferEx failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1034,7 +1034,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
@@ -1045,7 +1045,8 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return ret;
     }
 
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1057,7 +1058,7 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
@@ -1068,7 +1069,8 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return ret;
     }
 
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1084,7 +1086,8 @@ int32_t UsbImpl::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descr
     OsalMutexLock(&handle->devHandle->lock);
     uint8_t *ptr = static_cast<uint8_t *>(handle->devHandle->dev->descriptors);
     uint32_t length = handle->devHandle->dev->descriptorsLength;
-    descriptor.assign(ptr, ptr + length);
+    descriptor.resize(length);
+    std::copy(ptr, ptr + length, descriptor.begin());
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
 }
