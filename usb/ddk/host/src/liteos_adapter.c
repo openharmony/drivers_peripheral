@@ -24,6 +24,11 @@
 #define PATH_LEN      24
 #define DESC_READ_LEN 256
 #define EP_NUM_MAX    30
+#define SLEEP_TIME    20
+#define REQ_NUM       10
+#define TEST_BYTE_COUNT 1024  BufferLen
+#define TIME_OUT      500
+#define BUFFER_LEN    50
 
 static bool g_CompleteExit;
 
@@ -124,7 +129,7 @@ static int32_t OsSubmitUrb(UsbAdapterUrb *urb, UsbAdapterDevice *adapterDevice, 
         return (-EINVAL);
     }
 
-    err = usb_setup_endpoint(adapterDevice, uhe, 1024);
+    err = usb_setup_endpoint(adapterDevice, uhe, TEST_BYTE_COUNT);
     if (err < 0) {
         DPRINTFN(0, "setup failed err:%d\n", err);
         return (err);
@@ -525,7 +530,7 @@ static int32_t OsSubmitControlMsg(
 
     urb->dev = (UsbAdapterDevice *)adapterDevice;
     urb->endpoint = uhe;
-    urb->timeout = 500;
+    urb->timeout = TIME_OUT;
     urb->transfer_buffer = request->buffer;
     urb->context = (void *)request;
     urb->complete = OsUrbComplete;
@@ -576,7 +581,7 @@ static int32_t OsSubmitBulkRequestHandleUrb(
         case USB_REQUEST_TYPE_BULK:
             break;
         case USB_REQUEST_TYPE_INTERRUPT:
-            urb->interval = 50;
+            urb->interval = BUFFER_LEN;
             break;
         default:
             DPRINTFN(0, "%s:%d unknown requestType=%u\n", __func__, __LINE__, request->requestType);
@@ -1080,9 +1085,9 @@ static int32_t OsFreeRequest(const struct UsbHostRequest *request)
     }
 
     while (true) {
-        OsalMSleep(20);
+        OsalMSleep(SLEEP_TIME);
         if (request->numUrbs != request->numRetired) {
-            if (++retry > 10) {
+            if (++retry > REQ_NUM) {
                 DPRINTFN(0, "request busy numUrbs:%d+numretired:%d\n", request->numUrbs, request->numRetired);
                 return HDF_ERR_DEVICE_BUSY;
             }

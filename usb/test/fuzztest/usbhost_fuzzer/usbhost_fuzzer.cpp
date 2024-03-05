@@ -28,6 +28,14 @@ using namespace OHOS::HDI::Usb::V1_0;
 using OHOS::HDI::Usb::V1_0::UsbDev;
 using namespace OHOS::USB;
 
+#define INDEX_ZERO               0
+#define INDEX_ONE                1
+#define INDEX_TWO                2
+#define INDEX_THREE              3
+#define DIGIT_MAX                24
+#define DIGIT_MID                16
+#define DIGIT_SML                8
+
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
@@ -45,7 +53,8 @@ uint32_t Convert2Uint32(const uint8_t *ptr)
      * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
      * and the third digit no left
      */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    return (ptr[INDEX_ZERO] << DIGIT_MAX) | (ptr[INDEX_ONE] << DIGIT_MID)
+        | (ptr[INDEX_TWO] << DIGIT_SML) | (ptr[INDEX_THREE]);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)

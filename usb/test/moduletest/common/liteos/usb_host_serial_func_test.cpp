@@ -32,6 +32,8 @@ public:
     static void TearDownTestCase();
 };
 
+#define SLEEP_TIME    1000
+
 void UsbHostSerialFuncTest::SetUpTestCase()
 {
     printf("------start UsbHostSerialFuncTest------\n");
@@ -197,14 +199,14 @@ static void TestAsyncRead(char *readBuf, int32_t timeout)
     if (strlen(readBuf) > 0) {
         memset_s(readBuf, strlen(readBuf), 0, strlen(readBuf));
     }
-    timeout = timeout * 1000;
+    timeout = timeout * SLEEP_TIME;
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_READ);
     while (timeout-- > 0) {
         UsbHostDdkTestAsyncRead(readBuf);
         if (strlen(readBuf) > 0) {
             break;
         }
-        usleep(1000);
+        usleep(SLEEP_TIME);
     }
     printf("------TestAsyncRead end-----");
 }

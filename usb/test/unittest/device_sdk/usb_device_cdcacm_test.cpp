@@ -239,6 +239,7 @@ static struct UsbFnFunction g_acmFunction = {
 };
 
 /** device **/
+#define REQ_NUM           2
 #define BCD_USB           0x0200
 #define DEVICE_VENDOR_ID  0x12D1
 #define DEVICE_PRODUCT_ID 0x5000
@@ -417,8 +418,7 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
 
     DListHeadInit(&acmDevice->ctrlPool);
     acmDevice->ctrlReqNum = 0;
-
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < REQ_NUM; i++) {
         ctrlInfo = static_cast<struct CtrlInfo *>(OsalMemCalloc(sizeof(*ctrlInfo)));
         if (ctrlInfo == nullptr) {
             return -1;

@@ -53,7 +53,7 @@ struct HdfRemoteService *g_acmService = NULL;
 #endif
 static bool g_exitFlag = false;
 
-static int32_t UsbObtainSbuf(void)
+int32_t UsbObtainSbuf(void)
 {
     if (g_acmService == NULL) {
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
@@ -74,7 +74,7 @@ static int32_t UsbObtainSbuf(void)
     return HDF_SUCCESS;
 }
 
-static int32_t UsbHostDdkTestInit(const char *apiType)
+int32_t UsbHostDdkTestInit(const char *apiType)
 {
     const char *acmRawServiceName = "usbhost_acm_rawapi_service";
     const char *acmServiceName = "usbhost_acm_pnp_service";
@@ -174,7 +174,7 @@ static void TestModuleWriteLog(int32_t cmdType, const char *str)
     }
 }
 
-static int32_t UsbHostDdkTestAsyncRead(char * const readSbuf)
+int32_t UsbHostDdkTestAsyncRead(char * const readSbuf)
 {
     HdfSbufFlush(g_reply);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -205,7 +205,7 @@ static int32_t UsbHostDdkTestAsyncRead(char * const readSbuf)
     return HDF_SUCCESS;
 }
 
-static void UsbHostDdkTestAsyncWrite(const char *buf)
+void UsbHostDdkTestAsyncWrite(const char *buf)
 {
     if (buf == NULL) {
         return;
@@ -235,7 +235,7 @@ static void UsbHostDdkTestAsyncWrite(const char *buf)
     TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf);
 }
 
-static void UsbHostDdkTestSyncRead(char *readSbuf)
+void UsbHostDdkTestSyncRead(char *readSbuf)
 {
     HdfSbufFlush(g_reply);
 
@@ -265,7 +265,7 @@ static void UsbHostDdkTestSyncRead(char *readSbuf)
     }
 }
 
-static void UsbHostDdkTestSyncWrite(const char *buf)
+void UsbHostDdkTestSyncWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
 
@@ -292,7 +292,7 @@ static void UsbHostDdkTestSyncWrite(const char *buf)
     TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf);
 }
 
-static void UsbHostDdkTestCtrlClass(char *readSbuf)
+void UsbHostDdkTestCtrlClass(char *readSbuf)
 {
     HdfSbufFlush(g_reply);
 
@@ -318,7 +318,7 @@ static void UsbHostDdkTestCtrlClass(char *readSbuf)
     }
 }
 
-static void UsbHostDdkTestStdGetDes(char *readSbuf)
+void UsbHostDdkTestStdGetDes(char *readSbuf)
 {
     HdfSbufFlush(g_reply);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -351,7 +351,7 @@ static void UsbHostDdkTestStdGetDes(char *readSbuf)
     }
 }
 
-static void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
+void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
 {
     HdfSbufFlush(g_reply);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -386,7 +386,7 @@ static void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
     }
 }
 
-static void UsbHostDdkTestStdGetStatus(char *readSbuf)
+void UsbHostDdkTestStdGetStatus(char *readSbuf)
 {
     uint16_t data = 0;
 
@@ -420,7 +420,7 @@ static void UsbHostDdkTestStdGetStatus(char *readSbuf)
     }
 }
 
-static void TestStdGetConf(void)
+void TestStdGetConf(void)
 {
     uint8_t data;
 
@@ -447,7 +447,7 @@ static void TestStdGetConf(void)
     }
 }
 
-static void TestStdGetInterface(void)
+void TestStdGetInterface(void)
 {
     uint8_t data;
 
@@ -473,7 +473,7 @@ static void TestStdGetInterface(void)
     }
 }
 
-static void UsbHostDdkTestSetBaudrate(uint32_t value)
+void UsbHostDdkTestSetBaudrate(uint32_t value)
 {
     HdfSbufFlush(g_data);
 
@@ -500,7 +500,7 @@ static void UsbHostDdkTestSetBaudrate(uint32_t value)
     TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_SET_BAUDRATE");
 }
 
-static void UsbHostDdkTestGetBaudrate(char *readSbuf)
+void UsbHostDdkTestGetBaudrate(char *readSbuf)
 {
     uint32_t value = 0;
 
@@ -533,7 +533,7 @@ static void UsbHostDdkTestGetBaudrate(char *readSbuf)
     }
 }
 
-static void UsbHostDdkTestAddInterface(uint32_t value)
+void UsbHostDdkTestAddInterface(uint32_t value)
 {
     HdfSbufFlush(g_data);
 
@@ -557,7 +557,7 @@ static void UsbHostDdkTestAddInterface(uint32_t value)
     HDF_LOGD("%s:%d CMD_ADD_INTERFACE success!", __func__, __LINE__);
 }
 
-static void UsbHostDdkTestRemoveInterface(uint32_t value)
+void UsbHostDdkTestRemoveInterface(uint32_t value)
 {
     HdfSbufFlush(g_data);
 
@@ -581,7 +581,7 @@ static void UsbHostDdkTestRemoveInterface(uint32_t value)
     HDF_LOGD("%s:%d CMD_REMOVE_INTERFACE success!", __func__, __LINE__);
 }
 
-static int32_t UsbHostDdkTestOpen(int32_t cmdType)
+int32_t UsbHostDdkTestOpen(int32_t cmdType)
 {
     if (g_exitFlag) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
@@ -607,7 +607,7 @@ static int32_t UsbHostDdkTestOpen(int32_t cmdType)
     return status;
 }
 
-static int32_t UsbHostDdkTestClose(int32_t cmdType)
+int32_t UsbHostDdkTestClose(int32_t cmdType)
 {
     if (g_exitFlag) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
@@ -633,7 +633,7 @@ static int32_t UsbHostDdkTestClose(int32_t cmdType)
     return status;
 }
 
-static void TestExit(void)
+void TestExit(void)
 {
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
     HdfIoServiceRecycle(g_acmService);
@@ -644,7 +644,7 @@ static void TestExit(void)
     HdfSbufRecycle(g_reply);
 }
 
-static bool TestGetExitFlag(void)
+bool TestGetExitFlag(void)
 {
     return g_exitFlag;
 }

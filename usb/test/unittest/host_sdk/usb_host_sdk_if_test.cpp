@@ -17,7 +17,6 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <unistd.h>
-extern "C" {
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -25,7 +24,6 @@ extern "C" {
 #include "securec.h"
 #include "usb_ddk_interface.h"
 #include "usb_host_sdk_if_test.h"
-}
 
 #define USB_PIPE_DIR_OFFSET 7
 
