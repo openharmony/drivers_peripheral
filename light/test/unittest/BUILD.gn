@@ -11,14 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../../hdf_core"
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
