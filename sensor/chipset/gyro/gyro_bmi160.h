@@ -50,7 +50,6 @@
 #define BMI160_GYRO_DATA_READY_MASK         0x40
 
 int32_t DetectGyroBim160Chip(struct SensorCfgData *data);
-int32_t ReadBmi160Data(struct SensorCfgData *data);
 
 struct Bmi160DrvData {
     struct IDeviceIoService ioService;

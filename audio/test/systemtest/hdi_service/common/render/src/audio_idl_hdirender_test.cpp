@@ -422,6 +422,7 @@ HWTEST_F(AudioIdlHdiRenderTest, AudioRenderGetRenderPosition_008, TestSize.Level
         EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
         EXPECT_GT(frames, INITIAL_VALUE);
     }
+    render->Stop(render);
 }
 /**
     * @tc.name  AudioRenderSetRenderSpeed_001

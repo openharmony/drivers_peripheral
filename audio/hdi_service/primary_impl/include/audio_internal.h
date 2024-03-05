@@ -155,6 +155,7 @@ struct AudioFrameRenderMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
+    pthread_mutex_t mutex;
     struct IAudioCallback callback;
     void *cookie;
     CallbackProcessFunc callbackProcess;

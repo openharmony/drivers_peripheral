@@ -160,6 +160,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Le
 {
     //waiting for Flashlight powerdown
     sleep(1);
+    EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_OFF);
 
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -195,6 +196,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
 {
     //waiting for Flashlight powerdown
     sleep(1);
+    EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_OFF);
 
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
@@ -218,6 +220,7 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
     cameraTest->Close();
     //waiting for Flashlight powerdown
     sleep(1);
+    EXPECT_EQ(OHOS::Camera::Test::statusCallback, HDI::Camera::V1_0::FLASHLIGHT_OFF);
     
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 5: trun off the flashlight
