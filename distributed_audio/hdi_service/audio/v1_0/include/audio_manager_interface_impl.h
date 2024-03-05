@@ -66,7 +66,8 @@ public:
     int32_t AddAudioDevice(const std::string &adpName, const uint32_t dhId, const std::string &caps,
         const sptr<IDAudioCallback> &callback);
     int32_t RemoveAudioDevice(const std::string &adpName, const uint32_t dhId);
-    int32_t Notify(const std::string &adpName, const uint32_t devId, const DAudioEvent &event);
+    int32_t Notify(const std::string &adpName, const uint32_t devId,
+        const uint32_t streamId, const DAudioEvent &event);
     void SetDeviceObject(struct HdfDeviceObject *deviceObject);
 
 private:

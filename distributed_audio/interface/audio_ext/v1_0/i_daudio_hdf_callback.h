@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class IDAudioHDFCallback {
+class IDAudioHDFCallback { // TODO:没啥用，待删除
 public:
     virtual int32_t OpenDevice(int32_t devId, int32_t dhId) = 0;
     virtual int32_t CloseDevice(int32_t devId, int32_t dhId = 0;

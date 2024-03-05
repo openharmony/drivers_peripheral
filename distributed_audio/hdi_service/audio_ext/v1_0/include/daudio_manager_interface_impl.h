@@ -49,7 +49,7 @@ public:
 
     int32_t UnRegisterAudioDevice(const std::string &adpName, int32_t devId) override;
 
-    int32_t NotifyEvent(const std::string &adpName, int32_t devId, const DAudioEvent &event) override;
+    int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId, const DAudioEvent &event) override;
 
 private:
     DAudioManagerInterfaceImpl();

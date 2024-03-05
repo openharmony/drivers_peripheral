@@ -98,7 +98,7 @@ public:
     std::string GetDeviceCapabilitys(const uint32_t devId);
     int32_t AdapterLoad();
     int32_t AdapterUnload();
-    int32_t Notify(const uint32_t devId, const DAudioEvent &event);
+    int32_t Notify(const uint32_t devId, const uint32_t streamId, const DAudioEvent &event);
     int32_t AddAudioDevice(const uint32_t devId, const std::string &caps);
     int32_t RemoveAudioDevice(const uint32_t devId);
     uint32_t GetVolumeGroup(const uint32_t devId);
@@ -107,13 +107,13 @@ public:
 
 private:
     int32_t OpenRenderDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId);
+        const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId, const int32_t renderId = 0);
     int32_t CloseRenderDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extSpkCallback,
-        const int32_t dhId);
+        const int32_t dhId, const int32_t renderId = 0);
     int32_t OpenCaptureDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        const sptr<IDAudioCallback> extMicCallback, const int32_t dhId);
+        const sptr<IDAudioCallback> extMicCallback, const int32_t dhId, const int32_t captureId = 0);
     int32_t CloseCaptureDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extMicCallback,
-        const int32_t dhId);
+        const int32_t dhId, const int32_t captureId = 0);
     int32_t SetAudioVolume(const std::string& condition, const std::string &param);
     int32_t GetAudioVolume(const std::string& condition, std::string &param);
     int32_t HandleFocusChangeEvent(const DAudioEvent &event);
