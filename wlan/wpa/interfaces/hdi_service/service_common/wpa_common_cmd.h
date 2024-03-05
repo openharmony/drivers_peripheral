@@ -18,7 +18,6 @@
 #include "../wpa_impl.h"
 #include <pthread.h>
 #include "utils/common.h"
-#include "wpa_supplicant_hal.h"
 
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
@@ -107,10 +106,63 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName);
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
 
+void StrSafeCopy(char *dst, unsigned len, const char *src);
 int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen);
 const char *macToStr(const u8 *addr);
 struct StWpaMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
 };
+
+typedef struct WifiNetworkInfo {
+    int id;
+    char ssid[WIFI_SSID_LENGTH];
+    char bssid[WIFI_BSSID_LENGTH];
+    char flags[WIFI_NETWORK_FLAGS_LENGTH];
+} WifiNetworkInfo;
+
+typedef enum DeviceConfigType {
+    DEVICE_CONFIG_SSID = 0, /* Network Name. */
+    DEVICE_CONFIG_PSK = 1,  /* Password. */
+    /**
+     * Encryption Mode: WPA-PSK - wpa/wp2; NONE - password less network; WPA-EAP, SAE, wpa3.
+     */
+    DEVICE_CONFIG_KEYMGMT = 2,
+    DEVICE_CONFIG_PRIORITY = 3, /* WPA network priority */
+    /**
+     * Set this bit to 1 and deliver it when the hidden network is connected.
+     * In other cases, set this bit to 0 but do not deliver it.
+     */
+    DEVICE_CONFIG_SCAN_SSID = 4,
+    DEVICE_CONFIG_EAP = 5,             /* EPA Mode:/EAP/PEAP. */
+    DEVICE_CONFIG_IDENTITY = 6,        /* Account name. */
+    DEVICE_CONFIG_PASSWORD = 7,        /* Account password. */
+    DEVICE_CONFIG_BSSID = 8,           /* bssid. */
+    DEVICE_CONFIG_AUTH_ALGORITHMS = 9, /* auth algorithms */
+    DEVICE_CONFIG_WEP_KEY_IDX = 10,    /* wep key idx */
+    DEVICE_CONFIG_WEP_KEY_0 = 11,
+    DEVICE_CONFIG_WEP_KEY_1 = 12,
+    DEVICE_CONFIG_WEP_KEY_2 = 13,
+    DEVICE_CONFIG_WEP_KEY_3 = 14,
+    DEVICE_CONFIG_EAP_CLIENT_CERT = 15,
+    DEVICE_CONFIG_EAP_PRIVATE_KEY = 16,
+    DEVICE_CONFIG_EAP_PHASE2METHOD = 17,
+    DEVICE_CONFIG_IEEE80211W = 18,
+    DEVICE_CONFIG_ALLOW_PROTOCOLS = 19,
+    DEVICE_CONFIG_GROUP_CIPHERS = 20,
+    DEVICE_CONFIG_PAIRWISE_CIPHERS = 21,
+    DEVICE_CONFIG_SAE_PASSWD = 22,
+    /**
+     * Number of network configuration parameters, which is used as the last
+     * parameter.
+     */
+    DEVICE_CONFIG_END_POS,
+} DeviceConfigType;
+
+typedef struct WpaSsidField {
+    DeviceConfigType field;
+    char fieldName[32];
+    int flag; /* 0 need add "" 1 no need */
+} WpaSsidField;
+
 #endif
