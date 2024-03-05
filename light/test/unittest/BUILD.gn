@@ -19,7 +19,7 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
 }
 
-if (defined(ohos_lite)) {
+if (true) {
   unittest("hdf_peripheral_test_light") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     public_deps = [
+      "hdf_core:libhdf_utils",
       "../../hal:hdi_light",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
