@@ -49,6 +49,9 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
         case CODEC_BUFFER_TYPE_DMA_MEM_FD:
             buffer = CodecDMABuffer::Create(codecBuffer);
             break;
+        case CODEC_BUFFER_TYPE_AUDIO:
+            buffer = new ICodecBuffer(codecBuffer);
+            break;
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
             break;
@@ -153,6 +156,15 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
         }
     }
     return retCode < 0 ? -errno : EOK;
+}
+uint8_t *ICodecBuffer::GetBuffer()
+{
+    return nullptr;
+}
+int32_t ICodecBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
+{
+    (void)codecBuffer;
+    return HDF_SUCCESS;
 }
 }  // namespace Omx
 }  // namespace Codec
