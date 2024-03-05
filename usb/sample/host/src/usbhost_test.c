@@ -29,6 +29,7 @@
 #define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME   500
 #define CNT_MAX           10
+
 int32_t run;
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
