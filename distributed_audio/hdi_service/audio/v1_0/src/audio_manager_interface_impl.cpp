@@ -199,7 +199,8 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     return DH_SUCCESS;
 }
 
-int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint32_t devId, const DAudioEvent &event)
+int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint32_t devId,
+    const uint32_t streamId, const DAudioEvent &event)
 {
     DHLOGI("Notify event, adapter name: %{public}s. event type: %{public}d", GetAnonyString(adpName).c_str(),
         event.type);
@@ -209,7 +210,7 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
         return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
     }
 
-    int32_t ret = adp->second->Notify(devId, event);
+    int32_t ret = adp->second->Notify(devId, streamId, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify failed, adapter return: %{public}d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;

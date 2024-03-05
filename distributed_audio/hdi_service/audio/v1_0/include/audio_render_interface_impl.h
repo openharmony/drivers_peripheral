@@ -106,6 +106,7 @@ private:
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
+    uint32_t renderId_ = 0;
 
     std::mutex renderMtx_;
     std::mutex volMtx_;

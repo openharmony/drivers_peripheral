@@ -35,12 +35,13 @@ void NotifyEventFuzzTest(const uint8_t* data, size_t size)
 
     std::string adpName(reinterpret_cast<const char*>(data), size);
     int32_t devId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t streamId = *(reinterpret_cast<const int32_t*>(data));
     DAudioEvent event = {
         .type = *(reinterpret_cast<const int32_t*>(data)),
         .content = std::string(reinterpret_cast<const char*>(data), size),
     };
 
-    DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName, devId, event);
+    DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName, devId, streamId, event);
 }
 } // V1_0
 } // AudioExt

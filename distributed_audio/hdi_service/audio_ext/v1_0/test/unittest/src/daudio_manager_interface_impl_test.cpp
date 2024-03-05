@@ -88,8 +88,10 @@ HWTEST_F(DAudioManagerInterfaceImplTest, NotifyEvent_001, TestSize.Level1)
 {
     std::string adpName = "hello";
     int32_t devId = 11;
+    int32_t streamId = 0;
     DAudioEvent event;
-    EXPECT_EQ(HDF_FAILURE, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName, devId, event));
+    EXPECT_EQ(HDF_FAILURE, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName,
+        devId, streamId, event));
 }
 
 /**
@@ -102,10 +104,12 @@ HWTEST_F(DAudioManagerInterfaceImplTest, NotifyEvent_002, TestSize.Level1)
 {
     std::string adpName = "hello";
     int32_t devId = 64;
+    int32_t streamId = 0;
     DAudioEvent event;
     event.type = 15;
     event.content = "hello_world";
-    EXPECT_NE(HDF_SUCCESS, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName, devId, event));
+    EXPECT_NE(HDF_SUCCESS, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName,
+        devId, streamId, event));
 }
 } // V1_0
 } // AudioExt
