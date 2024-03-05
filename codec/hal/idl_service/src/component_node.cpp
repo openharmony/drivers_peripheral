@@ -375,6 +375,11 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
                 reinterpret_cast<uint8_t *>(&buffer.fd));
             break;
         }
+        case CODEC_BUFFER_TYPE_AUDIO: {
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                reinterpret_cast<uint8_t *>(&buffer.fd));
+            break;
+        }
         default:
             break;
     }
