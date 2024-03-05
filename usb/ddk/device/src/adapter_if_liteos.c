@@ -30,7 +30,7 @@
 #include "usb_handle.h"
 
 #define HDF_LOG_TAG adapter_if
-#define SLEEP_TIME  100000  
+#define SLEEP_TIME  100000
 #define OPEN_CNT    30
 #define MAX_SIZE    8
 

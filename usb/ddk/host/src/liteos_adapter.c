@@ -26,7 +26,7 @@
 #define EP_NUM_MAX    30
 #define SLEEP_TIME    20
 #define REQ_NUM       10
-#define TEST_BYTE_COUNT 1024  BufferLen
+#define TEST_BYTE_COUNT 1024
 #define TIME_OUT      500
 #define BUFFER_LEN    50
 
