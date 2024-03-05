@@ -11,9 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../hdf_core"
 import("//build/ohos.gni")
-import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = []
