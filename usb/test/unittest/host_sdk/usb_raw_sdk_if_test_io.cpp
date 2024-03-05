@@ -17,7 +17,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <gtest/gtest.h>
-extern "C" {
 #include "usb_raw_sdk_if_test.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
@@ -25,7 +24,11 @@ extern "C" {
 #include "osal_time.h"
 #include "securec.h"
 #include "hdf_usb_pnp_manage.h"
-}
+
+#define INTERFACE_CNT                2
+#define INTERFACE_INDEX_ZERO         2
+#define INTERFACE_INDEX_ONE          3
+#define REQ_INDEX                    2
 
 using namespace std;
 using namespace testing::ext;
@@ -251,9 +254,9 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
         HDF_LOGE("%{public}s:%{public}d acm or config is nullptr", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    acm->interfaceCnt = 2;
-    acm->interfaceIndex[0] = 2;
-    acm->interfaceIndex[1] = 3;
+    acm->interfaceCnt = INTERFACE_CNT;
+    acm->interfaceIndex[0] = INTERFACE_INDEX_ZERO;
+    acm->interfaceIndex[1] = INTERFACE_INDEX_ONE;
 
     for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = acm->interfaceIndex[i];
@@ -427,7 +430,7 @@ static void AcmRawFillCtrlReq()
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
     ctrlReq.value       = CPU_TO_LE16(0);
-    ctrlReq.index       = 2;
+    ctrlReq.index       = REQ_INDEX;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
     ctrlReq.timeout     = USB_CTRL_SET_TIMEOUT;

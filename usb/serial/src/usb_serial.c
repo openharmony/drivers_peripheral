@@ -24,6 +24,7 @@
 
 #define HDF_LOG_TAG USB_HOST_ACM
 #define STR_LEN     512
+#define SLEEP_TIME  500
 
 static struct UsbRequest *g_syncRequest = NULL;
 static struct UsbRequest *g_ctrlCmdRequest = NULL;
@@ -512,7 +513,7 @@ static int32_t SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle, struct UsbReque
         HDF_LOGE("UsbRequestSubmitAsync failed, ret=%d ", ret);
         return ret;
     }
-    OsalMSleep(500);
+    OsalMSleep(SLEEP_TIME);
     HDF_LOGE("SerialCtrlAsyncMsg  length%d ", request->compInfo.actualLength);
     for (unsigned int i = 0; i < request->compInfo.actualLength; i++) {
         HDF_LOGE("0x%02x", ((uint8_t *)(request->compInfo.buffer))[i]);
