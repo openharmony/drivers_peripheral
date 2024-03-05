@@ -38,9 +38,6 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     public_deps = [
-      "$HDF_CORE_PATH/adapter/build/test_common:libhdf_test_common",
-      "$HDF_CORE_PATH/adapter/uhdf/manager:hdf_core",
-      "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
       "../../hal:hdi_light",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
