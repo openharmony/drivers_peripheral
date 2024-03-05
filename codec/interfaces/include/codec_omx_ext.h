@@ -104,6 +104,8 @@ enum CodecBufferType {
     CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
     /** DMA memory. */
     CODEC_BUFFER_TYPE_DMA_MEM_FD = 0x10,
+    /** Audio memory. */
+    CODEC_BUFFER_TYPE_AUDIO = 0x20,
 };
 
 /**
@@ -185,6 +187,19 @@ struct ProcessNameParam {
     union OMX_VERSIONTYPE version;         /** Component version */
     char processName[PROCESS_NAME_LEN];    /** Process name array */
 };
+
+/**
+ * @brief Defines the <b>AudioL2HCParam</b>.
+ */
+struct AudioL2HCParam {
+    uint32_t size;                 /** Size of the structure */
+    union OMX_VERSIONTYPE version; /** Component version */
+    uint32_t sampleRate;           /** Sample Rate */
+    uint32_t sampleFormat;         /** Sample Format */
+    uint32_t channels;             /** Channels */
+    uint32_t bitRate;              /** Bit Rate */
+};
+
 /**
  * @brief Enumerates the extended codec indexes.
  */
@@ -211,6 +226,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamWorkingFrequency,
     /** ProcessNameParam */
     OMX_IndexParamProcessName,
+    /** AudioL2HCParam */
+    OMX_IndexParamAudioL2HC,
 };
 
 /**
