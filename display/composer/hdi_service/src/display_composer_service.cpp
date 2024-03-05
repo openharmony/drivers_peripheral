@@ -570,8 +570,10 @@ int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQu
     int32_t ret = HDF_FAILURE;
 
     if (cmdResponserV1_1_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
         ret = cmdResponserV1_1_->InitCmdRequest(request);
     } else if (cmdResponser_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
         ret = cmdResponser_->InitCmdRequest(request);
     }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -584,8 +586,10 @@ int32_t DisplayComposerService::CmdRequest(
     int32_t ret = HDF_FAILURE;
 
     if (cmdResponserV1_1_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
         ret = cmdResponserV1_1_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
     } else if (cmdResponser_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
         ret = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
     }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -597,8 +601,10 @@ int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32
     int32_t ret = HDF_FAILURE;
 
     if (cmdResponserV1_1_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
         ret = cmdResponserV1_1_->GetCmdReply(reply);
     } else if (cmdResponser_ != nullptr) {
+        CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
         ret = cmdResponser_->GetCmdReply(reply);
     }
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
