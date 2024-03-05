@@ -239,7 +239,7 @@ static int32_t ReadBh1745RawData(struct SensorCfgData *data, struct AlsData *raw
     return HDF_SUCCESS;
 }
 
-int32_t ReadBh1745Data(struct SensorCfgData *data, struct SensorReportEvent *event)
+static int32_t ReadBh1745Data(struct SensorCfgData *data, struct SensorReportEvent *event)
 {
     int32_t ret;
     struct AlsData rawData = { 0, 0, 0, 0 };
@@ -309,7 +309,7 @@ static int32_t DispatchBH1745(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Bh1745BindDriver(struct HdfDeviceObject *device)
+static int32_t Bh1745BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -327,7 +327,7 @@ int32_t Bh1745BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Bh1745InitDriver(struct HdfDeviceObject *device)
+static int32_t Bh1745InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct AlsOpsCall ops;
@@ -365,7 +365,7 @@ int32_t Bh1745InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Bh1745ReleaseDriver(struct HdfDeviceObject *device)
+static void Bh1745ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 

@@ -24,6 +24,13 @@ using namespace OHOS::HDI::Vibrator::V1_1;
 namespace OHOS {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
+constexpr int32_t ARRAY0 = 0;
+constexpr int32_t ARRAY1 = 1;
+constexpr int32_t ARRAY2 = 2;
+constexpr int32_t ARRAY3 = 3;
+constexpr int32_t DIGIT8 = 8;
+constexpr int32_t DIGIT16 = 16;
+constexpr int32_t DIGIT24 = 24;
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"ohos.hdi.vibrator.v1_1.IVibratorInterface";
 
 uint32_t Convert2Uint32(const uint8_t* ptr)
@@ -35,7 +42,7 @@ uint32_t Convert2Uint32(const uint8_t* ptr)
      * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
      * and the third digit no left
      */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    return (ptr[ARRAY0] << DIGIT24) | (ptr[ARRAY1] << DIGIT16) | (ptr[ARRAY2] << DIGIT8) | (ptr[ARRAY3]);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)

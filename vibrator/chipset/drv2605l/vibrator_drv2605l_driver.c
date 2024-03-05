@@ -54,7 +54,7 @@ static void ReleaseDrv2605lBusHandle(struct VibratorI2cCfg *busCfg)
     }
 }
 
-int32_t ReadDrv2605l(struct VibratorI2cCfg *busCfg, uint16_t regAddr, uint8_t *data, uint16_t dataLen)
+static int32_t ReadDrv2605l(struct VibratorI2cCfg *busCfg, uint16_t regAddr, uint8_t *data, uint16_t dataLen)
 {
     int32_t index = 0;
     unsigned char regBuf[I2C_REG_BUF_LEN] = {0};
@@ -92,7 +92,7 @@ int32_t ReadDrv2605l(struct VibratorI2cCfg *busCfg, uint16_t regAddr, uint8_t *d
     return HDF_SUCCESS;
 }
 
-int32_t WriteDrv2605l(struct VibratorI2cCfg *busCfg, uint8_t *writeData, uint16_t dataLen)
+static int32_t WriteDrv2605l(struct VibratorI2cCfg *busCfg, uint8_t *writeData, uint16_t dataLen)
 {
     struct I2cMsg msg[I2C_WRITE_MSG_NUM];
     CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(busCfg, HDF_FAILURE);
@@ -277,7 +277,7 @@ static int32_t DispatchDrv2605l(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t BindDrv2605lDriver(struct HdfDeviceObject *device)
+static int32_t BindDrv2605lDriver(struct HdfDeviceObject *device)
 {
     struct Drv2605lDriverData *drvData = NULL;
 
@@ -293,7 +293,7 @@ int32_t BindDrv2605lDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t InitDrv2605lDriver(struct HdfDeviceObject *device)
+static int32_t InitDrv2605lDriver(struct HdfDeviceObject *device)
 {
     static struct VibratorOps ops;
     struct Drv2605lDriverData *drvData = NULL;
@@ -338,7 +338,7 @@ int32_t InitDrv2605lDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void ReleaseDrv2605lDriver(struct HdfDeviceObject *device)
+static void ReleaseDrv2605lDriver(struct HdfDeviceObject *device)
 {
     struct Drv2605lDriverData *drvData = NULL;
 

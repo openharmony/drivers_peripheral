@@ -73,7 +73,6 @@
 #define LSM303_DATA_READY_MASK                  0x01
 
 int32_t DetectMagneticLsm303Chip(struct SensorCfgData *data);
-int32_t ReadLsm303Data(struct SensorCfgData *data);
 
 struct Lsm303DrvData {
     struct IDeviceIoService ioService;
