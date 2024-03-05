@@ -19,7 +19,7 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
 }
 
-if (true) {
+if (defined(ohos_lite)) {
   unittest("hdf_peripheral_test_light") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
