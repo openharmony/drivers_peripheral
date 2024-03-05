@@ -28,8 +28,6 @@
 #define ARGV_CMD_TYPE     (PARAM_GET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME   500
-#define CNT_MAX           10
-
 int32_t run;
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -246,7 +244,7 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
             case HOST_ACM_ASYNC_READ:
                 if (UsbHostDdkTestAsyncRead(NULL) != HDF_SUCCESS) {
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-                    if (cnt++ > CNT_MAX) {
+                    if (cnt++ > 10) {
                         asyncFlag = false;
                         return HDF_DEV_ERR_NO_DEVICE_SERVICE;
                     }
