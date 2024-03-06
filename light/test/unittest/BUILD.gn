@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../../hdf_core"
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -21,6 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 if (defined(ohos_lite)) {
+  HDF_CORE_PATH = "../../../../hdf_core"
   unittest("hdf_peripheral_test_light") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
