@@ -42,47 +42,42 @@ public:
     MockIDAudioCallback() {}
     ~MockIDAudioCallback() {}
 
-    int32_t CreateStream(const std::string &adpName, int32_t devId, int32_t streamId) override
+    int32_t CreateStream(int32_t streamId) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t DestroyStream(const std::string &adpName, int32_t devId, int32_t streamId) override
+    int32_t DestroyStream(int32_t streamId) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t SetParameters(const std::string &adpName, int32_t devId, int32_t streamId,
-        const AudioParameter &param) override
+    int32_t SetParameters(int32_t streamId, const AudioParameter &param) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
-        const DAudioEvent &event) override
+    int32_t NotifyEvent(int32_t streamId, const DAudioEvent &event) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t WriteStreamData(const std::string &adpName, int32_t devId, int32_t streamId,
-        const AudioData &data) override
+    int32_t WriteStreamData(int32_t streamId, const AudioData &data) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t ReadStreamData(const std::string &adpName, int32_t devId, int32_t streamId, AudioData &data) override
+    int32_t ReadStreamData(int32_t streamId, AudioData &data) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, int32_t streamId, uint64_t &frames,
-        CurrentTime &time) override
+    int32_t ReadMmapPosition(int32_t streamId, uint64_t &frames, CurrentTime &time) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t RefreshAshmemInfo(const std::string &adpName, int32_t devId, int32_t streamId, int fd,
-        int32_t ashmemLength, int32_t lengthPerTrans) override
+    int32_t RefreshAshmemInfo(int32_t streamId, int fd, int32_t ashmemLength, int32_t lengthPerTrans) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -489,47 +484,42 @@ public:
     MockRevertIDAudioCallback() {}
     ~MockRevertIDAudioCallback() {}
 
-    int32_t CreateStream(const std::string &adpName, int32_t devId, int32_t streamId) override
+    int32_t CreateStream(int32_t streamId) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t DestroyStream(const std::string &adpName, int32_t devId, int32_t streamId) override
+    int32_t DestroyStream(int32_t streamId) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t SetParameters(const std::string &adpName, int32_t devId, int32_t streamId,
-        const AudioParameter &param) override
+    int32_t SetParameters(int32_t streamId, const AudioParameter &param) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
-        const DAudioEvent &event) override
+    int32_t NotifyEvent(int32_t streamId, const DAudioEvent &event) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t WriteStreamData(const std::string &adpName, int32_t devId, int32_t streamId,
-        const AudioData &data) override
+    int32_t WriteStreamData(int32_t streamId, const AudioData &data) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t ReadStreamData(const std::string &adpName, int32_t devId, int32_t streamId, AudioData &data) override
+    int32_t ReadStreamData(int32_t streamId, AudioData &data) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, int32_t streamId, uint64_t &frames,
-        CurrentTime &time) override
+    int32_t ReadMmapPosition(int32_t streamId, uint64_t &frames, CurrentTime &time) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t RefreshAshmemInfo(const std::string &adpName, int32_t devId, int32_t streamId, int fd,
-        int32_t ashmemLength, int32_t lengthPerTrans) override
+    int32_t RefreshAshmemInfo(int32_t streamId, int fd, int32_t ashmemLength, int32_t lengthPerTrans) override
     {
         return DistributedHardware::DH_SUCCESS;
     }

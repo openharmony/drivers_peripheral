@@ -79,7 +79,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     }
 
     AudioData audioData;
-    int32_t ret = audioExtCallback_->ReadStreamData(adapterName_, devDesc_.pins, captureId_, audioData);
+    int32_t ret = audioExtCallback_->ReadStreamData(captureId_, audioData);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
@@ -131,7 +131,7 @@ int32_t AudioCaptureInterfaceImpl::Start()
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    if (audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, captureId_, event) != HDF_SUCCESS) {
+    if (audioExtCallback_->NotifyEvent(captureId_, event) != HDF_SUCCESS) {
         DHLOGE("Notify start event failed.");
         return HDF_FAILURE;
     }
@@ -165,7 +165,7 @@ int32_t AudioCaptureInterfaceImpl::Stop()
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    if (audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, captureId_, event) != HDF_SUCCESS) {
+    if (audioExtCallback_->NotifyEvent(captureId_, event) != HDF_SUCCESS) {
         DHLOGE("Notify stop event failed.");
         return HDF_FAILURE;
     }
