@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+HDF_CORE_PATH = "../../../../hdf_core"
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -38,7 +39,9 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     public_deps = [
-      "hdf_core:libhdf_utils",
+      "$HDF_CORE_PATH/adapter/build/test_common:libhdf_test_common",
+      "$HDF_CORE_PATH/adapter/uhdf/manager:hdf_core",
+      "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
       "../../hal:hdi_light",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
