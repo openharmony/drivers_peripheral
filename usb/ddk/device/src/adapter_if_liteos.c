@@ -32,6 +32,7 @@
 #define HDF_LOG_TAG adapter_if
 #define SLEEP_TIME  100000
 #define OPEN_CNT    30
+#define MAX_SIZE    8
 
 static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
 static bool g_usbRamTestFlag = false;
@@ -761,7 +762,7 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const 
         pipeInfo->dir = USB_PIPE_DIRECTION_IN;
     }
 
-    pipeInfo->maxPacketSize = (desc.wMaxPacketSize[0] | (desc.wMaxPacketSize[1] << 8));
+    pipeInfo->maxPacketSize = (desc.wMaxPacketSize[0] | (desc.wMaxPacketSize[1] << MAX_SIZE));
     pipeInfo->interval = desc.bInterval;
 
     return 0;

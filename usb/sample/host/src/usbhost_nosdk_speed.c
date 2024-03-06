@@ -46,6 +46,8 @@
 #define ENDPOINT_IN_OFFSET   7
 #define PATH_MAX_LENGTH      24
 #define STRTOL_BASE          10
+#define COUNT_PERCENT        10000
+#define SLEEP_TIME           10
 
 static pid_t g_tid;
 static int32_t g_exitOk = false;
@@ -85,11 +87,9 @@ static int32_t OpenDevice(void)
 
     HDF_LOGI("%{public}s: open file action", __func__);
     g_fd = open(path, O_RDWR);
-
     if (g_fd < 0) {
         HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
     }
-
     return g_fd;
 }
 
@@ -220,7 +220,7 @@ static int32_t ReapProcess(void * const argurb)
                 HDF_LOGI("%{public}s: recvbuf %{public}c", __func__, recvBuf[i]);
             }
             fflush(stdout);
-        } else if (g_recv_count % 10000 == 0) {
+        } else if (g_recv_count % COUNT_PERCENT == 0) {
             HDF_LOGI("%{public}s: #", __func__);
             fflush(stdout);
         }
@@ -295,12 +295,12 @@ static int32_t BeginProcess(unsigned char endPoint)
     }
 
     while (!g_speedFlag) {
-        OsalMSleep(10);
+        OsalMSleep(SLEEP_TIME);
     }
 
     kill(g_tid, SIGUSR1);
     while (!g_exitOk) {
-        OsalMSleep(10);
+        OsalMSleep(SLEEP_TIME);
     }
     for (i = 0; i < TEST_CYCLE; i++) {
         munmap(urb[i].urb->buffer, TEST_LENGTH);
