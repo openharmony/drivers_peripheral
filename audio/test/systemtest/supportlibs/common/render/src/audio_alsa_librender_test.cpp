@@ -65,7 +65,8 @@ void AudioAlsaLibRenderTest::SetUpTestCase(void)
     BindServiceRender = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
         "AudioBindServiceRender"));
     ASSERT_NE(nullptr, BindServiceRender);
-    CloseServiceRender = reinterpret_cast<void (*)(static_cast<struct DevHandle *>)>(dlsym(ptrHandle, "AudioCloseServiceRender"));
+    CloseServiceRender = reinterpret_cast<void (*)(static_cast<struct DevHandle *>)>(dlsym(ptrHandle,
+        "AudioCloseServiceRender"));
     ASSERT_NE(nullptr, CloseServiceRender);
 }
 
