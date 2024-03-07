@@ -16,8 +16,8 @@
 #ifndef CODEC_UTILS_H
 #define CODEC_UTILS_H
 
-#include <cstdio.h>
-#include <cstdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include "hdf_types.h"
 #include "codec_type.h"
 #include "osal_mem.h"
