@@ -99,6 +99,7 @@ private:
     int32_t UseBufferOnPort(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseBufferHandle(int bufferCount, int bufferSize);
     int32_t CheckAndUseBufferHandle();
+    int32_t GetParameterSupportBufferType(std::vector<int8_t> &inVec, std::vector<int8_t> &outVec);
     int GetYuvSize();
     int32_t ConfigPortDefine();
     bool FillAllTheBuffer();

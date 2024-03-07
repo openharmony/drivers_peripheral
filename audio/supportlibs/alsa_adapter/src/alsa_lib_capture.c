@@ -741,8 +741,8 @@ static int32_t SetHWParams(
 static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
 {
     int32_t ret;
-    /* The time when the application starts reading data */ 
-    snd_pcm_sframes_t startThresholdSize = 1; 
+    /* The time when the application starts reading data */
+    snd_pcm_sframes_t startThresholdSize = 1;
 
     if (handle == NULL || swparams == NULL) {
         AUDIO_FUNC_LOGE("SetHWParams parameter is null!");

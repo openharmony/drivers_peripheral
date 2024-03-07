@@ -500,7 +500,7 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
         } else if ((audioPnpUevent->switchState[0] == '1') || (audioPnpUevent->switchState[0] == '2')) {
             audioEvent.eventType = AUDIO_DEVICE_ADD;
             audioEvent.deviceType = AUDIO_HEADSET;
-        } else if (audioPnpUevent->switchState[0] == '4'){
+        } else if (audioPnpUevent->switchState[0] == '4') {
             audioEvent.eventType = AUDIO_DEVICE_ADD;
             audioEvent.deviceType = AUDIO_ADAPTER_DEVICE;
         } else {
