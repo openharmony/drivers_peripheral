@@ -229,11 +229,23 @@ int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t mode, int32_t& start
 {
     HDF_LOGI("%{public}s: Enter the GetHapticStartUpTime function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->GetHapticStartUpTime == nullptr) {
+    if (vibratorInterface == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = vibratorInterface->GetHapticStartUpTime(mode, &startUpTime);
+
+    return HDF_SUCCESS;
+}
+
+int32_t StartByIntensity(const std::string& effectType, int32_t Intensity);
+{
+    HDF_LOGI("%{public}s: Enter the StartByIntensity function\n", __func__);
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->StartByIntensity == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = vibratorInterface->StartByIntensity(effectType, &Intensity);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
