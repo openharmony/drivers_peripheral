@@ -34,7 +34,8 @@
         "hdf_core",
         "hitrace",
         "hilog",
-        "ipc"
+        "ipc",
+        "openmax"
       ],
       "third_party": []
     },

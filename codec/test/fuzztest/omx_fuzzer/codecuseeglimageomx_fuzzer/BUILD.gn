@@ -24,7 +24,6 @@ ohos_fuzztest("CodecUseEglImageOmxFuzzTest") {
   include_dirs = [
     "${codec_root}/interfaces/include",
     "${codec_root}/hal/include",
-    "//third_party/openmax/api/1.1.2",
     "${codec_root}/test/fuzztest/omx_fuzzer/codecuseeglimageomx_fuzzer",
     "${codec_root}/test/fuzztest/omx_fuzzer/codeccommonomx_fuzzer",
   ]
@@ -38,6 +37,7 @@ ohos_fuzztest("CodecUseEglImageOmxFuzzTest") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "openmax:libopenmax_shared",
   ]
 
   cflags = [
