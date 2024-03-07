@@ -21,8 +21,6 @@
 #include "hilog/log.h"
 namespace OHOS {
 namespace HDI {
-#define FILE_NAME         (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-#define FORMAT(fmt, ...)  "[%{public}s:%{public}d] %{public}s# " fmt, FILE_NAME, __LINE__, __FUNCTION__, ##__VA_ARGS__
 
 #ifdef THERMAL_HILOGF
 #undef THERMAL_HILOGF
@@ -77,28 +75,33 @@ enum ThermalManagerLogDomain {
     DOMAIN_END = THERMAL_DOMAIN_ID_END, // Max to 0xD002960, keep the sequence and length same as ThermalManagerLogLabel
 };
 
+struct ThermalManagerLogLabelDomain {
+    uint32_t domainId;
+    const char* tag;
+};
+
 // Keep the sequence and length same as ThermalManagerLogDomain
-static constexpr OHOS::HiviewDFX::HiLogLabel THERMAL_LABEL[LABEL_END] = {
-    {LOG_CORE, DOMAIN_APP, "ThermalApp"},
-    {LOG_CORE, DOMAIN_FRAMEWORK, "ThermalFwk"},
-    {LOG_CORE, DOMAIN_SERVICE, "ThermalSvc"},
-    {LOG_CORE, DOMAIN_HDI, "ThermalHdi"},
-    {LOG_CORE, DOMAIN_DRIVER, "ThermalDrv"},
-    {LOG_CORE, DOMAIN_FEATURE_PROTECTOR, "ThermalProtector"},
-    {LOG_CORE, DOMAIN_TEST, "ThermalTest"},
+static const ThermalManagerLogLabelDomain THERMAL_LABEL[LABEL_END] = {
+    {DOMAIN_APP,               "ThermalApp"},
+    {DOMAIN_FRAMEWORK,         "ThermalFwk"},
+    {DOMAIN_SERVICE,           "ThermalSvc"},
+    {DOMAIN_HDI,               "ThermalHdi"},
+    {DOMAIN_DRIVER,            "ThermalDrv"},
+    {DOMAIN_FEATURE_PROTECTOR, "ThermalProtector"},
+    {DOMAIN_TEST,              "ThermalTest"},
 };
 
 // In order to improve performance, do not check the module range, module should less than THERMALMGR_MODULE_BUTT.
 #define THERMAL_HILOGF(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Fatal(THERMAL_LABEL[module], FORMAT(__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, THERMAL_LABEL[module].domainId, THERMAL_LABEL[module].tag, ##__VA_ARGS__))
 #define THERMAL_HILOGE(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Error(THERMAL_LABEL[module], FORMAT(__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, THERMAL_LABEL[module].domainId, THERMAL_LABEL[module].tag, ##__VA_ARGS__))
 #define THERMAL_HILOGW(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Warn(THERMAL_LABEL[module], FORMAT(__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, THERMAL_LABEL[module].domainId, THERMAL_LABEL[module].tag, ##__VA_ARGS__))
 #define THERMAL_HILOGI(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Info(THERMAL_LABEL[module], FORMAT(__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, THERMAL_LABEL[module].domainId, THERMAL_LABEL[module].tag, ##__VA_ARGS__))
 #define THERMAL_HILOGD(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Debug(THERMAL_LABEL[module], FORMAT(__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, THERMAL_LABEL[module].domainId, THERMAL_LABEL[module].tag, ##__VA_ARGS__))
 } // namespace PowerMgr
 } // namespace OHOS
 
