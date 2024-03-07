@@ -183,7 +183,6 @@ void AudioUtCaptureTest::TearDown()
     free(devDescriptorName_);
     devDescriptorName_ = nullptr;
 
-
     ASSERT_NE(capture_, nullptr);
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
 
