@@ -52,15 +52,16 @@ void AudioAlsaLibCaptureTest::SetUpTestCase(void)
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     ASSERT_NE(nullptr, ptrHandle);
     InterfaceLibOutputCapture = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
-                                 struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibOutputCapture"));
+        struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibOutputCapture"));
     ASSERT_NE(nullptr, InterfaceLibOutputCapture);
     InterfaceLibCtlCapture = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
-                                          struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibCtlCapture"));
+        struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibCtlCapture"));
     ASSERT_NE(nullptr, InterfaceLibCtlCapture);
     AudioBindService = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
         "AudioBindService"));
     ASSERT_NE(nullptr, AudioBindService);
-    CloseServiceCapture = reinterpret_cast<void (*)(struct DevHandle *)>(dlsym(ptrHandle, "AudioCloseServiceCapture"));
+    CloseServiceCapture = reinterpret_cast<void (*)(struct DevHandle *)>(dlsym(ptrHandle,
+        "AudioCloseServiceCapture"));
     ASSERT_NE(nullptr, CloseServiceCapture);
 }
 
