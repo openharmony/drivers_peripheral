@@ -319,6 +319,8 @@ void StreamBase::HandleRequest()
         }
         request = waitingList_.front();
         CHECK_IF_PTR_NULL_RETURN_VOID(request);
+        CAMERA_LOGI("HandleRequest streamId = [%{public}d] and needCancel = [%{public}d]",
+            streamId_, request->NeedCancel() ? 1 : 0);
         if (!request->IsContinous()) {
             waitingList_.pop_front();
         }
