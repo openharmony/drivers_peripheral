@@ -1006,7 +1006,7 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_042, TestSize.Level1)
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_CHAN_ADJUST, (const int8_t *)&chanInfo,
         sizeof(chanInfo));
     printf("SendCmdIoctl CHAN_ADJUST, rc=%d.\n", rc);
-    ASSERT_FALSE(rc);
+    ASSERT_EQ(rc, -1);
 }
 
 /**
