@@ -311,6 +311,7 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(
     for (uint i = 0; i < outFences.size(); i++) {
         int32_t dupFd = outFences[i];
         sptr<HdifdParcelable> hdifd(new HdifdParcelable());
+        CHECK_NULLPOINTER_RETURN_VALUE(hdifd, HDF_FAILURE);
         hdifd->Init(dupFd);
         fences.push_back(hdifd);
     }
@@ -342,10 +343,12 @@ int32_t DisplayComposerService::SetVirtualDisplayBuffer(
 {
     DISPLAY_TRACE;
 
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(fence, HDF_FAILURE);
     BufferHandle* handle = buffer->GetBufferHandle();
     int32_t inFence = fence->GetFd();
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetVirtualDisplayBuffer(devId, *handle, inFence);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
@@ -398,6 +401,7 @@ int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQu
 {
     CHECK_NULLPOINTER_RETURN_VALUE(request, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     int32_t ret = cmdResponser_->InitCmdRequest(request);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
@@ -407,6 +411,7 @@ int32_t DisplayComposerService::CmdRequest(
     uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds, uint32_t& outEleCnt, std::vector<HdifdInfo>& outFds)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     int32_t ret = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
@@ -415,6 +420,7 @@ int32_t DisplayComposerService::CmdRequest(
 int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     int32_t ret = cmdResponser_->GetCmdReply(reply);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
