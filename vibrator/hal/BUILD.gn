@@ -28,15 +28,12 @@ if (defined(ohos_lite)) {
       "include",
       "../interfaces/include",
       "../utils/include",
-      "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
     cflags = [
       "-Wall",
@@ -61,7 +58,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "../utils/include",
-      "//third_party/bounds_checking_function/include",
     ]
 
     cflags = [
