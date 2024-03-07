@@ -1466,7 +1466,7 @@ static int32_t AudioParseAdapter(cJSON *adapterObj)
 
 static int32_t AudioAdaptersSetAdapterVar(cJSON *cJsonObj)
 {
-    int32_t ret, adaptersArraySize;
+    int32_t ret;
     cJSON *adapterObj = NULL;
 
     if (cJsonObj == NULL) {
@@ -1474,7 +1474,7 @@ static int32_t AudioAdaptersSetAdapterVar(cJSON *cJsonObj)
         return HDF_FAILURE;
     }
 
-    adaptersArraySize = cJSON_GetArraySize(cJsonObj);
+    int32_t adaptersArraySize = cJSON_GetArraySize(cJsonObj);
     if (adaptersArraySize <= 0) {
         AUDIO_FUNC_LOGE("Failed to get JSON array size!");
         return HDF_FAILURE;
