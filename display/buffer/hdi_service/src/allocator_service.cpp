@@ -19,11 +19,15 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "display_log.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+
+#undef DISPLAY_TRACE
+#define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
 
 namespace OHOS {
 namespace HDI {
@@ -104,6 +108,8 @@ int32_t AllocatorService::LoadVdi()
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
+
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ec = vdiImpl_->AllocMem(info, buffer);
