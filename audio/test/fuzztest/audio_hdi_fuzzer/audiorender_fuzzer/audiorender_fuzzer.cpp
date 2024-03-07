@@ -19,7 +19,8 @@ namespace OHOS {
 namespace Audio {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-
+struct AudioSampleAttributes g_attrs;
+struct AudioSceneDescriptor g_scene;
 enum RenderCmdId {
     AUDIO_RENDER_SET_SAMPLE_ATTR,
     AUDIO_RENDER_CHECK_SCENE_CAPABILITY,
@@ -45,6 +46,40 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
 }
 
+static int32_t InitAttrs(const struct AudioSampleAttributes *attrs)
+{
+    if (attrs == nullptr) {
+        return HDF_FAILURE;
+    }
+    /* Initialization of audio parameters for playback */
+    g_attrs.format = attrs->format;
+    g_attrs.channelCount = attrs->channelCount;
+    g_attrs.sampleRate = attrs->sampleRate;
+    g_attrs.interleaved = attrs->interleaved;
+    g_attrs.type = attrs->type;
+    g_attrs.period = attrs->period;
+    g_attrs.frameSize = attrs->frameSize;
+    g_attrs.isBigEndian = attrs->isBigEndian;
+    g_attrs.isSignedData = attrs->isSignedData;
+    g_attrs.startThreshold = attrs->startThreshold;
+    g_attrs.stopThreshold = attrs->stopThreshold;
+    g_attrs.silenceThreshold = attrs->silenceThreshold;
+    return HDF_SUCCESS;
+}
+
+static int32_t InitScene(const struct AudioSceneDescriptor *scene)
+{
+    if (devDesc == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    g_scene.scene = {0};
+    g_scene.desc.portId = scene->desc.portId;
+    g_scene.desc.pins = scene->desc.pins;
+    g_scene.desc.desc = NULL;
+    return HDF_SUCCESS;
+}
+
 void AudioRenderReqMmapBuffer(struct IAudioRender *&render, uint8_t *&data)
 {
     int32_t temp = *(reinterpret_cast<int32_t *>(data));
@@ -66,16 +101,18 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_RENDER_SET_SAMPLE_ATTR:
-            render->SetSampleAttributes(render, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
+            InitAttrs((const struct AudioSampleAttributes *)(rawData));
+            render->SetSampleAttributes(render, &g_attrs);
             break;
         case AUDIO_RENDER_CHECK_SCENE_CAPABILITY: {
             bool supported = false;
-            render->CheckSceneCapability(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData),
-                                         &supported);
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            render->CheckSceneCapability(render, &g_scene, &supported);
             break;
         }
         case AUDIO_RENDER_SELECT_SCENE:
-            render->SelectScene(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            render->SelectScene(render, &g_scene);
             break;
         case AUDIO_RENDER_SET_VOLUME:
             render->SetVolume(render, *(reinterpret_cast<float *>(data)));

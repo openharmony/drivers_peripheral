@@ -18,10 +18,12 @@
 namespace OHOS {
 namespace Audio {
 
-constexpr size_t THRESHOLD = 10;
+constexpr size_t THRESHOLD = 200;
 constexpr int32_t OFFSET = 4;
 uint32_t g_captureId = 0;
 uint32_t g_renderId = 0;
+struct AudioSampleAttributes g_attrs;
+struct AudioDeviceDescriptor g_devDesc;
 enum AdapterCmdId {
     AUDIO_ADAPTER_CREAT_RENDER,
     AUDIO_ADAPTER_DESTORY_RENDER,
@@ -43,15 +45,48 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
 }
 
+static int32_t InitAttrs(const struct AudioSampleAttributes *attrs)
+{
+    if (attrs == nullptr) {
+        return HDF_FAILURE;
+    }
+    /* Initialization of audio parameters for playback */
+    g_attrs.format = attrs->format;
+    g_attrs.channelCount = attrs->channelCount;
+    g_attrs.sampleRate = attrs->sampleRate;
+    g_attrs.interleaved = attrs->interleaved;
+    g_attrs.type = attrs->type;
+    g_attrs.period = attrs->period;
+    g_attrs.frameSize = attrs->frameSize;
+    g_attrs.isBigEndian = attrs->isBigEndian;
+    g_attrs.isSignedData = attrs->isSignedData;
+    g_attrs.startThreshold = attrs->startThreshold;
+    g_attrs.stopThreshold = attrs->stopThreshold;
+    g_attrs.silenceThreshold = attrs->silenceThreshold;
+    return HDF_SUCCESS;
+}
+
+static int32_t InitDevDesc(const struct AudioDeviceDescriptor *devDesc)
+{
+    if (devDesc == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    g_devDesc.portId = devDesc->portId;
+    g_devDesc.pins = devDesc->pins;
+    g_devDesc.desc = strdup("cardname");
+    return HDF_SUCCESS;
+}
+
 static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const uint8_t *&rawData)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_ADAPTER_CREAT_RENDER: {
             struct IAudioRender *render = nullptr;
-            adapter->CreateRender(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData),
-                                  reinterpret_cast<const struct AudioSampleAttributes *>(rawData),
-                                  &render, &g_renderId);
+            InitAttrs((const struct AudioSampleAttributes *)(rawData));
+            InitDevDesc((const struct AudioDeviceDescriptor *)(rawData));
+            adapter->CreateRender(adapter, &g_devDesc, &g_attrs, &render, &g_renderId);
             break;
         }
         case AUDIO_ADAPTER_DESTORY_RENDER: {
@@ -60,9 +95,9 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
             break;
         case AUDIO_ADAPTER_CREAT_CAPTURE: {
             struct IAudioCapture *capture = nullptr;
-            adapter->CreateCapture(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData),
-                                   reinterpret_cast<const struct AudioSampleAttributes *>(rawData),
-                                   &capture, &g_captureId);
+            InitAttrs((const struct AudioSampleAttributes *)(rawData));
+            InitDevDesc((const struct AudioDeviceDescriptor *)(rawData));
+            adapter->CreateCapture(adapter, &g_devDesc, &g_attrs, &capture, &g_captureId);
             break;
         }
         case AUDIO_ADAPTER_DESTORY_CAPTURE: {
@@ -105,7 +140,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     }
     uint32_t cmd = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
-    struct IAudioManager *manager = IAudioManagerGet(true);
+    struct IAudioManager *manager = IAudioManagerGet(false);
     if (manager == nullptr) {
         return false;
     }
@@ -117,7 +152,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     }
     AdapterFucSwitch(adapter, cmd, rawData);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-    IAudioManagerRelease(manager, true);
+    IAudioManagerRelease(manager, false);
     return true;
 }
 

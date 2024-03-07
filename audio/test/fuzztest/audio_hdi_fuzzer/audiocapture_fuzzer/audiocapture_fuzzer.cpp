@@ -17,9 +17,10 @@
 using namespace std;
 namespace OHOS {
 namespace Audio {
-constexpr size_t THRESHOLD = 10;
+constexpr size_t THRESHOLD = 200;
 constexpr int32_t OFFSET = 4;
-
+struct AudioSampleAttributes g_attrs;
+struct AudioSceneDescriptor g_scene;
 enum CaptureCmdId {
     AUDIO_CAPTURE_SET_SAMPLE_ATTR,
     AUDIO_CAPTURE_CHECK_SCENE_CAPABILITY,
@@ -44,6 +45,40 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
 }
 
+static int32_t InitAttrs(const struct AudioSampleAttributes *attrs)
+{
+    if (attrs == nullptr) {
+        return HDF_FAILURE;
+    }
+    /* Initialization of audio parameters for playback */
+    g_attrs.format = attrs->format;
+    g_attrs.channelCount = attrs->channelCount;
+    g_attrs.sampleRate = attrs->sampleRate;
+    g_attrs.interleaved = attrs->interleaved;
+    g_attrs.type = attrs->type;
+    g_attrs.period = attrs->period;
+    g_attrs.frameSize = attrs->frameSize;
+    g_attrs.isBigEndian = attrs->isBigEndian;
+    g_attrs.isSignedData = attrs->isSignedData;
+    g_attrs.startThreshold = attrs->startThreshold;
+    g_attrs.stopThreshold = attrs->stopThreshold;
+    g_attrs.silenceThreshold = attrs->silenceThreshold;
+    return HDF_SUCCESS;
+}
+
+static int32_t InitScene(const struct AudioSceneDescriptor *scene)
+{
+    if (devDesc == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    g_scene.scene = {0};
+    g_scene.desc.portId = scene->desc.portId;
+    g_scene.desc.pins = scene->desc.pins;
+    g_scene.desc.desc = NULL;
+    return HDF_SUCCESS;
+}
+
 void AudioCaptureReqMmapBuffer(struct IAudioCapture *&capture, uint8_t *&data)
 {
     int32_t temp = *(reinterpret_cast<int32_t *>(data));
@@ -65,16 +100,18 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_CAPTURE_SET_SAMPLE_ATTR:
-            capture->SetSampleAttributes(capture, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
+            InitAttrs((const struct AudioSampleAttributes *)(rawData));
+            capture->SetSampleAttributes(capture, &g_attrs);
             break;
         case AUDIO_CAPTURE_CHECK_SCENE_CAPABILITY: {
             bool supported = false;
-            capture->CheckSceneCapability(capture, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData),
-                                          &supported);
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            capture->CheckSceneCapability(capture, &g_scene, &supported);
             break;
         }
         case AUDIO_CAPTURE_SELECT_SCENE:
-            capture->SelectScene(capture, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            capture->SelectScene(capture, &g_scene);
             break;
         case AUDIO_CAPTURE_SET_VOLUME:
             capture->SetVolume(capture, *(reinterpret_cast<float *>(data)));
@@ -117,7 +154,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     uint32_t cmd = Convert2Uint32(rawData);
 
     rawData = rawData + OFFSET;
-    struct IAudioManager *manager = IAudioManagerGet(true);
+    struct IAudioManager *manager = IAudioManagerGet(false);
     if (manager == nullptr) {
         return false;
     }
@@ -128,7 +165,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     CaptureFucSwitch(capture, cmd, rawData);
     adapter->DestroyCapture(adapter, captureId);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-    IAudioManagerRelease(manager, true);
+    IAudioManagerRelease(manager, false);
     return true;
 }
 }
