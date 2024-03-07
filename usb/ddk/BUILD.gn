@@ -76,6 +76,10 @@ ohos_shared_library("libusb_ddk_host") {
   part_name = "drivers_peripheral_usb"
 }
 
+config("public_headers") {
+  include_dirs = [ "$hdf_framework_path/model/usb/include" ]
+}
+
 ohos_shared_library("libusb_pnp_manager") {
   sanitize = {
     integer_overflow = true
@@ -88,11 +92,11 @@ ohos_shared_library("libusb_pnp_manager") {
   branch_protector_ret = "pac_ret"
 
   include_dirs = [
-    "$hdf_framework_path/model/usb/include",
     "host/include",
     "device/include",
     "./../utils/include",
   ]
+  public_configs = [ ":public_headers" ]
   sources = [
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
     "$hdf_framework_path/model/usb/src/usb_wrapper.cpp",
