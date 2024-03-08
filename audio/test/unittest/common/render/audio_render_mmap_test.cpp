@@ -218,6 +218,8 @@ HWTEST_F(AudioUtRenderMmapTest, RenderGetMmapPositionIsValid001, TestSize.Level1
 
     ret = render_->GetMmapPosition(render_, &frames, &time);
     ASSERT_TRUE(ret == HDF_SUCCESS);
+
+    ret = render_->Stop(render_);
 }
 
 } // end of namespace
