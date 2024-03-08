@@ -391,7 +391,7 @@ int32_t VibratorIfService::GetHapticStartUpTime(int32_t mode, int32_t& startUpTi
     return ret;
 }
 
-int32_t StartByIntensity(const std::string& effectType, int32_t Intensity)
+int32_t VibratorIfService::StartByIntensity(const std::string& effectType, int32_t Intensity)
 {
     HDF_LOGD("%{public}s: Enter the StartByIntensity function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
