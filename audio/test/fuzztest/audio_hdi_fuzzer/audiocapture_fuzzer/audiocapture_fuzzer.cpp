@@ -68,7 +68,7 @@ static int32_t InitAttrs(const struct AudioSampleAttributes *attrs)
 
 static int32_t InitScene(const struct AudioSceneDescriptor *scene)
 {
-    if (devDesc == nullptr) {
+    if (scene == nullptr) {
         return HDF_FAILURE;
     }
 
