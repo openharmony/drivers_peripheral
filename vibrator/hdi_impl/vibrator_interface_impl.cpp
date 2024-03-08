@@ -237,7 +237,7 @@ int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t mode, int32_t& start
     return HDF_SUCCESS;
 }
 
-int32_t VibratorInterfaceImpl::StartByIntensity(const std::string& effectType, int32_t Intensity);
+int32_t VibratorInterfaceImpl::StartByIntensity(const std::string& effectType, int32_t Intensity)
 {
     HDF_LOGI("%{public}s: Enter the StartByIntensity function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
