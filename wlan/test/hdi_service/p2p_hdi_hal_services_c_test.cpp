@@ -644,4 +644,17 @@ HWTEST_F(HdfP2pHostCTest, P2pSaveConfigTest_042, TestSize.Level1)
         ASSERT_EQ(rc, HDF_SUCCESS);
     }
 }
+
+HWTEST_F(HdfP2pHostCTest, VendorProcessCmdTest_043, TestSize.Level1)
+{
+    int32_t rc = g_wpaObj->AddWpaIface(g_wpaObj, IFNAME, CONFNAME);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        rc = g_wpaObj->VendorProcessCmd(g_wpaObj, IFNAME, "test");
+        ASSERT_EQ(rc, HDF_FAILURE);
+        rc = g_wpaObj->RemoveWpaIface(g_wpaObj, IFNAME);
+        ASSERT_EQ(rc, HDF_SUCCESS);
+    }
+}
+
 };
