@@ -41,8 +41,8 @@ public:
     int32_t PlayHapticPattern(const HapticPaket& pkg) override;
     int32_t GetHapticCapacity(HapticCapacity& hapticCapacity) override;
     int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
+    int32_t StartByIntensity(const std::string& effectType, int32_t Intensity) override;
     int32_t GetVibratorVdiImpl();
-    int32_t StartByIntensity(const std::string& effectType, int32_t Intensity);
 
 private:
     IVibratorInterfaceVdi *vibratorVdiImpl_ = nullptr;
