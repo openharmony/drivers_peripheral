@@ -29,8 +29,8 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Buffer {
-namespace V1_0 {
-extern "C" IMapper* MapperImplGetInstance(void)
+namespace V1_2 {
+extern "C" Buffer::V1_2::IMapper* MapperImplGetInstance(void)
 {
     return new (std::nothrow) MapperService();
 }
@@ -146,7 +146,16 @@ int32_t MapperService::InvalidateCache(const sptr<NativeBuffer>& handle)
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
-} // namespace V1_0
+
+int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, ImageLayout& layout)
+{
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    int32_t ret = vdiImpl_->GetImageLayout(*handle->GetBufferHandle(), layout);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
+}
+} // namespace V1_2
 } // namespace Buffer
 } // namespace Display
 } // namespace HDI
