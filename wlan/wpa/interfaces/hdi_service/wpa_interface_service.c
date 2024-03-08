@@ -118,6 +118,8 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
     service->interface.P2pListNetworks = WpaInterfaceP2pListNetworks;
     service->interface.P2pSaveConfig = WpaInterfaceP2pSaveConfig;
 
+    service->interface.VendorProcessCmd = WpaInterfaceVendorExtProcessCmd;
+
     return &service->interface;
 }
 
