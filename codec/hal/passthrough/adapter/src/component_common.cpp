@@ -740,7 +740,7 @@ static int32_t GetOmxParamByKey(Param paramIn, OMX_PARAM_PORTDEFINITIONTYPE *par
         case KEY_PIXEL_FORMAT:
             param->format.video.eColorFormat =
                 ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn.val)));
-            return;
+            break;
 
         default: {
             HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn.key);
