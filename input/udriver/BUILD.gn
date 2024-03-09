@@ -50,6 +50,7 @@ if (drivers_peripheral_input_feature_udriver) {
       chipset_base_dir,
       updater_base_dir,
     ]
+    innerapi_tags = [ "passthrough" ]
     install_enable = true
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_input"
