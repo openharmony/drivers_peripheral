@@ -21,6 +21,7 @@
 #include <map>
 #include "display_format.h"
 #include "ibuffer.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 const std::unordered_map<PixelFormat, uint32_t> pixelFormatToCameraFormat_ = {
@@ -78,6 +79,8 @@ public:
         if (itr != cameraFormatToPixelFormat_.end()) {
             format = itr->second;
         } else {
+            CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(TYPE_CAST_ERROR),
+                CameraHalHisysevent::CreateMsg("CameraFormatToPixelFormat failed cameraFormat:%d", cameraFormat));
             CAMERA_LOGI("not find cameraFormat = %{public}u, use default format", cameraFormat);
         }
         return format;
@@ -90,6 +93,8 @@ public:
         if (itr != pixelFormatToCameraFormat_.end()) {
             cameraFormat = itr->second;
         } else {
+            CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(TYPE_CAST_ERROR),
+                CameraHalHisysevent::CreateMsg("PixelFormatToCameraFormat failed format:%d", format));
             CAMERA_LOGI("not find format = %{public}u, use default format", static_cast<uint32_t>(format));
         }
         return cameraFormat;

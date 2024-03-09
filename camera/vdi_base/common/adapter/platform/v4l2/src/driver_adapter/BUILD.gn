@@ -55,8 +55,9 @@ ohos_shared_library("peripheral_camera_v4l2_adapter") {
     "$camera_path/include",
     "$camera_path/dump/include",
     "$camera_path/../interfaces",
+    "$camera_path/utils/event",
   ]
-
+  deps = [ "$camera_path/utils:peripheral_camera_utils" ]
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",

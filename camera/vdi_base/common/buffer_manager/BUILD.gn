@@ -54,7 +54,6 @@ if (defined(ohos_lite)) {
 
     libs = []
     defines = []
-    deps = []
     external_deps = [
       "drivers_peripheral_display:hdi_display",
       "graphic_surface:surface",
@@ -108,6 +107,7 @@ if (defined(ohos_lite)) {
       "./src/buffer_adapter/standard",
       "$camera_path/include",
       "$camera_path/../../interfaces/include",
+      "$camera_path/utils/event",
     ]
 
     libs = []
@@ -117,7 +117,7 @@ if (defined(ohos_lite)) {
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
     }
-
+    deps = [ "$camera_path/utils:peripheral_camera_utils" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
