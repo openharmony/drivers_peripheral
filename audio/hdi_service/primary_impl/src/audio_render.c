@@ -42,9 +42,6 @@
 #define SEC_TO_MILLSEC 1000
 #define INTEGER_TO_DEC 10
 #define DECIMAL_PART   5
-#define RENDER_2_CHS   2
-#define PCM_8_BIT      8
-#define PCM_16_BIT     16
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode,
     uint64_t bytes, uint32_t *frameCount)
@@ -719,13 +716,14 @@ int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
 
     uint32_t byteRate = impl->renderParam.frameRenderMode.byteRate;
     uint32_t periodSize = impl->renderParam.frameRenderMode.periodSize;
+    uint32_t periodCount = impl->renderParam.frameRenderMode.periodCount;
 
     if (byteRate == 0) {
         AUDIO_FUNC_LOGE("byteRate error!");
         return AUDIO_ERR_INTERNAL;
     }
 
-    *ms = (periodSize * SEC_TO_MILLSEC) / (byteRate * RENDER_2_CHS * PCM_16_BIT / PCM_8_BIT);
+    *ms = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
     return AUDIO_SUCCESS;
 }
 
