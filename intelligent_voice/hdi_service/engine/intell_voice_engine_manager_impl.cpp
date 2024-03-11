@@ -16,6 +16,7 @@
 
 #include <dlfcn.h>
 #include <cinttypes>
+#include "securec.h"
 #include "hdf_base.h"
 #include "securec.h"
 #include "intell_voice_log.h"
@@ -28,6 +29,9 @@
 namespace OHOS {
 namespace IntelligentVoice {
 namespace Engine {
+
+#define CROSS_PROCESS_BUF_SIZE_LIMIT (256 *1024)
+
 extern "C" IIntellVoiceEngineManager *IntellVoiceEngineManagerImplGetInstance(void)
 {
     return new (std::nothrow) IntellVoiceEngineManagerImpl();
@@ -86,7 +90,19 @@ int32_t IntellVoiceEngineManagerImpl::GetAdapterDescriptors(std::vector<IntellVo
 }
 
 int32_t IntellVoiceEngineManagerImpl::CreateAdapter(
-    const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<IIntellVoiceEngineAdapter> &adapter)
+    const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter> &adapter)
+{
+    return CreateAdapterInner(descriptor, adapter);
+}
+
+int32_t IntellVoiceEngineManagerImpl::CreateAdapter_V_2(
+    const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter)
+{
+    return CreateAdapterInner(descriptor, adapter);
+}
+
+template<typename T>
+int32_t IntellVoiceEngineManagerImpl::CreateAdapterInner(const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<T> &adapter)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -102,7 +118,8 @@ int32_t IntellVoiceEngineManagerImpl::CreateAdapter(
         return HDF_FAILURE;
     }
 
-    adapter = sptr<IIntellVoiceEngineAdapter>(new (std::nothrow) IntellVoiceEngineAdapterImpl(std::move(engine)));
+    adapter = sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter>
+        (new (std::nothrow) IntellVoiceEngineAdapterImpl(std::move(engine)));
     if (adapter == nullptr) {
         INTELLIGENT_VOICE_LOGE("malloc intell voice adapter server failed ");
         return HDF_ERR_MALLOC_FAIL;
@@ -134,11 +151,9 @@ int32_t IntellVoiceEngineManagerImpl::ReleaseAdapter(const IntellVoiceEngineAdap
     return HDF_SUCCESS;
 }
 
-int32_t IntellVoiceEngineManagerImpl::SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback>& dataOprCallback)
+int32_t IntellVoiceEngineManagerImpl::SetDataOprCallback(const sptr<IIntellVoiceDataOprCallback> &dataOprCallback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     INTELLIGENT_VOICE_LOGI("enter");
-
     if (inst_ == nullptr) {
         INTELLIGENT_VOICE_LOGE("inst is nullptr");
         return HDF_FAILURE;
@@ -269,6 +284,96 @@ int32_t DataOprListener::FillOprDataFromAshmem(const sptr<Ashmem> &ashmem, OprDa
     (void)memcpy_s(data.data.get(), size, mem, size);
     data.size = size;
     return HDF_SUCCESS;
+}
+
+int32_t IntellVoiceEngineManagerImpl::GetUploadFiles(int32_t numMax, std::vector<UploadHdiFile> &files)
+{
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
+        return HDF_FAILURE;
+    }
+
+    if (inst_->GetUploadFiles(numMax, files) != 0 ) {
+        INTELLIGENT_VOICE_LOGE("getReportFile failed");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t IntellVoiceEngineManagerImpl::GetCloneFilesList(std::vector<std::string> &cloneFiles)
+{
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
+        return HDF_FAILURE;
+    }
+
+    return inst_->GetCloneFilesList(cloneFiles);
+}
+
+int32_t IntellVoiceEngineManagerImpl::GetCloneFile(const std::string &filePath, std::vector<uint8_t> &buffer)
+{
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
+        return HDF_FAILURE;
+    }
+
+    std::shared_ptr<uint8_t> data = nullptr;
+    uint32_t size = 0;
+
+    int32_t ret = inst_->GetCloneFile(filePath, data, size);
+    if (ret != 0) {
+        INTELLIGENT_VOICE_LOGE("get clone file fail");
+        return ret;
+    }
+
+    if (filePath.empty()) {
+        INTELLIGENT_VOICE_LOGE("file path is empty");
+        return HDF_FAILURE;
+    }
+
+    if (data == nullptr) {
+        INTELLIGENT_VOICE_LOGE("data is nullptr");
+        return HDF_FAILURE;
+    }
+
+    if (size == 0 || size > CROSS_PROCESS_BUF_SIZE_LIMIT) {
+        INTELLIGENT_VOICE_LOGE("size is invalid %{public}u", size);
+        return HDF_FAILURE;
+    }
+
+    buffer.resize(size);
+    ret = memcpy_s(&buffer[0], size, data.get(), size);
+    if (ret != 0) {
+        INTELLIGENT_VOICE_LOGE("memcpy err");
+        return HDF_FAILURE;
+    }
+
+    return 0;
+}
+
+int32_t IntellVoiceEngineManagerImpl::SendCloneFile(const std::string &filePath, const std::vector<uint8_t> &buffer)
+{
+    if (inst_ == nullptr) {
+        INTELLIGENT_VOICE_LOGE("inst is nullptr");
+        return HDF_FAILURE;
+    }
+
+    if (filePath.empty()) {
+        INTELLIGENT_VOICE_LOGE("file path is empty");
+        return HDF_FAILURE;
+    }
+
+    if (buffer.data() == nullptr) {
+        INTELLIGENT_VOICE_LOGE("data is nullptr");
+        return HDF_FAILURE;
+    }
+
+    if (buffer.size() == 0 || buffer.size() > CROSS_PROCESS_BUF_SIZE_LIMIT) {
+        INTELLIGENT_VOICE_LOGE("size is invalid %{public}" PRIu64 "", buffer.size());
+        return HDF_FAILURE;
+    }
+
+    return inst_->SendCloneFile(filePath, buffer.data(), buffer.size());
 }
 }
 }
