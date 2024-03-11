@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../motion.gni")
 
 ohos_shared_library("libmotion_interface_service_1.1") {
   include_dirs = [
@@ -42,10 +43,10 @@ ohos_shared_library("libmotion_interface_service_1.1") {
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
-      external_deps += ["c_utils:utils",]
+      external_deps += [ "c_utils:utils" ]
     }
     if (motion_hilog_enable) {
-      external_deps += ["hilog:libhilog",]
+      external_deps += [ "hilog:libhilog" ]
     }
   }
 
@@ -77,10 +78,10 @@ ohos_shared_library("libmotion_driver") {
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
-      external_deps += ["c_utils:utils",]
+      external_deps += [ "c_utils:utils" ]
     }
     if (motion_hilog_enable) {
-      external_deps += ["hilog:libhilog",]
+      external_deps += [ "hilog:libhilog" ]
     }
   }
 

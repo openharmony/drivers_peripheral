@@ -14,6 +14,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("../../../motion.gni")
 module_output_path = "drivers_peripheral_motion/motion"
 
 ohos_fuzztest("MotionFuzzTest") {
@@ -36,11 +37,11 @@ ohos_fuzztest("MotionFuzzTest") {
     "ipc:ipc_single",
   ]
   if (motion_c_utils_enable) {
-      external_deps += ["c_utils:utils",]
-    }
-    if (motion_hilog_enable) {
-      external_deps += ["hilog:libhilog",]
-    }
+    external_deps += [ "c_utils:utils" ]
+  }
+  if (motion_hilog_enable) {
+    external_deps += [ "hilog:libhilog" ]
+  }
 }
 
 group("hdf_fuzztest_motion") {
