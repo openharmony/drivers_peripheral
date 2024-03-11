@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,20 +31,22 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
-    if ((lv) compare (rv)) { \
-        return ret; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
+    do {                                             \
+        if ((lv)compare(rv)) {                       \
+            return ret;                              \
+        }                                            \
+    } while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
-    if ((lv) compare (rv)) { \
-        ret = value; \
-        goto table; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
+    do {                                                             \
+        if ((lv)compare(rv)) {                                       \
+            ret = value;                                             \
+            goto table;                                              \
+        }                                                            \
+    } while (false)
 #endif
 
 namespace OHOS {
@@ -76,35 +78,35 @@ public:
 
     virtual ~IMediaKeySession() = default;
 
-    virtual int32_t GenerateMediaKeyRequest(const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& mediaKeyRequestInfo,
-         OHOS::HDI::Drm::V1_0::MediaKeyRequest& mediaKeyRequest) = 0;
+    virtual int32_t GenerateMediaKeyRequest(const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo &mediaKeyRequestInfo,
+        OHOS::HDI::Drm::V1_0::MediaKeyRequest &mediaKeyRequest) = 0;
 
-    virtual int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediaKeyResponse,
-         std::vector<uint8_t>& mediaKeyId) = 0;
+    virtual int32_t ProcessMediaKeyResponse(const std::vector<uint8_t> &mediaKeyResponse,
+        std::vector<uint8_t> &mediaKeyId) = 0;
 
-    virtual int32_t CheckMediaKeyStatus(std::map<std::string, std::string>& mediaKeyStatus) = 0;
+    virtual int32_t CheckMediaKeyStatus(std::map<std::string, std::string> &mediaKeyStatus) = 0;
 
     virtual int32_t ClearMediaKeys() = 0;
 
-    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediaKeyId,
-         std::vector<uint8_t>& releaseRequest) = 0;
+    virtual int32_t GetOfflineReleaseRequest(const std::vector<uint8_t> &mediaKeyId,
+        std::vector<uint8_t> &releaseRequest) = 0;
 
-    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediaKeyId,
-         const std::vector<uint8_t>& response) = 0;
+    virtual int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t> &mediaKeyId,
+        const std::vector<uint8_t> &response) = 0;
 
-    virtual int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) = 0;
+    virtual int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t> &mediaKeyId) = 0;
 
-    virtual int32_t GetContentProtectionLevel(OHOS::HDI::Drm::V1_0::ContentProtectionLevel& level) = 0;
+    virtual int32_t GetContentProtectionLevel(OHOS::HDI::Drm::V1_0::ContentProtectionLevel &level) = 0;
 
-    virtual int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) = 0;
+    virtual int32_t RequiresSecureDecoderModule(const std::string &mimeType, bool &required) = 0;
 
-    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback>& sessionCallback) = 0;
+    virtual int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback> &sessionCallback) = 0;
 
-    virtual int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule>& decryptModule) = 0;
+    virtual int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> &decryptModule) = 0;
 
     virtual int32_t Destroy() = 0;
 
-    virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
+    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer)
     {
         majorVer = 1;
         minorVer = 0;

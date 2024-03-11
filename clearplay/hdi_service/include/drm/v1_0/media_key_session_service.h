@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,31 +38,31 @@ public:
     MediaKeySessionService(ContentProtectionLevel level);
     virtual ~MediaKeySessionService() = default;
 
-    int32_t GenerateMediaKeyRequest(const MediaKeyRequestInfo& mediaKeyRequestInfo,
-         MediaKeyRequest& mediaKeyRequest) override;
+    int32_t GenerateMediaKeyRequest(const MediaKeyRequestInfo &mediaKeyRequestInfo,
+        MediaKeyRequest &mediaKeyRequest) override;
 
-    int32_t ProcessMediaKeyResponse(const std::vector<uint8_t>& mediaKeyResponse,
-         std::vector<uint8_t>& mediaKeyId) override;
+    int32_t ProcessMediaKeyResponse(const std::vector<uint8_t> &mediaKeyResponse,
+        std::vector<uint8_t> &mediaKeyId) override;
 
-    int32_t CheckMediaKeyStatus(std::map<std::string, std::string>& mediaKeyStatus) override;
+    int32_t CheckMediaKeyStatus(std::map<std::string, std::string> &mediaKeyStatus) override;
 
     int32_t ClearMediaKeys() override;
 
-    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t>& mediaKeyId,
-         std::vector<uint8_t>& releaseRequest) override;
+    int32_t GetOfflineReleaseRequest(const std::vector<uint8_t> &mediaKeyId,
+        std::vector<uint8_t> &releaseRequest) override;
 
-    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t>& mediaKeyId,
-         const std::vector<uint8_t>& response) override;
+    int32_t ProcessOfflineReleaseResponse(const std::vector<uint8_t> &mediaKeyId,
+        const std::vector<uint8_t> &response) override;
 
-    int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t>& mediaKeyId) override;
+    int32_t RestoreOfflineMediaKeys(const std::vector<uint8_t> &mediaKeyId) override;
 
-    int32_t GetContentProtectionLevel(ContentProtectionLevel& level) override;
+    int32_t GetContentProtectionLevel(ContentProtectionLevel &level) override;
 
-    int32_t RequiresSecureDecoderModule(const std::string& mimeType, bool& required) override;
+    int32_t RequiresSecureDecoderModule(const std::string &mimeType, bool &required) override;
 
-    int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback>& sessionCallback) override;
+    int32_t SetCallback(const sptr<OHOS::HDI::Drm::V1_0::IMediaKeySessionCallback> &sessionCallback) override;
 
-    int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule>& decryptModule) override;
+    int32_t GetMediaDecryptModule(sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> &decryptModule) override;
 
     int32_t Destroy() override;
 
@@ -71,6 +71,7 @@ public:
     int32_t GetErrorDecryptNumber();
     int32_t SetKeySessionServiceCallback(sptr<KeySessionServiceCallback> callback);
     sptr<Session> session_;
+
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
@@ -79,7 +80,7 @@ private:
     sptr<KeySessionServiceCallback> sessionCallback_;
     std::mutex offlineKeyMutex_;
     std::map<std::string, std::string> offlineKeyIdAndKeyValueBase64_;
-    const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
+    const char *offlineKeyFileName = "/data/local/traces/offline_key.txt";
     const int keyIdMaxLength = 255;
     OHOS::sptr<MediaKeySessionCallbackService> vdiCallbackObj;
 };
