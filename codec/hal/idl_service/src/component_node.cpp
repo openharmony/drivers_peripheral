@@ -496,7 +496,7 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     }
     if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
         OMXBufferAppPrivateData privateData;
-        err = memset_s(&privateData, sizeof(privateData), 0, sizeof(privateData))
+        err = memset_s(&privateData, sizeof(privateData), 0, sizeof(privateData));
         if (err != 0) {
             CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
             return HDF_FAILURE;
