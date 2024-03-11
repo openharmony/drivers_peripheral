@@ -109,12 +109,13 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("scheduleId is null");
         return RESULT_BAD_PARAM;
     }
-    if (!IsSessionValid(param.userId)) {
+    ResultCode ret = CheckSessionValid(param.userId);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
-        return RESULT_GENERAL_ERROR;
+        return ret;
     }
     UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
-    ResultCode ret = CheckSpecification(param.userId, param.authType);
+    ret = CheckSpecification(param.userId, param.authType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check specification failed, authType is %{public}u, ret is %{public}d", param.authType, ret);
         return ret;
@@ -136,11 +137,12 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    if (!IsSessionValid(param.userId)) {
+    ResultCode ret = CheckSessionValid(param.userId);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
-        return RESULT_GENERAL_ERROR;
+        return ret;
     }
-    ResultCode ret = CheckSpecification(param.userId, param.authType);
+    ret = CheckSpecification(param.userId, param.authType);
     if (ret != RESULT_EXCEED_LIMIT) {
         LOG_ERROR("no pin or exception, authType is %{public}u, ret is %{public}d", param.authType, ret);
         return ret;
@@ -171,9 +173,14 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
     ResultCode ret = GetEnrollScheduleInfo(&currentScheduleId, &scheduleAuthType);
-    if (ret != RESULT_SUCCESS || executorInfo->scheduleId != currentScheduleId || IsSessionTimeout()) {
+    if (ret != RESULT_SUCCESS || executorInfo->scheduleId != currentScheduleId) {
         LOG_ERROR("schedule is mismatch");
         return RESULT_GENERAL_ERROR;
+    }
+    ret = CheckSessionTimeout();
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("idm session is time out");
+        return ret;
     }
     const CoAuthSchedule *schedule = GetCoAuthSchedule(executorInfo->scheduleId);
     if (schedule == NULL) {
@@ -323,9 +330,14 @@ IAM_STATIC ResultCode CheckResultValid(uint64_t scheduleId, int32_t userId)
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
     ResultCode ret = GetEnrollScheduleInfo(&currentScheduleId, &scheduleAuthType);
-    if (ret != RESULT_SUCCESS || scheduleId != currentScheduleId || IsSessionTimeout()) {
+    if (ret != RESULT_SUCCESS || scheduleId != currentScheduleId) {
         LOG_ERROR("schedule is mismatch");
         return RESULT_GENERAL_ERROR;
+    }
+    ret = CheckSessionTimeout();
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("idm session is time out");
+        return ret;
     }
     int32_t userIdGet;
     ret = GetUserId(&userIdGet);
