@@ -20,7 +20,6 @@ ohos_unittest("codec_idl_omx_test") {
   include_dirs = [
     "./",
     "../../../interfaces/include",
-    "//third_party/openmax/api/1.1.2",
   ]
   sources = [
     "codec_callback_service.cpp",
@@ -50,6 +49,7 @@ ohos_unittest("codec_idl_omx_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "openmax:libopenmax_shared" ]
   defines = []
   if (drivers_peripheral_codec_feature_support_omx_extend_test) {
     defines += [ "SUPPORT_OMX_EXTEND" ]

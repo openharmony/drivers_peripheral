@@ -14,10 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_executable("codec_hdi_omx_decode") {
-  include_dirs = [
-    "./include",
-    "//third_party/openmax/api/1.1.2",
-  ]
+  include_dirs = [ "./include" ]
 
   sources = [
     "src/codec_hdi_decode.cpp",
@@ -25,8 +22,6 @@ ohos_executable("codec_hdi_omx_decode") {
     "src/command_parse.cpp",
   ]
 
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -45,6 +40,10 @@ ohos_executable("codec_hdi_omx_decode") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "openmax:libopenmax_shared",
+  ]
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -52,17 +51,12 @@ ohos_executable("codec_hdi_omx_decode") {
 }
 
 ohos_executable("codec_hdi_omx_encode") {
-  include_dirs = [
-    "./include",
-    "//third_party/openmax/api/1.1.2",
-  ]
+  include_dirs = [ "./include" ]
 
   sources = [
     "src/codec_hdi_encode.cpp",
     "src/command_parse.cpp",
   ]
-
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -82,6 +76,10 @@ ohos_executable("codec_hdi_omx_encode") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "openmax:libopenmax_shared",
+  ]
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
