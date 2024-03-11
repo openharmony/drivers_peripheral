@@ -24,7 +24,8 @@
 
 #include "fingerprint_auth_interface_service.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "FINGERPRINT_AUTH_IMPL"
 
 #undef private
 
