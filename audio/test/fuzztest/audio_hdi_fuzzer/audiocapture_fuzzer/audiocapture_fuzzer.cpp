@@ -100,8 +100,7 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_CAPTURE_SET_SAMPLE_ATTR:
-            InitAttrs((const struct AudioSampleAttributes *)(rawData));
-            capture->SetSampleAttributes(capture, &g_attrs);
+            capture->SetSampleAttributes(capture, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
             break;
         case AUDIO_CAPTURE_CHECK_SCENE_CAPABILITY: {
             bool supported = false;

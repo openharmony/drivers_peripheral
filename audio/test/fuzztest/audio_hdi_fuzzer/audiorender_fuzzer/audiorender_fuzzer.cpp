@@ -101,8 +101,7 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
     uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_RENDER_SET_SAMPLE_ATTR:
-            InitAttrs((const struct AudioSampleAttributes *)(rawData));
-            render->SetSampleAttributes(render, &g_attrs);
+            render->SetSampleAttributes(render, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
             break;
         case AUDIO_RENDER_CHECK_SCENE_CAPABILITY: {
             bool supported = false;
