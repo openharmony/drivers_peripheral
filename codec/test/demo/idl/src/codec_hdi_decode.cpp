@@ -283,31 +283,12 @@ int32_t CodecHdiDecode::CheckAndUseBufferHandle()
     if (!useBufferHandle_) {
         return HDF_SUCCESS;
     }
-    SupportBufferType param;
-    if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
-    std::vector<int8_t> inVec, outVec;
-    util_->ObjectToVector(param, inVec);
-    auto err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("OMX_GetParameter OMX_IndexParamSupportBufferType in err [%{public}x]", err);
-        return err;
-    }
-    util_->VectorToObject(outVec, param);
 
-    if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
-    util_->ObjectToVector(param, inVec);
-    err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
+    std::vector<int8_t> inVec, outVec;
+    auto err = GetParameterSupportBufferType(inVec, outVec);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("OMX_GetParameter OMX_IndexParamSupportBufferType out err [%{public}x]", err);
         return err;
     }
-    util_->VectorToObject(outVec, param);
 
     GetBufferHandleUsageParams usage;
     if (util_->InitParamInOhos(usage) != HDF_SUCCESS) {
@@ -334,6 +315,35 @@ int32_t CodecHdiDecode::CheckAndUseBufferHandle()
         HDF_LOGE("OMX_SetParameter OMX_IndexParamUseBufferType out, err [%{public}x]", err);
         return err;
     }
+    return err;
+}
+
+int32_t CodecHdiDecode::GetParameterSupportBufferType(std::vector<int8_t> &inVec, std::vector<int8_t> &outVec)
+{
+    SupportBufferType param;
+    if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
+    util_->ObjectToVector(param, inVec);
+    auto err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("OMX_GetParameter OMX_IndexParamSupportBufferType in err [%{public}x]", err);
+        return err;
+    }
+    util_->VectorToObject(outVec, param);
+
+    if (util_->InitParamInOhos(param) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    param.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_OUTPUT);
+    util_->ObjectToVector(param, inVec);
+    err = client_->GetParameter(OMX_IndexParamSupportBufferType, inVec, outVec);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("OMX_GetParameter OMX_IndexParamSupportBufferType out err [%{public}x]", err);
+        return err;
+    }
+    util_->VectorToObject(outVec, param);
     return err;
 }
 

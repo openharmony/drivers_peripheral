@@ -705,6 +705,51 @@ int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t
     return HDF_SUCCESS;
 }
 
+static int32_t GetOmxParamByKey(Param paramIn, OMX_PARAM_PORTDEFINITIONTYPE *param)
+{
+    switch (paramIn.key) {
+        case KEY_INPUT_BUFFER_COUNT:
+        case KEY_OUTPUT_BUFFER_COUNT:
+            param->nBufferCountActual = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_BUFFERSIZE: {
+            param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            param->bEnabled = OMX_TRUE;
+            break;
+        }
+        case KEY_MIMETYPE: {
+            int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn.val)));
+            param->format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)codingType;
+            break;
+        }
+        case KEY_VIDEO_WIDTH:
+            param->format.video.nFrameWidth = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_VIDEO_HEIGHT:
+            param->format.video.nFrameHeight = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_VIDEO_STRIDE:
+            param->format.video.nStride = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_BITRATE:
+            param->format.video.nBitrate = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_VIDEO_FRAME_RATE:
+            param->format.video.xFramerate = *(reinterpret_cast<OMX_U32 *>(paramIn.val));
+            break;
+        case KEY_PIXEL_FORMAT:
+            param->format.video.eColorFormat =
+                ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn.val)));
+            break;
+
+        default: {
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn.key);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, int32_t paramCnt, CodecExInfo info)
 {
     OMX_PARAM_PORTDEFINITIONTYPE *param = reinterpret_cast<OMX_PARAM_PORTDEFINITIONTYPE *>(paramOut);
@@ -714,46 +759,8 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_INPUT_BUFFER_COUNT:
-            case KEY_OUTPUT_BUFFER_COUNT:
-                param->nBufferCountActual = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_BUFFERSIZE: {
-                param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                param->bEnabled = OMX_TRUE;
-                break;
-            }
-            case KEY_MIMETYPE: {
-                int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
-                param->format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)codingType;
-                break;
-            }
-            case KEY_VIDEO_WIDTH:
-                param->format.video.nFrameWidth = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_VIDEO_HEIGHT:
-                param->format.video.nFrameHeight = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_VIDEO_STRIDE:
-                param->format.video.nStride = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_BITRATE:
-                param->format.video.nBitrate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_VIDEO_FRAME_RATE:
-                param->format.video.xFramerate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-            case KEY_PIXEL_FORMAT:
-                param->format.video.eColorFormat =
-                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn[i].val)));
-                break;
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (GetOmxParamByKey(paramIn[i], param) == HDF_FAILURE) {
+            validCount--;
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;

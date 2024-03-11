@@ -93,6 +93,7 @@ private:
     int GetFreeBufferId();
     int32_t ConfigPortDefine();
     int32_t CheckAndUseBufferHandle();
+    int32_t GetParameterSupportBufferType(std::vector<int8_t> &inVec, std::vector<int8_t> &outVec);
     int32_t UseDynaBuffer(int bufferCount, int bufferSize);
     bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag);
     int32_t CreateBufferHandle();
