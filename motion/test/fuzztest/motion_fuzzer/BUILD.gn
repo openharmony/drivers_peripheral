@@ -29,14 +29,18 @@ ohos_fuzztest("MotionFuzzTest") {
   sources = [ "motion_fuzzer.cpp" ]
 
   external_deps = [
-    "c_utils:utils",
     "drivers_interface_motion:libmotion_stub_1.1",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  if (motion_c_utils_enable) {
+      external_deps += ["c_utils:utils",]
+    }
+    if (motion_hilog_enable) {
+      external_deps += ["hilog:libhilog",]
+    }
 }
 
 group("hdf_fuzztest_motion") {
