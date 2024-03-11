@@ -19,7 +19,6 @@ namespace OHOS {
 namespace Audio {
 constexpr size_t THRESHOLD = 200;
 constexpr int32_t OFFSET = 4;
-struct AudioSampleAttributes g_attrs;
 struct AudioSceneDescriptor g_scene;
 enum CaptureCmdId {
     AUDIO_CAPTURE_SET_SAMPLE_ATTR,
@@ -43,27 +42,6 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
      * and the third digit no left
      */
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
-}
-
-static int32_t InitAttrs(const struct AudioSampleAttributes *attrs)
-{
-    if (attrs == nullptr) {
-        return HDF_FAILURE;
-    }
-    /* Initialization of audio parameters for playback */
-    g_attrs.format = attrs->format;
-    g_attrs.channelCount = attrs->channelCount;
-    g_attrs.sampleRate = attrs->sampleRate;
-    g_attrs.interleaved = attrs->interleaved;
-    g_attrs.type = attrs->type;
-    g_attrs.period = attrs->period;
-    g_attrs.frameSize = attrs->frameSize;
-    g_attrs.isBigEndian = attrs->isBigEndian;
-    g_attrs.isSignedData = attrs->isSignedData;
-    g_attrs.startThreshold = attrs->startThreshold;
-    g_attrs.stopThreshold = attrs->stopThreshold;
-    g_attrs.silenceThreshold = attrs->silenceThreshold;
-    return HDF_SUCCESS;
 }
 
 static int32_t InitScene(const struct AudioSceneDescriptor *scene)
