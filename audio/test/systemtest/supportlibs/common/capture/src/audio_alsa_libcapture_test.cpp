@@ -51,16 +51,16 @@ void AudioAlsaLibCaptureTest::SetUpTestCase(void)
     char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     ASSERT_NE(nullptr, ptrHandle);
-    InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *, int,
-                                 struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputCapture");
+    InterfaceLibOutputCapture = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+        struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibOutputCapture"));
     ASSERT_NE(nullptr, InterfaceLibOutputCapture);
-    InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *, int,
-                                          struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlCapture");
+    InterfaceLibCtlCapture = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+        struct AudioHwCaptureParam *)>(dlsym(ptrHandle, "AudioInterfaceLibCtlCapture"));
     ASSERT_NE(nullptr, InterfaceLibCtlCapture);
     AudioBindService = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
         "AudioBindService"));
     ASSERT_NE(nullptr, AudioBindService);
-    CloseServiceCapture = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceCapture");
+    CloseServiceCapture = reinterpret_cast<void (*)(struct DevHandle *)>(dlsym(ptrHandle, "AudioCloseServiceCapture"));
     ASSERT_NE(nullptr, CloseServiceCapture);
 }
 

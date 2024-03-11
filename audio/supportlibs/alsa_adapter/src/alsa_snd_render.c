@@ -180,8 +180,9 @@ static int32_t SetHWParams(struct AlsaSoundCard *cardIns, snd_pcm_access_t acces
         return HDF_FAILURE;
     }
     snd_pcm_hw_params_get_buffer_time_max(hwParams, &renderIns->bufferTime, &dir);
-    if (renderIns->bufferTime > AUDIO_BUFFER_TIME_DEF)
+    if (renderIns->bufferTime > AUDIO_BUFFER_TIME_DEF) {
         renderIns->bufferTime = AUDIO_BUFFER_TIME_DEF;
+    }
     renderIns->periodTime = renderIns->bufferTime / AUDIO_PERIOD_TIME_RATIO;
     if (snd_pcm_hw_params_set_buffer_time_near(cardIns->pcmHandle, hwParams, &renderIns->bufferTime, &dir) < 0) {
         AUDIO_FUNC_LOGE("Set buffer time %{public}u failed", renderIns->bufferTime);
@@ -564,7 +565,7 @@ int32_t RenderSetParams(struct AlsaRender *renderIns, const struct AudioHwRender
 }
 
 static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *handleData,
-        const struct AudioPcmHwParams *hwParams)
+    const struct AudioPcmHwParams *hwParams)
 {
     int32_t ret, offset;
     long frames;
@@ -619,36 +620,13 @@ static int32_t RenderWritei(snd_pcm_t *pcm, const struct AudioHwRenderParam *han
     return HDF_SUCCESS;
 }
 
-static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct AudioHwRenderParam *handleData)
+static int32_t WriteiMmap(uint32_t loopTimes, uint32_t lastBuffSize, uint32_t frameSize,
+    struct AlsaSoundCard *cardIns, struct AudioMmapBufferDescriptor *mmapBufDesc)
 {
     int32_t ret;
-    uint32_t frameSize;
-    uint32_t totalSize;
-    uint32_t lastBuffSize;
-    uint32_t loopTimes;
     uint32_t looper = 0;
-    uint32_t copyLen;
     int32_t count = 0;
-    struct AudioMmapBufferDescriptor *mmapBufDesc = NULL;
-    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
-    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
-
-    cardIns->mmapFlag = false;
-    ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_MMAP_INTERLEAVED);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
-        return HDF_FAILURE;
-    }
-
-    frameSize = cardIns->hwParams.channels * cardIns->hwParams.format;
-    if (frameSize == 0) {
-        AUDIO_FUNC_LOGE("frame size = 0!");
-        return HDF_FAILURE;
-    }
-    mmapBufDesc = (struct AudioMmapBufferDescriptor *)&(handleData->frameRenderMode.mmapBufDesc);
-    totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
-    lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
-    loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
+    uint32_t copyLen;
     while (looper < loopTimes) {
         copyLen = (looper < (loopTimes - 1)) ? MIN_PERIOD_SIZE : lastBuffSize;
         snd_pcm_uframes_t frames = (snd_pcm_uframes_t)(copyLen / frameSize);
@@ -671,8 +649,38 @@ static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct Audi
         mmapBufDesc->offset += copyLen;
         cardIns->mmapFrames += (uint64_t)frames;
     }
-
     return HDF_SUCCESS;
+}
+
+static int32_t RenderWriteiMmap(struct AlsaSoundCard *cardIns, const struct AudioHwRenderParam *handleData)
+{
+    int32_t ret;
+    uint32_t frameSize;
+    uint32_t totalSize;
+    uint32_t lastBuffSize;
+    uint32_t loopTimes;
+    struct AudioMmapBufferDescriptor *mmapBufDesc = NULL;
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
+    CHECK_NULL_PTR_RETURN_DEFAULT(handleData);
+
+    cardIns->mmapFlag = false;
+    ret = ResetRenderParams(cardIns, SND_PCM_ACCESS_MMAP_INTERLEAVED);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
+        return HDF_FAILURE;
+    }
+
+    frameSize = cardIns->hwParams.channels * cardIns->hwParams.format;
+    if (frameSize == 0) {
+        AUDIO_FUNC_LOGE("frame size = 0!");
+        return HDF_FAILURE;
+    }
+    mmapBufDesc = (struct AudioMmapBufferDescriptor *)&(handleData->frameRenderMode.mmapBufDesc);
+    totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
+    lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
+    loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);
+
+    return WriteiMmap(loopTimes, lastBuffSize, frameSize, cardIns, mmapBufDesc);
 }
 
 static int32_t RenderOpenImpl(struct AlsaRender *renderIns)
@@ -792,7 +800,7 @@ static int32_t RenderInitImpl(struct AlsaRender* renderIns)
 }
 
 static int32_t RenderSelectSceneImpl(struct AlsaRender *renderIns, enum AudioPortPin descPins,
-        const struct PathDeviceInfo *deviceInfo)
+    const struct PathDeviceInfo *deviceInfo)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
     return HDF_SUCCESS;
