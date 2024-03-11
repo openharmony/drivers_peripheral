@@ -15,6 +15,7 @@ HDF_CORE_PATH = "../../../../../hdf_core"
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
+import("../../../motion.gni")
 
 module_output_path = "drivers_peripheral_motion/motion"
 
@@ -43,10 +44,10 @@ ohos_unittest("hdi_unittest_motion") {
       "ipc:ipc_single",
     ]
     if (motion_c_utils_enable) {
-      external_deps += ["c_utils:utils",]
+      external_deps += [ "c_utils:utils" ]
     }
     if (motion_hilog_enable) {
-      external_deps += ["hilog:libhilog",]
+      external_deps += [ "hilog:libhilog" ]
     }
   }
   external_deps += [ "ipc:ipc_single" ]
