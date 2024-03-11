@@ -56,16 +56,17 @@ void AudioAlsaLibRenderTest::SetUpTestCase(void)
     char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
     ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
     ASSERT_NE(nullptr, ptrHandle);
-    InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *, int,
-        struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
+    InterfaceLibOutputRender = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+        struct AudioHwRenderParam *)>(dlsym(ptrHandle, "AudioInterfaceLibOutputRender"));
     ASSERT_NE(nullptr, InterfaceLibOutputRender);
-    InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
-        struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
+    InterfaceLibCtlRender = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+        struct AudioHwRenderParam *)>(dlsym(ptrHandle, "AudioInterfaceLibCtlRender"));
     ASSERT_NE(nullptr, InterfaceLibCtlRender);
     BindServiceRender = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
         "AudioBindServiceRender"));
     ASSERT_NE(nullptr, BindServiceRender);
-    CloseServiceRender = (void (*)(static_cast<struct DevHandle *>))dlsym(ptrHandle, "AudioCloseServiceRender");
+    CloseServiceRender = reinterpret_cast<void (*)(static_cast<struct DevHandle *>)>(dlsym(ptrHandle,
+        "AudioCloseServiceRender"));
     ASSERT_NE(nullptr, CloseServiceRender);
 }
 
