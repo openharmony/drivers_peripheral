@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,22 +25,23 @@ namespace Drm {
 namespace V1_0 {
 class MediaDecryptModuleService : public OHOS::HDI::Drm::V1_0::IMediaDecryptModule {
 public:
-    MediaDecryptModuleService(sptr<Session>& session);
+    MediaDecryptModuleService(sptr<Session> &session);
     virtual ~MediaDecryptModuleService() = default;
 
-    int32_t DecryptMediaData(bool secure, const CryptoInfo& cryptoInfo, const DrmBuffer& srcBuffer,
-         const DrmBuffer& destBuffer) override;
+    int32_t DecryptMediaData(bool secure, const CryptoInfo &cryptoInfo, const DrmBuffer &srcBuffer,
+        const DrmBuffer &destBuffer) override;
 
     int32_t Release() override;
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
-private:
-    int32_t DecryptByAesCbc(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, 
-        uint8_t* src_data, uint8_t* dest_data, const std::vector<SubSample>& subSamples);
-    int32_t DecryptBySM4Cbc(const std::vector<uint8_t> &key, const std::vector<uint8_t> &iv,
-    uint8_t *srcData, uint8_t *destData, const std::vector<SubSample> &subSamples);
 
-    int32_t CopyBuffer(uint8_t* srcBuffer, uint8_t* dstBuffer, const std::vector<SubSample>& subSamples);
+private:
+    int32_t DecryptByAesCbc(const std::vector<uint8_t> &key, const std::vector<uint8_t> &iv, uint8_t *src_data,
+        uint8_t *dest_data, const std::vector<SubSample> &subSamples);
+    int32_t DecryptBySM4Cbc(const std::vector<uint8_t> &key, const std::vector<uint8_t> &iv, uint8_t *srcData,
+        uint8_t *destData, const std::vector<SubSample> &subSamples);
+
+    int32_t CopyBuffer(uint8_t *srcBuffer, uint8_t *dstBuffer, const std::vector<SubSample> &subSamples);
     int32_t decryptNumber = 0;
     int32_t errorDecryptNumber = 0;
     sptr<Session> session_;
