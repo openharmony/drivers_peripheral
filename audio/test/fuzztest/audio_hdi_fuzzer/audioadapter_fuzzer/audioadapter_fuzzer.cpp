@@ -74,7 +74,7 @@ static int32_t InitDevDesc(const struct AudioDeviceDescriptor *devDesc)
 
     g_devDesc.portId = devDesc->portId;
     g_devDesc.pins = devDesc->pins;
-    g_devDesc.desc = strdup("cardname");
+    g_devDesc.desc = NULL;
     return HDF_SUCCESS;
 }
 
