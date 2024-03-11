@@ -18,7 +18,7 @@
 using namespace std;
 namespace OHOS {
 namespace Audio {
-constexpr size_t THRESHOLD = 10;
+constexpr size_t THRESHOLD = 200;
 constexpr int32_t OFFSET = 4;
 enum ManagerCmdId {
     AUDIO_MANAGER_LOAD_ADAPTER,
@@ -43,7 +43,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     }
     uint32_t cmd = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
-    struct IAudioManager *manager = IAudioManagerGet(true);
+    struct IAudioManager *manager = IAudioManagerGet(false);
     if (manager == nullptr) {
         return false;
     }
@@ -69,7 +69,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
         default:
             break;
     }
-    IAudioManagerRelease(manager, true);
+    IAudioManagerRelease(manager, false);
     return true;
 }
 }
