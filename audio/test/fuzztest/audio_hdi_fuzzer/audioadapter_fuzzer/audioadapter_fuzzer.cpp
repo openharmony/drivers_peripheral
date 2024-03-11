@@ -63,7 +63,7 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_CREAT_RENDER: {
             struct IAudioRender *render = nullptr;
             InitDevDesc((const struct AudioDeviceDescriptor *)(rawData));
-            adapter->CreateRender(adapter, &g_devDesc, 
+            adapter->CreateRender(adapter, &g_devDesc,
                 reinterpret_cast<const struct AudioSampleAttributes *>(rawData), &render, &g_renderId);
             break;
         }
@@ -74,7 +74,7 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_CREAT_CAPTURE: {
             struct IAudioCapture *capture = nullptr;
             InitDevDesc((const struct AudioDeviceDescriptor *)(rawData));
-            adapter->CreateCapture(adapter, &g_devDesc, 
+            adapter->CreateCapture(adapter, &g_devDesc,
                 reinterpret_cast<const struct AudioSampleAttributes *>(rawData), &capture, &g_captureId);
             break;
         }
