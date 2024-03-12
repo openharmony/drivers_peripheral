@@ -138,6 +138,7 @@ void AudioUtRenderOffloadTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
     free(devDescriptorName_);
+    devDescriptorName_ = nullptr;
 
     if (adapter_ != nullptr) {
         adapter_->DestroyRender(adapter_, renderId_);

@@ -95,6 +95,7 @@ private:
     int GetFreeBufferId();
     int32_t ConfigPortDefine();
     int32_t CheckAndUseBufferHandle();
+    int32_t GetParameterSupportBufferType(std::vector<int8_t> &inVec, std::vector<int8_t> &outVec);
     int32_t CheckSupportBufferType(PortIndex portIndex, CodecBufferType codecBufferType);
     int32_t CheckAndUseDMABuffer();
     int32_t UseDMABuffer(PortIndex portIndex, int bufferCount, int bufferSize);

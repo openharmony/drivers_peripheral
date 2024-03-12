@@ -250,19 +250,8 @@ static int32_t StopAudioFiles(struct IAudioRender **renderS)
     return ret;
 }
 
-static int32_t FrameStartMmap(const struct StrPara *param)
+static int32_t GetFileSizeAndPath(char *pathBuf, int32_t *reqSize)
 {
-    if (param == NULL) {
-        return HDF_FAILURE;
-    }
-    const struct StrPara *strParam = param;
-    struct IAudioRender *render = strParam->render;
-    struct AudioMmapBufferDescriptor mmapDesc;
-
-    (void)signal(SIGINT, StreamClose);
-
-    // get file length
-    char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
@@ -280,12 +269,34 @@ static int32_t FrameStartMmap(const struct StrPara *param)
         return HDF_FAILURE;
     }
 
-    int32_t reqSize = (int32_t)ftell(fp);
-    if (reqSize < 0) {
+    *reqSize = (int32_t)ftell(fp);
+    if (*reqSize < 0) {
         fclose(fp);
         return HDF_FAILURE;
     }
     (void)fclose(fp);
+    return HDF_SUCCESS;
+}
+
+static int32_t FrameStartMmap(const struct StrPara *param)
+{
+    if (param == NULL) {
+        return HDF_FAILURE;
+    }
+    const struct StrPara *strParam = param;
+    struct IAudioRender *render = strParam->render;
+    struct AudioMmapBufferDescriptor mmapDesc;
+
+    (void)signal(SIGINT, StreamClose);
+
+    // get file length
+    char pathBuf[PATH_MAX] = {'\0'};
+    int32_t reqSize;
+    int32_t ret = GetFileSizeAndPath(pathBuf, &reqSize);
+    if (ret != 0) {
+        return HDF_FAILURE;
+    }
+    
     // Init param
     mmapDesc.memoryFd = 0; // default 0
     mmapDesc.filePath = strdup(pathBuf);
