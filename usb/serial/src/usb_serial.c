@@ -81,10 +81,9 @@ static void UsbSerialFreeFifo(const struct DataFifo *fifo)
 
 static int32_t AcmWbIsAvail(const struct AcmDevice *acm)
 {
-    int32_t i, n;
-    n = ACM_NW;
+    int32_t n = ACM_NW;
     OsalMutexLock((struct OsalMutex *)&acm->writeLock);
-    for (i = 0; i < ACM_NW; i++) {
+    for (int32_t i = 0; i < ACM_NW; i++) {
         n -= acm->wb[i].use;
     }
     OsalMutexUnlock((struct OsalMutex *)&acm->writeLock);
