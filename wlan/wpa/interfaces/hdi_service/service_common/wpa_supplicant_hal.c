@@ -105,22 +105,18 @@ static WpaSsidField g_wpaHalSsidFields[] = {
     {DEVICE_CONFIG_EAP_CERT_PWD, "private_key_passwd", WPA_QUOTATION_MARKS_FLAG_YES},
 };
 
-static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pcmd)
+static int WpaCliCmdStatus(WifiWpaStaInterface *this, const char*ifName, struct WpaHalCmdStatus *pcmd)
 {
     if (this == NULL || pcmd == NULL) {
         return -1;
     }
     char cmd[CMD_BUFFER_SIZE] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s STATUS", this->ifname) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s STATUS", ifName == NULL ? this->ifname : ifName) < 0) {
         HDF_LOGE("snprintf error");
         return -1;
     }
-    char *buf = (char *)calloc(REPLY_BUF_LENGTH, sizeof(char));
-    if (buf == NULL) {
-        return -1;
-    }
+    char buf[REPLY_BUF_LENGTH] = {0};
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
-        free(buf);
         return -1;
     }
     char *savedPtr = NULL;
@@ -152,7 +148,6 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pc
 
         key = strtok_r(NULL, "=", &savedPtr);
     }
-    free(buf);
     if (strcmp(pcmd->address, "") == 0) {
         return -1;
     }
