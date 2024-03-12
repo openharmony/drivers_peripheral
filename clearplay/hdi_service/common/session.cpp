@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,8 @@ int32_t Session::getKeyRequest(const std::vector<uint8_t> &indexInfo, const std:
         if (ret != HDF_SUCCESS) {
             return ret;
         }
-    } else if (mimeType == WEBM_INIT_DATA_FORMAT || mimeType == WEBM_AUDIO_DATA_FORMAT || mimeType == WEBM_VIDEO_DATA_FORMAT) {
+    } else if (mimeType == WEBM_INIT_DATA_FORMAT || mimeType == WEBM_AUDIO_DATA_FORMAT ||
+        mimeType == WEBM_VIDEO_DATA_FORMAT) {
         if (indexInfo.size() != KEY_ID_SIZE) {
             return HDF_ERR_INVALID_PARAM;
         }
