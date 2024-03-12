@@ -24,7 +24,7 @@
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
-     struct AudioEffectBuffer *output)
+    struct AudioEffectBuffer *output)
 {
     if (self == NULL || input == NULL || output == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -50,7 +50,7 @@ int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct Aud
 }
 
 int32_t EffectControlSendCommand(struct IEffectControl *self, enum EffectCommandTableIndex cmdId, const int8_t *cmdData,
-     uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
+    uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen)
 {
     if (self == NULL || cmdData == NULL || replyData == NULL || replyDataLen == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
@@ -96,7 +96,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
 }
 
 int32_t EffectControlEffectReverse(struct IEffectControl *self, const struct AudioEffectBuffer *input,
-     struct AudioEffectBuffer *output)
+    struct AudioEffectBuffer *output)
 {
     if (self == NULL || input == NULL || output == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
