@@ -21,6 +21,7 @@ ohos_shared_library("libdistributed_camera_provider_config") {
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.0",
@@ -48,8 +49,8 @@ ohos_shared_library("libdistributed_camera_host_config") {
   ]
   sources = [ "./src/config/dcamera_host_config.cpp" ]
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
-  configs = [ "//third_party/jsoncpp:jsoncpp_public_config" ]
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_stub_1.0",
@@ -78,7 +79,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "include/dcamera_provider",
     "include/dstream_operator",
     "include/utils",
-    "//third_party/jsoncpp/include",
   ]
 
   sources = [
@@ -96,8 +96,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "src/utils/dh_log.cpp",
   ]
 
-  deps = [ "//third_party/jsoncpp:jsoncpp" ]
-
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"distributedcamerahdf\"",
@@ -105,6 +103,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_stub_1.0",
