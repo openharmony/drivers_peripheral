@@ -16,23 +16,24 @@
 #define HOSTAPD_COMMON_CMD_H
 
 #include "../hostapd_impl.h"
+#include "hdi_hostapd_hal.h"
 #include <pthread.h>
 
+#define WIFI_MULTI_CMD_MAX_LEN 1024
 #define BUFFSIZE_REQUEST 4096
 #define CMD_SIZE 100
 #define REPLY_SIZE 1024
 #define MAX_WPA_MAIN_ARGC_NUM 20
 #define MAX_WPA_MAIN_ARGV_LEN 128
+#define PATH_NUM 2
+#define BUFF_SIZE 256
+
 #define WPA_HOSTAPD_NAME "hostapd"
 #define WPA_SLEEP_TIME (100 * 1000) /* 100ms */
-#ifdef OHOS_EUPDATER
-#define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
-#else
-#define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
-#endif // OHOS_EUPDATER
-#define START_CMD "hostapd "CONFIG_ROOR_DIR"/wpa_supplicant/hostapd.conf"
 
 int32_t HostapdInterfaceStartAp(struct IHostapdInterface *self);
+
+int32_t HostapdInterfaceStartApWithCmd(struct IHostapdInterface *self, const char *ifName, int id);
 
 int32_t HostapdInterfaceStopAp(struct IHostapdInterface *self);
 
@@ -72,6 +73,9 @@ int32_t HostapdInterfaceSetMacFilter(struct IHostapdInterface *self,
 int32_t HostapdInterfaceDelMacFilter(struct IHostapdInterface *self,
     const char *ifName, const char *mac, int32_t id);
 
+int32_t HostapdInterfaceReloadApConfigInfo(struct IHostapdInterface *self,
+    const char *ifName, int32_t id);
+
 int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self,
     const char *ifName, char *buf, uint32_t bufLen, int32_t size, int32_t id);
 
@@ -92,26 +96,4 @@ struct StApMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
 };
-
-typedef enum KeyMgmt {
-    /* WPA not used. */
-    NONE = 0,
-    /* WPA pre-share key ({@ preSharedKey} needs to be specified.) */
-    WPA_PSK = 1,
-    /**
-     * WPA2 pre-shared key, which is used for soft APs({@ preSharedKey} needs to
-     * be specified).
-     */
-    WPA2_PSK = 2
-} KeyMgmt;
-
-typedef enum ApBand {
-    /* Unknown Band */
-    AP_NONE_BAND = 0,
-    /* 2.4GHz Band */
-    AP_2GHZ_BAND = 1,
-    /* 5GHz Band */
-    AP_5GHZ_BAND = 2
-} ApBand;
-
 #endif

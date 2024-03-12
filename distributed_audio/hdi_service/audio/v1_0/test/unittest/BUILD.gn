@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../../../../distributedaudio.gni")
 
 group("hdi_service_audio_test") {

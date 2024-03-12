@@ -32,8 +32,6 @@ struct BH1750AlsData {
     int32_t als;
 };
 
-int32_t ReadBh1750Data(struct SensorCfgData *data);
-
 struct Bh1750DrvData {
     struct IDeviceIoService ioService;
     struct HdfDeviceObject *device;

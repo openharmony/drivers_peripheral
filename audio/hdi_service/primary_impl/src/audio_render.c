@@ -42,6 +42,9 @@
 #define SEC_TO_MILLSEC 1000
 #define INTEGER_TO_DEC 10
 #define DECIMAL_PART   5
+#define RENDER_2_CHS   2
+#define PCM_8_BIT      8
+#define PCM_16_BIT     16
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode,
     uint64_t bytes, uint32_t *frameCount)
@@ -88,11 +91,14 @@ int32_t AudioRenderStart(struct IAudioRender *handle)
         AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("IAudioRender already start!");
         return AUDIO_ERR_AO_BUSY; // render is busy now
     }
     if (hwRender->devDataHandle == NULL) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("devDataHandle is null!");
         return AUDIO_ERR_INTERNAL;
     }
@@ -100,17 +106,20 @@ int32_t AudioRenderStart(struct IAudioRender *handle)
     int32_t ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_START);
     if (ret < 0) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("AudioRenderStart SetParams FAIL");
         return AUDIO_ERR_INTERNAL;
     }
 
     char *buffer = (char *)OsalMemCalloc(FRAME_DATA);
     if (buffer == NULL) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Calloc Render buffer Fail!");
         return AUDIO_ERR_MALLOC_FAIL;
     }
 
     hwRender->renderParam.frameRenderMode.buffer = buffer;
+    pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
 
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Start");
     return AUDIO_SUCCESS;
@@ -148,12 +157,14 @@ int32_t AudioRenderStop(struct IAudioRender *handle)
         }  
     } while (0);
     
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
     } else {
         AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
         ret = AUDIO_ERR_NOT_SUPPORT;
     }
+    pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
 
     AudioLogRecord(AUDIO_INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Stop");
     return ret;
@@ -167,10 +178,13 @@ int32_t AudioRenderPause(struct IAudioRender *handle)
         AUDIO_FUNC_LOGE("hwRender is null");
         return AUDIO_ERR_INVALID_PARAM;
     }
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer == NULL) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("IAudioRender already stop!");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.renderMode.ctlParam.pause) {
         AUDIO_FUNC_LOGE("Audio is already pause!");
         return AUDIO_ERR_NOT_SUPPORT;
@@ -705,14 +719,13 @@ int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
 
     uint32_t byteRate = impl->renderParam.frameRenderMode.byteRate;
     uint32_t periodSize = impl->renderParam.frameRenderMode.periodSize;
-    uint32_t periodCount = impl->renderParam.frameRenderMode.periodCount;
 
     if (byteRate == 0) {
         AUDIO_FUNC_LOGE("byteRate error!");
         return AUDIO_ERR_INTERNAL;
     }
 
-    *ms = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
+    *ms = (periodSize * SEC_TO_MILLSEC) / (byteRate * RENDER_2_CHS * PCM_16_BIT / PCM_8_BIT);
     return AUDIO_SUCCESS;
 }
 
@@ -822,18 +835,22 @@ int32_t AudioRenderRenderFrame(
     struct IAudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
     if (frameLen > FRAME_DATA) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_ERR_INTERNAL;
     }
 
     int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, frameLen);
     if (ret != EOK) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("memcpy_s fail");
         return AUDIO_ERR_INTERNAL;
     }
@@ -842,16 +859,20 @@ int32_t AudioRenderRenderFrame(
     uint32_t frameCount = 0;
     ret = PcmBytesToFrames(&hwRender->renderParam.frameRenderMode, (uint64_t)frameLen, &frameCount);
     if (ret != AUDIO_SUCCESS) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("PcmBytesToFrames error!");
         return ret;
     }
 
     hwRender->renderParam.frameRenderMode.bufferFrameSize = (uint64_t)frameCount;
     if (AudioRenderRenderFramSplit(hwRender) < 0) {
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         AUDIO_FUNC_LOGE("AudioRenderRenderFramSplit error!");
         return AUDIO_ERR_INTERNAL;
     }
 
+    pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
+    
     *replyBytes = (uint64_t)frameLen;
 
     hwRender->renderParam.frameRenderMode.frames += hwRender->renderParam.frameRenderMode.bufferFrameSize;

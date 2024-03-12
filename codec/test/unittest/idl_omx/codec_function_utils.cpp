@@ -21,9 +21,6 @@
 #include <servmgr_hdi.h>
 
 #define HDF_LOG_TAG codec_hdi_test
-#define ERR_PORT_INDEX (-1)
-#define ERR_BUFFER_ID (-1)
-#define ERR_PORT_INDEX_2 10000
 
 using namespace std;
 using namespace OHOS::HDI::Codec::V2_0;
@@ -150,6 +147,7 @@ bool FunctionUtil::UseDynaBuffer(sptr<ICodecComponent> component, enum PortIndex
     for (int i = 0; i < bufferCount; i++) {
         auto omxBuffer = std::make_shared<OmxCodecBuffer>();
         InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_DYNAMIC_HANDLE);
+        FillCodecBufferWithBufferHandle(omxBuffer);
         omxBuffer->allocLen = WIDTH * HEIGHT * NUMERATOR / DENOMINATOR;
 
         OmxCodecBuffer outBuffer;
@@ -170,7 +168,6 @@ bool FunctionUtil::UseDynaBuffer(sptr<ICodecComponent> component, enum PortIndex
 bool FunctionUtil::UseHandleBuffer(sptr<ICodecComponent> component, enum PortIndex port,
     int bufferCount, int bufferSize)
 {
-    int32_t ret;
     if (bufferCount <= 0 || bufferSize <= 0) {
         HDF_LOGE("bufferCount <= 0 or bufferSize <= 0");
         return false;
@@ -181,15 +178,9 @@ bool FunctionUtil::UseHandleBuffer(sptr<ICodecComponent> component, enum PortInd
         InitOmxCodecBuffer(*omxBuffer.get(), CODEC_BUFFER_TYPE_HANDLE);
         FillCodecBufferWithBufferHandle(omxBuffer);
         omxBuffer->allocLen = WIDTH * HEIGHT * NUMERATOR / DENOMINATOR;
-        OmxCodecBuffer outBuffer;
-        OmxCodecBuffer errBuffer = *omxBuffer.get();
-        errBuffer.bufferhandle = nullptr;
-        ret = component->UseBuffer(static_cast<uint32_t>(port), errBuffer, outBuffer);
-        if (ret == HDF_SUCCESS) {
-            return false;
-        }
 
-        ret = component->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
+        OmxCodecBuffer outBuffer;
+        int32_t ret = component->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("UseBuffer error");
             return false;
@@ -206,20 +197,13 @@ bool FunctionUtil::UseHandleBuffer(sptr<ICodecComponent> component, enum PortInd
 bool FunctionUtil::UseBufferOnPort(sptr<ICodecComponent> component, enum PortIndex port,
     int32_t bufferCount, int32_t bufferSize)
 {
-    int32_t err;
     for (int i = 0; i < bufferCount; i++) {
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         int fd = OHOS::AshmemCreate(0, bufferSize);
         shared_ptr<OHOS::Ashmem> sharedMem = make_shared<OHOS::Ashmem>(fd, bufferSize);
         InitCodecBufferWithAshMem(port, bufferSize, omxBuffer, sharedMem);
         OmxCodecBuffer outBuffer;
-
-        err = component->UseBuffer(ERR_PORT_INDEX, *omxBuffer.get(), outBuffer);
-        if (err == HDF_SUCCESS) {
-            return false;
-        }
-
-        err = component->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
+        int32_t err = component->UseBuffer(static_cast<uint32_t>(port), *omxBuffer.get(), outBuffer);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("UseBuffer error");
             sharedMem->UnmapAshmem();
@@ -288,13 +272,6 @@ bool FunctionUtil::FreeBufferOnPort(sptr<ICodecComponent> component, enum PortIn
         buffer = outputBuffers_;
     }
     for (auto [bufferId, bufferInfo] : buffer) {
-        OmxCodecBuffer errBuffer = *bufferInfo->omxBuffer.get();
-        errBuffer.bufferId = ERR_BUFFER_ID;
-        ret = component->FreeBuffer(static_cast<uint32_t>(port), errBuffer);
-        if (ret == HDF_SUCCESS) {
-            return false;
-        }
-
         ret = component->FreeBuffer(static_cast<uint32_t>(port), *bufferInfo->omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("FreeBuffer error");
@@ -342,27 +319,23 @@ bool FunctionUtil::FillAndEmptyAllBuffer(sptr<ICodecComponent> component, CodecB
 {
     int32_t ret;
     auto iter = outputBuffers_.begin();
-    if (iter != outputBuffers_.end()) {
-        OmxCodecBuffer errBuffer0 = *iter->second->omxBuffer.get();
-        errBuffer0.bufferType = CODEC_BUFFER_TYPE_INVALID;
-        component->FillThisBuffer(errBuffer0);
-
-        OmxCodecBuffer errBuffer1 = *iter->second->omxBuffer.get();
-        errBuffer1.bufferId = ERR_BUFFER_ID;
-        ret = component->FillThisBuffer(errBuffer1);
-        if (ret == HDF_SUCCESS) {
-            return false;
+    for (; iter != outputBuffers_.end(); iter++) {
+        auto bufferInfo = iter->second;
+        if (type != bufferInfo->omxBuffer->bufferType) {
+            continue;
         }
-
-        ret = component->FillThisBuffer(*iter->second->omxBuffer.get());
+        ret = component->FillThisBuffer(*bufferInfo->omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("FillThisBuffer error");
             return false;
         }
     }
     iter = inputBuffers_.begin();
-    if (iter != inputBuffers_.end()) {
+    for (; iter != inputBuffers_.end(); iter++) {
         auto bufferInfo = iter->second;
+        if (type != bufferInfo->omxBuffer->bufferType) {
+            continue;
+        }
         if (type == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!PushAlongParam(*bufferInfo->omxBuffer.get()))) {
             HDF_LOGE("PushAlongParam error");
             return false;

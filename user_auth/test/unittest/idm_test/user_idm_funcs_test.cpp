@@ -121,7 +121,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_001, TestSize.Level0)
     uint64_t scheduleId = 0;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_BAD_PARAM);
     param.authType = 1;
-    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_NEED_INIT);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)

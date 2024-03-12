@@ -35,10 +35,10 @@
                 "c_utils",
                 "hilog",
                 "hdf_core",
-                "drivers_interface_audio"
+                "drivers_interface_audio",
+                "bounds_checking_function"
             ],
             "third_party": [
-                "bounds_checking_function",
                 "cJSON",
                 "alsa-lib"
             ]

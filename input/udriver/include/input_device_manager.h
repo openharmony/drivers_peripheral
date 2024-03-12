@@ -26,7 +26,7 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
-#include "input_uhdf_log.h"
+#include "hdf_log.h"
 #include "input_manager.h"
 
 namespace OHOS {

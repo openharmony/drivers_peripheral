@@ -20,8 +20,6 @@ if (defined(ohos_lite)) {
 } else {
   group("distributed_audio_entry") {
     deps = [
-      "${hdf_interfaces_path}/audio/v1_0:daudio_idl_target",
-      "${hdf_interfaces_path}/audioext/v1_0:daudioext_idl_target",
       "./hdi_service/audio/v1_0:hdf_daudio_primary_service",
       "./hdi_service/audio_ext/v1_0:hdf_daudio_ext_service",
     ]

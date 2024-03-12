@@ -235,6 +235,11 @@ void Test::DefaultInfosAnalyze(
 
 void Test::StartStream(std::vector<StreamIntent> intents)
 {
+    StartStream(intents, OHOS::HDI::Camera::V1_1::NORMAL);
+}
+
+void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_1::OperationMode_V1_1 mode)
+{
     streamOperatorCallback = new TestStreamOperatorCallback();
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
@@ -275,7 +280,7 @@ void Test::StartStream(std::vector<StreamIntent> intents)
 
     rc = streamOperator_V1_1->CreateStreams_V1_1(streamInfos);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
-    rc = streamOperator_V1_1->CommitStreams(OperationMode::NORMAL, abilityVec);
+    rc = streamOperator_V1_1->CommitStreams_V1_1(mode, abilityVec);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>().swap(streamInfos);

@@ -16,8 +16,8 @@
 #include "fingerprint_auth_interface_stub_fuzzer.h"
 
 #include "iam_logger.h"
-#include "v1_1/fingerprint_auth_interface_stub.h"
-#include "v1_1/fingerprint_auth_interface_service.h"
+#include "v1_2/fingerprint_auth_interface_stub.h"
+#include "v1_2/fingerprint_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
 
@@ -39,9 +39,9 @@ bool FingerprintAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
     if (rawData == nullptr) {
         return false;
     }
-    sptr<OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface> fingerprintAuth =
-        OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface::Get(true);
-    OHOS::HDI::FingerprintAuth::V1_1::FingerprintAuthInterfaceStub fingerprintAuthInterfaceStub(fingerprintAuth);
+    sptr<OHOS::HDI::FingerprintAuth::V1_2::IFingerprintAuthInterface> fingerprintAuth =
+        OHOS::HDI::FingerprintAuth::V1_2::IFingerprintAuthInterface::Get(true);
+    OHOS::HDI::FingerprintAuth::V1_2::FingerprintAuthInterfaceStub fingerprintAuthInterfaceStub(fingerprintAuth);
     for (uint32_t code = HDI_FINGERPRINT_AUTH_CODE_MIN; code <= HDI_FINGERPRINT_AUTH_CODE_MAX; code++) {
         MessageParcel data;
         MessageParcel reply;

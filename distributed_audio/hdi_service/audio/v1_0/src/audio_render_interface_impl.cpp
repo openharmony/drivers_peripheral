@@ -62,6 +62,10 @@ float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_
         return 1.0f;
     }
 
+    if (durationIndex == 0) {
+        return 1.0f;
+    }
+    
     float fadeRate = static_cast<float>(currentIndex) / durationIndex * DAUDIO_FADE_NORMALIZATION_FACTOR;
     if (fadeRate < 1) {
         return pow(fadeRate, DAUDIO_FADE_POWER_NUM) / DAUDIO_FADE_NORMALIZATION_FACTOR;

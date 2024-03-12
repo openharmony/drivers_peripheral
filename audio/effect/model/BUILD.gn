@@ -26,7 +26,6 @@ if (!defined(ohos_lite)) {
     include_dirs = [
       "include",
       "$hdf_audio_path/interfaces/effect",
-      "//third_party/bounds_checking_function/include",
       "../config/include/",
       "//third_party/cJSON/",
       "$hdf_audio_path/hdi_service/vendor_interface/utils",
@@ -45,6 +44,7 @@ if (!defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"

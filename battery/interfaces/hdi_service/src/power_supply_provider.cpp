@@ -270,7 +270,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 {
     int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file");
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d", path, errno);
         return HDF_ERR_IO;
     }
 
