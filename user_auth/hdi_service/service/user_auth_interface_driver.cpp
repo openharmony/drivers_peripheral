@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@
 #include "iam_logger.h"
 #include "useriam_common.h"
 
-#include "v1_2/user_auth_interface_stub.h"
-#include "v1_2/user_auth_interface_service.h"
+#include "v1_3/user_auth_interface_stub.h"
+#include "v1_3/user_auth_interface_service.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
@@ -84,8 +84,8 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUserAuthInterfaceHost->ioService.Open = nullptr;
     hdfUserAuthInterfaceHost->ioService.Release = nullptr;
 
-    OHOS::sptr<OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceService> serviceImpl(
-        new (std::nothrow) OHOS::HDI::UserAuth::V1_2::UserAuthInterfaceService());
+    OHOS::sptr<OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceService> serviceImpl(
+        new (std::nothrow) OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceService());
     if (serviceImpl == nullptr) {
         IAM_LOGE("failed to get of implement service");
         delete hdfUserAuthInterfaceHost;
@@ -93,7 +93,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUserAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, OHOS::HDI::UserAuth::V1_2::IUserAuthInterface::GetDescriptor());
+        serviceImpl, OHOS::HDI::UserAuth::V1_3::IUserAuthInterface::GetDescriptor());
     if (hdfUserAuthInterfaceHost->stub == nullptr) {
         IAM_LOGE("failed to get stub object");
         delete hdfUserAuthInterfaceHost;

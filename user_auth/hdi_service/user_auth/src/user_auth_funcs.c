@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,10 @@ IAM_STATIC ResultCode SetAuthResult(
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;
     result->result = info->result;
+    EnrolledStateHal enrolledState;
+    (void)GetEnrolledState(userId, authType, &enrolledState);
+    result->credentialDigest = enrolledState.credentialDigest;
+    result->credentialCount = enrolledState.credentialCount;
     if (result->result == RESULT_SUCCESS && authType == PIN_AUTH) {
         result->rootSecret = CopyBuffer(info->rootSecret);
         if (!IsBufferValid(result->rootSecret)) {
@@ -123,4 +127,15 @@ EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
     DestoryContext(userAuthContext);
     return ret;
+}
+
+ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal)
+{
+    ResultCode ret = GetEnrolledState(userId, authType, enrolledStateHal);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetEnrolledState failed");
+        return ret;
+    }
+
+    return RESULT_SUCCESS;
 }

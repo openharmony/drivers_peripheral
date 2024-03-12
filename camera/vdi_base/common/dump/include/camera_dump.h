@@ -60,11 +60,7 @@ public:
     bool DumpMetadata(std::string name, std::string type, const std::shared_ptr<CameraMetadata>& metadata);
     void ShowDumpMenu(struct HdfSBuf *reply);
     void CameraHostDumpProcess(struct HdfSBuf *data, struct HdfSBuf *reply);
-    static CameraDumper& GetInstance()
-    {
-        static CameraDumper instance_;
-        return instance_;
-    }
+    static CameraDumper& GetInstance();
 
 private:
     CameraDumper() {}

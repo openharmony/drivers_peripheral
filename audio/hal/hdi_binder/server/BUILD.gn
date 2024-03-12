@@ -22,7 +22,6 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "$hdf_audio_path/interfaces/include",
       "$hdf_hal_path/hdi_passthrough/include",
       "include",
-      "//third_party/bounds_checking_function/include",
     ]
 
     sources = [
@@ -46,6 +45,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = []
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
@@ -62,7 +62,6 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "$hdf_audio_path/interfaces/include",
       "$hdf_hal_path/hdi_passthrough/include",
       "include",
-      "//third_party/bounds_checking_function/include",
     ]
 
     sources = [
@@ -86,6 +85,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = []
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]

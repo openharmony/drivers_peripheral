@@ -176,9 +176,10 @@ RetCode StreamBase::StopStream()
 
     state_ = STREAM_STATE_IDLE;
     tunnel_->NotifyStop();
-    cv_.notify_one();
+    cv_.notify_all();
+
     if (handler_ != nullptr) {
-        handler_->join();
+        handler_->detach();
         handler_ = nullptr;
     }
 
@@ -292,6 +293,8 @@ void StreamBase::HandleRequest()
         }
         request = waitingList_.front();
         CHECK_IF_PTR_NULL_RETURN_VOID(request);
+        CAMERA_LOGI("HandleRequest streamId = [%{public}d] and needCancel = [%{public}d]",
+            streamId_, request->NeedCancel() ? 1 : 0);
         if (!request->IsContinous()) {
             waitingList_.pop_front();
         }
@@ -470,6 +473,13 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 pipeline_->CancelCapture({streamId_});
             }
         }
+    }
+    CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
+        buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
+    if (request->NeedCancel()) {
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
+    } else {
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
     }
     ReceiveBuffer(buffer);
     return RC_OK;

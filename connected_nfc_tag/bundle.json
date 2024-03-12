@@ -26,9 +26,7 @@
         "c_utils",
         "drivers_interface_connected_nfc_tag"
       ],
-      "third_party": [
-        "bounds_checking_function"
-      ]
+      "third_party": []
     },
     "build": {
       "sub_component": [

@@ -19,6 +19,7 @@
 #include "buffer.h"
 
 #include "context_manager.h"
+#include "idm_common.h"
 #include "user_sign_centre.h"
 
 #ifdef __cplusplus
@@ -32,11 +33,14 @@ typedef struct AuthResult {
     int32_t remainTimes;
     int32_t result;
     Buffer *rootSecret;
+    uint16_t credentialDigest;
+    uint16_t credentialCount;
 } AuthResult;
 
 ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result);
+ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 
 #ifdef __cplusplus
 }

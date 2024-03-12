@@ -27,6 +27,7 @@ const std::string VENDOR_NFC_EXT_SERVICE_LIB = "libvendor_ext_nfc_service.z.so";
 
 const std::string EXT_GET_CHIP_TYPE_FUNC_NAME = "GetChipType";
 const std::string EXT_GET_SUFFIX_FUNC_NAME = "GetNfcHalFuncNameSuffix";
+const std::string EXT_SET_FW_UPDATE_CONFIG_FUNC_NAME = "CheckFirmwareUpdate";
 
 const std::string HAL_OPEN_FUNC_NAME = "phNxpNciHal_open";
 const std::string HAL_WRITE_FUNC_NAME = "phNxpNciHal_write";
@@ -68,6 +69,7 @@ struct NfcHalInterface {
 struct NfcExtInterface {
     const char* (*getNfcChipType)(void);
     const char* (*getNfcHalFuncNameSuffix)(const char* chipType);
+    void (*checkFirmwareUpdate)(void);
 };
 
 class NfcVendorAdaptions : public INfcVendor {
@@ -93,6 +95,7 @@ private:
     std::string GetNfcHalFuncNameSuffix(const std::string &chipType);
     void ResetNfcInterface(void);
     int8_t InitNfcHalInterfaces(std::string nfcHalSoName, std::string suffix);
+    void CheckFirmwareUpdate(void);
 
     void *nfcHalHandle; // handle of nfc hal so
     NfcHalInterface nfcHalInf;

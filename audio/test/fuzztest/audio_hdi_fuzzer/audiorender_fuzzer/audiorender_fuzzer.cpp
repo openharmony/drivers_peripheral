@@ -19,7 +19,7 @@ namespace OHOS {
 namespace Audio {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
-
+struct AudioSceneDescriptor g_scene;
 enum RenderCmdId {
     AUDIO_RENDER_SET_SAMPLE_ATTR,
     AUDIO_RENDER_CHECK_SCENE_CAPABILITY,
@@ -43,6 +43,19 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
      * and the third digit no left
      */
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+}
+
+static int32_t InitScene(const struct AudioSceneDescriptor *scene)
+{
+    if (scene == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    g_scene.scene = {0};
+    g_scene.desc.portId = scene->desc.portId;
+    g_scene.desc.pins = scene->desc.pins;
+    g_scene.desc.desc = NULL;
+    return HDF_SUCCESS;
 }
 
 void AudioRenderReqMmapBuffer(struct IAudioRender *&render, uint8_t *&data)
@@ -70,12 +83,13 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
             break;
         case AUDIO_RENDER_CHECK_SCENE_CAPABILITY: {
             bool supported = false;
-            render->CheckSceneCapability(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData),
-                                         &supported);
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            render->CheckSceneCapability(render, &g_scene, &supported);
             break;
         }
         case AUDIO_RENDER_SELECT_SCENE:
-            render->SelectScene(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
+            InitScene((const struct AudioSceneDescriptor *)(rawData));
+            render->SelectScene(render, &g_scene);
             break;
         case AUDIO_RENDER_SET_VOLUME:
             render->SetVolume(render, *(reinterpret_cast<float *>(data)));
