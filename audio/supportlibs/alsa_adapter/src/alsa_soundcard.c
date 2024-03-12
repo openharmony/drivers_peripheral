@@ -839,10 +839,10 @@ static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlEl
         snd_ctl_elem_id_set_index(id, ctlElem->index);
     }
     if (ctlElem->device >= 0) {
-        snd_ctl_elem_id_set_index(id, ctlElem->device);
+        snd_ctl_elem_id_set_device(id, ctlElem->device);
     }
     if (ctlElem->subdevice >= 0) {
-        snd_ctl_elem_id_set_index(id, ctlElem->subdevice);
+        snd_ctl_elem_id_set_subdevice(id, ctlElem->subdevice);
     }
 
     ifaceType = ConvertIfaceType(ctlElem->iface);
