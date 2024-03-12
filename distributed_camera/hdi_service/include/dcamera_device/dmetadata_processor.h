@@ -22,7 +22,7 @@
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
-#include "json/json.h"
+#include "cJSON.h"
 #include "v1_0/dcamera_types.h"
 #include "v1_0/types.h"
 
@@ -66,17 +66,17 @@ private:
     void* GetMetadataItemData(const camera_metadata_item_t &item);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo,
         const bool isSink);
-    void ParsePhotoFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
+    void ParsePhotoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
         const bool isSink);
-    void ParsePreviewFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
+    void ParsePreviewFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
         const bool isSink);
-    void ParseVideoFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
+    void ParseVideoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
         const bool isSink);
     void InitDcameraBaseAbility();
     void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
-        std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink);
+        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink);
     void GetNodeSupportedResolution(int format, const std::string rootNode,
-        std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink);
+        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink);
     void SetFpsRanges();
     void InitBasicConfigTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
         std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs,
@@ -91,6 +91,8 @@ private:
         std::vector<DCResolution> &resolutionVec);
     void AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
         std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs);
+    cJSON* GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr);
+    bool GetInfoFromJson(const std::string& sinkAbilityInfo);
 
 private:
     constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
