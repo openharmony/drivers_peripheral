@@ -89,20 +89,21 @@ int32_t IntellVoiceEngineManagerImpl::GetAdapterDescriptors(std::vector<IntellVo
     return HDF_SUCCESS;
 }
 
-int32_t IntellVoiceEngineManagerImpl::CreateAdapter(
-    const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter> &adapter)
+int32_t IntellVoiceEngineManagerImpl::CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor,
+    sptr<HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter> &adapter)
 {
     return CreateAdapterInner(descriptor, adapter);
 }
 
-int32_t IntellVoiceEngineManagerImpl::CreateAdapter_V_2(
-    const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter)
+int32_t IntellVoiceEngineManagerImpl::CreateAdapter_V_2(const IntellVoiceEngineAdapterDescriptor &descriptor,
+    sptr<HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter> &adapter)
 {
     return CreateAdapterInner(descriptor, adapter);
 }
 
 template<typename T>
-int32_t IntellVoiceEngineManagerImpl::CreateAdapterInner(const IntellVoiceEngineAdapterDescriptor &descriptor, sptr<T> &adapter)
+int32_t IntellVoiceEngineManagerImpl::CreateAdapterInner(const IntellVoiceEngineAdapterDescriptor &descriptor,
+    sptr<T> &adapter)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -293,7 +294,7 @@ int32_t IntellVoiceEngineManagerImpl::GetUploadFiles(int32_t numMax, std::vector
         return HDF_FAILURE;
     }
 
-    if (inst_->GetUploadFiles(numMax, files) != 0 ) {
+    if (inst_->GetUploadFiles(numMax, files) != 0) {
         INTELLIGENT_VOICE_LOGE("getReportFile failed");
         return HDF_FAILURE;
     }
