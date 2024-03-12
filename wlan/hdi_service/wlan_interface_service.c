@@ -17,12 +17,11 @@
 #include <hdf_log.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include "v1_2/iwlan_callback.h"
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_callback.h"
+#include "v1_3/iwlan_interface.h"
 #include "wlan_common_cmd.h"
 #include "wlan_extend_cmd.h"
 #include "wlan_impl.h"
-#include "v1_2/iwlan_interface.h"
 
 struct WlanInterfaceService {
     struct IWlanInterface interface;
@@ -74,6 +73,7 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.ResetToFactoryMacAddress = WlanInterfaceResetToFactoryMacAddress;
     service->interface.SendActionFrame = WlanInterfaceSendActionFrame;
     service->interface.RegisterActionFrameReceiver = WlanInterfaceRegisterActionFrameReceiver;
+    service->interface.GetCoexictenceChannelList = WlanInterfaceGetCoexChannelList;
     service->interface.SetPowerSaveMode = WlanInterfaceSetPowerSaveMode;
     service->interface.SetDpiMarkRule = WlanInterfaceSetDpiMarkRule;
     return &service->interface;

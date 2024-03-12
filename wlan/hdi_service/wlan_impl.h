@@ -25,7 +25,7 @@
 #include "hdf_dlist.h"
 #include "osal_mutex.h"
 #include "securec.h"
-#include "v1_2/wlan_interface_stub.h"
+#include "v1_3/wlan_interface_stub.h"
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_base_feature.h"
