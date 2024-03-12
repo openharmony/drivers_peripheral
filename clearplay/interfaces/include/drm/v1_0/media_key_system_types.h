@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,20 +27,22 @@
 #endif
 
 #ifndef HDI_CHECK_VALUE_RETURN
-#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) do { \
-    if ((lv) compare (rv)) { \
-        return ret; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RETURN(lv, compare, rv, ret) \
+    do {                                             \
+        if ((lv)compare(rv)) {                       \
+            return ret;                              \
+        }                                            \
+    } while (false)
 #endif
 
 #ifndef HDI_CHECK_VALUE_RET_GOTO
-#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) do { \
-    if ((lv) compare (rv)) { \
-        ret = value; \
-        goto table; \
-    } \
-} while (false)
+#define HDI_CHECK_VALUE_RET_GOTO(lv, compare, rv, ret, value, table) \
+    do {                                                             \
+        if ((lv)compare(rv)) {                                       \
+            ret = value;                                             \
+            goto table;                                              \
+        }                                                            \
+    } while (false)
 #endif
 
 namespace OHOS {
@@ -51,7 +53,6 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 using namespace OHOS;
 
 enum ContentProtectionLevel : int32_t {
@@ -133,12 +134,12 @@ struct MediaKeyRequest {
 struct Pattern {
     uint32_t encryptBlocks;
     uint32_t skipBlocks;
-} __attribute__ ((aligned(8)));
+} __attribute__((aligned(8)));
 
 struct SubSample {
     uint32_t clearHeaderLen;
     uint32_t payLoadLen;
-} __attribute__ ((aligned(8)));
+} __attribute__((aligned(8)));
 
 struct CryptoInfo {
     OHOS::HDI::Drm::V1_0::CryptoAlgorithmType type;
@@ -158,30 +159,31 @@ struct DrmBuffer {
     uint32_t sharedMemType;
 };
 
-bool MediaKeyRequestInfoBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& dataBlock);
+bool MediaKeyRequestInfoBlockMarshalling(OHOS::MessageParcel &data,
+    const OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo &dataBlock);
 
-bool MediaKeyRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo& dataBlock);
+bool MediaKeyRequestInfoBlockUnmarshalling(OHOS::MessageParcel &data,
+    OHOS::HDI::Drm::V1_0::MediaKeyRequestInfo &dataBlock);
 
-bool MediaKeyRequestBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::MediaKeyRequest& dataBlock);
+bool MediaKeyRequestBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::MediaKeyRequest &dataBlock);
 
-bool MediaKeyRequestBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::MediaKeyRequest& dataBlock);
+bool MediaKeyRequestBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::MediaKeyRequest &dataBlock);
 
-bool PatternBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::Pattern& dataBlock);
+bool PatternBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::Pattern &dataBlock);
 
-bool PatternBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::Pattern& dataBlock);
+bool PatternBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::Pattern &dataBlock);
 
-bool SubSampleBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::SubSample& dataBlock);
+bool SubSampleBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::SubSample &dataBlock);
 
-bool SubSampleBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::SubSample& dataBlock);
+bool SubSampleBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::SubSample &dataBlock);
 
-bool CryptoInfoBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::CryptoInfo& dataBlock);
+bool CryptoInfoBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::CryptoInfo &dataBlock);
 
-bool CryptoInfoBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::CryptoInfo& dataBlock);
+bool CryptoInfoBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::CryptoInfo &dataBlock);
 
-bool DrmBufferBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::DrmBuffer& dataBlock);
+bool DrmBufferBlockMarshalling(OHOS::MessageParcel &data, const OHOS::HDI::Drm::V1_0::DrmBuffer &dataBlock);
 
-bool DrmBufferBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::DrmBuffer& dataBlock);
-
+bool DrmBufferBlockUnmarshalling(OHOS::MessageParcel &data, OHOS::HDI::Drm::V1_0::DrmBuffer &dataBlock);
 } // V1_0
 } // Drm
 } // HDI
