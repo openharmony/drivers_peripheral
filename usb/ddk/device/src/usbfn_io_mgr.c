@@ -242,7 +242,7 @@ int32_t UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
 static int32_t HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *interfaceMgr)
 {
     int32_t ret;
-    uint32_t i, j;
+    uint32_t i;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
     DListHeadInit(&handle->reqEntry);
@@ -269,7 +269,7 @@ static int32_t HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr 
     return 0;
 
 FREE_EVENT:
-    for (j = 0; j < i; j++) {
+    for (uint32_t j = 0; j < i; j++) {
         UsbFnMemFree(handle->reqEvent[j]);
     }
     return HDF_ERR_IO;
