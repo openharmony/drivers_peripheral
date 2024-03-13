@@ -56,7 +56,7 @@ SensorClientsManager::~SensorClientsManager()
 void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag)
 {
     std::unique_lock<std::mutex> lock(SensorInfoMutex_);
-    if (cFlag) {
+    if (!cFlag) {
         info = sensorInfo_;
         return;
     }
