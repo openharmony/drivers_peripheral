@@ -160,7 +160,6 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;
     Json::Value rootValue;
-
     std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
     if (jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(), &rootValue, &errs) &&
         rootValue.isObject()) {
@@ -171,7 +170,6 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
             dCameraPosition_ = rootValue["Position"].asString();
         }
     }
-
     if (dCameraPosition_ == "BACK") {
         const uint8_t position = OHOS_CAMERA_POSITION_BACK;
         AddAbilityEntry(OHOS_ABILITY_CAMERA_POSITION, &position, 1);
@@ -182,41 +180,29 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
         const uint8_t position = OHOS_CAMERA_POSITION_OTHER;
         AddAbilityEntry(OHOS_ABILITY_CAMERA_POSITION, &position, 1);
     }
-
     InitDcameraBaseAbility();
-
     const uint8_t controlFocusMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
     AddAbilityEntry(OHOS_CONTROL_FOCUSMODE, &controlFocusMode, 1);
-
     const uint8_t deviceFlashModes = OHOS_CAMERA_FLASH_MODE_AUTO;
     AddAbilityEntry(OHOS_ABILITY_DEVICE_AVAILABLE_FLASHMODES, &deviceFlashModes, 1);
-
     const uint8_t controlFlashMode = OHOS_CAMERA_FLASH_MODE_CLOSE;
     AddAbilityEntry(OHOS_CONTROL_FLASHMODE, &controlFlashMode, 1);
-
     float zoomRatioRange[1] = {1.0};
     AddAbilityEntry(OHOS_ABILITY_ZOOM_RATIO_RANGE, zoomRatioRange,
         (sizeof(zoomRatioRange) / sizeof(zoomRatioRange[0])));
-
     const float zoomRatio = 1.0;
     AddAbilityEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, 1);
-
     int32_t activeArraySize[] = {
-        0, 0, static_cast<int32_t>(maxPreviewResolution_.width_), static_cast<int32_t>(maxPreviewResolution_.height_)
-    };
+        0, 0, static_cast<int32_t>(maxPreviewResolution_.width_), static_cast<int32_t>(maxPreviewResolution_.height_)};
     AddAbilityEntry(OHOS_SENSOR_INFO_ACTIVE_ARRAY_SIZE, activeArraySize,
         (sizeof(activeArraySize) / sizeof(activeArraySize[0])));
-
     int32_t pixelArraySize[] = {
-        static_cast<int32_t>(maxPreviewResolution_.width_), static_cast<int32_t>(maxPreviewResolution_.height_)
-    };
+        static_cast<int32_t>(maxPreviewResolution_.width_), static_cast<int32_t>(maxPreviewResolution_.height_)};
     AddAbilityEntry(OHOS_SENSOR_INFO_PIXEL_ARRAY_SIZE, pixelArraySize,
         (sizeof(pixelArraySize) / sizeof(pixelArraySize[0])));
-
     const int32_t jpegThumbnailSizes[] = {0, 0, DEGREE_240, DEGREE_180};
     AddAbilityEntry(OHOS_JPEG_AVAILABLE_THUMBNAIL_SIZES, jpegThumbnailSizes,
         (sizeof(jpegThumbnailSizes) / sizeof(jpegThumbnailSizes[0])));
-
     return SUCCESS;
 }
 
