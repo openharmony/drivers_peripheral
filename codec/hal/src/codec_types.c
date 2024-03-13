@@ -475,7 +475,7 @@ bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCa
     return CodecCompCapabilityBlockMarshallingContinue(data, dataBlock);
 }
 
-bool CodecCompCapabilityBlockUnmarshallingContinue(struct HdfSBuf *data, CodecCompCapability *dataBlock)
+static bool CodecCompCapabilityBlockUnmarshallingContinue(struct HdfSBuf *data, CodecCompCapability *dataBlock)
 {
     if (!HdfSbufReadInt32(data, &dataBlock->maxInst)) {
         CODEC_LOGE("read dataBlock->maxInst failed!");
