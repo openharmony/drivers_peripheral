@@ -53,6 +53,44 @@ SensorClientsManager::~SensorClientsManager()
     sdcSensorConfig_.clear();
 }
 
+void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag)
+{
+    std::unique_lock<std::mutex> lock(SensorInfoMutex_);
+    if (cFlag) {
+        info = sensorInfo_;
+        return;
+    }
+    sensorInfo_ = info;
+    return;
+}
+
+void SensorClientsManager::GetEventData( struct SensorsDataPack &dataPack)
+{
+    std::unique_lock<std::mutex> lock(SensorsDataPackMutex_);
+    dataPack = listDump_;
+    return;
+}
+
+void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
+{
+    std::unique_lock<std::mutex> lock(SensorsDataPackMutex_);
+    if (event.data.empty()) {
+        HDF_LOGE("%{public}s: event data is empty!", __func__);
+        return;
+    }
+
+    if (listDump_.count == MAX_DUMP_DATA_SIZE) {
+        listDump_.listDumpArray[listDump_.pos++] = event;
+        if (listDump_.pos == MAX_DUMP_DATA_SIZE) {
+            listDump_.pos = 0;
+        } 
+    } else {
+        listDump_.listDumpArray[listDump_.count] = event;
+        listDump_.count++;
+    }
+    return;
+}
+
 int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
