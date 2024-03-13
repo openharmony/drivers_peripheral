@@ -727,7 +727,7 @@ static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService 
         SerStubComponentDeInit,
         SerStubUseEglImage,
         SerStubComponentRoleEnum,
-    }
+    };
     if (SerStubFuncList[cmdId] == NULL) {
         CODEC_LOGE("not support cmd %{public}d", cmdId);
         return HDF_ERR_INVALID_PARAM;
