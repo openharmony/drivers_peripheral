@@ -377,7 +377,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-int32_t LoadCodecCapabilityFromHcsPre(const struct DeviceResourceNode *node)
+static int32_t LoadCodecCapabilityFromHcsPre(const struct DeviceResourceNode *node)
 {
     CodecCapablityGroup *codecCapGroup = NULL;
     int32_t index;
