@@ -107,7 +107,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice006, TestSize.Level1)
 {
     struct UsbFnDevice *fnDev = nullptr;
     struct UsbFnDescriptorData descData;
-    const char *udcName = NULL;
+    const char *udcName = nullptr;
     descData.type = USBFN_DESC_DATA_TYPE_DESC;
     descData.descriptor = &g_acmFnDevice;
     fnDev = (struct UsbFnDevice *)UsbFnCreateDevice(udcName, &descData);
