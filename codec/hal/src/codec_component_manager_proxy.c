@@ -131,17 +131,8 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     return HDF_SUCCESS;
 }
 
-static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
-                               int64_t appData, struct CodecCallbackType *callback)
+static int32_t CreateComponentPreWriteData(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
-    if (data == NULL || reply == NULL || componentId == NULL) {
-        CODEC_LOGE("HdfSubf malloc failed!");
-        ReleaseSbuf(data, reply);
-        return HDF_ERR_MALLOC_FAIL;
-    }
-
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         CODEC_LOGE("write interface token failed");
         ReleaseSbuf(data, reply);
@@ -162,7 +153,25 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
+    return HDF_SUCCESS;
+}
+
+static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
+                               int64_t appData, struct CodecCallbackType *callback)
+{
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
+    if (data == NULL || reply == NULL || componentId == NULL) {
+        CODEC_LOGE("HdfSubf malloc failed!");
+        ReleaseSbuf(data, reply);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    int32_t ret = CreateComponentPreWriteData(data, reply)
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+    
+    ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                        CMD_CREATE_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
         CODEC_LOGE("call failed! error code is %{public}d", ret);
