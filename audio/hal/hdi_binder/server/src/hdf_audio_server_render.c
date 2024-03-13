@@ -121,7 +121,7 @@ static int32_t HdiServiceCreatRenderPreReadData(const char *adapterName, struct 
         AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, &renderPid)) {
+    if (!HdfSbufReadUint32(data, renderPid)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
