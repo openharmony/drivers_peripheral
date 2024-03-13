@@ -1018,7 +1018,7 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     
-    if (HdiServiceGetPassthroughModePreReadData(data, &port) != HDF_SUCCESS) {
+    if (HdiServiceGetPassthroughModePreReadData(adapterName, data, &port) != HDF_SUCCESS) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
