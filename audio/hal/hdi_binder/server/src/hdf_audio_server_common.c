@@ -980,7 +980,8 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
     return ret;
 }
 
-static HdiServiceGetPassthroughModePreReadData(struct HdfSBuf *data, struct AudioPort *port)
+static int32_t HdiServiceGetPassthroughModePreReadData(const char *adapterName,
+    struct HdfSBuf *data, struct AudioPort *port)
 {
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
         AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
@@ -1018,7 +1019,7 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
     }
     
     if (HdiServiceGetPassthroughModePreReadData(data, &port) != HDF_SUCCESS) {
-        return AUDIO_HAL_ERR_INTERNAL
+        return AUDIO_HAL_ERR_INTERNAL;
     }
 
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
