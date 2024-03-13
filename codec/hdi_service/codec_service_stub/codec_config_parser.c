@@ -438,7 +438,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
         NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
         NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS
     };
-    for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
+    for (int32_t index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         if (GetGroupCapabilities(node, codecGroupsNodeName[index], GetCapablityGroup(index)) != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
