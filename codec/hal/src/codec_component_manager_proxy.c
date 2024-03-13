@@ -167,7 +167,7 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
     }
-    int32_t ret = CreateComponentPreWriteData(data, reply);
+    int32_t ret = CreateComponentPreWriteData(data, reply, compName, appData, callback);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
