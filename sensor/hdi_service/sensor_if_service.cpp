@@ -22,6 +22,8 @@
 #include "sensor_callback_vdi.h"
 #include <hdf_remote_service.h>
 #include "callback_death_recipient.h"
+#include "sensor_dump.h"
+#include "devhost_dump_reg.h"
 
 constexpr int DISABLE_SENSOR = 0;
 constexpr int REPORT_INTERVAL = 0;
@@ -29,6 +31,7 @@ constexpr int UNREGISTER_SENSOR = 0;
 constexpr int REGISTER_SENSOR = 1;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
+constexpr int COPY_SENSORINFO = 1;
 enum BatchSeniorMode {
         SA = 0,
         SDC = 1
@@ -62,6 +65,15 @@ SensorIfService::~SensorIfService()
     }
     RemoveDeathNotice(TRADITIONAL_SENSOR_TYPE);
     RemoveDeathNotice(MEDICAL_SENSOR_TYPE);
+}
+
+void SensorIfService::RegisteDumpHost()
+{
+    int32_t ret = DevHostRegisterDumpHost(GetSensorDump);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DevHostRegisterDumpHost error", __func__);
+    }
+    return;
 }
 
 int32_t SensorIfService::GetSensorVdiImpl()
@@ -100,6 +112,7 @@ int32_t SensorIfService::Init()
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Init failed, error code is %{public}d", __func__, ret);
     }
+    RegisteDumpHost();
 
     return ret;
 }
@@ -156,6 +169,8 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         sensorInfo.maxDelay = it.maxDelay;
         sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
         info.push_back(std::move(sensorInfo));
+
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, COPY_SENSORINFO);
     }
 
     return HDF_SUCCESS;
