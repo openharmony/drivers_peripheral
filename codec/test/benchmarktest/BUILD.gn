@@ -20,6 +20,7 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
   include_dirs = [
     "./include",
     "../../interfaces/include",
+    "//third_party/openmax/api/1.1.2",
   ]
   sources = [
     "codec_benchmark_manager_test.cpp",
@@ -52,7 +53,6 @@ ohos_benchmarktest("hdf_codec_benchmark_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "openmax:libopenmax_shared" ]
   defines = []
   if (drivers_peripheral_codec_feature_support_omx_extend_test) {
     defines += [ "SUPPORT_OMX_EXTEND" ]
