@@ -17,6 +17,7 @@
 #include "osal_mem.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
+#include "hdf_audio_server_manager.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 #define INTERNEL_INPUT_STEAM_ID 1
@@ -112,6 +113,20 @@ static int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescri
     return HDF_SUCCESS;
 }
 
+static int32_t HdiServiceCreatCapturePreReadData(const char *adapterName, struct HdfSBuf *data, uint32_t *capturePid)
+{
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, capturePid)) {
+        AUDIO_FUNC_LOGE("read capturePid fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    AUDIO_FUNC_LOGD("capturePid = %{public}u", *capturePid);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
@@ -124,15 +139,11 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     struct AudioCapture *capture = NULL;
     const char *adapterName = NULL;
     uint32_t capturePid = 0;
-    if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, &capturePid)) {
-        AUDIO_FUNC_LOGE("read capturePid fail");
+    
+    if (HdiServiceCreatCapturePreReadData(adapterName, data, &capturePid) != AUDIO_HAL_SUCCESS) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    AUDIO_FUNC_LOGD("capturePid = %{public}u", capturePid);
+
     int32_t ret = GetInitCapturePara(data, &devDesc, &attrs);
     if (ret < 0) {
         return AUDIO_HAL_ERR_INTERNAL;

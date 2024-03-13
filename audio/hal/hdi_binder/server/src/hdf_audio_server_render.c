@@ -15,6 +15,7 @@
 #include "hdf_audio_server_render.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
+#include "hdf_audio_server_manager.h"
 #include "osal_mutex.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
@@ -114,6 +115,18 @@ static int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescrip
     return HDF_SUCCESS;
 }
 
+static int32_t HdiServiceCreatRenderPreReadData(const char *adapterName, struct HdfSBuf *data, uint32_t *renderPid)
+{
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, &renderPid)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -126,11 +139,8 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
     struct AudioRender *render = NULL;
     const char *adapterName = NULL;
     uint32_t renderPid = 0;
-    if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, &renderPid)) {
+
+    if (HdiServiceCreatRenderPreReadData(adapterName, data, &renderPid) != AUDIO_HAL_SUCCESS) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = GetInitRenderPara(data, &devDesc, &attrs);
