@@ -493,20 +493,20 @@ static int32_t SetAudioEventValue(struct AudioEvent *audioEvent, struct AudioPnp
             return HDF_FAILURE;
         }
         if (audioPnpUevent->switchState[0] == REMOVE_AUDIO_DEVICE) {
-            audioEvent.eventType = AUDIO_DEVICE_REMOVE;
-            audioEvent.deviceType = h2wTypeLast;
+            audioEvent->eventType = AUDIO_DEVICE_REMOVE;
+            audioEvent->deviceType = h2wTypeLast;
         } else if ((audioPnpUevent->switchState[0] == ADD_DEVICE_HEADSET) ||
                    (audioPnpUevent->switchState[0] == ADD_DEVICE_HEADSET_WITHOUT_MIC)) {
-            audioEvent.eventType = AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = AUDIO_HEADSET;
+            audioEvent->eventType = AUDIO_DEVICE_ADD;
+            audioEvent->deviceType = AUDIO_HEADSET;
         } else if (audioPnpUevent->switchState[0] == ADD_DEVICE_ADAPTER) {
-            audioEvent.eventType = AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = AUDIO_ADAPTER_DEVICE;
+            audioEvent->eventType = AUDIO_DEVICE_ADD;
+            audioEvent->deviceType = AUDIO_ADAPTER_DEVICE;
         } else {
-            audioEvent.eventType = AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = AUDIO_DEVICE_UNKNOWN;
+            audioEvent->eventType = AUDIO_DEVICE_ADD;
+            audioEvent->deviceType = AUDIO_DEVICE_UNKNOWN;
         }
-        h2wTypeLast = audioEvent.deviceType;
+        h2wTypeLast = audioEvent->deviceType;
     } else {
         if (strncmp(audioPnpUevent->action, UEVENT_ACTION_CHANGE, strlen(UEVENT_ACTION_CHANGE)) != 0) {
             return HDF_FAILURE;
@@ -518,13 +518,13 @@ static int32_t SetAudioEventValue(struct AudioEvent *audioEvent, struct AudioPnp
             return HDF_FAILURE;
         }
         if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS0) != NULL) {
-            audioEvent.eventType = AUDIO_DEVICE_REMOVE;
+            audioEvent->eventType = AUDIO_DEVICE_REMOVE;
         } else if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS1) != NULL) {
-            audioEvent.eventType = AUDIO_DEVICE_ADD;
+            audioEvent->eventType = AUDIO_DEVICE_ADD;
         } else {
             return HDF_FAILURE;
         }
-        audioEvent.deviceType = AUDIO_HEADSET;
+        audioEvent->deviceType = AUDIO_HEADSET;
     }
     return HDF_SUCCESS;
 }
