@@ -24,7 +24,8 @@
 
 #include "iam_logger.h"
 
-#define LOG_LABEL UserIam::Common::LABEL_IAM_COMMON
+#undef LOG_TAG
+#define LOG_TAG "USER_AUTH_HDI"
 
 namespace OHOS {
 namespace UserIam {

@@ -21,35 +21,35 @@ namespace OHOS {
 namespace UserIam {
 namespace Common {
 #ifdef __FILE_NAME__
-#define IAM_LOG_FILE __FILE_NAME__
+#define FACE_AUTH_FILE __FILE_NAME__
 #else
-#define IAM_LOG_FILE (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FACE_AUTH_FILE (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
-#ifdef LOG_LABEL
-#undef LOG_LABEL
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
 #endif
 
-#define ARGS(fmt, ...) "[%{public}s@%{public}s:%{public}d] " fmt, __FUNCTION__, IAM_LOG_FILE, __LINE__, ##__VA_ARGS__
-#define IAM_LOGD(...) OHOS::HiviewDFX::HiLog::Debug(LOG_LABEL, ARGS(__VA_ARGS__))
-#define IAM_LOGI(...) OHOS::HiviewDFX::HiLog::Info(LOG_LABEL, ARGS(__VA_ARGS__))
-#define IAM_LOGW(...) OHOS::HiviewDFX::HiLog::Warn(LOG_LABEL, ARGS(__VA_ARGS__))
-#define IAM_LOGE(...) OHOS::HiviewDFX::HiLog::Error(LOG_LABEL, ARGS(__VA_ARGS__))
-#define IAM_LOGF(...) OHOS::HiviewDFX::HiLog::Fatal(LOG_LABEL, ARGS(__VA_ARGS__))
+#define LOG_DOMAIN 0xD002406
 
-using HiLogLabel = OHOS::HiviewDFX::HiLogLabel;
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
 
-// common
-constexpr unsigned int IAM_DOMAIN_ID_COMMON = 0xD002400;
-constexpr HiLogLabel LABEL_IAM_COMMON = {LOG_CORE, IAM_DOMAIN_ID_COMMON, "IAM_COMMON"};
+#define FACE_AUTH_DEBUG(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
+#define FACE_AUTH_INFO(...) HILOG_INFO(LOG_CORE, __VA_ARGS__)
+#define FACE_AUTH_WARN(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
+#define FACE_AUTH_ERROR(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
+#define FACE_AUTH_FATAL(...) HILOG_FATAL(LOG_CORE, __VA_ARGS__)
 
-// face
-constexpr unsigned int IAM_DOMAIN_ID_FACE = 0xD002406;
-constexpr HiLogLabel LABEL_FACE_AUTH_NAPI = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_NAPI"};
-constexpr HiLogLabel LABEL_FACE_AUTH_SDK = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_SDK"};
-constexpr HiLogLabel LABEL_FACE_AUTH_SA = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_SA"};
-constexpr HiLogLabel LABEL_FACE_AUTH_HDI = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_HDI"};
-constexpr HiLogLabel LABEL_FACE_AUTH_IMPL = {LOG_CORE, IAM_DOMAIN_ID_FACE, "FACE_AUTH_IMPL"};
+#define ARGS(fmt, ...) "[%{public}s@%{public}s:%{public}d] " fmt, __FUNCTION__, FACE_AUTH_FILE, __LINE__, ##__VA_ARGS__
+#define FACE_LOG(level, ...) FACE_AUTH_##level(ARGS(__VA_ARGS__))
+
+#define IAM_LOGD(...) FACE_LOG(DEBUG, __VA_ARGS__)
+#define IAM_LOGI(...) FACE_LOG(INFO, __VA_ARGS__)
+#define IAM_LOGW(...) FACE_LOG(WARN, __VA_ARGS__)
+#define IAM_LOGE(...) FACE_LOG(ERROR, __VA_ARGS__)
+#define IAM_LOGF(...) FACE_LOG(FATAL, __VA_ARGS__)
 
 } // namespace Common
 } // namespace UserIam
