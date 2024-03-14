@@ -406,38 +406,7 @@ bool RangeValueBlockUnmarshalling(struct HdfSBuf *data, RangeValue *dataBlock)
 
 static bool CodecCompCapabilityBlockMarshallingContinue(struct HdfSBuf *data, const CodecCompCapability *dataBlock)
 {
-    int8_t isSoftwareCodec = dataBlock->isSoftwareCodec ? 1 : 0;
-    bool ret = HdfSbufWriteInt8(data, isSoftwareCodec);
-    if (!ret) {
-        CODEC_LOGE("write dataBlock->isSoftwareCodec failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteInt32(data, dataBlock->processModeMask)) {
-        CODEC_LOGE("write dataBlock->processModeMask failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteUint32(data, dataBlock->capsMask)) {
-        CODEC_LOGE("write dataBlock->capsMask failed!");
-        return false;
-    }
-
-    if (!RangeValueBlockMarshalling(data, &dataBlock->bitRate)) {
-        CODEC_LOGE("write dataBlock->bitRate failed!");
-        return false;
-    }
-
-    if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap))) {
-        CODEC_LOGE("write dataBlock->port failed!");
-        return false;
-    }
-    int8_t canSwapWidthHeight = dataBlock->canSwapWidthHeight ? 1 : 0;
-    ret = HdfSbufWriteInt8(data, canSwapWidthHeight);
-    if (!ret) {
-        CODEC_LOGE("write dataBlock->canSwapWidthHeight failed!");
-        return false;
-    }
+    
     return true;
 }
 
@@ -472,7 +441,40 @@ bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCa
         return false;
     }
 
-    return CodecCompCapabilityBlockMarshallingContinue(data, dataBlock);
+    int8_t isSoftwareCodec = dataBlock->isSoftwareCodec ? 1 : 0;
+    bool ret = HdfSbufWriteInt8(data, isSoftwareCodec);
+    if (!ret) {
+        CODEC_LOGE("write dataBlock->isSoftwareCodec failed!");
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, dataBlock->processModeMask)) {
+        CODEC_LOGE("write dataBlock->processModeMask failed!");
+        return false;
+    }
+
+    if (!HdfSbufWriteUint32(data, dataBlock->capsMask)) {
+        CODEC_LOGE("write dataBlock->capsMask failed!");
+        return false;
+    }
+
+    if (!RangeValueBlockMarshalling(data, &dataBlock->bitRate)) {
+        CODEC_LOGE("write dataBlock->bitRate failed!");
+        return false;
+    }
+
+    if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap))) {
+        CODEC_LOGE("write dataBlock->port failed!");
+        return false;
+    }
+    int8_t canSwapWidthHeight = dataBlock->canSwapWidthHeight ? 1 : 0;
+    ret = HdfSbufWriteInt8(data, canSwapWidthHeight);
+    if (!ret) {
+        CODEC_LOGE("write dataBlock->canSwapWidthHeight failed!");
+        return false;
+    }
+
+    return true;
 }
 
 static bool CodecCompCapabilityBlockUnmarshallingContinue(struct HdfSBuf *data, CodecCompCapability *dataBlock)
