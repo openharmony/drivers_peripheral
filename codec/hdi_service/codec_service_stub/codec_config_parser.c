@@ -377,17 +377,11 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t LoadCodecCapabilityFromHcsPre(const struct DeviceResourceNode *node)
+static int32_t LoadCodecCapabilityFromHcsPre(const struct DeviceResourceNode *node, char *codecGroupsNodeName[])
 {
     CodecCapablityGroup *codecCapGroup = NULL;
     int32_t index;
     int32_t codecNum = 0;
-    char *codecGroupsNodeName[] = {
-        NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
-        NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
-        NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
-        NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS
-    };
     for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         codecCapGroup = GetCapablityGroup(index);
         if (codecCapGroup == NULL) {
@@ -428,16 +422,16 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
     }
     g_resourceNode = node;
 
-    if (LoadCodecCapabilityFromHcsPre(node) != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    
     char *codecGroupsNodeName[] = {
         NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
         NODE_VIDEO_SOFTWARE_ENCODERS, NODE_VIDEO_SOFTWARE_DECODERS,
         NODE_AUDIO_HARDWARE_ENCODERS, NODE_AUDIO_HARDWARE_DECODERS,
         NODE_AUDIO_SOFTWARE_ENCODERS, NODE_AUDIO_SOFTWARE_DECODERS
     };
+    if (LoadCodecCapabilityFromHcsPre(node, codecGroupsNodeName) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    
     for (int32_t index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         if (GetGroupCapabilities(node, codecGroupsNodeName[index], GetCapablityGroup(index)) != HDF_SUCCESS) {
             return HDF_FAILURE;
