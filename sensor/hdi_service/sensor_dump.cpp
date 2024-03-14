@@ -20,7 +20,6 @@
 #include "sensor_uhdf_log.h"
 
 #define HDF_LOG_TAG uhdf_sensor_dump
-// #define HDF_LOG_TAG DATA_LEN 256
 
 constexpr int GET_SENSORINFO = 0;
 constexpr int DATA_LEN = 256;
