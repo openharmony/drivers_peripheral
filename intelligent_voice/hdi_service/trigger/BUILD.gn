@@ -64,6 +64,7 @@ ohos_shared_library("intell_voice_trigger_driver") {
       "c_utils:utils",
       "drivers_interface_intelligent_voice:libintell_voice_trigger_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_trigger_stub_1.1",
+      "drivers_interface_intelligent_voice:libintell_voice_trigger_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
