@@ -404,12 +404,6 @@ bool RangeValueBlockUnmarshalling(struct HdfSBuf *data, RangeValue *dataBlock)
     return true;
 }
 
-static bool CodecCompCapabilityBlockMarshallingContinue(struct HdfSBuf *data, const CodecCompCapability *dataBlock)
-{
-    
-    return true;
-}
-
 bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCapability *dataBlock)
 {
     if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->role)) {
@@ -477,35 +471,6 @@ bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCa
     return true;
 }
 
-static bool CodecCompCapabilityBlockUnmarshallingContinue(struct HdfSBuf *data, CodecCompCapability *dataBlock)
-{
-    if (!HdfSbufReadInt32(data, &dataBlock->maxInst)) {
-        CODEC_LOGE("read dataBlock->maxInst failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->isSoftwareCodec)) {
-        CODEC_LOGE("read dataBlock->isSoftwareCodec failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadInt32(data, &dataBlock->processModeMask)) {
-        CODEC_LOGE("read dataBlock->processModeMask failed!");
-        return false;
-    }
-
-    if (!HdfSbufReadUint32(data, &dataBlock->capsMask)) {
-        CODEC_LOGE("read dataBlock->capsMask failed!");
-        return false;
-    }
-
-    if (!RangeValueBlockUnmarshalling(data, &dataBlock->bitRate)) {
-        CODEC_LOGE("read &dataBlock->bitRate failed!");
-        return false;
-    }
-    return true;
-}
-
 bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapability *dataBlock)
 {
     if (dataBlock == NULL) {
@@ -532,7 +497,28 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
         }
     }
 
-    if (!CodecCompCapabilityBlockUnmarshallingContinue(data, dataBlock)) {
+    if (!HdfSbufReadInt32(data, &dataBlock->maxInst)) {
+        CODEC_LOGE("read dataBlock->maxInst failed!");
+        return false;
+    }
+
+    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->isSoftwareCodec)) {
+        CODEC_LOGE("read dataBlock->isSoftwareCodec failed!");
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, &dataBlock->processModeMask)) {
+        CODEC_LOGE("read dataBlock->processModeMask failed!");
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->capsMask)) {
+        CODEC_LOGE("read dataBlock->capsMask failed!");
+        return false;
+    }
+
+    if (!RangeValueBlockUnmarshalling(data, &dataBlock->bitRate)) {
+        CODEC_LOGE("read &dataBlock->bitRate failed!");
         return false;
     }
 
