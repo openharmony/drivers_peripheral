@@ -315,9 +315,10 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
         return DCamRetCode::INVALID_ARGUMENT;
     }
     auto surfaceBuffer = std::get<0>(bufCfg->second);
+    int64_t timeStamp = static_cast<int64_t>(GetVideoTimeStamp());
     OHOS::BufferFlushConfig flushConf = {
         .damage = { .x = 0, .y = 0, .w = dcStreamInfo_->width_, .h = dcStreamInfo_->height_ },
-        .timestamp = 0
+        .timestamp = timeStamp
     };
     if (dcStreamProducer_ != nullptr) {
         SetSurfaceBuffer(surfaceBuffer, buffer);
