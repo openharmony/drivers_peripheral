@@ -25,7 +25,8 @@
 #include "face_auth_interface_service.h"
 #include "refbase.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "FACE_AUTH_IMPL"
 
 #undef private
 
