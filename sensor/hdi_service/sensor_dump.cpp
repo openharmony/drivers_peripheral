@@ -30,7 +30,7 @@ namespace HDI {
 namespace Sensor {
 namespace V2_0 {
 
-static const char *g_sensorHelp =
+static const char *SENSOR_HELP =
     " Sensor manager dump options:\n"
     "     -h: [sensor command help]\n"
     "     -l: [show sensor list]\n"
@@ -65,7 +65,7 @@ int32_t SensorHdiDump::SensorShowList(struct HdfSBuf *reply)
              "maxDelay:  " + std::to_string(it.maxDelay) + "\n" +
              "fifoMaxEventCount:  " + std::to_string(it.fifoMaxEventCount) + "\n" +
              "============================================\n";
-             (void)HdfSbufWriteString(reply, st.c_str());
+            (void)HdfSbufWriteString(reply, st.c_str());
     }
     return HDF_SUCCESS;
 }
@@ -94,10 +94,10 @@ std::string SensorHdiDump::SensorInfoDataToString(const float *data,
 }
 
 int32_t SensorHdiDump::ShowData(const float *data,
-                     const int64_t timesTamp,
-                     const int32_t dataDimension,
-                     const int32_t sensorId,
-                     struct HdfSBuf *reply)
+                                const int64_t timesTamp,
+                                const int32_t dataDimension,
+                                const int32_t sensorId,
+                                struct HdfSBuf *reply)
 {
     std::string sensorInfoData = {0};
 
@@ -178,7 +178,7 @@ int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf
     }
 
     if (argc == 0) {
-        (void)HdfSbufWriteString(reply, g_sensorHelp);
+        (void)HdfSbufWriteString(reply, SENSOR_HELP);
         return HDF_SUCCESS;
     }
 
@@ -189,7 +189,7 @@ int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf
             return HDF_FAILURE;
         }
         if (strcmp(value, "-h") == 0) {
-            (void)HdfSbufWriteString(reply, g_sensorHelp);
+            (void)HdfSbufWriteString(reply, SENSOR_HELP);
             return HDF_SUCCESS;
         } else if (strcmp(value, "-l") == 0) {
             SensorShowList(reply);
