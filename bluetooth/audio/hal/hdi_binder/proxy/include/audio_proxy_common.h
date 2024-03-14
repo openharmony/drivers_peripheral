@@ -18,6 +18,13 @@
 #include <servmgr_hdi.h>
 #include "audio_internal.h"
 #include "hdf_audio_server.h"
+
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS::HDI::Audio_Bluetooth {
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
