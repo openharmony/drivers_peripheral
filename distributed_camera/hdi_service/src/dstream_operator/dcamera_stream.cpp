@@ -100,7 +100,7 @@ DCamRetCode DCameraStream::GetDCameraStreamInfo(shared_ptr<StreamInfo> &info)
 DCamRetCode DCameraStream::SetDCameraBufferQueue(const OHOS::sptr<BufferProducerSequenceable> &producer)
 {
     if (dcStreamInfo_->bufferQueue_) {
-        DHLOGE("Stream [%d] has already have bufferQueue.", dcStreamId_);
+        DHLOGE("Stream [%{public}d] has already have bufferQueue.", dcStreamId_);
         return DCamRetCode::SUCCESS;
     }
 
@@ -207,7 +207,8 @@ DCamRetCode DCameraStream::GetNextRequest()
     }
 
     if (surfaceError != OHOS::SURFACE_ERROR_OK || surfaceBuffer == nullptr) {
-        DHLOGE("Get producer buffer failed. [streamId = %d] [sfError = %d]", dcStreamInfo_->streamId_, surfaceError);
+        DHLOGE("Get producer buffer failed. [streamId = %{public}d] [sfError = %{public}d]",
+            dcStreamInfo_->streamId_, surfaceError);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
     return SurfaceBufferToDImageBuffer(surfaceBuffer, syncFence);
@@ -219,7 +220,7 @@ DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceB
     std::shared_ptr<DImageBuffer> imageBuffer = std::make_shared<DImageBuffer>();
     RetCode ret = DBufferManager::SurfaceBufferToDImageBuffer(surfaceBuffer, imageBuffer);
     if (ret != RC_OK) {
-        DHLOGE("Convert surface buffer to image buffer failed, streamId = %d.", dcStreamInfo_->streamId_);
+        DHLOGE("Convert surfacebuffer to image buffer failed, streamId = %{public}d.", dcStreamInfo_->streamId_);
         dcStreamProducer_->CancelBuffer(surfaceBuffer);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
@@ -228,12 +229,12 @@ DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceB
     imageBuffer->SetSyncFence(syncFence);
     ret = dcStreamBufferMgr_->AddBuffer(imageBuffer);
     if (ret != RC_OK) {
-        DHLOGE("Add buffer to buffer manager failed. [streamId = %d]", dcStreamInfo_->streamId_);
+        DHLOGE("Add buffer to buffer manager failed. [streamId = %{public}d]", dcStreamInfo_->streamId_);
         dcStreamProducer_->CancelBuffer(surfaceBuffer);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
-    DHLOGD("Add new image buffer success: index = %d, fenceFd = %d", imageBuffer->GetIndex(), syncFence->Get());
-
+    DHLOGD("Add new image buffer success: index = %{public}d, fenceFd = %{public}d", imageBuffer->GetIndex(),
+        syncFence->Get());
     auto itr = bufferConfigMap_.find(imageBuffer);
     if (itr == bufferConfigMap_.end()) {
         int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
@@ -282,7 +283,7 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
         std::lock_guard<std::mutex> lockSync(lockSync_);
         captureBufferCount_++;
     }
-    DHLOGD("Get buffer success. index = %d, size = %d", buffer.index_, buffer.size_);
+    DHLOGD("Get buffer success. index = %{public}d, size = %{public}d", buffer.index_, buffer.size_);
     return DCamRetCode::SUCCESS;
 }
 
@@ -297,14 +298,14 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
         }
     }
     if (imageBuffer == nullptr) {
-        DHLOGE("Cannot found image buffer, buffer index = %d.", buffer.index_);
+        DHLOGE("Cannot found image buffer, buffer index = %{public}d.", buffer.index_);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
     if (dcStreamBufferMgr_ != nullptr) {
         RetCode ret = dcStreamBufferMgr_->RemoveBuffer(imageBuffer);
         if (ret != RC_OK) {
-            DHLOGE("Buffer manager remove buffer failed: %d", ret);
+            DHLOGE("Buffer manager remove buffer failed: %{public}d", ret);
         }
     }
 
@@ -323,7 +324,7 @@ DCamRetCode DCameraStream::FlushDCameraBuffer(const DCameraBuffer &buffer)
         OHOS::sptr<OHOS::SyncFence> autoFence(new(std::nothrow) OHOS::SyncFence(-1));
         int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, autoFence, flushConf);
         if (ret != 0) {
-            DHLOGI("FlushBuffer error: %d", ret);
+            DHLOGI("FlushBuffer error: %{public}d", ret);
         }
     }
     bufferConfigMap_.erase(bufCfg);
@@ -334,7 +335,7 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 {
     DCamRetCode ret = FlushDCameraBuffer(buffer);
     if (ret != DCamRetCode::SUCCESS) {
-        DHLOGE("Flush Buffer failed, ret: %d", ret);
+        DHLOGE("Flush Buffer failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -372,21 +373,21 @@ uint64_t DCameraStream::GetVideoTimeStamp()
 
 void DCameraStream::DoCapture()
 {
-    DHLOGI("Do capture, streamId %d", dcStreamInfo_->streamId_);
+    DHLOGI("Do capture, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     isCancelCapture_ = false;
 }
 
 void DCameraStream::CancelCaptureWait()
 {
-    DHLOGI("Cancel capture wait for, streamId %d", dcStreamInfo_->streamId_);
+    DHLOGI("Cancel capture wait for, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     if (isCancelCapture_) {
         DHLOGI("CacelCapture has already execute");
         return;
     }
     if (captureBufferCount_ != 0) {
-        DHLOGI("StreamId:%d has request that not return and wait, captureBufferCount=%d",
+        DHLOGI("StreamId:%{public}d has request that not return and wait, captureBufferCount=%{public}d",
             dcStreamInfo_->streamId_, captureBufferCount_);
     }
     {
@@ -394,13 +395,13 @@ void DCameraStream::CancelCaptureWait()
         cv_.wait(lockSync, [this] { return !captureBufferCount_; });
     }
     isCancelCapture_ = true;
-    DHLOGI("Cancel capture wait for success, streamId %d", dcStreamInfo_->streamId_);
+    DHLOGI("Cancel capture wait for success, streamId %{public}d", dcStreamInfo_->streamId_);
     return;
 }
 
 DCamRetCode DCameraStream::CancelDCameraBuffer()
 {
-    DHLOGI("Cancel dcamera buffer wait for, streamId %d", dcStreamInfo_->streamId_);
+    DHLOGI("Cancel dcamera buffer wait for, streamId %{public}d", dcStreamInfo_->streamId_);
     std::lock_guard<std::mutex> lockRequest(requestMutex_);
     if (dcStreamBufferMgr_ == nullptr || dcStreamProducer_ == nullptr || isCancelBuffer_) {
         DHLOGE("BufferManager or Producer is null or isCanceled is true.");
@@ -408,7 +409,7 @@ DCamRetCode DCameraStream::CancelDCameraBuffer()
     }
 
     if (captureBufferCount_ != 0) {
-        DHLOGI("StreamId:%d has request that not return, captureBufferCount=%d",
+        DHLOGI("StreamId:%{public}d has request that not return, captureBufferCount=%{public}d",
             dcStreamInfo_->streamId_, captureBufferCount_);
     }
     {
@@ -439,7 +440,7 @@ DCamRetCode DCameraStream::CancelDCameraBuffer()
     }
     captureBufferCount_ = 0;
     isCancelBuffer_ = true;
-    DHLOGI("Cancel dcamera buffer wait for success, streamId %d", dcStreamInfo_->streamId_);
+    DHLOGI("Cancel dcamera buffer wait for success, streamId %{public}d", dcStreamInfo_->streamId_);
     return DCamRetCode::SUCCESS;
 }
 
