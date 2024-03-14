@@ -64,7 +64,7 @@ void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &inf
     return;
 }
 
-void SensorClientsManager::GetEventData( struct SensorsDataPack &dataPack)
+void SensorClientsManager::GetEventData(struct SensorsDataPack &dataPack)
 {
     std::unique_lock<std::mutex> lock(SensorsDataPackMutex_);
     dataPack = listDump_;
@@ -83,7 +83,7 @@ void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
         listDump_.listDumpArray[listDump_.pos++] = event;
         if (listDump_.pos == MAX_DUMP_DATA_SIZE) {
             listDump_.pos = 0;
-        } 
+        }
     } else {
         listDump_.listDumpArray[listDump_.count] = event;
         listDump_.count++;

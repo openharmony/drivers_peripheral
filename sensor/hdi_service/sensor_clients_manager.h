@@ -68,7 +68,7 @@ public:
     static bool IsSensorContinues(int32_t sensorId);
     void UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval);
     void CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag);
-    void GetEventData( struct SensorsDataPack &dataPack);
+    void GetEventData(struct SensorsDataPack &dataPack);
     void CopyEventData(const struct HdfSensorEvents event);
 private:
     SensorClientsManager();
