@@ -23,7 +23,7 @@
 using OHOS::HDI::Usb::V1_0::UsbDev;
 namespace OHOS {
 namespace USB {
-class UsbdDeviceStatusTest: public testing::Test {
+class UsbdDeviceStatusTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
