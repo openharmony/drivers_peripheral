@@ -178,7 +178,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus001, TestSize.Level1)
         }
     }
     HDF_LOGI("UsbdGetInterfaceActiveStatus001 %{public}d GetInterfaceActiveStatus=%{public}d, unactived=%{public}d",
-        __LINE__, ret,unactived);
+        __LINE__, ret, unactived);
     ASSERT_EQ(0, ret);
 }
 
