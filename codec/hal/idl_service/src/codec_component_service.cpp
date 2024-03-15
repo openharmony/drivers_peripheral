@@ -134,11 +134,9 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseBuffer");
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
     outBuffer = const_cast<OmxCodecBuffer &>(inBuffer);
-    if (outBuffer.fd >= 0 && isIPCMode_ && name_.find("OMX_hisi.audio") != std::string::npos) {
-        outBuffer.fd = dup(inBuffer.fd);
-    }
 
-    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD) {
+    if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD &&
+        name_.find("OMX_hisi.audio") == std::string::npos) {
         close(outBuffer.fd);
         outBuffer.fd = -1;
     }
