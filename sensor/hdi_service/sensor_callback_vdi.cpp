@@ -27,8 +27,8 @@ namespace V2_0 {
 namespace {
     constexpr int32_t DATA_LEN = 256;
     constexpr int64_t REPOPRT_TIME = 5000000000;
-    static std::unordered_map<int32_t, int64_t> firstTimetampMap_;
-    static std::unordered_map<int32_t, int64_t> lastTimetampMap_;
+    static std::unordered_map<int32_t, int64_t> firstTimestampMap_;
+    static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
 }
 
 
@@ -87,14 +87,14 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 void SensorCallbackVdi::PrintData(const HdfSensorEvents &event)
 {
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
-    if (firstTimetampMap_[event.sensorId] == 0) {
-        firstTimetampMap_[event.sensorId] = event.timestamp;
+    if (firstTimestampMap_[event.sensorId] == 0) {
+        firstTimestampMap_[event.sensorId] = event.timestamp;
     } else {
-        lastTimetampMap_[event.sensorId] = event.timestamp;
+        lastTimestampMap_[event.sensorId] = event.timestamp;
     }
 
-    if (lastTimetampMap_[event.sensorId] - firstTimetampMap_[event.sensorId] >= REPOPRT_TIME) {
-        firstTimetampMap_[event.sensorId] = lastTimetampMap_[event.sensorId];
+    if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
+        firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
         std::string st = {0};
         DataToStr(st, event);
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());

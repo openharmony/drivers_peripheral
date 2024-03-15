@@ -21,8 +21,8 @@
 
 #define HDF_LOG_TAG uhdf_sensor_dump
 
-constexpr int GET_SENSORINFO = 0;
-constexpr int DATA_LEN = 256;
+constexpr int32_t GET_SENSORINFO = 0;
+constexpr int32_t DATA_LEN = 256;
 
 namespace OHOS {
 namespace HDI {
