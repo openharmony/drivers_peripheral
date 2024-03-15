@@ -62,16 +62,9 @@ typedef struct {
     TokenDataToEncrypt tokenDataToEncrypt;
 } __attribute__((__packed__)) UserAuthTokenPlain;
 
-typedef struct {
-    bool isCached;
-    int32_t userId;
-    UserAuthTokenHal authToken;
-} __attribute__((__packed__)) UnlockAuthTokenCache;
-
 ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
 ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
-ResultCode GetUnlockAuthToken(int32_t *userId, UserAuthTokenHal *authToken);
 ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken);
 
 #ifdef __cplusplus

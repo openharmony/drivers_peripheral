@@ -1030,17 +1030,10 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &
         infoHal.authTypes[i] = static_cast<uint32_t>(info.authTypes[i]);
     }
 
-    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token);
+    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token, &resultTemp.enrolledState);
     if (ret != RESULT_SUCCESS) {
         (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
-        return ret;
-    }
-    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
-    ret = GetEnrolledStateFunc(info.userId, resultTemp.authType, &resultTemp.enrolledState);
-    if (ret != RESULT_SUCCESS) {
-        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
-        IAM_LOGE("get enrolled state failed, ret:%{public}d", ret);
         return ret;
     }
     reuseResult.resize(sizeof(ReuseUnlockResult));

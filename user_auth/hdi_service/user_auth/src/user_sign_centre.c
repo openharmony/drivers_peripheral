@@ -24,7 +24,6 @@
 #include "token_key.h"
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
-#define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
 
 #define AES_GCM_TOKEN_AAD "OH_authToken"
 #define AES_GCM_TOKEN_AAD_SIZE 12
@@ -34,9 +33,6 @@
 #else
 #define IAM_STATIC static
 #endif
-
-// Used to cache screenLock auth token plain.
-IAM_STATIC UnlockAuthTokenCache g_unlockAuthToken = {false, 0, {}};
 
 IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
 {
@@ -315,40 +311,6 @@ IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_
     return ret;
 }
 
-IAM_STATIC void SetUnlockAuthToken(int32_t userId, const UserAuthTokenHal *unlockToken)
-{
-    (void)memset_s(&g_unlockAuthToken, sizeof(UnlockAuthTokenCache), 0, sizeof(UnlockAuthTokenCache));
-    g_unlockAuthToken.isCached = true;
-    g_unlockAuthToken.userId = userId;
-    g_unlockAuthToken.authToken = *unlockToken;
-}
-
-ResultCode GetUnlockAuthToken(int32_t *userId, UserAuthTokenHal *unlockToken)
-{
-    if (userId == NULL || unlockToken == NULL) {
-        LOG_ERROR("unlockToken is null");
-        return RESULT_BAD_PARAM;
-    }
-    if (!g_unlockAuthToken.isCached) {
-        LOG_ERROR("invalid cached unlock token");
-        return RESULT_GENERAL_ERROR;
-    }
-    uint64_t time = GetSystemTime();
-    if (time < g_unlockAuthToken.authToken.tokenDataPlain.time) {
-        LOG_ERROR("bad system time");
-        return RESULT_GENERAL_ERROR;
-    }
-    if ((time - g_unlockAuthToken.authToken.tokenDataPlain.time) > REUSED_UNLOCK_TOKEN_PERIOD) {
-        (void)memset_s(&g_unlockAuthToken, sizeof(UnlockAuthTokenCache), 0, sizeof(UnlockAuthTokenCache));
-        g_unlockAuthToken.isCached = false;
-        LOG_ERROR("cached unlock token is time out");
-        return RESULT_TOKEN_TIMEOUT;
-    }
-    *unlockToken = g_unlockAuthToken.authToken;
-    *userId = g_unlockAuthToken.userId;
-    return RESULT_SUCCESS;
-}
-
 ResultCode GetTokenDataAndSign(UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken)
 {
@@ -379,10 +341,6 @@ ResultCode GetTokenDataAndSign(UserAuthContext *context,
         goto FAIL;
     }
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
-    if (context->isAuthResultCached) {
-        LOG_INFO("cache unlock auth token");
-        SetUnlockAuthToken(context->userId, authToken);
-    }
     return RESULT_SUCCESS;
 
 FAIL:

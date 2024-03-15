@@ -59,11 +59,19 @@ typedef enum ReuseMode {
     AUTH_TYPE_IRRELEVANT = 2,
 } ReuseMode;
 
+typedef struct {
+    bool isCached;
+    int32_t userId;
+    UserAuthTokenHal authToken;
+    EnrolledStateHal enrolledState;
+} __attribute__((__packed__)) UnlockAuthResultCache;
+
 ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result);
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
-ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken);
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken,
+    EnrolledStateHal *enrolledState);
 
 #ifdef __cplusplus
 }
