@@ -366,7 +366,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
             if (compName_.find("OMX_hisi.audio") != std::string::npos) {
                 void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
-                    static_cast<int>(PORT_READ | PORT_WRITE), MAP_SHARED, buffer.fd, 0);
+                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
                 err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                     reinterpret_cast<uint8_t *>(addr));
                 break;
