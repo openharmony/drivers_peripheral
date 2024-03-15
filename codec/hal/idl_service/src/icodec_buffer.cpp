@@ -49,9 +49,6 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
         case CODEC_BUFFER_TYPE_DMA_MEM_FD:
             buffer = CodecDMABuffer::Create(codecBuffer);
             break;
-        case CODEC_BUFFER_TYPE_AUDIO:
-            buffer = new ICodecBuffer(codecBuffer);
-            break;
         default:
             CODEC_LOGE("bufferType[%{public}d] is unexpected", codecBuffer.bufferType);
             break;

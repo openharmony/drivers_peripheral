@@ -104,8 +104,6 @@ enum CodecBufferType {
     CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
     /** DMA memory. */
     CODEC_BUFFER_TYPE_DMA_MEM_FD = 0x10,
-    /** Audio memory. */
-    CODEC_BUFFER_TYPE_AUDIO = 0x20,
 };
 
 /**
