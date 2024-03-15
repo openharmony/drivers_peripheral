@@ -27,7 +27,7 @@ config("usbd_public_config") {
     "${usb_driver_path}/interfaces/ddk/common",
     "${usb_driver_path}/gadget/function/include",
     "${usb_driver_path}/gadget/function/mtp/include",
-    "./../../../hdf_core/framework/model/usb/include",
+    "${usb_driver_path}/hdf_usb/include",
     "${usb_driver_path}/hdi_service",
     "${usb_driver_path}/interfaces/ddk/common/include",
     "${usb_driver_path}/interfaces/ddk/device",
