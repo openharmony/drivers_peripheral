@@ -31,7 +31,7 @@ std::map<VdiStreamIntent, std::string> IStream::g_availableStreamType = {
 StreamBase::StreamBase(const int32_t id,
                        const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
-                       std::shared_ptr<CaptureMessageOperator>& m)
+                       std::shared_ptr<CaptureMessageOperator>& m) : calltimes_(0)
 {
     streamId_ = id;
     streamType_ = static_cast<int32_t>(type);
