@@ -175,7 +175,7 @@ void FillFuzzEnrolledState(Parcel &parcel, EnrolledState &enrolledState)
     IAM_LOGI("success");
 }
 
-void FillFuzzReuseUnlockInfo(Parcel &parcel, ReuseUnlockInfoHal &info)
+void FillFuzzReuseUnlockInfo(Parcel &parcel, ReuseUnlockInfo &info)
 {
     info.userId= parcel.ReadInt32();
     info.authTrustLevel = parcel.ReadUint32();
@@ -574,7 +574,7 @@ void FuzzGetEnrolledState(Parcel &parcel)
 void FuzzCheckReuseUnlockResult(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    ReuseUnlockInfoHal info;
+    ReuseUnlockInfo info;
     FillFuzzReuseUnlockInfo(parcel, info);
     std::vector<uint8_t> token;
     FillFuzzUint8Vector(parcel, token);

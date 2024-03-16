@@ -1008,7 +1008,7 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &
     IAM_LOGI("start reuseMode: %{public}u, reuseDuration: %{public}" PRIu64 ".", info.reuseUnlockResultMode,
         info.reuseUnlockResultDuration);
     if (info.authTypes.empty() || info.authTypes.size() > MAX_AUTH_TYPE_LEN ||
-        info.reuseUnlockResultDuration == 0 || info.reuseUnlockResultDuration > MAX_ALLOWABLE_REUSE_DURATION ||
+        info.reuseUnlockResultDuration == 0 || info.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
         (info.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
         IAM_LOGE("checkReuseUnlockResult bad param");
         return RESULT_BAD_PARAM;
@@ -1036,6 +1036,7 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
         return ret;
     }
+    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
     reuseResult.resize(sizeof(ReuseUnlockResult));
     if (memcpy_s(reuseResult.data(), sizeof(ReuseUnlockResult), &resultTemp, sizeof(ReuseUnlockResult)) != EOK) {
         IAM_LOGE("copy authToken failed");
