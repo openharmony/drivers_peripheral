@@ -25,7 +25,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-const uint64_t MAX_ALLOWABLE_REUSE_DURATION = 5 * 60 * 1000;
+
+#define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
 
 typedef struct AuthResult {
     int32_t userId;

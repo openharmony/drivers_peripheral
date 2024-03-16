@@ -31,8 +31,6 @@
 #define IAM_STATIC static
 #endif
 
-#define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
-
 // Used to cache screenLock auth token plain.
 IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}, {}};
 
@@ -223,7 +221,7 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTo
     EnrolledStateHal *enrolledState)
 {
     if (info == NULL || authToken == NULL || info->reuseUnlockResultDuration == 0 ||
-        info->reuseUnlockResultDuration > MAX_ALLOWABLE_REUSE_DURATION ||
+        info->reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
         (info->reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info->reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
         LOG_ERROR("CheckReuseUnlockResultFunc bad param");
         return RESULT_BAD_PARAM;
