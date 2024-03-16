@@ -16,7 +16,6 @@ import("../../intelligent_voice.gni")
 
 ohos_shared_library("intell_voice_engine_manager_service_1.2") {
   include_dirs = [
-    "//third_party/bounds_checking_function/include",
     "../../interfaces",
     "../../utils",
   ]
