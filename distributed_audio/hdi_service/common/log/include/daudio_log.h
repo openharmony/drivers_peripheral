@@ -17,9 +17,15 @@
 #define OHOS_DAUDIO_LOG_H
 
 #include <cstring>
+#include <inttypes.h>
+
+#include "hilog/log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+#undef LOG_TAG
+#define LOG_TAG "DAUDIO"
+
 typedef enum {
     DH_LOG_DEBUG,
     DH_LOG_INFO,
@@ -29,17 +35,17 @@ typedef enum {
 
 void DHLog(DHLogLevel logLevel, const char *fmt, ...);
 
-#define DHLOGD(fmt, ...) DHLog(DH_LOG_DEBUG, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define DHLOGI(fmt, ...) DHLog(DH_LOG_INFO, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGI(fmt, ...) HILOG_INFO(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define DHLOGW(fmt, ...) DHLog(DH_LOG_WARN, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGW(fmt, ...) HILOG_WARN(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
-#define DHLOGE(fmt, ...) DHLog(DH_LOG_ERROR, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGE(fmt, ...) HILOG_ERROR(LOG_CORE, \
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 } // Distributedaudio
 } // OHOS
 #endif

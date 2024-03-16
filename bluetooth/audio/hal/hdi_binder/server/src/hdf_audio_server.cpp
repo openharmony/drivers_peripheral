@@ -413,7 +413,6 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
         HDF_LOGE("%{public}s: ControlDispatch: input para is NULL.", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGE("ControlDispatch: valid cmdId = %{public}d", cmdId);
 
     if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

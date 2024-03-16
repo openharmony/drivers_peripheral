@@ -27,6 +27,11 @@
 #include "h4_protocol.h"
 #include "mct_protocol.h"
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS {
 namespace HDI {
 namespace Bluetooth {
