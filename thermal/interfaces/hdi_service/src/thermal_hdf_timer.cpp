@@ -28,13 +28,13 @@
 #include "string_ex.h"
 #include "thermal_dfx.h"
 #include "thermal_log.h"
+#include "thermal_hdf_utils.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_1 {
 namespace {
-const int32_t MS_PER_SECOND = 1000;
 const std::string THERMAL_SIMULATION_TAG = "sim_tz";
 }
 ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &node,
@@ -90,9 +90,28 @@ void ThermalHdfTimer::TimerProviderCallback()
 
 void ThermalHdfTimer::LoopingThreadEntry()
 {
+    int32_t dfxInterval = static_cast<int32_t>(ThermalDfx::GetInstance().GetInterval());
+    int32_t gcd = ThermalHdfUtils::GetMaxCommonDivisor(thermalZoneMgr_->GetMaxCd(), dfxInterval);
+    if (dfxInterval == 0 || gcd == 0) {
+        THERMAL_HILOGE(COMP_HDI, "LoopingThreadEntry error");
+        return;
+    }
+    uint32_t loopingTimes = 0;
     while (isRunning_) {
-        std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->GetMaxCd() / MS_PER_SECOND));
-        TimerProviderCallback();
+        std::this_thread::sleep_for(std::chrono::milliseconds(gcd));
+        loopingTimes++;
+        int32_t dfxTask = loopingTimes % (dfxInterval / gcd);
+        int32_t reportTask = loopingTimes % (thermalZoneMgr_->GetMaxCd() / gcd);
+        if (dfxTask == 0) {
+            ThermalDfx::GetInstance().DoWork();
+        }
+        if (reportTask == 0) {
+            TimerProviderCallback();
+        }
+        // both dfxTask and reportTask execute, and reset loopingTimes
+        if ((dfxTask == 0) && (reportTask == 0)) {
+            loopingTimes = 0;
+        }
     }
 }
 
