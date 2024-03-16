@@ -47,17 +47,20 @@ if (defined(ohos_lite)) {
       "-DCOLORSPACE=\"videoconvert\"",
     ]
     include_dirs = [
-      "watchdog",
+      "event",
       "exif",
+      "watchdog",
     ]
   }
   ohos_shared_library("peripheral_camera_utils") {
     sources = [
+      "event/camera_hal_hisysevent.cpp",
       "exif/exif_utils.cpp",
       "watchdog/watchdog.cpp",
     ]
     include_dirs = [
       "$camera_path/include",
+      "$camera_path/utils/event",
       "//third_party/libexif",
     ]
     libs = []
@@ -69,6 +72,7 @@ if (defined(ohos_lite)) {
       "drivers_interface_camera:metadata",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
+      "hisysevent:libhisysevent",
     ]
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]

@@ -49,12 +49,13 @@ AudioAdapterInterfaceImpl::AudioAdapterInterfaceImpl(const AudioAdapterDescripto
     renderParam_ = { 0, 0, 0, 0, 0, 0 };
     captureParam_ = { 0, 0, 0, 0, 0, 0 };
 
-    DHLOGD("Distributed audio adapter constructed, name(%s).", GetAnonyString(desc.adapterName).c_str());
+    DHLOGD("Distributed audio adapter constructed, name(%{public}s).", GetAnonyString(desc.adapterName).c_str());
 }
 
 AudioAdapterInterfaceImpl::~AudioAdapterInterfaceImpl()
 {
-    DHLOGD("Distributed audio adapter destructed, name(%s).", GetAnonyString(adpDescriptor_.adapterName).c_str());
+    DHLOGD("Distributed audio adapter destructed, name(%{public}s).",
+        GetAnonyString(adpDescriptor_.adapterName).c_str());
 }
 
 void AudioAdapterInterfaceImpl::SetSpeakerCallback(const int32_t dhId, const sptr<IDAudioCallback> &spkCallback)
@@ -87,15 +88,17 @@ void AudioAdapterInterfaceImpl::SetMicCallback(const int32_t dhId, const sptr<ID
 
 int32_t AudioAdapterInterfaceImpl::InitAllPorts()
 {
-    DHLOGI("Init (%zu) distributed audio ports.", mapAudioDevice_.size());
+    DHLOGI("Init (%{public}zu) distributed audio ports.", mapAudioDevice_.size());
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, sptr<IAudioRender> &render, uint32_t &renderId)
 {
-    DHLOGI("Create distributed audio render, {pin: %zu, sampleRate: %zu, channel: %zu, formats: %zu, type: %d}.",
-        desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format, static_cast<int32_t>(attrs.type));
+    int32_t sampleRate = static_cast<int32_t>(attrs.sampleRate);
+    int32_t channelCount = static_cast<int32_t>(attrs.channelCount);
+    DHLOGI("Create distributed audio render, {pin: %{public}d, sampleRate: %d, channel: %d, formats: %{public}d, type: "
+        "%{public}d}.", desc.pins, sampleRate, channelCount, attrs.format, static_cast<int32_t>(attrs.type));
     render = nullptr;
     sptr<AudioRenderInterfaceImplBase> audioRender = nullptr;
     if (!CheckDevCapability(desc)) {
@@ -134,7 +137,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         DHLOGE("Generrate render ID and insert render failed.");
         return HDF_FAILURE;
     }
-    DHLOGI("Create render success, render ID is %u.", renderId);
+    DHLOGI("Create render success, render ID is %{public}u.", renderId);
     return HDF_SUCCESS;
 }
 
@@ -177,7 +180,7 @@ int32_t AudioAdapterInterfaceImpl::InsertRenderImpl(const sptr<AudioRenderInterf
 
 int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
 {
-    DHLOGI("Destroy distributed audio render, ID: %u.", renderId);
+    DHLOGI("Destroy distributed audio render, ID: %{public}u.", renderId);
     if (!IsIdValid(renderId)) {
         DHLOGE("The input render ID is invalid.");
         return HDF_FAILURE;
@@ -221,8 +224,10 @@ bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &
 int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, sptr<IAudioCapture> &capture, uint32_t &captureId)
 {
-    DHLOGI("Create distributed audio capture, {pin: %zu, sampleRate: %zu, channel: %zu, formats: %zu}.",
-        desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format);
+    int32_t sampleRate = static_cast<int32_t>(attrs.sampleRate);
+    int32_t channelCount = static_cast<int32_t>(attrs.channelCount);
+    DHLOGI("Create distributed audio capture, {pin: %{public}d, sampleRate: %d, channel: %d, formats: %{public}d}.",
+        desc.pins, sampleRate, channelCount, attrs.format);
     capture = nullptr;
     sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
     if (!CheckDevCapability(desc)) {
@@ -261,7 +266,7 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         DHLOGE("Generrate capture ID and insert capture failed.");
         return HDF_FAILURE;
     }
-    DHLOGI("Create capture success, capture ID is %u.", captureId);
+    DHLOGI("Create capture success, capture ID is %{public}u.", captureId);
     return HDF_SUCCESS;
 }
 
@@ -287,7 +292,7 @@ int32_t AudioAdapterInterfaceImpl::InsertCapImpl(const sptr<AudioCaptureInterfac
 
 int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
 {
-    DHLOGI("Destroy distributed audio capture, ID: %u.", captureId);
+    DHLOGI("Destroy distributed audio capture, ID: %{public}u.", captureId);
     if (!IsIdValid(captureId)) {
         DHLOGE("The input capture ID is invalid.");
         return HDF_FAILURE;
@@ -383,7 +388,8 @@ int32_t AudioAdapterInterfaceImpl::SetVoiceVolume(float volume)
 int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const std::string &condition,
     const std::string &value)
 {
-    DHLOGD("Set audio parameters, key = %d, condition: %s value: %s.", key, condition.c_str(), value.c_str());
+    DHLOGD("Set audio parameters, key = %{public}d, condition: %{public}s value: %{public}s.", key,
+        condition.c_str(), value.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME:
@@ -407,7 +413,7 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
 int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const std::string &condition,
     std::string &value)
 {
-    DHLOGD("Get audio parameters, key: %d, condition: %s.", key, condition.c_str());
+    DHLOGD("Get audio parameters, key: %{public}d, condition: %{public}s.", key, condition.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME:
@@ -478,13 +484,13 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const DAudioEven
 {
     switch (static_cast<AudioExtParamEvent>(event.type)) {
         case HDF_AUDIO_EVENT_VOLUME_CHANGE:
-            DHLOGI("Notify event: VOLUME_CHANGE, event content: %s.", event.content.c_str());
+            DHLOGI("Notify event: VOLUME_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleVolumeChangeEvent(event);
         case HDF_AUDIO_EVENT_FOCUS_CHANGE:
-            DHLOGI("Notify event: FOCUS_CHANGE, event content: %s.", event.content.c_str());
+            DHLOGI("Notify event: FOCUS_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleFocusChangeEvent(event);
         case HDF_AUDIO_EVENT_RENDER_STATE_CHANGE:
-            DHLOGI("Notify event: RENDER_STATE_CHANGE, event content: %s.", event.content.c_str());
+            DHLOGI("Notify event: RENDER_STATE_CHANGE, event content: %{public}s.", event.content.c_str());
             return HandleRenderStateChangeEvent(event);
         case HDF_AUDIO_EVENT_OPEN_SPK_RESULT:
         case HDF_AUDIO_EVENT_CLOSE_SPK_RESULT:
@@ -497,14 +503,14 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const DAudioEven
         case HDF_AUDIO_EVENT_MIC_CLOSED:
             return HandleDeviceClosed(event);
         default:
-            DHLOGE("Audio event: %d is undefined.", event.type);
+            DHLOGE("Audio event: %{public}d is undefined.", event.type);
             return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
     }
 }
 
 int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const std::string &caps)
 {
-    DHLOGI("Add distributed audio device %d.", devId);
+    DHLOGI("Add distributed audio device %{public}d.", devId);
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto dev = mapAudioDevice_.find(devId);
     if (dev != mapAudioDevice_.end()) {
@@ -519,7 +525,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
 
 int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 {
-    DHLOGI("Remove distributed audio device %d.", devId);
+    DHLOGI("Remove distributed audio device %{public}d.", devId);
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         if (mapAudioDevice_.find(devId) == mapAudioDevice_.end()) {
@@ -546,7 +552,7 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extSpkCallback, int32_t dhId)
 {
-    DHLOGI("Open render device, pin: %d.", dhId);
+    DHLOGI("Open render device, pin: %{public}d.", dhId);
     if (isSpkOpened_) {
         DHLOGI("Render already opened.");
         return DH_SUCCESS;
@@ -574,7 +580,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
 
     ret = WaitForSANotify(EVENT_OPEN_SPK);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed. ret: %d", ret);
+        DHLOGE("Wait SA notify failed. ret: %{public}d", ret);
         return ret;
     }
     DHLOGI("Open render device success.");
@@ -584,7 +590,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
 int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor &desc,
     sptr<IDAudioCallback> extSpkCallback, const int32_t dhId)
 {
-    DHLOGI("Close render device, pin: %d.", dhId);
+    DHLOGI("Close render device, pin: %{public}d.", dhId);
     if (extSpkCallback == nullptr) {
         DHLOGE("Callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
@@ -603,7 +609,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
 
     ret = WaitForSANotify(EVENT_CLOSE_SPK);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed. ret: %d.", ret);
+        DHLOGE("Wait SA notify failed. ret: %{public}d.", ret);
         return ret;
     }
     spkPinInUse_ = 0;
@@ -614,7 +620,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
 int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extMicCallback, const int32_t dhId)
 {
-    DHLOGI("Open capture device, pin: %d.", dhId);
+    DHLOGI("Open capture device, pin: %{public}d.", dhId);
     if (isMicOpened_) {
         DHLOGI("Capture already opened.");
         return DH_SUCCESS;
@@ -642,7 +648,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
 
     ret = WaitForSANotify(EVENT_OPEN_MIC);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed. ret: %d.", ret);
+        DHLOGE("Wait SA notify failed. ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("Open capture device success.");
@@ -652,7 +658,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
 int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescriptor &desc,
     const sptr<IDAudioCallback> extMicCallback, const int32_t dhId)
 {
-    DHLOGI("Close capture device, pin: %d.", dhId);
+    DHLOGI("Close capture device, pin: %{public}d.", dhId);
     std::lock_guard<std::mutex> devLck(captureOptMtx_);
     if (micPinInUse_ == 0) {
         DHLOGI("No need close capture device.");
@@ -667,7 +673,7 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
 
     ret = WaitForSANotify(EVENT_CLOSE_MIC);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait SA notify failed. ret:%d.", ret);
+        DHLOGE("Wait SA notify failed. ret:%{public}d.", ret);
         return ret;
     }
     micPinInUse_ = 0;
@@ -681,13 +687,13 @@ uint32_t AudioAdapterInterfaceImpl::GetVolumeGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%u.", devId);
+        DHLOGE("Can not find caps of dev:%{public}u.", devId);
         return volGroup;
     }
 
     int32_t ret = GetAudioParamUInt(caps->second, VOLUME_GROUP_ID, volGroup);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get volume group param failed, use default value, ret = %d.", ret);
+        DHLOGE("Get volume group param failed, use default value, ret = %{public}d.", ret);
     }
     return volGroup;
 }
@@ -698,13 +704,13 @@ uint32_t AudioAdapterInterfaceImpl::GetInterruptGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%u.", devId);
+        DHLOGE("Can not find caps of dev:%{public}u.", devId);
         return iptGroup;
     }
 
     int32_t ret = GetAudioParamUInt(caps->second, INTERRUPT_GROUP_ID, iptGroup);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get interrupt group param failed, use default value, ret = %d.", ret);
+        DHLOGE("Get interrupt group param failed, use default value, ret = %{public}d.", ret);
     }
     return iptGroup;
 }
@@ -797,7 +803,7 @@ int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &
     }
     std::string val = condition.substr(TYPE_CONDITION, len);
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_HDF_FAIL;
     }
     int32_t type = std::stoi(val);
@@ -806,10 +812,10 @@ int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &
 
 int32_t AudioAdapterInterfaceImpl::ParseDhIdFromJson(const std::string &args)
 {
-    DHLOGI("Parse distributed hardward Id from args : %s", args.c_str());
+    DHLOGI("Parse distributed hardward Id from args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
         return -1;
     }
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
@@ -825,14 +831,14 @@ int32_t AudioAdapterInterfaceImpl::ParseDhIdFromJson(const std::string &args)
     }
     int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
-    DHLOGI("Parsed dhId is: %d.", dhId);
+    DHLOGI("Parsed dhId is: %{public}d.", dhId);
     return dhId;
 }
 
 int32_t AudioAdapterInterfaceImpl::ConvertString2Int(std::string val)
 {
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return -1;
     }
     return std::stoi(val);
@@ -859,7 +865,7 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::GetRenderImpl(cons
 
 int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &event)
 {
-    DHLOGI("Vol change (%s).", event.content.c_str());
+    DHLOGI("Vol change (%{public}s).", event.content.c_str());
     sptr<AudioRenderInterfaceImplBase> audioRender = GetRenderImpl(event.content);
     if (audioRender == nullptr) {
         DHLOGE("Render is null.");
@@ -907,7 +913,7 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
 
 std::string AudioAdapterInterfaceImpl::GetVolumeChangeString(const std::string &args)
 {
-    DHLOGI("Vol change (%s).", args.c_str());
+    DHLOGI("Vol change (%{public}s).", args.c_str());
     std::stringstream ss;
     ss << VOLUME_CHANAGE << ";"
         << AUDIO_STREAM_TYPE << "=" << ParseStringFromArgs(args, AUDIO_STREAM_TYPE) << ";"
@@ -916,7 +922,7 @@ std::string AudioAdapterInterfaceImpl::GetVolumeChangeString(const std::string &
         << VOLUME_GROUP_ID << "=" << ParseStringFromArgs(args, VOLUME_GROUP_ID.c_str()) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(args, KEY_DH_ID) << ";";
     std::string res = ss.str();
-    DHLOGI("get ss : %s", res.c_str());
+    DHLOGI("get ss : %{public}s", res.c_str());
     return res;
 }
 
@@ -924,7 +930,7 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
 {
     cJSON *jParam = cJSON_Parse(content.c_str());
     if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
@@ -936,7 +942,7 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
     }
     std::string val(dhIdItem->valuestring);
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
@@ -947,7 +953,7 @@ int32_t AudioAdapterInterfaceImpl::GetVolFromEvent(const std::string &content, c
 
 int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &event)
 {
-    DHLOGI("Focus change (%s).", event.content.c_str());
+    DHLOGI("Focus change (%{public}s).", event.content.c_str());
     if (paramCallback_ == nullptr) {
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
@@ -958,7 +964,7 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
         << FORCE_TYPE << "=" << ParseStringFromArgs(event.content, FORCE_TYPE) << ";"
         << HINT_TYPE << "=" << ParseStringFromArgs(event.content, HINT_TYPE) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-    DHLOGI("get ss : %s", ss.str().c_str());
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_FOCUS, ss.str(), "", reserved, cookie);
@@ -971,7 +977,7 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
 
 int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEvent &event)
 {
-    DHLOGI("Render state change (%s).", event.content.c_str());
+    DHLOGI("Render state change (%{public}s).", event.content.c_str());
     if (paramCallback_ == nullptr) {
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
@@ -980,7 +986,7 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
     ss << RENDER_STATE_CHANGE_EVENT << ";"
         << KEY_STATE << "=" << ParseStringFromArgs(event.content, KEY_STATE) << ";"
         << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-    DHLOGI("get ss : %s", ss.str().c_str());
+    DHLOGI("get ss : %{public}s", ss.str().c_str());
     int8_t reserved = 0;
     int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(), "", reserved, cookie);
@@ -1010,7 +1016,7 @@ int32_t AudioAdapterInterfaceImpl::ConvertMsg2Code(const std::string &msg)
 
 int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
 {
-    DHLOGD("Notify event type %d, event content: %s.", event.type, event.content.c_str());
+    DHLOGD("Notify event type %{public}d, event content: %{public}s.", event.type, event.content.c_str());
     switch (event.type) {
         case HDF_AUDIO_EVENT_OPEN_SPK_RESULT:
             if (event.content == HDF_EVENT_RESULT_SUCCESS) {
@@ -1051,7 +1057,8 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             SetDumpFlag(false);
             break;
         default:
-            DHLOGE("Notify not support event type %d, event content: %s.", event.type, event.content.c_str());
+            DHLOGE("Notify not support event type %{public}d, event content: %{public}s.",
+                event.type, event.content.c_str());
             return ERR_DH_AUDIO_HDF_FAIL;
     }
     return DH_SUCCESS;
@@ -1067,7 +1074,7 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
                 (event == EVENT_OPEN_SPK && isSpkOpened_) || (event == EVENT_CLOSE_SPK && !isSpkOpened_);
         });
         if (!status) {
-            DHLOGE("Wait spk event: %d timeout(%d)s.", event, WAIT_SECONDS);
+            DHLOGE("Wait spk event: %{public}d timeout(%{public}d)s.", event, WAIT_SECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
         if (event == EVENT_OPEN_SPK && !isSpkOpened_) {
@@ -1088,7 +1095,7 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
                 (event == EVENT_OPEN_MIC && isMicOpened_) || (event == EVENT_CLOSE_MIC && !isMicOpened_);
         });
         if (!status) {
-            DHLOGE("Wait mic event: %d timeout(%d)s.", event, WAIT_SECONDS);
+            DHLOGE("Wait mic event: %{public}d timeout(%{public}d)s.", event, WAIT_SECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
         if (event == EVENT_OPEN_MIC && !isMicOpened_) {
@@ -1105,13 +1112,13 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
 
 int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
 {
-    DHLOGI("Handle device closed, event type: %d.", event.type);
+    DHLOGI("Handle device closed, event type: %{public}d.", event.type);
     if (paramCallback_ != nullptr) {
         std::stringstream ss;
         ss << "ERR_EVENT;DEVICE_TYPE=" <<
             (event.type == HDF_AUDIO_EVENT_SPK_CLOSED ? AUDIO_DEVICE_TYPE_SPEAKER : AUDIO_DEVICE_TYPE_MIC) << ";"
             << KEY_DH_ID << "=" << ParseStringFromArgs(event.content, KEY_DH_ID) << ";";
-        DHLOGI("get ss : %s", ss.str().c_str());
+        DHLOGI("get ss : %{public}s", ss.str().c_str());
         int8_t reserved = 0;
         int8_t cookie = 0;
         int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(),
@@ -1153,7 +1160,7 @@ bool AudioAdapterInterfaceImpl::IsPortsNoReg()
 inline bool AudioAdapterInterfaceImpl::IsIdValid(const uint32_t id)
 {
     if (id >= MAX_AUDIO_STREAM_NUM) {
-        DHLOGE("Current id:%u is not supported.", id);
+        DHLOGE("Current id:%{public}u is not supported.", id);
         return false;
     }
     return true;

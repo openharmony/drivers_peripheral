@@ -71,6 +71,8 @@ int32_t WlanInterfaceSendActionFrame(struct IWlanInterface *self, const char *if
     const uint8_t *frameData, uint32_t frameDataLen);
 int32_t WlanInterfaceRegisterActionFrameReceiver(struct IWlanInterface *self, const char *ifName,
     const uint8_t *match, uint32_t matchLen);
+int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char *ifName,
+    uint8_t *paramBuf, uint32_t *paramBufLen);
 int32_t WlanInterfaceSetPowerSaveMode(struct IWlanInterface *self, const char *ifName, int32_t frequency,
     int32_t mode);
 int32_t WlanInterfaceSetDpiMarkRule(struct IWlanInterface *self, int32_t uid, int32_t protocol, int32_t enable);

@@ -82,7 +82,7 @@ struct WifiWpaStaInterface {
     char ifname[WIFI_IFACE_NAME_MAXLEN];
     WifiWpaStaInterface *next;
 
-    int (*wpaCliCmdStatus)(WifiWpaStaInterface *p, struct WpaHalCmdStatus *pcmd);
+    int (*wpaCliCmdStatus)(WifiWpaStaInterface *p, const char *ifName, struct WpaHalCmdStatus *pcmd);
     int (*wpaCliCmdAddNetworks)(WifiWpaStaInterface *p);
     int (*wpaCliCmdReconnect)(WifiWpaStaInterface *p);
     int (*wpaCliCmdReassociate)(WifiWpaStaInterface *p);

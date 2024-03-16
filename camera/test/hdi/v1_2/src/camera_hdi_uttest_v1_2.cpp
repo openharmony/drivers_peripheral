@@ -1666,7 +1666,9 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
 
     if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+        float zoomRatio = 15;
         uint8_t stabControl = OHOS_CAMERA_MOON_CAPTURE_BOOST_ENABLE;
+        meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
         meta->addEntry(OHOS_CONTROL_MOON_CAPTURE_BOOST, &stabControl, DATA_COUNT);
         // ability meta data serialization for updating
         std::vector<uint8_t> setting;
@@ -1680,12 +1682,9 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
         cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
-        cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
         sleep(1);
-        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture,
-            cameraTest->captureIdVideo};
-        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture,
-            cameraTest->streamIdVideo};
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         sleep(UT_SECOND_TIMES);
         common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
@@ -1696,12 +1695,12 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
             uint8_t value = entry.data.u8[0];
             // 查询到状态， 检测状态到 月亮模式可开启
             if (OHOS_CAMERA_MOON_CAPTURE_BOOST_ENABLE == value) {
-                printf("Macro mode is set enabled.");
+                printf("Moon mode is set enabled.");
             } else {
-                printf("Macro mode is not enabled.");
+                printf("Moon mode is not enabled.");
             }
         } else {
-            printf("Macro mode is not enabled.");
+            printf("Moon mode is not enabled.");
         }
     }
 }

@@ -504,11 +504,10 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
         CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
         return err;
     }
+    OMXBufferAppPrivateData privateData{};
     if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
-        OMXBufferAppPrivateData privateData;
-        memset(&privateData, 0, sizeof(privateData));
         privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
-        privateData.param = static_cast<void *>(&buffer.alongParam[0]);
+        privateData.param = static_cast<void *>(buffer.alongParam.data());
         bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 

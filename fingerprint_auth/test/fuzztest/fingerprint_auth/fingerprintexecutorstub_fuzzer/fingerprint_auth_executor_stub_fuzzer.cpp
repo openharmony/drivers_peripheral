@@ -19,7 +19,9 @@
 #include "executor_impl.h"
 #include "v1_2/executor_service.h"
 #include "v1_2/executor_stub.h"
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
+
+#undef LOG_TAG
+#define LOG_TAG "FINGERPRINT_AUTH_HDI"
 
 #undef private
 

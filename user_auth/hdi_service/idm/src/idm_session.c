@@ -207,18 +207,23 @@ ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType)
     return RESULT_SUCCESS;
 }
 
-bool IsSessionTimeout(void)
+ResultCode CheckSessionTimeout(void)
 {
     if (!IsSessionExist()) {
-        return true;
+        return RESULT_NEED_INIT;
     }
     uint64_t currentTime = GetSystemTime();
-    if (currentTime < g_session->time || currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
+    if (currentTime < g_session->time) {
+        LOG_ERROR("bad time, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
+            currentTime, g_session->time);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
         LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
             currentTime, g_session->time);
-        return true;
+        return RESULT_TIMEOUT;
     }
-    return false;
+    return RESULT_SUCCESS;
 }
 
 ResultCode GetIsUpdate(bool *isUpdate)
@@ -235,13 +240,14 @@ ResultCode GetIsUpdate(bool *isUpdate)
     return RESULT_SUCCESS;
 }
 
-bool IsSessionValid(int32_t userId)
+ResultCode CheckSessionValid(int32_t userId)
 {
-    if (!IsSessionExist() || IsSessionTimeout()) {
-        return false;
+    ResultCode ret = CheckSessionTimeout();
+    if (ret != RESULT_SUCCESS) {
+        return ret;
     }
-    if (g_session->userId == userId) {
-        return true;
+    if (g_session->userId != userId) {
+        return RESULT_GENERAL_ERROR;
     }
-    return false;
+    return RESULT_SUCCESS;
 }
