@@ -78,6 +78,19 @@ void ThermalHdfUtils::TrimStr(std::string& str)
     str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
     str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
 }
+
+int32_t ThermalHdfUtils::GetMaxCommonDivisor(int32_t a, int32_t b)
+{
+    if (b == 0) {
+        return 0;
+    }
+
+    if (a % b == 0) {
+        return b;
+    } else {
+        return GetMaxCommonDivisor(b, a % b);
+    }
+}
 } // V1_1
 } // Thermal
 } // HDI
