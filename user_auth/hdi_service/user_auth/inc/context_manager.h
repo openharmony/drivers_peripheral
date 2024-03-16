@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,6 @@ typedef struct UserAuthContext {
     uint32_t authTrustLevel;
     uint32_t collectorSensorHint;
     LinkedList *scheduleList;
-    bool isAuthResultCached;
 } UserAuthContext;
 
 typedef struct {
@@ -44,7 +43,6 @@ typedef struct {
     uint32_t authType;
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
-    bool isAuthResultCached;
 } AuthSolutionHal;
 
 typedef struct IdentifyParam {
