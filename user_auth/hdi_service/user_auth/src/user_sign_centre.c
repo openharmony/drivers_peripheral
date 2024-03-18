@@ -349,10 +349,10 @@ FAIL:
     return ret;
 }
 
-ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken)
+ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *reuseToken)
 {
-    if (authToken == NULL) {
-        LOG_ERROR("authToken is null");
+    if (reuseToken == NULL) {
+        LOG_ERROR("reuseToken is null");
         return RESULT_BAD_PARAM;
     }
     HksAuthTokenKey tokenKey = {};
@@ -361,9 +361,9 @@ ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken)
         LOG_ERROR("GetTokenKey fail");
         goto FAIL;
     }
-    ret = UserAuthTokenSign(authToken, &tokenKey);
+    ret = UserAuthTokenSign(reuseToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("UserAuthTokenSign fail");
+        LOG_ERROR("ReuseUnlockTokenSign fail");
         goto FAIL;
     }
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
@@ -371,6 +371,6 @@ ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken)
 
 FAIL:
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
-    (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+    (void)memset_s(reuseToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     return ret;
 }
