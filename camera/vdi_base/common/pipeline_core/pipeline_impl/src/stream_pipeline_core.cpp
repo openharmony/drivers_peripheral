@@ -14,6 +14,7 @@
 #include "stream_pipeline_core.h"
 #include "idevice_manager.h"
 #include "ipp_node.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 RetCode StreamPipelineCore::Init(const std::string &cameraId)
@@ -47,10 +48,14 @@ RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
     std::lock_guard<std::recursive_mutex> l(mutex_);
     std::shared_ptr<PipelineSpec> spec = strategy_->GeneratePipelineSpec(mode);
     if (spec == nullptr) {
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(CREATE_PIPELINE_ERROR),
+            CameraHalHisysevent::CreateMsg("CreatePipeline GeneratePipelineSpec failed mode:%d", mode));
         return RC_ERROR;
     }
     std::shared_ptr<Pipeline> pipeline = builder_->Build(spec, cameraId_);
     if (pipeline == nullptr) {
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(CREATE_PIPELINE_ERROR),
+            CameraHalHisysevent::CreateMsg("CreatePipeline Build failed mode:%d", mode));
         return RC_ERROR;
     }
     return dispatcher_->Update(pipeline);

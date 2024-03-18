@@ -21,7 +21,8 @@
 #include "iam_logger.h"
 #include "iam_para2str.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "FACE_AUTH_IMPL"
 
 namespace OHOS {
 namespace HDI {

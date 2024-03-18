@@ -1828,3 +1828,39 @@ int32_t UsbMemTestTrigger(bool enable)
 {
     return RawUsbMemTestTrigger(enable);
 }
+
+bool UsbGetInterfaceActiveStatus(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+{
+    struct UsbPoolQueryPara poolQueryPara = {0};
+    struct UsbInterfacePool *interfacePool = NULL;
+    struct UsbInterfaceQueryPara interfaceQueryPara = {USB_INTERFACE_INTERFACE_INDEX_TYPE, interfaceIndex, 0};
+    struct UsbSdkInterface *interfaceObj = NULL;
+    struct UsbDeviceHandle *devHandle = NULL;
+    struct UsbSession *realSession = RawGetSession(session);
+    bool claimFlag = false;
+    bool unactivated;
+    if (realSession == NULL) {
+        return NULL;
+    }
+    SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    if (interfacePool == NULL || interfacePool->device == NULL) {
+        interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
+        if (interfacePool == NULL || interfacePool->device == NULL) {
+            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+            return NULL;
+        }
+    }
+
+    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
+        return NULL;
+    }
+
+    devHandle = interfacePool->device->devHandle;
+    unactivated = RawGetInterfaceActiveStatus(devHandle, interfaceIndex);
+
+    return unactivated;
+}

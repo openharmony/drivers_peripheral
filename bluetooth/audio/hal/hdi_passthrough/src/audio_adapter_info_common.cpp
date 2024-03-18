@@ -19,6 +19,12 @@
 #include "audio_internal.h"
 #include "cJSON.h"
 #include "audio_adapter_info_common.h"
+
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS::HDI::Audio_Bluetooth {
 constexpr const char *AUDIO_ADAPTER_CONFIG = "/vendor/etc/hdfconfig/a2dp_adapter_config.json";
 constexpr int ADAPTER_NAME_LEN = 32;

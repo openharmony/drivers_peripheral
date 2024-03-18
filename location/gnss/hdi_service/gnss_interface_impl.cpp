@@ -192,7 +192,6 @@ int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    // GnssConfigPara configPara;
     g_configPara.type = static_cast<uint32_t>(GnssStartClass::GNSS_START_CLASS_NORMAL);
     g_configPara.u.gnssBasicConfig.gnssMode = para.gnssBasic.gnssMode;
     g_configPara.u.gnssBasicConfig.size = sizeof(GnssBasicConfigPara);

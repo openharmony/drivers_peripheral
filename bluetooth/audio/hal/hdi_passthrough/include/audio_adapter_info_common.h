@@ -28,6 +28,12 @@
 #include "securec.h"
 #include "audio_types.h"
 #include "audio_internal.h"
+
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS::HDI::Audio_Bluetooth {
 struct AudioAdapterDescriptor *AudioAdapterGetConfigOut(void);
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
