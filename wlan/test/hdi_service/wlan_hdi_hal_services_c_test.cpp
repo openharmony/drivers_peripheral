@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
 #include <osal_mem.h>
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "wlan_callback_impl.h"
 #include "securec.h"
 #include "wlan_hdi_types.h"
@@ -1006,7 +1006,7 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_042, TestSize.Level1)
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_CHAN_ADJUST, (const int8_t *)&chanInfo,
         sizeof(chanInfo));
     printf("SendCmdIoctl CHAN_ADJUST, rc=%d.\n", rc);
-    ASSERT_FALSE(rc);
+    ASSERT_EQ(rc, -1);
 }
 
 /**

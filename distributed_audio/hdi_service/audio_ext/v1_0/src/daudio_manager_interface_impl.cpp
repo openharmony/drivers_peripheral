@@ -53,7 +53,7 @@ DAudioManagerInterfaceImpl::~DAudioManagerInterfaceImpl()
 int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpName, int32_t devId,
     const std::string &capability, const sptr<IDAudioCallback> &callbackObj)
 {
-    DHLOGI("Register audio device, name: %s, device: %d.", GetAnonyString(adpName).c_str(), devId);
+    DHLOGI("Register audio device, name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), devId);
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
@@ -61,7 +61,7 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpNa
 
     int32_t ret = audioMgr_->AddAudioDevice(adpName, devId, capability, callbackObj);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Register audio device failed, ret = %d", ret);
+        DHLOGE("Register audio device failed, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
 
@@ -71,7 +71,7 @@ int32_t DAudioManagerInterfaceImpl::RegisterAudioDevice(const std::string &adpNa
 
 int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adpName, int32_t devId)
 {
-    DHLOGI("UnRegister audio device, name: %s, device: %d.", GetAnonyString(adpName).c_str(), devId);
+    DHLOGI("UnRegister audio device, name: %{public}s, device: %{public}d.", GetAnonyString(adpName).c_str(), devId);
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
@@ -79,7 +79,7 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adp
 
     int32_t ret = audioMgr_->RemoveAudioDevice(adpName, devId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("UnRegister audio devcie failed. ret = %d", ret);
+        DHLOGE("UnRegister audio devcie failed. ret = %{public}d", ret);
         return HDF_FAILURE;
     }
 
@@ -93,10 +93,10 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
     }
-    DHLOGI("Notify event. event type = %d", event.type);
+    DHLOGI("Notify event. event type = %{public}d", event.type);
     int32_t ret = audioMgr_->Notify(adpName, devId, event);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify audio event failed. ret = %d", ret);
+        DHLOGE("Notify audio event failed. ret = %{public}d", ret);
         return HDF_FAILURE;
     }
 

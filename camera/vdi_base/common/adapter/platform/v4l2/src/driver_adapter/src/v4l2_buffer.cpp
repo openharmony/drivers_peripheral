@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <linux/dma-heap.h>
 #include <linux/dma-buf.h>
+#include <chrono>
 #ifndef V4L2_MAIN_TEST
 #include "ibuffer.h"
 #endif
@@ -44,10 +45,18 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
     req.type = bufferType_;
     req.memory = memoryType_;
 
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
-        CAMERA_LOGE("does not support memory mapping %{public}s\n", strerror(errno));
+        end = std::chrono::system_clock::now();
+        CAMERA_LOGE("does not support memory mapping %{public}s, time eplase %{public}lld ms\n",
+            strerror(errno), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
         return RC_ERROR;
     }
+
+    end = std::chrono::system_clock::now();
+    CAMERA_LOGD("ioctl(fd, VIDIOC_REQBUFS, &req), time elapse %{public}lld ms\n",
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     if (req.count != buffCont) {
         CAMERA_LOGE("error Insufficient buffer memory on \n");
@@ -55,10 +64,16 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
         req.count = 0;
         req.type = bufferType_;
         req.memory = memoryType_;
+        begin = std::chrono::system_clock::now();
         if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
-            CAMERA_LOGE("V4L2ReqBuffers does not release buffer	%s\n", strerror(errno));
+            end = std::chrono::system_clock::now();
+            CAMERA_LOGE("V4L2ReqBuffers does not release buffer %{public}s, time eplase %{public}lld ms\n",
+                strerror(errno), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
             return RC_ERROR;
         }
+        end = std::chrono::system_clock::now();
+        CAMERA_LOGD("ioctl(fd, VIDIOC_REQBUFS, &req), reapply memory time elapse %{public}lld ms\n",
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
         return RC_ERROR;
     }

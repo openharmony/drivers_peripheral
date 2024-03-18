@@ -17,7 +17,7 @@
 using namespace std;
 namespace OHOS {
 namespace Audio {
-constexpr size_t THRESHOLD = 10;
+constexpr size_t THRESHOLD = 200;
 constexpr int32_t OFFSET = 4;
 
 enum OffloadRenderCmdId {
@@ -60,7 +60,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
 
     rawData = rawData + OFFSET;
     size = size - OFFSET;
-    struct IAudioManager *manager = IAudioManagerGet(true);
+    struct IAudioManager *manager = IAudioManagerGet(false);
     if (manager == nullptr) {
         return false;
     }
@@ -71,7 +71,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     RenderFucSwitch(render, cmd, rawData, size);
     adapter->DestroyRender(adapter, renderId);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-    IAudioManagerRelease(manager, true);
+    IAudioManagerRelease(manager, false);
     return true;
 }
 }

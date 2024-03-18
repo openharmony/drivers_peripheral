@@ -528,7 +528,7 @@ int32_t AudioAdapterListGetRender(const char *adapterName, struct AudioRender **
 {
     int32_t num;
 
-    HDF_LOGE("%{public}s: enter ", __func__);
+    HDF_LOGD("%{public}s: enter ", __func__);
     if (g_renderAndCaptureManage == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -542,10 +542,9 @@ int32_t AudioAdapterListGetRender(const char *adapterName, struct AudioRender **
             return HDF_ERR_INVALID_PARAM;
         }
         if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
-            HDF_LOGE("%{public}s: renderPid = %{public}u, pid = %{public}u", __func__,
-                g_renderAndCaptureManage[i].renderPid, pid);
             if (g_renderAndCaptureManage[i].renderPid != pid) {
-                HDF_LOGE("%{public}s: renderPid != pid ", __func__);
+                HDF_LOGE("%{public}s: renderPid != pid renderPid = %{public}u, pid = %{public}u",
+                    __func__, g_renderAndCaptureManage[i].renderPid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }
             *render = g_renderAndCaptureManage[i].render;

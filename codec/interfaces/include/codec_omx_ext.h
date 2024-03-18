@@ -185,6 +185,7 @@ struct ProcessNameParam {
     union OMX_VERSIONTYPE version;         /** Component version */
     char processName[PROCESS_NAME_LEN];    /** Process name array */
 };
+
 /**
  * @brief Enumerates the extended codec indexes.
  */
@@ -211,6 +212,12 @@ enum OmxIndexCodecExType {
     OMX_IndexParamWorkingFrequency,
     /** ProcessNameParam */
     OMX_IndexParamProcessName,
+    /** CodecLTRParam/CodecLTRPerFrameParam */
+    OMX_IndexParamLTR,
+    /** CodecQPRangeParam */
+    OMX_IndexParamQPRange,
+    /** OMX_CONFIG_BOOLEANTYPE */
+    OMX_IndexParamLowLatency,
 };
 
 /**
@@ -329,6 +336,25 @@ struct OMXBufferAppPrivateData {
     int32_t fd;                          /** dma fd or secure dma fd allocated by vender */
     uint32_t sizeOfParam;
     void *param;
+};
+
+struct CodecLTRParam {
+    uint32_t size;                               /** Size of the structure */
+    union OMX_VERSIONTYPE version;               /** Component version */
+    uint32_t ltrFrameListLen;
+};
+
+struct CodecLTRPerFrameParam {
+    bool markAsLTR;
+    bool useLTR;
+    uint32_t useLTRPoc;
+};
+
+struct CodecQPRangeParam {
+    uint32_t size;                               /** Size of the structure */
+    union OMX_VERSIONTYPE version;               /** Component version */
+    uint32_t minQp;
+    uint32_t maxQp;
 };
 
 #ifdef __cplusplus

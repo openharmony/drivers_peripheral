@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_USB_V1_0_USBIMPL_H
-#define OHOS_HDI_USB_V1_0_USBIMPL_H
+#ifndef OHOS_HDI_USB_V1_1_USBIMPL_H
+#define OHOS_HDI_USB_V1_1_USBIMPL_H
 
 #include "hdf_slist.h"
 #include "hdf_usb_pnp_manage.h"
@@ -24,7 +24,7 @@
 #include "usb_session.h"
 #include "usbd.h"
 #include "usbd_load_usb_service.h"
-#include "v1_0/iusb_interface.h"
+#include "v1_1/iusb_interface.h"
 
 #define BASE_CLASS_HUB 0x09
 
@@ -33,7 +33,7 @@ constexpr uint8_t MAX_INTERFACEID = 0xFF;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_0 {
+namespace V1_1 {
 class UsbImpl : public IUsbInterface {
 public:
     OsalMutex lock_;
@@ -135,6 +135,8 @@ private:
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
+    int32_t GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated) override;
+    int32_t GetDeviceSpeed(const UsbDev &dev, uint8_t &speed) override;
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit UsbDeathRecipient(const sptr<IUsbdSubscriber> &deathSubscriber) : deathSubscriber_(deathSubscriber) {};
@@ -156,8 +158,8 @@ private:
     static UsbdLoadService loadUsbService_;
     static UsbdLoadService loadHdfEdm_;
 };
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_USB_V1_0_USBIMPL_H
+#endif // OHOS_HDI_USB_V1_1_USBIMPL_H

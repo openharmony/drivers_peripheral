@@ -17,7 +17,7 @@
 #include <hdf_log.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "wifi_hal.h"
 #include "wlan_common_cmd.h"
 
@@ -84,6 +84,18 @@ int32_t WlanInterfaceWifiSendCmdIoctl(struct IWlanInterface *self, const char *i
         HDF_LOGE("%{public}s: send ioctl command failed!, error code: %{public}d", __func__, ret);
     }
     return ret;
+}
+
+int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char *ifName,
+    uint8_t *paramBuf, uint32_t *paramBufLen)
+{
+    HDF_LOGI("%{public}s enter WlanInterfaceGetCoexChannelList", __func__);
+    (void)self;
+    if (ifName == NULL || paramBuf == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t WlanInterfaceRegisterHid2dCallback(Hid2dCallbackFunc func, const char *ifName)

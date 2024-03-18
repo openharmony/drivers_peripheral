@@ -16,6 +16,11 @@
 #include "bluetooth_a2dp_src_observer.h"
 #include <hdf_log.h>
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const OHOS::bluetooth::RawAddress &device, int state)
 {
     HDF_LOGI("BluetoothA2dpSrcObserver::OnConnectionStateChanged");
