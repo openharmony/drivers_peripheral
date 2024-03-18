@@ -71,8 +71,7 @@ ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result);
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
-ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken,
-    EnrolledStateHal *enrolledState);
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult);
 
 #ifdef __cplusplus
 }
