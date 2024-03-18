@@ -370,7 +370,7 @@ int32_t IntellVoiceEngineManagerImpl::SendCloneFile(const std::string &filePath,
     }
 
     if (buffer.size() == 0 || buffer.size() > CROSS_PROCESS_BUF_SIZE_LIMIT) {
-        INTELLIGENT_VOICE_LOGE("size is invalid %{public}" PRIu64 "", buffer.size());
+        INTELLIGENT_VOICE_LOGE("size %{public}u is invalid", static_cast<uint32_t>(buffer.size()));
         return HDF_FAILURE;
     }
 
