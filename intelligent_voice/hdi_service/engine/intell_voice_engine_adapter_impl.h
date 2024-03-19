@@ -20,7 +20,7 @@
 #include <fstream>
 #include <map>
 
-#include "v1_0/iintell_voice_engine_adapter.h"
+#include "v1_2/iintell_voice_engine_adapter.h"
 #include "i_engine.h"
 
 namespace OHOS {
@@ -28,11 +28,10 @@ namespace IntelligentVoice {
 namespace Engine {
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineCallback;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineCallBackEvent;
-
-using OHOS::HDI::IntelligentVoice::Engine::V1_0::IIntellVoiceEngineAdapter;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::StartInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
+using OHOS::HDI::IntelligentVoice::Engine::V1_2::EvaluationResultInfo;
 
 class EngineListener : public IEngineCallback {
 public:
@@ -43,20 +42,22 @@ private:
     sptr<IIntellVoiceEngineCallback> cb_;
 };
 
-class IntellVoiceEngineAdapterImpl : public IIntellVoiceEngineAdapter {
+class IntellVoiceEngineAdapterImpl : public HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineAdapter {
 public:
     explicit IntellVoiceEngineAdapterImpl(std::unique_ptr<IEngine> engine);
     ~IntellVoiceEngineAdapterImpl();
 
-    int32_t SetCallback(const sptr<IIntellVoiceEngineCallback>& engineCallback) override;
-    int32_t Attach(const IntellVoiceEngineAdapterInfo& info) override;
+    int32_t SetCallback(const sptr<IIntellVoiceEngineCallback> &engineCallback) override;
+    int32_t Attach(const IntellVoiceEngineAdapterInfo &info) override;
     int32_t Detach() override;
-    int32_t SetParameter(const std::string& keyValueList) override;
-    int32_t GetParameter(const std::string& keyList, std::string& valueList) override;
+    int32_t SetParameter(const std::string &keyValueList) override;
+    int32_t GetParameter(const std::string &keyList, std::string &valueList) override;
     int32_t Start(const StartInfo &info) override;
     int32_t Stop() override;
-    int32_t WriteAudio(const std::vector<uint8_t>& buffer) override;
-    int32_t Read(ContentType type, sptr<Ashmem>& buffer) override;
+    int32_t WriteAudio(const std::vector<uint8_t> &buffer) override;
+    int32_t Read(ContentType type, sptr<Ashmem> &buffer) override;
+    int32_t GetWakeupPcm(std::vector<uint8_t> &data) override;
+    int32_t Evaluate(const std::string &word, EvaluationResultInfo &info) override;
 
 private:
     int32_t ReadFileDataInner(ContentType type, uint8_t *&buffer, uint32_t &size);
