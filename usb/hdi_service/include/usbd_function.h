@@ -38,8 +38,9 @@
 
 #define SYS_USB_CONFIGFS                "sys.usb.configfs"
 #define SYS_USB_CONFIG                  "sys.usb.config"
+#define SYS_USB_STATU                   "sys.usb.state"
 #define HDC_CONFIG_OFF                  "none"
-#define HDC_CONFIG_ON                   "hdc"
+#define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
 #define HDC_CONFIG_STORAGE              "storage"
 #define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
@@ -85,6 +86,7 @@ private:
     static int32_t SetDDKFunction(uint32_t funcs);
     static int32_t UsbdEnableDevice();
     static int32_t UsbdWaitUdc();
+    static int32_t UsbdWaitToNone();
     static int32_t UsbdInitDDKFunction(uint32_t funcs);
     static int32_t UsbdSetKernelFunction(int32_t kfuns);
     static void UsbdUnregisterDevice(const std::string &serviceName);

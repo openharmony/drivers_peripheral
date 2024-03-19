@@ -131,7 +131,7 @@ void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, en
     }
 
     OsalMutexUnlock(&g_ddkListenerList.listMutex);
-    HDF_LOGD("%{public}s: notify cmd:%{public}d, end.", __func__, cmd);
+    HDF_LOGI("%{public}s: notify cmd:%{public}d, end.", __func__, cmd);
 }
 
 int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
