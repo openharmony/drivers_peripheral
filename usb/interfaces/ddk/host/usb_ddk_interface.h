@@ -489,7 +489,7 @@ int32_t UsbFillRequestByMmap(
     const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle, const struct UsbRequestParams *params);
 /**
  * @brief Cancels an asynchronous USB request.
- 
+
  * @param request Indicates the pointer to the USB request.
  *
  * @return Returns <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b> otherwise.
@@ -509,6 +509,8 @@ int32_t UsbMemTestTrigger(bool enable);
 int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct UsbInterface **interface);
 int32_t UsbGetInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t *settingIndex);
 int32_t UsbGetDeviceMemMapFd(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
+bool UsbGetInterfaceActiveStatus(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
+    uint8_t interfaceIndex);
 #ifdef __cplusplus
 }
 #endif

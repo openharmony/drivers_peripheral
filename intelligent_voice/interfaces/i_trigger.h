@@ -17,7 +17,7 @@
 #define I_TRIGGER_H
 #include <memory>
 #include <vector>
-#include "v1_0/intell_voice_trigger_types.h"
+#include "v1_2/intell_voice_trigger_types.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
@@ -25,16 +25,15 @@ namespace Trigger {
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerAdapterDsecriptor;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerProperties;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModel;
-using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceTriggerModelType;
 using OHOS::HDI::IntelligentVoice::Trigger::V1_0::IntellVoiceRecognitionEvent;
 
 struct TriggerModel {
-    TriggerModel(IntellVoiceTriggerModelType typeIn, uint32_t uidIn, std::vector<uint8_t> dataIn) : type(typeIn),
-        uid(uidIn)
+    TriggerModel(OHOS::HDI::IntelligentVoice::Trigger::V1_2::IntellVoiceTriggerModelType typeIn, uint32_t uidIn,
+        std::vector<uint8_t> dataIn) : type(typeIn), uid(uidIn)
     {
         data.swap(dataIn);
     }
-    IntellVoiceTriggerModelType type;
+    OHOS::HDI::IntelligentVoice::Trigger::V1_2::IntellVoiceTriggerModelType type;
     uint32_t uid;
     std::vector<uint8_t> data;
 };

@@ -19,6 +19,7 @@
 #include <memory>
 #include "v1_0/intell_voice_engine_types.h"
 #include "v1_1/intell_voice_engine_types.h"
+#include "v1_2/intell_voice_engine_types.h"
 
 namespace OHOS {
 namespace IntelligentVoice {
@@ -29,7 +30,8 @@ using OHOS::HDI::IntelligentVoice::Engine::V1_0::StartInfo;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::IntellVoiceEngineAdapterDescriptor;
 using OHOS::HDI::IntelligentVoice::Engine::V1_0::ContentType;
 using OHOS::HDI::IntelligentVoice::Engine::V1_1::IntellVoiceDataOprType;
-
+using OHOS::HDI::IntelligentVoice::Engine::V1_2::UploadHdiFile;
+using OHOS::HDI::IntelligentVoice::Engine::V1_2::EvaluationResultInfo;
 using IntellVoiceStatus = int32_t;
 
 using getParameterCb = std::function<void(const std::string &retStr)>;
@@ -68,6 +70,8 @@ public:
     virtual IntellVoiceStatus Stop() = 0;
     virtual IntellVoiceStatus Cancel() = 0;
     virtual IntellVoiceStatus ReadFileData(ContentType type, getFileDataCb cb) = 0;
+    virtual IntellVoiceStatus GetWakeupPcm(std::vector<uint8_t> &data) = 0;
+    virtual IntellVoiceStatus Evaluate(const std::string &word, EvaluationResultInfo &info) = 0;
 };
 
 class IEngineManager {
@@ -76,6 +80,10 @@ public:
         std::unique_ptr<IEngine> &engine) = 0;
     virtual int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor) = 0;
     virtual int32_t SetDataOprListener(std::shared_ptr<IDataOprListener> listener) = 0;
+    virtual int32_t GetUploadFiles(int32_t maxNum, std::vector<UploadHdiFile> &files) = 0;
+    virtual int32_t GetCloneFilesList(std::vector<std::string> &cloneFiles) = 0;
+    virtual int32_t GetCloneFile(const std::string &filePath, std::shared_ptr<uint8_t> &buffer, uint32_t &size) = 0;
+    virtual int32_t SendCloneFile(const std::string &filePath, const uint8_t *buffer, uint32_t size) = 0;
 };
 }
 }

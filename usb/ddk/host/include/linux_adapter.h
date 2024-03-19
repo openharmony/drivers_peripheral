@@ -145,6 +145,8 @@ struct UsbOsAdapterOps {
     int32_t (*detachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
     int32_t (*usbControlMsg)(const struct UsbDeviceHandle *devHandle, struct UsbControlRequestData *ctrlData);
     int32_t (*getUsbSpeed)(const struct UsbDeviceHandle *handle);
+    bool (*getInterfaceActiveStatus)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    int32_t (*getDeviceSpeed)(const struct UsbDeviceHandle *devHandle);
 };
 #ifdef __cplusplus
 extern "C" {
