@@ -19,7 +19,8 @@
 #include "defines.h"
 #include "iam_logger.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "PIN_AUTH_IMPL"
 
 namespace OHOS {
 namespace HDI {

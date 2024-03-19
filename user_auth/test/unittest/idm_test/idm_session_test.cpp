@@ -130,14 +130,14 @@ HWTEST_F(IdmSessionTest, TestGetEnrollScheduleInfo_002, TestSize.Level0)
     g_session = nullptr;
 }
 
-HWTEST_F(IdmSessionTest, TestIsSessionTimeout, TestSize.Level0)
+HWTEST_F(IdmSessionTest, TestCheckSessionTimeout, TestSize.Level0)
 {
     g_session = nullptr;
-    EXPECT_TRUE(IsSessionTimeout());
+    EXPECT_EQ(CheckSessionTimeout(), RESULT_NEED_INIT);
     struct SessionInfo session;
     session.time = UINT64_MAX;
     g_session = &session;
-    EXPECT_TRUE(IsSessionTimeout());
+    EXPECT_EQ(CheckSessionTimeout(), RESULT_GENERAL_ERROR);
     g_session = nullptr;
 }
 
@@ -146,15 +146,15 @@ HWTEST_F(IdmSessionTest, TestGetIsUpdate, TestSize.Level0)
     EXPECT_EQ(GetIsUpdate(nullptr), RESULT_BAD_PARAM);
 }
 
-HWTEST_F(IdmSessionTest, TestIsSessionValid, TestSize.Level0)
+HWTEST_F(IdmSessionTest, TestCheckSessionValid, TestSize.Level0)
 {
     struct SessionInfo session;
     session.userId = 2135;
     session.time = UINT64_MAX;
     g_session = &session;
-    EXPECT_FALSE(IsSessionValid(0));
+    EXPECT_EQ(CheckSessionValid(0), RESULT_GENERAL_ERROR);
     session.time = GetSystemTime();
-    EXPECT_FALSE(IsSessionValid(0));
+    EXPECT_EQ(CheckSessionValid(0), RESULT_GENERAL_ERROR);
     g_session = nullptr;
 }
 } // namespace UserAuth

@@ -19,11 +19,14 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "display_log.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "MAPPER_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+#undef DISPLAY_TRACE
+#define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
 
 namespace OHOS {
 namespace HDI {
@@ -105,6 +108,7 @@ int32_t MapperService::LoadVdi()
 
 int32_t MapperService::FreeMem(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     vdiImpl_->FreeMem(*handle->Move());
@@ -113,6 +117,7 @@ int32_t MapperService::FreeMem(const sptr<NativeBuffer>& handle)
 
 int32_t MapperService::Mmap(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     void* retPtr = vdiImpl_->Mmap(*handle->GetBufferHandle());
@@ -122,6 +127,7 @@ int32_t MapperService::Mmap(const sptr<NativeBuffer>& handle)
 
 int32_t MapperService::Unmap(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->Unmap(*handle->GetBufferHandle());
@@ -131,6 +137,7 @@ int32_t MapperService::Unmap(const sptr<NativeBuffer>& handle)
 
 int32_t MapperService::FlushCache(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->FlushCache(*handle->GetBufferHandle());
@@ -140,6 +147,7 @@ int32_t MapperService::FlushCache(const sptr<NativeBuffer>& handle)
 
 int32_t MapperService::InvalidateCache(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->InvalidateCache(*handle->GetBufferHandle());

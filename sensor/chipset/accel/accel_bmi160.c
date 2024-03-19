@@ -74,7 +74,7 @@ static int32_t ReadBmi160RawData(struct SensorCfgData *data, struct AccelData *r
     return HDF_SUCCESS;
 }
 
-int32_t ReadBmi160Data(struct SensorCfgData *cfg, struct SensorReportEvent *event)
+static int32_t ReadBmi160Data(struct SensorCfgData *cfg, struct SensorReportEvent *event)
 {
     int32_t ret;
     struct AccelData rawData = { 0, 0, 0 };
@@ -151,7 +151,7 @@ static int32_t DispatchBMI160(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Bmi160BindDriver(struct HdfDeviceObject *device)
+static int32_t Bmi160BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -169,7 +169,7 @@ int32_t Bmi160BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Bmi160InitDriver(struct HdfDeviceObject *device)
+static int32_t Bmi160InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct AccelOpsCall ops;
@@ -207,7 +207,7 @@ int32_t Bmi160InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Bmi160ReleaseDriver(struct HdfDeviceObject *device)
+static void Bmi160ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 

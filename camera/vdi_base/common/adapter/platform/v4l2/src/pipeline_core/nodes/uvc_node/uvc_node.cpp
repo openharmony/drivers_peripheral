@@ -231,7 +231,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     CameraDumper& dumper = CameraDumper::GetInstance();
-    dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer);
+    dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer, wide_, high_);
 
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
@@ -246,7 +246,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
     free(jBuf);
 
-    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer);
+    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer, wide_, high_);
 
     SourceNode::DeliverBuffer(buffer);
     return;

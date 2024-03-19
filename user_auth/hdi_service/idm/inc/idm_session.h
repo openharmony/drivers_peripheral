@@ -31,8 +31,8 @@ ResultCode CloseEditSession(void);
 ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate);
 void BreakOffCoauthSchedule(void);
 
-bool IsSessionTimeout(void);
-bool IsSessionValid(int32_t userId);
+ResultCode CheckSessionTimeout(void);
+ResultCode CheckSessionValid(int32_t userId);
 ResultCode GetUserId(int32_t *userId);
 ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen);
 ResultCode GetIsUpdate(bool *isUpdate);

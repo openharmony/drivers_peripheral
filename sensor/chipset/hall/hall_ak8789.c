@@ -47,7 +47,7 @@ static int32_t DispatchAK8789(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Ak8789BindDriver(struct HdfDeviceObject *device)
+static int32_t Ak8789BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -65,7 +65,7 @@ int32_t Ak8789BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t AK8789InitDriver(struct HdfDeviceObject *device)
+static int32_t AK8789InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct HallOpsCall ops;
@@ -95,7 +95,7 @@ int32_t AK8789InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Ak8789ReleaseDriver(struct HdfDeviceObject *device)
+static void Ak8789ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 

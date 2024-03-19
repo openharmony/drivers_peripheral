@@ -14,6 +14,7 @@
 #include "face_node.h"
 #include <securec.h>
 #include "camera_dump.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 RKFaceNode::RKFaceNode(const std::string &name, const std::string &type, const std::string &cameraId)
@@ -177,6 +178,8 @@ RetCode RKFaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata
 
     if (memcpy_s(outPutBuffer->GetVirAddress(), metadataSize, static_cast<void*>(metadata->get()),
         metadataSize) != 0) {
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("streamId:%d CopyMetadataBuffer failed", outPutBuffer->GetStreamId()));
         CAMERA_LOGE("memcpy_s failed");
         return RC_ERROR;
     }
@@ -187,6 +190,8 @@ RetCode RKFaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata
 RetCode RKFaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& outPutBuffer, int32_t dataSize)
 {
     if (memcpy_s(outPutBuffer->GetVirAddress(), dataSize, sourceBuffer, dataSize) != 0) {
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("streamId:%d CopyBuffer failed", outPutBuffer->GetStreamId()));
         CAMERA_LOGE("copy buffer memcpy_s failed");
         return RC_ERROR;
     }

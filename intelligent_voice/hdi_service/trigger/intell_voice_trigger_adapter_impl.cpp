@@ -87,7 +87,8 @@ int32_t IntellVoiceTriggerAdapterImpl::LoadModel(const IntellVoiceTriggerModel &
         return HDF_ERR_INVALID_PARAM;
     }
 
-    TriggerModel triggerModel(model.type, model.uid, modelData);
+    TriggerModel triggerModel(static_cast<OHOS::HDI::IntelligentVoice::Trigger::V1_2::IntellVoiceTriggerModelType>(
+        model.type), model.uid, modelData);
     int32_t ret = adapter_->LoadIntellVoiceTriggerModel(triggerModel, cb, cookie, handle);
     if (ret != 0) {
         INTELLIGENT_VOICE_LOGE("failed to load model, ret:%{public}d", ret);

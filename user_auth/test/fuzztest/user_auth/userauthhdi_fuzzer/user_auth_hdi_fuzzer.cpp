@@ -24,7 +24,8 @@
 #include "user_auth_hdi.h"
 #include "v1_3/user_auth_interface_service.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "USER_AUTH_HDI"
 
 #undef private
 

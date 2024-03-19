@@ -24,6 +24,7 @@ if (is_standard_system) {
     ]
     sources = [
       "hostapd_interface_service.c",
+      "service_common/hdi_hostapd_hal.c",
       "service_common/hostapd_common_cmd.c",
     ]
 
@@ -49,6 +50,7 @@ if (is_standard_system) {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "wpa_supplicant:wpa",
+      "wpa_supplicant:wpa_client_vendor",
     ]
 
     install_images = [ chipset_base_dir ]
