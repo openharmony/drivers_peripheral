@@ -19,7 +19,8 @@
 #include "v1_2/fingerprint_auth_interface_stub.h"
 #include "v1_2/fingerprint_auth_interface_service.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "FINGERPRINT_AUTH_HDI"
 
 #undef private
 

@@ -244,7 +244,7 @@ static int32_t CalcBarometerData(struct  BarometerData *barometerData, int32_t t
     return HDF_SUCCESS;
 }
 
-int32_t ReadBmp180Data(struct SensorCfgData *data)
+static int32_t ReadBmp180Data(struct SensorCfgData *data)
 {
     int32_t ret;
     int32_t tmp[BAROMETER_SUM];
@@ -330,7 +330,7 @@ static int32_t DispatchBMP180(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Bmp180BindDriver(struct HdfDeviceObject *device)
+static int32_t Bmp180BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -348,7 +348,7 @@ int32_t Bmp180BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Bmp180InitDriver(struct HdfDeviceObject *device)
+static int32_t Bmp180InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct BarometerOpsCall ops;
@@ -386,7 +386,7 @@ int32_t Bmp180InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Bmp180ReleaseDriver(struct HdfDeviceObject *device)
+static void Bmp180ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 

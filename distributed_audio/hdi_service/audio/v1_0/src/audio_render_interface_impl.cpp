@@ -40,13 +40,13 @@ AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, c
     devAttrs_(attrs), audioExtCallback_(callback)
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
-    DHLOGD("Distributed audio render constructed, period(%d), frameSize(%d).",
+    DHLOGD("Distributed audio render constructed, period(%{public}d), frameSize(%{public}d).",
         attrs.period, devAttrs_.frameSize);
 }
 
 AudioRenderInterfaceImpl::~AudioRenderInterfaceImpl()
 {
-    DHLOGD("Distributed audio render destructed, id(%d).", devDesc_.pins);
+    DHLOGD("Distributed audio render destructed, id(%{public}d).", devDesc_.pins);
 }
 
 int32_t AudioRenderInterfaceImpl::GetLatency(uint32_t &ms)
@@ -62,6 +62,10 @@ float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_
         return 1.0f;
     }
 
+    if (durationIndex == 0) {
+        return 1.0f;
+    }
+    
     float fadeRate = static_cast<float>(currentIndex) / durationIndex * DAUDIO_FADE_NORMALIZATION_FACTOR;
     if (fadeRate < 1) {
         return pow(fadeRate, DAUDIO_FADE_POWER_NUM) / DAUDIO_FADE_NORMALIZATION_FACTOR;
@@ -81,7 +85,7 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
         frame[k] = currentFrame_ == durationFrame - 1 ? frame[k] : static_cast<int16_t>(rate * frame[k]);
     }
     if (currentFrame_ < durationFrame - 1) {
-        DHLOGD("Fade-in frame[currentFrame: %d].", currentFrame_);
+        DHLOGD("Fade-in frame[currentFrame: %{public}d].", currentFrame_);
     }
     ++currentFrame_;
     currentFrame_ = currentFrame_ >= durationFrame ? durationFrame - 1 : currentFrame_;
@@ -91,9 +95,8 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
 
 int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, uint64_t &replyBytes)
 {
-    DHLOGD("Render frame[sampleRate: %u, channelCount: %u, format: %d, frameSize: %u].", devAttrs_.sampleRate,
-        devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
-    DHLOGD("Render frameIndex: %lld.", frameIndex_);
+    DHLOGD("Render frame[sampleRate: %{public}u, channelCount: %{public}u, format: %{public}d, frameSize: %{public}u].",
+        devAttrs_.sampleRate, devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
 
     int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> renderLck(renderMtx_);
@@ -124,8 +127,8 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     DHLOGD("Render audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastRenderStartTime_)) {
-        DHLOGE("This time render frame spend: %lld us, The interval of this time and the last time: %lld us",
-            endTime - startTime, startTime - lastRenderStartTime_);
+        DHLOGE("This time render frame spend: %" PRId64" us, The interval of this time and the last time: %" PRId64
+            " us", endTime - startTime, startTime - lastRenderStartTime_);
     }
     lastRenderStartTime_ = startTime;
     return HDF_SUCCESS;

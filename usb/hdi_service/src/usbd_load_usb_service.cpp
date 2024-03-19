@@ -33,7 +33,7 @@ using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_0 {
+namespace V1_1 {
 OnDemandLoadCallback::OnDemandLoadCallback() {}
 
 void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
@@ -82,7 +82,7 @@ int32_t UsbdLoadService::LoadService()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

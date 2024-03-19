@@ -40,7 +40,6 @@
 /* ACCEL DATA READY */
 #define MXC6655XA_ACCEL_DATA_READY_MASK         0x80
 
-int32_t ReadMxc6655xaData(struct SensorCfgData *cfg, struct SensorReportEvent *event);
 struct Mxc6655xaDrvData {
     struct IDeviceIoService ioService;
     struct HdfDeviceObject *device;

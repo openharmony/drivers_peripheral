@@ -25,7 +25,8 @@
 #include "iam_fuzz_test.h"
 #include "executor_impl.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "PIN_AUTH_HDI"
 
 #undef private
 

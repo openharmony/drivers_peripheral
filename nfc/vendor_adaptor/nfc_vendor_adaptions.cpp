@@ -61,6 +61,26 @@ string NfcVendorAdaptions::GetChipType(void)
     return nfcChipType;
 }
 
+void NfcVendorAdaptions::CheckFirmwareUpdate(void)
+{
+    nfcExtHandle = dlopen(VENDOR_NFC_EXT_SERVICE_LIB.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if (nfcExtHandle == nullptr) {
+        HDF_LOGE("%{public}s: fail to get nfc ext service handle.", __func__);
+        return;
+    }
+    nfcExtInf.checkFirmwareUpdate = reinterpret_cast<void (*)()>
+        (dlsym(nfcExtHandle, EXT_SET_FW_UPDATE_CONFIG_FUNC_NAME.c_str()));
+    if (nfcExtInf.checkFirmwareUpdate == nullptr) {
+        HDF_LOGE("%{public}s: fail to init func ptr.", __func__);
+        dlclose(nfcExtHandle);
+        nfcExtHandle = nullptr;
+        return;
+    }
+    nfcExtInf.checkFirmwareUpdate();
+    dlclose(nfcExtHandle);
+    nfcExtHandle = nullptr;
+}
+
 string NfcVendorAdaptions::GetNfcHalFuncNameSuffix(const std::string &chipType)
 {
     string suffix = DEFAULT_FUNC_NAME_SUFFIX;
@@ -155,6 +175,7 @@ NfcVendorAdaptions::NfcVendorAdaptions()
 {
     ResetNfcInterface();
     if (nfcHalHandle == nullptr) {
+        CheckFirmwareUpdate();
         string chipType = GetChipType();
         string nfcHalSoName = GetNfcHalSoName(chipType);
         string nfcHalFuncNameSuffix = GetNfcHalFuncNameSuffix(chipType);

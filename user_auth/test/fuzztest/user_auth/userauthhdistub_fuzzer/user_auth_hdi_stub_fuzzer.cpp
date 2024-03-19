@@ -23,7 +23,8 @@
 #include "v1_3/user_auth_interface_service.h"
 #include "v1_3/user_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "USER_AUTH_HDI"
 
 #undef private
 

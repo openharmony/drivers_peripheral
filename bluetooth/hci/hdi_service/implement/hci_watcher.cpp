@@ -21,6 +21,11 @@
 #include <hdf_log.h>
 #include "bt_hal_constant.h"
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS {
 namespace HDI {
 namespace Bluetooth {

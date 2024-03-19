@@ -123,11 +123,15 @@ bool CameraDumper::IsDumpCommandOpened(std::string type)
     return false;
 }
 
-bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer)
+bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer,
+    uint32_t width, uint32_t height)
 {
     if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
+
+    uint32_t defaultWidth = (width == 0) ? buffer->GetWidth() : width;
+    uint32_t defaultHeight = (height == 0) ? buffer->GetHeight() : height;
 
     uint32_t size = buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
@@ -138,7 +142,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     std::stringstream ss;
     std::string fileName;
     ss << name.c_str() << "_captureId[" << buffer->GetCaptureId() << "]_streamId[" << buffer->GetStreamId() <<
-        "]_width[" << buffer->GetWidth() << "]_height[" << buffer->GetHeight();
+        "]_width[" << defaultWidth << "]_height[" << defaultHeight;
 
     int32_t previewInterval = 1;
     std::istringstream ssPreview(g_dumpToolMap[PREVIEW_INTERVAL]);

@@ -23,7 +23,6 @@
 #define BMI160_PEDOMETER_DATA_READY_MASK     0x80
 
 int32_t DetectPedometerBim160Chip(struct SensorCfgData *data);
-int32_t ReadBmi160PedometerData(struct SensorCfgData *data);
 struct Bmi160DrvData {
     struct IDeviceIoService ioService;
     struct HdfDeviceObject *device;

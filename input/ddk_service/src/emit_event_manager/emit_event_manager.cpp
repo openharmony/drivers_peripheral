@@ -85,5 +85,12 @@ int32_t EmitEventManager::GetCurDeviceId(void)
     }
     return virtualDeviceMap_.size() < MAX_VIRTUAL_DEVICE_NUM ? id : -1;
 }
+void EmitEventManager::ClearDeviceMap(void)
+{
+    if (virtualDeviceMap_.size() > 0) {
+        virtualDeviceMap_.clear();
+        HDF_LOGI("%{public}s: clear device map success", __func__);
+    }
+}
 } // namespace ExternalDeviceManager
 } // namespace OHOS

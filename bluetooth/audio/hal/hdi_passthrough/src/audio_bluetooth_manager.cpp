@@ -205,7 +205,7 @@ void TearDown()
 
 int WriteFrame(const uint8_t *data, uint32_t size)
 {
-    HDF_LOGI("%{public}s", __func__);
+    HDF_LOGD("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     BTAudioStreamState state = getStateFunc();
     if (state != BTAudioStreamState::STARTED) {
