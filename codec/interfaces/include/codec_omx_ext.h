@@ -187,6 +187,19 @@ struct ProcessNameParam {
 };
 
 /**
+ * @brief Defines the <b>AudioCodecParam</b>.
+ */
+struct AudioCodecParam {
+    uint32_t size;                 /** Size of the structure */
+    union OMX_VERSIONTYPE version; /** Component version */
+    uint32_t sampleRate;           /** Sample Rate */
+    uint32_t sampleFormat;         /** Sample Format */
+    uint32_t channels;             /** Channels */
+    uint32_t bitRate;              /** Bit Rate */
+    uint32_t reserved;             /** reserved word */
+};
+
+/**
  * @brief Enumerates the extended codec indexes.
  */
 enum OmxIndexCodecExType {
@@ -212,6 +225,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamWorkingFrequency,
     /** ProcessNameParam */
     OMX_IndexParamProcessName,
+    /** AudioCodecParam */
+    OMX_IndexParamAudioCodec,
     /** CodecLTRParam/CodecLTRPerFrameParam */
     OMX_IndexParamLTR,
     /** CodecQPRangeParam */

@@ -58,10 +58,10 @@ public:
     sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) = 0;
+    virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer);
     virtual int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual uint8_t *GetBuffer() = 0;
+    virtual uint8_t *GetBuffer();
     struct OmxCodecBuffer &GetCodecBuffer();
     void SetBufferId(int32_t bufferId);
 
