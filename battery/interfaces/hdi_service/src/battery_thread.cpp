@@ -232,9 +232,10 @@ bool BatteryThread::CheckPowerUevent(const char* msg, std::string& powerUevent)
     if (iter != powerUeventMap_.end()) {
         while (*msg++) {}
         for (auto& uevent : iter->second) {
-            std::regex r(uevent);
+            std::regex r(uevent.first);
             if (std::regex_match(msg, r)) {
                 powerUevent = msg;
+                powerUevent += "$" + uevent.second;
                 return true;
             }
         }

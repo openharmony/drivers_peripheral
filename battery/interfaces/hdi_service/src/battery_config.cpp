@@ -28,6 +28,7 @@ namespace {
 constexpr const char* BATTERY_CONFIG_PATH = "etc/battery/battery_config.json";
 constexpr const char* SYSTEM_BATTERY_CONFIG_PATH = "/system/etc/battery/battery_config.json";
 constexpr const char* VENDOR_BATTERY_CONFIG_PATH = "/vendor/etc/battery/battery_config.json";
+constexpr const char* VENDOR_BATTERY_SPLIT_CONFIG_PATH = "/vendor/etc/battery/charge_config.json";
 constexpr const char* BATTERY_CONFIG_EXCEPTION_PATH = "";
 constexpr int32_t MAP_KEY_INDEX = 0;
 constexpr int32_t BEGIN_SOC_INDEX = 0;
@@ -66,18 +67,34 @@ bool BatteryConfig::ParseConfig()
 
     Json::CharReaderBuilder readerBuilder;
     std::ifstream ifsConf;
-
-    if (!OpenFile(ifsConf, path)) {
-        return false;
-    }
-
     Json::Value config;
     readerBuilder["collectComments"] = false;
     JSONCPP_STRING errs;
 
-    if (parseFromStream(readerBuilder, ifsConf, &config, &errs) && !config.empty()) {
-        ParseConfInner(config);
+    ifsConf.open(VENDOR_BATTERY_SPLIT_CONFIG_PATH);
+    bool isOpen = ifsConf.is_open();
+    if (isOpen) {
+        if (parseFromStream(readerBuilder, ifsConf, &config, &errs) && !config.empty()) {
+            ParseConfSplit(config);
+        }
+        ifsConf.close();
+
+        if (!OpenFile(ifsConf, path)) {
+            return false;
+        }
+        if (parseFromStream(readerBuilder, ifsConf, &config, &errs) && !config.empty()) {
+            ParseConfInner(config);
+        }
+    } else {
+        if (!OpenFile(ifsConf, path)) {
+            return false;
+        }
+        if (parseFromStream(readerBuilder, ifsConf, &config, &errs) && !config.empty()) {
+            ParseConfInner(config);
+            ParseConfSplit(config);
+        }
     }
+
     ifsConf.close();
     return true;
 }
@@ -97,7 +114,7 @@ const std::map<std::string, BatteryConfig::ChargeSceneConfig>& BatteryConfig::Ge
     return chargeSceneConfigMap_;
 }
 
-const std::map<std::string, std::vector<std::string>>& BatteryConfig::GetUeventList() const
+const UeventMap& BatteryConfig::GetUeventList() const
 {
     return ueventMap_;
 }
@@ -139,6 +156,11 @@ void BatteryConfig::ParseConfInner(const Json::Value& config)
     BATTERY_HILOGI(COMP_HDI, "start parse battery config inner");
     ParseLightConfig(GetValue(config, "light"));
     ParseChargerConfig(GetValue(config, "charger"));
+}
+
+void BatteryConfig::ParseConfSplit(const Json::Value& config)
+{
+    BATTERY_HILOGI(COMP_HDI, "start parse split config inner");
     ParseChargeSceneConfig(GetValue(config, "charge_scene"));
     ParseUeventConfig(GetValue(config, "uevent"));
 }
@@ -245,11 +267,11 @@ void BatteryConfig::ParseChargeSceneConfig(const Json::Value& chargeSceneConfig)
             tempChargeSceneConfig.type = isValidJsonString(type) ? type.asString() : "";
             tempChargeSceneConfig.expectValue = isValidJsonString(expectValue) ? expectValue.asString() : "";
         }
-        
+
         if (isValidJsonString(setPath)) {
             tempChargeSceneConfig.setPath = setPath.asString();
         }
-        
+
         if (isValidJsonString(getPath)) {
             tempChargeSceneConfig.getPath = getPath.asString();
         }
@@ -274,10 +296,15 @@ void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
             BATTERY_HILOGW(COMP_HDI, "The uevent conf is invalid, key=%{public}s", key.c_str());
             continue;
         }
-        std::vector<std::string> ueventList;
+        std::vector<std::pair<std::string, std::string>> ueventList;
         Json::Value::Members ObjMembers = valueObj.getMemberNames();
         for (auto it = ObjMembers.begin(); it != ObjMembers.end(); it++) {
-            ueventList.push_back(*it);
+            std::string event = *it;
+            if (!valueObj[event].isString()) {
+                BATTERY_HILOGW(COMP_SVC, "The uevent conf is invalid, key=%{public}s", key.c_str());
+            }
+            std::string act = valueObj[event].asString();
+            ueventList.push_back(std::make_pair(event, act));
         }
         ueventMap_.emplace(*iter, ueventList);
         BATTERY_HILOGI(COMP_HDI, "%{public}s size: %{public}d", key.c_str(),
