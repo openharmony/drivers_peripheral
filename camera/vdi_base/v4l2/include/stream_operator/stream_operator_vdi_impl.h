@@ -56,6 +56,8 @@ public:
     RetCode ReleaseStreams();
 
 private:
+    void FillCaptureErrorInfo(std::vector<VdiCaptureErrorInfo> &info, MessageGroup message);
+    void FillCaptureEndedInfo(std::vector<VdiCaptureEndedInfo> &info, MessageGroup message);
     void HandleCallbackMessage(MessageGroup &message);
     void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds);
     void OnCaptureEnded(int32_t captureId, const std::vector<VdiCaptureEndedInfo> &infos);
