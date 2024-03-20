@@ -20,7 +20,8 @@
 #include "executor_impl.h"
 #include "iam_logger.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "FINGERPRINT_AUTH_IMPL"
 
 namespace OHOS {
 namespace HDI {

@@ -17,6 +17,7 @@
 #include "image_buffer.h"
 #include "video_key_info.h"
 #include "camera_dump.h"
+#include "camera_hal_hisysevent.h"
 
 namespace {
 constexpr uint32_t REQUEST_TIMEOUT = 0;
@@ -89,6 +90,8 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
 
     if (sfError != OHOS::SURFACE_ERROR_OK) {
         CAMERA_LOGE("get producer buffer failed, error:%{public}s", SurfaceErrorStr(sfError).c_str());
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(REQUEST_GRAPHIC_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("request graphic buffer failed rc:%s", SurfaceErrorStr(sfError).c_str()));
         return nullptr;
     }
 
@@ -234,6 +237,8 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
         cb = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
         RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cb);
         if (rc != RC_OK || cb == nullptr) {
+            CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(TURN_BUFFER_ERROR),
+                CameraHalHisysevent::CreateMsg("graphic buffer transfor camera buffer failed rc:%d", rc));
             CAMERA_LOGE("create tunnel buffer failed.");
             return nullptr;
         }

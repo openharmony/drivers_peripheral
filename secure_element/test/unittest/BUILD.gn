@@ -1,0 +1,78 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//drivers/peripheral/secure_element/secure_element.gni")
+SE_DIR = "../../"
+
+config("se_unit_test_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "$SE_DIR/hdi_service",
+    "$SE_DIR/secure_element_ca_proxy",
+    "$SE_DIR/vendor_adaptor",
+  ]
+
+  defines = []
+  deps = []
+
+  if (drivers_peripheral_secure_element_use_ca) {
+    defines += [ "SE_VENDOR_ADAPTION_USE_CA" ]
+    deps += [ "../secure_element_ca_proxy:secure_element_ca_proxy" ]
+  }
+  cflags_cc = [ "-fexceptions" ]
+  cflags = [ "--coverage" ]
+  ldflags = [ "--coverage" ]
+}
+
+unit_test_deps = [
+  "$SE_DIR/hdi_service:libsecure_element_interface_service_1.0",
+  "$SE_DIR/hdi_service:se_hdi_driver",
+  "$SE_DIR/secure_element_ca_proxy:secure_element_ca_proxy",
+  "$SE_DIR/vendor_adaptor:se_vendor_adaptor",
+  "../../../../interface/secure_element/v1_0:libsecure_element_proxy_1.0",
+]
+
+unit_test_external_deps = [
+  "c_utils:utils",
+  "drivers_interface_secure_element:secure_element_idl_headers",
+  "hdf_core:libhdf_utils",
+  "hilog:libhilog",
+  "ipc:ipc_core",
+  "ipc:ipc_single",
+  "secure_element:se_inner_kits",
+]
+
+test_out_path = "hdf_se/service"
+
+ohos_unittest("se_impl_test") {
+  module_out_path = test_out_path
+
+  sources = [ "se_impl_test/se_impl_test.cpp" ]
+
+  configs = [ ":se_unit_test_config" ]
+
+  deps = unit_test_deps
+
+  external_deps = unit_test_external_deps
+
+  part_name = "secure_element"
+  subsystem_name = "hdf"
+}
+
+group("hdf_se_unittest") {
+  testonly = true
+
+  deps = [ ":se_impl_test" ]
+}

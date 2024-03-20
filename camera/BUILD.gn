@@ -64,6 +64,7 @@ if (defined(ohos_lite)) {
           "test/hdi/v1_0:camera_test_at",
           "test/hdi/v1_1:camera_test_hdi_V1_1",
           "test/hdi/v1_2:camera_test_hdi_V1_2",
+          "test/hdi/v1_3:camera_test_hdi_V1_3",
 
           # benchmark test
           "test/benchmarktest/v1_0:hdf_camera_benchmark_test",

@@ -18,7 +18,7 @@
 
 #include <vector>
 #include "buffer_handle.h"
-#include "v1_0/display_buffer_type.h"
+#include "v1_2/display_buffer_type.h"
 
 namespace OHOS {
 namespace HDI {
@@ -128,6 +128,8 @@ public:
     virtual int32_t ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys) = 0;
 
     virtual int32_t EraseMetadataKey(const BufferHandle& handle, uint32_t key) = 0;
+
+    virtual int32_t GetImageLayout(const BufferHandle& handle, V1_2::ImageLayout& layout) const = 0;
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();

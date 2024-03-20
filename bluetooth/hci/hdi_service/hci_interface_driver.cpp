@@ -21,6 +21,11 @@
 
 using namespace OHOS::HDI::Bluetooth::Hci::V1_0;
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 struct HdfHciInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;

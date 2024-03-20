@@ -1332,6 +1332,44 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
     return HDF_SUCCESS;
 }
 
+int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *ifName, const char *cmd)
+{
+#define NEW_CMD_MAX_LEN 500
+    HDF_LOGI("Ready to enter hdi %{public}s", __func__);
+    int32_t ret = 0;
+    (void)self;
+    if (cmd == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM ;
+    }
+
+    char *reply;
+    const int replySize = REPLY_SIZE;
+    reply = (char *)malloc(replySize);
+    if (reply == NULL) {
+        HDF_LOGE("%{public}s reply is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+
+    char newCmd[NEW_CMD_MAX_LEN] = {0};
+    if (snprintf_s(newCmd, sizeof(newCmd), sizeof(newCmd) - 1, "IFNAME=%s %s", ifName, cmd) < 0) {
+        HDF_LOGE("%{public}s: snprintf_s is failed, error code: %{public}d", __func__, ret);
+        free(reply);
+        return HDF_FAILURE;
+    }
+ 
+    if (WpaCliCmd(newCmd, reply, replySize) < 0) {
+        HDF_LOGE("%{public}s WpaCliCmd failed!", __func__);
+        free(reply);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("%{public}s cmd %{public}s reply %{public}s !", __func__, newCmd, reply);
+    ret = atoi(reply);
+    free(reply);
+    return ret;
+}
+
 static int32_t WpaFillP2pDeviceFoundParam(struct P2pDeviceInfoParam *deviceInfoParam,
     struct HdiP2pDeviceInfoParam *hdiP2pDeviceInfoParam)
 {

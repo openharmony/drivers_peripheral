@@ -23,7 +23,8 @@
 #include "v1_3/user_auth_interface_service.h"
 #include "v1_3/user_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "USER_AUTH_HDI"
 
 #undef private
 
@@ -34,7 +35,7 @@ namespace UserIam {
 namespace UserAuth {
 namespace {
 constexpr uint32_t USER_AUTH_HDI_CODE_MIN = 0;
-constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 30;
+constexpr uint32_t USER_AUTH_HDI_CODE_MAX = 31;
 const std::u16string USER_AUTH_HDI_INTERFACE_TOKEN = u"ohos.hdi.user_auth.v1_3.IUserAuthInterface";
 
 bool UserAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
