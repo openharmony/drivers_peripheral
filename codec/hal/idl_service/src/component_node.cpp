@@ -512,7 +512,8 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
     return err;
 }
 
-int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer, OMX_BUFFERHEADERTYPE *&bufferHdrType)
+int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
+    OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
     switch (buffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
