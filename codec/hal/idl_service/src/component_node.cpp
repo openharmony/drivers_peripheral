@@ -24,6 +24,8 @@
 #include "icodec_buffer.h"
 #include "sys/mman.h"
 
+#define AUDIO_CODEC_NAME "OMX.audio"
+
 using OHOS::HDI::Codec::V2_0::EventInfo;
 using OHOS::HDI::Codec::V2_0::CodecEventType;
 using OHOS::HDI::Codec::V2_0::CodecStateType;
@@ -354,7 +356,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
 
     int32_t err = OMX_ErrorBadParameter;
     sptr<ICodecBuffer> codecBuffer = sptr<ICodecBuffer>();
-    if (compName_.find("OMX.hisi.audio") != std::string::npos) {
+    if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
         codecBuffer = sptr<ICodecBuffer>(new ICodecBuffer(buffer));
     } else {
         codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
@@ -364,9 +366,10 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     switch (buffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
-            if (compName_.find("OMX.hisi.audio") != std::string::npos) {
+            if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
                 void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
                     static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
+                CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
                 err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                     reinterpret_cast<uint8_t *>(addr));
                 break;
