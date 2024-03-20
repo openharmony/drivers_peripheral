@@ -70,12 +70,14 @@ void AudioLibRenderHardwareDependenceTest::SetUpTestCase(void)
     if (ptrHandle == nullptr) {
         return;
     }
-    BindServiceRenderSo = (struct DevHandle* (*)(const char *serverName))dlsym(ptrHandle, "AudioBindServiceRender");
-    InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *handle, int cmdId,
-        struct AudioHwRenderParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
-    InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *handle, int cmdId,
-        struct AudioHwRenderParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
-    CloseServiceRenderSo = (void (*)(struct DevHandle *handle))dlsym(ptrHandle, "AudioCloseServiceRender");
+    BindServiceRenderSo = reinterpret_cast<struct DevHandle* (*)(const char *serverName)>(
+        dlsym(ptrHandle, "AudioBindServiceRender"));
+    InterfaceLibOutputRender = reinterpret_cast<int32_t (*)(struct DevHandle *handle, int cmdId,
+        struct AudioHwRenderParam *handleData)>(dlsym(ptrHandle, "AudioInterfaceLibOutputRender"));
+    InterfaceLibCtlRender = reinterpret_cast<int32_t (*)(struct DevHandle *handle, int cmdId,
+        struct AudioHwRenderParam *handleData)>(dlsym(ptrHandle, "AudioInterfaceLibCtlRender"));
+    CloseServiceRenderSo = reinterpret_cast<void (*)(struct DevHandle *handle)>(
+        dlsym(ptrHandle, "AudioCloseServiceRender"));
     if (BindServiceRenderSo == nullptr || CloseServiceRenderSo == nullptr ||
         InterfaceLibCtlRender == nullptr || InterfaceLibOutputRender == nullptr) {
         dlclose(ptrHandle);

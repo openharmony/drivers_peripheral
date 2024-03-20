@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,7 +66,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
     readPosition += sizeof(psshVersion1);
 
     // Validate system ID
-    std::string uuid((reinterpret_cast<const char*>(initData.data())) + readPosition, CLEARPLAY_UUID.size());
+    std::string uuid((reinterpret_cast<const char *>(initData.data())) + readPosition, CLEARPLAY_UUID.size());
     if (IsClearPlayUuid(uuid)) {
         HDF_LOGE("%{public}s: uuid error", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -108,7 +108,7 @@ int32_t ParsePssh(const std::vector<uint8_t> &initData, std::vector<std::vector<
         uint32_t keyIdCount;
         int32_t ret = HDF_FAILURE;
         ret = memcpy_s(&keyIdCount, sizeof(keyIdCount), &initData[readPosition], sizeof(keyIdCount));
-        if(ret != 0) {
+        if (ret != 0) {
             HDF_LOGE("%{public}s: memcpy_s faild", __func__);
             return ret;
         }

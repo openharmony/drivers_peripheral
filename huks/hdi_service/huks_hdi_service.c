@@ -158,7 +158,7 @@ static int32_t HuksVerify(struct IHuks *self, const struct HuksBlob *encKey, con
 }
 
 static int32_t HuksEncrypt(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
-     const struct HuksBlob *plainText, struct HuksBlob *cipherText)
+    const struct HuksBlob *plainText, struct HuksBlob *cipherText)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -185,7 +185,7 @@ static int32_t HuksAgreeKey(struct IHuks *self, const struct HuksParamSet *param
 }
 
 static int32_t HuksDeriveKey(struct IHuks *self, const struct HuksParamSet *paramSet, const struct HuksBlob *encKdfKey,
-     struct HuksBlob *derivedKey)
+    struct HuksBlob *derivedKey)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;
@@ -194,7 +194,7 @@ static int32_t HuksDeriveKey(struct IHuks *self, const struct HuksParamSet *para
 }
 
 static int32_t HuksMac(struct IHuks *self, const struct HuksBlob *encKey, const struct HuksParamSet *paramSet,
-     const struct HuksBlob *srcData, struct HuksBlob *mac)
+    const struct HuksBlob *srcData, struct HuksBlob *mac)
 {
     (void)self;
     int32_t ret = HUKS_FAILURE;

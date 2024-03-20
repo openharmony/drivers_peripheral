@@ -835,7 +835,7 @@ static snd_ctl_elem_iface_t ConvertIfaceType(enum SndIfaceType iface)
 }
 
 static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlElement *ctlElem,
-        snd_ctl_elem_info_t *info, snd_ctl_elem_id_t *id)
+    snd_ctl_elem_info_t *info, snd_ctl_elem_id_t *id)
 {
     int32_t ret;
     snd_ctl_elem_iface_t ifaceType;
@@ -976,7 +976,7 @@ int32_t SndElementReadEnum(
 }
 
 int32_t SndElementReadRange(
-        struct AlsaSoundCard * cardIns, const struct AlsaMixerCtlElement * ctlElem, long * mix, long * max)
+    struct AlsaSoundCard * cardIns, const struct AlsaMixerCtlElement * ctlElem, long * mix, long * max)
 {
     int ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -1301,7 +1301,7 @@ int32_t SndElementGroupWrite(
 }
 
 int32_t SndTraversalMixerElement(struct AlsaSoundCard *cardIns,
-        bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data)
+    bool (*callback)(void *data, snd_ctl_elem_id_t *elem_id), void *data)
 {
     int ret;
     snd_hctl_t *handle;
