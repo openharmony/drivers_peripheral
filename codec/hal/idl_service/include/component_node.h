@@ -73,6 +73,7 @@ private:
     int32_t OnEvent(HDI::Codec::V2_0::CodecEventType event, uint32_t data1, uint32_t data2, void *eventData);
     int32_t OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer);
     int32_t OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer);
+    int32_t UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
     uint32_t GenerateBufferId();
     sptr<ICodecBuffer> GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer);
     bool GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
