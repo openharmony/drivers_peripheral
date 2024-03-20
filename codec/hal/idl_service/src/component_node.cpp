@@ -364,7 +364,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     CHECK_AND_RETURN_RET_LOG(codecBuffer != nullptr, OMX_ErrorInvalidComponent, "codecBuffer is null");
 
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    err = UseBufferByType(portIndex, buffer, bufferHdrType);
+    err = UseBufferByType(portIndex, buffer, codecBuffer, bufferHdrType);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret = [%{public}x]", buffer.bufferType, err);
         codecBuffer = nullptr;
@@ -513,7 +513,7 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
 }
 
 int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
-    OMX_BUFFERHEADERTYPE *&bufferHdrType)
+    sptr<ICodecBuffer> codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
     switch (buffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
