@@ -27,6 +27,7 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
     "../../hal/v1.0/oem_interface/include",
     "../../hal/v1.0/buffer_manager/include",
     "../../utils/include",
+    "//third_party/openmax/api/1.1.2",
   ]
 
   public_configs = [ ":headers_config" ]
@@ -67,7 +68,7 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "openmax:libopenmax_shared" ]
+  license_file = "//third_party/openmax/README.OpenSource"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"

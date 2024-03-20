@@ -135,6 +135,8 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
 
 int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName);
 
+int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *ifName, const char *cmd);
+
 /**
  * @brief Defines callback for P2p
  *

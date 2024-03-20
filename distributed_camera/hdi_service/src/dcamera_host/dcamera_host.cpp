@@ -77,13 +77,13 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", GetAnonyString(cameraId).c_str());
+    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
     auto iter = dCameraDeviceMap_.find(cameraId);
     std::shared_ptr<CameraAbility> ability = nullptr;
     int32_t ret = (iter->second)->GetDCameraAbility(ability);
     if (ret != CamRetCode::NO_ERROR) {
-        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %d.", ret);
+        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %{public}d.", ret);
         return ret;
     }
     bool retBool = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
@@ -99,20 +99,21 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
         constexpr uint32_t UNIT_LENGTH = 3;
         ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &item);
-        DHLOGI("FindCameraMetadataItem item=%u, count=%u, dataType=%u", item.item, item.count, item.data_type);
+        DHLOGI("FindCameraMetadataItem item=%{public}u, count=%{public}u, dataType=%{public}u", item.item,
+            item.count, item.data_type);
         if (ret != CAM_META_SUCCESS) {
-            DHLOGE("Failed to find stream configuration in camera ability with return code %d", ret);
+            DHLOGE("Failed to find stream configuration in camera ability with return code %{public}d", ret);
             break;
         }
         if (item.count % UNIT_LENGTH != 0) {
-            DHLOGE("Invalid stream configuration count: %u", item.count);
+            DHLOGE("Invalid stream configuration count: %{public}u", item.count);
             break;
         }
         for (uint32_t index = 0; index < item.count; index += UNIT_LENGTH) {
             int32_t format = item.data.i32[index];
             int32_t width = item.data.i32[index + WIDTH_OFFSET];
             int32_t height = item.data.i32[index + HEIGHT_OFFSET];
-            DHLOGD("format: %d, width: %d, height: %d", format, width, height);
+            DHLOGD("format: %{public}d, width: %{public}d, height: %{public}d", format, width, height);
         }
     } while (0);
     return CamRetCode::NO_ERROR;
@@ -126,7 +127,7 @@ int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraD
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("DCameraHost::OpenCamera for cameraId: %s", GetAnonyString(cameraId).c_str());
+    DHLOGI("DCameraHost::OpenCamera for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
     auto iter = dCameraDeviceMap_.find(cameraId);
     if (iter == dCameraDeviceMap_.end()) {
@@ -141,7 +142,7 @@ int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraD
     }
 
     if (dcameraDevice->IsOpened()) {
-        DHLOGE("DCameraHost::OpenCamera, dcamera device %s already opened.", GetAnonyString(cameraId).c_str());
+        DHLOGE("DCameraHost::OpenCamera, dcamera device %{public}s already opened.", GetAnonyString(cameraId).c_str());
         return CamRetCode::CAMERA_BUSY;
     }
 
@@ -152,7 +153,7 @@ int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraD
     }
     device = dcameraDevice;
 
-    DHLOGI("DCameraHost::OpenCamera, open camera %s success.", GetAnonyString(cameraId).c_str());
+    DHLOGI("DCameraHost::OpenCamera, open camera %{public}s success.", GetAnonyString(cameraId).c_str());
     return CamRetCode::NO_ERROR;
 }
 
@@ -172,7 +173,7 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         DHLOGE("DCameraHost::AddDCameraDevice, devId or dhId is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    DHLOGI("DCameraHost::AddDCameraDevice for {devId: %s, dhId: %s}",
+    DHLOGI("DCameraHost::AddDCameraDevice for {devId: %{public}s, dhId: %{public}s}",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
     if (sinkAbilityInfo.empty() || sinkAbilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
@@ -208,14 +209,14 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     if (remote != nullptr) {
         remote->AddDeathRecipient(dCameraHostRecipient_);
     }
-    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s",
+    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %{public}s",
         GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }
 
 DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
 {
-    DHLOGI("DCameraHost::RemoveDCameraDevice for {devId: %s, dhId: %s}",
+    DHLOGI("DCameraHost::RemoveDCameraDevice for {devId: %{public}s, dhId: %{public}s}",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
     std::string dCameraId = GetCameraIdByDHBase(dhBase);
@@ -244,7 +245,7 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
-    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %s",
+    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %{public}s",
         GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }

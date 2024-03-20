@@ -517,5 +517,13 @@ HWTEST_F(HdfP2pHostDirectTest, P2pSaveConfigTest_042, TestSize.Level1)
     rc = g_wpaObj->P2pSaveConfig(g_wpaObj, IFNAME);
     ASSERT_EQ(rc, HDF_FAILURE);
 }
+
+HWTEST_F(HdfP2pHostDirectTest, VendorProcessCmdTest_043, TestSize.Level1)
+{
+    int32_t rc = g_wpaObj->VendorProcessCmd(g_wpaObj, nullptr, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wpaObj->VendorProcessCmd(g_wpaObj, IFNAME, nullptr);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
 };
 

@@ -92,6 +92,7 @@ private:
     uint32_t maxStateWaitTime = 10000;
     uint32_t maxStateWaitCount = 100;
     std::shared_mutex mapMutex_;
+    std::string compName_;
 };
 }  // namespace Omx
 }  // namespace Codec

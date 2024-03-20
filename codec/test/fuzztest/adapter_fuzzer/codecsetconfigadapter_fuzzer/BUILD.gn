@@ -23,6 +23,7 @@ ohos_fuzztest("CodecSetConfigAdapterFuzzTest") {
   include_dirs = [
     "${codec_root}/interfaces/include",
     "${codec_root}/hal/include",
+    "//third_party/openmax/api/1.1.2",
     "../codecsetconfigadapter_fuzzer",
     "../codeccommonadapter_fuzzer",
   ]
@@ -35,7 +36,6 @@ ohos_fuzztest("CodecSetConfigAdapterFuzzTest") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "openmax:libopenmax_shared",
   ]
 
   cflags = [

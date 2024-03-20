@@ -25,6 +25,7 @@ ohos_fuzztest("CodecOmxFuzzTest") {
     "${codec_root}/interfaces/include",
     "${codec_root}/hal/include",
     "${codec_root}/test/fuzztest/omx_fuzzer/codecomx_fuzzer",
+    "//third_party/openmax/api/1.1.2",
   ]
 
   cflags = [
@@ -41,7 +42,6 @@ ohos_fuzztest("CodecOmxFuzzTest") {
   external_deps = [
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
-    "openmax:libopenmax_shared",
   ]
 }
 

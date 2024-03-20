@@ -20,7 +20,8 @@
 #include "iam_logger.h"
 #include "v1_1/face_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "FACE_AUTH_HDI"
 
 namespace {
 struct HdfFaceAuthInterfaceHost {

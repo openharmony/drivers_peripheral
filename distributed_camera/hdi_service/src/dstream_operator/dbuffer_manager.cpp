@@ -26,7 +26,7 @@ std::shared_ptr<DImageBuffer> DBufferManager::AcquireBuffer()
     if (!idleList_.empty()) {
         auto it = idleList_.begin();
         busyList_.splice(busyList_.begin(), idleList_, it);
-        DHLOGD("Acquire buffer success, index = %d", (*it)->GetIndex());
+        DHLOGD("Acquire buffer success, index = %{public}d", (*it)->GetIndex());
         return *it;
     }
     return nullptr;

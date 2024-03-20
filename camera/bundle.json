@@ -16,6 +16,7 @@
       "drivers_peripheral_camera_feature_usb"
     ],
     "adapted_system_type": ["standard", "small"],
+    "hisysevent_config": ["//drivers/peripheral/camera/hisysevent.yaml"],
     "rom": "22212KB",
     "ram": "78517KB",
     "deps": {
@@ -27,7 +28,8 @@
         "drivers_interface_camera",
         "graphic_surface",
         "c_utils",
-        "hitrace"
+        "hitrace",
+        "hisysevent"
       ],
       "third_party": [
         "ffmpeg",

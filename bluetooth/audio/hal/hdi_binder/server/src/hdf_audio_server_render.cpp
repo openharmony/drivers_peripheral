@@ -599,7 +599,6 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("%{public}s: enter", __func__);
     char *frame = NULL;
     uint32_t requestBytes;
     uint64_t replyBytes;

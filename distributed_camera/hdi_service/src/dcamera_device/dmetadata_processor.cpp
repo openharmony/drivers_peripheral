@@ -277,8 +277,8 @@ void DMetadataProcessor::InitBasicConfigTag(std::map<int, std::vector<DCResoluti
     for (iter = sinkSupportedFormats.begin(); iter != sinkSupportedFormats.end(); ++iter) {
         std::vector<DCResolution> resolutionList = iter->second;
         for (auto resolution : resolutionList) {
-            DHLOGI("DMetadataProcessor::sink supported formats: { format=%d, width=%d, height=%d }", iter->first,
-                resolution.width_, resolution.height_);
+            DHLOGI("DMetadataProcessor::sink supported formats: { format=%{public}d, width=%{public}d, height="
+                "%{public}d }", iter->first, resolution.width_, resolution.height_);
             sinkStreamConfigs.push_back(iter->first);
             sinkStreamConfigs.push_back(resolution.width_);
             sinkStreamConfigs.push_back(resolution.height_);
@@ -325,7 +325,7 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
     for (previewIter = sinkPreviewProfiles_.begin(); previewIter != sinkPreviewProfiles_.end(); ++previewIter) {
         std::vector<DCResolution> resolutionList = previewIter->second;
         for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported preview formats: { format=%d, width=%d, height=%d }",
+            DHLOGI("sink extend supported preview formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
                 previewIter->first, resolution.width_, resolution.height_);
             AddConfigs(sinkExtendStreamConfigs, previewIter->first, resolution.width_, resolution.height_, PREVIEW_FPS);
         }
@@ -337,7 +337,7 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
     for (videoIter = sinkVideoProfiles_.begin(); videoIter != sinkVideoProfiles_.end(); ++videoIter) {
         std::vector<DCResolution> resolutionList = videoIter->second;
         for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported video formats: { format=%d, width=%d, height=%d }",
+            DHLOGI("sink extend supported video formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
                 videoIter->first, resolution.width_, resolution.height_);
             AddConfigs(sinkExtendStreamConfigs, videoIter->first, resolution.width_, resolution.height_, VIDEO_FPS);
         }
@@ -349,7 +349,7 @@ void DMetadataProcessor::InitExtendConfigTag(std::map<int, std::vector<DCResolut
     for (photoIter = sinkPhotoProfiles_.begin(); photoIter != sinkPhotoProfiles_.end(); ++photoIter) {
         std::vector<DCResolution> resolutionList = photoIter->second;
         for (auto resolution : resolutionList) {
-            DHLOGI("sink extend supported photo formats: { format=%d, width=%d, height=%d }",
+            DHLOGI("sink extend supported photo formats: { format=%{public}d, width=%{public}d, height=%{public}d }",
                 photoIter->first, resolution.width_, resolution.height_);
             AddConfigs(sinkExtendStreamConfigs, photoIter->first, resolution.width_, resolution.height_, PHOTO_FPS);
         }
@@ -423,7 +423,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
     int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret != CAM_META_SUCCESS) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
-            DHLOGE("Add tag %u failed.", tag);
+            DHLOGE("Add tag %{public}u failed.", tag);
             return FAILED;
         }
     }
@@ -441,7 +441,7 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
     int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret == CAM_META_SUCCESS) {
         if (!dCameraAbility_->updateEntry(tag, data, size)) {
-            DHLOGE("Update tag %u failed.", tag);
+            DHLOGE("Update tag %{public}u failed.", tag);
             return FAILED;
         }
     }
@@ -530,7 +530,7 @@ DCamRetCode DMetadataProcessor::ResetEnableResults()
 
 void DMetadataProcessor::UpdateResultMetadata(const uint64_t &resultTimestamp)
 {
-    DHLOGD("DMetadataProcessor::UpdateResultMetadata result callback mode: %d", metaResultMode_);
+    DHLOGD("DMetadataProcessor::UpdateResultMetadata result callback mode: %{public}d", metaResultMode_);
     if (metaResultMode_ != ResultCallbackMode::PER_FRAME) {
         return;
     }
@@ -554,12 +554,12 @@ void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
 {
     uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
     uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
-    DHLOGD("DMetadataProcessor::UpdateAllResult itemCapacity: %u, dataSize: %u", itemCap, dataSize);
+    DHLOGD("DMetadataProcessor::UpdateAllResult itemCapacity: %{public}u, dataSize: %{public}u", itemCap, dataSize);
     std::shared_ptr<OHOS::Camera::CameraMetadata> result =
         std::make_shared<OHOS::Camera::CameraMetadata>(itemCap, dataSize);
     int32_t ret = OHOS::Camera::CopyCameraMetadataItems(result->get(), latestProducerMetadataResult_->get());
     if (ret != CAM_META_SUCCESS) {
-        DHLOGE("DMetadataProcessor::UpdateAllResult copy metadata item failed, ret: %d", ret);
+        DHLOGE("DMetadataProcessor::UpdateAllResult copy metadata item failed, ret: %{public}d", ret);
         return;
     }
     resultCallback_(resultTimestamp, result);
@@ -570,17 +570,17 @@ void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
     bool needReturn = false;
     uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
     uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
-    DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %u, dataSize: %u", itemCap, dataSize);
+    DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %{public}u, dataSize: %{public}u", itemCap, dataSize);
     std::shared_ptr<OHOS::Camera::CameraMetadata> result =
         std::make_shared<OHOS::Camera::CameraMetadata>(itemCap, dataSize);
-    DHLOGD("DMetadataProcessor::UpdateOnChanged enabledResultSet size: %d", enabledResultSet_.size());
+    DHLOGD("DMetadataProcessor::UpdateOnChanged enabledResultSet size: %{public}zu", enabledResultSet_.size());
     for (auto tag : enabledResultSet_) {
-        DHLOGD("DMetadataProcessor::UpdateOnChanged cameta device metadata tag: %d", tag);
+        DHLOGD("DMetadataProcessor::UpdateOnChanged cameta device metadata tag: %{public}d", tag);
         camera_metadata_item_t item;
         camera_metadata_item_t anoItem;
         int ret1 = OHOS::Camera::FindCameraMetadataItem(latestProducerMetadataResult_->get(), tag, &item);
         int ret2 = OHOS::Camera::FindCameraMetadataItem(latestConsumerMetadataResult_->get(), tag, &anoItem);
-        DHLOGD("DMetadataProcessor::UpdateOnChanged find metadata item ret: %d, %d", ret1, ret2);
+        DHLOGD("DMetadataProcessor::UpdateOnChanged find metadata item ret: %{public}d, %{public}d", ret1, ret2);
         if (ret1 != CAM_META_SUCCESS) {
             continue;
         }
@@ -592,7 +592,7 @@ void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
                 continue;
             }
             uint32_t size = GetDataSize(item.data_type);
-            DHLOGD("DMetadataProcessor::UpdateOnChanged data size: %u", size);
+            DHLOGD("DMetadataProcessor::UpdateOnChanged data size: %{public}u", size);
             for (uint32_t i = 0; i < (size * static_cast<uint32_t>(item.count)); i++) {
                 if (*(item.data.u8 + i) != *(anoItem.data.u8 + i)) {
                     needReturn = true;
@@ -633,7 +633,7 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGD("DMetadataProcessor::SaveResultMetadata result callback mode: %d", metaResultMode_);
+    DHLOGD("DMetadataProcessor::SaveResultMetadata result callback mode: %{public}d", metaResultMode_);
     if (metaResultMode_ != ResultCallbackMode::ON_CHANGED) {
         return SUCCESS;
     }
@@ -720,7 +720,7 @@ void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item
             return item.data.r;
         }
         default: {
-            DHLOGE("DMetadataProcessor::GetMetadataItemData invalid data type: %u", item.data_type);
+            DHLOGE("DMetadataProcessor::GetMetadataItemData invalid data type: %{public}u", item.data_type);
             return nullptr;
         }
     }
@@ -930,7 +930,7 @@ void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *me
     }
 
     uint32_t tagCount = OHOS::Camera::GetCameraMetadataItemCount(metadata);
-    DHLOGD("DMetadataProcessor::PrintDCameraMetadata, input metadata item count = %d.", tagCount);
+    DHLOGD("DMetadataProcessor::PrintDCameraMetadata, input metadata item count = %{public}d.", tagCount);
     for (uint32_t i = 0; i < tagCount; i++) {
         camera_metadata_item_t item;
         int ret = OHOS::Camera::GetCameraMetadataItem(metadata, i, &item);
@@ -964,7 +964,7 @@ void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *me
                 DHLOGI("tag index:%d, name:%s, value:%lf", item.index, name, (double)(item.data.d[k]));
             }
         } else {
-            DHLOGI("tag index:%d, name:%s, value:%d", item.index, name, *(item.data.r));
+            DHLOGI("tag index:%d, name:%s", item.index, name);
         }
     }
 }

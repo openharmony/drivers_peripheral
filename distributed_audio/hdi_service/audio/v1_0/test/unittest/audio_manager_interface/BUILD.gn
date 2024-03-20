@@ -51,6 +51,7 @@ ohos_unittest("HDIServiceManagerTest") {
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
     "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
     "hdf_core:libhdf_host",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 }

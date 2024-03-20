@@ -93,7 +93,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "src/dstream_operator/dstream_operator.cpp",
     "src/utils/anonymous_string.cpp",
     "src/utils/dcamera.cpp",
-    "src/utils/dh_log.cpp",
   ]
 
   defines = [

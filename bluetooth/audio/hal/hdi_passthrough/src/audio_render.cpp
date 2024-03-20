@@ -307,7 +307,7 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
                                uint64_t requestBytes, uint64_t *replyBytes)
 {
-    HDF_LOGI("AudioRenderRenderFrame");
+    HDF_LOGD("AudioRenderRenderFrame");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
