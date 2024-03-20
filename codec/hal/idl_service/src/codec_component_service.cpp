@@ -21,6 +21,9 @@
 #include <unistd.h>
 #include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
+
+#define AUDIO_CODEC_NAME_SUBSTRING "OMX.audio"
+
 namespace OHOS {
 namespace HDI {
 namespace Codec {
@@ -137,7 +140,7 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
 
     if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD &&
         outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD &&
-        name_.find("OMX.hisi.audio") == std::string::npos) {
+        name_.find(AUDIO_CODEC_NAME_SUBSTRING) == std::string::npos) {
         close(outBuffer.fd);
         outBuffer.fd = -1;
     }
