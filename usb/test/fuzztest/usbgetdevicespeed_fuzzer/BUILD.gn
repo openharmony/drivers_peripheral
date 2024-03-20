@@ -28,7 +28,7 @@ ohos_fuzztest("UsbGetUsbSpeedFuzzTest") {
     "../../../../../../base/usb/usb_manager/utils/native/include",
   ]
 
-  deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
+  deps = [ "../../../ddk:libusb_core" ]
 
   external_deps = [
     "c_utils:utils",
@@ -55,6 +55,6 @@ ohos_fuzztest("UsbGetUsbSpeedFuzzTest") {
 
 group("fuzztest") {
   testonly = true
-  deps = [ ]
+  deps = []
   deps += [ ":UsbGetUsbSpeedFuzzTest" ]
 }
