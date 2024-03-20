@@ -19,13 +19,13 @@ module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 ohos_fuzztest("UsbGetUsbSpeedFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//drivers/peripheral/usb/test/fuzztest/usbgetdevicespeed_fuzzer"
+  fuzz_config_file = "../usbgetdevicespeed_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/usb/test/fuzztest/usbgetdevicespeed_fuzzer",
-    "//drivers/peripheral/usb/test/UsbSubscriberTest",
-    "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer",
-    "//base/usb/usb_manager/utils/native/include",
+    "../usbgetdevicespeed_fuzzer",
+    "../../UsbSubscriberTest",
+    "../usbcommonfunction_fuzzer",
+    "../../../../../../base/usb/usb_manager/utils/native/include",
   ]
 
   deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
@@ -47,8 +47,8 @@ ohos_fuzztest("UsbGetUsbSpeedFuzzTest") {
   ]
 
   sources = [
-    "//drivers/peripheral/usb/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
-    "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer/usbcommonfunction_fuzzer.cpp",
+    "../../UsbSubscriberTest/UsbSubscriberTest.cpp",
+    "../usbcommonfunction_fuzzer/usbcommonfunction_fuzzer.cpp",
     "usbgetdevicespeed_fuzzer.cpp",
   ]
 }
