@@ -55,7 +55,7 @@ DisplayComposerService::DisplayComposerService()
     if (ret == HDF_SUCCESS) {
         vdiImpl_ = createVdiFunc_();
         CHECK_NULLPOINTER_RETURN(vdiImpl_);
-        cacheMgr_.reset(DeviceCacheManager::GetInstance());
+        cacheMgr_ = DeviceCacheManager::GetInstance();
         CHECK_NULLPOINTER_RETURN(cacheMgr_);
         cmdResponser_ = HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
         CHECK_NULLPOINTER_RETURN(cmdResponser_);
