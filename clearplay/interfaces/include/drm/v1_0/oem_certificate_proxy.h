@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,10 +23,11 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 class OemCertificateProxy : public IProxyBroker<OHOS::HDI::Drm::V1_0::IOemCertificate> {
 public:
-    explicit OemCertificateProxy(const sptr<IRemoteObject>& remote) : IProxyBroker<OHOS::HDI::Drm::V1_0::IOemCertificate>(remote) {}
+    explicit OemCertificateProxy(const sptr<IRemoteObject> &remote)
+        : IProxyBroker<OHOS::HDI::Drm::V1_0::IOemCertificate>(remote)
+    {}
 
     virtual ~OemCertificateProxy() = default;
 
@@ -35,23 +36,22 @@ public:
         return true;
     }
 
-    int32_t GenerateOemKeySystemRequest(std::string& defaultUrl, std::vector<uint8_t>& request) override;
+    int32_t GenerateOemKeySystemRequest(std::string &defaultUrl, std::vector<uint8_t> &request) override;
 
-    int32_t ProcessOemKeySystemResponse(const std::vector<uint8_t>& response) override;
+    int32_t ProcessOemKeySystemResponse(const std::vector<uint8_t> &response) override;
 
-    int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
+    int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) override;
 
-    static int32_t GenerateOemKeySystemRequest_(std::string& defaultUrl, std::vector<uint8_t>& request,
-         const sptr<IRemoteObject> remote);
+    static int32_t GenerateOemKeySystemRequest_(std::string &defaultUrl, std::vector<uint8_t> &request,
+        const sptr<IRemoteObject> remote);
 
-    static int32_t ProcessOemKeySystemResponse_(const std::vector<uint8_t>& response, const sptr<IRemoteObject> remote);
+    static int32_t ProcessOemKeySystemResponse_(const std::vector<uint8_t> &response, const sptr<IRemoteObject> remote);
 
-    static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
+    static int32_t GetVersion_(uint32_t &majorVer, uint32_t &minorVer, const sptr<IRemoteObject> remote);
 
 private:
     static inline BrokerDelegator<OHOS::HDI::Drm::V1_0::OemCertificateProxy> delegator_;
 };
-
 } // V1_0
 } // Drm
 } // HDI

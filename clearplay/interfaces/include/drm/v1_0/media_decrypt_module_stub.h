@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-
 using namespace OHOS;
 class MediaDecryptModuleStub : public IPCObjectStub {
 public:
@@ -36,21 +35,31 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    static int32_t MediaDecryptModuleStubDecryptMediaData_(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption, sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
+    static int32_t MediaDecryptModuleStubDecryptMediaData_(MessageParcel &mediaDecryptModuleData,
+        MessageParcel &mediaDecryptModuleReply, MessageOption &mediaDecryptModuleOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
 
-    static int32_t MediaDecryptModuleStubRelease_(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption, sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
+    static int32_t MediaDecryptModuleStubRelease_(MessageParcel &mediaDecryptModuleData,
+        MessageParcel &mediaDecryptModuleReply, MessageOption &mediaDecryptModuleOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
 
-    static int32_t MediaDecryptModuleStubGetVersion_(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption, sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
+    static int32_t MediaDecryptModuleStubGetVersion_(MessageParcel &mediaDecryptModuleData,
+        MessageParcel &mediaDecryptModuleReply, MessageOption &mediaDecryptModuleOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl);
 
 private:
-    int32_t MediaDecryptModuleStubDecryptMediaData(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption);
+    int32_t MediaDecryptModuleStubDecryptMediaData(MessageParcel &mediaDecryptModuleData,
+        MessageParcel &mediaDecryptModuleReply, MessageOption &mediaDecryptModuleOption);
 
-    int32_t MediaDecryptModuleStubRelease(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption);
+    int32_t MediaDecryptModuleStubRelease(MessageParcel &mediaDecryptModuleData, MessageParcel &mediaDecryptModuleReply,
+        MessageOption &mediaDecryptModuleOption);
 
-    int32_t MediaDecryptModuleStubGetVersion(MessageParcel& mediaDecryptModuleData, MessageParcel& mediaDecryptModuleReply, MessageOption& mediaDecryptModuleOption);
+    int32_t MediaDecryptModuleStubGetVersion(MessageParcel &mediaDecryptModuleData,
+        MessageParcel &mediaDecryptModuleReply, MessageOption &mediaDecryptModuleOption);
 
-
-    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaDecryptModuleStub, OHOS::HDI::Drm::V1_0::IMediaDecryptModule> objDelegator_;
+    static inline ObjectDelegator<OHOS::HDI::Drm::V1_0::MediaDecryptModuleStub,
+        OHOS::HDI::Drm::V1_0::IMediaDecryptModule>
+        objDelegator_;
     sptr<OHOS::HDI::Drm::V1_0::IMediaDecryptModule> impl_;
 };
 } // V1_0
