@@ -155,19 +155,6 @@ void ThermalZoneManager::CalculateMaxCd()
     return;
 }
 
-int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
-{
-    if (b == 0) {
-        return NUM_ZERO;
-    }
-
-    if (a % b == 0) {
-        return b;
-    } else {
-        return GetMaxCommonDivisor(b, a % b);
-    }
-}
-
 int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> intervalList)
 {
     if (intervalList.empty()) {
@@ -177,7 +164,7 @@ int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> interv
     int32_t count = intervalList.size();
     int32_t commonDivisor = intervalList[0];
     for (int32_t i = 1; i < count; i++) {
-        commonDivisor = GetMaxCommonDivisor(commonDivisor, intervalList[i]);
+        commonDivisor = ThermalHdfUtils::GetMaxCommonDivisor(commonDivisor, intervalList[i]);
     }
     return commonDivisor;
 }
