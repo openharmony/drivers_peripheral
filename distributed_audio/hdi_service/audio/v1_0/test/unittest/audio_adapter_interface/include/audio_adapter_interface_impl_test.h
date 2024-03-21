@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,9 +33,9 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 class AudioAdapterInterfaceImpTest : public testing::Test {
 public:
