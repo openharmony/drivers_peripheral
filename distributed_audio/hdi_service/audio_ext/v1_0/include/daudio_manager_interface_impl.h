@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-#include <v1_0/id_audio_manager.h>
+#include <v2_0/id_audio_manager.h>
 
 #include "audio_manager_interface_impl.h"
 
@@ -26,8 +26,8 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
+namespace V2_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
 
 class DAudioManagerInterfaceImpl : public IDAudioManager {
 public:
@@ -75,7 +75,7 @@ private:
     static DAudioManagerInterfaceImpl *dAudioMgr_;
     static std::mutex mgrMtx_;
 };
-} // V1_0
+} // V2_0
 } // AudioExt
 } // Distributedaudio
 } // HDI

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,8 @@
 #include <mutex>
 
 #include <v1_0/iaudio_adapter.h>
-#include <v1_0/id_audio_manager.h>
 #include <v1_0/audio_types.h>
+#include <v2_0/id_audio_manager.h>
 
 #include "audio_capture_interface_impl.h"
 #include "audio_capture_interface_impl_base.h"
@@ -38,10 +38,10 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::PortOperationMode;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::PortOperationMode;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 typedef enum {
     STATUS_ONLINE = 0,
@@ -179,8 +179,8 @@ private:
     uint32_t timeInterval_ = 5;
 
     // mmap param
-    PortOperationMode renderFlags_ = Audioext::V1_0::NORMAL_MODE;
-    PortOperationMode capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+    PortOperationMode renderFlags_ = Audioext::V2_0::NORMAL_MODE;
+    PortOperationMode capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 #ifndef OHOS_DAUDIO_TEST_UTILS_H
 #define OHOS_DAUDIO_TEST_UTILS_H
 
-#include <v1_0/id_audio_callback.h>
+#include <v2_0/id_audio_callback.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
+namespace V2_0 {
 class MockIDAudioCallback : public IDAudioCallback {
 public:
     virtual ~MockIDAudioCallback() = default;
@@ -67,7 +67,7 @@ public:
         return 0;
     }
 };
-} // V1_0
+} // V2_0
 } // AudioExt
 } // Distributedaudio
 } // HDI

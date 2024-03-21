@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,16 +114,16 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
-        renderFlags_ = Audioext::V1_0::MMAP_MODE;
+        renderFlags_ = Audioext::V2_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
         audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
-        renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+        renderFlags_ = Audioext::V2_0::NORMAL_MODE;
         audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
     }
 #else
-    renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+    renderFlags_ = Audioext::V2_0::NORMAL_MODE;
     audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
 #endif
     int32_t ret = OpenRenderDevice(desc, attrs, extSpkCallback, renderPinId);
@@ -243,16 +243,16 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
-        capturerFlags_ = Audioext::V1_0::MMAP_MODE;
+        capturerFlags_ = Audioext::V2_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
         audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
-        capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+        capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
         audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
     }
 #else
-    capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+    capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
     audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
 #endif
     int32_t ret = OpenCaptureDevice(desc, attrs, extMicCallback, capPinId);
@@ -565,7 +565,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     renderParam_.sampleRate = attrs.sampleRate;
     renderParam_.streamUsage = attrs.type;
     renderParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
-        timeInterval_, renderFlags_ == Audioext::V1_0::MMAP_MODE);
+        timeInterval_, renderFlags_ == Audioext::V2_0::MMAP_MODE);
     renderParam_.renderFlags = renderFlags_;
 
     int32_t ret = extSpkCallback->SetParameters(renderId, renderParam_);
@@ -634,7 +634,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
     captureParam_.sampleRate = attrs.sampleRate;
     captureParam_.streamUsage = attrs.type;
     captureParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount,
-        attrs.format, timeInterval_, capturerFlags_ == Audioext::V1_0::MMAP_MODE);
+        attrs.format, timeInterval_, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
     int32_t ret = extMicCallback->SetParameters(captureId, captureParam_);

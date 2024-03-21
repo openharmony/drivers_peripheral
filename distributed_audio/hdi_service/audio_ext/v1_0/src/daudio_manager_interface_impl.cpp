@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
+namespace V2_0 {
 DAudioManagerInterfaceImpl *DAudioManagerInterfaceImpl::dAudioMgr_ = nullptr;
 std::mutex DAudioManagerInterfaceImpl::mgrMtx_;
 extern "C" IDAudioManager *DAudioManagerImplGetInstance(void)
@@ -103,7 +103,7 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
 
     return HDF_SUCCESS;
 }
-} // V1_0
+} // v2_0
 } // AudioExt
 } // Daudio
 } // HDI

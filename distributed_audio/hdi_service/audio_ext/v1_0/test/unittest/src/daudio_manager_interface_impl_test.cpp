@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
+namespace V2_0 {
 void DAudioManagerInterfaceImplTest::SetUpTestCase(void) {}
 
 void DAudioManagerInterfaceImplTest::TearDownTestCase(void) {}
@@ -111,7 +111,7 @@ HWTEST_F(DAudioManagerInterfaceImplTest, NotifyEvent_002, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, DAudioManagerInterfaceImpl::GetDAudioManager()->NotifyEvent(adpName,
         devId, streamId, event));
 }
-} // V1_0
+} // V2_0
 } // AudioExt
 } // Daudio
 } // HDI
