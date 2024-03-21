@@ -38,7 +38,7 @@
 
 #define SYS_USB_CONFIGFS                "sys.usb.configfs"
 #define SYS_USB_CONFIG                  "sys.usb.config"
-#define SYS_USB_STATU                   "sys.usb.state"
+#define SYS_USB_STATE                   "sys.usb.state"
 #define HDC_CONFIG_OFF                  "none"
 #define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
