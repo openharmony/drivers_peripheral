@@ -17,6 +17,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <memory>
+#include <chrono>
 #include <sys/mman.h>
 #include <unistd.h>
 #include "openssl/aes.h"
@@ -46,9 +47,10 @@ int32_t MediaDecryptModuleService::DecryptMediaData(bool secure, const CryptoInf
     const DrmBuffer &srcBuffer, const DrmBuffer &destBuffer)
 {
     HDF_LOGI("%{public}s: start", __func__);
+    auto start = std::chrono::high_resolution_clock::now();
     ++decryptNumber;
     int32_t ret = HDF_FAILURE;
-    if (session_ == nullptr) {
+    if (session_ == nullptr || secure == true) {
         ++errorDecryptNumber;
         (void)::close(srcBuffer.fd);
         (void)::close(destBuffer.fd);
@@ -123,6 +125,10 @@ int32_t MediaDecryptModuleService::DecryptMediaData(bool secure, const CryptoInf
         ++errorDecryptNumber;
         return ret;
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    HDF_LOGD("decryption time is %{public}lld", duration.count());
+    decryptTimes.push_back(duration.count());
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
@@ -247,6 +253,14 @@ int32_t MediaDecryptModuleService::GetDecryptNumber()
     HDF_LOGI("%{public}s: start", __func__);
     HDF_LOGI("%{public}s: end", __func__);
     return decryptNumber;
+}
+
+int32_t MediaDecryptModuleService::GetDecryptTimes(std::vector<double> &times)
+{
+    HDF_LOGI("%{public}s: start", __func__);
+    times.assign(decryptTimes.begin(), decryptTimes.end());
+    HDF_LOGI("%{public}s: end", __func__);
+    return HDF_SUCCESS;
 }
 
 int32_t MediaDecryptModuleService::GetErrorDecryptNumber()

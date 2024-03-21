@@ -80,6 +80,22 @@ int32_t MediaKeySystemService::SetConfigurationByteArray(const std::string &name
     return HDF_SUCCESS;
 }
 
+void MediaKeySystemService::GetDecryptTimeAsString(std::vector<std::vector<double>> &topThreeTimes,
+    std::string &decryptTimes)
+{
+    for (auto &time : topThreeTimes) {
+        if (!decryptTimes.empty()) {
+            decryptTimes.append(";");
+        }
+        for (auto it = time.begin(); it != time.end(); ++it) {
+            if (it != time.begin()) {
+                decryptTimes.append(",");
+            }
+            decryptTimes.append(std::to_string(*it));
+        }
+    }
+}
+
 int32_t MediaKeySystemService::GetStatistics(std::map<std::string, std::string> &statistics)
 {
     HDF_LOGI("%{public}s: start", __func__);
@@ -87,16 +103,23 @@ int32_t MediaKeySystemService::GetStatistics(std::map<std::string, std::string> 
     int sessionNum = mediaKeySessionMap_.size();
     int decryptNumber = 0;
     int errorDecryptNumber = 0;
+    std::vector<std::vector<double>> topThreeTimes;
+    std::string decryptTimes;
     for (auto &pair : mediaKeySessionMap_) {
         decryptNumber += pair.first->GetDecryptNumber();
         errorDecryptNumber += pair.first->GetErrorDecryptNumber();
+        std::vector<double> topThreeTime;
+        pair.first->GetDecryptTimes(topThreeTime);
+        topThreeTimes.push_back(topThreeTime);
     }
+    GetDecryptTimeAsString(topThreeTimes, decryptTimes);
     mediaKeySessionMutex_.unlock();
 
     statistics[versionName] = "clearplay";
     statistics[currentSessionNumName] = std::to_string(sessionNum);
     statistics[decryptNumberName] = std::to_string(decryptNumber);
     statistics[errorDecryptNumberName] = std::to_string(errorDecryptNumber);
+    statistics[decryptTime] = decryptTimes;
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
