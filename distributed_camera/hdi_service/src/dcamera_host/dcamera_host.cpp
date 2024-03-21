@@ -79,12 +79,16 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
 
     DHLOGE("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
-    auto iter = dCameraDeviceMap_.find(cameraId);
     std::shared_ptr<CameraAbility> ability = nullptr;
-    int32_t ret = (iter->second)->GetDCameraAbility(ability);
-    if (ret != CamRetCode::NO_ERROR) {
-        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %{public}d.", ret);
-        return ret;
+    int32_t ret = CamRetCode::NO_ERROR;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        auto iter = dCameraDeviceMap_.find(cameraId);
+        ret = (iter->second)->GetDCameraAbility(ability);
+        if (ret != CamRetCode::NO_ERROR) {
+            DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %{public}d.", ret);
+            return ret;
+        }
     }
     bool retBool = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     if (!retBool) {
@@ -129,16 +133,20 @@ int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraD
 
     DHLOGI("DCameraHost::OpenCamera for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
-    auto iter = dCameraDeviceMap_.find(cameraId);
-    if (iter == dCameraDeviceMap_.end()) {
-        DHLOGE("DCameraHost::OpenCamera, dcamera device not found.");
-        return CamRetCode::INSUFFICIENT_RESOURCES;
-    }
+    OHOS::sptr<DCameraDevice> dcameraDevice = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        auto iter = dCameraDeviceMap_.find(cameraId);
+        if (iter == dCameraDeviceMap_.end()) {
+            DHLOGE("DCameraHost::OpenCamera, dcamera device not found.");
+            return CamRetCode::INSUFFICIENT_RESOURCES;
+        }
 
-    OHOS::sptr<DCameraDevice> dcameraDevice = iter->second;
-    if (dcameraDevice == nullptr) {
-        DHLOGE("DCameraHost::OpenCamera, dcamera device is null.");
-        return INSUFFICIENT_RESOURCES;
+        dcameraDevice = iter->second;
+        if (dcameraDevice == nullptr) {
+            DHLOGE("DCameraHost::OpenCamera, dcamera device is null.");
+            return INSUFFICIENT_RESOURCES;
+        }
     }
 
     if (dcameraDevice->IsOpened()) {
@@ -193,7 +201,10 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     }
 
     std::string dCameraId = dcameraDevice->GetDCameraId();
-    dCameraDeviceMap_[dCameraId] = dcameraDevice;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        dCameraDeviceMap_[dCameraId] = dcameraDevice;
+    }
     DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
     dhBaseHashDCamIdMap_.emplace(dcameraBase, dCameraId);
     if (callback == nullptr) {
@@ -239,7 +250,10 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
     }
     DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
     dhBaseHashDCamIdMap_.erase(dcameraBase);
-    dCameraDeviceMap_.erase(dCameraId);
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        dCameraDeviceMap_.erase(dCameraId);
+    }
 
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
@@ -284,6 +298,7 @@ OHOS::sptr<DCameraDevice> DCameraHost::GetDCameraDeviceByDHBase(const DHBase &dh
         return nullptr;
     }
 
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
     auto iter = dCameraDeviceMap_.find(dCameraId);
     if (iter == dCameraDeviceMap_.end()) {
         DHLOGE("DCameraHost::GetDCameraDeviceByDHBase, dcamera device not found.");
