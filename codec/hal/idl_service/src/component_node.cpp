@@ -515,6 +515,7 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
 int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
     sptr<ICodecBuffer> codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
+    int32_t err = OMX_ErrorUndefined;
     switch (buffer.bufferType) {
         case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
             if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
@@ -542,7 +543,7 @@ int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffe
         default:
             break;
     }
-    return OMX_ErrorNone;
+    return err;
 }
 
 uint32_t ComponentNode::GenerateBufferId()
