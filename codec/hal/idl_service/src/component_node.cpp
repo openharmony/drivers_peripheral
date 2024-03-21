@@ -364,34 +364,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     CHECK_AND_RETURN_RET_LOG(codecBuffer != nullptr, OMX_ErrorInvalidComponent, "codecBuffer is null");
 
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    switch (buffer.bufferType) {
-        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
-            if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
-                void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
-                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
-                CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
-                err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
-                    reinterpret_cast<uint8_t *>(addr));
-                break;
-            }
-            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0,
-                buffer.allocLen);
-            break;
-        }
-        case CODEC_BUFFER_TYPE_HANDLE:
-        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
-            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
-                codecBuffer->GetBuffer());
-            break;
-        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
-            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
-                reinterpret_cast<uint8_t *>(&buffer.fd));
-            break;
-        }
-        default:
-            break;
-    }
-
+    err = UseBufferByType(portIndex, buffer, codecBuffer, bufferHdrType);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret = [%{public}x]", buffer.bufferType, err);
         codecBuffer = nullptr;
@@ -536,6 +509,40 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
     }
 
     err = OMX_FillThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
+    return err;
+}
+
+int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
+    sptr<ICodecBuffer> codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType)
+{
+    int32_t err = OMX_ErrorUndefined;
+    switch (buffer.bufferType) {
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
+            if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
+                void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
+                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
+                CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
+                err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                    reinterpret_cast<uint8_t *>(addr));
+                break;
+            }
+            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0,
+                buffer.allocLen);
+            break;
+        }
+        case CODEC_BUFFER_TYPE_HANDLE:
+        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                codecBuffer->GetBuffer());
+            break;
+        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
+                reinterpret_cast<uint8_t *>(&buffer.fd));
+            break;
+        }
+        default:
+            break;
+    }
     return err;
 }
 
