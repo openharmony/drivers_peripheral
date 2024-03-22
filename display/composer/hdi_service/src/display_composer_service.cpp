@@ -37,7 +37,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-extern "C" V1_1::IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_2::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -683,6 +683,12 @@ int32_t DisplayComposerService::GetHDRCapabilityInfos(uint32_t devId, HDRCapabil
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
+
+int32_t DisplayComposerService::CommitAndGetReleaseFence()
+{
+    return HDF_SUCCESS;
+}
+
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
