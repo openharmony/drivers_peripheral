@@ -616,9 +616,10 @@ HWTEST_F(HdfVibratorHdiTest, StopV1_2Test_004, TestSize.Level1)
 
 /**
   * @tc.name: StartByIntensityTest
-  * @tc.desc: Controls this vibrator to stop the vibrator.
+  * @tc.desc: Controls this Performing Time Series Vibrator Effects.
+  * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
-  * @tc.require:#I8BZ5H
+  * @tc.require:#I96NNZ
   */
 HWTEST_F(HdfVibratorHdiTest, StartByIntensityTest, TestSize.Level1)
 {
