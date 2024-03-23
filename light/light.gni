@@ -1,11 +1,11 @@
 declare_args() {
-    drivers_peripheral_light_feature_community = true
-    drivers_peripheral_light_feature_model = false
-    drivers_peripheral_light_feature_lite_support_test = false
+  drivers_peripheral_light_feature_community = true
+  drivers_peripheral_light_feature_model = false
+  drivers_peripheral_light_feature_lite_support_test = false
 }
 
 c_utils_enable = true
 if (defined(global_parts_info) &&
-!defined(global_parts_info.commonlibrary_c_utils)) {
-    c_utils_enable = false
+    !defined(global_parts_info.commonlibrary_c_utils)) {
+  c_utils_enable = false
 }
