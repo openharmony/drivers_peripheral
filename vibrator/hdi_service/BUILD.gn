@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../vibrator.gni")
+
 if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = []

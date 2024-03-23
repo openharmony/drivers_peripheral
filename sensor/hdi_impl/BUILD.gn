@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../sensor.gni")
 
 ohos_shared_library("libhdi_sensor_impl") {
   include_dirs = [

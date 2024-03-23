@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../light.gni")
 
 ohos_shared_library("libhdi_light_impl") {
   include_dirs = [
