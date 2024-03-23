@@ -13,6 +13,7 @@
 #
 
 import("//build/ohos.gni")
+import("../sensor.gni")
 
 if (defined(ohos_lite)) {
   config("libhdi_sensor_pub_config") {

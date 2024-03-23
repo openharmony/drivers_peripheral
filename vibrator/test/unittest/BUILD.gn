@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../../vibrator.gni")
+
 HDF_CORE_PATH = "../../../../hdf_core"
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")

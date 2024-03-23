@@ -13,6 +13,7 @@
 #
 
 import("//build/ohos.gni")
+import("../light.gni")
 
 if (defined(ohos_lite)) {
   config("libhdi_light_pub_config") {
