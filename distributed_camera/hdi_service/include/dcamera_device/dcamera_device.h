@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include "dmetadata_processor.h"
 #include "dstream_operator.h"
 
