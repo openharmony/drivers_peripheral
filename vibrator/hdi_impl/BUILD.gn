@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../vibrator.gni")
+
 if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = []
@@ -38,12 +40,14 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
         "hdf_core:libhdf_host",
         "hilog:libhilog",
         "ipc:ipc_single",
       ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
     } else {
       external_deps = [
         "hilog:libhilog",
