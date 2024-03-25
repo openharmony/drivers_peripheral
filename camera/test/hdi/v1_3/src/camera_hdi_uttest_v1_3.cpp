@@ -105,7 +105,7 @@ static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera:
     cameraTest->streamInfoVideo->v1_0.width_ = STREAMINFO_WIDTH;
     cameraTest->streamInfoVideo->v1_0.height_ = STREAMINFO_HEIGHT;
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
-    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo)
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
     // create and commitStream
     cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
