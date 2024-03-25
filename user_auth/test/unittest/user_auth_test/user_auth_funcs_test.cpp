@@ -48,7 +48,7 @@ public:
 
 HWTEST_F(UserAuthFuncsTest, TestGenerateSolutionFunc, TestSize.Level0)
 {
-    AuthSolutionHal param = {};
+    AuthParamHal param = {};
     EXPECT_EQ(GenerateSolutionFunc(param, nullptr), RESULT_BAD_PARAM);
 }
 
@@ -97,7 +97,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetUnlockAuthToken, TestSize.Level0)
 
 HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc001, TestSize.Level0)
 {
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     UserAuthTokenHal authToken;
     EnrolledStateHal enrolledState;
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, nullptr, nullptr), RESULT_BAD_PARAM);
@@ -118,7 +118,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     EnrolledStateHal enrolledState;
     SetUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
 
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     UserAuthTokenHal authToken;
     info.reuseUnlockResultDuration = 200;
     info.userId = 1;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_3/user_auth_interface_service.h"
+#include "v2_0/user_auth_interface_service.h"
 
 #include <cinttypes>
 #include <mutex>
@@ -69,7 +69,7 @@ int32_t UserAuthInterfaceService::Init()
     return OHOS::UserIam::Common::Init();
 }
 
-static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out)
+static bool CopyScheduleInfo(const CoAuthSchedule *in, HdiScheduleInfo *out)
 {
     IAM_LOGI("start");
     if (in->executorSize == 0 || (in->templateIds.data == NULL && in->templateIds.len != 0)) {
@@ -86,13 +86,13 @@ static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out
     out->executorMatcher = static_cast<uint32_t>(in->executors[0].executorMatcher);
     out->scheduleMode = static_cast<ScheduleMode>(in->scheduleMode);
     for (uint32_t i = 0; i < in->executorSize; ++i) {
-        ExecutorInfo temp = {};
+        HdiExecutorInfo temp = {};
         temp.executorIndex = in->executors[i].executorIndex;
         temp.info.authType = static_cast<AuthType>(in->executors[i].authType);
         temp.info.executorRole = static_cast<ExecutorRole>(in->executors[i].executorRole);
         temp.info.executorSensorHint = in->executors[i].executorSensorHint;
         temp.info.executorMatcher = static_cast<uint32_t>(in->executors[i].executorMatcher);
-        temp.info.esl = static_cast<ExecutorSecureLevel>(in->executors[i].esl);
+        temp.info.esl = static_cast<HdiExecutorSecureLevel>(in->executors[i].esl);
         temp.info.publicKey.resize(PUBLIC_KEY_LEN);
         if (memcpy_s(&temp.info.publicKey[0], temp.info.publicKey.size(),
             in->executors[i].pubKey, PUBLIC_KEY_LEN) != EOK) {
@@ -103,11 +103,12 @@ static bool CopyScheduleInfoV1_1(const CoAuthSchedule *in, ScheduleInfoV1_1 *out
         }
         out->executors.push_back(temp);
     }
-    out->extraInfo = {};
+    out->executorMessages.clear();
+    out->remoteMessage.clear();
     return true;
 }
 
-static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabilityLevel, uint64_t scheduleId)
+static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilityLevel, uint64_t scheduleId)
 {
     Attribute *attribute = CreateEmptyAttribute();
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
@@ -128,14 +129,15 @@ static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabili
             IAM_LOGE("SetAttributeUint64 scheduleId failed");
             break;
         }
-        info.extraInfo.resize(MAX_EXECUTOR_MSG_LEN);
-        Uint8Array retExtraInfo = { info.extraInfo.data(), MAX_EXECUTOR_MSG_LEN };
+        info.executorMessages.resize(1);
+        info.executorMessages[0].resize(MAX_EXECUTOR_MSG_LEN);
+        Uint8Array retExtraInfo = { info.executorMessages[0].data(), MAX_EXECUTOR_MSG_LEN };
         if (GetAttributeExecutorMsg(attribute, true, &retExtraInfo) != RESULT_SUCCESS) {
             IAM_LOGE("GetAttributeExecutorMsg failed");
-            info.extraInfo.clear();
+            info.executorMessages.clear();
             break;
         }
-        info.extraInfo.resize(retExtraInfo.len);
+        info.executorMessages[0].resize(retExtraInfo.len);
         ret = RESULT_SUCCESS;
     } while (0);
 
@@ -143,7 +145,7 @@ static int32_t SetAttributeToExtraInfo(ScheduleInfoV1_1 &info, uint32_t capabili
     return ret;
 }
 
-static int32_t GetCapabilityLevel(int32_t userId, ScheduleInfoV1_1 &info, uint32_t &capabilityLevel)
+static int32_t GetCapabilityLevel(int32_t userId, HdiScheduleInfo &info, uint32_t &capabilityLevel)
 {
     capabilityLevel = INVALID_CAPABILITY_LEVEL;
     LinkedList *credList = nullptr;
@@ -170,7 +172,7 @@ static int32_t GetCapabilityLevel(int32_t userId, ScheduleInfoV1_1 &info, uint32
     return RESULT_SUCCESS;
 }
 
-static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<ScheduleInfoV1_1> &infos)
+static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<HdiScheduleInfo> &infos)
 {
     for (auto &info : infos) {
         uint32_t capabilityLevel = INVALID_CAPABILITY_LEVEL;
@@ -189,100 +191,41 @@ static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<Schedule
     return RESULT_SUCCESS;
 }
 
-static void CopyScheduleInfoV1_1ToV1_0(const ScheduleInfoV1_1 &in, ScheduleInfo &out)
+static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
+    AuthParamHal &paramHal)
 {
-    out.scheduleId = in.scheduleId;
-    out.templateIds = in.templateIds;
-    out.authType = in.authType;
-    out.executorMatcher = in.executorMatcher;
-    out.scheduleMode = in.scheduleMode;
-    for (auto &inInfo : in.executors) {
-        ExecutorInfo outInfo = {};
-        outInfo.executorIndex = inInfo.executorIndex;
-        outInfo.info.authType = inInfo.info.authType;
-        outInfo.info.executorRole = inInfo.info.executorRole;
-        outInfo.info.executorSensorHint = inInfo.info.executorSensorHint;
-        outInfo.info.executorMatcher = inInfo.info.executorMatcher;
-        outInfo.info.esl = inInfo.info.esl;
-        outInfo.info.publicKey = inInfo.info.publicKey;
-        out.executors.push_back(outInfo);
-    }
-}
-
-static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in, std::vector<ScheduleInfo> &out)
-{
-    for (auto &inInfo : in) {
-        ScheduleInfo outInfo;
-        CopyScheduleInfoV1_1ToV1_0(inInfo, outInfo);
-        out.push_back(outInfo);
-    }
-}
-
-static void CopyAuthSolutionV1_0ToV1_2(const AuthSolution &in, AuthSolutionV1_2 &out)
-{
-    out.userId = in.userId;
-    out.authTrustLevel = in.authTrustLevel;
-    out.authType = in.authType;
-    out.executorSensorHint = in.executorSensorHint;
-    out.challenge = std::move(in.challenge);
-}
-
-int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
-    std::vector<ScheduleInfo> &infos)
-{
-    IAM_LOGI("start");
-    std::vector<ScheduleInfoV1_1> infosV1_1;
-    AuthSolutionV1_2 paramV1_2;
-    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
-    int32_t ret = BeginAuthenticationV1_2(contextId, paramV1_2, infosV1_1);
-    CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
-    uint64_t contextId, const AuthSolution &param, std::vector<ScheduleInfoV1_1> &infos)
-{
-    IAM_LOGI("start");
-    AuthSolutionV1_2 paramV1_2;
-    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
-    return BeginAuthenticationV1_2(contextId, paramV1_2, infos);
-}
-
-static int32_t CopyAuthSolutionV1_2ToHal(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
-    AuthSolutionHal &solutionHal)
-{
-    solutionHal.contextId = contextId;
-    solutionHal.userId = paramV1_2.userId;
-    solutionHal.authType = static_cast<uint32_t>(paramV1_2.authType);
-    solutionHal.authTrustLevel = paramV1_2.authTrustLevel;
-    if (!paramV1_2.challenge.empty() && memcpy_s(solutionHal.challenge, CHALLENGE_LEN, paramV1_2.challenge.data(),
-        paramV1_2.challenge.size()) != EOK) {
+    paramHal.contextId = contextId;
+    paramHal.userId = param.baseParam.userId;
+    paramHal.authType = static_cast<int32_t>(param.authType);
+    paramHal.authTrustLevel = param.baseParam.authTrustLevel;
+    if (!param.baseParam.challenge.empty() && memcpy_s(paramHal.challenge, CHALLENGE_LEN,
+        param.baseParam.challenge.data(), param.baseParam.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
     static const std::string screenLockBundleName = "B_com.ohos.systemui";
-    solutionHal.isAuthResultCached = false;
-    if (paramV1_2.callerName == screenLockBundleName) {
+    paramHal.isAuthResultCached = false;
+    if (param.baseParam.callerName == screenLockBundleName) {
         IAM_LOGI("auth result will be cached");
-        solutionHal.isAuthResultCached = true;
+        paramHal.isAuthResultCached = true;
     }
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
-    std::vector<ScheduleInfoV1_1> &infos)
+int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const HdiAuthParam &param,
+    std::vector<HdiScheduleInfo> &infos)
 {
     IAM_LOGI("start");
     infos.clear();
-    AuthSolutionHal solutionHal = {};
-    int32_t ret = CopyAuthSolutionV1_2ToHal(contextId, paramV1_2, solutionHal);
+    AuthParamHal paramHal = {};
+    int32_t ret = CopyAuthParamToHal(contextId, param, paramHal);
     if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("copy CopyAuthSolutionV1_2ToHal failed %{public}d", ret);
+        IAM_LOGE("copy CopyAuthParamToHal failed %{public}d", ret);
         return ret;
     }
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
-    ret = GenerateSolutionFunc(solutionHal, &schedulesGet);
+    ret = GenerateSolutionFunc(paramHal, &schedulesGet);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("generate solution failed %{public}d", ret);
         return ret;
@@ -298,9 +241,9 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, co
             DestroyLinkedList(schedulesGet);
             return RESULT_UNKNOWN;
         }
-        ScheduleInfoV1_1 temp = {};
+        HdiScheduleInfo temp = {};
         auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
-        if (!CopyScheduleInfoV1_1(coAuthSchedule, &temp)) {
+        if (!CopyScheduleInfo(coAuthSchedule, &temp)) {
             infos.clear();
             IAM_LOGE("copy schedule info failed");
             DestroyLinkedList(schedulesGet);
@@ -309,7 +252,7 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, co
         infos.push_back(temp);
         tempNode = tempNode->next;
     }
-    ret = SetArrayAttributeToExtraInfo(solutionHal.userId, infos);
+    ret = SetArrayAttributeToExtraInfo(paramHal.userId, infos);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetArrayAttributeToExtraInfo fail");
     }
@@ -325,7 +268,7 @@ int32_t UserAuthInterfaceService::GetAllUserInfo(std::vector<UserInfo> &userInfo
     return RESULT_SUCCESS;
 }
 
-static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
+static int32_t CreateExecutorCommand(int32_t userId, HdiAuthResultInfo &info)
 {
     LinkedList *executorSendMsg = nullptr;
     AuthPropertyMode authPropMode;
@@ -356,7 +299,7 @@ static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
             DestroyLinkedList(executorSendMsg);
             return RESULT_UNKNOWN;
         }
-        ExecutorSendMsg msg = {};
+        HdiExecutorSendMsg msg = {};
         msg.executorIndex = nodeData->executorIndex;
         msg.commandId = static_cast<int32_t>(authPropMode);
         msg.msg.resize(nodeMsgBuffer->contentSize);
@@ -373,8 +316,8 @@ static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
     return RESULT_SUCCESS;
 }
 
-static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn, AuthResultInfo &infoOut,
-    EnrolledState &enrolledStateOut)
+static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn, HdiAuthResultInfo &infoOut,
+    HdiEnrolledState &enrolledStateOut)
 {
     infoOut.result = infoIn.result;
     infoOut.remainAttempts = infoIn.remainTimes;
@@ -409,7 +352,7 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
 }
 
 static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
+    const std::vector<uint8_t> &scheduleResult, HdiAuthResultInfo &info, HdiEnrolledState &enrolledState)
 {
     IAM_LOGI("start");
     if (scheduleResult.size() == 0) {
@@ -440,18 +383,10 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
     return CreateExecutorCommand(authResult.userId, info);
 }
 
-int32_t UserAuthInterfaceService::UpdateAuthenticationResultWithEnrolledState(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
-{
-    IAM_LOGI("start");
-    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
-}
-
 int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info)
+    const std::vector<uint8_t> &scheduleResult, HdiAuthResultInfo &info, HdiEnrolledState &enrolledState)
 {
     IAM_LOGI("start");
-    EnrolledState enrolledState = {};
     return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
 }
 
@@ -462,18 +397,8 @@ int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
     return DestoryContextbyId(contextId);
 }
 
-int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthType authType,
-    const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, ScheduleInfo &scheduleInfo)
-{
-    IAM_LOGI("start");
-    ScheduleInfoV1_1 infoV1_1;
-    int32_t ret = BeginIdentificationV1_1(contextId, authType, challenge, executorSensorHint, infoV1_1);
-    CopyScheduleInfoV1_1ToV1_0(infoV1_1, scheduleInfo);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginIdentificationV1_1(uint64_t contextId, AuthType authType,
-    const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, ScheduleInfoV1_1 &scheduleInfo)
+int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, int32_t authType,
+    const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, HdiScheduleInfo &scheduleInfo)
 {
     IAM_LOGI("start");
     if (authType == PIN) {
@@ -505,7 +430,7 @@ int32_t UserAuthInterfaceService::BeginIdentificationV1_1(uint64_t contextId, Au
         return RESULT_UNKNOWN;
     }
     auto data = static_cast<CoAuthSchedule *>(scheduleGet->head->data);
-    if (!CopyScheduleInfoV1_1(data, &scheduleInfo)) {
+    if (!CopyScheduleInfo(data, &scheduleInfo)) {
         IAM_LOGE("copy schedule failed");
         ret = RESULT_BAD_COPY;
     }
@@ -552,7 +477,7 @@ int32_t UserAuthInterfaceService::CancelIdentification(uint64_t contextId)
     return DestoryContextbyId(contextId);
 }
 
-int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, AuthType authType, uint32_t &authTrustLevel)
+int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, int32_t authType, uint32_t &authTrustLevel)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -560,8 +485,8 @@ int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, AuthType aut
     return ret;
 }
 
-int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::vector<AuthType> &authTypes,
-    uint32_t authTrustLevel, std::vector<AuthType> &validTypes)
+int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::vector<int32_t> &authTypes,
+    uint32_t authTrustLevel, std::vector<int32_t> &validTypes)
 {
     IAM_LOGI("start userId:%{public}d authTrustLevel:%{public}u", userId, authTrustLevel);
     int32_t result = RESULT_TYPE_NOT_SUPPORT;
@@ -611,29 +536,8 @@ int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
     return CloseEditSession();
 }
 
-int32_t UserAuthInterfaceService::BeginEnrollmentV1_2(int32_t userId, const std::vector<uint8_t> &authToken,
-    const EnrollParamV1_2 &paramV1_2, ScheduleInfoV1_1 &infoV1_1)
-{
-    IAM_LOGI("start");
-    EnrollParam param;
-    param.authType = paramV1_2.authType;
-    param.executorSensorHint = paramV1_2.executorSensorHint;
-    return BeginEnrollmentV1_1(userId, authToken, param, infoV1_1);
-}
-
-
-int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vector<uint8_t> &authToken,
-    const EnrollParam &param, ScheduleInfo &info)
-{
-    IAM_LOGI("start");
-    ScheduleInfoV1_1 infoV1_1;
-    int32_t ret = BeginEnrollmentV1_1(userId, authToken, param, infoV1_1);
-    CopyScheduleInfoV1_1ToV1_0(infoV1_1, info);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
-    int32_t userId, const std::vector<uint8_t> &authToken, const EnrollParam &param, ScheduleInfoV1_1 &info)
+int32_t UserAuthInterfaceService::BeginEnrollment(
+    const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
 {
     IAM_LOGI("start");
     if (authToken.size() != sizeof(UserAuthTokenHal) && authToken.size() != 0) {
@@ -646,7 +550,7 @@ int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
         return RESULT_BAD_COPY;
     }
     checkParam.authType = param.authType;
-    checkParam.userId = userId;
+    checkParam.userId = param.userId;
     checkParam.executorSensorHint = param.executorSensorHint;
     std::lock_guard<std::mutex> lock(g_mutex);
     uint64_t scheduleId;
@@ -669,7 +573,7 @@ int32_t UserAuthInterfaceService::BeginEnrollmentV1_1(
         IAM_LOGE("get schedule info failed");
         return RESULT_UNKNOWN;
     }
-    if (!CopyScheduleInfoV1_1(scheduleInfo, &info)) {
+    if (!CopyScheduleInfo(scheduleInfo, &info)) {
         IAM_LOGE("copy schedule info failed");
         return RESULT_BAD_COPY;
     }
@@ -690,7 +594,7 @@ int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
     return RESULT_SUCCESS;
 }
 
-static void CopyCredentialInfo(const CredentialInfoHal &in, CredentialInfo &out)
+static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &out)
 {
     out.authType = static_cast<AuthType>(in.authType);
     out.credentialId = in.credentialId;
@@ -768,7 +672,7 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authType, std::vector<CredentialInfo> &infos)
+int32_t UserAuthInterfaceService::GetCredential(int32_t userId, int32_t authType, std::vector<CredentialInfo> &infos)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -796,7 +700,7 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authTyp
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t &secureUid, PinSubType &pinSubType,
+int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t &secureUid, int32_t &pinSubType,
     std::vector<EnrolledInfo> &infos)
 {
     IAM_LOGI("start");
@@ -869,7 +773,7 @@ int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<
     return RESULT_SUCCESS;
 }
 
-static bool CopyExecutorInfo(const ExecutorRegisterInfo &in, ExecutorInfoHal &out)
+static bool CopyExecutorInfo(const HdiExecutorRegisterInfo &in, ExecutorInfoHal &out)
 {
     out.authType = in.authType;
     out.executorMatcher = in.executorMatcher;
@@ -908,7 +812,7 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::AddExecutor(const ExecutorRegisterInfo &info, uint64_t &index,
+int32_t UserAuthInterfaceService::AddExecutor(const HdiExecutorRegisterInfo &info, uint64_t &index,
     std::vector<uint8_t> &publicKey, std::vector<uint64_t> &templateIds)
 {
     IAM_LOGI("start");
@@ -983,7 +887,7 @@ int32_t UserAuthInterfaceService::GetAllExtUserInfo(std::vector<ExtUserInfo> &us
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, AuthType authType, EnrolledState &info)
+int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, int32_t authType, HdiEnrolledState &enrolledState)
 {
     IAM_LOGI("start");
     EnrolledStateHal *enrolledStateHal = (EnrolledStateHal *) Malloc(sizeof(EnrolledStateHal));
@@ -997,57 +901,88 @@ int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, AuthType auth
         IAM_LOGE("GetEnrolledState failed");
         return ret;
     }
-    info.credentialDigest = enrolledStateHal->credentialDigest;
-    info.credentialCount = enrolledStateHal->credentialCount;
+    enrolledState.credentialDigest = enrolledStateHal->credentialDigest;
+    enrolledState.credentialCount = enrolledStateHal->credentialCount;
 
     Free(enrolledStateHal);
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &info, std::vector<uint8_t> &reuseResult)
+int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam& param,
+    ReuseUnlockInfo& info)
 {
-    IAM_LOGI("start reuseMode: %{public}u, reuseDuration: %{public}" PRIu64 ".", info.reuseUnlockResultMode,
-        info.reuseUnlockResultDuration);
-    if (info.authTypes.empty() || info.authTypes.size() > MAX_AUTH_TYPE_LEN ||
-        info.reuseUnlockResultDuration == 0 || info.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
-        (info.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+    IAM_LOGI("start reuseMode: %{public}u, reuseDuration: %{public}" PRIu64 ".", param.reuseUnlockResultMode,
+        param.reuseUnlockResultDuration);
+    if (param.authTypes.empty() || param.authTypes.size() > MAX_AUTH_TYPE_LEN ||
+        param.reuseUnlockResultDuration == 0 || param.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
+        (param.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && param.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
         IAM_LOGE("checkReuseUnlockResult bad param");
         return RESULT_BAD_PARAM;
     }
 
-    ReuseUnlockResult resultTemp = {};
-    ReuseUnlockInfoHal infoHal = {};
-    infoHal.userId = info.userId;
-    infoHal.authTrustLevel = info.authTrustLevel;
-    infoHal.reuseUnlockResultDuration = info.reuseUnlockResultDuration;
-    infoHal.reuseUnlockResultMode = info.reuseUnlockResultMode;
-    if (!info.challenge.empty() &&
-        memcpy_s(infoHal.challenge, CHALLENGE_LEN, info.challenge.data(), info.challenge.size()) != EOK) {
+    ReuseUnlockParamHal paramHal = {};
+    paramHal.userId = param.baseParam.userId;
+    paramHal.authTrustLevel = param.baseParam.authTrustLevel;
+    paramHal.reuseUnlockResultDuration = param.reuseUnlockResultDuration;
+    paramHal.reuseUnlockResultMode = param.reuseUnlockResultMode;
+    if (!param.baseParam.challenge.empty() &&
+        memcpy_s(paramHal.challenge, CHALLENGE_LEN,
+            param.baseParam.challenge.data(), param.baseParam.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    infoHal.authTypeSize = info.authTypes.size();
-    for (uint32_t i = 0; i < info.authTypes.size(); i++) {
-        infoHal.authTypes[i] = static_cast<uint32_t>(info.authTypes[i]);
+    paramHal.authTypeSize = param.authTypes.size();
+    for (uint32_t i = 0; i < param.authTypes.size(); i++) {
+        paramHal.authTypes[i] = static_cast<uint32_t>(param.authTypes[i]);
     }
 
-    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token, &resultTemp.enrolledState);
+    EnrolledStateHal enrolledState;
+    info.token.resize(AUTH_TOKEN_LEN);
+    int32_t ret = CheckReuseUnlockResultFunc(&paramHal, (UserAuthTokenHal *)info.token.data(),
+        &enrolledState);
     if (ret != RESULT_SUCCESS) {
-        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        info.token.clear();
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
         return ret;
     }
-    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
-    reuseResult.resize(sizeof(ReuseUnlockResult));
-    if (memcpy_s(reuseResult.data(), sizeof(ReuseUnlockResult), &resultTemp, sizeof(ReuseUnlockResult)) != EOK) {
-        IAM_LOGE("copy authToken failed");
-        reuseResult.clear();
-        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
-        return RESULT_BAD_COPY;
-    }
+    info.authType = ((UserAuthTokenHal *)info.token.data())->tokenDataPlain.authType;
+    info.enrolledState.credentialDigest = enrolledState.credentialDigest;
+    info.enrolledState.credentialCount = enrolledState.credentialCount;
     IAM_LOGI("check reuse unlock result finish success");
-    (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
     return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t>& msg)
+{
+    static_cast<void>(scheduleId);
+    static_cast<void>(srcRole);
+    static_cast<void>(msg);
+    return HDF_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::RegisterMessageCallback(const sptr<IMessageCallback>& messageCallback)
+{
+    static_cast<void>(messageCallback);
+    return HDF_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetLocalScheduleFromMessage(const std::vector<uint8_t>& remoteDeviceId,
+    const std::vector<uint8_t>& message, HdiScheduleInfo& scheduleInfo)
+{
+    static_cast<void>(remoteDeviceId);
+    static_cast<void>(message);
+    static_cast<void>(scheduleInfo);
+    return HDF_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetSignedExecutorInfo(const std::vector<int32_t>& authTypes, int32_t executorRole,
+    const std::vector<uint8_t>& remoteDeviceId, std::vector<uint8_t>& signedExecutorInfo)
+{
+    static_cast<void>(authTypes);
+    static_cast<void>(executorRole);
+    static_cast<void>(remoteDeviceId);
+    static_cast<void>(signedExecutorInfo);
+    return HDF_SUCCESS;
 }
 } // Userauth
 } // HDI

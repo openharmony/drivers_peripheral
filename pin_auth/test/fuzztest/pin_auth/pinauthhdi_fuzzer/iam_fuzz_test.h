@@ -29,6 +29,7 @@ void FillFuzzInt8Vector(Parcel &parcel, std::vector<int8_t> &data);
 void FillFuzzUint32Vector(Parcel &parcel, std::vector<uint32_t> &data);
 void FillFuzzUint64Vector(Parcel &parcel, std::vector<uint64_t> &data);
 void FillFuzzString(Parcel &parcel, std::string &str);
+void FillFuzzInt32Vector(Parcel &parcel, std::vector<int32_t> &data);
 } // namespace Common
 } // namespace UserIam
 } // namespace OHOS

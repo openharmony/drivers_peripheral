@@ -17,11 +17,12 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 
+#include "v2_0/user_auth_interface_service.h"
+#include "v2_0/user_auth_interface_stub.h"
+
 #include "iam_logger.h"
 #include "useriam_common.h"
-
-#include "v1_3/user_auth_interface_stub.h"
-#include "v1_3/user_auth_interface_service.h"
+#include "user_auth_hdi.h"
 
 #undef LOG_TAG
 #define LOG_TAG "USER_AUTH_HDI"
@@ -31,6 +32,9 @@ struct HdfUserAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
+
+using UserAuthInterfaceService = OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceService;
+using IUserAuthInterface = OHOS::HDI::UserAuth::V2_0::IUserAuthInterface;
 
 int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
@@ -85,8 +89,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfUserAuthInterfaceHost->ioService.Open = nullptr;
     hdfUserAuthInterfaceHost->ioService.Release = nullptr;
 
-    OHOS::sptr<OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceService> serviceImpl(
-        new (std::nothrow) OHOS::HDI::UserAuth::V1_3::UserAuthInterfaceService());
+    OHOS::sptr<UserAuthInterfaceService> serviceImpl(new (std::nothrow) UserAuthInterfaceService());
     if (serviceImpl == nullptr) {
         IAM_LOGE("failed to get of implement service");
         delete hdfUserAuthInterfaceHost;
@@ -94,7 +97,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfUserAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(
-        serviceImpl, OHOS::HDI::UserAuth::V1_3::IUserAuthInterface::GetDescriptor());
+        serviceImpl, IUserAuthInterface::GetDescriptor());
     if (hdfUserAuthInterfaceHost->stub == nullptr) {
         IAM_LOGE("failed to get stub object");
         delete hdfUserAuthInterfaceHost;

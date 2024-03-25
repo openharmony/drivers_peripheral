@@ -31,23 +31,16 @@ PinAuthInterfaceService g_pinAuthInterFaceService;
 void FuzzGetExecutorList(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    std::vector<sptr<IExecutorV1_0>> executorList;
-    g_pinAuthInterFaceService.GetExecutorList(executorList);
-    IAM_LOGI("end");
-}
-
-void FuzzGetExecutorListV1_1(Parcel &parcel)
-{
-    IAM_LOGI("begin");
-    std::vector<sptr<IExecutor>> executorList;
-    g_pinAuthInterFaceService.GetExecutorListV1_1(executorList);
+    std::vector<sptr<ICollector>> collectors;
+    std::vector<sptr<IVerifier>> verifiers;
+    std::vector<sptr<IExecutor>> allInOneExecutors;
+    g_pinAuthInterFaceService.GetExecutorList(allInOneExecutors, verifiers, collectors);
     IAM_LOGI("end");
 }
 
 using FuzzFunc = decltype(FuzzGetExecutorList);
 FuzzFunc *g_fuzzFuncs[] = {
-    FuzzGetExecutorList,
-    FuzzGetExecutorListV1_1,
+    FuzzGetExecutorList
 };
 
 void PinAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)
