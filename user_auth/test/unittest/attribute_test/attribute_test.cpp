@@ -517,40 +517,29 @@ HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
     FreeAttribute(&attribute);
 }
 
-HWTEST_F(AttributeTest, TestAttributeSetAndGet, TestSize.Level0)
+HWTEST_F(AttributeTest, TestAttributeSetAndGet_001, TestSize.Level0)
 {
     constexpr uint32_t MAX_MSG_LEN = 1000;
-    constexpr uint32_t MAX_SIZE = 10;
     Attribute *originAttribute = CreateEmptyAttribute();
     EXPECT_NE(originAttribute, nullptr);
     uint32_t testUint32 = 123;
     int32_t testInt32 = 123;
     uint64_t testUint64 = 456;
-    uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
-    uint64_t testUint64Buffer[] = { 123, 456, 789 };
-    Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) / sizeof(testUint8Buffer[0]) };
-    Uint64Array testUint64Array = { testUint64Buffer, sizeof(testUint64Buffer) / sizeof(testUint64Buffer[0]) };
     ResultCode result = SetAttributeUint32(originAttribute, AUTH_IDENTIFY_MODE, testUint32);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeInt32(originAttribute, AUTH_RESULT_CODE, testInt32);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeUint64(originAttribute, AUTH_SCHEDULE_ID, testUint64);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint8Array(originAttribute, AUTH_SIGNATURE, testUint8Array);
-    EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64Array(originAttribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
-    EXPECT_EQ(result, RESULT_SUCCESS);
     uint8_t msgBuffer[MAX_MSG_LEN] = {};
     Uint8Array msg = { msgBuffer, sizeof(msgBuffer) / sizeof(msgBuffer[0]) };
     result = GetAttributeSerializedMsg(originAttribute, &msg);
     EXPECT_EQ(result, RESULT_SUCCESS);
+    FreeAttribute(&originAttribute);
+
     uint32_t parsedUint32;
     int32_t parsedInt32;
     uint64_t parsedUint64;
-    uint8_t parsedUint8Buffer[MAX_SIZE];
-    uint64_t parsedUint64Buffer[MAX_SIZE];
-    Uint8Array parsedUint8Array = { parsedUint8Buffer, sizeof(parsedUint8Buffer) / sizeof(parsedUint8Buffer[0]) };
-    Uint64Array parsedUint64Array = { parsedUint64Buffer, sizeof(parsedUint64Buffer) / sizeof(parsedUint64Buffer[0]) };
     Attribute *parsedAttribute = CreateAttributeFromSerializedMsg(msg);
     result = GetAttributeUint32(parsedAttribute, AUTH_IDENTIFY_MODE, &parsedUint32);
     EXPECT_EQ(result, RESULT_SUCCESS);
@@ -560,6 +549,34 @@ HWTEST_F(AttributeTest, TestAttributeSetAndGet, TestSize.Level0)
     result = GetAttributeUint64(parsedAttribute, AUTH_SCHEDULE_ID, &parsedUint64);
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(parsedUint64, testUint64);
+    FreeAttribute(&parsedAttribute);
+}
+
+HWTEST_F(AttributeTest, TestAttributeSetAndGet_002, TestSize.Level0)
+{
+    constexpr uint32_t MAX_MSG_LEN = 1000;
+    Attribute *originAttribute = CreateEmptyAttribute();
+    EXPECT_NE(originAttribute, nullptr);
+    uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
+    uint64_t testUint64Buffer[] = { 123, 456, 789 };
+    Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) / sizeof(testUint8Buffer[0]) };
+    Uint64Array testUint64Array = { testUint64Buffer, sizeof(testUint64Buffer) / sizeof(testUint64Buffer[0]) };
+    ResultCode result = SetAttributeUint8Array(originAttribute, AUTH_SIGNATURE, testUint8Array);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    result = SetAttributeUint64Array(originAttribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    uint8_t msgBuffer[MAX_MSG_LEN] = {};
+    Uint8Array msg = { msgBuffer, sizeof(msgBuffer) / sizeof(msgBuffer[0]) };
+    result = GetAttributeSerializedMsg(originAttribute, &msg);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    FreeAttribute(&originAttribute);
+
+    constexpr uint32_t MAX_SIZE = 10;
+    uint8_t parsedUint8Buffer[MAX_SIZE];
+    uint64_t parsedUint64Buffer[MAX_SIZE];
+    Uint8Array parsedUint8Array = { parsedUint8Buffer, sizeof(parsedUint8Buffer) / sizeof(parsedUint8Buffer[0]) };
+    Uint64Array parsedUint64Array = { parsedUint64Buffer, sizeof(parsedUint64Buffer) / sizeof(parsedUint64Buffer[0]) };
+    Attribute *parsedAttribute = CreateAttributeFromSerializedMsg(msg);
     result = GetAttributeUint8Array(parsedAttribute, AUTH_SIGNATURE, &parsedUint8Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(testUint8Array.len, parsedUint8Array.len);
@@ -568,7 +585,6 @@ HWTEST_F(AttributeTest, TestAttributeSetAndGet, TestSize.Level0)
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(testUint64Array.len, parsedUint64Array.len);
     EXPECT_EQ(testUint64Array.data[2], parsedUint64Array.data[2]);
-    FreeAttribute(&originAttribute);
     FreeAttribute(&parsedAttribute);
 }
 } // namespace UserAuth

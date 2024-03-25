@@ -20,6 +20,7 @@
 #include "ibuffer_pool.h"
 #include "istream.h"
 #include "capture_request.h"
+#include <atomic>
 
 namespace OHOS::Camera {
 class StreamBase : public IStream, public std::enable_shared_from_this<StreamBase> {
@@ -94,6 +95,8 @@ protected:
 
     std::unique_ptr<std::thread> handler_ = nullptr;
     std::shared_ptr<CaptureRequest> lastRequest_ = nullptr;
+
+    std::atomic<int> calltimes_;
 };
 } // end namespace OHOS::Camera
 #endif // STREAM_OPERATOR_STREAM_BASE_H

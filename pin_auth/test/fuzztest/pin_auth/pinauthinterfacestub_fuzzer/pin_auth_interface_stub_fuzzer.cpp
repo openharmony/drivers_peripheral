@@ -19,7 +19,8 @@
 #include "pin_auth_hdi.h"
 #include "v1_1/pin_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "PIN_AUTH_HDI"
 
 #undef private
 

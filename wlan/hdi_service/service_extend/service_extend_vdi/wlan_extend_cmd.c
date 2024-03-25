@@ -18,7 +18,7 @@
 #include <hdf_load_vdi.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "wifi_hal.h"
 #include "wlan_common_cmd.h"
 #include "wlan_extend_cmd_vdi.h"
@@ -123,6 +123,27 @@ int32_t WlanInterfaceWifiSendCmdIoctl(struct IWlanInterface *self, const char *i
     ret = g_wlanExtendVdiImpl->sendCmdIoctl(self, ifName, cmdId, paramBuf, paramBufLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: send ioctl command failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char *ifName,
+    uint8_t *paramBuf, uint32_t *paramBufLen)
+{
+    int32_t ret;
+    HDF_LOGI("%{public}s enter WlanInterfaceGetCoexChannelList", __func__);
+    (void)self;
+    if (ifName == NULL || paramBuf == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wlanExtendVdiImpl == NULL) {
+        HDF_LOGE("%{public}s g_wlanExtendVdiImpl is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wlanExtendVdiImpl->getCoexChannelList(self, ifName, paramBuf, paramBufLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get coex channellist failed!, error code: %{public}d", __func__, ret);
     }
     return ret;
 }

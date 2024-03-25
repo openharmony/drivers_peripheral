@@ -592,7 +592,7 @@ int32_t WpaInterfaceWifiStatus(struct IWpaInterface *self, const char *ifName, s
     if (memset_s(&halStatus, sizeof(halStatus), 0, sizeof(halStatus)) != EOK) {
         return HDF_FAILURE;
     }
-    int ret = pStaIfc->wpaCliCmdStatus(pStaIfc, &halStatus);
+    int ret = pStaIfc->wpaCliCmdStatus(pStaIfc, ifName, &halStatus);
     if (ret < 0) {
         HDF_LOGE("%{public}s: wpaCliCmdStatus fail! ret=%{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -1505,6 +1505,77 @@ int32_t ProcessEventStaNotify(struct HdfWpaRemoteNode *node, char *notifyParam, 
     return ret;
 }
 
+static int32_t WpaFillWpaVendorExtInfo(struct WpaVendorExtInfo *wpaVendorExtInfo,
+                                       struct WpaVendorInfo *wpaVendorInfo)
+{
+    if (wpaVendorExtInfo == NULL || wpaVendorInfo == NULL) {
+        HDF_LOGE("%{public}s: wpaVendorExtInfo or wpaVendorInfo is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    wpaVendorInfo->type = wpaVendorExtInfo->type;
+    wpaVendorInfo->freq = wpaVendorExtInfo->freq;
+    wpaVendorInfo->width = wpaVendorExtInfo->width;
+    wpaVendorInfo->id = wpaVendorExtInfo->id;
+    wpaVendorInfo->status = wpaVendorExtInfo->status;
+    wpaVendorInfo->reason = wpaVendorExtInfo->reason;
+    if (FillData(&wpaVendorInfo->ssid, &wpaVendorInfo->ssidLen,
+                 wpaVendorExtInfo->ssid, strlen((char *)wpaVendorExtInfo->ssid)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s ssid fail !", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (FillData(&wpaVendorInfo->psk, &wpaVendorInfo->pskLen,
+                 wpaVendorExtInfo->psk, strlen((char *)wpaVendorExtInfo->psk)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s psk fail !", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (FillData(&wpaVendorInfo->devAddr, &wpaVendorInfo->devAddrLen,
+                 wpaVendorExtInfo->devAddr, ETH_ADDR_LEN) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s devAddr fail !", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (FillData(&wpaVendorInfo->data, &wpaVendorInfo->dataLen,
+                 wpaVendorExtInfo->data, strlen((char *)wpaVendorExtInfo->data)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s data fail !", __func__);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("wpaVendorInfo type %{public}d, freq %{public}d, reason %{public}d, "
+             "data %{public}s id %{public}d status %{public}d!",
+             wpaVendorInfo->type, wpaVendorInfo->freq, wpaVendorInfo->reason,
+             wpaVendorInfo->data, wpaVendorInfo->id, wpaVendorInfo->status);
+    return HDF_SUCCESS;
+}
+
+static int32_t ProcessEventWpaVendorExt(struct HdfWpaRemoteNode *node,
+    struct WpaVendorExtInfo *wpaVendorExtInfo, const char *ifName)
+{
+    HDF_LOGI("%{public}s: ifName => %{public}s ; ", __func__, ifName);
+    struct WpaVendorInfo wpaVendorInfo;
+    int32_t ret = HDF_FAILURE;
+    if (wpaVendorExtInfo == NULL) {
+        HDF_LOGE("%{public}s: wpaVendorExtInfo is NULL !", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventVendorCb == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (WpaFillWpaVendorExtInfo(wpaVendorExtInfo, &wpaVendorInfo) != HDF_SUCCESS) {
+        ret = HDF_FAILURE;
+        HDF_LOGE("%{public}s: wpaVendorInfo is NULL or associateRejectParam fialed!", __func__);
+    } else {
+        ret = node->callbackObj->OnEventVendorCb(node->callbackObj, &wpaVendorInfo, ifName);
+    }
+    HDF_LOGI("%{public}s: res %{public}d!", __func__, ret);
+    return ret;
+}
+
 static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
@@ -1590,6 +1661,9 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
             break;
         case WPA_EVENT_STA_NOTIFY:
             ret = ProcessEventStaNotify(pos, (char *)data, ifName);
+            break;
+        case WPA_EVENT_VENDOR_EXT:
+            ret = ProcessEventWpaVendorExt(pos, (struct WpaVendorExtInfo *)data, ifName);
             break;
         default:
             HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
@@ -1786,6 +1860,12 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
             return HDF_FAILURE;
         }
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+            CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+            return HDF_FAILURE;
+        }
+    } else if (strncmp(ifName, "chba0", strlen("chba0"))) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName),
             CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {

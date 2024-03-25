@@ -21,6 +21,11 @@
 #include "iremote_stub.h"
 #include "i_bluetooth_a2dp_src_observer.h"
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS {
 namespace Bluetooth {
 class BluetoothA2dpAudioSrcObserverStub : public IRemoteStub<IBluetoothA2dpSourceObserver> {

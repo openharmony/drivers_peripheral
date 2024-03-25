@@ -144,6 +144,7 @@ int32_t RawDetachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
 
 int32_t RawUsbControlMsg(const struct UsbDeviceHandle *devHandle,  struct UsbControlRequestData *ctrlData);
 int32_t RawUsbGetUsbSpeed(const struct UsbDeviceHandle *devHandle);
+bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 #ifdef __cplusplus
 }
 #endif

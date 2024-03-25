@@ -1446,6 +1446,36 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     DeleteAllExecutor(service);
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
+
+HWTEST_F(UserAuthInterfaceServiceTest, TestCheckReuseUnlockResult_001, TestSize.Level0)
+{
+    auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
+    EXPECT_NE(service, nullptr);
+
+    EXPECT_EQ(service->Init(), 0);
+
+    std::vector<uint8_t> token;
+    ReuseUnlockInfo info;
+    info.userId = 1;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+
+    info.authTypes.push_back(static_cast<AuthType>(1));
+    info.authTypes.push_back(static_cast<AuthType>(2));
+    info.authTypes.push_back(static_cast<AuthType>(4));
+    info.authTypes.push_back(static_cast<AuthType>(0));
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+    info.authTypes.pop_back();
+    info.reuseUnlockResultDuration = 0;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+    info.reuseUnlockResultDuration = 6 * 60 *1000;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+    info.reuseUnlockResultDuration = 5 * 60 *1000;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+    info.reuseUnlockResultMode = 0;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_BAD_PARAM);
+    info.reuseUnlockResultMode = 1;
+    EXPECT_EQ(service->CheckReuseUnlockResult(info, token), RESULT_GENERAL_ERROR);
+}
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

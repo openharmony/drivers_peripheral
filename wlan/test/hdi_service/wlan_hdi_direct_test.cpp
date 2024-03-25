@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "wlan_callback_impl.h"
 #include "securec.h"
 #include "wlan_hdi_types.h"

@@ -49,6 +49,7 @@ using EnrollParamV1_2 = OHOS::HDI::UserAuth::V1_3::EnrollParamV1_2;
 using UserInfo = OHOS::HDI::UserAuth::V1_3::UserInfo;
 using ExtUserInfo = OHOS::HDI::UserAuth::V1_3::ExtUserInfo;
 using EnrolledState = OHOS::HDI::UserAuth::V1_3::EnrolledState;
+using ReuseUnlockInfo = OHOS::HDI::UserAuth::V1_3::ReuseUnlockInfo;
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

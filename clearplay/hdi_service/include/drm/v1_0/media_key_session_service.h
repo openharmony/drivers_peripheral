@@ -69,6 +69,8 @@ public:
     int32_t Init();
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
+    int32_t GetDecryptTimes(std::vector<double> &times);
+    void GetDecryptMaxTimes(double time, std::vector<double> &topThreeTimes);
     int32_t SetKeySessionServiceCallback(sptr<KeySessionServiceCallback> callback);
     sptr<Session> session_;
 private:
@@ -82,6 +84,7 @@ private:
     const char* offlineKeyFileName = "/data/local/traces/offline_key.txt";
     const int keyIdMaxLength = 255;
     OHOS::sptr<MediaKeySessionCallbackService> vdiCallbackObj;
+    static const int32_t topThree = 3;
 };
 class KeySessionServiceCallback : public virtual RefBase {
 public:

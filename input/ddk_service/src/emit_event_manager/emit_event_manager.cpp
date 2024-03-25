@@ -16,6 +16,7 @@
 #include "emit_event_manager.h"
 #include "ipc_skeleton.h"
 #include <hdf_log.h>
+#include "ipc_skeleton.h"
 
 #define HDF_LOG_TAG emit_event_manager
 
@@ -29,6 +30,7 @@ EmitEventManager& EmitEventManager::GetInstance(void)
 }
 int32_t EmitEventManager::CreateDevice(const Hid_Device &hidDevice, const Hid_EventProperties &hidEventProperties)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     // check device number
     if (virtualDeviceMap_.size() >= MAX_VIRTUAL_DEVICE_NUM) {
         HDF_LOGE("%{public}s device num exceeds maximum %{public}d", __func__, MAX_VIRTUAL_DEVICE_NUM);
@@ -40,14 +42,19 @@ int32_t EmitEventManager::CreateDevice(const Hid_Device &hidDevice, const Hid_Ev
         HDF_LOGE("%{public}s faild to generate device id", __func__);
         return HID_DDK_FAILURE;
     }
+
+    uint32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    HDF_LOGD("calling token of %{public}s : %{public}u", __func__, callingToken);
+
     // create device
-    virtualDeviceMap_[id] =
-        std::make_unique<VirtualDeviceInject>(std::make_shared<VirtualDevice>(hidDevice, hidEventProperties));
+    virtualDeviceMap_[id] = std::make_unique<VirtualDeviceInject>(
+        std::make_shared<VirtualDevice>(hidDevice, hidEventProperties), callingToken);
     return id;
 }
 
 int32_t EmitEventManager::EmitEvent(uint32_t deviceId, const std::vector<Hid_EmitItem> &items)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (virtualDeviceMap_.count(deviceId) == 0) {
         HDF_LOGE("%{public}s device is not exit", __func__);
         return HID_DDK_FAILURE;
@@ -57,6 +64,12 @@ int32_t EmitEventManager::EmitEvent(uint32_t deviceId, const std::vector<Hid_Emi
         HDF_LOGE("%{public}s VirtualDeviceInject is null", __func__);
         return HID_DDK_NULL_PTR;
     }
+    uint32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    HDF_LOGD("calling token of %{public}s : %{public}u", __func__, callingToken);
+    if (virtualDeviceMap_[deviceId]->GetCreatorToken() != callingToken) {
+        HDF_LOGE("caller of %{public}s is invalid, callingToken:%{public}u", __func__, callingToken);
+        return HID_DDK_INVALID_OPERATION;
+    }
 
     virtualDeviceMap_[deviceId]->EmitEvent(items);
     return HID_DDK_SUCCESS;
@@ -64,11 +77,18 @@ int32_t EmitEventManager::EmitEvent(uint32_t deviceId, const std::vector<Hid_Emi
 
 int32_t EmitEventManager::DestroyDevice(uint32_t deviceId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (virtualDeviceMap_.count(deviceId) == 0) {
         HDF_LOGE("%{public}s device is not exit", __func__);
         return HID_DDK_FAILURE;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    uint32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    HDF_LOGD("calling token of %{public}s : %{public}u", __func__, callingToken);
+    if (virtualDeviceMap_[deviceId] != nullptr
+        && virtualDeviceMap_[deviceId]->GetCreatorToken() != callingToken) {
+        HDF_LOGE("caller of %{public}s is invalid, callingToken:%{public}u", __func__, callingToken);
+        return HID_DDK_INVALID_OPERATION;
+    }
     virtualDeviceMap_.erase(deviceId);
     lastDeviceId_ = deviceId;
     return HID_DDK_SUCCESS;
@@ -84,6 +104,13 @@ int32_t EmitEventManager::GetCurDeviceId(void)
         id++;
     }
     return virtualDeviceMap_.size() < MAX_VIRTUAL_DEVICE_NUM ? id : -1;
+}
+void EmitEventManager::ClearDeviceMap(void)
+{
+    if (virtualDeviceMap_.size() > 0) {
+        virtualDeviceMap_.clear();
+        HDF_LOGI("%{public}s: clear device map success", __func__);
+    }
 }
 } // namespace ExternalDeviceManager
 } // namespace OHOS

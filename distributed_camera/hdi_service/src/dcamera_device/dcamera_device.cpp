@@ -63,21 +63,21 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
     DCamRetCode ret = dCameraStreamOperator_->InitOutputConfigurations(dhBase_, dCameraAbilityInfo_,
         sourceAbilityInfo_);
     if (ret != SUCCESS) {
-        DHLOGE("Init distributed camera stream operator failed, ret=%d.", ret);
+        DHLOGE("Init distributed camera stream operator failed, ret=%{public}d.", ret);
         return ret;
     }
 
     ErrorCallback onErrorCallback =
         [this](ErrorType type, int32_t errorMsg) -> void {
             if (dCameraDeviceCallback_) {
-                DHLOGI("DCameraDevice onErrorCallback type: %u, errorMsg: %d", type, errorMsg);
+                DHLOGI("DCameraDevice onErrorCallback type: %{public}u, errorMsg: %{public}d", type, errorMsg);
                 dCameraDeviceCallback_->OnError(type, errorMsg);
             }
         };
     ResultCallback onResultCallback =
         [this](uint64_t timestamp, const std::shared_ptr<OHOS::Camera::CameraMetadata> &result) -> void {
             if (dCameraDeviceCallback_) {
-                DHLOGI("DCameraDevice onResultCallback timestamp: %llu", timestamp);
+                DHLOGI("DCameraDevice onResultCallback timestamp: %{public}" PRIu64, timestamp);
                 std::vector<uint8_t> metadata;
                 OHOS::Camera::MetadataUtils::ConvertMetadataToVec(result, metadata);
                 dCameraDeviceCallback_->OnResult(timestamp, metadata);
@@ -103,7 +103,7 @@ int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &ca
 
     DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
     if (ret != SUCCESS) {
-        DHLOGE("Set stream operator callbackObj failed, ret=%d.", ret);
+        DHLOGE("Set stream operator callbackObj failed, ret=%{public}d.", ret);
         return MapToExternalRetCode(ret);
     }
 
@@ -119,7 +119,8 @@ int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
     }
 
     if (!IsOpened()) {
-        DHLOGE("DCameraDevice::UpdateSettings, dcamera device %s already closed.", GetAnonyString(dCameraId_).c_str());
+        DHLOGE("DCameraDevice::UpdateSettings, dcamera device %{public}s already closed.",
+            GetAnonyString(dCameraId_).c_str());
         return CamRetCode::CAMERA_CLOSED;
     }
 
@@ -164,7 +165,7 @@ int32_t DCameraDevice::SetResultMode(ResultCallbackMode mode)
 
     DCamRetCode ret = dMetadataProcessor_->SetMetadataResultMode(mode);
     if (ret != SUCCESS) {
-        DHLOGE("Set metadata result mode failed, ret=%d.", ret);
+        DHLOGE("Set metadata result mode failed, ret=%{public}d.", ret);
     }
     return MapToExternalRetCode(ret);
 }
@@ -178,7 +179,7 @@ int32_t DCameraDevice::GetEnabledResults(std::vector<int32_t> &results)
 
     DCamRetCode ret = dMetadataProcessor_->GetEnabledMetadataResults(results);
     if (ret != SUCCESS) {
-        DHLOGE("Get enabled metadata results failed, ret=%d.", ret);
+        DHLOGE("Get enabled metadata results failed, ret=%{public}d.", ret);
     }
     return MapToExternalRetCode(ret);
 }
@@ -197,7 +198,7 @@ int32_t DCameraDevice::EnableResult(const std::vector<int32_t> &results)
 
     DCamRetCode ret = dMetadataProcessor_->EnableMetadataResult(results);
     if (ret != SUCCESS) {
-        DHLOGE("Enable metadata result failed, ret=%d.", ret);
+        DHLOGE("Enable metadata result failed, ret=%{public}d.", ret);
         return MapToExternalRetCode(ret);
     }
 
@@ -232,7 +233,7 @@ int32_t DCameraDevice::DisableResult(const std::vector<int32_t> &results)
 
     DCamRetCode ret = dMetadataProcessor_->DisableMetadataResult(results);
     if (ret != SUCCESS) {
-        DHLOGE("Disable metadata result failed, ret=%d.", ret);
+        DHLOGE("Disable metadata result failed, ret=%{public}d.", ret);
         return MapToExternalRetCode(ret);
     }
 
@@ -255,7 +256,7 @@ int32_t DCameraDevice::DisableResult(const std::vector<int32_t> &results)
 
 int32_t DCameraDevice::Close()
 {
-    DHLOGI("DCameraDevice::Close distributed camera: %s", GetAnonyString(dCameraId_).c_str());
+    DHLOGI("DCameraDevice::Close distributed camera: %{public}s", GetAnonyString(dCameraId_).c_str());
 
     OHOS::sptr<DCameraProvider> provider = DCameraProvider::GetInstance();
     if ((provider != nullptr) && (dCameraStreamOperator_ != nullptr)) {
@@ -293,7 +294,7 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
     }
     int32_t ret = provider->OpenSession(dhBase_);
     if (ret != DCamRetCode::SUCCESS) {
-        DHLOGE("Open distributed camera control session failed, ret = %d.", ret);
+        DHLOGE("Open distributed camera control session failed, ret = %{public}d.", ret);
         return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
     }
 
@@ -330,7 +331,7 @@ CamRetCode DCameraDevice::GetDCameraAbility(std::shared_ptr<CameraAbility> &abil
 
     DCamRetCode ret = dMetadataProcessor_->GetDCameraAbility(ability);
     if (ret != SUCCESS) {
-        DHLOGE("Get distributed camera ability failed, ret=%d.", ret);
+        DHLOGE("Get distributed camera ability failed, ret=%{public}d.", ret);
     }
     return MapToExternalRetCode(ret);
 }
@@ -344,7 +345,7 @@ DCamRetCode DCameraDevice::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 
     DCamRetCode ret = dCameraStreamOperator_->AcquireBuffer(streamId, buffer);
     if (ret != SUCCESS) {
-        DHLOGE("Acquire buffer failed, ret=%d.", ret);
+        DHLOGE("Acquire buffer failed, ret=%{public}d.", ret);
     }
     return ret;
 }
@@ -358,7 +359,7 @@ DCamRetCode DCameraDevice::ShutterBuffer(int streamId, const DCameraBuffer &buff
 
     DCamRetCode ret = dCameraStreamOperator_->ShutterBuffer(streamId, buffer);
     if (ret != SUCCESS) {
-        DHLOGE("Shutter buffer failed, ret=%d.", ret);
+        DHLOGE("Shutter buffer failed, ret=%{public}d.", ret);
     }
     return ret;
 }
@@ -376,7 +377,7 @@ DCamRetCode DCameraDevice::OnSettingsResult(const std::shared_ptr<DCameraSetting
     }
 
     if (result->type_ != DCSettingsType::METADATA_RESULT) {
-        DHLOGE("Invalid camera setting type = %d.", result->type_);
+        DHLOGE("Invalid camera setting type = %{public}d.", result->type_);
         return DCamRetCode::INVALID_ARGUMENT;
     }
     if ((result->value_).empty()) {
@@ -386,17 +387,17 @@ DCamRetCode DCameraDevice::OnSettingsResult(const std::shared_ptr<DCameraSetting
 
     DCamRetCode ret = dMetadataProcessor_->SaveResultMetadata(result->value_);
     if (ret != DCamRetCode::SUCCESS) {
-        DHLOGE("Save result metadata failed, ret = %d", ret);
+        DHLOGE("Save result metadata failed, ret = %{public}d", ret);
     }
     return ret;
 }
 
 DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
 {
-    DHLOGI("DCameraDevice::Notify for event type = %d, result = %d, content = %s.", event->type_, event->result_,
-        event->content_.c_str());
+    DHLOGI("DCameraDevice::Notify for event type = %{public}d, result = %{public}d, content = %{public}s.",
+        event->type_, event->result_, event->content_.c_str());
     if ((event->type_ != DCameraEventType::DCAMERA_MESSAGE) && (event->type_ != DCameraEventType::DCAMERA_OPERATION)) {
-        DHLOGE("Invalid distributed camera event type = %d.", event->type_);
+        DHLOGE("Invalid distributed camera event type = %{public}d.", event->type_);
         return DCamRetCode::INVALID_ARGUMENT;
     }
     switch (event->result_) {

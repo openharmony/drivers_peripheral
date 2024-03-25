@@ -17,6 +17,7 @@ ohos_executable("codec_idl_omx_decode") {
   include_dirs = [
     "./include",
     "../../../interfaces/include",
+    "//third_party/openmax/api/1.1.2",
   ]
 
   sources = [
@@ -45,7 +46,6 @@ ohos_executable("codec_idl_omx_decode") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "openmax:libopenmax_shared" ]
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -56,6 +56,7 @@ ohos_executable("codec_idl_omx_encode") {
   include_dirs = [
     "./include",
     "../../../interfaces/include",
+    "//third_party/openmax/api/1.1.2",
   ]
 
   sources = [
@@ -84,7 +85,6 @@ ohos_executable("codec_idl_omx_encode") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "openmax:libopenmax_shared" ]
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

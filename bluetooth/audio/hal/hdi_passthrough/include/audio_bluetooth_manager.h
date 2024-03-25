@@ -21,6 +21,11 @@
 #include "bluetooth_a2dp_a2dpCodecStatus.h"
 #include "raw_address.h"
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
