@@ -39,7 +39,7 @@ public:
     int32_t PlayHapticPattern(const HapticPaketVdi& pkgVdi) override;
     int32_t GetHapticCapacity(HapticCapacityVdi& hapticCapacityVdi) override;
     int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
-    int32_t StartByIntensity(const std::string& effectType, uint16_t Intensity) override;
+    int32_t StartByIntensity(const std::string& effectType, uint16_t intensity) override;
 };
 } // V1_1
 } // Vibrator
