@@ -27,11 +27,11 @@ namespace OHOS::Camera {
 using namespace std;
 static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
 {
-    static map<uint32_t, enum AVPixelFormat> ohosFormat2AVPixelFormatMap= {
+    static map<uint32_t, enum AVPixelFormat> ohosFormat2AVPixelFormatMap = {
         {CAMERA_FORMAT_RGBA_8888,    AV_PIX_FMT_RGBA},
         {CAMERA_FORMAT_RGB_888,      AV_PIX_FMT_RGB24},
         {CAMERA_FORMAT_YCRCB_420_SP, AV_PIX_FMT_NV21},
-        {CAMERA_FORMAT_YCRCB_422_P ,AV_PIX_FMT_YUYV422}
+        {CAMERA_FORMAT_YCRCB_422_P,  AV_PIX_FMT_YUYV422},
     };
     auto it = ohosFormat2AVPixelFormatMap.find(format);
     if (it != ohosFormat2AVPixelFormatMap.end()) {
@@ -47,7 +47,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     auto srcAVFmt = ConvertOhosFormat2AVPixelFormat(srcBufferInfo.format);
     auto dstAVFmt = ConvertOhosFormat2AVPixelFormat(dstBufferInfo.format);
     if (srcAVFmt == AV_PIX_FMT_NONE || dstAVFmt == AV_PIX_FMT_NONE) {
-        CAMERA_LOGE("NodeUtils::ImageFormatConvert Error, id = %{public}d, not support format: %{public}d -> %{public}d",
+        CAMERA_LOGE("NodeUtils::ImageFormatConvert err, id = %{public}d, unsupport format: %{public}d -> %{public}d",
             id, srcBufferInfo.format, dstBufferInfo.format);
         return -1;
     }

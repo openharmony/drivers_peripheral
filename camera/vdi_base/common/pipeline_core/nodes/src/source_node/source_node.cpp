@@ -124,6 +124,7 @@ void SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             captureRequests_[id].pop_front();
         }
     }
+    buffer->SetIsValidDataInSurfaceBuffer(false);
     NodeBase::DeliverBuffer(buffer);
 }
 
@@ -269,7 +270,6 @@ void SourceNode::PortHandler::CollectBuffers()
     CAMERA_LOGE("streamId[%{public}d], bufferIndex[%{public}d], Size %{public}d => %{public}d",
                 buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
 
-    // pool->ExpendBufferSize(buffer, bufferSize);
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
         CAMERA_LOGE("CollectBuffers begin malloc buffer");
         auto bufferAddr = malloc(bufferSize);

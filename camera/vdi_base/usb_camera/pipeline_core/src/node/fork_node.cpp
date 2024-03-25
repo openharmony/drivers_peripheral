@@ -99,8 +99,12 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
 {
     if (forkBuffer->GetVirAddress() == forkBuffer->GetSuffaceBufferAddr()) {
         CAMERA_LOGI("PcForkNode::DeliverBuffer begin malloc buffer");
-        auto bufferSize = buffer->GetSize();
-        auto bufferAddr = malloc(bufferSize);
+        uint32_t bufferSize = buffer->GetSize();
+        if (bufferSize == 0) {
+            CAMERA_LOGE("PcForkNode::DeliverBuffer error,  buffer->GetSize() == 0");
+            return;
+        }
+        void* bufferAddr = malloc(bufferSize);
         if (bufferAddr != nullptr) {
             forkBuffer->SetVirAddress(bufferAddr);
             forkBuffer->SetSize(bufferSize);
@@ -108,6 +112,7 @@ static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared
                 forkBuffer->GetVirAddress(), forkBuffer->GetSuffaceBufferAddr());
         } else {
             CAMERA_LOGE("PcForkNode::DeliverBuffer malloc buffer fail");
+            return;
         }
     }
     if (forkBuffer->GetVirAddress() != forkBuffer->GetSuffaceBufferAddr()) {
@@ -149,7 +154,7 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
                         captureRequests_[id].size(), forkBuffer->GetCaptureId());
                 }
             }
-            CAMERA_LOGE("PcForkNode::Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d", 
+            CAMERA_LOGE("Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d",
                 forkBuffer->GetStreamId(), forkBuffer->GetIndex(), forkBuffer->GetBufferStatus());
             NodeBase::DeliverBuffer(forkBuffer);
         }
