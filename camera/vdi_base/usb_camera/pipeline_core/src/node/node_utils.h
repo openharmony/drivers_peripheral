@@ -12,7 +12,7 @@
  */
 
 #ifndef __NODE_UTILS_H__
-#include "stdint.h"
+#include "cstdint"
 #include "mutex"
 #include "memory"
 #include "ibuffer.h"
@@ -21,7 +21,8 @@ namespace OHOS::Camera {
     public:
         struct ImageBufferInfo;
         static int32_t ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBufferInfo &dstBufferInfo);
-        static void BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer, void *dstBuffer = nullptr, uint32_t dstBufferSize = 0);
+        static void BufferScaleFormatTransform(std::shared_ptr<IBuffer>& buffer,
+            void *dstBuffer = nullptr, uint32_t dstBufferSize = 0);
 
         struct ImageBufferInfo {
             int32_t width;

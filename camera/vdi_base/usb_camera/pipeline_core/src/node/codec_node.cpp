@@ -271,7 +271,8 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     int32_t id = buffer->GetStreamId();
-    CAMERA_LOGI("CodecNode::DeliverBuffer, streamId[%{public}d], index[%{public}d], format = %{public}d, encode =  %{public}d",
+    CAMERA_LOGI("CodecNode::DeliverBuffer, streamId[%{public}d], index[%{public}d],\
+format = %{public}d, encode =  %{public}d",
         id, buffer->GetIndex(), buffer->GetFormat(), buffer->GetEncodeType());
 
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
