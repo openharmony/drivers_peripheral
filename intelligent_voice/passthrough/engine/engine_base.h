@@ -32,6 +32,8 @@ public:
     IntellVoiceStatus Stop() override;
     IntellVoiceStatus Cancel() override;
     IntellVoiceStatus ReadFileData(ContentType type, getFileDataCb cb) override;
+    IntellVoiceStatus GetWakeupPcm(std::vector<uint8_t> &data) override;
+    IntellVoiceStatus Evaluate(const std::string &word, EvaluationResultInfo &info) override;
 
 protected:
     std::shared_ptr<IEngineCallback> callback_ = nullptr;

@@ -53,12 +53,13 @@ ohos_shared_library("usb_camera_buffer_manager") {
     "$camera_path_vdi/buffer_manager/src/buffer_adapter/standard",
     "$camera_path_vdi/include",
     "$camera_path_vdi/../../interfaces/include",
+    "$camera_path_vdi/utils/event",
   ]
 
   libs = []
 
   defines = []
-
+  deps = [ "$camera_path_vdi/utils:peripheral_camera_utils" ]
   if (enable_camera_device_utest) {
     defines += [ "CAMERA_DEVICE_UTEST" ]
   }

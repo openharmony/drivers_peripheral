@@ -20,20 +20,26 @@
 
 namespace OHOS {
 namespace ExternalDeviceManager {
-VirtualDeviceInject::VirtualDeviceInject(std::shared_ptr<VirtualDevice> virtualDevice)
+VirtualDeviceInject::VirtualDeviceInject(std::shared_ptr<VirtualDevice> virtualDevice, uint32_t creatorToken)
 {
     if (virtualDevice != nullptr) {
         virtualDevice->SetUp();
     } else {
         HDF_LOGE("%{public}s: virtualDevice is nullptr", __func__);
     }
-    
+
+    creatorToken_ = creatorToken;
     injectThread_ = std::make_unique<InjectThread>(virtualDevice);
     if (injectThread_ != nullptr) {
         injectThread_->Start();
     } else {
         HDF_LOGE("%{public}s: injectThread_ is nullptr", __func__);
     }
+}
+
+uint32_t VirtualDeviceInject::GetCreatorToken()
+{
+    return creatorToken_;
 }
 
 VirtualDeviceInject::~VirtualDeviceInject()

@@ -43,14 +43,14 @@ AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName,
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
     const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
     framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) / sizePerSec;
-    DHLOGD("Distributed audio capture constructed, period(%d),frameSize(%d), framePeriodNs_(%d).",
-        attrs.period, devAttrs_.frameSize, framePeriodNs_);
-    DHLOGD("Distributed audio capture constructed, id(%d).", desc.pins);
+    DHLOGD("Distributed audio capture constructed, period(%{public}d),frameSize(%{public}d).",
+        attrs.period, devAttrs_.frameSize);
+    DHLOGD("Distributed audio capture constructed, id(%{public}d).", desc.pins);
 }
 
 AudioCaptureInterfaceImpl::~AudioCaptureInterfaceImpl()
 {
-    DHLOGD("Distributed audio capture destructed, id(%d).", devDesc_.pins);
+    DHLOGD("Distributed audio capture destructed, id(%{public}d).", devDesc_.pins);
 }
 
 int32_t AudioCaptureInterfaceImpl::GetCapturePosition(uint64_t &frames, AudioTimeStamp &time)
@@ -63,10 +63,9 @@ int32_t AudioCaptureInterfaceImpl::GetCapturePosition(uint64_t &frames, AudioTim
 
 int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes)
 {
-    DHLOGD("Capture frame[sampleRate: %d, channelCount: %d, format: %d, frameSize: %d].", devAttrs_.sampleRate,
-        devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
+    DHLOGD("Capture frame[sampleRate:%{public}d, channelCount: %{public}d, format: %{public}d, frameSize: %{public}d].",
+        devAttrs_.sampleRate, devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
     int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, startTime_);
-    DHLOGD("Capture framIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
 
     int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> captureLck(captureMtx_);
@@ -102,8 +101,8 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     DHLOGD("Capture audio frame success.");
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-        DHLOGD("This time capture frame spend: %lld us, The interval of this time and the last time: %lld us",
-            endTime - startTime, startTime - lastCaptureStartTime_);
+        DHLOGD("This time capture frame spend: %" PRId64" us, The interval of this time and the last time: %" PRId64
+            " us", endTime - startTime, startTime - lastCaptureStartTime_);
     }
     lastCaptureStartTime_ = startTime;
     return HDF_SUCCESS;

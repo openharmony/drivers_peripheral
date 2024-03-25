@@ -84,6 +84,8 @@ void ComponentMgr::AddVendorComponent()
 {
     std::string path = HDF_LIBRARY_NAME("libOMX_Core");
     AddComponentByLibName(path.c_str());
+    path = HDF_LIBRARY_NAME("libomx_audio_codec");
+    AddComponentByLibName(path.c_str());
 }
 
 void ComponentMgr::AddSoftComponent()

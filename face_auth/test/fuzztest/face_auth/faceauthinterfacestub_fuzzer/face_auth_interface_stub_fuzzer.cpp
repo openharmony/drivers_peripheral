@@ -20,7 +20,8 @@
 #include "v1_1/face_auth_interface_service.h"
 #include "v1_1/face_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_IMPL
+#undef LOG_TAG
+#define LOG_TAG "FACE_AUTH_IMPL"
 
 #undef private
 

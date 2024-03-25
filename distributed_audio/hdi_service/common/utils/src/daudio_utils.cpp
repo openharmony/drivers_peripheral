@@ -77,7 +77,7 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
     std::string val = "-1";
     int32_t ret = GetAudioParamStr(params, key, val);
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return -1;
     }
     value = std::stoi(val);
@@ -87,7 +87,7 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
 bool CheckIsNum(const std::string &jsonString)
 {
     if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
-        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
+        DHLOGE("Json string size is zero or too long.");
         return false;
     }
     for (char const &c : jsonString) {
@@ -258,12 +258,12 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
     for (auto it = keys.begin(); it != keys.end(); it++) {
         cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
         if (paramValue == nullptr) {
-            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
+            DHLOGE("JSON parameter does not contain key: %{public}s", (*it).c_str());
             return false;
         }
         bool res = IsString(jsonObj, *it);
         if (!res) {
-            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
+            DHLOGE("The key %{public}s value format in JSON is illegal.", (*it).c_str());
             return false;
         }
     }
@@ -272,27 +272,27 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
 
 std::string ParseStringFromArgs(const std::string &args, const char *key)
 {
-    DHLOGD("ParseStringFrom Args : %s", args.c_str());
+    DHLOGD("ParseStringFrom Args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
         cJSON_Delete(jParam);
         return "Failed to parse JSON";
     }
     if (!CJsonParamCheck(jParam, { key })) {
-        DHLOGE("Not found the key : %s.", key);
+        DHLOGE("Not found the key : %{public}s.", key);
         cJSON_Delete(jParam);
         return "Not found the key.";
     }
     cJSON *dhIdItem = cJSON_GetObjectItem(jParam, key);
     if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
-        DHLOGE("Not found the value of the key : %s.", key);
+        DHLOGE("Not found the value of the key : %{public}s.", key);
         cJSON_Delete(jParam);
         return "Not found the value.";
     }
     std::string content(dhIdItem->valuestring);
     cJSON_Delete(jParam);
-    DHLOGD("Parsed string is: %s.", content.c_str());
+    DHLOGD("Parsed string is: %{public}s.", content.c_str());
     return content;
 }
 } // namespace DistributedHardware

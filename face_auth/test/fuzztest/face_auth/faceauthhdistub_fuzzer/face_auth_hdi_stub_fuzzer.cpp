@@ -19,7 +19,9 @@
 
 #include "v1_1/executor_stub.h"
 #include "executor_impl.h"
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
+
+#undef LOG_TAG
+#define LOG_TAG "FACE_AUTH_HDI"
 
 #undef private
 

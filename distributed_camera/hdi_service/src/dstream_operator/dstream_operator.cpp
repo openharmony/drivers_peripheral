@@ -58,12 +58,12 @@ int32_t DStreamOperator::CreateStreams(const std::vector<StreamInfo> &streamInfo
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("DStreamOperator::CreateStreams, input stream info size=%d.", streamInfos.size());
+    DHLOGI("DStreamOperator::CreateStreams, input stream info size=%{public}zu.", streamInfos.size());
 
     for (const auto &info : streamInfos) {
-        DHLOGI("DStreamOperator::CreateStreams, streamInfo: id=%d, intent=%d, width=%d, height=%d, format=%d, " +
-            "dataspace=%d, encodeType=%d", info.streamId_, info.intent_, info.width_, info.height_, info.format_,
-            info.dataspace_, info.encodeType_);
+        DHLOGI("DStreamOperator::CreateStreams, streamInfo: id=%{public}d, width=%{public}d, "
+            "height=%{public}d, format=%{public}d, dataspace=%{public}d, encodeType=%{public}d",
+            info.streamId_, info.width_, info.height_, info.format_, info.dataspace_, info.encodeType_);
         if (FindHalStreamById(info.streamId_) != nullptr) {
             return CamRetCode::INVALID_ARGUMENT;
         }
@@ -82,8 +82,9 @@ int32_t DStreamOperator::CreateStreams(const std::vector<StreamInfo> &streamInfo
         std::shared_ptr<DCStreamInfo> dcStreamInfo = std::make_shared<DCStreamInfo>();
         ConvertStreamInfo(info, dcStreamInfo);
         InsertDCStream(info.streamId_, dcStreamInfo);
-        DHLOGI("DStreamOperator::CreateStreams, dcStreamInfo: id=%d, type=%d, width=%d, height=%d, format=%d, " +
-            "dataspace=%d, encodeType=%d", dcStreamInfo->streamId_, dcStreamInfo->type_, dcStreamInfo->width_,
+        DHLOGI("DStreamOperator::CreateStreams, dcStreamInfo: id=%{public}d, type=%{public}d, width=%{public}d, "
+            "height=%{public}d, format=%{public}d, dataspace=%{public}d, encodeType=%{public}d",
+            dcStreamInfo->streamId_, dcStreamInfo->type_, dcStreamInfo->width_,
             dcStreamInfo->height_, dcStreamInfo->format_, dcStreamInfo->dataspace_, dcStreamInfo->encodeType_);
     }
     DHLOGI("DStreamOperator::Create distributed camera streams success.");
@@ -97,7 +98,7 @@ int32_t DStreamOperator::ReleaseStreams(const std::vector<int32_t> &streamIds)
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("DStreamOperator::ReleaseStreams, input stream id list size=%d.", streamIds.size());
+    DHLOGI("DStreamOperator::ReleaseStreams, input stream id list size=%{public}zu.", streamIds.size());
 
     if (IsCapturing()) {
         DHLOGE("Can not release streams when capture.");
@@ -109,16 +110,16 @@ int32_t DStreamOperator::ReleaseStreams(const std::vector<int32_t> &streamIds)
         if (stream != nullptr) {
             DCamRetCode ret = stream->ReleaseDCameraBufferQueue();
             if (ret != SUCCESS) {
-                DHLOGE("Release distributed camera buffer queue for stream %d failed.", id);
+                DHLOGE("Release distributed camera buffer queue for stream %{public}d failed.", id);
                 return MapToExternalRetCode(ret);
             } else {
-                DHLOGI("Release distributed camera buffer queue for stream %d success.", id);
+                DHLOGI("Release distributed camera buffer queue for stream %{public}d success.", id);
             }
             stream = nullptr;
             EraseHalStream(id);
             EraseDCStream(id);
         } else {
-            DHLOGE("Error streamId %d.", id);
+            DHLOGE("Error streamId %{public}d.", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
     }
@@ -162,7 +163,7 @@ int32_t DStreamOperator::ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStr
 
 int32_t DStreamOperator::CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting)
 {
-    DHLOGI("DStreamOperator::CommitStreams, input operation mode=%d.", mode);
+    DHLOGI("DStreamOperator::CommitStreams, input operation mode=%{public}d.", mode);
 
     if (modeSetting.empty() || modeSetting.size() > METADATA_CAPACITY_MAX_SIZE) {
         DHLOGE("DStreamOperator::CommitStreams, input modeSetting is invalid.");
@@ -216,7 +217,7 @@ int32_t DStreamOperator::HalStreamCommit(const DCStreamInfo &streamInfo)
     if (stream != nullptr) {
         int32_t ret = stream->FinishCommitStream();
         if (ret != DCamRetCode::SUCCESS) {
-            DHLOGE("Stream %d cannot init.", streamInfo.streamId_);
+            DHLOGE("Stream %{public}d cannot init.", streamInfo.streamId_);
             return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
         }
     }
@@ -265,7 +266,7 @@ int32_t DStreamOperator::AttachBufferQueue(int32_t streamId, const sptr<BufferPr
         }
         return MapToExternalRetCode(ret);
     } else {
-        DHLOGE("Not found stream id %d when attach bubfer queue.", streamId);
+        DHLOGE("Not found stream id %{public}d when attach bubfer queue.", streamId);
         return CamRetCode::INVALID_ARGUMENT;
     }
 }
@@ -315,7 +316,7 @@ int32_t DStreamOperator::DetachBufferQueue(int32_t streamId)
         }
         return MapToExternalRetCode(ret);
     } else {
-        DHLOGE("Not found stream id %d when detach bubfer queue.", streamId);
+        DHLOGE("Not found stream id %{public}d when detach bubfer queue.", streamId);
         return CamRetCode::INVALID_ARGUMENT;
     }
 }
@@ -345,7 +346,7 @@ int32_t DStreamOperator::Capture(int32_t captureId, const CaptureInfo &info, boo
         return CamRetCode::INVALID_ARGUMENT;
     }
     if (captureId < 0 || FindCaptureInfoById(captureId) != nullptr) {
-        DHLOGE("Input captureId %d is exist.", captureId);
+        DHLOGE("Input captureId %{public}d is exist.", captureId);
         return CamRetCode::INVALID_ARGUMENT;
     }
     return DoCapture(captureId, info, isStreaming);
@@ -357,17 +358,17 @@ int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, b
         InsertNotifyCaptureMap(id);
         auto stream = FindHalStreamById(id);
         if (stream == nullptr) {
-            DHLOGE("Invalid stream id %d", id);
+            DHLOGE("Invalid stream id %{public}d", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
         if (!stream->HasBufferQueue()) {
-            DHLOGE("Stream %d has not bufferQueue.", id);
+            DHLOGE("Stream %{public}d has not bufferQueue.", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
         stream->DoCapture();
         InsertEnableShutter(id, info.enableShutterCallback_);
-        DHLOGI("DStreamOperator::DoCapture info: "+
-            "captureId=%d, streamId=%d, isStreaming=%d", captureId, id, isStreaming);
+        DHLOGI("DStreamOperator::DoCapture info: "
+            "captureId=%{public}d, streamId=%{public}d, isStreaming=%{public}d", captureId, id, isStreaming);
     }
 
     DCamRetCode ret = NegotiateSuitableCaptureInfo(info, isStreaming);
@@ -407,10 +408,10 @@ int32_t DStreamOperator::CancelCapture(int32_t captureId)
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DHLOGI("DStreamOperator::CancelCapture, cancel distributed camera capture, captureId=%d.", captureId);
+    DHLOGI("DStreamOperator::CancelCapture, cancel distributed camera capture, captureId=%{public}d.", captureId);
     auto halCaptureInfo = FindCaptureInfoById(captureId);
     if (captureId < 0 || halCaptureInfo == nullptr) {
-        DHLOGE("Input captureId %d is not exist.", captureId);
+        DHLOGE("Input captureId %{public}d is not exist.", captureId);
         return CamRetCode::INVALID_ARGUMENT;
     }
 
@@ -449,7 +450,7 @@ int32_t DStreamOperator::CancelCapture(int32_t captureId)
         SetCapturing(false);
         cachedDCaptureInfoList_.clear();
     }
-    DHLOGI("DStreamOperator::CancelCapture success, captureId=%d.", captureId);
+    DHLOGI("DStreamOperator::CancelCapture success, captureId=%{public}d.", captureId);
     return CamRetCode::NO_ERROR;
 }
 
@@ -464,8 +465,8 @@ bool DStreamOperator::HasContinuousCaptureInfo(int captureId)
                 continue;
             }
 
-            DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, streamId=%d, streamType=%d",
-                captureId, id, dcStreamInfo->second->type_);
+            DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%{public}d, streamId=%{public}d, streamType="
+                "%{public}d", captureId, id, dcStreamInfo->second->type_);
             if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
                 DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, stream %d is continuous stream.",
                     captureId, id);
@@ -494,7 +495,7 @@ void DStreamOperator::ExtractCameraAttr(Json::Value &rootValue, std::vector<int>
             !rootValue[rootNode]["Resolution"][formatStr].isArray() ||
             rootValue[rootNode]["Resolution"][formatStr].size() == 0 ||
             rootValue[rootNode]["Resolution"][formatStr].size() > JSON_ARRAY_MAX_SIZE) {
-            DHLOGE("Resolution or %s error.", formatStr.c_str());
+            DHLOGE("Resolution or %{public}s error.", formatStr.c_str());
             continue;
         }
         GetCameraAttr(rootValue, formatStr, rootNode, format);
@@ -508,7 +509,7 @@ void DStreamOperator::GetCameraAttr(Json::Value &rootValue, std::string formatSt
     uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
     for (uint32_t i = 0; i < size; i++) {
         if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
-            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
+            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
             continue;
         }
         std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
@@ -676,7 +677,7 @@ DCamRetCode DStreamOperator::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 
     auto stream = FindHalStreamById(streamId);
     if (stream == nullptr) {
-        DHLOGE("streamId %d is invalid, can not acquire buffer.", streamId);
+        DHLOGE("streamId %{public}d is invalid, can not acquire buffer.", streamId);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -691,11 +692,11 @@ DCamRetCode DStreamOperator::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 
 DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &buffer)
 {
-    DHLOGD("DStreamOperator::ShutterBuffer begin shutter buffer for streamId = %d", streamId);
+    DHLOGD("DStreamOperator::ShutterBuffer begin shutter buffer for streamId = %{public}d", streamId);
 
     int32_t captureId = FindCaptureIdByStreamId(streamId);
     if (captureId == -1) {
-        DHLOGE("ShutterBuffer failed, invalid streamId = %d", streamId);
+        DHLOGE("ShutterBuffer failed, invalid streamId = %{public}d", streamId);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -770,7 +771,7 @@ void DStreamOperator::SnapShotStreamOnCaptureEnded(int32_t captureId, int stream
     tmp.streamId_ = streamId;
     info.push_back(tmp);
     dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
-    DHLOGD("snapshot stream successfully reported captureId = %d streamId = %d.", captureId, streamId);
+    DHLOGD("snapshot stream successfully reported captureId = %{public}d streamId = %{public}d.", captureId, streamId);
 }
 
 void DStreamOperator::Release()
@@ -807,7 +808,7 @@ std::vector<int> DStreamOperator::GetStreamIds()
         streamIds.push_back(iter.first);
         idString += (std::to_string(iter.first) + ", ");
     }
-    DHLOGI("DStreamOperator::GetStreamIds, ids=[%s]", idString.c_str());
+    DHLOGI("DStreamOperator::GetStreamIds, ids=[%{public}s]", idString.c_str());
     return streamIds;
 }
 
@@ -853,7 +854,8 @@ void DStreamOperator::ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_p
 DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming)
 {
     for (auto streamId : srcCaptureInfo.streamIds_) {
-        DHLOGI("DStreamOperator::NegotiateSuitableCaptureInfo, streamId=%d, isStreaming=%d", streamId, isStreaming);
+        DHLOGI("DStreamOperator::NegotiateSuitableCaptureInfo, streamId=%{public}d, isStreaming=%{public}d",
+            streamId, isStreaming);
     }
 
     std::shared_ptr<DCCaptureInfo> inputCaptureInfo = nullptr;
@@ -876,8 +878,9 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const CaptureInfo& src
         for (auto id : info->streamIds_) {
             idString += (std::to_string(id) + ", ");
         }
-        DHLOGI("cachedDCaptureInfo: ids=%s width=%d, height=%d, format=%d, dataspace=%d, isCapture=%d," +
-            "encodeType=%d, streamType=%d", idString.c_str(), info->width_, info->height_, info->format_,
+        DHLOGI("cachedDCaptureInfo: ids=%{public}s width=%{public}d, height=%{public}d, format=%{public}d, "
+            "dataspace=%{public}d, isCapture=%{public}d, encodeType=%{public}d, streamType=%{public}d",
+            idString.c_str(), info->width_, info->height_, info->format_,
             info->dataspace_, info->isCapture_, info->encodeType_, info->type_);
     }
     return SUCCESS;
@@ -1023,8 +1026,8 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
     }
 
     if ((tempResolution.width_ == 0) || (tempResolution.height_ == 0)) {
-        DHLOGI("DStreamOperator::ChooseSuitableResolution, captureInfo. width = %d, height = %d. ", captureInfo->width_,
-            captureInfo->height_);
+        DHLOGI("DStreamOperator::ChooseSuitableResolution, captureInfo. width = %{public}d, height = %{public}d. ",
+            captureInfo->width_, captureInfo->height_);
         if (supportedResolutionList.size() > 0) {
             captureInfo->width_ = supportedResolutionList[supportedResolutionList.size() - 1].width_;
             captureInfo->height_ = supportedResolutionList[supportedResolutionList.size() - 1].height_;
@@ -1080,7 +1083,7 @@ void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &cap
             }
 
             if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
-                DHLOGI("DStreamOperator::ChooseSuitableStreamId, streamId: %d", id);
+                DHLOGI("DStreamOperator::ChooseSuitableStreamId, streamId: %{public}d", id);
                 captureInfo->streamIds_.push_back(id);
             }
         }
@@ -1089,7 +1092,7 @@ void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &cap
 
 DCEncodeType DStreamOperator::ConvertDCEncodeType(std::string &srcEncodeType)
 {
-    DHLOGI("DStreamOperator::ConvertDCEncodeType %s", srcEncodeType.c_str());
+    DHLOGI("DStreamOperator::ConvertDCEncodeType %{public}s", srcEncodeType.c_str());
     if (srcEncodeType == ENCODE_TYPE_STR_H264) {
         return DCEncodeType::ENCODE_TYPE_H264;
     } else if (srcEncodeType == ENCODE_TYPE_STR_H265) {

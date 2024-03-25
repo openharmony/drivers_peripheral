@@ -38,6 +38,9 @@ extern "C" {
 #define WIFI_PIN_CODE_LENGTH 8
 #define WIFI_P2P_TLVS_LENGTH 256
 #define WIFI_BSSID_LEN 6
+#define WPA_VENDOR_DATA_LEN 256
+#define WPA_VENDOR_SSID_LEN 32
+#define WPA_VENDOR_PSK_LEN 64
 
 typedef enum {
     WPA_EVENT_DISCONNECT = 0,
@@ -66,12 +69,13 @@ typedef enum {
     WPA_EVENT_STA_CONNECT_STATE,
     WPA_EVENT_IFACE_CREATED,
     WPA_EVENT_STA_AUTH_REJECT,
-    WPA_EVENT_STA_NOTIFY
+    WPA_EVENT_STA_NOTIFY,
+    WPA_EVENT_VENDOR_EXT,
 } WpaCallBackEventType;
 
 enum WpaClientType {
-    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<26 */
-    WIFI_WPA_TO_HAL_CLIENT = 134217727,
+    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<29 */
+    WIFI_WPA_TO_HAL_CLIENT = 268435454,
     WIFI_WPA_CLIENT_BUTT
 };
 
@@ -218,6 +222,19 @@ struct WpaCallbackEvent {
     uint32_t eventType; /* eventmap */
     char ifName[IFNAMSIZ + 1];
     OnReceiveFunc onRecFunc;
+};
+
+struct WpaVendorExtInfo {
+    int type;
+    int freq;
+    int width;
+    int id;
+    int status;
+    int reason;
+    unsigned char ssid[WPA_VENDOR_SSID_LEN];
+    unsigned char psk[WPA_VENDOR_PSK_LEN];
+    unsigned char devAddr[ETH_ADDR_LEN];
+    unsigned char data[WPA_VENDOR_DATA_LEN];
 };
 
 void WpaEventReport(const char *ifName, uint32_t event, void *data);

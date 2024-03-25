@@ -19,6 +19,11 @@
 #include <iproxy_broker.h>
 #include "vendor_interface.h"
 
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS {
 namespace HDI {
 namespace Bluetooth {
@@ -78,7 +83,7 @@ int32_t HciInterfaceImpl::Init(const sptr<IHciCallback>& callbackObj)
 
 int32_t HciInterfaceImpl::SendHciPacket(BtType type, const std::vector<uint8_t>& data)
 {
-    HDF_LOGI("HciInterfaceImpl %{public}s, %{public}d", __func__, type);
+    HDF_LOGD("HciInterfaceImpl %{public}s, %{public}d", __func__, type);
     if (data.empty()) {
         return HDF_FAILURE;
     }
