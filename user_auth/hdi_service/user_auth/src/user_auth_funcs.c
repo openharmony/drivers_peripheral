@@ -34,7 +34,7 @@
 // Used to cache screenLock auth token plain.
 IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}, {}};
 
-ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
+ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
 {
     if (schedules == NULL) {
         LOG_ERROR("schedules is null");
@@ -185,7 +185,7 @@ IAM_STATIC ResultCode GetUnlockAuthResult(int32_t *userId, UserAuthTokenHal *tok
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info, int32_t userId,
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info, int32_t userId,
     UserAuthTokenHal *authToken)
 {
     uint64_t time = GetSystemTime();
@@ -217,7 +217,7 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info,
     return RESULT_SUCCESS;
 }
 
-ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, UserAuthTokenHal *authToken,
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, UserAuthTokenHal *authToken,
     EnrolledStateHal *enrolledState)
 {
     if (info == NULL || authToken == NULL || info->reuseUnlockResultDuration == 0 ||

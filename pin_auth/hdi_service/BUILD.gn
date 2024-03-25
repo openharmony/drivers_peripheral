@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libpin_auth_interface_service_1.1") {
+ohos_shared_library("libpin_auth_interface_service_2.0") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -30,7 +30,6 @@ ohos_shared_library("libpin_auth_interface_service_1.1") {
     "common/inc",
     "database/inc",
     "main/inc",
-    "//third_party/openssl/include",
     "../common/logs",
     "../common/utils",
   ]
@@ -52,14 +51,13 @@ ohos_shared_library("libpin_auth_interface_service_1.1") {
     "service/src/pin_auth_interface_service.cpp",
   ]
 
-  deps = [ "//third_party/openssl:libcrypto_shared" ]
-
   external_deps = [
     "c_utils:utils",
     "drivers_interface_pin_auth:pin_auth_idl_headers",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "openssl:libcrypto_shared",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -85,11 +83,11 @@ ohos_shared_library("libpin_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/src/pin_auth_interface_driver.cpp" ]
-  deps = [ "../hdi_service:libpin_auth_interface_service_1.1" ]
+  deps = [ "../hdi_service:libpin_auth_interface_service_2.0" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_pin_auth:libpin_auth_stub_1.1",
+    "drivers_interface_pin_auth:libpin_auth_stub_2.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -108,6 +106,6 @@ ohos_shared_library("libpin_auth_driver") {
 group("hdf_pin_auth_service") {
   deps = [
     ":libpin_auth_driver",
-    ":libpin_auth_interface_service_1.1",
+    ":libpin_auth_interface_service_2.0",
   ]
 }

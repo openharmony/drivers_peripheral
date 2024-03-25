@@ -22,9 +22,7 @@
         "hilog",
         "c_utils",
         "init",
-        "drivers_interface_pin_auth"
-      ],
-      "third_party": [
+        "drivers_interface_pin_auth",
         "openssl"
       ]
     },
@@ -33,8 +31,8 @@
         "//drivers/peripheral/pin_auth:pin_auth_entry"
       ],
       "test": [
-        "//drivers/peripheral/pin_auth/test:fuzztest",
-        "//drivers/peripheral/pin_auth/test:uinttest"
+        "//drivers/peripheral/pin_auth/test:driver_pinauth_fuzztest",
+        "//drivers/peripheral/pin_auth/test:driver_pinauth_unittest"
       ],
       "inner_kits": []
     }
