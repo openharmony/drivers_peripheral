@@ -1865,6 +1865,12 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
             CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
             return HDF_FAILURE;
         }
+    } else if (strncmp(ifName, "chba0", strlen("chba0"))) {
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+            CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+            return HDF_FAILURE;
+        }
     }
     if (pWpaInterface->wpaCliAddIface(pWpaInterface, &addInterface, true) < 0) {
         HDF_LOGE("%{public}s Failed to add wpa iface!", __func__);
