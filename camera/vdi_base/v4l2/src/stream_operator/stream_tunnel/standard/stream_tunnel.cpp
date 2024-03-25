@@ -65,6 +65,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     OHOS::sptr<OHOS::SurfaceBuffer> sb = nullptr;
     int32_t fence = 0;
     constexpr int32_t SLEEP_TIME = 2000;
+    int32_t timtCount = 0;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     do {
         sfError = bufferQueue_->RequestBuffer(sb, fence, requestConfig_);
@@ -72,6 +73,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });
             usleep(SLEEP_TIME);
+            timtCount++;
         }
         if (fence != -1) {
             close(fence);
@@ -79,6 +81,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
         stats_.RequestBufferResult(sfError);
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
+    CAMERA_LOGE("bufferQueue_->RequestBuffer Done, sfError = %{public}d, cast time = %{public}d us", sfError, timtCount * SLEEP_TIME);
 
     if (stop_) {
         if (sb != nullptr) {
@@ -134,6 +137,11 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         int64_t timestamp = 0;
         sb->GetExtraData()->ExtraGet(OHOS::Camera::timeStamp, timestamp);
         flushConfig_.timestamp = timestamp;
+        if (!buffer->GetIsValidDataInSurfaceBuffer()) {
+            CAMERA_LOGI("copy data from camera buffer to surface buffer, size = %{public}d", sb->GetSize());
+            memcpy_s(sb->GetVirAddr(), sb->GetSize(), buffer->GetVirAddress(), sb->GetSize());
+        }
+        buffer->SetIsValidDataInSurfaceBuffer(false);
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         CAMERA_LOGI("FlushBuffer stream = [%{public}d], timestamp = [%{public}d], ret = [%{public}d]",
             buffer->GetStreamId(), timestamp, ret);
@@ -141,7 +149,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         frameCount_++;
     } else {
         int ret = bufferQueue_->CancelBuffer(sb);
-        CAMERA_LOGI("CancelBuffer stream = [%{public}d], ret = [%{public}d]", buffer->GetStreamId(), ret);
+        CAMERA_LOGE("CancelBuffer done, streamId = %{public}d, index = %{public}d, ret = %{public}d",
+            buffer->GetStreamId(), buffer->GetIndex(), ret);
         stats_.CancelBufferResult(ret);
     }
 
@@ -230,6 +239,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
         for (auto it = buffers.begin(); it != buffers.end(); it++) {
             if (it->second == sb) {
                 cb = it->first;
+                CAMERA_LOGD("GetCameraBufferAndUpdateInfo, found sb in buffers");
             }
         }
     }
@@ -248,6 +258,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
             std::lock_guard<std::mutex> l(lock_);
             buffers[cb] = sb;
         }
+        CAMERA_LOGD("GetCameraBufferAndUpdateInfo, create ImageBuffer. index = %{public}d", cb->GetIndex());
     } else {
         cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
     }

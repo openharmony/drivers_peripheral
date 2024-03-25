@@ -97,7 +97,6 @@ RetCode ForkNode::Stop(const int32_t streamId)
     }
 
     if (bufferPool_ != nullptr) {
-        bufferPool_->SetForkBufferId(-1);
         DrainForkBufferPool();
     }
 
@@ -115,6 +114,28 @@ RetCode ForkNode::Flush(const int32_t streamId)
     return RC_OK;
 }
 
+static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& forkBuffer)
+{
+    if (forkBuffer->GetVirAddress() == forkBuffer->GetSuffaceBufferAddr()) {
+        CAMERA_LOGI("ForkNode::DeliverBuffer begin malloc buffer");
+        auto bufferSize = buffer->GetSize();
+        auto bufferAddr = malloc(bufferSize);
+        if (bufferAddr != nullptr) {
+            forkBuffer->SetVirAddress(bufferAddr);
+            forkBuffer->SetSize(bufferSize);
+        } else {
+            CAMERA_LOGE("ForkNode::DeliverBuffer malloc buffer fail");
+        }
+    }
+    if (forkBuffer->GetVirAddress() != forkBuffer->GetSuffaceBufferAddr()) {
+        auto err = memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
+            buffer->GetVirAddress(), buffer->GetSize());
+        if (err != EOK) {
+            CAMERA_LOGE("ForkNode::DeliverBuffer memcpy_s is fail");
+        }
+    }
+}
+
 void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
@@ -125,23 +146,21 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
-            bufferPool_->setSFBuffer(buffer);
-            bufferPool_->SetIsFork(true);
+            CopyBufferToForkBuffer(buffer, forkBuffer);
+            forkBuffer->SetCurFormat(buffer->GetCurFormat());
+            forkBuffer->SetCurWidth(buffer->GetCurWidth());
+            forkBuffer->SetCurHeight(buffer->GetCurHeight());
+            forkBuffer->SetIsValidDataInSurfaceBuffer(false);
             std::lock_guard<std::mutex> l(mtx_);
             bufferQueue_.push(forkBuffer);
+            CAMERA_LOGI("fork node deliver buffer streamid = %{public}d, in alone thread, index = %{public}d",
+                forkBuffer->GetStreamId(), forkBuffer->GetIndex());
             bqcv_.notify_one();
             CAMERA_LOGD("ForkNode forkBuffer bqcv_:%{public}p this:%{public}p streamId:%{public}d",
                 &bqcv_, this, forkBuffer->GetStreamId());
         }
     }
-
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == buffer->GetStreamId()) {
-            it->DeliverBuffer(buffer);
-            CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
-            return;
-        }
-    }
+    return NodeBase::DeliverBuffer(buffer);
 }
 
 RetCode ForkNode::Capture(const int32_t streamId, const int32_t captureId)
@@ -186,24 +205,18 @@ void ForkNode::DeliverBufferToNextNode()
     std::shared_ptr<IBuffer> forkBuffer = bufferQueue_.front();
     bufferQueue_.pop();
     mtx_.unlock();
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ != streamId_) {
-            continue;
+    int32_t id = forkBuffer->GetStreamId();
+    CAMERA_LOGD("ForkNode DeliverBufferToNextNode streamId:%{public}d", id);
+    {
+        std::lock_guard<std::mutex> l(requestLock_);
+        if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
+            forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+        } else {
+            forkBuffer->SetCaptureId(captureRequests_[id].front());
+            captureRequests_[id].pop_front();
         }
-        int32_t id = forkBuffer->GetStreamId();
-        CAMERA_LOGD("ForkNode DeliverBufferToNextNode streamId:%{public}d", id);
-        {
-            std::lock_guard<std::mutex> l(requestLock_);
-            if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
-                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-            } else {
-                forkBuffer->SetCaptureId(captureRequests_[id].front());
-                captureRequests_[id].pop_front();
-            }
-        }
-        it->DeliverBuffer(forkBuffer);
-        break;
     }
+    NodeBase::DeliverBuffer(forkBuffer);
 }
 
 RetCode ForkNode::CancelCapture(const int32_t streamId)

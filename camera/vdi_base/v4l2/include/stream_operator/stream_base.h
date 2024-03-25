@@ -58,7 +58,7 @@ public:
     virtual uint64_t GetUsage();
     virtual uint32_t GetBufferCount();
     virtual void HandleResult(std::shared_ptr<IBuffer>& buffer);
-    virtual RetCode DeliverBuffer();
+    virtual RetCode DeliverStreamBuffer();
     virtual RetCode ReceiveBuffer(std::shared_ptr<IBuffer>& buffer);
     virtual uint64_t GetFrameCount() const;
 
