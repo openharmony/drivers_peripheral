@@ -133,7 +133,8 @@ int32_t SensorHdiDump::SensorShowData(struct HdfSBuf *reply)
     (void)HdfSbufWriteString(reply, "============== The last 10 data records ==============\n");
 
     for (int32_t i = 0; i < eventDumpList.count; i++) {
-        int32_t index = static_cast<const uint32_t>(eventDumpList.pos + i) < MAX_DUMP_DATA_SIZE;
+        int32_t index = static_cast<const uint32_t>(eventDumpList.pos + i) < MAX_DUMP_DATA_SIZE ?
+            (eventDumpList.pos + i) : (eventDumpList.pos + i - MAX_DUMP_DATA_SIZE);
         uint32_t dataLen = eventDumpList.listDumpArray[index].dataLen;
         eventData = static_cast<uint8_t*>(OsalMemCalloc(dataLen));
         if (eventData == nullptr) {
