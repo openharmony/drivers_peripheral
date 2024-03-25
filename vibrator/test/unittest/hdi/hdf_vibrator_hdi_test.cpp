@@ -630,5 +630,5 @@ HWTEST_F(HdfVibratorHdiTest, StartByIntensityTest, TestSize.Level1)
     EXPECT_EQ(startRet, HDF_SUCCESS);
 
     int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_PRESET);
-    EXPECT_EQ(endRet, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
