@@ -44,6 +44,7 @@ enum AudioPortPinVdi {
     PIN_VDI_OUT_HEADPHONE = 1 << 8,
     PIN_VDI_OUT_USB_HEADSET = 1 << 9,
     PIN_VDI_OUT_BLUETOOTH_A2DP = 1 << 10,
+	PIN_VDI_OUT_DP = 1 << 11,
     PIN_VDI_IN_MIC = 1 << 27 | 1 << 0,
     PIN_VDI_IN_HS_MIC = 1 << 27 | 1 << 1,
     PIN_VDI_IN_LINEIN = 1 << 27 | 1 << 2,
@@ -62,6 +63,7 @@ enum AudioCategoryVdi {
     AUDIO_VDI_MMAP_NOIRQ = 4,
     AUDIO_VDI_OFFLOAD = 5,
     AUDIO_VDI_MULTI_CHANNEL = 6,
+	AUDIO_VDI_DP = 7,
     AUDIO_VDI_CATEGORY_BUTT,
 };
 
@@ -213,6 +215,9 @@ enum AudioDeviceTypeVdi {
     AUDIO_VDI_PRIMARY_DEVICE = 1 << 7,
     AUDIO_VDI_USB_DEVICE = 1 << 8,
     AUDIO_VDI_A2DP_DEVICE = 1 << 9,
+	AUDIO_VDI_HDMI_DEVICE = 1 << 10,
+	AUDIO_VDI_ADAPTER_DEVICE = 1 << 11,
+	AUDIO_VDI_DP_DEVICE = 1 << 12,
     AUDIO_VDI_DEVICE_UNKNOWN,
     AUDIO_VDI_DEVICE_TYPE_BUTT,
 };
