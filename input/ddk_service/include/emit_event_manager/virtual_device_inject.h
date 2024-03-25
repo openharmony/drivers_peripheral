@@ -27,12 +27,15 @@ namespace ExternalDeviceManager {
 using namespace OHOS::HDI::Input::Ddk::V1_0;
 class VirtualDeviceInject {
 public:
-    VirtualDeviceInject(std::shared_ptr<VirtualDevice> virtualDevice);
+    VirtualDeviceInject(std::shared_ptr<VirtualDevice> virtualDevice, uint32_t creatorToken);
     DISALLOW_COPY_AND_MOVE(VirtualDeviceInject);
     virtual ~VirtualDeviceInject();
     void EmitEvent(const std::vector<Hid_EmitItem> &items);
+    uint32_t GetCreatorToken();
+
 private:
     std::unique_ptr<InjectThread> injectThread_;
+    uint32_t creatorToken_;
 };
 } // namespace ExternalDeviceManager
 } // namespace OHOS
