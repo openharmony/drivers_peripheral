@@ -22,6 +22,10 @@ using namespace OHOS::Camera;
 constexpr uint32_t ITEM_CAPACITY = 100;
 constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
+constexpr uint32_t FPS_COUNT = 2;
+constexpr uint32_t CHECK_AREA_COUNT = 4;
+constexpr uint32_t STREAMINFO_WIDTH = 1920;
+constexpr uint32_t STREAMINFO_HEIGHT = 1080;
 int64_t OHOS::Camera::Test::StreamConsumer::g_timestamp[2] = {0};
 void CameraHdiUtTestV1_3::SetUpTestCase(void) {}
 void CameraHdiUtTestV1_3::TearDownTestCase(void) {}
@@ -92,14 +96,14 @@ static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera:
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc)
     // preview streamInfo
     cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->streamInfoPre->v1_0.width_ = 1920;
-    cameraTest->streamInfoPre->v1_0.height_ = 1080;
+    cameraTest->streamInfoPre->v1_0.width_ = STREAMINFO_WIDTH;
+    cameraTest->streamInfoPre->v1_0.height_ = STREAMINFO_HEIGHT;
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
     // video streamInfo
     cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->streamInfoVideo->v1_0.width_ = 1920;
-    cameraTest->streamInfoVideo->v1_0.height_ = 1080;
+    cameraTest->streamInfoVideo->v1_0.width_ = STREAMINFO_WIDTH;
+    cameraTest->streamInfoVideo->v1_0.height_ = STREAMINFO_HEIGHT;
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo)
     // create and commitStream
@@ -107,7 +111,7 @@ static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera:
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
     static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::HIGH_FRAME_RATE),
-    cameraTest->abilityVec);
+        cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
 /**
@@ -153,7 +157,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
 
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t highFrameRate[2] = {120,120};
+    int32_t highFrameRate[2] = {120, 120};
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &highFrameRate, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
@@ -180,7 +184,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_004, TestSize.Level1)
 {
-    if (!IsTagValueExistsU8(cameraTest->ability,OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
+    if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE)) {
         cout << "skip this test, because SLOW_MOTION not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
@@ -189,7 +193,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_004, TestSize.Level1)
 
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t highFrameRate[2] = {240,240};
+    int32_t highFrameRate[2] = {240, 240};
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &highFrameRate, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
@@ -218,14 +222,14 @@ static void CreateAndCommitStreamsForSlowMotion(std::shared_ptr<OHOS::Camera::Te
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc)
     // preview streamInfo
     cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->streamInfoPre->v1_0.width_ = 1920;
-    cameraTest->streamInfoPre->v1_0.height_ = 1080;
+    cameraTest->streamInfoPre->v1_0.width_ = STREAMINFO_WIDTH;
+    cameraTest->streamInfoPre->v1_0.height_ = STREAMINFO_HEIGHT;
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
     // video streamInfo
     cameraTest->streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->streamInfoVideo->v1_0.width_ = 1920;
-    cameraTest->streamInfoVideo->v1_0.height_ = 1080;
+    cameraTest->streamInfoVideo->v1_0.width_ = STREAMINFO_WIDTH;
+    cameraTest->streamInfoVideo->v1_0.height_ = STREAMINFO_HEIGHT;
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo)
     // create and commitStream
@@ -233,7 +237,7 @@ static void CreateAndCommitStreamsForSlowMotion(std::shared_ptr<OHOS::Camera::Te
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
     static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SLOW_MOTION),
-    cameraTest->abilityVec);
+        cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
 
@@ -241,10 +245,10 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
 {
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t valueInvalid[2] = {960,960};
+    int32_t valueInvalid[2] = {960, 960};
     float motionCheckArea[4] = {1, 1, 1, 1};
-    meta->addEntry(OHOS_CONTROL_FPS_RANGES, &valueInvalid, 2);
-    meta->addEntry(OHOS_CONTROL_MOTION_DETECTION_CHECK_AREA, &motionCheckArea, 4);
+    meta->addEntry(OHOS_CONTROL_FPS_RANGES, &valueInvalid, FPS_COUNT);
+    meta->addEntry(OHOS_CONTROL_MOTION_DETECTION_CHECK_AREA, &motionCheckArea, CHECK_AREA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
@@ -261,6 +265,30 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
     cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+        uint8_t value = entry.data.u8[0];
+        // 检测到超级慢动作的状态
+        if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value){
+            printf("slow motion status is disabled");
+        }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value){
+            printf("slow motion status is ready");
+        }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value){
+            printf("slow motion status is started");
+        }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value){
+            printf("slow motion status is recording");
+        }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value){
+            printf("slow motion status is finished");
+        }
+    }
 }
 /**
  * @tc.name: Camera_Device_Hdi_V1_3_005
@@ -310,7 +338,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
 
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t slowMotionValue[2] = {960,960};
+    int32_t slowMotionValue[2] = {960, 960};
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &slowMotionValue, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
@@ -337,7 +365,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
  */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
 {
-    if (!IsTagValueExistsU8(cameraTest->ability,OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_2::SLOW_MOTION)) {
+    if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_2::SLOW_MOTION)) {
         cout << "skip this test, because SLOW_MOTION not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
@@ -356,27 +384,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
         if (entry.data.u8[0] == OHOS_CAMERA_MOTION_DETECTION_SUPPORTED) {
             CreateAndCommitStreamsForSlowMotion(cameraTest);
             UpdateSettingsForSlowMotionMode(cameraTest);
-            common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
-            EXPECT_NE(data, nullptr);
-            camera_metadata_item_t entry;
-            cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
-            EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-            if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
-                uint8_t value = entry.data.u8[0];
-                // 检测到超级慢动作的状态
-                if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value){
-                    printf("slow motion status is disabled");
-                }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value){
-                    printf("slow motion status is ready");
-                }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value){
-                    printf("slow motion status is started");
-                }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value){
-                    printf("slow motion status is recording");
-                }else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value){
-                    printf("slow motion status is finished");
-                }
-
-            }
+            SuperSlowMotionStatusCallback(cameraTest);
         }
     }
 }
