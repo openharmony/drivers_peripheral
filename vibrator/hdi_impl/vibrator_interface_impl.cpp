@@ -22,6 +22,8 @@
 
 #define HDF_LOG_TAG    uhdf_vibrator_service
 
+constexpr int32_t VIBRATOR_INTENSITY_STOP = 0;
+
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
@@ -217,6 +219,7 @@ int32_t VibratorInterfaceImpl::GetHapticCapacity(HapticCapacityVdi& hapticCapaci
     int32_t ret = vibratorInterface->GetHapticCapacity(&hapticCapacity);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
     }
     hapticCapacityVdi.isSupportHdHaptic = hapticCapacity.isSupportHdHaptic;
     hapticCapacityVdi.isSupportPresetMapping = hapticCapacity.isSupportPresetMapping;
@@ -238,19 +241,26 @@ int32_t VibratorInterfaceImpl::GetHapticStartUpTime(int32_t mode, int32_t& start
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
-int32_t VibratorInterfaceImpl::StartByIntensity(const std::string& effectType, uint16_t Intensity)
+int32_t VibratorInterfaceImpl::StartByIntensity(const std::string& effectType, uint16_t intensity)
 {
-    HDF_LOGI("%{public}s: Enter the StartByIntensity function\n", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
+    if (intensity == VIBRATOR_INTENSITY_STOP) {
+        return HDF_SUCCESS;
+    }
 
-    return HDF_SUCCESS;
+    int32_t ret = vibratorInterface->Start(effectType.c_str());
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
 }
 
 static int32_t CreateLightVdiInstance(struct HdfVdiBase *vdiBase)

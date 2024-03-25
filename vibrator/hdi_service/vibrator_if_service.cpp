@@ -391,7 +391,7 @@ int32_t VibratorIfService::GetHapticStartUpTime(int32_t mode, int32_t& startUpTi
     return ret;
 }
 
-int32_t VibratorIfService::StartByIntensity(const std::string& effectType, uint16_t Intensity)
+int32_t VibratorIfService::StartByIntensity(const std::string& effectType, uint16_t intensity)
 {
     HDF_LOGD("%{public}s: Enter the StartByIntensity function", __func__);
     if (vibratorVdiImpl_ == nullptr) {
@@ -400,7 +400,7 @@ int32_t VibratorIfService::StartByIntensity(const std::string& effectType, uint1
     }
 
     StartTrace(HITRACE_TAG_HDF, "StartByIntensity");
-    int32_t ret = vibratorVdiImpl_->StartByIntensity(effectType, Intensity);
+    int32_t ret = vibratorVdiImpl_->StartByIntensity(effectType, intensity);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s StartByIntensity failed, error code is %{public}d", __func__, ret);
     }
