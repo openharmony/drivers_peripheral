@@ -32,7 +32,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Buffer {
-namespace V1_2 {
+namespace V1_0 {
 extern "C" Buffer::V1_2::IMapper* MapperImplGetInstance(void)
 {
     return new (std::nothrow) MapperService();
@@ -155,7 +155,7 @@ int32_t MapperService::InvalidateCache(const sptr<NativeBuffer>& handle)
     return ret;
 }
 
-int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, ImageLayout& layout)
+int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::ImageLayout& layout)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
