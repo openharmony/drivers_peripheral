@@ -24,14 +24,12 @@
                 "hdf_core",
                 "hilog",
                 "c_utils",
+                "cJSON",
                 "samgr",
                 "drivers_interface_display",
                 "drivers_interface_distributed_camera",
                 "graphic_surface",
                 "drivers_interface_camera"
-            ],
-            "third_party":[
-                "jsoncpp"
             ]
         },
         "build":{
