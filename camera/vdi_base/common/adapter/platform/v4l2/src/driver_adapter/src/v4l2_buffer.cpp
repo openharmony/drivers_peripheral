@@ -406,9 +406,9 @@ RetCode HosV4L2Buffers::V4L2ReleaseBuffers(int fd)
     return V4L2ReqBuffers(fd, 0);
 }
 
-void HosV4L2Buffers::SetCallback(BufCallback cb)
+void HosV4L2Buffers::SetV4L2BuffersCallback(BufCallback cb)
 {
-    CAMERA_LOGD("HosV4L2Buffers::SetCallback OK.");
+    CAMERA_LOGD("SetV4L2BuffersCallback::SetCallback OK.");
     dequeueBuffer_ = cb;
 }
 

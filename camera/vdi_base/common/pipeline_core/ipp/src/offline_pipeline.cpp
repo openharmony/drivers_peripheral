@@ -39,6 +39,7 @@ RetCode OfflinePipeline::StartProcess()
     running_ = true;
     processThread_ = new std::thread([this]() {
         prctl(PR_SET_NAME, "offlinepipeline");
+        CAMERA_LOGI("offlinepipeline thread start");
         while (true) {
             {
                 std::unique_lock<std::mutex> l(queueLock_);
@@ -49,6 +50,7 @@ RetCode OfflinePipeline::StartProcess()
             }
             HandleBuffers();
         }
+        CAMERA_LOGI("offlinepipeline thread start");
     });
 
     if (processThread_ == nullptr) {
@@ -179,7 +181,7 @@ void OfflinePipeline::HandleBuffers()
             return;
         }
     }
-
+    CAMERA_LOGE("OfflinePipeline::HandleBuffers, begin to ProcessCache buffer, size = %{public}d ", buffers.size());
     ProcessCache(buffers);
     return;
 }

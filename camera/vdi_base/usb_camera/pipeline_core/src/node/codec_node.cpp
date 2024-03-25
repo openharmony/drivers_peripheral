@@ -15,16 +15,10 @@
 #include <securec.h>
 #include "camera_dump.h"
 #include "camera_hal_hisysevent.h"
-
+#include "node_utils.h"
 extern "C" {
 #include <jpeglib.h>
 #include <transupp.h>
-#ifdef DEVICE_USAGE_FFMPEG_ENABLE
-#include "libavutil/frame.h"
-#include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
-#include "libavutil/imgutils.h"
-#endif // DEVICE_USAGE_FFMPEG_ENABLE
 }
 
 namespace OHOS::Camera {
@@ -33,7 +27,7 @@ const unsigned long long TIME_CONVERSION_NS_S = 1000000000ULL; /* ns to s */
 CodecNode::CodecNode(const std::string& name, const std::string& type, const std::string &cameraId)
     : NodeBase(name, type, cameraId)
 {
-    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
+    CAMERA_LOGV("CodecNode::CodecNode, %{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
     jpegRotation_ = static_cast<uint32_t>(JXFORM_ROT_270);
     jpegQuality_ = 100; // 100:jpeg quality
 }
@@ -112,7 +106,7 @@ RetCode CodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
     if (ret != 0 || entry.data.i32 == nullptr) {
-        CAMERA_LOGE("tag not found");
+        CAMERA_LOGI("tag not found");
         return RC_ERROR;
     }
 
@@ -136,7 +130,7 @@ RetCode CodecNode::ConfigJpegQuality(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("tag OHOS_JPEG_QUALITY not found");
+        CAMERA_LOGI("tag OHOS_JPEG_QUALITY not found");
         return RC_ERROR;
     }
 
@@ -228,112 +222,42 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
         *jpegSize = rotJpgSize;
     }
 }
-
-void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
-{
-    if (buffer == nullptr) {
-        CAMERA_LOGE("CodecNode::Yuv422ToRGBA8888 buffer == nullptr");
-        return;
-    }
-
-    AVFrame *pFrameRGBA = nullptr;
-    AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    pFrameRGBA = av_frame_alloc();
-
-    void* temp = malloc(buffer->GetSize());
-    if (temp == nullptr) {
-        CAMERA_LOGE("CodecNode::Yuv422ToRGBA8888 malloc buffer == nullptr");
-        return;
-    }
-    int ret = memcpy_s((uint8_t *)temp, buffer->GetSize(), (uint8_t *)buffer->GetVirAddress(), buffer->GetSize());
-    if (ret == 0) {
-        buffer->SetEsFrameSize(buffer->GetSize());
-    } else {
-        CAMERA_LOGE("memcpy_s failed, ret = %{public}d\n", ret);
-        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
-            CameraHalHisysevent::CreateMsg("streamId:%d Yuv422ToRGBA8888 failed ret:%d", buffer->GetStreamId(), ret));
-        buffer->SetEsFrameSize(0);
-    }
-
-    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, (uint8_t *)temp, AV_PIX_FMT_YUYV422, buffer->GetWidth(),
-        buffer->GetHeight(), 1);
-    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_RGBA,
-        buffer->GetWidth(), buffer->GetHeight(), 1);
-
-    struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
-        buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGBA, SWS_BILINEAR, 0, 0, 0);
-
-    if (imgCtx != nullptr) {
-        sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, buffer->GetHeight(),
-                  pFrameRGBA->data, pFrameRGBA->linesize);
-        if (imgCtx) {
-            sws_freeContext(imgCtx);
-            imgCtx = nullptr;
-        }
-    } else {
-        sws_freeContext(imgCtx);
-        imgCtx = nullptr;
-    }
-    av_frame_free(&pFrameYUV);
-    av_frame_free(&pFrameRGBA);
-    free(temp);
-}
-
 void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 {
-    constexpr uint32_t RGB24Width = 3;
-
-    if (buffer == nullptr) {
-        CAMERA_LOGE("CodecNode::Yuv422ToJpeg buffer == nullptr");
+    CAMERA_LOGD("CodecNode::Yuv422ToJpeg begin");
+    int ret = 0;
+    constexpr uint8_t pixWidthRGB888 = 3;
+    uint32_t tmpBufferSize = buffer->GetWidth() * buffer->GetHeight() * pixWidthRGB888;
+    void* tmpBufferAddr = malloc(tmpBufferSize);
+    if (tmpBufferAddr == nullptr) {
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg fail, malloc tmpBufferAddr fail");
         return;
     }
+    auto oldFormat = buffer->GetCurFormat();
+    buffer->SetFormat(CAMERA_FORMAT_RGB_888);
+    NodeUtils::BufferScaleFormatTransform(buffer, tmpBufferAddr, tmpBufferSize);
+    buffer->SetFormat(oldFormat);
 
     uint8_t* jBuf = nullptr;
     unsigned long jpegSize = 0;
-    uint32_t tempSize = (buffer->GetWidth() * buffer->GetHeight() * RGB24Width);
-    void* temp = malloc(tempSize);
-    if (temp == nullptr) {
-        CAMERA_LOGE("CodecNode::Yuv422ToJpeg malloc buffer == nullptr");
-        return;
-    }
 
-    AVFrame *m_pFrameRGB = nullptr;
-    AVFrame *pFrameYUV = nullptr;
-    pFrameYUV = av_frame_alloc();
-    m_pFrameRGB = av_frame_alloc();
+    EncodeJpegToMemory((uint8_t *)tmpBufferAddr, buffer->GetWidth(), buffer->GetHeight(),
+        nullptr, &jpegSize, &jBuf);
 
-    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, (uint8_t *)buffer->GetVirAddress(), AV_PIX_FMT_YUYV422,
-        buffer->GetWidth(), buffer->GetHeight(), 1);
-    av_image_fill_arrays(m_pFrameRGB->data, m_pFrameRGB->linesize, (uint8_t *)temp, AV_PIX_FMT_RGB24,
-        buffer->GetWidth(), buffer->GetHeight(), 1);
-
-    struct SwsContext* imgCtx = sws_getContext(buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_YUYV422,
-        buffer->GetWidth(), buffer->GetHeight(), AV_PIX_FMT_RGB24, SWS_BILINEAR, 0, 0, 0);
-
-    sws_scale(imgCtx, pFrameYUV->data, pFrameYUV->linesize, 0, buffer->GetHeight(),
-              m_pFrameRGB->data, m_pFrameRGB->linesize);
-    sws_freeContext(imgCtx);
-    imgCtx = nullptr;
-    av_frame_free(&pFrameYUV);
-    av_frame_free(&m_pFrameRGB);
-    EncodeJpegToMemory((uint8_t *)temp, buffer->GetWidth(), buffer->GetHeight(), nullptr, &jpegSize, &jBuf);
-
-    int ret = memcpy_s((uint8_t*)buffer->GetVirAddress(), buffer->GetSize(), jBuf, jpegSize);
+    ret = memcpy_s((uint8_t *)buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize(), jBuf, jpegSize);
     if (ret == 0) {
         buffer->SetEsFrameSize(jpegSize);
     } else {
-        CAMERA_LOGE("memcpy_s failed, ret = %{public}d\n", ret);
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg memcpy_s failed 2 , ret = %{public}d\n", ret);
         CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
             CameraHalHisysevent::CreateMsg("streamId:%d Yuv422ToJpeg failed ret:%d", buffer->GetStreamId(), ret));
         buffer->SetEsFrameSize(0);
     }
-
-    free(jBuf);
-    free(temp);
     CAMERA_LOGI("CodecNode::Yuv422ToJpeg jpegSize = %{public}d\n", jpegSize);
+    free(jBuf);
+    free(tmpBufferAddr);
+    buffer->SetIsValidDataInSurfaceBuffer(true);
 }
-
 void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
@@ -341,27 +265,35 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         return;
     }
 
+    if (buffer->GetBufferStatus() != CAMERA_BUFFER_STATUS_OK) {
+        CAMERA_LOGE("BufferStatus() != CAMERA_BUFFER_STATUS_OK");
+        return NodeBase::DeliverBuffer(buffer);
+    }
+
     int32_t id = buffer->GetStreamId();
-    CAMERA_LOGI("CodecNode::DeliverBuffer StreamId %{public}d", id);
+    CAMERA_LOGI("CodecNode::DeliverBuffer, streamId[%{public}d], index[%{public}d], format = %{public}d, encode =  %{public}d",
+        id, buffer->GetIndex(), buffer->GetFormat(), buffer->GetEncodeType());
+
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
-    } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
     } else {
-        Yuv422ToRGBA8888(buffer);
+        NodeUtils::BufferScaleFormatTransform(buffer);
+    }
+
+    if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {
+        struct timespec ts = {};
+        int64_t timestamp = 0;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        timestamp = ts.tv_nsec + ts.tv_sec * TIME_CONVERSION_NS_S;
+        buffer->SetEsTimestamp(timestamp);
+        buffer->SetEsFrameSize(buffer->GetSuffaceBufferSize());
+        buffer->SetEsKeyFrame(0);
     }
 
     CameraDumper& dumper = CameraDumper::GetInstance();
     dumper.DumpBuffer("CodecNode", ENABLE_CODEC_NODE_CONVERTED, buffer);
 
-    std::vector<std::shared_ptr<IPort>> outPutPorts_;
-    outPutPorts_ = GetOutPorts();
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == id) {
-            it->DeliverBuffer(buffer);
-            CAMERA_LOGI("CodecNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            return;
-        }
-    }
+    NodeBase::DeliverBuffer(buffer);
 }
 
 RetCode CodecNode::Capture(const int32_t streamId, const int32_t captureId)
@@ -377,5 +309,5 @@ RetCode CodecNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-REGISTERNODE(CodecNode, {"RKCodec"})
+REGISTERNODE(CodecNode, {"Codec"})
 } // namespace OHOS::Camera

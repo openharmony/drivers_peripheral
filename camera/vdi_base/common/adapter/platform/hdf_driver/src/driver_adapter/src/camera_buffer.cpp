@@ -282,7 +282,7 @@ RetCode CameraBuffer::CameraReleaseBuffers(struct CameraFeature feature)
     return CameraReqMemory(feature, 0);
 }
 
-void CameraBuffer::SetCallback(BufCallback cb)
+void CameraBuffer::SetCameraBufferCallback(BufCallback cb)
 {
     CAMERA_LOGD("SetCallback OK.");
     dequeueBuffer_ = cb;
