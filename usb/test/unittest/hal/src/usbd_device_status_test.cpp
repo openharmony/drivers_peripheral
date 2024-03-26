@@ -172,7 +172,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus001, TestSize.Level1)
     int32_t ret = -1;
     bool unactived = 1;
     ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdDeviceStatusTest::UsbdGetInterfaceActiveStatus001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdDeviceStatusTest::UsbdGetInterfaceActiveStatus %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     for (; interfaceId < INTERFACEID_INVALID; interfaceId++) {
         ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
