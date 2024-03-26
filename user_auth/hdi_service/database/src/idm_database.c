@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -338,9 +338,10 @@ IAM_STATIC bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolle
 {
     LinkedListNode *temp = enrolledList->head;
     EnrolledInfoHal *enrolledInfo = NULL;
+    const static uint16_t num = 0xFFFF;
     while (temp != NULL) {
         enrolledInfo = (EnrolledInfoHal *)temp->data;
-        if (enrolledInfo != NULL && enrolledInfo->enrolledId == enrolledId) {
+        if ((enrolledInfo != NULL) && (enrolledInfo->enrolledId & num) == (enrolledId & num)) {
             return true;
         }
         temp = temp->next;
@@ -1020,4 +1021,40 @@ ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfoLen, ui
 ERROR:
     g_userInfoList->destroyIterator(iterator);
     return RESULT_GENERAL_ERROR;
+}
+
+ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal)
+{
+    LOG_INFO("get enrolled id info start, userId:%{public}d, authType:%{public}d", userId, authType);
+
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("user is null");
+        return RESULT_NOT_ENROLLED;
+    }
+    uint16_t credentialCount = 0;
+    LinkedListNode *credentialInfoTemp = user->credentialInfoList->head;
+    while (credentialInfoTemp != NULL) {
+        CredentialInfoHal *nodeInfo = credentialInfoTemp->data;
+        if (nodeInfo != NULL && nodeInfo->authType == authType) {
+            ++credentialCount;
+        }
+        credentialInfoTemp = credentialInfoTemp->next;
+    }
+    if (credentialCount == 0) {
+        LOG_ERROR("not enrolled");
+        return RESULT_NOT_ENROLLED;
+    }
+    enrolledStateHal->credentialCount = credentialCount;
+    LinkedListNode *enrolledInfoTemp = user->enrolledInfoList->head;
+    const static uint16_t num = 0xFFFF;
+    while (enrolledInfoTemp != NULL) {
+        EnrolledInfoHal *nodeInfo = enrolledInfoTemp->data;
+        if (nodeInfo != NULL && nodeInfo->authType == authType) {
+            enrolledStateHal->credentialDigest = nodeInfo->enrolledId & num;
+            break;
+        }
+        enrolledInfoTemp = enrolledInfoTemp->next;
+    }
+    return RESULT_SUCCESS;
 }

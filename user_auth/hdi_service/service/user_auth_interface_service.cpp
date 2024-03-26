@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "v1_2/user_auth_interface_service.h"
+#include "v1_3/user_auth_interface_service.h"
 
+#include <cinttypes>
 #include <mutex>
 #include <hdf_base.h>
 #include "securec.h"
@@ -36,7 +37,8 @@
 #include "user_idm_funcs.h"
 #include "enroll_specification_check.h"
 
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
+#undef LOG_TAG
+#define LOG_TAG "USER_AUTH_HDI"
 
 namespace OHOS {
 namespace HDI {
@@ -216,14 +218,13 @@ static void CopyScheduleInfosV1_1ToV1_0(const std::vector<ScheduleInfoV1_1> &in,
     }
 }
 
-static int32_t CopyAuthSolutionV1_2ToV1_0(const AuthSolutionV1_2 &in, AuthSolution &out)
+static void CopyAuthSolutionV1_0ToV1_2(const AuthSolution &in, AuthSolutionV1_2 &out)
 {
     out.userId = in.userId;
     out.authTrustLevel = in.authTrustLevel;
     out.authType = in.authType;
     out.executorSensorHint = in.executorSensorHint;
     out.challenge = std::move(in.challenge);
-    return RESULT_SUCCESS;
 }
 
 int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const AuthSolution &param,
@@ -231,22 +232,10 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
 {
     IAM_LOGI("start");
     std::vector<ScheduleInfoV1_1> infosV1_1;
-    int32_t ret = BeginAuthenticationV1_1(contextId, param, infosV1_1);
+    AuthSolutionV1_2 paramV1_2;
+    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
+    int32_t ret = BeginAuthenticationV1_2(contextId, paramV1_2, infosV1_1);
     CopyScheduleInfosV1_1ToV1_0(infosV1_1, infos);
-    return ret;
-}
-
-int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
-    std::vector<ScheduleInfoV1_1> &infos)
-{
-    IAM_LOGI("start");
-    AuthSolution param;
-    int32_t ret = CopyAuthSolutionV1_2ToV1_0(paramV1_2, param);
-    if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("AuthSolution copy failed");
-        return ret;
-    }
-    ret = BeginAuthenticationV1_1(contextId, param, infos);
     return ret;
 }
 
@@ -254,20 +243,46 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
     uint64_t contextId, const AuthSolution &param, std::vector<ScheduleInfoV1_1> &infos)
 {
     IAM_LOGI("start");
-    infos.clear();
-    AuthSolutionHal solutionIn = {};
-    solutionIn.contextId = contextId;
-    solutionIn.userId = param.userId;
-    solutionIn.authType = static_cast<uint32_t>(param.authType);
-    solutionIn.authTrustLevel = param.authTrustLevel;
-    if (!param.challenge.empty() && memcpy_s(solutionIn.challenge, CHALLENGE_LEN, param.challenge.data(),
-        param.challenge.size()) != EOK) {
+    AuthSolutionV1_2 paramV1_2;
+    CopyAuthSolutionV1_0ToV1_2(param, paramV1_2);
+    return BeginAuthenticationV1_2(contextId, paramV1_2, infos);
+}
+
+static int32_t CopyAuthSolutionV1_2ToHal(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
+    AuthSolutionHal &solutionHal)
+{
+    solutionHal.contextId = contextId;
+    solutionHal.userId = paramV1_2.userId;
+    solutionHal.authType = static_cast<uint32_t>(paramV1_2.authType);
+    solutionHal.authTrustLevel = paramV1_2.authTrustLevel;
+    if (!paramV1_2.challenge.empty() && memcpy_s(solutionHal.challenge, CHALLENGE_LEN, paramV1_2.challenge.data(),
+        paramV1_2.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
+    static const std::string screenLockBundleName = "B_com.ohos.systemui";
+    solutionHal.isAuthResultCached = false;
+    if (paramV1_2.callerName == screenLockBundleName) {
+        IAM_LOGI("auth result will be cached");
+        solutionHal.isAuthResultCached = true;
+    }
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::BeginAuthenticationV1_2(uint64_t contextId, const AuthSolutionV1_2 &paramV1_2,
+    std::vector<ScheduleInfoV1_1> &infos)
+{
+    IAM_LOGI("start");
+    infos.clear();
+    AuthSolutionHal solutionHal = {};
+    int32_t ret = CopyAuthSolutionV1_2ToHal(contextId, paramV1_2, solutionHal);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("copy CopyAuthSolutionV1_2ToHal failed %{public}d", ret);
+        return ret;
+    }
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
-    int32_t ret = GenerateSolutionFunc(solutionIn, &schedulesGet);
+    ret = GenerateSolutionFunc(solutionHal, &schedulesGet);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("generate solution failed %{public}d", ret);
         return ret;
@@ -294,7 +309,7 @@ int32_t UserAuthInterfaceService::BeginAuthenticationV1_1(
         infos.push_back(temp);
         tempNode = tempNode->next;
     }
-    ret = SetArrayAttributeToExtraInfo(solutionIn.userId, infos);
+    ret = SetArrayAttributeToExtraInfo(solutionHal.userId, infos);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetArrayAttributeToExtraInfo fail");
     }
@@ -358,8 +373,43 @@ static int32_t CreateExecutorCommand(int32_t userId, AuthResultInfo &info)
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
-    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info)
+static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn, AuthResultInfo &infoOut,
+    EnrolledState &enrolledStateOut)
+{
+    infoOut.result = infoIn.result;
+    infoOut.remainAttempts = infoIn.remainTimes;
+    infoOut.lockoutDuration = infoIn.freezingTime;
+    enrolledStateOut.credentialDigest = infoIn.credentialDigest;
+    enrolledStateOut.credentialCount = infoIn.credentialCount;
+    if (infoOut.result == RESULT_SUCCESS) {
+        infoOut.token.resize(sizeof(UserAuthTokenHal));
+        if (memcpy_s(infoOut.token.data(), infoOut.token.size(), &authTokenIn, sizeof(UserAuthTokenHal)) != EOK) {
+                IAM_LOGE("copy authToken failed");
+                infoOut.token.clear();
+                return RESULT_BAD_COPY;
+        }
+        if (infoIn.rootSecret != nullptr) {
+            infoOut.rootSecret.resize(infoIn.rootSecret->contentSize);
+            if (memcpy_s(infoOut.rootSecret.data(), infoOut.rootSecret.size(),
+                infoIn.rootSecret->buf, infoIn.rootSecret->contentSize) != EOK) {
+                IAM_LOGE("copy secret failed");
+                infoOut.rootSecret.clear();
+                infoOut.token.clear();
+                return RESULT_BAD_COPY;
+            }
+        }
+    }
+    DestoryBuffer(infoIn.rootSecret);
+    if (infoIn.authType != PIN_AUTH) {
+        IAM_LOGI("type not pin");
+        return RESULT_SUCCESS;
+    }
+    IAM_LOGI("type pin");
+    return RESULT_SUCCESS;
+}
+
+static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
 {
     IAM_LOGI("start");
     if (scheduleResult.size() == 0) {
@@ -382,34 +432,27 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         IAM_LOGE("execute func failed");
         return ret;
     }
-    info.result = authResult.result;
-    info.remainAttempts = authResult.remainTimes;
-    info.lockoutDuration = authResult.freezingTime;
-    if (info.result == RESULT_SUCCESS) {
-        info.token.resize(sizeof(UserAuthTokenHal));
-        if (memcpy_s(info.token.data(), info.token.size(), &authTokenHal, sizeof(authTokenHal)) != EOK) {
-            IAM_LOGE("copy authToken failed");
-            info.token.clear();
-            return RESULT_BAD_COPY;
-        }
-        if (authResult.rootSecret != nullptr) {
-            info.rootSecret.resize(authResult.rootSecret->contentSize);
-            if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(),
-                authResult.rootSecret->buf, authResult.rootSecret->contentSize) != EOK) {
-                IAM_LOGE("copy secret failed");
-                info.rootSecret.clear();
-                info.token.clear();
-                return RESULT_BAD_COPY;
-            }
-        }
+    ret = CopyAuthResult(authResult, authTokenHal, info, enrolledState);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("Copy auth result failed");
+        return ret;
     }
-    DestoryBuffer(authResult.rootSecret);
-    if (authResult.authType != PIN_AUTH) {
-        IAM_LOGI("type not pin");
-        return RESULT_SUCCESS;
-    }
-    IAM_LOGI("type pin");
     return CreateExecutorCommand(authResult.userId, info);
+}
+
+int32_t UserAuthInterfaceService::UpdateAuthenticationResultWithEnrolledState(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info, EnrolledState &enrolledState)
+{
+    IAM_LOGI("start");
+    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
+}
+
+int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
+    const std::vector<uint8_t> &scheduleResult, AuthResultInfo &info)
+{
+    IAM_LOGI("start");
+    EnrolledState enrolledState = {};
+    return UpdateAuthenticationResultInner(contextId, scheduleResult, info, enrolledState);
 }
 
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
@@ -937,6 +980,73 @@ int32_t UserAuthInterfaceService::GetAllExtUserInfo(std::vector<ExtUserInfo> &us
     }
 
     Free(userInfoResult);
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, AuthType authType, EnrolledState &info)
+{
+    IAM_LOGI("start");
+    EnrolledStateHal *enrolledStateHal = (EnrolledStateHal *) Malloc(sizeof(EnrolledStateHal));
+    if (enrolledStateHal == NULL) {
+        IAM_LOGE("malloc failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    int32_t ret = GetEnrolledStateFunc(userId, authType, enrolledStateHal);
+    if (ret != RESULT_SUCCESS) {
+        Free(enrolledStateHal);
+        IAM_LOGE("GetEnrolledState failed");
+        return ret;
+    }
+    info.credentialDigest = enrolledStateHal->credentialDigest;
+    info.credentialCount = enrolledStateHal->credentialCount;
+
+    Free(enrolledStateHal);
+    return RESULT_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &info, std::vector<uint8_t> &reuseResult)
+{
+    IAM_LOGI("start reuseMode: %{public}u, reuseDuration: %{public}" PRIu64 ".", info.reuseUnlockResultMode,
+        info.reuseUnlockResultDuration);
+    if (info.authTypes.empty() || info.authTypes.size() > MAX_AUTH_TYPE_LEN ||
+        info.reuseUnlockResultDuration == 0 || info.reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
+        (info.reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info.reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
+        IAM_LOGE("checkReuseUnlockResult bad param");
+        return RESULT_BAD_PARAM;
+    }
+
+    ReuseUnlockResult resultTemp = {};
+    ReuseUnlockInfoHal infoHal = {};
+    infoHal.userId = info.userId;
+    infoHal.authTrustLevel = info.authTrustLevel;
+    infoHal.reuseUnlockResultDuration = info.reuseUnlockResultDuration;
+    infoHal.reuseUnlockResultMode = info.reuseUnlockResultMode;
+    if (!info.challenge.empty() &&
+        memcpy_s(infoHal.challenge, CHALLENGE_LEN, info.challenge.data(), info.challenge.size()) != EOK) {
+        IAM_LOGE("challenge copy failed");
+        return RESULT_BAD_COPY;
+    }
+    infoHal.authTypeSize = info.authTypes.size();
+    for (uint32_t i = 0; i < info.authTypes.size(); i++) {
+        infoHal.authTypes[i] = static_cast<uint32_t>(info.authTypes[i]);
+    }
+
+    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token, &resultTemp.enrolledState);
+    if (ret != RESULT_SUCCESS) {
+        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
+        return ret;
+    }
+    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
+    reuseResult.resize(sizeof(ReuseUnlockResult));
+    if (memcpy_s(reuseResult.data(), sizeof(ReuseUnlockResult), &resultTemp, sizeof(ReuseUnlockResult)) != EOK) {
+        IAM_LOGE("copy authToken failed");
+        reuseResult.clear();
+        (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        return RESULT_BAD_COPY;
+    }
+    IAM_LOGI("check reuse unlock result finish success");
+    (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
     return RESULT_SUCCESS;
 }
 } // Userauth

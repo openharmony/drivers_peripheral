@@ -35,6 +35,7 @@ struct IHostapdInterface *HostapdInterfaceImplGetInstance(void)
         return NULL;
     }
     service->interface.StartAp = HostapdInterfaceStartAp;
+    service->interface.StartApWithCmd = HostapdInterfaceStartApWithCmd;
     service->interface.StopAp = HostapdInterfaceStopAp;
     service->interface.EnableAp = HostapdInterfaceEnableAp;
     service->interface.DisableAp = HostapdInterfaceDisableAp;
@@ -48,6 +49,7 @@ struct IHostapdInterface *HostapdInterfaceImplGetInstance(void)
     service->interface.SetApMaxConn = HostapdInterfaceSetApMaxConn;
     service->interface.SetMacFilter = HostapdInterfaceSetMacFilter;
     service->interface.DelMacFilter = HostapdInterfaceDelMacFilter;
+    service->interface.ReloadApConfigInfo = HostapdInterfaceReloadApConfigInfo;
     service->interface.GetStaInfos = HostapdInterfaceGetStaInfos;
     service->interface.DisassociateSta = HostapdInterfaceDisassociateSta;
     service->interface.RegisterEventCallback = HostapdInterfaceRegisterEventCallback;

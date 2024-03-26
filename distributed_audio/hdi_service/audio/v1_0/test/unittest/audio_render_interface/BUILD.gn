@@ -13,7 +13,6 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/hdf_service/hdi_service/audio"
@@ -50,6 +49,7 @@ ohos_unittest("HDIServiceRenderTest") {
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_stub_1.0",
     "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 }

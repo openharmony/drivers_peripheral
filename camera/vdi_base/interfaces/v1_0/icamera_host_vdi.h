@@ -62,8 +62,8 @@ public:
 
     virtual ~ICameraHostVdi() = default;
 
-    static sptr<ICameraHostVdi> Get(bool isStub = false);
-    static sptr<ICameraHostVdi> Get(const std::string &serviceName, bool isStub = false);
+    static ICameraHostVdi* Get(bool isStub = false);
+    static ICameraHostVdi* Get(const std::string &serviceName, bool isStub = false);
 
     virtual int32_t SetCallback(const sptr<ICameraHostVdiCallback> &callbackObj)
     {

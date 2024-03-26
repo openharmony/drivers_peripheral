@@ -17,9 +17,11 @@
 
 #include "iam_logger.h"
 #include "executor_impl.h"
-#include "v1_1/executor_service.h"
-#include "v1_1/executor_stub.h"
-#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
+#include "v1_2/executor_service.h"
+#include "v1_2/executor_stub.h"
+
+#undef LOG_TAG
+#define LOG_TAG "FINGERPRINT_AUTH_HDI"
 
 #undef private
 
@@ -44,8 +46,8 @@ bool FingerprintAuthExecutorStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::FingerprintAuth::V1_1::ExecutorStub> executorStub =
-        new OHOS::HDI::FingerprintAuth::V1_1::ExecutorStub(impl);
+    sptr<OHOS::HDI::FingerprintAuth::V1_2::ExecutorStub> executorStub =
+        new OHOS::HDI::FingerprintAuth::V1_2::ExecutorStub(impl);
     if (executorStub == nullptr) {
         IAM_LOGE("%{public}s:new executorStub failed.", __func__);
         return false;

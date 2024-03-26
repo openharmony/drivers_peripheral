@@ -11,10 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../../../hdf_core"
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
+import("../../../light.gni")
 
 module_output_path = "drivers_peripheral_light/light"
 ohos_unittest("hdf_unittest_hdi_light_common") {
@@ -32,12 +31,14 @@ ohos_unittest("hdf_unittest_hdi_light_common") {
   ]
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

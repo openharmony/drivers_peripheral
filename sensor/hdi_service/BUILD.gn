@@ -11,9 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../hdf_core"
 import("//build/ohos.gni")
-import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
+import("../sensor.gni")
 
 ohos_shared_library("libsensor_interface_service_2.0") {
   include_dirs = [
@@ -41,7 +40,6 @@ ohos_shared_library("libsensor_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_sensor:sensor_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -50,6 +48,9 @@ ohos_shared_library("libsensor_interface_service_2.0") {
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",
@@ -80,7 +81,6 @@ ohos_shared_library("libsensor_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_sensor:libsensor_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -89,6 +89,9 @@ ohos_shared_library("libsensor_driver") {
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",

@@ -115,6 +115,11 @@ static inline uint32_t BIT(uint8_t x)
 #define SUBCHIP_WIFI_PROP_LEN 10
 #define SUPPORT_COEXCHIP_LEN 7
 
+#define NETLINK_CAP_ACK 10
+#define NETLINK_EXT_ACK 11
+#define SOL_NETLINK 270
+#define RECV_MAX_COUNT 100
+
 // vendor attr
 enum AndrWifiAttr {
 #if (defined(LINUX_VERSION_CODE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
@@ -277,11 +282,6 @@ static struct nl_sock *OpenNetlinkSocket(void)
         return NULL;
     }
 
-    if (nl_socket_set_nonblocking(sock) != 0) {
-        HILOG_ERROR(LOG_CORE, "%s: fail to set nonblocking socket", __FUNCTION__);
-        nl_socket_free(sock);
-        return NULL;
-    }
     return sock;
 }
 
@@ -324,6 +324,13 @@ static int32_t ConnectCtrlSocket(void)
     g_wifiHalInfo.ctrlSock = OpenNetlinkSocket();
     if (g_wifiHalInfo.ctrlSock == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: fail to open ctrl socket", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    if (nl_socket_set_nonblocking(g_wifiHalInfo.ctrlSock) != 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to set nonblocking socket", __FUNCTION__);
+        CloseNetlinkSocket(g_wifiHalInfo.ctrlSock);
+        g_wifiHalInfo.ctrlSock = NULL;
         return RET_CODE_FAILURE;
     }
 
@@ -399,7 +406,7 @@ static int32_t PthreadMutexLock(void)
             usleep(WAITFORMUTEX);
         } else {
             HILOG_ERROR(LOG_CORE, "%s: pthread trylock timeout", __FUNCTION__);
-            return RET_CODE_SUCCESS;
+            return RET_CODE_FAILURE;
         }
     }
     return rc;
@@ -408,8 +415,7 @@ static int32_t PthreadMutexLock(void)
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
     HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
-    int32_t rc;
-    int32_t error;
+    int32_t rc = RET_CODE_FAILURE;
     struct nl_cb *cb = NULL;
 
     if (g_wifiHalInfo.cmdSock == NULL) {
@@ -421,6 +427,14 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         HILOG_ERROR(LOG_CORE, "%s: pthread trylock failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
+    
+    /* try to set NETLINK_EXT_ACK to 1, ignoring errors */
+    int32_t opt = 1;
+    setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_EXT_ACK, &opt, sizeof(opt));
+    
+    /* try to set NETLINK_CAP_ACK to 1, ignoring errors */
+    opt = 1;
+    setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_CAP_ACK, &opt, sizeof(opt));
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
@@ -429,22 +443,41 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
         }
+
+        int32_t error = 1;
         cb = NetlinkSetCallback(handler, &error, data);
         if (cb == NULL) {
             HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
             rc = RET_CODE_FAILURE;
             break;
         }
+
         /* wait for reply */
-        error = 1;
+        int32_t recv_count = 0;
         while (error > 0) {
             rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
-            if (rc < 0) {
+            if (rc == -NLE_DUMP_INTR) {
+                HILOG_ERROR(LOG_CORE, "nl_recvmsgs failed: rc=%{public}d, errno=%{public}d, (%{public}s)", rc, errno,
+                    strerror(errno));
+                error = -NLE_AGAIN;
+                rc = RET_CODE_NOT_AVAILABLE;
+            } else if (rc < 0) {
                 HILOG_ERROR(LOG_CORE, "nl_recvmsgs failed: rc=%{public}d, errno=%{public}d, (%{public}s)", rc, errno,
                     strerror(errno));
             }
+
+            if (rc == -NLE_NOMEM || recv_count != 0) {
+                recv_count++;
+            }
+
+            if (recv_count >= RECV_MAX_COUNT) {
+                HILOG_ERROR(LOG_CORE, "nl_recvmsgs failed times overs max count!");
+                error = -NLE_NOMEM;
+                rc = RET_CODE_NOMEM;
+            }
             HILOG_INFO(LOG_CORE, "nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d", rc, error);
         }
+
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
             rc = RET_CODE_NOT_SUPPORT;
@@ -569,6 +602,14 @@ static int32_t ConnectEventSocket(void)
         HILOG_ERROR(LOG_CORE, "%s: fail to open event socket", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
+
+    if (nl_socket_set_nonblocking(g_wifiHalInfo.eventSock) != 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to set nonblocking socket", __FUNCTION__);
+        CloseNetlinkSocket(g_wifiHalInfo.eventSock);
+        g_wifiHalInfo.eventSock = NULL;
+        return RET_CODE_FAILURE;
+    }
+
     do {
         ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_SCAN);
         if (ret != RET_CODE_SUCCESS) {

@@ -12,7 +12,7 @@
   "component": {
     "name": "drivers_peripheral_partitionslot",
     "subsystem": "hdf",
-    "adapted_system_type": ["standard", "small"],
+    "adapted_system_type": ["standard"],
     "rom": "600KB",
     "ram": "7400KB",
     "deps": {
@@ -22,7 +22,6 @@
         "hdf_core",
         "init",
         "hilog",
-        "common",
         "drivers_interface_partitionslot"
       ]
     },

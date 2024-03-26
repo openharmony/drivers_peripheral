@@ -402,7 +402,7 @@ int32_t AudioProxyRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *frame,
                                     uint64_t requestBytes, uint64_t *replyBytes)
 {
-    HDF_LOGI("%{public}s, ", __func__);
+    HDF_LOGD("%{public}s, ", __func__);
     if (frame == NULL || replyBytes == NULL) {
         HDF_LOGE("Render Frame Paras is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;

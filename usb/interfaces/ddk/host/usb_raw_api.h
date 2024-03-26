@@ -515,6 +515,27 @@ int32_t UsbRawCancelRequest(const struct UsbRawRequest *request);
 int32_t UsbRawHandleRequests(const UsbRawHandle *devHandle);
 int32_t GetRawConfigDescriptor(
     const UsbRawHandle *rawHandle, uint8_t configIndex, uint8_t *configDesc, uint32_t configDescLen);
+
+/**
+ * @brief Defines the handle for a control msg.
+ *
+ * @param devHandle Indicates the pointer to the device handle.
+ *
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
+ */
+int32_t UsbRawControlMsg(const UsbRawHandle * const devHandle, struct UsbControlRequestData *ctrlData);
+
+/**
+ * @brief Defines the handle for get usb speed information.
+ *
+ * @param devHandle Indicates the pointer to the device handle.
+ *
+ * @return Returns speed enum value defined in {@link UsbnetHostDeviceSpeed}
+ * otherwise.
+ */
+int32_t UsbRawGetUsbSpeed(const UsbRawHandle * const devHandle);
+
 #ifdef __cplusplus
 }
 #endif

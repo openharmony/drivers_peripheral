@@ -595,21 +595,33 @@ int32_t SndOpenMixer(struct AlsaSoundCard *cardIns)
     ret = snd_mixer_attach(cardIns->mixerHandle, cardIns->ctrlName);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Failed to attach mixer: %{public}s.", snd_strerror(ret));
-        snd_mixer_close(cardIns->mixerHandle);
+        ret = snd_mixer_close(cardIns->mixerHandle);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
+        }
+        cardIns->mixerHandle = NULL;
         return HDF_FAILURE;
     }
 
     ret = snd_mixer_selem_register(cardIns->mixerHandle, NULL, NULL);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Failed to register mixer element: %{public}s.", snd_strerror(ret));
-        snd_mixer_close(cardIns->mixerHandle);
+        ret = snd_mixer_close(cardIns->mixerHandle);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
+        }
+        cardIns->mixerHandle = NULL;
         return HDF_FAILURE;
     }
 
     ret = snd_mixer_load(cardIns->mixerHandle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Failed to load mixer element: %{public}s.", snd_strerror(ret));
-        snd_mixer_close(cardIns->mixerHandle);
+        ret = snd_mixer_close(cardIns->mixerHandle);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
+        }
+        cardIns->mixerHandle = NULL;
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -839,10 +851,10 @@ static int32_t SetElementInfo(snd_ctl_t *alsaHandle, const struct AlsaMixerCtlEl
         snd_ctl_elem_id_set_index(id, ctlElem->index);
     }
     if (ctlElem->device >= 0) {
-        snd_ctl_elem_id_set_index(id, ctlElem->device);
+        snd_ctl_elem_id_set_device(id, ctlElem->device);
     }
     if (ctlElem->subdevice >= 0) {
-        snd_ctl_elem_id_set_index(id, ctlElem->subdevice);
+        snd_ctl_elem_id_set_subdevice(id, ctlElem->subdevice);
     }
 
     ifaceType = ConvertIfaceType(ctlElem->iface);

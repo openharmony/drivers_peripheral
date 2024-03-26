@@ -15,28 +15,24 @@ import("//build/ohos.gni")
 
 if (defined(ohos_lite)) {
   ohos_executable("audio_mixer") {
-    include_dirs = [
-      "../../../supportlibs/adm_adapter/include",
-      "//third_party/bounds_checking_function/include",
-    ]
+    include_dirs = [ "../../../supportlibs/adm_adapter/include" ]
 
     sources = [
       "audio_mixer.c",
       "audio_mixer_main.c",
     ]
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hdf_core:libhdf_utils",
+    ]
     install_enable = false
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
   }
 } else {
   ohos_executable("audio_mixer") {
-    include_dirs = [
-      "../../../supportlibs/adm_adapter/include",
-      "//third_party/bounds_checking_function/include",
-    ]
+    include_dirs = [ "../../../supportlibs/adm_adapter/include" ]
 
     sources = [
       "audio_mixer.c",
@@ -45,7 +41,6 @@ if (defined(ohos_lite)) {
 
     defines = []
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
@@ -54,6 +49,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     install_enable = false
     install_images = [ chipset_base_dir ]

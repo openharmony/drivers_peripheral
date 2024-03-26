@@ -17,7 +17,6 @@
 #define APDS9960_PROXIMITY_THRESHOLD               7    // threshold
 
 int32_t DetectProximityApds9960Chip(struct SensorCfgData *data);
-int32_t ReadApds9960Data(struct SensorCfgData *data);
 
 struct Apds9960DrvData {
     struct IDeviceIoService ioService;

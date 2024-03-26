@@ -74,7 +74,7 @@ static int32_t ReadLsm303RawData(struct SensorCfgData *data, struct MagneticData
     return HDF_SUCCESS;
 }
 
-int32_t ReadLsm303Data(struct SensorCfgData *data)
+static int32_t ReadLsm303Data(struct SensorCfgData *data)
 {
     struct MagneticData rawData = { 0, 0, 0 };
     int32_t tmp[MAGNETIC_AXIS_NUM];
@@ -155,7 +155,7 @@ static int32_t DispatchLsm303(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Lsm303BindDriver(struct HdfDeviceObject *device)
+static int32_t Lsm303BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -173,7 +173,7 @@ int32_t Lsm303BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Lsm303InitDriver(struct HdfDeviceObject *device)
+static int32_t Lsm303InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct MagneticOpsCall ops;
@@ -211,7 +211,7 @@ int32_t Lsm303InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Lsm303ReleaseDriver(struct HdfDeviceObject *device)
+static void Lsm303ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
 

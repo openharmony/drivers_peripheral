@@ -122,6 +122,25 @@ int32_t UsbRawSetConfiguration(const UsbRawHandle *devHandle, int32_t config)
     return RawSetConfiguration((const struct UsbDeviceHandle *)devHandle, config);
 }
 
+int32_t UsbRawControlMsg(const UsbRawHandle * const devHandle, struct UsbControlRequestData *ctrlData)
+{
+    if ((devHandle == NULL) || (ctrlData == NULL)) {
+        HDF_LOGE("%{public}s:%d dev or config is NULL", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return RawUsbControlMsg((const struct UsbDeviceHandle *)devHandle, ctrlData);
+}
+
+int32_t UsbRawGetUsbSpeed(const UsbRawHandle * const devHandle)
+{
+    if ((devHandle == NULL)) {
+        HDF_LOGE("%{public}s:%d dev or config is NULL", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return RawUsbGetUsbSpeed((const struct UsbDeviceHandle *)devHandle);
+}
+
 int32_t UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawDescriptorParam *param, const unsigned char *data)
 {

@@ -337,10 +337,9 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     return interfacePos;
 }
 
-bool CheckInterfacePoolValid(struct DListHead *head)
+static bool CheckInterfacePoolValid(struct UsbInterfacePool *interfacePoolPtr)
 {
-    struct UsbInterfacePool *interfacePoolPosNext = CONTAINER_OF(head->next, struct UsbInterfacePool, object.entry);
-    if (interfacePoolPosNext == NULL || (uintptr_t)interfacePoolPosNext == INVALID_PTR) {
+    if (interfacePoolPtr == NULL || (uintptr_t)interfacePoolPtr == INVALID_PTR) {
         HDF_LOGE("%{public}s:%{public}d  interfacePoolPos object entry not initialized", __func__, __LINE__);
         return false;
     }
@@ -397,21 +396,24 @@ static struct UsbInterfacePool *IfFindInterfacePool(
         return NULL;
     }
 
-    if (!CheckInterfacePoolValid(ifacePoolList)) {
+    interfacePoolPos = CONTAINER_OF(ifacePoolList->next, struct UsbInterfacePool, object.entry);
+    if (!CheckInterfacePoolValid(interfacePoolPos)) {
         OsalMutexUnlock((struct OsalMutex *)&session->lock);
         HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
         return NULL;
     }
-    DLIST_FOR_EACH_ENTRY_SAFE(
-        interfacePoolPos, interfacePoolTemp, ifacePoolList, struct UsbInterfacePool, object.entry) {
+    interfacePoolTemp = CONTAINER_OF(interfacePoolPos->object.entry.next, struct UsbInterfacePool, object.entry);
+    while (&(interfacePoolPos->object.entry) != (ifacePoolList)) {
         if (FoundInterfacePool(interfacePoolPos, queryPara, refCountFlag)) {
             found = true;
             break;
         }
-        if (!CheckInterfacePoolValid(&interfacePoolPos->object.entry)) {
+        if (!CheckInterfacePoolValid(interfacePoolTemp)) {
             HDF_LOGE("%{public}s:%{public}d CheckInterfacePool invalid ", __func__, __LINE__);
             break;
         }
+        interfacePoolPos = interfacePoolTemp;
+        interfacePoolTemp = CONTAINER_OF(interfacePoolPos->object.entry.next, struct UsbInterfacePool, object.entry);
     }
     OsalMutexUnlock((struct OsalMutex *)&session->lock);
 
@@ -1825,4 +1827,40 @@ OUT:
 int32_t UsbMemTestTrigger(bool enable)
 {
     return RawUsbMemTestTrigger(enable);
+}
+
+bool UsbGetInterfaceActiveStatus(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+{
+    struct UsbPoolQueryPara poolQueryPara = {0};
+    struct UsbInterfacePool *interfacePool = NULL;
+    struct UsbInterfaceQueryPara interfaceQueryPara = {USB_INTERFACE_INTERFACE_INDEX_TYPE, interfaceIndex, 0};
+    struct UsbSdkInterface *interfaceObj = NULL;
+    struct UsbDeviceHandle *devHandle = NULL;
+    struct UsbSession *realSession = RawGetSession(session);
+    bool claimFlag = false;
+    bool unactivated;
+    if (realSession == NULL) {
+        return NULL;
+    }
+    SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
+    if (interfacePool == NULL || interfacePool->device == NULL) {
+        interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
+        if (interfacePool == NULL || interfacePool->device == NULL) {
+            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
+            return NULL;
+        }
+    }
+
+    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
+        return NULL;
+    }
+
+    devHandle = interfacePool->device->devHandle;
+    unactivated = RawGetInterfaceActiveStatus(devHandle, interfaceIndex);
+
+    return unactivated;
 }

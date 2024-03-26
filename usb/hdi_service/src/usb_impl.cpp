@@ -42,7 +42,7 @@ constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_0 {
+namespace V1_1 {
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {nullptr};
 UsbdLoadService UsbImpl::loadUsbService_ = {USB_SYSTEM_ABILITY_ID};
 UsbdLoadService UsbImpl::loadHdfEdm_ = {HDF_EXTERNAL_DEVICE_MANAGER_SA_ID};
@@ -53,7 +53,7 @@ uint32_t UsbImpl::attachFailedCount_ = 0;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Usb::V1_0::UsbImpl;
+    using OHOS::HDI::Usb::V1_1::UsbImpl;
     UsbImpl *service = new (std::nothrow) UsbImpl();
     if (service == nullptr) {
         return nullptr;
@@ -1013,7 +1013,7 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(&controlParams, buffer, length, static_cast<int32_t>(USB_DDK_DT_DEVICE) << TYPE_OFFSET_8, 0);
@@ -1022,8 +1022,8 @@ int32_t UsbImpl::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         HDF_LOGE("%{public}s:UsbControlTransferEx failed, ret:%{public}d", __func__, ret);
         return ret;
     }
-
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1035,7 +1035,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
@@ -1046,7 +1046,8 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return ret;
     }
 
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1058,7 +1059,7 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    uint16_t length = MAX_CONTROL_BUFF_SIZE;
+    uint16_t length = USB_MAX_DESCRIPTOR_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
@@ -1069,7 +1070,8 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
         return ret;
     }
 
-    descriptor.assign(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE);
+    descriptor.resize(USB_MAX_DESCRIPTOR_SIZE);
+    std::copy(buffer, buffer + USB_MAX_DESCRIPTOR_SIZE, descriptor.begin());
     return HDF_SUCCESS;
 }
 
@@ -1085,7 +1087,8 @@ int32_t UsbImpl::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descr
     OsalMutexLock(&handle->devHandle->lock);
     uint8_t *ptr = static_cast<uint8_t *>(handle->devHandle->dev->descriptors);
     uint32_t length = handle->devHandle->dev->descriptorsLength;
-    descriptor.assign(ptr, ptr + length);
+    descriptor.resize(length);
+    std::copy(ptr, ptr + length, descriptor.begin());
     OsalMutexUnlock(&handle->devHandle->lock);
     return HDF_SUCCESS;
 }
@@ -1227,13 +1230,6 @@ int32_t UsbImpl::ManageInterface(const UsbDev &dev, uint8_t interfaceId, bool di
         HDF_LOGE("%{public}s: ManageInterface failed, busNum=%{public}u, devAddr=%{public}u", __func__,
             port->busNum, port->devAddr);
         return HDF_FAILURE;
-    }
-    if (port->devHandle[interfaceId] == nullptr) {
-        port->devHandle[interfaceId] = UsbOpenInterface(port->iface[interfaceId]);
-        if (port->devHandle[interfaceId] == nullptr) {
-            HDF_LOGE("%{public}s:UsbOpenInterface failed.", __func__);
-            return HDF_FAILURE;
-        }
     }
     return HDF_SUCCESS;
 }
@@ -1944,7 +1940,39 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     list->cb = tcb;
     return HDF_SUCCESS;
 }
-} // namespace V1_0
+
+int32_t UsbImpl::GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (interfaceId >= USB_MAX_INTERFACES) {
+        HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    unactivated = UsbGetInterfaceActiveStatus(port->service->session_, port->busNum, port->devAddr, interfaceId);
+    return HDF_SUCCESS;
+}
+
+int32_t UsbImpl::GetDeviceSpeed(const UsbDev &dev, uint8_t &speed)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
+    int32_t ret = RawUsbGetUsbSpeed(handle->devHandle);
+    speed = (uint8_t)ret;
+    HDF_LOGE("%{public}s:GetDeviceSpeed, speed=%{public}u", __func__, speed);
+    return HDF_SUCCESS;
+}
+
+
+} // namespace V1_1
 } // namespace Usb
 } // namespace HDI
 } // namespace OHOS

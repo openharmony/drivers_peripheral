@@ -24,6 +24,9 @@ config("pipe_config") {
   if (drivers_peripheral_camera_feature_usb) {
     defines += [ "CAMERA_BUILT_ON_USB" ]
   }
+  if (target_cpu == "arm64" || target_cpu == "x86_64") {
+    defines += [ "__ARCH64__" ]
+  }
 
   cflags_cc = [
     "-Wall",

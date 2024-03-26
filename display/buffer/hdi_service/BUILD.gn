@@ -34,10 +34,12 @@ ohos_shared_library("liballocator_service_1.0") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
 
@@ -76,10 +78,13 @@ ohos_shared_library("libmapper_service_1.0") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
+    "drivers_interface_display:display_buffer_idl_headers_1.2",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
 
@@ -95,6 +100,7 @@ ohos_shared_library("libmapper_driver_1.0") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
+    "drivers_interface_display:libdisplay_buffer_stub_1.2",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -120,10 +126,12 @@ ohos_shared_library("libmetadata_service_1.1") {
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers_1.0",
     "drivers_interface_display:display_buffer_idl_headers_1.1",
+    "graphic_surface:buffer_handle",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
 

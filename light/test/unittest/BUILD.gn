@@ -11,17 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HDF_CORE_PATH = "../../../../hdf_core"
+import("../../light.gni")
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
+  HDF_CORE_PATH = "../../../../hdf_core"
   unittest("hdf_peripheral_test_light") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
@@ -67,10 +68,12 @@ if (defined(ohos_lite)) {
     deps = [ "../../hal:hdi_light" ]
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

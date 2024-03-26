@@ -335,6 +335,35 @@ int32_t MediaKeySessionService::GetDecryptNumber()
     return decryptModule_->GetDecryptNumber();
 }
 
+void MediaKeySessionService::GetDecryptMaxTimes(double time, std::vector<double> &topThreeTimes)
+{
+    if (topThreeTimes.size() < topThree) {
+        topThreeTimes.push_back(time);
+    } else {
+        auto minIt = std::min_element(topThreeTimes.begin(), topThreeTimes.end());
+        if (time > *minIt) {
+            *minIt = time;
+        }
+    }
+    if (topThreeTimes.size() > topThree) {
+        topThreeTimes.resize(topThree);
+    }
+
+    std::sort(topThreeTimes.begin(), topThreeTimes.end(), std::greater<int>());
+}
+
+int32_t MediaKeySessionService::GetDecryptTimes(std::vector<double> &topThreeTimes)
+{
+    HDF_LOGI("%{public}s: start", __func__);
+    std::vector<double> times;
+    decryptModule_->GetDecryptTimes(times);
+    for (auto time : times) {
+        GetDecryptMaxTimes(time, topThreeTimes);
+    }
+    HDF_LOGI("%{public}s: end", __func__);
+    return HDF_SUCCESS;
+}
+
 int32_t MediaKeySessionService::GetErrorDecryptNumber()
 {
     HDF_LOGI("%{public}s: start", __func__);

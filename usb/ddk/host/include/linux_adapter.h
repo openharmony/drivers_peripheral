@@ -64,6 +64,7 @@ static inline pid_t gettid()
 #define USB_ADAPTER_CAP_REAP_AFTER_DISCONNECT   0x10
 
 #define USBDEVFS_CONTROL            _IOWR('U', 0, struct UsbControlRequestData)
+#define USBDEVFS_BULK               _IOWR('U', 2, struct UsbAdapterBulkTransfer)
 #define USBDEVFS_SETINTERFACE       _IOR('U', 4, struct UsbAdapterSetInterface)
 #define USBDEVFS_SETCONFIGURATION   _IOR('U', 5, unsigned int)
 #define USBDEVFS_GETDRIVER          _IOW('U', 8, struct UsbAdapterGetdriver)
@@ -81,6 +82,14 @@ static inline pid_t gettid()
 #define USBDEVFS_DISCONNECT_CLAIM   _IOR('U', 27, struct UsbAdapterDisconnectClaim)
 #define USBDEVFS_ALLOC_STREAMS      _IOR('U', 28, struct UsbAdapterStreams)
 #define USBDEVFS_FREE_STREAMS       _IOR('U', 29, struct UsbAdapterStreams)
+#define USBDEVFS_GET_SPEED          _IO('U', 31)
+
+struct UsbAdapterBulkTransfer {
+    unsigned int ep;
+    unsigned int len;
+    unsigned int timeout; /* in milliseconds */
+    void *data;
+};
 
 struct UsbAdapterSetInterface {
     unsigned int interface;
@@ -134,6 +143,10 @@ struct UsbOsAdapterOps {
     int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
     int32_t (*attachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
     int32_t (*detachKernelDriver)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    int32_t (*usbControlMsg)(const struct UsbDeviceHandle *devHandle, struct UsbControlRequestData *ctrlData);
+    int32_t (*getUsbSpeed)(const struct UsbDeviceHandle *handle);
+    bool (*getInterfaceActiveStatus)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber);
+    int32_t (*getDeviceSpeed)(const struct UsbDeviceHandle *devHandle);
 };
 #ifdef __cplusplus
 extern "C" {

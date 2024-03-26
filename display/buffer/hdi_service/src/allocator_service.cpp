@@ -19,6 +19,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "display_log.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_SRV"
@@ -104,8 +105,11 @@ int32_t AllocatorService::LoadVdi()
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
+    HdfTrace trace(__func__, "HDI:DISP:");
+
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
     int32_t ec = vdiImpl_->AllocMem(info, buffer);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
@@ -117,11 +121,13 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         delete handle;
+        HdfTrace traceTwo("FreeMem-1", "HDI:VDI:");
         vdiImpl_->FreeMem(*buffer);
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
+        HdfTrace traceThree("FreeMem-2", "HDI:VDI:");
         vdiImpl_->FreeMem(*freeBuffer);
     });
     return HDF_SUCCESS;
