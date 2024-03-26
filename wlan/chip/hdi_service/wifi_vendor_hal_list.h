@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,13 +40,13 @@ private:
         WifiHalFn fn;
         bool primary;
         void* handle;
-    } wifi_hal_lib_desc;
+    } WifiHalLibDesc;
     
     void InitVendorHalsDescriptorList();
-    bool LoadVendorHalLib(const std::string& path, wifi_hal_lib_desc& desc);
+    bool LoadVendorHalLib(const std::string& path, WifiHalLibDesc& desc);
 
     std::weak_ptr<IfaceTool> ifaceTool_;
-    std::vector<wifi_hal_lib_desc> descs_;
+    std::vector<WifiHalLibDesc> descs_;
     std::vector<std::shared_ptr<WifiVendorHal>> vendorHals_;
 };
     

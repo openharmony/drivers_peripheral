@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ const int CHIP_ID_AP = 3;
 
 static constexpr int32_t K_PRIMARY_CHIP_ID = 0;
 
-extern "C" IWifi *WifiImplGetInstance(void)
+extern "C" IChipController *WifiImplGetInstance(void)
 {
     return new (std::nothrow) Wifi();
 }
@@ -57,7 +57,7 @@ Wifi::~Wifi()
     cbHandler_.Invalidate();
 }
 
-int32_t Wifi::RegisterWifiEventCallback(const sptr<IWifiEventCallback>& eventCallback)
+int32_t Wifi::RegisterWifiEventCallback(const sptr<IChipControllerCallback>& eventCallback)
 {
     if (AddWifiDeathRecipient(eventCallback) != HDF_SUCCESS) {
         return HDF_FAILURE;
@@ -151,7 +151,7 @@ int32_t Wifi::GetAvailableChips(std::vector<uint32_t>& chipIds)
     return HDF_SUCCESS;
 }
 
-int32_t Wifi::GetChipService(uint32_t chipId, sptr<IWifiChip>& chip)
+int32_t Wifi::GetChipService(uint32_t chipId, sptr<IConcreteChip>& chip)
 {
     for (auto& ch : chips_) {
         uint32_t cand_id = GetChipIdFromWifiChip(ch);
@@ -237,10 +237,10 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
     StopVendorHal(&lock);
 }
 
-int32_t Wifi::AddWifiDeathRecipient(const sptr<IWifiEventCallback>& eventCallback)
+int32_t Wifi::AddWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback)
 {
     HDF_LOGI("AddWifiDeathRecipient");
-    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IWifiEventCallback>(eventCallback);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IChipControllerCallback>(eventCallback);
     bool result = remote->AddDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("Wifi AddDeathRecipient fail");
@@ -249,10 +249,10 @@ int32_t Wifi::AddWifiDeathRecipient(const sptr<IWifiEventCallback>& eventCallbac
     return HDF_SUCCESS;
 }
 
-int32_t Wifi::RemoveWifiDeathRecipient(const sptr<IWifiEventCallback>& eventCallback)
+int32_t Wifi::RemoveWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback)
 {
     HDF_LOGI("RemoveWifiDeathRecipient");
-    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IWifiEventCallback>(eventCallback);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IChipControllerCallback>(eventCallback);
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
         HDF_LOGE("Wifi RemoveDeathRecipient fail");

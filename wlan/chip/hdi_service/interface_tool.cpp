@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,12 +20,12 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <linux/if_bridge.h>
-#include <string.h>
 #include <linux/if.h>
 #include <unistd.h>
 #include <hdf_log.h>
 #include "unique_fd.h"
 #include "securec.h"
+#include "string.h"
 
 namespace OHOS {
 namespace HDI {

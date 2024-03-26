@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,13 +19,13 @@
 #include <list>
 #include <map>
 #include <mutex>
-#include "v1_0/iwifi_chip.h"
-#include "v1_0/wlan_types_common.h"
+#include "v1_0/iconcrete_chip.h"
+#include "v1_0/chip_types.h"
 #include "interface_tool.h"
 #include "wifi_vendor_hal_list.h"
 #include "wifi_chip_modes.h"
 #include "callback_handler.h"
-#include "v1_0/iwifi_iface.h"
+#include "v1_0/ichip_iface.h"
 #include "wifi_ap_iface.h"
 #include "wifi_sta_iface.h"
 #include "wifi_p2p_iface.h"
@@ -35,7 +35,7 @@ namespace HDI {
 namespace Wlan {
 namespace Chip {
 namespace V1_0 {
-class WifiChip : public IWifiChip {
+class WifiChip : public IConcreteChip {
 public:
     WifiChip(int32_t chipId, bool isPrimary,
              const std::weak_ptr<WifiVendorHal> vendorHal,
@@ -45,22 +45,22 @@ public:
     void Invalidate();
     bool IsValid();
     int32_t GetChipId(int32_t& id) override;
-    int32_t RegisterChipEventCallback(const sptr<IWifiChipEventCallback>& chipEventcallback) override;
+    int32_t RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback) override;
     int32_t GetChipCaps(uint32_t& capabilities) override;
     int32_t GetChipModes(std::vector<ChipMode>& modes) override;
     int32_t GetCurrentMode(uint32_t& modeId) override;
     int32_t SetChipMode(uint32_t modeId) override;
-    int32_t CreateApIface(sptr<IWifiIface>& iface) override;
+    int32_t CreateApIface(sptr<IChipIface>& iface) override;
     int32_t GetApIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetApIface(const std::string& ifname, sptr<IWifiIface>& iface) override;
+    int32_t GetApIface(const std::string& ifname, sptr<IChipIface>& iface) override;
     int32_t RemoveApIface(const std::string& ifname) override;
-    int32_t CreateP2pIface(sptr<IWifiIface>& iface) override;
+    int32_t CreateP2pIface(sptr<IChipIface>& iface) override;
     int32_t GetP2pIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetP2pIface(const std::string& ifname, sptr<IWifiIface>& iface) override;
+    int32_t GetP2pIface(const std::string& ifname, sptr<IChipIface>& iface) override;
     int32_t RemoveP2pIface(const std::string& ifname) override;
-    int32_t CreateStaIface(sptr<IWifiIface>& iface) override;
+    int32_t CreateStaIface(sptr<IChipIface>& iface) override;
     int32_t GetStaIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetStaIface(const std::string& ifname, sptr<IWifiIface>& iface) override;
+    int32_t GetStaIface(const std::string& ifname, sptr<IChipIface>& iface) override;
     int32_t RemoveStaIface(const std::string& ifname) override;
 
 private:
@@ -98,7 +98,7 @@ private:
     bool isValid_;
     uint32_t currentModeId_;
     std::vector<ChipMode> modes_;
-    CallbackHandler<IWifiChipEventCallback> cbHandler_;
+    CallbackHandler<IConcreteChipCallback> cbHandler_;
     const std::function<void(const std::string&)> subsystemCallbackHandler_;
 };
 }

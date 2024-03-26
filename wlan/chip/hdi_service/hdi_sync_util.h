@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HIDL_SYNC_UTIL_H
-#define HIDL_SYNC_UTIL_H
+#ifndef HDI_SYNC_UTIL_H
+#define HDI_SYNC_UTIL_H
 
 #include <mutex>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,7 +68,7 @@ static int HdfWifiDriverBind(struct HdfDeviceObject *deviceObject)
     hdfWifiHost->ioService.Open = NULL;
     hdfWifiHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::Wlan::Chip::V1_0::IWifi::Get("chip_interface_service", true);
+    auto serviceImpl = OHOS::HDI::Wlan::Chip::V1_0::IChipController::Get("chip_interface_service", true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfWifiHost;
@@ -76,7 +76,7 @@ static int HdfWifiDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfWifiHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::Wlan::Chip::V1_0::IWifi::GetDescriptor());
+        OHOS::HDI::Wlan::Chip::V1_0::IChipController::GetDescriptor());
     if (hdfWifiHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfWifiHost;

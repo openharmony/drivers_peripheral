@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,7 +92,7 @@ int32_t WifiChip::GetChipId(int32_t& id)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::RegisterChipEventCallback(const sptr<IWifiChipEventCallback>& chipEventcallback)
+int32_t WifiChip::RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback)
 {
     if (!cbHandler_.AddCallback(chipEventcallback)) {
         return HDF_FAILURE;
@@ -516,7 +516,7 @@ int32_t WifiChip::CreateVirtualApInterface(const std::string& apVirtIf)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::CreateApIface(sptr<OHOS::HDI::Wlan::Chip::V1_0::IWifiIface>& iface)
+int32_t WifiChip::CreateApIface(sptr<OHOS::HDI::Wlan::Chip::V1_0::IChipIface>& iface)
 {
     if (!CanSupportIfaceType(IfaceType::AP)) {
         return HDF_FAILURE;
@@ -539,7 +539,7 @@ int32_t WifiChip::GetApIfaceNames(std::vector<std::string>& ifnames)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::GetApIface(const std::string& ifname, sptr<IWifiIface>& iface)
+int32_t WifiChip::GetApIface(const std::string& ifname, sptr<IChipIface>& iface)
 {
     iface = FindApUsingName(apIfaces_, ifname);
     if (iface == nullptr) {
@@ -559,7 +559,7 @@ int32_t WifiChip::RemoveApIface(const std::string& ifname)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::CreateP2pIface(sptr<IWifiIface>& iface)
+int32_t WifiChip::CreateP2pIface(sptr<IChipIface>& iface)
 {
     if (!CanSupportIfaceType(IfaceType::P2P)) {
         return HDF_FAILURE;
@@ -590,7 +590,7 @@ int32_t WifiChip::GetP2pIfaceNames(std::vector<std::string>& ifnames)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::GetP2pIface(const std::string& ifname, sptr<IWifiIface>& iface)
+int32_t WifiChip::GetP2pIface(const std::string& ifname, sptr<IChipIface>& iface)
 {
     iface = FindP2pUsingName(p2pIfaces_, ifname);
     if (iface == nullptr) {
@@ -609,7 +609,7 @@ int32_t WifiChip::RemoveP2pIface(const std::string& ifname)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::CreateStaIface(sptr<IWifiIface>& iface)
+int32_t WifiChip::CreateStaIface(sptr<IChipIface>& iface)
 {
     HDF_LOGI("%{public}s: enter CreateStaIface", __FUNCTION__);
     if (!CanSupportIfaceType(IfaceType::STA)) {
@@ -645,7 +645,7 @@ int32_t WifiChip::GetStaIfaceNames(std::vector<std::string>& ifnames)
     return HDF_SUCCESS;
 }
 
-int32_t WifiChip::GetStaIface(const std::string& ifname, sptr<IWifiIface>& iface)
+int32_t WifiChip::GetStaIface(const std::string& ifname, sptr<IChipIface>& iface)
 {
     iface = FindStaUsingName(staIfaces_, ifname);
     if (iface == nullptr) {
