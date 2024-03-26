@@ -678,6 +678,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("InterfaceLibModeRender not exist");
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         return HDF_FAILURE;
     }
     ret =
