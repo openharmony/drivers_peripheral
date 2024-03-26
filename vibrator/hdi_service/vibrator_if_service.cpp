@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_2 {
+namespace V1_3 {
 VibratorIfService::VibratorIfService()
 {
     int32_t ret = GetVibratorVdiImpl();
@@ -391,6 +391,24 @@ int32_t VibratorIfService::GetHapticStartUpTime(int32_t mode, int32_t& startUpTi
     return ret;
 }
 
+int32_t VibratorIfService::StartByIntensity(const std::string& effectType, uint16_t intensity)
+{
+    HDF_LOGD("%{public}s: Enter the StartByIntensity function", __func__);
+    if (vibratorVdiImpl_ == nullptr) {
+        HDF_LOGE("%{public}s: vibratorVdiImpl_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+
+    StartTrace(HITRACE_TAG_HDF, "StartByIntensity");
+    int32_t ret = vibratorVdiImpl_->StartByIntensity(effectType, intensity);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s StartByIntensity failed, error code is %{public}d", __func__, ret);
+    }
+    FinishTrace(HITRACE_TAG_HDF);
+
+    return ret;
+}
+
 extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 {
     VibratorIfService *impl = new (std::nothrow) VibratorIfService();
@@ -407,7 +425,7 @@ extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 
     return impl;
 }
-} // V1_2
+} // V1_3
 } // Vibrator
 } // HDI
 } // OHOS
