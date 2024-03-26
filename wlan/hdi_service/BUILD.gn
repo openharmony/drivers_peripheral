@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("libwlan_interface_service_1.2") {
+ohos_shared_library("libwlan_interface_service_1.3") {
   include_dirs = [
     "../interfaces/include",
     "../client/include",
@@ -30,7 +30,7 @@ ohos_shared_library("libwlan_interface_service_1.2") {
     "../hal:wifi_hal",
     "service_extend:libwlan_service_extend",
   ]
-  external_deps = [ "drivers_interface_wlan:libwlan_stub_1.2" ]
+  external_deps = [ "drivers_interface_wlan:libwlan_stub_1.3" ]
 
   defines = [ "__OHOS__USER__" ]
 
@@ -70,10 +70,10 @@ ohos_shared_library("libwifi_hdi_c_device") {
   sources = [ "wlan_interface_drivers.c" ]
 
   deps = [
-    ":libwlan_interface_service_1.2",
+    ":libwlan_interface_service_1.3",
     "service_extend:libwlan_service_extend",
   ]
-  external_deps = [ "drivers_interface_wlan:libwlan_stub_1.2" ]
+  external_deps = [ "drivers_interface_wlan:libwlan_stub_1.3" ]
 
   cflags = [
     "-Wall",
@@ -106,6 +106,6 @@ ohos_shared_library("libwifi_hdi_c_device") {
 group("hdi_wlan_service") {
   deps = [
     ":libwifi_hdi_c_device",
-    ":libwlan_interface_service_1.2",
+    ":libwlan_interface_service_1.3",
   ]
 }

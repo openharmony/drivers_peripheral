@@ -292,58 +292,69 @@ HWTEST_F(ContextManagerTest, TestFillInContext_001, TestSize.Level0)
 
 HWTEST_F(ContextManagerTest, TestFillInContext_002, TestSize.Level0)
 {
-    g_scheduleList = CreateLinkedList(DestroyScheduleNode);
-    EXPECT_NE(g_scheduleList, nullptr);
-    CoAuthSchedule schedule = {};
-    schedule.scheduleId = 2135;
-    schedule.executorSize = 0;
-    g_scheduleList->insert(g_scheduleList, static_cast<void *>(&schedule));
+    UserAuthContext *context = static_cast<UserAuthContext *>(Malloc(sizeof(UserAuthContext)));
+    EXPECT_NE(context, nullptr);
+    context->scheduleList = CreateLinkedList(DestroyScheduleNode);
+    EXPECT_NE(context->scheduleList, nullptr);
+    CoAuthSchedule *schedule = static_cast<CoAuthSchedule *>(Malloc(sizeof(CoAuthSchedule)));
+    EXPECT_NE(schedule, nullptr);
+    schedule->scheduleId = 2135;
+    schedule->executorSize = 0;
+    context->scheduleList->insert(context->scheduleList, static_cast<void *>(schedule));
 
-    UserAuthContext context = {};
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_BAD_PARAM);
+    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_BAD_PARAM);
+
+    DestroyContextNode(context);
 }
 
 HWTEST_F(ContextManagerTest, TestFillInContext_003, TestSize.Level0)
 {
-    g_scheduleList = CreateLinkedList(DestroyScheduleNode);
-    EXPECT_NE(g_scheduleList, nullptr);
-    CoAuthSchedule schedule = {};
-    schedule.scheduleId = 2135;
-    schedule.executorSize = 1;
+    UserAuthContext *context = static_cast<UserAuthContext *>(Malloc(sizeof(UserAuthContext)));
+    EXPECT_NE(context, nullptr);
+    context->scheduleList = CreateLinkedList(DestroyScheduleNode);
+    EXPECT_NE(context->scheduleList, nullptr);
+    CoAuthSchedule *schedule = static_cast<CoAuthSchedule *>(Malloc(sizeof(CoAuthSchedule)));
+    EXPECT_NE(schedule, nullptr);
+    schedule->scheduleId = 2135;
+    schedule->executorSize = 1;
     ExecutorInfoHal executorInfo = {};
     executorInfo.authType = 1;
     executorInfo.esl = 2;
     executorInfo.executorSensorHint = 10;
     executorInfo.executorRole = ALL_IN_ONE;
-    schedule.executors[0] = executorInfo;
-    g_scheduleList->insert(g_scheduleList, static_cast<void *>(&schedule));
+    schedule->executors[0] = executorInfo;
+    context->scheduleList->insert(context->scheduleList, static_cast<void *>(schedule));
 
     g_userInfoList = nullptr;
 
-    UserAuthContext context = {};
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+
+    DestroyContextNode(context);
 }
 
 HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
 {
-    g_scheduleList = CreateLinkedList(DestroyScheduleNode);
-    EXPECT_NE(g_scheduleList, nullptr);
-    CoAuthSchedule schedule = {};
-    schedule.scheduleId = 2135;
-    schedule.executorSize = 1;
+    UserAuthContext *context = static_cast<UserAuthContext *>(Malloc(sizeof(UserAuthContext)));
+    EXPECT_NE(context, nullptr);
+    context->scheduleList = CreateLinkedList(DestroyScheduleNode);
+    EXPECT_NE(context->scheduleList, nullptr);
+    CoAuthSchedule *schedule = static_cast<CoAuthSchedule *>(Malloc(sizeof(CoAuthSchedule)));
+    EXPECT_NE(schedule, nullptr);
+    schedule->scheduleId = 2135;
+    schedule->executorSize = 1;
     ExecutorInfoHal executorInfo = {};
     executorInfo.authType = 1;
     executorInfo.esl = 2;
     executorInfo.executorSensorHint = 10;
     executorInfo.executorRole = ALL_IN_ONE;
-    schedule.executors[0] = executorInfo;
-    g_scheduleList->insert(g_scheduleList, static_cast<void *>(&schedule));
+    schedule->executors[0] = executorInfo;
+    context->scheduleList->insert(context->scheduleList, static_cast<void *>(schedule));
 
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
@@ -358,13 +369,14 @@ HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
 
-    UserAuthContext context = {};
-    context.authType = 2;
+    context->authType = 2;
     uint64_t credentialId = 10;
     ExecutorResultInfo info = {};
     info.scheduleId = 2135;
     info.templateId = 20;
-    EXPECT_EQ(FillInContext(&context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+    EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
+
+    DestroyContextNode(context);
 }
 } // namespace UserAuth
 } // namespace UserIam

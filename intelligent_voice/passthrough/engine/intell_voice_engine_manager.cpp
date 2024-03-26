@@ -27,7 +27,8 @@ namespace IntelligentVoice {
 namespace Engine {
 class IntellVoiceEngineManager final : public IEngineManager {
 public:
-    int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor, std::unique_ptr<IEngine> &engine)
+    int32_t CreateAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor,
+        std::unique_ptr<IEngine> &engine) override
     {
         INTELLIGENT_VOICE_LOGD("create adapter");
         engine = EngineFactory::CreateEngine(descriptor.adapterType);
@@ -37,13 +38,37 @@ public:
         return HDF_SUCCESS;
     }
 
-    int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor)
+    int32_t ReleaseAdapter(const IntellVoiceEngineAdapterDescriptor &descriptor) override
     {
         INTELLIGENT_VOICE_LOGD("release adapter");
         return HDF_SUCCESS;
     }
 
-    int32_t SetDataOprListener(std::shared_ptr<IDataOprListener> listener)
+    int32_t SetDataOprListener(std::shared_ptr<IDataOprListener> listener) override
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
+    int32_t GetUploadFiles(int32_t maxNum, std::vector<UploadHdiFile> &files) override
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
+    int32_t GetCloneFilesList(std::vector<std::string> &cloneFiles) override
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
+    int32_t GetCloneFile(const std::string &filePath, std::shared_ptr<uint8_t> &buffer, uint32_t &size) override
+    {
+        INTELLIGENT_VOICE_LOGD("enter");
+        return HDF_SUCCESS;
+    }
+
+    int32_t SendCloneFile(const std::string &filePath, const uint8_t *buffer, uint32_t size) override
     {
         INTELLIGENT_VOICE_LOGD("enter");
         return HDF_SUCCESS;

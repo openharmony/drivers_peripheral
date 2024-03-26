@@ -31,7 +31,7 @@ std::map<VdiStreamIntent, std::string> IStream::g_availableStreamType = {
 StreamBase::StreamBase(const int32_t id,
                        const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
-                       std::shared_ptr<CaptureMessageOperator>& m)
+                       std::shared_ptr<CaptureMessageOperator>& m) : calltimes_(0)
 {
     streamId_ = id;
     streamType_ = static_cast<int32_t>(type);
@@ -127,6 +127,13 @@ RetCode StreamBase::StartStream()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
 
+    int origin = calltimes_.fetch_add(1);
+    if (origin != 0) {
+        // already called, no reenter
+        CAMERA_LOGE("Now will not start, current start %{public}d times", calltimes_.load());
+        return RC_ERROR;
+    }
+
     std::unique_lock<std::mutex> l(smLock_);
     if (state_ != STREAM_STATE_ACTIVE) {
         return RC_ERROR;
@@ -176,8 +183,9 @@ RetCode StreamBase::StopStream()
 
     state_ = STREAM_STATE_IDLE;
     tunnel_->NotifyStop();
-    cv_.notify_one();
-    if (handler_ != nullptr) {
+    cv_.notify_all();
+
+    if (handler_ != nullptr && handler_->joinable()) {
         handler_->join();
         handler_ = nullptr;
     }
@@ -292,6 +300,8 @@ void StreamBase::HandleRequest()
         }
         request = waitingList_.front();
         CHECK_IF_PTR_NULL_RETURN_VOID(request);
+        CAMERA_LOGI("HandleRequest streamId = [%{public}d] and needCancel = [%{public}d]",
+            streamId_, request->NeedCancel() ? 1 : 0);
         if (!request->IsContinous()) {
             waitingList_.pop_front();
         }
@@ -470,6 +480,13 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 pipeline_->CancelCapture({streamId_});
             }
         }
+    }
+    CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
+        buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
+    if (request->NeedCancel()) {
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
+    } else {
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
     }
     ReceiveBuffer(buffer);
     return RC_OK;

@@ -361,6 +361,27 @@ static int32_t OsGetActiveConfig(struct UsbDevice *dev, int32_t fd)
     return HDF_SUCCESS;
 }
 
+static int32_t AdapterUsbControlMsg(const struct UsbDeviceHandle *handle, struct UsbControlRequestData *ctrlData)
+{
+    if (handle == NULL || handle->dev == NULL || ctrlData == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return ioctl(handle->fd, USBDEVFS_CONTROL, ctrlData);
+}
+
+static int32_t AdapterGetUsbSpeed(const struct UsbDeviceHandle *handle)
+{
+    if (handle == NULL || handle->dev == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t ret = ioctl(handle->fd, USBDEVFS_GET_SPEED, NULL);
+    HDF_LOGI("%{public}s:%{public}d speed = %{public}d", __func__, __LINE__, ret);
+    return ret;
+}
+
 static void OsFreeIsoUrbs(struct UsbHostRequest *request)
 {
     struct UsbAdapterUrb *urb = NULL;
@@ -1449,6 +1470,20 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     return ret;
 }
 
+static bool AdapterGetInterfaceActiveStatus(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber)
+{
+    bool ret;
+    if (devHandle == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
+    ret = ioctl(devHandle->fd, USBDEVFS_GETDRIVER, &getDriver);
+    if (ret == 0 && strcmp(getDriver.driver, "usbfs") == 0) {
+        return false;
+    }
+    return true;
+}
+
 static struct UsbOsAdapterOps g_usbAdapter = {
     .init = AdapterInit,
     .exit = AdapterExit,
@@ -1472,6 +1507,9 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .detachKernelDriverAndClaim = AdapterDetachKernelDriverAndClaim,
     .attachKernelDriver = AdapterAttachKernelDriver,
     .detachKernelDriver = AdapterDetachKernelDriver,
+    .usbControlMsg = AdapterUsbControlMsg,
+    .getUsbSpeed = AdapterGetUsbSpeed,
+    .getInterfaceActiveStatus = AdapterGetInterfaceActiveStatus,
 };
 
 static void OsSignalHandler(int32_t signo)

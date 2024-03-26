@@ -340,7 +340,7 @@ static int32_t DispatchCs1262(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t Cs1262BindDriver(struct HdfDeviceObject *device)
+static int32_t Cs1262BindDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
 
@@ -356,7 +356,7 @@ int32_t Cs1262BindDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-int32_t Cs1262InitDriver(struct HdfDeviceObject *device)
+static int32_t Cs1262InitDriver(struct HdfDeviceObject *device)
 {
     int32_t ret;
     CHECK_NULL_PTR_RETURN_VALUE(device, HDF_ERR_INVALID_PARAM);
@@ -408,7 +408,7 @@ int32_t Cs1262InitDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-void Cs1262ReleaseDriver(struct HdfDeviceObject *device)
+static void Cs1262ReleaseDriver(struct HdfDeviceObject *device)
 {
     CHECK_NULL_PTR_RETURN(device);
     struct Cs1262DrvData *drvData = (struct Cs1262DrvData *)device->service;

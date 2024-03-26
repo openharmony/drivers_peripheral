@@ -18,38 +18,38 @@
 
 #include "v1_0/fingerprint_auth_types.h"
 #include "v1_0/iexecutor_callback.h"
-#include "v1_1/fingerprint_auth_types.h"
-#include "v1_1/iexecutor.h"
-#include "v1_1/ifingerprint_auth_interface.h"
-#include "v1_1/isa_command_callback.h"
+#include "v1_2/fingerprint_auth_types.h"
+#include "v1_2/iexecutor.h"
+#include "v1_2/ifingerprint_auth_interface.h"
+#include "v1_2/isa_command_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace FingerprintAuth {
-using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_1::IFingerprintAuthInterface;
+using IFingerprintAuthInterface = OHOS::HDI::FingerprintAuth::V1_2::IFingerprintAuthInterface;
 
-using IExecutorCallback = OHOS::HDI::FingerprintAuth::V1_1::IExecutorCallback;
+using IExecutorCallback = OHOS::HDI::FingerprintAuth::V1_2::IExecutorCallback;
 
 using IExecutorV1_0 = OHOS::HDI::FingerprintAuth::V1_0::IExecutor;
-using IExecutor = OHOS::HDI::FingerprintAuth::V1_1::IExecutor;
+using IExecutor = OHOS::HDI::FingerprintAuth::V1_2::IExecutor;
 
 using AuthType = OHOS::HDI::FingerprintAuth::V1_0::AuthType;
 using ExecutorRole = OHOS::HDI::FingerprintAuth::V1_0::ExecutorRole;
 using ExecutorSecureLevel = OHOS::HDI::FingerprintAuth::V1_0::ExecutorSecureLevel;
-using CommandId = OHOS::HDI::FingerprintAuth::V1_1::CommandId;
+using CommandId = OHOS::HDI::FingerprintAuth::V1_2::CommandId;
 using FingerprintTipsCode = OHOS::HDI::FingerprintAuth::V1_0::FingerprintTipsCode;
 using ExecutorInfo = OHOS::HDI::FingerprintAuth::V1_0::ExecutorInfo;
 using TemplateInfo = OHOS::HDI::FingerprintAuth::V1_0::TemplateInfo;
 using TemplateInfo = OHOS::HDI::FingerprintAuth::V1_0::TemplateInfo;
 
-using GetPropertyType = OHOS::HDI::FingerprintAuth::V1_1::GetPropertyType;
-using Property = OHOS::HDI::FingerprintAuth::V1_1::Property;
-using SaCommandId = OHOS::HDI::FingerprintAuth::V1_1::SaCommandId;
-using SaCommandParamNone = OHOS::HDI::FingerprintAuth::V1_1::SaCommandParamNone;
-using SaCommandParam = OHOS::HDI::FingerprintAuth::V1_1::SaCommandParam;
-using SaCommand = OHOS::HDI::FingerprintAuth::V1_1::SaCommand;
+using GetPropertyType = OHOS::HDI::FingerprintAuth::V1_2::GetPropertyType;
+using Property = OHOS::HDI::FingerprintAuth::V1_2::Property;
+using SaCommandId = OHOS::HDI::FingerprintAuth::V1_2::SaCommandId;
+using SaCommandParamNone = OHOS::HDI::FingerprintAuth::V1_2::SaCommandParamNone;
+using SaCommandParam = OHOS::HDI::FingerprintAuth::V1_2::SaCommandParam;
+using SaCommand = OHOS::HDI::FingerprintAuth::V1_2::SaCommand;
 
-using ISaCommandCallback = OHOS::HDI::FingerprintAuth::V1_1::ISaCommandCallback;
+using ISaCommandCallback = OHOS::HDI::FingerprintAuth::V1_2::ISaCommandCallback;
 } // namespace FingerprintAuth
 } // namespace HDI
 } // namespace OHOS

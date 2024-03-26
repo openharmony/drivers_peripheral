@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_WLAN_V1_2_WLANCALLBACKSERVICE_H
 #define OHOS_HDI_WLAN_V1_2_WLANCALLBACKSERVICE_H
 
-#include "v1_2/iwlan_callback.h"
+#include "v1_3/iwlan_callback.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -162,8 +162,7 @@ void TaskQueue::Init(void)
             if (taskQueue_.size() > 0) {
                 DdkUeventTaskInfo task = taskQueue_.front();
                 taskQueue_.pop();
-                queueLock_.unlock();
-                conditionVariable_.notify_one();
+                uniqueLock.unlock();
                 DdkDispatchUevent(&task);
             }
         }
@@ -196,6 +195,7 @@ int32_t TaskQueue::AddTask(const DdkUeventTaskInfo &task)
     std::lock_guard<std::mutex> lock(queueLock_);
     if (taskQueue_.size() > MAX_TASK_NUM) {
         HDF_LOGE("%{public}s: task queue is full", __func__);
+        conditionVariable_.notify_one();
         return HDF_FAILURE;
     }
     taskQueue_.emplace(task);

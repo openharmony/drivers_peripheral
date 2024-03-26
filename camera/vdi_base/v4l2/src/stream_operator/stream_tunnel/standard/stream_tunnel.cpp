@@ -17,6 +17,7 @@
 #include "image_buffer.h"
 #include "video_key_info.h"
 #include "camera_dump.h"
+#include "camera_hal_hisysevent.h"
 
 namespace {
 constexpr uint32_t REQUEST_TIMEOUT = 0;
@@ -89,6 +90,8 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
 
     if (sfError != OHOS::SURFACE_ERROR_OK) {
         CAMERA_LOGE("get producer buffer failed, error:%{public}s", SurfaceErrorStr(sfError).c_str());
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(REQUEST_GRAPHIC_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("request graphic buffer failed rc:%s", SurfaceErrorStr(sfError).c_str()));
         return nullptr;
     }
 
@@ -132,10 +135,13 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         sb->GetExtraData()->ExtraGet(OHOS::Camera::timeStamp, timestamp);
         flushConfig_.timestamp = timestamp;
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
+        CAMERA_LOGI("FlushBuffer stream = [%{public}d], timestamp = [%{public}d], ret = [%{public}d]",
+            buffer->GetStreamId(), timestamp, ret);
         stats_.FlushBufferResult(ret);
         frameCount_++;
     } else {
         int ret = bufferQueue_->CancelBuffer(sb);
+        CAMERA_LOGI("CancelBuffer stream = [%{public}d], ret = [%{public}d]", buffer->GetStreamId(), ret);
         stats_.CancelBufferResult(ret);
     }
 
@@ -194,9 +200,9 @@ void StreamTunnel::WaitForAllBufferReturned()
     std::unique_lock<std::mutex> l(finishLock_);
     auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 300); // 200ms
     if (!finishCV_.wait_until(l, timeout, [this] {
-            CAMERA_LOGD("restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
-            return restBuffers.load(std::memory_order_acquire) == 0;
-        })) {
+        CAMERA_LOGD("restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+        return restBuffers.load(std::memory_order_acquire) == 0;
+    })) {
         CAMERA_LOGW(
             "WaitForAllBufferReturned timeout, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
     } else {
@@ -231,6 +237,8 @@ std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<O
         cb = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
         RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cb);
         if (rc != RC_OK || cb == nullptr) {
+            CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(TURN_BUFFER_ERROR),
+                CameraHalHisysevent::CreateMsg("graphic buffer transfor camera buffer failed rc:%d", rc));
             CAMERA_LOGE("create tunnel buffer failed.");
             return nullptr;
         }

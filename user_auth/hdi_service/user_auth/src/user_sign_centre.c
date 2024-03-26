@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -333,6 +333,32 @@ ResultCode GetTokenDataAndSign(UserAuthContext *context,
     ret = GetTokenDataCipher(context, credentialId, authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetTokenDataCipher fail");
+        goto FAIL;
+    }
+    ret = UserAuthTokenSign(authToken, &tokenKey);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("UserAuthTokenSign fail");
+        goto FAIL;
+    }
+    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
+    return RESULT_SUCCESS;
+
+FAIL:
+    (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
+    (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+    return ret;
+}
+
+ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *authToken)
+{
+    if (authToken == NULL) {
+        LOG_ERROR("authToken is null");
+        return RESULT_BAD_PARAM;
+    }
+    HksAuthTokenKey tokenKey = {};
+    ResultCode ret = GetTokenKey(&tokenKey);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetTokenKey fail");
         goto FAIL;
     }
     ret = UserAuthTokenSign(authToken, &tokenKey);

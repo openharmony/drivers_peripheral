@@ -2208,4 +2208,64 @@ HWTEST_F(WifiHalTest, WifiHalStopPnoScan001, TestSize.Level1)
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
+
+/**
+ * @tc.name: WifiSendActionFrame001
+ * @tc.desc: Wifi send action frame factiom test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, WifiSendActionFrame001, TestSize.Level1)
+{
+    int32_t freq = WLAN_TX_POWER;
+    uint8_t frameData[IFNAME_MAX_NUM - 1] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+    uint32_t frameDataLen = IFNAME_MAX_NUM;
+    const char *ifName = "wlan0";
+
+    int32_t rc = g_wifi->sendActionFrame(nullptr, freq, frameData, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wifi->sendActionFrame(ifName, 0, frameData, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wifi->sendActionFrame(ifName, freq, nullptr, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wifi->sendActionFrame(ifName, freq, frameData, 0);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    g_wifi->sendActionFrame(ifName, freq, frameData, frameDataLen);
+}
+
+/**
+ * @tc.name: RegisterActionFrameReceiver001
+ * @tc.desc: Wifi send action frame factiom test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, RegisterActionFrameReceiver001, TestSize.Level1)
+{
+    uint8_t match[IFNAME_MAX_NUM - 1] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+    uint32_t matchLen = IFNAME_MAX_NUM;
+    const char *ifName = "wlan0";
+
+    int32_t rc = g_wifi->registerActionFrameReceiver(nullptr, match, matchLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wifi->registerActionFrameReceiver(ifName, nullptr, matchLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wifi->registerActionFrameReceiver(ifName, match, 0);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    g_wifi->registerActionFrameReceiver(ifName, match, matchLen);
+}
+
+/**
+ * @tc.name: WifiHalGetGetFeatureType001
+ * @tc.desc: Wifi hal get feature type function test
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(WifiHalTest, InitFeatureByType001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiP2p *p2pFeature = nullptr;
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_P2P_DEVICE, nullptr);
+    EXPECT_EQ(ret, HDF_FAILURE);
+    g_wifi->createFeature(PROTOCOL_80211_IFTYPE_P2P_DEVICE, (struct IWiFiBaseFeature **)&p2pFeature);
+}
 }; // namespace HalTest

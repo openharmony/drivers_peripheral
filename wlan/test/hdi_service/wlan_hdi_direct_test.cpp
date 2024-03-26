@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <servmgr_hdi.h>
-#include "v1_2/iwlan_interface.h"
+#include "v1_3/iwlan_interface.h"
 #include "wlan_callback_impl.h"
 #include "securec.h"
 #include "wlan_hdi_types.h"
@@ -105,11 +105,19 @@ HWTEST_F(HdfWifiDirectTest, GetSupportComboTest_002, TestSize.Level1)
 HWTEST_F(HdfWifiDirectTest, CreateFeatureTest_003, TestSize.Level1)
 {
     struct HdfFeatureInfo ifeature;
-    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+    int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
 
     (void)memset_s(&ifeature, sizeof(struct HdfFeatureInfo), 0, sizeof(struct HdfFeatureInfo));
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, nullptr);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_FAILURE);
+
+    wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_FAILURE);
+
+    wlanType = PROTOCOL_80211_IFTYPE_P2P_DEVICE;
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     ASSERT_EQ(rc, HDF_FAILURE);
 }
@@ -132,6 +140,13 @@ HWTEST_F(HdfWifiDirectTest, DestroyFeatureTest_004, TestSize.Level1)
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
     ifeature.ifName = const_cast<char*>(ifName.c_str());
+    ifeature.type = PROTOCOL_80211_IFTYPE_AP;
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    ifeature.type = PROTOCOL_80211_IFTYPE_STATION;
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    ifeature.type = PROTOCOL_80211_IFTYPE_P2P_DEVICE;
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_FAILURE);
 }
@@ -627,6 +642,92 @@ HWTEST_F(HdfWifiDirectTest, GetStaInfo_025, TestSize.Level1)
     rc = g_wlanObj->GetStaInfo(g_wlanObj, ifName, &info, nullptr, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
     rc = g_wlanObj->GetStaInfo(g_wlanObj, ifName, &info, mac, ETH_ADDR_LEN);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+/**
+ * @tc.name: GetApBandwidthTest_026
+ * @tc.desc: Wifi hdi get ap bandwidth info function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiDirectTest, GetApBandwidthTest_026, TestSize.Level1)
+{
+    int32_t rc;
+    uint8_t bandwidth = 0;
+    const char *ifName = "wlan0";
+
+    rc = g_wlanObj->GetApBandwidth(g_wlanObj, nullptr, &bandwidth);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->GetApBandwidth(g_wlanObj, ifName, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->GetApBandwidth(g_wlanObj, ifName, &bandwidth);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+/**
+ * @tc.name: ResetToFactoryMacAddressTest_027
+ * @tc.desc: Wifi hdi reset mac address function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiDirectTest, ResetToFactoryMacAddressTest_027, TestSize.Level1)
+{
+    int32_t rc;
+    const char *ifName = "wlan0";
+
+    rc = g_wlanObj->ResetToFactoryMacAddress(g_wlanObj, nullptr);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->ResetToFactoryMacAddress(g_wlanObj, ifName);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+
+/**
+ * @tc.name: SendActionFrameTest_028
+ * @tc.desc: Wifi hdi send action frame function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiDirectTest, SendActionFrameTest_028, TestSize.Level1)
+{
+    int32_t freq = WLAN_TX_POWER;
+    uint32_t frameDataLen = DEFAULT_COMBO_SIZE;
+    uint8_t frameData[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+    const char *ifName = "wlan0";
+
+    int32_t rc = g_wlanObj->SendActionFrame(g_wlanObj, nullptr, freq, frameData, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->SendActionFrame(g_wlanObj, ifName, 0, frameData, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->SendActionFrame(g_wlanObj, ifName, freq, nullptr, frameDataLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->SendActionFrame(g_wlanObj, ifName, freq, frameData, 0);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->SendActionFrame(g_wlanObj, ifName, freq, frameData, frameDataLen);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+/**
+ * @tc.name: RegisterActionFrameReceiverTest_029
+ * @tc.desc: Wifi hdi reset mac address function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiDirectTest, RegisterActionFrameReceiverTest_029, TestSize.Level1)
+{
+    int32_t rc;
+    uint8_t match [ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
+    uint32_t matchLen = DEFAULT_COMBO_SIZE;
+    const char *ifName = "wlan0";
+
+    rc = g_wlanObj->RegisterActionFrameReceiver(g_wlanObj, nullptr, match, matchLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->RegisterActionFrameReceiver(g_wlanObj, ifName, nullptr, matchLen);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->RegisterActionFrameReceiver(g_wlanObj, ifName, match, 0);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+    rc = g_wlanObj->RegisterActionFrameReceiver(g_wlanObj, ifName, match, matchLen);
     ASSERT_EQ(rc, HDF_FAILURE);
 }
 };

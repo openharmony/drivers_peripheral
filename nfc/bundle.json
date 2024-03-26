@@ -19,14 +19,16 @@
           "hdf_core",
           "hilog",
           "c_utils",
-          "drivers_interface_nfc",
-          "init"
+          "drivers_interface_nfc"
         ],
         "third_party": []
       },
       "build": {
         "sub_component": [
           "//drivers/peripheral/nfc:nfc_entry"
+        ],
+        "test": [
+          "//drivers/peripheral/nfc/test:test_hdf_nfc_service"
         ]
       }
     }

@@ -460,6 +460,7 @@ int32_t StreamOperatorVdiImpl::DetachBufferQueue(int32_t streamId)
 
 int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &info, bool isStreaming)
 {
+    CAMERA_LOGI("--- start Capture captureId = [%{public}d] ---", captureId) ;
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -506,6 +507,7 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
 
 int32_t StreamOperatorVdiImpl::CancelCapture(int32_t captureId)
 {
+    CAMERA_LOGI("--- start CancelCapture captureId = [%{public}d] ---", captureId) ;
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     HDF_CAMERA_TRACE;
@@ -590,6 +592,30 @@ bool StreamOperatorVdiImpl::CheckStreamInfo(const VdiStreamInfo streamInfo)
     return true;
 }
 
+void StreamOperatorVdiImpl::FillCaptureErrorInfo(std::vector<VdiCaptureErrorInfo> &info, MessageGroup message)
+{
+    for (auto cm : message) {
+        auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
+        CHECK_IF_PTR_NULL_RETURN_VOID(m);
+        VdiCaptureErrorInfo edi = {};
+        edi.streamId_ = m->GetStreamId();
+        edi.error_ = m->GetStreamError();
+        info.push_back(edi);
+    }
+}
+
+void StreamOperatorVdiImpl::FillCaptureEndedInfo(std::vector<VdiCaptureEndedInfo> &info, MessageGroup message)
+{
+    for (auto cm : message) {
+        auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
+        CHECK_IF_PTR_NULL_RETURN_VOID(m);
+        VdiCaptureEndedInfo edi = {};
+        edi.streamId_ = m->GetStreamId();
+        edi.frameCount_ = m->GetFrameCount();
+        info.push_back(edi);
+    }
+}
+
 void StreamOperatorVdiImpl::HandleCallbackMessage(MessageGroup &message)
 {
     if (message.empty()) {
@@ -610,27 +636,13 @@ void StreamOperatorVdiImpl::HandleCallbackMessage(MessageGroup &message)
         }
         case CAPTURE_MESSAGE_TYPE_ON_ERROR: {
             std::vector<VdiCaptureErrorInfo> info = {};
-            for (auto cm : message) {
-                auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
-                CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                VdiCaptureErrorInfo edi = {};
-                edi.streamId_ = m->GetStreamId();
-                edi.error_ = m->GetStreamError();
-                info.push_back(edi);
-            }
+            FillCaptureErrorInfo(info, message);
             OnCaptureError(message[0]->GetCaptureId(), info);
             break;
         }
         case CAPTURE_MESSAGE_TYPE_ON_ENDED: {
             std::vector<VdiCaptureEndedInfo> info = {};
-            for (auto cm : message) {
-                auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
-                CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                VdiCaptureEndedInfo edi = {};
-                edi.streamId_ = m->GetStreamId();
-                edi.frameCount_ = m->GetFrameCount();
-                info.push_back(edi);
-            }
+            FillCaptureEndedInfo(info, message);
             OnCaptureEnded(message[0]->GetCaptureId(), info);
             break;
         }

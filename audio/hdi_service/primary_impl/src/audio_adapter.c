@@ -295,6 +295,7 @@ int32_t InitHwRenderParam(
     hwRender->renderParam.frameRenderMode.periodSize = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     hwRender->renderParam.frameRenderMode.periodCount = DEEP_BUFFER_RENDER_PERIOD_COUNT;
     hwRender->renderParam.frameRenderMode.renderhandle = (AudioHandle)hwRender;
+    pthread_mutex_init(&hwRender->renderParam.frameRenderMode.mutex, NULL);
     hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     return HDF_SUCCESS;
 }
@@ -669,6 +670,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
         AUDIO_FUNC_LOGE("hwRender is NULL!");
         return AUDIO_ERR_INTERNAL;
     }
+    pthread_mutex_lock(&hwRender->renderParam.frameRenderMode.mutex);
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         ret = render->Stop((AudioHandle)render);
         if (ret < 0) {
@@ -679,6 +681,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("InterfaceLibModeRender not exist");
+        pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
         return HDF_FAILURE;
     }
     ret =
@@ -688,6 +691,8 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t render
     }
     AudioReleaseRenderHandle(hwRender);
     AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
+    pthread_mutex_unlock(&hwRender->renderParam.frameRenderMode.mutex);
+    pthread_mutex_destroy(&hwRender->renderParam.frameRenderMode.mutex);
     for (int i = 0; i < ERROR_LOG_MAX_NUM; i++) {
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].reason);
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].currentTime);

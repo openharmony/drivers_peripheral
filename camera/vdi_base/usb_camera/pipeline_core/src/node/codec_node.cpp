@@ -14,6 +14,7 @@
 #include "codec_node.h"
 #include <securec.h>
 #include "camera_dump.h"
+#include "camera_hal_hisysevent.h"
 
 extern "C" {
 #include <jpeglib.h>
@@ -111,7 +112,7 @@ RetCode CodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
     if (ret != 0 || entry.data.i32 == nullptr) {
-        CAMERA_LOGI("tag not found");
+        CAMERA_LOGE("tag not found");
         return RC_ERROR;
     }
 
@@ -135,7 +136,7 @@ RetCode CodecNode::ConfigJpegQuality(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
     if (ret != 0) {
-        CAMERA_LOGI("tag OHOS_JPEG_QUALITY not found");
+        CAMERA_LOGE("tag OHOS_JPEG_QUALITY not found");
         return RC_ERROR;
     }
 
@@ -199,7 +200,7 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
     cInfo.in_color_space = JCS_RGB;
 
     jpeg_set_defaults(&cInfo);
-    CAMERA_LOGE("CodecNode::EncodeJpegToMemory jpegQuality_ is = %{public}d", jpegQuality_);
+    CAMERA_LOGI("CodecNode::EncodeJpegToMemory jpegQuality_ is = %{public}d", jpegQuality_);
     jpeg_set_quality(&cInfo, jpegQuality_, TRUE);
     jpeg_mem_dest(&cInfo, jpegBuf, jpegSize);
     jpeg_start_compress(&cInfo, TRUE);
@@ -231,7 +232,7 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
 void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGI("CodecNode::Yuv422ToRGBA8888 buffer == nullptr");
+        CAMERA_LOGE("CodecNode::Yuv422ToRGBA8888 buffer == nullptr");
         return;
     }
 
@@ -242,14 +243,16 @@ void CodecNode::Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer)
 
     void* temp = malloc(buffer->GetSize());
     if (temp == nullptr) {
-        CAMERA_LOGI("CodecNode::Yuv422ToRGBA8888 malloc buffer == nullptr");
+        CAMERA_LOGE("CodecNode::Yuv422ToRGBA8888 malloc buffer == nullptr");
         return;
     }
     int ret = memcpy_s((uint8_t *)temp, buffer->GetSize(), (uint8_t *)buffer->GetVirAddress(), buffer->GetSize());
     if (ret == 0) {
         buffer->SetEsFrameSize(buffer->GetSize());
     } else {
-        printf("memcpy_s failed!\n");
+        CAMERA_LOGE("memcpy_s failed, ret = %{public}d\n", ret);
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("streamId:%d Yuv422ToRGBA8888 failed ret:%d", buffer->GetStreamId(), ret));
         buffer->SetEsFrameSize(0);
     }
 
@@ -282,7 +285,7 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     constexpr uint32_t RGB24Width = 3;
 
     if (buffer == nullptr) {
-        CAMERA_LOGI("CodecNode::Yuv422ToJpeg buffer == nullptr");
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg buffer == nullptr");
         return;
     }
 
@@ -291,7 +294,7 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     uint32_t tempSize = (buffer->GetWidth() * buffer->GetHeight() * RGB24Width);
     void* temp = malloc(tempSize);
     if (temp == nullptr) {
-        CAMERA_LOGI("CodecNode::Yuv422ToJpeg malloc buffer == nullptr");
+        CAMERA_LOGE("CodecNode::Yuv422ToJpeg malloc buffer == nullptr");
         return;
     }
 
@@ -320,13 +323,15 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     if (ret == 0) {
         buffer->SetEsFrameSize(jpegSize);
     } else {
-        CAMERA_LOGI("memcpy_s failed, ret = %{public}d\n", ret);
+        CAMERA_LOGE("memcpy_s failed, ret = %{public}d\n", ret);
+        CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
+            CameraHalHisysevent::CreateMsg("streamId:%d Yuv422ToJpeg failed ret:%d", buffer->GetStreamId(), ret));
         buffer->SetEsFrameSize(0);
     }
 
     free(jBuf);
     free(temp);
-    CAMERA_LOGE("CodecNode::Yuv422ToJpeg jpegSize = %{public}d\n", jpegSize);
+    CAMERA_LOGI("CodecNode::Yuv422ToJpeg jpegSize = %{public}d\n", jpegSize);
 }
 
 void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
@@ -337,7 +342,7 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     int32_t id = buffer->GetStreamId();
-    CAMERA_LOGE("CodecNode::DeliverBuffer StreamId %{public}d", id);
+    CAMERA_LOGI("CodecNode::DeliverBuffer StreamId %{public}d", id);
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {
         Yuv422ToJpeg(buffer);
     } else if (buffer->GetEncodeType() == ENCODE_TYPE_H264) {

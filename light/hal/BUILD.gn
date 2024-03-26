@@ -13,6 +13,7 @@
 #
 
 import("//build/ohos.gni")
+import("../light.gni")
 
 if (defined(ohos_lite)) {
   config("libhdi_light_pub_config") {
@@ -27,11 +28,10 @@ if (defined(ohos_lite)) {
       "include",
       "../interfaces/include",
       "../utils/include",
-      "//third_party/bounds_checking_function/include",
     ]
 
     public_configs = [ ":libhdi_light_pub_config" ]
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
     external_deps = [
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
@@ -64,7 +64,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "../utils/include",
-      "//third_party/bounds_checking_function/include",
     ]
     cflags = [
       "-Wall",
@@ -79,11 +78,13 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_light"
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
