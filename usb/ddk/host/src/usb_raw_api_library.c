@@ -1721,6 +1721,6 @@ bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t int
 
     OsalMutexLock(&devHandle->lock);
     bool ret = osAdapterOps->getInterfaceActiveStatus(devHandle, interfaceNumber);
-
+    OsalMutexUnlock(&devHandle->lock);
     return ret;
 }
