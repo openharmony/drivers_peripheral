@@ -52,7 +52,6 @@ namespace {
 constexpr int32_t DEFAULT_WIDTH = 20;
 constexpr int32_t DEFAULT_INTERVAL = 5000;
 constexpr int32_t MIN_INTERVAL = 100;
-const std::string LOG_THREAD_NAME = "thermal_log";
 } // namespace
 
 namespace {
@@ -66,19 +65,14 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest001, TestSize.Level1)
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: start.");
     auto &hdfLog = ThermalDfx::GetInstance();
     hdfLog.Init();
+    hdfLog.DoWork();
     // thermal log off skipped tests
     if (!hdfLog.enable_) {
         ThermalDfx::DestroyInstance();
         THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: thermal log off skipped tests.");
         return;
     }
-    ASSERT_TRUE(hdfLog.logThread_ != nullptr);
-    ASSERT_TRUE(hdfLog.logThread_->joinable());
-    ASSERT_TRUE(CheckThread(LOG_THREAD_NAME));
-
     ThermalDfx::DestroyInstance();
-    ASSERT_TRUE(hdfLog.logThread_ == nullptr);
-    ASSERT_FALSE(CheckThread(LOG_THREAD_NAME));
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest001: end.");
 }
 
@@ -202,19 +196,12 @@ HWTEST_F(HdfThermalLogTest, HdfThermalLogTest007, TestSize.Level1)
         THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest007: thermal log off skipped tests.");
         return;
     }
-    // Check that the thread is running properly
-    ASSERT_TRUE(hdfLog.logThread_ != nullptr);
-    ASSERT_TRUE(hdfLog.logThread_->joinable());
-    ASSERT_TRUE(CheckThread(LOG_THREAD_NAME));
     // Stop
     hdfLog.EnableWatchCallback("false");
-    ASSERT_TRUE(hdfLog.logThread_ == nullptr);
-    ASSERT_FALSE(CheckThread(LOG_THREAD_NAME));
+    ASSERT_EQ(hdfLog.enable_, false);
     // Run
     hdfLog.EnableWatchCallback("true");
-    ASSERT_TRUE(hdfLog.logThread_ != nullptr);
-    ASSERT_TRUE(hdfLog.logThread_->joinable());
-    ASSERT_TRUE(CheckThread(LOG_THREAD_NAME));
+    ASSERT_EQ(hdfLog.enable_, true);
     ThermalDfx::DestroyInstance();
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalLogTest007: end.");
 }

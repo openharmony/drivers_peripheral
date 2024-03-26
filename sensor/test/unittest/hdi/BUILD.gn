@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("../../../sensor.gni")
 
 module_output_path = "drivers_peripheral_sensor/sensor"
 
@@ -40,12 +41,14 @@ ohos_unittest("hdi_unittest_sensor") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_sensor:libsensor_proxy_2.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

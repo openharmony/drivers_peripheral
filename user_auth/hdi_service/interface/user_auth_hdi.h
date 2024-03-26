@@ -24,6 +24,8 @@ namespace OHOS {
 namespace HDI {
 namespace UserAuth {
 using IUserAuthInterface = OHOS::HDI::UserAuth::V2_0::IUserAuthInterface;
+using UserAuthInterfaceService = OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceService;
+
 using HdiAuthType = OHOS::HDI::UserAuth::V2_0::AuthType;
 using HdiExecutorRole = OHOS::HDI::UserAuth::V2_0::ExecutorRole;
 using HdiExecutorSecureLevel = OHOS::HDI::UserAuth::V2_0::ExecutorSecureLevel;
@@ -43,7 +45,6 @@ using HdiEnrollResultInfo = OHOS::HDI::UserAuth::V2_0::EnrollResultInfo;
 using HdiEnrolledState = OHOS::HDI::UserAuth::V2_0::EnrolledState;
 using HdiReuseUnlockInfo = OHOS::HDI::UserAuth::V2_0::ReuseUnlockInfo;
 using HdiReuseUnlockParam = OHOS::HDI::UserAuth::V2_0::ReuseUnlockParam;
-using UserAuthInterfaceService = OHOS::HDI::UserAuth::V2_0::UserAuthInterfaceService;
 using HdiIMessageCallback = OHOS::HDI::UserAuth::V2_0::IMessageCallback;
 using HdiUserInfo = OHOS::HDI::UserAuth::V2_0::UserInfo;
 using HdiExtUserInfo = OHOS::HDI::UserAuth::V2_0::ExtUserInfo;

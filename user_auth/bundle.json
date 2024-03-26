@@ -21,9 +21,7 @@
         "hdf_core",
         "c_utils",
         "hilog",
-        "drivers_interface_user_auth"
-      ],
-      "third_party": [
+        "drivers_interface_user_auth",
         "openssl"
       ]
     },

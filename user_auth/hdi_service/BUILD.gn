@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("llibuser_auth_interface_service_2.0") {
+ohos_shared_library("libuser_auth_interface_service_2.0") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -34,7 +34,6 @@ ohos_shared_library("llibuser_auth_interface_service_2.0") {
     "key_mgr/inc",
     "user_auth/inc",
     "service",
-    "//third_party/openssl/include",
     "../common/logs",
     "../common/utils",
   ]
@@ -73,8 +72,8 @@ ohos_shared_library("llibuser_auth_interface_service_2.0") {
     "drivers_interface_user_auth:user_auth_idl_headers",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "openssl:libcrypto_shared",
   ]
-  deps = [ "//third_party/openssl:libcrypto_shared" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
@@ -99,7 +98,7 @@ ohos_shared_library("libuser_auth_driver") {
     "../common/utils",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
-  deps = [ ":llibuser_auth_interface_service_2.0" ]
+  deps = [ ":libuser_auth_interface_service_2.0" ]
 
   external_deps = [
     "c_utils:utils",
@@ -123,6 +122,6 @@ ohos_shared_library("libuser_auth_driver") {
 group("hdf_user_auth_service") {
   deps = [
     ":libuser_auth_driver",
-    ":llibuser_auth_interface_service_2.0",
+    ":libuser_auth_interface_service_2.0",
   ]
 }

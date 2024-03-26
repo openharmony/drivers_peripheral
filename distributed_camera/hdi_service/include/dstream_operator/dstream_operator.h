@@ -25,7 +25,7 @@
 #include "dcamera_stream.h"
 #include "dmetadata_processor.h"
 
-#include "json/json.h"
+#include "cJSON.h"
 #include "v1_0/istream_operator.h"
 #include "v1_0/types.h"
 
@@ -60,10 +60,10 @@ public:
 
     DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
         const std::string &sourceAbilityInfo);
-    std::vector<DCEncodeType> ParseEncoderTypes(Json::Value& rootValue);
-    DCamRetCode ParsePhotoFormats(Json::Value& rootValue);
-    DCamRetCode ParsePreviewFormats(Json::Value& rootValue);
-    DCamRetCode ParseVideoFormats(Json::Value& rootValue);
+    std::vector<DCEncodeType> ParseEncoderTypes(cJSON* rootValue);
+    DCamRetCode ParsePhotoFormats(cJSON* rootValue);
+    DCamRetCode ParsePreviewFormats(cJSON* rootValue);
+    DCamRetCode ParseVideoFormats(cJSON* rootValue);
     DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
     DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
     DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
@@ -93,8 +93,9 @@ private:
     bool HasContinuousCaptureInfo(int captureId);
     int32_t ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStreams);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
-    void ExtractCameraAttr(Json::Value &rootValue, std::vector<int>& formats, const std::string rootNode);
-    void GetCameraAttr(Json::Value &rootValue, std::string formatStr, const std::string rootNode, int format);
+    void ExtractCameraAttr(cJSON* rootValue, std::vector<int>& formats, const std::string rootNode);
+    void GetCameraAttr(cJSON* rootValue, std::string formatStr, const std::string rootNode, int format);
+    cJSON* GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr);
     DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo>& inputCaptureInfo);
     void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,

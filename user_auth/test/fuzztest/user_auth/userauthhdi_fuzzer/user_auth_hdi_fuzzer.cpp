@@ -363,7 +363,9 @@ void FuzzDeleteUser(Parcel &parcel)
     FillFuzzUint8Vector(parcel, authToken);
     std::vector<CredentialInfo> deletedInfos;
     FillFuzzCredentialInfoVector(parcel, deletedInfos);
-    g_service.DeleteUser(userId, authToken, deletedInfos);
+    std::vector<uint8_t> rootSecret;
+    FillFuzzUint8Vector(parcel, rootSecret);
+    g_service.DeleteUser(userId, authToken, deletedInfos, rootSecret);
     IAM_LOGI("end");
 }
 

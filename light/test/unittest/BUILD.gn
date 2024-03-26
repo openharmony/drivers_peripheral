@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../../light.gni")
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -66,10 +68,12 @@ if (defined(ohos_lite)) {
     deps = [ "../../hal:hdi_light" ]
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

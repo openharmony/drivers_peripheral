@@ -40,8 +40,8 @@ extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
     return pinAuthInterfaceService;
 }
 
-int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>>& allInOneExecutors,
-    std::vector<sptr<IVerifier>>& verifiers, std::vector<sptr<ICollector>>& collectors)
+int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIExecutor>>& allInOneExecutors,
+    std::vector<sptr<HdiIVerifier>>& verifiers, std::vector<sptr<HdiICollector>>& collectors)
 {
     IAM_LOGI("start");
     static_cast<void>(verifiers);
@@ -52,7 +52,7 @@ int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>>& a
         IAM_LOGE("Generate pinHdi failed");
         return HDF_FAILURE;
     }
-    sptr<IExecutor> executor = new (std::nothrow) ExecutorImpl(pinHdi);
+    sptr<HdiIExecutor> executor = new (std::nothrow) ExecutorImpl(pinHdi);
     if (executor == nullptr) {
         IAM_LOGE("Generate executor failed");
         return HDF_FAILURE;

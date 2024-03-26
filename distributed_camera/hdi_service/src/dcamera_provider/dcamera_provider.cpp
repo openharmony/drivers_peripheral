@@ -43,6 +43,49 @@ OHOS::sptr<DCameraProvider> DCameraProvider::GetInstance()
     return instance_;
 }
 
+bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string& sinkAbilityInfo,
+    std::string& sourceAbilityInfo)
+{
+    cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
+    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
+        DHLOGE("Input sink ablity info is not json object.");
+        return false;
+    }
+
+    cJSON *sinkRootValue = cJSON_GetObjectItemCaseSensitive(rootValue, "SinkAbility");
+    if (sinkRootValue == nullptr || !cJSON_IsObject(sinkRootValue)) {
+        cJSON_Delete(rootValue);
+        DHLOGE("Get sink ability error.");
+        return false;
+    }
+
+    cJSON *srcRootValue = cJSON_GetObjectItemCaseSensitive(rootValue, "SourceAbility");
+    if (srcRootValue == nullptr || !cJSON_IsObject(srcRootValue)) {
+        cJSON_Delete(rootValue);
+        DHLOGE("Get source ability error.");
+        return false;
+    }
+
+    char *jsonSink = cJSON_Print(sinkRootValue);
+    if (jsonSink == nullptr) {
+        cJSON_Delete(rootValue);
+        return false;
+    }
+    sinkAbilityInfo = std::string(jsonSink);
+
+    char *jsonSource = cJSON_Print(srcRootValue);
+    if (jsonSource == nullptr) {
+        cJSON_Delete(rootValue);
+        cJSON_free(jsonSink);
+        return false;
+    }
+    sourceAbilityInfo = std::string(jsonSource);
+    cJSON_Delete(rootValue);
+    cJSON_free(jsonSink);
+    cJSON_free(jsonSource);
+    return true;
+}
+
 int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::string& abilityInfo,
     const sptr<IDCameraProviderCallback>& callbackObj)
 {
@@ -67,32 +110,16 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
     }
-
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(),
-        &rootValue, &errs) || !rootValue.isObject()) {
-        DHLOGE("Input sink ablity info is not json object.");
+    std::string sourceAbilityInfo;
+    std::string sinkAbilityInfo;
+    if (!GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceAbilityInfo)) {
         return DCamRetCode::INVALID_ARGUMENT;
     }
-
-    if (!rootValue["SinkAbility"].isObject() && !rootValue["SourceAbility"].isObject()) {
-        DHLOGE("Get ability error.");
-        return DCamRetCode::INVALID_ARGUMENT;
-    }
-    Json::Value sinkRootValue = rootValue["SinkAbility"];
-    Json::Value srcRootValue = rootValue["SourceAbility"];
-    std::string sinkAbilityInfo = sinkRootValue.toStyledString();
-    std::string sourceAbilityInfo = srcRootValue.toStyledString();
 
     DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, sinkAbilityInfo, sourceAbilityInfo, callbackObj);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("DCameraProvider::EnableDCameraDevice failed, ret = %{public}d.", ret);
     }
-
     return ret;
 }
 

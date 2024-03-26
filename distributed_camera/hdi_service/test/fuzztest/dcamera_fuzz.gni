@@ -32,12 +32,10 @@ cflags = [
   "-fno-omit-frame-pointer",
 ]
 
-dcamera_deps = [
-  "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0",
-  "//third_party/jsoncpp:jsoncpp",
-]
+dcamera_deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
 
 dcamera_external_deps = [
+  "cJSON:cjson",
   "c_utils:utils",
   "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
   "drivers_interface_camera:libcamera_proxy_1.0",

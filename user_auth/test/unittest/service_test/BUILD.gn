@@ -45,7 +45,7 @@ ohos_unittest("UserAuthHdiTest") {
     "src/user_auth_interface_service_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:llibuser_auth_interface_service_2.0" ]
+  deps = [ "../../../hdi_service:libuser_auth_interface_service_2.0" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 

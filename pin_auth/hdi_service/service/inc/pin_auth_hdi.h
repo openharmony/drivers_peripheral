@@ -29,19 +29,17 @@ namespace PinAuth {
 using IPinAuthInterface = OHOS::HDI::PinAuth::V2_0::IPinAuthInterface;
 using PinAuthInterfaceService = OHOS::HDI::PinAuth::V2_0::PinAuthInterfaceService;
 
-using IExecutor = OHOS::HDI::PinAuth::V2_0::IAllInOneExecutor;
-using ICollector = OHOS::HDI::PinAuth::V2_0::ICollector;
-using IVerifier = OHOS::HDI::PinAuth::V2_0::IVerifier;
+using HdiIExecutor = OHOS::HDI::PinAuth::V2_0::IAllInOneExecutor;
+using HdiICollector = OHOS::HDI::PinAuth::V2_0::ICollector;
+using HdiIVerifier = OHOS::HDI::PinAuth::V2_0::IVerifier;
+using HdiIExecutorCallback = OHOS::HDI::PinAuth::V2_0::IExecutorCallback;
 
-using IExecutorCallback = OHOS::HDI::PinAuth::V2_0::IExecutorCallback;
-
-using AuthType = OHOS::HDI::PinAuth::V2_0::AuthType;
-using ExecutorRole = OHOS::HDI::PinAuth::V2_0::ExecutorRole;
-using ExecutorSecureLevel = OHOS::HDI::PinAuth::V2_0::ExecutorSecureLevel;
-using ExecutorInfo = OHOS::HDI::PinAuth::V2_0::ExecutorInfo;
-
-using GetPropertyType = OHOS::HDI::PinAuth::V2_0::GetPropertyType;
-using Property = OHOS::HDI::PinAuth::V2_0::Property;
+using HdiAuthType = OHOS::HDI::PinAuth::V2_0::AuthType;
+using HdiExecutorRole = OHOS::HDI::PinAuth::V2_0::ExecutorRole;
+using HdiExecutorSecureLevel = OHOS::HDI::PinAuth::V2_0::ExecutorSecureLevel;
+using HdiExecutorInfo = OHOS::HDI::PinAuth::V2_0::ExecutorInfo;
+using HdiGetPropertyType = OHOS::HDI::PinAuth::V2_0::GetPropertyType;
+using HdiProperty = OHOS::HDI::PinAuth::V2_0::Property;
 } // namespace PinAuth
 } // namespace HDI
 } // namespace OHOS

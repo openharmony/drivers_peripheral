@@ -343,11 +343,6 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
         }
     }
     DestoryBuffer(infoIn.rootSecret);
-    if (infoIn.authType != PIN_AUTH) {
-        IAM_LOGI("type not pin");
-        return RESULT_SUCCESS;
-    }
-    IAM_LOGI("type pin");
     return RESULT_SUCCESS;
 }
 
@@ -380,6 +375,11 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
         IAM_LOGE("Copy auth result failed");
         return ret;
     }
+    if (authResult.authType != PIN_AUTH) {
+        IAM_LOGI("type not pin");
+        return RESULT_SUCCESS;
+    }
+    IAM_LOGI("type pin");
     return CreateExecutorCommand(authResult.userId, info);
 }
 
@@ -725,7 +725,7 @@ int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t &secureUi
 }
 
 int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<uint8_t> &authToken,
-    std::vector<CredentialInfo> &deletedInfos)
+    std::vector<CredentialInfo> &deletedInfos, std::vector<uint8_t> &rootSecret)
 {
     IAM_LOGI("start");
     if (authToken.size() != sizeof(UserAuthTokenHal)) {
@@ -919,7 +919,6 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
         IAM_LOGE("checkReuseUnlockResult bad param");
         return RESULT_BAD_PARAM;
     }
-
     ReuseUnlockParamHal paramHal = {};
     paramHal.userId = param.baseParam.userId;
     paramHal.authTrustLevel = param.baseParam.authTrustLevel;
@@ -935,19 +934,21 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
     for (uint32_t i = 0; i < param.authTypes.size(); i++) {
         paramHal.authTypes[i] = static_cast<uint32_t>(param.authTypes[i]);
     }
-
-    EnrolledStateHal enrolledState;
-    info.token.resize(AUTH_TOKEN_LEN);
-    int32_t ret = CheckReuseUnlockResultFunc(&paramHal, (UserAuthTokenHal *)info.token.data(),
-        &enrolledState);
+    ReuseUnlockResult reuseResult = {};
+    int32_t ret = CheckReuseUnlockResultFunc(&paramHal, &reuseResult);
     if (ret != RESULT_SUCCESS) {
         info.token.clear();
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
         return ret;
     }
-    info.authType = ((UserAuthTokenHal *)info.token.data())->tokenDataPlain.authType;
-    info.enrolledState.credentialDigest = enrolledState.credentialDigest;
-    info.enrolledState.credentialCount = enrolledState.credentialCount;
+    info.authType = reuseResult.authType;
+    info.enrolledState.credentialDigest = reuseResult.enrolledState.credentialDigest;
+    info.enrolledState.credentialCount = reuseResult.enrolledState.credentialCount;
+    if (memcpy_s(info.token.data(), info.token.size(), reuseResult.token, AUTH_TOKEN_LEN) != EOK) {
+        IAM_LOGE("copy authToken failed");
+        info.token.clear();
+        return RESULT_BAD_COPY;
+    }
     IAM_LOGI("check reuse unlock result finish success");
     return RESULT_SUCCESS;
 }

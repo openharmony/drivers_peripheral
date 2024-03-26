@@ -37,7 +37,7 @@ namespace OHOS {
 namespace HDI {
 namespace PinAuth {
 namespace {
-class DummyIExecutorCallback : public IExecutorCallback {
+class DummyIExecutorCallback : public HdiIExecutorCallback {
 public:
     DummyIExecutorCallback(int32_t onResultResult, int32_t onGetDataResult, int32_t OnTipResult,
         int32_t OnMessageResult)
@@ -76,19 +76,19 @@ private:
 
 ExecutorImpl g_executorImpl(make_shared<OHOS::UserIam::PinAuth::PinAuth>());
 
-void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
+void FillFuzzExecutorInfo(Parcel &parcel, HdiExecutorInfo &executorInfo)
 {
     executorInfo.sensorId = parcel.ReadUint16();
     executorInfo.executorMatcher = parcel.ReadUint32();
-    executorInfo.executorRole = static_cast<ExecutorRole>(parcel.ReadInt32());
-    executorInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
-    executorInfo.esl = static_cast<ExecutorSecureLevel>(parcel.ReadInt32());
+    executorInfo.executorRole = static_cast<HdiExecutorRole>(parcel.ReadInt32());
+    executorInfo.authType = static_cast<HdiAuthType>(parcel.ReadInt32());
+    executorInfo.esl = static_cast<HdiExecutorSecureLevel>(parcel.ReadInt32());
     FillFuzzUint8Vector(parcel, executorInfo.publicKey);
     FillFuzzUint8Vector(parcel, executorInfo.extraInfo);
     IAM_LOGI("success");
 }
 
-void FillFuzzIExecutorCallback(Parcel &parcel, sptr<IExecutorCallback> &callbackObj)
+void FillFuzzIExecutorCallback(Parcel &parcel, sptr<HdiIExecutorCallback> &callbackObj)
 {
     bool isNull = parcel.ReadBool();
     if (isNull) {
@@ -103,7 +103,7 @@ void FillFuzzIExecutorCallback(Parcel &parcel, sptr<IExecutorCallback> &callback
     IAM_LOGI("success");
 }
 
-void FillFuzzProperty(Parcel &parcel, Property &property)
+void FillFuzzProperty(Parcel &parcel, HdiProperty &property)
 {
     property.authSubType = parcel.ReadUint64();
     property.lockoutDuration = parcel.ReadInt32();
@@ -115,7 +115,7 @@ void FillFuzzProperty(Parcel &parcel, Property &property)
 void FuzzGetExecutorInfo(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    ExecutorInfo executorInfo;
+    HdiExecutorInfo executorInfo;
     FillFuzzExecutorInfo(parcel, executorInfo);
     g_executorImpl.GetExecutorInfo(executorInfo);
     IAM_LOGI("end");
@@ -152,7 +152,7 @@ void FuzzEnroll(Parcel &parcel)
     uint64_t scheduleId = parcel.ReadUint64();
     std::vector<uint8_t> extraInfo;
     FillFuzzUint8Vector(parcel, extraInfo);
-    sptr<IExecutorCallback> callbackObj;
+    sptr<HdiIExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
     g_executorImpl.Enroll(scheduleId, extraInfo, callbackObj);
     IAM_LOGI("end");
@@ -166,7 +166,7 @@ void FuzzAuthenticate(Parcel &parcel)
     FillFuzzUint64Vector(parcel, templateIdList);
     std::vector<uint8_t> extraInfo;
     FillFuzzUint8Vector(parcel, extraInfo);
-    sptr<IExecutorCallback> callbackObj;
+    sptr<HdiIExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
     g_executorImpl.Authenticate(scheduleId, templateIdList, extraInfo, callbackObj);
     IAM_LOGI("end");
@@ -195,7 +195,7 @@ void FuzzGetProperty(Parcel &parcel)
     FillFuzzUint64Vector(parcel, templateIdList);
     std::vector<int32_t> propertyTypes;
     FillFuzzInt32Vector(parcel, propertyTypes);
-    Property property;
+    HdiProperty property;
     FillFuzzProperty(parcel, property);
     g_executorImpl.GetProperty(templateIdList, propertyTypes, property);
     IAM_LOGI("end");
