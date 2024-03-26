@@ -107,6 +107,7 @@ int32_t EmitEventManager::GetCurDeviceId(void)
 }
 void EmitEventManager::ClearDeviceMap(void)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (virtualDeviceMap_.size() > 0) {
         virtualDeviceMap_.clear();
         HDF_LOGI("%{public}s: clear device map success", __func__);
