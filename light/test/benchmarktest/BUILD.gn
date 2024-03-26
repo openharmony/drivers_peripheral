@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("../../light.gni")
 
 module_output_path = "drivers_peripheral_light/light"
 ohos_benchmarktest("hdf_light_benchmark_test") {
@@ -33,12 +34,14 @@ ohos_benchmarktest("hdf_light_benchmark_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

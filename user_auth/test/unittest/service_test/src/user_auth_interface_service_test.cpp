@@ -97,6 +97,7 @@ void DoOnceEnroll(const std::shared_ptr<UserAuthInterfaceService> &service, int3
 {
     EnrollParam enrollParam = {};
     enrollParam.authType = authType;
+    enrollParam.userId = userId;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginEnrollment(authToken, enrollParam, scheduleInfo), 0);
 
@@ -137,7 +138,7 @@ void DoOnceAuth(const std::shared_ptr<UserAuthInterfaceService> &service, int32_
     para.remainAttempts = 5;
     EXPECT_EQ(GetExecutorResultTlv(para, authScheduleResult), 0);
     AuthResultInfo authResultInfo = {};
-    EnrolledState enrolledState = {};
+    HdiEnrolledState enrolledState = {};
 
     authResultTest.result = service->UpdateAuthenticationResult(contextId, authScheduleResult, authResultInfo,
         enrolledState);
@@ -970,10 +971,11 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     int32_t userId = 321657;
     std::vector<uint8_t> authToken;
     std::vector<CredentialInfo> deletedCredInfos;
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos), 8);
+    std::vector<uint8_t> rootSecret;
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 8);
 
     authToken.resize(sizeof(UserAuthTokenHal));
-    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos), 10017);
+    EXPECT_EQ(service->DeleteUser(userId, authToken, deletedCredInfos, rootSecret), 10017);
 }
 
 HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_002, TestSize.Level0)
@@ -1000,7 +1002,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_002, TestSize.Level0)
     EXPECT_EQ(authResultTest.result, 0);
 
     std::vector<CredentialInfo> deletedCredInfos;
-    EXPECT_EQ(service->DeleteUser(userId, authResultTest.token, deletedCredInfos), 0);
+    std::vector<uint8_t> rootSecret;
+    EXPECT_EQ(service->DeleteUser(userId, authResultTest.token, deletedCredInfos, rootSecret), 0);
     EXPECT_TRUE(!deletedCredInfos.empty());
 
     DeleteAllExecutor(service);
@@ -1144,6 +1147,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnrollTwice, TestSize.Level0)
     EXPECT_EQ(enrollResultTest.result, 0);
 
     EnrollParam enrollParam = {};
+    enrollParam.userId = userId;
     enrollParam.authType = authType;
     ScheduleInfo scheduleInfo = {};
     EXPECT_EQ(service->BeginEnrollment(authToken, enrollParam, scheduleInfo), 10018);
@@ -1224,7 +1228,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     AuthResultInfo authResultInfo = {};
     EnrolledState enrolledState = {};
 
-    EXPECT_EQ(service->UpdateAuthenticationResult(contextId, authScheduleResult, authResultInfo, enrolledState), 0);
+    EXPECT_EQ(service->UpdateAuthenticationResult(contextId, authScheduleResult, authResultInfo, enrolledState),
+        0);
 
     std::vector<CredentialInfo> deletedCredInfos;
     EXPECT_EQ(service->EnforceDeleteUser(userId, deletedCredInfos), 0);

@@ -54,7 +54,7 @@ void ExecutorImplTest::TearDown()
 HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
 {
     ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(nullptr);
-    ExecutorInfo info = {};
+    HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_FAILURE);
 
@@ -85,7 +85,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
     EXPECT_EQ(result, HDF_FAILURE);
 
     std::vector<int32_t> propertyTypes;
-    Property property;
+    HdiProperty property;
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_FAILURE);
 
@@ -104,7 +104,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     EXPECT_NE(pinHdi, nullptr);
     pinHdi->Init();
     ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
-    ExecutorInfo info = {};
+    HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_SUCCESS);
 
@@ -135,7 +135,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     EXPECT_EQ(result, HDF_FAILURE);
 
     std::vector<int32_t> propertyTypes;
-    Property property;
+    HdiProperty property;
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 

@@ -58,7 +58,7 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
     return ret;
 }
 
-IAM_STATIC void SetUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
+IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
     const EnrolledStateHal *enrolledState)
 {
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
@@ -69,21 +69,26 @@ IAM_STATIC void SetUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlo
     g_unlockAuthResult.enrolledState.credentialCount = enrolledState->credentialCount;
 }
 
-IAM_STATIC ResultCode SetAuthResult(const UserAuthContext *context, const ExecutorResultInfo *info,
-    AuthResult *result, UserAuthTokenHal *authToken)
+IAM_STATIC void SetAuthResult(int32_t userId, uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
 {
-    result->userId = context->userId;
-    result->authType = context->authType;
+    result->userId = userId;
+    result->authType = authType;
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;
     result->result = info->result;
-    EnrolledStateHal enrolledState;
-    (void)GetEnrolledState(context->userId, context->authType, &enrolledState);
-    result->credentialDigest = enrolledState.credentialDigest;
-    result->credentialCount = enrolledState.credentialCount;
+}
+
+IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, const ExecutorResultInfo *info,
+    AuthResult *result, UserAuthTokenHal *authToken)
+{
+    EnrolledStateHal enrolledState = {};
+    if (GetEnrolledState(context->userId, context->authType, &enrolledState) == RESULT_SUCCESS) {
+        result->credentialDigest = enrolledState.credentialDigest;
+        result->credentialCount = enrolledState.credentialCount;
+    }
     if (context->isAuthResultCached) {
         LOG_INFO("cache unlock auth result");
-        SetUnlockAuthResult(context->userId, authToken, &enrolledState);
+        CacheUnlockAuthResult(context->userId, authToken, &enrolledState);
     }
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH) {
         result->rootSecret = CopyBuffer(info->rootSecret);
@@ -119,6 +124,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
 
     ResultCode ret = RESULT_GENERAL_ERROR;
     if (executorResultInfo->result != RESULT_SUCCESS) {
+        ret = RESULT_SUCCESS;
         LOG_ERROR("executor result is not success, result:%{public}d", executorResultInfo->result);
         goto EXIT;
     }
@@ -135,13 +141,13 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
         LOG_ERROR("sign token failed");
         goto EXIT;
     }
-
-EXIT:
-    ret = SetAuthResult(userAuthContext, executorResultInfo, result, authToken);
+    ret = HandleAuthSuccessResult(userAuthContext, executorResultInfo, result, authToken);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("set result failed");
+        LOG_ERROR("handle auth success result failed");
     }
 
+EXIT:
+    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
     DestoryExecutorResultInfo(executorResultInfo);
     DestoryContext(userAuthContext);
     return ret;
@@ -158,12 +164,8 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetUnlockAuthResult(int32_t *userId, UserAuthTokenHal *token, EnrolledStateHal *enrolledState)
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info)
 {
-    if (userId == NULL || token == NULL || enrolledState == NULL) {
-        LOG_ERROR("bad param");
-        return RESULT_BAD_PARAM;
-    }
     if (!g_unlockAuthResult.isCached) {
         LOG_ERROR("invalid cached unlock token");
         return RESULT_GENERAL_ERROR;
@@ -179,35 +181,21 @@ IAM_STATIC ResultCode GetUnlockAuthResult(int32_t *userId, UserAuthTokenHal *tok
         LOG_ERROR("cached unlock token is time out");
         return RESULT_TOKEN_TIMEOUT;
     }
-    *token = g_unlockAuthResult.authToken;
-    *userId = g_unlockAuthResult.userId;
-    *enrolledState = g_unlockAuthResult.enrolledState;
-    return RESULT_SUCCESS;
-}
-
-IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info, int32_t userId,
-    UserAuthTokenHal *authToken)
-{
-    uint64_t time = GetSystemTime();
-    if (time < authToken->tokenDataPlain.time) {
-        LOG_ERROR("bad system time");
-        return RESULT_GENERAL_ERROR;
-    }
-    if ((time - authToken->tokenDataPlain.time) > info->reuseUnlockResultDuration) {
+    if ((time - g_unlockAuthResult.authToken.tokenDataPlain.time) > info->reuseUnlockResultDuration) {
         LOG_ERROR("reuse unlock check reuseUnlockResultDuration fail");
         return RESULT_TOKEN_TIMEOUT;
     }
-    if (info->userId != userId) {
+    if (info->userId != g_unlockAuthResult.userId) {
         LOG_ERROR("reuse unlock check userId fail");
         return RESULT_GENERAL_ERROR;
     }
-    if (info->authTrustLevel > authToken->tokenDataPlain.authTrustLevel) {
+    if (info->authTrustLevel > g_unlockAuthResult.authToken.tokenDataPlain.authTrustLevel) {
         LOG_ERROR("reuse unlock check authTrustLevel fail");
         return RESULT_GENERAL_ERROR;
     }
     if (info->reuseUnlockResultMode == AUTH_TYPE_RELEVANT) {
         for (uint32_t i = 0; i < info->authTypeSize; i++) {
-            if (info->authTypes[i] == authToken->tokenDataPlain.authType) {
+            if (info->authTypes[i] == g_unlockAuthResult.authToken.tokenDataPlain.authType) {
                 return RESULT_SUCCESS;
             }
         }
@@ -217,40 +205,44 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
     return RESULT_SUCCESS;
 }
 
-ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, UserAuthTokenHal *authToken,
-    EnrolledStateHal *enrolledState)
+IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult)
 {
-    if (info == NULL || authToken == NULL || info->reuseUnlockResultDuration == 0 ||
+    uint32_t ret = CheckReuseUnlockTokenValid(info);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("check unlock token fail");
+        return ret;
+    }
+    *((UserAuthTokenHal *)reuseResult->token) = g_unlockAuthResult.authToken;
+    reuseResult->enrolledState = g_unlockAuthResult.enrolledState;
+    reuseResult->authType = g_unlockAuthResult.authToken.tokenDataPlain.authType;
+    ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
+    if (memcpy_s(((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge,
+        CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("challenge copy failed");
+        return RESULT_BAD_COPY;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult)
+{
+    if (info == NULL || reuseResult == NULL || info->reuseUnlockResultDuration == 0 ||
         info->reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||
         (info->reuseUnlockResultMode != AUTH_TYPE_RELEVANT && info->reuseUnlockResultMode != AUTH_TYPE_IRRELEVANT)) {
         LOG_ERROR("CheckReuseUnlockResultFunc bad param");
         return RESULT_BAD_PARAM;
     }
-    int32_t unlockUserId = 0;
-    ResultCode ret = GetUnlockAuthResult(&unlockUserId, authToken, enrolledState);
+    ResultCode ret = GetReuseUnlockResult(info, reuseResult);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get reuse unlock token failed");
-        goto EXIT;
+        LOG_ERROR("get reuse unlock result failed");
+        (void)memset_s(reuseResult, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        return ret;
     }
-    ret = CheckReuseUnlockTokenValid(info, unlockUserId, authToken);
+    ret = ReuseUnlockTokenSign((UserAuthTokenHal *)reuseResult->token);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("check reuse unlock token failed");
-        goto EXIT;
+        LOG_ERROR("reuse unlock token sign failed");
+        (void)memset_s(reuseResult, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
+        return ret;
     }
-    authToken->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
-    if (memcpy_s(authToken->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge, CHALLENGE_LEN) != EOK) {
-        LOG_ERROR("challenge copy failed");
-        ret = RESULT_BAD_COPY;
-        goto EXIT;
-    }
-    ret = ReuseUnlockTokenSign(authToken);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get reuse auth token failed");
-        goto EXIT;
-    }
-    return ret;
-
-EXIT:
-    (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     return ret;
 }

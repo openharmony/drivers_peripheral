@@ -45,7 +45,7 @@ ExecutorImpl::~ExecutorImpl()
     threadPool_.Stop();
 }
 
-int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
+int32_t ExecutorImpl::GetExecutorInfo(HdiExecutorInfo &info)
 {
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {
@@ -55,15 +55,15 @@ int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
     constexpr unsigned short SENSOR_ID = 1;
     info.sensorId = SENSOR_ID;
     info.executorMatcher = EXECUTOR_TYPE;
-    info.executorRole = ExecutorRole::ALL_IN_ONE;
-    info.authType = AuthType::PIN;
+    info.executorRole = HdiExecutorRole::ALL_IN_ONE;
+    info.authType = HdiAuthType::PIN;
     uint32_t eslRet = 0;
     int32_t result = pinHdi_->GetExecutorInfo(info.publicKey, eslRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get ExecutorInfo failed, fail code : %{public}d", result);
         return result;
     }
-    info.esl = static_cast<ExecutorSecureLevel>(eslRet);
+    info.esl = static_cast<HdiExecutorSecureLevel>(eslRet);
 
     return HDF_SUCCESS;
 }
@@ -95,7 +95,7 @@ int32_t ExecutorImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const st
     return HDF_SUCCESS;
 }
 
-void ExecutorImpl::CallError(const sptr<IExecutorCallback> &callbackObj, uint32_t errorCode)
+void ExecutorImpl::CallError(const sptr<HdiIExecutorCallback> &callbackObj, uint32_t errorCode)
 {
     IAM_LOGI("start");
     std::vector<uint8_t> ret(0);
@@ -105,7 +105,7 @@ void ExecutorImpl::CallError(const sptr<IExecutorCallback> &callbackObj, uint32_
 }
 
 int32_t ExecutorImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
+    const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
 {
     IAM_LOGI("start");
     static_cast<void>(extraInfo);
@@ -126,7 +126,7 @@ int32_t ExecutorImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t
 }
 
 int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallback> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
@@ -161,7 +161,7 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
 }
 
 int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-    const sptr<IExecutorCallback> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
@@ -187,7 +187,7 @@ int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId
 }
 
 int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64_t>& templateIdList,
-    const std::vector<uint8_t> &extraInfo, const sptr<IExecutorCallback> &callbackObj)
+    const std::vector<uint8_t> &extraInfo, const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
@@ -260,7 +260,7 @@ int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
     int32_t result = GENERAL_ERROR;
     constexpr uint32_t INVALID_ID = 2;
     uint32_t commandId = INVALID_ID;
-    sptr<IExecutorCallback> callback = nullptr;
+    sptr<HdiIExecutorCallback> callback = nullptr;
     uint64_t templateId = 0;
     std::vector<uint8_t> algoParameter(0, 0);
     if (scheduleMap_.GetScheduleInfo(scheduleId, commandId, callback, templateId, algoParameter) != HDF_SUCCESS) {
@@ -322,7 +322,7 @@ int32_t ExecutorImpl::Cancel(uint64_t scheduleId)
 }
 
 uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, const uint32_t commandId,
-    const sptr<IExecutorCallback> callback, const uint64_t templateId, const std::vector<uint8_t> algoParameter)
+    const sptr<HdiIExecutorCallback> callback, const uint64_t templateId, const std::vector<uint8_t> algoParameter)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
@@ -342,7 +342,7 @@ uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, c
 }
 
 uint32_t ExecutorImpl::ScheduleMap::GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId,
-    sptr<IExecutorCallback> &callback, uint64_t &templateId, std::vector<uint8_t> &algoParameter)
+    sptr<HdiIExecutorCallback> &callback, uint64_t &templateId, std::vector<uint8_t> &algoParameter)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
@@ -371,7 +371,7 @@ uint32_t ExecutorImpl::ScheduleMap::DeleteScheduleId(const uint64_t scheduleId)
 }
 
 int32_t ExecutorImpl::GetProperty(
-    const std::vector<uint64_t> &templateIdList, const std::vector<int32_t> &propertyTypes, Property &property)
+    const std::vector<uint64_t> &templateIdList, const std::vector<int32_t> &propertyTypes, HdiProperty &property)
 {
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {

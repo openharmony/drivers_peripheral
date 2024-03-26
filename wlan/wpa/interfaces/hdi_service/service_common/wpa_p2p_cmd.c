@@ -1334,7 +1334,7 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
 
 int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *ifName, const char *cmd)
 {
-#define NEW_CMD_MAX_LEN 500
+#define NEW_CMD_MAX_LEN 400
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     int32_t ret = 0;
     (void)self;
