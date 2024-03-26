@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef WIFI_FEATURE_FLAGS_H
 #define WIFI_FEATURE_FLAGS_H
 
-#include "v1_0/iwifi.h"
-#include "v1_0/wlan_types_common.h"
+#include "v1_0/ichip_controller.h"
+#include "v1_0/chip_types.h"
 #include <string>
 
 #define TRIPLE_MODE_PROP "vendor.hw_mc.wifi.triplemodes"
@@ -34,7 +34,7 @@ namespace chip_mode_ids {
 constexpr int32_t K_INVALID = UINT32_MAX;
 constexpr int32_t K_V1_STA = 0;
 constexpr int32_t K_V1_AP = 1;
-constexpr int32_t k_V3 = 3;
+constexpr int32_t K_V3 = 3;
 }
 
 class WifiChipModes {

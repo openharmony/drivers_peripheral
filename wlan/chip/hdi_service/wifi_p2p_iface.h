@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef WIFI_P2P_IFACE_H
 #define WIFI_P2P_IFACE_H
 
-#include "v1_0/iwifi_iface.h"
-#include "v1_0/wlan_types_common.h"
+#include "v1_0/ichip_iface.h"
+#include "v1_0/chip_types.h"
 #include "wifi_vendor_hal.h"
 
 namespace OHOS {
@@ -26,7 +26,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-class WifiP2pIface : public IWifiIface {
+class WifiP2pIface : public IChipIface {
 public:
     WifiP2pIface(const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal);
     void Invalidate();

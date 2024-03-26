@@ -29,7 +29,8 @@
         "ipc",
         "hilog_lite",
         "wpa_supplicant",
-        "init"
+        "init",
+        "ipc"
       ],
       "third_party": [
         "libnl"
@@ -39,7 +40,8 @@
       "sub_component": [
         "//drivers/peripheral/wlan:wlan_entry",
         "//drivers/peripheral/wlan/wpa:wpa_entry",
-        "//drivers/peripheral/wlan/hostapd:hostapd_entry"
+        "//drivers/peripheral/wlan/hostapd:hostapd_entry",
+        "//drivers/peripheral/wlan/chip:wlan_chip_entry"
       ],
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"

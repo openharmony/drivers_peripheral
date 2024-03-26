@@ -15,6 +15,7 @@ group("wlan_entry") {
   deps = [
     "client:wifi_driver_client",
     "hal:wifi_hal",
+    "wifi_hal:wifi_hal_ext",
   ]
   if (!defined(ohos_lite)) {
     deps += [ "hdi_service:hdi_wlan_service" ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ std::vector<std::shared_ptr<WifiVendorHal>> WifiVendorHalList::GetHals()
 
 void WifiVendorHalList::InitVendorHalsDescriptorList()
 {
-    wifi_hal_lib_desc desc;
+    WifiHalLibDesc desc;
     std::string path = VENDOR_HAL_PATH;
     desc.primary = true;
     if (LoadVendorHalLib(path, desc)) {
@@ -60,7 +60,7 @@ void WifiVendorHalList::InitVendorHalsDescriptorList()
     }
 }
 
-bool WifiVendorHalList::LoadVendorHalLib(const std::string& path, wifi_hal_lib_desc &desc)
+bool WifiVendorHalList::LoadVendorHalLib(const std::string& path, WifiHalLibDesc &desc)
 {
     void* h = dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
     InitWifiVendorHalFuncTableT initfn;

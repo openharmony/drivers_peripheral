@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024. All rights reserved
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef HIDL_STRUCT_UTIL_H
-#define HIDL_STRUCT_UTIL_H
+#ifndef HDI_STRUCT_UTIL_H
+#define HDI_STRUCT_UTIL_H
 
 #include <vector>
-#include "v1_0/iwifi.h"
-#include "v1_0/iwifi_chip.h"
-#include "v1_0/wlan_types_common.h"
+#include "v1_0/ichip_controller.h"
+#include "v1_0/iconcrete_chip.h"
+#include "v1_0/chip_types.h"
 #include "wifi_vendor_hal.h"
 
 namespace OHOS {
