@@ -400,11 +400,6 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
         }
     }
     DestoryBuffer(infoIn.rootSecret);
-    if (infoIn.authType != PIN_AUTH) {
-        IAM_LOGI("type not pin");
-        return RESULT_SUCCESS;
-    }
-    IAM_LOGI("type pin");
     return RESULT_SUCCESS;
 }
 
@@ -437,6 +432,11 @@ static int32_t UpdateAuthenticationResultInner(uint64_t contextId,
         IAM_LOGE("Copy auth result failed");
         return ret;
     }
+    if (authResult.authType != PIN_AUTH) {
+        IAM_LOGI("type not pin");
+        return RESULT_SUCCESS;
+    }
+    IAM_LOGI("type pin");
     return CreateExecutorCommand(authResult.userId, info);
 }
 
@@ -1031,13 +1031,12 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockInfo &
         infoHal.authTypes[i] = static_cast<uint32_t>(info.authTypes[i]);
     }
 
-    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, (UserAuthTokenHal *)resultTemp.token, &resultTemp.enrolledState);
+    int32_t ret = CheckReuseUnlockResultFunc(&infoHal, &resultTemp);
     if (ret != RESULT_SUCCESS) {
         (void)memset_s(&resultTemp, sizeof(ReuseUnlockResult), 0, sizeof(ReuseUnlockResult));
         IAM_LOGE("check reuse unlock result failed, ret:%{public}d", ret);
         return ret;
     }
-    resultTemp.authType = ((UserAuthTokenHal *)resultTemp.token)->tokenDataPlain.authType;
     reuseResult.resize(sizeof(ReuseUnlockResult));
     if (memcpy_s(reuseResult.data(), sizeof(ReuseUnlockResult), &resultTemp, sizeof(ReuseUnlockResult)) != EOK) {
         IAM_LOGE("copy authToken failed");

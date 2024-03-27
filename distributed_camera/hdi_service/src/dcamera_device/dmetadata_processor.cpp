@@ -18,7 +18,7 @@
 #include "dbuffer_manager.h"
 #include "dcamera.h"
 #include "distributed_hardware_log.h"
-#include "json/json.h"
+#include "cJSON.h"
 #include "metadata_utils.h"
 
 namespace OHOS {
@@ -26,26 +26,25 @@ namespace DistributedHardware {
 DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilityInfo,
     const std::string &sourceAbilityInfo)
 {
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(),
-        &rootValue, &errs) && rootValue.isObject()) {
-        if (rootValue.isMember("MetaData") && rootValue["MetaData"].isString()) {
-            std::string metadataStr = rootValue["MetaData"].asString();
-            if (!metadataStr.empty()) {
-                std::hash<std::string> h;
-                DHLOGI("Decode distributed camera metadata from base64, hash: %{public}zu, length: %{public}zu",
-                    h(metadataStr), metadataStr.length());
-                std::string decodeString = Base64Decode(metadataStr);
-                DHLOGI("Decode distributed camera metadata from string, hash: %{public}zu, length: %{public}zu",
-                    h(decodeString), decodeString.length());
-                dCameraAbility_ = OHOS::Camera::MetadataUtils::DecodeFromString(decodeString);
-                DHLOGI("Decode distributed camera metadata from string success.");
-            }
-        }
+    cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
+    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
+        return FAILED;
+    }
+    cJSON *metaObj = cJSON_GetObjectItemCaseSensitive(rootValue, "MetaData");
+    if (metaObj == nullptr || !cJSON_IsString(metaObj) || (metaObj->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
+        return FAILED;
+    }
+    std::string metadataStr = std::string(metaObj->valuestring);
+    if (!metadataStr.empty()) {
+        std::hash<std::string> h;
+        DHLOGI("Decode distributed camera metadata from base64, hash: %zu, length: %zu",
+            h(metadataStr), metadataStr.length());
+        std::string decodeString = Base64Decode(metadataStr);
+        DHLOGI("Decode distributed camera metadata from string, hash: %zu, length: %zu",
+            h(decodeString), decodeString.length());
+        dCameraAbility_ = OHOS::Camera::MetadataUtils::DecodeFromString(decodeString);
+        DHLOGI("Decode distributed camera metadata from string success.");
     }
 
     if (dCameraAbility_ == nullptr) {
@@ -58,6 +57,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilit
         if (ret != SUCCESS) {
             DHLOGE("Init distributed camera defalult abilily keys failed.");
             dCameraAbility_ = nullptr;
+            cJSON_Delete(rootValue);
             return ret;
         }
     }
@@ -66,6 +66,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilit
     if (ret != SUCCESS) {
         DHLOGE("Init distributed camera output abilily keys failed.");
         dCameraAbility_ = nullptr;
+        cJSON_Delete(rootValue);
         return ret;
     }
 
@@ -74,6 +75,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilit
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         allResultSet_.insert((MetaType)(itemEntry->item));
     }
+    cJSON_Delete(rootValue);
     return SUCCESS;
 }
 
@@ -156,23 +158,34 @@ void DMetadataProcessor::SetFpsRanges()
     AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
 }
 
+bool DMetadataProcessor::GetInfoFromJson(const std::string& sinkAbilityInfo)
+{
+    cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
+    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
+        return false;
+    }
+    cJSON *verObj = cJSON_GetObjectItemCaseSensitive(rootValue, "ProtocolVer");
+    if (verObj == nullptr || !cJSON_IsString(verObj) || (verObj->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
+        return false;
+    }
+    protocolVersion_ = std::string(verObj->valuestring);
+
+    cJSON *positionObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Position");
+    if (positionObj == nullptr || !cJSON_IsString(positionObj) || (positionObj->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
+        return false;
+    }
+    dCameraPosition_ = std::string(positionObj->valuestring);
+    cJSON_Delete(rootValue);
+    return true;
+}
+
 DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string &sinkAbilityInfo)
 {
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(), &rootValue,
-        &errs) && rootValue.isObject()) {
-        if (rootValue.isMember("ProtocolVer") && rootValue["ProtocolVer"].isString()) {
-            protocolVersion_ = rootValue["ProtocolVer"].asString();
-        }
-        if (rootValue.isMember("Position") && rootValue["Position"].isString()) {
-            dCameraPosition_ = rootValue["Position"].asString();
-        }
+    if (!GetInfoFromJson(sinkAbilityInfo)) {
+        return FAILED;
     }
-
     if (dCameraPosition_ == "BACK") {
         const uint8_t position = OHOS_CAMERA_POSITION_BACK;
         AddAbilityEntry(OHOS_ABILITY_CAMERA_POSITION, &position, 1);
@@ -216,7 +229,6 @@ DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string 
     const int32_t jpegThumbnailSizes[] = {0, 0, DEGREE_240, DEGREE_180};
     AddAbilityEntry(OHOS_JPEG_AVAILABLE_THUMBNAIL_SIZES, jpegThumbnailSizes,
         (sizeof(jpegThumbnailSizes) / sizeof(jpegThumbnailSizes[0])));
-
     return SUCCESS;
 }
 
@@ -714,16 +726,33 @@ void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item
     }
 }
 
+cJSON* DMetadataProcessor::GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr)
+{
+    cJSON* nodeObj = cJSON_GetObjectItemCaseSensitive(rootValue, rootNode.c_str());
+    if (nodeObj == nullptr || !cJSON_IsObject(nodeObj)) {
+        return nullptr;
+    }
+
+    cJSON* resObj = cJSON_GetObjectItemCaseSensitive(nodeObj, "Resolution");
+    if (resObj == nullptr || !cJSON_IsObject(resObj)) {
+        return nullptr;
+    }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(resObj, formatStr.c_str());
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        return nullptr;
+    }
+    return formatObj;
+}
+
 void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
-    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink)
 {
     for (const auto &format : formats) {
         std::string formatStr = std::to_string(format);
-        if (!rootValue[rootNode].isMember("Resolution") || !rootValue[rootNode]["Resolution"].isMember(formatStr) ||
-            !rootValue[rootNode]["Resolution"][formatStr].isArray() ||
-            rootValue[rootNode]["Resolution"][formatStr].size() == 0 ||
-            rootValue[rootNode]["Resolution"][formatStr].size() > JSON_ARRAY_MAX_SIZE) {
-            DHLOGE("Resolution or %{public}s error.", formatStr.c_str());
+        cJSON *formatObj = GetFormatObj(rootNode, rootValue, formatStr);
+        if (formatObj == nullptr) {
+            DHLOGE("Resolution or %s error.", formatStr.c_str());
             continue;
         }
         GetNodeSupportedResolution(format, rootNode, supportedFormats, rootValue, isSink);
@@ -731,17 +760,22 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
 }
 
 void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::string rootNode,
-    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue, const bool isSink)
+    std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink)
 {
     std::vector<DCResolution> resolutionVec;
     std::string formatStr = std::to_string(format);
-    uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
+    cJSON* formatObj = GetFormatObj(rootNode, rootValue, formatStr);
+    if (formatObj == nullptr) {
+        return;
+    }
+    uint32_t size = cJSON_GetArraySize(formatObj);
     for (uint32_t i = 0; i < size; i++) {
-        if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
-            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item != nullptr && !cJSON_IsString(item)) {
+            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
             continue;
         }
-        std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+        std::string resoStr = std::string(item->valuestring);
         std::vector<std::string> reso;
         SplitString(resoStr, reso, STAR_SEPARATOR);
         if (reso.size() != SIZE_FMT_LEN) {
@@ -798,35 +832,38 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
     const std::string &abilityInfo, const bool isSink)
 {
     std::map<int, std::vector<DCResolution>> supportedFormats;
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(abilityInfo.c_str(), abilityInfo.c_str() + abilityInfo.length(),
-        &rootValue, &errs) || !rootValue.isObject()) {
+    cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
+    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
         return supportedFormats;
     }
     ParsePhotoFormats(rootValue, supportedFormats, isSink);
     ParsePreviewFormats(rootValue, supportedFormats, isSink);
     ParseVideoFormats(rootValue, supportedFormats, isSink);
+    cJSON_Delete(rootValue);
     return supportedFormats;
 }
 
-void DMetadataProcessor::ParsePhotoFormats(Json::Value& rootValue,
+void DMetadataProcessor::ParsePhotoFormats(cJSON* rootValue,
     std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
-    if (!rootValue.isMember("Photo") || !rootValue["Photo"].isMember("OutputFormat") ||
-        !rootValue["Photo"]["OutputFormat"].isArray() || rootValue["Photo"]["OutputFormat"].size() == 0 ||
-        rootValue["Photo"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Photo or photo output format error.");
+    cJSON *photoObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Photo");
+    if (photoObj == nullptr || !cJSON_IsObject(photoObj)) {
+        DHLOGE("Photo error.");
         return;
     }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(photoObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Photo output format error.");
+        return;
+    }
+
     std::vector<int> photoFormats;
-    uint32_t size = rootValue["Photo"]["OutputFormat"].size();
+    uint32_t size = cJSON_GetArraySize(formatObj);
     for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Photo"]["OutputFormat"][i]).isInt()) {
-            photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item !=nullptr && cJSON_IsNumber(item)) {
+            photoFormats.push_back(item->valueint);
         }
     }
     if (isSink) {
@@ -835,39 +872,51 @@ void DMetadataProcessor::ParsePhotoFormats(Json::Value& rootValue,
     GetEachNodeSupportedResolution(photoFormats, "Photo", supportedFormats, rootValue, isSink);
 }
 
-void DMetadataProcessor::ParsePreviewFormats(Json::Value& rootValue,
+void DMetadataProcessor::ParsePreviewFormats(cJSON* rootValue,
     std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
-    if (!rootValue.isMember("Preview") || !rootValue["Preview"].isMember("OutputFormat") ||
-        !rootValue["Preview"]["OutputFormat"].isArray() || rootValue["Preview"]["OutputFormat"].size() == 0 ||
-        rootValue["Preview"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Preview or preview output format error.");
+    cJSON *previewObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Preview");
+    if (previewObj == nullptr || !cJSON_IsObject(previewObj)) {
+        DHLOGE("Preview error.");
+        return;
+    }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(previewObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Preview output format error.");
         return;
     }
     std::vector<int> previewFormats;
-    uint32_t size = rootValue["Preview"]["OutputFormat"].size();
+    uint32_t size = cJSON_GetArraySize(formatObj);
     for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Preview"]["OutputFormat"][i]).isInt()) {
-            previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item !=nullptr && cJSON_IsNumber(item)) {
+            previewFormats.push_back(item->valueint);
         }
     }
     GetEachNodeSupportedResolution(previewFormats, "Preview", supportedFormats, rootValue, isSink);
 }
 
-void DMetadataProcessor::ParseVideoFormats(Json::Value& rootValue,
+void DMetadataProcessor::ParseVideoFormats(cJSON* rootValue,
     std::map<int, std::vector<DCResolution>>& supportedFormats, const bool isSink)
 {
-    if (!rootValue.isMember("Video") || !rootValue["Video"].isMember("OutputFormat") ||
-        !rootValue["Video"]["OutputFormat"].isArray() || rootValue["Video"]["OutputFormat"].size() == 0 ||
-        rootValue["Video"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Video or video output format error.");
+    cJSON *videoObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Video");
+    if (videoObj == nullptr || !cJSON_IsObject(videoObj)) {
+        DHLOGE("Video error.");
+        return;
+    }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(videoObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Video output format error.");
         return;
     }
     std::vector<int> videoFormats;
-    uint32_t size = rootValue["Video"]["OutputFormat"].size();
+    uint32_t size = cJSON_GetArraySize(formatObj);
     for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Video"]["OutputFormat"][i]).isInt()) {
-            videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item !=nullptr && cJSON_IsNumber(item)) {
+            videoFormats.push_back(item->valueint);
         }
     }
     GetEachNodeSupportedResolution(videoFormats, "Video", supportedFormats, rootValue, isSink);
