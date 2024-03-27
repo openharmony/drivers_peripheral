@@ -50,6 +50,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     event.data = eventVdi.data;
     event.dataLen = eventVdi.dataLen;
     SensorClientsManager::GetInstance()->CopyEventData(event);
+    PrintData(event);
     std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
