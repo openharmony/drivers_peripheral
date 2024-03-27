@@ -315,7 +315,7 @@ int32_t UsbdFunction::UsbdWaitToNone()
     char stateName[UDC_NAME_MAX_LEN] = {0};
     for (int32_t i = 0; i < WAIT_UDC_MAX_LOOP; i++) {
         (void)memset_s(stateName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
-        int32_t ret = GetParameter(SYS_USB_STATU, "invalid", stateName, UDC_NAME_MAX_LEN - 1);
+        int32_t ret = GetParameter(SYS_USB_STATE, "invalid", stateName, UDC_NAME_MAX_LEN - 1);
         if (ret <= 0) {
             HDF_LOGE("%{public}s: GetParameter failed", __func__);
             return HDF_FAILURE;

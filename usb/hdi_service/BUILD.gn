@@ -66,7 +66,6 @@ ohos_shared_library("libusb_interface_service_1.1") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_usb:libusbfn_mtp_stub_1.0",
       "drivers_interface_usb:usb_idl_headers_1.1",
       "drivers_interface_usb:usbfn_mtp_idl_headers",
@@ -75,12 +74,33 @@ ohos_shared_library("libusb_interface_service_1.1") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hilog:libhilog",
-      "hisysevent:libhisysevent",
       "hitrace:hitrace_meter",
       "init:libbegetutil",
       "ipc:ipc_single",
-      "samgr:samgr_proxy",
     ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
+
+    if (usb_samgr_enable) {
+      external_deps += [ "samgr:samgr_proxy" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_SAMGR" ]
+      } else {
+        defines = [ "USB_ENABLE_SAMGR" ]
+      }
+    }
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "drivers_interface_usb:libusbfn_mtp_stub_1.0",
@@ -117,7 +137,6 @@ ohos_shared_library("libusb_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_usb:libusb_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -127,6 +146,9 @@ ohos_shared_library("libusb_driver") {
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "drivers_interface_usb:libusb_stub_1.1",
