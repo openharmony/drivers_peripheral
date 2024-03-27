@@ -14,7 +14,6 @@
  */
 
 #include "wifi_ap_iface.h"
-#include "hdi_struct_util.h"
 
 namespace OHOS {
 namespace HDI {
@@ -62,7 +61,7 @@ int32_t WifiApIface::GetIfaceName(std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t WifiApIface::GetSupportFreqs(WifiBand band, std::vector<uint32_t>& frequencies)
+int32_t WifiApIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
 {
     static_assert(sizeof(WifiChannelInMhz) == sizeof(uint32_t), "Size mismatch");
     WifiError legacyStatus;
@@ -76,10 +75,6 @@ int32_t WifiApIface::GetSupportFreqs(WifiBand band, std::vector<uint32_t>& frequ
     return HDF_FAILURE;
 }
 
-int32_t WifiApIface::GetIfaceCap(uint32_t& capabilities)
-{
-    return HDF_SUCCESS;
-}
 }
 }
 }

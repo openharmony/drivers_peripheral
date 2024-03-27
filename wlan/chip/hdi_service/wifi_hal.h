@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <cstddef>
-#include "wifi_logger.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -134,8 +133,6 @@ void WifiEventLoop(wifiHandle handle);
 
 #define IS_SUPPORTED_FEATURE(feature, featureSet)   IS_MASK_SET(feature, featureSet)
 
-WifiError WifiGetSupportedFeatureSet(wifiInterfaceHandle handle, feature_set *set);
-
 WifiError WifiGetIfaces(wifiHandle handle, int *numIfaces, wifiInterfaceHandle **ifaces);
 WifiError WifiGetIfaceName(wifiInterfaceHandle iface, char *name, size_t size);
 
@@ -166,7 +163,6 @@ typedef struct {
     WifiError (*wifiWaitForDriverReady)(void);
     void (*wifiCleanup)(wifiHandle, WifiCleanedUpHandler);
     void (*wifiEventLoop)(wifiHandle);
-    WifiError (*wifiGetSupportedFeatureSet)(wifiInterfaceHandle, feature_set *);
     WifiError (*wifiGetIfaces)(wifiHandle, int *, wifiInterfaceHandle **);
     WifiError (*wifiGetIfaceName)(wifiInterfaceHandle, char *name, size_t);
     WifiError (*wifiGetValidChannels)(wifiInterfaceHandle, int, int, wifi_channel *, int *);

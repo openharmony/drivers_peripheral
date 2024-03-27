@@ -34,7 +34,6 @@ ohos_shared_library("libwifi_chip_interface_service_1.0") {
     "$root_path/wifi_ap_iface.cpp",
     "$root_path/wifi_sta_iface.cpp",
     "$root_path/wifi_p2p_iface.cpp",
-    "$root_path/hdi_struct_util.cpp",
   ]
 
   external_deps = [

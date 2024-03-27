@@ -52,8 +52,8 @@ public:
 
 private:
     enum class RunState { STOPPED, STARTED, STOPPING };
-    WifiStatus InitializVendorHal();
-    WifiStatus StopVendorHal(std::unique_lock<std::recursive_mutex>* lock);
+    ErrorCode InitializVendorHal();
+    ErrorCode StopVendorHal(std::unique_lock<std::recursive_mutex>* lock);
     int32_t GetChipIdFromWifiChip(sptr <WifiChip>& chip);
     void OnRemoteDied(const wptr<IRemoteObject>& object);
     int32_t AddWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback);

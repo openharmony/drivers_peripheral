@@ -21,7 +21,6 @@
 #include "wifi_chip.h"
 #include "parameter.h"
 #include "wifi_hal.h"
-#include "hdi_struct_util.h"
 #include <hdf_log.h>
 
 namespace OHOS {
@@ -130,25 +129,7 @@ std::string WifiChip::GetUsedIfaceName()
     return GetIfaceName(IfaceType::STA, 0);
 }
 
-int32_t WifiChip::GetChipCaps(uint32_t& capabilities)
-{
-    WifiError status;
-    uint64_t featureSet;
-    uint32_t loggerFeatureSet;
-    const auto ifname = GetUsedIfaceName();
-    std::tie(status, featureSet) =
-        vendorHal_.lock()->GetSupportedFeatureSet(ifname);
-    if (status != WIFI_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    loggerFeatureSet = 0;
-    if (!ConvertVendorFeaturesToChipCaps(featureSet, loggerFeatureSet, &capabilities)) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t WifiChip::GetChipModes(std::vector<ChipMode>& modes)
+int32_t WifiChip::GetChipModes(std::vector<UsableMode>& modes)
 {
     modes = modes_;
     return HDF_SUCCESS;
@@ -157,7 +138,7 @@ int32_t WifiChip::GetChipModes(std::vector<ChipMode>& modes)
 bool WifiChip::IsValidModeId(uint32_t modeId)
 {
     for (const auto& mode : modes_) {
-        if (mode.id == modeId) {
+        if (mode.modeId == modeId) {
             return true;
         }
     }
@@ -183,7 +164,7 @@ int32_t WifiChip::SetChipMode(uint32_t modeId)
         return HDF_SUCCESS;
     }
     int32_t status = HandleChipConfiguration(modeId);
-    if (status != WifiStatusCode::SUCCESS) {
+    if (status != ErrorCode::SUCCESS) {
         return HDF_FAILURE;
     }
     currentModeId_ = modeId;
@@ -216,11 +197,11 @@ int32_t WifiChip::HandleChipConfiguration(int32_t modeId)
 }
 
 std::vector<std::map<IfaceType, size_t>> WifiChip::ExpandIfaceCombinations(
-    const ChipIfaceCombination& combination)
+    const ComboIface& combination)
 {
     uint32_t numExpandedCombos = 1;
     for (const auto& limit : combination.limits) {
-        for (uint32_t i = 0; i < limit.maxIfaces; i++) {
+        for (uint32_t i = 0; i < limit.IfaceNum; i++) {
             numExpandedCombos *= limit.types.size();
         }
     }
@@ -236,7 +217,7 @@ std::vector<std::map<IfaceType, size_t>> WifiChip::ExpandIfaceCombinations(
     }
     uint32_t span = numExpandedCombos;
     for (const auto& limit : combination.limits) {
-        for (uint32_t i = 0; i < limit.maxIfaces; i++) {
+        for (uint32_t i = 0; i < limit.IfaceNum; i++) {
             span /= limit.types.size();
             for (uint32_t k = 0; k < numExpandedCombos; ++k) {
                 const auto ifaceType =
@@ -257,15 +238,15 @@ std::map<IfaceType, size_t> WifiChip::GetCurrentIfaceCombo()
     return iface_counts;
 }
 
-std::vector<ChipIfaceCombination> WifiChip::GetCurrentCombinations()
+std::vector<ComboIface> WifiChip::GetCurrentCombinations()
 {
     if (!IsValidModeId(currentModeId_)) {
         HDF_LOGE("Chip not configured in a mode yet");
         return {};
     }
     for (const auto& mode : modes_) {
-        if (mode.id == currentModeId_) {
-            return mode.availableCombinations;
+        if (mode.modeId == currentModeId_) {
+            return mode.usableCombo;
         }
     }
     HDF_LOGE("not find iface combinations for current mode!");

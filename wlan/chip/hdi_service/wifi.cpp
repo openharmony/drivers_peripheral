@@ -83,15 +83,13 @@ int32_t Wifi::Init()
     } else if (runState_ == RunState::STOPPING) {
         return HDF_SUCCESS;
     }
-    WifiStatus wifi_status = InitializVendorHal();
-    if (wifi_status.code == WifiStatusCode::SUCCESS) {
+    ErrorCode res = InitializVendorHal();
+    if (res == ErrorCode::SUCCESS) {
         const auto& onSubsystemRestartCallback =
             [this](const std::string& error) {
-            WifiStatus wifi_status;
-            wifi_status.code = WifiStatusCode::ERROR_UNKNOWN;
-            wifi_status.description = error;
+            ErrorCode res = ErrorCode::UNKNOWN;
             for (const auto& callback : cbHandler_.GetCallbacks()) {
-                callback->OnSubsystemRestart(wifi_status);
+                callback->OnSubsystemRestart(res);
             }
         };
 
@@ -125,8 +123,8 @@ int32_t Wifi::Release()
     }
     chips_.clear();
     auto lock = AcquireGlobalLock();
-    WifiStatus wifi_status = StopVendorHal(&lock);
-    if (wifi_status.code == WifiStatusCode::SUCCESS) {
+    ErrorCode res = StopVendorHal(&lock);
+    if (res == ErrorCode::SUCCESS) {
         return HDF_SUCCESS;
         HDF_LOGI("Wifi HAL stopped");
     } else {
@@ -164,11 +162,11 @@ int32_t Wifi::GetChipService(uint32_t chipId, sptr<IConcreteChip>& chip)
     return HDF_FAILURE;
 }
 
-WifiStatus Wifi::StopVendorHal(std::unique_lock<std::recursive_mutex>* lock)
+ErrorCode Wifi::StopVendorHal(std::unique_lock<std::recursive_mutex>* lock)
 {
     WifiError legacyStatus = WIFI_SUCCESS;
     int index = 0;
-    WifiStatus wifi_status;
+    ErrorCode res;
 
     runState_ = RunState::STOPPING;
     for (auto& hal : vendorHals_) {
@@ -183,34 +181,34 @@ WifiStatus Wifi::StopVendorHal(std::unique_lock<std::recursive_mutex>* lock)
 
     if (legacyStatus != WIFI_SUCCESS) {
         HDF_LOGE("One or more vendor hals failed to stop error is %{public}d", legacyStatus);
-        wifi_status.code = WifiStatusCode::ERROR_UNKNOWN;
-        return wifi_status;
+        res = ErrorCode::UNKNOWN;
+        return res;
     }
-    wifi_status.code = WifiStatusCode::SUCCESS;
-    return wifi_status;
+    res = ErrorCode::SUCCESS;
+    return res;
 }
 
-WifiStatus Wifi::InitializVendorHal()
+ErrorCode Wifi::InitializVendorHal()
 {
-    WifiStatus wifi_status;
+    ErrorCode res;
 
     vendorHals_ = vendorHalList_->GetHals();
     if (vendorHals_.empty()) {
-        wifi_status.code = WifiStatusCode::ERROR_UNKNOWN;
-        return wifi_status;
+        res = ErrorCode::UNKNOWN;
+        return res;
     }
     int index = 0;
     for (auto& hal : vendorHals_) {
         WifiError legacyStatus = hal->Initialize();
         if (legacyStatus != WIFI_SUCCESS) {
-            wifi_status.code = WifiStatusCode::ERROR_UNKNOWN;
-            return wifi_status;
+            res = ErrorCode::UNKNOWN;
+            return res;
         }
         index++;
     }
 
-    wifi_status.code = WifiStatusCode::SUCCESS;
-    return wifi_status;
+    res = ErrorCode::SUCCESS;
+    return res;
 }
 
 int32_t Wifi::GetChipIdFromWifiChip(sptr <WifiChip>& chip)

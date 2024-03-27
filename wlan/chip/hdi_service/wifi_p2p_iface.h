@@ -34,9 +34,8 @@ public:
     std::string GetName();
     int32_t GetIfaceName(std::string& name) override;
     int32_t GetIfaceType(IfaceType& type) override;
-    int32_t GetSupportFreqs(WifiBand band,
+    int32_t GetSupportFreqs(BandType band,
         std::vector<uint32_t>& frequencies) override;
-    int32_t GetIfaceCap(uint32_t& capabilities) override;
 
 private:
     std::string ifname_;

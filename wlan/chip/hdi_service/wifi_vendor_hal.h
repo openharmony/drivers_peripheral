@@ -49,14 +49,12 @@ public:
 
     WifiError GetSupportedIfaceName(uint32_t ifaceType, std::string& ifname);
 
-    std::pair<WifiError, uint64_t> GetSupportedFeatureSet(const std::string& ifaceName);
-
     WifiError CreateVirtualInterface(const std::string& ifname, WifiInterfaceType iftype);
 
     WifiError DeleteVirtualInterface(const std::string& ifname);
 
     std::pair<WifiError, std::vector<uint32_t>> GetValidFrequenciesForBand(
-        const std::string& ifaceName, WifiBand band);
+        const std::string& ifaceName, BandType band);
 
     WifiError SetDfsFlag(const std::string& ifaceName, bool dfsOn);
 
