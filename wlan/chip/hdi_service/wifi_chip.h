@@ -46,8 +46,7 @@ public:
     bool IsValid();
     int32_t GetChipId(int32_t& id) override;
     int32_t RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback) override;
-    int32_t GetChipCaps(uint32_t& capabilities) override;
-    int32_t GetChipModes(std::vector<ChipMode>& modes) override;
+    int32_t GetChipModes(std::vector<UsableMode>& modes) override;
     int32_t GetCurrentMode(uint32_t& modeId) override;
     int32_t SetChipMode(uint32_t modeId) override;
     int32_t CreateApIface(sptr<IChipIface>& iface) override;
@@ -69,10 +68,10 @@ private:
     bool CanSupportIfaceType(IfaceType type);
     bool CanExpandedIfaceSupportIfaceType(
         const std::map<IfaceType, size_t>& expandedCombo, IfaceType type);
-    std::vector<ChipIfaceCombination> GetCurrentCombinations();
+    std::vector<ComboIface> GetCurrentCombinations();
     std::map<IfaceType, size_t> GetCurrentIfaceCombo();
     std::vector<std::map<IfaceType, size_t>> ExpandIfaceCombinations(
-        const ChipIfaceCombination& combination);
+        const ComboIface& combination);
     bool IsValidModeId(uint32_t modeId);
     std::string AllocIfaceName(IfaceType type, uint32_t startIdx);
     bool CanExpandedIfaceComboSupportIfaceCombo(
@@ -97,7 +96,7 @@ private:
     std::vector<sptr<WifiStaIface>> staIfaces_;
     bool isValid_;
     uint32_t currentModeId_;
-    std::vector<ChipMode> modes_;
+    std::vector<UsableMode> modes_;
     CallbackHandler<IConcreteChipCallback> cbHandler_;
     const std::function<void(const std::string&)> subsystemCallbackHandler_;
 };

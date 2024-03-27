@@ -155,25 +155,6 @@ wifiInterfaceHandle WifiVendorHal::GetIfaceHandle(const std::string& ifaceName)
     return iface_handle_iter->second;
 }
 
-std::pair<WifiError, uint64_t> WifiVendorHal::GetSupportedFeatureSet(const std::string& ifaceName)
-{
-    feature_set set = 0;
-    feature_set chipSet = 0;
-    WifiError status = WIFI_SUCCESS;
-
-    static_assert(sizeof(set) == sizeof(uint64_t),
-                  "Some chipModes can not be represented in output");
-    wifiInterfaceHandle ifaceHandle = GetIfaceHandle(ifaceName);
-
-    globalFuncTable_.wifiGetChipFeatureSet(
-        globalHandle_, &chipSet);
-
-    if (ifaceHandle) {
-        status = globalFuncTable_.wifiGetSupportedFeatureSet(ifaceHandle, &set);
-    }
-    return {status, static_cast<uint64_t>(set | chipSet)};
-}
-
 WifiError WifiVendorHal::GetSupportedIfaceName(uint32_t ifaceType, std::string& ifname)
 {
     std::array<char, IFNAMSIZ> buffer;
@@ -184,7 +165,7 @@ WifiError WifiVendorHal::GetSupportedIfaceName(uint32_t ifaceType, std::string& 
 }
 
 std::pair<WifiError, std::vector<uint32_t>>WifiVendorHal::GetValidFrequenciesForBand(const std::string& ifaceName,
-    WifiBand band)
+    BandType band)
 {
     static_assert(sizeof(uint32_t) >= sizeof(wifi_channel),
         "Wifi Channel can not be represented in output");

@@ -30,26 +30,26 @@ constexpr int PROP_BOOL_VALUE_LEN = 6;
 
 WifiChipModes::WifiChipModes() {}
 
-ChipMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int modeId)
+UsableMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int modeId)
 {
     std::vector<IfaceType> staTypes = {};
     std::vector<IfaceType> apTypes = {};
     std::vector<IfaceType> p2pTypes = {};
-    std::vector<ChipIfaceCombination> chipComb = {};
-    ChipIfaceCombinationLimit staChipIfaceComb;
-    ChipIfaceCombinationLimit apChipIfaceComb;
-    ChipIfaceCombinationLimit p2pChipIfaceComb;
+    std::vector<ComboIface> chipComb = {};
+    IfaceLimit staChipIfaceComb;
+    IfaceLimit apChipIfaceComb;
+    IfaceLimit p2pChipIfaceComb;
 
     staTypes.push_back(STA);
     staChipIfaceComb.types = staTypes;
-    staChipIfaceComb.maxIfaces = staNum;
+    staChipIfaceComb.IfaceNum = staNum;
     apTypes.push_back(AP);
     apChipIfaceComb.types = apTypes;
-    apChipIfaceComb.maxIfaces = apNum;
+    apChipIfaceComb.IfaceNum = apNum;
     p2pTypes.push_back(P2P);
     p2pChipIfaceComb.types = p2pTypes;
-    p2pChipIfaceComb.maxIfaces = p2pNum;
-    ChipIfaceCombination comb;
+    p2pChipIfaceComb.IfaceNum = p2pNum;
+    ComboIface comb;
     if (staNum != 0)
         comb.limits.push_back(staChipIfaceComb);
     if (apNum != 0)
@@ -57,41 +57,41 @@ ChipMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int mode
     if (p2pNum != 0)
         comb.limits.push_back(p2pChipIfaceComb);
     chipComb.push_back(comb);
-    ChipMode chipmode = {};
-    chipmode.id = modeId;
-    chipmode.availableCombinations = chipComb;
+    UsableMode chipmode = {};
+    chipmode.modeId = modeId;
+    chipmode.usableCombo = chipComb;
     return chipmode;
 }
 
-std::vector<ChipMode> WifiChipModes::GetChipModesForPrimary()
+std::vector<UsableMode> WifiChipModes::GetChipModesForPrimary()
 {
-    std::vector<ChipMode> modes = {};
+    std::vector<UsableMode> modes = {};
     char propValue[PROP_MAX_LEN] = {0};
     int errCode = GetParameter(SAPCOEXIST_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);
     if (errCode > 0) {
         if (strncmp(propValue, "true", strlen("true")) == 0) {
             HDF_LOGI("select sap and sta coexist");
-            ChipMode mode = MakeComModes(3, 1, 1, 0);
+            UsableMode mode = MakeComModes(3, 1, 1, 0);
             modes.push_back(mode);
             return modes;
         }
     }
-    ChipMode mode = MakeComModes(3, 0, 1, 0);
+    UsableMode mode = MakeComModes(3, 0, 1, 0);
     modes.push_back(mode);
-    ChipMode modeAp = MakeComModes(0, 1, 0, 1);
+    UsableMode modeAp = MakeComModes(0, 1, 0, 1);
     modes.push_back(modeAp);
     return modes;
 }
 
-std::vector<ChipMode> WifiChipModes::GetChipModesForTriple()
+std::vector<UsableMode> WifiChipModes::GetChipModesForTriple()
 {
-    std::vector<ChipMode> modes = {};
-    ChipMode mode = MakeComModes(1, 1, 1, 0);
+    std::vector<UsableMode> modes = {};
+    UsableMode mode = MakeComModes(1, 1, 1, 0);
     modes.push_back(mode);
     return modes;
 }
 
-std::vector<ChipMode> WifiChipModes::GetChipModes(bool isPrimary)
+std::vector<UsableMode> WifiChipModes::GetChipModes(bool isPrimary)
 {
     char propValue[PROP_MAX_LEN] = {0};
     int errCode = GetParameter(TRIPLE_MODE_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);

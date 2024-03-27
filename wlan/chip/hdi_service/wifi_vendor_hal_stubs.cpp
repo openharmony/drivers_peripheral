@@ -48,7 +48,6 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->wifiWaitForDriverReady);
     PopulateStubFor(&halFn->wifiCleanup);
     PopulateStubFor(&halFn->wifiEventLoop);
-    PopulateStubFor(&halFn->wifiGetSupportedFeatureSet);
     PopulateStubFor(&halFn->wifiGetIfaces);
     PopulateStubFor(&halFn->wifiGetIfaceName);
     PopulateStubFor(&halFn->wifiGetValidChannels);

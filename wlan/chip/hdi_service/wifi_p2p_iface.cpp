@@ -54,15 +54,11 @@ int32_t WifiP2pIface::GetIfaceName(std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t WifiP2pIface::GetSupportFreqs(WifiBand band, std::vector<uint32_t>& frequencies)
+int32_t WifiP2pIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
 {
     return HDF_SUCCESS;
 }
 
-int32_t WifiP2pIface::GetIfaceCap(uint32_t& capabilities)
-{
-    return HDF_SUCCESS;
-}
 }
 }
 }

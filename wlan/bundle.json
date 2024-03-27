@@ -29,8 +29,7 @@
         "ipc",
         "hilog_lite",
         "wpa_supplicant",
-        "init",
-        "ipc"
+        "init"
       ],
       "third_party": [
         "libnl"

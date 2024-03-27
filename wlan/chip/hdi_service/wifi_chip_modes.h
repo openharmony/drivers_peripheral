@@ -41,13 +41,13 @@ class WifiChipModes {
 public:
     WifiChipModes();
     virtual ~WifiChipModes() = default;
-    virtual std::vector<ChipMode> GetChipModes(
+    virtual std::vector<UsableMode> GetChipModes(
         bool isPrimary);
 
 private:
-    std::vector<ChipMode> GetChipModesForPrimary();
-    std::vector<ChipMode> GetChipModesForTriple();
-    ChipMode MakeComModes(int staNum, int apNum, int p2pNum, int modeId);
+    std::vector<UsableMode> GetChipModesForPrimary();
+    std::vector<UsableMode> GetChipModesForTriple();
+    UsableMode MakeComModes(int staNum, int apNum, int p2pNum, int modeId);
 };
 }
 }

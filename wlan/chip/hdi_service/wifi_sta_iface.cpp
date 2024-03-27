@@ -14,7 +14,6 @@
  */
 #include "wifi_sta_iface.h"
 #include <hdf_log.h>
-#include "hdi_struct_util.h"
 
 namespace OHOS {
 namespace HDI {
@@ -63,7 +62,7 @@ int32_t WifiStaIface::GetIfaceName(std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t WifiStaIface::GetSupportFreqs(WifiBand band, std::vector<uint32_t>& frequencies)
+int32_t WifiStaIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
 {
     static_assert(sizeof(WifiChannelInMhz) == sizeof(uint32_t), "Size mismatch");
     WifiError legacyStatus;
@@ -77,22 +76,6 @@ int32_t WifiStaIface::GetSupportFreqs(WifiBand band, std::vector<uint32_t>& freq
     return HDF_FAILURE;
 }
 
-int32_t WifiStaIface::GetIfaceCap(uint32_t& capabilities)
-{
-    WifiError legacyStatus;
-    uint64_t legacyFeatureSet;
-    std::tie(legacyStatus, legacyFeatureSet) = vendorHal_.lock()->GetSupportedFeatureSet(ifname_);
-    if (legacyStatus != WifiError::WIFI_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    uint32_t legacyLoggerFeatureSet = 0;
-    uint32_t hidlCaps;
-    if (!ConvertVendorFeaturesToStaCaps(legacyFeatureSet, legacyLoggerFeatureSet, &hidlCaps)) {
-        return HDF_FAILURE;
-    }
-    capabilities = hidlCaps;
-    return HDF_SUCCESS;
-}
 }
 }
 }
