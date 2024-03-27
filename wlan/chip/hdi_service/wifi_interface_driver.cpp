@@ -17,21 +17,21 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/wifi_stub.h"
+#include "v1_0/chip_controller_stub.h"
 
-#define HDF_LOG_TAG wifi_driver
+#define HDF_LOG_TAG    chip_controller_driver
 
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
-struct HdfWifiHost {
+struct HdfChipControllerHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t WifiDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+static int32_t ChipControllerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    auto *hdfWifiHost = CONTAINER_OF(client->device->service, struct HdfWifiHost, ioService);
+    auto *hdfChipControllerHost = CONTAINER_OF(client->device->service, struct HdfChipControllerHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -46,72 +46,72 @@ static int32_t WifiDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, s
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return hdfWifiHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfChipControllerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfWifiDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfChipControllerDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver init start", __func__);
     return HDF_SUCCESS;
 }
 
-static int HdfWifiDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfChipControllerDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver bind start", __func__);
-    auto *hdfWifiHost = new (std::nothrow) HdfWifiHost;
-    if (hdfWifiHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create hdfWifiHost object", __func__);
+    auto *hdfChipControllerHost = new (std::nothrow) HdfChipControllerHost;
+    if (hdfChipControllerHost == nullptr) {
+        HDF_LOGE("%{public}s: failed to create create HdfChipControllerHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfWifiHost->ioService.Dispatch = WifiDriverDispatch;
-    hdfWifiHost->ioService.Open = NULL;
-    hdfWifiHost->ioService.Release = NULL;
+    hdfChipControllerHost->ioService.Dispatch = ChipControllerDriverDispatch;
+    hdfChipControllerHost->ioService.Open = NULL;
+    hdfChipControllerHost->ioService.Release = NULL;
 
     auto serviceImpl = OHOS::HDI::Wlan::Chip::V1_0::IChipController::Get("chip_interface_service", true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
-        delete hdfWifiHost;
+        delete hdfChipControllerHost;
         return HDF_FAILURE;
     }
 
-    hdfWifiHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+    hdfChipControllerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         OHOS::HDI::Wlan::Chip::V1_0::IChipController::GetDescriptor());
-    if (hdfWifiHost->stub == nullptr) {
+    if (hdfChipControllerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
-        delete hdfWifiHost;
+        delete hdfChipControllerHost;
         return HDF_FAILURE;
     }
 
-    deviceObject->service = &hdfWifiHost->ioService;
+    deviceObject->service = &hdfChipControllerHost->ioService;
     return HDF_SUCCESS;
 }
 
-static void HdfWifiDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfChipControllerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver release start", __func__);
     if (deviceObject->service == nullptr) {
         return;
     }
 
-    auto *hdfWifiHost = CONTAINER_OF(deviceObject->service, struct HdfWifiHost, ioService);
-    if (hdfWifiHost != nullptr) {
-        delete hdfWifiHost;
+    auto *hdfChipControllerHost = CONTAINER_OF(deviceObject->service, struct HdfChipControllerHost, ioService);
+    if (hdfChipControllerHost != nullptr) {
+        delete hdfChipControllerHost;
     }
 }
 
-struct HdfDriverEntry g_wifiDriverEntry = {
+struct HdfDriverEntry g_chipcontrollerDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "chip",
-    .Bind = HdfWifiDriverBind,
-    .Init = HdfWifiDriverInit,
-    .Release = HdfWifiDriverRelease,
+    .Bind = HdfChipControllerDriverBind,
+    .Init = HdfChipControllerDriverInit,
+    .Release = HdfChipControllerDriverRelease,
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-HDF_INIT(g_wifiDriverEntry);
+HDF_INIT(g_chipcontrollerDriverEntry);
 #ifdef  __cplusplus
 }
 #endif
