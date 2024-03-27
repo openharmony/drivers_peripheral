@@ -965,8 +965,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0030)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
-    std::cout << "OHOS_SENSOR_ORIENTATION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == 0);
+    std::cout << "OHOS_SENSOR_ORIENTATION value is " << entry.data.i32[0] << std::endl;
+    EXPECT_TRUE(entry.data.i32[0] == 0);
 }
 
 /**
@@ -1582,8 +1582,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
         EXPECT_EQ(ret, CAM_META_SUCCESS);
-        CAMERA_LOGD("OHOS_SENSOR_ORIENTATION value is %{pubilc}d", entry.data.u8[0]);
-        EXPECT_TRUE(entry.data.u8[0] == 0);
+        CAMERA_LOGD("OHOS_SENSOR_ORIENTATION value is %{pubilc}d", entry.data.i32[0]);
+        EXPECT_TRUE(entry.data.i32[0] == 0);
     }
 }
 
