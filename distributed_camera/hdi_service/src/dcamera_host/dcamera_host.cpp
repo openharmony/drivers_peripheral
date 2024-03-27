@@ -205,7 +205,7 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_[dCameraId] = dcameraDevice;
     }
-    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
     dhBaseHashDCamIdMap_.emplace(dcameraBase, dCameraId);
     if (callback == nullptr) {
         DHLOGE("DCameraHost::SetProviderCallback failed, callback is null");
@@ -248,7 +248,7 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
         remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
     }
-    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
     dhBaseHashDCamIdMap_.erase(dcameraBase);
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
@@ -282,7 +282,7 @@ bool DCameraHost::IsCameraIdInvalid(const std::string &cameraId)
 
 std::string DCameraHost::GetCameraIdByDHBase(const DHBase &dhBase)
 {
-    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
     auto iter = dhBaseHashDCamIdMap_.find(dcameraBase);
     if (iter == dhBaseHashDCamIdMap_.end()) {
         return "";
