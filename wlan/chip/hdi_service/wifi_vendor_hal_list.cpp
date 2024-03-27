@@ -26,7 +26,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-const std::string VENDOR_HAL_PATH = "/vendor/lib64/libwifi_hal_default.z.so";
+const std::string VENDOR_HAL_PATH = "/vendor/lib64/libwifi_hal_huawei.z.so";
 
 WifiVendorHalList::WifiVendorHalList(
     const std::weak_ptr<IfaceTool> ifaceTool)
@@ -69,7 +69,7 @@ bool WifiVendorHalList::LoadVendorHalLib(const std::string& path, WifiHalLibDesc
         HDF_LOGE("failed to open vendor hal library: %{public}s", path.c_str());
         return false;
     }
-    initfn = static_cast<InitWifiVendorHalFuncTableT>(dlsym(
+    initfn = reinterpret_cast<InitWifiVendorHalFuncTableT>(dlsym(
         h, "InitWifiVendorHalFuncTable"));
     if (!initfn) {
         HDF_LOGE("InitWifiVendorHalFuncTable not found in: %{public}s", path.c_str());

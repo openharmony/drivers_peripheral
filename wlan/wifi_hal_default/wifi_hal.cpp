@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hal.h"
+#include "gscan.h"
 
 WifiError WifiVirtualInterfaceCreate(wifiHandle handle, const char* ifname,
     WifiInterfaceType ifaceType)

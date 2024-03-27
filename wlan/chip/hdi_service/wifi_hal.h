@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <cstddef>
-#include "gscan.h"
 #include "wifi_logger.h"
 
 #ifdef __cplusplus
