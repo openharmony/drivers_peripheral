@@ -753,7 +753,7 @@ void V4L2DeviceManager::AddDefaultAbilityStreamAvailableBasicConfigurations(std:
 void V4L2DeviceManager::AddDefaultSensorOrientation(std::shared_ptr<CameraMetadata> metadata)
 {
     std::vector<uint8_t> sensorOrientationVector;
-    const uint8_t sensorOrientation = 0;
+    const int32_t sensorOrientation = 0;
     sensorOrientationVector.push_back(sensorOrientation);
     AddOrUpdateOhosTag(metadata, OHOS_SENSOR_ORIENTATION, sensorOrientationVector);
 }
