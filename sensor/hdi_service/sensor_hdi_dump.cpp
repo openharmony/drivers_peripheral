@@ -18,7 +18,6 @@
 #include <securec.h>
 #include <unordered_map>
 #include "sensor_uhdf_log.h"
-#include "sensor_if_service.h"
 
 #define HDF_LOG_TAG uhdf_sensor_hdi_dump
 
