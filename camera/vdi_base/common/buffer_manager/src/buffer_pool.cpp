@@ -109,8 +109,6 @@ RetCode BufferPool::DestroyBuffer()
         std::unique_lock<std::mutex> l(lock_);
         idleList_.clear();
         busyList_.clear();
-        sfBuffer_.clear();
-        sfSize_.clear();
         return RC_OK;
     }
 
@@ -148,8 +146,6 @@ RetCode BufferPool::DestroyBuffer()
             }
         }
         busyList_.clear();
-        sfBuffer_.clear();
-        sfSize_.clear();
     }
 
     return RC_OK;
@@ -272,49 +268,5 @@ uint32_t BufferPool::GetIdleBufferCount()
 {
     std::unique_lock<std::mutex> l(lock_);
     return idleList_.size();
-}
-void BufferPool::setSFBuffer(std::shared_ptr<IBuffer>& buffer)
-{
-    sfBuffer_.insert(std::make_pair(buffer->GetIndex(), static_cast<uint8_t *>(buffer->GetVirAddress())));
-    sfSize_.insert(std::make_pair(buffer->GetIndex(), buffer->GetSize()));
-    forkBufferId_ = buffer->GetIndex();
-}
-
-std::map<int32_t, uint8_t*> BufferPool::getSFBuffer(int32_t index)
-{
-    std::map<int32_t, uint8_t*> sizeVirMap;
-    auto iterMap = sfBuffer_.find(index);
-    if (iterMap == sfBuffer_.end()) {
-        CAMERA_LOGE("std::map sfBuffer_ no buffer->GetIndex()\n");
-        return sizeVirMap;
-    }
-
-    auto iterSizeMap = sfSize_.find(index);
-    if (iterSizeMap == sfSize_.end()) {
-        CAMERA_LOGE("std::map sfSize_ no buffer->GetIndex()\n");
-        return sizeVirMap;
-    }
-    sizeVirMap[iterSizeMap->second] = iterMap->second;
-    return sizeVirMap;
-}
-
-int32_t BufferPool::GetForkBufferId()
-{
-    return forkBufferId_;
-}
-
-void BufferPool::SetForkBufferId(int32_t index)
-{
-    forkBufferId_ = index;
-}
-
-bool BufferPool::GetIsFork()
-{
-    return isFork_;
-}
-
-void BufferPool::SetIsFork(bool isFork)
-{
-    isFork_ = isFork;
 }
 } // namespace OHOS::Camera

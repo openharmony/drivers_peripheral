@@ -37,6 +37,7 @@ RetCode SourceNode::Init(const int32_t streamId)
 
 RetCode SourceNode::Start(const int32_t streamId)
 {
+    CAMERA_LOGI("SourceNode::Start [%{public}d] start", streamId);
     std::shared_ptr<IPort> port = nullptr;
     auto outPorts = GetOutPorts();
     for (auto& p : outPorts) {
@@ -123,6 +124,7 @@ void SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             captureRequests_[id].pop_front();
         }
     }
+    buffer->SetIsValidDataInSurfaceBuffer(false);
     NodeBase::DeliverBuffer(buffer);
 }
 
@@ -200,6 +202,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());
+        CAMERA_LOGI("[ZG]StartCollectBuffers thread start, name = %{public}s", name.c_str());
         while (true) {
             {
                 std::unique_lock<std::mutex> l(cltLock);
@@ -210,6 +213,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
             }
             CollectBuffers();
         }
+        CAMERA_LOGI("[ZG]StartCollectBuffers thread end, name = %{public}d", name.c_str());
     });
 
     return RC_OK;
@@ -261,34 +265,22 @@ void SourceNode::PortHandler::CollectBuffers()
     std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
     frameSpec->bufferPoolId_ = format.bufferPoolId_;
     frameSpec->bufferCount_ = format.bufferCount_;
-    constexpr uint32_t YUV422Width = 2;
-    uint32_t bufferSize = maxWide_ * maxHigh_ * YUV422Width;
-    if (isResize_ == false || (maxWide_ == buffer->GetWidth() && maxHigh_ == buffer->GetHeight())) {
-        frameSpec->buffer_ = buffer;
-    } else {
-        if (count_ < frameSpec->bufferCount_) {
-            uint8_t* addr = reinterpret_cast<uint8_t*>(malloc(static_cast<uint32_t>(bufferSize)));
-            if (addr == nullptr) {
-                CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
-                return;
-            }
-            pool->setSFBuffer(buffer);
-            cBuffer.insert(std::make_pair(buffer->GetIndex(), (uint8_t *)addr));
-            buffer->SetVirAddress(addr);
+    constexpr uint32_t NewBufferBytePrePiex = 4;
+    uint32_t bufferSize = maxWide_ * maxHigh_ * NewBufferBytePrePiex;
+    CAMERA_LOGE("streamId[%{public}d], bufferIndex[%{public}d], Size %{public}d => %{public}d",
+                buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
+
+    if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
+        CAMERA_LOGE("CollectBuffers begin malloc buffer");
+        auto bufferAddr = malloc(bufferSize);
+        if (bufferAddr != nullptr) {
+            buffer->SetVirAddress(bufferAddr);
             buffer->SetSize(bufferSize);
         } else {
-            auto iterMap = cBuffer.find(buffer->GetIndex());
-            if (iterMap == cBuffer.end()) {
-                CAMERA_LOGE("std::map cBuffer no buffer>GetIndex()\n");
-                return;
-            }
-            buffer->SetVirAddress(iterMap->second);
-            buffer->SetSize(bufferSize);
+            CAMERA_LOGE("CollectBuffers malloc buffer fail");
         }
-        count_++;
-        frameSpec->buffer_ = buffer;
     }
-
+    frameSpec->buffer_ = buffer;
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
     RetCode rc = node->ProvideBuffers(frameSpec);
@@ -310,6 +302,7 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
         int id = format.streamId_;
         std::string name = "distribute#" + std::to_string(id);
         prctl(PR_SET_NAME, name.c_str());
+        CAMERA_LOGI("[ZG]StartDistributeBuffers thread start, name = %{public}s", name.c_str());
 
         while (true) {
             {
@@ -321,6 +314,7 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
             }
             DistributeBuffers();
         }
+        CAMERA_LOGI("[ZG]StartDistributeBuffers thread end, name = %{public}s", name.c_str());
     });
 
     return RC_OK;
@@ -380,6 +374,7 @@ void SourceNode::PortHandler::DistributeBuffers()
 
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
+    CAMERA_LOGE("DistributeBuffers Loop, start deliverBuffer, streamId = %{public}d", buffer->GetStreamId());
     node->DeliverBuffer(buffer);
 
     return;

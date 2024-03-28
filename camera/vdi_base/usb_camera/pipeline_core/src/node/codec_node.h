@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "camera.h"
 #include "source_node.h"
-
+#include "node_utils.h"
 
 namespace OHOS::Camera {
 class CodecNode : public NodeBase {
@@ -40,7 +40,7 @@ public:
 private:
     void EncodeJpegToMemory(uint8_t* image, int width, int height,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
-    void Yuv422ToRGBA8888(std::shared_ptr<IBuffer>& buffer);
+
     void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);
 
     uint32_t jpegRotation_;

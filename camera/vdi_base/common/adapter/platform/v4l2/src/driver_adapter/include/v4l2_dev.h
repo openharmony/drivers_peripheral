@@ -73,7 +73,7 @@ public:
 
     RetCode StopStream(const std::string& cameraID);
 
-    RetCode SetCallback(BufCallback cb);
+    RetCode SetV4L2DevCallback(BufCallback cb);
 
     RetCode Flush(const std::string& cameraID);
 

@@ -34,6 +34,7 @@ public:
     RetCode GetDeviceController();
     RetCode SetCallback() override;
     void SetBufferCallback() override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
 private:
     void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);

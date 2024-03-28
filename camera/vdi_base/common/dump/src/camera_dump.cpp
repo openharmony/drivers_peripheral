@@ -132,8 +132,8 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
 
     uint32_t defaultWidth = (width == 0) ? buffer->GetWidth() : width;
     uint32_t defaultHeight = (height == 0) ? buffer->GetHeight() : height;
-
-    uint32_t size = buffer->GetSize();
+    void* srcAddr = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferAddr() : buffer->GetVirAddress();
+    uint32_t size = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferSize() : buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
     if (name != DqBufferName) {
         size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
@@ -177,8 +177,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
         ss >> fileName;
         fileName += ".yuv";
     }
-
-    return SaveDataToFile(fileName.c_str(), buffer->GetVirAddress(), size);
+    return SaveDataToFile(fileName.c_str(), srcAddr, size);
 }
 
 bool CameraDumper::DumpMetadata(std::string name, std::string type,
@@ -243,6 +242,7 @@ bool CameraDumper::IsDumpOpened(DumpType type)
 
 bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32_t size)
 {
+    CAMERA_LOGI("save dump file <%{public}s> begin, size: %{public}d", fileName, size);
     std::stringstream mkdirCmd;
     mkdirCmd << "mkdir -p " << DUMP_PATH;
     system(mkdirCmd.str().c_str());

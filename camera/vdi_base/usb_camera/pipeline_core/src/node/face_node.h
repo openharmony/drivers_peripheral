@@ -36,10 +36,10 @@ std::vector<uint32_t> FaceDetectMetadataTag = {
     OHOS_STATISTICS_FACE_IDS
 };
 
-class RKFaceNode : public NodeBase {
+class FaceNode : public NodeBase {
 public:
-    RKFaceNode(const std::string &name, const std::string &type, const std::string &cameraId);
-    ~RKFaceNode() override;
+    FaceNode(const std::string &name, const std::string &type, const std::string &cameraId);
+    ~FaceNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;

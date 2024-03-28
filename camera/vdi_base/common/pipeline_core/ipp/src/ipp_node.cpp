@@ -310,7 +310,6 @@ void IppNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     std::vector<std::shared_ptr<IBuffer>> cache;
     cache.emplace_back(buffer);
-
     ReceiveCache(cache);
     return;
 }
@@ -417,6 +416,7 @@ void IppNode::DeliverAlgoProductBuffer(std::shared_ptr<IBuffer>& result)
         CAMERA_LOGV("deliver buffer to offline stream");
         DeliverOfflineBuffer(result);
     } else {
+        return NodeBase::DeliverBuffer(result);
         std::shared_ptr<IPort> outPort = GetOutPortById(0);
         if (outPort == nullptr) {
             CAMERA_LOGE("can't find out port, deliver algo product failed.");

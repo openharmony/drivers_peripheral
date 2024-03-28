@@ -51,9 +51,19 @@ uint32_t ImageBuffer::GetWidth() const
     return width_;
 }
 
+uint32_t ImageBuffer::GetCurWidth() const
+{
+    return curWidth_;
+}
+
 uint32_t ImageBuffer::GetHeight() const
 {
     return height_;
+}
+
+uint32_t ImageBuffer::GetCurHeight() const
+{
+    return curHeight_;
 }
 
 uint32_t ImageBuffer::GetStride() const
@@ -66,9 +76,24 @@ int32_t ImageBuffer::GetFormat() const
     return format_;
 }
 
+int32_t ImageBuffer::GetCurFormat() const
+{
+    return curFormat_;
+}
+
 uint32_t ImageBuffer::GetSize() const
 {
     return size_;
+}
+
+uint32_t ImageBuffer::GetSuffaceBufferSize() const
+{
+    return sbSize_;
+}
+
+void* ImageBuffer::GetSuffaceBufferAddr() const
+{
+    return sbAddr_;
 }
 
 uint64_t ImageBuffer::GetUsage() const
@@ -146,6 +171,11 @@ int32_t ImageBuffer::GetStreamId() const
     return streamId_;
 }
 
+bool ImageBuffer::GetIsValidDataInSurfaceBuffer() const
+{
+    return isDataValidInSurfaceBuffer_;
+}
+
 void ImageBuffer::SetIndex(const int32_t index)
 {
     std::lock_guard<std::mutex> l(l_);
@@ -160,10 +190,24 @@ void ImageBuffer::SetWidth(const uint32_t width)
     return;
 }
 
+void ImageBuffer::SetCurWidth(const uint32_t width)
+{
+    std::lock_guard<std::mutex> l(l_);
+    curWidth_ = width;
+    return;
+}
+
 void ImageBuffer::SetHeight(const uint32_t height)
 {
     std::lock_guard<std::mutex> l(l_);
     height_ = height;
+    return;
+}
+
+void ImageBuffer::SetCurHeight(const uint32_t height)
+{
+    std::lock_guard<std::mutex> l(l_);
+    curHeight_ = height;
     return;
 }
 
@@ -180,12 +224,29 @@ void ImageBuffer::SetFormat(const int32_t format)
     format_ = format;
     return;
 }
+void ImageBuffer::SetCurFormat(const int32_t format)
+{
+    std::lock_guard<std::mutex> l(l_);
+    curFormat_ = format;
+    return;
+}
 
 void ImageBuffer::SetSize(const uint32_t size)
 {
     std::lock_guard<std::mutex> l(l_);
     size_ = size;
     return;
+}
+void ImageBuffer::SetSuffaceBufferAddr(const void* addr)
+{
+    std::lock_guard<std::mutex> l(l_);
+    sbAddr_ = const_cast<void*>(addr);
+}
+
+void ImageBuffer::SetSuffaceBufferSize(const uint32_t size)
+{
+    std::lock_guard<std::mutex> l(l_);
+    sbSize_ = size;
 }
 
 void ImageBuffer::SetUsage(const uint64_t usage)
@@ -307,8 +368,20 @@ void ImageBuffer::SetStreamId(const int32_t streamId)
     return;
 }
 
+void ImageBuffer::SetIsValidDataInSurfaceBuffer(const bool isValid)
+{
+    std::lock_guard<std::mutex> l(l_);
+    isDataValidInSurfaceBuffer_ = isValid;
+}
+
 void ImageBuffer::Free()
 {
+    std::lock_guard<std::mutex> l(l_);
+    if (virAddr_ != sbAddr_ && virAddr_ != nullptr) {
+        CAMERA_LOGE("Free VirtualAddr, streamId = %{public}d, index = %{public}d", streamId_, index_);
+        free(virAddr_);
+    }
+    virAddr_ = nullptr;
     index_ = -1;
     width_ = 0;
     height_ = 0;
@@ -316,10 +389,8 @@ void ImageBuffer::Free()
     format_ = CAMERA_FORMAT_INVALID;
     size_ = 0;
     usage_ = 0;
-    virAddr_ = nullptr;
     phyAddr_ = 0;
     fd_ = -1;
-
     return;
 }
 
