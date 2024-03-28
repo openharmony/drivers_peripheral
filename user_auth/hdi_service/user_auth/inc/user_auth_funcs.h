@@ -64,7 +64,6 @@ typedef struct {
     bool isCached;
     int32_t userId;
     UserAuthTokenHal authToken;
-    EnrolledStateHal enrolledState;
 } __attribute__((__packed__)) UnlockAuthResultCache;
 
 ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
