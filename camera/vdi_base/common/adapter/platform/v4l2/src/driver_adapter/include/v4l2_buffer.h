@@ -51,7 +51,7 @@ public:
 
     RetCode V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec);
 
-    void SetCallback(BufCallback cb);
+    void SetV4L2BuffersCallback(BufCallback cb);
 
     RetCode Flush(int fd);
 

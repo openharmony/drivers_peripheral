@@ -707,7 +707,7 @@ RetCode HosV4L2Dev::ConfigSys(const std::string& cameraID, V4l2FmtCmd command, D
     return rc;
 }
 
-RetCode HosV4L2Dev::SetCallback(BufCallback cb)
+RetCode HosV4L2Dev::SetV4L2DevCallback(BufCallback cb)
 {
     if (cb == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::SetCallback is null");
@@ -718,7 +718,7 @@ RetCode HosV4L2Dev::SetCallback(BufCallback cb)
         return RC_ERROR;
     }
 
-    myBuffers_->SetCallback(cb);
+    myBuffers_->SetV4L2BuffersCallback(cb);
 
     return RC_OK;
 }
