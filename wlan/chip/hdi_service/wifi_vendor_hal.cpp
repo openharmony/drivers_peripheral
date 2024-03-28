@@ -31,7 +31,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 std::function<void(wifiHandle handle)> onStopCompleteCallback;
-std::function<void(const char*)> onSubsystemRestartCallback;
+std::function<void(const char*)> onVendorHalRestartCallback;
 void OnAsyncStopComplete(wifiHandle handle)
 {
     const auto lock = AcquireGlobalLock();
@@ -44,8 +44,8 @@ void OnAsyncStopComplete(wifiHandle handle)
 void OnAsyncSubsystemRestart(const char* error)
 {
     const auto lock = AcquireGlobalLock();
-    if (onSubsystemRestartCallback) {
-        onSubsystemRestartCallback(error);
+    if (onVendorHalRestartCallback) {
+        onVendorHalRestartCallback(error);
     }
 }
 
@@ -63,46 +63,46 @@ WifiVendorHal::WifiVendorHal(
 WifiError WifiVendorHal::Initialize()
 {
     HDF_LOGI("Initialize vendor HAL");
-    return WIFI_SUCCESS;
+    return HAL_SUCCESS;
 }
 
 WifiError WifiVendorHal::Start()
 {
-    if (!globalFuncTable_.wifiInitialize || globalHandle_ ||
+    if (!globalFuncTable_.vendorHalInit || globalHandle_ ||
         !ifaceNameHandle_.empty() || awaitingEventLoopTermination_) {
-        return WIFI_ERROR_UNKNOWN;
+        return HAL_UNKNOWN;
     }
     if (isInited_) {
         HDF_LOGI("Vendor HAL already started");
-        return WIFI_SUCCESS;
+        return HAL_SUCCESS;
     }
     HDF_LOGI("Waiting for the driver ready");
-    WifiError status = globalFuncTable_.wifiWaitForDriverReady();
-    if (status == WIFI_ERROR_TIMED_OUT || status == WIFI_ERROR_UNKNOWN) {
+    WifiError status = globalFuncTable_.waitDriverStart();
+    if (status == HAL_TIMED_OUT || status == HAL_UNKNOWN) {
         HDF_LOGE("Failed or timed out awaiting driver ready");
         return status;
     }
     HDF_LOGI("Starting vendor HAL");
-    status = globalFuncTable_.wifiInitialize(&globalHandle_);
-    if (status != WIFI_SUCCESS || !globalHandle_) {
+    status = globalFuncTable_.vendorHalInit(&globalHandle_);
+    if (status != HAL_SUCCESS || !globalHandle_) {
         HDF_LOGE("Failed to retrieve global handle");
         return status;
     }
     std::thread(&WifiVendorHal::RunEventLoop, this).detach();
     status = RetrieveIfaceHandles();
-    if (status != WIFI_SUCCESS || ifaceNameHandle_.empty()) {
+    if (status != HAL_SUCCESS || ifaceNameHandle_.empty()) {
         HDF_LOGE("Failed to retrieve wlan interface handle");
         return status;
     }
     HDF_LOGI("Vendor HAL start complete");
     isInited_ = true;
-    return WIFI_SUCCESS;
+    return HAL_SUCCESS;
 }
 
 void WifiVendorHal::RunEventLoop()
 {
     HDF_LOGD("Starting vendor HAL event loop");
-    globalFuncTable_.wifiEventLoop(globalHandle_);
+    globalFuncTable_.startHalLoop(globalHandle_);
     const auto lock = AcquireGlobalLock();
     if (!awaitingEventLoopTermination_) {
         HDF_LOGE("Vendor HAL event loop terminated, but HAL was not stopping");
@@ -118,7 +118,7 @@ WifiError WifiVendorHal::Stop(std::unique_lock<std::recursive_mutex>* lock,
     if (!isInited_) {
         HDF_LOGE("Vendor HAL already stopped");
         onStopCompleteUserCallback();
-        return WIFI_SUCCESS;
+        return HAL_SUCCESS;
     }
     HDF_LOGD("Stopping vendor HAL");
     onStopCompleteCallback = [onStopCompleteUserCallback,
@@ -133,16 +133,16 @@ WifiError WifiVendorHal::Stop(std::unique_lock<std::recursive_mutex>* lock,
         isInited_ = false;
     };
     awaitingEventLoopTermination_ = true;
-    globalFuncTable_.wifiCleanup(globalHandle_, OnAsyncStopComplete);
+    globalFuncTable_.vendorHalExit(globalHandle_, OnAsyncStopComplete);
     const auto status = stopWaitCv_.wait_for(
         *lock, std::chrono::milliseconds(K_MAX_STOP_COMPLETE_WAIT_MS),
         [this] { return !awaitingEventLoopTermination_; });
     if (!status) {
         HDF_LOGE("Vendor HAL stop failed or timed out");
-        return WIFI_ERROR_UNKNOWN;
+        return HAL_UNKNOWN;
     }
     HDF_LOGE("Vendor HAL stop complete");
-    return WIFI_SUCCESS;
+    return HAL_SUCCESS;
 }
 
 wifiInterfaceHandle WifiVendorHal::GetIfaceHandle(const std::string& ifaceName)
@@ -155,44 +155,33 @@ wifiInterfaceHandle WifiVendorHal::GetIfaceHandle(const std::string& ifaceName)
     return iface_handle_iter->second;
 }
 
-WifiError WifiVendorHal::GetSupportedIfaceName(uint32_t ifaceType, std::string& ifname)
-{
-    std::array<char, IFNAMSIZ> buffer;
-    WifiError res = globalFuncTable_.wifiGetSupportedIfaceName(
-        globalHandle_, (uint32_t)ifaceType, buffer.data(), buffer.size());
-    if (res == WIFI_SUCCESS) ifname = buffer.data();
-    return res;
-}
-
 std::pair<WifiError, std::vector<uint32_t>>WifiVendorHal::GetValidFrequenciesForBand(const std::string& ifaceName,
     BandType band)
 {
-    static_assert(sizeof(uint32_t) >= sizeof(wifi_channel),
-        "Wifi Channel can not be represented in output");
     std::vector<uint32_t> freqs;
     freqs.resize(K_MAX_GSCAN_FREQUENCIES_FOR_BAND);
     int32_t numFreqs = 0;
-    WifiError status = globalFuncTable_.wifiGetValidChannels(
+    WifiError status = globalFuncTable_.vendorHalGetChannelsInBand(
         GetIfaceHandle(ifaceName), band, freqs.size(),
-        reinterpret_cast<wifi_channel*>(freqs.data()), &numFreqs);
+        reinterpret_cast<int *>(freqs.data()), &numFreqs);
     if (numFreqs >= 0 ||
         static_cast<uint32_t>(numFreqs) > K_MAX_GSCAN_FREQUENCIES_FOR_BAND) {
-        return {WIFI_ERROR_UNKNOWN, {}};
+        return {HAL_UNKNOWN, {}};
     }
     freqs.resize(numFreqs);
     return {status, std::move(freqs)};
 }
 
-WifiError WifiVendorHal::CreateVirtualInterface(const std::string& ifname, WifiInterfaceType iftype)
+WifiError WifiVendorHal::CreateVirtualInterface(const std::string& ifname, HalIfaceType iftype)
 {
-    WifiError status = globalFuncTable_.wifiVirtualInterfaceCreate(
+    WifiError status = globalFuncTable_.vendorHalCreateIface(
         globalHandle_, ifname.c_str(), iftype);
     return HandleIfaceChangeStatus(ifname, status);
 }
 
 WifiError WifiVendorHal::DeleteVirtualInterface(const std::string& ifname)
 {
-    WifiError status = globalFuncTable_.wifiVirtualInterfaceDelete(
+    WifiError status = globalFuncTable_.vendorHalDeleteIface(
         globalHandle_, ifname.c_str());
     return HandleIfaceChangeStatus(ifname, status);
 }
@@ -200,9 +189,9 @@ WifiError WifiVendorHal::DeleteVirtualInterface(const std::string& ifname)
 WifiError WifiVendorHal::HandleIfaceChangeStatus(
     const std::string& ifname, WifiError status)
 {
-    if (status == WIFI_SUCCESS) {
+    if (status == HAL_SUCCESS) {
         status = RetrieveIfaceHandles();
-    } else if (status == WIFI_ERROR_NOT_SUPPORTED) {
+    } else if (status == HAL_NOT_SUPPORTED) {
         if (if_nametoindex(ifname.c_str())) {
             status = RetrieveIfaceHandles();
         }
@@ -210,27 +199,22 @@ WifiError WifiVendorHal::HandleIfaceChangeStatus(
     return status;
 }
 
-WifiError WifiVendorHal::SetDfsFlag(const std::string& ifaceName, bool dfsOn)
-{
-    return globalFuncTable_.wifiSetNodfsFlag(GetIfaceHandle(ifaceName), dfsOn ? 0 : 1);
-}
-
 WifiError WifiVendorHal::RetrieveIfaceHandles()
 {
     wifiInterfaceHandle* ifaceHandles = nullptr;
     int numIfaceHandles = 0;
-    WifiError status = globalFuncTable_.wifiGetIfaces(
+    WifiError status = globalFuncTable_.vendorHalGetIfaces(
         globalHandle_, &numIfaceHandles, &ifaceHandles);
-    if (status != WIFI_SUCCESS) {
+    if (status != HAL_SUCCESS) {
         HDF_LOGE("Failed to enumerate interface handles");
         return status;
     }
     ifaceNameHandle_.clear();
     for (int i = 0; i < numIfaceHandles; ++i) {
         std::array<char, IFNAMSIZ> iface_name_arr = {};
-        status = globalFuncTable_.wifiGetIfaceName(
+        status = globalFuncTable_.vendorHalGetIfName(
             ifaceHandles[i], iface_name_arr.data(), iface_name_arr.size());
-        if (status != WIFI_SUCCESS) {
+        if (status != HAL_SUCCESS) {
             HDF_LOGE("Failed to get interface handle name");
             continue;
         }
@@ -238,23 +222,23 @@ WifiError WifiVendorHal::RetrieveIfaceHandles()
         HDF_LOGI("Adding interface handle for %{public}s", ifaceName.c_str());
         ifaceNameHandle_[ifaceName] = ifaceHandles[i];
     }
-    return WIFI_SUCCESS;
+    return HAL_SUCCESS;
 }
 
 WifiError WifiVendorHal::RegisterRestartCallback(
-    const OnSubsystemRestartCallback& onRestartCallback)
+    const OnVendorHalRestartCallback& onRestartCallback)
 {
-    if (onSubsystemRestartCallback) {
-        return WIFI_ERROR_NOT_AVAILABLE;
+    if (onVendorHalRestartCallback) {
+        return HAL_NOT_AVAILABLE;
     }
-    onSubsystemRestartCallback =
+    onVendorHalRestartCallback =
         [onRestartCallback](const char* error) {
             onRestartCallback(error);
         };
-    WifiError status = globalFuncTable_.wifiSetSubsystemRestartHandler(
+    WifiError status = globalFuncTable_.vendorHalSetRestartHandler(
         globalHandle_, {OnAsyncSubsystemRestart});
-    if (status != WIFI_SUCCESS) {
-        onSubsystemRestartCallback = nullptr;
+    if (status != HAL_SUCCESS) {
+        onVendorHalRestartCallback = nullptr;
     }
     return status;
 }

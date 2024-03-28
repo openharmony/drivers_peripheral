@@ -26,7 +26,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-const std::string VENDOR_HAL_PATH = "/vendor/lib64/libwifi_hal_huawei.z.so";
+const std::string VENDOR_HAL_PATH = "/vendor/lib64/libwifi_hal_hw.z.so";
 
 WifiVendorHalList::WifiVendorHalList(
     const std::weak_ptr<IfaceTool> ifaceTool)
@@ -80,13 +80,13 @@ bool WifiVendorHalList::LoadVendorHalLib(const std::string& path, WifiHalLibDesc
         goto out_err;
     }
     res = initfn(&desc.fn);
-    if (res != WIFI_SUCCESS) {
+    if (res != HAL_SUCCESS) {
         HDF_LOGE("failed to initialize the vendor func table in: %{public}s, error: %{public}d",
             path.c_str(), res);
         goto out_err;
     }
-    res = desc.fn.wifiEarlyInitialize();
-    if (res != WIFI_SUCCESS && res != WIFI_ERROR_NOT_SUPPORTED) {
+    res = desc.fn.vendorHalPreInit();
+    if (res != HAL_SUCCESS && res != HAL_NOT_SUPPORTED) {
         HDF_LOGE("early initialization failed in: %{public}s, error: %{public}d", path.c_str(), res);
         goto out_err;
     }

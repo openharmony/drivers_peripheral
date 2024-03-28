@@ -26,7 +26,7 @@ struct StubFunction;
 
 template <typename R, typename... Args>
 struct StubFunction<R (*)(Args...)> {
-    static constexpr R Invoke(Args...) { return WIFI_ERROR_NOT_SUPPORTED; }
+    static constexpr R Invoke(Args...) { return HAL_NOT_SUPPORTED; }
 };
 template <typename... Args>
 struct StubFunction<void (*)(Args...)> {
@@ -44,22 +44,18 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     if (halFn == nullptr) {
         return false;
     }
-    PopulateStubFor(&halFn->wifiInitialize);
-    PopulateStubFor(&halFn->wifiWaitForDriverReady);
-    PopulateStubFor(&halFn->wifiCleanup);
-    PopulateStubFor(&halFn->wifiEventLoop);
-    PopulateStubFor(&halFn->wifiGetIfaces);
-    PopulateStubFor(&halFn->wifiGetIfaceName);
-    PopulateStubFor(&halFn->wifiGetValidChannels);
-    PopulateStubFor(&halFn->wifiSetNodfsFlag);
-    PopulateStubFor(&halFn->wifiGetLoggerSupportedFeatureSet);
-    PopulateStubFor(&halFn->wifiVirtualInterfaceCreate);
-    PopulateStubFor(&halFn->wifiVirtualInterfaceDelete);
-    PopulateStubFor(&halFn->wifiSetSubsystemRestartHandler);
-    PopulateStubFor(&halFn->wifiGetSupportedIfaceName);
-    PopulateStubFor(&halFn->wifiEarlyInitialize);
-    PopulateStubFor(&halFn->wifiGetChipFeatureSet);
-    PopulateStubFor(&halFn->wifiTriggerSubsystemRestart);
+    PopulateStubFor(&halFn->vendorHalInit);
+    PopulateStubFor(&halFn->waitDriverStart);
+    PopulateStubFor(&halFn->vendorHalExit);
+    PopulateStubFor(&halFn->startHalLoop);
+    PopulateStubFor(&halFn->vendorHalGetIfaces);
+    PopulateStubFor(&halFn->vendorHalGetIfName);
+    PopulateStubFor(&halFn->vendorHalGetChannelsInBand);
+    PopulateStubFor(&halFn->vendorHalCreateIface);
+    PopulateStubFor(&halFn->vendorHalDeleteIface);
+    PopulateStubFor(&halFn->vendorHalSetRestartHandler);
+    PopulateStubFor(&halFn->vendorHalPreInit);
+    PopulateStubFor(&halFn->triggerVendorHalRestart);
     return true;
 }
     

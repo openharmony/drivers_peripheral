@@ -33,7 +33,7 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 
-using OnSubsystemRestartCallback = std::function<void(const std::string&)>;
+using OnVendorHalRestartCallback = std::function<void(const std::string&)>;
 class WifiVendorHal {
 public:
     WifiVendorHal(const std::weak_ptr<IfaceTool> ifaceTool,
@@ -45,21 +45,17 @@ public:
     WifiError Start();
 
     virtual WifiError Stop(std::unique_lock<std::recursive_mutex>* lock,
-        const std::function<void()>& on_complete_callback);
+        const std::function<void()>& onCompleteCallback);
 
-    WifiError GetSupportedIfaceName(uint32_t ifaceType, std::string& ifname);
-
-    WifiError CreateVirtualInterface(const std::string& ifname, WifiInterfaceType iftype);
+    WifiError CreateVirtualInterface(const std::string& ifname, HalIfaceType iftype);
 
     WifiError DeleteVirtualInterface(const std::string& ifname);
 
     std::pair<WifiError, std::vector<uint32_t>> GetValidFrequenciesForBand(
         const std::string& ifaceName, BandType band);
 
-    WifiError SetDfsFlag(const std::string& ifaceName, bool dfsOn);
-
     WifiError RegisterRestartCallback(
-        const OnSubsystemRestartCallback& onRestartCallback);
+        const OnVendorHalRestartCallback& onRestartCallback);
 
 private:
     WifiError RetrieveIfaceHandles();

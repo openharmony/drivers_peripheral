@@ -85,11 +85,11 @@ int32_t Wifi::Init()
     }
     ErrorCode res = InitializVendorHal();
     if (res == ErrorCode::SUCCESS) {
-        const auto& onSubsystemRestartCallback =
+        const auto& onVendorHalRestartCallback =
             [this](const std::string& error) {
             ErrorCode res = ErrorCode::UNKNOWN;
             for (const auto& callback : cbHandler_.GetCallbacks()) {
-                callback->OnSubsystemRestart(res);
+                callback->OnVendorHalRestart(res);
             }
         };
 
@@ -97,7 +97,7 @@ int32_t Wifi::Init()
         for (auto& hal : vendorHals_) {
             chips_.push_back(new WifiChip(
                 chipId, chipId == K_PRIMARY_CHIP_ID, hal,
-                chipModes_, onSubsystemRestartCallback));
+                chipModes_, onVendorHalRestartCallback));
             chipId++;
         }
         runState_ = RunState::STARTED;
@@ -164,14 +164,14 @@ int32_t Wifi::GetChipService(uint32_t chipId, sptr<IConcreteChip>& chip)
 
 ErrorCode Wifi::StopVendorHal(std::unique_lock<std::recursive_mutex>* lock)
 {
-    WifiError legacyStatus = WIFI_SUCCESS;
+    WifiError legacyStatus = HAL_SUCCESS;
     int index = 0;
     ErrorCode res;
 
     runState_ = RunState::STOPPING;
     for (auto& hal : vendorHals_) {
         WifiError tmp = hal->Stop(lock, [&]() {});
-        if (tmp != WIFI_SUCCESS) {
+        if (tmp != HAL_SUCCESS) {
             HDF_LOGE("Failed to stop vendor hal index: %{public}d, error %{public}d", index, tmp);
             legacyStatus = tmp;
         }
@@ -179,7 +179,7 @@ ErrorCode Wifi::StopVendorHal(std::unique_lock<std::recursive_mutex>* lock)
     }
     runState_ = RunState::STOPPED;
 
-    if (legacyStatus != WIFI_SUCCESS) {
+    if (legacyStatus != HAL_SUCCESS) {
         HDF_LOGE("One or more vendor hals failed to stop error is %{public}d", legacyStatus);
         res = ErrorCode::UNKNOWN;
         return res;
@@ -200,7 +200,7 @@ ErrorCode Wifi::InitializVendorHal()
     int index = 0;
     for (auto& hal : vendorHals_) {
         WifiError legacyStatus = hal->Initialize();
-        if (legacyStatus != WIFI_SUCCESS) {
+        if (legacyStatus != HAL_SUCCESS) {
             res = ErrorCode::UNKNOWN;
             return res;
         }

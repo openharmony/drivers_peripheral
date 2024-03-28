@@ -42,13 +42,13 @@ UsableMode WifiChipModes::MakeComModes(int staNum, int apNum, int p2pNum, int mo
 
     staTypes.push_back(STA);
     staChipIfaceComb.types = staTypes;
-    staChipIfaceComb.IfaceNum = staNum;
+    staChipIfaceComb.ifaceNum = staNum;
     apTypes.push_back(AP);
     apChipIfaceComb.types = apTypes;
-    apChipIfaceComb.IfaceNum = apNum;
+    apChipIfaceComb.ifaceNum = apNum;
     p2pTypes.push_back(P2P);
     p2pChipIfaceComb.types = p2pTypes;
-    p2pChipIfaceComb.IfaceNum = p2pNum;
+    p2pChipIfaceComb.ifaceNum = p2pNum;
     ComboIface comb;
     if (staNum != 0)
         comb.limits.push_back(staChipIfaceComb);

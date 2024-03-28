@@ -63,13 +63,12 @@ int32_t WifiApIface::GetIfaceName(std::string& name)
 
 int32_t WifiApIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
 {
-    static_assert(sizeof(WifiChannelInMhz) == sizeof(uint32_t), "Size mismatch");
     WifiError legacyStatus;
     std::vector<uint32_t> validFrequencies;
     std::tie(legacyStatus, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
         instances_.size() > 0 ? instances_[0] : ifname_, band);
     frequencies = validFrequencies;
-    if (legacyStatus == WIFI_SUCCESS) {
+    if (legacyStatus == HAL_SUCCESS) {
         return HDF_SUCCESS;
     }
     return HDF_FAILURE;
