@@ -39,6 +39,7 @@ static const int RES_BUFFER_MAX_LENGTH = 512;
 static const uint16_t SW1_OFFSET = 2;
 static const uint16_t SW2_OFFSET = 1;
 static const uint16_t MAX_CHANNEL_NUM = 4;
+static const uint16_t MIN_RES_LEN = 2;
 uint16_t g_openedChannelCount = 0;
 bool g_openedChannels[MAX_CHANNEL_NUM] = {false, false, false, false};
 #endif
@@ -116,24 +117,23 @@ int32_t SeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid, u
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openLogicalChannel failed ret %{public}u", ret);
+        status = SecureElementStatus::SE_GENERAL_ERROR;
         if (g_openedChannelCount == 0) {
             HDF_LOGI("openLogicalChannel: g_openedChannelCount = %{public}d, Uninit", g_openedChannelCount);
             SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
         }
         return HDF_SUCCESS;
     }
-    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= SW1_OFFSET
-        && channelNumber < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelNumber]) {
-        if ((response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)
-            || response[resLen - SW2_OFFSET] == 0x62 || response[resLen - SW2_OFFSET] == 0x63) {
+    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= MIN_RES_LEN) {
+        status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
+        if (channelNumber < MAX_CHANNEL_NUM - 1 && !g_openedChannels[channelNumber] &&
+            status == SecureElementStatus::SE_SUCCESS) {
             g_openedChannels[channelNumber] = true;
             g_openedChannelCount++;
         }
     }
 #endif
-    status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
 
@@ -155,22 +155,22 @@ int32_t SeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, uin
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("openBasicChannel failed ret %{public}u", ret);
+        status = SecureElementStatus::SE_GENERAL_ERROR;
         if (g_openedChannelCount == 0) {
             HDF_LOGI("openBasicChannel failed: g_openedChannelCount = %{public}d, Uninit", g_openedChannelCount);
             SecureElementCaProxy::GetInstance().VendorSecureElementCaUninit();
         }
         return HDF_SUCCESS;
     }
-    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= SW1_OFFSET && !g_openedChannels[0]) {
-        if (response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00) {
+    if (ret == SECURE_ELEMENT_CA_RET_OK && resLen >= MIN_RES_LEN) {
+        status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
+        if (!g_openedChannels[0] && (response[resLen - SW1_OFFSET] == 0x90 && response[resLen - SW2_OFFSET] == 0x00)) {
             g_openedChannels[0] = true;
             g_openedChannelCount++;
         }
     }
 #endif
-    status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
 
@@ -211,11 +211,16 @@ int32_t SeVendorAdaptions::transmit(const std::vector<uint8_t>& command, std::ve
         response.push_back(res[i]);
     }
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
-        status = SecureElementStatus::SE_GENERAL_ERROR;
         HDF_LOGE("transmit failed ret %{public}u", ret);
+        status = SecureElementStatus::SE_GENERAL_ERROR;
+        return HDF_SUCCESS;
     }
+    if (resLen >= MIN_RES_LEN) {
+        status = getStatusBySW(res[resLen - SW1_OFFSET], res[resLen - SW2_OFFSET]);
+        return HDF_SUCCESS;
+    }
+    HDF_LOGE("transmit failed resLen %{public}d", resLen);
 #endif
-    status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
 }
 
@@ -225,6 +230,24 @@ int32_t SeVendorAdaptions::reset(SecureElementStatus& status)
     HDF_LOGE("reset is not support");
     status = SecureElementStatus::SE_SUCCESS;
     return HDF_SUCCESS;
+}
+
+SecureElementStatus SeVendorAdaptions::getStatusBySW(uint8_t sw1, uint8_t sw2) const
+{
+    /* 0x9000, 0x62XX, 0x63XX Status is success */
+    if ((sw1 == 0x90 && sw2 == 0x00) || (sw1 == 0x62) || (sw1 == 0x63)) {
+        return SecureElementStatus::SE_SUCCESS;
+    }
+    /* 0x6A82, 0x6999, 0x6985 AID provided doesn't match any applet on the secure element */
+    if ((sw1 == 0x6A && sw2 == 0x82) || (sw1 == 0x69 && (sw2 == 0x99 || sw2 == 0x85))) {
+        return SecureElementStatus::SE_NO_SUCH_ELEMENT_ERROR;
+    }
+    /* 0x6A86 Operation provided by the P2 parameter is not permitted by the applet. */
+    if (sw1 == 0x6A && sw2 == 0x86) {
+        return SecureElementStatus::SE_OPERATION_NOT_SUPPORTED_ERROR;
+    }
+    HDF_LOGE("getStatusBySW fail, SW:0x%{public}02x%{public}02x", sw1, sw2);
+    return SecureElementStatus::SE_GENERAL_ERROR;
 }
 } // SecureElement
 } // HDI

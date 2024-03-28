@@ -44,6 +44,8 @@ public:
         SecureElementStatus& status) override;
 
     int32_t reset(SecureElementStatus& status) override;
+
+    SecureElementStatus getStatusBySW(uint8_t sw1, uint8_t sw2) const;
 };
 } // SecureElement
 } // HDI
