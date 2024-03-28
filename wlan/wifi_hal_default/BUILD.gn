@@ -11,42 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-wifi_hal_path = "//drivers/peripheral/wlan/wifi_hal"
-
 import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("wifi_hal_default") {
-  include_dirs = [
-    "$wifi_hal_path",
-    "//drivers/peripheral/wlan/chip/hdi_service",
-    "//third_party/libnl/libnl-3.7.0/include",
-  ]
-  sources = [
-    "wifi_hal.cpp",
-  ]
-
-  deps = [ "//third_party/libnl:libnl_share" ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "hilog:libhilog",
-      "c_utils:utils",
-    ]
-  } else {
-    external_deps = [
-      "hilog:libhilog",
+if (defined(ohos_lite)) {
+  group("hal_default_entry") {
+      deps = []
+  }
+} else {
+  group("hal_default_entry") {
+    deps = [
+        "wifi_hal_service:wifi_hal_default",
     ]
   }
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_wlan"
 }

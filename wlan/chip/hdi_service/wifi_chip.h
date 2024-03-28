@@ -49,18 +49,18 @@ public:
     int32_t GetChipModes(std::vector<UsableMode>& modes) override;
     int32_t GetCurrentMode(uint32_t& modeId) override;
     int32_t SetChipMode(uint32_t modeId) override;
-    int32_t CreateApIface(sptr<IChipIface>& iface) override;
-    int32_t GetApIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetApIface(const std::string& ifname, sptr<IChipIface>& iface) override;
-    int32_t RemoveApIface(const std::string& ifname) override;
-    int32_t CreateP2pIface(sptr<IChipIface>& iface) override;
-    int32_t GetP2pIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetP2pIface(const std::string& ifname, sptr<IChipIface>& iface) override;
-    int32_t RemoveP2pIface(const std::string& ifname) override;
-    int32_t CreateStaIface(sptr<IChipIface>& iface) override;
-    int32_t GetStaIfaceNames(std::vector<std::string>& ifnames) override;
-    int32_t GetStaIface(const std::string& ifname, sptr<IChipIface>& iface) override;
-    int32_t RemoveStaIface(const std::string& ifname) override;
+    int32_t CreateApService(sptr<IChipIface>& iface) override;
+    int32_t GetApServiceIfNames(std::vector<std::string>& ifnames) override;
+    int32_t GetApService(const std::string& ifname, sptr<IChipIface>& iface) override;
+    int32_t RemoveApService(const std::string& ifname) override;
+    int32_t CreateP2pService(sptr<IChipIface>& iface) override;
+    int32_t GetP2pServiceIfNames(std::vector<std::string>& ifnames) override;
+    int32_t GetP2pService(const std::string& ifname, sptr<IChipIface>& iface) override;
+    int32_t RemoveP2pService(const std::string& ifname) override;
+    int32_t CreateStaService(sptr<IChipIface>& iface) override;
+    int32_t GetStaServiceIfNames(std::vector<std::string>& ifnames) override;
+    int32_t GetStaService(const std::string& ifname, sptr<IChipIface>& iface) override;
+    int32_t RemoveStaService(const std::string& ifname) override;
 
 private:
     std::string GetIfaceName(IfaceType type, unsigned idx);

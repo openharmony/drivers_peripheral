@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_sta_iface.h"
 #include <hdf_log.h>
 
@@ -27,12 +28,7 @@ WifiStaIface::WifiStaIface(
     : ifname_(ifname),
       vendorHal_(vendorHal),
       isValid_(true)
-{
-    WifiError legacyStatus = vendorHal_.lock()->SetDfsFlag(ifname_, true);
-    if (legacyStatus != WifiError::WIFI_SUCCESS) {
-        HDF_LOGE("Failed to set DFS flag, DFS channels may be unavailable.");
-    }
-}
+{}
 
 void WifiStaIface::Invalidate()
 {
@@ -64,14 +60,13 @@ int32_t WifiStaIface::GetIfaceName(std::string& name)
 
 int32_t WifiStaIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
 {
-    static_assert(sizeof(WifiChannelInMhz) == sizeof(uint32_t), "Size mismatch");
-    WifiError legacyStatus;
+    WifiError status;
     std::vector<uint32_t> validFrequencies;
-    std::tie(legacyStatus, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
+    std::tie(status, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
         ifname_, band);
     frequencies = validFrequencies;
-    if (legacyStatus == WIFI_SUCCESS) {
-        return HDF_SUCCESS;    
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
     }
     return HDF_FAILURE;
 }

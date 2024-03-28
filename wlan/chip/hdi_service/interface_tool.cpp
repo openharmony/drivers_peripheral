@@ -14,6 +14,7 @@
  */
 
 #include "interface_tool.h"
+#include <cstring>
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <netinet/in.h>
@@ -25,7 +26,7 @@
 #include <hdf_log.h>
 #include "unique_fd.h"
 #include "securec.h"
-#include "string.h"
+
 
 namespace OHOS {
 namespace HDI {

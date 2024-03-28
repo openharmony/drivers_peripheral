@@ -16,12 +16,10 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 if (defined(ohos_lite)) {
   group("wlan_chip_entry") {
-      deps = []
+    deps = []
   }
 } else {
   group("wlan_chip_entry") {
-    deps = [
-        "hdi_service:hdi_chip_service",
-    ]
+    deps = [ "hdi_service:hdi_chip_service" ]
   }
 }
