@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../../../audio.gni")
 
 if (defined(ohos_lite)) {
   ohos_executable("audio_mixer") {
