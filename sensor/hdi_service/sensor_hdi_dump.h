@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_DUMP_H
-#define SENSOR_DUMP_H
+#ifndef SENSOR_HDI_DUMP_H
+#define SENSOR_HDI_DUMP_H
 #include <vector>
 #include "hdf_sbuf.h"
 #include "devhost_dump_reg.h"
 #include "sensor_type.h"
-#include "sensor_if_service.h"
 
 namespace OHOS {
 namespace HDI {
@@ -64,4 +63,4 @@ int32_t GetSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply);
 } // HDI
 } // OHOS
 
-#endif //SENSOR_DUMP_H
+#endif //SENSOR_HDI_DUMP_H

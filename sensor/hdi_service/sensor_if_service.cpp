@@ -22,7 +22,7 @@
 #include "sensor_callback_vdi.h"
 #include <hdf_remote_service.h>
 #include "callback_death_recipient.h"
-#include "sensor_dump.h"
+#include "sensor_hdi_dump.h"
 #include "devhost_dump_reg.h"
 
 constexpr int DISABLE_SENSOR = 0;

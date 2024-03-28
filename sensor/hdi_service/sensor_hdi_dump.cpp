@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-#include "sensor_dump.h"
+#include "sensor_hdi_dump.h"
 #include "osal_mem.h"
 #include <securec.h>
 #include <unordered_map>
 #include "sensor_uhdf_log.h"
+#include "sensor_if_service.h"
 
-#define HDF_LOG_TAG uhdf_sensor_dump
+#define HDF_LOG_TAG uhdf_sensor_hdi_dump
 
 constexpr int32_t GET_SENSORINFO = 0;
 constexpr int32_t DATA_LEN = 256;
@@ -79,7 +80,7 @@ std::string SensorHdiDump::SensorInfoDataToString(const float *data,
     char arrayStr[DATA_LEN] = {0};
 
     for (int32_t i = 0; i < dataDimension; i++) {
-        if (sprintf_s(arrayStr +strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
+        if (sprintf_s(arrayStr + strlen(arrayStr), DATA_LEN, "[%f]", data[i]) < 0) {
             HDF_LOGE("%{public}s: sprintf_s failed", __func__);
             return st;
         }
@@ -87,7 +88,7 @@ std::string SensorHdiDump::SensorInfoDataToString(const float *data,
 
     dataStr = arrayStr;
     st = "sensor id: " + std::to_string(sensorId) + ", ts = " +
-        std::to_string(timesTamp/1e9) + ", data = " + dataStr + "\n";
+        std::to_string(timesTamp / 1e9) + ", data = " + dataStr + "\n";
 
     return st;
 }
@@ -146,7 +147,7 @@ int32_t SensorHdiDump::SensorShowData(struct HdfSBuf *reply)
                   eventDumpList.listDumpArray[index].data.end(), eventData);
         float *data = reinterpret_cast<float*>(eventData);
 
-        int32_t dataDimension = static_cast<int32_t>(dataLen/sizeof(float));
+        int32_t dataDimension = static_cast<int32_t>(dataLen / sizeof(float));
 
         int32_t ret = ShowData(data, eventDumpList.listDumpArray[index].timestamp, dataDimension,
                                eventDumpList.listDumpArray[index].sensorId, reply);
@@ -184,7 +185,7 @@ int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf
 
     for (uint32_t i = 0; i < argc; i++) {
         const char *value = HdfSbufReadString(data);
-        if (value == NULL) {
+        if (value == nullptr) {
             HDF_LOGE("%{public}s: arg is invalid", __func__);
             return HDF_FAILURE;
         }

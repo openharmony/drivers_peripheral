@@ -25,7 +25,7 @@ ohos_shared_library("libsensor_interface_service_2.0") {
     "sensor_callback_vdi.cpp",
     "sensor_client_info.cpp",
     "sensor_clients_manager.cpp",
-    "sensor_dump.cpp",
+    "sensor_hdi_dump.cpp",
     "sensor_if_service.cpp",
   ]
 

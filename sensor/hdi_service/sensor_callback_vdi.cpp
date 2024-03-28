@@ -105,7 +105,7 @@ void SensorCallbackVdi::PrintData(const HdfSensorEvents &event)
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)
 {
-    void *origin = OsalMemCalloc(sizeof(uint8_t) *(event.dataLen));
+    void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
     if (origin == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
         return;
@@ -115,7 +115,7 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
     std::copy(event.data.begin(), event.data.end(), eventData);
     float *data = reinterpret_cast<float*>(eventData);
     int32_t dataLen = event.dataLen;
-    int32_t dataDimension = static_cast<int32_t>(dataLen/sizeof(float));
+    int32_t dataDimension = static_cast<int32_t>(dataLen / sizeof(float));
     std::string dataStr = {0};
     char arrayStr[DATA_LEN] = {0};
 
@@ -128,7 +128,7 @@ void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event
 
     dataStr = arrayStr;
     str = "sensorId: " + std::to_string(event.sensorId) + ", ts: " +
-        std::to_string(event.timestamp/1e9) + ", data: " + dataStr;
+        std::to_string(event.timestamp / 1e9) + ", data: " + dataStr;
 
     OsalMemFree(origin);
     return;
