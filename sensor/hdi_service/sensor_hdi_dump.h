@@ -19,6 +19,7 @@
 #include "hdf_sbuf.h"
 #include "devhost_dump_reg.h"
 #include "sensor_type.h"
+#include "sensor_if_service.h"
 
 namespace OHOS {
 namespace HDI {
