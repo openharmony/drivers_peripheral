@@ -46,3 +46,9 @@ enable_audio_adm_service = true
 
 #If all above flag is set to false, it will build failure.so forbid setting all above flag to false.
 enable_coverage = false
+
+enable_c_utils = true
+if (defined(global_parts_info) &&
+    !defined(global_parts_info.commonlibrary_c_utils)) {
+  enable_c_utils = false
+}
