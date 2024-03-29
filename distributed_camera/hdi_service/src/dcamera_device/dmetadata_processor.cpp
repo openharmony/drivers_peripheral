@@ -373,6 +373,7 @@ void DMetadataProcessor::AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &si
 {
     if (srcPreviewProfiles_.count(format) > 0) {
         sinkExtendStreamConfigs.push_back(EXTEND_PREVIEW); // preview
+        size_t originSize = sinkExtendStreamConfigs.size();
         for (const auto &resolution : srcPreviewProfiles_[format]) {
             std::vector<DCResolution> resolutionList;
             if (sinkPreviewProfiles_.count(format) > 0) {
@@ -383,9 +384,15 @@ void DMetadataProcessor::AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &si
             }
             AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, PREVIEW_FPS);
         }
+        if (originSize == sinkExtendStreamConfigs.size()) {
+            sinkExtendStreamConfigs.pop_back();
+            DHLOGD("the sink contains all resolutions on the source in this format.");
+            return;
+        }
         sinkExtendStreamConfigs.push_back(EXTEND_EOF); // preview eof
     } else if (srcVideoProfiles_.count(format) > 0) {
         sinkExtendStreamConfigs.push_back(EXTEND_VIDEO); // video
+        size_t originSize = sinkExtendStreamConfigs.size();
         for (const auto &resolution : srcVideoProfiles_[format]) {
             std::vector<DCResolution> resolutionList;
             if (sinkVideoProfiles_.count(format) > 0) {
@@ -395,6 +402,11 @@ void DMetadataProcessor::AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &si
                 continue;
             }
             AddConfigs(sinkExtendStreamConfigs, format, resolution.width_, resolution.height_, VIDEO_FPS);
+        }
+        if (originSize == sinkExtendStreamConfigs.size()) {
+            sinkExtendStreamConfigs.pop_back();
+            DHLOGD("the sink contains all resolutions on the source in this format.");
+            return;
         }
         sinkExtendStreamConfigs.push_back(EXTEND_EOF); // video eof
     }

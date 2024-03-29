@@ -22,7 +22,7 @@
 #include "utils.h"
 #include "camera.h"
 #include "source_node.h"
-
+#include "node_utils.h"
 namespace OHOS::Camera {
 class ScaleNode : public NodeBase {
 public:
@@ -34,11 +34,6 @@ public:
     virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
     RetCode CancelCapture(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId);
-private:
-    void PreviewScaleConver(std::shared_ptr<IBuffer>& buffer);
-    void ScaleConver(std::shared_ptr<IBuffer>& buffer);
-    void ScaleConverToYuv420(std::shared_ptr<IBuffer>& buffer);
-    std::shared_ptr<IBufferPool>          bufferPool_ = nullptr;    // buffer pool of branch stream
 };
 } // namespace OHOS::Camera
 #endif

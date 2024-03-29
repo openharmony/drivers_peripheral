@@ -179,7 +179,7 @@ void SensorController::SetNodeCallBack(const NodeBufferCb cb)
 {
     CAMERA_LOGI("SensorController SetNodeCallBack entry");
     nodeBufferCb_ = cb;
-    sensorVideo_->SetCallback([&](std::shared_ptr<FrameSpec> buffer) {
+    sensorVideo_->SetV4L2DevCallback([&](std::shared_ptr<FrameSpec> buffer) {
         BufferCallback(buffer);
     });
 }
