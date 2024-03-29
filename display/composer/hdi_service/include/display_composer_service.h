@@ -21,6 +21,7 @@
 #include "v1_2/display_command/display_cmd_responser.h"
 #include "v1_2/idisplay_composer.h"
 #include "v1_2/display_composer_type.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
@@ -87,6 +88,7 @@ private:
 private:
     /* Common */
     void* libHandle_;
+    std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
     uint32_t currentBacklightLevel_;
     sptr<IHotPlugCallback> hotPlugCb_;
