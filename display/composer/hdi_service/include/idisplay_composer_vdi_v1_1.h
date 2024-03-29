@@ -20,7 +20,7 @@
 #include <string>
 #include "common/include/display_common.h"
 #include "idisplay_composer_vdi.h"
-#include "v1_1/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "v1_1/imode_callback.h"
 #include "v1_1/iseamless_change_callback.h"
 
