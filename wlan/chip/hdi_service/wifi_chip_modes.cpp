@@ -94,9 +94,9 @@ std::vector<UsableMode> WifiChipModes::GetChipModesForTriple()
 std::vector<UsableMode> WifiChipModes::GetChipModes(bool isPrimary)
 {
     char propValue[PROP_MAX_LEN] = {0};
-    int errCode = GetParameter(TRIPLE_MODE_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);
+    int errCode = GetParameter(SUBCHIP_PROP, 0, propValue, PROP_SUBCHIPTYPE_LEN);
     if (errCode > 0) {
-        if (strncmp(propValue, "true", strlen("true")) == 0) {
+        if (strncmp(propValue, SUPPORT_COEXCHIP, strlen(SUPPORT_COEXCHIP)) == 0) {
             HDF_LOGI("select tripleModes for wifi");
             return GetChipModesForTriple();
         }

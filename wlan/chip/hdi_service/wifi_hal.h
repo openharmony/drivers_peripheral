@@ -78,7 +78,7 @@ typedef struct {
     void (*vendorHalExit)(wifiHandle, VendorHalExitHandler);
     void (*startHalLoop)(wifiHandle);
     WifiError (*vendorHalGetIfaces)(wifiHandle, int *, wifiInterfaceHandle **);
-    WifiError (*vendorHalGetIfName)(wifiInterfaceHandle, char *name, size_t);
+    WifiError (*vendorHalGetIfName)(wifiInterfaceHandle, char *name, size_t size);
     WifiError (*vendorHalGetChannelsInBand)(wifiInterfaceHandle, int, int, int *, int *);
     WifiError (*vendorHalCreateIface)(wifiHandle handle, const char* ifname, HalIfaceType ifaceType);
     WifiError (*vendorHalDeleteIface)(wifiHandle handle, const char* ifname);

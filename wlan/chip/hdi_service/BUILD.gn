@@ -14,26 +14,21 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-root_path = "//drivers/peripheral/wlan/chip/hdi_service"
-
-ohos_shared_library("libwifi_chip_interface_service_1.0") {
-  include_dirs = [
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "$root_path",
-  ]
+ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
+  include_dirs = []
 
   sources = [
-    "$root_path/wifi.cpp",
-    "$root_path/interface_tool.cpp",
-    "$root_path/wifi_chip_modes.cpp",
-    "$root_path/wifi_vendor_hal_list.cpp",
-    "$root_path/wifi_vendor_hal.cpp",
-    "$root_path/wifi_chip.cpp",
-    "$root_path/hdi_sync_util.cpp",
-    "$root_path/wifi_vendor_hal_stubs.cpp",
-    "$root_path/wifi_ap_iface.cpp",
-    "$root_path/wifi_sta_iface.cpp",
-    "$root_path/wifi_p2p_iface.cpp",
+    "hdi_sync_util.cpp",
+    "interface_tool.cpp",
+    "wifi.cpp",
+    "wifi_ap_iface.cpp",
+    "wifi_chip.cpp",
+    "wifi_chip_modes.cpp",
+    "wifi_p2p_iface.cpp",
+    "wifi_sta_iface.cpp",
+    "wifi_vendor_hal.cpp",
+    "wifi_vendor_hal_list.cpp",
+    "wifi_vendor_hal_stubs.cpp",
   ]
 
   external_deps = [
@@ -43,9 +38,10 @@ ohos_shared_library("libwifi_chip_interface_service_1.0") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_single",
   ]
 
-  deps = [ ]
+  deps = []
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -53,9 +49,9 @@ ohos_shared_library("libwifi_chip_interface_service_1.0") {
 }
 
 ohos_shared_library("libchip_hdi_driver") {
-  include_dirs = [ "$root_path" ]
+  include_dirs = []
 
-  sources = [ "$root_path/chip_controller_driver.cpp" ]
+  sources = [ "chip_controller_driver.cpp" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -83,8 +79,8 @@ ohos_shared_library("libchip_hdi_driver") {
 }
 
 group("hdi_chip_service") {
-    deps = [
-        ":libchip_hdi_driver",
-        ":libwifi_chip_interface_service_1.0",
-    ]
+  deps = [
+    ":libchip_controller_chip_interface_service_1.0",
+    ":libchip_hdi_driver",
+  ]
 }

@@ -25,14 +25,19 @@ ohos_fuzztest("ChipFuzzTest") {
 
   include_dirs = []
 
-  deps = []
+  deps = [
+    "../../../chip/hdi_service:libchip_controller_chip_interface_service_1.0",
+  ]
 
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   external_deps = [
-    "drivers_interface_wlan:libchip_proxy_1.0",
+    "c_utils:utils",
+    "drivers_interface_wlan:libchip_stub_1.0",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   cflags = [
@@ -42,9 +47,7 @@ ohos_fuzztest("ChipFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "$TEST_ROOT_DIR/test/fuzztest/chip_fuzzer/chip_fuzzer.cpp",
-  ]
+  sources = [ "chip_fuzzer.cpp" ]
 }
 
 group("chip_fuzztest") {

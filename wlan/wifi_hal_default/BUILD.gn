@@ -12,16 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 if (defined(ohos_lite)) {
   group("hal_default_entry") {
-      deps = []
+    deps = []
   }
 } else {
   group("hal_default_entry") {
-    deps = [
-        "wifi_hal_service:wifi_hal_default",
-    ]
+    deps = [ "wifi_hal_service:wifi_hal_default" ]
   }
 }

@@ -33,7 +33,7 @@ const int CHIP_ID_AP = 3;
 
 static constexpr int32_t K_PRIMARY_CHIP_ID = 0;
 
-extern "C" IChipController *WifiImplGetInstance(void)
+extern "C" IChipController *ChipControllerImplGetInstance(void)
 {
     return new (std::nothrow) Wifi();
 }
@@ -225,6 +225,8 @@ int32_t Wifi::GetChipIdFromWifiChip(sptr <WifiChip>& chip)
 
 void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
+    HDF_LOGI("chip service OnRemoteDied");
+    runState_ = RunState::STOPPING;
     for (auto& chip : chips_) {
         if (chip) {
             chip->Invalidate();
@@ -233,6 +235,7 @@ void Wifi::OnRemoteDied(const wptr<IRemoteObject> &object)
     chips_.clear();
     auto lock = AcquireGlobalLock();
     StopVendorHal(&lock);
+    runState_ = RunState::STOPPED;
 }
 
 int32_t Wifi::AddWifiDeathRecipient(const sptr<IChipControllerCallback>& eventCallback)

@@ -27,7 +27,6 @@
 #include "unique_fd.h"
 #include "securec.h"
 
-
 namespace OHOS {
 namespace HDI {
 namespace Wlan {
