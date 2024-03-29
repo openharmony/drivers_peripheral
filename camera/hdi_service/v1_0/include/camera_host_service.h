@@ -31,7 +31,7 @@ using namespace OHOS::VDI::Camera::V1_0;
 
 struct CameraIdInfo {
     std::string totalCameraId;
-    OHOS::sptr<ICameraHostVdi> cameraHostVdi;
+    ICameraHostVdi *cameraHostVdi;
     std::string vendorCameraId;
 };
 
@@ -47,7 +47,7 @@ public:
     int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
 
 private:
-    CameraHostService(std::vector<OHOS::sptr<ICameraHostVdi>> cameraHostVdiList,
+    CameraHostService(std::vector<ICameraHostVdi*> cameraHostVdiList,
         std::vector<struct HdfVdiObject *> cameraHostVdiLoaderList);
     virtual ~CameraHostService();
     CameraHostService(const CameraHostService &other) = delete;
@@ -57,11 +57,11 @@ private:
 
     static int32_t GetVdiLibList(std::vector<std::string> &vdiLibList);
     static void HdfCloseVdiLoaderList(std::vector<struct HdfVdiObject *> &cameraHostVdiLoaderList);
-    OHOS::sptr<ICameraHostVdi> GetCameraHostVdi(const std::string &totalCameraId);
+    ICameraHostVdi* GetCameraHostVdi(const std::string &totalCameraId);
     const std::string GetVendorCameraId(const std::string &totalCameraId);
     int32_t UpdateCameraIdMapList();
 
-    std::vector<OHOS::sptr<ICameraHostVdi>> cameraHostVdiList_;
+    std::vector<ICameraHostVdi*> cameraHostVdiList_;
     std::vector<CameraIdInfo> cameraIdInfoList_;
     std::vector<struct HdfVdiObject *> cameraHostVdiLoaderList_;
     static OHOS::sptr<CameraHostService> cameraHostService_;
