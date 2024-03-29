@@ -39,7 +39,7 @@ public:
     std::mutex timestampMapMutex_;
 private:
     void PrintData(const HdfSensorEvents &event);
-    void DataToStr(string std::&str, const HdfSensorEvents &event);
+    void DataToStr(std::string &str, const HdfSensorEvents &event);
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
 };
