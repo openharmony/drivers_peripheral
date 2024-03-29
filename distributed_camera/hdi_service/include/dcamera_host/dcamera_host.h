@@ -80,7 +80,7 @@ private:
     static OHOS::sptr<DCameraHost> instance_;
 
     OHOS::sptr<ICameraHostCallback> dCameraHostCallback_;
-    std::map<DCameraBase, std::string> dhBaseHashDCamIdMap_;
+    std::map<std::string, std::string> dhBaseHashDCamIdMap_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
     std::mutex deviceMapLock_;
 };

@@ -46,11 +46,14 @@ ohos_shared_library("libusbhost_acm") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -89,11 +92,13 @@ ohos_shared_library("libusbhost_acm_rawapi") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

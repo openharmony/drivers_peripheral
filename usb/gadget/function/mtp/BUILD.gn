@@ -38,15 +38,20 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
 
   deps = [ "${usb_driver_path}/ddk:libusb_ddk_device" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_usb:usbfn_mtp_idl_headers",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
-
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:usbfn_mtp_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
@@ -71,16 +76,22 @@ ohos_shared_library("libusbfn_mtp_driver") {
 
   deps = []
 
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_usb:libusbfn_mtp_stub_1.0",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusbfn_mtp_stub_1.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]

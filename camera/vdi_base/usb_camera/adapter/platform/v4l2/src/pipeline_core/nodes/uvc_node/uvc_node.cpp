@@ -201,6 +201,12 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
+    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
+        buffer->GetStreamId(), buffer->GetIndex());
+
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_422_P);
+    buffer->SetCurWidth(wide_);
+    buffer->SetCurHeight(high_);
 
     SourceNode::DeliverBuffer(buffer);
     return;
@@ -209,7 +215,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    CAMERA_LOGI("Provide buffers enter.");
+    CAMERA_LOGI("UvcNode::ProvideBuffers enter.");
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
         CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;

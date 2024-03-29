@@ -33,7 +33,7 @@ public:
     RetCode CameraStreamQueue(struct CameraFeature feature, const std::shared_ptr<FrameSpec> &frameSpec);
     RetCode CameraStreamDequeue(struct CameraFeature feature);
     RetCode CameraReleaseBuffers(struct CameraFeature feature);
-    void SetCallback(BufCallback cb);
+    void SetCameraBufferCallback(BufCallback cb);
     RetCode Flush(char *deviceName);
 
 private:

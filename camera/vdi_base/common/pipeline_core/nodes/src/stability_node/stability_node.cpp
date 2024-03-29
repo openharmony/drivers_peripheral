@@ -45,19 +45,7 @@ void StabilityNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
         CAMERA_LOGE("StabilityNode::DeliverBuffer frameSpec is null");
         return;
     }
-
-    int32_t id = buffer->GetStreamId();
-
-    std::vector<std::shared_ptr<IPort>> outPutPorts = GetOutPorts();
-    auto it = std::find_if(outPutPorts.begin(), outPutPorts.end(), [id](const std::shared_ptr<IPort> &port) {
-        return port->format_.streamId_ == id;
-    });
-    if (it == outPutPorts.end()) {
-        CAMERA_LOGE("StabilityNode invalid output ports.");
-        return;
-    }
-    (*it)->DeliverBuffer(buffer);
-    CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", (*it)->format_.streamId_);
+    NodeBase::DeliverBuffer(buffer);
     return;
 }
 

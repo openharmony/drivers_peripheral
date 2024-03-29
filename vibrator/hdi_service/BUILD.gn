@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
     public_configs = []
   }
 } else {
-  ohos_shared_library("libvibrator_interface_service_1.2") {
+  ohos_shared_library("libvibrator_interface_service_1.3") {
     include_dirs = [
       "../interfaces/include/",
       ".",
@@ -82,6 +82,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "drivers_interface_vibrator:libvibrator_stub_1.1",
         "drivers_interface_vibrator:libvibrator_stub_1.2",
+        "drivers_interface_vibrator:libvibrator_stub_1.3",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
@@ -108,7 +109,7 @@ if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = [
       ":libvibrator_driver",
-      ":libvibrator_interface_service_1.2",
+      ":libvibrator_interface_service_1.3",
     ]
   }
 }

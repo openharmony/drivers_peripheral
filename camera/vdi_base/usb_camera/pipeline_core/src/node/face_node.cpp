@@ -17,85 +17,81 @@
 #include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
-RKFaceNode::RKFaceNode(const std::string &name, const std::string &type, const std::string &cameraId)
+FaceNode::FaceNode(const std::string &name, const std::string &type, const std::string &cameraId)
     : NodeBase(name, type, cameraId), metaDataSize_(0)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
-RKFaceNode::~RKFaceNode()
+FaceNode::~FaceNode()
 {
-    CAMERA_LOGI("~RKFaceNode Node exit.");
+    CAMERA_LOGI("~FaceNode Node exit.");
 }
 
-RetCode RKFaceNode::Start(const int32_t streamId)
+RetCode FaceNode::Start(const int32_t streamId)
 {
-    CAMERA_LOGI("RKFaceNode::Start streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("FaceNode::Start streamId = %{public}d\n", streamId);
     CreateMetadataInfo();
     return RC_OK;
 }
 
-RetCode RKFaceNode::Stop(const int32_t streamId)
+RetCode FaceNode::Stop(const int32_t streamId)
 {
-    CAMERA_LOGI("RKFaceNode::Stop streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("FaceNode::Stop streamId = %{public}d\n", streamId);
     std::unique_lock <std::mutex> lock(mLock_);
     metaDataSize_ = 0;
     return RC_OK;
 }
 
-RetCode RKFaceNode::Flush(const int32_t streamId)
+RetCode FaceNode::Flush(const int32_t streamId)
 {
-    CAMERA_LOGI("RKFaceNode::Flush streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("FaceNode::Flush streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-void RKFaceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+void FaceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGE("RKFaceNode::DeliverBuffer frameSpec is null");
+        CAMERA_LOGE("FaceNode::DeliverBuffer frameSpec is null");
         return;
+    }
+    if (buffer->GetBufferStatus() != CAMERA_BUFFER_STATUS_OK) {
+        CAMERA_LOGE("BufferStatus() != CAMERA_BUFFER_STATUS_OK");
+        return NodeBase::DeliverBuffer(buffer);
     }
 
     int32_t id = buffer->GetStreamId();
 
     CameraDumper& dumper = CameraDumper::GetInstance();
-    dumper.DumpBuffer("RKFaceNode", ENABLE_FACE_NODE_CONVERTED, buffer);
+    dumper.DumpBuffer("FaceNode", ENABLE_FACE_NODE_CONVERTED, buffer);
 
-    outPutPorts_ = GetOutPorts();
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == id) {
-            CopyMetadataBuffer(metaData_, buffer, metaDataSize_);
-            it->DeliverBuffer(buffer);
-            CAMERA_LOGI("RKFaceNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            return;
-        }
-    }
+    NodeBase::DeliverBuffer(buffer);
 }
 
-RetCode RKFaceNode::Config(const int32_t streamId, const CaptureMeta& meta)
+RetCode FaceNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     (void)meta;
     if (meta == nullptr || meta->get() == nullptr) {
-        CAMERA_LOGE("RKFaceNode::Config meta is invalid");
+        CAMERA_LOGE("FaceNode::Config meta is invalid");
         return RC_ERROR;
     }
-    CAMERA_LOGD("RKFaceNode::Config streamId = %{public}d", streamId);
+    CAMERA_LOGD("FaceNode::Config streamId = %{public}d", streamId);
     return RC_OK;
 }
 
-RetCode RKFaceNode::Capture(const int32_t streamId, const int32_t captureId)
+RetCode FaceNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("RKFaceNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
+    CAMERA_LOGV("FaceNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
     return RC_OK;
 }
 
-RetCode RKFaceNode::CancelCapture(const int32_t streamId)
+RetCode FaceNode::CancelCapture(const int32_t streamId)
 {
-    CAMERA_LOGI("RKFaceNode::CancelCapture streamid = %{public}d", streamId);
+    CAMERA_LOGI("FaceNode::CancelCapture streamid = %{public}d", streamId);
     return RC_OK;
 }
 
-RetCode RKFaceNode::GetFaceDetectMetaData(std::shared_ptr<CameraMetadata> &metadata)
+RetCode FaceNode::GetFaceDetectMetaData(std::shared_ptr<CameraMetadata> &metadata)
 {
     GetCameraFaceDetectSwitch(metadata);
     GetCameraFaceRectangles(metadata);
@@ -103,14 +99,14 @@ RetCode RKFaceNode::GetFaceDetectMetaData(std::shared_ptr<CameraMetadata> &metad
     return RC_OK;
 }
 
-RetCode RKFaceNode::GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> &metadata)
+RetCode FaceNode::GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> &metadata)
 {
     uint8_t faceDetectSwitch = OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE;
     metadata->addEntry(OHOS_STATISTICS_FACE_DETECT_SWITCH, &faceDetectSwitch, sizeof(uint8_t));
     return RC_OK;
 }
 
-RetCode RKFaceNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> &metadata)
+RetCode FaceNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> &metadata)
 {
     constexpr int32_t row = 3;
     constexpr int32_t col = 4;
@@ -149,7 +145,7 @@ RetCode RKFaceNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> &met
     return RC_OK;
 }
 
-RetCode RKFaceNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> &metadata)
+RetCode FaceNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> &metadata)
 {
     std::vector<int32_t> vFaceIds;
     constexpr int32_t id_zero = 0;
@@ -162,7 +158,7 @@ RetCode RKFaceNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> &metadata)
     return RC_OK;
 }
 
-RetCode RKFaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata,
+RetCode FaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata,
     std::shared_ptr<IBuffer>& outPutBuffer, int32_t dataSize)
 {
     int bufferSize = outPutBuffer->GetSize();
@@ -187,7 +183,7 @@ RetCode RKFaceNode::CopyMetadataBuffer(std::shared_ptr<CameraMetadata> &metadata
     return RC_OK;
 }
 
-RetCode RKFaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& outPutBuffer, int32_t dataSize)
+RetCode FaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& outPutBuffer, int32_t dataSize)
 {
     if (memcpy_s(outPutBuffer->GetVirAddress(), dataSize, sourceBuffer, dataSize) != 0) {
         CameraHalHisysevent::WriteFaultHisysEvent(CameraHalHisysevent::GetEventName(COPY_BUFFER_ERROR),
@@ -199,7 +195,7 @@ RetCode RKFaceNode::CopyBuffer(uint8_t *sourceBuffer, std::shared_ptr<IBuffer>& 
     return RC_OK;
 }
 
-RetCode RKFaceNode::CreateMetadataInfo()
+RetCode FaceNode::CreateMetadataInfo()
 {
     const int ENTRY_CAPACITY = 30; // 30:entry capacity
     const int DATA_CAPACITY = 2000; // 2000:data capacity
@@ -213,5 +209,5 @@ RetCode RKFaceNode::CreateMetadataInfo()
     return RC_OK;
 }
 
-REGISTERNODE(RKFaceNode, {"RKFace"})
+REGISTERNODE(FaceNode, {"Face"})
 } // namespace OHOS::Camera

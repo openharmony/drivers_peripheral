@@ -32,7 +32,7 @@
 #endif
 
 // Used to cache screenLock auth token plain.
-IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}, {}};
+IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}};
 
 ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
 {
@@ -58,15 +58,12 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
     return ret;
 }
 
-IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
-    const EnrolledStateHal *enrolledState)
+IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken)
 {
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
     g_unlockAuthResult.isCached = true;
     g_unlockAuthResult.userId = userId;
     g_unlockAuthResult.authToken = *unlockToken;
-    g_unlockAuthResult.enrolledState.credentialDigest = enrolledState->credentialDigest;
-    g_unlockAuthResult.enrolledState.credentialCount = enrolledState->credentialCount;
 }
 
 IAM_STATIC void SetAuthResult(int32_t userId, uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
@@ -88,7 +85,7 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
     }
     if (context->isAuthResultCached) {
         LOG_INFO("cache unlock auth result");
-        CacheUnlockAuthResult(context->userId, authToken, &enrolledState);
+        CacheUnlockAuthResult(context->userId, authToken);
     }
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH) {
         result->rootSecret = CopyBuffer(info->rootSecret);
@@ -213,13 +210,18 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, Reus
         return ret;
     }
     *((UserAuthTokenHal *)reuseResult->token) = g_unlockAuthResult.authToken;
-    reuseResult->enrolledState = g_unlockAuthResult.enrolledState;
     reuseResult->authType = g_unlockAuthResult.authToken.tokenDataPlain.authType;
     ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
     if (memcpy_s(((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge,
         CHALLENGE_LEN) != EOK) {
         LOG_ERROR("challenge copy failed");
         return RESULT_BAD_COPY;
+    }
+    ret = GetEnrolledState(info->userId, reuseResult->authType, &reuseResult->enrolledState);
+    if (ret == RESULT_NOT_ENROLLED) {
+        LOG_ERROR("GetEnrolledState result not enrolled");
+        (void)memset_s(&reuseResult->enrolledState, sizeof(EnrolledStateHal), 0, sizeof(EnrolledStateHal));
+        ret = RESULT_SUCCESS;
     }
     return RESULT_SUCCESS;
 }

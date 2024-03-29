@@ -965,8 +965,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0030)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
     EXPECT_EQ(ret, CAM_META_SUCCESS);
-    std::cout << "OHOS_SENSOR_ORIENTATION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
-    EXPECT_TRUE(entry.data.u8[0] == 0);
+    std::cout << "OHOS_SENSOR_ORIENTATION value is " << entry.data.i32[0] << std::endl;
+    EXPECT_TRUE(entry.data.i32[0] == 0);
 }
 
 /**
@@ -1582,8 +1582,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0049)
         camera_metadata_item_t entry;
         int ret = FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
         EXPECT_EQ(ret, CAM_META_SUCCESS);
-        CAMERA_LOGD("OHOS_SENSOR_ORIENTATION value is %{pubilc}d", entry.data.u8[0]);
-        EXPECT_TRUE(entry.data.u8[0] == 0);
+        CAMERA_LOGD("OHOS_SENSOR_ORIENTATION value is %{pubilc}d", entry.data.i32[0]);
+        EXPECT_TRUE(entry.data.i32[0] == 0);
     }
 }
 
@@ -1729,4 +1729,176 @@ TEST_F(UtestUSBCameraTest, camera_usb_0053)
     cameraBase_->captureIds = {cameraBase_->CAPTURE_ID_PREVIEW, cameraBase_->CAPTURE_ID_CAPTURE};
     cameraBase_->streamIds = {cameraBase_->STREAM_ID_PREVIEW, cameraBase_->STREAM_ID_CAPTURE};
     cameraBase_->StopStream(cameraBase_->captureIds, cameraBase_->streamIds);
+}
+
+void StoreFile(const unsigned char *bufStart, const uint32_t size, const char* suffix)
+{
+    static int count = 0;
+    constexpr uint32_t pathLen = 128;
+    char path[pathLen] = {0};
+    char prefix[] = "/data/";
+    struct timeval start = {};
+    gettimeofday(&start, nullptr);
+    std::cout << "suffix = " << suffix << std::endl;
+    if (sprintf_s(path, sizeof(path), "%sfile_%d_%lld_%s", prefix, count++, start.tv_usec, suffix) < 0) {
+        CAMERA_LOGE("%{public}s:StoreFile sprintf  failed", __func__);
+        return;
+    }
+    int fd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+    if (fd < 0) {
+        CAMERA_LOGE("demo test:StoreFile open %s %{public}s failed", path, strerror(errno));
+    }
+    int ret = 0;
+
+    ret = write(fd, bufStart, size);
+    if (ret == -1) {
+        CAMERA_LOGE("demo test:StoreFile write video file error %{public}s.....\n", strerror(errno));
+    }
+    CAMERA_LOGD("demo test:StoreFile size == %{public}d\n", size);
+    std::cout << "Strore File , Path = " << path << ", size = " << size << std::endl;
+    close(fd);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: single video stream, output nv21, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0054)
+{
+    cameraBase_->OpenUsbCamera();
+    cameraBase_->AchieveStreamOperator();
+    auto streamCustomerVideo = std::make_shared<StreamCustomer>();
+
+    uint32_t captureIdVideo = 1;
+    uint32_t streamIdVideo = 1;
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = streamIdVideo;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 720; // 720:picture height
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.encodeType_ = ENCODE_TYPE_NULL;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = VIDEO;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfo);
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "_single_video.yuv");
+    });
+
+    CaptureInfo captureInfoVideo = {
+        .streamIds_ = {streamIdVideo},
+        .captureSetting_ = cameraBase_->ability_,
+        .enableShutterCallback_ = false,
+    };
+    std::cout << "start capture video" <<  std::endl;
+    CAMERA_LOGE("start capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdVideo, captureInfoVideo, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+
+    std::cout << "cancel capture video" <<  std::endl;
+    CAMERA_LOGE("cancel capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdVideo);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    
+    std::cout << "start capture video" <<  std::endl;
+    CAMERA_LOGE("start capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdVideo, captureInfoVideo, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+
+    streamCustomerVideo->ReceiveFrameOff();
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture({captureIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: single video stream, output jpeg, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0055)
+{
+    cameraBase_->OpenUsbCamera();
+    cameraBase_->AchieveStreamOperator();
+    auto streamCustomerVideo = std::make_shared<StreamCustomer>();
+
+    uint32_t captureIdVideo = 1;
+    uint32_t streamIdVideo = 1;
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = streamIdVideo;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 720; // 720:picture height
+    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = VIDEO;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfos.push_back(streamInfo);
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CommitStreams(NORMAL, cameraBase_->ability_);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    streamCustomerVideo->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
+        StoreFile(addr, size, "_single_video.jpeg");
+    });
+
+    CaptureInfo captureInfoVideo = {
+        .streamIds_ = {streamIdVideo},
+        .captureSetting_ = cameraBase_->ability_,
+        .enableShutterCallback_ = false,
+    };
+    std::cout << "start capture video" <<  std::endl;
+    CAMERA_LOGE("start capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdVideo, captureInfoVideo, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+
+    std::cout << "cancel capture video" <<  std::endl;
+    CAMERA_LOGE("cancel capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture(captureIdVideo);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    
+    std::cout << "start capture video" <<  std::endl;
+    CAMERA_LOGE("start capture video");
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->Capture(captureIdVideo, captureInfoVideo, true);
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+
+    streamCustomerVideo->ReceiveFrameOff();
+
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->CancelCapture({captureIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    cameraBase_->rc = (CamRetCode)cameraBase_->streamOperator->ReleaseStreams({streamIdVideo});
+    EXPECT_EQ(true, cameraBase_->rc == HDI::Camera::V1_0::NO_ERROR);
 }

@@ -19,12 +19,12 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_2/ivibrator_interface.h"
+#include "v1_3/ivibrator_interface.h"
 #include "vibrator_type.h"
 #include "vibrator_uhdf_log.h"
 
 using namespace OHOS::HDI::Vibrator;
-using namespace OHOS::HDI::Vibrator::V1_2;
+using namespace OHOS::HDI::Vibrator::V1_3;
 using namespace testing::ext;
 
 namespace {
@@ -34,6 +34,7 @@ namespace {
     uint32_t g_sleepTime2 = 5000;
     int32_t g_intensity1 = 30;
     int32_t g_intensity2 = -30;
+    int32_t g_intensity3 = 60;
     int32_t g_frequency1 = 200;
     int32_t g_frequency2 = -200;
     V1_2::HapticPaket g_pkg = {434, 1, {{V1_2::CONTINUOUS, 0, 149, 100, 50, 0, 4,
@@ -46,7 +47,7 @@ namespace {
     std::string g_builtIn = "haptic.default.effect";
     std::string g_effect1 = "haptic.long_press.light";
     std::string g_arbitraryStr = "arbitraryString";
-    sptr<OHOS::HDI::Vibrator::V1_2::IVibratorInterface> g_vibratorInterface = nullptr;
+    sptr<OHOS::HDI::Vibrator::V1_3::IVibratorInterface> g_vibratorInterface = nullptr;
 }
 
 class HdfVibratorHdiTest : public testing::Test {
@@ -59,7 +60,7 @@ public:
 
 void HdfVibratorHdiTest::SetUpTestCase()
 {
-    g_vibratorInterface = OHOS::HDI::Vibrator::V1_2::IVibratorInterface::Get();
+    g_vibratorInterface = OHOS::HDI::Vibrator::V1_3::IVibratorInterface::Get();
 }
 
 void HdfVibratorHdiTest::TearDownTestCase()
@@ -611,4 +612,23 @@ HWTEST_F(HdfVibratorHdiTest, StopV1_2Test_004, TestSize.Level1)
 
     int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_BUTT);
     EXPECT_EQ(endRet, HDF_ERR_INVALID_PARAM);
+}
+
+/**
+  * @tc.name: StartByIntensityTest
+  * @tc.desc: Controls this Performing Time Series Vibrator Effects.
+  * Controls this vibrator to stop the vibrator
+  * @tc.type: FUNC
+  * @tc.require:#I96NNZ
+  */
+HWTEST_F(HdfVibratorHdiTest, StartByIntensityTest, TestSize.Level1)
+{
+    HDF_LOGI("StartByIntensityTest in");
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->StartByIntensity(g_effect1, g_intensity3);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    int32_t endRet = g_vibratorInterface->StopV1_2(HdfVibratorModeV1_2::HDF_VIBRATOR_MODE_PRESET);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
