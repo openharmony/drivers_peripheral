@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,99 +12,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "chip_fuzzer.h"
+
+#include "securec.h"
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include "v1_0/chip_controller_stub.h"
+#include "../../../chip/hdi_service/wifi.h"
+
+using namespace OHOS::HDI::Wlan::Chip::V1_0;
+using namespace std;
 
 namespace OHOS {
-namespace WIFI {
+namespace HDI {
+namespace Wlan {
+namespace Chip {
+namespace V1_0 {
 
-
-static void FuzzStartScan(struct IWlanInterface *interface, const uint8_t *rawData)
-{
-    struct HdfWifiScan scan = {0};
-    struct HdfFeatureInfo feature;
-    feature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
-    feature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-
-    interface->StartScan(interface, &feature, &scan);
-    HDF_LOGI("%{public}s: success", __FUNCTION__);
+namespace {
+const int32_t REWIND_READ_DATA = 0;
+shared_ptr<ChipControllerStub> g_WifiChipController = nullptr;
 }
 
-static FuzzWlanFuncs g_fuzzWlanFuncs[] = {
-    FuzzStartScan,
-};
-
-static void FuncToOptimal(struct IWlanInterface *interface, uint32_t cmdId, const uint8_t *data)
+static void WifiChipStubFuzzTest(const uint8_t *data, size_t size)
 {
-    FuzzWlanFuncs fuzzWlanFunc = g_fuzzWlanFuncs[cmdId];
-    if (fuzzWlanFunc != nullptr) {
-        fuzzWlanFunc(interface, data);
+    uint32_t code;
+    if (size < sizeof(code)) {
+        return;
     }
-    return;
-}
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
+        return;
+    }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
-{
-    struct HdfFeatureInfo ifeature;
-    bool result = false;
-
-    if (rawData == nullptr || size == 0) {
-        return false;
+    MessageParcel datas;
+    datas.WriteInterfaceToken(IChipController::GetDescriptor());
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(REWIND_READ_DATA);
+    MessageParcel reply;
+    MessageOption option;
+    if (g_WifiChipController == nullptr) {
+        sptr<Wifi> impl = new Wifi();
+        impl->Init();
+        g_WifiChipController = make_shared<ChipControllerStub>(impl);
     }
-    uint32_t cmdId = Convert2Uint32(rawData) % ((sizeof(g_fuzzWlanFuncs) / sizeof(g_fuzzWlanFuncs[0])));
-    g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
-    if (g_wlanObj == nullptr) {
-        HDF_LOGE("%{public}s: g_wlanObj is null", __FUNCTION__);
-        return result;
-    }
-    uint32_t dataSize = size - OFFSET;
-    uint8_t *tmpRawData = reinterpret_cast<uint8_t *>(OsalMemCalloc(dataSize + 1));
-    if (tmpRawData == nullptr) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failed!", __FUNCTION__);
-        return result;
-    }
-    int32_t ret = g_wlanObj->Start(g_wlanObj);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Start failed! ret=%{public}d", __FUNCTION__, ret);
-        OsalMemFree(tmpRawData);
-        return result;
-    }
-    do {
-        if (PreProcessRawData(rawData, size, tmpRawData, dataSize + 1) != true) {
-            break;
-        }
-        ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: CreateFeature failed! ret=%{public}d", __FUNCTION__, ret);
-            break;
-        }
-        FuncToOptimal(g_wlanObj, cmdId, tmpRawData);
-        ret = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestroyFeature failed! ret=%{public}d", __FUNCTION__, ret);
-            break;
-        }
-        result = true;
-    } while (false);
-    ret = g_wlanObj->Stop(g_wlanObj);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Stop failed! ret=%{public}d", __FUNCTION__, ret);
-        result = false;
-    }
-    IWlanInterfaceReleaseInstance(g_wlanServiceName, g_wlanObj, false);
-    OsalMemFree(tmpRawData);
-    return result;
+    g_WifiChipController->OnRemoteRequest(code, datas, reply, option);
 }
-} // namespace WIFI
+} // namespace V1_1
+} // namespace Chip
+} // namespace Wlan
+} // namespace HDI
 } // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < OHOS::WIFI::THRESHOLD) {
-        return 0;
-    }
-
     /* Run your code on data */
-    OHOS::WIFI::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::HDI::Wlan::Chip::V1_0::WifiChipStubFuzzTest(data, size);
     return 0;
 }

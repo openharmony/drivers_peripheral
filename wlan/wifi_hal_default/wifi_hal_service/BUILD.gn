@@ -11,30 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-wifi_hal_path = "//drivers/peripheral/wlan/wifi_hal_default/wifi_hal_service"
-
 import("//build/ohos.gni")
 
 ohos_shared_library("wifi_hal_default") {
-  include_dirs = [
-    "$wifi_hal_path",
-    "//drivers/peripheral/wlan/chip/hdi_service",
-  ]
-  sources = [
-    "wifi_hal.cpp",
-  ]
+  include_dirs = [ "../../chip/hdi_service" ]
+  sources = [ "wifi_hal.cpp" ]
 
-  deps = [ ]
+  deps = []
 
   if (is_standard_system) {
     external_deps = [
-      "hilog:libhilog",
       "c_utils:utils",
+      "hilog:libhilog",
     ]
   } else {
-    external_deps = [
-      "hilog:libhilog",
-    ]
+    external_deps = [ "hilog:libhilog" ]
   }
   cflags = [
     "-Wall",
