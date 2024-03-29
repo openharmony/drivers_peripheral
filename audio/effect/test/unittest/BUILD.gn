@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("./../../../../audio.gni")
+import("./../../../audio.gni")
 
 ohos_unittest("hdf_effect_hdi_ut") {
   module_out_path = "drivers_peripheral_audio/audio"
