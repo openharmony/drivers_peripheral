@@ -257,7 +257,7 @@ static int WpaCtrlCommand(struct wpa_ctrl *ctrl, const char *cmd, char *buf, siz
     if (len < bufSize) {
         buf[len] = '\0';
     } else {
-        HDF_LOGE("len is invalid,current len is %{public}d, bufSize is %{public}d", len, bufSize);
+        HDF_LOGE("len is invalid,current len is %{public}zu, bufSize is %{public}zu", len, bufSize);
         return -1;
     }
     if (memcmp(buf, "FAIL", FAIL_LENGTH) == 0) {
