@@ -53,11 +53,15 @@ AllocatorService::AllocatorService()
 
 AllocatorService::~AllocatorService()
 {
+    std::lock_guard<std::mutex> lck(mutex_);
     if (destroyVdi_ != nullptr && vdiImpl_ != nullptr) {
         destroyVdi_(vdiImpl_);
+        vdiImpl_ = nullptr;
+        destroyVdi_ = nullptr;
     }
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
     }
 }
 
