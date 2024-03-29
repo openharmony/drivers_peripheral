@@ -90,8 +90,8 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_SUCCESS);
-    EXPECT_EQ(GetReuseUnlockResult(reuseResult.enrolledState.credentialCount, 0));
-    EXPECT_EQ(GetReuseUnlockResult(reuseResult.enrolledState.credentialDigest, 0));
+    EXPECT_EQ(reuseResult.enrolledState.credentialCount, 0);
+    EXPECT_EQ(reuseResult.enrolledState.credentialDigest, 0);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
 }
 
