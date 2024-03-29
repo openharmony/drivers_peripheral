@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_LOCATION_LOCATION_AGNSS_V1_0_AGNSSINTERFACEIMPL_H
-#define OHOS_HDI_LOCATION_LOCATION_AGNSS_V1_0_AGNSSINTERFACEIMPL_H
+#ifndef OHOS_HDI_LOCATION_LOCATION_AGNSS_V2_0_AGNSSINTERFACEIMPL_H
+#define OHOS_HDI_LOCATION_LOCATION_AGNSS_V2_0_AGNSSINTERFACEIMPL_H
 
-#include "v1_0/ia_gnss_interface.h"
+#include "v2_0/ia_gnss_interface.h"
 
 #include "iremote_object.h"
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V1_0 {
+namespace V2_0 {
 class AGnssInterfaceImpl : public IAGnssInterface {
 public:
     AGnssInterfaceImpl();
@@ -37,6 +37,8 @@ public:
     int32_t SetAgnssRefInfo(const AGnssRefInfo& refInfo) override;
 
     int32_t SetSubscriberSetId(const SubscriberSetId& id) override;
+
+    int32_t SendNetworkState(const NetworkState& state) override;
 
     void ResetAgnss();
 private:
@@ -61,10 +63,10 @@ public:
 private:
     wptr<AGnssInterfaceImpl> agnssInterfaceImpl_;
 };
-} // V1_0
+} // V2_0
 } // Agnss
 } // Location
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_LOCATION_LOCATION_AGNSS_V1_0_AGNSSINTERFACEIMPL_H
+#endif // OHOS_HDI_LOCATION_LOCATION_AGNSS_V2_0_AGNSSINTERFACEIMPL_H
