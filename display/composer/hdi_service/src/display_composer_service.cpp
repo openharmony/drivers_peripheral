@@ -157,7 +157,7 @@ int32_t DisplayComposerService::LoadVdiV1_0()
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
-    cmdResponser_ = V1_0::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
+    cmdResponser_ = V1_2::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     return HDF_SUCCESS;
 }
@@ -191,7 +191,7 @@ int32_t DisplayComposerService::LoadVdiV1_1()
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
-    cmdResponserV1_1_ = V1_1::HdiDisplayCmdResponser::Create(vdiImplV1_1_, cacheMgr_);
+    cmdResponserV1_1_ = V1_2::HdiDisplayCmdResponser::Create(vdiImplV1_1_, cacheMgr_);
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponserV1_1_, HDF_FAILURE);
     return HDF_SUCCESS;
 }
