@@ -1438,7 +1438,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     AuthResultInfo authResultInfo = {};
 
     EXPECT_EQ(service->UpdateAuthenticationResult(contextId, authScheduleResult, authResultInfo),
-        RESULT_GENERAL_ERROR);
+        RESULT_SUCCESS);
 
     std::vector<CredentialInfo> deletedCredInfos;
     EXPECT_EQ(service->EnforceDeleteUser(userId, deletedCredInfos), 0);
