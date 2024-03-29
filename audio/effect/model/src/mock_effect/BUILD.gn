@@ -13,6 +13,7 @@
 
 hdf_audio_path = "./../../../.."
 import("//build/ohos.gni")
+import("$hdf_audio_path/audio.gni")
 
 if (!defined(ohos_lite)) {
   ohos_shared_library("mock_effect_lib") {
