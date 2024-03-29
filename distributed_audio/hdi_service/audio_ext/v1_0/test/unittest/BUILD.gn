@@ -39,7 +39,7 @@ ohos_unittest("HDIServiceDaudioExtTest") {
   configs = [ ":module_private_config" ]
 
   public_deps = [
-    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_1.0",
+    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

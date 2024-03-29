@@ -43,7 +43,7 @@ ohos_fuzztest("UnRegisterAudioDeviceFuzzTest") {
     "${common_path}/include",
   ]
 
-  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_1.0" ]
+  deps = [ "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_2.0" ]
 
   external_deps = [
     "c_utils:utils",
