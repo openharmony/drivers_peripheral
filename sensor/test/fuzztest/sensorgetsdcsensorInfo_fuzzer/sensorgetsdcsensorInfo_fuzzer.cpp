@@ -23,7 +23,7 @@ using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace {
     struct AllParameters {
-        std::vector<SdcSensorInfo> sdcSensorInfo;
+        SdcSensorInfo sdcSensorInfo;
     };
 }
 
@@ -38,7 +38,10 @@ namespace OHOS {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             return false;
         }
-        if (!g_sensorInterface->GetSdcSensorInfo(params.sdcSensorInfo)) {
+        std::vector<SdcSensorInfo> sdcSensorInfos;
+        sdcSensorInfos.push_back(std::move(params.sdcSensorInfo));
+
+        if (!g_sensorInterface->GetSdcSensorInfo(sdcSensorInfos)) {
             result = true;
         }
         return result;
