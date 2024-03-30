@@ -73,71 +73,48 @@ void Test::Init()
     uint32_t mainVer;
     uint32_t minVer;
     int32_t ret;
-    if (serviceV1_2 == nullptr) {
-        serviceV1_2 = OHOS::HDI::Camera::V1_2::ICameraHost::Get("camera_service", false);
-        EXPECT_NE(serviceV1_2, nullptr);
+    if (serviceV1_3 == nullptr) {
+        serviceV1_3 = OHOS::HDI::Camera::V1_3::ICameraHost::Get("camera_service", false);
+        EXPECT_NE(serviceV1_3, nullptr);
         CAMERA_LOGI("V1_2::ICameraHost get success");
-        ret = serviceV1_2->GetVersion(mainVer, minVer);
+        ret = serviceV1_3->GetVersion(mainVer, minVer);
         EXPECT_EQ(ret, 0);
         CAMERA_LOGI("V1_2::ICameraHost get version success, %{public}d, %{public}d", mainVer, minVer);
-        service = static_cast<OHOS::HDI::Camera::V1_0::ICameraHost *>(serviceV1_2.GetRefPtr());
     }
 
     hostCallback = new TestCameraHostCallback();
-    ret = service->SetCallback(hostCallback);
+    ret = serviceV1_3->SetCallback(hostCallback);
     EXPECT_EQ(ret, 0);
 }
 
 void Test::Open(int cameraId)
 {
-    if (cameraDevice == nullptr) {
-        EXPECT_NE(service, nullptr);
-        service->GetCameraIds(cameraIds);
+    if (cameraDeviceV1_3 == nullptr) {
+        EXPECT_NE(serviceV1_3, nullptr);
+        serviceV1_3->GetCameraIds(cameraIds);
         EXPECT_NE(cameraIds.size(), 0);
         GetCameraMetadata(cameraId);
         deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
 
-        EXPECT_NE(serviceV1_2, nullptr);
+        EXPECT_NE(serviceV1_3, nullptr);
         if (DEVICE_1 == cameraId) {
-            rc = serviceV1_2->OpenCamera_V1_1(cameraIds[1], deviceCallback, cameraDeviceV1_1);
+            rc = serviceV1_3->OpenCamera_V1_3(cameraIds[1], deviceCallback, cameraDeviceV1_3);
         } else {
-            rc = serviceV1_2->OpenCamera_V1_1(cameraIds[0], deviceCallback, cameraDeviceV1_1);
+            rc = serviceV1_3->OpenCamera_V1_3(cameraIds[0], deviceCallback, cameraDeviceV1_3);
         }
         EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
-        EXPECT_NE(cameraDeviceV1_1, nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_1.GetRefPtr());
+        EXPECT_NE(cameraDeviceV1_3, nullptr);
         CAMERA_LOGI("OpenCamera V1_2 success");
     }
 }
 
-void Test::OpenCameraV1_2(int cameraId)
-{
-    if (cameraDevice == nullptr) {
-        EXPECT_NE(service, nullptr);
-        service->GetCameraIds(cameraIds);
-        EXPECT_NE(cameraIds.size(), 0);
-        GetCameraMetadata(cameraId);
-        deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
-
-        EXPECT_NE(serviceV1_2, nullptr);
-        if (cameraId == DEVICE_1) {
-            rc = serviceV1_2->OpenCamera_V1_2(cameraIds[1], deviceCallback, cameraDeviceV1_2);
-        } else {
-            rc = serviceV1_2->OpenCamera_V1_2(cameraIds[0], deviceCallback, cameraDeviceV1_2);
-        }
-        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
-        EXPECT_NE(cameraDeviceV1_2, nullptr);
-        cameraDevice = static_cast<OHOS::HDI::Camera::V1_0::ICameraDevice *>(cameraDeviceV1_2.GetRefPtr());
-        CAMERA_LOGI("OpenCamera V1_2 success");
-    }
-}
 
 void Test::GetCameraMetadata(int cameraId)
 {
     if (DEVICE_1 == cameraId) {
-        rc = service->GetCameraAbility(cameraIds[1], abilityVec);
+        rc = serviceV1_3->GetCameraAbility(cameraIds[1], abilityVec);
     } else {
-        rc = service->GetCameraAbility(cameraIds[0], abilityVec);
+        rc = serviceV1_3->GetCameraAbility(cameraIds[0], abilityVec);
     }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
@@ -148,9 +125,9 @@ void Test::GetCameraMetadata(int cameraId)
 
 void Test::Close()
 {
-    if (cameraDevice != nullptr) {
-        cameraDevice->Close();
-        cameraDevice = nullptr;
+    if (cameraDeviceV1_3 != nullptr) {
+        cameraDeviceV1_3->Close();
+        cameraDeviceV1_3 = nullptr;
     }
 }
 
@@ -294,17 +271,17 @@ void Test::DefaultInfosAnalyze(
 
 void Test::StartStream(std::vector<StreamIntent> intents)
 {
-    streamOperatorCallback = new TestStreamOperatorCallback();
+    streamOperatorCallbackV1_3 =
+        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
     uint32_t mainVersion = 1;
     uint32_t minVersion = 0;
-    rc = cameraDeviceV1_1->GetStreamOperator_V1_1(streamOperatorCallback, streamOperator_V1_1);
+    rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
-        rc = streamOperator_V1_1->GetVersion(mainVersion, minVersion);
-        streamOperator = static_cast<OHOS::HDI::Camera::V1_0::IStreamOperator *>(streamOperator_V1_1.GetRefPtr());
+        rc = streamOperator_V1_3->GetVersion(mainVersion, minVersion);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
-            CAMERA_LOGE("StreamOperator V1_1 get version failed, rc = %{public}d", rc);
+            CAMERA_LOGE("streamOperator_V1_3 get version failed, rc = %{public}d", rc);
         } else {
-            CAMERA_LOGI("StreamOperator V1_1 get version success, %{public}u, %{public}u",
+            CAMERA_LOGI("streamOperator_V1_3 get version success, %{public}u, %{public}u",
                 mainVersion, minVersion);
         }
         CAMERA_LOGI("GetStreamOperator success");
@@ -332,9 +309,9 @@ void Test::StartStream(std::vector<StreamIntent> intents)
         }
     }
 
-    rc = streamOperator_V1_1->CreateStreams_V1_1(streamInfos);
+    rc = streamOperator_V1_3->CreateStreams_V1_1(streamInfos);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
-    rc = streamOperator_V1_1->CommitStreams(OperationMode::NORMAL, abilityVec);
+    rc = streamOperator_V1_3->CommitStreams(OperationMode::NORMAL, abilityVec);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>().swap(streamInfos);
@@ -346,14 +323,8 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
     captureInfo->streamIds_ = {streamId};
     captureInfo->captureSetting_ = abilityVec;
     captureInfo->enableShutterCallback_ = shutterCallback;
-    if (streamOperator_V1_2 != nullptr) {
-        rc = (CamRetCode)streamOperator_V1_2->Capture(captureId, *captureInfo, isStreaming);
-    } else if (streamOperator_V1_1 != nullptr) {
-        rc = (CamRetCode)streamOperator_V1_1->Capture(captureId, *captureInfo, isStreaming);
-    } else {
-        rc = (CamRetCode)streamOperator->Capture(captureId, *captureInfo, isStreaming);
-    }
-
+    EXPECT_EQ(true, streamOperator_V1_3 != nullptr);
+    rc = (CamRetCode)streamOperator_V1_3->Capture(captureId, *captureInfo, isStreaming);
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("check Capture: Capture success, %{public}d", captureId);
@@ -368,13 +339,8 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
-            if (streamOperator_V1_2 != nullptr) {
-                rc = streamOperator_V1_2->CancelCapture(captureId);
-            } else if (streamOperator_V1_1 != nullptr) {
-                rc = streamOperator_V1_1->CancelCapture(captureId);
-            } else {
-                rc = streamOperator->CancelCapture(captureId);
-            }
+            EXPECT_EQ(true, streamOperator_V1_3 != nullptr);
+            rc = streamOperator_V1_3->CancelCapture(captureId);
             EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
             if (rc == HDI::Camera::V1_0::NO_ERROR) {
                 CAMERA_LOGI("check Capture: CancelCapture success, %{public}d", captureId);
@@ -385,13 +351,8 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
         }
     }
     if (sizeof(streamIds) > 0) {
-        if (streamOperator_V1_2 != nullptr) {
-            rc = streamOperator_V1_2->ReleaseStreams(streamIds);
-        } else if (streamOperator_V1_1 != nullptr) {
-            rc = streamOperator_V1_1->ReleaseStreams(streamIds);
-        } else {
-            rc = streamOperator->ReleaseStreams(streamIds);
-        }
+        EXPECT_EQ(true, streamOperator_V1_3 != nullptr);
+        rc = streamOperator_V1_3->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGI("check Capture: ReleaseStream success");
@@ -548,40 +509,25 @@ int32_t Test::TestStreamOperatorCallback::OnFrameShutter(int32_t captureId,
 
 int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId)
 {
-    for (auto it : streamId) {
-        CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d", captureId, it);
-    }
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnCaptureStarted(captureId, streamId);
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureEnded(int32_t captureId,
     const std::vector<CaptureEndedInfo> &infos)
 {
-    for (auto it : infos) {
-        CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d, count: %{public}d", captureId, it.streamId_,
-            it.frameCount_);
-    }
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnCaptureEnded(captureId, infos);
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureError(int32_t captureId,
     const std::vector<CaptureErrorInfo> &infos)
 {
-    for (auto it : infos) {
-        CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d, error: %{public}d", captureId, it.streamId_,
-            it.error_);
-    }
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnCaptureError(captureId, infos);
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_2::OnFrameShutter(int32_t captureId,
     const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
-    (void)timestamp;
-    for (auto it : streamIds) {
-        CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d", captureId, it);
-    }
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnFrameShutter(captureId, streamIds, timestamp);
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted_V1_2(int32_t captureId,
@@ -590,6 +536,55 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted_V1_2(int32_t capt
     for (auto it : infos) {
         CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d", captureId, it.streamId_);
     }
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId)
+{
+    return instanceImpl.OnCaptureStarted(captureId, streamId);
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureEnded(int32_t captureId,
+    const std::vector<CaptureEndedInfo> &infos)
+{
+    return instanceImpl.OnCaptureEnded(captureId, infos);
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureError(int32_t captureId,
+    const std::vector<CaptureErrorInfo> &infos)
+{
+    return instanceImpl.OnCaptureError(captureId, infos);
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutter(int32_t captureId,
+    const std::vector<int32_t> &streamIds, uint64_t timestamp)
+{
+    return instanceImpl.OnFrameShutter(captureId, streamIds, timestamp);
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureStarted_V1_2(int32_t captureId,
+    const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
+{
+    return instanceImpl.OnCaptureStarted_V1_2(captureId, infos);
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureReady(int32_t captureId,
+    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+{
+    // currently do nothing
+    (void)captureId;
+    (void)streamIds;
+    (void)timestamp;
+    return HDI::Camera::V1_0::NO_ERROR;
+}
+
+int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureId,
+    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+{
+    // currently do nothing
+    (void)captureId;
+    (void)streamIds;
+    (void)timestamp;
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
@@ -628,20 +623,17 @@ int32_t Test::TestCameraHostCallback::OnCameraEvent(const std::string& cameraId,
 
 int32_t Test::TestCameraHostCallbackV1_2::OnCameraStatus(const std::string& cameraId, CameraStatus status)
 {
-    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnCameraStatus(cameraId, status);
 }
 
 int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
 {
-    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), status);
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnFlashlightStatus(cameraId, status);
 }
 
 int32_t Test::TestCameraHostCallbackV1_2::OnCameraEvent(const std::string& cameraId, CameraEvent event)
 {
-    CAMERA_LOGE("cameraId: %{public}s, status: %{public}d", cameraId.c_str(), event);
-    return HDI::Camera::V1_0::NO_ERROR;
+    return instanceImpl.OnCameraEvent(cameraId, event);
 }
 
 int32_t Test::TestCameraHostCallbackV1_2::OnFlashlightStatus_V1_2(FlashlightStatus status)
