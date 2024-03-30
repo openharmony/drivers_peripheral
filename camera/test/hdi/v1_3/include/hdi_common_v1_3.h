@@ -83,24 +83,15 @@ public:
     void OpenCameraV1_2(int cameraId);
     void Close();
     void GetCameraMetadata(int cameraId);
-    void DefaultPreview(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultCapture(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultSketch(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosPreview(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosPreviewV1_2(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosCapture(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosAnalyze(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosVideo(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
-    void DefaultInfosSketch(
-        std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultCapture(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosPreviewV1_2(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosCapture(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosAnalyze(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosVideo(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void DefaultInfosSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void StartStream(std::vector<StreamIntent> intents);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
@@ -109,14 +100,14 @@ public:
     OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraHost> serviceV1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraHost> serviceV1_3 = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> streamOperatorCallbackV1_3 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
@@ -269,6 +260,21 @@ public:
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
         int32_t OnCaptureStarted_V1_2(int32_t captureId,
             const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
+    };
+
+    class TestStreamOperatorCallbackV1_3 : public OHOS::HDI::Camera::V1_3::IStreamOperatorCallback {
+    public:
+        TestStreamOperatorCallbackV1_3() = default;
+        virtual ~TestStreamOperatorCallbackV1_3() = default;
+        int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
+        int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
+        int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
+        int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
+        int32_t OnCaptureStarted_V1_2(int32_t captureId,
+            const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
+        int32_t OnCaptureReady(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
+        int32_t OnFrameShutterEnd(int32_t captureId,
+            const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
     };
 
     class TestCameraHostCallback : public ICameraHostCallback {
