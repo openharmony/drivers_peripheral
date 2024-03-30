@@ -80,7 +80,6 @@ class Test {
 public:
     void Init();
     void Open(int cameraId);
-    void OpenCameraV1_2(int cameraId);
     void Close();
     void GetCameraMetadata(int cameraId);
     void DefaultPreview(
@@ -106,22 +105,12 @@ public:
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
-    OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraHost> serviceV1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHost> serviceV1_3 = nullptr;
-    OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_3 = nullptr;
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraHost> serviceV1_3 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
+
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> streamOperatorCallbackV1_3 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraHostCallback> hostCallbackV1_2 = nullptr;
-    OHOS::sptr<IStreamOperator> streamOperator = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_1::IStreamOperator> streamOperator_V1_1 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_2 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperator> streamOperator_V1_3 = nullptr;
     class DemoCameraDeviceCallback;
     OHOS::sptr<DemoCameraDeviceCallback> deviceCallback = nullptr;
@@ -260,6 +249,7 @@ public:
     };
 
     class TestStreamOperatorCallbackV1_2 : public OHOS::HDI::Camera::V1_2::IStreamOperatorCallback {
+        TestStreamOperatorCallback instanceImpl;
     public:
         TestStreamOperatorCallbackV1_2() = default;
         virtual ~TestStreamOperatorCallbackV1_2() = default;
@@ -269,6 +259,24 @@ public:
         int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
         int32_t OnCaptureStarted_V1_2(int32_t captureId,
             const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
+    };
+
+    class TestStreamOperatorCallbackV1_3 : public OHOS::HDI::Camera::V1_3::IStreamOperatorCallback {
+        TestStreamOperatorCallbackV1_2 instanceImpl;
+    public:
+        TestStreamOperatorCallbackV1_3() = default;
+        virtual ~TestStreamOperatorCallbackV1_3() = default;
+        int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
+        int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo> &infos) override;
+        int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo> &infos) override;
+        int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t> &streamIds, uint64_t timestamp) override;
+        int32_t OnCaptureStarted_V1_2(int32_t captureId,
+            const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
+
+        int32_t OnCaptureReady(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp) override;
+        int32_t OnFrameShutterEnd(int32_t captureId, const std::vector<int32_t>& streamIds,
+            uint64_t timestamp) override;
+
     };
 
     class TestCameraHostCallback : public ICameraHostCallback {
@@ -282,6 +290,7 @@ public:
     };
 
     class TestCameraHostCallbackV1_2 : public OHOS::HDI::Camera::V1_2::ICameraHostCallback {
+        TestCameraHostCallback instanceImpl;
     public:
         TestCameraHostCallbackV1_2() = default;
         virtual ~TestCameraHostCallbackV1_2() = default;
