@@ -69,10 +69,10 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-    external_deps = [
-      "c_utils:utils",
-      "hdf_core:libhdf_utils",
-    ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
+    if (enable_c_utils) {
+      external_deps += [ "c_utils:utils" ]
+    }
     defines = []
     if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_SO" ]

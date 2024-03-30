@@ -27,6 +27,8 @@ ohos_shared_library("audio_primary_driver") {
       "hdf_core:libhdi",
       "hilog:libhilog",
     ]
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -55,6 +57,8 @@ ohos_shared_library("audio_manager_service_2.0") {
       "hdf_core:libhdi",
       "hilog:libhilog",
     ]
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

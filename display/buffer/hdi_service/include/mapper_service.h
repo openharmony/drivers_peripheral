@@ -19,6 +19,7 @@
 #include "idisplay_buffer_vdi.h"
 #include "v1_2/display_buffer_type.h"
 #include "v1_2/imapper.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
@@ -42,7 +43,7 @@ public:
 
 private:
     int32_t LoadVdi();
-
+    std::mutex mutex_;
     void* libHandle_;
     IDisplayBufferVdi* vdiImpl_;
     CreateDisplayBufferVdiFunc createVdi_;
