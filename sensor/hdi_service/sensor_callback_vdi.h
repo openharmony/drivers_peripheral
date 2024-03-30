@@ -36,7 +36,10 @@ public:
     explicit SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
     int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
+    std::mutex timestampMapMutex_;
 private:
+    void PrintData(const HdfSensorEvents &event);
+    void DataToStr(std::string &str, const HdfSensorEvents &event);
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
 };
