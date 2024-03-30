@@ -34,8 +34,12 @@ ohos_systemtest("hdf_audio_idlhdi_render_test") {
   external_deps = [
     "drivers_interface_audio:libaudio_proxy_2.0",
     "hdf_core:libhdf_utils",
-    "hilog:libhilog",
   ]
+  if (defined(ohos_lite)) {
+    external_deps += [ "hilog_lite:hilog_share" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
 
   deps = [
     "//third_party/googletest:gmock_main",

@@ -54,7 +54,10 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
-static std::chrono::milliseconds waitTime_(1000); // {1000ms};
+static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
+static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
+static constexpr int32_t WAIT_TIME_FACTOR = 2;
+static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
 static std::mutex g_forceMutex;
@@ -199,8 +202,10 @@ int32_t DoSuspend()
     bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     if (!ret) {
         HDF_LOGE("DoSuspend fail");
+        waitTime_ = std::min(waitTime_ * WAIT_TIME_FACTOR, MAX_WAIT_TIME);
         return HDF_FAILURE;
     }
+    waitTime_ = DEFAULT_WAIT_TIME;
     return HDF_SUCCESS;
 }
 

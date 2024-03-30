@@ -89,10 +89,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_001, TestSize.Level1)
 static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera::Test> cameraTest)
 {
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
-        cameraTest->streamOperator_V1_1);
-    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     // preview streamInfo
     cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
@@ -107,9 +107,9 @@ static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera:
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
     // create and commitStream
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
         static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE),
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -161,7 +161,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_003, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &highFrameRate, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     // start capture
@@ -197,7 +197,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_004, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &highFrameRate, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     // start capture
@@ -215,10 +215,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_2_004, TestSize.Level1)
 static void CreateAndCommitStreamsForSlowMotion(std::shared_ptr<OHOS::Camera::Test> cameraTest)
 {
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
-        cameraTest->streamOperator_V1_1);
-    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     // preview streamInfo
     cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
@@ -233,9 +233,9 @@ static void CreateAndCommitStreamsForSlowMotion(std::shared_ptr<OHOS::Camera::Te
     cameraTest->DefaultInfosVideo(cameraTest->streamInfoVideo);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoVideo);
     // create and commitStream
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_1->CommitStreams_V1_1(
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
         static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_2::SLOW_MOTION),
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
@@ -251,12 +251,12 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
     meta->addEntry(OHOS_CONTROL_MOTION_DETECTION_CHECK_AREA, &motionCheckArea, CHECK_AREA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     int32_t slowMotionControl = OHOS_CAMERA_MOTION_DETECTION_ENABLE;
     meta->addEntry(OHOS_CONTROL_MOTION_DETECTION, &slowMotionControl, DATA_CAPACITY);
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     
     // start capture
@@ -329,10 +329,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get Stream Operator
-    cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
-    cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
-        cameraTest->streamOperator_V1_1);
-    EXPECT_NE(cameraTest->streamOperator_V1_1, nullptr);
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     CreateAndCommitStreamsForSlowMotion(cameraTest);
 
@@ -342,7 +342,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &slowMotionValue, 2);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDevice->UpdateSettings(setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
     // start capture
@@ -372,7 +372,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
     int32_t rc;
     // step 2: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    rc = cameraTest->serviceV1_2->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
+    rc = cameraTest->serviceV1_3->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
@@ -389,13 +389,112 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
     }
 }
 
+void CaptureByColorSpacesWithUpdateStreams(std::vector<int32_t> captureColorSpaces,
+    std::shared_ptr<OHOS::Camera::Test> cameraTest)
+{
+    printf("Enter CaptureByColorSpacesWithUpdateStreams function!\n");
+    if (!captureColorSpaces.empty()) {
+        // clear infos
+        cameraTest->streamInfosV1_1.clear();
+        // preview streamInfo
+        cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+        cameraTest->streamInfoV1_1->v1_0.dataspace_ = captureColorSpaces[0];
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+        // capture streamInfo
+        cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+        cameraTest->streamInfoCapture->v1_0.dataspace_ = captureColorSpaces[0];
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+
+        // streamInfosV1_1 should not be empty
+        cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+        cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+            OHOS::HDI::Camera::V1_1::OperationMode_V1_1::NORMAL, cameraTest->abilityVec);
+        // start without colorspace setting
+        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+
+        for (int32_t colorSpaces : captureColorSpaces) {
+            printf("capture colorSpaces value %d\n", colorSpaces);
+            // CancelCapture
+            cameraTest->streamOperator_V1_3->CancelCapture(cameraTest->captureIdPreview);
+            // clear infos
+            cameraTest->streamInfosV1_1.clear();
+            // preview streamInfo
+            cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+            cameraTest->streamInfoV1_1->v1_0.dataspace_ = colorSpaces;
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+            // capture streamInfo
+            cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+            cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+            cameraTest->streamInfoCapture->v1_0.dataspace_ = colorSpaces;
+            cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+            // UpdateStreams
+            cameraTest->rc = cameraTest->streamOperator_V1_3->UpdateStreams(cameraTest->streamInfosV1_1);
+            // Capture
+            EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+            cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+            cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+            sleep(UT_SECOND_TIMES);
+        }
+
+        // StopStream
+        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    }
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_2_088
+ * @tc.desc: requirement hdr vivid ut
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_008, TestSize.Level1)
+{
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
+        cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_COLOR_SPACES, &entry);
+    printf("OHOS_ABILITY_AVAILABLE_COLOR_SPACES value count %d\n", entry.count);
+    if (ret == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        std::vector<int32_t> captureColorSpaces;
+        int32_t operatorMode = -2;
+        for (size_t i = 0; i < entry.count - 1; i++) {
+            if (operatorMode == -2 && (entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::CAPTURE
+                || entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::VIDEO
+                || entry.data.i32[i] == HDI::Camera::V1_2::OperationMode_V1_2::SUPER_STAB)) {
+                operatorMode = entry.data.i32[i];
+            } else if (entry.data.i32[i] == -1 && operatorMode != -2 && entry.data.i32[i + 1] == -1) {
+                operatorMode = -2;
+            } else if (entry.data.i32[i] == -1 && operatorMode != -2 && entry.data.i32[i + 1] != -1) {
+                operatorMode = -1;
+            } else if (operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::CAPTURE) {
+                captureColorSpaces.push_back(entry.data.i32[i]);
+            } else if (operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::VIDEO ||
+                operatorMode == HDI::Camera::V1_2::OperationMode_V1_2::SUPER_STAB) {
+                continue;
+            } else if (operatorMode == -2 && entry.data.i32[i] > 0) {
+                operatorMode = -1;
+            }
+        }
+        CaptureByColorSpacesWithUpdateStreams(captureColorSpaces, cameraTest);
+    }
+}
+
 /**
  * @tc.name: Camera_Device_Hdi_V1_3_008
  * @tc.desc: OHOS_ABILITY_MOVING_PHOTO
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_008, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_009, TestSize.Level1)
 {
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
@@ -431,7 +530,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_008, TestSize.Level1)
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_009, TestSize.Level1)
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_010, TestSize.Level1)
 {
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
