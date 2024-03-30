@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("./../../../audio.gni")
 
 ohos_unittest("hdf_effect_hdi_ut") {
   module_out_path = "drivers_peripheral_audio/audio"
@@ -24,10 +25,16 @@ ohos_unittest("hdf_effect_hdi_ut") {
   include_dirs = [ "./" ]
 
   external_deps = [
-    "c_utils:utils",
     "drivers_interface_audio:effect_idl_headers",
     "drivers_interface_audio:libeffect_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hilog:libhilog",
   ]
+  if (defined(ohos_lite)) {
+    external_deps += [ "hilog_lite:hilog_share" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+  if (enable_c_utils) {
+    external_deps += [ "c_utils:utils" ]
+  }
 }
