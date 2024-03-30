@@ -17,6 +17,7 @@ import("../../location.gni")
 ohos_shared_library("libagnss_interface_service_2.0") {
   include_dirs = [
     "${location_driver_path}/agnss/hdi_service",
+    "${location_driver_path}/gnss/hdi_service",
   ]
   sources = [ "agnss_interface_impl.cpp" ]
 
