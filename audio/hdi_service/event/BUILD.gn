@@ -55,7 +55,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       if (enable_c_utils) {
         external_deps += [ "c_utils:utils" ]
       }
-    } else if(defined(ohos_lite)) {
+    } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
     } else {
       external_deps = [ "hilog:libhilog" ]
