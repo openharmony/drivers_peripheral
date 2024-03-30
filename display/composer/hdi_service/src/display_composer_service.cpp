@@ -80,19 +80,25 @@ DisplayComposerService::DisplayComposerService()
 
 DisplayComposerService::~DisplayComposerService()
 {
+    std::lock_guard<std::mutex> lck(mutex_);
     cmdResponser_ = nullptr;
     cmdResponserV1_1_ = nullptr;
 
     if ((destroyVdiFunc_ != nullptr) && (vdiImpl_ != nullptr)) {
         destroyVdiFunc_(vdiImpl_);
+        vdiImpl_ = nullptr;
+        destroyVdiFunc_ = nullptr;
     }
 
     if ((destroyVdiFuncV1_1_ != nullptr) && (vdiImplV1_1_ != nullptr)) {
         destroyVdiFuncV1_1_(vdiImplV1_1_);
+        vdiImplV1_1_ = nullptr;
+        destroyVdiFuncV1_1_ = nullptr;
     }
 
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
     }
 }
 
