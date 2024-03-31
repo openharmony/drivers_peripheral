@@ -87,7 +87,7 @@ static void GetRefLocationidCb(uint32_t type)
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
-            callback->RequestAgnssRefInfo();
+            callback->RequestAgnssRefInfo(static_cast<AGnssRefInfoType>(type));
         }
     }
 }
