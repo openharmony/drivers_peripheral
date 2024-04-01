@@ -28,7 +28,11 @@ ohos_fuzztest("UsbGetInterfaceStatusFuzzTest") {
     "../../../../../../base/usb/usb_manager/utils/native/include",
   ]
 
-  deps = [ "../../../ddk:libusb_core" ]
+  deps = [
+    "../../../ddk:libusb_core",
+    "../../../hdi_service:libusb_interface_service_1.1",
+    "//third_party/googletest:gtest_main",
+  ]
 
   external_deps = [
     "c_utils:utils",
