@@ -30,6 +30,7 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V2_0 {
+using UeventMap = std::map<std::string, std::vector<std::pair<std::string, std::string>>>;
 class BatteryConfig : public NoCopyable {
 public:
     struct LightConfig {
@@ -57,11 +58,12 @@ public:
     const std::vector<LightConfig>& GetLightConfig() const;
     const BatteryConfig::ChargerConfig& GetChargerConfig() const;
     const std::map<std::string, BatteryConfig::ChargeSceneConfig>& GetChargeSceneConfigMap() const;
-    const std::map<std::string, std::vector<std::string>>& GetUeventList() const;
+    const UeventMap& GetUeventList() const;
 
 private:
     bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
     void ParseConfInner(const Json::Value& config);
+    void ParseConfSplit(const Json::Value& config);
     void ParseLightConfig(const Json::Value& lightConfig);
     void ParseChargeSceneConfig(const Json::Value& chargeSceneConfig);
     void ParseChargerConfig(const Json::Value& chargerConfig);
@@ -74,7 +76,7 @@ private:
     std::map<std::string, BatteryConfig::ChargeSceneConfig> chargeSceneConfigMap_;
     static std::mutex mutex_;
     static std::shared_ptr<BatteryConfig> instance_;
-    std::map<std::string, std::vector<std::string>> ueventMap_;
+    UeventMap ueventMap_;
 };
 }  // namespace V2_0
 }  // namespace Battery
