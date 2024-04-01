@@ -588,55 +588,6 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureI
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
-int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId)
-{
-    return instanceImpl.OnCaptureStarted(captureId, streamId);
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureEnded(int32_t captureId,
-    const std::vector<CaptureEndedInfo> &infos)
-{
-    return instanceImpl.OnCaptureEnded(captureId, infos);
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureError(int32_t captureId,
-    const std::vector<CaptureErrorInfo> &infos)
-{
-    return instanceImpl.OnCaptureError(captureId, infos);
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutter(int32_t captureId,
-    const std::vector<int32_t> &streamIds, uint64_t timestamp)
-{
-    return instanceImpl.OnFrameShutter(captureId, streamIds, timestamp);
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureStarted_V1_2(int32_t captureId,
-    const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
-{
-    return instanceImpl.OnCaptureStarted_V1_2(captureId, infos);
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureReady(int32_t captureId,
-    const std::vector<int32_t>& streamIds, uint64_t timestamp)
-{
-    // currently do nothing
-    (void)captureId;
-    (void)streamIds;
-    (void)timestamp;
-    return HDI::Camera::V1_0::NO_ERROR;
-}
-
-int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureId,
-    const std::vector<int32_t>& streamIds, uint64_t timestamp)
-{
-    // currently do nothing
-    (void)captureId;
-    (void)streamIds;
-    (void)timestamp;
-    return HDI::Camera::V1_0::NO_ERROR;
-}
-
 int32_t Test::DemoCameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
 {
     CAMERA_LOGE("type: %{public}d, errorMsg: %{public}d", type, errorMsg);
