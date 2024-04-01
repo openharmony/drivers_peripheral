@@ -976,7 +976,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_002, TestSize.Lev
 
     AdapterTest_->renderDevs_[0] = std::make_pair(dhId,
         new AudioRenderInterfaceImpl(adpterName, desc, attrs, callback));
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->HandleVolumeChangeEvent(event));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->HandleVolumeChangeEvent(event));
 }
 
 /**
