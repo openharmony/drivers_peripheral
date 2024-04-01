@@ -1025,9 +1025,21 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
         return HDF_ERR_INVALID_PARAM;
     }
 
-    std::fstream out(path, std::ios::out | std::ios::trunc);
-    out << value;
-    out.close();
+    int32_t fd = open(path.c_str(), O_CREAT | O_RDWR, 0644);
+    if (fd < NUM_ZERO) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d",
+            path.c_str(), errno);
+        return HDF_ERR_IO;
+    }
+
+    size_t size = value.length();
+    if (write(fd, value.c_str(), size) != size) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to write file %{public}s, errno: %{public}d",
+            path.c_str(), errno);
+        close(fd);
+        return HDF_ERR_IO;
+    }
+    close(fd);
 
     BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;
