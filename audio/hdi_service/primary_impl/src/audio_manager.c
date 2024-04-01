@@ -43,11 +43,11 @@ PathSelGetConfToJsonObj g_pathSelGetConfToJsonObj = NULL;
 PathSelAnalysisJson g_pathSelAnalysisJson = NULL;
 #endif
 
-static const char *g_capturePassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
-static const char *g_renderPassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
+static const char *CAPTURE_PASSTHTOUGH_PATH = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
+static const char *RENDER_PASSTHTOUGH_PATH = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-static const char *g_pathSelectPassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_path_select");
+static const char *PATH_SELECT_PASSTHROUGH_PATH = HDF_LIBRARY_FULL_PATH("libaudio_path_select");
 #endif
 
 static void *g_ptrCaptureHandle = NULL;
@@ -267,25 +267,25 @@ static uint32_t AudioManagerServiceFindAdapterPos(struct IAudioManager *manager,
 
 static int32_t AudioInitDynamicLib(void)
 {
-    if (g_capturePassthroughPath == NULL || g_renderPassthroughPath == NULL) {
+    if (CAPTURE_PASSTHTOUGH_PATH == NULL || RENDER_PASSTHTOUGH_PATH == NULL) {
         AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_ERR_INTERNAL;
     }
 
-    int32_t ret = InitCapturePassthroughHandle(g_capturePassthroughPath);
+    int32_t ret = InitCapturePassthroughHandle(CAPTURE_PASSTHTOUGH_PATH);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitCapturePassthroughHandle FAIL!");
         return AUDIO_ERR_INTERNAL;
     }
 
-    ret = InitRenderPassthroughHandle(g_renderPassthroughPath);
+    ret = InitRenderPassthroughHandle(RENDER_PASSTHTOUGH_PATH);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitRenderPassthroughHandle FAIL!");
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_ERR_INTERNAL;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    ret = InitPathSelectPassthroughHandle(g_pathSelectPassthroughPath);
+    ret = InitPathSelectPassthroughHandle(PATH_SELECT_PASSTHROUGH_PATH);
     if (ret < 0 || g_pathSelGetConfToJsonObj == NULL) {
         AUDIO_FUNC_LOGE("InitPathSelectPassthroughHandle FAIL!");
         AudioDlClose(&g_ptrRenderHandle);
