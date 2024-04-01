@@ -369,10 +369,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
         cout << "skip this test, because SLOW_MOTION not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
-    int32_t rc;
     // step 2: set callback object
     cameraTest->hostCallbackV1_2 = new OHOS::Camera::Test::TestCameraHostCallbackV1_2();
-    rc = cameraTest->serviceV1_3->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
+    cameraTest->rc = cameraTest->serviceV1_3->SetCallback_V1_2(cameraTest->hostCallbackV1_2);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
@@ -552,4 +552,46 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_010, TestSize.Level1)
         }
         CAMERA_LOGI("print tag<OHOS_CONTROL_MOVING_PHOTO> u8 value end.");
     }
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_011
+ * @tc.desc:CAPTURE_DURATION
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED, &entry);
+    if (cameraTest->rc != 0) {
+        cout << "skip this test, because OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED not supported now" << endl;
+        return;
+    }
+
+    //start stream
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+
+    //updateSettings
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint32_t snapshotDuration = 1;
+    meta->addEntry(OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &snapshotDuration, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    //start preview and capture
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+
+    //release stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
