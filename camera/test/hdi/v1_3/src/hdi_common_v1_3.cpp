@@ -534,7 +534,7 @@ int32_t Test::TestStreamOperatorCallbackV1_2::OnCaptureStarted_V1_2(int32_t capt
     const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos)
 {
     for (auto it : infos) {
-        CAMERA_LOGE("captureId: %{public}d, streamId: %{public}d", captureId, it.streamId_);
+        CAMERA_LOGI("captureId: %{public}d, streamId: %{public}d", captureId, it.streamId_);
     }
     return HDI::Camera::V1_0::NO_ERROR;
 }
@@ -569,22 +569,22 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureStarted_V1_2(int32_t capt
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureReady(int32_t captureId,
-    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+    const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
-    // currently do nothing
-    (void)captureId;
-    (void)streamIds;
     (void)timestamp;
+    for (auto it : streamIds) {
+        CAMERA_LOGI("OnCaptureReady captureId: %{public}d, streamId: %{public}d", captureId, it);
+    }
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
 int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutterEnd(int32_t captureId,
-    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+    const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
-    // currently do nothing
-    (void)captureId;
-    (void)streamIds;
     (void)timestamp;
+    for (auto it : streamIds) {
+        CAMERA_LOGI("OnFrameShutterEnd captureId: %{public}d, streamId: %{public}d", captureId, it);
+    }
     return HDI::Camera::V1_0::NO_ERROR;
 }
 

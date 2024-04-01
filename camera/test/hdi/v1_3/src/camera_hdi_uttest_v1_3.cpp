@@ -487,3 +487,69 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_008, TestSize.Level1)
         CaptureByColorSpacesWithUpdateStreams(captureColorSpaces, cameraTest);
     }
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_008
+ * @tc.desc: OHOS_ABILITY_MOVING_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_009, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_MOVING_PHOTO, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        printf("OHOS_ABILITY_MOVING_PHOTO is not support");
+        return;
+    }
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_ABILITY_MOVING_PHOTO> i32 value start.");
+        printf("OHOS_ABILITY_MOVING_PHOTO i32 value count %d\n", entry.count);
+        constexpr size_t step = 10;
+        std::stringstream ss;
+        for (size_t i = 0; i < entry.count; i++) {
+            ss << entry.data.i32[i] << " ";
+            if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+                printf("OHOS_ABILITY_MOVING_PHOTO %s\n", ss.str().c_str());
+                ss.clear();
+                ss.str("");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_MOVING_PHOTO> i32 value end.");
+    }
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_009
+ * @tc.desc: OHOS_CONTROL_MOVING_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_010, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_MOVING_PHOTO, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        printf("OHOS_CONTROL_MOVING_PHOTO is not support");
+    } else if (entry.data.u8 != nullptr && entry.count > 0) {
+        CAMERA_LOGI("print tag<OHOS_CONTROL_MOVING_PHOTO> u8 value start.");
+        printf("OHOS_CONTROL_MOVING_PHOTO u8 value count %d\n", entry.count);
+        for (size_t i = 0; i < entry.count; i++) {
+            if (entry.data.u8[i] == OHOS_CAMERA_MOVING_PHOTO_OFF) {
+                printf("OHOS_CONTROL_MOVING_PHOTO mode OHOS_CAMERA_MOVING_PHOTO_OFF");
+            } else if (entry.data.u8[i] == OHOS_CAMERA_MOVING_PHOTO_ON) {
+                printf("OHOS_CONTROL_MOVING_PHOTO mode OHOS_CAMERA_MOVING_PHOTO_ON");
+            }
+        }
+        CAMERA_LOGI("print tag<OHOS_CONTROL_MOVING_PHOTO> u8 value end.");
+    }
+}
