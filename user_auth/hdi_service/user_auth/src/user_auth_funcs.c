@@ -223,7 +223,7 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockInfoHal *info, Reuse
         (void)memset_s(&reuseResult->enrolledState, sizeof(EnrolledStateHal), 0, sizeof(EnrolledStateHal));
         ret = RESULT_SUCCESS;
     }
-    return RESULT_SUCCESS;
+    return ret;
 }
 
 ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult)
