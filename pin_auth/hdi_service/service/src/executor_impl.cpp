@@ -250,7 +250,6 @@ int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId,
 int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data,
     int32_t resultCode)
 {
-    static_cast<void>(resultCode);
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {
         IAM_LOGE("pinHdi_ is nullptr");
@@ -266,6 +265,11 @@ int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
     if (scheduleMap_.GetScheduleInfo(scheduleId, commandId, callback, templateId, algoParameter) != HDF_SUCCESS) {
         IAM_LOGE("Get ScheduleInfo failed, fail code : %{public}d", result);
         return HDF_FAILURE;
+    }
+    if (resultCode != SUCCESS && callback != nullptr) {
+        IAM_LOGE("SetData failed, resultCode is %{public}d", resultCode);
+        CallError(callback, resultCode);
+        return resultCode;
     }
     switch (commandId) {
         case ENROLL_PIN:
