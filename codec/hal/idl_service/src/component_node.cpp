@@ -26,16 +26,16 @@
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
-using OHOS::HDI::Codec::V2_0::EventInfo;
-using OHOS::HDI::Codec::V2_0::CodecEventType;
-using OHOS::HDI::Codec::V2_0::CodecStateType;
-using OHOS::HDI::Codec::V2_0::CodecCommandType;
-using OHOS::HDI::Codec::V2_0::CodecStateType;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_INVALID;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_LOADED;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_IDLE;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_EXECUTING;
-using OHOS::HDI::Codec::V2_0::CODEC_COMMAND_STATE_SET;
+using OHOS::HDI::Codec::V3_0::EventInfo;
+using OHOS::HDI::Codec::V3_0::CodecEventType;
+using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V3_0::CodecCommandType;
+using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -240,7 +240,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V2_0::CodecTunnelSetupType &tunnelSetup)
+                                              OHOS::HDI::Codec::V3_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
