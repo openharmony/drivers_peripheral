@@ -91,6 +91,7 @@ public:
     void DefaultInfosAnalyze(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosVideo(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
+    void StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode);
     void StartStream(std::vector<StreamIntent> intents);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);

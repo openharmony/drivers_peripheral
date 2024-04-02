@@ -269,6 +269,56 @@ void Test::DefaultInfosAnalyze(
     consumerMap_[StreamIntent::ANALYZE] = consumer_analyze;
 }
 
+void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode)
+{
+    streamOperatorCallbackV1_3 =
+        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
+    uint32_t mainVersion = 1;
+    uint32_t minVersion = 0;
+    rc = cameraDeviceV1_3->GetStreamOperator_V1_3(streamOperatorCallbackV1_3, streamOperator_V1_3);
+    if (rc == HDI::Camera::V1_0::NO_ERROR) {
+        rc = streamOperator_V1_3->GetVersion(mainVersion, minVersion);
+        if (rc != HDI::Camera::V1_0::NO_ERROR) {
+            CAMERA_LOGE("streamOperator_V1_3 get version failed, rc = %{public}d", rc);
+        } else {
+            CAMERA_LOGI("streamOperator_V1_3 get version success, %{public}u, %{public}u",
+                mainVersion, minVersion);
+        }
+        CAMERA_LOGI("GetStreamOperator success");
+    } else {
+        CAMERA_LOGE("GetStreamOperator fail, rc = %{public}d", rc);
+    }
+    streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    streamInfoVideo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    streamInfoAnalyze = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+
+    for (auto& streamType : intents) {
+        if (streamType == StreamIntent::PREVIEW) {
+            DefaultInfosPreview(streamInfoPre);
+            streamInfos.push_back(*streamInfoPre);
+        } else if (streamType == StreamIntent::VIDEO) {
+            DefaultInfosVideo(streamInfoVideo);
+            streamInfos.push_back(*streamInfoVideo);
+        } else if (streamType == StreamIntent::ANALYZE) {
+            DefaultInfosAnalyze(streamInfoAnalyze);
+            streamInfos.push_back(*streamInfoAnalyze);
+        } else {
+            DefaultInfosCapture(streamInfoCapture);
+            streamInfos.push_back(*streamInfoCapture);
+        }
+    }
+
+    rc = streamOperator_V1_3->CreateStreams_V1_1(streamInfos);
+    EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
+    rc = streamOperator_V1_3->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(professionalMode),
+        abilityVec);
+    EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
+    sleep(1);
+    std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>().swap(streamInfos);
+}
+
 void Test::StartStream(std::vector<StreamIntent> intents)
 {
     streamOperatorCallbackV1_3 =
