@@ -36,7 +36,6 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
     "../../../../hdi_service/service",
     "../../../../common/logs",
     "../../../../common/utils",
-    "//third_party/openssl/include",
   ]
 
   sources = [
@@ -77,9 +76,8 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
     "drivers_interface_user_auth:user_auth_idl_headers",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "openssl:libcrypto_shared",
   ]
-
-  deps = [ "//third_party/openssl:libcrypto_shared" ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"

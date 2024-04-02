@@ -21,9 +21,7 @@
         "hdf_core",
         "c_utils",
         "hilog",
-        "drivers_interface_user_auth"
-      ],
-      "third_party": [
+        "drivers_interface_user_auth",
         "openssl"
       ]
     },
@@ -32,7 +30,7 @@
         "//drivers/peripheral/user_auth:user_auth_entry"
       ],
       "test": [
-        "//drivers/peripheral/user_auth/test/fuzztest/user_auth:fuzztest",
+        "//drivers/peripheral/user_auth/test/fuzztest/user_auth:driver_userauth_fuzztest",
         "//drivers/peripheral/user_auth/test/unittest:driver_userauth_unittest"
       ],
       "inner_kits": [

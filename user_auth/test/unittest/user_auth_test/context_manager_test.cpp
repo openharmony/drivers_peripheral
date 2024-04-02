@@ -65,7 +65,7 @@ HWTEST_F(ContextManagerTest, TestInitUserAuthContextList, TestSize.Level0)
 
 HWTEST_F(ContextManagerTest, TestGenerateAuthContext, TestSize.Level0)
 {
-    AuthSolutionHal param = {};
+    AuthParamHal param = {};
     EXPECT_EQ(GenerateAuthContext(param, nullptr), RESULT_BAD_PARAM);
     UserAuthContext *context = nullptr;
     g_contextList = nullptr;

@@ -54,15 +54,11 @@ void ExecutorImplTest::TearDown()
 HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
 {
     ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(nullptr);
-    ExecutorInfo info = {};
+    HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_FAILURE);
 
     uint64_t templateId = 0;
-    TemplateInfo templateInfo = {};
-    result = impl->GetTemplateInfo(templateId, templateInfo);
-    EXPECT_EQ(result, HDF_FAILURE);
-
     std::vector<uint64_t> templateIdList;
     std::vector<uint8_t> frameworkPublicKey;
     std::vector<uint8_t> extraInfo;
@@ -73,12 +69,13 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
     result = impl->Enroll(scheduleId, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
-    result = impl->Authenticate(scheduleId, templateId, extraInfo, nullptr);
+    result = impl->Authenticate(scheduleId, templateIdList, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     uint64_t authSubType = 10010;
     std::vector<uint8_t> pinData(32, 1);
-    result = impl->OnSetData(scheduleId, authSubType, pinData);
+    int32_t resultCode = 0;
+    result = impl->SetData(scheduleId, authSubType, pinData, resultCode);
     EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Delete(templateId);
@@ -87,12 +84,8 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
     result = impl->Cancel(scheduleId);
     EXPECT_EQ(result, HDF_FAILURE);
 
-    int32_t commandId = 0;
-    result = impl->SendCommand(commandId, extraInfo, nullptr);
-    EXPECT_EQ(result, HDF_SUCCESS);
-
-    std::vector<GetPropertyType> propertyTypes;
-    Property property;
+    std::vector<int32_t> propertyTypes;
+    HdiProperty property;
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_FAILURE);
 
@@ -111,15 +104,11 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     EXPECT_NE(pinHdi, nullptr);
     pinHdi->Init();
     ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
-    ExecutorInfo info = {};
+    HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_SUCCESS);
 
     uint64_t templateId = 0;
-    TemplateInfo templateInfo = {};
-    result = impl->GetTemplateInfo(templateId, templateInfo);
-    EXPECT_EQ(result, 2);
-
     std::vector<uint64_t> templateIdList;
     std::vector<uint8_t> frameworkPublicKey;
     std::vector<uint8_t> extraInfo;
@@ -130,12 +119,13 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     result = impl->Enroll(scheduleId, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
-    result = impl->Authenticate(scheduleId, templateId, extraInfo, nullptr);
+    result = impl->Authenticate(scheduleId, templateIdList, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
     uint64_t authSubType = 10010;
+    int32_t resultCode = 0;
     std::vector<uint8_t> pinData(32, 1);
-    result = impl->OnSetData(scheduleId, authSubType, pinData);
+    result = impl->SetData(scheduleId, authSubType, pinData, resultCode);
     EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Delete(templateId);
@@ -144,8 +134,8 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     result = impl->Cancel(scheduleId);
     EXPECT_EQ(result, HDF_FAILURE);
 
-    std::vector<GetPropertyType> propertyTypes;
-    Property property;
+    std::vector<int32_t> propertyTypes;
+    HdiProperty property;
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 

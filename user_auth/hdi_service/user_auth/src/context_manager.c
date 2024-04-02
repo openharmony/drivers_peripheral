@@ -56,7 +56,7 @@ void DestoryUserAuthContextList(void)
     g_contextList = NULL;
 }
 
-IAM_STATIC UserAuthContext *InitAuthContext(AuthSolutionHal params)
+IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
 {
     UserAuthContext *context = (UserAuthContext *)Malloc(sizeof(UserAuthContext));
     if (context == NULL) {
@@ -84,7 +84,7 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthSolutionHal params)
     return context;
 }
 
-ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context)
+ResultCode GenerateAuthContext(AuthParamHal params, UserAuthContext **context)
 {
     LOG_INFO("start");
     if (context == NULL) {

@@ -14,12 +14,12 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-group("uinttest") {
+group("driver_pinauth_unittest") {
   testonly = true
-  deps = [ "uinttest/pin_auth:PinAuthHdiUtTest" ]
+  deps = [ "unittest/pin_auth:PinAuthHdiUtTest" ]
 }
 
-group("fuzztest") {
+group("driver_pinauth_fuzztest") {
   testonly = true
   deps = [
     "fuzztest/pin_auth/pinauthexecutorstub_fuzzer:PinAuthExecutorStubFuzzTest",
