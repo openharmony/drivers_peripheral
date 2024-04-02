@@ -37,7 +37,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-extern "C" V1_1::IDisplayComposer* DisplayComposerImplGetInstance(void)
+extern "C" V1_2::IDisplayComposer* DisplayComposerImplGetInstance(void)
 {
     return new (std::nothrow) DisplayComposerService();
 }
@@ -80,19 +80,25 @@ DisplayComposerService::DisplayComposerService()
 
 DisplayComposerService::~DisplayComposerService()
 {
+    std::lock_guard<std::mutex> lck(mutex_);
     cmdResponser_ = nullptr;
     cmdResponserV1_1_ = nullptr;
 
     if ((destroyVdiFunc_ != nullptr) && (vdiImpl_ != nullptr)) {
         destroyVdiFunc_(vdiImpl_);
+        vdiImpl_ = nullptr;
+        destroyVdiFunc_ = nullptr;
     }
 
     if ((destroyVdiFuncV1_1_ != nullptr) && (vdiImplV1_1_ != nullptr)) {
         destroyVdiFuncV1_1_(vdiImplV1_1_);
+        vdiImplV1_1_ = nullptr;
+        destroyVdiFuncV1_1_ = nullptr;
     }
 
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
     }
 }
 
@@ -683,6 +689,12 @@ int32_t DisplayComposerService::GetHDRCapabilityInfos(uint32_t devId, HDRCapabil
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
+
+int32_t DisplayComposerService::CommitAndGetReleaseFence()
+{
+    return HDF_SUCCESS;
+}
+
 } // namespace Composer
 } // namespace Display
 } // namespace HDI

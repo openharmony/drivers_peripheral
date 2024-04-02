@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../sensor.gni")
 
 ohos_shared_library("libhdi_sensor_impl") {
   include_dirs = [
@@ -35,7 +36,6 @@ ohos_shared_library("libhdi_sensor_impl") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_sensor:sensor_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
@@ -43,6 +43,9 @@ ohos_shared_library("libhdi_sensor_impl") {
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "hdf_core:libhdf_utils",

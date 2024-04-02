@@ -31,7 +31,6 @@ config("module_private_config") {
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
-    "//third_party/jsoncpp/include",
     "${camera_hdf_path}/camera/interfaces/include",
     "${camera_hdf_path}/camera/interfaces/hdi_ipc",
   ]
@@ -47,12 +46,10 @@ ohos_unittest("HdfDstreamOperatorTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0",
-    "//third_party/jsoncpp:jsoncpp",
-  ]
+  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",

@@ -34,10 +34,15 @@ public:
 
     int32_t GetIndex() const override;
     uint32_t GetWidth() const override;
+    uint32_t GetCurWidth() const override;
     uint32_t GetHeight() const override;
+    uint32_t GetCurHeight() const override;
     uint32_t GetStride() const override;
     int32_t GetFormat() const override;
+    int32_t GetCurFormat() const override;
     uint32_t GetSize() const override;
+    void* GetSuffaceBufferAddr() const override;
+    uint32_t GetSuffaceBufferSize() const override;
     uint64_t GetUsage() const override;
     void* GetVirAddress() const override;
     uint64_t GetPhyAddress() const override;
@@ -53,13 +58,19 @@ public:
     EsFrameInfo GetEsFrameInfo() const override;
     int32_t GetEncodeType() const override;
     int32_t GetStreamId() const override;
+    bool GetIsValidDataInSurfaceBuffer() const override;
 
     void SetIndex(const int32_t index) override;
     void SetWidth(const uint32_t width) override;
+    void SetCurWidth(const uint32_t width) override;
     void SetHeight(const uint32_t height) override;
+    void SetCurHeight(const uint32_t height) override;
     void SetStride(const uint32_t stride) override;
     void SetFormat(const int32_t format) override;
+    void SetCurFormat(const int32_t format) override;
     void SetSize(const uint32_t size) override;
+    void SetSuffaceBufferSize(const uint32_t size) override;
+    void SetSuffaceBufferAddr(const void* addr) override;
     void SetUsage(const uint64_t usage) override;
     void SetVirAddress(const void* addr) override;
     void SetPhyAddress(const uint64_t addr) override;
@@ -77,19 +88,26 @@ public:
     void SetEsKeyFrame(const int32_t isKey) override;
     void SetEsFrameNum(const int32_t frameNum) override;
     void SetStreamId(const int32_t streamId) override;
+    void SetIsValidDataInSurfaceBuffer(const bool isValid) override;
 
     void Free() override;
     bool operator==(const IBuffer& u) override;
 
 private:
+    bool isDataValidInSurfaceBuffer_ = false;
     int32_t index_ = -1;
     uint32_t width_ = 0;
+    uint32_t curWidth_ = 0;
     uint32_t height_ = 0;
+    uint32_t curHeight_ = 0;
     uint32_t stride_ = 0;
     uint32_t format_ = CAMERA_FORMAT_INVALID;
+    uint32_t curFormat_ = CAMERA_FORMAT_INVALID;
     uint32_t size_ = 0;
+    uint32_t sbSize_ = 0;
     uint64_t usage_ = 0;
     void* virAddr_ = nullptr;
+    void* sbAddr_ = nullptr;
     uint64_t phyAddr_ = 0;
     int32_t fd_ = -1;
     int32_t sourceType_ = CAMERA_BUFFER_SOURCE_TYPE_NONE;

@@ -36,7 +36,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Usb {
-namespace V1_0 {
+namespace V1_1 {
 uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
 
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
@@ -217,6 +217,12 @@ int32_t UsbdFunction::SetFunctionToNone()
         HDF_LOGE("%{public}s: RemoveHdc error, ret = %{public}d", __func__, ret);
         return ret;
     }
+
+    ret = UsbdWaitToNone();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbdWaitToNone error, ret = %{public}d", __func__, ret);
+        return ret;
+    }
     currentFuncs_ = USB_FUNCTION_NONE;
     return ret;
 }
@@ -297,6 +303,30 @@ int32_t UsbdFunction::UsbdWaitUdc()
     }
 
     if (strcmp(udcName, tmpName) != 0) {
+        HDF_LOGE("%{public}s: strcmp failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::UsbdWaitToNone()
+{
+    char stateName[UDC_NAME_MAX_LEN] = {0};
+    for (int32_t i = 0; i < WAIT_UDC_MAX_LOOP; i++) {
+        (void)memset_s(stateName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
+        int32_t ret = GetParameter(SYS_USB_STATE, "invalid", stateName, UDC_NAME_MAX_LEN - 1);
+        if (ret <= 0) {
+            HDF_LOGE("%{public}s: GetParameter failed", __func__);
+            return HDF_FAILURE;
+        }
+        if (strcmp(stateName, HDC_CONFIG_OFF) == 0) {
+            return HDF_SUCCESS;
+        }
+        usleep(WAIT_UDC_TIME);
+    }
+
+    if (strcmp(stateName, HDC_CONFIG_OFF) != 0) {
         HDF_LOGE("%{public}s: strcmp failed", __func__);
         return HDF_FAILURE;
     }

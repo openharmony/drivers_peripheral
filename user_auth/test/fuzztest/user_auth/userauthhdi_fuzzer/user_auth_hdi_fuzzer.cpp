@@ -176,6 +176,18 @@ void FillFuzzEnrolledState(Parcel &parcel, EnrolledState &enrolledState)
     IAM_LOGI("success");
 }
 
+void FillFuzzReuseUnlockInfo(Parcel &parcel, ReuseUnlockInfo &info)
+{
+    info.userId= parcel.ReadInt32();
+    info.authTrustLevel = parcel.ReadUint32();
+    FillFuzzAuthTypeVector(parcel, info.authTypes);
+    FillFuzzUint8Vector(parcel, info.challenge);
+    info.callerName = parcel.ReadString();
+    info.apiVersion = parcel.ReadInt32();
+    info.reuseUnlockResultDuration = parcel.ReadUint64();
+    info.reuseUnlockResultMode = parcel.ReadUint32();
+}
+
 void FillFuzzIdentifyResultInfo(Parcel &parcel, IdentifyResultInfo &identifyResultInfo)
 {
     identifyResultInfo.result = parcel.ReadInt32();
@@ -560,6 +572,17 @@ void FuzzGetEnrolledState(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzCheckReuseUnlockResult(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    ReuseUnlockInfo info;
+    FillFuzzReuseUnlockInfo(parcel, info);
+    std::vector<uint8_t> token;
+    FillFuzzUint8Vector(parcel, token);
+    g_service.CheckReuseUnlockResult(info, token);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzInit);
 FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOpenSession, FuzzCloseSession,
     FuzzBeginEnrollment, FuzzUpdateEnrollmentResult, FuzzCancelEnrollment, FuzzDeleteCredential, FuzzGetCredential,
@@ -567,7 +590,7 @@ FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOp
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
     FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzBeginEnrollmentV1_1, FuzzBeginAuthenticationV1_1,
     FuzzBeginIdentificationV1_1, FuzzBeginAuthenticationV1_2, FuzzBeginEnrollmentV1_2,
-    FuzzUpdateAuthenticationResultWithEnrolledState, FuzzGetEnrolledState};
+    FuzzUpdateAuthenticationResultWithEnrolledState, FuzzGetEnrolledState, FuzzCheckReuseUnlockResult};
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {

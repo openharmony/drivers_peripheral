@@ -413,7 +413,7 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
 int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const std::string &condition,
     std::string &value)
 {
-    DHLOGD("Get audio parameters, key: %{public}d, condition: %{public}s.", key, condition.c_str());
+    DHLOGI("Get audio parameters, key: %{public}d, condition: %{public}s.", key, condition.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME:
@@ -789,6 +789,7 @@ int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, 
             vol = 0;
             DHLOGE("Get volume failed.");
     }
+    DHLOGI("Get volume : %{public}" PRIu32" type : %{public}d", vol, type);
     param = std::to_string(vol);
     return DH_SUCCESS;
 }
@@ -878,7 +879,7 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
         return ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    if (event.content.rfind(FIRST_VOLUME_CHANAGE, 0) == 0) {
+    if (event.content.find(FIRST_VOLUME_CHANAGE) != event.content.npos) {
         int32_t maxVol = AUDIO_DEFAULT_MAX_VOLUME_LEVEL;
         ret = GetVolFromEvent(event.content, MAX_VOLUME_LEVEL, maxVol);
         if (ret != DH_SUCCESS) {

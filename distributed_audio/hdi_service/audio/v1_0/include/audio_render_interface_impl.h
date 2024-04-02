@@ -114,7 +114,7 @@ private:
     uint32_t timeInterval_ = 5;
     uint32_t currentFrame_ = 0;
     uint32_t vol_ = 0;
-    uint32_t volMax_ = 0;
+    uint32_t volMax_ = 15;
     uint32_t volMin_ = 0;
     int64_t frameIndex_ = 0;
     float renderSpeed_ = 0;

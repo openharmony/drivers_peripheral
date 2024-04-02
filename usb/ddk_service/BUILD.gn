@@ -53,17 +53,25 @@ ohos_shared_library("libusb_ddk_service_1.0") {
     "${usb_driver_path}/ddk:libusb_pnp_manager",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_usb:usb_ddk_idl_headers",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "ipc:ipc_single",
-  ]
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:usb_ddk_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+    }
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -83,17 +91,22 @@ ohos_shared_library("libusb_ddk_driver") {
 
   sources = [ "src/usb_ddk_driver.cpp" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_usb:libusb_ddk_stub_1.0",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
-
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_usb:libusb_ddk_stub_1.0",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
   configs = [ ":ddk_public_config" ]
 
   shlib_type = "hdi"

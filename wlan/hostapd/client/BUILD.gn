@@ -13,6 +13,10 @@
 
 import("//build/ohos.gni")
 
+config("hostapd_hdi_client_public_config") {
+  include_dirs = [ "include" ]
+}
+
 if (defined(ohos_lite)) {
   ohos_shared_library("hostapd_hdi_client") {
     output_extension = "z.so"
@@ -42,6 +46,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hostapd_hdi_client") {
     include_dirs = [ "include" ]
     sources = [ "src/hostapd_client.c" ]
+    public_configs = [ ":hostapd_hdi_client_public_config" ]
 
     external_deps = [
       "c_utils:utils",

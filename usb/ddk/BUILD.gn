@@ -62,11 +62,14 @@ ohos_shared_library("libusb_ddk_host") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
+
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -119,12 +122,23 @@ ohos_shared_library("libusb_pnp_manager") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
-      "hisysevent:libhisysevent",
     ]
+
+    if (usb_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+
+      if (defined(defines)) {
+        defines += [ "USB_ENABLE_HISYSEVENT" ]
+      } else {
+        defines = [ "USB_ENABLE_HISYSEVENT" ]
+      }
+    }
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -164,10 +178,12 @@ ohos_shared_library("libusb_ddk_device") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

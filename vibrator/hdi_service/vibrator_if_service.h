@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H
-#define OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H
+#ifndef OHOS_HDI_VIBRATOR_V1_3_VIBRAORINTERFACESERVICE_H
+#define OHOS_HDI_VIBRATOR_V1_3_VIBRAORINTERFACESERVICE_H
 
-#include "v1_2/ivibrator_interface.h"
+#include "v1_3/ivibrator_interface.h"
 #include "ivibrator_interface_vdi.h"
 #include "ivibrator_type_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_2 {
+namespace V1_3 {
 class VibratorIfService : public IVibratorInterface {
 public:
     VibratorIfService();
@@ -41,15 +41,16 @@ public:
     int32_t PlayHapticPattern(const HapticPaket& pkg) override;
     int32_t GetHapticCapacity(HapticCapacity& hapticCapacity) override;
     int32_t GetHapticStartUpTime(int32_t mode, int32_t& startUpTime) override;
+    int32_t StartByIntensity(const std::string& effectType, uint16_t intensity) override;
     int32_t GetVibratorVdiImpl();
 
 private:
     IVibratorInterfaceVdi *vibratorVdiImpl_ = nullptr;
     struct HdfVdiObject *vdi_ = nullptr;
 };
-} // V1_2
+} // V1_3
 } // Vibrator
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_V1_2_VIBRAORINTERFACESERVICE_H
+#endif // OHOS_HDI_VIBRATOR_V1_3_VIBRAORINTERFACESERVICE_H

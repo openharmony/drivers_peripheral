@@ -329,11 +329,11 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     if (request->IsFirstOne() && !request->IsContinous()) {
         uint32_t n = GetBufferCount();
         for (uint32_t i = 0; i < n; i++) {
-            DeliverBuffer();
+            DeliverStreamBuffer();
         }
     } else {
         do {
-            rc = DeliverBuffer();
+            rc = DeliverStreamBuffer();
             {
                 std::unique_lock<std::mutex> l(wtLock_);
                 if (waitingList_.empty()) {
@@ -375,7 +375,7 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     return RC_OK;
 }
 
-RetCode StreamBase::DeliverBuffer()
+RetCode StreamBase::DeliverStreamBuffer()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
@@ -386,7 +386,8 @@ RetCode StreamBase::DeliverBuffer()
     buffer->SetEncodeType(streamConfig_.encodeType);
     buffer->SetStreamId(streamId_);
     bufferPool_->AddBuffer(buffer);
-    CAMERA_LOGI("stream [id:%{public}d] enqueue buffer index:%{public}d", streamId_, buffer->GetIndex());
+    CAMERA_LOGI("stream [id:%{public}d] enqueue buffer index:%{public}d, size:%{public}d",
+        streamId_, buffer->GetIndex(), buffer->GetSize());
     return RC_OK;
 }
 

@@ -17,15 +17,19 @@
 #define OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPER_SERVICE_H
 
 #include "idisplay_buffer_vdi.h"
-#include "v1_0/display_buffer_type.h"
-#include "v1_0/imapper.h"
+#include "v1_2/display_buffer_type.h"
+#include "v1_2/imapper.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-class MapperService : public IMapper {
+using OHOS::HDI::Display::Buffer::V1_2::IDisplayBufferVdi;
+using OHOS::HDI::Display::Buffer::V1_2::CreateDisplayBufferVdiFunc;
+using OHOS::HDI::Display::Buffer::V1_2::DestroyDisplayBufferVdiFunc;
+class MapperService : public Buffer::V1_2::IMapper {
 public:
     MapperService();
     virtual ~MapperService();
@@ -35,10 +39,11 @@ public:
     int32_t Unmap(const sptr<NativeBuffer>& handle) override;
     int32_t FlushCache(const sptr<NativeBuffer>& handle) override;
     int32_t InvalidateCache(const sptr<NativeBuffer>& handle) override;
+    int32_t GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::ImageLayout& layout) override;
 
 private:
     int32_t LoadVdi();
-
+    std::mutex mutex_;
     void* libHandle_;
     IDisplayBufferVdi* vdiImpl_;
     CreateDisplayBufferVdiFunc createVdi_;

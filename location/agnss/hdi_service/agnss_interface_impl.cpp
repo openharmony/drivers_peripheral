@@ -147,7 +147,6 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
     bool ret = agnssInterface->set_agnss_callback(&agnsscallback);
     if (!ret) {
         HDF_LOGE("set_agnss_callback failed.");
-        return HDF_FAILURE;
     }
     AddAgnssDeathRecipient(callbackObj);
     g_agnssCallBackMap[remote.GetRefPtr()] = callbackObj;
