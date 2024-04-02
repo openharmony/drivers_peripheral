@@ -55,7 +55,7 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
     }
 
     end = std::chrono::system_clock::now();
-    CAMERA_LOGD("ioctl(fd, VIDIOC_REQBUFS, &req), time elapse %{public}lld ms\n",
+    CAMERA_LOGI("ioctl(fd, VIDIOC_REQBUFS, &req), time elapse %{public}lld ms\n",
         std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     if (req.count != buffCont) {
@@ -72,7 +72,7 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
             return RC_ERROR;
         }
         end = std::chrono::system_clock::now();
-        CAMERA_LOGD("ioctl(fd, VIDIOC_REQBUFS, &req), reapply memory time elapse %{public}lld ms\n",
+        CAMERA_LOGI("ioctl(fd, VIDIOC_REQBUFS, &req), reapply memory time elapse %{public}lld ms\n",
             std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
         return RC_ERROR;
@@ -406,9 +406,9 @@ RetCode HosV4L2Buffers::V4L2ReleaseBuffers(int fd)
     return V4L2ReqBuffers(fd, 0);
 }
 
-void HosV4L2Buffers::SetCallback(BufCallback cb)
+void HosV4L2Buffers::SetV4L2BuffersCallback(BufCallback cb)
 {
-    CAMERA_LOGD("HosV4L2Buffers::SetCallback OK.");
+    CAMERA_LOGD("SetV4L2BuffersCallback::SetCallback OK.");
     dequeueBuffer_ = cb;
 }
 

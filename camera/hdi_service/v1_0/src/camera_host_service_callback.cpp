@@ -30,7 +30,7 @@ int32_t CameraHostServiceCallback::OnCameraStatus(const std::string &cameraId, V
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostCallback_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
         [cameraId, this](const struct CameraIdInfo &cameraIdInfo) {
-            return cameraId == cameraIdInfo.vendorCameraId && cameraHostVdi_ == cameraIdInfo.cameraHostVdi;
+            return cameraId == cameraIdInfo.vendorCameraId && cameraHostVdi_.GetRefPtr() == cameraIdInfo.cameraHostVdi;
         });
     if (itr == cameraIdInfoList_.end()) {
         CAMERA_LOGE("Vendor camera id %{public}s doesn't exist", cameraId.c_str());
@@ -47,7 +47,7 @@ int32_t CameraHostServiceCallback::OnFlashlightStatus(const std::string &cameraI
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostCallback_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
         [cameraId, this](const struct CameraIdInfo &cameraIdInfo) {
-            return cameraId == cameraIdInfo.vendorCameraId && cameraHostVdi_ == cameraIdInfo.cameraHostVdi;
+            return cameraId == cameraIdInfo.vendorCameraId && cameraHostVdi_.GetRefPtr() == cameraIdInfo.cameraHostVdi;
         });
     if (itr == cameraIdInfoList_.end()) {
         CAMERA_LOGE(" Vendor camera id %{public}s doesn't exist", cameraId.c_str());
@@ -83,7 +83,8 @@ int32_t CameraHostServiceCallback::OnCameraEvent(const std::string &cameraId, Vd
     } else {
         auto itr = std::find_if(cameraIdInfoList_.begin(), cameraIdInfoList_.end(),
             [cameraId, this](const struct CameraIdInfo &cameraIdInfo) {
-                return cameraId == cameraIdInfo.vendorCameraId && cameraHostVdi_ == cameraIdInfo.cameraHostVdi;
+                return cameraId == cameraIdInfo.vendorCameraId &&
+                    cameraHostVdi_.GetRefPtr() == cameraIdInfo.cameraHostVdi;
             });
         if (itr == cameraIdInfoList_.end()) {
             CAMERA_LOGE("Remove camera id error, vendor camera id %{public}s doesn't exist", cameraId.c_str());

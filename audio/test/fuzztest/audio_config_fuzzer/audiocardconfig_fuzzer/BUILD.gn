@@ -39,11 +39,15 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
 
   deps = [ "//third_party/cJSON:cjson" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-  ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
+  if (defined(ohos_lite)) {
+    external_deps += [ "hilog_lite:hilog_share" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+  if (enable_c_utils) {
+    external_deps += [ "c_utils:utils" ]
+  }
 
   include_dirs += [ "//third_party/alsa-lib/include" ]
 }

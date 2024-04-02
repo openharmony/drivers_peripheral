@@ -37,8 +37,15 @@ ohos_fuzztest("AudioOffloadRenderFuzzTest") {
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_3.0",
     "hdf_core:libhdf_utils",
-    "hilog:libhilog",
   ]
+  if (defined(ohos_lite)) {
+    external_deps += [ "hilog_lite:hilog_share" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+  if (enable_c_utils) {
+    external_deps += [ "c_utils:utils" ]
+  }
 
   defines = []
   defines += [ "AUDIO_ADM_PASSTHROUGH" ]

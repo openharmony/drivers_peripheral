@@ -16,7 +16,7 @@
 #include <hdf_device_desc.h>
 #include "intell_voice_log.h"
 #include <hdf_sbuf_ipc.h>
-#include "v1_1/intell_voice_engine_manager_stub.h"
+#include "v1_2/intell_voice_engine_manager_stub.h"
 
 #undef HDF_LOG_TAG
 #define HDF_LOG_TAG "IntellVoiceEngineDriver"
@@ -67,7 +67,7 @@ static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceO
     hdfIntellVoiceEngineManagerHost->ioService.Open = NULL;
     hdfIntellVoiceEngineManagerHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::HDI::IntelligentVoice::Engine::V1_1::IIntellVoiceEngineManager::Get(true);
+    auto serviceImpl = OHOS::HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineManager::Get(true);
     if (serviceImpl == nullptr) {
         INTELLIGENT_VOICE_LOGE("failed to get of implement service");
         delete hdfIntellVoiceEngineManagerHost;
@@ -75,7 +75,7 @@ static int HdfIntellVoiceEngineManagerDriverBind(struct HdfDeviceObject *deviceO
     }
 
     hdfIntellVoiceEngineManagerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        OHOS::HDI::IntelligentVoice::Engine::V1_1::IIntellVoiceEngineManager::GetDescriptor());
+        OHOS::HDI::IntelligentVoice::Engine::V1_2::IIntellVoiceEngineManager::GetDescriptor());
     if (hdfIntellVoiceEngineManagerHost->stub == nullptr) {
         INTELLIGENT_VOICE_LOGE("failed to get stub object");
         delete hdfIntellVoiceEngineManagerHost;

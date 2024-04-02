@@ -89,6 +89,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_SAR                 = 15,  /**< SAR sensor */
     SENSOR_TYPE_AMBIENT_LIGHT1      = 16,  /**< Secondary ambient light sensor*/
     SENSOR_TYPE_HALL1               = 17,  /**< Secondary hall effect sensor */
+    SENSOR_TYPE_PROXIMITY1          = 18,  /**< Secondary proximity sensor */
     SENSOR_TYPE_MEDICAL_BEGIN       = 128, /**< The begin of medical sensorId enumeration value range */
     SENSOR_TYPE_MEDICAL_END         = 160, /**< The end of medical sensorId enumeration value range */
     SENSOR_TYPE_PHYSICAL_MAX        = 255, /**< Maximum type of a physical sensor */
@@ -111,6 +112,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_DEVICE_ORIENTATION          = 279,   /**< Device orientation sensor */
     SENSOR_TYPE_WEAR_DETECTION              = 280,   /**< Wear detection sensor */
     SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED  = 281,   /**< Uncalibrated acceleration sensor */
+    SENSOR_TYPE_RPC                         = 282,   /**< Radio Power Control */
     SENSOR_TYPE_MAX,                                 /**< Maximum number of sensor types */
 };
 

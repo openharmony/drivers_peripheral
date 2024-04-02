@@ -18,16 +18,18 @@
 
 #include "idisplay_composer_vdi_v1_1.h"
 #include "cache_manager/device_cache_manager.h"
-#include "v1_1/display_command/display_cmd_responser.h"
-#include "v1_1/idisplay_composer.h"
+#include "v1_2/display_command/display_cmd_responser.h"
+#include "v1_2/idisplay_composer.h"
+#include "v1_2/display_composer_type.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
-class DisplayComposerService : public V1_1::IDisplayComposer {
+class DisplayComposerService : public V1_2::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -70,6 +72,7 @@ public:
     int32_t GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts) override;
     int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) override;
     int32_t RegRefreshCallback(const sptr<IRefreshCallback>& cb) override;
+    int32_t CommitAndGetReleaseFence() override;
 
 private:
     void HidumperInit();
@@ -85,6 +88,7 @@ private:
 private:
     /* Common */
     void* libHandle_;
+    std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
     uint32_t currentBacklightLevel_;
     sptr<IHotPlugCallback> hotPlugCb_;

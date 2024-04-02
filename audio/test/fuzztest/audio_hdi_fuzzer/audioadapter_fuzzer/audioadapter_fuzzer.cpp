@@ -84,7 +84,12 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
             break;
         case AUDIO_ADAPTER_GET_PORT_CAPABILITY: {
             struct AudioPortCapability capability = {};
-            adapter->GetPortCapability(adapter, reinterpret_cast<const struct AudioPort *>(rawData), &capability);
+            struct AudioPort port = {
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
+                .portId = *(reinterpret_cast<uint32_t *>(data)),
+                .portName = reinterpret_cast<char *>(data),
+            };
+            adapter->GetPortCapability(adapter, &port, &capability);
             break;
         }
         case AUDIO_ADAPTER_SET_PASSTHROUGH_MODE: {

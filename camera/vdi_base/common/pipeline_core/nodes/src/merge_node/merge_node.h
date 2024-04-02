@@ -22,8 +22,7 @@
 #include "node_base.h"
 
 namespace OHOS::Camera {
-class MergeNode : public NodeBase
-{
+class MergeNode : public NodeBase {
 public:
     MergeNode(const std::string& name, const std::string& type, const std::string &cameraId);
     ~MergeNode() override;

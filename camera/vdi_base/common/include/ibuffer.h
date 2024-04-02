@@ -32,10 +32,15 @@ public:
 
     virtual int32_t GetIndex() const = 0;
     virtual uint32_t GetWidth() const = 0;
+    virtual uint32_t GetCurWidth() const = 0;
     virtual uint32_t GetHeight() const = 0;
+    virtual uint32_t GetCurHeight() const = 0;
     virtual uint32_t GetStride() const = 0;
     virtual int32_t GetFormat() const = 0;
+    virtual int32_t GetCurFormat() const = 0;
     virtual uint32_t GetSize() const = 0;
+    virtual uint32_t GetSuffaceBufferSize() const = 0;
+    virtual void* GetSuffaceBufferAddr() const = 0;
     virtual uint64_t GetUsage() const = 0;
     virtual void* GetVirAddress() const = 0;
     virtual uint64_t GetPhyAddress() const = 0;
@@ -51,13 +56,19 @@ public:
     virtual EsFrameInfo GetEsFrameInfo() const = 0;
     virtual int32_t GetEncodeType() const = 0;
     virtual int32_t GetStreamId() const = 0;
+    virtual bool GetIsValidDataInSurfaceBuffer() const = 0;
 
     virtual void SetIndex(const int32_t index) = 0;
     virtual void SetWidth(const uint32_t width) = 0;
+    virtual void SetCurWidth(const uint32_t width) = 0;
     virtual void SetHeight(const uint32_t height) = 0;
+    virtual void SetCurHeight(const uint32_t height) = 0;
     virtual void SetStride(const uint32_t stride) = 0;
     virtual void SetFormat(const int32_t format) = 0;
+    virtual void SetCurFormat(const int32_t format) = 0;
     virtual void SetSize(const uint32_t size) = 0;
+    virtual void SetSuffaceBufferAddr(const void* addr) = 0;
+    virtual void SetSuffaceBufferSize(const uint32_t size) = 0;
     virtual void SetUsage(const uint64_t usage) = 0;
     virtual void SetVirAddress(const void* addr) = 0;
     virtual void SetPhyAddress(const uint64_t addr) = 0;
@@ -75,6 +86,7 @@ public:
     virtual void SetEsKeyFrame(const int32_t isKey) = 0;
     virtual void SetEsFrameNum(const int32_t frameNum) = 0;
     virtual void SetStreamId(const int32_t streamId) = 0;
+    virtual void SetIsValidDataInSurfaceBuffer(const bool isValid) = 0;
 
     virtual void Free() = 0;
 

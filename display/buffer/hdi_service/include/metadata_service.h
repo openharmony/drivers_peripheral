@@ -18,6 +18,7 @@
 
 #include "v1_1/imetadata.h"
 #include "idisplay_buffer_vdi.h"
+#include <mutex>
 namespace OHOS {
 namespace HDI {
 namespace Display {
@@ -42,6 +43,7 @@ public:
     int32_t EraseMetadataKey(const sptr<NativeBuffer>& handle, uint32_t key) override;
 private:
     int32_t LoadVdi();
+    std::mutex mutex_;
     void* libHandle_;
     IDisplayBufferVdi* vdiImpl_;
     CreateDisplayBufferVdiFunc createVdi_;

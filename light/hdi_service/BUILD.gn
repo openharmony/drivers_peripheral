@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../light.gni")
 
 ohos_shared_library("liblight_interface_service_1.0") {
   include_dirs = [
@@ -35,12 +36,14 @@ ohos_shared_library("liblight_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_light:light_idl_headers",
       "hdf_core:libhdf_host",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -69,7 +72,6 @@ ohos_shared_library("liblight_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_light:liblight_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -78,6 +80,9 @@ ohos_shared_library("liblight_driver") {
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",

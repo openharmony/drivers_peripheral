@@ -127,6 +127,7 @@ int32_t ICodecBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
     codecBuffer_.pts = omxBuffer.nTimeStamp;
     return HDF_SUCCESS;
 }
+
 int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
 {
     int retCode = -EPERM;
@@ -153,6 +154,17 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
         }
     }
     return retCode < 0 ? -errno : EOK;
+}
+
+uint8_t *ICodecBuffer::GetBuffer()
+{
+    return nullptr;
+}
+
+int32_t ICodecBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
+{
+    (void)codecBuffer;
+    return HDF_SUCCESS;
 }
 }  // namespace Omx
 }  // namespace Codec

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
 using namespace OHOS::HDI::Display::Composer::V1_0;
-
+using namespace OHOS::HDI::Display::Buffer::V1_2;
 DisplayBufferVdiImpl::DisplayBufferVdiImpl()
 {
 #ifdef GRALLOC_GBM_SUPPORT
@@ -105,6 +105,12 @@ int32_t DisplayBufferVdiImpl::ListMetadataKeys(const BufferHandle& handle, std::
 }
 
 int32_t DisplayBufferVdiImpl::EraseMetadataKey(const BufferHandle& handle, uint32_t key)
+{
+    DISPLAY_LOGE("%s is not supported", __func__);
+    return DISPLAY_NOT_SUPPORT;
+}
+
+int32_t DisplayBufferVdiImpl::GetImageLayout(const BufferHandle& handle, ImageLayout& layout) const
 {
     DISPLAY_LOGE("%s is not supported", __func__);
     return DISPLAY_NOT_SUPPORT;

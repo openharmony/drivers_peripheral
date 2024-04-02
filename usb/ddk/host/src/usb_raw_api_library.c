@@ -1709,3 +1709,18 @@ void RawUsbMemFree(void *mem)
         OsalMemFree(mem);
     }
 }
+
+bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+    if (devHandle == NULL || interfaceNumber >= USB_MAXINTERFACES || osAdapterOps->claimInterface == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("interfaceNumber = %{public}u", interfaceNumber);
+
+    OsalMutexLock(&devHandle->lock);
+    bool ret = osAdapterOps->getInterfaceActiveStatus(devHandle, interfaceNumber);
+    OsalMutexUnlock(&devHandle->lock);
+    return ret;
+}
