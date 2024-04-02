@@ -1736,8 +1736,6 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
 int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct IWpaCallback *cbFunc,
     const char *ifName)
 {
-    int32_t ret = HDF_FAILURE;
-
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
@@ -1746,7 +1744,7 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     HdfWpaDelRemoteObj(cbFunc);
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
-        ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
+        int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
@@ -1830,7 +1828,7 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
         return HDF_FAILURE;
     }
     pthread_setname_np(g_tid, "WpaMainThread");
-    HDF_LOGI("%{public}s: pthread_create ID: %{public}p.", __func__, (void*)g_tid);
+    HDF_LOGI("%{public}s: pthread_create successfully.", __func__);
     usleep(WPA_SLEEP_TIME);
     return HDF_SUCCESS;
 }
