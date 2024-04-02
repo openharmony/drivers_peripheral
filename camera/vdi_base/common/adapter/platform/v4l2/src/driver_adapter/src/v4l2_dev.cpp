@@ -132,7 +132,7 @@ RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCon
     }
 
     if (myBuffers_ == nullptr) {
-        myBuffers_ = std::make_shared<HosV4L2Buffers>(memoryType_, bufferType_);
+        myBuffers_ = HosV4L2Buffers::CreateHosV4L2Buffers(memoryType_, bufferType_);
         if (myBuffers_ == nullptr) {
             CAMERA_LOGE("error: Creatbuffer: myBuffers_ make_shared is NULL\n");
             return RC_ERROR;
