@@ -29,6 +29,7 @@ ohos_shared_library("libril_service_1.2") {
       "hilog:libhilog",
       "ipc:ipc_single",
       "ril_adapter:hril",
+      "ril_adapter:hril_innerkits",
     ]
   } else {
     external_deps = [
@@ -60,6 +61,7 @@ ohos_shared_library("libril_driver") {
       "hilog:libhilog",
       "ipc:ipc_single",
       "ril_adapter:hril_hdf",
+      "ril_adapter:hril_innerkits",
     ]
   } else {
     external_deps = [
