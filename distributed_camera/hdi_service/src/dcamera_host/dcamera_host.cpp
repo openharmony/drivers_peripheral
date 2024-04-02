@@ -80,7 +80,7 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
     DHLOGE("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
     std::shared_ptr<CameraAbility> ability = nullptr;
-    int32_t ret = CamRetCode::NO_ERROR;
+    int32_t ret;
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         auto iter = dCameraDeviceMap_.find(cameraId);
