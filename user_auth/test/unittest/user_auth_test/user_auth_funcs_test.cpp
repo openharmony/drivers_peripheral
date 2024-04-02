@@ -23,7 +23,7 @@
 
 extern "C" {
     extern UnlockAuthResultCache g_unlockAuthResult;
-    extern ResultCode GetReuseUnlockResult(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult);
+    extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
 }
@@ -47,7 +47,7 @@ public:
 
 HWTEST_F(UserAuthFuncsTest, TestGenerateSolutionFunc, TestSize.Level0)
 {
-    AuthSolutionHal param = {};
+    AuthParamHal param = {};
     EXPECT_EQ(GenerateSolutionFunc(param, nullptr), RESULT_BAD_PARAM);
 }
 
@@ -74,7 +74,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
 
 HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
 {
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
@@ -97,7 +97,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
 
 HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc001, TestSize.Level0)
 {
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, nullptr), RESULT_BAD_PARAM);
 
@@ -117,7 +117,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     EnrolledStateHal enrolledState;
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
 
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     info.reuseUnlockResultDuration = 200;
     info.userId = 1;

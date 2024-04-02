@@ -34,7 +34,7 @@
 // Used to cache screenLock auth token plain.
 IAM_STATIC UnlockAuthResultCache g_unlockAuthResult = {false, 0, {}};
 
-ResultCode GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
+ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
 {
     if (schedules == NULL) {
         LOG_ERROR("schedules is null");
@@ -161,7 +161,7 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info)
+IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info)
 {
     if (!g_unlockAuthResult.isCached) {
         LOG_ERROR("invalid cached unlock token");
@@ -202,7 +202,7 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockInfoHal *info)
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult)
+IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult)
 {
     uint32_t ret = CheckReuseUnlockTokenValid(info);
     if (ret != RESULT_SUCCESS) {
@@ -226,7 +226,7 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockInfoHal *info, Reuse
     return RESULT_SUCCESS;
 }
 
-ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult)
+ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult)
 {
     if (info == NULL || reuseResult == NULL || info->reuseUnlockResultDuration == 0 ||
         info->reuseUnlockResultDuration > REUSED_UNLOCK_TOKEN_PERIOD ||

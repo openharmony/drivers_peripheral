@@ -78,8 +78,6 @@ ohos_unittest("UserAuthUserAuthTest") {
     "user_sign_centre_test.cpp",
   ]
 
-  deps = [ "//third_party/openssl:libcrypto_shared" ]
-
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
@@ -89,5 +87,6 @@ ohos_unittest("UserAuthUserAuthTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "ipc:ipc_single",
+    "openssl:libcrypto_shared",
   ]
 }
