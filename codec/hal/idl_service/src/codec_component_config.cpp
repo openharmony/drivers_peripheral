@@ -61,13 +61,18 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
     constexpr char CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT[] = "canSwapWidthHeight";
 
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY[] = "isSupportLowLatency";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_TSVC[] = "isSupportTSVC";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
+    constexpr char CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM[] = "maxLTRFrameNum";
+
     constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
     constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
     constexpr char CODEC_CONFIG_KEY_CHANNEL_LAYOUTS[] = "channelLayouts";
     constexpr char CODEC_CONFIG_KEY_CHANNEL_COUNT[] = "channelCount";
 }
 
-using namespace OHOS::HDI::Codec::V2_0;
+using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -350,6 +355,15 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
         if (GetUintTableConfig(iface, childNode, arrayAttrs[i]) != HDF_SUCCESS) {
             CODEC_LOGE("failed to get %{public}s.%{public}s!", childNode.name, nodeAttrs[i].attrName.c_str());
             return HDF_FAILURE;
+        }
+    }
+    cap.port.video.isSupportLowLatency = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY);
+    cap.port.video.isSupportTSVC = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_TSVC);
+    cap.port.video.isSupportLTR = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LTR);
+    if (cap.port.video.isSupportLTR) {
+        if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM,
+                            reinterpret_cast<uint32_t *>(&cap.port.video.maxLTRFrameNum), 0) != HDF_SUCCESS) {
+            CODEC_LOGE("failed to get %{public}s maxLTRFrameNum!", childNode.name);
         }
     }
     return HDF_SUCCESS;

@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_0_CODECCOMPONENTMANAGERSERVICE_H
-#define OHOS_HDI_CODEC_V2_0_CODECCOMPONENTMANAGERSERVICE_H
+#ifndef OHOS_HDI_CODEC_V3_0_CODECCOMPONENTMANAGERSERVICE_H
+#define OHOS_HDI_CODEC_V3_0_CODECCOMPONENTMANAGERSERVICE_H
 
 #include <map>
 #include <mutex>
 #include <hdf_remote_service.h>
 #include "device_resource_if.h"
-#include "v2_0/icodec_component.h"
-#include "v2_0/icodec_component_manager.h"
+#include "v3_0/icodec_component.h"
+#include "v3_0/icodec_component_manager.h"
 #include "component_mgr.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V2_0 {
+namespace V3_0 {
 class CodecComponentManagerService : public ICodecComponentManager {
 public:
     CodecComponentManagerService();
@@ -49,9 +49,9 @@ private:
     DeviceResourceNode resourceNode_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
-}  // namespace V2_0
+}  // namespace V3_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif  // OHOS_HDI_CODEC_V2_0_CODECCOMPONENTMANAGERSERVICE_H
+#endif  // OHOS_HDI_CODEC_V3_0_CODECCOMPONENTMANAGERSERVICE_H

@@ -19,8 +19,8 @@
 #include <unistd.h>
 #include <hdf_remote_service.h>
 #include "codec_log_wrapper.h"
-#include "v2_0/codec_types.h"
-using namespace OHOS::HDI::Codec::V2_0;
+#include "v3_0/codec_types.h"
+using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
