@@ -57,7 +57,6 @@ void ExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
         return NodeBase::DeliverBuffer(buffer);
     }
 
-    int32_t id = buffer->GetStreamId();
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG && gpsInfo_.size() > 0) {
         int outPutBufferSize = 0;
         exif_data exifInfo;
