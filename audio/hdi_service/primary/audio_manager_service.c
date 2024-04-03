@@ -32,7 +32,7 @@ struct AudioManagerPriv {
     AudioManagerDestroyIfInstance destroyIfInstance;
 };
 
-static const char *g_hdiAudioLibPath = HDF_LIBRARY_FULL_PATH("libaudio_primary_impl_vendor");
+static const char *HDI_AUDIO_LIB_PATH = HDF_LIBRARY_FULL_PATH("libaudio_primary_impl_vendor");
 
 static struct AudioManagerPriv *GetAudioManagerPriv(void)
 {
@@ -44,15 +44,15 @@ static int32_t AudioManagerLoadPrimaryLib(struct AudioManagerPriv *priv)
 {
     char *error = NULL;
 
-    if (g_hdiAudioLibPath == NULL || priv == NULL) {
+    if (HDI_AUDIO_LIB_PATH == NULL || priv == NULL) {
         HDF_LOGE("%{public}s:para is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    priv->handle = dlopen(g_hdiAudioLibPath, RTLD_LAZY);
+    priv->handle = dlopen(HDI_AUDIO_LIB_PATH, RTLD_LAZY);
     if (priv->handle == NULL) {
         error = dlerror();
-        HDF_LOGE("%{public}s:load path%{public}s, dlopen err=%{public}s", __func__, g_hdiAudioLibPath, error);
+        HDF_LOGE("%{public}s:load path%{public}s, dlopen err=%{public}s", __func__, HDI_AUDIO_LIB_PATH, error);
         return HDF_FAILURE;
     }
 
