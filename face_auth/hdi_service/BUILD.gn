@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libface_auth_interface_service_1.1") {
+ohos_shared_library("libface_auth_interface_service_2.0") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -30,15 +30,16 @@ ohos_shared_library("libface_auth_interface_service_1.1") {
     "../common/utils",
   ]
   sources = [
-    "src/executor_impl.cpp",
+    "src/all_in_one_executor_impl.cpp",
     "src/face_auth_interface_service.cpp",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_face_auth:face_auth_idl_headers",
+    "drivers_interface_face_auth:libface_auth_stub_2.0",
     "graphic_surface:surface",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -66,7 +67,7 @@ ohos_shared_library("libface_auth_driver") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_face_auth:libface_auth_stub_1.1",
+    "drivers_interface_face_auth:libface_auth_stub_2.0",
     "graphic_surface:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
@@ -85,6 +86,6 @@ ohos_shared_library("libface_auth_driver") {
 group("hdf_face_auth_service") {
   deps = [
     ":libface_auth_driver",
-    ":libface_auth_interface_service_1.1",
+    ":libface_auth_interface_service_2.0",
   ]
 }

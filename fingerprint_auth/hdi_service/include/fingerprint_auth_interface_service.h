@@ -28,12 +28,10 @@ public:
     FingerprintAuthInterfaceService();
     ~FingerprintAuthInterfaceService() override = default;
 
-    int32_t GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList) override;
-
-    int32_t GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList) override;
+    int32_t GetExecutorList(std::vector<sptr<IAllInOneExecutor>> &executorList) override;
 
 private:
-    std::vector<sptr<IExecutor>> executorList_;
+    std::vector<sptr<IAllInOneExecutor>> executorList_;
 };
 } // namespace FingerprintAuth
 } // namespace HDI

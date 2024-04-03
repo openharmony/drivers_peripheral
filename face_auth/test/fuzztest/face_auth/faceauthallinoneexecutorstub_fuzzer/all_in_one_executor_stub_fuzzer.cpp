@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#include "face_auth_interface_stub_fuzzer.h"
+#include "all_in_one_executor_stub_fuzzer.h"
 
 #include "iam_logger.h"
 
+#include "all_in_one_executor_impl.h"
 #include "face_auth_hdi.h"
 
 #undef LOG_TAG
-#define LOG_TAG "FACE_AUTH_IMPL"
+#define LOG_TAG "FACE_AUTH_HDI"
 
 #undef private
 
@@ -28,51 +29,51 @@ namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
 namespace {
-constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MIN = 0;
-constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MAX = 3;
-constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MIN_V1_1 = 2;
-const std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN_V1_0 = u"ohos.hdi.face_auth.v1_0.IFaceAuthInterface";
-const std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN_V1_1 = u"ohos.hdi.face_auth.v2_0.IFaceAuthInterface";
+constexpr uint32_t EXECUTOR_STUB_CODE_MIN = 0;
+constexpr uint32_t EXECUTOR_STUB_CODE_MAX = 14;
+constexpr uint32_t EXECUTOR_STUB_CODE_MIN_V1_1 = 11;
+const std::u16string EXECUTOR_STUB_TOKEN_V1_0 = u"ohos.hdi.face_auth.v1_0.IAllInOneExecutor";
+const std::u16string EXECUTOR_STUB_TOKEN_V1_1 = u"ohos.hdi.face_auth.v2_0.IAllInOneExecutor";
 
-bool FaceAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
+bool FaceAuthHdiStubFuzzTest(const uint8_t *rawData, size_t size)
 {
     IAM_LOGI("start");
     if (rawData == nullptr) {
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<IFaceAuthInterface> serviceImpl = IFaceAuthInterface::Get(true);
+    AllInOneExecutorImpl *serviceImpl = new (std::nothrow) AllInOneExecutorImpl();
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;
     }
-    sptr<FaceAuthInterfaceStub> faceAuthInterfaceStub = new FaceAuthInterfaceStub(serviceImpl);
-    if (faceAuthInterfaceStub == nullptr) {
-        IAM_LOGE("%{public}s:new IFaceAuthInterfaceStub failed.", __func__);
+    sptr<AllInOneExecutorStub> executorStub = new AllInOneExecutorStub(serviceImpl);
+    if (executorStub == nullptr) {
+        IAM_LOGE("%{public}s:new executorStub failed.", __func__);
         return false;
     }
 
-    for (uint32_t code = FACE_AUTH_INTERFACE_STUB_CODE_MIN; code < FACE_AUTH_INTERFACE_STUB_CODE_MAX; code++) {
+    for (uint32_t code = EXECUTOR_STUB_CODE_MIN; code < EXECUTOR_STUB_CODE_MAX; code++) {
         MessageParcel data;
         MessageParcel reply;
         MessageOption optionSync = MessageOption::TF_SYNC;
         MessageOption optionAsync = MessageOption::TF_ASYNC;
-        std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN;
-        if (code < FACE_AUTH_INTERFACE_STUB_CODE_MIN_V1_1) {
-            FACE_AUTH_INTERFACE_STUB_TOKEN = FACE_AUTH_INTERFACE_STUB_TOKEN_V1_0;
+        std::u16string EXECUTOR_STUB_TOKEN;
+        if (code < EXECUTOR_STUB_CODE_MIN_V1_1) {
+            EXECUTOR_STUB_TOKEN = EXECUTOR_STUB_TOKEN_V1_0;
         } else {
-            FACE_AUTH_INTERFACE_STUB_TOKEN = FACE_AUTH_INTERFACE_STUB_TOKEN_V1_1;
+            EXECUTOR_STUB_TOKEN = EXECUTOR_STUB_TOKEN_V1_1;
         }
         // Sync
-        data.WriteInterfaceToken(FACE_AUTH_INTERFACE_STUB_TOKEN);
+        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN);
         data.WriteBuffer(rawData, size);
         data.RewindRead(0);
-        (void)faceAuthInterfaceStub->OnRemoteRequest(code, data, reply, optionSync);
+        (void)executorStub->OnRemoteRequest(code, data, reply, optionSync);
         // Async
-        data.WriteInterfaceToken(FACE_AUTH_INTERFACE_STUB_TOKEN);
+        data.WriteInterfaceToken(EXECUTOR_STUB_TOKEN);
         data.WriteBuffer(rawData, size);
         data.RewindRead(0);
-        (void)faceAuthInterfaceStub->OnRemoteRequest(code, data, reply, optionAsync);
+        (void)executorStub->OnRemoteRequest(code, data, reply, optionAsync);
     }
     return true;
 }
@@ -84,6 +85,6 @@ bool FaceAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
 /* Fuzzer entry point */
 extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::HDI::FaceAuth::FaceAuthInterfaceStubFuzzTest(data, size);
+    OHOS::HDI::FaceAuth::FaceAuthHdiStubFuzzTest(data, size);
     return 0;
 }
