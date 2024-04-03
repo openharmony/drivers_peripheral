@@ -417,12 +417,6 @@ void IppNode::DeliverAlgoProductBuffer(std::shared_ptr<IBuffer>& result)
         DeliverOfflineBuffer(result);
     } else {
         return NodeBase::DeliverBuffer(result);
-        std::shared_ptr<IPort> outPort = GetOutPortById(0);
-        if (outPort == nullptr) {
-            CAMERA_LOGE("can't find out port, deliver algo product failed.");
-            return;
-        }
-        outPort->DeliverBuffer(result);
     }
 
     return;
