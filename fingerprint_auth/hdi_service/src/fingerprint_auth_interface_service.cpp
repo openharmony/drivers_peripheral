@@ -17,7 +17,7 @@
 
 #include <hdf_base.h>
 
-#include "executor_impl.h"
+#include "all_in_one_executor_impl.h"
 #include "iam_logger.h"
 
 #undef LOG_TAG
@@ -38,28 +38,20 @@ extern "C" IFingerprintAuthInterface *FingerprintAuthInterfaceImplGetInstance(vo
 
 FingerprintAuthInterfaceService::FingerprintAuthInterfaceService()
 {
-    auto executor = new (std::nothrow) ExecutorImpl();
+    auto executor = new (std::nothrow) AllInOneExecutorImpl();
     if (executor == nullptr) {
         IAM_LOGE("executor is nullptr");
         return;
     }
-    executorList_.push_back(sptr<IExecutor>(executor));
+    executorList_.push_back(sptr<IAllInOneExecutor>(executor));
 }
 
-int32_t FingerprintAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList)
+int32_t FingerprintAuthInterfaceService::GetExecutorList(std::vector<sptr<IAllInOneExecutor>> &executorList)
 {
     IAM_LOGI("interface mock start");
     for (auto executor : executorList_) {
         executorList.push_back(executor);
     }
-    IAM_LOGI("interface mock success");
-    return HDF_SUCCESS;
-}
-
-int32_t FingerprintAuthInterfaceService::GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList)
-{
-    IAM_LOGI("interface mock start");
-    executorList = executorList_;
     IAM_LOGI("interface mock success");
     return HDF_SUCCESS;
 }

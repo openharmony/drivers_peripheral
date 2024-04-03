@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
+ohos_fuzztest("FaceAuthAllInOneExecutorStubFuzzTest") {
   branch_protector_ret = "pac_ret"
   module_out_path = "drivers_peripheral_face_auth/drivers_peripheral_face_auth"
   fuzz_config_file = "."
@@ -29,7 +29,7 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
     "../../../../common/logs",
   ]
 
-  sources = [ "face_auth_interface_service_fuzzer.cpp" ]
+  sources = [ "all_in_one_executor_stub_fuzzer.cpp" ]
 
   deps = [ "../common_fuzzer:libface_auth_interface_service_2.0_fuzzer" ]
 
@@ -41,6 +41,7 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
     "graphic_surface:surface",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 
   subsystem_name = "hdf"

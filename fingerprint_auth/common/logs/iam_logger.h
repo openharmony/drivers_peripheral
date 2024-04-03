@@ -41,8 +41,8 @@ namespace Common {
 #define FINGERPRINT_AUTH_ERROR(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
 #define FINGERPRINT_AUTH_FATAL(...) HILOG_FATAL(LOG_CORE, __VA_ARGS__)
 
-#define ARGS(fmt, ...) "[%{public}s@%{public}s:%{public}d] " fmt, __FUNCTION__, \
-    FINGERPRINT_AUTH_FILE, __LINE__, ##__VA_ARGS__
+#define ARGS(fmt, ...) \
+    "[%{public}s@%{public}s:%{public}d] " fmt, __FUNCTION__, FINGERPRINT_AUTH_FILE, __LINE__, ##__VA_ARGS__
 #define FINGERPRINT_LOG(level, ...) FINGERPRINT_AUTH_##level(ARGS(__VA_ARGS__))
 
 #define IAM_LOGD(...) FINGERPRINT_LOG(DEBUG, __VA_ARGS__)
