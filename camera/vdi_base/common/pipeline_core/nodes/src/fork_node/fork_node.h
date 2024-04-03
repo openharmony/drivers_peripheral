@@ -36,7 +36,7 @@ public:
 private:
     void DrainForkBufferPool();
     void DeliverBufferToNextNode();
-    void DeliverForkBuffer(std::shared_ptr<IBuffer>& buffer);
+    void DeliverForkBuffer(std::shared_ptr<IBuffer>& forkbuffer);
 
     std::mutex                            mtx_;
     std::queue<std::shared_ptr<IBuffer>>  bufferQueue_ = {};
