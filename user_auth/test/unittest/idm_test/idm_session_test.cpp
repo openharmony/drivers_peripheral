@@ -149,7 +149,8 @@ HWTEST_F(IdmSessionTest, TestGetIsUpdate, TestSize.Level0)
 HWTEST_F(IdmSessionTest, TestCheckSessionValid, TestSize.Level0)
 {
     struct SessionInfo session;
-    session.userId = 2135;
+    constexpr int32_t USER_ID = 2135;
+    session.userId = USER_ID;
     session.time = UINT64_MAX;
     g_session = &session;
     EXPECT_EQ(CheckSessionValid(0), RESULT_GENERAL_ERROR);
