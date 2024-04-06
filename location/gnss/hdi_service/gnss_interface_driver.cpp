@@ -17,9 +17,9 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/gnss_interface_stub.h"
+#include "v2_0/gnss_interface_stub.h"
 
-using namespace OHOS::HDI::Location::Gnss::V1_0;
+using namespace OHOS::HDI::Location::Gnss::V2_0;
 
 struct HdfGnssInterfaceHost {
     struct IDeviceIoService ioService;

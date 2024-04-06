@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_LOCATION_LOCATION_GNSS_V1_0_GNSSINTERFACEIMPL_H
-#define OHOS_HDI_LOCATION_LOCATION_GNSS_V1_0_GNSSINTERFACEIMPL_H
+#ifndef OHOS_HDI_LOCATION_LOCATION_GNSS_V2_0_GNSSINTERFACEIMPL_H
+#define OHOS_HDI_LOCATION_LOCATION_GNSS_V2_0_GNSSINTERFACEIMPL_H
 
-#include "v1_0/ignss_interface.h"
+#include "v2_0/ignss_interface.h"
 
 #include "iremote_object.h"
 
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Gnss {
-namespace V1_0 {
+namespace V2_0 {
 class GnssInterfaceImpl : public IGnssInterface {
 public:
     GnssInterfaceImpl();
@@ -42,13 +42,17 @@ public:
 
     int32_t SetGnssReferenceInfo(const GnssRefInfo& refInfo) override;
 
-    int32_t DeleteAuxiliaryData(GnssAuxiliaryData data) override;
+    int32_t DeleteAuxiliaryData(GnssAuxiliaryDataType data) override;
 
     int32_t SetPredictGnssData(const std::string& data) override;
 
     int32_t GetCachedGnssLocationsSize(int32_t& size) override;
 
     int32_t GetCachedGnssLocations() override;
+
+    int32_t SendNiUserResponse(int32_t gnssNiNotificationId, GnssNiResponseCmd userResponse) override;
+
+    int32_t SendNetworkInitiatedMsg(const std::string& msg, int32_t length) override;
 
     void ResetGnss();
 private:
@@ -74,10 +78,10 @@ public:
 private:
     wptr<GnssInterfaceImpl> gnssInterfaceImpl_;
 };
-} // V1_0
+} // V2_0
 } // Gnss
 } // Location
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_LOCATION_LOCATION_GNSS_V1_0_GNSSINTERFACEIMPL_H
+#endif // OHOS_HDI_LOCATION_LOCATION_GNSS_V2_0_GNSSINTERFACEIMPL_H

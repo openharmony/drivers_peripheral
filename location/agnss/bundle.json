@@ -1,7 +1,7 @@
 {
     "name": "@ohos/drivers_peripheral_location_agnss",
     "description": "location agnss hdf",
-    "version": "1.0",
+    "version": "2.0",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {

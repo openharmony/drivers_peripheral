@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define SV_NUM_MAX 64
+#define SATELLITE_NUM_MAXIMUM 128
 
 enum class AgnssSetIdClass {
     AGNSS_SETID_CLASS_NONE = 0,
@@ -121,12 +121,12 @@ enum class GnssCapabilities {
     GNSS_CAP_SUPPORT_GNSS_CACHE = (1 << 5),
 };
 
-enum class SatellitesStatusFlag {
-    SATELLITES_STATUS_NONE = 0,
-    SATELLITES_STATUS_HAS_EPHEMERIS_DATA = 1 << 0,
-    SATELLITES_STATUS_HAS_ALMANAC_DATA = 1 << 1,
-    SATELLITES_STATUS_USED_IN_FIX = 1 << 2,
-    SATELLITES_STATUS_HAS_CARRIER_FREQUENCY = 1 << 3
+enum class SatelliteAdditionalInfo {
+    SATELLITES_ADDITIONAL_INFO_NULL = 0,
+    SATELLITES_ADDITIONAL_INFO_EPHEMERIS_DATA_EXIST = 1 << 0,
+    SATELLITES_ADDITIONAL_INFO_ALMANAC_DATA_EXIST = 1 << 1,
+    SATELLITES_ADDITIONAL_INFO_USED_IN_FIX = 1 << 2,
+    SATELLITES_ADDITIONAL_INFO_CARRIER_FREQUENCY_EXIST = 1 << 3
 };
 
 enum class GnssWorkingMode {
@@ -266,61 +266,48 @@ typedef struct {
 } GnssCachingConfig;
 
 /*
- * Represents Satellite Statu info.
+ * Status information of a single satellite.
  */
 typedef struct {
     size_t size;
-    /*
-     * Pseudo-random or satellite ID number for the satellite, a.k.a. Space Vehicle (SV), or
-     * FCN/OSN number for Glonass. The distinction is made by looking at constellation field.
-     * Values must be in the range of:
-     *
-     * - GNSS:    1-32
-     * - SBAS:    120-151, 183-192
-     * - GLONASS: 1-24, the orbital slot number (OSN), if known.  Or, if not:
-     *            93-106, the frequency channel number (FCN) (-7 to +6) offset by
-     *            + 100
-     *            i.e. report an FCN of -7 as 93, FCN of 0 as 100, and FCN of +6
-     *            as 106.
-     * - QZSS:    193-200
-     * - Galileo: 1-36
-     * - Beidou:  1-37
-     * - IRNSS:   1-14
-     */
+
+    /* Satellite ID number for the satellite. */
     int16_t satelliteId;
 
-    /* Defines the constellation type.
-     * See ConstellationClass for the definition of constellationType */
-    uint8_t constellationType;
+    /*
+     * Defines the constellation category.
+     * See ConstellationCategory for the definition of constellationCategory.
+     */
+    uint8_t constellationCategory;
 
-    /* Carrier-to-noise density in dB-Hz */
+    /* Carrier-to-noise density in dB-Hz. */
     float cn0;
 
-    /* Elevation of SV in degrees. */
+    /* Elevation of satellite in degrees. */
     float elevation;
 
-    /* Azimuth of SV in degrees. */
+    /* Azimuth of satellite in degrees. */
     float azimuth;
 
-    /* Carrier frequency of the signal tracked. */
-    float carrierFrequencie;
+    /* Carrier frequency of the signal tracked. The unit is Hz. */
+    float carrierFrequency;
 
-    /* See SatellitesStatusFlag for the definition of flag. */
-    uint32_t flag;
+    /* See SatelliteAdditionalInfo for the definition of satelliteAdditionalInfo. */
+    uint32_t satelliteAdditionalInfo;
 } SatelliteStatusInfo;
 
 /*
- * Represents all satellite status info.
+ * Status informations of all satellites.
  */
 typedef struct {
     /* set to sizeof(GnssSatelliteStatus) */
     size_t size;
 
-    /* Number of GNSS SVs currently visible. */
+    /* Number of all satellites that can be viewed. */
     uint32_t satellitesNum;
 
-    /* Pointer to an array of SVs information for all GNSS constellations. */
-    SatelliteStatusInfo satellitesList[SV_NUM_MAX];
+    /* Array of all satellites information. */
+    SatelliteStatusInfo satellitesList[SATELLITE_NUM_MAXIMUM];
 } GnssSatelliteStatus;
 
 /*  Callback with location information. */
