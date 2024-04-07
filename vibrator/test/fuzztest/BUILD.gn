@@ -23,9 +23,9 @@ group("hdf_vibrator_fuzztest") {
     "vibratorgethapticstartuptime_fuzzer:fuzztest",
     "vibratorplayhapticpattern_fuzzer:fuzztest",
     "vibratorstart_fuzzer:fuzztest",
+    "vibratorstartbyintensity_fuzzer:fuzztest",
     "vibratorstartonce_fuzzer:fuzztest",
     "vibratorstop_fuzzer:fuzztest",
     "vibratorstopv1_2_fuzzer:fuzztest",
-    "vibratorstartbyintensity_fuzzer:fuzztest",
   ]
 }
