@@ -22,6 +22,7 @@
 #include "user_auth_funcs.h"
 
 extern "C" {
+    extern LinkedList *g_userInfoList;
     extern UnlockAuthResultCache g_unlockAuthResult;
     extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
@@ -147,6 +148,12 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
 
     info.authTypes[1] = 1;
     info.authTypeSize = 2;
+    EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo userInfo = {};
+    userInfo.userId = 1;
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
 }
