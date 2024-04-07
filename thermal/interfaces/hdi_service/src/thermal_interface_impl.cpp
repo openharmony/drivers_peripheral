@@ -24,7 +24,9 @@
 #include "thermal_device_mitigation.h"
 #include "thermal_zone_manager.h"
 #include "thermal_log.h"
+#ifdef HAS_THERMAL_CONFIG_POLICY_PART
 #include "config_policy_utils.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
@@ -55,9 +57,10 @@ ThermalInterfaceImpl::ThermalInterfaceImpl()
 
 int32_t ThermalInterfaceImpl::Init()
 {
-    char buf[MAX_PATH_LEN];
     bool parseConfigSuc = false;
     int32_t ret;
+#ifdef HAS_THERMAL_CONFIG_POLICY_PART
+    char buf[MAX_PATH_LEN];
     char* path = GetOneCfgFile(HDI_XML_PATH.c_str(), buf, MAX_PATH_LEN);
     if (path != nullptr && *path != '\0') {
         ret = ThermalHdfConfig::GetInstance().ThermalHDIConfigInit(path);
@@ -67,6 +70,7 @@ int32_t ThermalInterfaceImpl::Init()
         }
         parseConfigSuc = true;
     }
+#endif
 
     if (!parseConfigSuc) {
         ret = ThermalHdfConfig::GetInstance().ThermalHDIConfigInit(VENDOR_HDI_XML_PATH);
