@@ -47,13 +47,13 @@ HWTEST_F(IdentifyFuncsTest, TestDoIdentify, TestSize.Level0)
 
 HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_001, TestSize.Level0)
 {
-    uint64_t contextId = 1235;
-    EXPECT_EQ(DoUpdateIdentify(contextId, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    constexpr uint64_t CONTEXT_ID = 1235;
+    EXPECT_EQ(DoUpdateIdentify(CONTEXT_ID, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_002, TestSize.Level0)
 {
-    uint64_t contextId = 1235;
+    constexpr uint64_t CONTEXT_ID = 1235;
     Buffer *scheduleResult = CreateBufferBySize(10);
     int32_t userId = 32156;
     UserAuthTokenHal token = {};
@@ -61,9 +61,9 @@ HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_002, TestSize.Level0)
     g_contextList = CreateLinkedList(DestroyContextNode);
     EXPECT_NE(g_contextList, nullptr);
     UserAuthContext context = {};
-    context.contextId = contextId;
+    context.contextId = CONTEXT_ID;
     g_contextList->insert(g_contextList, static_cast<void *>(&context));
-    EXPECT_EQ(DoUpdateIdentify(contextId, scheduleResult, &userId, &token, &result), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(DoUpdateIdentify(CONTEXT_ID, scheduleResult, &userId, &token, &result), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam
