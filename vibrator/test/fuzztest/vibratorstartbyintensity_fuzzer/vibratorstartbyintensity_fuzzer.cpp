@@ -29,14 +29,9 @@ namespace OHOS {
             return false;
         }
         sptr<V1_3::IVibratorInterface> g_vibratorInterface = V1_3::IVibratorInterface::Get();
-        int ret = g_vibratorInterface->StartOnce(*(uint32_t *)data);
+        int ret = g_vibratorInterface->StartByIntensity(reinterpret_cast<const std::string &>(data), *(uint16_t *)data);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Vibrator Start failed, ret is [%{public}x]\n", __func__, ret);
-            return false;
-        }
-        ret = g_vibratorInterface->StartByIntensity(reinterpret_cast<const std::string &>(data), *(uint16_t *)data);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Vibrator Start failed, ret is [%{public}x]\n", __func__, ret);
+            HDF_LOGE("%{public}s: Vibrator StartByIntensity failed, ret is [%{public}x]\n", __func__, ret);
             return false;
         }
         return true;
