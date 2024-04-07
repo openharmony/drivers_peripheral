@@ -72,18 +72,20 @@ HWTEST_F(ContextManagerTest, TestGenerateAuthContext, TestSize.Level0)
     EXPECT_EQ(GenerateAuthContext(param, &context), RESULT_NEED_INIT);
     g_contextList = CreateLinkedList(DestroyContextNode);
     EXPECT_NE(g_contextList, nullptr);
+    constexpr uint64_t CONTEXT_ID = 321566;
     UserAuthContext authContext = {};
-    authContext.contextId = 321566;
+    authContext.contextId = CONTEXT_ID;
     g_contextList->insert(g_contextList, static_cast<void *>(&authContext));
-    param.contextId = 321566;
+    param.contextId = CONTEXT_ID;
     EXPECT_EQ(GenerateAuthContext(param, &context), RESULT_DUPLICATE_CHECK_FAILED);
 }
 
 HWTEST_F(ContextManagerTest, TestGenerateIdentifyContext, TestSize.Level0)
 {
     g_contextList = nullptr;
+    constexpr uint64_t CONTEXT_ID = 234562;
     IdentifyParam param = {};
-    param.contextId = 234562;
+    param.contextId = CONTEXT_ID;
     EXPECT_EQ(GenerateIdentifyContext(param), nullptr);
     g_contextList = CreateLinkedList(DestroyContextNode);
     EXPECT_NE(g_contextList, nullptr);
@@ -95,15 +97,16 @@ HWTEST_F(ContextManagerTest, TestGenerateIdentifyContext, TestSize.Level0)
 HWTEST_F(ContextManagerTest, TestGetContext, TestSize.Level0)
 {
     g_contextList = nullptr;
-    uint64_t contextId = 324112;
-    EXPECT_EQ(GetContext(contextId), nullptr);
+    constexpr uint64_t CONTEXT_ID_1 = 324112;
+    constexpr uint64_t CONTEXT_ID_2 = 31157;
+    EXPECT_EQ(GetContext(CONTEXT_ID_1), nullptr);
     g_contextList = CreateLinkedList(DestroyContextNode);
     EXPECT_NE(g_contextList, nullptr);
     UserAuthContext context = {};
-    context.contextId = 31157;
+    context.contextId = CONTEXT_ID_2;
     g_contextList->insert(g_contextList, static_cast<void *>(&context));
     g_contextList->insert(g_contextList, nullptr);
-    EXPECT_EQ(GetContext(contextId), nullptr);
+    EXPECT_EQ(GetContext(CONTEXT_ID_1), nullptr);
 }
 
 HWTEST_F(ContextManagerTest, TestGetAuthCredentialList_001, TestSize.Level0)
@@ -134,8 +137,8 @@ HWTEST_F(ContextManagerTest, TestCheckCredentialSize, TestSize.Level0)
     LinkedList *credList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(credList, nullptr);
     CredentialInfoHal info = {};
-    uint32_t credNum = 102;
-    for (uint32_t i = 0; i < credNum; ++i) {
+    constexpr uint32_t CRED_MUN = 102;
+    for (uint32_t i = 0; i < CRED_MUN; ++i) {
         credList->insert(credList, static_cast<void *>(&info));
     }
     EXPECT_EQ(CheckCredentialSize(credList), RESULT_EXCEED_LIMIT);
@@ -158,19 +161,20 @@ HWTEST_F(ContextManagerTest, TestQueryAuthTempletaInfo, TestSize.Level0)
 HWTEST_F(ContextManagerTest, TestIsContextDuplicate, TestSize.Level0)
 {
     g_contextList = nullptr;
-    uint64_t contextId = 36517;
-    EXPECT_FALSE(IsContextDuplicate(contextId));
+    constexpr uint64_t CONTEXT_ID_1 = 36517;
+    constexpr uint64_t CONTEXT_ID_2 = 36529;
+    EXPECT_FALSE(IsContextDuplicate(CONTEXT_ID_1));
 
     g_contextList = CreateLinkedList(DestroyContextNode);
     EXPECT_NE(g_contextList, nullptr);
     UserAuthContext context1 = {};
-    context1.contextId = contextId;
+    context1.contextId = CONTEXT_ID_1;
     g_contextList->insert(g_contextList, static_cast<void *>(&context1));
     UserAuthContext context2 = {};
-    context2.contextId = 36529;
+    context2.contextId = CONTEXT_ID_2;
     g_contextList->insert(g_contextList, static_cast<void *>(&context2));
     g_contextList->insert(g_contextList, nullptr);
-    EXPECT_TRUE(IsContextDuplicate(contextId));
+    EXPECT_TRUE(IsContextDuplicate(CONTEXT_ID_1));
 }
 
 HWTEST_F(ContextManagerTest, TestCopySchedules_001, TestSize.Level0)
@@ -189,9 +193,9 @@ HWTEST_F(ContextManagerTest, TestCopySchedules_002, TestSize.Level0)
     UserAuthContext context = {};
     context.scheduleList = CreateLinkedList(DestroyScheduleNode);
     EXPECT_NE(context.scheduleList, nullptr);
-    uint32_t scheduleNum = 6;
+    constexpr uint32_t SCHEDUAL_NUM = 6;
     CoAuthSchedule schedule = {};
-    for (uint32_t i = 0; i < scheduleNum; ++i) {
+    for (uint32_t i = 0; i < SCHEDUAL_NUM; ++i) {
         context.scheduleList->insert(context.scheduleList, static_cast<void *>(&schedule));
     }
     LinkedList *getSchedule = nullptr;

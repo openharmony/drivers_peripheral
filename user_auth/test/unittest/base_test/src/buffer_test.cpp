@@ -25,6 +25,11 @@ using namespace testing;
 using namespace testing::ext;
 namespace {
     constexpr uint32_t MAX_BUFFER_SIZE = 512000 + 1;
+    constexpr uint32_t BUFFER_LEN_1 = 1;
+    constexpr uint32_t BUFFER_LEN_2 = 2;
+    constexpr uint32_t BUFFER_LEN_4 = 4;
+    constexpr uint32_t BUFFER_LEN_5 = 5;
+    constexpr uint32_t BUFFER_LEN_6 = 6;
 } // namespace
 
 void BufferTest::SetUpTestCase()
@@ -97,9 +102,9 @@ HWTEST_F(BufferTest, CreateBufferByData_test, TestSize.Level0)
     result = IsBufferValid(buffer2);
     EXPECT_EQ(result, false);
 
-    Buffer *data = CreateBufferBySize(5);
+    Buffer *data = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(data, nullptr);
-    (void)memset_s(data->buf, data->maxSize, 1, data->maxSize);
+    (void)memset_s(data->buf, data->maxSize, BUFFER_LEN_1, data->maxSize);
     data->contentSize = data->maxSize;
 
     Buffer *buffer3 = CreateBufferByData(data->buf, 0);
@@ -131,18 +136,19 @@ HWTEST_F(BufferTest, CheckBufferWithSize_test, TestSize.Level0)
 {
     Buffer *buffer1 = CreateBufferByData(nullptr, 0);
     EXPECT_EQ(buffer1, nullptr);
-    bool result = CheckBufferWithSize(buffer1, 5);
+
+    bool result = CheckBufferWithSize(buffer1, BUFFER_LEN_5);
     EXPECT_EQ(result, false);
 
-    Buffer *data = CreateBufferBySize(5);
+    Buffer *data = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(data, nullptr);
-    (void)memset_s(data->buf, data->maxSize, 1, data->maxSize);
+    (void)memset_s(data->buf, data->maxSize, BUFFER_LEN_1, data->maxSize);
     data->contentSize = data->maxSize;
 
-    result = CheckBufferWithSize(data, 4);
+    result = CheckBufferWithSize(data, BUFFER_LEN_4);
     EXPECT_EQ(result, false);
 
-    result = CheckBufferWithSize(data, 5);
+    result = CheckBufferWithSize(data, BUFFER_LEN_5);
     EXPECT_EQ(result, true);
 
     DestoryBuffer(data);
@@ -161,7 +167,7 @@ HWTEST_F(BufferTest, CopyBuffer_test, TestSize.Level0)
     Buffer *result = CopyBuffer(buffer0);
     EXPECT_EQ(result, nullptr);
 
-    Buffer *buffer2 = CreateBufferBySize(5);
+    Buffer *buffer2 = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(buffer2, nullptr);
     result = CopyBuffer(buffer2);
     EXPECT_NE(result, nullptr);
@@ -180,10 +186,10 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level0)
     bool result = CompareBuffer(nullptr, nullptr);
     EXPECT_EQ(result, false);
 
-    Buffer *buffer1 = CreateBufferBySize(5);
+    Buffer *buffer1 = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(buffer1, nullptr);
     buffer1->contentSize = buffer1->maxSize;
-    Buffer *buffer2 = CreateBufferBySize(6);
+    Buffer *buffer2 = CreateBufferBySize(BUFFER_LEN_6);
     EXPECT_NE(buffer2, nullptr);
     buffer2->contentSize = buffer2->maxSize;
     result = CompareBuffer(buffer1, buffer2);
@@ -191,14 +197,14 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level0)
     DestoryBuffer(buffer1);
     DestoryBuffer(buffer2);
 
-    Buffer *buffer3 = CreateBufferBySize(5);
+    Buffer *buffer3 = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(buffer3, nullptr);
-    (void)memset_s(buffer3->buf, buffer3->maxSize, 1, buffer3->maxSize);
+    (void)memset_s(buffer3->buf, buffer3->maxSize, BUFFER_LEN_1, buffer3->maxSize);
     buffer3->contentSize = buffer3->maxSize;
     
-    Buffer *buffer4 = CreateBufferBySize(6);
+    Buffer *buffer4 = CreateBufferBySize(BUFFER_LEN_6);
     EXPECT_NE(buffer4, nullptr);
-    (void)memset_s(buffer4->buf, buffer4->maxSize, 2, buffer4->maxSize);
+    (void)memset_s(buffer4->buf, buffer4->maxSize, BUFFER_LEN_2, buffer4->maxSize);
     buffer4->contentSize = buffer4->maxSize;
     result = CompareBuffer(buffer3, buffer4);
     EXPECT_EQ(result, false);
@@ -207,7 +213,7 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level0)
 
     Buffer *buffer5 = CreateBufferBySize(5);
     EXPECT_NE(buffer5, nullptr);
-    (void)memset_s(buffer5->buf, buffer5->maxSize, 1, buffer5->maxSize);
+    (void)memset_s(buffer5->buf, buffer5->maxSize, BUFFER_LEN_1, buffer5->maxSize);
     buffer5->contentSize = buffer5->maxSize;
     result = CompareBuffer(buffer5, buffer5);
     EXPECT_EQ(result, true);
@@ -222,9 +228,9 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level0)
  */
 HWTEST_F(BufferTest, GetBufferData_test, TestSize.Level0)
 {
-    Buffer *buffer1 = CreateBufferBySize(5);
+    Buffer *buffer1 = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(buffer1, nullptr);
-    (void)memset_s(buffer1->buf, buffer1->maxSize, 1, buffer1->maxSize);
+    (void)memset_s(buffer1->buf, buffer1->maxSize, BUFFER_LEN_1, buffer1->maxSize);
     buffer1->contentSize = buffer1->maxSize;
 
     uint32_t result = GetBufferData(nullptr, nullptr, nullptr);
@@ -233,7 +239,7 @@ HWTEST_F(BufferTest, GetBufferData_test, TestSize.Level0)
     result = GetBufferData(buffer1, nullptr, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    Buffer *res = CreateBufferBySize(4);
+    Buffer *res = CreateBufferBySize(BUFFER_LEN_4);
     EXPECT_NE(res, nullptr);
     res->contentSize = res->maxSize;
 
@@ -241,7 +247,7 @@ HWTEST_F(BufferTest, GetBufferData_test, TestSize.Level0)
     EXPECT_EQ(result, RESULT_BAD_COPY);
     DestoryBuffer(res);
 
-    Buffer *res1 = CreateBufferBySize(5);
+    Buffer *res1 = CreateBufferBySize(BUFFER_LEN_5);
     EXPECT_NE(res1, nullptr);
     res1->contentSize = res1->maxSize;
 
