@@ -556,6 +556,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthentication_001, TestSize.Lev
     param.baseParam.challenge.resize(100);
     param.baseParam.apiVersion = 11;
     param.baseParam.callerName = "";
+    param.baseParam.callerType = 0;
     std::vector<ScheduleInfo> scheduleInfos;
     EXPECT_EQ(service->BeginAuthentication(contextId, param, scheduleInfos), 10003);
 }
@@ -572,6 +573,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthentication_002, TestSize.Lev
     param.baseParam.challenge.resize(100);
     param.baseParam.apiVersion = 10000;
     param.baseParam.callerName = "com.ohos.systemui";
+    param.baseParam.callerType = 0;
     std::vector<ScheduleInfo> scheduleInfos;
     EXPECT_EQ(service->BeginAuthentication(contextId, param, scheduleInfos), 10003);
 }
