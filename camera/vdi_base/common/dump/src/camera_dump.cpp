@@ -130,8 +130,8 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
         return false;
     }
 
-    uint32_t defaultWidth = (width == 0) ? buffer->GetWidth() : width;
-    uint32_t defaultHeight = (height == 0) ? buffer->GetHeight() : height;
+    uint32_t defaultWidth = (width == 0) ? buffer->GetCurWidth() : width;
+    uint32_t defaultHeight = (height == 0) ? buffer->GetCurHeight() : height;
     void* srcAddr = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferAddr() : buffer->GetVirAddress();
     uint32_t size = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferSize() : buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
