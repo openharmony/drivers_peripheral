@@ -567,31 +567,27 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED, &entry);
-    if (cameraTest->rc != 0) {
+    if (cameraTest->rc != 0 || entry.data.u8[0] != 1) {
         cout << "skip this test, because OHOS_ABILITY_CAPTURE_DURATION_SUPPORTED not supported now" << endl;
         return;
     }
+
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &entry);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
     //start stream
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
 
-    //updateSettings
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    uint32_t snapshotDuration = 1;
-    meta->addEntry(OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &snapshotDuration, DATA_COUNT);
-    std::vector<uint8_t> setting;
-    MetadataUtils::ConvertMetadataToVec(meta, setting);
-
-    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-
     //start preview and capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
-    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    //OncaptureReady trigger
+    for (uint8_t i = 0; i < 2; i++) {
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    }
 
     //release stream
-    cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
