@@ -21,8 +21,8 @@
 #include "codec_dma_buffer.h"
 #include "codec_log_wrapper.h"
 #include "codec_share_buffer.h"
-#include "v2_0/codec_types.h"
-using namespace OHOS::HDI::Codec::V2_0;
+#include "v3_0/codec_types.h"
+using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {

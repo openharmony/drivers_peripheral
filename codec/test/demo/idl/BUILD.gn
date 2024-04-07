@@ -30,7 +30,7 @@ ohos_executable("codec_idl_omx_decode") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
-      "drivers_interface_codec:libcodec_proxy_2.0",
+      "drivers_interface_codec:libcodec_proxy_3.0",
       "drivers_interface_display:display_buffer_idl_headers",
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
@@ -69,7 +69,7 @@ ohos_executable("codec_idl_omx_encode") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
-      "drivers_interface_codec:libcodec_proxy_2.0",
+      "drivers_interface_codec:libcodec_proxy_3.0",
       "drivers_interface_display:display_buffer_idl_headers",
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
