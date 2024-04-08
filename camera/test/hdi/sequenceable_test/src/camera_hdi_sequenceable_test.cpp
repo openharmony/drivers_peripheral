@@ -159,6 +159,22 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_02, TestSize.Lev
 }
 
 /**
+ * @tc.name: BufferHandleSequenceTest_03
+ * @tc.desc: BufferHandleSequenceTest_03
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequenceTest_03, TestSize.Level1)
+{
+    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferHandleSequenceble01;
+    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferHandleSequenceble02;
+    bufferHandleSequenceble01.operator = (bufferHandleSequenceble02);
+    Parcel parcel;
+    bufferHandleSequenceble01.Marshalling(parcel);
+    BufferHandleSequenceable::Unmarshalling(parcel);
+}
+
+/**
  * @tc.name: BufferProducerSequenceTest_01
  * @tc.desc: BufferProducerSequenceTest_01
  * @tc.size: MediumTest
@@ -166,10 +182,10 @@ HWTEST_F(CameraHdiSequenceableTest, BufferHandleSequencebleTest_02, TestSize.Lev
  */
 HWTEST_F(CameraHdiSequenceableTest, BufferProducerSequenceTest_01, TestSize.Level1)
 {
-    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferProducerSequenceble01;
-    OHOS::HDI::Camera::V1_0::BufferHandleSequenceable bufferProducerSequenceble02;
-    bufferProducerSequenceble01.operator = (bufferProducerSequenceble02);
+    OHOS::HDI::Camera::V1_0::BufferProducerSequenceable bufferProducerSequenceble01;
+    OHOS::HDI::Camera::V1_0::BufferProducerSequenceable bufferProducerSequenceble02;
+    bufferProducerSequenceble01 = bufferProducerSequenceble02;
     Parcel parcel;
     bufferProducerSequenceble01.Marshalling(parcel);
-    BufferHandleSequenceable::Unmarshalling(parcel);
+    BufferProducerSequenceable::Unmarshalling(parcel);
 }

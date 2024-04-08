@@ -572,9 +572,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
         return;
     }
 
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &entry);
-    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
-
     //start stream
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
@@ -590,4 +587,11 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+
+    sleep(UT_SECOND_TIMES);
+    common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
+    EXPECT_NE(callbackData, nullptr);
+    camera_metadata_item_t callbackEntry;
+    cameraTest->rc = FindCameraMetadataItem(callbackData, OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &callbackEntry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
