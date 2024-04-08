@@ -87,7 +87,7 @@ HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
     InitConfig(effect);
     effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
 
-    int32_t ret = g_lightPerformanceDev->TurnOnLight(LIGHT_ID_BATTERY, effect);
+    int32_t ret = g_lightPerformanceDev->TurnOnLight(LIGHT_ID_BATTERY, &effect);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     OsalSleep(g_sleepTime);
