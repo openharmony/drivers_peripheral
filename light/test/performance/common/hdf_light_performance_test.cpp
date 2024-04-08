@@ -21,6 +21,7 @@
 #include "osal_time.h"
 #include "light_if.h"
 #include "light_type.h"
+#include "v1_0/ilight_interface.h"
 
 using namespace testing::ext;
 
