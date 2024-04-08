@@ -46,7 +46,10 @@ if (defined(ohos_lite)) {
       "../../hal:hdi_light",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hilog_lite:hilog_shared" ]
+    external_deps = [
+      "hilog_lite:hilog_shared",
+      "drivers_interface_light:liblight_proxy_1.0",
+    ]
   }
 } else {
   module_output_path = "hdf/light"
@@ -69,6 +72,7 @@ if (defined(ohos_lite)) {
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
+        "drivers_interface_light:liblight_proxy_1.0",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
