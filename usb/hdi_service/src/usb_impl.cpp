@@ -901,6 +901,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_ADD");
         isGadgetConnected_ = true;
         USBDeviceInfo info = {ACT_UPDEVICE, 0, 0};
         if (subscriber == nullptr) {
@@ -910,6 +911,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         ret = subscriber->DeviceEvent(info);
         return ret;
     } else if (id == USB_PNP_DRIVER_GADGET_REMOVE) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_REMOVE");
         isGadgetConnected_ = false;
         USBDeviceInfo info = {ACT_DOWNDEVICE, 0, 0};
         if (subscriber == nullptr) {
@@ -919,11 +921,13 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         ret = subscriber->DeviceEvent(info);
         return ret;
     } else if (id == USB_PNP_DRIVER_PORT_HOST) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
     }
-
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_NOTIFY_ADD_OR_REMOVE_DEVICE");
     ret = UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
     return ret;
 }
