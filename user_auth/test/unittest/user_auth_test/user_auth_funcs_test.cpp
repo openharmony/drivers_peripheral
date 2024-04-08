@@ -23,7 +23,7 @@
 
 extern "C" {
     extern UnlockAuthResultCache g_unlockAuthResult;
-    extern ResultCode GetReuseUnlockResult(const ReuseUnlockInfoHal *info, ReuseUnlockResult *reuseResult);
+    extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
 }
@@ -47,34 +47,35 @@ public:
 
 HWTEST_F(UserAuthFuncsTest, TestGenerateSolutionFunc, TestSize.Level0)
 {
-    AuthSolutionHal param = {};
+    AuthParamHal param = {};
     EXPECT_EQ(GenerateSolutionFunc(param, nullptr), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestRequestAuthResultFunc, TestSize.Level0)
 {
-    uint64_t contextId = 2131;
-    EXPECT_EQ(RequestAuthResultFunc(contextId, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
-    Buffer *scheduleResult = CreateBufferBySize(10);
+    constexpr uint64_t CONTEXT_ID = 2131;
+    constexpr uint32_t BUFFER_SIZE = 10;
+    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    Buffer *scheduleResult = CreateBufferBySize(BUFFER_SIZE);
     UserAuthTokenHal token = {};
     AuthResult result = {};
-    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, nullptr, nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, nullptr), RESULT_BAD_PARAM);
-    result.rootSecret = CreateBufferBySize(10);
-    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, &result), RESULT_BAD_PARAM);
+    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, &token, nullptr), RESULT_BAD_PARAM);
+    result.rootSecret = CreateBufferBySize(BUFFER_SIZE);
+    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, &token, &result), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
 {
-    int32_t userId = 1;
-    uint32_t authType = 1;
+    constexpr int32_t USER_ID = 1;
+    constexpr uint32_t AUTH_TYPE = 1;
     EnrolledStateHal enrolledStateHal = {};
-    EXPECT_EQ(GetEnrolledStateFunc(userId, authType, &enrolledStateHal), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetEnrolledStateFunc(USER_ID, AUTH_TYPE, &enrolledStateHal), RESULT_NOT_ENROLLED);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
 {
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
@@ -97,7 +98,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
 
 HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc001, TestSize.Level0)
 {
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, nullptr), RESULT_BAD_PARAM);
 
@@ -117,7 +118,7 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     EnrolledStateHal enrolledState;
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
 
-    ReuseUnlockInfoHal info;
+    ReuseUnlockParamHal info;
     ReuseUnlockResult reuseResult;
     info.reuseUnlockResultDuration = 200;
     info.userId = 1;

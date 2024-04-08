@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V1_0_GEOFENCEINTERFACEIMPL_H
-#define OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V1_0_GEOFENCEINTERFACEIMPL_H
+#ifndef OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V2_0_GEOFENCEINTERFACEIMPL_H
+#define OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V2_0_GEOFENCEINTERFACEIMPL_H
 
-#include "v1_0/igeofence_interface.h"
+#include "v2_0/igeofence_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V1_0 {
+namespace V2_0 {
 class GeofenceInterfaceImpl : public IGeofenceInterface {
 public:
     GeofenceInterfaceImpl() = default;
@@ -34,10 +34,10 @@ public:
 
     int32_t DeleteGnssGeofence(int32_t fenceIndex) override;
 };
-} // V1_0
+} // V2_0
 } // Geofence
 } // Location
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V1_0_GEOFENCEINTERFACEIMPL_H
+#endif // OHOS_HDI_LOCATION_LOCATION_GEOFENCE_V2_0_GEOFENCEINTERFACEIMPL_H

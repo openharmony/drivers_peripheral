@@ -98,6 +98,14 @@ void FillFuzzString(Parcel &parcel, std::string &str)
     str = std::string(&data[0]);
     IAM_LOGI("fill string len %{public}u ok", len - 1);
 }
+void FillFuzzInt32Vector(Parcel &parcel, std::vector<int32_t> &data)
+{
+    uint32_t len = parcel.ReadUint32() % MAX_DATA_LEN;
+    uint32_t memLen = len * sizeof(uint32_t);
+    data.resize(len);
+    FillFuzzBuffer(parcel, static_cast<void *>(&data[0]), memLen);
+    IAM_LOGI("fill vector len %{public}u ok", len);
+}
 } // namespace Common
 } // namespace UserIam
 } // namespace OHOS

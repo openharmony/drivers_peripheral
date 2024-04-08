@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("fuzztest") {
+group("driver_userauth_fuzztest") {
   testonly = true
   deps = [
     "userauthhdi_fuzzer:UserAuthHdiFuzzTest",

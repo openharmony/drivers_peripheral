@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "v1_1/pin_auth_interface_service.h"
+#include "v2_0/pin_auth_interface_service.h"
 
 #include <hdf_base.h>
 
@@ -40,31 +40,24 @@ extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
     return pinAuthInterfaceService;
 }
 
-int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList)
-{
-    std::vector<sptr<IExecutor>> executorListV1_1;
-    int32_t result = GetExecutorListV1_1(executorListV1_1);
-    for (auto &executor : executorListV1_1) {
-        executorList.push_back(executor);
-    }
-    return result;
-}
-
-int32_t PinAuthInterfaceService::GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList)
+int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIExecutor>>& allInOneExecutors,
+    std::vector<sptr<HdiIVerifier>>& verifiers, std::vector<sptr<HdiICollector>>& collectors)
 {
     IAM_LOGI("start");
+    static_cast<void>(verifiers);
+    static_cast<void>(collectors);
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi =
         OHOS::UserIam::Common::MakeShared<OHOS::UserIam::PinAuth::PinAuth>();
     if (pinHdi == nullptr) {
         IAM_LOGE("Generate pinHdi failed");
         return HDF_FAILURE;
     }
-    sptr<IExecutor> executor = new (std::nothrow) ExecutorImpl(pinHdi);
+    sptr<HdiIExecutor> executor = new (std::nothrow) ExecutorImpl(pinHdi);
     if (executor == nullptr) {
         IAM_LOGE("Generate executor failed");
         return HDF_FAILURE;
     }
-    executorList.push_back(executor);
+    allInOneExecutors.push_back(executor);
     IAM_LOGI("end");
     return HDF_SUCCESS;
 }

@@ -17,9 +17,9 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/geofence_interface_stub.h"
+#include "v2_0/geofence_interface_stub.h"
 
-using namespace OHOS::HDI::Location::Geofence::V1_0;
+using namespace OHOS::HDI::Location::Geofence::V2_0;
 
 struct HdfGeofenceInterfaceHost {
     struct IDeviceIoService ioService;

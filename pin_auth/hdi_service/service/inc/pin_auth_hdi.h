@@ -16,35 +16,30 @@
 #ifndef PIN_AUTH_HDI
 #define PIN_AUTH_HDI
 
-#include "v1_0/pin_auth_types.h"
-#include "v1_0/iexecutor_callback.h"
-#include "v1_1/pin_auth_types.h"
-#include "v1_1/iexecutor.h"
-#include "v1_1/iexecutor_callback.h"
-#include "v1_1/ipin_auth_interface.h"
-#include "v1_1/pin_auth_interface_service.h"
+#include "v2_0/iall_in_one_executor.h"
+#include "v2_0/icollector.h"
+#include "v2_0/iexecutor_callback.h"
+#include "v2_0/pin_auth_interface_service.h"
+#include "v2_0/iverifier.h"
+#include "v2_0/pin_auth_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-using IPinAuthInterface = OHOS::HDI::PinAuth::V1_1::IPinAuthInterface;
-using PinAuthInterfaceService = OHOS::HDI::PinAuth::V1_1::PinAuthInterfaceService;
+using IPinAuthInterface = OHOS::HDI::PinAuth::V2_0::IPinAuthInterface;
+using PinAuthInterfaceService = OHOS::HDI::PinAuth::V2_0::PinAuthInterfaceService;
 
-using IExecutorV1_0 = OHOS::HDI::PinAuth::V1_0::IExecutor;
-using IExecutor = OHOS::HDI::PinAuth::V1_1::IExecutor;
+using HdiIExecutor = OHOS::HDI::PinAuth::V2_0::IAllInOneExecutor;
+using HdiICollector = OHOS::HDI::PinAuth::V2_0::ICollector;
+using HdiIVerifier = OHOS::HDI::PinAuth::V2_0::IVerifier;
+using HdiIExecutorCallback = OHOS::HDI::PinAuth::V2_0::IExecutorCallback;
 
-using IExecutorCallbackV1_0 = OHOS::HDI::PinAuth::V1_0::IExecutorCallback;
-using IExecutorCallback = OHOS::HDI::PinAuth::V1_1::IExecutorCallback;
-
-using AuthType = OHOS::HDI::PinAuth::V1_0::AuthType;
-using ExecutorRole = OHOS::HDI::PinAuth::V1_0::ExecutorRole;
-using ExecutorSecureLevel = OHOS::HDI::PinAuth::V1_0::ExecutorSecureLevel;
-using CommandId = OHOS::HDI::PinAuth::V1_0::CommandId;
-using ExecutorInfo = OHOS::HDI::PinAuth::V1_0::ExecutorInfo;
-using TemplateInfo = OHOS::HDI::PinAuth::V1_0::TemplateInfo;
-
-using GetPropertyType = OHOS::HDI::PinAuth::V1_1::GetPropertyType;
-using Property = OHOS::HDI::PinAuth::V1_1::Property;
+using HdiAuthType = OHOS::HDI::PinAuth::V2_0::AuthType;
+using HdiExecutorRole = OHOS::HDI::PinAuth::V2_0::ExecutorRole;
+using HdiExecutorSecureLevel = OHOS::HDI::PinAuth::V2_0::ExecutorSecureLevel;
+using HdiExecutorInfo = OHOS::HDI::PinAuth::V2_0::ExecutorInfo;
+using HdiGetPropertyType = OHOS::HDI::PinAuth::V2_0::GetPropertyType;
+using HdiProperty = OHOS::HDI::PinAuth::V2_0::Property;
 } // namespace PinAuth
 } // namespace HDI
 } // namespace OHOS

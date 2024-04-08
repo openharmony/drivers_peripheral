@@ -45,7 +45,7 @@ typedef struct {
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
     bool isAuthResultCached;
-} AuthSolutionHal;
+} AuthParamHal;
 
 typedef struct IdentifyParam {
     uint64_t contextId;
@@ -56,7 +56,7 @@ typedef struct IdentifyParam {
 
 ResultCode InitUserAuthContextList(void);
 void DestoryUserAuthContextList(void);
-ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context);
+ResultCode GenerateAuthContext(AuthParamHal params, UserAuthContext **context);
 UserAuthContext *GenerateIdentifyContext(IdentifyParam params);
 
 UserAuthContext *GetContext(uint64_t contextId);

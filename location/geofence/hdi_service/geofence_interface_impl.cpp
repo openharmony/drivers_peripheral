@@ -21,7 +21,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Geofence {
-namespace V1_0 {
+namespace V2_0 {
 extern "C" IGeofenceInterface *GeofenceInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) GeofenceInterfaceImpl();
@@ -45,7 +45,7 @@ int32_t GeofenceInterfaceImpl::DeleteGnssGeofence(int32_t fenceIndex)
 {
     return HDF_SUCCESS;
 }
-} // V1_0
+} // V2_0
 } // Geofence
 } // Location
 } // HDI

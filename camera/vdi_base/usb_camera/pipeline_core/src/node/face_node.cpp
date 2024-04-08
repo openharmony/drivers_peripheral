@@ -60,8 +60,6 @@ void FaceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         return NodeBase::DeliverBuffer(buffer);
     }
 
-    int32_t id = buffer->GetStreamId();
-
     CameraDumper& dumper = CameraDumper::GetInstance();
     dumper.DumpBuffer("FaceNode", ENABLE_FACE_NODE_CONVERTED, buffer);
 

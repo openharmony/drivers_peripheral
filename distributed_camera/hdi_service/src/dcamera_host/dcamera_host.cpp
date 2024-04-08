@@ -80,7 +80,7 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
     DHLOGE("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
 
     std::shared_ptr<CameraAbility> ability = nullptr;
-    int32_t ret = CamRetCode::NO_ERROR;
+    int32_t ret;
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         auto iter = dCameraDeviceMap_.find(cameraId);
@@ -193,6 +193,10 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         DHLOGE("DCameraHost::AddDCameraDevice, input sourceAbilityInfo is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
+    if (GetCamDevNum() > MAX_DCAMERAS_NUMBER) {
+        DHLOGE("DCameraHost::AddDCameraDevice, cameras exceed the upper limit.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceAbilityInfo));
     if (dcameraDevice == nullptr) {
@@ -223,6 +227,12 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
     DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %{public}s",
         GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
+}
+
+size_t DCameraHost::GetCamDevNum()
+{
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+    return dCameraDeviceMap_.size();
 }
 
 DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)

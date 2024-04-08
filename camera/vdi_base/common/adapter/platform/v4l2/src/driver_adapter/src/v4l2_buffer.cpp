@@ -25,9 +25,47 @@
 #include "securec.h"
 #include "v4l2_buffer.h"
 #include "camera_dump.h"
+#define NOLOG
+#include "TimeOutExecutor.h"
+
+using namespace OHOS::TIMEOUTEXECUTOR;
 
 namespace OHOS::Camera {
 const std::string DMA_BUF_FILE_NAME = "/dev/dma_heap/system";
+
+RetCode ioctlWrapper(int fd, uint32_t buffCont, uint32_t buffType, uint32_t memoryType)
+{
+    CAMERA_LOGD("Enter function:  %{public}s\n", __FUNCTION__);
+    CAMERA_LOGD("Parameters[buffCont: %{public}d, buffType: %{public}d, memoryType: %{public}d]\n",
+        buffCont, buffType, memoryType);
+
+    struct v4l2_requestbuffers req = {};
+    req.count = buffCont;
+    req.type = buffType;
+    req.memory = memoryType;
+
+    if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
+        CAMERA_LOGE("does not support memory mapping %{public}s\n", strerror(errno));
+        return RC_ERROR;
+    }
+
+    if (req.count != buffCont) {
+        CAMERA_LOGE("error Insufficient buffer memory on \n");
+
+        req.count = 0;
+        req.type = buffType;
+        req.memory = memoryType;
+
+        // Insufficient buffer memory, release rollback memory
+        if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
+            CAMERA_LOGE("V4L2ReqBuffers does not release buffer %{public}s\n", strerror(errno));
+            return RC_ERROR;
+        }
+        return RC_ERROR;
+    }
+    return RC_OK;
+}
+
 HosV4L2Buffers::HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType)
     : memoryType_(memType), bufferType_(bufferType)
 {
@@ -37,47 +75,17 @@ HosV4L2Buffers::~HosV4L2Buffers() {}
 
 RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
 {
-    struct v4l2_requestbuffers req = {};
-
-    CAMERA_LOGD("V4L2ReqBuffers buffCont %{public}d\n", buffCont);
-
-    req.count = buffCont;
-    req.type = bufferType_;
-    req.memory = memoryType_;
-
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
-    if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
-        end = std::chrono::system_clock::now();
-        CAMERA_LOGE("does not support memory mapping %{public}s, time eplase %{public}lld ms\n",
-            strerror(errno), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
+    RetCode result = RC_OK;
+    TimeOutExecutor<decltype(ioctlWrapper)> executor(ioctlWrapper);
+    auto executeRet = executor.Execute(result, fd, buffCont, bufferType_, memoryType_);
+    if (TimeOutExecutor<decltype(ioctlWrapper)>::TIMEOUT == executeRet) {
+        CAMERA_LOGE("request buffer timeout, max waittime: %{public}d ms\n", executor.GetTimeOut());
         return RC_ERROR;
     }
 
-    end = std::chrono::system_clock::now();
-    CAMERA_LOGI("ioctl(fd, VIDIOC_REQBUFS, &req), time elapse %{public}lld ms\n",
-        std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
-
-    if (req.count != buffCont) {
-        CAMERA_LOGE("error Insufficient buffer memory on \n");
-
-        req.count = 0;
-        req.type = bufferType_;
-        req.memory = memoryType_;
-        begin = std::chrono::system_clock::now();
-        if (ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
-            end = std::chrono::system_clock::now();
-            CAMERA_LOGE("V4L2ReqBuffers does not release buffer %{public}s, time eplase %{public}lld ms\n",
-                strerror(errno), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
-            return RC_ERROR;
-        }
-        end = std::chrono::system_clock::now();
-        CAMERA_LOGI("ioctl(fd, VIDIOC_REQBUFS, &req), reapply memory time elapse %{public}lld ms\n",
-            std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
-
-        return RC_ERROR;
-    }
-    return RC_OK;
+    // executeRet is SUCCESS
+    CAMERA_LOGI("request buffer execute successful. \n");
+    return result;
 }
 
 RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec)

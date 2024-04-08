@@ -65,7 +65,6 @@ void ScaleNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         buffer->GetStreamId(), buffer->GetIndex(),
         buffer->GetCurWidth(), buffer->GetCurHeight(), buffer->GetWidth(), buffer->GetHeight());
 
-    int32_t id = buffer->GetStreamId();
     if (buffer->GetEncodeType() == ENCODE_TYPE_NULL) {
         NodeUtils::BufferScaleFormatTransform(buffer);
     }

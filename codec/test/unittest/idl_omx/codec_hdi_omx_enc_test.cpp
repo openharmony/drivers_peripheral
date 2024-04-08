@@ -18,7 +18,7 @@
 #include <servmgr_hdi.h>
 #include <vector>
 #include "codec_function_utils.h"
-#include "v2_0/codec_callback_service.h"
+#include "v3_0/codec_callback_service.h"
 
 #define ERR_COUNT (-1)
 
@@ -26,7 +26,7 @@ using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
 using OHOS::HDI::Base::NativeBuffer;
-using namespace OHOS::HDI::Codec::V2_0;
+using namespace OHOS::HDI::Codec::V3_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 
@@ -36,7 +36,7 @@ constexpr AvCodecRole ROLE = MEDIA_ROLETYPE_VIDEO_AVC;
 static sptr<ICodecComponent> g_component = nullptr;
 static sptr<ICodecCallback> g_callback = nullptr;
 static sptr<ICodecComponentManager> g_manager = nullptr;
-static OHOS::HDI::Codec::V2_0::CodecVersionType g_version;
+static OHOS::HDI::Codec::V3_0::CodecVersionType g_version;
 static std::string g_compName = "";
 
 class CodecHdiOmxEncTest : public testing::Test {
@@ -450,8 +450,8 @@ HWTEST_F(CodecHdiOmxEncTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
     ASSERT_TRUE(g_component != nullptr);
     const int32_t tunneledComp = 1002;
     const uint32_t tunneledPort = 101;
-    OHOS::HDI::Codec::V2_0::CodecTunnelSetupType tunnelSetup;
-    tunnelSetup.supplier = OHOS::HDI::Codec::V2_0::CODEC_BUFFER_SUPPLY_INPUT;
+    OHOS::HDI::Codec::V3_0::CodecTunnelSetupType tunnelSetup;
+    tunnelSetup.supplier = OHOS::HDI::Codec::V3_0::CODEC_BUFFER_SUPPLY_INPUT;
 
     auto ret = g_component->ComponentTunnelRequest(outputIndex, tunneledComp, tunneledPort,
         tunnelSetup, tunnelSetup);

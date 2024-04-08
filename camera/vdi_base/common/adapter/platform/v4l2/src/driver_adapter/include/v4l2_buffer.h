@@ -21,6 +21,7 @@
 #include <cstring>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
+#include <memory>
 #include "v4l2_common.h"
 #if defined(V4L2_UTEST) || defined (V4L2_MAIN_TEST)
 #include "v4l2_temp.h"
@@ -38,10 +39,22 @@ struct AdapterBuff {
     int32_t heapfd;
     int32_t dmafd;
 };
-class HosV4L2Buffers {
-public:
+class HosV4L2Buffers : public std::enable_shared_from_this<HosV4L2Buffers> {
+    // hide construct function
     HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType);
-    ~HosV4L2Buffers();
+public:
+    static std::shared_ptr<HosV4L2Buffers> CreateHosV4L2Buffers(enum v4l2_memory memType,
+        enum v4l2_buf_type bufferType)
+    {
+        struct HosV4L2BuffersHelper : public HosV4L2Buffers {
+            HosV4L2BuffersHelper(enum v4l2_memory memType, enum v4l2_buf_type bufferType)
+                : HosV4L2Buffers(memType, bufferType) {}
+        };
+        // online code commit rule requires using std::make_shared
+        return std::make_shared<HosV4L2BuffersHelper>(memType, bufferType);
+    }
+
+    virtual ~HosV4L2Buffers();
 
     RetCode V4L2ReqBuffers(int fd, int unsigned buffCont);
     RetCode V4L2ReleaseBuffers(int fd);
