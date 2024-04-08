@@ -39,10 +39,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     HDF_LOGD("%{public}s enter the OnDataEventVdi function, sensorId is %{public}d", __func__, eventVdi.sensorId);
     struct HdfSensorEvents event;
     int32_t ret;
-    if (sensorCallback_ == nullptr) {
-        HDF_LOGD("%{public}s sensorCallback_ is NULL", __func__);
-        return HDF_FAILURE;
-    }
 
     event.sensorId = eventVdi.sensorId;
     event.version = eventVdi.version;
@@ -57,13 +53,16 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
         HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
+        FinishTrace(HITRACE_TAG_HDF);
         return HDF_FAILURE;
     }
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
+        FinishTrace(HITRACE_TAG_HDF);
         return HDF_FAILURE;
     }
+    FinishTrace(HITRACE_TAG_HDF);
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         if (client.find(*it) == client.end()) {
             continue;
@@ -77,14 +76,16 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
             HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, *it);
             continue;
         }
+        StartTrace(HITRACE_TAG_HDF, "callback->OnDataEvent, serviceId is " + std::to_string(*it) + ", sensorId is " +
+            std::to_string(event.sensorId));
         ret = callback->OnDataEvent(event);
+        FinishTrace(HITRACE_TAG_HDF);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         } else {
             HDF_LOGD("%{public}s Sensor OnDataEvent success, serviceId is %{public}d", __func__, *it);
         }
     }
-    FinishTrace(HITRACE_TAG_HDF);
     return HDF_SUCCESS;
 }
 
