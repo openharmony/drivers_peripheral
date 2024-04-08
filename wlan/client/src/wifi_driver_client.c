@@ -58,7 +58,7 @@ void DeinitEventcallbackMutex(void)
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
-    HDF_LOGI("hal enter %{public}s", __FUNCTION__);
+    HDF_LOGD("hal enter %{public}s", __FUNCTION__);
     uint32_t i;
     OnReceiveFunc callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
@@ -66,18 +66,18 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
-            HDF_LOGI("send event=%{public}u, ifName=%{public}s, i=%{public}d", event, ifName, i);
+            HDF_LOGD("send event=%{public}u, ifName=%{public}s, i=%{public}d", event, ifName, i);
             callbackEventMap[i] = g_callbackEventMap[i]->onRecFunc;
         }
     }
     pthread_mutex_unlock(&g_callbackMutex);
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (callbackEventMap[i] != NULL) {
-            HDF_LOGI("callbackEventMap i:%{public}d vent=%{public}u, ifName=%{public}s", i,  event, ifName);
+            HDF_LOGD("callbackEventMap i:%{public}d vent=%{public}u, ifName=%{public}s", i,  event, ifName);
             callbackEventMap[i](event, data, ifName);
         }
     }
-    HDF_LOGI("hal exit %{public}s", __FUNCTION__);
+    HDF_LOGD("hal exit %{public}s", __FUNCTION__);
 }
 
 int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
