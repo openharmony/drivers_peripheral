@@ -44,7 +44,6 @@ if (defined(ohos_lite)) {
       deps += [
         "unittest/hdi:hdf_unittest_hdi_light",
         "unittest/hdi:hdf_unittest_hdi_light_common",
-        "performance:hdf_peripheral_test_light_performance",
       ]
     }
   }
