@@ -29,6 +29,7 @@ using namespace OHOS::HDI::Light::V1_0;
 namespace {
     constexpr int32_t MAX_VALUE = 255;
     constexpr int32_t MIN_VALUE = 0;
+    constexpr uint32_t g_sleepTime = 3;
     const struct LightInterface *g_lightPerformanceDev = nullptr;
     }
 
@@ -64,7 +65,7 @@ void HdfLightPerformanceTest::TearDown()
 {
 }
 
-static void InitConfig(HdfLightEffect &effect)
+static void InitConfig(LightEffect &effect)
 {
     effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
     effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
@@ -82,7 +83,7 @@ HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightPerformanceDev);
 
-    HdfLightEffect effect;
+    LightEffect effect;
     InitConfig(effect);
     effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
 
