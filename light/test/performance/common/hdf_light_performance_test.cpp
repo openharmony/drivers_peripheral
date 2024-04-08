@@ -24,6 +24,7 @@
 #include "v1_0/ilight_interface.h"
 
 using namespace testing::ext;
+using namespace OHOS::HDI::Light::V1_0;
 
 namespace {
     constexpr int32_t MAX_VALUE = 255;
