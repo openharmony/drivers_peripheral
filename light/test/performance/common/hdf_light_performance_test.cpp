@@ -78,7 +78,7 @@ static void InitConfig(HdfLightEffect &effect)
   * @tc.type: FUNC
   * @tc.require: #I9EKU9
   */
-HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRed_001, TestSize.Level1)
+HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightPerformanceDev);
 
@@ -101,7 +101,7 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRed_001, TestSize.Level1)
   * @tc.type: FUNC
   * @tc.require: #I9EKU9
   */
-HWTEST_F(HdfLightHdiCommonTest, Interface_coverage, TestSize.Level1)
+HWTEST_F(HdfLightPerformanceTest, Interface_coverage, TestSize.Level1)
 {
     g_lightPerformanceDev = NewLightInterfaceInstance();
     ASSERT_NE(nullptr, g_lightPerformanceDev);
