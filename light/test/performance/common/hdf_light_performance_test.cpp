@@ -93,3 +93,16 @@ HWTEST_F(HdfLightHdiCommonTest, TurnOnLightRed_001, TestSize.Level1)
     ret = g_lightPerformanceDev->TurnOffLight(LIGHT_ID_BATTERY);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
+
+/**
+  * @tc.name: Interface_coverage
+  * @tc.desc: Turn on the light always on red.
+  * @tc.type: FUNC
+  * @tc.require: #I9EKU9
+  */
+HWTEST_F(HdfLightHdiCommonTest, Interface_coverage, TestSize.Level1)
+{
+    g_lightPerformanceDev = NewLightInterfaceInstance();
+    ASSERT_NE(nullptr, g_lightPerformanceDev);
+    FreeLightInterfaceInstance();
+}
