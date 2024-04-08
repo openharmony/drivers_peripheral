@@ -27,7 +27,6 @@ using namespace testing::ext;
 namespace {
     constexpr int32_t MAX_VALUE = 255;
     constexpr int32_t MIN_VALUE = 0;
-    std::vector<HdfLightInfo> g_info;
     const struct LightInterface *g_lightPerformanceDev = nullptr;
     }
 
@@ -68,7 +67,7 @@ static void InitConfig(HdfLightEffect &effect)
     effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
     effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
     effect.lightColor.colorValue.rgbColor.b = MIN_VALUE;
-    effect.flashEffect.flashMode = HDF_LIGHT_FLASH_NONE;
+    effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
 }
 
 /**
