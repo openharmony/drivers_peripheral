@@ -17,6 +17,7 @@
 #include "osal_mem.h"
 #include <securec.h>
 #include <unordered_map>
+#include "hitrace_meter.h"
 
 #define HDF_LOG_TAG uhdf_sensor_callback_vdi
 
@@ -34,6 +35,7 @@ namespace {
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
+    StartTrace(HITRACE_TAG_HDF, "OnDataEventVdi");
     HDF_LOGD("%{public}s enter the OnDataEventVdi function, sensorId is %{public}d", __func__, eventVdi.sensorId);
     struct HdfSensorEvents event;
     int32_t ret;
@@ -82,6 +84,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
             HDF_LOGD("%{public}s Sensor OnDataEvent success, serviceId is %{public}d", __func__, *it);
         }
     }
+    FinishTrace(HITRACE_TAG_HDF);
     return HDF_SUCCESS;
 }
 
