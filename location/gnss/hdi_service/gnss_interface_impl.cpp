@@ -34,7 +34,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Gnss {
-namespace V1_0 {
+namespace V2_0 {
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
@@ -63,10 +63,10 @@ static void LocationUpdate(GnssLocation* location)
     locationNew.latitude = location->latitude;
     locationNew.longitude = location->longitude;
     locationNew.altitude = location->altitude;
-    locationNew.accuracy = location->horizontalAccuracy;
+    locationNew.horizontalAccuracy = location->horizontalAccuracy;
     locationNew.speed = location->speed;
-    locationNew.direction = location->bearing;
-    locationNew.timeStamp = location->timestamp;
+    locationNew.bearing = location->bearing;
+    locationNew.timeForFix = location->timestamp;
     locationNew.timeSinceBoot = location->timestampSinceBoot;
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -104,11 +104,13 @@ static void SvStatusCallback(GnssSatelliteStatus* svInfo)
     for (unsigned int i = 0; i < svInfo->satellitesNum; i++) {
         svStatus.satelliteIds.push_back(svInfo->satellitesList[i].satelliteId);
         svStatus.constellation.push_back(
-            static_cast<GnssConstellationType>(svInfo->satellitesList[i].constellationType));
+            static_cast<ConstellationCategory>(svInfo->satellitesList[i].constellationCategory));
         svStatus.elevation.push_back(svInfo->satellitesList[i].elevation);
         svStatus.azimuths.push_back(svInfo->satellitesList[i].azimuth);
-        svStatus.carrierFrequencies.push_back(svInfo->satellitesList[i].carrierFrequencie);
+        svStatus.carrierFrequencies.push_back(svInfo->satellitesList[i].carrierFrequency);
         svStatus.carrierToNoiseDensitys.push_back(svInfo->satellitesList[i].cn0);
+        svStatus.additionalInfo.push_back(
+            static_cast<SatelliteAdditionalInfo>(svInfo->satellitesList[i].satelliteAdditionalInfo));
     }
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -276,7 +278,7 @@ int32_t GnssInterfaceImpl::SetGnssReferenceInfo(const GnssRefInfo& refInfo)
     return HDF_SUCCESS;
 }
 
-int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryData data)
+int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryDataType data)
 {
     HDF_LOGI("%{public}s.", __func__);
     uint16_t flags = static_cast<uint16_t>(data);
@@ -341,6 +343,16 @@ int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& c
     return HDF_SUCCESS;
 }
 
+int32_t GnssInterfaceImpl::SendNiUserResponse(int32_t gnssNiNotificationId, GnssNiResponseCmd userResponse)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t GnssInterfaceImpl::SendNetworkInitiatedMsg(const std::string& msg, int length)
+{
+    return HDF_SUCCESS;
+}
+
 void GnssInterfaceImpl::ResetGnssDeathRecipient()
 {
     std::unique_lock<std::mutex> lock(g_mutex);
@@ -359,7 +371,7 @@ void GnssInterfaceImpl::ResetGnss()
     StopGnss(GNSS_START_TYPE_NORMAL);
     DisableGnss();
 }
-} // V1_0
+} // V2_0
 } // Gnss
 } // Location
 } // HDI

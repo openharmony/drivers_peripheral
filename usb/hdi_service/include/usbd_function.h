@@ -42,7 +42,7 @@
 #define HDC_CONFIG_OFF                  "none"
 #define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
-#define HDC_CONFIG_STORAGE              "storage"
+#define HDC_CONFIG_STORAGE              "hisuite_mass_storage"
 #define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
 #define HDC_CONFIG_STORAGE_HDC          "storage_hdc"
 #define HDC_CONFIG_MANUFACTURE_HDC      "manufacture_hdc"

@@ -17,9 +17,9 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/agnss_interface_stub.h"
+#include "v2_0/agnss_interface_stub.h"
 
-using namespace OHOS::HDI::Location::Agnss::V1_0;
+using namespace OHOS::HDI::Location::Agnss::V2_0;
 
 struct HdfAGnssInterfaceHost {
     struct IDeviceIoService ioService;

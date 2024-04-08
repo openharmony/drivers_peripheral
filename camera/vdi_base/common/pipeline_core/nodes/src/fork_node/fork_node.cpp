@@ -63,7 +63,7 @@ RetCode ForkNode::Start(const int32_t streamId)
         return RC_ERROR;
     }
 
-    forkThread_ = std::make_shared<std::thread>([this](){
+    forkThread_ = std::make_shared<std::thread>([this]() {
         while (!stopForkThread_) {
             DeliverBufferToNextNode();
         }

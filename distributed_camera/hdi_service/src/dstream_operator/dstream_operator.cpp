@@ -529,7 +529,7 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
     uint32_t size = cJSON_GetArraySize(formatObj);
     for (uint32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
-        if (item != nullptr && !cJSON_IsString(item)) {
+        if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
             continue;
         }
@@ -625,7 +625,7 @@ std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(cJSON* rootValue)
     uint32_t size = cJSON_GetArraySize(codecObj);
     for (uint32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(codecObj, i);
-        if (item != nullptr && !cJSON_IsString(item)) {
+        if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Get CodecType error.");
             return enCoders;
         }

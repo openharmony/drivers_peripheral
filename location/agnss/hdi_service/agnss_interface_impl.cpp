@@ -30,7 +30,7 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace Agnss {
-namespace V1_0 {
+namespace V2_0 {
 namespace {
 using AgnssCallBackMap = std::unordered_map<IRemoteObject*, sptr<IAGnssCallback>>;
 using AgnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
@@ -87,7 +87,7 @@ static void GetRefLocationidCb(uint32_t type)
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
-            callback->RequestAgnssRefInfo();
+            callback->RequestAgnssRefInfo(static_cast<AGnssRefInfoType>(type));
         }
     }
 }
@@ -277,6 +277,11 @@ int32_t AGnssInterfaceImpl::RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>
     return HDF_SUCCESS;
 }
 
+int32_t AGnssInterfaceImpl::SendNetworkState(const NetworkState& state)
+{
+    return HDF_SUCCESS;
+}
+
 void AGnssInterfaceImpl::ResetAgnssDeathRecipient()
 {
     std::unique_lock<std::mutex> lock(g_mutex);
@@ -295,7 +300,7 @@ void AGnssInterfaceImpl::ResetAgnss()
     std::unique_lock<std::mutex> lock(g_mutex);
     g_agnssCallBackMap.clear();
 }
-} // V1_0
+} // V2_0
 } // Agnss
 } // Location
 } // HDI

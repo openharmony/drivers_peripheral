@@ -482,14 +482,14 @@ HWTEST_F(AttributeTest, TestCreateAttributeFromSerializedMsg_001, TestSize.Level
 
 HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
 {
-    const std::vector<AttributeKey> keys = {AUTH_RESULT_CODE, AUTH_SIGNATURE, AUTH_DATA,
+    const std::vector<AttributeKey> KEYS = {AUTH_RESULT_CODE, AUTH_SIGNATURE, AUTH_DATA,
         AUTH_REMAIN_COUNT, AUTH_SCHEDULE_MODE, AUTH_REMAIN_TIME, AUTH_SCHEDULE_ID, AUTH_ROOT_SECRET};
     constexpr uint32_t LEN_BASE = 100;
     constexpr uint32_t MAX_BUFFER_LEN = 2000;
     std::vector<uint8_t> msg;
     msg.reserve(MAX_BUFFER_LEN);
     std::vector<std::vector<uint8_t>> rawValues;
-    for (const auto key : keys) {
+    for (const auto key : KEYS) {
         std::vector<uint8_t> type(sizeof(uint32_t));
         std::vector<uint8_t> len(sizeof(uint32_t));
         std::vector<uint8_t> value;
@@ -506,10 +506,10 @@ HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
     Uint8Array data = { msg.data(), static_cast<uint32_t>(msg.size()) };
     Attribute *attribute = CreateAttributeFromSerializedMsg(data);
 
-    for (uint32_t i = 0; i < keys.size(); ++i) {
+    for (uint32_t i = 0; i < KEYS.size(); ++i) {
         std::vector<uint8_t> out(LEN_BASE);
         Uint8Array value = { out.data(), static_cast<uint32_t>(out.size()) };
-        ASSERT_EQ(GetAttributeUint8Array(attribute, keys[i], &value), RESULT_SUCCESS);
+        ASSERT_EQ(GetAttributeUint8Array(attribute, KEYS[i], &value), RESULT_SUCCESS);
         out.resize(value.len);
         ASSERT_THAT(rawValues[i], ElementsAreArray(out));
     }
