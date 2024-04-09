@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,8 +143,9 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_001, TestSize.Level1)
 {
     std::string adpName;
     uint32_t devId = 0;
+    uint32_t streamId = 0;
     DAudioEvent event;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_INVALID_OPERATION, audioManagerInterfaceImpl_->Notify(adpName, devId, event));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_INVALID_OPERATION, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
 }
 
 /**
@@ -157,11 +158,12 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
 {
     std::string adpName = "adpName";
     uint32_t devId = 0;
+    uint32_t streamId = 0;
     DAudioEvent event;
     AudioAdapterDescriptor desc;
     sptr<AudioAdapterInterfaceImpl> AudioAdapter = new AudioAdapterInterfaceImpl(desc);
     audioManagerInterfaceImpl_->mapAudioAdapter_.insert(std::make_pair(adpName, AudioAdapter));
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, event));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->Notify(adpName, devId, streamId, event));
 }
 
 /**
