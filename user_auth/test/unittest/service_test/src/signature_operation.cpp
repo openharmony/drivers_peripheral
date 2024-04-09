@@ -141,20 +141,20 @@ static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t 
         return nullptr;
     }
 
-    constexpr int32_t ZERO = 0;
-    constexpr uint32_t SECRET_LEN = 32;
-    constexpr uint32_t SECRET_VALUE_LEN = 100;
-    constexpr uint8_t SECRET_VALUE = 8;
-    std::vector<uint8_t> rootSecret(SECRET_VALUE_LEN, SECRET_VALUE);
+    constexpr int32_t zero = 0;
+    constexpr uint32_t secretLen = 32;
+    constexpr uint32_t secretValueLen = 100;
+    constexpr uint8_t secretValue = 8;
+    std::vector<uint8_t> rootSecret(secretValueLen, secretValue);
     uint32_t acl = FACE_AUTH_CAPABILITY_LEVEL;
     if (WriteTlv(AUTH_RESULT_CODE, sizeof(result), (const uint8_t *)&result, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_TEMPLATE_ID, sizeof(templatedId), (const uint8_t *)&templatedId, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_SCHEDULE_ID, sizeof(scheduleId), (const uint8_t *)&scheduleId, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_SUBTYPE, sizeof(subType), (const uint8_t *)&subType, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_CAPABILITY_LEVEL, sizeof(acl), (const uint8_t *)&acl, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_REMAIN_TIME, sizeof(int32_t), (const uint8_t *)&ZERO, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_REMAIN_TIME, sizeof(int32_t), (const uint8_t *)&zero, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_REMAIN_COUNT, sizeof(int32_t), (const uint8_t *)&remainAttempts, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_ROOT_SECRET, SECRET_LEN, &rootSecret[0], ret) != RESULT_SUCCESS) {
+        WriteTlv(AUTH_ROOT_SECRET, secretLen, &rootSecret[0], ret) != RESULT_SUCCESS) {
         IAM_LOGE("write tlv fail");
         DestoryBuffer(ret);
         return nullptr;
