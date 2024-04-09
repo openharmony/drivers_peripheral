@@ -618,3 +618,53 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_012, TestSize.Level1)
         CAMERA_LOGE("print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end.");
     }
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_013
+ * @tc.desc: OHOS_ABILITY_MOVING_PHOTO OHOS_CAMERA_MOVING_PHOTO_OFF
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_013, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_3_013 start.");
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t movingPhoto = static_cast<uint8_t>(OHOS_CAMERA_MOVING_PHOTO_OFF);
+    modeSetting->addEntry(OHOS_ABILITY_MOVING_PHOTO, &movingPhoto, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_014
+ * @tc.desc: OHOS_ABILITY_MOVING_PHOTO OHOS_CAMERA_MOVING_PHOTO_ON
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_014, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_3_014 start.");
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t movingPhoto = static_cast<uint8_t>(OHOS_CAMERA_MOVING_PHOTO_ON);
+    modeSetting->addEntry(OHOS_ABILITY_MOVING_PHOTO, &movingPhoto, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+}
