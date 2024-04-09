@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
+namespace V2_0 {
 DAudioManagerInterfaceImpl *DAudioManagerInterfaceImpl::dAudioMgr_ = nullptr;
 std::mutex DAudioManagerInterfaceImpl::mgrMtx_;
 extern "C" IDAudioManager *DAudioManagerImplGetInstance(void)
@@ -87,14 +87,15 @@ int32_t DAudioManagerInterfaceImpl::UnRegisterAudioDevice(const std::string &adp
     return HDF_SUCCESS;
 }
 
-int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int32_t devId, const DAudioEvent &event)
+int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int32_t devId,
+    int32_t streamId, const DAudioEvent &event)
 {
     if (audioMgr_ == nullptr) {
         DHLOGE("Audio manager is null.");
         return HDF_FAILURE;
     }
     DHLOGI("Notify event. event type = %{public}d", event.type);
-    int32_t ret = audioMgr_->Notify(adpName, devId, event);
+    int32_t ret = audioMgr_->Notify(adpName, devId, streamId, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio event failed. ret = %{public}d", ret);
         return HDF_FAILURE;
@@ -102,7 +103,7 @@ int32_t DAudioManagerInterfaceImpl::NotifyEvent(const std::string &adpName, int3
 
     return HDF_SUCCESS;
 }
-} // V1_0
+} // v2_0
 } // AudioExt
 } // Daudio
 } // HDI

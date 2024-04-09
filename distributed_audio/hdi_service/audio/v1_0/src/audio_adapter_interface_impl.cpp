@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,16 +114,16 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
-        renderFlags_ = Audioext::V1_0::MMAP_MODE;
+        renderFlags_ = Audioext::V2_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
         audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
-        renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+        renderFlags_ = Audioext::V2_0::NORMAL_MODE;
         audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
     }
 #else
-    renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+    renderFlags_ = Audioext::V2_0::NORMAL_MODE;
     audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
 #endif
     int32_t ret = OpenRenderDevice(desc, attrs, extSpkCallback, renderPinId);
@@ -243,16 +243,16 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
-        capturerFlags_ = Audioext::V1_0::MMAP_MODE;
+        capturerFlags_ = Audioext::V2_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
         audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
-        capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+        capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
         audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
     }
 #else
-    capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+    capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
     audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
 #endif
     int32_t ret = OpenCaptureDevice(desc, attrs, extMicCallback, capPinId);
@@ -480,7 +480,7 @@ int32_t AudioAdapterInterfaceImpl::AdapterUnload()
     return HDF_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const DAudioEvent &event)
+int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t streamId, const DAudioEvent &event)
 {
     switch (static_cast<AudioExtParamEvent>(event.type)) {
         case HDF_AUDIO_EVENT_VOLUME_CHANGE:
@@ -550,7 +550,8 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 }
 
 int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extSpkCallback, int32_t dhId)
+    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extSpkCallback,
+    const int32_t dhId, const int32_t renderId)
 {
     DHLOGI("Open render device, pin: %{public}d.", dhId);
     if (isSpkOpened_) {
@@ -564,15 +565,15 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     renderParam_.sampleRate = attrs.sampleRate;
     renderParam_.streamUsage = attrs.type;
     renderParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
-        timeInterval_, renderFlags_ == Audioext::V1_0::MMAP_MODE);
+        timeInterval_, renderFlags_ == Audioext::V2_0::MMAP_MODE);
     renderParam_.renderFlags = renderFlags_;
 
-    int32_t ret = extSpkCallback->SetParameters(adpDescriptor_.adapterName, dhId, renderParam_);
+    int32_t ret = extSpkCallback->SetParameters(renderId, renderParam_);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Set render parameters failed.");
         return ERR_DH_AUDIO_HDF_SET_PARAM_FAIL;
     }
-    ret = extSpkCallback->OpenDevice(adpDescriptor_.adapterName, dhId);
+    ret = extSpkCallback->CreateStream(renderId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Open render device failed.");
         return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
@@ -588,7 +589,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
 }
 
 int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor &desc,
-    sptr<IDAudioCallback> extSpkCallback, const int32_t dhId)
+    sptr<IDAudioCallback> extSpkCallback, const int32_t dhId, const int32_t renderId)
 {
     DHLOGI("Close render device, pin: %{public}d.", dhId);
     if (extSpkCallback == nullptr) {
@@ -601,7 +602,7 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
         return DH_SUCCESS;
     }
     renderParam_ = {};
-    int32_t ret = extSpkCallback->CloseDevice(adpDescriptor_.adapterName, dhId);
+    int32_t ret = extSpkCallback->DestroyStream(renderId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
         return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
@@ -618,7 +619,8 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
 }
 
 int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extMicCallback, const int32_t dhId)
+    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> extMicCallback,
+    const int32_t dhId, const int32_t captureId)
 {
     DHLOGI("Open capture device, pin: %{public}d.", dhId);
     if (isMicOpened_) {
@@ -632,15 +634,15 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
     captureParam_.sampleRate = attrs.sampleRate;
     captureParam_.streamUsage = attrs.type;
     captureParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount,
-        attrs.format, timeInterval_, capturerFlags_ == Audioext::V1_0::MMAP_MODE);
+        attrs.format, timeInterval_, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
-    int32_t ret = extMicCallback->SetParameters(adpDescriptor_.adapterName, dhId, captureParam_);
+    int32_t ret = extMicCallback->SetParameters(captureId, captureParam_);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Set audio parameters failed.");
         return ERR_DH_AUDIO_HDF_SET_PARAM_FAIL;
     }
-    ret = extMicCallback->OpenDevice(adpDescriptor_.adapterName, dhId);
+    ret = extMicCallback->CreateStream(captureId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Open audio device failed.");
         return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
@@ -656,7 +658,7 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
 }
 
 int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescriptor &desc,
-    const sptr<IDAudioCallback> extMicCallback, const int32_t dhId)
+    const sptr<IDAudioCallback> extMicCallback, const int32_t dhId, const int32_t captureId)
 {
     DHLOGI("Close capture device, pin: %{public}d.", dhId);
     std::lock_guard<std::mutex> devLck(captureOptMtx_);
@@ -665,7 +667,7 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
         return DH_SUCCESS;
     }
     captureParam_ = {};
-    int32_t ret = extMicCallback->CloseDevice(adpDescriptor_.adapterName, dhId);
+    int32_t ret = extMicCallback->DestroyStream(captureId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
         return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
@@ -741,7 +743,8 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
 
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        for (const auto &item : renderDevs_) {
+        for (uint32_t id = 0; id < MAX_AUDIO_STREAM_NUM; id++) {
+            const auto &item = renderDevs_[id];
             std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
             sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
             SetAudioParamStr(event.content, "dhId", std::to_string(item.first));
@@ -749,8 +752,7 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
             if (render == nullptr || extSpkCallback == nullptr) {
                 continue;
             }
-            if (extSpkCallback->NotifyEvent(adpDescriptor_.adapterName,
-                item.first, event) != HDF_SUCCESS) {
+            if (extSpkCallback->NotifyEvent(id, event) != HDF_SUCCESS) {
                 DHLOGE("NotifyEvent failed.");
                 return ERR_DH_AUDIO_HDF_FAIL;
             }

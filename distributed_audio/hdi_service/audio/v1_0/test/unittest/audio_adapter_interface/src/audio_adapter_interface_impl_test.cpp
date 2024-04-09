@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -479,7 +479,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_001, TestSize.Level1)
     event.type = 3;
     event.content = "VOLUME_LEVEL";
     uint32_t devId = 64;
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    uint32_t streamId = 0;
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
 }
 
 /**
@@ -494,16 +495,17 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_002, TestSize.Level1)
     event.type = 10;
     event.content = "FOCUS_CHANGE";
     uint32_t devId = 64;
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    uint32_t streamId = 0;
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 11;
     event.content = "RENDER_STATE_CHANG";
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_NE(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 7;
     event.content = "CLOSE_MIC_RESULT";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 9;
     event.content = "MIC_CLOSED_STATE";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
 }
 
 /**
@@ -518,16 +520,17 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_003, TestSize.Level1)
     event.type = 4;
     event.content = "OPEN_SPK_RESULT";
     uint32_t devId = 64;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    uint32_t streamId = 0;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 5;
     event.content = "CLOSE_SPK_RESULT";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 6;
     event.content = "OPEN_MIC_RESULT";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
     event.type = 8;
     event.content = "SPK_CLOSED";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->Notify(devId, streamId, event));
 }
 
 /**

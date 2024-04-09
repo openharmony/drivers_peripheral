@@ -863,7 +863,6 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
     char cmd[CMD_SIZE] = {0};
     char join[CMD_SIZE] = {0};
     char mode[CMD_SIZE] = {0};
-    char persistent[CMD_SIZE] = {0};
     char pin[CMD_SIZE] = {0};
     char peerDevAddr[CMD_SIZE] = {0};
     if (memcpy_s(pin, CMD_SIZE, info->pin, CMD_SIZE) != EOK) {
@@ -914,6 +913,8 @@ int32_t WpaInterfaceP2pConnect(struct IWpaInterface *self, const char *ifName, c
         free(reply);
         return HDF_ERR_INVALID_PARAM;
     }
+
+    char persistent[CMD_SIZE] = {0};
     if (info->peerDevAddr && strlen(peerDevAddr) >= MIN_MAC_LEN) {
         ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_CONNECT %s %s%s%s%s", ifName,
             macToStr(info->peerDevAddr), pin, mode, persistent, join);
@@ -1256,7 +1257,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         HDF_LOGE("%{public}s reply is NULL!", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = 0;
+
     (void)self;
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s LIST_NETWORKS", ifName) < 0) {
         HDF_LOGE("snprintf err");
@@ -1305,9 +1306,7 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         index++;
         token = strtok_r(NULL, "\n", &savedPtr);
     }
-    if (ret < 0) {
-        HDF_LOGE("%{public}s P2pListNetworks fail!", __func__);
-    }
+
     free(reply);
     HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;

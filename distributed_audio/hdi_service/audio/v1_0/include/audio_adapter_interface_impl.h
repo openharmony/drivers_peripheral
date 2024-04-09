@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,8 @@
 #include <mutex>
 
 #include <v1_0/iaudio_adapter.h>
-#include <v1_0/id_audio_manager.h>
 #include <v1_0/audio_types.h>
+#include <v2_0/id_audio_manager.h>
 
 #include "audio_capture_interface_impl.h"
 #include "audio_capture_interface_impl_base.h"
@@ -38,10 +38,10 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::PortOperationMode;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::PortOperationMode;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 typedef enum {
     STATUS_ONLINE = 0,
@@ -98,7 +98,7 @@ public:
     std::string GetDeviceCapabilitys(const uint32_t devId);
     int32_t AdapterLoad();
     int32_t AdapterUnload();
-    int32_t Notify(const uint32_t devId, const DAudioEvent &event);
+    int32_t Notify(const uint32_t devId, const uint32_t streamId, const DAudioEvent &event);
     int32_t AddAudioDevice(const uint32_t devId, const std::string &caps);
     int32_t RemoveAudioDevice(const uint32_t devId);
     uint32_t GetVolumeGroup(const uint32_t devId);
@@ -107,13 +107,13 @@ public:
 
 private:
     int32_t OpenRenderDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId);
+        const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId, const int32_t renderId = 0);
     int32_t CloseRenderDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extSpkCallback,
-        const int32_t dhId);
+        const int32_t dhId, const int32_t renderId = 0);
     int32_t OpenCaptureDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        const sptr<IDAudioCallback> extMicCallback, const int32_t dhId);
+        const sptr<IDAudioCallback> extMicCallback, const int32_t dhId, const int32_t captureId = 0);
     int32_t CloseCaptureDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extMicCallback,
-        const int32_t dhId);
+        const int32_t dhId, const int32_t captureId = 0);
     int32_t SetAudioVolume(const std::string& condition, const std::string &param);
     int32_t GetAudioVolume(const std::string& condition, std::string &param);
     int32_t HandleFocusChangeEvent(const DAudioEvent &event);
@@ -179,8 +179,8 @@ private:
     uint32_t timeInterval_ = 5;
 
     // mmap param
-    PortOperationMode renderFlags_ = Audioext::V1_0::NORMAL_MODE;
-    PortOperationMode capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+    PortOperationMode renderFlags_ = Audioext::V2_0::NORMAL_MODE;
+    PortOperationMode capturerFlags_ = Audioext::V2_0::NORMAL_MODE;
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
