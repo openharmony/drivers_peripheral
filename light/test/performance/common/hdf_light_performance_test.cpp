@@ -30,7 +30,7 @@ namespace {
     constexpr int32_t MAX_VALUE = 255;
     constexpr int32_t MIN_VALUE = 0;
     constexpr uint32_t SLEEP_TIME = 3;
-    sptr<LightInterface> g_lightPerformanceDev = nullptr;
+    const struct LightInterface *g_lightPerformanceDev = nullptr;
 }
 
 class HdfLightPerformanceTest : public testing::Test {
