@@ -104,7 +104,6 @@ HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
   */
 HWTEST_F(HdfLightPerformanceTest, Interface_coverage, TestSize.Level1)
 {
-    g_lightPerformanceDev = NewLightInterfaceInstance();
     ASSERT_NE(nullptr, g_lightPerformanceDev);
     FreeLightInterfaceInstance();
     EXPECT_EQ(nullptr, g_lightPerformanceDev);
