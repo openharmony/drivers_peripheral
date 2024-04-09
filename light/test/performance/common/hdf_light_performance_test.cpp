@@ -28,7 +28,7 @@ using namespace OHOS::HDI::Light::V1_0;
 
 namespace {
     const struct LightInterface *g_lightPerformanceDev = nullptr;
-    }
+}
 
 class HdfLightPerformanceTest : public testing::Test {
 public:
