@@ -626,13 +626,18 @@ void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_
     info.nameLen = nameLen;
     info.queryLen = paramLen;
     info.respLen = paramLen;
-    info.name = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * nameLen);
-    info.query = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * paramLen);
-    info.resp = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * paramLen);
+    info.name = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * nameLen));
+    info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
+        return;
+    }
     strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
 
     interface->P2pAddService(interface, ifName, &info);
     OsalMemFree(info.name);
+    OsalMemFree(info.query);
+    OsalMemFree(info.resp);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
@@ -648,12 +653,18 @@ void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uin
     info.nameLen = nameLen;
     info.queryLen = paramLen;
     info.respLen = paramLen;
-    info.name = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * nameLen);
-    info.query = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * paramLen);
-    info.resp = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * paramLen);
+    info.name = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * nameLen));
+    info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
+        return;
+    }
     strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
 
     interface->P2pRemoveService(interface, ifName, &info);
+    OsalMemFree(info.name);
+    OsalMemFree(info.query);
+    OsalMemFree(info.resp);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
