@@ -800,9 +800,9 @@ void AudioCloseService(const struct DevHandle *handle)
 void SndElementItemInit(struct AlsaMixerCtlElement *m)
 {
     m->iface = IFACE_MIXER;
-    m->index = -1;
-    m->device = -1;
-    m->subdevice = -1;
+    m->index = 0;
+    m->device = 0;
+    m->subdevice = 0;
 }
 
 static snd_ctl_elem_iface_t ConvertIfaceType(enum SndIfaceType iface)
