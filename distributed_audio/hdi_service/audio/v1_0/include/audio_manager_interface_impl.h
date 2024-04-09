@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,7 @@
 #include "hdf_device_desc.h"
 #include "iremote_object.h"
 #include <v1_0/iaudio_manager.h>
-#include <v1_0/id_audio_manager.h>
+#include <v2_0/id_audio_manager.h>
 
 #include "audio_adapter_interface_impl.h"
 
@@ -32,8 +32,8 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 typedef struct {
     std::string adapterName;
@@ -66,7 +66,8 @@ public:
     int32_t AddAudioDevice(const std::string &adpName, const uint32_t dhId, const std::string &caps,
         const sptr<IDAudioCallback> &callback);
     int32_t RemoveAudioDevice(const std::string &adpName, const uint32_t dhId);
-    int32_t Notify(const std::string &adpName, const uint32_t devId, const DAudioEvent &event);
+    int32_t Notify(const std::string &adpName, const uint32_t devId,
+        const uint32_t streamId, const DAudioEvent &event);
     void SetDeviceObject(struct HdfDeviceObject *deviceObject);
 
 private:

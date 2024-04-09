@@ -340,7 +340,10 @@ void FuzzWpaInterfaceWpsPbcMode(struct IWpaInterface *interface, const uint8_t *
     wpsParam.anyFlag = 1;
     wpsParam.multiAp = 1;
     wpsParam.bssidLen = 6;
-    wpsParam.bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (wpsParam.bssidLen));
+    wpsParam.bssid = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * (wpsParam.bssidLen)));
+    if (wpsParam.bssid == nullptr) {
+        return;
+    }
     wpsParam.bssid[0] = 0x12;
     wpsParam.bssid[1] = 0x34;
     wpsParam.bssid[2] = 0x56;
@@ -349,6 +352,7 @@ void FuzzWpaInterfaceWpsPbcMode(struct IWpaInterface *interface, const uint8_t *
     wpsParam.bssid[5] = 0xcd;
 
     interface->WpsPbcMode(interface, ifName, &wpsParam);
+    OsalMemFree(wpsParam.bssid);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
@@ -360,7 +364,10 @@ void FuzzWpaInterfaceWpsPinMode(struct IWpaInterface *interface, const uint8_t *
     wpsParam.anyFlag = 1;
     wpsParam.multiAp = 1;
     wpsParam.bssidLen = 6;
-    wpsParam.bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (wpsParam.bssidLen));
+    wpsParam.bssid = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * (wpsParam.bssidLen)));
+    if (wpsParam.bssid == nullptr) {
+        return;
+    }
     wpsParam.bssid[0] = 0x12;
     wpsParam.bssid[1] = 0x34;
     wpsParam.bssid[2] = 0x56;
@@ -370,6 +377,7 @@ void FuzzWpaInterfaceWpsPinMode(struct IWpaInterface *interface, const uint8_t *
     int pinCode = 0;
 
     interface->WpsPinMode(interface, ifName, &wpsParam, &pinCode);
+    OsalMemFree(wpsParam.bssid);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
@@ -624,6 +632,7 @@ void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_
     strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
 
     interface->P2pAddService(interface, ifName, &info);
+    OsalMemFree(info.name);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
@@ -725,12 +734,19 @@ void FuzzWpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *interface, const 
 void FuzzWpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *interface, const uint8_t *rawData)
 {
     const char *ifName = reinterpret_cast<const char *>(rawData);
-    char *replyDisc = (char *)calloc(REPLY_SIZE, sizeof(char));
+    char *replyDisc = static_cast<char *>(calloc(REPLY_SIZE, sizeof(char)));
+    if (replyDisc == nullptr) {
+        return;
+    }
     uint32_t replyDiscLen = REPLY_SIZE;
     struct HdiP2pReqService reqService;
     (void)memset_s(&reqService, sizeof(struct HdiP2pReqService), 0, sizeof(struct HdiP2pReqService));
     reqService.bssidLen = ETH_ADDR_LEN;
-    reqService.bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (reqService.bssidLen));
+    reqService.bssid = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * (reqService.bssidLen)));
+    if (reqService.bssid == nullptr) {
+        free(replyDisc);
+        return;
+    }
     reqService.bssid[0] = 0x12;
     reqService.bssid[1] = 0x34;
     reqService.bssid[2] = 0x56;
@@ -739,6 +755,8 @@ void FuzzWpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *interface, con
     reqService.bssid[5] = 0xcd;
 
     interface->P2pReqServiceDiscovery(interface, ifName, &reqService, replyDisc, replyDiscLen);
+    free(replyDisc);
+    OsalMemFree(reqService.bssid);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
@@ -766,10 +784,14 @@ void FuzzWpaInterfaceP2pConnect(struct IWpaInterface *interface, const uint8_t *
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiP2pConnectInfo info;
     (void)memset_s(&info, sizeof(struct HdiP2pConnectInfo), 0, sizeof(struct HdiP2pConnectInfo));
-    char *replyPin = (char *)calloc(REPLY_SIZE, sizeof(char));
+    char *replyPin = static_cast<char *>(calloc(REPLY_SIZE, sizeof(char)));
+    if (replyPin == nullptr) {
+        return;
+    }
     uint32_t replyPinLen = REPLY_SIZE;
 
     interface->P2pConnect(interface, ifName, &info, replyPin, replyPinLen);
+    free(replyPin);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
