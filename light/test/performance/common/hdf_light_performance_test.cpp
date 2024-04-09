@@ -29,8 +29,8 @@ using namespace OHOS::HDI::Light::V1_0;
 namespace {
     constexpr int32_t MAX_VALUE = 255;
     constexpr int32_t MIN_VALUE = 0;
-    constexpr uint32_t g_sleepTime = 3;
-    const struct LightInterface *g_lightPerformanceDev = nullptr;
+    constexpr uint32_t SLEEP_TIME = 3;
+    sptr<LightInterface> g_lightPerformanceDev = nullptr;
 }
 
 class HdfLightPerformanceTest : public testing::Test {
@@ -90,7 +90,7 @@ HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
     int32_t ret = g_lightPerformanceDev->TurnOnLight(LIGHT_ID_BATTERY, &effect);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    OsalSleep(g_sleepTime);
+    OsalSleep(SLEEP_TIME);
 
     ret = g_lightPerformanceDev->TurnOffLight(LIGHT_ID_BATTERY);
     EXPECT_EQ(HDF_SUCCESS, ret);
