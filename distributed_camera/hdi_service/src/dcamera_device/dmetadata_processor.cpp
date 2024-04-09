@@ -780,8 +780,8 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, const std::strin
     if (formatObj == nullptr) {
         return;
     }
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
@@ -871,8 +871,8 @@ void DMetadataProcessor::ParsePhotoFormats(cJSON* rootValue,
     }
 
     std::vector<int> photoFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item !=nullptr && cJSON_IsNumber(item)) {
             photoFormats.push_back(item->valueint);
@@ -899,8 +899,8 @@ void DMetadataProcessor::ParsePreviewFormats(cJSON* rootValue,
         return;
     }
     std::vector<int> previewFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item !=nullptr && cJSON_IsNumber(item)) {
             previewFormats.push_back(item->valueint);
@@ -924,8 +924,8 @@ void DMetadataProcessor::ParseVideoFormats(cJSON* rootValue,
         return;
     }
     std::vector<int> videoFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item !=nullptr && cJSON_IsNumber(item)) {
             videoFormats.push_back(item->valueint);
