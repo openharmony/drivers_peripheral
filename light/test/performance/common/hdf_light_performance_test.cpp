@@ -27,6 +27,9 @@ using namespace testing::ext;
 using namespace OHOS::HDI::Light::V1_0;
 
 namespace {
+    constexpr int32_t MAX_VALUE = 255;
+    constexpr int32_t MIN_VALUE = 0;
+    constexpr uint32_t SLEEP_TIME = 3;
     const struct LightInterface *g_lightPerformanceDev = nullptr;
 }
 
@@ -60,4 +63,35 @@ void HdfLightPerformanceTest::SetUp()
 
 void HdfLightPerformanceTest::TearDown()
 {
+}
+
+static void InitConfig(LightEffect &effect)
+{
+    effect.lightColor.colorValue.rgbColor.r = MIN_VALUE;
+    effect.lightColor.colorValue.rgbColor.g = MIN_VALUE;
+    effect.lightColor.colorValue.rgbColor.b = MIN_VALUE;
+    effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
+}
+
+/**
+  * @tc.name: TurnOnLightRed001
+  * @tc.desc: Turn on the light always on red.
+  * @tc.type: FUNC
+  * @tc.require: #I9EKU9
+  */
+HWTEST_F(HdfLightPerformanceTest, TurnOnLightRed_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightPerformanceDev);
+
+    LightEffect effect;
+    InitConfig(effect);
+    effect.lightColor.colorValue.rgbColor.r = MAX_VALUE;
+
+    int32_t ret = g_lightPerformanceDev->TurnOnLight(LIGHT_ID_BATTERY, &effect);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    OsalSleep(SLEEP_TIME);
+
+    ret = g_lightPerformanceDev->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
