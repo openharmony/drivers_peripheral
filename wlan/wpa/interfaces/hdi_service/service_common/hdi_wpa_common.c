@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include <string.h>
-#include <hdf_log.h>
-#include "hdi_wpa_hal.h"
+ 
 #include "hdi_wpa_common.h"
-#include "wpa_common_cmd.h"
+#include <hdf_log.h>
+#include <string.h>
 #include "common/wpa_ctrl.h"
+#include "hdi_wpa_hal.h"
+#include "wpa_common_cmd.h"
+
 #undef LOG_TAG
 #define LOG_TAG "HdiHalWpaCommon"
 
@@ -121,7 +122,7 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
 int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
 {
     HDF_LOGI("enter WpaCliCmd");
-    if (cmd == NULL || buf == NULL || bufLen <= 0) {
+    if (cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("WpaCliCmd, invalid parameters!");
         return -1;
     }
