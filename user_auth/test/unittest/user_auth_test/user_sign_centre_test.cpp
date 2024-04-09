@@ -80,24 +80,24 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenSign, TestSize.Level0)
 
 HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
 {
-    constexpr uint32_t TEST_VERSION = 1;
-    constexpr uint32_t TEST_AUTH_TRUST_LEVEL = 3;
-    constexpr uint32_t TEST_AUTH_TYPE = 4;
-    constexpr uint32_t TEST_AUTH_MODE = 5;
-    constexpr uint32_t TEST_SECURITY_LEVEL = 6;
-    constexpr int32_t TEST_USER_ID = 7;
-    constexpr uint64_t TEST_SECURE_ID = 8;
-    constexpr uint64_t TEST_ENROLLED_ID = 9;
-    constexpr uint64_t TEST_CREDENTIAL_ID = 10;
+    constexpr uint32_t testVersion = 1;
+    constexpr uint32_t testAuthTrustLevel = 3;
+    constexpr uint32_t testAuthType = 4;
+    constexpr uint32_t testAuthMode = 5;
+    constexpr uint32_t testSecurityLevel = 6;
+    constexpr int32_t testUserId = 7;
+    constexpr uint64_t testSecureId = 8;
+    constexpr uint64_t testEnrolledId = 9;
+    constexpr uint64_t testCredentialId = 10;
     UserAuthTokenHal token = {
-        .version = TEST_VERSION,
+        .version = testVersion,
         .tokenDataPlain = {
             .challenge = DEAULT_CHALLENGE,
             .time = GetSystemTime(),
-            .authTrustLevel = TEST_AUTH_TRUST_LEVEL,
-            .authType = TEST_AUTH_TYPE,
-            .authMode = TEST_AUTH_MODE,
-            .securityLevel = TEST_SECURITY_LEVEL,
+            .authTrustLevel = testAuthTrustLevel,
+            .authType = testAuthType,
+            .authMode = testAuthMode,
+            .securityLevel = testSecurityLevel,
         },
         .tokenDataCipher = DEFAULT_CIPHER,
         .tag = DEFAULT_TAG,
@@ -105,10 +105,10 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
         .sign = DEFAULT_SIGN,
     };
     TokenDataToEncrypt data = {
-        .userId = TEST_USER_ID,
-        .secureUid = TEST_SECURE_ID,
-        .enrolledId = TEST_ENROLLED_ID,
-        .credentialId = TEST_CREDENTIAL_ID,
+        .userId = testUserId,
+        .secureUid = testSecureId,
+        .enrolledId = testEnrolledId,
+        .credentialId = testCredentialId,
     };
     HksAuthTokenKey userAuthTokenKey = {};
     EXPECT_EQ(GetTokenKey(&userAuthTokenKey), RESULT_SUCCESS);

@@ -41,10 +41,10 @@ public:
 
 void RandomFillVector(std::vector<uint8_t> &src, uint32_t len)
 {
-    constexpr uint32_t MOD = 128;
+    constexpr uint32_t mod = 128;
     for (uint32_t i = 0; i < len; ++i) {
         uint32_t num = static_cast<uint32_t>(rand());
-        src.push_back(static_cast<uint8_t>(num % MOD));
+        src.push_back(static_cast<uint8_t>(num % mod));
     }
 }
 
@@ -97,18 +97,18 @@ HWTEST_F(AttributeTest, TestAttributeUint32_001, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint32_t VALUE_1 = 6036;
-    constexpr uint32_t VALUE_2 = 5697;
-    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_REMAIN_TIME, VALUE_1), RESULT_SUCCESS);
-    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, VALUE_2), RESULT_SUCCESS);
+    constexpr uint32_t value1 = 6036;
+    constexpr uint32_t value2 = 5697;
+    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_REMAIN_TIME, value1), RESULT_SUCCESS);
+    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, value2), RESULT_SUCCESS);
 
     uint32_t out1 = 0;
     uint32_t out2 = 0;
     ASSERT_EQ(GetAttributeUint32(attribute, AUTH_REMAIN_TIME, &out1), RESULT_SUCCESS);
     ASSERT_EQ(GetAttributeUint32(attribute, AUTH_PROPERTY_MODE, &out2), RESULT_SUCCESS);
 
-    ASSERT_EQ(out1, VALUE_1);
-    ASSERT_EQ(out2, VALUE_2);
+    ASSERT_EQ(out1, value1);
+    ASSERT_EQ(out2, value2);
 
     FreeAttribute(&attribute);
 }
@@ -118,9 +118,9 @@ HWTEST_F(AttributeTest, TestAttributeUint32_002, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint32_t VALUE = 6036;
-    ASSERT_EQ(SetAttributeUint32(nullptr, AUTH_REMAIN_TIME, VALUE), RESULT_BAD_PARAM);
-    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_REMAIN_TIME, VALUE), RESULT_SUCCESS);
+    constexpr uint32_t value = 6036;
+    ASSERT_EQ(SetAttributeUint32(nullptr, AUTH_REMAIN_TIME, value), RESULT_BAD_PARAM);
+    ASSERT_EQ(SetAttributeUint32(attribute, AUTH_REMAIN_TIME, value), RESULT_SUCCESS);
 
     uint32_t out = 0;
     ASSERT_EQ(GetAttributeUint32(nullptr, AUTH_REMAIN_TIME, &out), RESULT_BAD_PARAM);
@@ -136,18 +136,18 @@ HWTEST_F(AttributeTest, TestAttributeInt32_001, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr int32_t VALUE_1 = 6036;
-    constexpr int32_t VALUE_2 = 5697;
-    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_RESULT_CODE, VALUE_1), RESULT_SUCCESS);
-    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_REMAIN_COUNT, VALUE_2), RESULT_SUCCESS);
+    constexpr int32_t value1 = 6036;
+    constexpr int32_t value2 = 5697;
+    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_RESULT_CODE, value1), RESULT_SUCCESS);
+    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_REMAIN_COUNT, value2), RESULT_SUCCESS);
 
     int32_t out1 = 0;
     int32_t out2 = 0;
     ASSERT_EQ(GetAttributeInt32(attribute, AUTH_RESULT_CODE, &out1), RESULT_SUCCESS);
     ASSERT_EQ(GetAttributeInt32(attribute, AUTH_REMAIN_COUNT, &out2), RESULT_SUCCESS);
 
-    ASSERT_EQ(out1, VALUE_1);
-    ASSERT_EQ(out2, VALUE_2);
+    ASSERT_EQ(out1, value1);
+    ASSERT_EQ(out2, value2);
 
     FreeAttribute(&attribute);
 }
@@ -157,9 +157,9 @@ HWTEST_F(AttributeTest, TestAttributeInt32_002, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr int32_t VALUE = 6036;
-    ASSERT_EQ(SetAttributeInt32(nullptr, AUTH_RESULT_CODE, VALUE), RESULT_BAD_PARAM);
-    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_RESULT_CODE, VALUE), RESULT_SUCCESS);
+    constexpr int32_t value = 6036;
+    ASSERT_EQ(SetAttributeInt32(nullptr, AUTH_RESULT_CODE, value), RESULT_BAD_PARAM);
+    ASSERT_EQ(SetAttributeInt32(attribute, AUTH_RESULT_CODE, value), RESULT_SUCCESS);
 
     int32_t out = 0;
     ASSERT_EQ(GetAttributeInt32(nullptr, AUTH_RESULT_CODE, &out), RESULT_BAD_PARAM);
@@ -175,18 +175,18 @@ HWTEST_F(AttributeTest, TestAttributeUint64_001, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint64_t VALUE_1 = 6036;
-    constexpr uint64_t VALUE_2 = 5697;
-    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, VALUE_1), RESULT_SUCCESS);
-    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, VALUE_2), RESULT_SUCCESS);
+    constexpr uint64_t value1 = 6036;
+    constexpr uint64_t value2 = 5697;
+    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, value1), RESULT_SUCCESS);
+    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, value2), RESULT_SUCCESS);
 
     uint64_t out1 = 0;
     uint64_t out2 = 0;
     ASSERT_EQ(GetAttributeUint64(attribute, AUTH_TEMPLATE_ID, &out1), RESULT_SUCCESS);
     ASSERT_EQ(GetAttributeUint64(attribute, AUTH_SCHEDULE_ID, &out2), RESULT_SUCCESS);
 
-    ASSERT_EQ(out1, VALUE_1);
-    ASSERT_EQ(out2, VALUE_2);
+    ASSERT_EQ(out1, value1);
+    ASSERT_EQ(out2, value2);
 
     FreeAttribute(&attribute);
 }
@@ -196,9 +196,9 @@ HWTEST_F(AttributeTest, TestAttributeUint64_002, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint64_t VALUE = 6036;
-    ASSERT_EQ(SetAttributeUint64(nullptr, AUTH_TEMPLATE_ID, VALUE), RESULT_BAD_PARAM);
-    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, VALUE), RESULT_SUCCESS);
+    constexpr uint64_t value = 6036;
+    ASSERT_EQ(SetAttributeUint64(nullptr, AUTH_TEMPLATE_ID, value), RESULT_BAD_PARAM);
+    ASSERT_EQ(SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, value), RESULT_SUCCESS);
 
     uint64_t out = 0;
     ASSERT_EQ(GetAttributeUint64(nullptr, AUTH_TEMPLATE_ID, &out), RESULT_BAD_PARAM);
@@ -214,17 +214,17 @@ HWTEST_F(AttributeTest, TestAttributeUint8Array_001, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint8_t SIZE = 252;
+    constexpr uint8_t size = 252;
     std::vector<uint8_t> array;
-    array.reserve(SIZE);
-    for (uint8_t i = 0; i < SIZE; ++i) {
+    array.reserve(size);
+    for (uint8_t i = 0; i < size; ++i) {
         array.push_back(i);
     }
-    Uint8Array data = { array.data(), SIZE };
+    Uint8Array data = { array.data(), size };
     ASSERT_EQ(SetAttributeUint8Array(attribute, AUTH_SIGNATURE, data), RESULT_SUCCESS);
 
-    std::vector<uint8_t> out(SIZE);
-    Uint8Array value = { out.data(), SIZE };
+    std::vector<uint8_t> out(size);
+    Uint8Array value = { out.data(), size };
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, &value), RESULT_SUCCESS);
     ASSERT_THAT(out, ElementsAreArray(array));
 
@@ -240,17 +240,17 @@ HWTEST_F(AttributeTest, TestAttributeUint8Array_002, TestSize.Level0)
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, nullptr), RESULT_BAD_PARAM);
     Uint8Array value = {};
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, &value), RESULT_BAD_PARAM);
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint8_t> array(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint8_t> array(size);
     value = { array.data(), 0 };
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, &value), RESULT_BAD_PARAM);
 
     value = { array.data(), static_cast<uint32_t>(array.size()) };
-    constexpr uint32_t INVALID_KEY = 100000032;
+    constexpr uint32_t invalidKey = 100000032;
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_CALLER_UID, &value), RESULT_GENERAL_ERROR);
-    ASSERT_EQ(GetAttributeUint8Array(attribute, static_cast<AttributeKey>(INVALID_KEY), &value), RESULT_GENERAL_ERROR);
+    ASSERT_EQ(GetAttributeUint8Array(attribute, static_cast<AttributeKey>(invalidKey), &value), RESULT_GENERAL_ERROR);
 
-    std::vector<uint8_t> out(SIZE + SIZE);
+    std::vector<uint8_t> out(size + size);
     Uint8Array data = { out.data(), static_cast<uint32_t>(out.size()) };
     ASSERT_EQ(SetAttributeUint8Array(attribute, AUTH_SIGNATURE, data), RESULT_SUCCESS);
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, &value), RESULT_GENERAL_ERROR);
@@ -269,8 +269,8 @@ HWTEST_F(AttributeTest, TestAttributeUint8Array_003, TestSize.Level0)
     ASSERT_EQ(SetAttributeUint8Array(attribute, AUTH_SIGNATURE, data), RESULT_BAD_PARAM);
 
     data = { array.data(), static_cast<uint32_t>(array.size()) };
-    constexpr uint32_t INVALID_KEY = 100000032;
-    ASSERT_EQ(SetAttributeUint8Array(attribute, static_cast<AttributeKey>(INVALID_KEY), data), RESULT_GENERAL_ERROR);
+    constexpr uint32_t invalidKey = 100000032;
+    ASSERT_EQ(SetAttributeUint8Array(attribute, static_cast<AttributeKey>(invalidKey), data), RESULT_GENERAL_ERROR);
 
     MockMemMgr mock;
     EXPECT_CALL(mock, Malloc(_))
@@ -306,8 +306,8 @@ HWTEST_F(AttributeTest, TestSetEmptyUint8Array_001, TestSize.Level0)
     Uint8Array data = {};
     ASSERT_EQ(SetAttributeUint8Array(attribute, AUTH_SIGNATURE, data), RESULT_SUCCESS);
 
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint8_t> array(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint8_t> array(size);
     Uint8Array value = { array.data(), static_cast<uint32_t>(array.size()) };
     ASSERT_EQ(GetAttributeUint8Array(attribute, AUTH_SIGNATURE, &value), RESULT_SUCCESS);
 
@@ -321,17 +321,17 @@ HWTEST_F(AttributeTest, TestAttributeUint64Array_001, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     ASSERT_NE(attribute, nullptr);
 
-    constexpr uint64_t SIZE = 8192;
+    constexpr uint64_t size = 8192;
     std::vector<uint64_t> array;
-    array.reserve(SIZE);
-    for (uint64_t i = 0; i < SIZE; ++i) {
+    array.reserve(size);
+    for (uint64_t i = 0; i < size; ++i) {
         array.push_back(i);
     }
-    Uint64Array data = { array.data(), SIZE };
+    Uint64Array data = { array.data(), size };
     ASSERT_EQ(SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, data), RESULT_SUCCESS);
 
-    std::vector<uint64_t> out(SIZE);
-    Uint64Array value = { out.data(), SIZE };
+    std::vector<uint64_t> out(size);
+    Uint64Array value = { out.data(), size };
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, &value), RESULT_SUCCESS);
     ASSERT_THAT(out, ElementsAreArray(array));
 
@@ -347,18 +347,18 @@ HWTEST_F(AttributeTest, TestAttributeUint64Array_002, TestSize.Level0)
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, nullptr), RESULT_BAD_PARAM);
     Uint64Array value = {};
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, &value), RESULT_BAD_PARAM);
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint64_t> array(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint64_t> array(size);
     value = { array.data(), 0 };
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, &value), RESULT_BAD_PARAM);
 
     value = { array.data(), static_cast<uint32_t>(array.size()) };
-    constexpr uint32_t INVALID_KEY = 100000032;
+    constexpr uint32_t invalidKey = 100000032;
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_CALLER_UID, &value), RESULT_GENERAL_ERROR);
-    ASSERT_EQ(GetAttributeUint64Array(attribute, static_cast<AttributeKey>(INVALID_KEY), &value),
+    ASSERT_EQ(GetAttributeUint64Array(attribute, static_cast<AttributeKey>(invalidKey), &value),
         RESULT_GENERAL_ERROR);
 
-    std::vector<uint8_t> temp(SIZE);
+    std::vector<uint8_t> temp(size);
     Uint8Array data = { temp.data(), static_cast<uint32_t>(temp.size()) };
     ASSERT_EQ(SetAttributeUint8Array(attribute, AUTH_SIGNATURE, data), RESULT_SUCCESS);
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_SIGNATURE, &value), RESULT_GENERAL_ERROR);
@@ -412,8 +412,8 @@ HWTEST_F(AttributeTest, TestSetEmptyUint64Array_001, TestSize.Level0)
     Uint64Array data = {};
     ASSERT_EQ(SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, data), RESULT_SUCCESS);
 
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint64_t> array(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint64_t> array(size);
     Uint64Array value = { array.data(), static_cast<uint32_t>(array.size()) };
     ASSERT_EQ(GetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, &value), RESULT_SUCCESS);
 
@@ -433,8 +433,8 @@ HWTEST_F(AttributeTest, TestGetAttributeSerializedMsg_001, TestSize.Level0)
     Uint8Array retMsg = { nullptr, 0 };
     ASSERT_EQ(GetAttributeSerializedMsg(attribute, &retMsg), RESULT_BAD_PARAM);
 
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint8_t> temp(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint8_t> temp(size);
     retMsg = { temp.data(), 0 };
     ASSERT_EQ(GetAttributeSerializedMsg(attribute, &retMsg), RESULT_BAD_PARAM);
 
@@ -449,8 +449,8 @@ HWTEST_F(AttributeTest, TestCreateAttributeFromSerializedMsg_001, TestSize.Level
     Uint8Array msg = { nullptr, 0 };
     ASSERT_EQ(CreateAttributeFromSerializedMsg(msg), nullptr);
 
-    constexpr uint32_t SIZE = 20;
-    std::vector<uint8_t> temp(SIZE);
+    constexpr uint32_t size = 20;
+    std::vector<uint8_t> temp(size);
     msg = { temp.data(), 0 };
     ASSERT_EQ(CreateAttributeFromSerializedMsg(msg), nullptr);
 
@@ -482,18 +482,18 @@ HWTEST_F(AttributeTest, TestCreateAttributeFromSerializedMsg_001, TestSize.Level
 
 HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
 {
-    const std::vector<AttributeKey> KEYS = {AUTH_RESULT_CODE, AUTH_SIGNATURE, AUTH_DATA,
+    const std::vector<AttributeKey> keys = {AUTH_RESULT_CODE, AUTH_SIGNATURE, AUTH_DATA,
         AUTH_REMAIN_COUNT, AUTH_SCHEDULE_MODE, AUTH_REMAIN_TIME, AUTH_SCHEDULE_ID, AUTH_ROOT_SECRET};
-    constexpr uint32_t LEN_BASE = 100;
-    constexpr uint32_t MAX_BUFFER_LEN = 2000;
+    constexpr uint32_t lenBase = 100;
+    constexpr uint32_t maxBufferLen = 2000;
     std::vector<uint8_t> msg;
-    msg.reserve(MAX_BUFFER_LEN);
+    msg.reserve(maxBufferLen);
     std::vector<std::vector<uint8_t>> rawValues;
-    for (const auto key : KEYS) {
+    for (const auto key : keys) {
         std::vector<uint8_t> type(sizeof(uint32_t));
         std::vector<uint8_t> len(sizeof(uint32_t));
         std::vector<uint8_t> value;
-        uint32_t size = rand() % LEN_BASE + 1;
+        uint32_t size = rand() % lenBase + 1;
         static_cast<void>(memcpy_s(type.data(), type.size(), &key, sizeof(key)));
         static_cast<void>(memcpy_s(len.data(), len.size(), &size, sizeof(size)));
         RandomFillVector(value, size);
@@ -506,10 +506,10 @@ HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
     Uint8Array data = { msg.data(), static_cast<uint32_t>(msg.size()) };
     Attribute *attribute = CreateAttributeFromSerializedMsg(data);
 
-    for (uint32_t i = 0; i < KEYS.size(); ++i) {
-        std::vector<uint8_t> out(LEN_BASE);
+    for (uint32_t i = 0; i < keys.size(); ++i) {
+        std::vector<uint8_t> out(lenBase);
         Uint8Array value = { out.data(), static_cast<uint32_t>(out.size()) };
-        ASSERT_EQ(GetAttributeUint8Array(attribute, KEYS[i], &value), RESULT_SUCCESS);
+        ASSERT_EQ(GetAttributeUint8Array(attribute, keys[i], &value), RESULT_SUCCESS);
         out.resize(value.len);
         ASSERT_THAT(rawValues[i], ElementsAreArray(out));
     }
@@ -519,7 +519,7 @@ HWTEST_F(AttributeTest, TestAttributeDeserialize, TestSize.Level0)
 
 HWTEST_F(AttributeTest, TestAttributeSetAndGet_001, TestSize.Level0)
 {
-    constexpr uint32_t MAX_MSG_LEN = 1000;
+    constexpr uint32_t maxBufferLen = 1000;
     Attribute *originAttribute = CreateEmptyAttribute();
     EXPECT_NE(originAttribute, nullptr);
     uint32_t testUint32 = 123;
@@ -531,7 +531,7 @@ HWTEST_F(AttributeTest, TestAttributeSetAndGet_001, TestSize.Level0)
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeUint64(originAttribute, AUTH_SCHEDULE_ID, testUint64);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    uint8_t msgBuffer[MAX_MSG_LEN] = {};
+    uint8_t msgBuffer[maxBufferLen] = {};
     Uint8Array msg = { msgBuffer, sizeof(msgBuffer) / sizeof(msgBuffer[0]) };
     result = GetAttributeSerializedMsg(originAttribute, &msg);
     EXPECT_EQ(result, RESULT_SUCCESS);
@@ -554,7 +554,7 @@ HWTEST_F(AttributeTest, TestAttributeSetAndGet_001, TestSize.Level0)
 
 HWTEST_F(AttributeTest, TestAttributeSetAndGet_002, TestSize.Level0)
 {
-    constexpr uint32_t MAX_MSG_LEN = 1000;
+    constexpr uint32_t maxBufferLen = 1000;
     Attribute *originAttribute = CreateEmptyAttribute();
     EXPECT_NE(originAttribute, nullptr);
     uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
@@ -565,15 +565,15 @@ HWTEST_F(AttributeTest, TestAttributeSetAndGet_002, TestSize.Level0)
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeUint64Array(originAttribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    uint8_t msgBuffer[MAX_MSG_LEN] = {};
+    uint8_t msgBuffer[maxBufferLen] = {};
     Uint8Array msg = { msgBuffer, sizeof(msgBuffer) / sizeof(msgBuffer[0]) };
     result = GetAttributeSerializedMsg(originAttribute, &msg);
     EXPECT_EQ(result, RESULT_SUCCESS);
     FreeAttribute(&originAttribute);
 
-    constexpr uint32_t MAX_SIZE = 10;
-    uint8_t parsedUint8Buffer[MAX_SIZE];
-    uint64_t parsedUint64Buffer[MAX_SIZE];
+    constexpr uint32_t maxSize = 10;
+    uint8_t parsedUint8Buffer[maxSize];
+    uint64_t parsedUint64Buffer[maxSize];
     Uint8Array parsedUint8Array = { parsedUint8Buffer, sizeof(parsedUint8Buffer) / sizeof(parsedUint8Buffer[0]) };
     Uint64Array parsedUint64Array = { parsedUint64Buffer, sizeof(parsedUint64Buffer) / sizeof(parsedUint64Buffer[0]) };
     Attribute *parsedAttribute = CreateAttributeFromSerializedMsg(msg);
