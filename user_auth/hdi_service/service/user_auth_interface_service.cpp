@@ -348,6 +348,8 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
             }
         }
     }
+    infoOut.userId = infoIn.userId;
+    IAM_LOGI("matched userId: %{public}d.", infoOut.userId);
     DestoryBuffer(infoIn.rootSecret);
     return RESULT_SUCCESS;
 }
