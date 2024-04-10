@@ -49,8 +49,8 @@ HWTEST_F(AdaptorMemoryTest, Malloc_Free_test, TestSize.Level0)
 {
     uint8_t *data1 = (uint8_t *)Malloc(0);
     EXPECT_EQ(data1, nullptr);
-    constexpr uint64_t MAX_SIZE = 1073741825;
-    uint8_t *data2 = (uint8_t *)Malloc(MAX_SIZE);
+    constexpr uint64_t maxSize = 1073741825;
+    uint8_t *data2 = (uint8_t *)Malloc(maxSize);
     EXPECT_EQ(data2, nullptr);
     Free(data2);
     uint8_t *data3 = (uint8_t *)Malloc(1);

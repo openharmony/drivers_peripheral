@@ -53,24 +53,24 @@ HWTEST_F(UserAuthFuncsTest, TestGenerateSolutionFunc, TestSize.Level0)
 
 HWTEST_F(UserAuthFuncsTest, TestRequestAuthResultFunc, TestSize.Level0)
 {
-    constexpr uint64_t CONTEXT_ID = 2131;
-    constexpr uint32_t BUFFER_SIZE = 10;
-    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
-    Buffer *scheduleResult = CreateBufferBySize(BUFFER_SIZE);
+    constexpr uint64_t contextId = 2131;
+    constexpr uint32_t bufferSize = 10;
+    EXPECT_EQ(RequestAuthResultFunc(contextId, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    Buffer *scheduleResult = CreateBufferBySize(bufferSize);
     UserAuthTokenHal token = {};
     AuthResult result = {};
-    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, nullptr, nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, &token, nullptr), RESULT_BAD_PARAM);
-    result.rootSecret = CreateBufferBySize(BUFFER_SIZE);
-    EXPECT_EQ(RequestAuthResultFunc(CONTEXT_ID, scheduleResult, &token, &result), RESULT_BAD_PARAM);
+    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, nullptr), RESULT_BAD_PARAM);
+    result.rootSecret = CreateBufferBySize(bufferSize);
+    EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, &result), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
 {
-    constexpr int32_t USER_ID = 1;
-    constexpr uint32_t AUTH_TYPE = 1;
+    constexpr int32_t userId = 1;
+    constexpr uint32_t authType = 1;
     EnrolledStateHal enrolledStateHal = {};
-    EXPECT_EQ(GetEnrolledStateFunc(USER_ID, AUTH_TYPE, &enrolledStateHal), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetEnrolledStateFunc(userId, authType, &enrolledStateHal), RESULT_NOT_ENROLLED);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)

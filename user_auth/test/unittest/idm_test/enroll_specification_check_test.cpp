@@ -87,18 +87,18 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)
 HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_002, TestSize.Level0)
 {
     g_userInfoList = nullptr;
-    constexpr int32_t USER_ID = 2661;
-    constexpr uint64_t VALID_AUTH_TOKEN_TIME = 100;
-    constexpr uint32_t AUTH_TYPE = 1;
-    constexpr uint64_t SEC_UID_1 = 10;
-    constexpr uint64_t SEC_UID_2 = 20;
+    constexpr int32_t userId = 2661;
+    constexpr uint64_t validAuthTokenTime = 100;
+    constexpr uint32_t authType = 1;
+    constexpr uint64_t secUid1 = 10;
+    constexpr uint64_t secUid2 = 20;
     struct SessionInfo session = {};
-    session.userId = USER_ID;
-    session.validAuthTokenTime = VALID_AUTH_TOKEN_TIME;
+    session.userId = userId;
+    session.validAuthTokenTime = validAuthTokenTime;
     g_session = &session;
     EXPECT_EQ(GenerateChallenge(session.challenge, CHALLENGE_LEN), RESULT_SUCCESS);
     UserAuthTokenHal token = {};
-    token.tokenDataPlain.authType = AUTH_TYPE;
+    token.tokenDataPlain.authType = authType;
     token.tokenDataPlain.time = GetSystemTime();
     TokenDataToEncrypt data = {
         .userId = 0,
@@ -121,13 +121,13 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_002, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
     UserInfo *userInfo = static_cast<UserInfo *>(Malloc(sizeof(UserInfo)));
     userInfo->userId = session.userId;
-    userInfo->secUid = SEC_UID_2;
+    userInfo->secUid = secUid2;
     userInfo->credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     userInfo->enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
     EXPECT_EQ(CheckIdmOperationToken(session.userId, &token), RESULT_BAD_MATCH);
 
-    userInfo->secUid = SEC_UID_1;
+    userInfo->secUid = secUid1;
     EXPECT_EQ(CheckIdmOperationToken(session.userId, &token), RESULT_SUCCESS);
     g_session = nullptr;
     DestroyLinkedList(g_userInfoList);
@@ -138,9 +138,9 @@ HWTEST_F(EnrollCheckTest, TestCheckSpecification, TestSize.Level0)
 {
     g_userInfoList = nullptr;
     g_currentUser = nullptr;
-    constexpr int32_t USER_ID = 2361;
-    constexpr uint32_t AUTH_TYPE = 1;
-    EXPECT_EQ(CheckSpecification(USER_ID, AUTH_TYPE), RESULT_UNKNOWN);
+    constexpr int32_t userId = 2361;
+    constexpr uint32_t authType = 1;
+    EXPECT_EQ(CheckSpecification(userId, authType), RESULT_UNKNOWN);
 }
 } // namespace UserAuth
 } // namespace UserIam
