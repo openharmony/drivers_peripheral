@@ -252,7 +252,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus005, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_OK;
     bool unactived = 1;
-    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
+    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus005 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
