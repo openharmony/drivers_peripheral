@@ -695,6 +695,9 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_015, TestSize.Level1)
             }
         }
         CAMERA_LOGI("print tag<OHOS_ABILITY_EQUIVALENT_FOCUS> value end.");
+    } else {
+        CAMERA_LOGI("can not find OHOS_ABILITY_EQUIVALENT_FOCUS.");
+        return;
     }
 }
 
@@ -712,8 +715,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_016, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    EXPECT_TRUE(entry.data.u8 != nullptr);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-        EXPECT_TRUE(entry.data.u8 != nullptr);
         for (size_t i = 0; i < entry.count; i++ ) {
             float value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO) {
