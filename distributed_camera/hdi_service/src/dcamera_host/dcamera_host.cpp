@@ -252,11 +252,11 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
             dcameraDevice->Close();
         }
         dcameraDevice->SetProviderCallback(nullptr);
-    }
-    sptr<IDCameraProviderCallback> callback = dcameraDevice->GetProviderCallback();
-    if (callback != nullptr) {
-        sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
-        remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+        sptr<IDCameraProviderCallback> callback = dcameraDevice->GetProviderCallback();
+        if (callback != nullptr) {
+            sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
+            remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+        }
     }
     std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
     dhBaseHashDCamIdMap_.erase(dcameraBase);
