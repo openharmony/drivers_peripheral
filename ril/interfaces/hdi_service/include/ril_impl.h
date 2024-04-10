@@ -22,13 +22,13 @@
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "v1_2/iril.h"
+#include "v1_3/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_2 {
+namespace V1_3 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -93,6 +93,7 @@ public:
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) override;
     int32_t GetRadioState(int32_t slotId, int32_t serialId) override;
     int32_t GetImei(int32_t slotId, int32_t serialId) override;
+    int32_t GetImeiSv(int32_t slotId, int32_t serialId) override;
     int32_t GetMeid(int32_t slotId, int32_t serialId) override;
     int32_t GetVoiceRadioTechnology(int32_t slotId, int32_t serialId) override;
     int32_t GetBasebandVersion(int32_t slotId, int32_t serialId) override;
@@ -172,6 +173,7 @@ public:
 
     int32_t SetCallback(const sptr<V1_1::IRilCallback> &rilCallback) override;
     int32_t SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback) override;
+    int32_t SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -203,7 +205,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
