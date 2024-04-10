@@ -96,7 +96,7 @@ void ThermalHdfTimer::LoopingThreadEntry()
         THERMAL_HILOGE(COMP_HDI, "LoopingThreadEntry error");
         return;
     }
-    uint32_t loopingTimes = 0;
+    int32_t loopingTimes = 0;
     while (isRunning_) {
         std::this_thread::sleep_for(std::chrono::milliseconds(gcd));
         loopingTimes++;
