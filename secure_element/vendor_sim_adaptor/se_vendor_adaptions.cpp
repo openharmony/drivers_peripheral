@@ -159,6 +159,7 @@ int SimSeVendorAdaptions::VendorSimSecureElementOpenLogicalChannel(
     if (vendorSimSecureElementOpenLogicalChannelFunc_) {
         ret = vendorSimSecureElementOpenLogicalChannelFunc_(arrAid, aidLen, p2, rsp, &rspLen, channelNum, status);
         if (!ret && rspLen) {
+            response.resize(rspLen);
             for (i = 0; i < rspLen; i++) {
                 response.push_back(rsp[i]);
             }
@@ -254,6 +255,7 @@ int32_t SimSeVendorAdaptions::openLogicalChannel(const std::vector<uint8_t>& aid
         return HDF_SUCCESS;
     }
     status = (SecureElementStatus)tmpStatus;
+    resLen = response.size();
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
@@ -291,6 +293,7 @@ int32_t SimSeVendorAdaptions::openBasicChannel(const std::vector<uint8_t>& aid, 
         return HDF_SUCCESS;
     }
     status = (SecureElementStatus)tmpStatus;
+    resLen = response.size();
     for (uint32_t i = 0; i < resLen; i++) {
         response.push_back(res[i]);
     }
