@@ -14,9 +14,10 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
+ohos_fuzztest("FingerprintAuthInterfaceStubFuzzTest") {
   branch_protector_ret = "pac_ret"
-  module_out_path = "drivers_peripheral_face_auth/drivers_peripheral_face_auth"
+  module_out_path =
+      "drivers_peripheral_fingerprint_auth/drivers_peripheral_fingerprint_auth"
   fuzz_config_file = "."
   cflags = [
     "-g",
@@ -29,20 +30,18 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
     "../../../../common/logs",
   ]
 
-  sources = [ "face_auth_interface_service_fuzzer.cpp" ]
-
-  deps = [ "../common_fuzzer:libface_auth_interface_service_2.0_fuzzer" ]
+  sources = [ "fingerprint_auth_interface_stub_fuzzer.cpp" ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_face_auth:face_auth_idl_headers",
-    "drivers_interface_face_auth:libface_auth_stub_2.0",
-    "graphic_surface:surface",
+    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
+    "drivers_interface_fingerprint_auth:libfingerprint_auth_proxy_2.0",
+    "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_2.0",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 
   subsystem_name = "hdf"
-  part_name = "drivers_peripheral_face_auth"
+  part_name = "drivers_peripheral_fingerprint_auth"
 }

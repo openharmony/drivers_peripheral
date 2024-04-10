@@ -31,7 +31,7 @@
           "//drivers/peripheral/fingerprint_auth:fingerprint_auth_entry"
         ],
         "test": [
-          "//drivers/peripheral/fingerprint_auth/test/fuzztest/fingerprint_auth:fuzztest"
+          "//drivers/peripheral/fingerprint_auth/test/fuzztest/fingerprint_auth:hdf_fingerprint_auth_fuzztest"
         ],
         "inner_kits": [
         ]

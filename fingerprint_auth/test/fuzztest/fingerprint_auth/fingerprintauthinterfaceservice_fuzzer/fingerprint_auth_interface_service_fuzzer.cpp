@@ -13,63 +13,40 @@
  * limitations under the License.
  */
 
-#include "face_auth_interface_service_fuzzer.h"
+#include "fingerprint_auth_interface_service_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
 #include "parcel.h"
 
-#include "iconsumer_surface.h"
-
 #include "iam_logger.h"
 
-#include "face_auth_interface_service.h"
+#include "fingerprint_auth_interface_service.h"
 #include "refbase.h"
 
 #undef LOG_TAG
-#define LOG_TAG "FACE_AUTH_IMPL"
+#define LOG_TAG "FINGERPRINT_AUTH_IMPL"
 
 #undef private
 
 namespace OHOS {
 namespace HDI {
-namespace FaceAuth {
+namespace FingerprintAuth {
 namespace {
-FaceAuthInterfaceService g_faceAuthInterfaceService;
+FingerprintAuthInterfaceService g_fingerprintAuthInterfaceService;
 void FuzzGetExecutorList(Parcel &parcel)
 {
     IAM_LOGI("begin");
     std::vector<sptr<IAllInOneExecutor>> executorList;
-    g_faceAuthInterfaceService.GetExecutorList(executorList);
-    IAM_LOGI("end");
-}
-
-void FuzzSetBufferProducer(Parcel &parcel)
-{
-    IAM_LOGI("begin");
-    sptr<IBufferProducer> bufferProducer = nullptr;
-    if (parcel.ReadBool()) {
-        auto surface = IConsumerSurface::Create();
-        if (surface == nullptr) {
-            IAM_LOGE("CreateSurfaceAsConsumer fail");
-            return;
-        }
-        bufferProducer = surface->GetProducer();
-    }
-    sptr<BufferProducerSequenceable> producerSequenceable =
-        new (std::nothrow) BufferProducerSequenceable(bufferProducer);
-    g_faceAuthInterfaceService.SetBufferProducer(producerSequenceable);
+    g_fingerprintAuthInterfaceService.GetExecutorList(executorList);
     IAM_LOGI("end");
 }
 
 using FuzzFunc = decltype(FuzzGetExecutorList);
-FuzzFunc *g_fuzzFuncs[] = {
-    FuzzGetExecutorList,
-    FuzzSetBufferProducer,
-};
+FuzzFunc *g_fuzzFuncs[] = {FuzzGetExecutorList};
 
-void FaceAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)
+void FingerprintAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)
 {
     Parcel parcel;
     parcel.WriteBuffer(data, size);
@@ -80,13 +57,13 @@ void FaceAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)
     return;
 }
 } // namespace
-} // namespace FaceAuth
+} // namespace FingerprintAuth
 } // namespace HDI
 } // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::HDI::FaceAuth::FaceAuthInterfaceServiceFuzzTest(data, size);
+    OHOS::HDI::FingerprintAuth::FingerprintAuthInterfaceServiceFuzzTest(data, size);
     return 0;
 }
