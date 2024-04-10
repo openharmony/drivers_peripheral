@@ -47,6 +47,11 @@ namespace {
 static std::mutex g_mutex;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
+enum UserAuthCallerType : int32_t {
+    TOKEN_INVALID = -1,
+    TOKEN_HAP = 0,
+    TOKEN_NATIVE,
+};
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -203,9 +208,10 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    static const std::string screenLockBundleName = "B_com.ohos.systemui";
+    static const std::string screenLockBundleName = "com.ohos.systemui";
     paramHal.isAuthResultCached = false;
-    if (param.baseParam.callerName == screenLockBundleName) {
+    if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
+        param.baseParam.callerName == screenLockBundleName) {
         IAM_LOGI("auth result will be cached");
         paramHal.isAuthResultCached = true;
     }
@@ -944,6 +950,7 @@ int32_t UserAuthInterfaceService::CheckReuseUnlockResult(const ReuseUnlockParam&
     info.authType = reuseResult.authType;
     info.enrolledState.credentialDigest = reuseResult.enrolledState.credentialDigest;
     info.enrolledState.credentialCount = reuseResult.enrolledState.credentialCount;
+    info.token.resize(AUTH_TOKEN_LEN);
     if (memcpy_s(info.token.data(), info.token.size(), reuseResult.token, AUTH_TOKEN_LEN) != EOK) {
         IAM_LOGE("copy authToken failed");
         info.token.clear();
