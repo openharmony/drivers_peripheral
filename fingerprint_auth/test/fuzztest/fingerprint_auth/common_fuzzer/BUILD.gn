@@ -14,20 +14,23 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_shared_library("libfingerprint_auth_interface_service_1.2_fuzzer") {
+ohos_shared_library("libfingerprint_auth_interface_service_2.0_fuzzer") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
     "../../../../hdi_service/include",
     "../../../../common/logs",
+    "../../../../common/utils",
   ]
   sources = [
-    "../../../../hdi_service/src/executor_impl.cpp",
+    "../../../../hdi_service/src/all_in_one_executor_impl.cpp",
     "../../../../hdi_service/src/fingerprint_auth_interface_service.cpp",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers_1.2",
+    "drivers_interface_fingerprint_auth:fingerprint_auth_idl_headers",
+    "drivers_interface_fingerprint_auth:libfingerprint_auth_stub_2.0",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]

@@ -33,7 +33,7 @@
           "//drivers/peripheral/face_auth:face_auth_entry"
         ],
         "test": [
-          "//drivers/peripheral/face_auth/test/fuzztest/face_auth:fuzztest"
+          "//drivers/peripheral/face_auth/test/fuzztest/face_auth:hdf_face_auth_fuzztest"
         ],
         "inner_kits": [
         ]
