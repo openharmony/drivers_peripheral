@@ -683,18 +683,18 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_015, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_EQUIVALENT_FOCUS, &entry);
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.i32 != nullptr && entry.count > 0) {
-        CAMERA_LOGE("print tag<OHOS_ABILITY_EQUIVALENT_FOCUS> value start.");
+        CAMERA_LOGI("print tag<OHOS_ABILITY_EQUIVALENT_FOCUS> value start.");
         constexpr size_t step = 10; // print step
         std::stringstream ss;
         for (size_t i = 0; i < entry.count; i++) {
             ss << entry.data.i32[i] << " ";
             if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
-                CAMERA_LOGE("%{public}s\n", ss.str().c_str());
+                CAMERA_LOGI("%{public}s\n", ss.str().c_str());
                 ss.clear();
                 ss.str("");
             }
         }
-        CAMERA_LOGE("print tag<OHOS_ABILITY_EQUIVALENT_FOCUS> value end.");
+        CAMERA_LOGI("print tag<OHOS_ABILITY_EQUIVALENT_FOCUS> value end.");
     }
 }
 
