@@ -15,6 +15,7 @@
 
 #include "sensor_uhdf_log.h"
 #include "sensor_clients_manager.h"
+#include <hdf_remote_service.h>
 #include <cinttypes>
 
 #define HDF_LOG_TAG uhdf_sensor_clients_manager
@@ -139,8 +140,12 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
 void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     auto it = sensorConfig_.find(sensorId);
     if (it != sensorConfig_.end()) {
+        if (samplingInterval <= it->second.samplingInterval) {
+            bestConfigServiceId = serviceId;
+        }
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
          : it->second.samplingInterval;
         it->second.reportInterval = reportInterval <= it->second.reportInterval ? reportInterval
@@ -148,6 +153,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     } else {
         BestSensorConfig config = {samplingInterval, reportInterval};
         sensorConfig_.emplace(sensorId, config);
+        bestConfigServiceId = serviceId;
     }
 }
 
@@ -169,7 +175,8 @@ void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingI
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+        reportInterval is [%{public}" PRId64 "], bestConfig from serviceId %{public}d", __func__, sensorId,
+        samplingInterval, reportInterval, bestConfigServiceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval < ERROR_INTERVAL) {
         HDF_LOGE("%{public}s: samplingInterval or reportInterval error", __func__);
@@ -188,7 +195,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
             HDF_LOGD("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
                      "%{public}" PRId64 "/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId,
-                    samplingInterval, reportInterval, periodCount);
+                     client.sensorConfigMap_.find(sensorId)->second.samplingInterval, samplingInterval, periodCount);
             if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
                 periodCount > client.periodCountMap_[sensorId]) {
                 client.periodCountMap_[sensorId] = periodCount;
