@@ -55,10 +55,13 @@ static int32_t DisplayComposerDriverDispatch(
     pthread_rwlock_rdlock(&g_rwLock);
     auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
     if (hdfDisplayComposerHost == nullptr) {
+        pthread_rwlock_unlock(&g_rwLock);
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr", __func__);
         return HDF_FAILURE;
     }
-    return hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    pthread_rwlock_unlock(&g_rwLock);
+    return ret;
 }
 
 static int HdfDisplayComposerDriverInit(struct HdfDeviceObject* deviceObject)
@@ -104,12 +107,14 @@ static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject* deviceObject
     HDF_LOGI("%{public}s: enter", __func__);
     pthread_rwlock_wrlock(&g_rwLock);
     if (deviceObject->service == nullptr) {
+        pthread_rwlock_unlock(&g_rwLock);
         HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
     auto* hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
     delete hdfDisplayComposerHost;
     hdfDisplayComposerHost = nullptr;
+    pthread_rwlock_unlock(&g_rwLock);
 }
 
 static struct HdfDriverEntry g_displaycomposerDriverEntry = {
