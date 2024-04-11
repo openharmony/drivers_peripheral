@@ -12,8 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <mutex>
-#include <shared_mutex>
+#include <pthread>
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
@@ -30,10 +29,7 @@ struct HdfDisplayComposerHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-using ReadLock -= std::shared_lock<std::shared_mutex>;
-using WriteLock = std::lock_guard<std::shared_mutex>;
-
-static mutable std::shared_mutex g_mutex;
+static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
 
 static int32_t DisplayComposerDriverDispatch(
     struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
@@ -56,7 +52,7 @@ static int32_t DisplayComposerDriverDispatch(
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ReadLock lock(g_mutex);
+    pthread_rwlock_rdlock(&g_rwLock);
     auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
     if (hdfDisplayComposerHost == nullptr) {
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr", __func__);
@@ -111,7 +107,7 @@ static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject* deviceObject
         HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
-
+    pthread_rwlock_wrlock(&g_rwLock);
     auto* hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
     delete hdfDisplayComposerHost;
     hdfDisplayComposerHost = nullptr;
