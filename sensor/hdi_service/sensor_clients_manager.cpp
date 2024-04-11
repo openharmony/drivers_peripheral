@@ -168,10 +168,11 @@ void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingI
 
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval < ERROR_INTERVAL) {
-        HDF_LOGE("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+        HDF_LOGE("%{public}s: samplingInterval or reportInterval error", __func__);
         return;
     }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
@@ -188,6 +189,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
             if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
                 periodCount > client.periodCountMap_[sensorId]) {
                 client.periodCountMap_[sensorId] = periodCount;
+                HDF_LOGD("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount=%{public}" PRId64 "/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId, samplingInterval, reportInterval, periodCount);
             }
         }
     }
