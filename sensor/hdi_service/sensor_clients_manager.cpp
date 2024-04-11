@@ -174,8 +174,8 @@ void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingI
 
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
-    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],
-        reportInterval is [%{public}" PRId64 "], bestConfig from serviceId %{public}d", __func__, sensorId,
+    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],"
+        "reportInterval is [%{public}" PRId64 "], bestConfig from serviceId %{public}d", __func__, sensorId,
         samplingInterval, reportInterval, bestConfigServiceId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval < ERROR_INTERVAL) {
