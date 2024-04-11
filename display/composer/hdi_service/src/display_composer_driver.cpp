@@ -33,7 +33,7 @@ struct HdfDisplayComposerHost {
 using ReadLock -= std::shared_lock<std::shared_mutex>;
 using WriteLock = std::lock_guard<std::shared_mutex>;
 
-static std::mutex g_mutex;
+static mutable std::mutex g_mutex;
 
 static int32_t DisplayComposerDriverDispatch(
     struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
