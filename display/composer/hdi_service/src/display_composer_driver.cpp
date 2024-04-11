@@ -102,12 +102,11 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
 static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    WriteLock lock(g_mutex);
+    pthread_rwlock_wrlock(&g_rwLock);
     if (deviceObject->service == nullptr) {
         HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
-    pthread_rwlock_wrlock(&g_rwLock);
     auto* hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
     delete hdfDisplayComposerHost;
     hdfDisplayComposerHost = nullptr;
