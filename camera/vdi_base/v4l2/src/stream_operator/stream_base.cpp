@@ -179,11 +179,14 @@ RetCode StreamBase::StopStream()
     std::unique_lock<std::mutex> l(smLock_);
 
     CAMERA_LOGI("stop stream [id:%{public}d] begin", streamId_);
-    CHECK_IF_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_OK);
+    {
+        std::unique_lock<std::mutex> l(wtLock_);
+        CHECK_IF_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_OK);
 
-    state_ = STREAM_STATE_IDLE;
-    tunnel_->NotifyStop();
-    cv_.notify_all();
+        state_ = STREAM_STATE_IDLE;
+        tunnel_->NotifyStop();
+        cv_.notify_all();
+    }
 
     if (handler_ != nullptr && handler_->joinable()) {
         handler_->join();
