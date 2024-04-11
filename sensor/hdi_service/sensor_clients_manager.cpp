@@ -143,7 +143,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     auto it = sensorConfig_.find(sensorId);
     if (it != sensorConfig_.end()) {
-        if (samplingInterval <= it->second.samplingInterval) {
+        if (samplingInterval < it->second.samplingInterval) {
             bestConfigServiceId = serviceId;
         }
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
