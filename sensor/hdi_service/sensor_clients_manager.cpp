@@ -15,7 +15,6 @@
 
 #include "sensor_uhdf_log.h"
 #include "sensor_clients_manager.h"
-#include <hdf_remote_service.h>
 #include <cinttypes>
 
 #define HDF_LOG_TAG uhdf_sensor_clients_manager
@@ -140,7 +139,6 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
 void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
-    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     auto it = sensorConfig_.find(sensorId);
     if (it != sensorConfig_.end()) {
         it->second.samplingInterval = samplingInterval <= it->second.samplingInterval ? samplingInterval
