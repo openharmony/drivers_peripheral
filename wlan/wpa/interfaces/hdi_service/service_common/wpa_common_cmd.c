@@ -1575,8 +1575,7 @@ static int32_t ProcessEventWpaVendorExt(struct HdfWpaRemoteNode *node,
     HDF_LOGI("%{public}s: res %{public}d!", __func__, ret);
     return ret;
 }
-
-static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
     switch (event) {
@@ -1607,6 +1606,23 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
             break;
+        case WPA_EVENT_STA_AUTH_REJECT:
+            ret = ProcessEventWpaAuthReject(pos, (struct WpaAuthRejectParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_NOTIFY:
+            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
+            break;
+        default:
+            HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
+            break;
+    }
+    return ret;
+}
+
+static int32_t HdfP2pDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    switch (event) {
         case WPA_EVENT_DEVICE_FOUND:
             ret = ProcessEventP2pDeviceFound(pos, (struct P2pDeviceInfoParam *)data, ifName);
             break;
@@ -1656,12 +1672,17 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_IFACE_CREATED:
             ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
             break;
-        case WPA_EVENT_STA_AUTH_REJECT:
-            ret = ProcessEventWpaAuthReject(pos, (struct WpaAuthRejectParam *)data, ifName);
+        default:
+            HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
             break;
-        case WPA_EVENT_STA_NOTIFY:
-            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
-            break;
+    }
+    return ret;
+}
+
+static int32_t HdfVendorExtDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    switch (event) {
         case WPA_EVENT_VENDOR_EXT:
             ret = ProcessEventWpaVendorExt(pos, (struct WpaVendorExtInfo *)data, ifName);
             break;
@@ -1671,6 +1692,7 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
     }
     return ret;
 }
+
 
 static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
 {
@@ -1695,7 +1717,16 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
             continue;
         }
-        ret = HdfWpaDealEvent(event, pos, data, ifName);
+        if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {
+            ret = HdfStaDealEvent(event, pos, data, ifName);
+        } else if (strncmp(ifName, "chba", strlen("chba")) == 0 ||
+            strncmp(ifName, "p2p-chba", strlen("p2p-chba")) == 0) {
+            ret = HdfVendorExtDealEvent(event, pos, data, ifName);
+        } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+            ret = HdfP2pDealEvent(event, pos, data, ifName);
+        } else {
+            HDF_LOGE("%{public}s: ifName is error %{public}s", __func__, ifName);
+        }
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
