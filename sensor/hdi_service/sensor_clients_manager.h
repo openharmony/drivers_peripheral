@@ -79,6 +79,7 @@ private:
     std::unordered_map<int32_t, struct BestSensorConfig> sdcSensorConfig_;
     std::vector<HdfSensorInformation> sensorInfo_;
     SensorsDataPack listDump_ = {0};
+    uint32_t bestConfigServiceId;
 };
 
 struct BestSensorConfig {
