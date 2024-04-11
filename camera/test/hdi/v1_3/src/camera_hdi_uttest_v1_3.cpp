@@ -23,6 +23,7 @@ constexpr uint32_t ITEM_CAPACITY = 100;
 constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
 constexpr uint32_t FPS_COUNT = 2;
+constexpr uint32_t EXPOSURE_COUNT = 2;
 constexpr uint32_t CHECK_AREA_COUNT = 4;
 constexpr uint32_t STREAMINFO_WIDTH = 1920;
 constexpr uint32_t STREAMINFO_HEIGHT = 1080;
