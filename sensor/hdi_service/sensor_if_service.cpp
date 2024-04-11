@@ -47,7 +47,6 @@ namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
     CallBackDeathRecipientMap g_callBackDeathRecipientMap;
-    std::mutex g_mutex;
 }
 
 SensorIfService::SensorIfService()
@@ -350,7 +349,6 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
-    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = AddCallbackMap(groupId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -390,7 +388,6 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
-    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = RemoveCallbackMap(groupId, serviceId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -537,7 +534,7 @@ int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<ISensorCallback> 
 
 void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     sptr<IRemoteObject> callbackObject = object.promote();
     if (callbackObject == nullptr) {
         return;
