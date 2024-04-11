@@ -190,12 +190,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
             HDF_LOGD("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
                      "%{public}d/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId,
                      client.sensorConfigMap_.find(sensorId)->second.samplingInterval, samplingInterval, periodCount);
-            if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
-                periodCount > client.periodCountMap_[sensorId]) {
-                client.periodCountMap_[sensorId] = periodCount;
-            } else {
-                HDF_LOGD("%{public}s: periodCount is abandoned", __func__);
-            }
+            client.periodCountMap_[sensorId] = periodCount;
         }
     }
 }
