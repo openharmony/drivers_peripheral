@@ -2994,46 +2994,6 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     return ret;
 }
 
-static int32_t WifiAbortScan(const char *ifName)
-{
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
-    int32_t ret = RET_CODE_FAILURE;
-    struct nl_msg *msg = NULL;
-    uint32_t interfaceId;
-    if (ifName == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    interfaceId = if_nametoindex(ifName);
-    if (interfaceId == 0) {
-        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    msg = nlmsg_alloc();
-    if (msg == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
-        return RET_CODE_NOMEM;
-    }
-    do {
-        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_ABORT_SCAN");
-        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_ABORT_SCAN, 0)) {
-            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
-            break;
-        }
-        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
-            break;
-        }
-        ret = NetlinkSendCmdSync(msg, NULL, NULL);
-        if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: abort scan failed", __FUNCTION__);
-        }
-    } while (0);
-    nlmsg_free(msg);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
-    return ret;
-}
-
 static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     return NL_SKIP;
@@ -3053,11 +3013,6 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
     if (interfaceId == 0) {
         HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
         return RET_CODE_FAILURE;
-    }
-    ret = WifiAbortScan(STR_WLAN0);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: wifi abort scan failed", __FUNCTION__);
-        return ret;
     }
     msg = nlmsg_alloc();
     if (msg == NULL) {
