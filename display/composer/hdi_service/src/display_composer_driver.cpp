@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <pthread>
+#include <pthread.h>
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
