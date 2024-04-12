@@ -721,10 +721,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_016, TestSize.Level1)
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES is can not be found");
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_NE(entry.data.i32 , nullptr);
+        EXPECT_NE(entry.data.ui32 , nullptr);
         EXPECT_EQ(entry.count > 0 , true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            float value = entry.data.ui32[i];
             if (value == OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO) {
                 CAMERA_LOGI("HIGH_RESOLUTION_PHOTO mode is supported");
             }
@@ -812,7 +812,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_018, TestSize.Level1)
         EXPECT_NE(entry.data.f , nullptr);
         EXPECT_EQ(entry.count > 0 , true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            float value = entry.data.f[i];
             if (value == OHOS::HDI::Camera::V1_2::CAPTURE_MACRO) {
                 CAMERA_LOGI("CAPTURE_MACRO mode is supported");
             }
@@ -893,7 +893,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_020, TestSize.Level1)
         EXPECT_NE(entry.data.f , nullptr);
         EXPECT_EQ(entry.count > 0 , true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            float value = entry.data.f[i];
             if (value == OHOS::HDI::Camera::V1_2::VIDEO_MACRO) {
                 CAMERA_LOGI("VIDEO_MACRO mode is supported");
             }
