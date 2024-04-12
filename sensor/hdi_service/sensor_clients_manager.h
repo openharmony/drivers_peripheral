@@ -47,6 +47,7 @@ public:
     void EraseSdcSensorBestConfig(int sensorId);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
+    bool GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map);
     bool IsClientsEmpty(int groupId);
     std::unordered_map<int32_t, std::set<int32_t>> GetSensorUsed();
     bool IsNeedOpenSensor(int sensorId, int serviceId);
