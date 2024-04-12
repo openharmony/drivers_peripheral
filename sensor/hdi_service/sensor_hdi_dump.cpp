@@ -201,7 +201,7 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
             sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" + std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
             sensorInfoData += "}}\n";
         }
-        sensorInfoData += "}\n";
+        sensorInfoData += "}\n\n";
     }
     (void)HdfSbufWriteString(reply, sensorInfoData.c_str());
     return HDF_SUCCESS;
