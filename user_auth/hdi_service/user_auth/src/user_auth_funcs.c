@@ -23,6 +23,7 @@
 #include "context_manager.h"
 #include "executor_message.h"
 #include "idm_database.h"
+#include "idm_session.h"
 #include "user_sign_centre.h"
 
 #ifdef IAM_TEST_ENABLE
@@ -93,6 +94,7 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
             LOG_ERROR("rootSecret is invalid");
             return RESULT_NO_MEMORY;
         }
+        CacheRootSecret(context->userId, result->rootSecret);
     }
     return RESULT_SUCCESS;
 }

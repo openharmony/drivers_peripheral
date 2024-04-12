@@ -24,8 +24,6 @@
 #include "ed25519_key.h"
 #include "idm_database.h"
 
-#define ROOT_SECRET_LEN 32
-
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
 #else

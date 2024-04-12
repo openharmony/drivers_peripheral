@@ -158,6 +158,37 @@ HWTEST_F(IdmSessionTest, TestCheckSessionValid, TestSize.Level0)
     EXPECT_EQ(CheckSessionValid(0), RESULT_GENERAL_ERROR);
     g_session = nullptr;
 }
+
+HWTEST_F(IdmSessionTest, TestGetChallenge, TestSize.Level0)
+{
+    constexpr uint32_t arrayLen = 32;
+    uint8_t challengeArray[arrayLen] = {};
+    EXPECT_EQ(GetChallenge(nullptr, 0), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetChallenge(nullptr, arrayLen), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetChallenge(challengeArray, arrayLen), RESULT_NEED_INIT);
+}
+
+HWTEST_F(IdmSessionTest, TestGetCacheRootSecret, TestSize.Level0)
+{
+    constexpr int32_t userId = 0;
+    Buffer *rootSecret = GetCacheRootSecret(userId);
+    EXPECT_EQ(rootSecret, nullptr);
+    struct SessionInfo session;
+    session.userId = userId;
+    rootSecret = GetCacheRootSecret(userId);
+    EXPECT_EQ(rootSecret, nullptr);
+}
+
+HWTEST_F(IdmSessionTest, TestCacheRootSecret, TestSize.Level0)
+{
+    constexpr int32_t userId = 0;
+    CacheRootSecret(userId, nullptr);
+    constexpr int32_t dataLen = 32;
+    Buffer *test = CreateBufferBySize(dataLen);
+    CacheRootSecret(userId, test);
+    DestoryBuffer(test);
+}
+
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

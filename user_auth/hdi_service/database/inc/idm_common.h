@@ -25,6 +25,7 @@ extern "C" {
 
 #define MAX_USER 32
 #define MAX_CREDENTIAL 100
+#define ROOT_SECRET_LEN 32
 
 typedef struct {
     uint64_t credentialId;
@@ -44,6 +45,7 @@ typedef struct {
     int32_t userId;
     uint64_t secUid;
     uint64_t pinSubType;
+    uint64_t cachePinSubType;
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
 } UserInfo;

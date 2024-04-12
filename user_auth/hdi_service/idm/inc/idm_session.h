@@ -19,7 +19,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "buffer.h"
 #include "defines.h"
+#include "idm_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +42,10 @@ ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType);
 
 void RefreshValidTokenTime(void);
 bool IsValidTokenTime(uint64_t tokenTime);
+
+ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen);
+void CacheRootSecret(int32_t userId, Buffer *rootSecret);
+Buffer *GetCacheRootSecret(int32_t userId);
 
 #ifdef __cplusplus
 }

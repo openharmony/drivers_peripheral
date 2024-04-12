@@ -76,7 +76,7 @@ typedef enum ResultCode {
 } ResultCode;
 
 typedef enum AuthType {
-    DEFAULT_AUTH_TYPE = 0,
+    DEFAULT_AUTH_TYPE = 0, // default type used to cache pin
     PIN_AUTH = 1,
     FACE_AUTH = 2,
     FINGER_AUTH = 4,
