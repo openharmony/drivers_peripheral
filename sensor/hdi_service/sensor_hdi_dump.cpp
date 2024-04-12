@@ -174,8 +174,8 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     (void)SensorClientsManager::GetInstance()->GetBestSensorConfigMap(bestSensorConfigMap);
 
     (void)HdfSbufWriteString(reply, "============== all clients information ==============\n");
-    std::string sensorInfoData = {0};
-    sensorInfoData += "bestSensorConfigMap=[";
+    std::string sensorInfoData = "";
+    sensorInfoData += "bestSensorConfigMap=[\n";
     for (auto &entry2 : bestSensorConfigMap) {
         auto &sensorId = entry2.first;
         auto &bestSensorConfig = entry2.second;
@@ -183,31 +183,23 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
         sensorInfoData += "bestSensorConfig={";
         sensorInfoData += "samplingInterval=" + std::to_string(bestSensorConfig.samplingInterval) + ",";
         sensorInfoData += "reportInterval=" + std::to_string(bestSensorConfig.reportInterval);
-        sensorInfoData += "}},";
+        sensorInfoData += "}}\n";
     }
     sensorInfoData += "]\n\n\n";
     for (auto &entry : sensorClientInfoMap) {
         auto &serviceId = entry.first;
         auto &sensorClientInfo = entry.second;
-        sensorInfoData += "serviceId=" + std::to_string(serviceId) + "\n";
-        sensorInfoData += "sensorConfigMap_=[";
+        sensorInfoData += "serviceId=" + std::to_string(serviceId) + " ";
+        sensorInfoData += "sensorConfigMap_=[\n";
         for (auto &entry2 : sensorClientInfo.sensorConfigMap_) {
             auto &sensorId = entry2.first;
             auto &sensorConfig = entry2.second;
             sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
             sensorInfoData += "sensorConfig={";
             sensorInfoData += "samplingInterval=" + std::to_string(sensorConfig.samplingInterval) + ",";
-            sensorInfoData += "reportInterval=" + std::to_string(sensorConfig.reportInterval);
-            sensorInfoData += "}},";
-        }
-        sensorInfoData += "]\n";
-        sensorInfoData += "periodCountMap_=[";
-        for (auto &entry2 : sensorClientInfo.periodCountMap_) {
-            auto &sensorId = entry2.first;
-            auto &periodCount = entry2.second;
-            sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
-            sensorInfoData += "curCount/periodCount=" + std::to_string(curCountMap_[sensorId]) + "/" + std::to_string(periodCount);
-            sensorInfoData += "},";
+            sensorInfoData += "reportInterval=" + std::to_string(sensorConfig.reportInterval) + ",";
+            sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" + std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
+            sensorInfoData += "}}\n";
         }
         sensorInfoData += "]\n";
     }
