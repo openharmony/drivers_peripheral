@@ -185,4 +185,36 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
   }
+
+  ohos_unittest("hdf_chip_wifi") {
+    module_out_path = module_output_path
+    include_dirs = [ "$TEST_ROOT_DIR/chip/hdi_service" ]
+    sources = [
+      "chip/interface_tool_test.cpp",
+      "chip/wifi_ap_iface_test.cpp",
+      "chip/wifi_chip_modes_test.cpp",
+      "chip/wifi_chip_test.cpp",
+      "chip/wifi_p2p_iface_test.cpp",
+      "chip/wifi_sta_iface_test.cpp",
+      "chip/wifi_test.cpp",
+      "chip/wifi_vendor_hal_list_test.cpp",
+      "chip/wifi_vendor_hal_test.cpp",
+    ]
+
+    cflags = configFlag
+    deps = [ "$TEST_ROOT_DIR/chip/hdi_service:libchip_controller_chip_interface_service_1.0" ]
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "drivers_interface_wlan:chip_idl_headers",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_utils",
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "ipc:ipc_single",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
 }
