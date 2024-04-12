@@ -173,9 +173,9 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     std::unordered_map<int32_t, struct BestSensorConfig> bestSensorConfigMap;
     (void)SensorClientsManager::GetInstance()->GetBestSensorConfigMap(bestSensorConfigMap);
 
-    (void)HdfSbufWriteString(reply, "============== all clients information ==============\n");
+    (void)HdfSbufWriteString(reply, "============== all clients information ==============\n\n");
     std::string sensorInfoData = "";
-    sensorInfoData += "bestSensorConfigMap=[\n";
+    sensorInfoData += "bestSensorConfigMap={\n";
     for (auto &entry2 : bestSensorConfigMap) {
         auto &sensorId = entry2.first;
         auto &bestSensorConfig = entry2.second;
@@ -185,12 +185,12 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
         sensorInfoData += "reportInterval=" + std::to_string(bestSensorConfig.reportInterval);
         sensorInfoData += "}}\n";
     }
-    sensorInfoData += "]\n\n\n";
+    sensorInfoData += "}\n\n";
     for (auto &entry : sensorClientInfoMap) {
         auto &serviceId = entry.first;
         auto &sensorClientInfo = entry.second;
         sensorInfoData += "serviceId=" + std::to_string(serviceId) + " ";
-        sensorInfoData += "sensorConfigMap_=[\n";
+        sensorInfoData += "sensorConfigMap_={\n";
         for (auto &entry2 : sensorClientInfo.sensorConfigMap_) {
             auto &sensorId = entry2.first;
             auto &sensorConfig = entry2.second;
@@ -201,7 +201,7 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
             sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" + std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
             sensorInfoData += "}}\n";
         }
-        sensorInfoData += "]\n";
+        sensorInfoData += "}\n";
     }
     (void)HdfSbufWriteString(reply, sensorInfoData.c_str());
     return HDF_SUCCESS;
