@@ -50,8 +50,7 @@ public:
     int32_t GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo) override;
     int32_t GetSensorVdiImpl();
     void OnRemoteDied(const wptr<IRemoteObject> &object);
-
-    std::mutex sensorCbMutex_;
+    std::mutex sensorServiceMutex_;
 private:
     int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
     int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
