@@ -92,7 +92,8 @@ public:
     void DefaultInfosVideo(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultInfosSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t professionalMode);
-    void StartStream(std::vector<StreamIntent> intents);
+    void StartStream(std::vector<StreamIntent> intents,
+        OHOS::HDI::Camera::V1_3::OperationMode mode = OHOS::HDI::Camera::V1_3::NORMAL);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t DumpImageFile(int streamId, std::string suffix, const void* buffer, int32_t size);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);

@@ -319,7 +319,7 @@ void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t pr
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>().swap(streamInfos);
 }
 
-void Test::StartStream(std::vector<StreamIntent> intents)
+void Test::StartStream(std::vector<StreamIntent> intents, OHOS::HDI::Camera::V1_3::OperationMode mode)
 {
     streamOperatorCallbackV1_3 =
         OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (new TestStreamOperatorCallbackV1_3);
@@ -361,7 +361,8 @@ void Test::StartStream(std::vector<StreamIntent> intents)
 
     rc = streamOperator_V1_3->CreateStreams_V1_1(streamInfos);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
-    rc = streamOperator_V1_3->CommitStreams(OperationMode::NORMAL, abilityVec);
+    rc = streamOperator_V1_3->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(mode), abilityVec);
     EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
     sleep(1);
     std::vector<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>().swap(streamInfos);
