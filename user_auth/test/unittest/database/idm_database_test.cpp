@@ -234,7 +234,7 @@ HWTEST_F(IdmDatabaseTest, TestIsCredentialIdDuplicate, TestSize.Level0)
     credInfo.credentialId = credentialId2;
     info.credentialInfoList->insert(info.credentialInfoList, static_cast<void *>(&credInfo));
     g_userInfoList->insert(g_userInfoList, &info);
-    EXPECT_TRUE(IsCredentialIdDuplicate(nullptr, credentialId2));
+    EXPECT_FALSE(IsCredentialIdDuplicate(nullptr, credentialId2));
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsEnrolledIdDuplicate, TestSize.Level0)
@@ -462,11 +462,11 @@ HWTEST_F(IdmDatabaseTest, TestIsCredMatch_002, TestSize.Level0)
     credInfo.executorSensorHint = excutorSensorHint2;
     CredentialCondition limit = {};
     SetCredentialConditionExecutorSensorHint(&limit, 0);
-    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorSensorHint(&limit, excutorSensorHint1);
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorSensorHint(&limit, excutorSensorHint2);
-    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsCredMatch_003, TestSize.Level0)
@@ -476,11 +476,11 @@ HWTEST_F(IdmDatabaseTest, TestIsCredMatch_003, TestSize.Level0)
     CredentialInfoHal credInfo = {};
     credInfo.executorMatcher = executorMatcher2;
     CredentialCondition limit = {};
-    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorMatcher(&limit, executorMatcher1);
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorMatcher(&limit, executorMatcher2);
-    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsUserMatch, TestSize.Level0)

@@ -62,6 +62,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo);
 ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType);
 ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType);
 ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
+void RemoveCachePin(int32_t userId, bool *isRemoved);
 
 void SetCredentialConditionCredentialId(CredentialCondition *condition, uint64_t credentialId);
 void SetCredentialConditionTemplateId(CredentialCondition *condition, uint64_t templateId);

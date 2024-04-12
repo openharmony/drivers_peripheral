@@ -610,8 +610,67 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, HdiCredentialInfo &o
     out.executorIndex = QueryCredentialExecutorIndex(in.authType, in.executorSensorHint);
 }
 
+static int32_t GetUpdateResult(int32_t userId, HdiEnrollResultInfo &info, Buffer *scheduleResultBuffer)
+{
+    UpdateCredentialOutput output = {};
+    int32_t ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &output);
+    if (ret == RESULT_SUCCESS) {
+        /* Only update pin have oldRootSecret and rootSecret */
+        info.rootSecret.resize(ROOT_SECRET_LEN);
+        if (memcpy_s(info.rootSecret.data(), ROOT_SECRET_LEN, output.rootSecret->buf, ROOT_SECRET_LEN) != EOK) {
+            IAM_LOGE("failed to copy rootSecret");
+            info.rootSecret.clear();
+            return RESULT_BAD_COPY;
+        }
+        info.oldRootSecret.resize(ROOT_SECRET_LEN);
+        if (memcpy_s(info.oldRootSecret.data(), ROOT_SECRET_LEN, output.oldRootSecret->buf, ROOT_SECRET_LEN) != EOK) {
+            IAM_LOGE("failed to copy oldRootSecret");
+            info.oldRootSecret.clear();
+            DestoryBuffer(output.rootSecret);
+            return RESULT_BAD_COPY;
+        }
+        DestoryBuffer(output.rootSecret);
+        DestoryBuffer(output.oldRootSecret);
+    }
+    CopyCredentialInfo(output.deletedCredential, info.oldInfo);
+
+    return RESULT_SUCCESS;
+}
+
+static int32_t GetEnrollResult(int32_t userId, HdiEnrollResultInfo &info, Buffer *scheduleResultBuffer)
+{
+    Buffer *authToken = nullptr;
+    Buffer *rootSecret = nullptr;
+    int32_t ret = AddCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &rootSecret, &authToken);
+    if (ret == RESULT_SUCCESS) {
+        /* Only enroll pin have authToken and rootSecret */
+        if (authToken != nullptr) {
+            info.authToken.resize(authToken->contentSize);
+            if (memcpy_s(info.authToken.data(), info.authToken.size(), authToken->buf, authToken->contentSize) != EOK) {
+                IAM_LOGE("failed to copy authToken");
+                info.authToken.clear();
+                DestoryBuffer(authToken);
+                DestoryBuffer(rootSecret);
+                return RESULT_BAD_COPY;
+            }
+        }
+        if (rootSecret != nullptr) {
+            info.rootSecret.resize(rootSecret->contentSize);
+            if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(), rootSecret->buf,
+                rootSecret->contentSize) != EOK) {
+                IAM_LOGE("failed to copy rootSecret");
+                info.rootSecret.clear();
+                ret = RESULT_BAD_COPY;
+            }
+        }
+    }
+    DestoryBuffer(authToken);
+    DestoryBuffer(rootSecret);
+    return ret;
+}
+
 int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const std::vector<uint8_t> &scheduleResult,
-    EnrollResultInfo &info)
+    HdiEnrollResultInfo &info)
 {
     IAM_LOGI("start");
     if (scheduleResult.size() == 0) {
@@ -631,23 +690,18 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
         DestoryBuffer(scheduleResultBuffer);
         return ret;
     }
-    Buffer *rootSecret = nullptr;
     if (isUpdate) {
-        CredentialInfoHal oldCredentialHal = {};
-        ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &oldCredentialHal, &rootSecret);
-        CopyCredentialInfo(oldCredentialHal, info.oldInfo);
-    } else {
-        ret = AddCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &rootSecret);
-    }
-    if (rootSecret != nullptr) {
-        info.rootSecret.resize(rootSecret->contentSize);
-        if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(), rootSecret->buf, rootSecret->contentSize) != EOK) {
-            IAM_LOGE("failed to copy rootSecret");
-            info.rootSecret.clear();
-            ret = RESULT_BAD_COPY;
+        ret = GetUpdateResult(userId, info, scheduleResultBuffer);
+        if (ret != RESULT_SUCCESS) {
+            IAM_LOGE("GetUpdateResult failed");
         }
-        DestoryBuffer(rootSecret);
+    } else {
+        ret = GetEnrollResult(userId, info, scheduleResultBuffer);
+        if (ret != RESULT_SUCCESS) {
+            IAM_LOGE("GetEnrollResult failed");
+        }
     }
+
     DestoryBuffer(scheduleResultBuffer);
     return ret;
 }
@@ -671,7 +725,7 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
     CredentialInfoHal credentialInfoHal = {};
     int32_t ret = DeleteCredentialFunc(param, &credentialInfoHal);
     if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("delete failed");
+        IAM_LOGE("delete credential failed");
         return ret;
     }
     CopyCredentialInfo(credentialInfoHal, info);
@@ -748,7 +802,25 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
         IAM_LOGE("failed to verify token");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
-    return EnforceDeleteUser(userId, deletedInfos);
+    ret = EnforceDeleteUser(userId, deletedInfos);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("oldRootSecret is invalid");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    rootSecret.resize(ROOT_SECRET_LEN);
+    Buffer *oldRootSecret = GetCacheRootSecret(userId);
+    if (!IsBufferValid(oldRootSecret)) {
+        LOG_ERROR("get GetCacheRootSecret failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (memcpy_s(rootSecret.data(), rootSecret.size(), oldRootSecret->buf, oldRootSecret->contentSize) != EOK) {
+        IAM_LOGE("rootSecret copy failed");
+        ret = RESULT_BAD_COPY;
+    }
+
+    DestoryBuffer(oldRootSecret);
+    return ret;
 }
 
 int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<CredentialInfo> &deletedInfos)
