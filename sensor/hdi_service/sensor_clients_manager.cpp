@@ -346,6 +346,13 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     return true;
 }
 
+bool SensorClientsManager::GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map)
+{
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    map = sensorConfig_;
+    return true;
+}
+
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
                                                  int64_t &reportInterval)
 {

@@ -170,10 +170,13 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
         HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
         return HDF_FAILURE;
     }
+    std::unordered_map<int32_t, struct BestSensorConfig> bestSensorConfigMap;
+    (void)SensorClientsManager::GetInstance()->GetBestSensorConfigMap(bestSensorConfigMap);
+
     (void)HdfSbufWriteString(reply, "============== all clients information ==============\n");
     std::string sensorInfoData = {0};
     sensorInfoData += "bestSensorConfigMap=[";
-    for (auto &entry2 : sensorConfig_) {
+    for (auto &entry2 : bestSensorConfigMap) {
         auto &sensorId = entry2.first;
         auto &bestSensorConfig = entry2.second;
         sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
