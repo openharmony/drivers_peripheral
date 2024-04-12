@@ -30,6 +30,7 @@ struct HdfDisplayComposerHost {
 };
 
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
+static bool g_stop = false;
 
 static int32_t DisplayComposerDriverDispatch(
     struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
@@ -54,7 +55,7 @@ static int32_t DisplayComposerDriverDispatch(
 
     pthread_rwlock_rdlock(&g_rwLock);
     auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
-    if (hdfDisplayComposerHost == nullptr) {
+    if (hdfDisplayComposerHost == nullptr || g_stop) {
         pthread_rwlock_unlock(&g_rwLock);
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr", __func__);
         return HDF_FAILURE;
@@ -73,7 +74,7 @@ static int HdfDisplayComposerDriverInit(struct HdfDeviceObject* deviceObject)
 static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    auto* hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
+    static auto* hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
     if (hdfDisplayComposerHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfDisplayComposerHost object", __func__);
         return HDF_FAILURE;
@@ -99,6 +100,7 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
     }
 
     deviceObject->service = &hdfDisplayComposerHost->ioService;
+    g_stop = false;
     return HDF_SUCCESS;
 }
 
@@ -106,14 +108,7 @@ static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject* deviceObject
 {
     HDF_LOGI("%{public}s: enter", __func__);
     pthread_rwlock_wrlock(&g_rwLock);
-    if (deviceObject->service == nullptr) {
-        pthread_rwlock_unlock(&g_rwLock);
-        HDF_LOGE("%{public}s: service is nullptr", __func__);
-        return;
-    }
-    auto* hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
-    delete hdfDisplayComposerHost;
-    hdfDisplayComposerHost = nullptr;
+    g_stop = true;
     pthread_rwlock_unlock(&g_rwLock);
 }
 
