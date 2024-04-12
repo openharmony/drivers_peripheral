@@ -783,7 +783,9 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_017, TestSize.Level1)
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_EXPECT_TIME, &entry);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.ui32 != nullptr && entry.count > 1) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_NE(entry.data.ui32 , nullptr);
+        EXPECT_EQ(entry.count > 1 , true);
         CAMERA_LOGI("mode is %{public}u and captureExpectTime is %{public}u", entry.data.ui32[0], entry.data.ui32[1]);
     }
     cameraTest->captureIds = {cameraTest->captureIdPreview};
