@@ -189,16 +189,16 @@ HWTEST_F(UserIdmFuncsTest, TestAddCredentialFunc, TestSize.Level0)
 {
     constexpr int32_t userId1 = 21345;
     constexpr int32_t userId2 = 1122;
-    EXPECT_EQ(AddCredentialFunc(userId1, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(AddCredentialFunc(userId1, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
     Buffer *scheduleResult = CreateBufferBySize(20);
     uint64_t credentialId = 0;
     Buffer *rootSecret = nullptr;
-    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret), RESULT_UNKNOWN);
-    
+    Buffer *authToken = nullptr;
+    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret, &authToken), RESULT_UNKNOWN);
     struct SessionInfo session = {};
     session.userId = userId2;
     g_session = &session;
-    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret), RESULT_UNKNOWN);
+    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret, &authToken), RESULT_UNKNOWN);
     g_session = nullptr;
 }
 
@@ -278,14 +278,12 @@ HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
 
 HWTEST_F(UserIdmFuncsTest, TestUpdateCredentialFunc, TestSize.Level0)
 {
-    EXPECT_EQ(UpdateCredentialFunc(0, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateCredentialFunc(0, nullptr, nullptr), RESULT_BAD_PARAM);
 
     constexpr uint32_t bufferSize = 10;
     Buffer *scheduleResult = CreateBufferBySize(bufferSize);
-    uint64_t credentialId = 10;
-    CredentialInfoHal credInfo = {};
-    Buffer *rootSecret = nullptr;
-    EXPECT_EQ(UpdateCredentialFunc(0, scheduleResult, &credentialId, &credInfo, &rootSecret), RESULT_UNKNOWN);
+    UpdateCredentialOutput output = {};
+    EXPECT_EQ(UpdateCredentialFunc(0, scheduleResult, &output), RESULT_UNKNOWN);
 }
 } // namespace UserAuth
 } // namespace UserIam
