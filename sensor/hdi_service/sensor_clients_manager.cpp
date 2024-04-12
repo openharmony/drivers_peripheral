@@ -387,8 +387,8 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
         return false;
     }
-    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     sensorClientInfo.curCountMap_[sensorId]++;
+    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
         return false;
