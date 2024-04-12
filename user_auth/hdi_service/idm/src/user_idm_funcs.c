@@ -191,9 +191,61 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     return RESULT_SUCCESS;
 }
 
-ResultCode AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret)
+IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
 {
-    if (!IsBufferValid(scheduleResult) || credentialId == NULL || rootSecret == NULL) {
+    UserAuthContext context = {};
+    context.userId = userId;
+    context.authType = credentialInfo->authType;
+    context.authTrustLevel = ATL4;
+    ResultCode ret = GetChallenge(context.challenge, CHALLENGE_LEN);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get challenge fail");
+        return NULL;
+    }
+
+    UserAuthTokenHal authTokenHal = {};
+    ret = GetTokenDataAndSign(&context, credentialInfo->credentialId, SCHEDULE_MODE_ENROLL, &authTokenHal);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("generate pin enroll authToken fail");
+        return NULL;
+    }
+    Buffer *authToken = CreateBufferByData((uint8_t *)(&authTokenHal), sizeof(UserAuthTokenHal));
+    if (!IsBufferValid(authToken)) {
+        LOG_ERROR("create authToken buffer fail");
+        return NULL;
+    }
+
+    return authToken;
+}
+
+IAM_STATIC ResultCode ProcessAddPinCredential(int32_t userId, const CredentialInfoHal *credentialInfo,
+    const ExecutorResultInfo *executorResultInfo, Buffer **rootSecret, Buffer **authToken)
+{
+    ResultCode ret = SetPinSubType(userId, executorResultInfo->authSubType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("set pin sub type failed");
+        return ret;
+    }
+    *rootSecret = CopyBuffer(executorResultInfo->rootSecret);
+    if ((*rootSecret) == NULL) {
+        LOG_ERROR("copy rootSecret fail");
+        return RESULT_NO_MEMORY;
+    }
+    *authToken = GetAuthTokenForPinEnroll(credentialInfo, userId);
+    if (!IsBufferValid(*authToken)) {
+        LOG_ERROR("authToken is invalid");
+        DestoryBuffer(*rootSecret);
+        *rootSecret = NULL;
+        return RESULT_NO_MEMORY;
+    }
+
+    return RESULT_SUCCESS;
+}
+
+ResultCode AddCredentialFunc(
+    int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret, Buffer **authToken)
+{
+    if (!IsBufferValid(scheduleResult) || credentialId == NULL || rootSecret == NULL || authToken == NULL) {
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
     }
@@ -223,15 +275,10 @@ ResultCode AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint6
     if (credentialInfo.authType != PIN_AUTH) {
         goto EXIT;
     }
-    ret = SetPinSubType(userId, executorResultInfo->authSubType);
+    ret = ProcessAddPinCredential(userId, &credentialInfo, executorResultInfo, rootSecret, authToken);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("set pin sub type failed");
+        LOG_ERROR("ProcessAddPinCredential fail");
         goto EXIT;
-    }
-    *rootSecret = CopyBuffer(executorResultInfo->rootSecret);
-    if (!IsBufferValid(*rootSecret)) {
-        LOG_ERROR("rootSecret is invalid");
-        ret = RESULT_NO_MEMORY;
     }
 
 EXIT:
@@ -352,10 +399,27 @@ IAM_STATIC ResultCode CheckResultValid(uint64_t scheduleId, int32_t userId)
     return RESULT_SUCCESS;
 }
 
-ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId,
-    CredentialInfoHal *deletedCredential, Buffer **rootSecret)
+IAM_STATIC ResultCode GetUpdateCredentialOutputRootSecret(
+    UpdateCredentialOutput *output, int32_t userId, const Buffer *rootSecret)
 {
-    if (!IsBufferValid(scheduleResult) || credentialId == NULL || deletedCredential == NULL || rootSecret == NULL) {
+    output->rootSecret = CopyBuffer(rootSecret);
+    if (output->rootSecret == NULL) {
+        LOG_ERROR("copy rootSecret fail");
+        return RESULT_NO_MEMORY;
+    }
+    output->oldRootSecret = GetCacheRootSecret(userId);
+    if (output->oldRootSecret == NULL) {
+        LOG_ERROR("GetCacheRootSecret fail");
+        DestoryBuffer(output->rootSecret);
+        output->rootSecret = NULL;
+        return RESULT_NO_MEMORY;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, UpdateCredentialOutput *output)
+{
+    if (!IsBufferValid(scheduleResult) || output == NULL) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -369,14 +433,9 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, ui
         LOG_ERROR("check result failed");
         goto EXIT;
     }
-    ret = GetDeletedCredential(userId, deletedCredential);
+    ret = GetDeletedCredential(userId, &(output->deletedCredential));
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get old credential failed");
-        goto EXIT;
-    }
-    ret = DeleteCredentialInfo(userId, deletedCredential->credentialId, deletedCredential);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("delete failed");
         goto EXIT;
     }
     const CoAuthSchedule *schedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
@@ -392,11 +451,11 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, ui
         LOG_ERROR("failed to add credential");
         goto EXIT;
     }
-    *credentialId = credentialInfo.credentialId;
-    *rootSecret = CopyBuffer(executorResultInfo->rootSecret);
-    if (!IsBufferValid(*rootSecret)) {
-        LOG_ERROR("rootSecret is invalid");
-        ret = RESULT_NO_MEMORY;
+    output->credentialId = credentialInfo.credentialId;
+    ret = GetUpdateCredentialOutputRootSecret(output, userId, executorResultInfo->rootSecret);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetUpdateCredentialOutputRootSecret fail");
+        goto EXIT;
     }
 
 EXIT:

@@ -24,6 +24,7 @@
 #include "adaptor_time.h"
 #include "coauth.h"
 #include "linked_list.h"
+#include "idm_database.h"
 
 #define SESSION_VALIDITY_PERIOD (10 * 60 * 1000)
 #define MAX_CHALLENGE_GENERATION_TIMES 5
@@ -45,6 +46,14 @@ struct SessionInfo {
     bool isUpdate;
     bool isScheduleValid;
 } *g_session;
+
+IAM_STATIC Buffer *g_cacheRootSecret = NULL;
+
+IAM_STATIC void DestroyCacheRootSecret()
+{
+    DestoryBuffer(g_cacheRootSecret);
+    g_cacheRootSecret = NULL;
+}
 
 IAM_STATIC bool IsSessionExist(void)
 {
@@ -138,6 +147,8 @@ ResultCode CloseEditSession(void)
     if (!IsSessionExist()) {
         return RESULT_GENERAL_ERROR;
     }
+    DestroyCacheRootSecret();
+    RemoveCachePin(g_session->userId, NULL);
     Free(g_session);
     g_session = NULL;
     return RESULT_SUCCESS;
@@ -221,6 +232,7 @@ ResultCode CheckSessionTimeout(void)
     if (currentTime - g_session->time > SESSION_VALIDITY_PERIOD) {
         LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
             currentTime, g_session->time);
+        DestroyCacheRootSecret();
         return RESULT_TIMEOUT;
     }
     return RESULT_SUCCESS;
@@ -249,5 +261,62 @@ ResultCode CheckSessionValid(int32_t userId)
     if (g_session->userId != userId) {
         return RESULT_GENERAL_ERROR;
     }
+    return RESULT_SUCCESS;
+}
+
+void CacheRootSecret(int32_t userId, Buffer *rootSecret)
+{
+    /* The presence of a session is the pin change phase */
+    if (CheckSessionTimeout() != RESULT_SUCCESS) {
+        return;
+    }
+    if (g_session->userId != userId) {
+        LOG_ERROR("CacheRootSecret check user id fail");
+        return;
+    }
+    if (!CheckBufferWithSize(rootSecret, ROOT_SECRET_LEN)) {
+        LOG_ERROR("check root secret fail");
+        return;
+    }
+    DestroyCacheRootSecret();
+    g_cacheRootSecret = CopyBuffer(rootSecret);
+    if (g_cacheRootSecret == NULL) {
+        LOG_ERROR("copy cache root secret fail");
+    }
+}
+
+Buffer *GetCacheRootSecret(int32_t userId)
+{
+    if (CheckSessionTimeout() != RESULT_SUCCESS) {
+        return NULL;
+    }
+    if (g_session->userId != userId) {
+        LOG_ERROR("GetCacheRootSecret check user id fail");
+        return NULL;
+    }
+    if (g_cacheRootSecret == NULL) {
+        LOG_ERROR("no cache root secret");
+        return NULL;
+    }
+    return CopyBuffer(g_cacheRootSecret);
+}
+
+ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen)
+{
+    if ((challenge == NULL) || (challengeLen != CHALLENGE_LEN)) {
+        LOG_ERROR("challenge is invalid");
+        return RESULT_BAD_PARAM;
+    }
+
+    ResultCode ret = CheckSessionTimeout();
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("session does not exist");
+        return ret;
+    }
+    if (memcpy_s(challenge, challengeLen, g_session->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("copy challenge failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
     return RESULT_SUCCESS;
 }
