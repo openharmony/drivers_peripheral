@@ -24,6 +24,7 @@
           "hdf_core",
           "hilog",
           "c_utils",
+          "init",
           "drivers_interface_secure_element"
         ],
         "third_party": [
