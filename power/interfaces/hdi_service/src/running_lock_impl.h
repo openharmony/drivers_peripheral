@@ -36,6 +36,10 @@ public:
         uint64_t lockid = 0, const std::string &bundleName = "");
     static int32_t Unhold(const RunningLockInfo &info,
         uint64_t lockid = 0, const std::string &bundleName = "");
+    static int32_t HoldLock(const RunningLockInfo &info, PowerHdfState state,
+        uint64_t lockid = 0, const std::string &bundleName = "");
+    static int32_t UnholdLock(const RunningLockInfo &info,
+        uint64_t lockid = 0, const std::string &bundleName = "");
     static void Clean();
     static uint32_t GetCount(RunningLockType type);
     static std::string GetRunningLockTag(RunningLockType type);
