@@ -24,6 +24,7 @@
 #include "input_device_manager.h"
 #include "input_manager.h"
 #include "osal_time.h"
+#include "osal_mem.h"
 
 using namespace testing::ext;
 using namespace OHOS::Input;
@@ -31,6 +32,10 @@ static IInputInterface *g_inputInterface;
 static InputEventCb g_callback;
 static InputHostCb g_hotplugCb;
 static int32_t g_touchIndex;
+static uint32_t g_index = 1;
+static int32_t g_fileDescriptorFirst = 3;
+static int32_t g_fileDescriptorSecond = 4;
+static uint32_t g_type = INDEV_TYPE_MOUSE;
 static const int32_t KEEP_ALIVE_TIME_MS = 3000;
 static const int32_t INVALID_INDEX = 15;
 static const int32_t INVALID_INDEX1 = -1;
@@ -42,6 +47,10 @@ static const int32_t TEST_LEN2 = -1;
 static const int32_t VALUE_NULL = 0;
 static const int32_t VALUE_DEFAULT = 1;
 static const uint32_t INIT_DEFAULT_VALUE = 255;
+static const uint32_t STATUS = INPUT_DEVICE_STATUS_CLOSED;
+static const string NODE_PATH = "dev/input/";
+static const size_t COUNT = 1;
+
 
 class HdiInputTest : public testing::Test {
 public:
@@ -61,10 +70,7 @@ void HdiInputTest::SetUpTestCase()
 
 void HdiInputTest::TearDownTestCase()
 {
-    if (g_inputInterface != nullptr) {
-        free(g_inputInterface);
-        g_inputInterface = nullptr;
-    }
+    ReleaseInputInterface(&g_inputInterface);
 }
 
 void HdiInputTest::SetUp()
@@ -927,4 +933,131 @@ HWTEST_F(HdiInputTest, RunExtraCommand002, TestSize.Level1)
         HDF_LOGE("%s: run extra command failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: RegisterHotPlugCallback
+  * @tc.desc: Register Hot Plug Callback
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, RegisterHotPlugCallback001, TestSize.Level1)
+{
+    printf("%s: [Input] RegisterHotPlugCallback001 enter\n", __func__);
+    int32_t ret;
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
+
+    ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: Register Hot Plug Callback failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: UnregisterHotPlugCallback
+  * @tc.desc: Unregister Hot Plug Callback
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, UnregisterHotPlugCallback001, TestSize.Level1)
+{
+    printf("%s: [Input] UnregisterHotPlugCallback001 enter\n", __func__);
+    int32_t ret;
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
+
+    ret  = g_inputInterface->iInputReporter->UnregisterHotPlugCallback();
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: Unregister Hot Plug Callback failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+  * @tc.name: SendHotPlugEvent
+  * @tc.desc: Send Hot Plug Event
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, SendHotPlugEvent001, TestSize.Level1)
+{
+    printf("%s: [Input] SendHotPlugEvent001 enter\n", __func__);
+    InputDeviceManager iInputDeviceManager;
+    iInputDeviceManager.SendHotPlugEvent(g_type, g_index, STATUS);
+}
+
+/**
+  * @tc.name: DoWithEventDeviceAdd
+  * @tc.desc: Do With Event Device Add
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, DoWithEventDeviceAdd001, TestSize.Level1)
+{
+    printf("%s: [Input] DoWithEventDeviceAdd001 enter\n", __func__);
+    InputDeviceManager iInputDeviceManager;
+    iInputDeviceManager.DoWithEventDeviceAdd(g_fileDescriptorFirst, g_fileDescriptorSecond, NODE_PATH);
+}
+
+/**
+  * @tc.name: DoWithEventDeviceDel
+  * @tc.desc: Do With Event Device Del
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, DoWithEventDeviceDel001, TestSize.Level1)
+{
+    printf("%s: [Input] DoWithEventDeviceDel001 enter\n", __func__);
+    InputDeviceManager iInputDeviceManager;
+    iInputDeviceManager.DoWithEventDeviceDel(g_fileDescriptorFirst, g_index);
+}
+
+/**
+  * @tc.name: ReportEventPkg
+  * @tc.desc: Report Event Pkg
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, ReportEventPkg001, TestSize.Level1)
+{
+    printf("%s: [Input] ReportEventPkg001 enter\n", __func__);
+    InputEventPackage **evtPkg = (InputEventPackage **)OsalMemAlloc(sizeof(InputEventPackage *) * COUNT);
+    INPUT_CHECK_NULL_POINTER(evtPkg, INPUT_NULL_PTR);
+    InputDeviceManager iInputDeviceManager;
+    iInputDeviceManager.ReportEventPkg(g_fileDescriptorFirst, evtPkg, COUNT);
+}
+
+/**
+  * @tc.name: DoRead
+  * @tc.desc: Do Read
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, DoRead001, TestSize.Level1)
+{
+    printf("%s: [Input] DoRead001 enter\n", __func__);
+    struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
+    InputDeviceManager iInputDeviceManager;
+    iInputDeviceManager.DoRead(g_fileDescriptorFirst, evtBuffer, EVENT_BUFFER_SIZE);
+}
+
+/**
+  * @tc.name: InotifyEventHandler
+  * @tc.desc: Inotify Event Handler
+  * @tc.type: FUNC
+  * @tc.require: SR000F867Q
+  */
+HWTEST_F(HdiInputTest, InotifyEventHandler001, TestSize.Level1)
+{
+    printf("%s: [Input] InotifyEventHandler001 enter\n", __func__);
+    int32_t ret;
+    struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
+    InputDeviceManager iInputDeviceManager;
+    ret = iInputDeviceManager.InotifyEventHandler(g_fileDescriptorFirst, g_fileDescriptorSecond);
+    if (ret != INPUT_SUCCESS) {
+        printf("%s: Inotify Event Handler failed, ret %d\n", __func__, ret);
+    }
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
