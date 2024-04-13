@@ -107,6 +107,36 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info,
     return status;
 }
 
+int32_t RunningLockImpl::HoldLock(const RunningLockInfo &info, PowerHdfState state,
+    uint64_t lockid, const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!IsValidType(info.type, state)) {
+        HDF_LOGW("HoldLock failed, type=%{public}d or state=%{public}d is invalid", info.type, state);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t status = SystemOperation::WriteWakeLock(GetRunningLockTag(info.type));
+    if (status == HDF_SUCCESS) {
+        RunningLockImpl::NotifyChanged(info, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_ADD");
+    }
+    return status;
+}
+
+int32_t RunningLockImpl::UnholdLock(const RunningLockInfo &info,
+    uint64_t lockid, const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!IsValidType(info.type)) {
+        HDF_LOGW("UnholdLock failed, type=%{public}d is invalid", info.type);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t status = SystemOperation::WriteWakeUnlock(GetRunningLockTag(info.type));
+    if (status == HDF_SUCCESS) {
+        RunningLockImpl::NotifyChanged(info, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_REMOVE");
+    }
+    return status;
+}
+
 void RunningLockImpl::Clean()
 {
     HDF_LOGI("start to clear running locks");

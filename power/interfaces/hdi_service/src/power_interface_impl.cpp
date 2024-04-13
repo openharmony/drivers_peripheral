@@ -402,13 +402,13 @@ int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 int32_t PowerInterfaceImpl::HoldRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    return RunningLockImpl::Hold(info, g_powerState, lockid, bundleName);
+    return RunningLockImpl::HoldLock(info, g_powerState, lockid, bundleName);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLockExt(const RunningLockInfo &info,
     uint64_t lockid, const std::string &bundleName)
 {
-    return RunningLockImpl::Unhold(info, lockid, bundleName);
+    return RunningLockImpl::UnholdLock(info, lockid, bundleName);
 }
 
 int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
