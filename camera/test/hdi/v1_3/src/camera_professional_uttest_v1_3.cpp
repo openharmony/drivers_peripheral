@@ -683,7 +683,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_015, TestSiz
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AWB_MODES, &entry);
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     for (size_t i = 0;i < entry.count;i++) {
         if (entry.data.u8[i] == OHOS_CAMERA_AWB_MODE_OFF) {
@@ -1242,7 +1242,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AWB_MODES, &entry);
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
 
     for (uint8_t i = 0;i < entry.count;i++) {
         cameraTest->intents = {PREVIEW, VIDEO};
