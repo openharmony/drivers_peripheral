@@ -20,7 +20,7 @@
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "v1_0/ilight_interface.h"
-#include "light_type.h"
+#include "light_if.h"
 
 using namespace OHOS::HDI::Light::V1_0;
 using namespace testing::ext;
@@ -407,5 +407,19 @@ HWTEST_F(HdfLightHdiTest, TurnOnMultiLights_001, TestSize.Level1)
     OsalSleep(g_sleepTime);
 
     ret = g_lightInterface->TurnOffLight(LIGHT_ID_BATTERY);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: NewLightInterfaceInstance
+  * @tc.desc: create lightInterfaceInstance
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, NewLightInterfaceInstance, TestSize.Level1)
+{
+    const struct LightInterface *lightInterface = NewLightInterfaceInstance();
+    ASSERT_NE(nullptr, lightInterface);
+    int32_t ret = FreeLightInterfaceInstance();
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
