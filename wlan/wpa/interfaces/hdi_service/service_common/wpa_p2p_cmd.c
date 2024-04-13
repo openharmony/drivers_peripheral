@@ -960,22 +960,17 @@ int32_t WpaInterfaceP2pHid2dConnect(struct IWpaInterface *self, const char *ifNa
 
     char cmd[CMD_SIZE];
     char buf[CMD_SIZE];
-    char bssid[CMD_SIZE] = {0};
-    if (memcpy_s(bssid, CMD_SIZE, info->bssid, CMD_SIZE) != EOK) {
-        HDF_LOGE("%{public}s strcpy failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    int32_t ret = 0;
     (void)self;
-
-    if (info->bssid && strlen(bssid) >= MIN_MAC_LEN) {
-        ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n0", ifName,
-            (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, info->frequency);
+    int freq = (info->frequency >> 16);
+    int isLegacyGo = (info->frequency & 0xffff);
+    if (freq < 0) {
+        HDF_LOGE("hid2dconnect freq is failed, freq=%{public}d", freq);
+        freq = 0;
     }
-
-    if (ret < 0) {
-        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
+    HDF_LOGI("hid2dconnect freq=%{public}d, isLegacyGo=%{public}d", freq, isLegacyGo);
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n%d", ifName,
+        (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s.", __func__, cmd);
         return HDF_FAILURE;
     }
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
