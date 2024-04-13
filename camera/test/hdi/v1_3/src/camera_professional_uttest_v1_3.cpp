@@ -683,7 +683,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_015, TestSiz
     EXPECT_NE(cameraTest->ability, nullptr);
     common_metadata_header_t* data = cameraTest->ability->get();
     camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_MODES, &entry);
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     for (size_t i = 0;i < entry.count;i++) {
         if (entry.data.u8[i] == OHOS_CAMERA_AWB_MODE_OFF) {
@@ -766,6 +766,13 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_016, TestSiz
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+    sleep(UT_SECOND_TIMES);
+    common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
+    EXPECT_NE(callbackData, nullptr);
+    camera_metadata_item_t callbackEntry;
+    cameraTest->rc = FindCameraMetadataItem(callbackData, OHOS_STATUS_ALGO_MEAN_Y, &callbackEntry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
 
 /**
@@ -844,6 +851,13 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_018, TestSiz
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     }
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+    sleep(UT_SECOND_TIMES);
+    common_metadata_header_t* callbackData = cameraTest->deviceCallback->resultMeta->get();
+    EXPECT_NE(callbackData, nullptr);
+    camera_metadata_item_t callbackEntry;
+    cameraTest->rc = FindCameraMetadataItem(callbackData, OHOS_STATUS_PREVIEW_PHYSICAL_CAMERA_ID, &callbackEntry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
 
 /**
@@ -1086,7 +1100,9 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_024, TestSiz
     EXPECT_NE(callbackData, nullptr);
     camera_metadata_item_t callbackEntry;
     cameraTest->rc = FindCameraMetadataItem(callbackData, OHOS_STATUS_SENSOR_EXPOSURE_TIME, &callbackEntry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    EXPECT_NE(callbackEntry.data.r, nullptr);
+    CAMERA_LOGI("the value of OHOS_STATUS_SENSOR_EXPOSURE_TIME is %{public}d/%{public}d",
+        callbackEntry.data.r[0].numerator, callbackEntry.data.r[0].denominator);
 }
 
 /**
@@ -1149,6 +1165,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_026, TestSiz
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
         uint8_t focusMode = entry.data.u8[i];
         meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, DATA_COUNT);
+        if (entry.data.u8[i] == OHOS_CAMERA_FOCUS_MODE_MANUAL) {
+            uint8_t focusedPoint[] = {1, 1, 1, 1};
+            meta->addEntry(OHOS_CONTROL_FOCUSED_POINT, &focusedPoint, DATA_COUNT);
+        }
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
         cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
@@ -1222,7 +1242,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_028, TestSiz
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AWB_MODES, &entry);
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_CONTROL_AWB_AVAILABLE_MODES, &entry);
 
     for (uint8_t i = 0;i < entry.count;i++) {
         cameraTest->intents = {PREVIEW, VIDEO};
