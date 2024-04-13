@@ -30,7 +30,7 @@ struct HdfDisplayComposerHost {
 };
 
 static pthread_rwlock_t g_rwLock = PTHREAD_RWLOCK_INITIALIZER;
-static bool g_stop = false;
+static bool g_stop = true;
 
 static int32_t DisplayComposerDriverDispatch(
     struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
