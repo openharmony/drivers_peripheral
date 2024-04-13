@@ -53,6 +53,7 @@ private:
                      const int32_t sensorId,
                      struct HdfSBuf *reply);
     int32_t SensorShowData(struct HdfSBuf *reply);
+    int32_t SensorShowClient(struct HdfSBuf *reply);
 
     std::shared_ptr<SensorClientsManager> clientsManager_;
 };

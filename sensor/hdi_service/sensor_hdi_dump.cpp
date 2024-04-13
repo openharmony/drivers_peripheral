@@ -33,7 +33,8 @@ static const char *SENSOR_HELP =
     " Sensor manager dump options:\n"
     "     -h: [sensor command help]\n"
     "     -l: [show sensor list]\n"
-    "     -d: [The data information is displayed 10 times]\n";
+    "     -d: [The data information is displayed 10 times]\n"
+    "     -c: [show sensor client information]\n";
 
 SensorHdiDump::SensorHdiDump()
 {}
@@ -163,6 +164,51 @@ int32_t SensorHdiDump::SensorShowData(struct HdfSBuf *reply)
     return HDF_SUCCESS;
 }
 
+int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
+{
+    std::unordered_map<int, SensorClientInfo> sensorClientInfoMap;
+    if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, sensorClientInfoMap)) {
+        HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
+        return HDF_FAILURE;
+    }
+    std::unordered_map<int32_t, struct BestSensorConfig> bestSensorConfigMap;
+    (void)SensorClientsManager::GetInstance()->GetBestSensorConfigMap(bestSensorConfigMap);
+
+    (void)HdfSbufWriteString(reply, "============== all clients information ==============\n\n");
+    std::string sensorInfoData = "";
+    sensorInfoData += "bestSensorConfigMap={\n";
+    for (auto &entry2 : bestSensorConfigMap) {
+        auto &sensorId = entry2.first;
+        auto &bestSensorConfig = entry2.second;
+        sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
+        sensorInfoData += "bestSensorConfig={";
+        sensorInfoData += "samplingInterval=" + std::to_string(bestSensorConfig.samplingInterval) + ",";
+        sensorInfoData += "reportInterval=" + std::to_string(bestSensorConfig.reportInterval);
+        sensorInfoData += "}}\n";
+    }
+    sensorInfoData += "}\n\n";
+    for (auto &entry : sensorClientInfoMap) {
+        auto &serviceId = entry.first;
+        auto &sensorClientInfo = entry.second;
+        sensorInfoData += "serviceId=" + std::to_string(serviceId) + " ";
+        sensorInfoData += "sensorConfigMap_={\n";
+        for (auto &entry2 : sensorClientInfo.sensorConfigMap_) {
+            auto &sensorId = entry2.first;
+            auto &sensorConfig = entry2.second;
+            sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
+            sensorInfoData += "sensorConfig={";
+            sensorInfoData += "samplingInterval=" + std::to_string(sensorConfig.samplingInterval) + ",";
+            sensorInfoData += "reportInterval=" + std::to_string(sensorConfig.reportInterval) + ",";
+            sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" +
+                    std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
+            sensorInfoData += "}}\n";
+        }
+        sensorInfoData += "}\n\n";
+    }
+    (void)HdfSbufWriteString(reply, sensorInfoData.c_str());
+    return HDF_SUCCESS;
+}
+
 int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t argc = 0;
@@ -196,6 +242,9 @@ int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf
             return HDF_SUCCESS;
         } else if (strcmp(value, "-d") == 0) {
             SensorShowData(reply);
+            return HDF_SUCCESS;
+        } else if (strcmp(value, "-c") == 0) {
+            SensorShowClient(reply);
             return HDF_SUCCESS;
         }
     }
