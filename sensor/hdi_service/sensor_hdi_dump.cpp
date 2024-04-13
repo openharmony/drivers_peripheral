@@ -198,7 +198,8 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
             sensorInfoData += "sensorConfig={";
             sensorInfoData += "samplingInterval=" + std::to_string(sensorConfig.samplingInterval) + ",";
             sensorInfoData += "reportInterval=" + std::to_string(sensorConfig.reportInterval) + ",";
-            sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" + std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
+            sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" +
+                    std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
             sensorInfoData += "}}\n";
         }
         sensorInfoData += "}\n\n";
