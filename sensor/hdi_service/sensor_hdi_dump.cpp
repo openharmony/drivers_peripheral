@@ -33,7 +33,8 @@ static const char *SENSOR_HELP =
     " Sensor manager dump options:\n"
     "     -h: [sensor command help]\n"
     "     -l: [show sensor list]\n"
-    "     -d: [The data information is displayed 10 times]\n";
+    "     -d: [The data information is displayed 10 times]\n"
+    "     -c: [show sensor client information]\n";
 
 SensorHdiDump::SensorHdiDump()
 {}
