@@ -478,6 +478,10 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_INFO(LOG_CORE, "nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d", rc, error);
         }
 
+        if (error < 0) {
+            HILOG_ERROR(LOG_CORE, "%s: Netlink error", __FUNCTION__);
+            rc = RET_CODE_FAILURE;
+        }
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
             rc = RET_CODE_NOT_SUPPORT;
