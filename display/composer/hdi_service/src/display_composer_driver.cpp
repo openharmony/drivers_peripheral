@@ -57,7 +57,7 @@ static int32_t DisplayComposerDriverDispatch(
     auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
     if (hdfDisplayComposerHost == nullptr || g_stop) {
         pthread_rwlock_unlock(&g_rwLock);
-        HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr", __func__);
+        HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr, stop: %{public}d", __func__, start build);
         return HDF_FAILURE;
     }
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
