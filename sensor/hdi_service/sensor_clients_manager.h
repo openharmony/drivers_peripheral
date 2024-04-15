@@ -62,8 +62,8 @@ public:
     std::mutex sensorUsedMutex_;
     std::mutex sensorConfigMutex_;
     std::mutex sdcSensorConfigMutex_;
-    std::mutex SensorInfoMutex_;
-    std::mutex SensorsDataPackMutex_;
+    std::mutex sensorInfoMutex_;
+    std::mutex sensorsDataPackMutex_;
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
     static bool IsSensorContinues(int32_t sensorId);
