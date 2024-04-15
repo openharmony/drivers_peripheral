@@ -70,14 +70,14 @@ void DcameraEnableDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    std::string deviceId = "1";
+    std::string dhId = "2";
     std::string abilityInfo(reinterpret_cast<const char*>(data), size);
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
 
-    sptr<IDCameraProviderCallback> callback;
+    sptr<IDCameraProviderCallback> callback = new MockDCameraProviderCallbackImpl(deviceId, dhId);
 
     DCameraProvider::GetInstance()->EnableDCameraDevice(dhBase, abilityInfo, callback);
 }

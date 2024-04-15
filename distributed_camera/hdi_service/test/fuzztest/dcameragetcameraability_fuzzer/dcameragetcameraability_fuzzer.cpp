@@ -27,9 +27,21 @@ void DcameraGetCameraAbilityFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint8_t))) {
         return;
     }
-    std::string cameraId(reinterpret_cast<const char*>(data), size);
+    std::string deviceId = "1";
+    std::string dhId = "2";
+    std::string cameraId = "1";
     std::vector<uint8_t> cameraAbility;
     cameraAbility.push_back(* data);
+    DHBase dhBase;
+    dhBase.deviceId_ = deviceId;
+    dhBase.dhId_ = dhId;
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
+        sourceAbilityInfo));
+    if (dcameraDevice != nullptr) {
+        DCameraHost::GetInstance()->dCameraDeviceMap_[cameraId] = dcameraDevice;
+    }
     DCameraHost::GetInstance()->GetCameraAbility(cameraId, cameraAbility);
 }
 }
