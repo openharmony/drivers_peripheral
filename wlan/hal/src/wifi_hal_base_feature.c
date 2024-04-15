@@ -65,7 +65,7 @@ static int32_t GetDeviceMacAddressInner(const struct IWiFiBaseFeature *baseFeatu
 static int32_t GetValidFreqsWithBandInner(const struct IWiFiBaseFeature *baseFeature,
     int32_t band, int32_t *freqs, uint32_t size, uint32_t *num)
 {
-    if (baseFeature == NULL || freqs == NULL || size < MAX_CHANNEL_NUM || num == NULL) {
+    if (baseFeature == NULL || freqs == NULL || size < MAX_CHANNEL_NUM || num == NULL || band < 0) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
