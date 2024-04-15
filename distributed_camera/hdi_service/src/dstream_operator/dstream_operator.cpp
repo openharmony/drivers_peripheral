@@ -526,8 +526,8 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
     if (formatObj == nullptr) {
         return;
     }
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
@@ -622,8 +622,8 @@ std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(cJSON* rootValue)
         return enCoders;
     }
 
-    uint32_t size = cJSON_GetArraySize(codecObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(codecObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(codecObj, i);
         if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Get CodecType error.");
@@ -650,8 +650,8 @@ DCamRetCode DStreamOperator::ParsePhotoFormats(cJSON* rootValue)
     }
 
     std::vector<int> photoFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON *item = cJSON_GetArrayItem(formatObj, i);
         if (item != nullptr && cJSON_IsNumber(item)) {
             photoFormats.push_back(item->valueint);
@@ -677,8 +677,8 @@ DCamRetCode DStreamOperator::ParsePreviewFormats(cJSON* rootValue)
     }
 
     std::vector<int> previewFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON* item = cJSON_GetArrayItem(formatObj, i);
         if (item != nullptr && cJSON_IsNumber(item)) {
             previewFormats.push_back(item->valueint);
@@ -703,8 +703,8 @@ DCamRetCode DStreamOperator::ParseVideoFormats(cJSON* rootValue)
         return DCamRetCode::INVALID_ARGUMENT;
     }
     std::vector<int> videoFormats;
-    uint32_t size = cJSON_GetArraySize(formatObj);
-    for (uint32_t i = 0; i < size; i++) {
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
         cJSON* item = cJSON_GetArrayItem(formatObj, i);
         if (item != nullptr && cJSON_IsNumber(item)) {
             videoFormats.push_back(item->valueint);
