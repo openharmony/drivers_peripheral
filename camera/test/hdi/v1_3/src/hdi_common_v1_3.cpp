@@ -388,7 +388,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    if (sizeof(captureIds) > 0) {
+    if (captureIds.size() > 0) {
         for (auto &captureId : captureIds) {
             EXPECT_EQ(true, streamOperator_V1_3 != nullptr);
             rc = streamOperator_V1_3->CancelCapture(captureId);
@@ -401,7 +401,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
             }
         }
     }
-    if (sizeof(streamIds) > 0) {
+    if (streamIds.size() > 0) {
         EXPECT_EQ(true, streamOperator_V1_3 != nullptr);
         rc = streamOperator_V1_3->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
