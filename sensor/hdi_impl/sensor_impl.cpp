@@ -135,7 +135,7 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
     tmp = sensorInfo;
     while (count--) {
         HdfSensorInformationVdi hdfSensorInfo;
-        InfoToInfoVdi(tmp, hdfSensorInfo);
+        (void)InfoToInfoVdi(tmp, hdfSensorInfo);
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
