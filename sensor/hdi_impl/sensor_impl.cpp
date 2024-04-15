@@ -321,7 +321,10 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &
 int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
+    if (sensorInterface == nullptr || sensorInterface->GetSdcSensorInfo == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
     struct SdcSensorInfo sdcSensorInfo[DEFAULT_SDC_SENSOR_INFO_SIZE];
