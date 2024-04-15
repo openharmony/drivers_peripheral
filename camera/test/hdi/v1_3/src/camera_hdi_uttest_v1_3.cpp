@@ -129,7 +129,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_002, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         EXPECT_TRUE(entry.data.u8 != nullptr);
         for (size_t i = 0; i < entry.count; i++ ) {
             float value = entry.data.u8[i];
@@ -270,24 +270,30 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
 
 static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::Test> cameraTest)
 {
-    common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
-    EXPECT_NE(data, nullptr);
-    camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
-    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
-        uint8_t value = entry.data.u8[0];
-        // 检测到超级慢动作的状态
-        if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value) {
-            printf("slow motion status is disabled");
-        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value) {
-            printf("slow motion status is ready");
-        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value) {
-            printf("slow motion status is started");
-        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value) {
-            printf("slow motion status is recording");
-        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value) {
-            printf("slow motion status is finished");
+    if (cameraTest->deviceCallback->resultMeta == nullptr) {
+        CAMERA_LOGI("callback not triggered\n");
+        return;
+    }
+    if (cameraTest->deviceCallback->resultMeta != nullptr) {
+        common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
+        EXPECT_NE(data, nullptr);
+        camera_metadata_item_t entry;
+        cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+        if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+            uint8_t value = entry.data.u8[0];
+            // 检测到超级慢动作的状态
+            if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value) {
+                printf("slow motion status is disabled");
+            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value) {
+                printf("slow motion status is ready");
+            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value) {
+                printf("slow motion status is started");
+            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value) {
+                printf("slow motion status is recording");
+            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value) {
+                printf("slow motion status is finished");
+            }
         }
     }
 }
@@ -305,7 +311,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_005, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         EXPECT_TRUE(entry.data.u8 != nullptr);
         for (size_t i = 0; i < entry.count; i++ ) {
             float value = entry.data.u8[i];
@@ -374,7 +380,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_007, TestSize.Level1)
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_MOTION_DETECTION_SUPPORT, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         EXPECT_TRUE(entry.data.u8 != nullptr);
         if (entry.data.u8[0] == OHOS_CAMERA_MOTION_DETECTION_SUPPORTED) {
             CreateAndCommitStreamsForSlowMotion(cameraTest);
@@ -697,6 +703,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_015, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_EQUIVALENT_FOCUS, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_EQUIVALENT_FOCUS can not be find");
+        return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.i32, nullptr);
@@ -731,6 +738,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_016, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES is can not be found");
+        return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.ui32, nullptr);
@@ -821,6 +829,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_018, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES can not be found");
+        return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
         EXPECT_NE(entry.data.f, nullptr);
@@ -902,12 +911,13 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_020, TestSize.Level1)
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_MODES, &entry);
     if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGI("OHOS_ABILITY_CAMERA_MODES can not be find");
+        return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_NE(entry.data.f, nullptr);
+        EXPECT_NE(entry.data.u8, nullptr);
         EXPECT_EQ(entry.count > 0, true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.f[i];
+            float value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_2::VIDEO_MACRO) {
                 CAMERA_LOGI("VIDEO_MACRO mode is supported");
             }
