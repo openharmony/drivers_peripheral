@@ -55,7 +55,7 @@ SensorClientsManager::~SensorClientsManager()
 
 void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag)
 {
-    std::unique_lock<std::mutex> lock(SensorInfoMutex_);
+    std::unique_lock<std::mutex> lock(sensorInfoMutex_);
     if (!cFlag) {
         info = sensorInfo_;
         return;
@@ -66,14 +66,14 @@ void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &inf
 
 void SensorClientsManager::GetEventData(struct SensorsDataPack &dataPack)
 {
-    std::unique_lock<std::mutex> lock(SensorsDataPackMutex_);
+    std::unique_lock<std::mutex> lock(sensorsDataPackMutex_);
     dataPack = listDump_;
     return;
 }
 
 void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
 {
-    std::unique_lock<std::mutex> lock(SensorsDataPackMutex_);
+    std::unique_lock<std::mutex> lock(sensorsDataPackMutex_);
     if (event.data.empty()) {
         HDF_LOGE("%{public}s: event data is empty!", __func__);
         return;
