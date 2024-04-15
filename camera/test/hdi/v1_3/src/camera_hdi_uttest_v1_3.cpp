@@ -541,6 +541,16 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     cameraTest->intents = {PREVIEW, STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
 
+    //fill capture setting
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t muteMode = static_cast<uint8_t>(OHOS_CAMERA_MUTE_MODE_OFF);
+    modeSetting->addEntry(OHOS_CONTROL_MUTE_MODE, &muteMode, DATA_COUNT);
+    uint8_t deferredImage = OHOS::HDI::Camera::V1_2::STILL_IMAGE;
+    modeSetting->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &deferredImage, DATA_COUNT);
+    std::vector<uint8_t> controlVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, controlVec);
+    cameraTest->abilityVec = controlVec;
+
     //start preview and capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     //OncaptureReady trigger
