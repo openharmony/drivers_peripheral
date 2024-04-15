@@ -74,7 +74,7 @@ static int HdfDisplayComposerDriverInit(struct HdfDeviceObject* deviceObject)
 static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    static auto* hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
+    auto* hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
     if (hdfDisplayComposerHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfDisplayComposerHost object", __func__);
         return HDF_FAILURE;
