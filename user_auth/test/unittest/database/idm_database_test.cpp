@@ -42,6 +42,7 @@ extern "C" {
     extern bool IsUserMatch(const CredentialCondition *limit, const UserInfo *user);
     extern ResultCode TraverseCredentialList(const CredentialCondition *limit, const LinkedList *credentialList,
         LinkedList *credListGet);
+    extern void RemoveCachePin(UserInfo *user, bool *isRemoved);
 }
 
 namespace OHOS {
@@ -408,6 +409,25 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)
     Free(credInfo2);
 }
 
+HWTEST_F(IdmDatabaseTest, TestClearCachePin, TestSize.Level0)
+{
+    constexpr int32_t userId = 115;
+    ClearCachePin(userId);
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    constexpr uint64_t credentialId1 = 10;
+    UserInfo userInfo = {};
+    userInfo.userId = userId;
+    userInfo.enrolledInfoList = nullptr;
+    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    EXPECT_NE(userInfo.credentialInfoList, nullptr);
+    auto *credInfo1 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
+    credInfo1->credentialId = credentialId1;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo1));
+    ClearCachePin(userId);
+}
+
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialById, TestSize.Level0)
 {
     constexpr uint64_t credentialId = 111;
@@ -481,6 +501,10 @@ HWTEST_F(IdmDatabaseTest, TestIsCredMatch_003, TestSize.Level0)
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
     SetCredentialConditionExecutorMatcher(&limit, executorMatcher2);
     EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
+    SetCredentiaConditionNeedCachePin(nullptr);
+    EXPECT_FALSE(IsCredMatch(&limit, &credInfo));
+    SetCredentiaConditionNeedCachePin(&limit);
+    EXPECT_TRUE(IsCredMatch(&limit, &credInfo));
 }
 
 HWTEST_F(IdmDatabaseTest, TestIsUserMatch, TestSize.Level0)
@@ -700,6 +724,24 @@ HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_002, TestSize.Level0)
     EXPECT_EQ(enrolledState.credentialDigest, testEnrolledId);
     EXPECT_EQ(enrolledState.credentialCount, expectCredentialCount);
 }
+
+HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
+{
+    constexpr int32_t userId = 1;
+    UserInfo userInfo = {};
+    userInfo.userId = userId;
+    bool removed = false;
+
+    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    CredentialInfoHal credentialInfo = {0, 0, 2, 2, 3, 4};
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo));
+    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 1, 1};
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
+
+    RemoveCachePin(&userInfo, &removed);
+    EXPECT_EQ(removed, false);
+}
+
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

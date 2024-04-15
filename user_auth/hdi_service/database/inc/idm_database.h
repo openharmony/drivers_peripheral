@@ -38,6 +38,7 @@ typedef enum CredentialConditionTag {
     CREDENTIAL_CONDITION_SENSOR_HINT = 8, // 1 << 3
     CREDENTIAL_CONDITION_EXECUTOR_MATCHER = 16, // 1 << 4
     CREDENTIAL_CONDITION_USER_ID = 32, // 1 << 5
+    CREDENTIAL_CONDITION_NEED_CACHE_PIN = 64, // 1 << 6
 } CredentialConditionTag;
 
 typedef struct {
@@ -62,7 +63,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo);
 ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType);
 ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType);
 ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
-void RemoveCachePin(int32_t userId, bool *isRemoved);
+void ClearCachePin(int32_t userId);
 
 void SetCredentialConditionCredentialId(CredentialCondition *condition, uint64_t credentialId);
 void SetCredentialConditionTemplateId(CredentialCondition *condition, uint64_t templateId);
@@ -70,6 +71,7 @@ void SetCredentialConditionAuthType(CredentialCondition *condition, uint32_t aut
 void SetCredentialConditionExecutorSensorHint(CredentialCondition *condition, uint32_t executorSensorHint);
 void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint32_t executorMatcher);
 void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId);
+void SetCredentiaConditionNeedCachePin(CredentialCondition *condition);
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
