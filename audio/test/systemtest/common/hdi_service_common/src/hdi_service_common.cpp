@@ -612,7 +612,7 @@ int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struc
         HDF_LOGE("%{public}s: AUDIO_TEST:start failed\n", __func__);
         return ret;
     }
-    ret = GetCaptureBufferSize(capture, bufferSize)
+    ret = GetCaptureBufferSize(capture, bufferSize);
     if (ret < 0 || bufferSize == 0) {
         HDF_LOGE("%{public}s: AUDIO_TEST:GetCaptureBufferSize failed\n", __func__);
         return ret;
