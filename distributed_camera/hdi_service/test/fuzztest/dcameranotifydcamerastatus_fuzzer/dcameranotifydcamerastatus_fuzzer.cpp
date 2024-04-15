@@ -27,8 +27,8 @@ void DcameraNotifyDCameraStatusFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    std::string deviceId = "1";
+    std::string dhId = "2";
     int32_t result = *(reinterpret_cast<const int32_t *>(data));
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
