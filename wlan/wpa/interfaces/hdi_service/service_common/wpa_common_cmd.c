@@ -555,8 +555,8 @@ static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWp
             return;
         }
         status->addressLen = ETH_ADDR_LEN + 1 ;
-        if (strcpy_s((char *)status->address, ETH_ADDR_LEN + 1, (char*)tmpAddress) != EOK) {
-            HDF_LOGE("%{public}s strcpy failed", __func__);
+        if (memcpy_s((char *)status->address, ETH_ADDR_LEN + 1, (char*)tmpAddress, ETH_ADDR_LEN + 1) != EOK) {
+            HDF_LOGE("%{public}s strcpy memcpy", __func__);
         }
     }
     if (strcmp(halStatus->bssid, "") != 0) {
