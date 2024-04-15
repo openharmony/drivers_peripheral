@@ -65,6 +65,9 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
     }
     size_t splitPosEnd = params.find(';', pos);
     if (splitPosEnd != params.npos) {
+        if (pos + step + 1 > splitPosEnd) {
+            return ERR_DH_AUDIO_HDF_FAIL;
+        }
         value = params.substr(pos + step + 1, splitPosEnd - pos - step - 1);
     } else {
         value = params.substr(pos + step + 1);
@@ -202,7 +205,12 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
 
 void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
 {
-    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    char path[PATH_MAX + 1] = {0x00};
+    if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
+        DHLOGE("The file path is invalid.");
+        return;
+    }
+    std::ofstream ofs(path, std::ios::binary | std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         return;
     }
