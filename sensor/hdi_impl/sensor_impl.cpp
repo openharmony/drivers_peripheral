@@ -348,7 +348,6 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInf
 
 int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
 {
-
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
         return SENSOR_INVALID_PARAM;
