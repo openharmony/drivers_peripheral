@@ -45,7 +45,6 @@ public:
 private:
     const SensorInterface *sensorInterface;
     int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
-    int32_t InfoToInfoVdi(SensorInformation &info, HdfSensorInformationVdi &infoVdi);
 };
 } // V1_1
 } // Sensor
