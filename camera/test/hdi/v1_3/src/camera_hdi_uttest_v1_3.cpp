@@ -271,7 +271,7 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
 static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::Test> cameraTest)
 {
     if (cameraTest->deviceCallback->resultMeta == nullptr) {
-        CAMERA_LOGI("callback not triggered\n");
+        CAMERA_LOGI("callback not triggered");
         return;
     }
     if (cameraTest->deviceCallback->resultMeta != nullptr) {
