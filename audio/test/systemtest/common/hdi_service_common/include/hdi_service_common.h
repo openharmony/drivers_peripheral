@@ -264,6 +264,8 @@ int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&a
 
 int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render,
                             uint32_t renderId);
+
+int32_t GetCaptureBufferSize(struct IAudioCapture *capture, uint32_t &bufferSize);
 }
 }
 #endif // AUDIO_IDLHDI_COMMON_H
