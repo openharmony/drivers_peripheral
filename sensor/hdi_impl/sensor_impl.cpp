@@ -380,6 +380,20 @@ int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
         return SENSOR_SUCCESS;
     }
 
+    int32_t ret = HDF_FAILURE;
+    if (groupId == TRADITIONAL_SENSOR_TYPE) {
+        ret = sensorInterface->Unregister(groupId, TradtionalSensorDataCallback);
+    } else if (groupId == MEDICAL_SENSOR_TYPE) {
+        ret = sensorInterface->Unregister(groupId, MedicalSensorDataCallback);
+    }
+
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
+    }
+
+    g_groupIdCallBackMap.erase(groupId);
+
     return ret;
 }
 
