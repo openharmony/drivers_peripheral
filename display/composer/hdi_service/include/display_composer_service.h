@@ -18,6 +18,8 @@
 
 #include "idisplay_composer_vdi_v1_1.h"
 #include "cache_manager/device_cache_manager.h"
+#include "v1_1/display_command/display_cmd_responser.h"
+#include "v1_1/idisplay_composer.h"
 #include "v1_2/display_command/display_cmd_responser.h"
 #include "v1_2/idisplay_composer.h"
 #include "v1_2/display_composer_type.h"
@@ -96,15 +98,15 @@ private:
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
 
-    /* V1_0 */
+    /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
-    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
+    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
 
-    /* V1_1 */
+    /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;
     DestroyComposerVdiFuncV1_1 destroyVdiFuncV1_1_;
-    std::unique_ptr<V1_1::HdiDisplayCmdResponser> cmdResponserV1_1_;
+    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponserV1_1_;
     sptr<IRefreshCallback> refreshCb_;
 };
 } // namespace Composer
