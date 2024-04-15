@@ -301,11 +301,11 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &ca
 
 int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &callbackObj)
 {
+    HDF_LOGI("%{public}s: Enter the Unregister function, groupId is %{public}d", __func__, groupId);
     if (sensorInterface == nullptr || sensorInterface->Unregister == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%{public}s: Enter the Unregister function, groupId is %{public}d", __func__, groupId);
     std::lock_guard<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject> &remote = callbackObj->HandleCallbackDeath();
     StartTrace(HITRACE_TAG_SENSORS, "Unregister");
