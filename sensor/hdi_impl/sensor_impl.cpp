@@ -110,7 +110,10 @@ int32_t SensorImpl::Init()
 int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
 {
     HDF_LOGI("%{public}s: Enter the GetAllSensorInfo function.", __func__);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetAllSensors);
+    if (sensorInterface == nullptr || sensorInterface->GetAllSensors == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *tmp = nullptr;
@@ -132,27 +135,32 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
     tmp = sensorInfo;
     while (count--) {
         HdfSensorInformationVdi hdfSensorInfo;
-        std::string sensorName(tmp->sensorName);
-        hdfSensorInfo.sensorName = sensorName;
-        std::string vendorName(tmp->vendorName);
-        hdfSensorInfo.vendorName = vendorName;
-        std::string firmwareVersion(tmp->firmwareVersion);
-        hdfSensorInfo.firmwareVersion = firmwareVersion;
-        std::string hardwareVersion(tmp->hardwareVersion);
-        hdfSensorInfo.hardwareVersion = hardwareVersion;
-        hdfSensorInfo.sensorTypeId = tmp->sensorTypeId;
-        hdfSensorInfo.sensorId = tmp->sensorId;
-        hdfSensorInfo.maxRange = tmp->maxRange;
-        hdfSensorInfo.accuracy = tmp->accuracy;
-        hdfSensorInfo.power = tmp->power;
-        hdfSensorInfo.minDelay = tmp->minDelay;
-        hdfSensorInfo.maxDelay = tmp->maxDelay;
-        hdfSensorInfo.fifoMaxEventCount = tmp->fifoMaxEventCount;
+        InfoToInfoVdi(tmp, hdfSensorInfo);
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
 
     return HDF_SUCCESS;
+}
+
+int32_t InfoToInfoVdi(SensorInformation &info, HdfSensorInformationVdi &infoVdi)
+{
+    std::string sensorName(info->sensorName);
+    infoVdi.sensorName = sensorName;
+    std::string vendorName(info->vendorName);
+    infoVdi.vendorName = vendorName;
+    std::string firmwareVersion(info->firmwareVersion);
+    infoVdi.firmwareVersion = firmwareVersion;
+    std::string hardwareVersion(info->hardwareVersion);
+    infoVdi.hardwareVersion = hardwareVersion;
+    infoVdi.sensorTypeId = info->sensorTypeId;
+    infoVdi.sensorId = info->sensorId;
+    infoVdi.maxRange = info->maxRange;
+    infoVdi.accuracy = info->accuracy;
+    infoVdi.power = info->power;
+    infoVdi.minDelay = info->minDelay;
+    infoVdi.maxDelay = info->maxDelay;
+    infoVdi.fifoMaxEventCount = info->fifoMaxEventCount;
 }
 
 int32_t SensorImpl::Enable(int32_t sensorId)
