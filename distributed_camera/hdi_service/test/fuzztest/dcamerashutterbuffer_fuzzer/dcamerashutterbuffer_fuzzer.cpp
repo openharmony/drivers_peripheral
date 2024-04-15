@@ -29,9 +29,9 @@ void DcameraShutterBufferFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    int32_t streamId = *(reinterpret_cast<const int32_t*>(data));
+    std::string deviceId = "1";
+    std::string dhId = "2";
+    int32_t streamId = 1;
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
