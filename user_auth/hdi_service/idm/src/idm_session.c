@@ -148,7 +148,7 @@ ResultCode CloseEditSession(void)
         return RESULT_GENERAL_ERROR;
     }
     DestroyCacheRootSecret();
-    RemoveCachePin(g_session->userId, NULL);
+    ClearCachePin(g_session->userId);
     Free(g_session);
     g_session = NULL;
     return RESULT_SUCCESS;
@@ -233,6 +233,7 @@ ResultCode CheckSessionTimeout(void)
         LOG_ERROR("timeout, currentTime: %{public}" PRIu64 ", sessionTime: %{public}" PRIu64,
             currentTime, g_session->time);
         DestroyCacheRootSecret();
+        ClearCachePin(g_session->userId);
         return RESULT_TIMEOUT;
     }
     return RESULT_SUCCESS;
