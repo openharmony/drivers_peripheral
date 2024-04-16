@@ -133,7 +133,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_002, TestSize.Level1)
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         EXPECT_TRUE(entry.data.u8 != nullptr);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            uint8_t value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_3::HIGH_FRAME_RATE) {
                 CAMERA_LOGI("HIGH_FRAME_RATE mode is supported");
             }
@@ -314,7 +314,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_005, TestSize.Level1)
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
         EXPECT_TRUE(entry.data.u8 != nullptr);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            uint8_t value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_2::SLOW_MOTION) {
                 CAMERA_LOGI("SLOW_MOTION mode is supported");
             }
