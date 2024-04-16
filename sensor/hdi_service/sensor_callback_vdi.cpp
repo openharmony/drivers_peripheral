@@ -35,7 +35,6 @@ namespace {
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
-    StartTrace(HITRACE_TAG_HDF, "OnDataEventVdi");
     HDF_LOGD("%{public}s enter the OnDataEventVdi function, sensorId is %{public}d", __func__, eventVdi.sensorId);
     struct HdfSensorEvents event;
     int32_t ret;
@@ -53,16 +52,13 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     std::unordered_map<int, SensorClientInfo> client;
     if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, client)) {
         HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
-        FinishTrace(HITRACE_TAG_HDF);
         return HDF_FAILURE;
     }
     sptr<ISensorCallback> callback;
     if (sensorEnabled.find(event.sensorId) == sensorEnabled.end()) {
         HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
-        FinishTrace(HITRACE_TAG_HDF);
         return HDF_FAILURE;
     }
-    FinishTrace(HITRACE_TAG_HDF);
     for (auto it = sensorEnabled[event.sensorId].begin(); it != sensorEnabled[event.sensorId].end(); ++it) {
         if (client.find(*it) == client.end()) {
             continue;
