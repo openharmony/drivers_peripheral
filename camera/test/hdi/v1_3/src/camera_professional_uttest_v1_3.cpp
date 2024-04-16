@@ -64,7 +64,7 @@ void GetSupportedPhysicalApertureValues(std::shared_ptr<CameraMetadata> ability)
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
     float entryValues[] = {entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
         entry.data.f[14], entry.data.f[18]};
-    for (size_t i = 0; i < entryValues.size() / float.size(); i++) {
+    for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
         supportedPhysicalApertureValues_.push_back(entryValues[i]);
     }
 }
