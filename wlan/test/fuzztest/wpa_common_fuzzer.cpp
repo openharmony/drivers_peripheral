@@ -423,6 +423,23 @@ void FuzzWpaInterfaceRemoveWpaIface(struct IWpaInterface *interface, const uint8
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
+void FuzzWpaInterfaceReassociate(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+
+    interface->Reassociate(interface, ifName);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+void FuzzWpaInterfaceStaShellCmd(struct IWpaInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    const char *cmd = reinterpret_cast<const char *>(rawData);
+    
+    interface->StaShellCmd(interface, ifName, cmd);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
 
 /* **********P2p Interface********** */
 void FuzzWpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *interface, const uint8_t *rawData)
@@ -600,30 +617,54 @@ void FuzzWpaInterfaceP2pAddGroup(struct IWpaInterface *interface, const uint8_t 
 void FuzzWpaInterfaceP2pAddService(struct IWpaInterface *interface, const uint8_t *rawData)
 {
     const char *ifName = reinterpret_cast<const char *>(rawData);
-    struct HdiP2pServiceInfo info;
+    struct HdiP2pServiceInfo info = {0};
     (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
     info.mode = 0;
     info.version = 0;
     const int nameLen = 32;
+    const int paramLen = 1;
     info.nameLen = nameLen;
-    info.name = static_cast<uint8_t *>OsalMemCalloc(sizeof(uint8_t) * nameLen);
-    if (info.name == nullptr) {
+    info.queryLen = paramLen;
+    info.respLen = paramLen;
+    info.name = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * nameLen));
+    info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
         return;
     }
-    strcpy_s(static_cast<char *>(info.name), sizeof(info.name), "p2p0");
+    strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
 
     interface->P2pAddService(interface, ifName, &info);
     OsalMemFree(info.name);
+    OsalMemFree(info.query);
+    OsalMemFree(info.resp);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
 void FuzzWpaInterfaceP2pRemoveService(struct IWpaInterface *interface, const uint8_t *rawData)
 {
     const char *ifName = reinterpret_cast<const char *>(rawData);
-    struct HdiP2pServiceInfo info;
+    struct HdiP2pServiceInfo info = {0};
     (void)memset_s(&info, sizeof(struct HdiP2pServiceInfo), 0, sizeof(struct HdiP2pServiceInfo));
+    info.mode = 0;
+    info.version = 0;
+    const int nameLen = 32;
+    const int paramLen = 1;
+    info.nameLen = nameLen;
+    info.queryLen = paramLen;
+    info.respLen = paramLen;
+    info.name = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * nameLen));
+    info.query = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    info.resp = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * paramLen));
+    if (info.name == nullptr || info.query == nullptr || info.resp == nullptr) {
+        return;
+    }
+    strcpy_s((char *)info.name, sizeof(info.name), "p2p0");
 
     interface->P2pRemoveService(interface, ifName, &info);
+    OsalMemFree(info.name);
+    OsalMemFree(info.query);
+    OsalMemFree(info.resp);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 

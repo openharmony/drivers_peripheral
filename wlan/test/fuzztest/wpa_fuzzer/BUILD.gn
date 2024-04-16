@@ -48,7 +48,10 @@ ohos_fuzztest("WpaFuzzTest") {
     "drivers_interface_wlan:libwpa_proxy_1.0",
     "drivers_interface_wlan:libwpa_stub_1.0",
     "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
     "wpa_supplicant:wpa",
   ]
