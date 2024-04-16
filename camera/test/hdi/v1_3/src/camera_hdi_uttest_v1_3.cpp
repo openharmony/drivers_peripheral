@@ -23,7 +23,7 @@ constexpr uint32_t ITEM_CAPACITY = 100;
 constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
 constexpr uint32_t FPS_COUNT = 2;
-constexpr uint32_t EXPOSURE_COUNT = 2;
+constexpr uint32_t EXPOSURE_COUNT = 4;
 constexpr uint32_t CHECK_AREA_COUNT = 4;
 constexpr uint32_t STREAMINFO_WIDTH = 1920;
 constexpr uint32_t STREAMINFO_HEIGHT = 1080;
@@ -741,10 +741,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_016, TestSize.Level1)
         return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_NE(entry.data.ui32, nullptr);
+        EXPECT_NE(entry.data.u8, nullptr);
         EXPECT_EQ(entry.count > 0, true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.ui32[i];
+            uint8_t value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO) {
                 CAMERA_LOGI("HIGH_RESOLUTION_PHOTO mode is supported");
             }
@@ -764,6 +764,16 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_017, TestSize.Level1)
         OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO)) {
         cout << "skip this test, because HIGH_RESOLUTION_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
+    }
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_EXPECT_TIME, &entry);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_NE(entry.data.ui32, nullptr);
+        EXPECT_EQ(entry.count > 1, true);
+        CAMERA_LOGI("mode is %{public}u and captureExpectTime is %{public}u", entry.data.ui32[0], entry.data.ui32[1]);
     }
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get Stream Operator
@@ -798,16 +808,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_017, TestSize.Level1)
     sleep(UT_SECOND_TIMES);
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
-    EXPECT_NE(cameraTest->ability, nullptr);
-    common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
-    EXPECT_NE(data, nullptr);
-    camera_metadata_item_t entry;
-    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CAPTURE_EXPECT_TIME, &entry);
-    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_NE(entry.data.ui32, nullptr);
-        EXPECT_EQ(entry.count > 1, true);
-        CAMERA_LOGI("mode is %{public}u and captureExpectTime is %{public}u", entry.data.ui32[0], entry.data.ui32[1]);
-    }
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
@@ -832,10 +832,10 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_018, TestSize.Level1)
         return;
     }
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR) {
-        EXPECT_NE(entry.data.f, nullptr);
+        EXPECT_NE(entry.data.u8, nullptr);
         EXPECT_EQ(entry.count > 0, true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.f[i];
+            uint8_t value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_2::CAPTURE_MACRO) {
                 CAMERA_LOGI("CAPTURE_MACRO mode is supported");
             }
@@ -917,7 +917,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_020, TestSize.Level1)
         EXPECT_NE(entry.data.u8, nullptr);
         EXPECT_EQ(entry.count > 0, true);
         for (size_t i = 0; i < entry.count; i++ ) {
-            float value = entry.data.u8[i];
+            uint8_t value = entry.data.u8[i];
             if (value == OHOS::HDI::Camera::V1_2::VIDEO_MACRO) {
                 CAMERA_LOGI("VIDEO_MACRO mode is supported");
             }
