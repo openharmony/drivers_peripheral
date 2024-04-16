@@ -17,7 +17,7 @@
 #include "hdf_log.h"
 #include "osal_mem.h"
 
-#define BUFFER_SIZE 16384;
+#define BUFFER_SIZE 16384
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
 #ifdef SUPPORT_OFFLOAD
