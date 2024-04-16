@@ -39,6 +39,7 @@ using HdiExecutorSendMsg = OHOS::HDI::UserAuth::V2_0::ExecutorSendMsg;
 using HdiAuthResultInfo = OHOS::HDI::UserAuth::V2_0::AuthResultInfo;
 using HdiIdentifyResultInfo = OHOS::HDI::UserAuth::V2_0::IdentifyResultInfo;
 using HdiEnrollParam = OHOS::HDI::UserAuth::V2_0::EnrollParam;
+// using HdiUserType = OHOS::HDI::UserAuth::V2_0::UserType;
 using HdiCredentialInfo = OHOS::HDI::UserAuth::V2_0::CredentialInfo;
 using HdiEnrolledInfo = OHOS::HDI::UserAuth::V2_0::EnrolledInfo;
 using HdiEnrollResultInfo = OHOS::HDI::UserAuth::V2_0::EnrollResultInfo;

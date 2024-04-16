@@ -29,6 +29,7 @@ typedef struct {
     int32_t userId;
     uint32_t authType;
     uint32_t executorSensorHint;
+    int32_t userType;
 } PermissionCheckParam;
 
 typedef struct {
