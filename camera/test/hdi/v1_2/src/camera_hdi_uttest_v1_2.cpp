@@ -84,7 +84,7 @@ void CameraHdiUtTestV1_2::TakePhoteWithDefferredImage(int PhotoCount)
 {
     auto meta = std::make_shared<CameraSetting>(100, 100);
     uint8_t value = OHOS::HDI::Camera::V1_2::STILL_IMAGE;
-    meta->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &value, value.size());
+    meta->addEntry(OHOS_CONTROL_DEFERRED_IMAGE_DELIVERY, &value, sizeof(value));
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     cameraTest->rc = cameraTest->cameraDevice->UpdateSettings(metaVec);
@@ -1442,7 +1442,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_048, TestSize.Level1)
     if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.f != nullptr && entry.count > 0) {
         float entryValues[] = { entry.data.f[3], entry.data.f[7], entry.data.f[8], entry.data.f[9], entry.data.f[10],
             entry.data.f[14], entry.data.f[18] };
-        for (size_t i = 0; i < entryValues.size() / float.size(); i++) {
+        for (size_t i = 0; i < sizeof(entryValues) / sizeof(float); i++) {
             // Get Stream Operator
             cameraTest->streamOperatorCallback = new OHOS::Camera::Test::TestStreamOperatorCallback();
             cameraTest->rc = cameraTest->cameraDeviceV1_1->GetStreamOperator_V1_1(cameraTest->streamOperatorCallback,
@@ -1703,25 +1703,4 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
             printf("Moon mode is not enabled.");
         }
     }
-}
-
-HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_055, TestSize.Level1)
-{
-	common_metadata_header_t* src = cameraTest->ability->get();
-	EXPECT_NE(src, nullptr);
-	uint32_t index;
-	printf("Number of Tags: %u", src->item_count);
-	for(index = 0; index < src->item_count; index++){
-		printf("-----------------Number: %u--------------- \n",index);
-		camera_metadata_item_t metadataItem;
-		GetCameraMetadataItem(src, index, &metadataItem);
-		std::string st = {};
-		std::string info = std::to_string(metadataItem.item);
-		st = MetadataItemDump(src, metadataItem.item);
-		st = st + "item: " + info + "\n";
-		printf("%s", st.c_str());
-
-	}
-	// 找到最后一个结束
-		printf("~~~~~~~~~~~~~Find_Tags_Over~~~~~~~~~~~~~~~~\n");
 }
