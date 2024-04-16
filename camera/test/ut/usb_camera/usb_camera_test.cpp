@@ -1740,7 +1740,7 @@ void StoreFile(const unsigned char *bufStart, const uint32_t size, const char* s
     struct timeval start = {};
     gettimeofday(&start, nullptr);
     std::cout << "suffix = " << suffix << std::endl;
-    if (sprintf_s(path, sizeof(path), "%sfile_%d_%lld_%s", prefix, count++, start.tv_usec, suffix) < 0) {
+    if (sprintf_s(path, path.size(), "%sfile_%d_%lld_%s", prefix, count++, start.tv_usec, suffix) < 0) {
         CAMERA_LOGE("%{public}s:StoreFile sprintf  failed", __func__);
         return;
     }
