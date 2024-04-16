@@ -18,7 +18,6 @@ import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 TEST_ROOT_DIR = "../../.."
 
 module_output_path = "drivers_peripheral_wlan/drivers_peripheral_wlan"
-
 ohos_fuzztest("HostapdFuzzTest") {
   module_out_path = module_output_path
 
@@ -45,7 +44,10 @@ ohos_fuzztest("HostapdFuzzTest") {
     "drivers_interface_wlan:libhostapd_stub_1.0",
     "drivers_interface_wlan:libwlan_proxy_1.3",
     "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
     "wpa_supplicant:wpa",
   ]

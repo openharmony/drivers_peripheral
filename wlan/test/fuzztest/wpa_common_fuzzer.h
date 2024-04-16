@@ -67,6 +67,9 @@ void FuzzWpaInterfaceUnregisterEventCallback(struct IWpaInterface *interface, co
 void FuzzWpaInterfaceGetConnectionCapabilities(struct IWpaInterface *interface, const uint8_t *rawData);
 void FuzzWpaInterfaceAddWpaIface(struct IWpaInterface *interface, const uint8_t *rawData);
 void FuzzWpaInterfaceRemoveWpaIface(struct IWpaInterface *interface, const uint8_t *rawData);
+void FuzzWpaInterfaceReassociate(struct IWpaInterface *interface, const uint8_t *rawData);
+void FuzzWpaInterfaceStaShellCmd(struct IWpaInterface *interface, const uint8_t *rawData);
+
 
 /* **********P2p Interface********** */
 void FuzzWpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *interface, const uint8_t *rawData);

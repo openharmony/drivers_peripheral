@@ -231,3 +231,12 @@ void FuzzHostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *inter
     interface->UnregisterEventCallback(interface, g_hostapdCallbackObj, ifName);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
+
+void FuzzHostapdInterfaceReloadApConfigInfo(struct IHostapdInterface *interface, const uint8_t *rawData)
+{
+    const char *ifName = reinterpret_cast<const char *>(rawData);
+    int32_t id = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    interface->ReloadApConfigInfo(interface, ifName, id);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}

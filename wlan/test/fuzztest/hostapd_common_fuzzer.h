@@ -44,6 +44,7 @@ void FuzzHostapdInterfaceSetApMaxConn(struct IHostapdInterface *interface, const
 void FuzzHostapdInterfaceSetMacFilter(struct IHostapdInterface *interface, const uint8_t *rawData);
 void FuzzHostapdInterfaceDelMacFilter(struct IHostapdInterface *interface, const uint8_t *rawData);
 void FuzzHostapdInterfaceGetStaInfos(struct IHostapdInterface *interface, const uint8_t *rawData);
+void FuzzHostapdInterfaceReloadApConfigInfo(struct IHostapdInterface *interface, const uint8_t *rawData);
 void FuzzHostapdInterfaceDisassociateSta(struct IHostapdInterface *interface, const uint8_t *rawData);
 void FuzzHostapdInterfaceRegisterEventCallback(struct IHostapdInterface *interface, const uint8_t *rawData);
 void FuzzHostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *interface, const uint8_t *rawData);
