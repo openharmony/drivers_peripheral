@@ -72,7 +72,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
             HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, *it);
             continue;
         }
-        StartTrace(HITRACE_TAG_HDF, "callback->OnDataEvent, serviceId is " + std::to_string(*it) + ", sensorId is " +
+        StartTrace(HITRACE_TAG_HDF, "ODE,serviceId=" + std::to_string(*it) + ",sensorId=" +
             std::to_string(event.sensorId));
         ret = callback->OnDataEvent(event);
         FinishTrace(HITRACE_TAG_HDF);
