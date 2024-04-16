@@ -1552,7 +1552,9 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
             HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
-        for (i = 0; i < scan->numSsids; i++) {
+        /*add an empty ssid for a wildcard scan*/
+        nla_put(msg, 1, 0, NULL);
+        for (i = 1; i <= scan->numSsids; i++) {
             if (i >= wiphyInfo->scanCapabilities.maxNumScanSsids) {
                 HILOG_INFO(LOG_CORE, "%s: Skip the excess hidden ssids for scan", __FUNCTION__);
                 break;
