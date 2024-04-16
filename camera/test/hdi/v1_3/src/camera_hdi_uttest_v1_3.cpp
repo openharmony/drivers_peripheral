@@ -115,6 +115,7 @@ static void CreateAndCommitStreamsForHighFrameRate(std::shared_ptr<OHOS::Camera:
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 }
+
 /**
  * @tc.name: Camera_Device_Hdi_V1_3_002
  * @tc.desc: Determine whether the HIGH_FRAME_RATE mode is supported
@@ -139,7 +140,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_002, TestSize.Level1)
         }
     }
 }
-
 
 /**
  * @tc.name: Camera_Device_Hdi_V1_3_003
@@ -246,7 +246,7 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
 {
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t valueInvalid[2] = {960, 960};
+    int32_t valueInvalid[2] = {240, 240};
     float motionCheckArea[4] = {1, 1, 1, 1};
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, &valueInvalid, FPS_COUNT);
     meta->addEntry(OHOS_CONTROL_MOTION_DETECTION_CHECK_AREA, &motionCheckArea, CHECK_AREA_COUNT);
@@ -339,8 +339,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_006, TestSize.Level1)
 
     //update settings
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
-    int32_t slowMotionValue[2] = {960, 960};
-    meta->addEntry(OHOS_CONTROL_FPS_RANGES, &slowMotionValue, 2);
+    int32_t slowMotionValue[2] = {240, 240};
+    meta->addEntry(OHOS_CONTROL_FPS_RANGES, &slowMotionValue, FPS_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
