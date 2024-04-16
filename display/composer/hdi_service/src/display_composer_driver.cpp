@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 #include <pthread.h>
-#include <chrono>
-#include <thread>
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
@@ -25,8 +23,6 @@
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
-
-#define DELAY_MICROSECONDS 2 // delay 2 microsends
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
@@ -61,7 +57,6 @@ static int32_t DisplayComposerDriverDispatch(
     auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
     if (hdfDisplayComposerHost == nullptr || g_stop) {
         pthread_rwlock_unlock(&g_rwLock);
-        std::this_thread::sleep_for(std::chrono::microseconds(DELAY_MICROSECONDS));
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr, stop: %{public}d", __func__, g_stop);
         return HDF_FAILURE;
     }
