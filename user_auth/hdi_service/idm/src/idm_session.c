@@ -25,6 +25,7 @@
 #include "coauth.h"
 #include "linked_list.h"
 #include "idm_database.h"
+// #include "user_auth_hdi.h"
 
 #define SESSION_VALIDITY_PERIOD (10 * 60 * 1000)
 #define MAX_CHALLENGE_GENERATION_TIMES 5
@@ -318,5 +319,15 @@ ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen)
         return RESULT_GENERAL_ERROR;
     }
 
+    return RESULT_SUCCESS;
+}
+
+ResultCode IsValidUserType(int32_t userType)
+{
+    // if (userType != HdiUserType::MAIN && userType != HdiUserType::SUB && userType != HdiUserType::PRIVATE) {
+    //     LOG_ERROR("userType is invalid");
+    //     return RESULT_BAD_PARAM;
+    // }
+    LOG_INFO("userType: %d", userType);
     return RESULT_SUCCESS;
 }

@@ -137,7 +137,12 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    ResultCode ret = CheckSessionValid(param.userId);
+    ResultCode ret = IsValidUserType(param.userType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("userType is invalid");
+        return ret;
+    }
+    ret = CheckSessionValid(param.userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;

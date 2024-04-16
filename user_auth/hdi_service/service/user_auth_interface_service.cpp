@@ -560,6 +560,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
     checkParam.authType = param.authType;
     checkParam.userId = param.userId;
     checkParam.executorSensorHint = param.executorSensorHint;
+    checkParam.userType = param.userType;
     std::lock_guard<std::mutex> lock(g_mutex);
     uint64_t scheduleId;
     int32_t ret;
