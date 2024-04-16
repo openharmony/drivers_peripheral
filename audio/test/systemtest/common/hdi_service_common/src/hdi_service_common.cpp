@@ -17,6 +17,7 @@
 #include "hdf_log.h"
 #include "osal_mem.h"
 
+#define BUFFER_SIZE 16384;
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
 #ifdef SUPPORT_OFFLOAD
@@ -1090,7 +1091,7 @@ int32_t GetCaptureBufferSize(struct IAudioCapture *capture, uint32_t &bufferSize
 
     bufferSize = frameCount * frameSize;
     if (bufferSize == 0) {
-        return HDF_FAILURE;
+        bufferSize = BUFFER_SIZE;
     }
     return HDF_SUCCESS;
 }
