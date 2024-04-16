@@ -39,13 +39,13 @@ int32_t Test::DumpImageFile(int streamId, std::string suffix, const void* buffer
     }
     char mkdirCmd[PATH_MAX] = {0};
     char path[PATH_MAX] = {0};
-    int ret = sprintf_s(mkdirCmd, sizeof(mkdirCmd) / sizeof(mkdirCmd[0]),
+    int ret = sprintf_s(mkdirCmd, mkdirCmd.size() / mkdirCmd[0].size(),
         "mkdir -p /data/stream-%d", streamId);
     if (ret < 0) {
         return -1;
     }
     system(mkdirCmd);
-    ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "data/stream-%d/%lld.%s",
+    ret = sprintf_s(path, path.size() / path[0].size(), "data/stream-%d/%lld.%s",
         streamId, GetCurrentLocalTimeStamp(), suffix.c_str());
     if (ret < 0) {
         return -1;
@@ -303,7 +303,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    if (sizeof(captureIds) > 0) {
+    if (captureIds.size() > 0) {
         for (auto &captureId : captureIds) {
             rc = streamOperator->CancelCapture(captureId);
             EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
@@ -315,7 +315,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
             }
         }
     }
-    if (sizeof(streamIds) > 0) {
+    if (streamIds.size() > 0) {
         rc = streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
