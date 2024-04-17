@@ -119,7 +119,7 @@ int32_t WpaInterfaceP2pSetSsidPostfixName(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -141,7 +141,7 @@ int32_t WpaInterfaceP2pSetWpsDeviceType(struct IWpaInterface *self, const char *
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -163,7 +163,7 @@ int32_t WpaInterfaceP2pSetWpsConfigMethods(struct IWpaInterface *self, const cha
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -185,7 +185,7 @@ int32_t WpaInterfaceP2pSetGroupMaxIdle(struct IWpaInterface *self, const char *i
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -209,7 +209,7 @@ int32_t WpaInterfaceP2pSetWfdEnable(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -228,7 +228,7 @@ int32_t WpaInterfaceP2pSetPersistentReconnect(struct IWpaInterface *self, const 
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -250,7 +250,7 @@ int32_t WpaInterfaceP2pSetWpsSecondaryDeviceType(struct IWpaInterface *self, con
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -272,7 +272,7 @@ int32_t WpaInterfaceP2pSetupWpsPbc(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -318,7 +318,7 @@ int32_t WpaInterfaceP2pSetupWpsPin(struct IWpaInterface *self, const char *ifNam
             return HDF_FAILURE;
         }
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -351,7 +351,7 @@ int32_t WpaInterfaceP2pSetPowerSave(struct IWpaInterface *self, const char *ifNa
         HDF_LOGE("P2pSetPowerSave, groupIfc is NULL");
         return HDF_FAILURE;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -378,7 +378,7 @@ int32_t WpaInterfaceP2pSetDeviceName(struct IWpaInterface *self, const char *ifN
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -400,7 +400,7 @@ int32_t WpaInterfaceP2pSetWfdDeviceConfig(struct IWpaInterface *self, const char
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -419,7 +419,7 @@ int32_t WpaInterfaceP2pSetRandomMac(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -438,7 +438,7 @@ int32_t WpaInterfaceP2pStartFind(struct IWpaInterface *self, const char *ifName,
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -458,7 +458,7 @@ int32_t WpaInterfaceP2pSetExtListen(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -478,7 +478,7 @@ int32_t WpaInterfaceP2pSetListenChannel(struct IWpaInterface *self, const char *
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -508,7 +508,7 @@ int32_t WpaInterfaceP2pProvisionDiscovery(struct IWpaInterface *self, const char
         return HDF_FAILURE;
     }
     p2pProvision.mode = mode;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -528,7 +528,7 @@ int32_t WpaInterfaceP2pAddGroup(struct IWpaInterface *self, const char *ifName, 
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -551,7 +551,7 @@ int32_t WpaInterfaceP2pAddService(struct IWpaInterface *self, const char *ifName
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -574,7 +574,7 @@ int32_t WpaInterfaceP2pRemoveService(struct IWpaInterface *self, const char *ifN
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -593,7 +593,7 @@ int32_t WpaInterfaceP2pStopFind(struct IWpaInterface *self, const char *ifName)
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -613,7 +613,7 @@ int32_t WpaInterfaceP2pFlush(struct IWpaInterface *self, const char *ifName)
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -632,7 +632,7 @@ int32_t WpaInterfaceP2pFlushService(struct IWpaInterface *self, const char *ifNa
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -651,7 +651,7 @@ int32_t WpaInterfaceP2pRemoveNetwork(struct IWpaInterface *self, const char *ifN
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -709,7 +709,7 @@ int32_t WpaInterfaceP2pInvite(struct IWpaInterface *self, const char *ifName,
         return HDF_FAILURE;
     }
     p2pHalInvite.persistent = 0;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -739,7 +739,7 @@ int32_t WpaInterfaceP2pReinvoke(struct IWpaInterface *self, const char *ifName, 
         return HDF_FAILURE;
     }
     p2pHalReInvite.networkId = networkId;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -762,7 +762,7 @@ int32_t WpaInterfaceP2pGetDeviceAddress(struct IWpaInterface *self, const char *
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -786,7 +786,7 @@ int32_t WpaInterfaceP2pReqServiceDiscovery(struct IWpaInterface *self, const cha
     }
     (void)self;
     char seq[WIFI_P2P_SERVER_DISCOVERY_SEQUENCE_LENGTH] = {0};
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -813,7 +813,7 @@ int32_t WpaInterfaceP2pCancelServiceDiscovery(struct IWpaInterface *self, const 
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -836,7 +836,7 @@ int32_t WpaInterfaceP2pRespServerDiscovery(struct IWpaInterface *self, const cha
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -991,7 +991,7 @@ int32_t WpaInterfaceP2pSetServDiscExternal(struct IWpaInterface *self, const cha
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1013,7 +1013,7 @@ int32_t WpaInterfaceP2pRemoveGroup(struct IWpaInterface *self, const char *ifNam
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1032,7 +1032,7 @@ int32_t WpaInterfaceP2pCancelConnect(struct IWpaInterface *self, const char *ifN
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1080,7 +1080,7 @@ int32_t WpaInterfaceP2pAddNetwork(struct IWpaInterface *self, const char *ifName
         return HDF_ERR_INVALID_PARAM;
     }
     (void)self;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1312,7 +1312,7 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
     (void)self;
     (void)ifName;
-    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface(ifName);
     if (pMainIfc == NULL) {
         HDF_LOGE("%{public}s: pMainIfc is null", __func__);
         return HDF_ERR_INVALID_PARAM;

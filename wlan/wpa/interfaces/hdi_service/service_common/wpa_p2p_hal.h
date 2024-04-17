@@ -90,7 +90,7 @@ struct StWifiWpaP2pGroupInterface {
     P2pSupplicantErrCode (*wpaP2pCliCmdSetGroupIdle)(WifiWpaP2pGroupInterface *p, int timeout);
 };
 
-WifiWpaP2pInterface *GetWifiWapP2pInterface(void);
+WifiWpaP2pInterface *GetWifiWapP2pInterface(const char *ifName);
 void RelesaeWpaP2pInterface(void);
 WifiErrorNo ConvertP2pErrCode(P2pSupplicantErrCode code);
 WifiWpaP2pGroupInterface *GetWifiWpaP2pGroupInterface(const char *groupIfc);
