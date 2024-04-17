@@ -42,6 +42,8 @@
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
 #define STA_NO_LEN 2
+#define FREQ_MAX_SIZE 100
+#define CMD_BUFFER_MIN_SIZE 15
 
 const int WPA_QUOTATION_MARKS_FLAG_YES = 0;
 const int WPA_QUOTATION_MARKS_FLAG_NO = 1;
@@ -888,6 +890,10 @@ static int ConcatScanSetting(const ScanSettings *settings, char *buff, int len)
     int pos = 0;
     int res;
     int i;
+    if (settings->freqSize < 0 || settings->freqSize > FREQ_MAX_SIZE) {
+        HDF_LOGE("invalid parameter");
+        return 0;
+    }
     for (i = 0; i < settings->freqSize; ++i) {
         if (i == 0) {
             res = snprintf_s(buff + pos, len - pos, len - pos - 1, "%s", " freq=");
@@ -956,6 +962,10 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     unsigned expectedLen = 0;
     if (settings != NULL) {
         expectedLen = AssignCmdLen(this, settings);
+    }
+    if (expectedLen < CMD_BUFFER_MIN_SIZE || expectedLen > CMD_BUFFER_SIZE) {
+        HDF_LOGE("invalid parameter");
+        return -1;
     }
     if (expectedLen >= len) {
         len = expectedLen + 1;

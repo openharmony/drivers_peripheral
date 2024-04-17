@@ -608,7 +608,12 @@ static int32_t ProcessEventStaJoin(struct HdfHostapdRemoteNode *node,
             HdiApCbParmFree(hdiApCbParm, true);
             return HDF_FAILURE;
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            if (memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH,
+                apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH) != 0) {
+                HDF_LOGE("%{public}s: memcpy_s fail", __func__);
+                HdiApCbParmFree(hdiApCbParm, true);
+                return HDF_FAILURE;
+            }
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventStaJoin(node->callbackObj, hdiApCbParm, ifName);
             HDF_LOGI("%{public}s: OnEventStaJoin send success, content is %{private}s", __func__,
@@ -640,7 +645,12 @@ static int32_t ProcessEventApState(struct HdfHostapdRemoteNode *node,
             HdiApCbParmFree(hdiApCbParm, true);
             return HDF_FAILURE;
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            if (memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH,
+                apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH) != 0) {
+                HDF_LOGE("%{public}s: memcpy_s fail", __func__);
+                HdiApCbParmFree(hdiApCbParm, true);
+                return HDF_FAILURE;
+            }
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventApState(node->callbackObj, hdiApCbParm, ifName);
             HDF_LOGI("%{public}s: OnEventApState send success, content is %{private}s", __func__,
@@ -677,7 +687,7 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
 
     (void)OsalMutexLock(&HdfHostapdStubDriver()->mutex);
     head = &HdfHostapdStubDriver()->remoteListHead;
-    HDF_LOGD("%s: enter HdfHostapdCallbackFun event =%d ", __FUNCTION__, event);
+    HDF_LOGD("%s: enter HdfHostapdCallbackFun event =%u ", __FUNCTION__, event);
     if (data == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL", __func__);
         (void)OsalMutexUnlock(&HdfHostapdStubDriver()->mutex);
