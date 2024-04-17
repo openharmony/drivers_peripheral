@@ -1680,7 +1680,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
 
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     head = &HdfWpaStubDriver()->remoteListHead;
-    HDF_LOGD("%s: enter HdfWpaCallbackFun event =%d", __FUNCTION__, event);
+    HDF_LOGD("%s: enter HdfWpaCallbackFun event =%u", __FUNCTION__, event);
     if (ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
         (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
