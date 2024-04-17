@@ -17,6 +17,7 @@
 #include "hdf_log.h"
 #include "osal_mem.h"
 
+#define BUFFER_SIZE 16384
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
 #ifdef SUPPORT_OFFLOAD
@@ -612,14 +613,12 @@ int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struc
         HDF_LOGE("%{public}s: AUDIO_TEST:start failed\n", __func__);
         return ret;
     }
-    uint32_t pcmBytes = PcmFramesToBytes(attrs);
-    if (pcmBytes < PCM_BYTE_MIN || pcmBytes > PCM_BYTE_MAX) {
-        return HDF_FAILURE;
+    ret = GetCaptureBufferSize(capture, bufferSize);
+    if (ret < 0 || bufferSize == 0) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:GetCaptureBufferSize failed\n", __func__);
+        return ret;
     }
-    bufferSize = FRAME_COUNT * pcmBytes;
-    if (bufferSize == 0) {
-        return HDF_FAILURE;
-    }
+
     char *frame = nullptr;
     frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
@@ -1067,6 +1066,33 @@ int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&ad
     }
     IAudioAdapterRelease(adapter, IS_STUB);
     adapter = nullptr;
+    return HDF_SUCCESS;
+}
+
+int32_t GetCaptureBufferSize(struct IAudioCapture *capture, uint32_t &bufferSize)
+{
+    int32_t ret = HDF_SUCCESS;
+    uint64_t frameSize = 0;
+    uint64_t frameCount = 0;
+    
+    if (capture == nullptr) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    ret = capture->GetFrameSize(capture, &frameSize);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    ret = capture->GetFrameCount(capture, &frameCount);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    bufferSize = frameCount * frameSize;
+    if (bufferSize == 0) {
+        bufferSize = BUFFER_SIZE;
+    }
     return HDF_SUCCESS;
 }
 }
