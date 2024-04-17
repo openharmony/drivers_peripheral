@@ -246,7 +246,6 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
     }
     HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d num:%{public}u scanResultCapacity:%{public}u", __FUNCTION__,
         __LINE__, scanResults->num, scanResults->scanResultCapacity);
-    WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULT, scanResult);
     scanResults->num++;
     if (scanResults->num == scanResults->scanResultCapacity) {
         scanResults->scanResultCapacity += INIT_SCAN_RES_NUM;
@@ -294,7 +293,7 @@ static void WifiEventScanResultProcess(const char *ifName)
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed",  __FUNCTION__);
     }
     WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &scanResults);
-    HILOG_INFO(LOG_CORE, "%s: scanResults.num = %d", __FUNCTION__, scanResults.num);
+    HILOG_INFO(LOG_CORE, "%s: scanResults.num = %u", __FUNCTION__, scanResults.num);
     FreeScanResults(&scanResults);
     nlmsg_free(msg);
     HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
