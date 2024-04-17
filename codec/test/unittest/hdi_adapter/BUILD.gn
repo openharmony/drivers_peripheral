@@ -16,7 +16,6 @@ import("//build/test.gni")
 
 ohos_unittest("codec_hdi_adapter_test") {
   module_out_path = "hdf/codec"
-  include_dirs = [ "//third_party/openmax/api/1.1.2" ]
   sources = [ "codec_hdi_adapter_test.cpp" ]
 
   if (is_standard_system) {
@@ -31,4 +30,5 @@ ohos_unittest("codec_hdi_adapter_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "openmax:libopenmax_static" ]
 }

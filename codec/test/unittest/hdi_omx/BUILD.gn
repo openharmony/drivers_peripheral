@@ -17,7 +17,6 @@ import("../../../codec.gni")
 
 ohos_unittest("codec_hdi_omx_test") {
   module_out_path = "drivers_peripheral_codec/codec"
-  include_dirs = [ "//third_party/openmax/api/1.1.2" ]
 
   sources = [
     "codec_hdi_manager_test.cpp",
@@ -43,6 +42,7 @@ ohos_unittest("codec_hdi_omx_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "openmax:libopenmax_static" ]
   defines = []
   if (drivers_peripheral_codec_feature_support_omx_extend_test) {
     defines += [ "SUPPORT_OMX" ]
