@@ -30,7 +30,7 @@ public:
 
     int32_t IsMediaKeySystemSupported(const std::string& name, const std::string& mimeType,
          OHOS::HDI::Drm::V1_0::ContentProtectionLevel level, bool& isSupported) override;
-
+    int32_t GetMediaKeySystemDescription(std::string &name, std::string &uuid) override;
     int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) override;
     int32_t CloseMediaKeySystemService(sptr<OHOS::HDI::Drm::V1_0::MediaKeySystemService> mediaKeySystem) override;
 
