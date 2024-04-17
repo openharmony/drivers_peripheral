@@ -108,7 +108,7 @@ static void WifiEventScanDoneProcess(const char *ifName, uint32_t event, struct 
         return;
     }
     WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
-    HDF_LOGI("%s: g_scanResults.num = %d", __FUNCTION__, g_scanResults.num);
+    HDF_LOGI("%s: g_scanResults.num = %u", __FUNCTION__, g_scanResults.num);
     FreeScanResults(&g_scanResults);
     WifiEventReport(ifName, event, &status);
 }
@@ -334,7 +334,7 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
         HDF_LOGE("%s fail to get ifName", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    HDF_LOGI("%s: WifiDriverEventProcess event=%d", __FUNCTION__, eventId);
+    HDF_LOGI("%s: WifiDriverEventProcess event=%u", __FUNCTION__, eventId);
     switch (eventId) {
         case WIFI_EVENT_NEW_STA:
             WifiEventNewStaProcess(ifName, eventId, data);

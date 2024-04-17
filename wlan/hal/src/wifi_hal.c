@@ -277,7 +277,7 @@ static int32_t UnregisterHid2dCallbackInner(Hid2dCallback func, const char *ifNa
 static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 {
     if (ifName == NULL || chipId >= MAX_WLAN_DEVICE) {
-        HDF_LOGE("%s: input parameter invalid, line: %d, chipId = %d", __FUNCTION__, __LINE__, chipId);
+        HDF_LOGE("%s: input parameter invalid, line: %d, chipId = %u", __FUNCTION__, __LINE__, chipId);
         return HDF_ERR_INVALID_PARAM;
     }
     return HalCmdSetResetDriver(chipId, ifName);

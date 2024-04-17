@@ -583,7 +583,7 @@ static int SendPrivateCmd(struct iwreq *wrq, struct iw_priv_args *privPtr, const
     wrq->u.data.flags = (uint16_t)subCmd;
     /* Perform the ioctl operation */
     ret = ioctl(sock, cmd, wrq);
-    HDF_LOGD("the data length is:%d, ret is %d", wrq->u.data.length, ret);
+    HDF_LOGD("the data length is:%hu, ret is %d", wrq->u.data.length, ret);
     return ret;
 }
 
