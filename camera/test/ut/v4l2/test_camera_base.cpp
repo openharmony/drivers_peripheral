@@ -642,7 +642,7 @@ void TestCameraBase::StopStream(std::vector<int>& captureIds, std::vector<int>& 
 {
     constexpr uint32_t timeForWaitCancelCapture = 2;
     sleep(timeForWaitCancelCapture);
-    if (captureIds.size) > 0) {
+    if (captureIds.size()) > 0) {
         for (const auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
