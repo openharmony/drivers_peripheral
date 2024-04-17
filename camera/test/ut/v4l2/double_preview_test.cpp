@@ -127,7 +127,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
     sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
-    if (sizeof(captureIds) == 0) {
+    if (captureIds.size() == 0) {
         return;
     }
     for (const auto &captureId : captureIds) {

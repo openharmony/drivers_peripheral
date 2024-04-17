@@ -310,7 +310,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    if (sizeof(captureIds) > 0) {
+    if (captureIds.size() > 0) {
         for (auto &captureId : captureIds) {
             if (streamOperator_V1_1 != nullptr) {
                 rc = streamOperator_V1_1->CancelCapture(captureId);
@@ -326,7 +326,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
             }
         }
     }
-    if (sizeof(streamIds) > 0) {
+    if (streamIds.size() > 0) {
         if (streamOperator_V1_1 != nullptr) {
             rc = streamOperator_V1_1->ReleaseStreams(streamIds);
         } else {
