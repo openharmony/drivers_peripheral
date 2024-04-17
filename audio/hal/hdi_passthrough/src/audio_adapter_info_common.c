@@ -459,7 +459,7 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
 
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value)
 {
-    if (keyValueList == NULL || key == NULL || value == NULL) {
+    if (keyValueList == NULL || listLenth < 0 || key == NULL || value == NULL) {
         AUDIO_FUNC_LOGE("param is null!");
         return HDF_FAILURE;
     }
@@ -487,7 +487,7 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
         AUDIO_FUNC_LOGE("sprintf_s failed!");
         return HDF_FAILURE;
     }
-    if (listLenth < strlen(strValue)) {
+    if (listLenth < (int32_t)strlen(strValue)) {
         AUDIO_FUNC_LOGE("keyValueList length too little!");
         return HDF_FAILURE;
     }
