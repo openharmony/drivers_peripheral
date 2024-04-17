@@ -2473,9 +2473,9 @@ static int32_t ProcessMatchSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyI
         }
         if (nla_put(msg, NL80211_SCHED_SCAN_MATCH_ATTR_SSID, pnoSettings->pnoNetworks[i].ssid.ssidLen,
             pnoSettings->pnoNetworks[i].ssid.ssid) != RET_CODE_SUCCESS) {
-                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
-                return RET_CODE_FAILURE;
-            }
+            HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         nla_put_u32(msg, NL80211_SCHED_SCAN_MATCH_ATTR_RSSI, pnoSettings->min5gRssi);
         nla_nest_end(msg, nest);
         matchSsidsCount++;
