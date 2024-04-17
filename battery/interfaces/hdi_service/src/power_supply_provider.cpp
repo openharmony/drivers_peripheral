@@ -1032,7 +1032,7 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
         return HDF_ERR_IO;
     }
 
-    size_t size = value.length();
+    ssize_t size = value.length();
     if (write(fd, value.c_str(), size) != size) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to write file %{public}s, errno: %{public}d",
             path.c_str(), errno);
