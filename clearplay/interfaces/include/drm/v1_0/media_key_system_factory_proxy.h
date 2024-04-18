@@ -40,7 +40,7 @@ public:
 
     int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) override;
 
-     int32_t GetMediaKeySystemDescription(std::string& name, std::string& uuid) override;
+    int32_t GetMediaKeySystemDescription(std::string& name, std::string& uuid) override;
 
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
