@@ -23,6 +23,14 @@ using namespace OHOS::HDI::Camera;
 constexpr uint32_t ITEM_CAPACITY = 100;
 constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
+constexpr uint32_t RESOLUTION_COUNT = 26;
+constexpr uint32_t RESOLUTION_PARAM = 2;
+uint32_t supportedResolution[RESOLUTION_COUNT][RESOLUTION_PARAM] = {
+    {640, 400}, {640, 480}, {640, 640}, {720, 480}, {720, 540}, {720, 720}, {800, 480}, {800, 600},
+    {864, 480}, {960, 720}, {1024, 768}, {1088, 1080}, {1088, 1088}, {1136, 480}, {1280, 592}, {1280, 720},
+    {1280, 768}, {1280, 960}, {1440, 1080}, {1584, 720}, {1600, 1200}, {1920, 888}, {1920, 1080}, {3200, 2400},
+    {3840, 2160}, {8192, 6144},
+};
 vector<float> supportedPhysicalApertureValues_;
 void CameraProfessionalUtTestV1_3::SetUpTestCase(void) {}
 void CameraProfessionalUtTestV1_3::TearDownTestCase(void) {}
@@ -1330,5 +1338,56 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     }
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name:Camera_Professional_Hdi_V1_3_030
+ * @tc.desc:different resolution
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSize.Level1)
+{
+    //Get Stream Operator
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    
+    for (uint8_t i = 0; i < RESOLUTION_COUNT; i++) {
+        //preview streamInfo
+        cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
+        cameraTest->streamInfoPre->V1_0.width_ = supportedResolution[i][0];
+        cameraTest->streamInfoPre->V1_0.width_ = supportedResolution[i][1];
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
+        
+        //capture streamInfo
+        cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+        cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+        cameraTest->streamInfoCapture->V1_0.width_ = supportedResolution[i][0];
+        cameraTest->streamInfoCapture->V1_0.width_ = supportedResolution[i][1];
+        cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+        
+        //create and commit stream
+        cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+        cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+            static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO),
+            cameraTest->abilityVec);
+        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+        
+        //start capture
+        cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+        cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+        
+        //stop stream
+        cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
+        cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+        cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    }
+    
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
