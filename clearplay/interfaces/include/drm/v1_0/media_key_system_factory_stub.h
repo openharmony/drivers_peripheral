@@ -40,7 +40,9 @@ public:
 
     static int32_t MediaKeySystemFactoryStubCreateMediaKeySystem_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
-     static int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
+    static int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription_(MessageParcel& mediaKeySystemFactoryData,
+        MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption,
+        sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
     static int32_t MediaKeySystemFactoryStubGetVersion_(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption, sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystemFactory> impl);
 
@@ -49,7 +51,8 @@ private:
 
     int32_t MediaKeySystemFactoryStubCreateMediaKeySystem(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
-    int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
+    int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription(MessageParcel& mediaKeySystemFactoryData,
+        MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
     int32_t MediaKeySystemFactoryStubGetVersion(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
