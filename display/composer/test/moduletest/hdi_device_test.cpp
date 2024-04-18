@@ -346,6 +346,22 @@ static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
     }
 }
 
+static int PrepareAndCommit()
+{
+    int ret;
+    DISPLAY_TEST_LOGD();
+    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
+    DISPLAY_TEST_CHK_RETURN((display == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get display"));
+
+    ret = display->PrepareDisplayLayers(); // 确定顶压策略(是否走GPU合成)、刷新layer列表
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
+        DISPLAY_TEST_LOGE("PrepareDisplayLayers failed"));
+
+    ret = display->Commit(); // 送显
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Commit failed"));
+    return DISPLAY_SUCCESS;
+}
+
 void LayerRotateTest::TearDown()
 {
     HdiTestDevice::GetInstance().Clear();
@@ -391,7 +407,6 @@ int32_t VblankCtr::WaitVblank(uint32_t ms)
     bool ret = false;
     DISPLAY_TEST_LOGD();
     std::unique_lock<std::mutex> lck(vblankMutex_);
-    hasVblank_ = false; // must wait next vblank
     ret = vblankCondition_.wait_for(lck, std::chrono::milliseconds(ms), [=] { return hasVblank_; });
     DISPLAY_TEST_LOGD();
     if (!ret) {
@@ -532,8 +547,20 @@ TEST_F(DeviceTest, CtrlTest)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "RegDisplayVBlankCallback failed";
     ret = display->SetDisplayVsyncEnabled(true);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
+
+    std::vector<LayerSettings> settings = {
+        {
+            .rectRatio = { 0, 0, 1.0f, 1.0f },
+            .color = PINK
+        },
+    };
+    std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
+    ASSERT_TRUE((layers.size() > 0));
+    VblankCtr::GetInstance().hasVblank_ = false;
+    PrepareAndCommit();
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_2000); // 2000ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
+    VblankCtr::GetInstance().hasVblank_ = false;
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
     usleep(SLEEP_CONT_100 * SLEEP_CONT_2000); // wait for 100ms avoid the last vsync.
