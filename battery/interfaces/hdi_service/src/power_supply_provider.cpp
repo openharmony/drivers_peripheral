@@ -1025,7 +1025,7 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t fd = open(path.c_str(), O_CREAT | O_RDWR, 0644);
+    int32_t fd = open(path.c_str(), O_TRUNC | O_WRONLY);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d",
             path.c_str(), errno);
