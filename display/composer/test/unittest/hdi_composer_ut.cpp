@@ -109,12 +109,9 @@ static int PrepareAndCommit()
 
 static void LoopCommit()
 {
-    while (true) {
+    while (!g_threadCtrl) {
         PrepareAndCommit();
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_10));
-        if (g_threadCtrl) {
-            break;
-        }
     }
 }
 
