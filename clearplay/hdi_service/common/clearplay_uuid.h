@@ -23,7 +23,8 @@ namespace OHOS {
 namespace HDI {
 namespace Drm {
 namespace V1_0 {
-static const std::string CLEARPLAY_UUID = "com.clearplay.drm";
+const std::string CLEARPLAY_UUID = "47a10ff0-ca3c-49c6-9c12-a764ffde091f";
+const std::string CLEARPLAY_NAME = "com.clearplay.drm";
 
 bool IsClearPlayUuid(const std::string &uuid);
 } // V1_0
