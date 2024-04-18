@@ -47,7 +47,7 @@ extern "C" {
 #define WIFI_POWER_MODE_NUM 3
 
 #define INIT_SCAN_RES_NUM 200
-#define MAX_SSID_LEN 32
+#define MAX_SSID_LEN 33 // 32 + \0
 
 typedef enum {
     CMD_CLOSE_GO_CAC,
