@@ -19,11 +19,13 @@
 #include <cstdint>
 #include <sys/socket.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace OHOS {
+namespace HDI {
+namespace Location {
 
 #define SATELLITE_NUM_MAXIMUM 128
+#define GNSS_NI_SUPPLICANT_INFO_LENGTH_MAXIMUM 256
+#define GNSS_NI_NOTIFICATION_TEXT_LENGTH_MAXIMUM 2048
 
 enum class AgnssSetIdClass {
     AGNSS_SETID_CLASS_NONE = 0,
@@ -157,10 +159,11 @@ enum class GnssAuxiliaryDataClass {
     GNSS_AUXILIARY_DATA_CLASS_ALL = 0xFFFF
 };
 
-enum class GnssModuleIfaceClass {
-    AGPS_INTERFACE = 1,
-    GNSS_GEOFENCING_INTERFACE = 2,
-    GNSS_CACHE_INTERFACE = 3,
+enum class GnssModuleIfaceCategory {
+    AGNSS_MODULE_INTERFACE = 1,
+    GNSS_GEOFENCING_MODULE_INTERFACE = 2,
+    GNSS_NET_INITIATED_MODULE_INTERFACE = 3,
+    GNSS_MEASUREMENT_MODULE_INTERFACE = 4,
 };
 
 enum class GeofenceEvent {
@@ -182,6 +185,31 @@ enum class GeofenceOperateResult {
     GEOFENCE_OPERATION_ERROR_PARAMS_INVALID = -103,
 };
 
+enum class GnssNiRequestCategory {
+    GNSS_NI_REQUEST_CATEGORY_EMERGENCY_SUPL = 1,
+    GNSS_NI_REQUEST_CATEGORY_VOICE = 2,
+    GNSS_NI_REQUEST_CATEGORY_UMTS_CONTROL_PLANE = 3,
+    GNSS_NI_REQUEST_CATEGORY_UMTS_SUPL = 4,
+};
+
+enum class GnssNiResponseCmd {
+    GNSS_NI_RESPONSE_CMD_ACCEPT = 1,
+    GNSS_NI_RESPONSE_CMD_NO_RESPONSE = 2,
+    GNSS_NI_RESPONSE_CMD_REJECT = 3,
+};
+
+enum class GnssNiNotificationCategory {
+    GNSS_NI_NOTIFICATION_REQUIRE_NOTIFY = (1 << 0),
+    GNSS_NI_NOTIFICATION_REQUIRE_VERIFY = (1 << 1),
+    GNSS_NI_NOTIFICATION_REQUIRE_PRIVACY_OVERRIDE = (1 << 2),
+};
+
+enum class GnssNiRequestEncodingFormat {
+    GNSS_NI_ENCODING_FORMAT_NULL = 1,
+    GNSS_NI_ENCODING_FORMAT_SUPL_GSM_DEFAULT = 2,
+    GNSS_NI_ENCODING_FORMAT_SUPL_UCS2 = 3,
+    GNSS_NI_ENCODING_FORMAT_SUPL_UTF8 = 4,
+};
 /* CellID info struct. */
 typedef struct {
     size_t size;
@@ -424,7 +452,73 @@ typedef struct {
     on_cached_locations_change cachedLocationCb;
 } GnssCacheCallbackIfaces;
 
-/* GNSS callback structure. */
+/*
+ * Definition of the GNSS NI notification request structure.
+ */
+typedef struct {
+    size_t size;
+
+    /*
+     * An ID of GNSS NI notifications.
+     */
+    int16_t gnssNiNotificationId;
+
+    /*
+     * Category of GNSS NI Request. See GnssNiRequestCategory for the definition of gnssNiRequestCategory.
+     */
+    int16_t gnssNiRequestCategory;
+
+    /*
+     * Category of notification. See GnssNiNotificationCategory for the definition of gnssNiCategory.
+     */
+    int32_t notificationCategory;
+
+    /*
+     * Timeout to wait for user response. The unit is seconds.
+     */
+    int32_t requestTimeout;
+
+    /*
+     * Default response command when timeout.
+     */
+    int32_t defaultResponseCmd;
+
+    /*
+     * Supplicant information.
+     */
+    char supplicantInfo[GNSS_NI_SUPPLICANT_INFO_LENGTH_MAXIMUM];
+
+    /*
+     * Notification message text.
+     */
+    char notificationText[GNSS_NI_NOTIFICATION_TEXT_LENGTH_MAXIMUM];
+
+    /*
+     * See GnssNiRequestEncodingFormat for the definition of supplicantInfoEncoding.
+     */
+    int16_t supplicantInfoEncoding;
+
+    /*
+     * See GnssNiRequestEncodingFormat for the definition of notificationTextEncoding.
+     */
+    int16_t notificationTextEncoding;
+} GnssNiNotificationRequest;
+
+/*
+ * Callback for GNSS NI notification reporting.
+ */
+typedef void (*OnGnssNiNotificationChange)(GnssNiNotificationRequest *notification);
+
+/*
+ * Definition of GNSS NI callback structure.
+ */
+typedef struct {
+    OnGnssNiNotificationChange reportNiNotification;
+} GnssNetInitiatedCallbacks;
+
+/*
+ * GNSS callback structure.
+ */
 typedef struct {
     size_t size;
     GnssBasicCallbackIfaces gnssCb;
@@ -619,8 +713,31 @@ typedef struct {
     bool (* delete_gnss_geofence)(int32_t geofenceId);
 } GeofenceModuleInterface;
 
-#ifdef __cplusplus
-}
-#endif
+/*
+ * Definition of GNSS NI interface.
+ */
+typedef struct {
+    size_t size;
+
+    /* Set callbacks. */
+    void (*setCallback)(GnssNetInitiatedCallbacks *callbacks);
+
+    /*
+     * Sends user response command.
+     * Parameters:
+     *    gnssNiNotificationId - The id of GNSS NI notifications.
+     *    userResponse         - User reponse command.
+     *                           See GnssNiResponseCmd for the definition of userResponse.
+     */
+    void (*sendUserResponse)(int32_t gnssNiNotificationId, int32_t userResponse);
+
+    /*
+     * Send network initiated message.
+     */
+    void (*sendNetworkInitiatedMsg)(uint8_t *msg, size_t length);
+} GnssNetInitiatedInterface;
+} // namespace Location
+} // namespace HDI
+} // namespace OHOS
 
 #endif /* OHOS_HDI_LOCATION_LOCATION_VENDOR_LIB_H */
