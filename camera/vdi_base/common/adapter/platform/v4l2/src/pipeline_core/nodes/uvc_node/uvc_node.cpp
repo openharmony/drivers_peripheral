@@ -248,6 +248,9 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
     dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer, wide_, high_);
 
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
+    buffer->SetCurWidth(wide_);
+    buffer->SetCurHeight(high_);
     SourceNode::DeliverBuffer(buffer);
     return;
 }
