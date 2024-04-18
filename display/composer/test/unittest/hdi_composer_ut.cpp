@@ -30,6 +30,7 @@
 #include "hdi_test_render_utils.h"
 #include "timer.h"
 #include <sys/time.h>
+#include <thread>
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_1;
@@ -39,10 +40,12 @@ using namespace testing::ext;
 static sptr<Composer::V1_1::IDisplayComposerInterface> g_composerDevice = nullptr;
 static std::shared_ptr<IDisplayBuffer> g_gralloc = nullptr;
 static std::vector<uint32_t> g_displayIds;
+const int SLEEP_CONT_10 = 10;
 const int SLEEP_CONT_100 = 100;
 const int SLEEP_CONT_2000 = 2000;
 static bool g_isOnSeamlessChangeCalled = false;
 static bool g_isOnModeCalled = false;
+static bool g_threadCtrl = false;
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
@@ -102,6 +105,17 @@ static int PrepareAndCommit()
     ret = display->Commit(); // 送显
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Commit failed"));
     return DISPLAY_SUCCESS;
+}
+
+static void LoopCommit()
+{
+    while (true) {
+        PrepareAndCommit();
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_10));
+        if (g_threadCtrl) {
+            break;
+        }
+    }
 }
 
 static void TestVBlankCallback(unsigned int sequence, uint64_t ns, void* data)
@@ -224,7 +238,6 @@ int32_t VblankCtr::WaitVblank(uint32_t ms)
     bool ret = false;
     DISPLAY_TEST_LOGD();
     std::unique_lock<std::mutex> lck(vblankMutex_);
-    hasVblank_ = false; // must wait next vblank
     ret = vblankCondition_.wait_for(lck, std::chrono::milliseconds(ms), [=] { return hasVblank_; });
     DISPLAY_TEST_LOGD();
     if (!ret) {
@@ -825,9 +838,11 @@ HWTEST_F(DeviceTest, test_RegDisplayVBlankCallback, TestSize.Level1)
     };
     std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
     ASSERT_TRUE((layers.size() > 0));
+    VblankCtr::GetInstance().hasVblank_ = false;
     PrepareAndCommit();
     ret = VblankCtr::GetInstance().WaitVblank(SLEEP_CONT_100); // 100ms
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
+    VblankCtr::GetInstance().hasVblank_ = false;
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
     usleep(SLEEP_CONT_100 * SLEEP_CONT_2000); // wait for 100ms avoid the last vsync.
@@ -886,9 +901,11 @@ HWTEST_F(DeviceTest, test_SetDisplayModeAsync, TestSize.Level1)
     if (ret == DISPLAY_SUCCESS) {
         std::vector<std::shared_ptr<HdiTestLayer>> layers = CreateLayers(settings);
         ASSERT_TRUE((layers.size() > 0));
-        PrepareAndCommit(); // 送显
-
+        g_threadCtrl = false;
+        std::thread commitThread(LoopCommit);
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_CONT_100));
+        g_threadCtrl = true;
+        commitThread.join();
         ASSERT_EQ(g_isOnModeCalled, true);
 
         DestroyLayer(layers[0]);
