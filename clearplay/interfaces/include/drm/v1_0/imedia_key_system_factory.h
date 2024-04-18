@@ -55,6 +55,7 @@ enum {
     CMD_MEDIA_KEY_SYSTEM_FACTORY_GET_VERSION = 0,
     CMD_MEDIA_KEY_SYSTEM_FACTORY_IS_MEDIA_KEY_SYSTEM_SUPPORTED = 1,
     CMD_MEDIA_KEY_SYSTEM_FACTORY_CREATE_MEDIA_KEY_SYSTEM = 2,
+    CMD_MEDIA_KEY_SYSTEM_FACTORY_GET_MEDIA_KEY_SYSTEM_NAME = 3,
 };
 
 class IMediaKeySystemFactory : public HdiBase {
@@ -70,6 +71,8 @@ public:
          OHOS::HDI::Drm::V1_0::ContentProtectionLevel level, bool& isSupported) = 0;
 
     virtual int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) = 0;
+
+    virtual int32_t GetMediaKeySystemDescription(std::string& name, std::string& uuid) = 0;
 
     virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
     {
