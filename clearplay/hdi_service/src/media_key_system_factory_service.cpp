@@ -92,7 +92,7 @@ int32_t MediaKeySystemFactoryService::CreateMediaKeySystem(sptr<OHOS::HDI::Drm::
     name = CLEARPLAY_UUID;
     uuid = CLEARPLAY_NAME;
     HDF_LOGI("%{public}s: end", __func__);
-	return HDF_SUCCESS;
+    return HDF_SUCCESS;
  }
 int32_t MediaKeySystemFactoryService::CloseMediaKeySystemService(sptr<MediaKeySystemService> mediaKeySystem)
 {
