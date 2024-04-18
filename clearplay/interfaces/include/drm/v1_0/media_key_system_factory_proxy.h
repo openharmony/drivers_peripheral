@@ -50,7 +50,8 @@ public:
     static int32_t CreateMediaKeySystem_(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem,
          const sptr<IRemoteObject> remote);
 
-     static int32_t GetMediaKeySystemDescription_(std::string& name, std::string& uuid, const sptr<IRemoteObject> remote);
+    static int32_t GetMediaKeySystemDescription_(std::string& name,
+        std::string& uuid, const sptr<IRemoteObject> remote);
 
     static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
 
