@@ -17,6 +17,7 @@
 #include "osal_mem.h"
 #include <securec.h>
 #include <unordered_map>
+#include "hitrace_meter.h"
 
 #define HDF_LOG_TAG uhdf_sensor_callback_vdi
 
@@ -37,10 +38,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
     HDF_LOGD("%{public}s enter the OnDataEventVdi function, sensorId is %{public}d", __func__, eventVdi.sensorId);
     struct HdfSensorEvents event;
     int32_t ret;
-    if (sensorCallback_ == nullptr) {
-        HDF_LOGD("%{public}s sensorCallback_ is NULL", __func__);
-        return HDF_FAILURE;
-    }
 
     event.sensorId = eventVdi.sensorId;
     event.version = eventVdi.version;
@@ -75,7 +72,10 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
             HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, *it);
             continue;
         }
+        StartTrace(HITRACE_TAG_HDF, "ODE,serviceId=" + std::to_string(*it) + ",sensorId=" +
+            std::to_string(event.sensorId));
         ret = callback->OnDataEvent(event);
+        FinishTrace(HITRACE_TAG_HDF);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         } else {
