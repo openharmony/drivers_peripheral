@@ -1387,6 +1387,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
         cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+        cameraTest->streamInfosV1_1.clear();
     }
     
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
