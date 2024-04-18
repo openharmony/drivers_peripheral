@@ -49,7 +49,7 @@ private:
 
     int32_t MediaKeySystemFactoryStubCreateMediaKeySystem(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
-     int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
+    int32_t MediaKeySystemFactoryStubGetMediaKeySystemDescription(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
     int32_t MediaKeySystemFactoryStubGetVersion(MessageParcel& mediaKeySystemFactoryData, MessageParcel& mediaKeySystemFactoryReply, MessageOption& mediaKeySystemFactoryOption);
 
