@@ -187,7 +187,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
         }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
-            HDF_LOGD("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
+            HDF_LOGI("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
                      "%{public}d/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId,
                      client.sensorConfigMap_.find(sensorId)->second.samplingInterval, samplingInterval, periodCount);
             client.periodCountMap_[sensorId] = periodCount;
