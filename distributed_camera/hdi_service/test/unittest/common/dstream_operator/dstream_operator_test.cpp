@@ -73,6 +73,7 @@ constexpr int TEST_HEIGHT = 480;
 constexpr int TEST_WIDTH = 640;
 constexpr int TEST_DATASPACE = 8;
 constexpr int TEST_TUNNELEDMODE = 5;
+constexpr int TEST_SLEEPTIME = 3;
 
 void DStreamOperatorTest::SetUpTestCase(void)
 {
@@ -303,7 +304,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_007, TestSize.Level1)
     rc = dstreamOperator_->AttachBufferQueue(streamInfo.streamId_, bufferProducer);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
-    sleep(3);
+    sleep(TEST_SLEEPTIME);
     rc = dstreamOperator_->DetachBufferQueue(streamInfo.streamId_);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
     // release stream
