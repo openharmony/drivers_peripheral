@@ -208,10 +208,10 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    static const std::string screenLockBundleName = "com.ohos.systemui";
+    static const std::string SCREEN_LOCK_BUNDLE_NAME = "com.ohos.systemui";
     paramHal.isAuthResultCached = false;
     if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
-        param.baseParam.callerName == screenLockBundleName) {
+        param.baseParam.callerName == SCREEN_LOCK_BUNDLE_NAME) {
         IAM_LOGI("auth result will be cached");
         paramHal.isAuthResultCached = true;
     }
