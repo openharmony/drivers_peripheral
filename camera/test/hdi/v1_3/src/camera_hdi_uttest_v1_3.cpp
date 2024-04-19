@@ -293,7 +293,6 @@ static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::Test> ca
         } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value) {
             printf("slow motion status is finished");
         }
-
     }
 }
 /**
