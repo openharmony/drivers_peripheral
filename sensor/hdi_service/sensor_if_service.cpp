@@ -259,7 +259,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
 int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int32_t mode, int64_t samplingInterval,
                                         int64_t reportInterval)
 {
-    HDF_LOGD("%{public}s: serviceId is %{public}d, sensorId is %{public}d, mode is %{public}d, samplingInterval is "
+    HDF_LOGI("%{public}s: serviceId is %{public}d, sensorId is %{public}d, mode is %{public}d, samplingInterval is "
              "[%{public}" PRId64 "], reportInterval is [%{public}" PRId64 "].", __func__, serviceId, sensorId, mode,
              samplingInterval, reportInterval);
     if (sensorVdiImpl_ == nullptr) {
