@@ -31,7 +31,7 @@ RetCode HosV4L2Streams::V4L2StreamOn(int fd)
 {
     enum v4l2_buf_type buf_type;
     int rc;
-    CAMERA_LOGD("HosV4L2Streams::V4L2StreamOn\n");
+    CAMERA_LOGI("HosV4L2Streams::V4L2StreamOn\n");
 
     buf_type = bufferType_;
     rc = ioctl(fd, VIDIOC_STREAMON, &buf_type);
@@ -47,7 +47,7 @@ RetCode HosV4L2Streams::V4L2StreamOff(int fd)
 {
     enum v4l2_buf_type buf_type;
     int rc;
-    CAMERA_LOGD("HosV4L2Streams::V4L2StreamOff\n");
+    CAMERA_LOGI("HosV4L2Streams::V4L2StreamOff\n");
 
     buf_type = bufferType_;
     rc = ioctl(fd, VIDIOC_STREAMOFF, &buf_type);
