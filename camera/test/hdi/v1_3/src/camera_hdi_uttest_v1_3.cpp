@@ -274,26 +274,24 @@ static void SuperSlowMotionStatusCallback(std::shared_ptr<OHOS::Camera::Test> ca
         CAMERA_LOGI("callback not triggered");
         return;
     }
-    if (cameraTest->deviceCallback->resultMeta != nullptr) {
-        common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
-        EXPECT_NE(data, nullptr);
-        camera_metadata_item_t entry;
-        cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
-        EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-        if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
-            uint8_t value = entry.data.u8[0];
-            // 检测到超级慢动作的状态
-            if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value) {
-                printf("slow motion status is disabled");
-            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value) {
-                printf("slow motion status is ready");
-            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value) {
-                printf("slow motion status is started");
-            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value) {
-                printf("slow motion status is recording");
-            } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value) {
-                printf("slow motion status is finished");
-            }
+    common_metadata_header_t* data = cameraTest->deviceCallback->resultMeta->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_STATUS_SLOW_MOTION_DETECTION, &entry);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    if (cameraTest->rc == HDI::Camera::V1_0::NO_ERROR && entry.data.u8 != nullptr && entry.count > 0) {
+        uint8_t value = entry.data.u8[0];
+        // 检测到超级慢动作的状态
+        if (OHOS_CONTROL_SLOW_MOTION_STATUS_DISABLE == value) {
+            printf("slow motion status is disabled");
+        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_READY == value) {
+            printf("slow motion status is ready");
+        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_START == value) {
+            printf("slow motion status is started");
+        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_RECORDING == value) {
+            printf("slow motion status is recording");
+        } else if (OHOS_CONTROL_SLOW_MOTION_STATUS_FINISH == value) {
+            printf("slow motion status is finished");
         }
     }
 }
