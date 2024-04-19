@@ -47,7 +47,7 @@ struct MetadataTag {
     CameraId cameraId2 = CAMERA_FIRST;
 };
 
-const MetadataTag g_ohosMapCameraId[] = {
+const MetadataTag OHOS_MAP_CAMERA_ID[] = {
     { "lcam001", CAMERA_THIRD },
     { "lcam002", CAMERA_THIRD },
     { "lcam003", CAMERA_FOURTH },
@@ -57,7 +57,7 @@ const MetadataTag g_ohosMapCameraId[] = {
 
 CameraId UvcNode::ConvertCameraId(const std::string &cameraId)
 {
-    for (auto cameraID : g_ohosMapCameraId) {
+    for (auto cameraID : OHOS_MAP_CAMERA_ID) {
         if (cameraID.cameraId1 == cameraId) {
             return cameraID.cameraId2;
         }

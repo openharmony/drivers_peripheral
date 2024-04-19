@@ -32,6 +32,7 @@ public:
     HosV4L2Control();
     ~HosV4L2Control();
 
+    void V4L2VidiocSCtrl (int fd, int ret, struct v4l2_ext_control* cList, int count);
     RetCode V4L2GetCtrl(int fd, unsigned int id, int& value);
     RetCode V4L2SetCtrl(int fd, unsigned int id, int value);
     RetCode V4L2GetControls(int fd, std::vector<DeviceControl>& control);

@@ -175,7 +175,7 @@ RetCode CodecNode::Config(const int32_t streamId, const CaptureMeta& meta)
     return rc;
 }
 
-void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
+void CodecNode::EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
     const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf)
 {
     struct jpeg_compress_struct cInfo;
@@ -188,8 +188,8 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
     cInfo.err = jpeg_std_error(&jErr);
 
     jpeg_create_compress(&cInfo);
-    cInfo.image_width = width;
-    cInfo.image_height = height;
+    cInfo.image_width = jpegData.width;
+    cInfo.image_height = jpegData.height;
     cInfo.input_components = colorMap;
     cInfo.in_color_space = JCS_RGB;
 
@@ -203,7 +203,7 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
         jpeg_write_marker(&cInfo, JPEG_COM, (const JOCTET*)comment, strlen(comment));
     }
 
-    rowStride = width;
+    rowStride = jpegData.width;
     while (cInfo.next_scanline < cInfo.image_height) {
         row_pointer[0] = &image[cInfo.next_scanline * rowStride * pixelsThick];
         jpeg_write_scanlines(&cInfo, row_pointer, 1);
@@ -222,6 +222,7 @@ void CodecNode::EncodeJpegToMemory(uint8_t* image, int width, int height,
         *jpegSize = rotJpgSize;
     }
 }
+
 void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 {
     CAMERA_LOGD("CodecNode::Yuv422ToJpeg begin");
@@ -241,8 +242,8 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     uint8_t* jBuf = nullptr;
     unsigned long jpegSize = 0;
 
-    EncodeJpegToMemory((uint8_t *)tmpBufferAddr, buffer->GetWidth(), buffer->GetHeight(),
-        nullptr, &jpegSize, &jBuf);
+    JpegData jpegdata = {buffer->GetWidth(), buffer->GetHeight()};
+    EncodeJpegToMemory((uint8_t *)tmpBufferAddr, jpegdata, nullptr, &jpegSize, &jBuf);
 
     ret = memcpy_s((uint8_t *)buffer->GetSuffaceBufferAddr(), buffer->GetSuffaceBufferSize(), jBuf, jpegSize);
     if (ret == 0) {
