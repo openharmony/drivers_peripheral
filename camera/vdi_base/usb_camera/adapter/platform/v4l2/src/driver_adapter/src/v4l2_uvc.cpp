@@ -70,15 +70,39 @@ void HosV4L2UVC::V4L2UvcSearchCapability(const std::string devName, const std::s
     }
 }
 
+int HosV4L2UVC::V4L2SprintfDev(std::pair<std::map<std::string, std::string>::iterator, bool> &iter,
+    char* devName, const std::string v4l2Device, uint32_t devNameSize)
+{
+    if (!iter.second) {
+        for (int i = 1; i < MAXUVCNODE; i++) {
+            if ((sprintf_s(devName, devNameSize, "%s%d", devName, i)) < 0) {
+                CAMERA_LOGE("%{public}s: sprintf devName failed", __func__);
+                return RC_ERROR;
+            }
+            {
+                std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
+                iter = HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(devName), v4l2Device));
+            }
+            if (iter.second) {
+                CAMERA_LOGI("UVC:V4L2UvcMatchDev::deviceMatch.insert: %{public}s devName %{public}s i %{public}d\n",
+                    v4l2Device.c_str(), devName, i);
+                break;
+            }
+        }
+    }
+    return RC_OK;
+}
+
 void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2Device, bool inOut)
 {
     std::pair<std::map<std::string, std::string>::iterator, bool> iter;
     constexpr uint32_t nameSize = 16;
     char devName[nameSize] = {0};
+    uint32_t devNameSize = sizeof(devName);
 
     CAMERA_LOGI("UVC:V4L2UvcMatchDev name %{public}s v4l2Device %{public}s inOut = %{public}d\n",
         name.c_str(), v4l2Device.c_str(), inOut);
-    if ((sprintf_s(devName, sizeof(devName), "%s", name.c_str())) < 0) {
+    if ((sprintf_s(devName, devNameSize, "%s", name.c_str())) < 0) {
         CAMERA_LOGE("%{public}s: sprintf devName failed", __func__);
         return;
     }
@@ -87,22 +111,10 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
             std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
             iter = HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(devName), v4l2Device));
         }
-        if (!iter.second) {
-            for (int i = 1; i < MAXUVCNODE; i++) {
-                if ((sprintf_s(devName, sizeof(devName), "%s%d", devName, i)) < 0) {
-                    CAMERA_LOGE("%{public}s: sprintf devName failed", __func__);
-                    return;
-                }
-                {
-                    std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
-                    iter = HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(devName), v4l2Device));
-                }
-                if (iter.second) {
-                    CAMERA_LOGI("UVC:V4L2UvcMatchDev::deviceMatch.insert: %{public}s devName %{public}s i %{public}d\n",
-                        v4l2Device.c_str(), devName, i);
-                    break;
-                }
-            }
+        devNameSize = sizeof(devName);
+        int ret = V4L2SprintfDev(iter, devName, v4l2Device, devNameSize);
+        if (ret != RC_OK) {
+            return;
         }
     } else {
         CAMERA_LOGD("UVC: HosV4L2Dev::deviceMatch.erase: %{public}s devName %{public}s\n",

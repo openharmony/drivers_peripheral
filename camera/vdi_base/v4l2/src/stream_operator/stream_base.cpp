@@ -487,11 +487,8 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
     }
     CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
         buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
-    if (request->NeedCancel()) {
-        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
-    } else {
+    request->NeedCancel() ? buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP) :
         buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
-    }
     ReceiveBuffer(buffer);
     return RC_OK;
 }

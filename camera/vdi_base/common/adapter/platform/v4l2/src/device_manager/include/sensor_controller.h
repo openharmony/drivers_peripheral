@@ -56,6 +56,8 @@ private:
     RetCode SendAWBMetaData(common_metadata_header_t *data);
     RetCode SendAWBLockMetaData(common_metadata_header_t *data);
     RetCode SendExposureMetaData(common_metadata_header_t *data);
+    void CheckRetCodeValue(RetCode rc);
+    void CheckUpdateSettingRetCode(RetCode rc, int exposureVal);
     RetCode SendExposureModeMetaData(common_metadata_header_t *data);
     RetCode SendExposureAutoModeMetaData(common_metadata_header_t *data);
     RetCode SendFocusMetaData(common_metadata_header_t *data);

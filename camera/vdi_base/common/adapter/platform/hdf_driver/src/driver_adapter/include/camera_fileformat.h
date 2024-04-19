@@ -35,6 +35,8 @@ public:
     RetCode CameraGetFmtDescs(struct CameraFeature feature, std::vector<CameraCtrl> &fmtDesc);
 
 private:
+    void CameraGetCurrentFormat(struct CameraFeature &feature, std::vector<CameraCtrl> &fmtDesc,
+        struct CameraFmtDesc &enumFmtDesc);
     RetCode CameraSearchFormat(struct CameraFeature feature, std::vector<CameraCtrl> &fmtDesc);
     int EnumFmtDesc(struct CameraFeature feature, struct CameraFmtDesc &enumFmtDesc);
     int EnumFrmsize(struct CameraFeature feature, struct CameraFrmSizeDesc &frmSize);

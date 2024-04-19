@@ -38,7 +38,11 @@ public:
     RetCode ConfigJpegQuality(common_metadata_header_t* data);
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
 private:
-    void EncodeJpegToMemory(uint8_t* image, int width, int height,
+    struct JpegData {
+        int width;
+        int height;
+    };
+    void EncodeJpegToMemory(uint8_t* image, JpegData jpegData,
             const char* comment, unsigned long* jpegSize, uint8_t** jpegBuf);
 
     void Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer);
