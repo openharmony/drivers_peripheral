@@ -558,7 +558,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     cameraTest->abilityVec = controlVec;
 
     //start preview and capture
-    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, true, true);
     //OncaptureReady trigger
     for (uint8_t i = 0; i < 2; i++) {
         cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
@@ -575,6 +575,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_011, TestSize.Level1)
     camera_metadata_item_t callbackEntry;
     cameraTest->rc = FindCameraMetadataItem(callbackData, OHOS_CAMERA_CUSTOM_SNAPSHOT_DURATION, &callbackEntry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    printf("currentSnapshotDuration = %d\n", callbackEntry.data.ui32[0]);
 }
 
 /**

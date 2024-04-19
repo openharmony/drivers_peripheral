@@ -610,6 +610,10 @@ int32_t Test::TestStreamOperatorCallbackV1_3::OnCaptureError(int32_t captureId,
 int32_t Test::TestStreamOperatorCallbackV1_3::OnFrameShutter(int32_t captureId,
     const std::vector<int32_t> &streamIds, uint64_t timestamp)
 {
+    (void)timestamp;
+    for (auto it : streamIds) {
+        CAMERA_LOGI("OnFrameShutter captureId: %{public}d, streamId: %{public}d", captureId, it);
+    }
     return instanceImpl.OnFrameShutter(captureId, streamIds, timestamp);
 }
 
