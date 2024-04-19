@@ -23,7 +23,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
 {
     int ret;
     int count = 0;
-
+    CAMERA_LOGI("HosV4L2Control::V4L2SetCtrls in fd %{public}d\n", fd);
     if (numControls != static_cast<int>(control.size())) {
         CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls numControls != control.size()\n");
         return RC_ERROR;
@@ -55,7 +55,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
                     ctrl.value = cList[i].value;
                     ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
                     if (ret) {
-                        CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls VIDIOC_S_CTRL error i = %d\n", i);
+                        CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls VIDIOC_S_CTRL error i = %{public}d\n", i);
                         continue;
                     }
                 }
@@ -64,7 +64,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
             count = 0;
         }
     }
-
+    CAMERA_LOGI("HosV4L2Control::V4L2SetCtrls out fd %{public}d\n", fd);
     return RC_OK;
 }
 
@@ -73,7 +73,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
     int ret;
     int count = 0;
     auto iter = control.begin();
-
+    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrls in fd %{public}d\n", fd);
     if (numControls != static_cast<int>(control.size())) {
         CAMERA_LOGE("HosV4L2Control::V4L2GetCtrls numControls != control.size()\n");
         return RC_ERROR;
@@ -119,12 +119,13 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
             count = 0;
         }
     }
-
+    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrls out fd %{public}d\n", fd);
     return RC_OK;
 }
 
 RetCode HosV4L2Control::V4L2GetCtrl(int fd, unsigned int id, int& value)
 {
+    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrl in fd %{public}d\n", fd);
     int rc = 0;
     struct v4l2_control ctrl;
 
@@ -132,12 +133,12 @@ RetCode HosV4L2Control::V4L2GetCtrl(int fd, unsigned int id, int& value)
 
     rc = ioctl(fd, VIDIOC_G_CTRL, &ctrl);
     if (rc < 0) {
-        CAMERA_LOGE("HosV4L2Control::V4L2GetCtrl error rc = %d", rc);
+        CAMERA_LOGE("HosV4L2Control::V4L2GetCtrl error rc = %{public}d", rc);
         return RC_ERROR;
     }
 
     value = ctrl.value;
-
+    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrl out fd %{public}d\n", fd);
     return RC_OK;
 }
 
@@ -146,24 +147,24 @@ RetCode HosV4L2Control::V4L2SetCtrl(int fd, unsigned int id, int value)
     struct v4l2_control ctrl;
     int rc;
 
-    CAMERA_LOGD("HosV4L2Control::V4L2SetCtrl id = %d, value = %d\n", id, value);
+    CAMERA_LOGI("V4L2SetCtrl in fd = %{public}d, id = %{public}d, value = %{public}d\n", fd, id, value);
 
     ctrl.id = id;
     ctrl.value = value;
 
     rc = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
     if (rc < 0) {
-        CAMERA_LOGE("HosV4L2Control::V4L2SetCtrl error rc = %d", rc);
+        CAMERA_LOGE("HosV4L2Control::V4L2SetCtrl error rc = %{public}d", rc);
         return RC_ERROR;
     }
-
+    CAMERA_LOGI("V4L2SetCtrl out fd = %{public}d, id = %{public}d, value = %{public}d\n", fd, id, value);
     return RC_OK;
 }
 
 int HosV4L2Control::ExtControl(int fd, struct v4l2_queryctrl *ctrl)
 {
     int ret = 0;
-
+    CAMERA_LOGI("ExtControl in fd = %{public}d\n", fd);
     if (ctrl == nullptr) {
         CAMERA_LOGE("HosV4L2Control::ExtControl ctrl == nullptr");
         return -1;
@@ -171,13 +172,14 @@ int HosV4L2Control::ExtControl(int fd, struct v4l2_queryctrl *ctrl)
 
     ctrl->id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     ret = ioctl(fd, VIDIOC_QUERYCTRL, ctrl);
-
+    CAMERA_LOGI("ExtControl out fd = %{public}d, ret = %{public}d\n", fd, ret);
     return ret;
 }
 
 void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     DeviceControl& ctrl, v4l2_queryctrl& qCtrl)
 {
+    CAMERA_LOGI("V4L2SetValue in fd = %{public}d\n", fd);
     int value, rc;
 
     ctrl.id = qCtrl.id;
@@ -191,7 +193,7 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     ctrl.name = std::string(reinterpret_cast<char*>(qCtrl.name));
 
     if (qCtrl.type == V4L2_CTRL_TYPE_CTRL_CLASS) {
-        CAMERA_LOGD("%-14s\n", qCtrl.name);
+        CAMERA_LOGD("%{public}s-14s\n", qCtrl.name);
         control.push_back(ctrl);
         return;
     }
@@ -199,15 +201,17 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     rc = V4L2GetCtrl(fd, qCtrl.id, value);
     if (rc != RC_ERROR) {
         ctrl.value = value;
-        CAMERA_LOGD("%-14s : id=%08x, type=%d, minimum=%d, maximum=%d\n"
-            "\t\t value = %d, step=%d, default_value=%d\n",
+        CAMERA_LOGI("%{public}s-14s : id=%{public}x-08x, type=%{public}d, minimum=%{public}d, maximum=%{public}d\n"
+            "\t\t value = %{public}d, step=%{public}d, default_value=%{public}d\n",
             qCtrl.name, qCtrl.id, qCtrl.type, qCtrl.minimum, qCtrl.maximum,
             value, qCtrl.step, qCtrl.default_value);
     }
+    CAMERA_LOGI("V4L2SetValue out fd = %{public}d\n", fd);
 }
 
 void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& control)
 {
+    CAMERA_LOGI("V4L2EnumExtControls in fd = %{public}d\n", fd);
     struct v4l2_queryctrl qCtrl = {};
     DeviceControl ctrl = {};
     int rc;
@@ -215,7 +219,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
     qCtrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     while (!ExtControl(fd, &qCtrl)) {
         if (qCtrl.flags & V4L2_CTRL_FLAG_DISABLED) {
-            CAMERA_LOGD("V4L2ENUMExtControls flags  V4L2_CTRL_FLAG_DISABLED\n");
+            CAMERA_LOGI("V4L2ENUMExtControls flags  V4L2_CTRL_FLAG_DISABLED\n");
             continue;
         }
 
@@ -232,7 +236,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
                 if (rc < 0) {
                     continue;
                 }
-                CAMERA_LOGD("\t %d : %s\n", menu.index, menu.name);
+                CAMERA_LOGD("\t V4L2EnumExtControls %{public}d : %{public}s\n", menu.index, menu.name);
                 menuTemp.index = menu.index;
                 menuTemp.id = menu.id;
                 menuTemp.value = menu.value;
@@ -243,10 +247,12 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
         // Need fix: ctrl menu will keep old menu. Need clear ctrl every convert
         control.push_back(ctrl);
     }
+    CAMERA_LOGI("V4L2EnumExtControls out fd = %{public}d\n", fd);
 }
 
 int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, unsigned int id)
 {
+    CAMERA_LOGI("V4L2GetControl in fd = %{public}d\n", fd);
     struct v4l2_queryctrl queryCtrl = {};
     DeviceControl ctrl = {};
     int rc;
@@ -254,12 +260,12 @@ int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, 
     queryCtrl.id = id;
     rc = ioctl(fd, VIDIOC_QUERYCTRL, &queryCtrl);
     if (rc < 0) {
-        CAMERA_LOGE("V4L2GetControl ioctl error rc %d\n", rc);
+        CAMERA_LOGE("V4L2GetControl ioctl error rc %{public}d\n", rc);
         return RC_ERROR;
     }
 
     if (queryCtrl.flags & V4L2_CTRL_FLAG_DISABLED) {
-        CAMERA_LOGD("V4L2ENUMExtControls flags  V4L2_CTRL_FLAG_DISABLED\n");
+        CAMERA_LOGI("V4L2ENUMExtControls flags  V4L2_CTRL_FLAG_DISABLED\n");
         return RC_OK;
     }
 
@@ -287,12 +293,13 @@ int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, 
     }
 
     control.push_back(ctrl);
-
+    CAMERA_LOGI("V4L2GetControl out fd = %{public}d\n", fd);
     return RC_OK;
 }
 
 void HosV4L2Control::V4L2EnumControls(int fd, std::vector<DeviceControl>& control)
 {
+    CAMERA_LOGI("V4L2EnumControls in fd = %{public}d\n", fd);
     int rc;
     constexpr uint32_t max = V4L2_CID_PRIVATE_BASE + 100;
 
@@ -307,10 +314,12 @@ void HosV4L2Control::V4L2EnumControls(int fd, std::vector<DeviceControl>& contro
             if (rc == RC_ERROR)
                 break;
     }
+    CAMERA_LOGI("V4L2EnumControls out fd = %{public}d\n", fd);
 }
 
 RetCode HosV4L2Control::V4L2GetControls(int fd, std::vector<DeviceControl>& control)
 {
+    CAMERA_LOGI("V4L2GetControls out fd = %{public}d\n", fd);
     int rc;
     struct v4l2_queryctrl qCtrl = {};
 
@@ -324,13 +333,13 @@ RetCode HosV4L2Control::V4L2GetControls(int fd, std::vector<DeviceControl>& cont
     qCtrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     rc = ExtControl(fd, &qCtrl);
     if (rc < 0) {
-        CAMERA_LOGD("V4L2GetControls no support V4L2_CTRL_FLAG_NEXT_CTRL\n");
+        CAMERA_LOGE("V4L2GetControls no support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumControls(fd, control);
     } else {
-        CAMERA_LOGD("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
+        CAMERA_LOGE("V4L2GetControls support V4L2_CTRL_FLAG_NEXT_CTRL\n");
         V4L2EnumExtControls(fd, control);
     }
-
+    CAMERA_LOGI("V4L2GetControls in fd = %{public}d\n", fd);
     return RC_OK;
 }
 } // namespace OHOS::Camera
