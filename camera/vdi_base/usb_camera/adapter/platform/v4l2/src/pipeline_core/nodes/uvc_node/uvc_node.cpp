@@ -19,7 +19,7 @@ namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
     : NodeBase(name, type, cameraId), SourceNode(name, type, cameraId)
 {
-    CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
+    CAMERA_LOGI("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
     RetCode rc = RC_OK;
     constexpr int ITEM_CAPACITY_SIZE = 30;
     constexpr int DATA_CAPACITY_SIZE = 1000;
