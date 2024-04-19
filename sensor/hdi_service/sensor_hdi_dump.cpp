@@ -173,7 +173,7 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     }
     std::unordered_map<int32_t, struct BestSensorConfig> bestSensorConfigMap;
     (void)SensorClientsManager::GetInstance()->GetBestSensorConfigMap(bestSensorConfigMap);
-
+    std::unordered_map<int, std::set<int>> sensorEnabled = SensorClientsManager::GetInstance()->GetSensorUsed();
     (void)HdfSbufWriteString(reply, "============== all clients information ==============\n\n");
     std::string sensorInfoData = "";
     sensorInfoData += "bestSensorConfigMap={\n";
@@ -200,7 +200,11 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
             sensorInfoData += "samplingInterval=" + std::to_string(sensorConfig.samplingInterval) + ",";
             sensorInfoData += "reportInterval=" + std::to_string(sensorConfig.reportInterval) + ",";
             sensorInfoData += "curCount/periodCount=" + std::to_string(sensorClientInfo.curCountMap_[sensorId]) + "/" +
-                    std::to_string(sensorClientInfo.periodCountMap_[sensorId]);
+                    std::to_string(sensorClientInfo.periodCountMap_[sensorId]) + ",";
+            if (sensorEnabled.find(sensorId) != sensorEnabled.end() &&
+                sensorEnabled.find(sensorId)->second.find(serviceId) != sensorEnabled.find(sensorId)->second.end()) {
+                sensorInfoData += "enable";
+            }
             sensorInfoData += "}}\n";
         }
         sensorInfoData += "}\n\n";
