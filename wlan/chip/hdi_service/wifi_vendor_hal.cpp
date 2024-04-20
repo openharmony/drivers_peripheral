@@ -176,7 +176,11 @@ WifiError WifiVendorHal::CreateVirtualInterface(const std::string& ifname, HalIf
 {
     WifiError status = globalFuncTable_.vendorHalCreateIface(
         globalHandle_, ifname.c_str(), iftype);
-    return HandleIfaceChangeStatus(ifname, status);
+    status = HandleIfaceChangeStatus(ifname, status);
+    if (status == HAL_SUCCESS && iftype == HalIfaceType::HAL_TYPE_STA) {
+        ifaceTool_.lock()->SetUpState(ifname.c_str(), true);
+    }
+    return status;
 }
 
 WifiError WifiVendorHal::DeleteVirtualInterface(const std::string& ifname)
