@@ -48,7 +48,9 @@ IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, Linke
 IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
 IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 IAM_STATIC bool IsUserValid(UserInfo *user);
-IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount, bool *cachePinRemoved);
+IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount,
+    bool *cachePinRemoved);
+IAM_STATIC void RemoveCachePin(UserInfo *user, bool *isRemoved);
 IAM_STATIC ResultCode ClearInvalidData(void);
 
 ResultCode InitUserInfoList(void)
@@ -442,6 +444,10 @@ IAM_STATIC ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *cre
         LOG_ERROR("GenerateDeduplicateUint64 failed");
         return ret;
     }
+    if (credentialInfo->authType == DEFAULT_AUTH_TYPE) {
+        bool isRemoved = false;
+        RemoveCachePin(user, &isRemoved);
+    }
     CredentialInfoHal *credential = Malloc(sizeof(CredentialInfoHal));
     if (credential == NULL) {
         LOG_ERROR("credential malloc failed");
@@ -578,22 +584,9 @@ IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
     return false;
 }
 
-IAM_STATIC void TrySetBool(bool *isRemoved, bool value)
-{
-    if (isRemoved != NULL) {
-        *isRemoved = value;
-    }
-}
-
-void RemoveCachePin(int32_t userId, bool *isRemoved)
+IAM_STATIC void RemoveCachePin(UserInfo *user, bool *isRemoved)
 {
     LOG_INFO("RemoveCachePin start");
-    UserInfo *user = QueryUserInfo(userId);
-    if (user == NULL) {
-        LOG_ERROR("can't find this user");
-        TrySetBool(isRemoved, false);
-        return;
-    }
     LinkedListNode *temp = user->credentialInfoList->head;
     CredentialInfoHal *credentialInfoCache = NULL;
     while (temp != NULL) {
@@ -606,18 +599,43 @@ void RemoveCachePin(int32_t userId, bool *isRemoved)
     }
     if (credentialInfoCache == NULL) {
         LOG_INFO("RemoveCachePin no cache pin");
-        TrySetBool(isRemoved, false);
+        *isRemoved = false;
         return;
     }
     uint64_t credentialId = credentialInfoCache->credentialId;
-    ResultCode ret = (user->credentialInfoList)->remove(user->credentialInfoList, &credentialId, MatchCredentialById, true);
+    ResultCode ret = (user->credentialInfoList)->remove(
+        user->credentialInfoList, &credentialId, MatchCredentialById, true);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("remove credential failed");
-        TrySetBool(isRemoved, false);
+        *isRemoved = false;
         return;
     }
     LOG_ERROR("remove credential success");
-    TrySetBool(isRemoved, true);
+    *isRemoved = true;
+}
+
+void ClearCachePin(int32_t userId)
+{
+    LOG_INFO("ClearCachePin start");
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("can't find this user");
+        return;
+    }
+
+    bool isRemoved = false;
+    RemoveCachePin(user, &isRemoved);
+    if (isRemoved && UpdateFileInfo(g_userInfoList) != RESULT_SUCCESS) {
+        LOG_ERROR("ClearCachePin save fail");
+        return;
+    }
+}
+
+IAM_STATIC void SwitchSubType(UserInfo *user)
+{
+    uint64_t tmpSubType = user->pinSubType;
+    user->pinSubType = user->cachePinSubType;
+    user->cachePinSubType = tmpSubType;
 }
 
 // add for reliable pin updates
@@ -643,22 +661,17 @@ IAM_STATIC ResultCode DeletePinCredentialInfo(UserInfo *user)
     }
     credentialInfoOld->authType = DEFAULT_AUTH_TYPE;
     credentialInfoCache->authType = PIN_AUTH;
-    uint64_t tmpSubType = user->pinSubType;
-    user->pinSubType = user->cachePinSubType;
-    user->cachePinSubType = tmpSubType;
+    SwitchSubType(user);
     ResultCode result = UpdateFileInfo(g_userInfoList);
     if (result == RESULT_SUCCESS) {
         LOG_INFO("switch cache pin success");
-        CredentialInfoHal tmpCredentialInfoHal = {};
-        (void)DeleteCredentialInfo(user->userId, credentialInfoOld->credentialId, &tmpCredentialInfoHal);
-        LOG_INFO("remove old pin end");
+        ClearCachePin(user->userId);
         return result;
     }
     LOG_ERROR("switch cache pin fail");
     credentialInfoOld->authType = PIN_AUTH;
     credentialInfoCache->authType = DEFAULT_AUTH_TYPE;
-    user->cachePinSubType = user->pinSubType;
-    user->pinSubType = tmpSubType;
+    SwitchSubType(user);
     return RESULT_GENERAL_ERROR;
 }
 
@@ -751,15 +764,19 @@ IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, Linke
 // do not cotain cache pin credential
 IAM_STATIC bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
 {
-    if (credentialInfo->authType == DEFAULT_AUTH_TYPE) {
-        return false;
-    }
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_CREDENTIAL_ID) != 0 &&
         limit->credentialId != credentialInfo->credentialId) {
         return false;
     }
-    if ((limit->conditionFactor & CREDENTIAL_CONDITION_AUTH_TYPE) != 0 && limit->authType != credentialInfo->authType) {
-        return false;
+    if (credentialInfo->authType == DEFAULT_AUTH_TYPE) {
+        if ((limit->conditionFactor & CREDENTIAL_CONDITION_NEED_CACHE_PIN) == 0) {
+            return false;
+        }
+    } else {
+        if ((limit->conditionFactor & CREDENTIAL_CONDITION_AUTH_TYPE) != 0 &&
+            limit->authType != credentialInfo->authType) {
+            return false;
+        }
     }
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_TEMPLATE_ID) != 0 &&
         limit->templateId != credentialInfo->templateId) {
@@ -987,6 +1004,15 @@ void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId
     condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
 }
 
+void SetCredentiaConditionNeedCachePin(CredentialCondition *condition)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->conditionFactor |= CREDENTIAL_CONDITION_NEED_CACHE_PIN;
+}
+
 IAM_STATIC bool IsUserValid(UserInfo *user)
 {
     LinkedList *credentialInfoList = user->credentialInfoList;
@@ -998,7 +1024,8 @@ IAM_STATIC bool IsUserValid(UserInfo *user)
     return true;
 }
 
-IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount, bool *cachePinRemoved)
+IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCount, uint32_t *userCount,
+    bool *cachePinRemoved)
 {
     LOG_INFO("get invalid user start");
     if (g_userInfoList == NULL) {
@@ -1033,7 +1060,7 @@ IAM_STATIC ResultCode GetInvalidUser(int32_t *invalidUserId, uint32_t maxUserCou
         }
 
         bool isRemoved = false;
-        RemoveCachePin(user->userId, &isRemoved);
+        RemoveCachePin(user, &isRemoved);
         if (isRemoved) {
             *cachePinRemoved = true;
         }

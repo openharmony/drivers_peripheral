@@ -872,6 +872,7 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, authType);
     SetCredentialConditionExecutorSensorHint(&condition, sensorHint);
+    SetCredentiaConditionNeedCachePin(&condition);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == nullptr) {
         IAM_LOGE("query credential failed");
