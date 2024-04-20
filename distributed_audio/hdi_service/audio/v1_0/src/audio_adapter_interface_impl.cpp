@@ -144,7 +144,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         return HDF_FAILURE;
     }
 
-    int32_t ret = OpenRenderDevice(desc, attrs, extSpkCallback, renderPinId, renderId); 
+    int32_t ret = OpenRenderDevice(desc, attrs, extSpkCallback, renderPinId, renderId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Open render device failed.");
         DeleteRenderImpl(renderId);
@@ -178,7 +178,6 @@ int32_t AudioAdapterInterfaceImpl::InsertRenderImpl(const AudioDeviceDescriptor 
     const AudioSampleAttributes &attrs, sptr<AudioRenderInterfaceImplBase> &audioRender,
     const int32_t dhId, uint32_t &renderId)
 {
-    audioRender = nullptr;
     std::lock_guard<std::mutex> devLck(renderDevMtx_);
     if (renderDevs_.size() != MAX_AUDIO_STREAM_NUM) {
         DHLOGE("Render device contain check error.");
