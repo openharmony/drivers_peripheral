@@ -20,13 +20,39 @@ namespace OHOS::Camera {
 CameraFileFormat::CameraFileFormat() {}
 CameraFileFormat::~CameraFileFormat() {}
 
+void CameraFileFormat::CameraGetCurrentFormat(struct CameraFeature &feature, std::vector<CameraCtrl> &fmtDesc,
+    struct CameraFmtDesc &enumFmtDesc)
+{
+    struct CameraFrmRatioDesc fraMival = {};
+    constexpr uint32_t fmtMax = 1;
+    for (int k = 0; k < fmtMax; ++k) {
+        fraMival.index = k;
+        fraMival.pixelFormat = frmSize.pixelFormat;
+        fraMival.width = frmSize.width;
+        fraMival.height = frmSize.height;
+        ret = Enumfrmivale(feature, fraMival);
+        if (ret == 0) {
+            break;
+        }
+        CameraCtrl currentFormat = {};
+        strncpy_s(currentFormat.fmtdesc.description, NAME_SIZE, enumFmtDesc.description, NAME_SIZE);
+        currentFormat.fmtdesc.pixelFormat = enumFmtDesc.pixelFormat;
+        currentFormat.fmtdesc.width = frmSize.width;
+        currentFormat.fmtdesc.height = frmSize.height;
+        currentFormat.fmtdesc.fps.numerator = fraMival.numerator;
+        currentFormat.fmtdesc.fps.denominator = fraMival.denominator;
+        fmtDesc.push_back(currentFormat);
+    }
+}
+
 RetCode CameraFileFormat::CameraSearchFormat(struct CameraFeature feature, std::vector<CameraCtrl> &fmtDesc)
 {
-    int32_t i, j, k, ret;
+    int32_t i;
+    int32_t j;
+    int32_t ret;
     constexpr uint32_t fmtMax = 1;
     struct CameraFmtDesc enumFmtDesc = {};
     struct CameraFrmSizeDesc frmSize = {};
-    struct CameraFrmRatioDesc fraMival = {};
 
     for (i = 0; i < fmtMax; ++i) {
         enumFmtDesc.index = i;
@@ -41,24 +67,7 @@ RetCode CameraFileFormat::CameraSearchFormat(struct CameraFeature feature, std::
             if (ret != 0) {
                 break;
             }
-            for (k = 0; k < fmtMax; ++k) {
-                fraMival.index = k;
-                fraMival.pixelFormat = frmSize.pixelFormat;
-                fraMival.width = frmSize.width;
-                fraMival.height = frmSize.height;
-                ret = Enumfrmivale(feature, fraMival);
-                if (ret != 0) {
-                    break;
-                }
-                CameraCtrl currentFormat = {};
-                strncpy_s(currentFormat.fmtdesc.description, NAME_SIZE, enumFmtDesc.description, NAME_SIZE);
-                currentFormat.fmtdesc.pixelFormat = enumFmtDesc.pixelFormat;
-                currentFormat.fmtdesc.width = frmSize.width;
-                currentFormat.fmtdesc.height = frmSize.height;
-                currentFormat.fmtdesc.fps.numerator = fraMival.numerator;
-                currentFormat.fmtdesc.fps.denominator = fraMival.denominator;
-                fmtDesc.push_back(currentFormat);
-            }
+            CameraGetCurrentFormat(feature, fmtDesc, enumFmtDesc);
         }
     }
     if (i == 0) {

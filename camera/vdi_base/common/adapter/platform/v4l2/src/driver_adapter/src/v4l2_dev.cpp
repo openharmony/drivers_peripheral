@@ -230,11 +230,31 @@ RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
     return RC_OK;
 }
 
+void HosV4L2Dev::dequeueBuffers()
+{
+    int nfds;
+    int rc;
+    struct epoll_event events[MAXSTREAMCOUNT];
+    nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
+    CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
+
+    for (int n = 0; nfds > 0; ++n, --nfds) {
+        if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {
+            CHECK_IF_PTR_NULL_RETURN_VOID(myBuffers_);
+            rc = myBuffers_->V4L2DequeueBuffer(events[n].data.fd);
+            if (rc == RC_ERROR) {
+                continue;
+            }
+        } else {
+            CAMERA_LOGI("loopBuffers: epoll invalid events = 0x%{public}x or eventFd exit = %{public}d\n",
+                events[n].events, (events[n].data.fd == eventFd_));
+            usleep(WATING_TIME);
+        }
+    }
+}
+
 void HosV4L2Dev::loopBuffers()
 {
-    int nfds, rc;
-    struct epoll_event events[MAXSTREAMCOUNT];
-
     CAMERA_LOGI("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
     prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
@@ -245,23 +265,7 @@ void HosV4L2Dev::loopBuffers()
                 break;
             }
         }
-        nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
-        CAMERA_LOGI("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
-
-        for (int n = 0; nfds > 0; ++n, --nfds) {
-            if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {
-                CHECK_IF_PTR_NULL_RETURN_VOID(myBuffers_);
-                rc = myBuffers_->V4L2DequeueBuffer(events[n].data.fd);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("loopBuffers: myBuffers_->V4L2DequeueBuffer return error == %{public}d\n", rc);
-                    continue;
-                }
-            } else {
-                CAMERA_LOGI("loopBuffers: epoll invalid events = 0x%{public}x or eventFd exit = %{public}d\n",
-                    events[n].events, (events[n].data.fd == eventFd_));
-                usleep(WATING_TIME);
-            }
-        }
+        dequeueBuffers();
     }
     CAMERA_LOGI("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
 }

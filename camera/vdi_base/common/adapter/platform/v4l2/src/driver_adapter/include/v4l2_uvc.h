@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/eventfd.h>
+#include <map>
 #include "v4l2_common.h"
 #if defined(V4L2_UTEST) || defined (V4L2_MAIN_TEST)
 #include "v4l2_temp.h"
@@ -43,6 +44,8 @@ public:
 private:
     void V4L2UvcSearchCapability(const std::string devName, const std::string v4l2Device, bool inOut);
     RetCode V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capability& cap);
+    int V4L2SprintfDev(std::pair<std::map<std::string, std::string>::iterator, bool> &iter,
+        char* devName, const std::string v4l2Device, uint32_t devNameSize);
     void V4L2UvcMatchDev(const std::string      name, const std::string v4l2Device, bool inOut);
     void V4L2UvcEnmeDevices();
     void loopUvcDevice();
