@@ -40,7 +40,8 @@ AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
     : adapterName_(adpName), devDesc_(desc), devAttrs_(attrs), audioExtCallback_(callback)
 {
-    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
+    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
+        AUDIO_NORMAL_INTERVAL, false);
     const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
     framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) / sizePerSec;
     DHLOGD("Distributed audio capture constructed, period(%{public}d),frameSize(%{public}d).",
