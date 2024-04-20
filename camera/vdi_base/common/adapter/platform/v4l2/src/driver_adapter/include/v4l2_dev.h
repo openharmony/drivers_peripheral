@@ -101,6 +101,7 @@ public:
 
 private:
     int GetCurrentFd(const std::string& cameraID);
+    void dequeueBuffers();
     void loopBuffers();
     RetCode CreateEpoll(int fd, const unsigned int streamNumber);
     void EraseEpoll(int fd);

@@ -19,6 +19,23 @@ namespace OHOS::Camera {
 HosV4L2Control::HosV4L2Control() {}
 HosV4L2Control::~HosV4L2Control() {}
 
+void HosV4L2Control::V4L2VidiocSCtrl (int fd, int ret, struct v4l2_ext_control* cList, int count)
+{
+    if (ret) {
+        CAMERA_LOGE("HosV4L2Control::VIDIOC_S_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
+        struct v4l2_control ctrl;
+        for (int i = 0; count > 0; i++, count--) {
+            ctrl.id = cList[i].id;
+            ctrl.value = cList[i].value;
+            ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
+            if (ret) {
+                CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls VIDIOC_S_CTRL error i = %{public}d\n", i);
+                continue;
+            }
+        }
+    }
+}
+
 RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& control, const int numControls)
 {
     int ret;
@@ -46,21 +63,8 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
             ctrls.count = count;
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
-            if (ret) {
-                CAMERA_LOGE("HosV4L2Control::VIDIOC_S_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
-                struct v4l2_control ctrl;
-
-                for (int i = 0; count > 0; i++, count--) {
-                    ctrl.id = cList[i].id;
-                    ctrl.value = cList[i].value;
-                    ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
-                    if (ret) {
-                        CAMERA_LOGE("HosV4L2Control::V4L2SetCtrls VIDIOC_S_CTRL error i = %{public}d\n", i);
-                        continue;
-                    }
-                }
-            }
-
+            
+            V4L2VidiocSCtrl(fd, ret, cList, count);
             count = 0;
         }
     }

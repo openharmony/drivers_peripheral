@@ -25,7 +25,7 @@ constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr uint32_t DATA_COUNT = 1;
 constexpr uint32_t RESOLUTION_COUNT = 26;
 constexpr uint32_t RESOLUTION_PARAM = 2;
-uint32_t supportedResolution_[RESOLUTION_COUNT][RESOLUTION_PARAM] = {
+uint32_t g_supportedResolution[RESOLUTION_COUNT][RESOLUTION_PARAM] = {
     {640, 400}, {640, 480}, {640, 640}, {720, 480}, {720, 540}, {720, 720}, {800, 480}, {800, 600},
     {864, 480}, {960, 720}, {1024, 768}, {1088, 1080}, {1088, 1088}, {1136, 480}, {1280, 592}, {1280, 720},
     {1280, 768}, {1280, 960}, {1440, 1080}, {1584, 720}, {1600, 1200}, {1920, 888}, {1920, 1080}, {3200, 2400},
@@ -1360,15 +1360,15 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
         //preview streamInfo
         cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
-        cameraTest->streamInfoPre->v1_0.width_ = supportedResolution_[i][0];
-        cameraTest->streamInfoPre->v1_0.height_ = supportedResolution_[i][1];
+        cameraTest->streamInfoPre->v1_0.width_ = g_supportedResolution[i][0];
+        cameraTest->streamInfoPre->v1_0.height_ = g_supportedResolution[i][1];
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
         
         //capture streamInfo
         cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
-        cameraTest->streamInfoCapture->v1_0.width_ = supportedResolution_[i][0];
-        cameraTest->streamInfoCapture->v1_0.height_ = supportedResolution_[i][1];
+        cameraTest->streamInfoCapture->v1_0.width_ = g_supportedResolution[i][0];
+        cameraTest->streamInfoCapture->v1_0.height_ = g_supportedResolution[i][1];
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
         
         //create and commit stream
