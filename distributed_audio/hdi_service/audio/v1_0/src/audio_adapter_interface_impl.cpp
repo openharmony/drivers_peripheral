@@ -112,7 +112,7 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         return HDF_FAILURE;
     }
 #ifdef DAUDIO_SUPPORT_EXTENSION
-    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+    if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V2_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
@@ -145,7 +145,7 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
     const AudioDeviceDescriptor &desc, int32_t &dhId)
 {
     dhId = static_cast<int32_t>(desc.pins);
-    if (desc.pins == DEFAULT_RENDER_ID && attrs.type == AUDIO_MMAP_NOIRQ) {
+    if (desc.pins == DEFAULT_RENDER_ID && (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP)) {
         dhId = LOW_LATENCY_RENDER_ID;
     }
 
@@ -241,7 +241,7 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         return HDF_FAILURE;
     }
 #ifdef DAUDIO_SUPPORT_EXTENSION
-    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+    if (attrs.type == AUDIO_MMAP_NOIRQ || attrs.type == AUDIO_MMAP_VOIP) {
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V2_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
@@ -564,8 +564,15 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     renderParam_.channelCount = attrs.channelCount;
     renderParam_.sampleRate = attrs.sampleRate;
     renderParam_.streamUsage = attrs.type;
+    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+        renderParam_.period = AUDIO_MMAP_NOIRQ_INTERVAL;
+    } else if (attrs.type == AUDIO_MMAP_VOIP) {
+        renderParam_.period = AUDIO_MMAP_VOIP_INTERVAL;
+    } else {
+        renderParam_.period = AUDIO_NORMAL_INTERVAL;
+    }
     renderParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
-        timeInterval_, renderFlags_ == Audioext::V2_0::MMAP_MODE);
+        renderParam_.period, renderFlags_ == Audioext::V2_0::MMAP_MODE);
     renderParam_.renderFlags = renderFlags_;
 
     int32_t ret = extSpkCallback->SetParameters(renderId, renderParam_);
@@ -633,8 +640,15 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
     captureParam_.channelCount = attrs.channelCount;
     captureParam_.sampleRate = attrs.sampleRate;
     captureParam_.streamUsage = attrs.type;
+    if (attrs.type == AUDIO_MMAP_NOIRQ) {
+        captureParam_.period = AUDIO_MMAP_NOIRQ_INTERVAL;
+    } else if (attrs.type == AUDIO_MMAP_VOIP) {
+        captureParam_.period = AUDIO_MMAP_VOIP_INTERVAL;
+    } else {
+        captureParam_.period = AUDIO_NORMAL_INTERVAL;
+    }
     captureParam_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount,
-        attrs.format, timeInterval_, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
+        attrs.format, captureParam_.period, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
     int32_t ret = extMicCallback->SetParameters(captureId, captureParam_);
