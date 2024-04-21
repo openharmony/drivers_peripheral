@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,6 +57,7 @@ AttributeKey g_attributeKeyArray[] = {
     AUTH_TIME_STAMP,
     AUTH_ROOT_SECRET,
     AUTH_ROOT,
+    AUTH_EXPIRED_SYS_TIME,
 };
 
 #define ARRAY_LENGTH(array) (uint32_t)(sizeof(array) / sizeof((array)[0]))

@@ -48,6 +48,9 @@ using HdiReuseUnlockParam = OHOS::HDI::UserAuth::V2_0::ReuseUnlockParam;
 using HdiIMessageCallback = OHOS::HDI::UserAuth::V2_0::IMessageCallback;
 using HdiUserInfo = OHOS::HDI::UserAuth::V2_0::UserInfo;
 using HdiExtUserInfo = OHOS::HDI::UserAuth::V2_0::ExtUserInfo;
+using HdiGlobalConfigType = OHOS::HDI::UserAuth::V2_0::GlobalConfigType;
+using HdiGlobalConfigValue= OHOS::HDI::UserAuth::V2_0::GlobalConfigValue;
+using HdiGlobalConfigParam = OHOS::HDI::UserAuth::V2_0::GlobalConfigParam;
 } // namespace UserAuth
 } // namespace HDI
 } // namespace OHOS

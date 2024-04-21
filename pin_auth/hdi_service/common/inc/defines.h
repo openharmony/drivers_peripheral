@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,7 +96,11 @@ typedef enum ResultCodeForCoAuth {
     /**
      * Indicates that the user has not enrolled the authenticator.
      */
-    NOT_ENROLLED = 10
+    NOT_ENROLLED = 10,
+    /**
+     * The result is fail, because the pin credential is expired.
+    */
+    PIN_EXPIRED = 13,
 } ResultCodeForCoAuth;
 
 typedef enum AuthType {

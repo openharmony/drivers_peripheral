@@ -160,6 +160,24 @@ HWTEST_F(IdmFileMgrTest, TestStreamReadEnrolledList, TestSize.Level0)
 {
     EXPECT_EQ(StreamReadEnrolledList(nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
 }
+
+HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
+{
+    uint32_t configInfoNum = 1;
+    EXPECT_EQ(UpdateGlobalConfigFile(nullptr, configInfoNum), RESULT_BAD_PARAM);
+
+    GlobalConfigParamHal globalConfigInfo = {};
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+}
+
+HWTEST_F(IdmFileMgrTest, TestLoadGlobalConfigInfo, TestSize.Level0)
+{
+    EXPECT_EQ(LoadGlobalConfigInfo(nullptr, nullptr), RESULT_BAD_PARAM);
+
+    uint32_t configInfoNum = 1;
+    GlobalConfigParamHal *param = {};
+    EXPECT_EQ(LoadGlobalConfigInfo(param, &configInfoNum), RESULT_GENERAL_ERROR);
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS
