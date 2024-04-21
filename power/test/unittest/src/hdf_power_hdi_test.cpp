@@ -19,6 +19,7 @@
 
 #include "v1_1/ipower_interface.h"
 #include "v1_1/power_types.h"
+#include "v1_1/running_lock_types.h"
 
 using namespace OHOS::HDI;
 using namespace OHOS::HDI::Power::V1_1;
@@ -168,5 +169,24 @@ HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest007, TestSize.Level1)
 #else
     EXPECT_NE(0, ret);
 #endif
+}
+
+/**
+  * @tc.name: HdfPowerHdiTest008
+  * @tc.desc: check GetWakeupReason
+  * @tc.type: FUNC
+  */
+HWTEST_F(HdfPowerHdiTest, HdfPowerHdiTest008, TestSize.Level1)
+{
+    std::string testName = "HdfPowerHdiTest008";
+    RunningLockInfo filledInfo;
+    filledInfo.name = testName;
+    filledInfo.type = RUNNINGLOCK_BUTT;
+    filledInfo.uid = 0;
+    filledInfo.pid = 0;
+    int32_t ret = g_powerInterface->HoldRunningLockExt(filledInfo, 0, testName);
+    EXPECT_NE(0, ret);
+    ret = g_powerInterface->UnholdRunningLockExt(filledInfo, 0, testName);
+    EXPECT_NE(0, ret);
 }
 }

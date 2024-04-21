@@ -941,4 +941,30 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest021, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
     EXPECT_EQ(originCount, RunningLockImpl::GetCount(runinglockInfo.type));
 }
+
+/**
+  * @tc.name: HdfPowerRunningLockTest022
+  * @tc.desc: test HoldLock and UnholdLock
+  * @tc.type: FUNC
+  * @tc.require: issueI9C4GG
+  */
+HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level1)
+{
+    PowerHdfState powerState = PowerHdfState::AWAKE;
+    RunningLockInfo runinglockInfo1 {};
+    runinglockInfo1.name = runnninglockNameLabel + "task.22";
+    runinglockInfo1.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
+
+    RunningLockInfo runinglockInfo2 {};
+    runinglockInfo2.name = "";
+    runinglockInfo2.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo2, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo2));
+
+    powerState = PowerHdfState::SLEEP;
+    EXPECT_NE(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
+    EXPECT_NE(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
+}
 }
