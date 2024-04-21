@@ -76,12 +76,33 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
     context->collectorSensorHint = params.executorSensorHint;
     context->scheduleList = CreateLinkedList(DestroyScheduleNode);
     context->isAuthResultCached = params.isAuthResultCached;
+    context->isExpiredReturnSuccess = params.isExpiredReturnSuccess;
     if (context->scheduleList == NULL) {
         LOG_ERROR("schedule list create failed");
         Free(context);
         return NULL;
     }
     return context;
+}
+
+IAM_STATIC ResultCode GetContextExpiredTime(int32_t userId, UserAuthContext *authContext)
+{
+    PinExpiredInfo expiredInfo = {};
+    ResultCode result = GetPinExpiredPeriod(userId, &expiredInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetPinExpiredPeriod failed");
+        return result;
+    }
+    if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        LOG_ERROR("pinExpiredPeriod is not set");
+        authContext->authExpiredSysTime = NO_CHECK_PIN_EXPIRED_PERIOD;
+        return RESULT_SUCCESS;
+    }
+    authContext->authExpiredSysTime = UINT64_MAX;
+    if (expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod < UINT64_MAX) {
+        authContext->authExpiredSysTime = expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod;
+    }
+    return RESULT_SUCCESS;
 }
 
 ResultCode GenerateAuthContext(AuthParamHal params, UserAuthContext **context)
@@ -107,6 +128,13 @@ ResultCode GenerateAuthContext(AuthParamHal params, UserAuthContext **context)
     ResultCode ret = CreateAndInsertSchedules(*context, SCHEDULE_MODE_AUTH);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("create schedule failed %{public}d", ret);
+        DestroyContextNode(*context);
+        *context = NULL;
+        return ret;
+    }
+    ret = GetContextExpiredTime(params.userId, *context);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetAuthExpiredSysTime failed");
         DestroyContextNode(*context);
         *context = NULL;
         return ret;
@@ -624,4 +652,77 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
 EXIT:
     DestroyLinkedList(credList);
     return ret;
+}
+
+IAM_STATIC ResultCode UpdateContextExpiredTime(UserAuthContext *contextData)
+{
+    if (contextData == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    PinExpiredInfo expiredInfo = {};
+    ResultCode ret = GetPinExpiredPeriod(contextData->userId, &expiredInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetPinExpiredPeriod failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        contextData->authExpiredSysTime = NO_CHECK_PIN_EXPIRED_PERIOD;
+        return RESULT_SUCCESS;
+    }
+    contextData->authExpiredSysTime = UINT64_MAX;
+    if (expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod < UINT64_MAX) {
+        contextData->authExpiredSysTime = expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t *size)
+{
+    if (g_contextList == NULL || executorExpiredInfos == NULL || size == NULL) {
+        LOG_ERROR("bad parameter");
+        return RESULT_BAD_PARAM;
+    }
+    *size = 0;
+    LinkedListNode *contextNode = g_contextList->head;
+    while (contextNode != NULL && *size < MAX_SCHEDULE_NUM) {
+        UserAuthContext *contextData = (UserAuthContext *)contextNode->data;
+        if (contextData == NULL) {
+            LOG_ERROR("contextData is null, please check");
+            contextNode = contextNode->next;
+            continue;
+        }
+        if (UpdateContextExpiredTime(contextData) != RESULT_SUCCESS) {
+            LOG_ERROR("UpdateContextExpiredTime failed");
+            contextNode = contextNode->next;
+            continue;
+        }
+        if (contextData->isExpiredReturnSuccess) {
+            LOG_INFO("the caller is lockScreen or settings");
+            contextNode = contextNode->next;
+            continue;
+        }
+        LinkedList *scheduleList = contextData->scheduleList;
+        if (scheduleList == NULL) {
+            LOG_ERROR("schedule list is null");
+            contextNode = contextNode->next;
+            continue;
+        }
+        LinkedListNode *scheduleNode = scheduleList->head;
+        while (scheduleNode != NULL && *size < MAX_SCHEDULE_NUM) {
+            CoAuthSchedule *scheduleData = (CoAuthSchedule *) scheduleNode->data;
+            if (scheduleData == NULL) {
+                LOG_ERROR("scheduleData is NULL, please check");
+                scheduleNode = scheduleNode->next;
+                continue;
+            }
+            executorExpiredInfos[*size].authExpiredSysTime = contextData->authExpiredSysTime;
+            executorExpiredInfos[*size].scheduleId = scheduleData->scheduleId;
+            executorExpiredInfos[*size].scheduleMode = scheduleData->scheduleMode;
+            (*size)++;
+            scheduleNode = scheduleNode->next;
+        }
+        contextNode = contextNode->next;
+    }
+    return RESULT_SUCCESS;
 }

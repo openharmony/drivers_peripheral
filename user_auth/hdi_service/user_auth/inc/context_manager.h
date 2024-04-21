@@ -34,7 +34,9 @@ typedef struct UserAuthContext {
     uint32_t authTrustLevel;
     uint32_t collectorSensorHint;
     LinkedList *scheduleList;
+    uint64_t authExpiredSysTime;
     bool isAuthResultCached;
+    bool isExpiredReturnSuccess;
 } UserAuthContext;
 
 typedef struct {
@@ -45,6 +47,7 @@ typedef struct {
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
     bool isAuthResultCached;
+    bool isExpiredReturnSuccess;
 } AuthParamHal;
 
 typedef struct IdentifyParam {
@@ -53,6 +56,12 @@ typedef struct IdentifyParam {
     uint32_t authType;
     uint32_t executorSensorHint;
 } IdentifyParam;
+
+typedef struct {
+    uint64_t scheduleId;
+    uint32_t scheduleMode;
+    uint64_t authExpiredSysTime;
+} ExecutorExpiredInfo;
 
 ResultCode InitUserAuthContextList(void);
 void DestoryUserAuthContextList(void);
@@ -66,6 +75,7 @@ ResultCode DestoryContextbyId(uint64_t contextId);
 ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
 ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
     uint32_t authMode);
+ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t *size);
 
 #ifdef __cplusplus
 }

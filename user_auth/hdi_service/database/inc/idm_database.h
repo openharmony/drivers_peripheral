@@ -75,6 +75,8 @@ void SetCredentiaConditionNeedCachePin(CredentialCondition *condition);
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
+ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param);
+ResultCode GetPinExpiredPeriod(int32_t userId, PinExpiredInfo *expiredInfo);
 
 #ifdef __cplusplus
 }

@@ -27,6 +27,8 @@ extern "C" {
     extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
+    extern ResultCode HandleAuthSuccessResult(const UserAuthContext *context, const ExecutorResultInfo *info,
+    AuthResult *result, UserAuthTokenHal *authToken);
 }
 
 namespace OHOS {
@@ -157,6 +159,33 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
+}
+
+HWTEST_F(UserAuthFuncsTest, TestHandleAuthSuccessResult, TestSize.Level0)
+{
+    UserAuthContext context = {};
+    ExecutorResultInfo info = {};
+    AuthResult result = {};
+    UserAuthTokenHal authToken = {};
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    context.authExpiredSysTime = 1;
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    result.result = RESULT_SUCCESS;
+    context.authType = PIN_AUTH;
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    context.isAuthResultCached = true;
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+}
+
+HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
+{
+    GlobalConfigParamHal param = {};
+    ExecutorExpiredInfo expiredInfo = {};
+    uint32_t size = 0;
+    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr, &expiredInfo, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, nullptr, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, &size), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam
