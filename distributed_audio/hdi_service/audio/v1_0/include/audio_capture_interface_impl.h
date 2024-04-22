@@ -85,7 +85,6 @@ private:
     AudioSampleAttributes devAttrs_;
     uint32_t captureId_ = 0;
     bool dumpFlag_ = false;
-    uint32_t timeInterval_ = 5;
     int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
