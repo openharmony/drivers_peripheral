@@ -19,6 +19,7 @@ ohos_shared_library("libgnss_interface_service_2.0") {
   sources = [
     "gnss_interface_impl.cpp",
     "location_vendor_interface.cpp",
+    "string_utils.cpp",
   ]
 
   sanitize = {
