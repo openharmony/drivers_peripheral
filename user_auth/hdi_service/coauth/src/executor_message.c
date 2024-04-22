@@ -62,6 +62,37 @@ FAIL:
     return result;
 }
 
+IAM_STATIC ResultCode ExtractUserIdAndUserType(const Attribute *attribute, Attribute *dataAndSignAttribute)
+{
+    int32_t userId;
+    ResultCode result = GetAttributeInt32(attribute, AUTH_USER_ID, &userId);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 userId failed");
+        return result;
+    }
+    LOG_INFO("GetAttributeInt32 userId %{public}d", userId);
+    result = SetAttributeInt32(dataAndSignAttribute, AUTH_USER_ID, userId);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 userId failed");
+        return result;
+    }
+
+    int32_t userType;
+    result = GetAttributeInt32(attribute, AUTH_USER_TYPE, &userType);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 userType failed");
+        return result;
+    }
+    LOG_INFO("GetAttributeInt32 userType %{public}d", userType);
+    result = SetAttributeInt32(dataAndSignAttribute, AUTH_USER_TYPE, userType);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 userType failed");
+        return result;
+    }
+
+    return result;
+}
+
 IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
     Uint8Array *retDataAndSignTlv)
 {
@@ -80,7 +111,11 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
             LOG_ERROR("GetAttributeSerializedMsg for data fail");
             break;
         }
-
+        result = ExtractUserIdAndUserType(attribute, dataAndSignAttribute);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("ExtractUserIdAndUserType for userData fail");
+            break;
+        }
         result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, dataTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("SetAttributeUint8Array for data fail");

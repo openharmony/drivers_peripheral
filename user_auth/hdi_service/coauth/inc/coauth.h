@@ -41,6 +41,7 @@ typedef struct ScheduleParam {
     uint32_t collectorSensorHint;
     uint32_t verifierSensorHint;
     uint32_t executorMatcher;
+    int32_t userType;
 } ScheduleParam;
 
 typedef struct CoAuthSchedule {
@@ -51,6 +52,7 @@ typedef struct CoAuthSchedule {
     Uint64Array templateIds;
     uint32_t executorSize;
     ExecutorInfoHal executors[MAX_EXECUTOR_SIZE];
+    int32_t userType;
 } CoAuthSchedule;
 
 ResultCode InitCoAuth(void);

@@ -113,7 +113,8 @@ static bool CopyScheduleInfo(const CoAuthSchedule *in, HdiScheduleInfo *out)
     return true;
 }
 
-static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilityLevel, uint64_t scheduleId)
+static int32_t SetAttributeToExtraInfo(
+    HdiScheduleInfo &info, uint32_t capabilityLevel, uint64_t scheduleId, int32_t userId, int32_t userType)
 {
     Attribute *attribute = CreateEmptyAttribute();
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == nullptr, RESULT_GENERAL_ERROR);
@@ -132,6 +133,16 @@ static int32_t SetAttributeToExtraInfo(HdiScheduleInfo &info, uint32_t capabilit
         }
         if (SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId) != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeUint64 scheduleId failed");
+            break;
+        }
+        IAM_LOGI("SetAttributeInt32 userId %{public}d", userId);
+        if (SetAttributeInt32(attribute, AUTH_USER_ID, userId) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeInt32 userId failed");
+            break;
+        }
+        IAM_LOGI("SetAttributeInt32 userType %{public}d", userType);
+        if (SetAttributeInt32(attribute, AUTH_USER_TYPE, userType) != RESULT_SUCCESS) {
+            IAM_LOGE("SetAttributeInt32 userType failed");
             break;
         }
         info.executorMessages.resize(1);
@@ -186,7 +197,10 @@ static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<HdiSched
             IAM_LOGE("GetCapabilityLevel fail");
             return result;
         }
-        result = SetAttributeToExtraInfo(info, capabilityLevel, info.scheduleId);
+        // temporary demo
+        int32_t userType = 2;
+        result = SetAttributeToExtraInfo(info, capabilityLevel, info.scheduleId, userId, userType);
+
         if (result != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeToExtraInfo fail");
             return result;
@@ -586,7 +600,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
         IAM_LOGE("copy schedule info failed");
         return RESULT_BAD_COPY;
     }
-    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleId);
+    ret = SetAttributeToExtraInfo(info, INVALID_CAPABILITY_LEVEL, scheduleId, param.userId, param.userType);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetAttributeToExtraInfo failed");
     }

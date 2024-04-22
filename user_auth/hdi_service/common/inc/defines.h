@@ -93,6 +93,12 @@ typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
 } AuthSubType;
 
+typedef enum UserType {
+    MAIN_USER = 0,
+    SUB_USER = 1,
+    PRIVATE_USER = 2,
+} UserType;
+
 typedef enum AuthPropertyMode {
     PROPERTY_INIT_ALGORITHM = 1,
     PROPERTY_MODE_DEL = 2,

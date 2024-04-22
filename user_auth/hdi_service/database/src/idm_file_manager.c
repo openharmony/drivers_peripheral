@@ -162,6 +162,13 @@ IAM_STATIC ResultCode StreamWriteUserInfo(Buffer *parcel, UserInfo *userInfo)
         LOG_ERROR("userId streamWrite failed");
         return result;
     }
+    LOG_INFO("userInfo userId %{public}d", userInfo->userId);
+    result = StreamWrite(parcel, &userInfo->userType, sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("userType streamWrite failed");
+        return result;
+    }
+    LOG_INFO("userInfo userType %{public}d", userInfo->userType);
     result = StreamWrite(parcel, &userInfo->secUid, sizeof(uint64_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("secUid streamWrite failed");

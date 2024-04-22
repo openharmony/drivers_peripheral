@@ -35,6 +35,7 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.userId = param->userId;
     scheduleParam.authType = param->authType;
+    scheduleParam.userType = param->userType;
     scheduleParam.scheduleMode = SCHEDULE_MODE_ENROLL;
     scheduleParam.collectorSensorHint = param->executorSensorHint;
     if (scheduleParam.collectorSensorHint != INVALID_SENSOR_HINT) {
@@ -109,7 +110,12 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("scheduleId is null");
         return RESULT_BAD_PARAM;
     }
-    ResultCode ret = CheckSessionValid(param.userId);
+    ResultCode ret = IsValidUserType(param.userType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("userType is invalid");
+        return ret;
+    }
+    ret = CheckSessionValid(param.userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;
@@ -137,12 +143,7 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    ResultCode ret = IsValidUserType(param.userType);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("userType is invalid");
-        return ret;
-    }
-    ret = CheckSessionValid(param.userId);
+    ResultCode ret = CheckSessionValid(param.userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;
@@ -170,6 +171,7 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
     credentialInfo->capabilityLevel = result->capabilityLevel;
     credentialInfo->executorSensorHint = GetScheduleVeriferSensorHint(schedule);
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
+    credentialInfo->userType = schedule->userType;
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,

@@ -34,6 +34,7 @@ typedef struct {
     uint32_t executorSensorHint;
     uint32_t executorMatcher;
     uint32_t capabilityLevel;
+    int32_t userType;
 } CredentialInfoHal;
 
 typedef struct {
@@ -48,6 +49,7 @@ typedef struct {
     uint64_t cachePinSubType;
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
+    int32_t userType;
 } UserInfo;
 
 typedef struct {
