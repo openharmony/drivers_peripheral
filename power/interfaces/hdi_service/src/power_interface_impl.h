@@ -66,8 +66,8 @@ public:
 
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl) :
-            powerInterfaceImpl_(powerInterfaceImpl) {};
+        explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl)
+            : powerInterfaceImpl_(powerInterfaceImpl) {};
         ~PowerDeathRecipient() override {};
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 
