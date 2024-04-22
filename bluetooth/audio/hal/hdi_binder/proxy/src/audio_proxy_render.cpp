@@ -636,9 +636,31 @@ int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struc
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
+    ret = HdfSbufReadFileDescriptor(reply);
+    if (ret < 0) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    desc->memoryFd = ret;
+    if (!HdfSbufReadInt32(reply, &desc->totalBufferFrames)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufReadInt32(reply, &desc->transferFrameSize)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufReadInt32(reply, &desc->isShareable)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufReadInt32(reply, &desc->offset)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
 
     AudioProxyBufReplyRecycle(data, reply);
-    return ret;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)

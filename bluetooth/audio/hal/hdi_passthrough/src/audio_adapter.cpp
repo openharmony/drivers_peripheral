@@ -16,6 +16,7 @@
 #include "audio_internal.h"
 #include "audio_adapter_info_common.h"
 #include "audio_adapter.h"
+#include "fast_audio_render.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 constexpr int CONFIG_CHANNEL_COUNT = 2; // two channels
 constexpr float GAIN_MAX = 50.0;
@@ -27,11 +28,13 @@ constexpr const char *TYPE_RENDER = "Render";
 constexpr const char *TYPE_CAPTURE = "Capture";
 constexpr const int SHIFT_RIGHT_31_BITS = 31;
 
-int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
+static void GetFastRenderFuncs(struct AudioHwRender *hwRender)
 {
-    if (hwRender == NULL) {
-        return HDF_FAILURE;
-    }
+
+}
+
+static void GetNoramlRenderFuncs(struct AudioHwRender *hwRender)
+{
     hwRender->common.control.Start = AudioRenderStart;
     hwRender->common.control.Stop = AudioRenderStop;
     hwRender->common.control.Pause = AudioRenderPause;
@@ -66,6 +69,18 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.GetChannelMode = AudioRenderGetChannelMode;
     hwRender->common.RegCallback = AudioRenderRegCallback;
     hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
+}
+
+int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender, const char *adapterName)
+{
+    if (hwRender == nullptr || adapterName == nullptr) {
+        return HDF_FAILURE;
+    }
+    if (strcmp(adapterName, "bt_a2dp_fast") == 0) {
+        GetFastRenderFuncs(hwRender);
+    } else {
+        GetNoramlRenderFuncs(hwRender);
+    }
     return HDF_SUCCESS;
 }
 
@@ -107,7 +122,7 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
         return HDF_ERR_NOT_SUPPORT;
     }
     AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+    if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
         return HDF_ERR_NOT_SUPPORT;
     }
     AudioFormat audioFormat = attrs->format;
@@ -307,11 +322,12 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         return HDF_FAILURE;
     }
 
-    if (GetAudioRenderFunc(hwRender) < 0) {
-        return HDF_FAILURE;
-    }
     /* Fill hwRender para */
     if (InitHwRenderParam(hwRender, desc, attrs) < 0) {
+        return HDF_FAILURE;
+    }
+
+    if (GetAudioRenderFunc(hwRender, hwAdapter->adapterDescriptor.adapterName) < 0) {
         return HDF_FAILURE;
     }
     /* Select Path */
