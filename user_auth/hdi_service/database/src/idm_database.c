@@ -482,7 +482,7 @@ IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
         LOG_ERROR("create user failed");
         return RESULT_UNKNOWN;
     }
-
+    user->userType = credentialInfo->userType;
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential to user failed");
