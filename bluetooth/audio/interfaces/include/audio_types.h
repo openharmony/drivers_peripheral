@@ -105,6 +105,9 @@ struct AudioDeviceDescriptor {
 enum AudioCategory {
     AUDIO_IN_MEDIA = 0,     /**< Media */
     AUDIO_IN_COMMUNICATION, /**< Communications */
+    AUDIO_IN_RINGTONE,      /**< Ringtone */
+    AUDIO_IN_CALL,          /**< Call */
+    AUDIO_MMAP_NOIRQ,       /**< Mmap mode */
 };
 
 /**

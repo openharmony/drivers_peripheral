@@ -16,6 +16,7 @@
 #include "audio_internal.h"
 #include "audio_adapter_info_common.h"
 #include "audio_adapter.h"
+#include "fast_audio_render.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 constexpr int CONFIG_CHANNEL_COUNT = 2; // two channels
 constexpr float GAIN_MAX = 50.0;
@@ -27,11 +28,46 @@ constexpr const char *TYPE_RENDER = "Render";
 constexpr const char *TYPE_CAPTURE = "Capture";
 constexpr const int SHIFT_RIGHT_31_BITS = 31;
 
-int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
+static void GetFastRenderFuncs(struct AudioHwRender *hwRender)
 {
-    if (hwRender == NULL) {
-        return HDF_FAILURE;
-    }
+    hwRender->common.control.Start = FastRenderStart;
+    hwRender->common.control.Stop = FastRenderStop;
+    hwRender->common.control.Pause = FastRenderPause;
+    hwRender->common.control.Resume = FastRenderResume;
+    hwRender->common.control.Flush = FastRenderFlush;
+    hwRender->common.control.TurnStandbyMode = FastRenderTurnStandbyMode;
+    hwRender->common.control.AudioDevDump = FastRenderAudioDevDump;
+    hwRender->common.attr.GetFrameSize = FastRenderGetFrameSize;
+    hwRender->common.attr.GetFrameCount = FastRenderGetFrameCount;
+    hwRender->common.attr.SetSampleAttributes = FastRenderSetSampleAttributes;
+    hwRender->common.attr.GetSampleAttributes = FastRenderGetSampleAttributes;
+    hwRender->common.attr.GetCurrentChannelId = FastRenderGetCurrentChannelId;
+    hwRender->common.attr.SetExtraParams = FastRenderSetExtraParams;
+    hwRender->common.attr.GetExtraParams = FastRenderGetExtraParams;
+    hwRender->common.attr.ReqMmapBuffer = FastRenderReqMmapBuffer;
+    hwRender->common.attr.GetMmapPosition = FastRenderGetMmapPosition;
+    hwRender->common.scene.CheckSceneCapability = FastRenderCheckSceneCapability;
+    hwRender->common.scene.SelectScene = FastRenderSelectScene;
+    hwRender->common.volume.SetMute = FastRenderSetMute;
+    hwRender->common.volume.GetMute = FastRenderGetMute;
+    hwRender->common.volume.SetVolume = FastRenderSetVolume;
+    hwRender->common.volume.GetVolume = FastRenderGetVolume;
+    hwRender->common.volume.GetGainThreshold = FastRenderGetGainThreshold;
+    hwRender->common.volume.GetGain = FastRenderGetGain;
+    hwRender->common.volume.SetGain = FastRenderSetGain;
+    hwRender->common.GetLatency = FastRenderGetLatency;
+    hwRender->common.RenderFrame = FastRenderRenderFrame;
+    hwRender->common.GetRenderPosition = FastRenderGetRenderPosition;
+    hwRender->common.SetRenderSpeed = FastRenderSetRenderSpeed;
+    hwRender->common.GetRenderSpeed = FastRenderGetRenderSpeed;
+    hwRender->common.SetChannelMode = FastRenderSetChannelMode;
+    hwRender->common.GetChannelMode = FastRenderGetChannelMode;
+    hwRender->common.RegCallback = FastRenderRegCallback;
+    hwRender->common.DrainBuffer = FastRenderDrainBuffer;
+}
+
+static void GetNoramlRenderFuncs(struct AudioHwRender *hwRender)
+{
     hwRender->common.control.Start = AudioRenderStart;
     hwRender->common.control.Stop = AudioRenderStop;
     hwRender->common.control.Pause = AudioRenderPause;
@@ -66,6 +102,18 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.GetChannelMode = AudioRenderGetChannelMode;
     hwRender->common.RegCallback = AudioRenderRegCallback;
     hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
+}
+
+int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender, const char *adapterName)
+{
+    if (hwRender == nullptr || adapterName == nullptr) {
+        return HDF_FAILURE;
+    }
+    if (strcmp(adapterName, "bt_a2dp_fast") == 0) {
+        GetFastRenderFuncs(hwRender);
+    } else {
+        GetNoramlRenderFuncs(hwRender);
+    }
     return HDF_SUCCESS;
 }
 
@@ -107,7 +155,7 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
         return HDF_ERR_NOT_SUPPORT;
     }
     AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+    if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
         return HDF_ERR_NOT_SUPPORT;
     }
     AudioFormat audioFormat = attrs->format;
@@ -307,11 +355,12 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         return HDF_FAILURE;
     }
 
-    if (GetAudioRenderFunc(hwRender) < 0) {
-        return HDF_FAILURE;
-    }
     /* Fill hwRender para */
     if (InitHwRenderParam(hwRender, desc, attrs) < 0) {
+        return HDF_FAILURE;
+    }
+
+    if (GetAudioRenderFunc(hwRender, hwAdapter->adapterDescriptor.adapterName) < 0) {
         return HDF_FAILURE;
     }
     /* Select Path */
