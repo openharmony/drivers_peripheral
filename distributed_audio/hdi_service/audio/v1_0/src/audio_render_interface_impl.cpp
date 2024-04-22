@@ -39,7 +39,8 @@ AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, c
     : adapterName_(adpName), devDesc_(desc),
     devAttrs_(attrs), audioExtCallback_(callback)
 {
-    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
+    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
+        AUDIO_NORMAL_INTERVAL, false);
     DHLOGD("Distributed audio render constructed, period(%{public}d), frameSize(%{public}d).",
         attrs.period, devAttrs_.frameSize);
 }
