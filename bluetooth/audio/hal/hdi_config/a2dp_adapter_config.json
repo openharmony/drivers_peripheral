@@ -50,5 +50,14 @@
             "id": 0,
             "name": "AOP"
         }]
+    },
+    {
+        "name": "bt_a2dp_fast",
+        "portnum": 1,
+        "port": [{
+            "dir": "PORT_OUT",
+            "id": 0,
+            "name": "AOP"
+        }]
     }]
 }
