@@ -11,29 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  drivers_peripheral_power_wakeup_cause_path = false
-}
-
 if (!defined(global_parts_info) ||
     defined(global_parts_info.commonlibrary_c_utils)) {
-  has_power_c_utils_part = true
+  has_thermal_c_utils_part = true
 } else {
-  has_power_c_utils_part = false
+  has_thermal_c_utils_part = false
 }
 
 if (!defined(global_parts_info) ||
     defined(global_parts_info.customization_config_policy)) {
-  has_power_config_policy_part = true
-  cflags_cc = [ "-DHAS_POWER_CONFIG_POLICY_PART" ]
+  has_thermal_config_policy_part = true
+  cflags_cc = [ "-DHAS_THERMAL_CONFIG_POLICY_PART" ]
 } else {
-  has_power_config_policy_part = false
-}
-
-if (!defined(global_parts_info) ||
-    defined(global_parts_info.hiviewdfx_hisysevent)) {
-  has_power_hisysevent_part = true
-  cflags_cc += [ "-DHAS_POWER_HISYSEVENT_PART" ]
-} else {
-  has_power_hisysevent_part = false
+  has_thermal_config_policy_part = false
 }

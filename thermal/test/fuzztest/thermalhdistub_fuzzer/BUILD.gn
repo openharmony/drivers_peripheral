@@ -13,6 +13,7 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
+import("../../../thermal.gni")
 
 ohos_fuzztest("ThermalHdiStubFuzzTest") {
   module_out_path = "drivers_peripheral_thermal/drivers_peripheral_thermal"
@@ -30,14 +31,15 @@ ohos_fuzztest("ThermalHdiStubFuzzTest") {
     "../../../interfaces/hdi_service:libthermal_interface_service_1.1",
   ]
   external_deps = [
-    "c_utils:utils",
     "drivers_interface_thermal:libthermal_proxy_1.1",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
-
+  if (has_thermal_c_utils_part) {
+    external_deps += [ "c_utils:utils" ]
+  }
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_thermal"
 }
