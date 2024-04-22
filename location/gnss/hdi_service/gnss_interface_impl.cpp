@@ -25,9 +25,10 @@
 
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
+#include "string_utils.h"
 
 namespace {
-GnssConfigPara g_configPara;
+OHOS::HDI::Location::GnssConfigPara g_configPara;
 }
 
 namespace OHOS {
@@ -49,6 +50,42 @@ std::mutex g_deathMutex;
 extern "C" IGnssInterface* GnssInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) GnssInterfaceImpl();
+}
+
+static void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *notification)
+{
+    if (notification == nullptr) {
+        HDF_LOGE("%{public}s:niNotificationRequest is nullptr.", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s:NiNotifyCb.", __func__);
+    std::unique_lock<std::mutex> lock(g_mutex);
+    GnssNiNotificationRequest niNotification;
+    niNotification.gnssNiNotificationId = notification->gnssNiNotificationId;
+    niNotification.gnssNiRequestCategory = GnssNiRequestCategory(notification->gnssNiRequestCategory);
+    niNotification.notificationCategory = GnssNiNotificationCategory(notification->notificationCategory);
+    niNotification.requestTimeout = notification->requestTimeout;
+    niNotification.defaultResponseCmd = notification->defaultResponseCmd;
+    niNotification.supplicantInfo = notification->supplicantInfo;
+    niNotification.notificationText = notification->notificationText;
+    niNotification.supplicantInfoEncoding = GnssNiRequestEncodingFormat(notification->supplicantInfoEncoding);
+    niNotification.notificationTextEncoding = GnssNiRequestEncodingFormat(notification->notificationTextEncoding);
+
+    HDF_LOGI("reportNiNotification: notificationId %{public}u, niType %{public}d, notifyType %{public}d, timeout "
+        "%{public}d, defaultRespone %{private}d",
+        niNotification.gnssNiNotificationId,
+        niNotification.gnssNiRequestCategory,
+        niNotification.notificationCategory,
+        niNotification.requestTimeout,
+        niNotification.defaultResponseCmd);
+
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
+        if (callback != nullptr) {
+            callback->ReportGnssNiNotification(niNotification);
+        }
+    }
+    HDF_LOGI("%{public}s:NiNotifyCallback.", __func__);
 }
 
 static void LocationUpdate(GnssLocation* location)
@@ -227,6 +264,17 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("enable_gnss failed.");
         return HDF_FAILURE;
     }
+    static GnssNetInitiatedCallbacks niCallback;
+    niCallback.reportNiNotification = NiNotifyCallback;
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_NET_INITIATED_MODULE_INTERFACE);
+    auto niInterface = static_cast<const GnssNetInitiatedInterface*>
+        (LocationVendorInterface::GetInstance()->GetModuleInterface(moduleType));
+    if (niInterface != nullptr) {
+        niInterface->setCallback(&niCallback);
+    } else {
+        HDF_LOGE("%{public}s:can not get gnssNiInterface.", __func__);
+    }
+
     AddGnssDeathRecipient(callbackObj);
     g_locationCallBackMap[remote.GetRefPtr()] = callbackObj;
     return ret;
@@ -345,11 +393,37 @@ int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& c
 
 int32_t GnssInterfaceImpl::SendNiUserResponse(int32_t gnssNiNotificationId, GnssNiResponseCmd userResponse)
 {
+    HDF_LOGI("%{public}s.", __func__);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_NET_INITIATED_MODULE_INTERFACE);
+    auto niInterface = static_cast<const GnssNetInitiatedInterface*>
+        (LocationVendorInterface::GetInstance()->GetModuleInterface(moduleType));
+    if (niInterface == nullptr) {
+        HDF_LOGE("%{public}s:can not get gnssNiInterface.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    niInterface->sendUserResponse(gnssNiNotificationId, static_cast<int32_t>(userResponse));
     return HDF_SUCCESS;
 }
 
 int32_t GnssInterfaceImpl::SendNetworkInitiatedMsg(const std::string& msg, int length)
 {
+    HDF_LOGI("%{public}s.", __func__);
+    if (msg.empty()) {
+        HDF_LOGE("%{public}s msg is empty", __func__);
+        return HDF_FAILURE;
+    }
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_NET_INITIATED_MODULE_INTERFACE);
+    auto niInterface = static_cast<const GnssNetInitiatedInterface*>
+        (LocationVendorInterface::GetInstance()->GetModuleInterface(moduleType));
+    if (niInterface == nullptr) {
+        HDF_LOGE("%{public}s:can not get gnssNiInterface.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::vector<uint8_t> data = StringUtils::HexToByteVector(msg);
+    HDF_LOGI("%{public}s. msg : %{public}s, length %{public}d, msg size %{public}d, data size %{public}d",
+        __func__, msg.c_str(), length, int(msg.size()), int(data.size()));
+
+    niInterface->sendNetworkInitiatedMsg(data.data(), data.size());
     return HDF_SUCCESS;
 }
 
