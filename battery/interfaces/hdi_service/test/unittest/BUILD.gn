@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-
+import("../../../../battery.gni")
 module_output_path = "drivers_peripheral_battery/battery"
 
 ###############################################################################
@@ -50,7 +50,6 @@ ohos_unittest("test_hdisrv") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "config_policy:configpolicy_util",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
@@ -58,6 +57,9 @@ ohos_unittest("test_hdisrv") {
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
+  if (has_battery_c_utils_part) {
+    external_deps += [ "c_utils:utils" ]
+  }
 }
 
 ohos_unittest("hdi_unittest_battery") {
@@ -68,12 +70,14 @@ ohos_unittest("hdi_unittest_battery") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_battery:libbattery_proxy_2.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (has_battery_c_utils_part) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

@@ -12,6 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../thermal.gni")
 
 ohos_shared_library("libthermal_interface_service_1.1") {
   include_dirs = [
@@ -40,8 +41,6 @@ ohos_shared_library("libthermal_interface_service_1.1") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
-      "config_policy:configpolicy_util",
       "drivers_interface_thermal:thermal_idl_headers",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -49,6 +48,12 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       "init:libbegetutil",
       "ipc:ipc_single",
     ]
+    if (has_thermal_c_utils_part) {
+      external_deps += [ "c_utils:utils" ]
+    }
+    if (has_thermal_config_policy_part) {
+      external_deps += [ "config_policy:configpolicy_util" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",
@@ -70,7 +75,6 @@ ohos_shared_library("libthermal_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_thermal:libthermal_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -79,6 +83,9 @@ ohos_shared_library("libthermal_driver") {
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (has_thermal_c_utils_part) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [
       "hilog:libhilog",
