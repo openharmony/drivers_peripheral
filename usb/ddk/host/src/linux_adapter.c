@@ -1314,12 +1314,14 @@ static struct UsbHostRequest *AdapterAllocRequestByMmap(
         return NULL;
     }
 
-    ftruncate(handle->mmapFd, len);
+    int32_t fd = handle->isAshmem ? handle->ashmemFd : handle->mmapFd;
 
-    memBuf = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, handle->mmapFd, 0);
+    ftruncate(fd, len);
+    memBuf = mmap(
+        NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (memBuf == MAP_FAILED) {
-        HDF_LOGE("%{public}s fd:%{public}d mmap failed, errno=%{public}d, len %{public}zu", __func__, handle->mmapFd,
-            errno, len);
+        HDF_LOGE("%{public}s fd:%{public}d mmap failed, errno=%{public}d, len=%{public}zu",
+            __func__, fd, errno, len);
         return NULL;
     }
 
