@@ -20,6 +20,7 @@
 #include "bluetooth_a2dp_a2dpCodecInfo.h"
 #include "bluetooth_a2dp_a2dpCodecStatus.h"
 #include "raw_address.h"
+#include "audio_internal.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
@@ -45,9 +46,16 @@ void DeRegisterObserver();
 #ifdef A2DP_HDI_SERVICE
 bool SetUp();
 void TearDown();
+bool FastSetUp();
+void FastTearDown();
+int FastStartPlaying(uint32_t sampleRate, uint32_t channelCount, uint32_t format);
+int FastSuspendPlaying();
+int FastStopPlaying();
+int FastReqMmapBuffer(int32_t ashmemLength);
+void FastReadMmapPosition(int64_t &sec, int64_t &mSec, uint64_t &frames);
 #endif
 
-int WriteFrame(const uint8_t *data, uint32_t size);
+int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs);
 int StartPlaying();
 int SuspendPlaying();
 int StopPlaying();
