@@ -563,6 +563,7 @@ int32_t SndConverAlsaPcmFormat(const struct AudioPcmHwParams *hwParams, snd_pcm_
 
 int32_t SndPcmPrepare(struct AlsaSoundCard *cardIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     int32_t ret;
     ret = snd_pcm_prepare(cardIns->pcmHandle);
     if (ret < 0) {
@@ -574,11 +575,15 @@ int32_t SndPcmPrepare(struct AlsaSoundCard *cardIns)
 
 bool SndisBusy(struct AlsaSoundCard *cardIns)
 {
+    if (cardIns == NULL) {
+        return false;
+    }
     return (cardIns->pcmHandle == NULL) ? false : true;
 }
 
 int32_t SndOpenMixer(struct AlsaSoundCard *cardIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     int32_t ret;
 
     if (strlen(cardIns->ctrlName) == 0) {
@@ -629,11 +634,16 @@ int32_t SndOpenMixer(struct AlsaSoundCard *cardIns)
 
 snd_pcm_state_t SndGetRunState(struct AlsaSoundCard * cardIns)
 {
+    CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     return snd_pcm_state(cardIns->pcmHandle);
 }
 
 void SndCloseHandle(struct AlsaSoundCard *cardIns)
 {
+    if (cardIns == NULL) {
+        AUDIO_FUNC_LOGE("cardIns is NULL");
+        return;
+    }
     int32_t ret;
     if (cardIns->cardStatus > 0) {
         cardIns->cardStatus -= 1;
