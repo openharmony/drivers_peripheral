@@ -616,15 +616,15 @@ void V4L2DeviceManager::ConvertAbilityFpsRangesToOhos(std::shared_ptr<CameraMeta
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FPS_RANGES, fpsRangesVector);
 }
 
+constexpr int END_SYMBOL = -1;
+constexpr int MINIMUM_FPS = 5;
+constexpr int PREVIEW_STREAM = 0;
+constexpr int CAPTURE_STREAM = 2;
+constexpr int VIDEO_STREAM = 1;
+constexpr int FORMAT = 1;
 void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     std::shared_ptr<CameraMetadata> metadata, const std::vector<DeviceFormat>& deviceFormat)
 {
-    const int END_SYMBOL = -1;
-    const int MINIMUM_FPS = 5;
-    const int PREVIEW_STREAM = 0;
-    const int CAPTURE_STREAM = 2;
-    const int VIDEO_STREAM = 1;
-    const int FORMAT = 1;
     std::string name = "YUYV 4:2:2";
     std::vector<int32_t> formatVector;
     int32_t fpsValue = 0;
@@ -646,7 +646,6 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     if (formatVector.size() > 0) {
         formatVector.pop_back();
     }
-    formatVector.push_back(END_SYMBOL);
 
     std::vector<int32_t> streamAvailableExtendConfigurationsVector;
     streamAvailableExtendConfigurationsVector.push_back(0);
@@ -654,14 +653,23 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
     streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
+    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
+                                                     formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+
     streamAvailableExtendConfigurationsVector.push_back(CAPTURE_STREAM);
     streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+
     streamAvailableExtendConfigurationsVector.push_back(VIDEO_STREAM);
     streamAvailableExtendConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
     streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
                                                      formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+
     streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
                        streamAvailableExtendConfigurationsVector);
