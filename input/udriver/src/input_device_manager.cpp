@@ -40,6 +40,7 @@
 namespace OHOS {
 namespace Input {
 using namespace std;
+constexpr uint32_t DEV_INDEX_MAX = 32;
 void InputDeviceManager::Init()
 {
     inputDevList_.clear();
@@ -351,6 +352,9 @@ void InputDeviceManager::DeleteDevListNode(int index)
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
         if (it->first == (uint32_t)index) {
             it = inputDevList_.erase(it);
+            if (devIndex_ < 1 || devIndex_ > DEV_INDEX_MAX) {
+                return;
+            }
             devIndex_ -= 1;
         } else {
             ++it;
