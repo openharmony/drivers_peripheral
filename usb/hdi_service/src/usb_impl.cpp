@@ -38,7 +38,7 @@
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
-constexpr uint16_t LANGUAGE_ID = 0x409;
+constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 
 namespace OHOS {
 namespace HDI {
@@ -1041,7 +1041,7 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
         &controlParams, buffer, length,
-        (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) + descId, LANGUAGE_ID);
+        (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) + descId, ENGLISH_US_LANGUAGE_ID);
     int32_t ret = UsbControlTransferEx(port, &controlParams, GET_STRING_SET_TIMEOUT);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbControlTransferEx failed ret=%{public}d", __func__, ret);
