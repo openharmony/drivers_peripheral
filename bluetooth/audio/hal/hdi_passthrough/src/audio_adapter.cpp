@@ -66,7 +66,7 @@ static void GetFastRenderFuncs(struct AudioHwRender *hwRender)
     hwRender->common.DrainBuffer = FastRenderDrainBuffer;
 }
 
-static void GetNoramlRenderFuncs(struct AudioHwRender *hwRender)
+static void GetNormalRenderFuncs(struct AudioHwRender *hwRender)
 {
     hwRender->common.control.Start = AudioRenderStart;
     hwRender->common.control.Stop = AudioRenderStop;
@@ -112,7 +112,7 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender, const char *adapterNa
     if (strcmp(adapterName, "bt_a2dp_fast") == 0) {
         GetFastRenderFuncs(hwRender);
     } else {
-        GetNoramlRenderFuncs(hwRender);
+        GetNormalRenderFuncs(hwRender);
     }
     return HDF_SUCCESS;
 }

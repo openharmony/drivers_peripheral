@@ -52,7 +52,7 @@ int FastStartPlaying(uint32_t sampleRate, uint32_t channelCount, uint32_t format
 int FastSuspendPlaying();
 int FastStopPlaying();
 int FastReqMmapBuffer(int32_t ashmemLength);
-void FastReadMmapPosition(int64_t &sec, int64_t &mSec, uint64_t &frames);
+void FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames);
 #endif
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs);

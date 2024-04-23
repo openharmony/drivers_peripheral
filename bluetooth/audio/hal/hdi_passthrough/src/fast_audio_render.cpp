@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include <string>
 
 namespace OHOS::HDI::Audio_Bluetooth {
+#ifdef A2DP_HDI_SERVICE
 const uint32_t MIN_TIME_INTERVAL = 30;
 const uint32_t MAX_TIME_INTERVAL = 80;
 const int32_t MAX_ASHMEM_LEN = 100000;
@@ -28,25 +29,25 @@ const int32_t MIN_ASHMEM_LEN = 10;
 const int32_t RENDER_TIME_INTERVAL = 5;
 const int32_t PER_MS_SECOND = 1000;
 
-static int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timeMs) {
-    return (sampleRate * timeMs) / PER_MS_SECOND} int32_t FastRenderStart(AudioHandle handle)
+static int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timeMs)
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    return (sampleRate * timeMs) / PER_MS_SECOND;
 }
+#endif
 
 int32_t FastRenderStart(AudioHandle handle)
 {
     HDF_LOGI("%{public}s enter", __func__);
 #ifdef A2DP_HDI_SERVICE
     AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender>(handle);
-    if (render == nullptr) {
+    if (hwRender == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     AudioSampleAttributes *attr = &hwRender->RenderParam.frameRenderMode.attrs;
     uint32_t format = static_cast<uint32_t>(attrs->format);
     return OHOS::Bluetooth::FastStartPlaying(attrs->sampleRate, attrs->channelCount, format);
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderStop(AudioHandle handle)
@@ -56,7 +57,7 @@ int32_t FastRenderStop(AudioHandle handle)
 #ifdef A2DP_HDI_SERVICE
     return OHOS::Bluetooth::FastStopPlaying();
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderPause(AudioHandle handle)
@@ -66,7 +67,7 @@ int32_t FastRenderPause(AudioHandle handle)
 #ifdef A2DP_HDI_SERVICE
     return OHOS::Bluetooth::FastSuspendPlaying();
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderResume(AudioHandle handle)
@@ -74,21 +75,21 @@ int32_t FastRenderResume(AudioHandle handle)
     HDF_LOGI("%{public}s enter", __func__);
 #ifdef A2DP_HDI_SERVICE
     AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender>(handle);
-    if (render == nullptr) {
+    if (hwRender == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     AudioSampleAttributes *attr = &hwRender->RenderParam.frameRenderMode.attrs;
     uint32_t format = static_cast<uint32_t>(attrs->format);
     return OHOS::Bluetooth::FastStartPlaying(attrs->sampleRate, attrs->channelCount, format);
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderFlush(AudioHandle handle)
 {
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetFrameSize(AudioHandle handle, uint64_t *size)
@@ -96,7 +97,7 @@ int32_t FastRenderGetFrameSize(AudioHandle handle, uint64_t *size)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)size;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetFrameCount(AudioHandle handle, uint64_t *count)
@@ -104,7 +105,7 @@ int32_t FastRenderGetFrameCount(AudioHandle handle, uint64_t *count)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)count;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetSampleAttributes(AudioHandle handle, const struct AudioSampleAttributes *attrs)
@@ -112,7 +113,7 @@ int32_t FastRenderSetSampleAttributes(AudioHandle handle, const struct AudioSamp
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)attrs;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAttributes *attrs)
@@ -120,7 +121,7 @@ int32_t FastRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAttr
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)attrs;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
@@ -128,7 +129,7 @@ int32_t FastRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)channelId;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene, bool *supported)
@@ -137,7 +138,7 @@ int32_t FastRenderCheckSceneCapability(AudioHandle handle, const struct AudioSce
     (void)handle;
     (void)scene;
     (void)supported;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSelectScene(AudioHandle handle, const struct AudioSceneDescriptor *scene)
@@ -145,7 +146,7 @@ int32_t FastRenderSelectScene(AudioHandle handle, const struct AudioSceneDescrip
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)scene;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetMute(AudioHandle handle, bool mute)
@@ -153,7 +154,7 @@ int32_t FastRenderSetMute(AudioHandle handle, bool mute)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)mute;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetMute(AudioHandle handle, bool *mute)
@@ -161,7 +162,7 @@ int32_t FastRenderGetMute(AudioHandle handle, bool *mute)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)mute;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetVolume(AudioHandle handle, float volume)
@@ -169,7 +170,7 @@ int32_t FastRenderSetVolume(AudioHandle handle, float volume)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)volume;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetVolume(AudioHandle handle, float *volume)
@@ -177,7 +178,7 @@ int32_t FastRenderGetVolume(AudioHandle handle, float *volume)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)volume;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
@@ -186,7 +187,7 @@ int32_t FastRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
     (void)handle;
     (void)min;
     (void)max;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetGain(AudioHandle handle, float *gain)
@@ -194,7 +195,7 @@ int32_t FastRenderGetGain(AudioHandle handle, float *gain)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)gain;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetGain(AudioHandle handle, float gain)
@@ -202,7 +203,7 @@ int32_t FastRenderSetGain(AudioHandle handle, float gain)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)gain;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetLatency(struct AudioRender *render, uint32_t *ms)
@@ -210,7 +211,7 @@ int32_t FastRenderGetLatency(struct AudioRender *render, uint32_t *ms)
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)ms;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderRenderFrame(
@@ -221,7 +222,7 @@ int32_t FastRenderRenderFrame(
     (void)frame;
     (void)requestBytes;
     (void)replyBytes;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
@@ -230,7 +231,7 @@ int32_t FastRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames
     (void)render;
     (void)frames;
     (void)time;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetRenderSpeed(struct AudioRender *render, float speed)
@@ -238,7 +239,7 @@ int32_t FastRenderSetRenderSpeed(struct AudioRender *render, float speed)
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)speed;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetRenderSpeed(struct AudioRender *render, float *speed)
@@ -246,7 +247,7 @@ int32_t FastRenderGetRenderSpeed(struct AudioRender *render, float *speed)
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)speed;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetChannelMode(struct AudioRender *render, AudioChannelMode mode)
@@ -254,7 +255,7 @@ int32_t FastRenderSetChannelMode(struct AudioRender *render, AudioChannelMode mo
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)mode;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *mode)
@@ -262,7 +263,7 @@ int32_t FastRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *m
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)mode;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
@@ -270,16 +271,16 @@ int32_t FastRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)keyValueList;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
-int32_t FastRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth)
+int32_t FastRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLength)
 {
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
     (void)keyValueList;
-    (void)listLenth;
-    return AUDIO_HAL_SUCCESS;
+    (void)listLength;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
@@ -317,7 +318,7 @@ int32_t FastRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct Audi
     HDF_LOGI("%{public}s, fd=%{public}d, length=%{public}d, transferFrameSize=%{public}d, totalBufferFrames=%{public}d",
         __func__, desc->memoryFd, desc->transferFrameSize, desc->totalBufferFrames);
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
@@ -332,16 +333,16 @@ int32_t FastRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct A
     *frames = readFrames;
     time->tvSec = sec;
     time->tvNSec = nSec;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 #endif
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderTurnStandbyMode(AudioHandle handle)
 {
     HDF_LOGI("%{public}s enter", __func__);
     (void)handle;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
@@ -350,7 +351,7 @@ int32_t FastRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
     (void)handle;
     (void)range;
     (void)fd;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie)
@@ -359,7 +360,7 @@ int32_t FastRenderRegCallback(struct AudioRender *render, RenderCallback callbac
     (void)render;
     (void)callback;
     (void)cookie;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
 int32_t FastRenderDrainBuffer(struct AudioRender *render, AudioDrainNotifyType *type)
@@ -367,6 +368,6 @@ int32_t FastRenderDrainBuffer(struct AudioRender *render, AudioDrainNotifyType *
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)type;
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 } // namespace OHOS::HDI::Audio_Bluetooth
