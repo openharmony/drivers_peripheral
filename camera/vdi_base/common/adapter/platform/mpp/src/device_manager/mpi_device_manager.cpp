@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Camera {
-IMPLEMENT_DEVICEMANAGER(MpiDeviceManager)
+IMPLEMENT_DEVICEMANAGER(MpiDeviceManager);
 MpiDeviceManager::MpiDeviceManager()
     :sysInitFlag(false)
 {

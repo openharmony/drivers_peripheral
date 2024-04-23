@@ -73,7 +73,7 @@ public:                                                                         
 
 #define IMPLEMENT_DEVICEMANAGER(className) \
     DeviceManagerDynamicClass* className::className##_ = \
-        new DeviceManagerDynamicClass(#className, &className::createInstance);
+        new DeviceManagerDynamicClass(#className, &className::createInstance)
 
 #define GetDeviceManagerFactory CreateDeviceManagerFactory::SharedDeviceManagerFactory()
 } // namespace Camera
