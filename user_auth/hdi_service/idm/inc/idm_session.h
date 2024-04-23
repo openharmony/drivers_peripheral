@@ -30,7 +30,7 @@ extern "C" {
 ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challengeLen);
 ResultCode CloseEditSession(void);
 
-ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate);
+ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate, int32_t userType);
 void BreakOffCoauthSchedule(void);
 
 ResultCode CheckSessionTimeout(void);
@@ -40,6 +40,7 @@ ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen);
 ResultCode GetIsUpdate(bool *isUpdate);
 ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType);
 ResultCode IsValidUserType(int32_t userType);
+ResultCode GetUserTypeFromSession(int32_t *userType);
 
 void RefreshValidTokenTime(void);
 bool IsValidTokenTime(uint64_t tokenTime);
