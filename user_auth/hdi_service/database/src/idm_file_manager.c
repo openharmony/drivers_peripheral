@@ -352,6 +352,13 @@ IAM_STATIC ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserIn
         LOG_ERROR("Read userId failed");
         return RESULT_GENERAL_ERROR;
     }
+    LOG_INFO("userInfo userId %{public}d", userInfo->userId);
+    result = StreamRead(parcel, index, &userInfo->userType, sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("Read userType failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    LOG_INFO("userInfo userType %{public}d", userInfo->userType);
     result = StreamRead(parcel, index, &userInfo->secUid, sizeof(uint64_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("Read secUid failed");
