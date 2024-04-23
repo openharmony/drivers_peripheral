@@ -101,6 +101,7 @@ private:
     std::mutex adapterMapMtx_;
     std::map<std::string, sptr<AudioAdapterInterfaceImpl>> mapAudioAdapter_;
     std::map<std::string, sptr<IDAudioCallback>> mapAudioCallback_;
+    std::map<std::string, bool> mapAddFlags_;
 };
 } // V1_0
 } // Audio
