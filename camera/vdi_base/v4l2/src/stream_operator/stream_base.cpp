@@ -31,7 +31,7 @@ std::map<VdiStreamIntent, std::string> IStream::g_availableStreamType = {
 StreamBase::StreamBase(const int32_t id,
                        const VdiStreamIntent type,
                        std::shared_ptr<IPipelineCore>& p,
-                       std::shared_ptr<CaptureMessageOperator>& m)
+                       std::shared_ptr<CaptureMessageOperator>& m) : calltimes_(0)
 {
     streamId_ = id;
     streamType_ = static_cast<int32_t>(type);
@@ -127,6 +127,13 @@ RetCode StreamBase::StartStream()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
 
+    int origin = calltimes_.fetch_add(1);
+    if (origin != 0) {
+        // already called, no reenter
+        CAMERA_LOGE("Now will not start, current start %{public}d times", calltimes_.load());
+        return RC_ERROR;
+    }
+
     std::unique_lock<std::mutex> l(smLock_);
     if (state_ != STREAM_STATE_ACTIVE) {
         return RC_ERROR;
@@ -172,14 +179,17 @@ RetCode StreamBase::StopStream()
     std::unique_lock<std::mutex> l(smLock_);
 
     CAMERA_LOGI("stop stream [id:%{public}d] begin", streamId_);
-    CHECK_IF_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_OK);
+    {
+        std::unique_lock<std::mutex> l(wtLock_);
+        CHECK_IF_EQUAL_RETURN_VALUE(state_, STREAM_STATE_IDLE, RC_OK);
 
-    state_ = STREAM_STATE_IDLE;
-    tunnel_->NotifyStop();
-    cv_.notify_all();
+        state_ = STREAM_STATE_IDLE;
+        tunnel_->NotifyStop();
+        cv_.notify_all();
+    }
 
-    if (handler_ != nullptr) {
-        handler_->detach();
+    if (handler_ != nullptr && handler_->joinable()) {
+        handler_->join();
         handler_ = nullptr;
     }
 
@@ -322,11 +332,11 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     if (request->IsFirstOne() && !request->IsContinous()) {
         uint32_t n = GetBufferCount();
         for (uint32_t i = 0; i < n; i++) {
-            DeliverBuffer();
+            DeliverStreamBuffer();
         }
     } else {
         do {
-            rc = DeliverBuffer();
+            rc = DeliverStreamBuffer();
             {
                 std::unique_lock<std::mutex> l(wtLock_);
                 if (waitingList_.empty()) {
@@ -368,7 +378,7 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     return RC_OK;
 }
 
-RetCode StreamBase::DeliverBuffer()
+RetCode StreamBase::DeliverStreamBuffer()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
@@ -379,7 +389,8 @@ RetCode StreamBase::DeliverBuffer()
     buffer->SetEncodeType(streamConfig_.encodeType);
     buffer->SetStreamId(streamId_);
     bufferPool_->AddBuffer(buffer);
-    CAMERA_LOGI("stream [id:%{public}d] enqueue buffer index:%{public}d", streamId_, buffer->GetIndex());
+    CAMERA_LOGI("stream [id:%{public}d] enqueue buffer index:%{public}d, size:%{public}d",
+        streamId_, buffer->GetIndex(), buffer->GetSize());
     return RC_OK;
 }
 
@@ -476,11 +487,8 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
     }
     CAMERA_LOGI("stream = [%{public}d] OnFrame and NeedCancel = [%{public}d]",
         buffer->GetStreamId(), request->NeedCancel() ? 1 : 0);
-    if (request->NeedCancel()) {
-        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
-    } else {
+    request->NeedCancel() ? buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP) :
         buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
-    }
     ReceiveBuffer(buffer);
     return RC_OK;
 }

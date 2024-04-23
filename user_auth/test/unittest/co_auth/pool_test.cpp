@@ -90,31 +90,35 @@ HWTEST_F(PoolTest, TestGenerateValidExecutorId, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestRegisterExecutorToPool_001, TestSize.Level0)
 {
+    constexpr uint32_t authType = 4;
     g_poolList = nullptr;
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_NEED_INIT);
     InitResourcePool();
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_BAD_PARAM);
     ExecutorInfoHal info = {};
-    info.authType = 4;
+    info.authType = authType;
     EXPECT_EQ(RegisterExecutorToPool(&info), 0);
     g_poolList = nullptr;
 }
 
 HWTEST_F(PoolTest, TestRegisterExecutorToPool_002, TestSize.Level0)
 {
+    constexpr uint32_t authType = 1;
+    constexpr uint32_t executorSensorHint = 20;
+    constexpr uint32_t executorRole = 50;
     g_poolList = nullptr;
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_NEED_INIT);
     InitResourcePool();
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_BAD_PARAM);
     auto *info1 = static_cast<ExecutorInfoHal *>(Malloc(sizeof(ExecutorInfoHal)));
-    info1->authType = 1;
-    info1->executorSensorHint = 20;
-    info1->executorRole = 50;
+    info1->authType = authType;
+    info1->executorSensorHint = executorSensorHint;
+    info1->executorRole = executorRole;
     g_poolList->insert(g_poolList, static_cast<void *>(info1));
     auto *info2 = static_cast<ExecutorInfoHal *>(Malloc(sizeof(ExecutorInfoHal)));
-    info2->authType = 1;
-    info2->executorSensorHint = 20;
-    info2->executorRole = 50;
+    info2->authType = authType;
+    info2->executorSensorHint = executorSensorHint;
+    info2->executorRole = executorRole;
     EXPECT_EQ(RegisterExecutorToPool(info2), 0);
     DestroyResourcePool();
 }
@@ -122,7 +126,8 @@ HWTEST_F(PoolTest, TestRegisterExecutorToPool_002, TestSize.Level0)
 HWTEST_F(PoolTest, TestUnregisterExecutorToPool, TestSize.Level0)
 {
     g_poolList = nullptr;
-    EXPECT_EQ(UnregisterExecutorToPool(12), RESULT_NEED_INIT);
+    constexpr uint64_t index = 12;
+    EXPECT_EQ(UnregisterExecutorToPool(index), RESULT_NEED_INIT);
 }
 
 HWTEST_F(PoolTest, TestCopyExecutorInfo, TestSize.Level0)
@@ -133,9 +138,10 @@ HWTEST_F(PoolTest, TestCopyExecutorInfo, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestIsExecutorMatch_001, TestSize.Level0)
 {
-    uint64_t index = 245485;
+    constexpr uint64_t index = 245485;
+    constexpr uint64_t executorIndex = 2634;
     ExecutorInfoHal executorInfo = {};
-    executorInfo.executorIndex = 2634;
+    executorInfo.executorIndex = executorIndex;
     ExecutorCondition condition = {};
     EXPECT_TRUE(IsExecutorMatch(&condition, &executorInfo));
     SetExecutorConditionExecutorIndex(&condition, index);
@@ -146,9 +152,10 @@ HWTEST_F(PoolTest, TestIsExecutorMatch_001, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestIsExecutorMatch_002, TestSize.Level0)
 {
-    uint32_t hint = 245485;
+    constexpr uint64_t hint = 245485;
+    constexpr uint64_t executorIndex = 2634;
     ExecutorInfoHal executorInfo = {};
-    executorInfo.executorSensorHint = 2634;
+    executorInfo.executorIndex = executorIndex;
     ExecutorCondition condition = {};
     EXPECT_TRUE(IsExecutorMatch(&condition, &executorInfo));
     SetExecutorConditionSensorHint(&condition, hint);
@@ -159,9 +166,8 @@ HWTEST_F(PoolTest, TestIsExecutorMatch_002, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestIsExecutorMatch_003, TestSize.Level0)
 {
-    uint32_t matcher = 245485;
+    constexpr uint64_t matcher = 245485;
     ExecutorInfoHal executorInfo = {};
-    executorInfo.executorMatcher = 2634;
     ExecutorCondition condition = {};
     EXPECT_TRUE(IsExecutorMatch(&condition, &executorInfo));
     SetExecutorConditionExecutorMatcher(&condition, matcher);
@@ -178,27 +184,30 @@ HWTEST_F(PoolTest, TestQueryExecutor, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestQueryCollecterMatcher, TestSize.Level0)
 {
+    constexpr uint32_t authType1 = 1;
+    constexpr uint32_t authType2 = 4;
+    constexpr uint32_t executorSensorHint = 20;
     g_poolList = nullptr;
-    EXPECT_EQ(QueryCollecterMatcher(1, 20, nullptr), RESULT_NEED_INIT);
+    EXPECT_EQ(QueryCollecterMatcher(authType1, executorSensorHint, nullptr), RESULT_NEED_INIT);
     InitResourcePool();
-    EXPECT_EQ(QueryCollecterMatcher(1, 20, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(QueryCollecterMatcher(authType1, executorSensorHint, nullptr), RESULT_BAD_PARAM);
     uint32_t matcher = 1245;
-    EXPECT_EQ(QueryCollecterMatcher(1, 20, &matcher), RESULT_NOT_FOUND);
+    EXPECT_EQ(QueryCollecterMatcher(authType1, executorSensorHint, &matcher), RESULT_NOT_FOUND);
     ExecutorInfoHal info1 = {};
-    info1.authType = 1;
-    info1.executorSensorHint = 20;
+    info1.authType = authType1;
+    info1.executorSensorHint = executorSensorHint;
     info1.executorRole = ALL_IN_ONE;
     g_poolList->insert(g_poolList, static_cast<void *>(&info1));
     ExecutorInfoHal info2 = {};
-    info2.authType = 1;
-    info2.executorSensorHint = 20;
+    info2.authType = authType1;
+    info2.executorSensorHint = executorSensorHint;
     info2.executorRole = VERIFIER;
     g_poolList->insert(g_poolList, static_cast<void *>(&info2));
     ExecutorInfoHal info3 = {};
-    info3.authType = 1;
+    info3.authType = authType1;
     g_poolList->insert(g_poolList, static_cast<void *>(&info3));
     ExecutorInfoHal info4 = {};
-    info4.authType = 4;
+    info4.authType = authType2;
     g_poolList->insert(g_poolList, static_cast<void *>(&info4));
     g_poolList->insert(g_poolList, nullptr);
     EXPECT_EQ(QueryCollecterMatcher(1, 20, &matcher), RESULT_SUCCESS);
@@ -207,74 +216,83 @@ HWTEST_F(PoolTest, TestQueryCollecterMatcher, TestSize.Level0)
 
 HWTEST_F(PoolTest, TestQueryCredentialExecutorIndex, TestSize.Level0)
 {
+    constexpr uint32_t authType1 = 1;
+    constexpr uint32_t authType2 = 4;
+    constexpr uint32_t executorSensorHint = 20;
+    constexpr uint32_t executorIndex = 1267;
     g_poolList = nullptr;
-    EXPECT_EQ(QueryCredentialExecutorIndex(1, 20), INVALID_EXECUTOR_INDEX);
+    EXPECT_EQ(QueryCredentialExecutorIndex(authType1, executorSensorHint), INVALID_EXECUTOR_INDEX);
     InitResourcePool();
-    EXPECT_EQ(QueryCredentialExecutorIndex(1, 20), INVALID_EXECUTOR_INDEX);
+    EXPECT_EQ(QueryCredentialExecutorIndex(authType1, executorSensorHint), INVALID_EXECUTOR_INDEX);
     ExecutorInfoHal info1 = {};
-    info1.authType = 1;
-    info1.executorSensorHint = 20;
+    info1.authType = authType1;
+    info1.executorSensorHint = executorSensorHint;
     info1.executorRole = ALL_IN_ONE;
-    info1.executorIndex = 1267;
+    info1.executorIndex = executorIndex;
     g_poolList->insert(g_poolList, static_cast<void *>(&info1));
     ExecutorInfoHal info2 = {};
-    info2.authType = 1;
-    info2.executorSensorHint = 20;
+    info2.authType = authType1;
+    info2.executorSensorHint = executorSensorHint;
     info2.executorRole = COLLECTOR;
     g_poolList->insert(g_poolList, static_cast<void *>(&info2));
     ExecutorInfoHal info3 = {};
-    info3.authType = 1;
+    info3.authType = authType1;
     g_poolList->insert(g_poolList, static_cast<void *>(&info3));
     ExecutorInfoHal info4 = {};
-    info4.authType = 4;
+    info4.authType = authType2;
     g_poolList->insert(g_poolList, static_cast<void *>(&info4));
     g_poolList->insert(g_poolList, nullptr);
-    EXPECT_EQ(QueryCredentialExecutorIndex(1, 20), info1.executorIndex);
+    EXPECT_EQ(QueryCredentialExecutorIndex(authType1, executorSensorHint), info1.executorIndex);
     g_poolList = nullptr;
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionExecutorIndex, TestSize.Level0)
 {
-    SetExecutorConditionExecutorIndex(nullptr, 10);
+    constexpr uint32_t executorIndex = 10;
+    SetExecutorConditionExecutorIndex(nullptr, executorIndex);
     ExecutorCondition condition = {};
-    SetExecutorConditionExecutorIndex(&condition, 10);
-    EXPECT_EQ(condition.executorIndex, 10);
+    SetExecutorConditionExecutorIndex(&condition, executorIndex);
+    EXPECT_EQ(condition.executorIndex, executorIndex);
     EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_INDEX, EXECUTOR_CONDITION_INDEX);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionAuthType, TestSize.Level0)
 {
-    SetExecutorConditionAuthType(nullptr, 1);
+    constexpr uint32_t authType = 1;
+    SetExecutorConditionAuthType(nullptr, authType);
     ExecutorCondition condition = {};
-    SetExecutorConditionAuthType(&condition, 1);
-    EXPECT_EQ(condition.authType, 1);
+    SetExecutorConditionAuthType(&condition, authType);
+    EXPECT_EQ(condition.authType, authType);
     EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_AUTH_TYPE, EXECUTOR_CONDITION_AUTH_TYPE);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionSensorHint, TestSize.Level0)
 {
-    SetExecutorConditionSensorHint(nullptr, 20);
+    constexpr uint32_t executorSensorHint = 20;
+    SetExecutorConditionSensorHint(nullptr, executorSensorHint);
     ExecutorCondition condition = {};
-    SetExecutorConditionSensorHint(&condition, 20);
-    EXPECT_EQ(condition.executorSensorHint, 20);
+    SetExecutorConditionSensorHint(&condition, executorSensorHint);
+    EXPECT_EQ(condition.executorSensorHint, executorSensorHint);
     EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_SENSOR_HINT, EXECUTOR_CONDITION_SENSOR_HINT);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionExecutorRole, TestSize.Level0)
 {
-    SetExecutorConditionExecutorRole(nullptr, 2136);
+    constexpr uint32_t excutorRole = 2136;
+    SetExecutorConditionExecutorRole(nullptr, excutorRole);
     ExecutorCondition condition = {};
-    SetExecutorConditionExecutorRole(&condition, 2136);
-    EXPECT_EQ(condition.executorRole, 2136);
+    SetExecutorConditionExecutorRole(&condition, excutorRole);
+    EXPECT_EQ(condition.executorRole, excutorRole);
     EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_ROLE, EXECUTOR_CONDITION_ROLE);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionExecutorMatcher, TestSize.Level0)
 {
-    SetExecutorConditionExecutorMatcher(nullptr, 2363);
+    constexpr uint32_t executorMatcher = 2363;
+    SetExecutorConditionExecutorMatcher(nullptr, executorMatcher);
     ExecutorCondition condition = {};
-    SetExecutorConditionExecutorMatcher(&condition, 2363);
-    EXPECT_EQ(condition.executorMatcher, 2363);
+    SetExecutorConditionExecutorMatcher(&condition, executorMatcher);
+    EXPECT_EQ(condition.executorMatcher, executorMatcher);
     EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_MATCHER, EXECUTOR_CONDITION_MATCHER);
 }
 } // namespace UserAuth

@@ -21,11 +21,12 @@
 #endif
 #define LOG_DOMAIN 0xD000105
 
-void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const OHOS::bluetooth::RawAddress &device, int state)
+void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const OHOS::bluetooth::RawAddress &device,
+    int state, int cause)
 {
     HDF_LOGI("BluetoothA2dpSrcObserver::OnConnectionStateChanged");
     if ((callbacks_ != nullptr) && (callbacks_->OnConnectionStateChanged)) {
-        callbacks_->OnConnectionStateChanged(device, state);
+        callbacks_->OnConnectionStateChanged(device, state, cause);
     }
 }
 

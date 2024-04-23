@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audioext {
-namespace V1_0 {
+namespace V2_0 {
 void UnRegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
@@ -37,7 +37,7 @@ void UnRegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
     int32_t devId = *(reinterpret_cast<const int32_t*>(data));
     DAudioManagerInterfaceImpl::GetDAudioManager()->UnRegisterAudioDevice(adpName, devId);
 }
-} // V1_0
+} // V2_0
 } // AudioExt
 } // Distributedaudio
 } // HDI
@@ -47,7 +47,7 @@ void UnRegisterAudioDeviceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HDI::DistributedAudio::Audioext::V1_0::UnRegisterAudioDeviceFuzzTest(data, size);
+    OHOS::HDI::DistributedAudio::Audioext::V2_0::UnRegisterAudioDeviceFuzzTest(data, size);
     return 0;
 }
 

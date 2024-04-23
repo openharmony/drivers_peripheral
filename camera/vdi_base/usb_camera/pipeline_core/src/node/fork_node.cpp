@@ -78,7 +78,6 @@ RetCode PcForkNode::Stop(const int32_t streamId)
     }
 
     if (bufferPool_ != nullptr) {
-        bufferPool_->SetForkBufferId(-1);
         DrainForkBufferPool();
     }
 
@@ -96,6 +95,35 @@ RetCode PcForkNode::Flush(const int32_t streamId)
     return RC_OK;
 }
 
+static void CopyBufferToForkBuffer(std::shared_ptr<IBuffer>& buffer, std::shared_ptr<IBuffer>& forkBuffer)
+{
+    if (forkBuffer->GetVirAddress() == forkBuffer->GetSuffaceBufferAddr()) {
+        CAMERA_LOGI("PcForkNode::DeliverBuffer begin malloc buffer");
+        uint32_t bufferSize = buffer->GetSize();
+        if (bufferSize == 0) {
+            CAMERA_LOGE("PcForkNode::DeliverBuffer error,  buffer->GetSize() == 0");
+            return;
+        }
+        void* bufferAddr = malloc(bufferSize);
+        if (bufferAddr != nullptr) {
+            forkBuffer->SetVirAddress(bufferAddr);
+            forkBuffer->SetSize(bufferSize);
+            CAMERA_LOGI("PcForkNode::DeliverBuffer malloc sucess, Address = %{public}p, SbAddr =  %{public}p",
+                forkBuffer->GetVirAddress(), forkBuffer->GetSuffaceBufferAddr());
+        } else {
+            CAMERA_LOGE("PcForkNode::DeliverBuffer malloc buffer fail");
+            return;
+        }
+    }
+    if (forkBuffer->GetVirAddress() != forkBuffer->GetSuffaceBufferAddr()) {
+        auto err = memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
+            buffer->GetVirAddress(), buffer->GetSize());
+        if (err != EOK) {
+            CAMERA_LOGE("PcForkNode::DeliverBuffer memcpy_s is fail");
+        }
+    }
+}
+
 void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
@@ -106,47 +134,32 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
         if (forkBuffer != nullptr) {
-            if (forkBuffer->GetEncodeType() == ENCODE_TYPE_NULL) {
-                forkBuffer->SetFormat(CAMERA_FORMAT_YCRCB_420_SP);
-                CAMERA_LOGD("forkBuffer EncodeType is NULL, change Format to CAMERA_FORMAT_YCRCB_420_SP");
-            }
-            bufferPool_->setSFBuffer(buffer);
-            bufferPool_->SetIsFork(true);
-
+            CopyBufferToForkBuffer(buffer, forkBuffer);
+            forkBuffer->SetIsValidDataInSurfaceBuffer(false);
+            forkBuffer->SetCurFormat(buffer->GetCurFormat());
+            forkBuffer->SetCurWidth(buffer->GetCurWidth());
+            forkBuffer->SetCurHeight(buffer->GetCurHeight());
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
-
-            for (auto& it : outPutPorts_) {
-                if (it->format_.streamId_ != streamId_) {
-                    continue;
+            auto id = forkBuffer->GetStreamId();
+            {
+                std::lock_guard<std::mutex> l(requestLock_);
+                if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
+                    forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+                    CAMERA_LOGV("queue size: 0");
+                } else {
+                    forkBuffer->SetCaptureId(captureRequests_[id].front());
+                    captureRequests_[id].pop_front();
+                    CAMERA_LOGV("queue size:%{public}u, CaptureId = %{public}d ",\
+                        captureRequests_[id].size(), forkBuffer->GetCaptureId());
                 }
-                CAMERA_LOGI("deliver fork buffer for streamid = %{public}d", it->format_.streamId_);
-                int32_t id = forkBuffer->GetStreamId();
-                {
-                    std::lock_guard<std::mutex> l(requestLock_);
-                    CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d", id);
-                    if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
-                        CAMERA_LOGV("queue size: 0");
-                        forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                    } else {
-                        CAMERA_LOGV("queue size:%{public}u", captureRequests_[id].size());
-                        forkBuffer->SetCaptureId(captureRequests_[id].front());
-                        captureRequests_[id].pop_front();
-                    }
-                }
-                it->DeliverBuffer(forkBuffer);
-                break;
             }
+            CAMERA_LOGE("Deliver fork buffer, streamId[%{public}d], index[%{public}d], status = %{public}d",
+                forkBuffer->GetStreamId(), forkBuffer->GetIndex(), forkBuffer->GetBufferStatus());
+            NodeBase::DeliverBuffer(forkBuffer);
         }
     }
-
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == buffer->GetStreamId()) {
-            it->DeliverBuffer(buffer);
-            CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
-            return;
-        }
-    }
+    NodeBase::DeliverBuffer(buffer);
 }
 
 RetCode PcForkNode::Capture(const int32_t streamId, const int32_t captureId)

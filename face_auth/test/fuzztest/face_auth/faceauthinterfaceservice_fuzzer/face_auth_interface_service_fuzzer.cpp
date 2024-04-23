@@ -20,6 +20,8 @@
 
 #include "parcel.h"
 
+#include "iconsumer_surface.h"
+
 #include "iam_logger.h"
 
 #include "face_auth_interface_service.h"
@@ -38,23 +40,33 @@ FaceAuthInterfaceService g_faceAuthInterfaceService;
 void FuzzGetExecutorList(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    std::vector<sptr<IExecutorV1_0>> executorList;
+    std::vector<sptr<IAllInOneExecutor>> executorList;
     g_faceAuthInterfaceService.GetExecutorList(executorList);
     IAM_LOGI("end");
 }
 
-void FuzzGetExecutorListV1_1(Parcel &parcel)
+void FuzzSetBufferProducer(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    std::vector<sptr<IExecutor>> executorList;
-    g_faceAuthInterfaceService.GetExecutorListV1_1(executorList);
+    sptr<IBufferProducer> bufferProducer = nullptr;
+    if (parcel.ReadBool()) {
+        auto surface = IConsumerSurface::Create();
+        if (surface == nullptr) {
+            IAM_LOGE("CreateSurfaceAsConsumer fail");
+            return;
+        }
+        bufferProducer = surface->GetProducer();
+    }
+    sptr<BufferProducerSequenceable> producerSequenceable =
+        new (std::nothrow) BufferProducerSequenceable(bufferProducer);
+    g_faceAuthInterfaceService.SetBufferProducer(producerSequenceable);
     IAM_LOGI("end");
 }
 
 using FuzzFunc = decltype(FuzzGetExecutorList);
 FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorList,
-    FuzzGetExecutorListV1_1,
+    FuzzSetBufferProducer,
 };
 
 void FaceAuthInterfaceServiceFuzzTest(const uint8_t *data, size_t size)

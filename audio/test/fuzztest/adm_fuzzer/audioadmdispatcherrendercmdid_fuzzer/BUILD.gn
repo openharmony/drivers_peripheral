@@ -49,11 +49,15 @@ ohos_fuzztest("AudioAdmDispatcherRenderCmdidFuzzTest") {
     "//third_party/bounds_checking_function/include",
     "//third_party/googletest/googletest/include",
   ]
-  external_deps = [
-    "c_utils:utils",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-  ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
+  if (defined(ohos_lite)) {
+    external_deps += [ "hilog_lite:hilog_share" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+  if (enable_c_utils) {
+    external_deps += [ "c_utils:utils" ]
+  }
   defines = []
   if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_SO" ]

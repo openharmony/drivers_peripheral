@@ -15,7 +15,9 @@
 
 #include "power_config.h"
 #include "string_ex.h"
+#ifdef HAS_POWER_CONFIG_POLICY_PART
 #include "config_policy_utils.h"
+#endif
 #include "power_hdf_log.h"
 
 namespace OHOS {

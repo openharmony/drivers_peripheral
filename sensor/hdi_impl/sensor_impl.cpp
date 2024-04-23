@@ -110,7 +110,10 @@ int32_t SensorImpl::Init()
 int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
 {
     HDF_LOGI("%{public}s: Enter the GetAllSensorInfo function.", __func__);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetAllSensors);
+    if (sensorInterface == nullptr || sensorInterface->GetAllSensors == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *tmp = nullptr;
@@ -158,7 +161,10 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformationVdi> &info)
 int32_t SensorImpl::Enable(int32_t sensorId)
 {
     HDF_LOGI("%{public}s: Enter the Enable function, sensorId is %{public}d", __func__, sensorId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Enable);
+    if (sensorInterface == nullptr || sensorInterface->Enable == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "Enable");
     int32_t ret = sensorInterface->Enable(sensorId);
@@ -173,7 +179,10 @@ int32_t SensorImpl::Enable(int32_t sensorId)
 int32_t SensorImpl::Disable(int32_t sensorId)
 {
     HDF_LOGI("%{public}s: Enter the Disable function, sensorId is %{public}d", __func__, sensorId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Disable);
+    if (sensorInterface == nullptr || sensorInterface->Disable == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "Disable");
     int32_t ret = sensorInterface->Disable(sensorId);
@@ -189,7 +198,10 @@ int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t
 {
     HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetBatch);
+    if (sensorInterface == nullptr || sensorInterface->SetBatch == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "SetBatch");
     int32_t ret = sensorInterface->SetBatch(sensorId, samplingInterval, reportInterval);
@@ -205,7 +217,10 @@ int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 {
     HDF_LOGI("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
         __func__, sensorId, mode);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetMode);
+    if (sensorInterface == nullptr || sensorInterface->SetMode == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "SetMode");
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
@@ -221,7 +236,10 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 {
     HDF_LOGI("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
         __func__, sensorId, option);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->SetOption);
+    if (sensorInterface == nullptr || sensorInterface->SetOption == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "SetOption");
     int32_t ret = sensorInterface->SetOption(sensorId, option);
@@ -236,7 +254,10 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &callbackObj)
 {
     HDF_LOGI("%{public}s: Enter the Register function, groupId is %{public}d", __func__, groupId);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Register);
+    if (sensorInterface == nullptr || sensorInterface->Register == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
@@ -281,6 +302,10 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallbackVdi> &ca
 int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &callbackObj)
 {
     HDF_LOGI("%{public}s: Enter the Unregister function, groupId is %{public}d", __func__, groupId);
+    if (sensorInterface == nullptr || sensorInterface->Unregister == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
     std::lock_guard<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject> &remote = callbackObj->HandleCallbackDeath();
     StartTrace(HITRACE_TAG_SENSORS, "Unregister");
@@ -296,7 +321,10 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallbackVdi> &
 int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInfoVdi)
 {
     HDF_LOGI("%{public}s: Enter the GetSdcSensorInfo function", __func__);
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->GetSdcSensorInfo);
+    if (sensorInterface == nullptr || sensorInterface->GetSdcSensorInfo == nullptr) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
 
     StartTrace(HITRACE_TAG_SENSORS, "GetSdcSensorInfo");
     struct SdcSensorInfo sdcSensorInfo[DEFAULT_SDC_SENSOR_INFO_SIZE];
@@ -323,8 +351,6 @@ int32_t SensorImpl::GetSdcSensorInfo(std::vector<SdcSensorInfoVdi> &sdcSensorInf
 
 int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
 {
-    CHECK_SENSOR_MODULE_INSTANCE(sensorInterface, sensorInterface->Unregister);
-
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
         return SENSOR_INVALID_PARAM;

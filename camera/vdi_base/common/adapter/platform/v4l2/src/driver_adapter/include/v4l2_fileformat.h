@@ -48,6 +48,8 @@ public:
 
 private:
     RetCode V4L2GetCapability(int fd, const std::string& dev_name, const std::string& cameraId);
+    void V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtDesc,
+        struct v4l2_frmsizeenum &frmSize, struct v4l2_fmtdesc &enumFmtDesc);
     RetCode V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDesc);
     enum v4l2_buf_type bufType_ = V4L2_BUF_TYPE_PRIVATE;
 };

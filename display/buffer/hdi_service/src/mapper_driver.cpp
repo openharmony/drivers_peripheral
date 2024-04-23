@@ -18,13 +18,14 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/mapper_stub.h"
+#include "v1_2/mapper_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "MAPPER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
 
-using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_2;
 
 struct HdfMapperHost {
     struct IDeviceIoService ioService;
@@ -75,7 +76,7 @@ static int HdfMapperDriverBind(struct HdfDeviceObject* deviceObject)
     hdfMapperHost->ioService.Open = NULL;
     hdfMapperHost->ioService.Release = NULL;
 
-    auto serviceImpl = IMapper::Get(true);
+    auto serviceImpl = Display::Buffer::V1_2::IMapper::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get the implement of service", __func__);
         delete hdfMapperHost;
@@ -83,7 +84,8 @@ static int HdfMapperDriverBind(struct HdfDeviceObject* deviceObject)
     }
 
     hdfMapperHost->stub =
-        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IMapper::GetDescriptor());
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        Display::Buffer::V1_2::IMapper::GetDescriptor());
     if (hdfMapperHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfMapperHost;

@@ -14,12 +14,19 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../location.gni")
 
-ohos_shared_library("libgeofence_interface_service_1.0") {
+ohos_shared_library("libgeofence_interface_service_2.0") {
   include_dirs = [
     "${location_driver_path}/geofence/hdi_service",
     "${location_driver_path}/gnss/hdi_service",
   ]
   sources = [ "geofence_interface_impl.cpp" ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
 
   deps = []
 
@@ -83,7 +90,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
   }
 
   external_deps +=
-      [ "drivers_interface_location_geofence:liblocation_geofence_stub_1.0" ]
+      [ "drivers_interface_location_geofence:liblocation_geofence_stub_2.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
@@ -93,7 +100,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
 
 group("hdi_location_geofence_service") {
   deps = [
-    ":libgeofence_interface_service_1.0",
+    ":libgeofence_interface_service_2.0",
     ":liblocation_geofence_hdi_driver",
   ]
 }

@@ -38,7 +38,7 @@ extern "C" {
 #define WIFI_PIN_CODE_LENGTH 8
 #define WIFI_P2P_TLVS_LENGTH 256
 #define WIFI_BSSID_LEN 6
-#define WPA_VENDOR_DATA_LEN 400
+#define WPA_VENDOR_DATA_LEN 256
 #define WPA_VENDOR_SSID_LEN 32
 #define WPA_VENDOR_PSK_LEN 64
 
@@ -74,8 +74,8 @@ typedef enum {
 } WpaCallBackEventType;
 
 enum WpaClientType {
-    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<29 */
-    WIFI_WPA_TO_HAL_CLIENT = 268435454,
+    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 ... | 1<<28 */
+    WIFI_WPA_TO_HAL_CLIENT = (1 << 28) - 1,
     WIFI_WPA_CLIENT_BUTT
 };
 

@@ -17,19 +17,20 @@
 #include <hdf_device_desc.h>
 #include <hdf_sbuf_ipc.h>
 
+#include "object_collector.h"
+
+#include "face_auth_hdi.h"
 #include "iam_logger.h"
-#include "v1_1/face_auth_interface_stub.h"
 
 #undef LOG_TAG
 #define LOG_TAG "FACE_AUTH_HDI"
 
+using namespace OHOS::HDI::FaceAuth;
 namespace {
 struct HdfFaceAuthInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
-
-using IFaceAuthInterface = OHOS::HDI::FaceAuth::V1_1::IFaceAuthInterface;
 
 int32_t FaceAuthInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)

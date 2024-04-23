@@ -40,6 +40,8 @@ public:
 
     int32_t CreateMediaKeySystem(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem) override;
 
+    int32_t GetMediaKeySystemDescription(std::string& name, std::string& uuid) override;
+
     int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer) override;
 
     static int32_t IsMediaKeySystemSupported_(const std::string& name, const std::string& mimeType,
@@ -47,6 +49,9 @@ public:
 
     static int32_t CreateMediaKeySystem_(sptr<OHOS::HDI::Drm::V1_0::IMediaKeySystem>& mediaKeySystem,
          const sptr<IRemoteObject> remote);
+
+    static int32_t GetMediaKeySystemDescription_(std::string& name,
+        std::string& uuid, const sptr<IRemoteObject> remote);
 
     static int32_t GetVersion_(uint32_t& majorVer, uint32_t& minorVer, const sptr<IRemoteObject> remote);
 

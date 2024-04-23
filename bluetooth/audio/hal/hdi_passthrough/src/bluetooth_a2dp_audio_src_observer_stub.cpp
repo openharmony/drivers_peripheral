@@ -63,8 +63,9 @@ ErrCode BluetoothA2dpAudioSrcObserverStub::OnConnectionStateChangedInner(Message
 {
     std::string addr = data.ReadString();
     int state = data.ReadInt32();
+    int cause = data.ReadInt32();
     HDF_LOGI("BluetoothA2dpAudioSrcObserverStub::OnConnectionStateChangedInner");
-    OnConnectionStateChanged(RawAddress(addr), state);
+    OnConnectionStateChanged(RawAddress(addr), state, cause);
 
     return NO_ERROR;
 }

@@ -555,8 +555,8 @@ static void WpaProcessWifiStatus(struct WpaHalCmdStatus *halStatus, struct HdiWp
             return;
         }
         status->addressLen = ETH_ADDR_LEN + 1 ;
-        if (strcpy_s((char *)status->address, ETH_ADDR_LEN + 1, (char*)tmpAddress) != EOK) {
-            HDF_LOGE("%{public}s strcpy failed", __func__);
+        if (memcpy_s((char *)status->address, ETH_ADDR_LEN + 1, (char*)tmpAddress, ETH_ADDR_LEN + 1) != EOK) {
+            HDF_LOGE("%{public}s strcpy memcpy", __func__);
         }
     }
     if (strcmp(halStatus->bssid, "") != 0) {
@@ -1575,8 +1575,7 @@ static int32_t ProcessEventWpaVendorExt(struct HdfWpaRemoteNode *node,
     HDF_LOGI("%{public}s: res %{public}d!", __func__, ret);
     return ret;
 }
-
-static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
     switch (event) {
@@ -1607,6 +1606,23 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
             break;
+        case WPA_EVENT_STA_AUTH_REJECT:
+            ret = ProcessEventWpaAuthReject(pos, (struct WpaAuthRejectParam *)data, ifName);
+            break;
+        case WPA_EVENT_STA_NOTIFY:
+            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
+            break;
+        default:
+            HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
+            break;
+    }
+    return ret;
+}
+
+static int32_t HdfP2pDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    switch (event) {
         case WPA_EVENT_DEVICE_FOUND:
             ret = ProcessEventP2pDeviceFound(pos, (struct P2pDeviceInfoParam *)data, ifName);
             break;
@@ -1656,12 +1672,17 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_IFACE_CREATED:
             ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
             break;
-        case WPA_EVENT_STA_AUTH_REJECT:
-            ret = ProcessEventWpaAuthReject(pos, (struct WpaAuthRejectParam *)data, ifName);
+        default:
+            HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
             break;
-        case WPA_EVENT_STA_NOTIFY:
-            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
-            break;
+    }
+    return ret;
+}
+
+static int32_t HdfVendorExtDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, void *data, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    switch (event) {
         case WPA_EVENT_VENDOR_EXT:
             ret = ProcessEventWpaVendorExt(pos, (struct WpaVendorExtInfo *)data, ifName);
             break;
@@ -1672,6 +1693,7 @@ static int32_t HdfWpaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
     return ret;
 }
 
+
 static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfWpaRemoteNode *pos = NULL;
@@ -1680,7 +1702,7 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
 
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     head = &HdfWpaStubDriver()->remoteListHead;
-    HDF_LOGD("%s: enter HdfWpaCallbackFun event =%d", __FUNCTION__, event);
+    HDF_LOGD("%s: enter HdfWpaCallbackFun event =%u", __FUNCTION__, event);
     if (ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
         (void)OsalMutexUnlock(&HdfWpaStubDriver()->mutex);
@@ -1695,7 +1717,16 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
             continue;
         }
-        ret = HdfWpaDealEvent(event, pos, data, ifName);
+        if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {
+            ret = HdfStaDealEvent(event, pos, data, ifName);
+        } else if (strncmp(ifName, "chba", strlen("chba")) == 0 ||
+            strncmp(ifName, "p2p-chba", strlen("p2p-chba")) == 0) {
+            ret = HdfVendorExtDealEvent(event, pos, data, ifName);
+        } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+            ret = HdfP2pDealEvent(event, pos, data, ifName);
+        } else {
+            HDF_LOGE("%{public}s: ifName is error %{public}s", __func__, ifName);
+        }
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
@@ -1736,8 +1767,6 @@ int32_t WpaInterfaceRegisterEventCallback(struct IWpaInterface *self, struct IWp
 int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct IWpaCallback *cbFunc,
     const char *ifName)
 {
-    int32_t ret = HDF_FAILURE;
-
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
@@ -1746,7 +1775,7 @@ int32_t WpaInterfaceUnregisterEventCallback(struct IWpaInterface *self, struct I
     (void)OsalMutexLock(&HdfWpaStubDriver()->mutex);
     HdfWpaDelRemoteObj(cbFunc);
     if (DListIsEmpty(&HdfWpaStubDriver()->remoteListHead)) {
-        ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
+        int32_t ret = WpaUnregisterEventCallback(HdfWpaCallbackFun, WIFI_WPA_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }
@@ -1830,7 +1859,7 @@ static int32_t StartWpaSupplicant(const char *moduleName, const char *startCmd)
         return HDF_FAILURE;
     }
     pthread_setname_np(g_tid, "WpaMainThread");
-    HDF_LOGI("%{public}s: pthread_create ID: %{public}p.", __func__, (void*)g_tid);
+    HDF_LOGI("%{public}s: pthread_create successfully.", __func__);
     usleep(WPA_SLEEP_TIME);
     return HDF_SUCCESS;
 }
@@ -1860,6 +1889,12 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
             return HDF_FAILURE;
         }
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+            CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+            return HDF_FAILURE;
+        }
+    } else if (strncmp(ifName, "chba0", strlen("chba0")) == 0) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName),
             CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {

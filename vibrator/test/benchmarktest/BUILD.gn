@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
+import("../../vibrator.gni")
 
 module_output_path = "drivers_peripheral_vibrator/vibrator"
 ohos_benchmarktest("hdf_vibrator_benchmark_test") {
@@ -37,11 +38,13 @@ ohos_benchmarktest("hdf_vibrator_benchmark_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_vibrator:libvibrator_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
   }
 }

@@ -19,11 +19,12 @@
 #include "buffer_handle.h"
 #include "idisplay_buffer_vdi.h"
 #include "v1_0/display_buffer_type.h"
+#include "v1_2/display_buffer_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_2;
 
 class DisplayBufferVdiImpl : public IDisplayBufferVdi {
 public:
@@ -43,6 +44,8 @@ public:
     virtual int32_t GetMetadata(const BufferHandle& handle, uint32_t key, std::vector<uint8_t>& value) override;
     virtual int32_t ListMetadataKeys(const BufferHandle& handle, std::vector<uint32_t>& keys) override;
     virtual int32_t EraseMetadataKey(const BufferHandle& handle, uint32_t key) override;
+    virtual int32_t GetImageLayout(const BufferHandle& handle,
+        Display::Buffer::V1_2::ImageLayout& layout) const override;
 };
 } // namespace DISPLAY
 } // namespace HDI

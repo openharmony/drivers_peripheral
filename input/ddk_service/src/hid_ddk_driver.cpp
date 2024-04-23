@@ -18,6 +18,7 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/hid_ddk_stub.h"
+#include "emit_event_manager.h"
 
 #define HDF_LOG_TAG hid_ddk_driver
 
@@ -90,6 +91,8 @@ static int HdfHidDdkDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfHidDdkDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver release start", __func__);
+    OHOS::ExternalDeviceManager::EmitEventManager::GetInstance().ClearDeviceMap();
+
     if (deviceObject->service == nullptr) {
         return;
     }

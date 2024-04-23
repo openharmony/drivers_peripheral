@@ -64,13 +64,17 @@ ohos_shared_library("audio_primary_impl_vendor") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
     ]
+    if (enable_c_utils) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

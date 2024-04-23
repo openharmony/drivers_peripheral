@@ -17,44 +17,46 @@
 #include "camera_dump.h"
 
 namespace OHOS::Camera {
-RKExifNode::RKExifNode(const std::string &name, const std::string &type, const std::string &cameraId)
+ExifNode::ExifNode(const std::string &name, const std::string &type, const std::string &cameraId)
     : NodeBase(name, type, cameraId)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
-RKExifNode::~RKExifNode()
+ExifNode::~ExifNode()
 {
-    CAMERA_LOGI("~RKExifNode Node exit.");
+    CAMERA_LOGI("~ExifNode Node exit.");
 }
 
-RetCode RKExifNode::Start(const int32_t streamId)
+RetCode ExifNode::Start(const int32_t streamId)
 {
-    CAMERA_LOGI("RKExifNode::Start streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("ExifNode::Start streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-RetCode RKExifNode::Stop(const int32_t streamId)
+RetCode ExifNode::Stop(const int32_t streamId)
 {
-    CAMERA_LOGI("RKExifNode::Stop streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("ExifNode::Stop streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-RetCode RKExifNode::Flush(const int32_t streamId)
+RetCode ExifNode::Flush(const int32_t streamId)
 {
-    CAMERA_LOGI("RKExifNode::Flush streamId = %{public}d\n", streamId);
+    CAMERA_LOGI("ExifNode::Flush streamId = %{public}d\n", streamId);
     return RC_OK;
 }
 
-void RKExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
+void ExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 {
     if (buffer == nullptr) {
-        CAMERA_LOGE("RKExifNode::DeliverBuffer frameSpec is null");
+        CAMERA_LOGE("ExifNode::DeliverBuffer frameSpec is null");
         return;
     }
+    if (buffer->GetBufferStatus() != CAMERA_BUFFER_STATUS_OK) {
+        CAMERA_LOGE("BufferStatus() != CAMERA_BUFFER_STATUS_OK");
+        return NodeBase::DeliverBuffer(buffer);
+    }
 
-    int32_t id = buffer->GetStreamId();
-    CAMERA_LOGE("RKExifNode::DeliverBuffer StreamId %{public}d", id);
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG && gpsInfo_.size() > 0) {
         int outPutBufferSize = 0;
         exif_data exifInfo;
@@ -73,19 +75,12 @@ void RKExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
     }
 
     CameraDumper& dumper = CameraDumper::GetInstance();
-    dumper.DumpBuffer("RKExifNode", ENABLE_EXIF_NODE_CONVERTED, buffer);
+    dumper.DumpBuffer("ExifNode", ENABLE_EXIF_NODE_CONVERTED, buffer);
 
-    outPutPorts_ = GetOutPorts();
-    for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == id) {
-            it->DeliverBuffer(buffer);
-            CAMERA_LOGI("RKExifNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            return;
-        }
-    }
+    NodeBase::DeliverBuffer(buffer);
 }
 
-RetCode RKExifNode::Config(const int32_t streamId, const CaptureMeta &meta)
+RetCode ExifNode::Config(const int32_t streamId, const CaptureMeta &meta)
 {
     if (meta == nullptr) {
         CAMERA_LOGW("%{public}s streamId= %{public}d", __FUNCTION__, streamId);
@@ -97,7 +92,7 @@ RetCode RKExifNode::Config(const int32_t streamId, const CaptureMeta &meta)
     return RC_OK;
 }
 
-RetCode RKExifNode::SendMetadata(std::shared_ptr<CameraMetadata> meta)
+RetCode ExifNode::SendMetadata(std::shared_ptr<CameraMetadata> meta)
 {
     common_metadata_header_t *data = meta->get();
     camera_metadata_item_t entry;
@@ -140,7 +135,7 @@ RetCode RKExifNode::SendMetadata(std::shared_ptr<CameraMetadata> meta)
     return rc;
 }
 
-RetCode RKExifNode::SetGpsInfoMetadata(common_metadata_header_t *data)
+RetCode ExifNode::SetGpsInfoMetadata(common_metadata_header_t *data)
 {
     uint32_t count = 0;
     camera_metadata_item_t entry;
@@ -163,18 +158,18 @@ RetCode RKExifNode::SetGpsInfoMetadata(common_metadata_header_t *data)
     return RC_OK;
 }
 
-RetCode RKExifNode::Capture(const int32_t streamId, const int32_t captureId)
+RetCode ExifNode::Capture(const int32_t streamId, const int32_t captureId)
 {
-    CAMERA_LOGV("RKExifNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
+    CAMERA_LOGV("ExifNode::Capture streamId = %{public}d and captureId = %{public}d", streamId, captureId);
     return RC_OK;
 }
 
-RetCode RKExifNode::CancelCapture(const int32_t streamId)
+RetCode ExifNode::CancelCapture(const int32_t streamId)
 {
-    CAMERA_LOGI("RKExifNode::CancelCapture streamid = %{public}d", streamId);
+    CAMERA_LOGI("ExifNode::CancelCapture streamid = %{public}d", streamId);
 
     return RC_OK;
 }
 
-REGISTERNODE(RKExifNode, {"RKExif"})
+REGISTERNODE(ExifNode, {"RKExif"})
 } // namespace OHOS::Camera

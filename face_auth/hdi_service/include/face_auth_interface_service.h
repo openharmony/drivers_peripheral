@@ -28,12 +28,11 @@ public:
     FaceAuthInterfaceService();
     ~FaceAuthInterfaceService() override = default;
 
-    int32_t GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList) override;
-
-    int32_t GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList) override;
+    int32_t GetExecutorList(std::vector<sptr<IAllInOneExecutor>> &executorList) override;
+    int32_t SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer) override;
 
 private:
-    std::vector<sptr<IExecutor>> executorList_;
+    std::vector<sptr<IAllInOneExecutor>> executorList_;
 };
 } // namespace FaceAuth
 } // namespace HDI

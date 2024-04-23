@@ -19,11 +19,14 @@
 #include <hdf_log.h>
 #include "hilog/log.h"
 #include "display_log.h"
+#include "hdf_trace.h"
 
 #undef LOG_TAG
 #define LOG_TAG "METADATA_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+#undef DISPLAY_TRACE
+#define DISPLAY_TRACE HdfTrace trace(__func__, "HDI:DISP:")
 
 namespace OHOS {
 namespace HDI {
@@ -53,11 +56,15 @@ MetadataService::MetadataService()
 
 MetadataService::~MetadataService()
 {
+    std::lock_guard<std::mutex> lck(mutex_);
     if (destroyVdi_ != nullptr && vdiImpl_ != nullptr) {
         destroyVdi_(vdiImpl_);
+        vdiImpl_ = nullptr;
+        destroyVdi_ = nullptr;
     }
     if (libHandle_ != nullptr) {
         dlclose(libHandle_);
+        libHandle_ = nullptr;
     }
 }
 
@@ -106,6 +113,7 @@ int32_t MetadataService::LoadVdi()
 
 int32_t MetadataService::RegisterBuffer(const sptr<NativeBuffer>& handle)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->RegisterBuffer(*handle->GetBufferHandle());
@@ -115,6 +123,7 @@ int32_t MetadataService::RegisterBuffer(const sptr<NativeBuffer>& handle)
 
 int32_t MetadataService::SetMetadata(const sptr<NativeBuffer>& handle, uint32_t key, const std::vector<uint8_t>& value)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->SetMetadata(*handle->GetBufferHandle(), key, value);
@@ -124,6 +133,7 @@ int32_t MetadataService::SetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
 
 int32_t MetadataService::GetMetadata(const sptr<NativeBuffer>& handle, uint32_t key, std::vector<uint8_t>& value)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetMetadata(*handle->GetBufferHandle(), key, value);
@@ -132,6 +142,7 @@ int32_t MetadataService::GetMetadata(const sptr<NativeBuffer>& handle, uint32_t 
 
 int32_t MetadataService::ListMetadataKeys(const sptr<NativeBuffer>& handle, std::vector<uint32_t>& keys)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->ListMetadataKeys(*handle->GetBufferHandle(), keys);
@@ -141,6 +152,7 @@ int32_t MetadataService::ListMetadataKeys(const sptr<NativeBuffer>& handle, std:
 
 int32_t MetadataService::EraseMetadataKey(const sptr<NativeBuffer>& handle, uint32_t key)
 {
+    DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->EraseMetadataKey(*handle->GetBufferHandle(), key);

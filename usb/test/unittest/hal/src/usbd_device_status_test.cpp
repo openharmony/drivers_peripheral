@@ -171,6 +171,9 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus001, TestSize.Level1)
     struct UsbDev dev = dev_;
     int32_t ret = -1;
     bool unactived = 1;
+    ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
+    HDF_LOGI("UsbdDeviceStatusTest::UsbdGetInterfaceActiveStatus %{public}d ClaimInterface=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     for (; interfaceId < INTERFACEID_INVALID; interfaceId++) {
         ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
         if (ret == 0) {
@@ -249,7 +252,7 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus005, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_OK;
     bool unactived = 1;
-    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
+    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->GetInterfaceActiveStatus(dev, interfaceId, unactived);
     HDF_LOGI("UsbdGetInterfaceActiveStatus005 %{public}d, ret=%{public}d, unactived=%{public}d",
         __LINE__, ret, unactived);
@@ -309,6 +312,5 @@ HWTEST_F(UsbdDeviceStatusTest, UsbdGetInterfaceActiveStatus008, TestSize.Level1)
         __LINE__, ret, unactived);
     ASSERT_NE(ret, 0);
 }
-
 } // USB
 } // OHOS

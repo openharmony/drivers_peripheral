@@ -24,7 +24,6 @@ ohos_fuzztest("CodecSetParameterHdiFuzzTest") {
   include_dirs = [
     "${codec_root}/interfaces/include",
     "${codec_root}/hal/include",
-    "//third_party/openmax/api/1.1.2",
     "${codec_root}/test/fuzztest/hdi_fuzzer/codecsetparameterhdi_fuzzer",
     "${codec_root}/test/fuzztest/hdi_fuzzer/codeccommonhdi_fuzzer",
   ]
@@ -32,7 +31,7 @@ ohos_fuzztest("CodecSetParameterHdiFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_codec:codec_idl_headers",
-    "drivers_interface_codec:libcodec_proxy_2.0",
+    "drivers_interface_codec:libcodec_proxy_3.0",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
@@ -40,6 +39,7 @@ ohos_fuzztest("CodecSetParameterHdiFuzzTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "openmax:libopenmax_static",
   ]
 
   cflags = [

@@ -487,32 +487,53 @@ int32_t DStreamOperator::ChangeToOfflineStream(const std::vector<int32_t> &strea
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-void DStreamOperator::ExtractCameraAttr(Json::Value &rootValue, std::vector<int>& formats, const std::string rootNode)
+cJSON* DStreamOperator::GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr)
+{
+    cJSON* nodeObj = cJSON_GetObjectItemCaseSensitive(rootValue, rootNode.c_str());
+    if (nodeObj == nullptr || !cJSON_IsObject(nodeObj)) {
+        return nullptr;
+    }
+    cJSON* resObj = cJSON_GetObjectItemCaseSensitive(nodeObj, "Resolution");
+    if (resObj == nullptr || !cJSON_IsObject(resObj)) {
+        return nullptr;
+    }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(resObj, formatStr.c_str());
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        return nullptr;
+    }
+    return formatObj;
+}
+
+void DStreamOperator::ExtractCameraAttr(cJSON* rootValue, std::vector<int>& formats, const std::string rootNode)
 {
     for (const auto &format : formats) {
         std::string formatStr = std::to_string(format);
-        if (!rootValue[rootNode].isMember("Resolution") || !rootValue[rootNode]["Resolution"].isMember(formatStr) ||
-            !rootValue[rootNode]["Resolution"][formatStr].isArray() ||
-            rootValue[rootNode]["Resolution"][formatStr].size() == 0 ||
-            rootValue[rootNode]["Resolution"][formatStr].size() > JSON_ARRAY_MAX_SIZE) {
-            DHLOGE("Resolution or %{public}s error.", formatStr.c_str());
+        cJSON *formatObj = GetFormatObj(rootNode, rootValue, formatStr);
+        if (formatObj == nullptr) {
+            DHLOGE("Resolution or %s error.", formatStr.c_str());
             continue;
         }
         GetCameraAttr(rootValue, formatStr, rootNode, format);
     }
 }
 
-void DStreamOperator::GetCameraAttr(Json::Value &rootValue, std::string formatStr, const std::string rootNode,
+void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, const std::string rootNode,
     int format)
 {
     std::vector<DCResolution> resolutionVec;
-    uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
-            DHLOGE("Resolution %{public}s %{public}d ,is not string.", formatStr.c_str(), i);
+    cJSON *formatObj = GetFormatObj(rootNode, rootValue, formatStr);
+    if (formatObj == nullptr) {
+        return;
+    }
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item == nullptr || !cJSON_IsString(item)) {
+            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
             continue;
         }
-        std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+        std::string resoStr = std::string(item->valuestring);
         std::vector<std::string> reso;
         SplitString(resoStr, reso, STAR_SEPARATOR);
         if (reso.size() != SIZE_FMT_LEN) {
@@ -546,32 +567,31 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
     const std::string &sourceAbilityInfo)
 {
     dhBase_ = dhBase;
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(sinkAbilityInfo.c_str(), sinkAbilityInfo.c_str() + sinkAbilityInfo.length(),
-        &rootValue, &errs) || !rootValue.isObject()) {
+    cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
+    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
         DHLOGE("Input sink ablity info is not json object.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    Json::Value srcRootValue;
-    if (!jsonReader->parse(sourceAbilityInfo.c_str(), sourceAbilityInfo.c_str() + sourceAbilityInfo.length(),
-        &srcRootValue, &errs) || !srcRootValue.isObject()) {
+    cJSON *srcRootValue = cJSON_Parse(sourceAbilityInfo.c_str());
+    if (srcRootValue == nullptr || !cJSON_IsObject(srcRootValue)) {
         DHLOGE("Input source ablity info is not json object.");
+        cJSON_Delete(rootValue);
         return DCamRetCode::INVALID_ARGUMENT;
     }
     dcSupportedCodecType_ = ParseEncoderTypes(rootValue);
     sourceEncodeTypes_ = ParseEncoderTypes(srcRootValue);
     if (dcSupportedCodecType_.empty() || sourceEncodeTypes_.empty()) {
         DHLOGE("Get CodeType failed.");
+        cJSON_Delete(rootValue);
+        cJSON_Delete(srcRootValue);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
     if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
         ParseVideoFormats(rootValue) != SUCCESS) {
+        cJSON_Delete(rootValue);
+        cJSON_Delete(srcRootValue);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -583,44 +603,58 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
 
     if (dcSupportedCodecType_.empty() || dcSupportedFormatMap_.empty() || !resolutionMap) {
         DHLOGE("Input ablity info is invalid.");
+        cJSON_Delete(rootValue);
+        cJSON_Delete(srcRootValue);
         return DEVICE_NOT_INIT;
     }
+    cJSON_Delete(rootValue);
+    cJSON_Delete(srcRootValue);
     return SUCCESS;
 }
 
-std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(Json::Value& rootValue)
+std::vector<DCEncodeType> DStreamOperator::ParseEncoderTypes(cJSON* rootValue)
 {
     std::vector<DCEncodeType> enCoders;
-    if (!rootValue.isMember("CodecType") || !rootValue["CodecType"].isArray() ||
-        (rootValue["CodecType"].size() == 0) || (rootValue["CodecType"].size() > JSON_ARRAY_MAX_SIZE)) {
+    cJSON *codecObj = cJSON_GetObjectItemCaseSensitive(rootValue, "CodecType");
+    if (codecObj == nullptr || !cJSON_IsArray(codecObj) || cJSON_GetArraySize(codecObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(codecObj)) > JSON_ARRAY_MAX_SIZE) {
         DHLOGE("Get CodecType error.");
         return enCoders;
     }
-    uint32_t size = rootValue["CodecType"].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if (!(rootValue["CodecType"][i]).isString()) {
+
+    int32_t size = cJSON_GetArraySize(codecObj);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON *item = cJSON_GetArrayItem(codecObj, i);
+        if (item == nullptr || !cJSON_IsString(item)) {
             DHLOGE("Get CodecType error.");
             return enCoders;
         }
-        std::string codeType = (rootValue["CodecType"][i]).asString();
+        std::string codeType = std::string(item->valuestring);
         enCoders.push_back(ConvertDCEncodeType(codeType));
     }
     return enCoders;
 }
 
-DCamRetCode DStreamOperator::ParsePhotoFormats(Json::Value& rootValue)
+DCamRetCode DStreamOperator::ParsePhotoFormats(cJSON* rootValue)
 {
-    if (!rootValue.isMember("Photo") || !rootValue["Photo"].isMember("OutputFormat") ||
-        !rootValue["Photo"]["OutputFormat"].isArray() || rootValue["Photo"]["OutputFormat"].size() == 0 ||
-        rootValue["Photo"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Photo or photo output format error.");
+    cJSON *photoObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Photo");
+    if (photoObj == nullptr || !cJSON_IsObject(photoObj)) {
+        DHLOGE("Photo error.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(photoObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Photo output format error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
     std::vector<int> photoFormats;
-    uint32_t size = rootValue["Photo"]["OutputFormat"].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Photo"]["OutputFormat"][i]).isInt()) {
-            photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON *item = cJSON_GetArrayItem(formatObj, i);
+        if (item != nullptr && cJSON_IsNumber(item)) {
+            photoFormats.push_back(item->valueint);
         }
     }
     dcSupportedFormatMap_[DCSceneType::PHOTO] = photoFormats;
@@ -628,19 +662,26 @@ DCamRetCode DStreamOperator::ParsePhotoFormats(Json::Value& rootValue)
     return SUCCESS;
 }
 
-DCamRetCode DStreamOperator::ParsePreviewFormats(Json::Value& rootValue)
+DCamRetCode DStreamOperator::ParsePreviewFormats(cJSON* rootValue)
 {
-    if (!rootValue.isMember("Preview") || !rootValue["Preview"].isMember("OutputFormat") ||
-        !rootValue["Preview"]["OutputFormat"].isArray() || rootValue["Preview"]["OutputFormat"].size() == 0 ||
-        rootValue["Preview"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Preview or preview output format error.");
+    cJSON *previewObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Preview");
+    if (previewObj == nullptr || !cJSON_IsObject(previewObj)) {
+        DHLOGE("Preview error.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(previewObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Preview output format error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
     std::vector<int> previewFormats;
-    uint32_t size = rootValue["Preview"]["OutputFormat"].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Preview"]["OutputFormat"][i]).isInt()) {
-            previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON* item = cJSON_GetArrayItem(formatObj, i);
+        if (item != nullptr && cJSON_IsNumber(item)) {
+            previewFormats.push_back(item->valueint);
         }
     }
     dcSupportedFormatMap_[DCSceneType::PREVIEW] = previewFormats;
@@ -648,19 +689,25 @@ DCamRetCode DStreamOperator::ParsePreviewFormats(Json::Value& rootValue)
     return SUCCESS;
 }
 
-DCamRetCode DStreamOperator::ParseVideoFormats(Json::Value& rootValue)
+DCamRetCode DStreamOperator::ParseVideoFormats(cJSON* rootValue)
 {
-    if (!rootValue.isMember("Video") || !rootValue["Video"].isMember("OutputFormat") ||
-        !rootValue["Video"]["OutputFormat"].isArray() || rootValue["Video"]["OutputFormat"].size() == 0 ||
-        rootValue["Video"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
-        DHLOGE("Video or video output format error.");
+    cJSON *videoObj = cJSON_GetObjectItemCaseSensitive(rootValue, "Video");
+    if (videoObj == nullptr || !cJSON_IsObject(videoObj)) {
+        DHLOGE("Video error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(videoObj, "OutputFormat");
+    if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
+        static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Video output format error.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
     std::vector<int> videoFormats;
-    uint32_t size = rootValue["Video"]["OutputFormat"].size();
-    for (uint32_t i = 0; i < size; i++) {
-        if ((rootValue["Video"]["OutputFormat"][i]).isInt()) {
-            videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
+    int32_t size = cJSON_GetArraySize(formatObj);
+    for (int32_t i = 0; i < size; i++) {
+        cJSON* item = cJSON_GetArrayItem(formatObj, i);
+        if (item != nullptr && cJSON_IsNumber(item)) {
+            videoFormats.push_back(item->valueint);
         }
     }
     dcSupportedFormatMap_[DCSceneType::VIDEO] = videoFormats;

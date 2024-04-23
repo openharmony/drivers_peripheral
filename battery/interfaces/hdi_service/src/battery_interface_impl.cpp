@@ -54,7 +54,6 @@ int32_t BatteryInterfaceImpl::Init()
     powerSupplyProvider_->InitPowerSupplySysfs();
 
     auto& batteryConfig = BatteryConfig::GetInstance();
-
     batteryConfig.ParseConfig();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V2_0::BatteryThread>();

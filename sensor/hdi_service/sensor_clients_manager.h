@@ -28,6 +28,13 @@ namespace HDI {
 namespace Sensor {
 namespace V2_0 {
 
+constexpr uint32_t MAX_DUMP_DATA_SIZE = 10;
+
+struct SensorsDataPack {
+    int32_t count;
+    int32_t pos;
+    struct HdfSensorEvents listDumpArray[MAX_DUMP_DATA_SIZE];
+};
 
 class SensorClientsManager {
 public:
@@ -40,6 +47,7 @@ public:
     void EraseSdcSensorBestConfig(int sensorId);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
+    bool GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map);
     bool IsClientsEmpty(int groupId);
     std::unordered_map<int32_t, std::set<int32_t>> GetSensorUsed();
     bool IsNeedOpenSensor(int sensorId, int serviceId);
@@ -54,10 +62,15 @@ public:
     std::mutex sensorUsedMutex_;
     std::mutex sensorConfigMutex_;
     std::mutex sdcSensorConfigMutex_;
+    std::mutex sensorInfoMutex_;
+    std::mutex sensorsDataPackMutex_;
     void SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval, int64_t &reportInterval);
     bool IsNotNeedReportData(int32_t serviceId, int32_t sensorId);
     static bool IsSensorContinues(int32_t sensorId);
     void UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval);
+    void CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag);
+    void GetEventData(struct SensorsDataPack &dataPack);
+    void CopyEventData(const struct HdfSensorEvents event);
 private:
     SensorClientsManager();
     static std::mutex instanceMutex_;
@@ -65,6 +78,8 @@ private:
     std::unordered_map<int32_t, std::set<int32_t>> sensorUsed_;
     std::unordered_map<int32_t, struct BestSensorConfig> sensorConfig_;
     std::unordered_map<int32_t, struct BestSensorConfig> sdcSensorConfig_;
+    std::vector<HdfSensorInformation> sensorInfo_;
+    SensorsDataPack listDump_ = {0};
 };
 
 struct BestSensorConfig {

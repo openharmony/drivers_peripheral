@@ -139,6 +139,12 @@ int32_t UsbdFunction::AddHdc()
         HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
+
+    status = SetParameter(PERSIST_SYS_USB_CONFIG, HDC_CONFIG_ON);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add hdc persist config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -157,6 +163,12 @@ int32_t UsbdFunction::SetFunctionToStorage()
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
     if (status != 0) {
         HDF_LOGE("%{public}s:add storage config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+
+    status = SetParameter(PERSIST_SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add storage persist config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -215,6 +227,12 @@ int32_t UsbdFunction::SetFunctionToNone()
     int32_t ret = RemoveHdc();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveHdc error, ret = %{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = UsbdWaitToNone();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbdWaitToNone error, ret = %{public}d", __func__, ret);
         return ret;
     }
     currentFuncs_ = USB_FUNCTION_NONE;
@@ -297,6 +315,30 @@ int32_t UsbdFunction::UsbdWaitUdc()
     }
 
     if (strcmp(udcName, tmpName) != 0) {
+        HDF_LOGE("%{public}s: strcmp failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::UsbdWaitToNone()
+{
+    char stateName[UDC_NAME_MAX_LEN] = {0};
+    for (int32_t i = 0; i < WAIT_UDC_MAX_LOOP; i++) {
+        (void)memset_s(stateName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
+        int32_t ret = GetParameter(SYS_USB_STATE, "invalid", stateName, UDC_NAME_MAX_LEN - 1);
+        if (ret <= 0) {
+            HDF_LOGE("%{public}s: GetParameter failed", __func__);
+            return HDF_FAILURE;
+        }
+        if (strcmp(stateName, HDC_CONFIG_OFF) == 0) {
+            return HDF_SUCCESS;
+        }
+        usleep(WAIT_UDC_TIME);
+    }
+
+    if (strcmp(stateName, HDC_CONFIG_OFF) != 0) {
         HDF_LOGE("%{public}s: strcmp failed", __func__);
         return HDF_FAILURE;
     }
@@ -416,6 +458,17 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 int32_t UsbdFunction::UsbdGetFunction(void)
 {
     return currentFuncs_;
+}
+
+int32_t UsbdFunction::UsbdUpdateFunction(uint32_t funcs)
+{
+    if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT && funcs != (USB_FUNCTION_HDC + USB_FUNCTION_RNDIS) &&
+        funcs != (USB_FUNCTION_HDC + USB_FUNCTION_STORAGE)) {
+        HDF_LOGE("%{public}s: funcs invalid funcs is: %{public}d", __func__, funcs);
+        return HDF_FAILURE;
+    }
+    currentFuncs_ = funcs;
+    return HDF_SUCCESS;
 }
 
 int32_t UsbdFunction::UsbdRegisterDevice(const std::string &serviceName)

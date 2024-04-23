@@ -19,7 +19,7 @@ namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type, const std::string &cameraId)
     : NodeBase(name, type, cameraId), SourceNode(name, type, cameraId)
 {
-    CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
+    CAMERA_LOGI("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
     RetCode rc = RC_OK;
     constexpr int ITEM_CAPACITY_SIZE = 30;
     constexpr int DATA_CAPACITY_SIZE = 1000;
@@ -46,7 +46,7 @@ struct MetadataTag {
     CameraId cameraId2 = CAMERA_FIRST;
 };
 
-const MetadataTag g_ohosMapCameraId[] = {
+const MetadataTag OHOS_MAP_CAMERA_ID[] = {
     { "lcam001", CAMERA_FIRST },
     { "lcam002", CAMERA_SECOND },
     { "lcam003", CAMERA_THIRD },
@@ -56,7 +56,7 @@ const MetadataTag g_ohosMapCameraId[] = {
 
 CameraId UvcNode::ConvertCameraId(const std::string &cameraId)
 {
-    for (auto cameraID : g_ohosMapCameraId) {
+    for (auto cameraID : OHOS_MAP_CAMERA_ID) {
         if (cameraID.cameraId1 == cameraId) {
             return cameraID.cameraId2;
         }
@@ -201,6 +201,12 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
+    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
+        buffer->GetStreamId(), buffer->GetIndex());
+
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_422_P);
+    buffer->SetCurWidth(wide_);
+    buffer->SetCurHeight(high_);
 
     SourceNode::DeliverBuffer(buffer);
     return;
@@ -209,7 +215,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    CAMERA_LOGI("Provide buffers enter.");
+    CAMERA_LOGI("UvcNode::ProvideBuffers enter.");
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
         CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;

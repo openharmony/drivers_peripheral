@@ -37,7 +37,7 @@ using namespace testing;
 using namespace testing::ext;
 
 namespace {
-    const uint32_t MAX_BUFFER_LEN = 512000;
+    constexpr uint32_t MAX_BUFFER_LEN = 512000;
 } // namespace
 
 class IdmFileMgrTest : public testing::Test {
@@ -55,7 +55,7 @@ HWTEST_F(IdmFileMgrTest, TestCapacityExpansion_001, TestSize.Level0)
 {
     EXPECT_EQ(CapacityExpansion(nullptr, 0), RESULT_BAD_PARAM);
 
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *object = CreateBufferBySize(bufferSize);
     object->maxSize = MAX_BUFFER_LEN;
     EXPECT_EQ(CapacityExpansion(object, 0), RESULT_BAD_PARAM);
@@ -63,39 +63,39 @@ HWTEST_F(IdmFileMgrTest, TestCapacityExpansion_001, TestSize.Level0)
 
 HWTEST_F(IdmFileMgrTest, TestCapacityExpansion_002, TestSize.Level0)
 {
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *object = CreateBufferBySize(bufferSize);
     EXPECT_EQ(CapacityExpansion(object, 0), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmFileMgrTest, TestCapacityExpansion_003, TestSize.Level0)
 {
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *object = CreateBufferBySize(bufferSize);
-    uint32_t targetCapacity = 5120000;
-    EXPECT_EQ(CapacityExpansion(object, targetCapacity), RESULT_BAD_PARAM);
+    constexpr uint32_t targerCapacity = 5120000;
+    EXPECT_EQ(CapacityExpansion(object, targerCapacity), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdmFileMgrTest, TestStreamWrite_001, TestSize.Level0)
 {
     EXPECT_EQ(StreamWrite(nullptr, nullptr, 0), RESULT_BAD_PARAM);
 
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *parcel = CreateBufferBySize(bufferSize);
     uint32_t from = 0;
-    uint32_t objectSize = 5120000;
-    EXPECT_EQ(StreamWrite(parcel, static_cast<void *>(&from), objectSize), RESULT_BAD_PARAM);
+    constexpr uint32_t objectSize1 = 5120000;
+    EXPECT_EQ(StreamWrite(parcel, static_cast<void *>(&from), objectSize1), RESULT_BAD_PARAM);
 
-    objectSize = 15;
-    uint8_t array[objectSize];
-    EXPECT_EQ(StreamWrite(parcel, static_cast<void *>(&array), objectSize), RESULT_SUCCESS);
+    constexpr uint32_t objectSize2 = 15;
+    uint8_t array[objectSize2];
+    EXPECT_EQ(StreamWrite(parcel, static_cast<void *>(&array), objectSize2), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmFileMgrTest, TestStreamWrite_002, TestSize.Level0)
 {
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *parcel = CreateBufferBySize(bufferSize);
-    uint32_t objectSize = 5;
+    constexpr uint32_t objectSize = 5;
 
     uint8_t array[objectSize];
     EXPECT_EQ(StreamWrite(parcel, static_cast<void *>(&array), objectSize), RESULT_SUCCESS);
@@ -105,7 +105,7 @@ HWTEST_F(IdmFileMgrTest, TestStreamWriteEnrolledInfo, TestSize.Level0)
 {
     EXPECT_EQ(StreamWriteEnrolledInfo(nullptr, nullptr), RESULT_BAD_PARAM);
 
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *parcel = CreateBufferBySize(bufferSize);
     LinkedList *enrolledList = CreateLinkedList(DestroyEnrolledNode);
     EXPECT_NE(enrolledList, nullptr);
@@ -119,7 +119,7 @@ HWTEST_F(IdmFileMgrTest, TestStreamWriteCredentialList, TestSize.Level0)
 {
     EXPECT_EQ(StreamWriteCredentialList(nullptr, nullptr), RESULT_BAD_PARAM);
 
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *parcel = CreateBufferBySize(bufferSize);
     LinkedList *credentialList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(credentialList, nullptr);
@@ -141,14 +141,14 @@ HWTEST_F(IdmFileMgrTest, TestUpdateFileInfo, TestSize.Level0)
 
 HWTEST_F(IdmFileMgrTest, TestStreamRead, TestSize.Level0)
 {
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *parcel = CreateBufferBySize(bufferSize);
     uint32_t index = 20;
-    uint32_t size = 1000;
-    EXPECT_EQ(StreamRead(parcel, &index, nullptr, size), RESULT_BAD_PARAM);
-
-    parcel->contentSize = 200;
-    EXPECT_EQ(StreamRead(parcel, &index, nullptr, size), RESULT_BAD_PARAM);
+    constexpr uint32_t SIZE = 1000;
+    EXPECT_EQ(StreamRead(parcel, &index, nullptr, SIZE), RESULT_BAD_PARAM);
+    constexpr uint32_t contextSize = 200;
+    parcel->contentSize = contextSize;
+    EXPECT_EQ(StreamRead(parcel, &index, nullptr, SIZE), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdmFileMgrTest, TestStreamReadCredentialList, TestSize.Level0)

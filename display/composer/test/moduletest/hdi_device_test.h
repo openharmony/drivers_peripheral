@@ -57,12 +57,12 @@ public:
     }
     void NotifyVblank(unsigned int sequence, uint64_t ns, const void* data);
     int32_t WaitVblank(uint32_t ms);
+    bool hasVblank_ = false;
 private:
     std::mutex vblankMutex_;
     std::condition_variable vblankCondition_;
     VblankCtr() {}
     ~VblankCtr();
-    bool hasVblank_ = false;
 };
 } // OHOS
 } // HDI

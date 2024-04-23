@@ -164,7 +164,7 @@ void MetaDataTest::StartCapture(
 void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
     sleep(SLEEP_SECOND_TWO);
-    if (sizeof(captureIds) == 0) {
+    if (captureIds.size() == 0) {
         return;
     }
     for (const auto &captureId : captureIds) {

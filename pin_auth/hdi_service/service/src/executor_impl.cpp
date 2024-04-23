@@ -45,7 +45,7 @@ ExecutorImpl::~ExecutorImpl()
     threadPool_.Stop();
 }
 
-int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
+int32_t ExecutorImpl::GetExecutorInfo(HdiExecutorInfo &info)
 {
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {
@@ -54,43 +54,16 @@ int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
     }
     constexpr unsigned short SENSOR_ID = 1;
     info.sensorId = SENSOR_ID;
-    info.executorType = EXECUTOR_TYPE;
-    info.executorRole = ExecutorRole::ALL_IN_ONE;
-    info.authType = AuthType::PIN;
+    info.executorMatcher = EXECUTOR_TYPE;
+    info.executorRole = HdiExecutorRole::ALL_IN_ONE;
+    info.authType = HdiAuthType::PIN;
     uint32_t eslRet = 0;
     int32_t result = pinHdi_->GetExecutorInfo(info.publicKey, eslRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get ExecutorInfo failed, fail code : %{public}d", result);
         return result;
     }
-    info.esl = static_cast<ExecutorSecureLevel>(eslRet);
-
-    return HDF_SUCCESS;
-}
-
-int32_t ExecutorImpl::GetTemplateInfo(uint64_t templateId, TemplateInfo &info)
-{
-    IAM_LOGI("start");
-    if (pinHdi_ == nullptr) {
-        IAM_LOGE("pinHdi_ is nullptr");
-        return HDF_FAILURE;
-    }
-    OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
-    int32_t result = pinHdi_->QueryPinInfo(templateId, infoRet);
-    if (result != SUCCESS) {
-        IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
-        return result;
-    }
-    /* subType is stored in extraInfo */
-    info.extraInfo.resize(sizeof(infoRet.subType));
-    if (memcpy_s(&(info.extraInfo[0]), sizeof(infoRet.subType), &(infoRet.subType), sizeof(infoRet.subType)) != EOK) {
-        IAM_LOGE("copy subType to extraInfo fail!");
-        return HDF_FAILURE;
-    }
-
-    info.executorType = EXECUTOR_TYPE;
-    info.remainAttempts = infoRet.remainTimes;
-    info.lockoutDuration = infoRet.freezingTime;
+    info.esl = static_cast<HdiExecutorSecureLevel>(eslRet);
 
     return HDF_SUCCESS;
 }
@@ -114,7 +87,15 @@ int32_t ExecutorImpl::OnRegisterFinish(const std::vector<uint64_t> &templateIdLi
     return HDF_SUCCESS;
 }
 
-void ExecutorImpl::CallError(const sptr<IExecutorCallbackV1_0> &callbackObj, uint32_t errorCode)
+int32_t ExecutorImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t>& msg)
+{
+    static_cast<void>(scheduleId);
+    static_cast<void>(srcRole);
+    static_cast<void>(msg);
+    return HDF_SUCCESS;
+}
+
+void ExecutorImpl::CallError(const sptr<HdiIExecutorCallback> &callbackObj, uint32_t errorCode)
 {
     IAM_LOGI("start");
     std::vector<uint8_t> ret(0);
@@ -124,7 +105,7 @@ void ExecutorImpl::CallError(const sptr<IExecutorCallbackV1_0> &callbackObj, uin
 }
 
 int32_t ExecutorImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallbackV1_0> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
+    const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
 {
     IAM_LOGI("start");
     static_cast<void>(extraInfo);
@@ -145,7 +126,7 @@ int32_t ExecutorImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t
 }
 
 int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallbackV1_0> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
@@ -164,76 +145,13 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
         IAM_LOGE("EnrollInner failed, fail code : %{public}d", result);
         return HDF_SUCCESS;
     }
-    result = callbackObj->OnGetData(scheduleId, algoParameter, 0);
+
+    std::vector<uint8_t> challenge;
+    result = callbackObj->OnGetData(algoParameter, 0, algoVersion, challenge);
     if (result != SUCCESS) {
         IAM_LOGE("Enroll Pin failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
         // If the enroll fails, delete scheduleId of scheduleMap
-        if (scheduleMap_.DeleteScheduleId(scheduleId) != HDF_SUCCESS) {
-            IAM_LOGI("delete scheduleId failed");
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-int32_t ExecutorImpl::EnrollV1_1(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallback> &callbackObj)
-{
-    IAM_LOGI("start");
-    if (callbackObj == nullptr) {
-        IAM_LOGE("callbackObj is nullptr");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (pinHdi_ == nullptr) {
-        IAM_LOGE("pinHdi_ is nullptr");
-        CallError(callbackObj, INVALID_PARAMETERS);
-        return HDF_SUCCESS;
-    }
-    std::vector<uint8_t> algoParameter;
-    uint32_t algoVersion = 0;
-    int32_t result = EnrollInner(scheduleId, extraInfo, callbackObj, algoParameter, algoVersion);
-    if (result != SUCCESS) {
-        IAM_LOGE("EnrollInner failed, fail code : %{public}d", result);
-        return HDF_SUCCESS;
-    }
-    result = callbackObj->OnGetDataV1_1(scheduleId, algoParameter, 0, algoVersion);
-    if (result != SUCCESS) {
-        IAM_LOGE("Enroll Pin failed, fail code : %{public}d", result);
-        CallError(callbackObj, GENERAL_ERROR);
-        // If the enroll fails, delete scheduleId of scheduleMap
-        if (scheduleMap_.DeleteScheduleId(scheduleId) != HDF_SUCCESS) {
-            IAM_LOGI("delete scheduleId failed");
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallbackV1_0> &callbackObj)
-{
-    IAM_LOGI("start");
-    if (callbackObj == nullptr) {
-        IAM_LOGE("callbackObj is nullptr");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (pinHdi_ == nullptr) {
-        IAM_LOGE("pinHdi_ is nullptr");
-        CallError(callbackObj, INVALID_PARAMETERS);
-        return HDF_SUCCESS;
-    }
-    std::vector<uint8_t> algoParameter;
-    int32_t result = AuthenticateInner(scheduleId, templateId, algoParameter, callbackObj);
-    if (result != SUCCESS) {
-        IAM_LOGE("AuthenticateInner failed, fail code : %{public}d", result);
-        return HDF_SUCCESS;
-    }
-    result = callbackObj->OnGetData(scheduleId, algoParameter, 0);
-    if (result != SUCCESS) {
-        IAM_LOGE("Authenticate Pin failed, fail code : %{public}d", result);
-        CallError(callbackObj, GENERAL_ERROR);
-        // If the authentication fails, delete scheduleId of scheduleMap
         if (scheduleMap_.DeleteScheduleId(scheduleId) != HDF_SUCCESS) {
             IAM_LOGI("delete scheduleId failed");
         }
@@ -243,7 +161,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
 }
 
 int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-    const sptr<IExecutorCallbackV1_0> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
@@ -268,22 +186,23 @@ int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId
     return SUCCESS;
 }
 
-int32_t ExecutorImpl::AuthenticateV1_1(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallback> &callbackObj)
+int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64_t>& templateIdList,
+    const std::vector<uint8_t> &extraInfo, const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     if (callbackObj == nullptr) {
         IAM_LOGE("callbackObj is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (pinHdi_ == nullptr) {
-        IAM_LOGE("pinHdi_ is nullptr");
+    if (pinHdi_ == nullptr || templateIdList.size() != 1) {
+        IAM_LOGE("pinHdi_ is nullptr or templateIdList size not 1");
         CallError(callbackObj, INVALID_PARAMETERS);
         return HDF_SUCCESS;
     }
     static_cast<void>(extraInfo);
     std::vector<uint8_t> algoParameter;
     uint32_t algoVersion = 0;
+    uint64_t templateId = templateIdList[0];
     int32_t result = pinHdi_->GetAlgoParameter(templateId, algoParameter, algoVersion);
     if (result != SUCCESS) {
         IAM_LOGE("Get algorithm parameter failed, fail code : %{public}d", result);
@@ -296,7 +215,8 @@ int32_t ExecutorImpl::AuthenticateV1_1(uint64_t scheduleId, uint64_t templateId,
         return HDF_SUCCESS;
     }
 
-    result = callbackObj->OnGetDataV1_1(scheduleId, algoParameter, 0, algoVersion);
+    std::vector<uint8_t> challenge;
+    result = callbackObj->OnGetData(algoParameter, 0, algoVersion, challenge);
     if (result != SUCCESS) {
         IAM_LOGE("Authenticate Pin failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
@@ -327,7 +247,8 @@ int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId,
     return result;
 }
 
-int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data)
+int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data,
+    int32_t resultCode)
 {
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {
@@ -338,12 +259,17 @@ int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const
     int32_t result = GENERAL_ERROR;
     constexpr uint32_t INVALID_ID = 2;
     uint32_t commandId = INVALID_ID;
-    sptr<IExecutorCallbackV1_0> callback = nullptr;
+    sptr<HdiIExecutorCallback> callback = nullptr;
     uint64_t templateId = 0;
     std::vector<uint8_t> algoParameter(0, 0);
     if (scheduleMap_.GetScheduleInfo(scheduleId, commandId, callback, templateId, algoParameter) != HDF_SUCCESS) {
         IAM_LOGE("Get ScheduleInfo failed, fail code : %{public}d", result);
         return HDF_FAILURE;
+    }
+    if (resultCode != SUCCESS && callback != nullptr) {
+        IAM_LOGE("SetData failed, resultCode is %{public}d", resultCode);
+        CallError(callback, resultCode);
+        return resultCode;
     }
     switch (commandId) {
         case ENROLL_PIN:
@@ -399,18 +325,8 @@ int32_t ExecutorImpl::Cancel(uint64_t scheduleId)
     return HDF_SUCCESS;
 }
 
-int32_t ExecutorImpl::SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
-    const sptr<IExecutorCallbackV1_0> &callbackObj)
-{
-    IAM_LOGI("Extension interface, temporarily useless");
-    static_cast<void>(commandId);
-    static_cast<void>(extraInfo);
-    static_cast<void>(callbackObj);
-    return HDF_SUCCESS;
-}
-
 uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, const uint32_t commandId,
-    const sptr<IExecutorCallbackV1_0> callback, const uint64_t templateId, const std::vector<uint8_t> algoParameter)
+    const sptr<HdiIExecutorCallback> callback, const uint64_t templateId, const std::vector<uint8_t> algoParameter)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
@@ -430,7 +346,7 @@ uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, c
 }
 
 uint32_t ExecutorImpl::ScheduleMap::GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId,
-    sptr<IExecutorCallbackV1_0> &callback, uint64_t &templateId, std::vector<uint8_t> &algoParameter)
+    sptr<HdiIExecutorCallback> &callback, uint64_t &templateId, std::vector<uint8_t> &algoParameter)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
@@ -459,7 +375,7 @@ uint32_t ExecutorImpl::ScheduleMap::DeleteScheduleId(const uint64_t scheduleId)
 }
 
 int32_t ExecutorImpl::GetProperty(
-    const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes, Property &property)
+    const std::vector<uint64_t> &templateIdList, const std::vector<int32_t> &propertyTypes, HdiProperty &property)
 {
     IAM_LOGI("start");
     if (pinHdi_ == nullptr) {

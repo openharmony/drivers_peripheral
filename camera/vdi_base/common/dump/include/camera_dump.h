@@ -53,7 +53,8 @@ const std::string CAPTURE_INTERVAL = "captureInterval";
 class CameraDumper {
 public:
     ~CameraDumper ();
-    bool DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer);
+    bool DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer,
+        uint32_t width = 0, uint32_t height = 0);
     bool DumpStart();
     bool ReadDumpConfig();
     bool IsDumpCommandOpened(std::string type);

@@ -66,9 +66,13 @@ public:
 
     int32_t SetKeySystemServiceCallback(sptr<MediaKeySystemServiceCallback> callback);
     int32_t CloseKeySessionService(sptr<MediaKeySessionService> mediaKeySession) override;
+    void GetDecryptTimeAsString(std::vector<std::vector<double>> &topThreeTimes,
+        std::string &decryptTimes);
+
 private:
     int32_t GetOfflineKeyFromFile();
     int32_t SetOfflineKeyToFile();
+    static void GetDecryptMaxTimes(double time, std::vector<double> &topThreeTimes);
     std::map<std::string, std::vector<uint8_t>> configuration_;
     std::map<std::string, std::string> configurationString_;
     std::map<sptr<MediaKeySessionService>, bool> mediaKeySessionMap_;
@@ -82,6 +86,7 @@ private:
     const std::string versionName = "version";
     const std::string decryptNumberName = "decryptNumber";
     const std::string errorDecryptNumberName = "errorDecryptNumber";
+    const std::string decryptTime = "decryptTimes";
     OHOS::sptr<MediaKeySystemCallbackService> vdiCallbackObj;
 };
 class MediaKeySystemServiceCallback : public virtual RefBase {

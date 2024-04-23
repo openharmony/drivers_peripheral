@@ -27,6 +27,8 @@ ohos_shared_library("audio_primary_driver") {
       "hdf_core:libhdi",
       "hilog:libhilog",
     ]
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -34,7 +36,7 @@ ohos_shared_library("audio_primary_driver") {
 
   external_deps += [
     "bounds_checking_function:libsec_shared",
-    "drivers_interface_audio:libaudio_stub_2.0",
+    "drivers_interface_audio:libaudio_stub_3.0",
   ]
 
   shlib_type = "hdi"
@@ -43,7 +45,7 @@ ohos_shared_library("audio_primary_driver") {
   part_name = "drivers_peripheral_audio"
 }
 
-ohos_shared_library("audio_manager_service_2.0") {
+ohos_shared_library("audio_manager_service_3.0") {
   sources = [ "audio_manager_service.c" ]
 
   if (is_standard_system) {
@@ -55,12 +57,14 @@ ohos_shared_library("audio_manager_service_2.0") {
       "hdf_core:libhdi",
       "hilog:libhilog",
     ]
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
   include_dirs = [ "$hdf_hdi_service_path/vendor_interface/utils" ]
 
-  external_deps += [ "drivers_interface_audio:libaudio_stub_2.0" ]
+  external_deps += [ "drivers_interface_audio:libaudio_stub_3.0" ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

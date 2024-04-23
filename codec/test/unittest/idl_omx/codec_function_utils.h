@@ -25,9 +25,9 @@
 #include <securec.h>
 #include "hdf_log.h"
 #include "codec_omx_ext.h"
-#include "v2_0/codec_callback_service.h"
-#include "v2_0/icodec_component.h"
-#include "v2_0/icodec_component_manager.h"
+#include "v3_0/codec_callback_service.h"
+#include "v3_0/icodec_component.h"
+#include "v3_0/icodec_component_manager.h"
 #include "v1_0/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
@@ -50,7 +50,7 @@ constexpr uint32_t ALIGNMENT = 16;
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V2_0 {
+namespace V3_0 {
 enum class PortIndex { INDEX_INPUT = 0, INDEX_OUTPUT = 1 };
 class FunctionUtil : public RefBase {
     struct BufferInfo {
@@ -156,7 +156,7 @@ private:
     std::map<int32_t, std::shared_ptr<BufferInfo>> inputBuffers_;
     std::map<int32_t, std::shared_ptr<BufferInfo>> outputBuffers_;
 };
-} // V2_0
+} // V3_0
 } // Codec
 } // HDI
 } // OHOS

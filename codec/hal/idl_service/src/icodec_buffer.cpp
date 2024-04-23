@@ -21,8 +21,8 @@
 #include "codec_dma_buffer.h"
 #include "codec_log_wrapper.h"
 #include "codec_share_buffer.h"
-#include "v2_0/codec_types.h"
-using namespace OHOS::HDI::Codec::V2_0;
+#include "v3_0/codec_types.h"
+using namespace OHOS::HDI::Codec::V3_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -127,6 +127,7 @@ int32_t ICodecBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
     codecBuffer_.pts = omxBuffer.nTimeStamp;
     return HDF_SUCCESS;
 }
+
 int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
 {
     int retCode = -EPERM;
@@ -153,6 +154,17 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
         }
     }
     return retCode < 0 ? -errno : EOK;
+}
+
+uint8_t *ICodecBuffer::GetBuffer()
+{
+    return nullptr;
+}
+
+int32_t ICodecBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
+{
+    (void)codecBuffer;
+    return HDF_SUCCESS;
 }
 }  // namespace Omx
 }  // namespace Codec

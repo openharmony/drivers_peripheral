@@ -32,16 +32,20 @@ public:
     HosV4L2Control();
     ~HosV4L2Control();
 
+    void V4L2VidiocSCtrl (int fd, int ret, struct v4l2_ext_control* cList, int count);
     RetCode V4L2GetCtrl(int fd, unsigned int id, int& value);
     RetCode V4L2SetCtrl(int fd, unsigned int id, int value);
     RetCode V4L2GetControls(int fd, std::vector<DeviceControl>& control);
     RetCode V4L2SetCtrls(int fd, std::vector<DeviceControl>& control, const int numControls);
+    void V4L2VidiocGExtCtrls (int fd, int ret, int &count,
+        v4l2_ext_control *cList, std::vector<DeviceControl>& control);
     RetCode V4L2GetCtrls(int fd, std::vector<DeviceControl>& control, const int numControls);
 
 private:
     void V4L2SetValue(int fd, std::vector<DeviceControl>& control, DeviceControl& ctrl,
         v4l2_queryctrl& qCtrl);
     int ExtControl(int fd, struct v4l2_queryctrl *ctrl);
+    void V4L2EnumExtControl(int fd, v4l2_queryctrl &qCtrl, DeviceControl &ctrl);
     void V4L2EnumExtControls(int fd, std::vector<DeviceControl>& control);
     void V4L2EnumControls(int fd, std::vector<DeviceControl>& control);
     int V4L2GetControl(int fd, std::vector<DeviceControl>& control, unsigned int id);

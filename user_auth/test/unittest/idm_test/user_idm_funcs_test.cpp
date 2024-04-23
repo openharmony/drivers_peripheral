@@ -66,7 +66,8 @@ public:
 HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_001, TestSize.Level0)
 {
     PermissionCheckParam param = {};
-    param.executorSensorHint = 10;
+    constexpr uint32_t executorSensorHint = 10;
+    param.executorSensorHint = executorSensorHint;
     EXPECT_EQ(GenerateIdmSchedule(&param), nullptr);
 }
 
@@ -74,14 +75,15 @@ HWTEST_F(UserIdmFuncsTest, TestGenerateIdmSchedule_002, TestSize.Level0)
 {
     InitResourcePool();
     EXPECT_NE(g_poolList, nullptr);
+    constexpr uint32_t executorSensorHint = 10;
     ExecutorInfoHal info = {};
-    info.authType = 1;
-    info.executorSensorHint = 10;
+    info.authType = PIN_AUTH;
+    info.executorSensorHint = executorSensorHint;
     info.executorRole = COLLECTOR;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     PermissionCheckParam param = {};
-    param.authType = 1;
-    param.executorSensorHint = 10;
+    param.authType = PIN_AUTH;
+    param.executorSensorHint = executorSensorHint;
     EXPECT_EQ(GenerateIdmSchedule(&param), nullptr);
     g_poolList = nullptr;
 }
@@ -94,7 +96,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_001, TestSize.Level0)
 
 HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
 {
-    int32_t userId = 32156;
+    constexpr int32_t userId = 32156;
     struct SessionInfo session = {};
     session.userId = userId;
     session.time = GetSystemTime();
@@ -116,17 +118,19 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
 HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_001, TestSize.Level0)
 {
     PermissionCheckParam param = {};
-    param.authType = 2;
+    param.authType = FACE_AUTH;
     EXPECT_EQ(CheckUpdatePermission(param, nullptr), RESULT_BAD_PARAM);
     uint64_t scheduleId = 0;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_BAD_PARAM);
-    param.authType = 1;
+    param.authType = PIN_AUTH;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_NEED_INIT);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
 {
-    int32_t userId = 32156;
+    constexpr int32_t userId = 32156;
+    constexpr uint32_t excutorSensorHint1 = 10;
+    constexpr uint32_t excutorSensorHint2 = 20;
     struct SessionInfo session = {};
     session.userId = userId;
     session.time = GetSystemTime();
@@ -135,7 +139,7 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
     EXPECT_NE(g_userInfoList, nullptr);
 
     PermissionCheckParam param = {};
-    param.authType = 1;
+    param.authType = PIN_AUTH;
     param.userId = userId;
     uint64_t scheduleId = 0;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_SUCCESS);
@@ -144,11 +148,11 @@ HWTEST_F(UserIdmFuncsTest, TestCheckUpdatePermission_002, TestSize.Level0)
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(userInfo.credentialInfoList, nullptr);
     CredentialInfoHal credInfo = {};
-    credInfo.authType = 1;
-    credInfo.executorSensorHint = 20;
+    credInfo.authType = PIN_AUTH;
+    credInfo.executorSensorHint = excutorSensorHint2;
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-    param.executorSensorHint = 10;
+    param.executorSensorHint = excutorSensorHint1;
     EXPECT_EQ(CheckUpdatePermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
     g_userInfoList = nullptr;
     g_session = nullptr;
@@ -161,12 +165,12 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
     CredentialInfoHal credInfo = {};
     EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
 
-    int32_t userId = 32158;
+    constexpr int32_t userId = 32158;
     struct SessionInfo session = {};
     session.userId = userId;
     session.isScheduleValid = true;
     session.scheduleId = 10;
-    session.authType = 2;
+    session.authType = FACE_AUTH;
     session.time = UINT64_MAX;
     g_session = &session;
 
@@ -183,17 +187,18 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
 
 HWTEST_F(UserIdmFuncsTest, TestAddCredentialFunc, TestSize.Level0)
 {
-    int32_t userId = 21345;
-    EXPECT_EQ(AddCredentialFunc(userId, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    constexpr int32_t userId1 = 21345;
+    constexpr int32_t userId2 = 1122;
+    EXPECT_EQ(AddCredentialFunc(userId1, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
     Buffer *scheduleResult = CreateBufferBySize(20);
     uint64_t credentialId = 0;
     Buffer *rootSecret = nullptr;
-    EXPECT_EQ(AddCredentialFunc(userId, scheduleResult, &credentialId, &rootSecret), RESULT_UNKNOWN);
-    
+    Buffer *authToken = nullptr;
+    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret, &authToken), RESULT_UNKNOWN);
     struct SessionInfo session = {};
-    session.userId = 1122;
+    session.userId = userId2;
     g_session = &session;
-    EXPECT_EQ(AddCredentialFunc(userId, scheduleResult, &credentialId, &rootSecret), RESULT_UNKNOWN);
+    EXPECT_EQ(AddCredentialFunc(userId1, scheduleResult, &credentialId, &rootSecret, &authToken), RESULT_UNKNOWN);
     g_session = nullptr;
 }
 
@@ -225,7 +230,7 @@ HWTEST_F(UserIdmFuncsTest, TestGetUserInfoFunc, TestSize.Level0)
 HWTEST_F(UserIdmFuncsTest, TestGetDeletedCredential, TestSize.Level0)
 {
     g_userInfoList = nullptr;
-    int32_t userId = 2156;
+    constexpr int32_t userId = 2156;
     CredentialInfoHal deletedCredInfo = {};
     EXPECT_EQ(GetDeletedCredential(userId, &deletedCredInfo), RESULT_UNKNOWN);
 
@@ -248,20 +253,20 @@ HWTEST_F(UserIdmFuncsTest, TestGetDeletedCredential, TestSize.Level0)
 HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
 {
     g_session = nullptr;
-    uint64_t scheduleId = 10;
-    int32_t userId = 2112;
+    constexpr uint64_t scheduleId = 10;
+    constexpr int32_t userId = 2112;
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     struct SessionInfo session = {};
     session.userId = 1122;
     session.scheduleId = 20;
-    session.authType = 2;
+    session.authType = FACE_AUTH;
     session.isScheduleValid = true;
     session.time = UINT64_MAX;
     g_session = &session;
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
-    session.scheduleId = 10;
+    session.scheduleId = scheduleId;
     EXPECT_EQ(CheckResultValid(scheduleId, userId), RESULT_GENERAL_ERROR);
 
     session.time = GetSystemTime();
@@ -273,14 +278,12 @@ HWTEST_F(UserIdmFuncsTest, TestCheckResultValid, TestSize.Level0)
 
 HWTEST_F(UserIdmFuncsTest, TestUpdateCredentialFunc, TestSize.Level0)
 {
-    EXPECT_EQ(UpdateCredentialFunc(0, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateCredentialFunc(0, nullptr, nullptr), RESULT_BAD_PARAM);
 
-    uint32_t bufferSize = 10;
+    constexpr uint32_t bufferSize = 10;
     Buffer *scheduleResult = CreateBufferBySize(bufferSize);
-    uint64_t credentialId = 10;
-    CredentialInfoHal credInfo = {};
-    Buffer *rootSecret = nullptr;
-    EXPECT_EQ(UpdateCredentialFunc(0, scheduleResult, &credentialId, &credInfo, &rootSecret), RESULT_UNKNOWN);
+    UpdateCredentialOutput output = {};
+    EXPECT_EQ(UpdateCredentialFunc(0, scheduleResult, &output), RESULT_UNKNOWN);
 }
 } // namespace UserAuth
 } // namespace UserIam

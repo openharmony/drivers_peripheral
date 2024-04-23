@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "parameter.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_device_manager.h"
 #include "device_resource_if.h"
@@ -39,6 +40,7 @@
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
+constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 
 namespace OHOS {
 namespace HDI {
@@ -51,6 +53,16 @@ UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
 uint32_t UsbImpl::attachCount_ = 0;
 uint32_t UsbImpl::attachFailedCount_ = 0;
+static const std::map<std::string, uint32_t> configMap = {
+    {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
+    {HDC_CONFIG_HDC, USB_FUNCTION_HDC},
+    {HDC_CONFIG_ON, USB_FUNCTION_HDC},
+    {HDC_CONFIG_RNDIS, USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE, USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_RNDIS_HDC, USB_FUNCTION_HDC + USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
+};
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -902,6 +914,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_ADD");
         isGadgetConnected_ = true;
         USBDeviceInfo info = {ACT_UPDEVICE, 0, 0};
         if (subscriber == nullptr) {
@@ -911,6 +924,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         ret = subscriber->DeviceEvent(info);
         return ret;
     } else if (id == USB_PNP_DRIVER_GADGET_REMOVE) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_GADGET_REMOVE");
         isGadgetConnected_ = false;
         USBDeviceInfo info = {ACT_DOWNDEVICE, 0, 0};
         if (subscriber == nullptr) {
@@ -920,11 +934,13 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         ret = subscriber->DeviceEvent(info);
         return ret;
     } else if (id == USB_PNP_DRIVER_PORT_HOST) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_HOST");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber);
     } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
+        HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_DRIVER_PORT_DEVICE");
         return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber);
     }
-
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "USB_PNP_NOTIFY_ADD_OR_REMOVE_DEVICE");
     ret = UsbdPnpNotifyAddAndRemoveDevice(data, usbdSubscriber, id);
     return ret;
 }
@@ -948,8 +964,31 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::UpdateFunctionStatus()
+{
+    char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
+    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
+    if (ret <= 0) {
+        HDF_LOGI("%{public}s: GetParameter failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    std::string functionValue(cFunctionValue);
+    auto it = configMap.find(functionValue);
+    if (it != configMap.end()) {
+        HDF_LOGI("Function is %{public}s", functionValue.c_str());
+        return UsbdFunction::UsbdUpdateFunction(it->second);
+    }
+    return HDF_FAILURE;
+}
+
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    int32_t ret = UsbImpl::UpdateFunctionStatus();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: UpdateFunctionStatus failed", __func__);
+        return HDF_FAILURE;
+    }
     inst->parsePortPath();
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {

@@ -24,9 +24,7 @@
         "hilog",
         "ipc"
       ],
-      "third_part": [
-        "bounds_checking_function",
-        "googletest"
+      "third_party": [
       ]
     },
     "build": {

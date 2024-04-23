@@ -38,7 +38,7 @@ class CameraHalHisysevent {
 public:
     static std::string CreateMsg(const char* format, ...);
     static void WriteFaultHisysEvent(const std::string &name, const std::string &msg);
-    static std::string GetEventName(ErrorEventType ErrorEventType);
+    static std::string GetEventName(ErrorEventType errorEventType);
 };
 }  // namespace OHOS::Camera
 #endif

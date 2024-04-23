@@ -67,11 +67,6 @@ RetCode HeapBufferAllocator::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
         return RC_ERROR;
     }
 
-    char* addr = reinterpret_cast<char*>(buffer->GetVirAddress());
-    if (addr != nullptr) {
-        delete[] addr;
-        addr = nullptr;
-    }
     buffer->Free();
     return RC_OK;
 }

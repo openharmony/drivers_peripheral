@@ -13,12 +13,13 @@
  * limitations under the License.
  */
  
-#include <string.h>
-#include <hdf_log.h>
-#include "hdi_wpa_hal.h"
 #include "hdi_wpa_common.h"
-#include "wpa_common_cmd.h"
+#include <hdf_log.h>
+#include <string.h>
 #include "common/wpa_ctrl.h"
+#include "hdi_wpa_hal.h"
+#include "wpa_common_cmd.h"
+
 #undef LOG_TAG
 #define LOG_TAG "HdiHalWpaCommon"
 
@@ -121,11 +122,31 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
 int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
 {
     HDF_LOGI("enter WpaCliCmd");
-    if (cmd == NULL || buf == NULL || bufLen <= 0) {
+    if (cmd == NULL || buf == NULL || bufLen == 0) {
         HDF_LOGE("WpaCliCmd, invalid parameters!");
         return -1;
     }
-    WpaCtrl *ctrl = GetWpaCtrl();
+    WpaCtrl *ctrl = NULL;
+    char *ifName = NULL;
+    if (strncmp(cmd, "IFNAME=", strlen("IFNAME=")) == 0) {
+        ifName = (char *)cmd + strlen("IFNAME=");
+    } else if (strncmp(cmd, "INTERFACE_ADD ", strlen("INTERFACE_ADD ")) == 0) {
+        ifName = (char *)cmd + strlen("INTERFACE_ADD ");
+    } else if (strncmp(cmd, "INTERFACE_REMOVE ", strlen("INTERFACE_REMOVE ")) == 0) {
+        ifName = (char *)cmd + strlen("INTERFACE_REMOVE ");
+    } else {
+        ifName = "wlan0";
+    }
+ 
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+        ctrl = GetStaCtrl();
+    } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        ctrl = GetP2pCtrl();
+    } else if (strncmp(ifName, "chba", strlen("chba")) == 0) {
+        ctrl = GetChbaCtrl();
+    } else if (strncmp(ifName, "common", strlen("common")) == 0) {
+        ctrl = GetCommonCtrl();
+    }
     if (ctrl == NULL || ctrl->pSend == NULL) {
         HDF_LOGE("WpaCliCmd, ctrl/ctrl->pSend is NULL!");
         return -1;

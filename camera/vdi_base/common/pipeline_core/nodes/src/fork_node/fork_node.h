@@ -36,6 +36,8 @@ public:
 private:
     void DrainForkBufferPool();
     void DeliverBufferToNextNode();
+    void DeliverForkBuffer(std::shared_ptr<IBuffer>& forkbuffer);
+
     std::mutex                            mtx_;
     std::queue<std::shared_ptr<IBuffer>>  bufferQueue_ = {};
     std::condition_variable               bqcv_;
@@ -51,6 +53,7 @@ private:
     std::shared_ptr<IBuffer>              pendingBuffer_ = nullptr;   // pending buffer for branch stream
     std::mutex requestLock_;
     std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
+    bool                                  isDeliveryForkBufferInAloneThread_ = true;
 };
 } // namespace OHOS::Camera
 #endif

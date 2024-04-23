@@ -14,8 +14,9 @@
  */
 
 #include "running_lock_counter.h"
-
+#ifdef HAS_POWER_HISYSEVENT_PART
 #include "hisysevent.h"
+#endif
 #include "hdf_base.h"
 #include "system_operation.h"
 #include "power_hdf_log.h"
@@ -68,6 +69,7 @@ void RunningLockCounter::Clean()
 
 void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType changeType, RunningLockState state)
 {
+#ifdef HAS_POWER_HISYSEVENT_PART
     const int logLevel = 2;
     const std::string &tag = runninglockNotifyStr_.at(changeType);
     const std::string bundleName = "";
@@ -75,6 +77,7 @@ void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType c
         HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "PID", info.pid, "UID", info.uid, "STATE", static_cast<int32_t>(state), "TYPE", type_, "NAME", info.name,
         "BUNDLENAME", bundleName, "LOG_LEVEL", logLevel, "TAG", tag);
+#endif
 }
 } // namespace V1_1
 } // namespace Power

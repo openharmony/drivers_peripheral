@@ -27,7 +27,9 @@ void DCameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string cameraId(reinterpret_cast<const char*>(data), size);
+    std::string cameraId = "1";
+    std::string dcameraBase = "2";
+    DCameraHost::GetInstance()->dhBaseHashDCamIdMap_.emplace(dcameraBase, cameraId);
     std::vector<std::string> cameraIds;
     cameraIds.push_back(cameraId);
     DCameraHost::GetInstance()->GetCameraIds(cameraIds);

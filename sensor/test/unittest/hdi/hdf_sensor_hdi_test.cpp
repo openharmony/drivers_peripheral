@@ -24,7 +24,6 @@
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 #include "sensor_uhdf_log.h"
-#include <unistd.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 using namespace testing::ext;

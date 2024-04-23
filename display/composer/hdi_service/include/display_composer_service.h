@@ -20,14 +20,18 @@
 #include "cache_manager/device_cache_manager.h"
 #include "v1_1/display_command/display_cmd_responser.h"
 #include "v1_1/idisplay_composer.h"
+#include "v1_2/display_command/display_cmd_responser.h"
+#include "v1_2/idisplay_composer.h"
+#include "v1_2/display_composer_type.h"
+#include <mutex>
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
-class DisplayComposerService : public V1_1::IDisplayComposer {
+class DisplayComposerService : public V1_2::IDisplayComposer {
 public:
     DisplayComposerService();
     virtual ~DisplayComposerService();
@@ -70,6 +74,7 @@ public:
     int32_t GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts) override;
     int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) override;
     int32_t RegRefreshCallback(const sptr<IRefreshCallback>& cb) override;
+    int32_t CommitAndGetReleaseFence() override;
 
 private:
     void HidumperInit();
@@ -85,6 +90,7 @@ private:
 private:
     /* Common */
     void* libHandle_;
+    std::mutex mutex_;
     std::shared_ptr<DeviceCacheManager> cacheMgr_;
     uint32_t currentBacklightLevel_;
     sptr<IHotPlugCallback> hotPlugCb_;
@@ -92,15 +98,15 @@ private:
     sptr<IModeCallback> modeCb_;
     sptr<ISeamlessChangeCallback> seamlessChangeCb_;
 
-    /* V1_0 */
+    /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
-    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
+    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
 
-    /* V1_1 */
+    /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;
     DestroyComposerVdiFuncV1_1 destroyVdiFuncV1_1_;
-    std::unique_ptr<V1_1::HdiDisplayCmdResponser> cmdResponserV1_1_;
+    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponserV1_1_;
     sptr<IRefreshCallback> refreshCb_;
 };
 } // namespace Composer

@@ -38,6 +38,8 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
     buffer->SetSize(static_cast<uint32_t>(bufHandle->size));
     buffer->SetVirAddress(surfaceBuffer->GetVirAddr());
+    buffer->SetSuffaceBufferAddr(surfaceBuffer->GetVirAddr());
+    buffer->SetSuffaceBufferSize(static_cast<uint32_t>(bufHandle->size));
 
     return RC_OK;
 }

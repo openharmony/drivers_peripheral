@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_CODEC_V2_0_CODECCALLBACKSERVICE_H
-#define OHOS_HDI_CODEC_V2_0_CODECCALLBACKSERVICE_H
+#ifndef OHOS_HDI_CODEC_V3_0_CODECCALLBACKSERVICE_H
+#define OHOS_HDI_CODEC_V3_0_CODECCALLBACKSERVICE_H
 
-#include "v2_0/icodec_callback.h"
+#include "v3_0/icodec_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V2_0 {
+namespace V3_0 {
 class CodecCallbackService : public ICodecCallback {
 public:
     CodecCallbackService() = default;
@@ -30,9 +30,9 @@ public:
     int32_t EmptyBufferDone(int64_t appData, const OmxCodecBuffer &buffer) override;
     int32_t FillBufferDone(int64_t appData, const OmxCodecBuffer &buffer) override;
 };
-} // V2_0
+} // V3_0
 } // Codec
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_CODEC_V2_0_CODECCALLBACKSERVICE_H
+#endif // OHOS_HDI_CODEC_V3_0_CODECCALLBACKSERVICE_H

@@ -24,7 +24,7 @@ constexpr int ITEM_CAPACITY_SIZE = 30;
 constexpr int DATA_CAPACITY_SIZE = 2000;
 
 namespace OHOS::Camera {
-IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager)
+IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager);
 V4L2DeviceManager::V4L2DeviceManager() {}
 
 V4L2DeviceManager::~V4L2DeviceManager() {}
@@ -752,8 +752,8 @@ void V4L2DeviceManager::AddDefaultAbilityStreamAvailableBasicConfigurations(std:
 
 void V4L2DeviceManager::AddDefaultSensorOrientation(std::shared_ptr<CameraMetadata> metadata)
 {
-    std::vector<uint8_t> sensorOrientationVector;
-    const uint8_t sensorOrientation = 0;
+    std::vector<int32_t> sensorOrientationVector;
+    const int32_t sensorOrientation = 0;
     sensorOrientationVector.push_back(sensorOrientation);
     AddOrUpdateOhosTag(metadata, OHOS_SENSOR_ORIENTATION, sensorOrientationVector);
 }

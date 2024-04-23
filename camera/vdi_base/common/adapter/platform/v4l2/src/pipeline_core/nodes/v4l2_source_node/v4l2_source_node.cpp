@@ -193,5 +193,19 @@ void V4L2SourceNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadat
         meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
     }
 }
+void V4L2SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+{
+    if (buffer == nullptr) {
+        CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
+        return;
+    }
+    CAMERA_LOGI("V4L2SourceNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
+        buffer->GetStreamId(), buffer->GetIndex());
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
+    buffer->SetCurWidth(wide_);
+    buffer->SetCurHeight(high_);
+    SourceNode::DeliverBuffer(buffer);
+}
+
 REGISTERNODE(V4L2SourceNode, {"v4l2_source"})
 } // namespace OHOS::Camera

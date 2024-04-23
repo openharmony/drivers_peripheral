@@ -47,7 +47,7 @@ struct MetadataTag {
     CameraId cameraId2 = CAMERA_FIRST;
 };
 
-const MetadataTag g_ohosMapCameraId[] = {
+const MetadataTag OHOS_MAP_CAMERA_ID[] = {
     { "lcam001", CAMERA_THIRD },
     { "lcam002", CAMERA_THIRD },
     { "lcam003", CAMERA_FOURTH },
@@ -57,7 +57,7 @@ const MetadataTag g_ohosMapCameraId[] = {
 
 CameraId UvcNode::ConvertCameraId(const std::string &cameraId)
 {
-    for (auto cameraID : g_ohosMapCameraId) {
+    for (auto cameraID : OHOS_MAP_CAMERA_ID) {
         if (cameraID.cameraId1 == cameraId) {
             return cameraID.cameraId2;
         }
@@ -231,7 +231,7 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     CameraDumper& dumper = CameraDumper::GetInstance();
-    dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer);
+    dumper.DumpBuffer("YUV422", ENABLE_UVC_NODE, buffer, wide_, high_);
 
     uint8_t* jBuf = static_cast<uint8_t *>(malloc(buffer->GetSize()));
     YUV422To420(static_cast<uint8_t *>(buffer->GetVirAddress()), static_cast<uint8_t *>(jBuf),
@@ -246,8 +246,11 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
     free(jBuf);
 
-    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer);
+    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer, wide_, high_);
 
+    buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
+    buffer->SetCurWidth(wide_);
+    buffer->SetCurHeight(high_);
     SourceNode::DeliverBuffer(buffer);
     return;
 }
