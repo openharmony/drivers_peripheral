@@ -105,6 +105,10 @@ static WpaSsidField g_wpaHalSsidFields[] = {
     {DEVICE_CONFIG_SAE_PASSWD, "sae_password", WPA_QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_CA_CERT, "ca_cert", WPA_QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_CERT_PWD, "private_key_passwd", WPA_QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_WAPI_CA_CERT, "wapi_ca_cert", WPA_QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_WAPI_USER_CERT, "wapi_user_sel_cert", WPA_QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_WAPI_PSK_KEY_TYPE, "psk_key_type", WPA_QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_WAPI_PSK, "wapi_psk", WPA_QUOTATION_MARKS_FLAG_YES},
 };
 
 static int WpaCliCmdStatus(WifiWpaStaInterface *this, const char*ifName, struct WpaHalCmdStatus *pcmd)
