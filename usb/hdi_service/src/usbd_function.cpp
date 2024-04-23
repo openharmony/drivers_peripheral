@@ -139,6 +139,12 @@ int32_t UsbdFunction::AddHdc()
         HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
+
+    status = SetParameter(PERSIST_SYS_USB_CONFIG, HDC_CONFIG_ON);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add hdc persist config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -157,6 +163,12 @@ int32_t UsbdFunction::SetFunctionToStorage()
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
     if (status != 0) {
         HDF_LOGE("%{public}s:add storage config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+
+    status = SetParameter(PERSIST_SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add storage persist config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -446,6 +458,17 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 int32_t UsbdFunction::UsbdGetFunction(void)
 {
     return currentFuncs_;
+}
+
+int32_t UsbdFunction::UsbdUpdateFunction(uint32_t funcs)
+{
+    if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT && funcs != (USB_FUNCTION_HDC + USB_FUNCTION_RNDIS) &&
+        funcs != (USB_FUNCTION_HDC + USB_FUNCTION_STORAGE)) {
+        HDF_LOGE("%{public}s: funcs invalid funcs is: %{public}d", __func__, funcs);
+        return HDF_FAILURE;
+    }
+    currentFuncs_ = funcs;
+    return HDF_SUCCESS;
 }
 
 int32_t UsbdFunction::UsbdRegisterDevice(const std::string &serviceName)
