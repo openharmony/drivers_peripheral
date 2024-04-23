@@ -1,5 +1,5 @@
 {
-    "adapterNum": 4,
+    "adapterNum": 5,
     "adapters": [{
         "name": "internal",
         "portnum": 2,

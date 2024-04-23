@@ -160,6 +160,15 @@ void DeRegisterObserver()
 }
 
 #ifdef A2DP_HDI_SERVICE
+#define GET_SYM_ERRPR_RET(handle, funcType, funcPtr, funcStr)       \
+    do {                                                            \
+        funcPtr = (funcType)dlsym(handle, funcStr);                 \
+        if (funcPtr == nullptr) {                                   \
+            HDF_LOGE("%{public}s: lib so func not found", funcStr); \
+            return false;                                           \
+        }                                                           \
+    } while (0)
+
 static bool InitAudioDeviceSoHandle(const char *path)
 {
     if (path == NULL) {
@@ -176,31 +185,23 @@ static bool InitAudioDeviceSoHandle(const char *path)
             HDF_LOGE("%{public}s: open lib so fail, reason:%{public}s ", __func__, dlerror());
             return false;
         }
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, setUpFunc, "SetUp");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, tearDownFunc, "TearDown");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, getStateFunc, "GetState");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartPlayingFunc, startPlayingFunc, "StartPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendPlayingFunc, "SuspendPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopPlayingFunc, "StopPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, WriteFrameFunc, writeFrameFunc, "WriteFrame");
 
-        setUpFunc = (SetUpFunc)dlsym(g_ptrAudioDeviceHandle, "SetUp");
-        tearDownFunc = (TearDownFunc)dlsym(g_ptrAudioDeviceHandle, "TearDown");
-        getStateFunc = (GetStateFunc)dlsym(g_ptrAudioDeviceHandle, "GetState");
-        startPlayingFunc = (StartPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StartPlaying");
-        suspendPlayingFunc = (SuspendPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "SuspendPlaying");
-        stopPlayingFunc = (StopPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StopPlaying");
-        writeFrameFunc = (WriteFrameFunc)dlsym(g_ptrAudioDeviceHandle, "WriteFrame");
-
-        fastSetUpFunc = (SetUpFunc)dlsym(g_ptrAudioDeviceHandle, "FastSetUp");
-        fastTearDownFunc = (TearDownFunc)dlsym(g_ptrAudioDeviceHandle, "FastTearDown");
-        fastGetStateFunc = (GetStateFunc)dlsym(g_ptrAudioDeviceHandle, "FastGetState");
-        fastStartPlayingFunc = (StartPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "FastStartPlaying");
-        fastSuspendPlayingFunc = (SuspendPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "FastSuspendPlaying");
-        fastStopPlayingFunc = (StopPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "FastStopPlaying");
-        fastReqMmapBufferFunc = (ReqMmapBufferFunc)(g_ptrAudioDeviceHandle, "FastReqMmapBuffer");
-        fastReadMmapPositionFunc = (ReadMmapPositionFunc)(g_ptrAudioDeviceHandle, "FastReadMmapPosition");
-        if (setUpFunc == NULL || tearDownFunc == NULL || getStateFunc == NULL || startPlayingFunc == NULL ||
-            suspendPlayingFunc == NULL || stopPlayingFunc == NULL || writeFrameFunc == NULL || fastSetUpFunc == NULL ||
-            fastTearDownFunc == NULL || fastGetStateFunc == NULL || fastStartPlayingFunc == NULL ||
-            fastSuspendPlayingFunc == NULL || fastStopPlayingFunc == NULL || fastReqMmapBufferFunc == NULL ||
-            fastReadMmapPositionFunc == NULL) {
-            HDF_LOGE("%{public}s: lib so func not found", __func__);
-            return false;
-        }
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, fastSetUpFunc, "FastSetUp");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, fastTearDownFunc, "FastTearDown");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, fastGetStateFunc, "FastGetState");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartPlayingFunc, fastStartPlayingFunc, "FastStartPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, fastSuspendPlayingFunc, "FastSuspendPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, fastStopPlayingFunc, "FastStopPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReqMmapBufferFunc, fastReqMmapBufferFunc, "FastReqMmapBuffer");
+        GET_SYM_ERRPR_RET(
+            g_ptrAudioDeviceHandle, ReadMmapPositionFunc, fastReadMmapPositionFunc, "FastReadMmapPosition");
     }
     return true;
 }
@@ -269,7 +270,7 @@ int FastStopPlaying()
 {
     BTAudioStreamState state = fastGetStateFunc();
     HDF_LOGI("%{public}s, state=%{public}hhu", __func__, state);
-    if (state != BTAudioStreamState::INVAILD) {
+    if (state != BTAudioStreamState::INVALID) {
         fastStopPlayingFunc();
     }
     return HDF_SUCCESS;
@@ -280,9 +281,9 @@ int FastReqMmapBuffer(int32_t ashmemLength)
     return fastReqMmapBufferFunc(ashmemLength);
 }
 
-int FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames)
+void FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames)
 {
-    return fastReadMmapPositionFunc(sec, nSec, frames);
+    fastReadMmapPositionFunc(sec, nSec, frames);
 }
 #endif
 

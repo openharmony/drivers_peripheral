@@ -821,7 +821,7 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
         HDF_LOGE("reqmmapbuffer failed");
         return ret;
     }
-    if (!HdfSbufWriteFileDescriptor(reply, desc.memoryAddress)) {
+    if (!HdfSbufWriteFileDescriptor(reply, desc.memoryFd)) {
         HDF_LOGE("memoryFd write failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -841,7 +841,7 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if (!HdfSbufWriteUInt32(reply, desc.offset)) {
+    if (!HdfSbufWriteUint32(reply, desc.offset)) {
         HDF_LOGE("offset write failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }

@@ -654,7 +654,7 @@ int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struc
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (!HdfSbufReadInt32(reply, &desc->offset)) {
+    if (!HdfSbufReadUint32(reply, &desc->offset)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }

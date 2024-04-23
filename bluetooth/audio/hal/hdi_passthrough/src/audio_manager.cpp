@@ -91,7 +91,9 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     if (manager == NULL || hwAdapter == NULL) {
         return;
     }
+#ifdef A2DP_HDI_SERVICE
     bool isFastAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_a2dp_fast") == 0);
+#endif
     if (hwAdapter->portCapabilitys != NULL) {
         int32_t portNum = hwAdapter->adapterDescriptor.portNum;
         int32_t i = 0;
