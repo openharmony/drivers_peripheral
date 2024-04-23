@@ -61,6 +61,7 @@ public:
     OHOS::sptr<IDCameraProviderCallback> GetProviderCallback();
     std::string GetDCameraId();
     bool IsOpened();
+    void SetDcameraAbility(const std::string& sinkAbilityInfo);
 
 private:
     void Init(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
