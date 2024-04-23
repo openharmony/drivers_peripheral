@@ -104,7 +104,7 @@ public:
 
 private:
     struct BatterySysfsInfo {
-        char* name;
+        char* name = nullptr;
         std::string capacityPath;
         std::string voltagePath;
         std::string temperaturePath;
