@@ -965,6 +965,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level1)
 
     powerState = PowerHdfState::SLEEP;
     EXPECT_NE(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
-    EXPECT_NE(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
 }
 }
