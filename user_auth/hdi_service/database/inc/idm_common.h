@@ -34,13 +34,18 @@ typedef struct {
     uint32_t executorSensorHint;
     uint32_t executorMatcher;
     uint32_t capabilityLevel;
-    int32_t userType;
 } CredentialInfoHal;
 
 typedef struct {
     uint32_t authType;
     uint64_t enrolledId;
 } EnrolledInfoHal;
+
+typedef struct {
+    int32_t userId;
+    int32_t userType;
+    bool needUserType;
+} UserDetails;
 
 typedef struct {
     int32_t userId;

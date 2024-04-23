@@ -20,6 +20,7 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "idm_file_manager.h"
+#include "idm_session.h"
 
 #define MAX_DUPLICATE_CHECK 100
 #define PRE_APPLY_NUM 5
@@ -298,7 +299,12 @@ IAM_STATIC UserInfo *CreateUser(int32_t userId)
         return NULL;
     }
     user->userId = userId;
-    ResultCode ret = GenerateDeduplicateUint64(g_userInfoList, &user->secUid, IsSecureUidDuplicate);
+    ResultCode ret = GetUserTypeFromSession(&(user->userType));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get userType failed");
+        return NULL;
+    }
+    ret = GenerateDeduplicateUint64(g_userInfoList, &user->secUid, IsSecureUidDuplicate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("generate secureUid failed");
         DestroyUserInfoNode(user);
@@ -482,7 +488,8 @@ IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
         LOG_ERROR("create user failed");
         return RESULT_UNKNOWN;
     }
-    user->userType = credentialInfo->userType;
+    LOG_INFO("user userId %{public}d", user->userId);
+    LOG_INFO("user userType %{public}d", user->userType);
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential to user failed");
