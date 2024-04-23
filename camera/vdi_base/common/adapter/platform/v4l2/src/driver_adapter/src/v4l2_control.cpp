@@ -72,11 +72,35 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
     return RC_OK;
 }
 
+void HosV4L2Control::V4L2VidiocGExtCtrls (int fd, int ret, int &count,
+    v4l2_ext_control *cList, std::vector<DeviceControl>& control)
+{
+    auto iter = control.begin();
+    if (ret) {
+        CAMERA_LOGE("HosV4L2Control::VIDIOC_G_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
+        struct v4l2_control ctrl;
+        for (int i = 0; count > 0; i++, count--) {
+            ctrl.id = cList[i].id;
+            ret = ioctl(fd, VIDIOC_G_CTRL, &ctrl);
+            if (ret) {
+                continue;
+            }
+
+            iter->value = ctrl.value;
+            iter++;
+        }
+    } else {
+        for (int i = 0; count > 0; i++, count--) {
+            iter->value = cList[i].value;
+            iter++;
+        }
+    }
+}
+
 RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& control, const int numControls)
 {
     int ret;
     int count = 0;
-    auto iter = control.begin();
     CAMERA_LOGI("HosV4L2Control::V4L2GetCtrls in fd %{public}d\n", fd);
     if (numControls != static_cast<int>(control.size())) {
         CAMERA_LOGE("HosV4L2Control::V4L2GetCtrls numControls != control.size()\n");
@@ -100,25 +124,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
             ctrls.count = count;
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
-            if (ret) {
-                CAMERA_LOGE("HosV4L2Control::VIDIOC_G_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
-                struct v4l2_control ctrl;
-                for (int i = 0; count > 0; i++, count--) {
-                    ctrl.id = cList[i].id;
-                    ret = ioctl(fd, VIDIOC_G_CTRL, &ctrl);
-                    if (ret) {
-                        continue;
-                    }
-
-                    iter->value = ctrl.value;
-                    iter++;
-                }
-            } else {
-                for (int i = 0; count > 0; i++, count--) {
-                    iter->value = cList[i].value;
-                    iter++;
-                }
-            }
+            V4L2VidiocGExtCtrls(fd, ret, count, cList, control);
 
             count = 0;
         }
@@ -213,12 +219,35 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     CAMERA_LOGI("V4L2SetValue out fd = %{public}d\n", fd);
 }
 
+void HosV4L2Control::V4L2EnumExtControl(int fd, v4l2_queryctrl &qCtrl, DeviceControl &ctrl)
+{
+    int rc;
+    if (qCtrl.type == V4L2_CTRL_TYPE_MENU) {
+        struct v4l2_querymenu menu = {};
+        V4l2Menu menuTemp = {};
+        for (menu.index = static_cast<uint32_t>(qCtrl.minimum);
+                menu.index <= static_cast<uint32_t>(qCtrl.maximum);
+                menu.index++) {
+            menu.id = qCtrl.id;
+            rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
+            if (rc < 0) {
+                continue;
+            }
+            CAMERA_LOGD("\t V4L2EnumExtControls %{public}d : %{public}s\n", menu.index, menu.name);
+            menuTemp.index = menu.index;
+            menuTemp.id = menu.id;
+            menuTemp.value = menu.value;
+            menuTemp.name = std::string(reinterpret_cast<char*>(menu.name));
+            ctrl.menu.push_back(menuTemp);
+        }
+    }
+}
+
 void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& control)
 {
     CAMERA_LOGI("V4L2EnumExtControls in fd = %{public}d\n", fd);
     struct v4l2_queryctrl qCtrl = {};
     DeviceControl ctrl = {};
-    int rc;
 
     qCtrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     while (!ExtControl(fd, &qCtrl)) {
@@ -229,25 +258,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
 
         V4L2SetValue(fd, control, ctrl, qCtrl);
 
-        if (qCtrl.type == V4L2_CTRL_TYPE_MENU) {
-            struct v4l2_querymenu menu = {};
-            V4l2Menu menuTemp = {};
-            for (menu.index = static_cast<uint32_t>(qCtrl.minimum);
-                    menu.index <= static_cast<uint32_t>(qCtrl.maximum);
-                    menu.index++) {
-                menu.id = qCtrl.id;
-                rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
-                if (rc < 0) {
-                    continue;
-                }
-                CAMERA_LOGD("\t V4L2EnumExtControls %{public}d : %{public}s\n", menu.index, menu.name);
-                menuTemp.index = menu.index;
-                menuTemp.id = menu.id;
-                menuTemp.value = menu.value;
-                menuTemp.name = std::string(reinterpret_cast<char*>(menu.name));
-                ctrl.menu.push_back(menuTemp);
-            }
-        }
+        V4L2EnumExtControl(fd, qCtrl, ctrl);
         // Need fix: ctrl menu will keep old menu. Need clear ctrl every convert
         control.push_back(ctrl);
     }

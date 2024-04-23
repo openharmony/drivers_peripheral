@@ -25,7 +25,7 @@ constexpr int ITEM_CAPACITY_SIZE = 30;
 constexpr int DATA_CAPACITY_SIZE = 2000;
 
 namespace OHOS::Camera {
-IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager)
+IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager);
 V4L2DeviceManager::V4L2DeviceManager() {}
 
 V4L2DeviceManager::~V4L2DeviceManager() {}
