@@ -537,7 +537,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         if (g_tmpUserInfoList != NULL) {
             LOG_INFO("g_tmpUserInfoList size: %{public}d", g_tmpUserInfoList->getSize(g_tmpUserInfoList));
         } else {
-            LOG_INFO("CheckEnrollPermission g_tmpUserInfoList is NULL!");
+            LOG_INFO("g_tmpUserInfoList is NULL!");
         }
         return ret;
     }
