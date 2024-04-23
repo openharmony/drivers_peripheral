@@ -91,7 +91,7 @@ IAM_STATIC ResultCode GenerateCoAuthSchedule(PermissionCheckParam *param, bool i
         LOG_ERROR("add coauth schedule failed");
         goto EXIT;
     }
-    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate);
+    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate, enrollSchedule->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm associate coauth schedule failed");
         RemoveCoAuthSchedule(enrollSchedule->scheduleId);
@@ -171,7 +171,6 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
     credentialInfo->capabilityLevel = result->capabilityLevel;
     credentialInfo->executorSensorHint = GetScheduleVeriferSensorHint(schedule);
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
-    credentialInfo->userType = schedule->userType;
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,

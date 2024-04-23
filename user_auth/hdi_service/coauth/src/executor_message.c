@@ -94,7 +94,7 @@ IAM_STATIC ResultCode ExtractUserIdAndUserType(const Attribute *attribute, Attri
 }
 
 IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
-    Uint8Array *retDataAndSignTlv)
+    Uint8Array *retDataAndSignTlv, bool needUserType)
 {
     Attribute *dataAndSignAttribute = CreateEmptyAttribute();
     Uint8Array dataTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
@@ -111,10 +111,12 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
             LOG_ERROR("GetAttributeSerializedMsg for data fail");
             break;
         }
-        result = ExtractUserIdAndUserType(attribute, dataAndSignAttribute);
-        if (result != RESULT_SUCCESS) {
-            LOG_ERROR("ExtractUserIdAndUserType for userData fail");
-            break;
+        if (needUserType == true) {
+            result = ExtractUserIdAndUserType(attribute, dataAndSignAttribute);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("ExtractUserIdAndUserType for userData fail");
+                break;
+            }
         }
         result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, dataTlv);
         if (result != RESULT_SUCCESS) {
@@ -146,7 +148,8 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
     return result;
 }
 
-ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg)
+ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg,
+    bool needUserType)
 {
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == NULL, RESULT_GENERAL_ERROR);
     IF_TRUE_LOGE_AND_RETURN_VAL(retMsg == NULL, RESULT_GENERAL_ERROR);
@@ -162,7 +165,7 @@ ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignatur
             break;
         }
 
-        result = GetAttributeDataAndSignTlv(attribute, needSignature, &dataAndSignTlv);
+        result = GetAttributeDataAndSignTlv(attribute, needSignature, &dataAndSignTlv, needUserType);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("GetAttributeDataAndSignTlv fail");
             break;
@@ -480,9 +483,9 @@ IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMod
     }
 
     if (authPropertyMode == PROPERTY_MODE_UNFREEZE) {
-        result = GetAttributeExecutorMsg(attribute, true, &retInfo);
+        result = GetAttributeExecutorMsg(attribute, true, &retInfo, false);
     } else {
-        result = GetAttributeExecutorMsg(attribute, false, &retInfo);
+        result = GetAttributeExecutorMsg(attribute, false, &retInfo, false);
     }
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeExecutorMsg failed");

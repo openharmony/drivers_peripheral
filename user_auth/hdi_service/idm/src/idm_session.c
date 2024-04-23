@@ -45,6 +45,7 @@ struct SessionInfo {
     uint64_t scheduleId;
     bool isUpdate;
     bool isScheduleValid;
+    int32_t userType;
 } *g_session;
 
 IAM_STATIC Buffer *g_cacheRootSecret = NULL;
@@ -181,7 +182,7 @@ ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen)
     return RESULT_SUCCESS;
 }
 
-ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate)
+ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate, int32_t userType)
 {
     if (!IsSessionExist()) {
         return RESULT_NEED_INIT;
@@ -190,6 +191,16 @@ ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool 
     g_session->authType = authType;
     g_session->isUpdate = isUpdate;
     g_session->isScheduleValid = true;
+    g_session->userType = userType;
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetUserTypeFromSession(int32_t *userType)
+{
+    if (!IsSessionExist()) {
+        return RESULT_NEED_INIT;
+    }
+    *userType = g_session->userType;
     return RESULT_SUCCESS;
 }
 
@@ -327,6 +338,6 @@ ResultCode IsValidUserType(int32_t userType)
         LOG_ERROR("userType is invalid");
         return RESULT_BAD_PARAM;
     }
-    LOG_INFO("userType is not valid");
+    LOG_INFO("userType is valid");
     return RESULT_SUCCESS;
 }
