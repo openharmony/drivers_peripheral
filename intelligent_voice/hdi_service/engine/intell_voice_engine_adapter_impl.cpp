@@ -58,7 +58,7 @@ int32_t IntellVoiceEngineAdapterImpl::SetCallback(const sptr<IIntellVoiceEngineC
     return HDF_SUCCESS;
 }
 
-int32_t IntellVoiceEngineAdapterImpl::Attach(const IntellVoiceEngineAdapterInfo& info)
+int32_t IntellVoiceEngineAdapterImpl::Attach(const IntellVoiceEngineAdapterInfo &info)
 {
     INTELLIGENT_VOICE_LOGD("Attach enter");
     return engine_->Init(info);
@@ -97,6 +97,11 @@ int32_t IntellVoiceEngineAdapterImpl::Stop()
 int32_t IntellVoiceEngineAdapterImpl::WriteAudio(const std::vector<uint8_t> &buffer)
 {
     return engine_->Write(buffer.data(), buffer.size());
+}
+
+int32_t IntellVoiceEngineAdapterImpl::Evaluate(const std::string &word, EvaluationResultInfo &info)
+{
+    return engine_->Evaluate(word, info);
 }
 
 int32_t IntellVoiceEngineAdapterImpl::Read(ContentType type, sptr<Ashmem> &buffer)
@@ -159,6 +164,12 @@ int32_t IntellVoiceEngineAdapterImpl::ReadFileDataInner(ContentType type, uint8_
         size = fileSize;
         (void)memcpy_s(buffer, size, fileData.get(), fileSize);
     });
+}
+
+
+int32_t IntellVoiceEngineAdapterImpl::GetWakeupPcm(std::vector<uint8_t> &data)
+{
+    return engine_->GetWakeupPcm(data);
 }
 
 EngineListener::EngineListener(const sptr<IIntellVoiceEngineCallback> &cb) : cb_(cb)

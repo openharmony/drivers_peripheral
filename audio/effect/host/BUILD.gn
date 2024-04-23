@@ -27,6 +27,8 @@ ohos_shared_library("effect_model_service") {
       "hdf_core:libhdi",
       "hilog:libhilog",
     ]
+  } else if (defined(ohos_lite)) {
+    external_deps = [ "hilog_lite:hilog_shared" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

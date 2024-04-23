@@ -13,6 +13,7 @@
 #
 
 import("//build/ohos.gni")
+import("../vibrator.gni")
 
 if (defined(ohos_lite)) {
   config("libhdi_vibrator_pub_config") {
@@ -73,10 +74,12 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_vibrator"
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
+      if (c_utils_enable) {
+        external_deps += [ "c_utils:utils" ]
+      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

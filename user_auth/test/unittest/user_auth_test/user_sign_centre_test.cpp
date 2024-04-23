@@ -16,13 +16,15 @@
 #include <gtest/gtest.h>
 
 #include <cstring>
+#include "securec.h"
+#include <thread>
 
+#include "adaptor_memory.h"
 #include "adaptor_time.h"
 #include "token_key.h"
 #include "user_sign_centre.h"
 
 extern "C" {
-    extern LinkedList *g_userInfoList;
     extern bool IsTimeValid(const UserAuthTokenHal *userAuthToken);
     extern ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *authTokenKey);
     extern ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
@@ -78,15 +80,15 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenSign, TestSize.Level0)
 
 HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
 {
-    const uint32_t testVersion = 1;
-    const uint32_t testAuthTrustLevel = 3;
-    const uint32_t testAuthType = 4;
-    const uint32_t testAuthMode = 5;
-    const uint32_t testSecurityLevel = 6;
-    const int32_t testUserId = 7;
-    const uint64_t testSecureUid = 8;
-    const uint64_t testEnrolledId = 9;
-    const uint64_t testCredentialId = 10;
+    constexpr uint32_t testVersion = 1;
+    constexpr uint32_t testAuthTrustLevel = 3;
+    constexpr uint32_t testAuthType = 4;
+    constexpr uint32_t testAuthMode = 5;
+    constexpr uint32_t testSecurityLevel = 6;
+    constexpr int32_t testUserId = 7;
+    constexpr uint64_t testSecureId = 8;
+    constexpr uint64_t testEnrolledId = 9;
+    constexpr uint64_t testCredentialId = 10;
     UserAuthTokenHal token = {
         .version = testVersion,
         .tokenDataPlain = {
@@ -104,7 +106,7 @@ HWTEST_F(UserAuthSignTest, TestTokenGenerateAndVerify, TestSize.Level0)
     };
     TokenDataToEncrypt data = {
         .userId = testUserId,
-        .secureUid = testSecureUid,
+        .secureUid = testSecureId,
         .enrolledId = testEnrolledId,
         .credentialId = testCredentialId,
     };
@@ -149,6 +151,13 @@ HWTEST_F(UserAuthSignTest, TestUserAuthTokenVerify, TestSize.Level0)
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_BAD_SIGN);
     EXPECT_EQ(UserAuthTokenSign(&userAuthToken, &userAuthTokenKey), RESULT_SUCCESS);
     EXPECT_EQ(UserAuthTokenVerify(&userAuthToken, &userAuthTokenPlain), RESULT_GENERAL_ERROR);
+}
+
+HWTEST_F(UserAuthSignTest, TestReuseUnlockTokenSign, TestSize.Level0)
+{
+    UserAuthTokenHal token = {};
+    EXPECT_EQ(ReuseUnlockTokenSign(nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(ReuseUnlockTokenSign(&token), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam

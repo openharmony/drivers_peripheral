@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,17 +24,17 @@
 
 #include <v1_0/audio_types.h>
 #include <v1_0/iaudio_render.h>
-#include <v1_0/id_audio_manager.h>
+#include <v2_0/id_audio_manager.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 constexpr uint32_t DURATION_FRAMES = 100;
 constexpr uint32_t CUR_FRAME_INIT_VALUE = 0;
@@ -106,15 +106,15 @@ private:
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
+    uint32_t renderId_ = 0;
 
     std::mutex renderMtx_;
     std::mutex volMtx_;
     bool firstOpenFlag_ = true;
     bool dumpFlag_ = false;
-    uint32_t timeInterval_ = 5;
     uint32_t currentFrame_ = 0;
     uint32_t vol_ = 0;
-    uint32_t volMax_ = 0;
+    uint32_t volMax_ = 15;
     uint32_t volMin_ = 0;
     int64_t frameIndex_ = 0;
     float renderSpeed_ = 0;

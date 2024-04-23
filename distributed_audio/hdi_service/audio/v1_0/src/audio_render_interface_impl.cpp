@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,8 @@ AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, c
     : adapterName_(adpName), devDesc_(desc),
     devAttrs_(attrs), audioExtCallback_(callback)
 {
-    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
+    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
+        AUDIO_NORMAL_INTERVAL, false);
     DHLOGD("Distributed audio render constructed, period(%{public}d), frameSize(%{public}d).",
         attrs.period, devAttrs_.frameSize);
 }
@@ -117,7 +118,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    int32_t ret = audioExtCallback_->WriteStreamData(adapterName_, devDesc_.pins, data);
+    int32_t ret = audioExtCallback_->WriteStreamData(renderId_, data);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Write stream data failed.");
         return HDF_FAILURE;
@@ -215,7 +216,7 @@ int32_t AudioRenderInterfaceImpl::Start()
         cJSON_Delete(jParam);
         cJSON_free(jsonData);
         DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
-        int32_t ret = audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event);
+        int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
         if (ret != HDF_SUCCESS) {
             DHLOGE("Restart failed.");
         }
@@ -247,7 +248,7 @@ int32_t AudioRenderInterfaceImpl::Stop()
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
-    int32_t ret = audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event);
+    int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Pause and clear cache streams failed.");
     }

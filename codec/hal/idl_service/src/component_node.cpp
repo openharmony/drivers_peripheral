@@ -22,17 +22,20 @@
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"
+#include "sys/mman.h"
 
-using OHOS::HDI::Codec::V2_0::EventInfo;
-using OHOS::HDI::Codec::V2_0::CodecEventType;
-using OHOS::HDI::Codec::V2_0::CodecStateType;
-using OHOS::HDI::Codec::V2_0::CodecCommandType;
-using OHOS::HDI::Codec::V2_0::CodecStateType;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_INVALID;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_LOADED;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_IDLE;
-using OHOS::HDI::Codec::V2_0::CODEC_STATE_EXECUTING;
-using OHOS::HDI::Codec::V2_0::CODEC_COMMAND_STATE_SET;
+#define AUDIO_CODEC_NAME "OMX.audio"
+
+using OHOS::HDI::Codec::V3_0::EventInfo;
+using OHOS::HDI::Codec::V3_0::CodecEventType;
+using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V3_0::CodecCommandType;
+using OHOS::HDI::Codec::V3_0::CodecStateType;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_INVALID;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_LOADED;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_IDLE;
+using OHOS::HDI::Codec::V3_0::CODEC_STATE_EXECUTING;
+using OHOS::HDI::Codec::V3_0::CODEC_COMMAND_STATE_SET;
 #define FD_SIZE sizeof(int)
 namespace {
     constexpr int NAME_LENGTH = 32;
@@ -87,7 +90,7 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
 
 ComponentNode::~ComponentNode()
 {
-    std::shared_lock<std::shared_mutex> lk(mapMutex_);
+    std::unique_lock<std::shared_mutex> lk(mapMutex_);
     omxCallback_ = nullptr;
     bufferHeaderPortMap_.clear();
     codecBufferMap_.clear();
@@ -111,6 +114,7 @@ int32_t ComponentNode::OpenHandle(const std::string &name)
         return err;
     }
     this->comp_ = (OMX_HANDLETYPE)comp;
+    compName_ = name;
     return HDF_SUCCESS;
 }
 
@@ -236,7 +240,7 @@ int32_t ComponentNode::GetState(CodecStateType &state)
 }
 
 int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OHOS::HDI::Codec::V2_0::CodecTunnelSetupType &tunnelSetup)
+                                              OHOS::HDI::Codec::V3_0::CodecTunnelSetupType &tunnelSetup)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
@@ -349,38 +353,20 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
-    if (buffer.fenceFd >= 0) {
-        close(buffer.fenceFd);
-        buffer.fenceFd = -1;
-    }
 
     int32_t err = OMX_ErrorBadParameter;
-    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
-    if (codecBuffer == nullptr) {
-        CODEC_LOGE("codecBuffer is null");
-        return OMX_ErrorInvalidComponent;
+    sptr<ICodecBuffer> codecBuffer = sptr<ICodecBuffer>();
+    if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
+        codecBuffer = sptr<ICodecBuffer>(new ICodecBuffer(buffer));
+    } else {
+        codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
     }
-    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    switch (buffer.bufferType) {
-        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
-            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
-            break;
-        case CODEC_BUFFER_TYPE_HANDLE:
-        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
-            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
-                codecBuffer->GetBuffer());
-            break;
-        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
-            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
-                reinterpret_cast<uint8_t *>(&buffer.fd));
-            break;
-        }
-        default:
-            break;
-    }
+    CHECK_AND_RETURN_RET_LOG(codecBuffer != nullptr, OMX_ErrorInvalidComponent, "codecBuffer is null");
 
+    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
+    err = UseBufferByType(portIndex, buffer, codecBuffer, bufferHdrType);
     if (err != OMX_ErrorNone) {
-        CODEC_LOGE("type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret err[%{public}x]", buffer.bufferType, err);
+        CODEC_LOGE("type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret = [%{public}x]", buffer.bufferType, err);
         codecBuffer = nullptr;
         return err;
     }
@@ -494,11 +480,11 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
         CODEC_LOGE("EmptyOmxBuffer err [%{public}d]", err);
         return err;
     }
+    bufferHdrType->pAppPrivate = nullptr;
+    OMXBufferAppPrivateData privateData{};
     if (buffer.bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE && (!buffer.alongParam.empty())) {
-        OMXBufferAppPrivateData privateData;
-        memset(&privateData, 0, sizeof(privateData));
         privateData.sizeOfParam = static_cast<uint32_t>(buffer.alongParam.size());
-        privateData.param = static_cast<void *>(&buffer.alongParam[0]);
+        privateData.param = static_cast<void *>(buffer.alongParam.data());
         bufferHdrType->pAppPrivate = static_cast<void *>(&privateData);
     }
 
@@ -524,6 +510,40 @@ int32_t ComponentNode::FillThisBuffer(OmxCodecBuffer &buffer)
     }
 
     err = OMX_FillThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
+    return err;
+}
+
+int32_t ComponentNode::UseBufferByType(uint32_t portIndex, OmxCodecBuffer &buffer,
+    sptr<ICodecBuffer> codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType)
+{
+    int32_t err = OMX_ErrorUndefined;
+    switch (buffer.bufferType) {
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD: {
+            if (compName_.find(AUDIO_CODEC_NAME) != std::string::npos) {
+                void *addr = ::mmap(nullptr, static_cast<size_t>(buffer.allocLen),
+                    static_cast<int>(PROT_READ | PROT_WRITE), MAP_SHARED, buffer.fd, 0);
+                CHECK_AND_RETURN_RET_LOG(addr != nullptr, OMX_ErrorBadParameter, "addr is null");
+                err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                    reinterpret_cast<uint8_t *>(addr));
+                break;
+            }
+            err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0,
+                buffer.allocLen);
+            break;
+        }
+        case CODEC_BUFFER_TYPE_HANDLE:
+        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
+                codecBuffer->GetBuffer());
+            break;
+        case CODEC_BUFFER_TYPE_DMA_MEM_FD: {
+            err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, 0,
+                reinterpret_cast<uint8_t *>(&buffer.fd));
+            break;
+        }
+        default:
+            break;
+    }
     return err;
 }
 

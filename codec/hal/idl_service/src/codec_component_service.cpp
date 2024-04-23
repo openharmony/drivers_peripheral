@@ -21,10 +21,13 @@
 #include <unistd.h>
 #include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
+
+#define AUDIO_CODEC_NAME "OMX.audio"
+
 namespace OHOS {
 namespace HDI {
 namespace Codec {
-namespace V2_0 {
+namespace V3_0 {
 CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
     const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name)
 {
@@ -134,14 +137,16 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecUseBuffer");
     CODEC_LOGI("portIndex: [%{public}d]", portIndex);
     outBuffer = const_cast<OmxCodecBuffer &>(inBuffer);
-    if (outBuffer.fd >= 0 && !isIPCMode_ && outBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        outBuffer.fd = dup(inBuffer.fd);
-    }
 
     if (outBuffer.fd >= 0 && isIPCMode_ && outBuffer.bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD &&
-        outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD) {
+        outBuffer.bufferType != CODEC_BUFFER_TYPE_DMA_MEM_FD &&
+        name_.find(AUDIO_CODEC_NAME) == std::string::npos) {
         close(outBuffer.fd);
         outBuffer.fd = -1;
+    }
+    if (outBuffer.fenceFd >= 0) {
+        close(outBuffer.fenceFd);
+        outBuffer.fenceFd = -1;
     }
 
     return node_->UseBuffer(portIndex, outBuffer);
@@ -275,7 +280,7 @@ void CodecComponentService::GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::C
     dumpNode_ = node_;
 }
 
-}  // namespace V2_0
+}  // namespace V3_0
 }  // namespace Codec
 }  // namespace HDI
 }  // namespace OHOS

@@ -65,9 +65,10 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
     for (auto [ss, vv] : seqNode_) {
         CAMERA_LOGI("sink stream id:%{public}d \n", ss);
         for (auto it : vv) {
-            it->wide_ = p->wide_;
-            it->high_ = p->high_;
-            CAMERA_LOGI("seq node name:%{public}s\n", it->GetName().c_str());
+            it->wide_ = p->maxWidth_;
+            it->high_ = p->maxHeight_;
+            CAMERA_LOGI("seq node name:%{public}s, %{public}d * %{public}d\n",
+                it->GetName().c_str(), it->wide_, it->high_);
         }
     }
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump End-------------\n");

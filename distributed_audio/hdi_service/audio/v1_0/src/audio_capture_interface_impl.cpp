@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,8 @@ AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
     : adapterName_(adpName), devDesc_(desc), devAttrs_(attrs), audioExtCallback_(callback)
 {
-    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
+    devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
+        AUDIO_NORMAL_INTERVAL, false);
     const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
     framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) / sizePerSec;
     DHLOGD("Distributed audio capture constructed, period(%{public}d),frameSize(%{public}d).",
@@ -79,7 +80,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     }
 
     AudioData audioData;
-    int32_t ret = audioExtCallback_->ReadStreamData(adapterName_, devDesc_.pins, audioData);
+    int32_t ret = audioExtCallback_->ReadStreamData(captureId_, audioData);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
@@ -131,7 +132,7 @@ int32_t AudioCaptureInterfaceImpl::Start()
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    if (audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event) != HDF_SUCCESS) {
+    if (audioExtCallback_->NotifyEvent(captureId_, event) != HDF_SUCCESS) {
         DHLOGE("Notify start event failed.");
         return HDF_FAILURE;
     }
@@ -165,7 +166,7 @@ int32_t AudioCaptureInterfaceImpl::Stop()
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
     }
-    if (audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event) != HDF_SUCCESS) {
+    if (audioExtCallback_->NotifyEvent(captureId_, event) != HDF_SUCCESS) {
         DHLOGE("Notify stop event failed.");
         return HDF_FAILURE;
     }

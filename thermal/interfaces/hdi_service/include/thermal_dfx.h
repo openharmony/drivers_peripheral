@@ -36,24 +36,23 @@ public:
     ~ThermalDfx();
 
     void Init();
+    void DoWork();
+    uint32_t GetInterval();
     static ThermalDfx& GetInstance();
     static void DestroyInstance();
 
 private:
     std::string CanonicalizeSpecPath(const char* src);
     bool Compress(const std::string& dataFile, const std::string& destFile);
-    void StartThread();
     void CreateLogFile();
     void ProcessLogInfo(std::string& logFile, bool isEmpty);
     void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime);
     void WriteToFile(std::ofstream& wStream, std::string& currentTime);
     void CompressFile();
     bool PrepareWriteDfxLog();
-    void LoopingThreadEntry();
     std::string GetFileNameIndex(const uint32_t index);
     int32_t GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue);
     bool GetBoolParameter(const std::string& key, const bool def);
-    void StopThread();
     void WidthWatchCallback(const std::string& value);
     void IntervalWatchCallback(const std::string& value);
     void EnableWatchCallback(const std::string& value);
@@ -62,8 +61,6 @@ private:
     std::atomic_uint8_t width_;
     std::atomic_uint32_t interval_;
     std::atomic_bool enable_;
-    std::unique_ptr<std::thread> logThread_ {nullptr};
-    std::mutex mutex_;
     static std::mutex mutexInstance_;
     static std::shared_ptr<ThermalDfx> instance_;
 };

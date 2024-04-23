@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
+#include "wpa_supplicant_hal.h"
 #include <poll.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <hdf_log.h>
-#include "securec.h"
 #include "hdi_wpa_common.h"
+#include "securec.h"
 #include "utils/common.h"
 #include "wpa_hdi_util.h"
-#include "wpa_supplicant_hal.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaStaHal"
@@ -42,6 +42,8 @@
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
 #define STA_NO_LEN 2
+#define FREQ_MAX_SIZE 100
+#define CMD_BUFFER_MIN_SIZE 15
 
 const int WPA_QUOTATION_MARKS_FLAG_YES = 0;
 const int WPA_QUOTATION_MARKS_FLAG_NO = 1;
@@ -888,6 +890,10 @@ static int ConcatScanSetting(const ScanSettings *settings, char *buff, int len)
     int pos = 0;
     int res;
     int i;
+    if (settings->freqSize < 0 || settings->freqSize > FREQ_MAX_SIZE) {
+        HDF_LOGE("invalid parameter");
+        return 0;
+    }
     for (i = 0; i < settings->freqSize; ++i) {
         if (i == 0) {
             res = snprintf_s(buff + pos, len - pos, len - pos - 1, "%s", " freq=");
@@ -957,6 +963,10 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     if (settings != NULL) {
         expectedLen = AssignCmdLen(this, settings);
     }
+    if (expectedLen < CMD_BUFFER_MIN_SIZE || expectedLen > CMD_BUFFER_SIZE) {
+        HDF_LOGE("invalid parameter");
+        return -1;
+    }
     if (expectedLen >= len) {
         len = expectedLen + 1;
     }
@@ -1002,23 +1012,15 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
 
 static int ConvertChanToFreqMhz(int channel, int band)
 {
-    int bandFirstChNum24 = 1;
-    int bandLastChNum24 = 14;
-    int bandStartFreqMhz24 = 2412;
-    int bandFirstChMum5 = 32;
-    int bandLastChMum5 = 173;
-    int bandStartFreqMhz5 = 5160;
-    int bandFirstChMum6 = 1;
-    int bandLastChMum6 = 233;
-    int bandStartFreqMhz6 = 5955;
-    int bandCla2Freq136ChMhz6 = 5935;
     int band24Ghz = 1;
-    int bandSpecial = 2484;
-    int channelSpecial = 14;
     int channelTimes = 5;
-    int channelType = 2;
 
     if (band == band24Ghz) {
+        int bandFirstChNum24 = 1;
+        int bandLastChNum24 = 14;
+        int bandStartFreqMhz24 = 2412;
+        int bandSpecial = 2484;
+        int channelSpecial = 14;
         if (channel == channelSpecial) {
             return bandSpecial;
         } else if (channel >= bandFirstChNum24 && channel <= bandLastChNum24) {
@@ -1028,6 +1030,9 @@ static int ConvertChanToFreqMhz(int channel, int band)
         }
     }
     if (band == BAND_5_GHZ) {
+        int bandFirstChMum5 = 32;
+        int bandLastChMum5 = 173;
+        int bandStartFreqMhz5 = 5160;
         if (channel >= bandFirstChMum5 && channel <= bandLastChMum5) {
             return ((channel - bandFirstChMum5) * channelTimes) + bandStartFreqMhz5;
         } else {
@@ -1035,14 +1040,19 @@ static int ConvertChanToFreqMhz(int channel, int band)
         }
     }
     if (band == BAND_6_GHZ) {
+        int bandFirstChMum6 = 1;
+        int bandLastChMum6 = 233;
+        int bandStartFreqMhz6 = 5955;
+        int bandCla2Freq136ChMhz6 = 5935;
+        int channelType = 2;
         if (channel >= bandFirstChMum6 && channel <= bandLastChMum6) {
             if (channel == channelType) {
                 return bandCla2Freq136ChMhz6;
             }
             return ((channel - bandFirstChMum6) * channelTimes) + bandStartFreqMhz6;
-            } else {
-                return UNSPECIFIED;
-            }
+        } else {
+            return UNSPECIFIED;
+        }
     }
     return UNSPECIFIED;
 }
@@ -1083,9 +1093,9 @@ static int GetHtChanWidth(int secondOffsetChannel)
 
 static int GetHtCentFreq0(int primaryFrequency, int secondOffsetChannel)
 {
-    int freqValue = 10;
-    int offsetChannle = 3;
     if (secondOffsetChannel != 0) {
+        int freqValue = 10;
+        int offsetChannle = 3;
         if (secondOffsetChannel == 1) {
             return primaryFrequency + freqValue;
         } else if (secondOffsetChannel == offsetChannle) {

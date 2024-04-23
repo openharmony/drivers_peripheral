@@ -642,7 +642,7 @@ void TestCameraBase::StopStream(std::vector<int>& captureIds, std::vector<int>& 
 {
     constexpr uint32_t timeForWaitCancelCapture = 2;
     sleep(timeForWaitCancelCapture);
-    if (sizeof(captureIds) > 0) {
+    if (captureIds.size() > 0) {
         for (const auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
@@ -670,7 +670,7 @@ void TestCameraBase::StopStream(std::vector<int>& captureIds, std::vector<int>& 
         }
     }
     sleep(1);
-    if (sizeof(streamIds) > 0) {
+    if (streamIds.size() > 0) {
         // release stream
         rc = (CamRetCode)streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);

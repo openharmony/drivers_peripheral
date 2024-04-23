@@ -47,13 +47,13 @@ HWTEST_F(IdentifyFuncsTest, TestDoIdentify, TestSize.Level0)
 
 HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_001, TestSize.Level0)
 {
-    uint64_t contextId = 1235;
+    constexpr uint64_t contextId = 1235;
     EXPECT_EQ(DoUpdateIdentify(contextId, nullptr, nullptr, nullptr, nullptr), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdentifyFuncsTest, TestDoUpdateIdentify_002, TestSize.Level0)
 {
-    uint64_t contextId = 1235;
+    constexpr uint64_t contextId = 1235;
     Buffer *scheduleResult = CreateBufferBySize(10);
     int32_t userId = 32156;
     UserAuthTokenHal token = {};

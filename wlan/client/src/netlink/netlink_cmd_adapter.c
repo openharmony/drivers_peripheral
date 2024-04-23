@@ -430,11 +430,15 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     
     /* try to set NETLINK_EXT_ACK to 1, ignoring errors */
     int32_t opt = 1;
-    setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_EXT_ACK, &opt, sizeof(opt));
-    
+    if (setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_EXT_ACK, &opt, sizeof(opt)) < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: setsockopt one failed", __FUNCTION__);
+    }
+
     /* try to set NETLINK_CAP_ACK to 1, ignoring errors */
     opt = 1;
-    setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_CAP_ACK, &opt, sizeof(opt));
+    if (setsockopt(nl_socket_get_fd(g_wifiHalInfo.cmdSock), SOL_NETLINK, NETLINK_CAP_ACK, &opt, sizeof(opt)) < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: setsockopt two failed", __FUNCTION__);
+    }
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
@@ -478,6 +482,10 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_INFO(LOG_CORE, "nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d", rc, error);
         }
 
+        if (error < 0) {
+            HILOG_ERROR(LOG_CORE, "%s: Netlink error", __FUNCTION__);
+            rc = RET_CODE_FAILURE;
+        }
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
             rc = RET_CODE_NOT_SUPPORT;
@@ -1093,7 +1101,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
 
     ifaceId = if_nametoindex(networkInfo.infos[0].name);
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_CORE, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
+        HILOG_ERROR(LOG_CORE, "%s: get iface id(%u) failed", __FUNCTION__, ifaceId);
         return RET_CODE_FAILURE;
     }
 
@@ -1243,7 +1251,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
 
     ifaceId = if_nametoindex(ifName);
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_CORE, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
+        HILOG_ERROR(LOG_CORE, "%s: get iface id(%u) failed", __FUNCTION__, ifaceId);
         return RET_CODE_INVALID_PARAM;
     }
 
@@ -1342,7 +1350,11 @@ int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
-    nla_put(msg, WIFI_ATTRIBUTE_COUNTRY, len, code);
+    if (nla_put(msg, WIFI_ATTRIBUTE_COUNTRY, len, code) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: nla_put code failed", __FUNCTION__);
+        nlmsg_free(msg);
+        return RET_CODE_FAILURE;
+    }
     nla_nest_end(msg, data);
 
     ret = NetlinkSendCmdSync(msg, NULL, NULL);
@@ -1379,7 +1391,11 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
-    nla_put(msg, WIFI_ATTRIBUTE_RANDOM_MAC_OUI, len, scanMac);
+    if (nla_put(msg, WIFI_ATTRIBUTE_RANDOM_MAC_OUI, len, scanMac) !=RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: nla_put scanMac failed", __FUNCTION__);
+        nlmsg_free(msg);
+        return RET_CODE_FAILURE;
+    }
     nla_nest_end(msg, data);
     ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
@@ -1432,7 +1448,7 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
     }
 
     if (chipId >= MAX_WLAN_DEVICE) {
-        HILOG_ERROR(LOG_CORE, "%s: chipId = %d", __FUNCTION__, chipId);
+        HILOG_ERROR(LOG_CORE, "%s: chipId = %u", __FUNCTION__, chipId);
         return RET_CODE_INVALID_PARAM;
     }
     *num = 1;
@@ -1552,12 +1568,20 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
             HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
-        for (i = 0; i < scan->numSsids; i++) {
+        /*add an empty ssid for a wildcard scan*/
+        if (nla_put(msg, 1, 0, NULL) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put NULL failed", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        for (i = 1; i <= scan->numSsids; i++) {
             if (i >= wiphyInfo->scanCapabilities.maxNumScanSsids) {
                 HILOG_INFO(LOG_CORE, "%s: Skip the excess hidden ssids for scan", __FUNCTION__);
                 break;
             }
-            nla_put(msg, i + 1, scan->ssids[i].ssidLen, scan->ssids[i].ssid);
+            if (nla_put(msg, i + 1, scan->ssids[i].ssidLen, scan->ssids[i].ssid) != RET_CODE_SUCCESS) {
+                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed", __FUNCTION__);
+                return RET_CODE_FAILURE;
+            }
         }
         nla_nest_end(msg, nest);
     }
@@ -1610,11 +1634,17 @@ static int32_t CmdScanPutMsg(const char *ifName, struct nl_msg *msg, const WifiS
     }
 
     if (scan->extraIes) {
-        nla_put(msg, NL80211_ATTR_IE, scan->extraIesLen, scan->extraIes);
+        if (nla_put(msg, NL80211_ATTR_IE, scan->extraIesLen, scan->extraIes) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put extraIes failed", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
     }
 
     if (scan->bssid) {
-        nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, scan->bssid);
+        if (nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, scan->bssid) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put bssid failed", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
     }
 
     return RET_CODE_SUCCESS;
@@ -2441,8 +2471,11 @@ static int32_t ProcessMatchSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyI
             HILOG_ERROR(LOG_CORE, "%s: nla_nest_start failed.", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
-        nla_put(msg, NL80211_SCHED_SCAN_MATCH_ATTR_SSID, pnoSettings->pnoNetworks[i].ssid.ssidLen,
-            pnoSettings->pnoNetworks[i].ssid.ssid);
+        if (nla_put(msg, NL80211_SCHED_SCAN_MATCH_ATTR_SSID, pnoSettings->pnoNetworks[i].ssid.ssidLen,
+            pnoSettings->pnoNetworks[i].ssid.ssid) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         nla_put_u32(msg, NL80211_SCHED_SCAN_MATCH_ATTR_RSSI, pnoSettings->min5gRssi);
         nla_nest_end(msg, nest);
         matchSsidsCount++;
@@ -2505,7 +2538,11 @@ static int32_t ProcessSsidToMsg(struct nl_msg *msg, const WiphyInfo *wiphyInfo, 
             return RET_CODE_FAILURE;
         }
         DLIST_FOR_EACH_ENTRY(ssidListNode, &scanSsids, struct SsidListNode, entry) {
-            nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid);
+            if (nla_put(msg, index, ssidListNode->ssidInfo.ssidLen, ssidListNode->ssidInfo.ssid) != RET_CODE_SUCCESS) {
+                HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed.", __FUNCTION__);
+                ClearSsidsList(&scanSsids);
+                return RET_CODE_FAILURE;
+            }
             index++;
         }
         nla_nest_end(msg, nestedSsid);
@@ -2628,7 +2665,10 @@ static int32_t ProcessReqflagsToMsg(struct nl_msg *msg, const WiphyInfo *wiphyIn
         (void)memset_s(&rssiAdjust, sizeof(rssiAdjust), 0, sizeof(rssiAdjust));
         rssiAdjust.band = NL80211_BAND_2GHZ;
         rssiAdjust.delta = pnoSettings->min2gRssi - pnoSettings->min5gRssi;
-        nla_put(msg, NL80211_ATTR_SCHED_SCAN_RSSI_ADJUST, sizeof(rssiAdjust), &rssiAdjust);
+        if (nla_put(msg, NL80211_ATTR_SCHED_SCAN_RSSI_ADJUST, sizeof(rssiAdjust), &rssiAdjust) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put rssiAdjust failed.", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
     }
     if (wiphyInfo->wiphyFeatures.supportsRandomMacSchedScan) {
         scanFlag |= NL80211_SCAN_FLAG_RANDOM_ADDR;
@@ -2994,46 +3034,6 @@ int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalRes
     return ret;
 }
 
-static int32_t WifiAbortScan(const char *ifName)
-{
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s ifName:%{public}s", __FUNCTION__, ifName);
-    int32_t ret = RET_CODE_FAILURE;
-    struct nl_msg *msg = NULL;
-    uint32_t interfaceId;
-    if (ifName == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: ifName is NULL.", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    interfaceId = if_nametoindex(ifName);
-    if (interfaceId == 0) {
-        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    msg = nlmsg_alloc();
-    if (msg == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
-        return RET_CODE_NOMEM;
-    }
-    do {
-        HILOG_INFO(LOG_CORE, "genlmsg_put NL80211_CMD_ABORT_SCAN");
-        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_ABORT_SCAN, 0)) {
-            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
-            break;
-        }
-        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId failed", __FUNCTION__);
-            break;
-        }
-        ret = NetlinkSendCmdSync(msg, NULL, NULL);
-        if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: abort scan failed", __FUNCTION__);
-        }
-    } while (0);
-    nlmsg_free(msg);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
-    return ret;
-}
-
 static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     return NL_SKIP;
@@ -3053,11 +3053,6 @@ int32_t WifiSendActionFrame(const char *ifName, uint32_t freq, const uint8_t *fr
     if (interfaceId == 0) {
         HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
         return RET_CODE_FAILURE;
-    }
-    ret = WifiAbortScan(STR_WLAN0);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: wifi abort scan failed", __FUNCTION__);
-        return ret;
     }
     msg = nlmsg_alloc();
     if (msg == NULL) {

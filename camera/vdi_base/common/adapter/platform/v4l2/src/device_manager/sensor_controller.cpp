@@ -179,7 +179,7 @@ void SensorController::SetNodeCallBack(const NodeBufferCb cb)
 {
     CAMERA_LOGI("SensorController SetNodeCallBack entry");
     nodeBufferCb_ = cb;
-    sensorVideo_->SetCallback([&](std::shared_ptr<FrameSpec> buffer) {
+    sensorVideo_->SetV4L2DevCallback([&](std::shared_ptr<FrameSpec> buffer) {
         BufferCallback(buffer);
     });
 }
@@ -194,7 +194,8 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
     constexpr uint32_t UNIT_COUNT = 1000;
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    int64_t timestamp = static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT * UNIT_COUNT + tv.tv_usec * UNIT_COUNT;
+    int64_t timestamp =
+        static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT * UNIT_COUNT + tv.tv_usec * UNIT_COUNT;
     buffer->buffer_->SetEsTimestamp(timestamp);
     nodeBufferCb_(buffer);
 }
@@ -691,6 +692,22 @@ RetCode SensorController::SendExposureMetaData(common_metadata_header_t *data)
     return rc;
 }
 
+void SensorController::CheckRetCodeValue(RetCode rc)
+{
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("Send CMD_EXPOSURE_LOCK fail");
+    }
+}
+
+void SensorController::CheckUpdateSettingRetCode(RetCode rc, int exposureVal)
+{
+    if (rc == RC_OK) {
+        CAMERA_LOGI("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d success", exposureVal);
+    } else {
+        CAMERA_LOGE("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d failed", exposureVal);
+    }
+}
+
 RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
@@ -722,20 +739,14 @@ RetCode SensorController::SendExposureModeMetaData(common_metadata_header_t *dat
             if (queryResult == RC_OK) {
                 rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_LOCK, &curLock);
                 CAMERA_LOGI("Set CMD_EXPOSURE_LOCK [%{public}d]", exposureMode);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("Send CMD_EXPOSURE_LOCK fail");
-                }
+                CheckRetCodeValue(rc);
             }
             if (isAutoMode == true) {
                 rc = SendExposureAutoModeMetaData(data);
             } else {
                 rc = sensorVideo_->UpdateSetting(GetName(), CMD_EXPOSURE_MODE, (int*)&exposureVal);
                 CAMERA_LOGI("Set CMD_EXPOSURE_MODE [%{public}d]", exposureMode);
-                if (rc == RC_OK) {
-                    CAMERA_LOGI("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d success", exposureVal);
-                } else {
-                    CAMERA_LOGE("Send OHOS_CONTROL_EXPOSURE_MODE value=%{public}d failed", exposureVal);
-                }
+                CheckUpdateSettingRetCode(rc, exposureVal);
             }
         }
     }

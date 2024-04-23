@@ -53,6 +53,44 @@ SensorClientsManager::~SensorClientsManager()
     sdcSensorConfig_.clear();
 }
 
+void SensorClientsManager::CopySensorInfo(std::vector<HdfSensorInformation> &info, bool cFlag)
+{
+    std::unique_lock<std::mutex> lock(sensorInfoMutex_);
+    if (!cFlag) {
+        info = sensorInfo_;
+        return;
+    }
+    sensorInfo_ = info;
+    return;
+}
+
+void SensorClientsManager::GetEventData(struct SensorsDataPack &dataPack)
+{
+    std::unique_lock<std::mutex> lock(sensorsDataPackMutex_);
+    dataPack = listDump_;
+    return;
+}
+
+void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
+{
+    std::unique_lock<std::mutex> lock(sensorsDataPackMutex_);
+    if (event.data.empty()) {
+        HDF_LOGE("%{public}s: event data is empty!", __func__);
+        return;
+    }
+
+    if (listDump_.count == MAX_DUMP_DATA_SIZE) {
+        listDump_.listDumpArray[listDump_.pos++] = event;
+        if (listDump_.pos == MAX_DUMP_DATA_SIZE) {
+            listDump_.pos = 0;
+        }
+    } else {
+        listDump_.listDumpArray[listDump_.count] = event;
+        listDump_.count++;
+    }
+    return;
+}
+
 int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
@@ -130,10 +168,12 @@ void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingI
 
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],"
+        "reportInterval is [%{public}" PRId64 "]", __func__, sensorId,
+        samplingInterval, reportInterval);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (samplingInterval <= ERROR_INTERVAL || reportInterval < ERROR_INTERVAL) {
-        HDF_LOGE("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
-        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+        HDF_LOGE("%{public}s: samplingInterval or reportInterval error", __func__);
         return;
     }
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
@@ -147,10 +187,10 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
         }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
-            if (client.periodCountMap_.find(sensorId) == client.periodCountMap_.end() ||
-                periodCount > client.periodCountMap_[sensorId]) {
-                client.periodCountMap_[sensorId] = periodCount;
-            }
+            HDF_LOGD("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
+                     "%{public}d/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId,
+                     client.sensorConfigMap_.find(sensorId)->second.samplingInterval, samplingInterval, periodCount);
+            client.periodCountMap_[sensorId] = periodCount;
         }
     }
 }
@@ -308,6 +348,13 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
     return true;
 }
 
+bool SensorClientsManager::GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map)
+{
+    std::unique_lock<std::mutex> lock(sensorConfigMutex_);
+    map = sensorConfig_;
+    return true;
+}
+
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
                                                  int64_t &reportInterval)
 {
@@ -342,8 +389,8 @@ bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensor
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
         return false;
     }
-    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     sensorClientInfo.curCountMap_[sensorId]++;
+    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
         return false;

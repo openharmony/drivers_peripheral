@@ -30,9 +30,9 @@ namespace HDI {
 namespace UserAuth {
 namespace {
     KeyPair *g_keyPair = nullptr;
-    const uint32_t TAG_AND_LEN_BYTE = 8;
-    const uint32_t FACE_AUTH_CAPABILITY_LEVEL = 3;
-    const uint32_t RESULT_TLV_LEN = 500;
+    constexpr uint32_t TAG_AND_LEN_BYTE = 8;
+    constexpr uint32_t FACE_AUTH_CAPABILITY_LEVEL = 3;
+    constexpr uint32_t RESULT_TLV_LEN = 500;
 } // namespace
 
 enum AuthAttributeType : uint32_t {
@@ -141,17 +141,18 @@ static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t 
         return nullptr;
     }
 
-    const int32_t ZERO = 0;
-    const uint32_t secretLen = 32;
-    const uint32_t secretValueLen = 100;
-    std::vector<uint8_t> rootSecret(secretValueLen, 8);
+    constexpr int32_t zero = 0;
+    constexpr uint32_t secretLen = 32;
+    constexpr uint32_t secretValueLen = 100;
+    constexpr uint8_t secretValue = 8;
+    std::vector<uint8_t> rootSecret(secretValueLen, secretValue);
     uint32_t acl = FACE_AUTH_CAPABILITY_LEVEL;
     if (WriteTlv(AUTH_RESULT_CODE, sizeof(result), (const uint8_t *)&result, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_TEMPLATE_ID, sizeof(templatedId), (const uint8_t *)&templatedId, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_SCHEDULE_ID, sizeof(scheduleId), (const uint8_t *)&scheduleId, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_SUBTYPE, sizeof(subType), (const uint8_t *)&subType, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_CAPABILITY_LEVEL, sizeof(acl), (const uint8_t *)&acl, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_REMAIN_TIME, sizeof(int32_t), (const uint8_t *)&ZERO, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_REMAIN_TIME, sizeof(int32_t), (const uint8_t *)&zero, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_REMAIN_COUNT, sizeof(int32_t), (const uint8_t *)&remainAttempts, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_ROOT_SECRET, secretLen, &rootSecret[0], ret) != RESULT_SUCCESS) {
         IAM_LOGE("write tlv fail");

@@ -88,9 +88,9 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    uint32_t testUint32 = 123;
-    int32_t testInt32 = 123;
-    uint64_t testUint64 = 456;
+    constexpr uint32_t testUint32 = 123;
+    constexpr int32_t testInt32 = 123;
+    constexpr uint64_t testUint64 = 456;
     uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
     uint64_t testUint64Buffer[] = { 123, 456, 789 };
     Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) };
@@ -127,9 +127,9 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeExecutorMsg, TestSize.Level0)
     result = GetAttributeExecutorMsg(attribute, false, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
-    uint32_t testUint32 = 123;
-    int32_t testInt32 = 123;
-    uint64_t testUint64 = 456;
+    constexpr uint32_t testUint32 = 123;
+    constexpr int32_t testInt32 = 123;
+    constexpr uint64_t testUint64 = 456;
     uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
     uint64_t testUint64Buffer[] = { 123, 456, 789 };
     Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) };
@@ -191,14 +191,14 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromDataAndSignTlv, TestSize.Le
     retInfo.len = 0;
     retAttribute = CreateAttributeFromDataAndSignTlv(retInfo, true);
     EXPECT_EQ(retAttribute, nullptr);
-    int32_t resultCode = 123;
-    int32_t authType = 1;
-    uint64_t templateId = 456;
+    constexpr int32_t resultCode = 123;
+    constexpr uint32_t authType1 = 1;
+    constexpr uint64_t templateId = 456;
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
     ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint32(attribute, AUTH_TYPE, authType);
+    result = SetAttributeUint32(attribute, AUTH_TYPE, authType1);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
@@ -228,7 +228,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromExecutorMsg, TestSize.Level
     Uint8Array msg = { (uint8_t *)Malloc(MAX_EXECUTOR_SIZE), MAX_EXECUTOR_SIZE };
     Attribute *retAttribute = CreateAttributeFromExecutorMsg(msg, true);
     EXPECT_EQ(retAttribute, nullptr);
-    int32_t resultCode = 1;
+    constexpr int32_t resultCode = 1;
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
     ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
@@ -285,8 +285,8 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorResultInfoFromAttribute, TestSize.L
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    constexpr uint64_t authSubType = 0;
-    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, authSubType);
+    constexpr uint64_t subType = 0;
+    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, subType);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
@@ -331,8 +331,8 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorResultInfo, TestSize.Level0)
     constexpr uint64_t scheduleId = 234;
     result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    constexpr uint64_t authSubType = 0;
-    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, authSubType);
+    constexpr uint64_t subType = 0;
+    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, subType);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr int32_t remainTimes = 10;
     result = SetAttributeInt32(attribute, AUTH_REMAIN_COUNT, remainTimes);
@@ -343,8 +343,9 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorResultInfo, TestSize.Level0)
     constexpr uint32_t capabilityLevel = 2;
     result = SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel);
     EXPECT_EQ(result, RESULT_SUCCESS);
+    constexpr uint32_t dataLen = 120;
     std::vector<uint8_t> data;
-    data.resize(120);
+    data.resize(dataLen);
     Uint8Array retExtraInfo = { data.data(), data.size() };
     result = GetAttributeExecutorMsg(attribute, false, &retExtraInfo);
     EXPECT_EQ(result, RESULT_SUCCESS);
@@ -372,8 +373,9 @@ HWTEST_F(ExecutorMessageTest, TestDestoryExecutorResultInfo, TestSize.Level0)
 HWTEST_F(ExecutorMessageTest, TestCreateExecutorMsg, TestSize.Level0)
 {
     EXPECT_EQ(CreateExecutorMsg(1, 0, nullptr), nullptr);
+    constexpr uint32_t dataLen = 1;
     Uint64Array array = {};
-    array.len = 1;
+    array.len = dataLen;
     array.data = nullptr;
     EXPECT_EQ(CreateExecutorMsg(1, 0, &array), nullptr);
 }
@@ -390,10 +392,13 @@ HWTEST_F(ExecutorMessageTest, TestDestoryExecutorMsg, TestSize.Level0)
 
 HWTEST_F(ExecutorMessageTest, TestGetExecutorTemplateList, TestSize.Level0)
 {
+    constexpr uint32_t authType1 = 1;
+    constexpr uint32_t authType2 = 2;
+    constexpr uint32_t executorSensorHint = 10;
     g_userInfoList = nullptr;
     ExecutorInfoHal info = {};
-    info.authType = 1;
-    info.executorSensorHint = 10;
+    info.authType = authType1;
+    info.executorSensorHint = executorSensorHint;
     Uint64Array array = {};
     EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_UNKNOWN);
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
@@ -402,29 +407,34 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorTemplateList, TestSize.Level0)
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     EXPECT_NE(userInfo.credentialInfoList, nullptr);
     CredentialInfoHal credInfo = {};
-    credInfo.authType = 1;
-    credInfo.executorSensorHint = 10;
-    uint32_t credNum = 102;
+    credInfo.authType = authType1;
+    credInfo.executorSensorHint = executorSensorHint;
+    constexpr uint32_t credNum = 102;
     for (uint32_t i = 0; i < credNum; ++i) {
         userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
     }
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_REACH_LIMIT);
-    info.authType = 2;
+    info.authType = authType2;
     EXPECT_EQ(GetExecutorTemplateList(0, &info, &array), RESULT_SUCCESS);
 }
 
 HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_001, TestSize.Level0)
 {
+    constexpr uint32_t authType = 2;
+    constexpr uint32_t executorSensorHint = 10;
     g_userInfoList = nullptr;
     ExecutorInfoHal info = {};
-    info.authType = 1;
-    info.executorSensorHint = 10;
+    info.authType = authType;
+    info.executorSensorHint = executorSensorHint;
     EXPECT_EQ(AssemblyMessage(0, &info, 2, nullptr), RESULT_UNKNOWN);
 }
 
 HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
 {
+    constexpr uint32_t authType = 1;
+    constexpr uint32_t executorSensorHint_1 = 10;
+    constexpr uint32_t executorSensorHint_2 = 20;
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     UserInfo *userInfo = static_cast<UserInfo *>(malloc(sizeof(UserInfo)));
@@ -435,20 +445,20 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
     CredentialInfoHal *credInfo = static_cast<CredentialInfoHal *>(malloc(sizeof(CredentialInfoHal)));
     EXPECT_NE(credInfo, nullptr);
     static_cast<void>(memset_s(credInfo, sizeof(CredentialInfoHal), 0, sizeof(CredentialInfoHal)));
-    credInfo->authType = 1;
-    credInfo->executorSensorHint = 10;
+    credInfo->authType = authType;
+    credInfo->executorSensorHint = executorSensorHint_1;
     userInfo->credentialInfoList->insert(userInfo->credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(userInfo));
 
     ExecutorInfoHal info = {};
-    info.authType = 1;
-    info.executorSensorHint = 20;
+    info.authType = authType;
+    info.executorSensorHint = executorSensorHint_2;
     LinkedList *executorMsg = CreateLinkedList(DestoryExecutorMsg);
     EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
 
     executorMsg = CreateLinkedList(DestoryExecutorMsg);
-    info.executorSensorHint = 10;
+    info.executorSensorHint = executorSensorHint_1;
     EXPECT_EQ(AssemblyMessage(0, &info, 2, executorMsg), RESULT_SUCCESS);
     DestroyLinkedList(executorMsg);
     DestroyUserInfoList();
@@ -456,13 +466,14 @@ HWTEST_F(ExecutorMessageTest, TestAssemblyMessage_002, TestSize.Level0)
 
 HWTEST_F(ExecutorMessageTest, TestTraverseExecutor, TestSize.Level0)
 {
+    constexpr uint32_t authType = 2;
     g_poolList = nullptr;
     g_userInfoList = nullptr;
     EXPECT_EQ(TraverseExecutor(0, 1, 0, nullptr), RESULT_UNKNOWN);
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
-    info.authType = 2;
+    info.authType = authType;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     LinkedList *executorMsg = new LinkedList();
     EXPECT_EQ(TraverseExecutor(0, 2, 0, executorMsg), RESULT_UNKNOWN);
@@ -471,6 +482,7 @@ HWTEST_F(ExecutorMessageTest, TestTraverseExecutor, TestSize.Level0)
 
 HWTEST_F(ExecutorMessageTest, TestGetExecutorMsgList, TestSize.Level0)
 {
+    constexpr uint32_t authType = 1;
     g_poolList = nullptr;
     g_userInfoList = nullptr;
     EXPECT_EQ(GetExecutorMsgList(1, 2, nullptr), RESULT_BAD_PARAM);
@@ -479,7 +491,7 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorMsgList, TestSize.Level0)
     InitResourcePool();
     ExecutorInfoHal info = {};
     info.executorRole = VERIFIER;
-    info.authType = 1;
+    info.authType = authType;
     g_poolList->insert(g_poolList, static_cast<void *>(&info));
     EXPECT_EQ(GetExecutorMsgList(1, 4, &executorMsg), RESULT_SUCCESS);
 }

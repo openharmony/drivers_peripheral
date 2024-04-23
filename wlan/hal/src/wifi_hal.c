@@ -151,7 +151,11 @@ static int32_t FindValidNetwork(int32_t type, struct IWiFiBaseFeature **feature)
         }
         if (networkNode->ifeature != NULL && networkNode->ifeature->type == type) {
             HDF_LOGI("%s: feature is existed. type: %d", __FUNCTION__, type);
-            *feature = networkNode->ifeature;
+            if (memcpy_s((*feature)->ifName, IFNAME_MAX_LEN, networkNode->ifName, strlen(networkNode->ifName)) != EOK) {
+                HDF_LOGE("%s: memcpy_s failed, line: %d", __FUNCTION__, __LINE__);
+                return HDF_FAILURE;
+            }
+            (*feature)->type = type;
             return HDF_SUCCESS;
         }
         if (networkNode->ifeature == NULL && networkNode->supportMode[type] == 1) {
@@ -273,7 +277,7 @@ static int32_t UnregisterHid2dCallbackInner(Hid2dCallback func, const char *ifNa
 static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 {
     if (ifName == NULL || chipId >= MAX_WLAN_DEVICE) {
-        HDF_LOGE("%s: input parameter invalid, line: %d, chipId = %d", __FUNCTION__, __LINE__, chipId);
+        HDF_LOGE("%s: input parameter invalid, line: %d, chipId = %u", __FUNCTION__, __LINE__, chipId);
         return HDF_ERR_INVALID_PARAM;
     }
     return HalCmdSetResetDriver(chipId, ifName);
@@ -309,7 +313,7 @@ static int32_t SetPowerModeInner(const char *ifName, uint8_t mode)
 
 static int32_t StartChannelMeasInner(const char *ifName, const struct MeasParam *measParam)
 {
-    if (ifName == NULL || measParam == NULL) {
+    if (ifName == NULL || measParam == NULL || measParam->channelId < 0) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -345,7 +349,7 @@ static int32_t SendCmdIoctlInner(const char *ifName, int32_t cmdId, const int8_t
 
 static int32_t GetStationInfoInner(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
 {
-    if (ifName == NULL || info == NULL || mac == NULL || macLen < ETH_ADDR_LEN) {
+    if (ifName == NULL || info == NULL || mac == NULL || macLen != ETH_ADDR_LEN) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }

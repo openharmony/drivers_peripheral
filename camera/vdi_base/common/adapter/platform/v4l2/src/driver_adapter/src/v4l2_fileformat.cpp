@@ -21,12 +21,41 @@ namespace OHOS::Camera {
 HosFileFormat::HosFileFormat() {}
 HosFileFormat::~HosFileFormat() {}
 
+void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtDesc,
+    struct v4l2_frmsizeenum &frmSize, struct v4l2_fmtdesc &enumFmtDesc)
+{
+    struct v4l2_frmivalenum  fraMival = {};
+    constexpr int32_t fmtMax = 50;
+    for (int k = 0; k < fmtMax; ++k) {
+        fraMival.index = k;
+        fraMival.pixel_format = frmSize.pixel_format;
+        fraMival.width = frmSize.discrete.width;
+        fraMival.height = frmSize.discrete.height;
+        if (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &fraMival) < 0) {
+            break;
+        }
+
+        DeviceFormat currentFormat = {};
+        currentFormat.fmtdesc.description = std::string(reinterpret_cast<char*>(enumFmtDesc.description));
+        currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
+        currentFormat.fmtdesc.width = frmSize.discrete.width;
+        currentFormat.fmtdesc.height = frmSize.discrete.height;
+        currentFormat.fmtdesc.fps.numerator = fraMival.discrete.numerator;
+        currentFormat.fmtdesc.fps.denominator = fraMival.discrete.denominator;
+
+        fmtDesc.push_back(currentFormat);
+
+        CAMERA_LOGI("frame interval: %{public}d, %{public}d\n\n",
+            fraMival.discrete.numerator, fraMival.discrete.denominator);
+    }
+}
+
 RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDesc)
 {
-    int i, j, k;
+    int i;
+    int j;
     struct v4l2_fmtdesc enumFmtDesc = {};
     struct v4l2_frmsizeenum frmSize = {};
-    struct v4l2_frmivalenum  fraMival = {};
     constexpr int32_t fmtMax = 50;
 
     for (i = 0; i < fmtMax; ++i) {
@@ -36,7 +65,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
             break;
         }
 
-        CAMERA_LOGD("[%d]Supported format with description = %s\n\n", i, enumFmtDesc.description);
+        CAMERA_LOGI("[%{public}d]Supported format with description = %{public}s\n\n", i, enumFmtDesc.description);
 
         for (j = 0; j < fmtMax; ++j) {
             frmSize.index = j;
@@ -46,31 +75,11 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
             }
 
             if (frmSize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-                CAMERA_LOGD("V4L2_FRMSIZE_TYPE_DISCRETE width %d x height %d\n\n",
+                CAMERA_LOGI("V4L2_FRMSIZE_TYPE_DISCRETE width %{public}d x height %{public}d\n\n",
                     frmSize.discrete.width, frmSize.discrete.height);
             }
 
-            for (k = 0; k < fmtMax; ++k) {
-                fraMival.index = k;
-                fraMival.pixel_format = frmSize.pixel_format;
-                fraMival.width = frmSize.discrete.width;
-                fraMival.height = frmSize.discrete.height;
-                if (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &fraMival) < 0) {
-                    break;
-                }
-
-                DeviceFormat currentFormat = {};
-                currentFormat.fmtdesc.description = std::string(reinterpret_cast<char*>(enumFmtDesc.description));
-                currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
-                currentFormat.fmtdesc.width = frmSize.discrete.width;
-                currentFormat.fmtdesc.height = frmSize.discrete.height;
-                currentFormat.fmtdesc.fps.numerator = fraMival.discrete.numerator;
-                currentFormat.fmtdesc.fps.denominator = fraMival.discrete.denominator;
-
-                fmtDesc.push_back(currentFormat);
-
-                CAMERA_LOGD("frame interval: %d, %d\n\n", fraMival.discrete.numerator, fraMival.discrete.denominator);
-            }
+            V4L2GetCurrentFormat(fd, fmtDesc, frmSize, enumFmtDesc);
         }
     }
 
@@ -131,7 +140,7 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, con
     std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
     HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(reinterpret_cast<char*>(cap.driver)), devName));
 
-    CAMERA_LOGD("v4l2 driver name = %{public}s\n", cap.driver);
+    CAMERA_LOGI("v4l2 driver name = %{public}s\n", cap.driver);
     CAMERA_LOGD("v4l2 capabilities = 0x%{public}x\n", cap.capabilities);
     CAMERA_LOGD("v4l2 card: %{public}s\n", cap.card);
     CAMERA_LOGD("v4l2 bus info: %{public}s\n", cap.bus_info);

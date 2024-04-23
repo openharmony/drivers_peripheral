@@ -17,8 +17,7 @@
 
 #include "iam_logger.h"
 
-#include "v1_1/face_auth_interface_service.h"
-#include "v1_1/face_auth_interface_stub.h"
+#include "face_auth_hdi.h"
 
 #undef LOG_TAG
 #define LOG_TAG "FACE_AUTH_IMPL"
@@ -33,7 +32,7 @@ constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MIN = 0;
 constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MAX = 3;
 constexpr uint32_t FACE_AUTH_INTERFACE_STUB_CODE_MIN_V1_1 = 2;
 const std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN_V1_0 = u"ohos.hdi.face_auth.v1_0.IFaceAuthInterface";
-const std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN_V1_1 = u"ohos.hdi.face_auth.v1_1.IFaceAuthInterface";
+const std::u16string FACE_AUTH_INTERFACE_STUB_TOKEN_V1_1 = u"ohos.hdi.face_auth.v2_0.IFaceAuthInterface";
 
 bool FaceAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
 {
@@ -42,14 +41,12 @@ bool FaceAuthInterfaceStubFuzzTest(const uint8_t *rawData, size_t size)
         IAM_LOGE("%{public}s:rawData is null.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::FaceAuth::V1_1::IFaceAuthInterface> serviceImpl =
-        OHOS::HDI::FaceAuth::V1_1::IFaceAuthInterface::Get(true);
+    sptr<IFaceAuthInterface> serviceImpl = IFaceAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;
     }
-    sptr<OHOS::HDI::FaceAuth::V1_1::FaceAuthInterfaceStub> faceAuthInterfaceStub =
-        new OHOS::HDI::FaceAuth::V1_1::FaceAuthInterfaceStub(serviceImpl);
+    sptr<FaceAuthInterfaceStub> faceAuthInterfaceStub = new FaceAuthInterfaceStub(serviceImpl);
     if (faceAuthInterfaceStub == nullptr) {
         IAM_LOGE("%{public}s:new IFaceAuthInterfaceStub failed.", __func__);
         return false;

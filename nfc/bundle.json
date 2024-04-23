@@ -26,6 +26,9 @@
       "build": {
         "sub_component": [
           "//drivers/peripheral/nfc:nfc_entry"
+        ],
+        "test": [
+          "//drivers/peripheral/nfc/test:test_hdf_nfc_service"
         ]
       }
     }

@@ -75,6 +75,15 @@ PowerSupplyProvider::PowerSupplyProvider()
     index_ = 0;
 }
 
+PowerSupplyProvider::~PowerSupplyProvider()
+{
+    for (auto it = nodeCacheFiles_.begin(); it != nodeCacheFiles_.end();) {
+        int32_t fd = it->second;
+        close(fd);
+        nodeCacheFiles_.erase(it++);
+    }
+}
+
 inline int32_t PowerSupplyProvider::ParseInt(const char* str)
 {
     return static_cast<int32_t>(strtol(str, nullptr, STR_TO_LONG_LEN));
@@ -266,9 +275,23 @@ void PowerSupplyProvider::FormatSysfsPaths()
                nodeNamePathMap_["charge_now"].c_str());
 }
 
-int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
+int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size)
 {
-    int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
+    int32_t fd = -1;
+
+    auto item = nodeCacheFiles_.find(path);
+    if (item != nodeCacheFiles_.end()) {
+        fd = item->second;
+    }
+
+    if (fd != -1) {
+        size_t readSize = pread(fd, buf, size - 1, 0);
+        buf[readSize] = '\0';
+        Trim(buf);
+        return HDF_SUCCESS;
+    }
+
+    fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGD(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d", path, errno);
         return HDF_ERR_IO;
@@ -277,12 +300,12 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     size_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
-    close(fd);
+    nodeCacheFiles_.insert(std::make_pair(path, fd));
 
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf, size_t size) const
+int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf, size_t size)
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
@@ -293,7 +316,7 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
     return HDF_SUCCESS;
 }
 
-void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
+void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size)
 {
     std::string onlineNode = "USB";
     int32_t ret;
@@ -366,7 +389,7 @@ int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
     return PLUGGED_TYPE_BUTT;
 }
 
-int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
+int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
@@ -388,7 +411,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
+int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
@@ -410,7 +433,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
     return HDF_SUCCESS;
 }
 
-void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) const
+void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info)
 {
     ParseCapacity(&info->capacity_);
     ParseVoltage(&info->voltage_);
@@ -439,7 +462,7 @@ void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) con
     CopyBatteryInfo(info);
 }
 
-void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct BatterydInfo* info) const
+void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct BatterydInfo* info)
 {
     static struct BatteryAssigner batteryAssigners[] = {
         { BATTERY_KEY_CAPACITY.c_str(), BATTERY_KEY_CAPACITY.length(), CapacityAssigner },
@@ -691,7 +714,7 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
     closedir(dir);
 }
 
-int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
+int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity)
 {
     char buf[MAX_BUFF_SIZE] = {0};
 
@@ -706,7 +729,7 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
+int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy)
 {
     char buf[MAX_BUFF_SIZE] = {0};
 
@@ -721,7 +744,7 @@ int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
+int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage)
 {
     char buf[MAX_BUFF_SIZE] = {0};
 
@@ -736,7 +759,7 @@ int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
+int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow)
 {
     char buf[MAX_BUFF_SIZE] = {0};
 
@@ -751,7 +774,7 @@ int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
+int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy)
 {
     char buf[MAX_BUFF_SIZE] = {0};
 
@@ -766,7 +789,7 @@ int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
+int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.voltagePath.c_str(), buf, sizeof(buf));
@@ -780,7 +803,7 @@ int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
+int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.temperaturePath.c_str(), buf, sizeof(buf));
@@ -794,7 +817,7 @@ int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
+int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.healthStatePath.c_str(), buf, sizeof(buf));
@@ -807,7 +830,7 @@ int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
+int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
@@ -821,7 +844,7 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
+int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.chargeStatePath.c_str(), buf, sizeof(buf));
@@ -834,7 +857,7 @@ int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
+int32_t PowerSupplyProvider::ParsePresent(int8_t* present)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.presentPath.c_str(), buf, sizeof(buf));
@@ -847,7 +870,7 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
+int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.chargeCounterPath.c_str(), buf, sizeof(buf));
@@ -861,7 +884,7 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
+int32_t PowerSupplyProvider::ParseTechnology(std::string& technology)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.technologyPath.c_str(), buf, sizeof(buf));
@@ -873,7 +896,7 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
     return HDF_SUCCESS;
 }
 
-int32_t PowerSupplyProvider::ParseChargeType(int32_t* chargeType, std::string& chargeTypePath) const
+int32_t PowerSupplyProvider::ParseChargeType(int32_t* chargeType, std::string& chargeTypePath)
 {
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(chargeTypePath.c_str(), buf, sizeof(buf));
@@ -886,7 +909,7 @@ int32_t PowerSupplyProvider::ParseChargeType(int32_t* chargeType, std::string& c
     return HDF_SUCCESS;
 }
 
-BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
+BatterydInfo PowerSupplyProvider::GetBatteryInfo()
 {
     UpdateInfoByReadSysFile(&g_batteryInfo);
     return g_batteryInfo;
@@ -1002,9 +1025,21 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
         return HDF_ERR_INVALID_PARAM;
     }
 
-    std::fstream out(path, std::ios::out | std::ios::trunc);
-    out << value;
-    out.close();
+    int32_t fd = open(path.c_str(), O_TRUNC | O_WRONLY);
+    if (fd < NUM_ZERO) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file %{public}s, errno: %{public}d",
+            path.c_str(), errno);
+        return HDF_ERR_IO;
+    }
+
+    ssize_t size = value.length();
+    if (write(fd, value.c_str(), size) != size) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to write file %{public}s, errno: %{public}d",
+            path.c_str(), errno);
+        close(fd);
+        return HDF_ERR_IO;
+    }
+    close(fd);
 
     BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;

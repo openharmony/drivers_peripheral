@@ -43,11 +43,11 @@ std::string CameraHalHisysevent::CreateMsg(const char* format, ...)
     return msg;
 }
 
-std::string CameraHalHisysevent::GetEventName(ErrorEventType ErrorEventType)
+std::string CameraHalHisysevent::GetEventName(ErrorEventType errorEventType)
 {
-    auto it = g_eventNameMap.find(ErrorEventType);
+    auto it = g_eventNameMap.find(errorEventType);
     if (it != g_eventNameMap.end()) {
-        return g_eventNameMap[ErrorEventType];
+        return g_eventNameMap[errorEventType];
     }
     return "";
 }

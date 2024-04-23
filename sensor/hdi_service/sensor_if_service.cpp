@@ -22,6 +22,8 @@
 #include "sensor_callback_vdi.h"
 #include <hdf_remote_service.h>
 #include "callback_death_recipient.h"
+#include "sensor_hdi_dump.h"
+#include "devhost_dump_reg.h"
 
 constexpr int DISABLE_SENSOR = 0;
 constexpr int REPORT_INTERVAL = 0;
@@ -29,6 +31,7 @@ constexpr int UNREGISTER_SENSOR = 0;
 constexpr int REGISTER_SENSOR = 1;
 constexpr int ENABLE_SENSOR = 1;
 constexpr int COMMON_REPORT_FREQUENCY = 1000000000;
+constexpr int COPY_SENSORINFO = 1;
 enum BatchSeniorMode {
         SA = 0,
         SDC = 1
@@ -44,7 +47,6 @@ namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
     CallBackDeathRecipientMap g_callBackDeathRecipientMap;
-    std::mutex g_mutex;
 }
 
 SensorIfService::SensorIfService()
@@ -62,6 +64,15 @@ SensorIfService::~SensorIfService()
     }
     RemoveDeathNotice(TRADITIONAL_SENSOR_TYPE);
     RemoveDeathNotice(MEDICAL_SENSOR_TYPE);
+}
+
+void SensorIfService::RegisteDumpHost()
+{
+    int32_t ret = DevHostRegisterDumpHost(GetSensorDump);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DevHostRegisterDumpHost error", __func__);
+    }
+    return;
 }
 
 int32_t SensorIfService::GetSensorVdiImpl()
@@ -100,6 +111,7 @@ int32_t SensorIfService::Init()
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Init failed, error code is %{public}d", __func__, ret);
     }
+    RegisteDumpHost();
 
     return ret;
 }
@@ -121,6 +133,7 @@ sptr<SensorCallbackVdi> SensorIfService::GetSensorCb(int32_t groupId, const sptr
 
 int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: Enter the GetAllSensorInfo function.", __func__);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -156,6 +169,8 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
         sensorInfo.maxDelay = it.maxDelay;
         sensorInfo.fifoMaxEventCount = it.fifoMaxEventCount;
         info.push_back(std::move(sensorInfo));
+
+        SensorClientsManager::GetInstance()->CopySensorInfo(info, COPY_SENSORINFO);
     }
 
     return HDF_SUCCESS;
@@ -163,6 +178,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation> &inf
 
 int32_t SensorIfService::Enable(int32_t sensorId)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
@@ -189,6 +205,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
 
 int32_t SensorIfService::Disable(int32_t sensorId)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
@@ -224,6 +241,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
 
 int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
@@ -286,6 +304,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
 
 int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
         __func__, sensorId, mode);
     if (sensorVdiImpl_ == nullptr) {
@@ -305,6 +324,7 @@ int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
 
 int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
         __func__, sensorId, option);
     if (sensorVdiImpl_ == nullptr) {
@@ -324,11 +344,11 @@ int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
 
 int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     int32_t ret = HDF_SUCCESS;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Register function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
-    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = AddCallbackMap(groupId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: AddCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -364,10 +384,10 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
 
 int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
-    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t result = RemoveCallbackMap(groupId, serviceId, callbackObj);
     if (result !=SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
@@ -514,7 +534,7 @@ int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<ISensorCallback> 
 
 void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     sptr<IRemoteObject> callbackObject = object.promote();
     if (callbackObject == nullptr) {
         return;
@@ -600,10 +620,15 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
     }
     StartTrace(HITRACE_TAG_HDF, "SetSdcSensor");
     int32_t ret;
+    if (rateLevel < REPORT_INTERVAL) {
+        HDF_LOGE("%{public}s: rateLevel cannot less than zero", __func__);
+        return HDF_FAILURE;
+    }
     int64_t samplingInterval = rateLevel == REPORT_INTERVAL ? REPORT_INTERVAL : COMMON_REPORT_FREQUENCY / rateLevel;
     int64_t reportInterval = REPORT_INTERVAL;
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     if (enabled) {
+        std::unique_lock<std::mutex> lock(sensorServiceMutex_);
         ret = SetBatchSenior(serviceId, sensorId, SDC, samplingInterval, reportInterval);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%{public}s SetBatchSenior SDC failed, error code is %{public}d", __func__, ret);
@@ -634,6 +659,7 @@ int32_t SensorIfService::SetSdcSensor(int32_t sensorId, bool enabled, int32_t ra
 
 int32_t SensorIfService::GetSdcSensorInfo(std::vector<SdcSensorInfo>& sdcSensorInfo)
 {
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: Enter the GetSdcSensorInfo function", __func__);
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);

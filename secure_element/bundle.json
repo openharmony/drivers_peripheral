@@ -24,6 +24,7 @@
           "hdf_core",
           "hilog",
           "c_utils",
+          "init",
           "drivers_interface_secure_element"
         ],
         "third_party": [
@@ -32,6 +33,9 @@
       "build": {
         "sub_component": [
           "//drivers/peripheral/secure_element:secure_element_entry"
+        ],
+        "test": [
+          "//drivers/peripheral/secure_element/test:test_hdf_se_service"
         ]
       }
     }

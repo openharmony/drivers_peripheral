@@ -43,7 +43,10 @@ typedef struct StWpaIfaceInfo {
 
 typedef struct StWifiWpaInterface WifiWpaInterface;
 struct StWifiWpaInterface {
-    WpaCtrl wpaCtrl;
+    WpaCtrl staCtrl;
+    WpaCtrl p2pCtrl;
+    WpaCtrl chbaCtrl;
+    WpaCtrl commonCtrl;
     pthread_t tid;
     int threadRunFlag;
     WpaIfaceInfo *ifaces;
@@ -57,7 +60,10 @@ struct StWifiWpaInterface {
 
 WifiWpaInterface *GetWifiWpaGlobalInterface(void);
 void ReleaseWpaGlobalInterface(void);
-WpaCtrl *GetWpaCtrl(void);
+WpaCtrl *GetStaCtrl(void);
+WpaCtrl *GetP2pCtrl(void);
+WpaCtrl *GetChbaCtrl(void);
+WpaCtrl *GetCommonCtrl(void);
 #ifdef __cplusplus
 }
 #endif

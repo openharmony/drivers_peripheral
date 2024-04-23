@@ -13,21 +13,23 @@
  * limitations under the License.
  */
 
+#include "hdi_hostapd_hal.h"
+
 #include <errno.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <linux/wireless.h>
 #include <malloc.h>
 #include <poll.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
-#include <linux/wireless.h>
-#include "securec.h"
+#include <unistd.h>
+
 #include "common/wpa_ctrl.h"
-#include "hdi_hostapd_hal.h"
+#include "securec.h"
 
 #ifdef OHOS_EUPDATER
 #define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
@@ -68,6 +70,7 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
 #define AP_SET_CFG_DELAY 500000
 #define SOFTAP_MAX_BUFFER_SIZE 4096
 #define IFNAMSIZ 16
+#define ADDITIONAL_SPACE_FOR_FORMATTING 3
 
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_COEX_CFG, HOSTAPD_DEFAULT_CFG_COEX, HOSTAPD_DEFAULT_UDPPORT}
@@ -207,12 +210,11 @@ static int HostapdCliConnect(int id)
     GetCtrlInterface(ifname, sizeof(ifname), id);
     HDF_LOGI("HostapdCliConnect Ifname is: %{public}s", ifname);
     while (retryCount-- > 0) {
-        int ret = InitHostapdCtrl(ifname, id);
-        if (ret == 0) {
+        if (InitHostapdCtrl(ifname, id) == 0) {
             HDF_LOGI("Global hostapd interface connect successfully");
             break;
         } else {
-            HDF_LOGD("Init hostapd ctrl failed: %{public}d", ret);
+            HDF_LOGD("Init hostapd ctrl failed");
         }
         usleep(SLEEP_TIME_100_MS);
     }
@@ -257,7 +259,7 @@ static int WpaCtrlCommand(struct wpa_ctrl *ctrl, const char *cmd, char *buf, siz
     if (len < bufSize) {
         buf[len] = '\0';
     } else {
-        HDF_LOGE("len is invalid,current len is %{public}d, bufSize is %{public}d", len, bufSize);
+        HDF_LOGE("len is invalid,current len is %{public}zu, bufSize is %{public}zu", len, bufSize);
         return -1;
     }
     if (memcmp(buf, "FAIL", FAIL_LENGTH) == 0) {
@@ -540,7 +542,6 @@ static int SendPrivateCmd(struct iwreq *wrq, struct iw_priv_args *privPtr, const
     }
     /* Find the matching command from the privPtr array */
     int i;
-    int j;
     for (i = 0; i < wrq->u.data.length; i++) {
         if (strncmp(privPtr[i].name, fName, strlen(fName)) == 0) {
             cmd = (int)privPtr[i].cmd;
@@ -554,6 +555,7 @@ static int SendPrivateCmd(struct iwreq *wrq, struct iw_priv_args *privPtr, const
     }
     /* Process sub-command for a private command */
     if (cmd < SIOCDEVPRIVATE) {
+        int j;
         for (j = 0; j < i; j++) {
             if ((privPtr[j].set_args == privPtr[i].set_args) &&
                 (privPtr[j].get_args == privPtr[i].get_args) &&
@@ -581,7 +583,7 @@ static int SendPrivateCmd(struct iwreq *wrq, struct iw_priv_args *privPtr, const
     wrq->u.data.flags = (uint16_t)subCmd;
     /* Perform the ioctl operation */
     ret = ioctl(sock, cmd, wrq);
-    HDF_LOGD("the data length is:%d, ret is %d", wrq->u.data.length, ret);
+    HDF_LOGD("the data length is:%hu, ret is %d", wrq->u.data.length, ret);
     return ret;
 }
 
@@ -632,15 +634,12 @@ static int SetCommandHwHisi(const char *iface, const char *fName, unsigned int b
 
 static int AddParam(unsigned int position, const char *cmd, const char *arg, char outDataBuf[], unsigned int outSize)
 {
-    if (position < 0) {
-        HDF_LOGE("%{public}s position < 0", __func__);
-        return position;
-    }
     if (cmd == NULL || arg == NULL) {
         HDF_LOGE("%{public}s cmd == NULL or arg == NULL", __func__);
         return -1;
     }
-    if ((unsigned int)(position + strlen(cmd) + strlen(arg) + 3) >= outSize) { // 3: for "=" "," and terminator
+    /* ADDITIONAL_SPACE_FOR_FORMATTING 3: for "=" "," and terminator */
+    if ((unsigned int)(position + strlen(cmd) + strlen(arg) + ADDITIONAL_SPACE_FOR_FORMATTING) >= outSize) {
         HDF_LOGE("%{public}s Command line is too big", __func__);
         return -1;
     }

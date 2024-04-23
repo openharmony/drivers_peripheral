@@ -118,7 +118,7 @@ ThermalDfx::ThermalDfx() :
 
 ThermalDfx::~ThermalDfx()
 {
-    StopThread();
+    enable_ = false;
 }
 
 std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
@@ -393,7 +393,6 @@ void ThermalDfx::IntervalWatchCallback(const std::string& value)
 void ThermalDfx::EnableWatchCallback(const std::string& value)
 {
     enable_ = (value == "true");
-    enable_ ? StartThread() : StopThread();
 }
 
 int32_t ThermalDfx::GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue)
@@ -411,32 +410,17 @@ bool ThermalDfx::GetBoolParameter(const std::string& key, const bool def)
     return (value == "true");
 }
 
-void ThermalDfx::LoopingThreadEntry()
+uint32_t ThermalDfx::GetInterval()
 {
-    while (enable_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(interval_));
+    return interval_;
+}
+
+void ThermalDfx::DoWork()
+{
+    if (enable_) {
         CreateLogFile();
         CompressFile();
     }
-}
-
-void ThermalDfx::StartThread()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (enable_ && logThread_ == nullptr) {
-        logThread_ = std::make_unique<std::thread>(&ThermalDfx::LoopingThreadEntry, this);
-        pthread_setname_np(logThread_->native_handle(), "thermal_log");
-    }
-}
-
-void ThermalDfx::StopThread()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    enable_ = false;
-    if (logThread_ != nullptr && logThread_->joinable()) {
-        logThread_->join();
-    }
-    logThread_ = nullptr;
 }
 
 void ThermalDfx::Init()
@@ -457,7 +441,6 @@ void ThermalDfx::Init()
 
     XmlTraceConfig& config = ThermalHdfConfig::GetInstance().GetXmlTraceConfig();
     g_outPath = config.outPath;
-    StartThread();
 }
 } // V1_1
 } // Thermal

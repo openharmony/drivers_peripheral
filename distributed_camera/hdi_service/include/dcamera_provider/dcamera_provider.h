@@ -58,6 +58,8 @@ private:
     bool IsDCameraHDFEventInvalid(const DCameraHDFEvent& event);
     sptr<IDCameraProviderCallback> GetCallbackBydhBase(const DHBase &dhBase);
     OHOS::sptr<DCameraDevice> GetDCameraDevice(const DHBase &dhBase);
+    bool GetAbilityInfo(const std::string& abilityInfo, std::string& sinkAbilityInfo,
+        std::string& sourceAbilityInfo);
 
 private:
     class AutoRelease {

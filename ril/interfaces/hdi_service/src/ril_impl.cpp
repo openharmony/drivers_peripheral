@@ -21,16 +21,17 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_2 {
+namespace V1_3 {
 static std::mutex mutex_;
 static sptr<V1_1::IRilCallback> callback1_1_;
-static sptr<V1_2::IRilCallback> callback_;
+static sptr<V1_2::IRilCallback> callback1_2_;
+static sptr<V1_3::IRilCallback> callback_;
 namespace {
 sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_2::RilImpl;
+    using OHOS::HDI::Ril::V1_3::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -312,6 +313,11 @@ int32_t RilImpl::GetImei(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::GetImei, slotId, serialId);
 }
 
+int32_t RilImpl::GetImeiSv(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetImeiSv, slotId, serialId);
+}
+
 int32_t RilImpl::GetMeid(int32_t slotId, int32_t serialId)
 {
     return TaskSchedule(&Telephony::HRilManager::GetMeid, slotId, serialId);
@@ -438,6 +444,11 @@ int32_t RilImpl::SetCallback(const sptr<V1_1::IRilCallback> &rilCallback)
 
 int32_t RilImpl::SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback)
 {
+    return HDF_SUCCESS;
+}
+
+int32_t RilImpl::SetCallback1_3(const sptr<V1_3::IRilCallback> &rilCallback)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = rilCallback;
     if (callback_ == nullptr) {
@@ -446,12 +457,12 @@ int32_t RilImpl::SetCallback1_2(const sptr<V1_2::IRilCallback> &rilCallback)
     }
     g_deathRecipient = new RilDeathRecipient(this);
     if (g_deathRecipient == nullptr) {
-        HDF_LOGE("SetCallback1_2 fail g_deathRecipient is null");
+        HDF_LOGE("SetCallback1_3 fail g_deathRecipient is null");
         return HDF_FAILURE;
     }
     AddRilDeathRecipient(callback_);
     if (Telephony::HRilManager::manager_ == nullptr) {
-        HDF_LOGE("SetCallback1_2 fail manager_ is null");
+        HDF_LOGE("SetCallback1_3 fail manager_ is null");
         return HDF_FAILURE;
     }
     Telephony::HRilManager::manager_->SetRilCallback(callback_);
@@ -721,7 +732,7 @@ int32_t RilImpl::Init()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_2
+} // namespace V1_3
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

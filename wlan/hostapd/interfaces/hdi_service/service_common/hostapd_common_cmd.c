@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#include <securec.h>
-#include <hdf_base.h>
+#include "hostapd_common_cmd.h"
+#include <dlfcn.h>
 #include <errno.h>
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <osal_time.h>
 #include <osal_mem.h>
-#include <unistd.h>
+#include <securec.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <string.h>
-#include "v1_0/ihostapd_callback.h"
-#include "v1_0/ihostapd_interface.h"
+#include <unistd.h>
 #include "ap/ap_config.h"
 #include "ap/hostapd.h"
 #include "ap_ctrl_iface.h"
 #include "ap/ctrl_iface_ap.h"
 #include "ap_main.h"
 #include "hostapd_client.h"
-#include "hostapd_common_cmd.h"
+#include "v1_0/ihostapd_callback.h"
+#include "v1_0/ihostapd_interface.h"
 
 pthread_t g_tid;
 int32_t g_channel;
@@ -118,7 +118,7 @@ static int32_t StartApMain(const char *moduleName, const char *startCmd)
         return HDF_FAILURE;
     }
     pthread_setname_np(g_tid, "ApMainThread");
-    HDF_LOGE("%{public}s: pthread_create ID: %{public}p", __func__, (void*)g_tid);
+    HDF_LOGE("%{public}s: pthread_create successfully.", __func__);
     usleep(WPA_SLEEP_TIME);
     return HDF_SUCCESS;
 }
@@ -173,12 +173,12 @@ static int32_t StartHostapd(void)
     return HDF_SUCCESS;
 }
 
-int32_t HostapdInterfaceEnableAp(struct IHostapdInterface *self, const char *ifNamce,
+int32_t HostapdInterfaceEnableAp(struct IHostapdInterface *self, const char *ifName,
     int32_t id)
 {
     HDF_LOGI("Enter hdi %{public}s", __func__);
     (void)self;
-    if (ifNamce == NULL) {
+    if (ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid", __func__);
         return HDF_ERR_INVALID_PARAM ;
     }
@@ -478,7 +478,7 @@ int32_t HostapdInterfaceSetApMaxConn(struct IHostapdInterface *self, const char 
     (void)self;
     if (ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid", __func__);
-        return HDF_ERR_INVALID_PARAM ;
+        return HDF_ERR_INVALID_PARAM;
     }
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
@@ -561,6 +561,7 @@ int32_t HostapdInterfaceGetStaInfos(struct IHostapdInterface *self, const char *
         return HDF_FAILURE;
     }
     bufLen = strlen(buf);
+    HDF_LOGD("bufLen is %{public}u", bufLen);
     return HDF_SUCCESS;
 }
 
@@ -607,7 +608,12 @@ static int32_t ProcessEventStaJoin(struct HdfHostapdRemoteNode *node,
             HdiApCbParmFree(hdiApCbParm, true);
             return HDF_FAILURE;
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            if (memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH,
+                apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH) != 0) {
+                HDF_LOGE("%{public}s: memcpy_s fail", __func__);
+                HdiApCbParmFree(hdiApCbParm, true);
+                return HDF_FAILURE;
+            }
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventStaJoin(node->callbackObj, hdiApCbParm, ifName);
             HDF_LOGI("%{public}s: OnEventStaJoin send success, content is %{private}s", __func__,
@@ -639,7 +645,12 @@ static int32_t ProcessEventApState(struct HdfHostapdRemoteNode *node,
             HdiApCbParmFree(hdiApCbParm, true);
             return HDF_FAILURE;
         } else {
-            os_memcpy(hdiApCbParm->content, apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH);
+            if (memcpy_s(hdiApCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH,
+                apCbParm->content, WIFI_HOSTAPD_CB_CONTENT_LENGTH) != 0) {
+                HDF_LOGE("%{public}s: memcpy_s fail", __func__);
+                HdiApCbParmFree(hdiApCbParm, true);
+                return HDF_FAILURE;
+            }
             hdiApCbParm->id = apCbParm->id;
             ret = node->callbackObj->OnEventApState(node->callbackObj, hdiApCbParm, ifName);
             HDF_LOGI("%{public}s: OnEventApState send success, content is %{private}s", __func__,
@@ -676,7 +687,7 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
 
     (void)OsalMutexLock(&HdfHostapdStubDriver()->mutex);
     head = &HdfHostapdStubDriver()->remoteListHead;
-    HDF_LOGD("%s: enter HdfHostapdCallbackFun event =%d ", __FUNCTION__, event);
+    HDF_LOGD("%s: enter HdfHostapdCallbackFun event =%u ", __FUNCTION__, event);
     if (data == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: data or ifName is NULL", __func__);
         (void)OsalMutexUnlock(&HdfHostapdStubDriver()->mutex);
@@ -792,7 +803,6 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
     struct IHostapdCallback *cbFunc, const char *ifName)
 {
     HDF_LOGI("Enter hdi %{public}s", __func__);
-    int32_t ret = HDF_FAILURE;
 
     (void)self;
     if (cbFunc == NULL || ifName == NULL) {
@@ -802,7 +812,7 @@ int32_t HostapdInterfaceUnregisterEventCallback(struct IHostapdInterface *self,
     (void)OsalMutexLock(&HdfHostapdStubDriver()->mutex);
     HdfHostapdDelRemoteObj(cbFunc);
     if (DListIsEmpty(&HdfHostapdStubDriver()->remoteListHead)) {
-        ret = HostapdUnregisterEventCallback(HdfHostapdCallbackFun, WIFI_HOSTAPD_TO_HAL_CLIENT, ifName);
+        int32_t ret = HostapdUnregisterEventCallback(HdfHostapdCallbackFun, WIFI_HOSTAPD_TO_HAL_CLIENT, ifName);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
         }

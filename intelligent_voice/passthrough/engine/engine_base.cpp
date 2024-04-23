@@ -59,6 +59,16 @@ IntellVoiceStatus EngineBase::ReadFileData(ContentType /* type */, getFileDataCb
 {
     return HDF_SUCCESS;
 }
+
+IntellVoiceStatus EngineBase::GetWakeupPcm(std::vector<uint8_t> & /* data */)
+{
+    return HDF_SUCCESS;
+}
+
+IntellVoiceStatus EngineBase::Evaluate(const std::string & /* word */, EvaluationResultInfo & /* info */)
+{
+    return HDF_SUCCESS;
+}
 }
 }
 }

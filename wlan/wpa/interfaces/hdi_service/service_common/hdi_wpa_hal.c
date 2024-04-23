@@ -67,18 +67,19 @@ static int WpaCliConnect(WifiWpaInterface *p)
         HDF_LOGE("Wpa connect parameter error.");
         return -1;
     }
-    if (p->wpaCtrl.pSend != NULL) {
+    if (p->staCtrl.pSend != NULL && p->p2pCtrl.pSend != NULL && p->chbaCtrl.pSend != NULL &&
+        p->commonCtrl.pSend != NULL) {
         HDF_LOGE("Wpa is already connected.");
         return 0;
     }
     int count = WPA_TRY_CONNECT_TIMES;
     while (count-- > 0) {
-        int ret = InitWpaCtrl(&p->wpaCtrl, WPA_CTRL_OPEN_IFNAME);
-        if (ret == 0) {
+        if (!InitWpaCtrl(&p->staCtrl, WPA_CTRL_OPEN_IFNAME) && !InitWpaCtrl(&p->p2pCtrl, WPA_CTRL_OPEN_IFNAME) &&
+            !InitWpaCtrl(&p->chbaCtrl, WPA_CTRL_OPEN_IFNAME) && !InitWpaCtrl(&p->commonCtrl, WPA_CTRL_OPEN_IFNAME)) {
             HDF_LOGI("Global wpa interface connect successfully!");
             break;
         } else {
-            HDF_LOGE("Init wpaCtrl failed: %{public}d", ret);
+            HDF_LOGE("Init wpaCtrl failed.");
         }
         usleep(WPA_TRY_CONNECT_SLEEP_TIME);
     }
@@ -98,7 +99,10 @@ static void WpaCliClose(WifiWpaInterface *p)
         pthread_join(p->tid, NULL);
         p->tid = 0;
     }
-    ReleaseWpaCtrl(&p->wpaCtrl);
+    ReleaseWpaCtrl(&p->staCtrl);
+    ReleaseWpaCtrl(&p->p2pCtrl);
+    ReleaseWpaCtrl(&p->chbaCtrl);
+    ReleaseWpaCtrl(&p->commonCtrl);
     return;
 }
 
@@ -230,12 +234,42 @@ void ReleaseWpaGlobalInterface(void)
     g_wpaInterface = NULL;
 }
 
-WpaCtrl *GetWpaCtrl(void)
+WpaCtrl *GetStaCtrl(void)
 {
-    HDF_LOGI("enter GetWpaCtrl");
+    HDF_LOGI("enter GetStaCtrl");
     if (g_wpaInterface == NULL) {
-        HDF_LOGE("GetWpaCtrl g_wpaInterface = NULL!");
+        HDF_LOGE("GetStaCtrl g_wpaInterface = NULL!");
         return NULL;
     }
-    return &g_wpaInterface->wpaCtrl;
+    return &g_wpaInterface->staCtrl;
+}
+ 
+WpaCtrl *GetP2pCtrl(void)
+{
+    HDF_LOGI("enter GetP2pCtrl");
+    if (g_wpaInterface == NULL) {
+        HDF_LOGE("GetP2pCtrl g_wpaInterface = NULL!");
+        return NULL;
+    }
+    return &g_wpaInterface->p2pCtrl;
+}
+ 
+WpaCtrl *GetChbaCtrl(void)
+{
+    HDF_LOGI("enter GetChbaCtrl");
+    if (g_wpaInterface == NULL) {
+        HDF_LOGE("GetChbaCtrl g_wpaInterface = NULL!");
+        return NULL;
+    }
+    return &g_wpaInterface->chbaCtrl;
+}
+ 
+WpaCtrl *GetCommonCtrl(void)
+{
+    HDF_LOGI("enter GetCommonCtrl");
+    if (g_wpaInterface == NULL) {
+        HDF_LOGE("GetCommonCtrl g_wpaInterface = NULL!");
+        return NULL;
+    }
+    return &g_wpaInterface->commonCtrl;
 }

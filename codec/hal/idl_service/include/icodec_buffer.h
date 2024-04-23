@@ -23,8 +23,8 @@
 #include <memory>
 #include <refbase.h>
 #include "codec_omx_ext.h"
-#include "v2_0/codec_types.h"
-using OHOS::HDI::Codec::V2_0::OmxCodecBuffer;
+#include "v3_0/codec_types.h"
+using OHOS::HDI::Codec::V3_0::OmxCodecBuffer;
 constexpr uint32_t TIME_WAIT_MS = 10;
 namespace OHOS {
 namespace Codec {
@@ -58,10 +58,10 @@ public:
     sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) = 0;
+    virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer);
     virtual int32_t EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer);
-    virtual uint8_t *GetBuffer() = 0;
+    virtual uint8_t *GetBuffer();
     struct OmxCodecBuffer &GetCodecBuffer();
     void SetBufferId(int32_t bufferId);
 

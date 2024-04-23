@@ -12,3 +12,4 @@
 # limitations under the License.
 
 sys.usb.config = usb_host:usb_host:0776
+persist.sys.usb.config = usb_host:usb_host:0776

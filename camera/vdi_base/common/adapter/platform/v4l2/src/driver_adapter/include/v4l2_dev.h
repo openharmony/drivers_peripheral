@@ -73,7 +73,7 @@ public:
 
     RetCode StopStream(const std::string& cameraID);
 
-    RetCode SetCallback(BufCallback cb);
+    RetCode SetV4L2DevCallback(BufCallback cb);
 
     RetCode Flush(const std::string& cameraID);
 
@@ -101,6 +101,7 @@ public:
 
 private:
     int GetCurrentFd(const std::string& cameraID);
+    void dequeueBuffers();
     void loopBuffers();
     RetCode CreateEpoll(int fd, const unsigned int streamNumber);
     void EraseEpoll(int fd);

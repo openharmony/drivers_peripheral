@@ -123,13 +123,17 @@ bool CameraDumper::IsDumpCommandOpened(std::string type)
     return false;
 }
 
-bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer)
+bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::shared_ptr<IBuffer>& buffer,
+    uint32_t width, uint32_t height)
 {
     if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
 
-    uint32_t size = buffer->GetSize();
+    uint32_t defaultWidth = (width == 0) ? buffer->GetCurWidth() : width;
+    uint32_t defaultHeight = (height == 0) ? buffer->GetCurHeight() : height;
+    void* srcAddr = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferAddr() : buffer->GetVirAddress();
+    uint32_t size = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferSize() : buffer->GetSize();
     const std::string DqBufferName = "DQBuffer";
     if (name != DqBufferName) {
         size = buffer->GetEsFrameInfo().size > 0 ? buffer->GetEsFrameInfo().size : size;
@@ -138,7 +142,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     std::stringstream ss;
     std::string fileName;
     ss << name.c_str() << "_captureId[" << buffer->GetCaptureId() << "]_streamId[" << buffer->GetStreamId() <<
-        "]_width[" << buffer->GetWidth() << "]_height[" << buffer->GetHeight();
+        "]_width[" << defaultWidth << "]_height[" << defaultHeight;
 
     int32_t previewInterval = 1;
     std::istringstream ssPreview(g_dumpToolMap[PREVIEW_INTERVAL]);
@@ -173,8 +177,7 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
         ss >> fileName;
         fileName += ".yuv";
     }
-
-    return SaveDataToFile(fileName.c_str(), buffer->GetVirAddress(), size);
+    return SaveDataToFile(fileName.c_str(), srcAddr, size);
 }
 
 bool CameraDumper::DumpMetadata(std::string name, std::string type,
@@ -239,6 +242,7 @@ bool CameraDumper::IsDumpOpened(DumpType type)
 
 bool CameraDumper::SaveDataToFile(const char *fileName, const void *data, uint32_t size)
 {
+    CAMERA_LOGI("save dump file <%{public}s> begin, size: %{public}d", fileName, size);
     std::stringstream mkdirCmd;
     mkdirCmd << "mkdir -p " << DUMP_PATH;
     system(mkdirCmd.str().c_str());

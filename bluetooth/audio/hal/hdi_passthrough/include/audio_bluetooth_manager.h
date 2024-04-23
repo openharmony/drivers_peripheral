@@ -31,7 +31,7 @@ namespace Bluetooth {
 using namespace OHOS::bluetooth;
 
 typedef struct BtA2dpAudioCallback {
-    void (*OnConnectionStateChanged)(const RawAddress &device, int state);
+    void (*OnConnectionStateChanged)(const RawAddress &device, int state, int cause);
     void (*OnPlayingStatusChanged)(const RawAddress &device, int playingState, int error);
     void (*OnConfigurationChanged)(const RawAddress &device, const BluetoothA2dpCodecInfo &info, int error);
     void (*OnMediaStackChanged)(const RawAddress &device, int action);

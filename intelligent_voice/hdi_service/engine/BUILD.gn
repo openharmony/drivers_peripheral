@@ -14,9 +14,8 @@
 import("//build/ohos.gni")
 import("../../intelligent_voice.gni")
 
-ohos_shared_library("intell_voice_engine_manager_service_1.1") {
+ohos_shared_library("intell_voice_engine_manager_service_1.2") {
   include_dirs = [
-    "//third_party/bounds_checking_function/include",
     "../../interfaces",
     "../../utils",
   ]
@@ -56,6 +55,7 @@ ohos_shared_library("intell_voice_engine_driver") {
       "c_utils:utils",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.0",
       "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.1",
+      "drivers_interface_intelligent_voice:libintell_voice_engine_stub_1.2",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -80,7 +80,7 @@ ohos_shared_library("intell_voice_engine_driver") {
 group("hdi_intell_voice_engine_service") {
   deps = [
     ":intell_voice_engine_driver",
-    ":intell_voice_engine_manager_service_1.1",
+    ":intell_voice_engine_manager_service_1.2",
     "etc:intelligent_voice_engine_cfg",
   ]
 

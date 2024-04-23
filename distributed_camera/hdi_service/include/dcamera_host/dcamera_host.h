@@ -33,6 +33,7 @@ using namespace OHOS::HDI::Camera::V1_0;
 class DCameraHost : public ICameraHost {
 const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;
 const uint32_t ID_MAX_SIZE = 2 * DEVID_MAX_LENGTH;
+const size_t MAX_DCAMERAS_NUMBER = 32;
 public:
     DCameraHost() = default;
     ~DCameraHost() override = default;
@@ -59,6 +60,7 @@ public:
 private:
     bool IsCameraIdInvalid(const std::string &cameraId);
     std::string GetCameraIdByDHBase(const DHBase &dhBase);
+    size_t GetCamDevNum();
 
 private:
     class AutoRelease {
@@ -80,8 +82,10 @@ private:
     static OHOS::sptr<DCameraHost> instance_;
 
     OHOS::sptr<ICameraHostCallback> dCameraHostCallback_;
-    std::map<DCameraBase, std::string> dhBaseHashDCamIdMap_;
+    std::map<std::string, std::string> dhBaseHashDCamIdMap_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
+    std::mutex deviceMapLock_;
+    std::mutex dCamIdMapLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

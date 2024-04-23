@@ -1147,7 +1147,7 @@ static void InitGlobalWpaP2pFunc(void)
     return;
 }
 
-WifiWpaP2pInterface *GetWifiWapP2pInterface()
+WifiWpaP2pInterface *GetWifiWapP2pInterface(const char *ifName)
 {
     if (g_wpaP2pInterface != NULL) {
         return g_wpaP2pInterface;
@@ -1157,11 +1157,7 @@ WifiWpaP2pInterface *GetWifiWapP2pInterface()
         HDF_LOGE("alloc memory for p2p interface failed!");
         return NULL;
     }
-#ifdef NON_SEPERATE_P2P
-    strcpy_s(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), "p2p-dev-wlan0");
-#else
-    strcpy_s(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), "p2p0");
-#endif
+    strcpy_s(g_wpaP2pInterface->ifName, sizeof(g_wpaP2pInterface->ifName), ifName);
     InitGlobalWpaP2pFunc();
     return g_wpaP2pInterface;
 }

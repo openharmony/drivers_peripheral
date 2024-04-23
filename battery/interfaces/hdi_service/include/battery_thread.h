@@ -28,6 +28,7 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V2_0 {
+using UeventMap = std::map<std::string, std::vector<std::pair<std::string, std::string>>>;
 enum EventType {
     EVENT_UEVENT_FD,
     EVENT_TIMER_FD,
@@ -63,7 +64,7 @@ private:
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
-    std::map<std::string, std::vector<std::string>> powerUeventMap_;
+    UeventMap powerUeventMap_;
 };
 }  // namespace V2_0
 }  // namespace Battery

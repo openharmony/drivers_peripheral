@@ -34,6 +34,7 @@ public:
     int32_t Release() override;
     int32_t GetDecryptNumber();
     int32_t GetErrorDecryptNumber();
+    int32_t GetDecryptTimes(std::vector<double> &times);
 private:
     int32_t DecryptByAesCbc(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, 
         uint8_t* src_data, uint8_t* dest_data, const std::vector<SubSample>& subSamples);
@@ -43,6 +44,7 @@ private:
     int32_t CopyBuffer(uint8_t* srcBuffer, uint8_t* dstBuffer, const std::vector<SubSample>& subSamples);
     int32_t decryptNumber = 0;
     int32_t errorDecryptNumber = 0;
+    std::vector<double> decryptTimes;
     sptr<Session> session_;
 };
 } // V1_0

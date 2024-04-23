@@ -1072,7 +1072,11 @@ static int32_t HdiServiceGetDevStatusByPnp(const struct HdfDeviceIoClient *clien
 
 static bool AudioDevExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct AudioDevExtInfo *dataBlock)
 {
-    if (data == NULL || dataBlock == NULL) {
+    if (dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid data block", __func__);
+        return false;
+    }
+    if (data == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
         goto ERROR;
     }

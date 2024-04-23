@@ -21,10 +21,8 @@
           "hilog",
           "drivers_interface_distributed_audio",
           "c_utils",
+          "cJSON",
           "samgr"
-        ],
-        "third_party": [
-          "cJSON"
         ]
       },
       "build": {
@@ -47,6 +45,13 @@
           },
           {
             "name": "//drivers/interface/distributed_audio/audioext/v1_0:libdaudioext_proxy_1.0",
+            "header": {
+              "header_files": [],
+              "header_base": "//drivers/interface/distributed_audio/audioext"
+            }
+          },
+          {
+            "name": "//drivers/interface/distributed_audio/audioext/v2_0:libdaudioext_proxy_2.0",
             "header": {
               "header_files": [],
               "header_base": "//drivers/interface/distributed_audio/audioext"

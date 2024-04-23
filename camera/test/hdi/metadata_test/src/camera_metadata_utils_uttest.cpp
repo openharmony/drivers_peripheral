@@ -143,7 +143,7 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_003, TestSize.Level1)
 }
 
 constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
-constexpr uint32_t MAX_SUPPORTED_ITEMS = 2000;
+constexpr uint32_t MAX_SUPPORTED_ITEMS = 12000;
 constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
 constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
 
@@ -195,25 +195,38 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_004, TestSize.Level1)
 HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_005, TestSize.Level1)
 {
     //item.count = MAX_SUPPORTED_ITEMS + 1
+    uint32_t exceedMaxSupportedItem = MAX_SUPPORTED_ITEMS + 1;
     vector<uint8_t> metaVec = {232, 3, 0, 0, 16, 39, 0, 0, 160, 134, 1, 0};
     metaVec.resize(28);
-    metaVec[24] = 113;
-    metaVec[25] = 23;
-    metaVec[26] = 0;
-    metaVec[27] = 0;
+    metaVec[24] = exceedMaxSupportedItem >> 24;
+    metaVec[25] = exceedMaxSupportedItem >> 16;
+    metaVec[26] = exceedMaxSupportedItem >> 8;
+    metaVec[27] = exceedMaxSupportedItem;
     auto metaData = make_shared<CameraMetadata>(MAX_ITEM_CAPACITY, MAX_DATA_CAPACITY);
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
 
     //dataCapacity = MAX_DATA_CAPACITY + 1
-    metaVec[8] = 161;
+    uint32_t exceedMaxDataCapacity = MAX_DATA_CAPACITY +1;
+    metaVec[8] = exceedMaxDataCapacity >> 24;
+    metaVec[9] = exceedMaxDataCapacity >> 16;
+    metaVec[10] = exceedMaxDataCapacity >> 8;
+    metaVec[11] = exceedMaxDataCapacity;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
 
     //itemCapacity = MAX_ITEM_CAPACITY + 1
-    metaVec[4] = 17;
+    uint32_t exceedMaxItemCapacity = MAX_ITEM_CAPACITY + 1;
+    metaVec[4] = exceedMaxItemCapacity >> 24;
+    metaVec[5] = exceedMaxItemCapacity >> 16;
+    metaVec[6] = exceedMaxItemCapacity >> 8;
+    metaVec[7] = exceedMaxItemCapacity;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
 
     //tagCount = MAX_SUPPORTED_TAGS + 1
-    metaVec[0] = 233;
+    uint32_t exceedMaxSupportedTags = MAX_SUPPORTED_TAGS + 1;
+    metaVec[0] = exceedMaxSupportedTags >> 24;
+    metaVec[1] = exceedMaxSupportedTags >> 16;
+    metaVec[2] = exceedMaxSupportedTags >> 8;
+    metaVec[3] = exceedMaxSupportedTags;
     MetadataUtils::ConvertVecToMetadata(metaVec, metaData);
 }
 

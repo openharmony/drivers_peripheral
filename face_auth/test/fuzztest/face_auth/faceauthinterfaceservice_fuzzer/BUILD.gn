@@ -17,7 +17,7 @@ import("//build/test.gni")
 ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
   branch_protector_ret = "pac_ret"
   module_out_path = "drivers_peripheral_face_auth/drivers_peripheral_face_auth"
-  fuzz_config_file = "../faceauthinterfaceservice_fuzzer"
+  fuzz_config_file = "."
   cflags = [
     "-g",
     "-O0",
@@ -31,13 +31,15 @@ ohos_fuzztest("FaceAuthInterfaceServiceFuzzTest") {
 
   sources = [ "face_auth_interface_service_fuzzer.cpp" ]
 
-  deps = [ "../common_fuzzer:libface_auth_interface_service_1.1_fuzzer" ]
+  deps = [ "../common_fuzzer:libface_auth_interface_service_2.0_fuzzer" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_face_auth:face_auth_idl_headers",
+    "drivers_interface_face_auth:libface_auth_stub_2.0",
     "graphic_surface:surface",
+    "hdf_core:libhdi",
     "hilog:libhilog",
   ]
 

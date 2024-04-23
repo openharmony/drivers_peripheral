@@ -17,8 +17,9 @@
 
 #include <hdf_base.h>
 
-#include "executor_impl.h"
+#include "all_in_one_executor_impl.h"
 #include "iam_logger.h"
+#include "iam_para2str.h"
 
 #undef LOG_TAG
 #define LOG_TAG "FACE_AUTH_IMPL"
@@ -38,15 +39,15 @@ extern "C" IFaceAuthInterface *FaceAuthInterfaceImplGetInstance(void)
 
 FaceAuthInterfaceService::FaceAuthInterfaceService()
 {
-    auto executor = new (std::nothrow) ExecutorImpl();
+    auto executor = new (std::nothrow) AllInOneExecutorImpl();
     if (executor == nullptr) {
         IAM_LOGE("executor is nullptr");
         return;
     }
-    executorList_.push_back(sptr<IExecutor>(executor));
+    executorList_.push_back(sptr<IAllInOneExecutor>(executor));
 }
 
-int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList)
+int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IAllInOneExecutor>> &executorList)
 {
     IAM_LOGI("interface mock start");
     for (auto executor : executorList_) {
@@ -56,11 +57,10 @@ int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutorV1_0
     return HDF_SUCCESS;
 }
 
-int32_t FaceAuthInterfaceService::GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList)
+int32_t FaceAuthInterfaceService::SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer)
 {
-    IAM_LOGI("interface mock start");
-    executorList = executorList_;
-    IAM_LOGI("interface mock success");
+    IAM_LOGI("interface mock start set buffer producer %{public}s",
+        UserIam::Common::GetPointerNullStateString(bufferProducer.GetRefPtr()).c_str());
     return HDF_SUCCESS;
 }
 } // namespace FaceAuth
