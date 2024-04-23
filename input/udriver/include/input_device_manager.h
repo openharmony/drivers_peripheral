@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Input {
 using namespace std;
 #define EPOLL_WAIT_TIMEOUT  (-1)
-#define DEVICE_INFO_SIZE    (80)
+#define DEVICE_INFO_SIZE    (64)
 #define EPOLL_MAX_EVENTS    (32)
 #define MAX_SUPPORT_DEVS    (32)
 #define BUFFER_SIZE         (1024)
