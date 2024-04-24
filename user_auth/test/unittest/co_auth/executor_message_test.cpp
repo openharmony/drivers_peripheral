@@ -29,7 +29,7 @@ extern "C" {
     extern void DestroyUserInfoList(void);
     extern ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv);
     extern ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
-        Uint8Array *retDataAndSignTlv, bool needUserType);
+        Uint8Array *retDataAndSignTlv);
     extern ResultCode Ed25519VerifyData(uint64_t scheduleId, Uint8Array dataTlv, Uint8Array signTlv);
     extern ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv);
     extern Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, bool needVerifySignature);
@@ -85,7 +85,7 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     Uint8Array retData = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData, false);
+    ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     constexpr uint32_t testUint32 = 123;
@@ -106,9 +106,9 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    result = GetAttributeDataAndSignTlv(attribute, false, &retData, false);
+    result = GetAttributeDataAndSignTlv(attribute, false, &retData);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeDataAndSignTlv(attribute, true, &retData, false);
+    result = GetAttributeDataAndSignTlv(attribute, true, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     Free(retData.data);
     FreeAttribute(&attribute);
@@ -119,12 +119,12 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeExecutorMsg, TestSize.Level0)
     Uint8Array retData = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = GetAttributeExecutorMsg(nullptr, false, &retData, false);
+    ResultCode result = GetAttributeExecutorMsg(nullptr, false, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    result = GetAttributeExecutorMsg(attribute, false, nullptr, false);
+    result = GetAttributeExecutorMsg(attribute, false, nullptr);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     retData.len = 0;
-    result = GetAttributeExecutorMsg(attribute, false, &retData, false);
+    result = GetAttributeExecutorMsg(attribute, false, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
     constexpr uint32_t testUint32 = 123;
@@ -145,9 +145,9 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeExecutorMsg, TestSize.Level0)
     result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    result = GetAttributeExecutorMsg(attribute, false, &retData, false);
+    result = GetAttributeExecutorMsg(attribute, false, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    result = GetAttributeExecutorMsg(attribute, true, &retData, false);
+    result = GetAttributeExecutorMsg(attribute, true, &retData);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     Free(retData.data);
     FreeAttribute(&attribute);
@@ -202,7 +202,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromDataAndSignTlv, TestSize.Le
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeExecutorMsg(attribute, true, &retInfo, false);
+    result = GetAttributeExecutorMsg(attribute, true, &retInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
     Uint8Array dataAndSignTlv = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
@@ -233,7 +233,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromExecutorMsg, TestSize.Level
     EXPECT_NE(attribute, nullptr);
     ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeExecutorMsg(attribute, true, &msg, false);
+    result = GetAttributeExecutorMsg(attribute, true, &msg);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
     retAttribute = CreateAttributeFromExecutorMsg(msg, false);
@@ -347,7 +347,7 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorResultInfo, TestSize.Level0)
     std::vector<uint8_t> data;
     data.resize(dataLen);
     Uint8Array retExtraInfo = { data.data(), data.size() };
-    result = GetAttributeExecutorMsg(attribute, false, &retExtraInfo, false);
+    result = GetAttributeExecutorMsg(attribute, false, &retExtraInfo);
     EXPECT_EQ(result, RESULT_SUCCESS);
     Buffer *buf = CreateBufferByData(retExtraInfo.data, retExtraInfo.len);
     EXPECT_NE(buf, nullptr);

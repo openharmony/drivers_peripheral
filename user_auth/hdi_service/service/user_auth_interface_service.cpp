@@ -150,7 +150,7 @@ static int32_t SetAttributeToExtraInfo(
         info.executorMessages.resize(1);
         info.executorMessages[0].resize(MAX_EXECUTOR_MSG_LEN);
         Uint8Array retExtraInfo = { info.executorMessages[0].data(), MAX_EXECUTOR_MSG_LEN };
-        if (GetAttributeExecutorMsg(attribute, true, &retExtraInfo, userDetails.needUserType) != RESULT_SUCCESS) {
+        if (GetAttributeExecutorMsg(attribute, true, &retExtraInfo) != RESULT_SUCCESS) {
             IAM_LOGE("GetAttributeExecutorMsg failed");
             info.executorMessages.clear();
             break;
