@@ -488,7 +488,6 @@ IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
         LOG_ERROR("create user failed");
         return RESULT_UNKNOWN;
     }
-    LOG_INFO("user userId %{public}d", user->userId);
     LOG_INFO("user userType %{public}d", user->userType);
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
@@ -524,7 +523,6 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         ret = UpdateFileInfo(g_userInfoList);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("updateFileInfo failed");
-            return ret;
         }
         return ret;
     }
