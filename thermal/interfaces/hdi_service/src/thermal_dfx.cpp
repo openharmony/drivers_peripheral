@@ -18,7 +18,6 @@
 #include <cstdio>
 #include <deque>
 #include <fcntl.h>
-#include <filesystem>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -286,10 +285,9 @@ void ThermalDfx::CreateLogFile()
     }
 
     bool isEmpty = false;
-    std::ifstream fin(std::filesystem::canonical(logFile));
+    std::ifstream fin(logFile);
     std::fstream file;
-    std::string canonicalPath = std::filesystem::canonical(logFile).string();
-    file.open(canonicalPath, std::ios::in);
+    file.open(logFile, std::ios::in);
     if (file.eof() || !fin) {
         isEmpty = true;
     }
@@ -303,7 +301,7 @@ void ThermalDfx::CreateLogFile()
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 {
     std::string currentTime = GetCurrentTime(TIME_FORMAT_2);
-    std::ofstream wStream(std::filesystem::canonical(logFile), std::ios::app);
+    std::ofstream wStream(logFile, std::ios::app);
     if (wStream.is_open()) {
         if (isEmpty) {
             WriteToEmptyFile(wStream, currentTime);
