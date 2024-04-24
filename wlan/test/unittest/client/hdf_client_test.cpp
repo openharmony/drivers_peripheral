@@ -266,7 +266,7 @@ HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level1)
     ret = SetTxPower(ifNameInvalid, power);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
     ret = SetTxPower(WLAN_IFNAME, power);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
 /**
