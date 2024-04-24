@@ -53,8 +53,6 @@
         HDF_LOGE("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
 
-#endif
-
 #ifndef CHECK_NULL_PTR_RETURN_DEFAULT
 #define CHECK_NULL_PTR_RETURN_DEFAULT(pointer)          \
     do {                                                      \
@@ -94,4 +92,4 @@
         }                                                     \
     } while (0)
 #endif
-
+#endif
