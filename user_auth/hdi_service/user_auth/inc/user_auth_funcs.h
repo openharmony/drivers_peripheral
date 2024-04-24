@@ -39,6 +39,7 @@ typedef struct AuthResult {
     uint64_t credentialDigest;
     uint16_t credentialCount;
     int64_t pinExpiredInfo;
+    Buffer *remoteAuthResultMsg;
 } AuthResult;
 
 typedef struct {
@@ -76,6 +77,12 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
 ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *executorExpiredInfos,
     uint32_t len, uint32_t *size);
 void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult);
+
+ResultCode GenerateScheduleFunc(const Buffer *tlv, Uint8Array remoteUdid, ScheduleInfoParam *scheduleInfo);
+ResultCode GenerateAuthResultFunc(const Buffer *tlv, AuthResultParam *authResultInfo);
+ResultCode GetExecutorInfoLinkedList(uint32_t authType, uint32_t executorRole, LinkedList *allExecutorInfoList);
+Buffer *GetSignExecutorInfoFunc(Uint8Array peerUdid, LinkedList *executorList);
+void DestroyAuthResult(AuthResult *authResult);
 
 #ifdef __cplusplus
 }

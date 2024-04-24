@@ -37,7 +37,7 @@ ResultCode DoIdentify(const IdentifyParam param, LinkedList **schedule)
     ResultCode ret = CopySchedules(identifyContext, schedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get schedule failed");
-        DestoryContext(identifyContext);
+        DestroyContext(identifyContext);
         return ret;
     }
     return ret;
@@ -48,7 +48,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
 {
     if (!IsBufferValid(scheduleResult) || token == NULL || userId == NULL || result == NULL) {
         LOG_ERROR("param is null");
-        DestoryContextbyId(contextId);
+        DestroyContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
 
@@ -60,7 +60,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
     if (executorResultInfo == NULL) {
         LOG_ERROR("executorResultInfo is null");
-        DestoryContext(identifyContext);
+        DestroyContext(identifyContext);
         return RESULT_GENERAL_ERROR;
     }
 
@@ -84,7 +84,7 @@ ResultCode DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, in
     *userId = identifyContext->userId;
 
 EXIT:
-    DestoryExecutorResultInfo(executorResultInfo);
-    DestoryContext(identifyContext);
+    DestroyExecutorResultInfo(executorResultInfo);
+    DestroyContext(identifyContext);
     return ret;
 }

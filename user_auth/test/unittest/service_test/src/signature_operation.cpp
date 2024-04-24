@@ -37,57 +37,81 @@ namespace {
 
 enum AuthAttributeType : uint32_t {
     /* Root tag */
-    AUTH_ROOT = 100000,
+    ATTR_ROOT = 100000,
     /* Result code */
-    AUTH_RESULT_CODE = 100001,
+    ATTR_RESULT_CODE = 100001,
     /* Tag of signature data in TLV */
-    AUTH_SIGNATURE = 100004,
+    ATTR_SIGNATURE = 100004,
     /* Identify mode */
-    AUTH_IDENTIFY_MODE = 100005,
+    ATTR_IDENTIFY_MODE = 100005,
     /* Tag of templateId data in TLV */
-    AUTH_TEMPLATE_ID = 100006,
+    ATTR_TEMPLATE_ID = 100006,
     /* Tag of templateId list data in TLV */
-    AUTH_TEMPLATE_ID_LIST = 100007,
+    ATTR_TEMPLATE_ID_LIST = 100007,
     /* Expected attribute, tag of remain count in TLV */
-    AUTH_REMAIN_COUNT = 100009,
+    ATTR_REMAIN_ATTEMPTS = 100009,
     /* Remain time */
-    AUTH_REMAIN_TIME = 100010,
+    ATTR_LOCKOUT_DURATION = 100010,
     /* Session id, required when decode in C */
-    AUTH_SCHEDULE_ID = 100014,
+    ATTR_SCHEDULE_ID = 100014,
     /* Package name */
-    AUTH_CALLER_NAME = 100015,
+    ATTR_CALLER_NAME = 100015,
     /* Schedule version */
     AUTH_SCHEDULE_VERSION = 100016,
     /* Tag of lock out template in TLV */
     AUTH_LOCK_OUT_TEMPLATE = 100018,
-    /* Tag of unlock template in TLV */
-    AUTH_UNLOCK_TEMPLATE = 100019,
     /* Tag of data */
-    AUTH_DATA = 100020,
+    ATTR_DATA = 100020,
     /* Tag of auth subType */
-    AUTH_SUBTYPE = 100021,
+    ATTR_PIN_SUB_TYPE = 100021,
     /* Tag of auth schedule mode */
-    AUTH_SCHEDULE_MODE = 100022,
+    ATTR_SCHEDULE_MODE = 100022,
     /* Tag of property */
-    AUTH_PROPERTY_MODE = 100023,
+    ATTR_PROPERTY_MODE = 100023,
     /* Tag of auth type */
-    AUTH_TYPE = 100024,
+    ATTR_TYPE = 100024,
     /* Tag of cred id */
-    AUTH_CREDENTIAL_ID = 100025,
+    ATTR_CREDENTIAL_ID = 100025,
     /* Controller */
-    AUTH_CONTROLLER = 100026,
+    ATTR_CONTROLLER = 100026,
     /* calleruid */
-    AUTH_CALLER_UID = 100027,
+    ATTR_CALLER_UID = 100027,
     /* result */
-    AUTH_RESULT = 100028,
+    ATTR_RESULT = 100028,
     /* capability level */
-    AUTH_CAPABILITY_LEVEL = 100029,
+    ATTR_CAPABILITY_LEVEL = 100029,
     /* algorithm setinfo */
-    ALGORITHM_INFO = 100030,
+    ATTR_ALGORITHM_INFO = 100030,
     /* time stamp */
-    AUTH_TIME_STAMP = 100031,
+    ATTR_TIME_STAMP = 100031,
     /* root secret */
-    AUTH_ROOT_SECRET = 100032,
+    ATTR_ROOT_SECRET = 100032,
+    /* attrs */
+    ATTR_ATTRS = 100033,
+    /* executor index */
+    ATTR_EXECUTOR_INDEX = 100034,
+    /* public key */
+    ATTR_PUBLIC_KEY = 100035,
+    /* executor matcher */
+    ATTR_EXECUTOR_MATCHER = 100036,
+    /* local udid */
+    ATTR_LOCAL_UDID = 100037,
+    /* peer udid */
+    ATTR_PEER_UDID = 100038,
+    /* user id */
+    ATTR_USER_ID = 100041,
+    /* token */
+    ATTR_TOKEN = 100042,
+    /* executor role */
+    ATTR_EXECUTOR_ROLE = 100043,
+    /* esl */
+    ATTR_ESL = 100044,
+    /* VERIFIER udid */
+    ATTR_VERIFIER_UDID = 100045,
+    /* COLLECTOR udid */
+    ATTR_COLLECTOR_UDID = 100046,
+    /* Challenge */
+    ATTR_CHALLENGE = 100066,
 };
 
 ResultCode GenerateExecutorKeyPair()
@@ -147,14 +171,14 @@ static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t 
     constexpr uint8_t secretValue = 8;
     std::vector<uint8_t> rootSecret(secretValueLen, secretValue);
     uint32_t acl = FACE_AUTH_CAPABILITY_LEVEL;
-    if (WriteTlv(AUTH_RESULT_CODE, sizeof(result), (const uint8_t *)&result, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_TEMPLATE_ID, sizeof(templatedId), (const uint8_t *)&templatedId, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_SCHEDULE_ID, sizeof(scheduleId), (const uint8_t *)&scheduleId, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_SUBTYPE, sizeof(subType), (const uint8_t *)&subType, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_CAPABILITY_LEVEL, sizeof(acl), (const uint8_t *)&acl, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_REMAIN_TIME, sizeof(int32_t), (const uint8_t *)&zero, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_REMAIN_COUNT, sizeof(int32_t), (const uint8_t *)&remainAttempts, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_ROOT_SECRET, secretLen, &rootSecret[0], ret) != RESULT_SUCCESS) {
+    if (WriteTlv(ATTR_RESULT_CODE, sizeof(result), (const uint8_t *)&result, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_TEMPLATE_ID, sizeof(templatedId), (const uint8_t *)&templatedId, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_SCHEDULE_ID, sizeof(scheduleId), (const uint8_t *)&scheduleId, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_PIN_SUB_TYPE, sizeof(subType), (const uint8_t *)&subType, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_CAPABILITY_LEVEL, sizeof(acl), (const uint8_t *)&acl, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_LOCKOUT_DURATION, sizeof(int32_t), (const uint8_t *)&zero, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_REMAIN_ATTEMPTS, sizeof(int32_t), (const uint8_t *)&remainAttempts, ret) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_ROOT_SECRET, secretLen, &rootSecret[0], ret) != RESULT_SUCCESS) {
         IAM_LOGE("write tlv fail");
         DestoryBuffer(ret);
         return nullptr;
@@ -189,9 +213,9 @@ static ResultCode GenerateRetTlv(const TlvRequiredPara &para, Buffer *retTlv)
     }
 
     uint32_t rootLen = TAG_AND_LEN_BYTE + dataContent->contentSize + TAG_AND_LEN_BYTE + ED25519_FIX_SIGN_BUFFER_SIZE;
-    if (WriteTlvHead(AUTH_ROOT, rootLen, retTlv) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_DATA, dataContent->contentSize, dataContent->buf, retTlv) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_SIGNATURE, signContent->contentSize, signContent->buf, retTlv) != RESULT_SUCCESS) {
+    if (WriteTlvHead(ATTR_ROOT, rootLen, retTlv) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_DATA, dataContent->contentSize, dataContent->buf, retTlv) != RESULT_SUCCESS ||
+        WriteTlv(ATTR_SIGNATURE, signContent->contentSize, signContent->buf, retTlv) != RESULT_SUCCESS) {
         IAM_LOGE("write tlv fail");
         DestoryBuffer(dataContent);
         DestoryBuffer(signContent);

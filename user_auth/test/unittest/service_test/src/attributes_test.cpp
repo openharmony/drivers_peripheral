@@ -49,10 +49,10 @@ HWTEST_F(AttributesTest, AttributesInit, TestSize.Level0)
 
 HWTEST_F(AttributesTest, AttributesSerialize, TestSize.Level0)
 {
-    const std::vector<Attributes::AttributeKey> desired = {Attributes::AUTH_EXPIRED_SYS_TIME};
+    const std::vector<Attributes::AttributeKey> desired = {Attributes::ATTR_EXPIRED_SYS_TIME};
 
     Attributes attrs;
-    EXPECT_TRUE(attrs.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, UINT64_MAX));
+    EXPECT_TRUE(attrs.SetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, UINT64_MAX));
 
     EXPECT_THAT(attrs.GetKeys(), ElementsAreArray(desired));
     auto buff = attrs.Serialize();
@@ -60,7 +60,7 @@ HWTEST_F(AttributesTest, AttributesSerialize, TestSize.Level0)
     EXPECT_THAT(attrs2.GetKeys(), ElementsAreArray(desired));
 
     uint64_t u64Value;
-    EXPECT_TRUE(attrs2.GetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, u64Value));
+    EXPECT_TRUE(attrs2.GetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, u64Value));
     EXPECT_EQ(u64Value, UINT64_MAX);
 }
 
@@ -68,14 +68,14 @@ HWTEST_F(AttributesTest, AttributesUint64Value, TestSize.Level0)
 {
     Attributes attrs1;
     uint64_t value1;
-    EXPECT_TRUE(attrs1.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, UINT32_MAX));
-    EXPECT_TRUE(attrs1.GetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, value1));
+    EXPECT_TRUE(attrs1.SetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, UINT32_MAX));
+    EXPECT_TRUE(attrs1.GetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, value1));
     EXPECT_EQ(value1, UINT32_MAX);
 
     Attributes attrs2;
     uint64_t value2;
-    EXPECT_TRUE(attrs2.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, UINT64_MAX));
-    EXPECT_TRUE(attrs2.GetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, value2));
+    EXPECT_TRUE(attrs2.SetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, UINT64_MAX));
+    EXPECT_TRUE(attrs2.GetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, value2));
     EXPECT_EQ(value2, UINT64_MAX);
 }
 

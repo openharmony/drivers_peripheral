@@ -60,11 +60,13 @@ ohos_shared_library("libuser_auth_interface_service_2.0") {
     "idm/src/idm_session.c",
     "idm/src/user_idm_funcs.c",
     "key_mgr/src/ed25519_key.c",
+    "key_mgr/src/hmac_key.c",
     "key_mgr/src/token_key.c",
     "service/user_auth_interface_service.cpp",
     "user_auth/src/auth_level.c",
     "user_auth/src/context_manager.c",
     "user_auth/src/identify_funcs.c",
+    "user_auth/src/udid_manager.c",
     "user_auth/src/user_auth_funcs.c",
     "user_auth/src/user_sign_centre.c",
   ]

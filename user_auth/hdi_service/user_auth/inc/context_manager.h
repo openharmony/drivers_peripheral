@@ -37,6 +37,8 @@ typedef struct UserAuthContext {
     uint64_t authExpiredSysTime;
     bool isAuthResultCached;
     bool isExpiredReturnSuccess;
+    uint8_t localUdid[UDID_LEN];
+    uint8_t collectorUdid[UDID_LEN];
 } UserAuthContext;
 
 typedef struct {
@@ -48,6 +50,8 @@ typedef struct {
     uint32_t executorSensorHint;
     bool isAuthResultCached;
     bool isExpiredReturnSuccess;
+    uint8_t localUdid[UDID_LEN];
+    uint8_t collectorUdid[UDID_LEN];
 } AuthParamHal;
 
 typedef struct IdentifyParam {
@@ -70,8 +74,8 @@ UserAuthContext *GenerateIdentifyContext(IdentifyParam params);
 
 UserAuthContext *GetContext(uint64_t contextId);
 ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId);
-void DestoryContext(UserAuthContext *context);
-ResultCode DestoryContextbyId(uint64_t contextId);
+void DestroyContext(UserAuthContext *context);
+ResultCode DestroyContextbyId(uint64_t contextId);
 ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
 ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
     uint32_t authMode);

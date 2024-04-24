@@ -742,7 +742,7 @@ HWTEST_F(IdmDatabaseTest, TestGetEnrolledState_002, TestSize.Level0)
     userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
     EnrolledInfoHal enrolledInfo = {1, testEnrolledId};
     userInfo.enrolledInfoList->insert(userInfo.enrolledInfoList, static_cast<void *>(&enrolledInfo));
-    
+
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     CredentialInfoHal credentialInfo = {0, 0, 1, 0, 0, 0};
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo));

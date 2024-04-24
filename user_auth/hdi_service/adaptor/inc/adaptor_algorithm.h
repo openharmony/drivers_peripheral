@@ -18,6 +18,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "securec.h"
 #include "buffer.h"
 
 #ifdef __cplusplus
@@ -28,6 +29,9 @@ extern "C" {
 #define SHA256_DIGEST_SIZE 32
 #define AES_GCM_TAG_SIZE 16
 #define AES_GCM_IV_SIZE 12
+
+#define USER_AUTH_DISTRIBUTE_DEVICE_KEY "USER_AUTH_DISTRIBUTE_DEVICE_KEY"
+#define USER_AUTH_DISTRIBUTE_DEVICE_KEY_SIZE 32
 
 typedef struct {
     Buffer *pubKey;
@@ -51,6 +55,7 @@ int32_t SecureRandom(uint8_t *buffer, uint32_t size);
 
 int32_t AesGcmEncrypt(const Buffer *plaintext, const AesGcmParam *aesGcmParam, Buffer **ciphertext, Buffer **tag);
 int32_t AesGcmDecrypt(const Buffer *ciphertext, const AesGcmParam *aesGcmParam, const Buffer *tag, Buffer **plaintext);
+int32_t GetDistributeKey(const Buffer *peerUdid, const Buffer *salt, Buffer **key);
 
 #ifdef __cplusplus
 }

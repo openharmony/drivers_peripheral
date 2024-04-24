@@ -17,6 +17,7 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
 #include "buffer.h"
@@ -463,4 +464,56 @@ FAIL:
         EVP_CIPHER_CTX_free(ctx);
     }
     return RESULT_GENERAL_ERROR;
+}
+
+static Buffer *Sha256Adaptor(const Buffer *data)
+{
+    if (!IsBufferValid(data)) {
+        LOG_ERROR("bad param");
+        return NULL;
+    }
+    Buffer *result = CreateBufferBySize(SHA256_DIGEST_SIZE);
+    if (!IsBufferValid(result)) {
+        LOG_ERROR("create buffer failed");
+        return NULL;
+    }
+    if (SHA256(data->buf, data->contentSize, result->buf) != result->buf) {
+        LOG_ERROR("SHA256 failed");
+        DestoryBuffer(result);
+        return NULL;
+    }
+    result->contentSize = SHA256_DIGEST_SIZE;
+    return result;
+}
+
+int32_t GetDistributeKey(const Buffer *peerUdid, const Buffer *salt, Buffer **key)
+{
+    if (!IsBufferValid(peerUdid) || !IsBufferValid(salt) || (key == NULL)) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    Buffer *keyData = CreateBufferBySize(salt->contentSize + USER_AUTH_DISTRIBUTE_DEVICE_KEY_SIZE);
+    if (keyData == NULL) {
+        LOG_ERROR("CreateBufferBySize keyData fail");
+        return RESULT_NO_MEMORY;
+    }
+    if (memcpy_s(keyData->buf, keyData->maxSize, USER_AUTH_DISTRIBUTE_DEVICE_KEY, USER_AUTH_DISTRIBUTE_DEVICE_KEY_SIZE) != EOK) {
+        LOG_ERROR("copy fix tag fail");
+        DestoryBuffer(keyData);
+        return RESULT_NO_MEMORY;
+    }
+    keyData->contentSize += USER_AUTH_DISTRIBUTE_DEVICE_KEY_SIZE;
+    if (memcpy_s(keyData->buf + keyData->contentSize, keyData->maxSize - keyData->contentSize, salt->buf, salt->contentSize) != EOK) {
+        LOG_ERROR("copy salt fail");
+        DestoryBuffer(keyData);
+        return RESULT_NO_MEMORY;
+    }
+    keyData->contentSize += salt->contentSize;
+    *key = Sha256Adaptor(keyData);
+    DestoryBuffer(keyData);
+    if (*key == NULL) {
+        LOG_ERROR("calculate key fail");
+        return RESULT_NO_MEMORY;
+    }
+    return RESULT_SUCCESS;
 }

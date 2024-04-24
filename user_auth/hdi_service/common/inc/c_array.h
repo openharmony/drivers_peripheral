@@ -17,6 +17,7 @@
 #define IAM_C_ARRAY_H
 
 #include <stdint.h>
+#include <string.h>
 
 #include "defines.h"
 
@@ -36,6 +37,17 @@ typedef struct Uint64Array {
     uint64_t *data;
     uint32_t len;
 } Uint64Array;
+
+inline bool Uint8ArrayIsSame(const Uint8Array array1, const Uint8Array array2)
+{
+    if (array1.len != array2.len) {
+        return false;
+    }
+    if (array1.data == NULL || array2.data == NULL) {
+        return false;
+    }
+    return memcmp(array1.data, array2.data, array1.len) == 0;
+}
 
 void DestroyUint8Array(Uint8Array **array);
 void DestroyUint64Array(Uint64Array **array);

@@ -201,7 +201,7 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level0)
     EXPECT_NE(buffer3, nullptr);
     (void)memset_s(buffer3->buf, buffer3->maxSize, BUFFER_LEN_1, buffer3->maxSize);
     buffer3->contentSize = buffer3->maxSize;
-    
+
     Buffer *buffer4 = CreateBufferBySize(BUFFER_LEN_6);
     EXPECT_NE(buffer4, nullptr);
     (void)memset_s(buffer4->buf, buffer4->maxSize, BUFFER_LEN_2, buffer4->maxSize);

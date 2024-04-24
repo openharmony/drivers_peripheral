@@ -64,11 +64,16 @@ Buffer *ExecutorMsgSign(const Buffer *data)
     if (!IsEd25519KeyPairValid(g_keyPair)) {
         return NULL;
     }
-    Buffer *signatrue = NULL;
-    int32_t ret = Ed25519Sign(g_keyPair, data, &signatrue);
+    Buffer *signature = NULL;
+    int32_t ret = Ed25519Sign(g_keyPair, data, &signature);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("sign failed");
         return NULL;
     }
-    return signatrue;
+    if (signature->contentSize != ED25519_FIX_SIGN_BUFFER_SIZE) {
+        LOG_ERROR("sign data len invalid");
+        DestoryBuffer(signature);
+        return NULL;
+    }
+    return signature;
 }

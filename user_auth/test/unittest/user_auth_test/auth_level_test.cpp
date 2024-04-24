@@ -119,22 +119,6 @@ HWTEST_F(AuthLevelTest, TestGetAslAndAcl_003, TestSize.Level0)
     uint32_t acl = 0;
     EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
 }
-
-HWTEST_F(AuthLevelTest, TestGetAuthTrustLevel_001, TestSize.Level0)
-{
-    g_poolList = CreateLinkedList(DestroyExecutorInfo);
-    EXPECT_NE(g_poolList, nullptr);
-    ExecutorInfoHal executorInfo = {};
-    executorInfo.authType = 1;
-    executorInfo.executorRole = ALL_IN_ONE;
-    executorInfo.esl = 0;
-    g_poolList->insert(g_poolList, static_cast<void *>(&executorInfo));
-    g_userInfoList = nullptr;
-    constexpr int32_t userId = 21356;
-    constexpr uint32_t authType = 1;
-    uint32_t atl = 0;
-    EXPECT_EQ(GetAuthTrustLevel(userId, authType, atl), RESULT_SUCCESS);
-}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

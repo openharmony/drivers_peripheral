@@ -87,7 +87,7 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.authType = 1;
     userAuthTokenCached.tokenDataPlain.authTrustLevel = ATL4;
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
-    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_VERIFY_TOKEN_FAIL);
 
     userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
     userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
