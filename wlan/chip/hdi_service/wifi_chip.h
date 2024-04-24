@@ -21,7 +21,7 @@
 #include <mutex>
 #include "v1_0/iconcrete_chip.h"
 #include "v1_0/chip_types.h"
-#include "interface_tool.h"
+#include "iface_tool.h"
 #include "wifi_vendor_hal_list.h"
 #include "wifi_chip_modes.h"
 #include "callback_handler.h"
@@ -29,6 +29,7 @@
 #include "wifi_ap_iface.h"
 #include "wifi_sta_iface.h"
 #include "wifi_p2p_iface.h"
+#include "iface_util.h"
 
 namespace OHOS {
 namespace HDI {
@@ -39,6 +40,7 @@ class WifiChip : public IConcreteChip {
 public:
     WifiChip(int32_t chipId, bool isPrimary,
              const std::weak_ptr<WifiVendorHal> vendorHal,
+             const std::shared_ptr<IfaceUtil> ifaceUtil,
              const std::weak_ptr<WifiChipModes> chipModes,
              const std::function<void(const std::string&)> &subsystemCallbackHandler);
     ~WifiChip();
@@ -46,6 +48,7 @@ public:
     bool IsValid();
     int32_t GetChipId(int32_t& id) override;
     int32_t RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback) override;
+    int32_t GetChipCaps(uint32_t& capabilities) override;
     int32_t GetChipModes(std::vector<UsableMode>& modes) override;
     int32_t GetCurrentMode(uint32_t& modeId) override;
     int32_t SetChipMode(uint32_t modeId) override;
@@ -96,6 +99,7 @@ private:
     std::vector<sptr<WifiStaIface>> staIfaces_;
     bool isValid_;
     uint32_t currentModeId_;
+    std::shared_ptr<IfaceUtil> ifaceUtil_;
     std::vector<UsableMode> modes_;
     CallbackHandler<IConcreteChipCallback> cbHandler_;
     const std::function<void(const std::string&)> subsystemCallbackHandler_;

@@ -16,7 +16,7 @@
 #ifndef WIFI_LEGACY_HAL_FACTORY_H
 #define WIFI_LEGACY_HAL_FACTORY_H
 
-#include "interface_tool.h"
+#include "iface_tool.h"
 #include "wifi_vendor_hal.h"
 #include "wifi_hal.h"
 #include <hdf_log.h>
