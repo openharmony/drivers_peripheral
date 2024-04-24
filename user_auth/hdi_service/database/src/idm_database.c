@@ -36,9 +36,6 @@
 // Caches IDM user information.
 IAM_STATIC LinkedList *g_userInfoList = NULL;
 
-// tmp IDM user information.
-IAM_STATIC LinkedList *g_tmpUserInfoList = NULL;
-
 // Caches the current user to reduce the number of user list traversal times.
 IAM_STATIC UserInfo *g_currentUser = NULL;
 
@@ -528,16 +525,6 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("updateFileInfo failed");
             return ret;
-        }
-        g_tmpUserInfoList = LoadFileInfo();
-        if (g_tmpUserInfoList == NULL) {
-            LOG_ERROR("load file info failed");
-            return RESULT_NEED_INIT;
-        }
-        if (g_tmpUserInfoList != NULL) {
-            LOG_INFO("g_tmpUserInfoList size: %{public}d", g_tmpUserInfoList->getSize(g_tmpUserInfoList));
-        } else {
-            LOG_INFO("g_tmpUserInfoList is NULL!");
         }
         return ret;
     }
