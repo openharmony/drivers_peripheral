@@ -33,6 +33,7 @@ public:
     virtual bool GetUpState(const char* ifName);
     virtual bool SetUpState(const char* ifName, bool requestUp);
     virtual bool SetWifiUpState(bool requestUp);
+    virtual bool SetMacAddress(const char* ifName, const char* mac);
 };
 }
 }

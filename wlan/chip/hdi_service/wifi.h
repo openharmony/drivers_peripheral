@@ -19,12 +19,13 @@
 #include "v1_0/ichip_controller.h"
 #include "v1_0/iconcrete_chip.h"
 #include "v1_0/chip_types.h"
-#include "interface_tool.h"
+#include "iface_tool.h"
 #include "wifi_vendor_hal_list.h"
 #include "wifi_chip_modes.h"
 #include "callback_handler.h"
 #include "wifi_chip.h"
 #include "remote_death_recipient.h"
+#include "iface_util.h"
 
 namespace OHOS {
 namespace HDI {

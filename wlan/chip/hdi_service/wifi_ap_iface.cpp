@@ -14,6 +14,7 @@
  */
 
 #include "wifi_ap_iface.h"
+#include <hdf_log.h>
 
 namespace OHOS {
 namespace HDI {
@@ -22,10 +23,12 @@ namespace Chip {
 namespace V1_0 {
 WifiApIface::WifiApIface(
     const std::string& ifname, const std::vector<std::string>& instances,
-    const std::weak_ptr<WifiVendorHal> vendorHal)
+    const std::weak_ptr<WifiVendorHal> vendorHal,
+    const std::weak_ptr<IfaceUtil> ifaceUtil)
     : ifname_(ifname),
       instances_(instances),
       vendorHal_(vendorHal),
+      ifaceUtil_(ifaceUtil),
       isValid_(true) {}
 
 void WifiApIface::Invalidate()
@@ -61,17 +64,107 @@ int32_t WifiApIface::GetIfaceName(std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t WifiApIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
+int32_t WifiApIface::GetSupportFreqs(int band, std::vector<uint32_t>& frequencies)
 {
-    WifiError legacyStatus;
+    WifiError status;
     std::vector<uint32_t> validFrequencies;
-    std::tie(legacyStatus, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
+    std::tie(status, validFrequencies) = vendorHal_.lock()->GetValidFrequenciesForBand(
         instances_.size() > 0 ? instances_[0] : ifname_, band);
     frequencies = validFrequencies;
-    if (legacyStatus == HAL_SUCCESS) {
+    if (status == HAL_SUCCESS) {
         return HDF_SUCCESS;
     }
     return HDF_FAILURE;
+}
+
+int32_t WifiApIface::GetIfaceCap(uint32_t& capabilities)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::SetMacAddress(const std::string& mac)
+{
+    bool status = ifaceUtil_.lock()->SetMacAddress(ifname_, mac);
+    if (!status) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t WifiApIface::SetCountryCode(const std::string& code)
+{
+    WifiError status = vendorHal_.lock()->SetCountryCode(ifname_, code);
+    if (status != HAL_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t WifiApIface::GetPowerMode(int32_t& powerMode)
+{
+    WifiError status;
+    int mode;
+
+    std::tie(status, mode) = vendorHal_.lock()->GetPowerMode(ifname_);
+    if (status == HAL_SUCCESS) {
+        powerMode = mode;
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
+}
+
+int32_t WifiApIface::SetPowerMode(int32_t powerMode)
+{
+    WifiError status = vendorHal_.lock()->SetPowerMode(ifname_, powerMode);
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
+}
+
+int32_t WifiApIface::RegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::UnRegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::StartScan(const ScanParams& scanParam)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::GetScanInfos(std::vector<ScanResultsInfo>& scanResultsInfo)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::StartPnoScan(const PnoScanParams& pnoParams)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::StopPnoScan()
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::GetSignalPollInfo(SignalPollResult& signalPollResult)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::EnablePowerMode(int32_t mode)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiApIface::SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 }

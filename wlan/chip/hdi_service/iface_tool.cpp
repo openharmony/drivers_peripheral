@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "interface_tool.h"
+#include "iface_tool.h"
 #include <cstring>
 #include <net/if.h>
 #include <net/if_arp.h>
@@ -33,6 +33,12 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 const char K_WLAN0_INTERFACE_NAME[] = "wlan0";
+const int MAC_LEN = 6;
+const int MAC_POS_1 = 1;
+const int MAC_POS_2 = 2;
+const int MAC_POS_3 = 3;
+const int MAC_POS_4 = 4;
+const int MAC_POS_5 = 5;
 
 bool GetIfState(const char* ifName, int sock, struct ifreq* ifr)
 {
@@ -96,6 +102,39 @@ bool IfaceTool::SetUpState(const char* ifName, bool requestUp)
 bool IfaceTool::SetWifiUpState(bool requestUp)
 {
     return SetUpState(K_WLAN0_INTERFACE_NAME, requestUp);
+}
+
+bool IfaceTool::SetMacAddress(const char* ifName, const char* mac)
+{
+    struct ifreq ifr;
+
+    unsigned char macBin[MAC_LEN];
+    if (sscanf_s(mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
+        &macBin[0], &macBin[MAC_POS_1], &macBin[MAC_POS_2],
+        &macBin[MAC_POS_3], &macBin[MAC_POS_4], &macBin[MAC_POS_5]) == EOF) {
+        return false;
+    }
+    UniqueFd sock(socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0));
+    if (sock.Get() < 0) {
+        HDF_LOGE("Failed to open socket to set MAC address %{public}s", strerror(errno));
+        return false;
+    }
+    if (!GetIfState(ifName, sock.Get(), &ifr)) {
+        return false;
+    }
+    if (memset_s(&ifr.ifr_hwaddr, sizeof(ifr.ifr_hwaddr), 0, sizeof(ifr.ifr_hwaddr)) < 0) {
+        HDF_LOGE("Failed to memset");
+    }
+    ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
+    if (memcpy_s(ifr.ifr_hwaddr.sa_data, MAC_LEN, macBin, MAC_LEN) < 0) {
+        HDF_LOGE("Failed to memcpy");
+    }
+    if (TEMP_FAILURE_RETRY(ioctl(sock.Get(), SIOCSIFHWADDR, &ifr)) != 0) {
+        HDF_LOGE("Failed to set interface MAC address for %{public}s, %{public}s",
+            ifName, strerror(errno));
+        return false;
+    }
+    return true;
 }
 }
 }
