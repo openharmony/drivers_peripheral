@@ -182,3 +182,28 @@ ResultCode GetBufferData(const Buffer *buffer, uint8_t *data, uint32_t *dataSize
     *dataSize = buffer->contentSize;
     return RESULT_SUCCESS;
 }
+
+Buffer *MergeBuffers(const Buffer *buffer1, const Buffer *buffer2)
+{
+    Buffer *merged = CreateBufferBySize(buffer1->maxSize + buffer2->maxSize);
+    if (!IsBufferValid(merged)) {
+        LOG_ERROR("create buffer failed");
+        return NULL;
+    }
+
+    if (memcpy_s(merged->buf, merged->maxSize, buffer1->buf, buffer1->contentSize) != EOK) {
+        LOG_ERROR("memcpy buffer1 failed");
+        goto FAIL;
+    }
+    if (memcpy_s(merged->buf + buffer1->contentSize, merged->maxSize - buffer1->contentSize,
+        buffer2->buf, buffer2->contentSize) != EOK) {
+        LOG_ERROR("memcpy buffer2 failed");
+        goto FAIL;
+    }
+    merged->contentSize = buffer1->contentSize + buffer2->contentSize;
+    return merged;
+
+FAIL:
+    DestoryBuffer(merged);
+    return NULL;
+}

@@ -80,8 +80,10 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)
     GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
     token.tokenDataPlain.authType = PIN_AUTH;
+    token.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    token.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     GENERATE_TOKEN(data, token, tokenKey);
-    EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
+    EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
     token.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
     token.tokenDataPlain.tokenType = TOKEN_TYPE_COAUTH;
     GENERATE_TOKEN(data, token, tokenKey);
@@ -119,6 +121,8 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_002, TestSize.Level0)
     HksAuthTokenKey tokenKey = {};
     EXPECT_EQ(GetTokenKey(&tokenKey), RESULT_SUCCESS);
     GENERATE_TOKEN(data, token, tokenKey);
+    token.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    token.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
     EXPECT_EQ(CheckIdmOperationToken(session.userId, &token), RESULT_BAD_MATCH);
 

@@ -117,7 +117,6 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
         LOG_ERROR("no memory");
         return RESULT_NO_MEMORY;
     }
-
     if (g_scheduleList->getSize(g_scheduleList) >= MAX_SCHEDULE_NUM) {
         LOG_ERROR("too many schedules already");
         DestroyCoAuthSchedule(schedule);
@@ -128,6 +127,7 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
         LOG_ERROR("insert failed");
         DestroyCoAuthSchedule(schedule);
     }
+    LOG_INFO("success");
     return result;
 }
 
@@ -219,7 +219,7 @@ IAM_STATIC ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
 }
 
 IAM_STATIC ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule *coAuthSchedule,
-    uint32_t sensorHint, uint32_t executorRole)
+    uint32_t sensorHint, uint32_t executorRole, Uint8Array deviceUdid)
 {
     LinkedListNode *tempNode = executors->head;
     while (tempNode != NULL) {
@@ -233,6 +233,11 @@ IAM_STATIC ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSched
             continue;
         }
         if (sensorHint != INVALID_SENSOR_HINT && sensorHint != executor->executorSensorHint) {
+            tempNode = tempNode->next;
+            continue;
+        }
+
+        if (memcmp(deviceUdid.data, executor->deviceUdid, UDID_LEN) != 0) {
             tempNode = tempNode->next;
             continue;
         }
@@ -256,26 +261,37 @@ IAM_STATIC ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *
         LOG_ERROR("query executor failed");
         return RESULT_UNKNOWN;
     }
+
+    Uint8Array localUdidArray = { .data = (uint8_t *)(param->localUdid), .len = UDID_LEN };
+    Uint8Array collectorUdidArray = { .data = (uint8_t *)(param->collectorUdid), .len = UDID_LEN };
     ResultCode ret;
-    if (param->collectorSensorHint == INVALID_SENSOR_HINT || param->verifierSensorHint == INVALID_SENSOR_HINT ||
-        param->collectorSensorHint == param->verifierSensorHint) {
+    LOG_INFO("collectorSensorHint: %{public}u, verifierSensorHint: %{public}u", param->collectorSensorHint,
+        param->verifierSensorHint);
+    if ((param->collectorSensorHint == INVALID_SENSOR_HINT || param->verifierSensorHint == INVALID_SENSOR_HINT ||
+        param->collectorSensorHint == param->verifierSensorHint) &&
+        memcmp(param->localUdid, param->collectorUdid, UDID_LEN) == 0) {
         uint32_t allInOneSensorHint = param->verifierSensorHint | param->collectorSensorHint;
-        ret = MountExecutorOnce(executors, coAuthSchedule, allInOneSensorHint, ALL_IN_ONE);
-        if (ret == RESULT_SUCCESS) {
-            goto EXIT;
+        LOG_INFO("mount all-in-one executor");
+        ret = MountExecutorOnce(executors, coAuthSchedule, allInOneSensorHint, ALL_IN_ONE, localUdidArray);
+        if (ret != RESULT_SUCCESS) {
+            LOG_INFO("all-in-one executor is not found");
         }
+        goto EXIT;
     }
+
+    LOG_INFO("mount verifier and collector");
     if (param->scheduleMode == SCHEDULE_MODE_IDENTIFY) {
         LOG_ERROR("identification only supports all in one");
         ret = RESULT_GENERAL_ERROR;
         goto EXIT;
     }
-    ret = MountExecutorOnce(executors, coAuthSchedule, param->verifierSensorHint, VERIFIER);
+    ret = MountExecutorOnce(executors, coAuthSchedule, param->verifierSensorHint, VERIFIER, localUdidArray);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("verifier is not found");
         goto EXIT;
     }
-    ret = MountExecutorOnce(executors, coAuthSchedule, param->collectorSensorHint, COLLECTOR);
+
+    ret = MountExecutorOnce(executors, coAuthSchedule, param->collectorSensorHint, COLLECTOR, collectorUdidArray);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("collector is not found");
     }
@@ -285,7 +301,7 @@ EXIT:
     return ret;
 }
 
-uint32_t GetScheduleVeriferSensorHint(const CoAuthSchedule *coAuthSchedule)
+uint32_t GetScheduleVerifierSensorHint(const CoAuthSchedule *coAuthSchedule)
 {
     if (coAuthSchedule == NULL) {
         LOG_ERROR("coAuthSchedule is null");

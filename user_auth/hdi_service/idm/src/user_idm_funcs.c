@@ -23,6 +23,7 @@
 #include "enroll_specification_check.h"
 #include "executor_message.h"
 #include "idm_database.h"
+#include "udid_manager.h"
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -38,6 +39,16 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
     scheduleParam.userType = param->userType;
     scheduleParam.scheduleMode = SCHEDULE_MODE_ENROLL;
     scheduleParam.collectorSensorHint = param->executorSensorHint;
+
+    Uint8Array localUdid = { scheduleParam.localUdid, UDID_LEN };
+    bool getLocalUdidRet = GetLocalUdid(&localUdid);
+    Uint8Array collectorUdid = { scheduleParam.collectorUdid, UDID_LEN };
+    bool getCollectorUdidRet = GetLocalUdid(&collectorUdid);
+    if (!getLocalUdidRet || !getCollectorUdidRet) {
+        LOG_ERROR("get udid failed");
+        return NULL;
+    }
+
     if (scheduleParam.collectorSensorHint != INVALID_SENSOR_HINT) {
         ResultCode ret = QueryCollecterMatcher(scheduleParam.authType, scheduleParam.collectorSensorHint,
             &scheduleParam.executorMatcher);
@@ -133,7 +144,7 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
             return RESULT_VERIFY_TOKEN_FAIL;
         }
     }
-    
+
     return GenerateCoAuthSchedule(&param, false, scheduleId);
 }
 
@@ -159,7 +170,7 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("a valid token is required");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
-    
+
     return GenerateCoAuthSchedule(&param, true, scheduleId);
 }
 
@@ -169,7 +180,7 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
     credentialInfo->authType = schedule->authType;
     credentialInfo->templateId = result->templateId;
     credentialInfo->capabilityLevel = result->capabilityLevel;
-    credentialInfo->executorSensorHint = GetScheduleVeriferSensorHint(schedule);
+    credentialInfo->executorSensorHint = GetScheduleVerifierSensorHint(schedule);
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
 }
 
@@ -288,7 +299,7 @@ ResultCode AddCredentialFunc(
     }
 
 EXIT:
-    DestoryExecutorResultInfo(executorResultInfo);
+    DestroyExecutorResultInfo(executorResultInfo);
     return ret;
 }
 
@@ -465,7 +476,7 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
     }
 
 EXIT:
-    DestoryExecutorResultInfo(executorResultInfo);
+    DestroyExecutorResultInfo(executorResultInfo);
     return ret;
 }
 
