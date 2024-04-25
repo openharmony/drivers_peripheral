@@ -249,14 +249,21 @@ EXIT:
     return ret;
 }
 
-IAM_STATIC ResultCode StreamWriteExpiredPeriod(Buffer *parcel, GlobalConfigParamHal *globalConfigInfo)
+IAM_STATIC ResultCode StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigParamHal globalConfigInfo)
 {  
-    ResultCode result = StreamWrite(parcel, &(globalConfigInfo[0].type), sizeof(int32_t));
+    ResultCode result = StreamWrite(parcel, &globalConfigInfo.type, sizeof(int32_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("StreamWrite global config type failed");
         return RESULT_GENERAL_ERROR;
     }
-    result = StreamWrite(parcel, &(globalConfigInfo[0].value.pinExpiredPeriod), sizeof(int64_t));
+    switch (globalConfigInfo.type) {
+        case PIN_EXPIRED_PERIOD:
+            result = StreamWrite(parcel, &globalConfigInfo.value.pinExpiredPeriod, sizeof(int64_t));
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", globalConfigInfo.type);
+            result = RESULT_GENERAL_ERROR;
+    }
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("StreamWrite pinExpiredPeriod failed");
         return RESULT_GENERAL_ERROR;
@@ -264,11 +271,11 @@ IAM_STATIC ResultCode StreamWriteExpiredPeriod(Buffer *parcel, GlobalConfigParam
     return RESULT_SUCCESS;
 }
 
-ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigInfo, uint32_t configInfoNum)
+ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigArray, uint32_t configInfoNum)
 {
     LOG_INFO("start");
-    if (globalConfigInfo == NULL) {
-        LOG_ERROR("globalConfigInfo is null");
+    if (globalConfigArray == NULL) {
+        LOG_ERROR("globalConfigArray is null");
         return RESULT_BAD_PARAM;
     }
     FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
@@ -297,11 +304,13 @@ ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigInfo, uint32
         DestoryBuffer(parcel);
         return RESULT_GENERAL_ERROR;
     }
-    ret = StreamWriteExpiredPeriod(parcel, globalConfigInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("StreamWriteExpiredPeriod failed");
-        DestoryBuffer(parcel);
-        return RESULT_GENERAL_ERROR;
+    for (uint32_t i = 0; i < configInfoNum; i++) {
+        ret = StreamWriteGlobalConfig(parcel, globalConfigArray[i]);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("StreamWriteGlobalConfig failed");
+            DestoryBuffer(parcel);
+            return RESULT_GENERAL_ERROR;
+        }
     }
     // This is for example only. Should be implemented in trusted environment.
     ret = (ResultCode)fileOperator->writeFile(GLOBAL_CONFIG_INFO, parcel->buf, parcel->contentSize);
@@ -551,14 +560,21 @@ IAM_STATIC Buffer *ReadGlobalConfigFile(FileOperator *fileOperator)
     return parcel;
 }
 
-IAM_STATIC ResultCode StreamReadExpiredPeriod(Buffer *parcel, uint32_t *index, GlobalConfigParamHal *globalConfigInfo)
+IAM_STATIC ResultCode StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalConfigParamHal globalConfigInfo)
 {  
-    ResultCode result = StreamRead(parcel, index, &(globalConfigInfo[0].type), sizeof(int32_t));
+    ResultCode result = StreamRead(parcel, index, &globalConfigInfo.type, sizeof(int32_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("read globalConfig type failed");
         return RESULT_GENERAL_ERROR;
     }
-    result = StreamRead(parcel, index, &(globalConfigInfo[0].value.pinExpiredPeriod), sizeof(int64_t));
+    switch (globalConfigInfo.type) {
+        case PIN_EXPIRED_PERIOD:
+            result = StreamRead(parcel, index, &globalConfigInfo.value.pinExpiredPeriod, sizeof(int64_t));
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", globalConfigInfo.type);
+            result = RESULT_GENERAL_ERROR;
+    }
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("read pinExpiredPeriod value failed");
         return RESULT_GENERAL_ERROR;
@@ -580,7 +596,8 @@ IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigParamHal 
         LOG_ERROR("read configInfoNum failed");
         return RESULT_GENERAL_ERROR;
     }
-    result = StreamReadExpiredPeriod(parcel, &index, globalConfigInfo);
+    for (uint32_t i = 0; i < (*configInfoNum); i++)
+    result = StreamReadGlobalConfig(parcel, &index, globalConfigInfo[i]);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("read StreamReadExpiredPeriod failed");
         return RESULT_GENERAL_ERROR;

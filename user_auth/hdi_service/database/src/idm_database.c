@@ -517,36 +517,6 @@ FAIL:
     return ret;
 }
 
-IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinCredential)
-{
-    CredentialCondition condition = {};
-    SetCredentialConditionUserId(&condition, userId);
-    SetCredentialConditionAuthType(&condition, PIN_AUTH);
-    LinkedList *credList = QueryCredentialLimit(&condition);
-    if (credList == NULL || credList->getSize(credList) == 0) {
-        LOG_ERROR("pin credential is null");
-        DestroyLinkedList(credList);
-        return RESULT_GENERAL_ERROR;
-    }
-    if (credList->head == NULL || credList->head->data == NULL) {
-        LOG_ERROR("pin credList node is invalid");
-        DestroyLinkedList(credList);
-        return RESULT_GENERAL_ERROR;
-    }
-    if (pinCredential == NULL) {
-        LOG_ERROR("no need to get pin credential");
-        DestroyLinkedList(credList);
-        return RESULT_SUCCESS;
-    }
-    if (memcpy_s(pinCredential, sizeof(CredentialInfoHal), credList->head->data, sizeof(CredentialInfoHal)) != EOK) {
-        LOG_ERROR("credential copy fail");
-        DestroyLinkedList(credList);
-        return RESULT_GENERAL_ERROR;
-    }
-    DestroyLinkedList(credList);
-    return RESULT_SUCCESS;
-}
-
 ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
 {
     if ((credentialInfo == NULL) || (credentialInfo->authType == DEFAULT_AUTH_TYPE)) {
@@ -570,9 +540,21 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         LOG_ERROR("user is null");
         return RESULT_BAD_PARAM;
     }
-    if (credentialInfo->authType == PIN_AUTH && QueryPinCredential(userId, NULL) == RESULT_SUCCESS) {
-        LOG_INFO("cache pin, and add for reliable pin updates");
-        credentialInfo->authType = DEFAULT_AUTH_TYPE;
+    if (credentialInfo->authType == PIN_AUTH) {
+        CredentialCondition condition = {};
+        SetCredentialConditionAuthType(&condition, PIN_AUTH);
+        SetCredentialConditionUserId(&condition, userId);
+        LinkedList *credList = QueryCredentialLimit(&condition);
+        if (credList == NULL) {
+            LOG_ERROR("query credential failed");
+            return RESULT_UNKNOWN;
+        }
+        if (credList->getSize(credList) != 0) {
+            LOG_INFO("cache pin");
+            // add for reliable pin updates
+            credentialInfo->authType = DEFAULT_AUTH_TYPE;
+        }
+        DestroyLinkedList(credList);
     }
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
@@ -1259,13 +1241,42 @@ ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
     return RESULT_GENERAL_ERROR;
 }
 
-ResultCode GetPinExpiredPeriod(int32_t userId, PinExpiredInfo *expiredInfo)
+IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinCredential)
 {
-    (void)memset_s(expiredInfo, sizeof(PinExpiredInfo), 0, sizeof(PinExpiredInfo));
+    if (pinCredential == NULL) {
+        LOG_ERROR("no need to get pin credential");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    SetCredentialConditionAuthType(&condition, PIN_AUTH);
+    LinkedList *credList = QueryCredentialLimit(&condition);
+    if (credList == NULL || credList->getSize(credList) == 0) {
+        LOG_ERROR("pin credential is null");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (credList->head == NULL || credList->head->data == NULL) {
+        LOG_ERROR("pin credList node is invalid");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (memcpy_s(pinCredential, sizeof(CredentialInfoHal), credList->head->data, sizeof(CredentialInfoHal)) != EOK) {
+        LOG_ERROR("credential copy fail");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
+{
     if (expiredInfo == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
+    (void)memset_s(expiredInfo, sizeof(PinExpiredInfo), 0, sizeof(PinExpiredInfo));
     for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
         if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
             expiredInfo->pinExpiredPeriod = g_globalConfigArray[i].value.pinExpiredPeriod;

@@ -291,10 +291,10 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
     return ret;
 }
 
-ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *executorExpiredInfos,
+ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *expiredInfos, uint32_t len,
     uint32_t *size)
 {
-    if (param == NULL || executorExpiredInfos == NULL || size == NULL) {
+    if (param == NULL || expiredInfos == NULL || size == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
@@ -304,7 +304,7 @@ ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpired
         return ret;
     }
     if (param->type == PIN_EXPIRED_PERIOD) {
-        ret = UpdateExecutorExpiredInfo(executorExpiredInfos, size);
+        ret = UpdateExecutorExpiredInfo(expiredInfos, len, size);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("refresh ExecutorExpiredInfo failed");
             return ret;

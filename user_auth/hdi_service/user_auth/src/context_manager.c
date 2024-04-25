@@ -85,12 +85,16 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
     return context;
 }
 
-IAM_STATIC ResultCode GetContextExpiredTime(int32_t userId, UserAuthContext *authContext)
+IAM_STATIC ResultCode SetContextExpiredTime(UserAuthContext *authContext)
 {
+    if (authContext == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
     PinExpiredInfo expiredInfo = {};
-    ResultCode result = GetPinExpiredPeriod(userId, &expiredInfo);
+    ResultCode result = GetPinExpiredInfo(authContext->userId, &expiredInfo);
     if (result != RESULT_SUCCESS) {
-        LOG_ERROR("GetPinExpiredPeriod failed");
+        LOG_ERROR("GetPinExpiredInfo failed");
         return result;
     }
     if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
@@ -132,7 +136,7 @@ ResultCode GenerateAuthContext(AuthParamHal params, UserAuthContext **context)
         *context = NULL;
         return ret;
     }
-    ret = GetContextExpiredTime(params.userId, *context);
+    ret = SetContextExpiredTime(*context);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetAuthExpiredSysTime failed");
         DestroyContextNode(*context);
@@ -654,30 +658,7 @@ EXIT:
     return ret;
 }
 
-IAM_STATIC ResultCode UpdateContextExpiredTime(UserAuthContext *contextData)
-{
-    if (contextData == NULL) {
-        LOG_ERROR("bad param");
-        return RESULT_BAD_PARAM;
-    }
-    PinExpiredInfo expiredInfo = {};
-    ResultCode ret = GetPinExpiredPeriod(contextData->userId, &expiredInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetPinExpiredPeriod failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
-        contextData->authExpiredSysTime = NO_CHECK_PIN_EXPIRED_PERIOD;
-        return RESULT_SUCCESS;
-    }
-    contextData->authExpiredSysTime = UINT64_MAX;
-    if (expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod < UINT64_MAX) {
-        contextData->authExpiredSysTime = expiredInfo.pinEnrolledSysTime + expiredInfo.pinExpiredPeriod;
-    }
-    return RESULT_SUCCESS;
-}
-
-ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t *size)
+ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t len, uint32_t *size)
 {
     if (g_contextList == NULL || executorExpiredInfos == NULL || size == NULL) {
         LOG_ERROR("bad parameter");
@@ -685,15 +666,15 @@ ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, 
     }
     *size = 0;
     LinkedListNode *contextNode = g_contextList->head;
-    while (contextNode != NULL && *size < MAX_SCHEDULE_NUM) {
+    while (contextNode != NULL && *size < len) {
         UserAuthContext *contextData = (UserAuthContext *)contextNode->data;
         if (contextData == NULL) {
             LOG_ERROR("contextData is null, please check");
             contextNode = contextNode->next;
             continue;
         }
-        if (UpdateContextExpiredTime(contextData) != RESULT_SUCCESS) {
-            LOG_ERROR("UpdateContextExpiredTime failed");
+        if (SetContextExpiredTime(contextData) != RESULT_SUCCESS) {
+            LOG_ERROR("SetContextExpiredTime failed");
             contextNode = contextNode->next;
             continue;
         }
@@ -709,7 +690,7 @@ ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, 
             continue;
         }
         LinkedListNode *scheduleNode = scheduleList->head;
-        while (scheduleNode != NULL && *size < MAX_SCHEDULE_NUM) {
+        while (scheduleNode != NULL && *size < len) {
             CoAuthSchedule *scheduleData = (CoAuthSchedule *) scheduleNode->data;
             if (scheduleData == NULL) {
                 LOG_ERROR("scheduleData is NULL, please check");

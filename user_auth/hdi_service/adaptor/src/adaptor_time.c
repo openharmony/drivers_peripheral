@@ -52,5 +52,5 @@ uint64_t GetReeTime(void)
         LOG_ERROR("get time failed");
         return 0;
     }
-    return curTime.tv_sec * MS_OF_S + curTime.tv_usec/MS_OF_S;
+    return curTime.tv_sec * MS_OF_S + curTime.tv_usec / MS_OF_S;
 }

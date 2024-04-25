@@ -75,7 +75,7 @@ ResultCode DestoryContextbyId(uint64_t contextId);
 ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
 ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info,
     uint32_t authMode);
-ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t *size);
+ResultCode UpdateExecutorExpiredInfo(ExecutorExpiredInfo *executorExpiredInfos, uint32_t len, uint32_t *size);
 
 #ifdef __cplusplus
 }
