@@ -695,6 +695,7 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     AudioSetCaptureBusy(index, true);
     if (capture == NULL || capture->CaptureFrame == NULL) {
         AUDIO_FUNC_LOGE("capture or CaptureFrame is NULL");
+        AudioMemFree((void **)&frame);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->CaptureFrame((AudioHandle)capture, (void *)frame, requestBytes, &replyBytes);
