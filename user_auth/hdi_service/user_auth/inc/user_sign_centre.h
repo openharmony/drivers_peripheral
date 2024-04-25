@@ -31,6 +31,7 @@ extern "C" {
 #define AUTH_TOKEN_DATA_LEN (AUTH_TOKEN_LEN - SHA256_DIGEST_SIZE)
 #define AUTH_TOKEN_CIPHER_LEN sizeof(TokenDataToEncrypt)
 #define TOKEN_VERSION 0
+#define UDID_LEN 64
 
 typedef struct {
     uint8_t challenge[CHALLENGE_LEN];
@@ -39,6 +40,7 @@ typedef struct {
     uint32_t authType;
     uint32_t authMode;
     uint32_t securityLevel;
+    uint32_t tokenType;
 } __attribute__((__packed__)) TokenDataPlain;
 
 typedef struct {
@@ -46,6 +48,8 @@ typedef struct {
     uint64_t secureUid;
     uint64_t enrolledId;
     uint64_t credentialId;
+    uint8_t collectorUdid[UDID_LEN];
+    uint8_t verifierUdid[UDID_LEN];
 } __attribute__((__packed__)) TokenDataToEncrypt;
 
 typedef struct {
