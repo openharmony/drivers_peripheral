@@ -89,6 +89,11 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
+    userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
+
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_SUCCESS);
@@ -116,6 +121,8 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.authType = 1;
     userAuthTokenCached.tokenDataPlain.authTrustLevel = ATL3;
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime() + 300;
+    userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     EnrolledStateHal enrolledState;
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
 
