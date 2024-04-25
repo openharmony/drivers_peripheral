@@ -51,6 +51,10 @@ RetCode V4L2DeviceManager::Init()
     }
 
     rc = CreateManager();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("%s CreateManager fail", __FUNCTION__);
+        return RC_ERROR;
+    }
     enumeratorManager_ = std::make_shared<EnumeratorManager>();
     if (enumeratorManager_ == nullptr) {
         CAMERA_LOGE("%s Create EnumeratorManager fail", __FUNCTION__);
