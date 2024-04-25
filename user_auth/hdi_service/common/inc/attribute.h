@@ -76,10 +76,6 @@ typedef enum {
     AUTH_TIME_STAMP = 100031,
     /* root secret */
     AUTH_ROOT_SECRET = 100032,
-    /* user id */
-    AUTH_USER_ID = 100034,
-    /* user type */
-    AUTH_USER_TYPE = 100035,
 } AttributeKey;
 
 typedef void Attribute;

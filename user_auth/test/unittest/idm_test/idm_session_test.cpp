@@ -105,7 +105,7 @@ HWTEST_F(IdmSessionTest, TestCheckChallenge_002, TestSize.Level0)
 HWTEST_F(IdmSessionTest, TestAssociateCoauthSchedule, TestSize.Level0)
 {
     g_session = nullptr;
-    EXPECT_EQ(AssociateCoauthSchedule(0, 0, true, 0), RESULT_NEED_INIT);
+    EXPECT_EQ(AssociateCoauthSchedule(0, 0, true), RESULT_NEED_INIT);
 }
 
 HWTEST_F(IdmSessionTest, TestGetEnrollScheduleInfo_001, TestSize.Level0)

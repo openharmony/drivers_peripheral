@@ -57,8 +57,6 @@ AttributeKey g_attributeKeyArray[] = {
     AUTH_TIME_STAMP,
     AUTH_ROOT_SECRET,
     AUTH_ROOT,
-    AUTH_USER_ID,
-    AUTH_USER_TYPE,
 };
 
 #define ARRAY_LENGTH(array) (uint32_t)(sizeof(array) / sizeof((array)[0]))

@@ -41,7 +41,7 @@ extern "C" {
     extern LinkedList *g_scheduleList;
     extern CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param);
     extern int32_t GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
-        CredentialInfoHal *credentialInfo);
+        CredentialInfoHal *credentialInfo, const CoAuthSchedule *schedule);
     extern int32_t GetDeletedCredential(int32_t userId, CredentialInfoHal *deletedCredential);
     extern int32_t CheckResultValid(uint64_t scheduleId, int32_t userId);
 }
@@ -163,7 +163,8 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
     g_session = nullptr;
     ExecutorResultInfo resultInfo = {};
     CredentialInfoHal credInfo = {};
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
+    CoAuthSchedule scheduleInfo = {};
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo, &scheduleInfo), RESULT_GENERAL_ERROR);
 
     constexpr int32_t userId = 32158;
     struct SessionInfo session = {};
@@ -175,13 +176,13 @@ HWTEST_F(UserIdmFuncsTest, TestGetCredentialInfoFromSchedule, TestSize.Level0)
     g_session = &session;
 
     resultInfo.scheduleId = 311157;
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo, &scheduleInfo), RESULT_GENERAL_ERROR);
     resultInfo.scheduleId = 10;
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo, &scheduleInfo), RESULT_GENERAL_ERROR);
 
     session.time = GetSystemTime();
     g_scheduleList = nullptr;
-    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetCredentialInfoFromSchedule(&resultInfo, &credInfo, &scheduleInfo), RESULT_SUCCESS);
     g_session = nullptr;
 }
 

@@ -91,7 +91,7 @@ IAM_STATIC ResultCode GenerateCoAuthSchedule(PermissionCheckParam *param, bool i
         LOG_ERROR("add coauth schedule failed");
         goto EXIT;
     }
-    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate, enrollSchedule->userType);
+    ret = AssociateCoauthSchedule(enrollSchedule->scheduleId, param->authType, isUpdate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm associate coauth schedule failed");
         RemoveCoAuthSchedule(enrollSchedule->scheduleId);
@@ -174,7 +174,7 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
-    CredentialInfoHal *credentialInfo)
+    CredentialInfoHal *credentialInfo, const CoAuthSchedule *schedule)
 {
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
@@ -187,11 +187,6 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm session is time out");
         return ret;
-    }
-    const CoAuthSchedule *schedule = GetCoAuthSchedule(executorInfo->scheduleId);
-    if (schedule == NULL) {
-        LOG_ERROR("schedule is null");
-        return RESULT_GENERAL_ERROR;
     }
     GetInfoFromResult(credentialInfo, executorInfo, schedule);
     return RESULT_SUCCESS;
@@ -266,13 +261,18 @@ ResultCode AddCredentialFunc(
         LOG_ERROR("executorResultInfo is null");
         return RESULT_UNKNOWN;
     }
+    const CoAuthSchedule *schedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
+    if (schedule == NULL) {
+        LOG_ERROR("schedule is null");
+        return RESULT_GENERAL_ERROR;
+    }
     CredentialInfoHal credentialInfo;
-    ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo);
+    ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo, schedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("failed to get credential info result");
         goto EXIT;
     }
-    ret = AddCredentialInfo(userId, &credentialInfo);
+    ret = AddCredentialInfo(userId, &credentialInfo, schedule->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential failed");
         goto EXIT;
@@ -452,7 +452,7 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
     }
     CredentialInfoHal credentialInfo;
     GetInfoFromResult(&credentialInfo, executorResultInfo, schedule);
-    ret = AddCredentialInfo(userId, &credentialInfo);
+    ret = AddCredentialInfo(userId, &credentialInfo, schedule->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("failed to add credential");
         goto EXIT;

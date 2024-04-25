@@ -26,14 +26,14 @@ extern "C" {
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
     extern bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid);
-    extern UserInfo *CreateUser(int32_t userId);
+    extern UserInfo *CreateUser(int32_t userId, int32_t userType);
     extern ResultCode DeleteUser(int32_t userId);
     extern bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentialId);
     extern bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolledId);
     extern ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
     extern ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType);
     extern ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credentialInfo);
-    extern ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo);
+    extern ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType);
     extern bool MatchCredentialById(const void *data, const void *condition);
     extern bool MatchEnrolledInfoByType(const void *data, const void *condition);
     extern CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
@@ -209,7 +209,7 @@ HWTEST_F(IdmDatabaseTest, TestCreateUser, TestSize.Level0)
 {
     g_userInfoList = nullptr;
     constexpr int32_t userId = 123;
-    EXPECT_EQ(CreateUser(userId), nullptr);
+    EXPECT_EQ(CreateUser(userId, 0), nullptr);
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteUser, TestSize.Level0)
@@ -295,7 +295,7 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
 {
     g_currentUser = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(AddUser(111, nullptr), RESULT_NEED_INIT);
+    EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_NEED_INIT);
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr uint32_t userNum = 1002;
@@ -303,12 +303,12 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
     for (uint32_t i = 0; i < userNum; ++i) {
         g_userInfoList->insert(g_userInfoList, static_cast<void *>(&info));
     }
-    EXPECT_EQ(AddUser(111, nullptr), RESULT_EXCEED_LIMIT);
+    EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_EXCEED_LIMIT);
 }
 
 HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo, TestSize.Level0)
 {
-    EXPECT_EQ(AddCredentialInfo(111, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(AddCredentialInfo(111, nullptr, 0), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdmDatabaseTest, TestMatchCredentialById, TestSize.Level0)
