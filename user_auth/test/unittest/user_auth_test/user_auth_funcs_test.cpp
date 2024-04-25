@@ -28,7 +28,7 @@ extern "C" {
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
     extern ResultCode HandleAuthSuccessResult(const UserAuthContext *context, const ExecutorResultInfo *info,
-    AuthResult *result, UserAuthTokenHal *authToken);
+        AuthResult *result, UserAuthTokenHal *authToken);
 }
 
 namespace OHOS {
@@ -182,10 +182,10 @@ HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
     GlobalConfigParamHal param = {};
     ExecutorExpiredInfo expiredInfo = {};
     uint32_t size = 0;
-    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr, &expiredInfo, &size), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, nullptr, &size), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, &size), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr, &expiredInfo, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, nullptr, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, &size), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam

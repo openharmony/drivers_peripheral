@@ -1067,21 +1067,14 @@ int32_t UserAuthInterfaceService::SendMessage(uint64_t scheduleId, int32_t srcRo
     return HDF_SUCCESS;
 }
 
-static void SetExecutorMessageCallback(const sptr<HdiIMessageCallback> messageCallback)
+static sptr<HdiIMessageCallback> GetExecutorMessageCallback()
 {
     std::lock_guard<std::recursive_mutex> lock(g_executorMessageMutex);
-    g_executorMessageCallback = messageCallback;
-}
-
-static ResultCode GetExecutorMessageCallback(sptr<HdiIMessageCallback> messageCallback)
-{
     if (g_executorMessageCallback == nullptr) {
         IAM_LOGE("bad messageCallback");
-        return RESULT_GENERAL_ERROR;
+        return nullptr;
     }
-    std::lock_guard<std::recursive_mutex> lock(g_executorMessageMutex);
-    messageCallback = g_executorMessageCallback;
-    return RESULT_SUCCESS;
+    return g_executorMessageCallback;
 }
 
 int32_t UserAuthInterfaceService::RegisterMessageCallback(const sptr<IMessageCallback>& messageCallback)
@@ -1091,7 +1084,8 @@ int32_t UserAuthInterfaceService::RegisterMessageCallback(const sptr<IMessageCal
         IAM_LOGE("RegisterMessageCallback bad param");
         return RESULT_BAD_PARAM;
     }
-    SetExecutorMessageCallback(messageCallback);
+    std::lock_guard<std::recursive_mutex> lock(g_executorMessageMutex);
+    g_executorMessageCallback = messageCallback;
     return HDF_SUCCESS;
 }
 
@@ -1155,13 +1149,13 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
 
     ExecutorExpiredInfo expiredInfos[MAX_SCHEDULE_NUM];
     uint32_t size = 0;
-    uint32_t ret = SetGlobalConfigParamFunc(&paramHal, expiredInfos, &size);
+    uint32_t ret = SetGlobalConfigParamFunc(&paramHal, expiredInfos, MAX_SCHEDULE_NUM, &size);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetGlobalConfigParamFunc failed");
         return ret;
     }
-    sptr<HdiIMessageCallback> messageCallback;
-    if (GetExecutorMessageCallback(messageCallback) != RESULT_SUCCESS) {
+    sptr<HdiIMessageCallback> messageCallback = GetExecutorMessageCallback();
+    if (messageCallback != nullptr) {
         IAM_LOGE("GetExecutorMessageCallback failed");
         return RESULT_GENERAL_ERROR;
     }
@@ -1170,7 +1164,7 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         if (SetExecutorMessage(expiredInfos[i].authExpiredSysTime, msg) != RESULT_SUCCESS) {
             continue;
         }
-        if (g_executorMessageCallback->OnMessage(expiredInfos[i].scheduleId, expiredInfos[i].scheduleMode, msg) !=
+        if (messageCallback->OnMessage(expiredInfos[i].scheduleId, expiredInfos[i].scheduleMode, msg) !=
             RESULT_SUCCESS) {
             IAM_LOGE("SendMessage failed");
             continue;

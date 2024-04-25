@@ -754,13 +754,13 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
 }
 
-HWTEST_F(IdmDatabaseTest, TestGetPinExpiredPeriod, TestSize.Level0)
+HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
 {
     int32_t userId = 1;
-    EXPECT_EQ(GetPinExpiredPeriod(userId, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(GetPinExpiredInfo(userId, nullptr), RESULT_BAD_PARAM);
 
     PinExpiredInfo info = {};
-    EXPECT_EQ(GetPinExpiredPeriod(userId, &info), RESULT_SUCCESS);
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
 
     g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
     g_globalConfigArray[0].value.pinExpiredPeriod = 1;
@@ -773,7 +773,7 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredPeriod, TestSize.Level0)
     CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 0, 1, 0};
     userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
-    EXPECT_EQ(GetPinExpiredPeriod(userId, &info), RESULT_SUCCESS);
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam

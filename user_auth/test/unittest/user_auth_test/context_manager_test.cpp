@@ -394,15 +394,13 @@ HWTEST_F(ContextManagerTest, TestUpdateAuthExpiredTime, TestSize.Level0)
 
 HWTEST_F(ContextManagerTest, TestUpdateExecutorExpiredInfo, TestSize.Level0)
 {
-    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, NULL), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, NULL), RESULT_BAD_PARAM);
 
     uint32_t size = 1;
     ExecutorExpiredInfo expiredInfo = {};
-    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, NULL), RESULT_BAD_PARAM);
-    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, &size), RESULT_BAD_PARAM);
-
-    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, &size), RESULT_BAD_PARAM);
-
+    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, NULL), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, &size), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace UserIam
