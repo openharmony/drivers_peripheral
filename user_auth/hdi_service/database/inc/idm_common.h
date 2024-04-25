@@ -43,12 +43,6 @@ typedef struct {
 
 typedef struct {
     int32_t userId;
-    int32_t userType;
-    bool needUserType;
-} UserDetails;
-
-typedef struct {
-    int32_t userId;
     uint64_t secUid;
     uint64_t pinSubType;
     uint64_t cachePinSubType;
