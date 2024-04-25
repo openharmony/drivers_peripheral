@@ -136,7 +136,7 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
     static AGnssCallbackIfaces agnsscallback;
     GetAGnssCallbackMethods(&agnsscallback);
 
-    int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
         static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
@@ -156,7 +156,7 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
 int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
 {
     HDF_LOGI("%{public}s.", __func__);
-    int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
         static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
@@ -175,7 +175,7 @@ int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
 
 int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
 {
-    int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
         static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
@@ -227,7 +227,7 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
 int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
 {
     HDF_LOGI("%{public}s.", __func__);
-    int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
         static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));

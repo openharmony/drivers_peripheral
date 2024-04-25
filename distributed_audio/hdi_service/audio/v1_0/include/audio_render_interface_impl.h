@@ -112,7 +112,6 @@ private:
     std::mutex volMtx_;
     bool firstOpenFlag_ = true;
     bool dumpFlag_ = false;
-    uint32_t timeInterval_ = 5;
     uint32_t currentFrame_ = 0;
     uint32_t vol_ = 0;
     uint32_t volMax_ = 15;

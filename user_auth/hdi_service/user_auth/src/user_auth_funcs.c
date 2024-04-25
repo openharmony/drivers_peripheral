@@ -52,7 +52,7 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
     }
-    if (!authContext->isExpiredReturnSuccess) {
+    if (!authContext->isExpiredReturnSuccess && authContext->authExpiredSysTime != NO_CHECK_PIN_EXPIRED_PERIOD) {
         uint64_t nowTime = GetReeTime();
         if (nowTime > authContext->authExpiredSysTime) {
             LOG_ERROR("pin is expired");
@@ -86,6 +86,10 @@ IAM_STATIC void SetAuthResult(int32_t userId, uint32_t authType, const ExecutorR
 
 IAM_STATIC ResultCode GetExpiredInfoForResult(const UserAuthContext *context, AuthResult *result)
 {
+    if (context == NULL || result == NULL) {
+        LOG_INFO("bad param");
+        return RESULT_BAD_PARAM;
+    }
     if (context->authExpiredSysTime == NO_CHECK_PIN_EXPIRED_PERIOD) {
         LOG_INFO("pinExpiredPeriod is not set");
         result->pinExpiredInfo = NO_SET_PIN_EXPIRED_PERIOD;

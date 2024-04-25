@@ -175,6 +175,10 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_SAE_PASSWD = 22,
     DEVICE_CONFIG_EAP_CA_CERT = 23,
     DEVICE_CONFIG_EAP_CERT_PWD = 24,
+    DEVICE_CONFIG_WAPI_CA_CERT = 25,
+    DEVICE_CONFIG_WAPI_USER_CERT = 26,
+    DEVICE_CONFIG_WAPI_PSK_KEY_TYPE = 27,
+    DEVICE_CONFIG_WAPI_PSK = 28,
     /**
      * Number of network configuration parameters, which is used as the last
      * parameter.

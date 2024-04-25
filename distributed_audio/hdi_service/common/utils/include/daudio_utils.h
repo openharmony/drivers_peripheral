@@ -24,6 +24,9 @@
 #define AUDIO_MS_PER_SECOND 1000
 #define AUDIO_US_PER_SECOND 1000000
 #define AUDIO_NS_PER_SECOND ((int64_t)1000000000)
+#define AUDIO_MMAP_NOIRQ_INTERVAL 5
+#define AUDIO_MMAP_VOIP_INTERVAL  20
+#define AUDIO_NORMAL_INTERVAL     20
 namespace OHOS {
 namespace DistributedHardware {
 std::string GetAnonyString(const std::string &value);

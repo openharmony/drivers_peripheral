@@ -176,7 +176,6 @@ private:
     uint32_t spkPinInUse_ = 0;
     uint32_t micPinInUse_ = 0;
     uint32_t streamMuteStatus_ = 0;
-    uint32_t timeInterval_ = 5;
 
     // mmap param
     PortOperationMode renderFlags_ = Audioext::V2_0::NORMAL_MODE;

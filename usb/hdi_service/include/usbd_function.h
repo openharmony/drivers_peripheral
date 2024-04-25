@@ -39,7 +39,9 @@
 #define SYS_USB_CONFIGFS                "sys.usb.configfs"
 #define SYS_USB_CONFIG                  "sys.usb.config"
 #define SYS_USB_STATE                   "sys.usb.state"
+#define PERSIST_SYS_USB_CONFIG          "persist.sys.usb.config"
 #define HDC_CONFIG_OFF                  "none"
+#define HDC_CONFIG_HDC                  "hdc"
 #define HDC_CONFIG_ON                   "hdc_debug"
 #define HDC_CONFIG_RNDIS                "rndis"
 #define HDC_CONFIG_STORAGE              "hisuite_mass_storage"
@@ -72,6 +74,7 @@ public:
     ~UsbdFunction() = default;
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
+    static int32_t UsbdUpdateFunction(uint32_t funcs);
 
 private:
     static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask);

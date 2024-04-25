@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../thermal.gni")
 
 module_output_path = "drivers_peripheral_thermal/thermal"
 
@@ -43,12 +44,14 @@ ohos_unittest("hdi_unittest_thermal") {
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
       "drivers_interface_thermal:libthermal_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
+    if (has_thermal_c_utils_part) {
+      external_deps += [ "c_utils:utils" ]
+    }
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
