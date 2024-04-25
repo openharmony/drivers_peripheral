@@ -645,6 +645,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_013, TestSiz
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
         uint8_t focusMode = entry.data.u8[i];
         meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, DATA_COUNT);
+        if (entry.data.u8[i] == OHOS_CAMERA_FOCUS_MODE_MANUAL) {
+            uint8_t focusedPoint[] = {1, 1, 1, 1};
+            meta->addEntry(OHOS_CONTROL_FOCUSED_POINT, &focusedPoint, DATA_COUNT);
+        }
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
         cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
