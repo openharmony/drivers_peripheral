@@ -20,7 +20,6 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "idm_file_manager.h"
-#include "idm_session.h"
 
 #define MAX_DUPLICATE_CHECK 100
 #define PRE_APPLY_NUM 5
