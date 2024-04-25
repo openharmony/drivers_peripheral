@@ -59,7 +59,7 @@ static void FreeEventPkgs(InputEventPackage **eventPkgs, size_t count)
 {
     for (size_t i = 0; i < count; i++) {
         if (eventPkgs[i] != NULL) {
-            free(eventPkgs[i]);
+            OsalMemFree(evtPkg[i]);
             eventPkgs[i] = nullptr;
         }
     }
@@ -149,7 +149,7 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t si
         if (evtPkg[i] == nullptr) {
             HDF_LOGE("%{public}s: OsalMemAlloc failed, line: %{public}d", __func__, __LINE__);
             FreeEventPkgs(evtPkg, i);
-            free(evtPkg);
+            OsalMemFree(evtPkg);
             evtPkg = nullptr;
             return;
         }
