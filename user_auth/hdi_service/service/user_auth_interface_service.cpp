@@ -187,7 +187,6 @@ static int32_t SetArrayAttributeToExtraInfo(int32_t userId, std::vector<HdiSched
             return result;
         }
         result = SetAttributeToExtraInfo(info, capabilityLevel, info.scheduleId);
-
         if (result != RESULT_SUCCESS) {
             IAM_LOGE("SetAttributeToExtraInfo fail");
             return result;

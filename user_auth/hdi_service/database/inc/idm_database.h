@@ -58,7 +58,7 @@ ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds);
 LinkedList *QueryCredentialLimit(const CredentialCondition *limit);
 ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId);
 
-ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo);
+ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType);
 ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType);
 ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType);
 ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
