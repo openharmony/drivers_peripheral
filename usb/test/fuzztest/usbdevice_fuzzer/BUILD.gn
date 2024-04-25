@@ -34,12 +34,18 @@ ohos_fuzztest("UsbdeviceFuzzTest") {
     "./../../../../ddk:libusb_core",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
+  if (is_standard_system) {
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+    if (usb_c_utils_enable) {
+      external_deps += [ "c_utils:utils" ]
+    }
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
 
   cflags = [
     "-g",
