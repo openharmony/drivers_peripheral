@@ -80,6 +80,7 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
             LOG_ERROR("GetAttributeSerializedMsg for data fail");
             break;
         }
+
         result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, dataTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("SetAttributeUint8Array for data fail");
