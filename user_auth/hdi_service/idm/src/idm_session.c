@@ -49,7 +49,7 @@ struct SessionInfo {
 
 IAM_STATIC Buffer *g_cacheRootSecret = NULL;
 
-IAM_STATIC void DestroyCacheRootSecret()
+IAM_STATIC void DestroyCacheRootSecret(void)
 {
     DestoryBuffer(g_cacheRootSecret);
     g_cacheRootSecret = NULL;

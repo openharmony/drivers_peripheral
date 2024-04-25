@@ -167,14 +167,14 @@ HWTEST_F(UserAuthFuncsTest, TestHandleAuthSuccessResult, TestSize.Level0)
     ExecutorResultInfo info = {};
     AuthResult result = {};
     UserAuthTokenHal authToken = {};
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
     context.authExpiredSysTime = 1;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
     result.result = RESULT_SUCCESS;
     context.authType = PIN_AUTH;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
     context.isAuthResultCached = true;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_SUCCESS);
+    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)

@@ -25,7 +25,7 @@ constexpr int ITEM_CAPACITY_SIZE = 30;
 constexpr int DATA_CAPACITY_SIZE = 2000;
 
 namespace OHOS::Camera {
-IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager)
+IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager);
 V4L2DeviceManager::V4L2DeviceManager() {}
 
 V4L2DeviceManager::~V4L2DeviceManager() {}
@@ -51,6 +51,10 @@ RetCode V4L2DeviceManager::Init()
     }
 
     rc = CreateManager();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("%s CreateManager fail", __FUNCTION__);
+        return RC_ERROR;
+    }
     enumeratorManager_ = std::make_shared<EnumeratorManager>();
     if (enumeratorManager_ == nullptr) {
         CAMERA_LOGE("%s Create EnumeratorManager fail", __FUNCTION__);

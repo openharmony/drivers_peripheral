@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "parameter.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_device_manager.h"
 #include "device_resource_if.h"
@@ -38,6 +39,8 @@
 #include "usbd_wrapper.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
+constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
+constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 
 namespace OHOS {
 namespace HDI {
@@ -50,6 +53,16 @@ UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
 uint32_t UsbImpl::attachCount_ = 0;
 uint32_t UsbImpl::attachFailedCount_ = 0;
+static const std::map<std::string, uint32_t> configMap = {
+    {HDC_CONFIG_OFF, USB_FUNCTION_NONE},
+    {HDC_CONFIG_HDC, USB_FUNCTION_HDC},
+    {HDC_CONFIG_ON, USB_FUNCTION_HDC},
+    {HDC_CONFIG_RNDIS, USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE, USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_RNDIS_HDC, USB_FUNCTION_HDC + USB_FUNCTION_RNDIS},
+    {HDC_CONFIG_STORAGE_HDC, USB_FUNCTION_HDC + USB_FUNCTION_STORAGE},
+    {HDC_CONFIG_MANUFACTURE_HDC, USB_FUNCTION_MANUFACTURE}
+};
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -951,8 +964,31 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::UpdateFunctionStatus()
+{
+    char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
+    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
+    if (ret <= 0) {
+        HDF_LOGI("%{public}s: GetParameter failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    std::string functionValue(cFunctionValue);
+    auto it = configMap.find(functionValue);
+    if (it != configMap.end()) {
+        HDF_LOGI("Function is %{public}s", functionValue.c_str());
+        return UsbdFunction::UsbdUpdateFunction(it->second);
+    }
+    return HDF_FAILURE;
+}
+
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    int32_t ret = UsbImpl::UpdateFunctionStatus();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: UpdateFunctionStatus failed", __func__);
+        return HDF_FAILURE;
+    }
     inst->parsePortPath();
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
@@ -1043,7 +1079,8 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
     MakeUsbControlParams(
-        &controlParams, buffer, length, (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) + descId, 0);
+        &controlParams, buffer, length,
+        (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) + descId, ENGLISH_US_LANGUAGE_ID);
     int32_t ret = UsbControlTransferEx(port, &controlParams, GET_STRING_SET_TIMEOUT);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbControlTransferEx failed ret=%{public}d", __func__, ret);

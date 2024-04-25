@@ -284,8 +284,7 @@ ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigArray, uint3
         return RESULT_GENERAL_ERROR;
     }
 
-    int32_t expiredPeriodSize = sizeof(int32_t) + sizeof(int64_t);
-    int32_t configInfoSize = sizeof(uint32_t) * 2 + expiredPeriodSize;
+    int32_t configInfoSize = sizeof(uint32_t) * 2 + sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM;
     Buffer *parcel = CreateBufferBySize(configInfoSize);
     if (parcel == NULL) {
         LOG_ERROR("parcel is null");

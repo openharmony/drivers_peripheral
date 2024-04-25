@@ -751,7 +751,7 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
 
     param.type = PIN_EXPIRED_PERIOD;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)

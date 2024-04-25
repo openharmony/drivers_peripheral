@@ -27,21 +27,27 @@ ohos_shared_library("libpower_interface_service_1.1") {
   deps = [ "//third_party/libxml2:xml2" ]
 
   external_deps = [
-    "c_utils:utils",
     "drivers_interface_power:power_idl_headers",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "ipc:ipc_single",
   ]
+  if (has_power_c_utils_part) {
+    external_deps += [ "c_utils:utils" ]
+  }
+  if (has_power_hisysevent_part) {
+    external_deps += [ "hisysevent:libhisysevent" ]
+  }
 
   if (drivers_peripheral_power_wakeup_cause_path) {
     sources += [ "src/power_config.cpp" ]
 
     deps += [ "//third_party/jsoncpp:jsoncpp" ]
 
-    external_deps += [ "config_policy:configpolicy_util" ]
+    if (has_power_config_policy_part) {
+      external_deps += [ "config_policy:configpolicy_util" ]
+    }
 
     defines = [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
@@ -57,7 +63,6 @@ ohos_shared_library("libpower_driver") {
   sources = [ "src/power_interface_driver.cpp" ]
 
   external_deps = [
-    "c_utils:utils",
     "drivers_interface_power:libpower_stub_1.1",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
@@ -66,6 +71,9 @@ ohos_shared_library("libpower_driver") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  if (has_power_c_utils_part) {
+    external_deps += [ "c_utils:utils" ]
+  }
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
