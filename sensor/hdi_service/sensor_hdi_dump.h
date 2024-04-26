@@ -39,23 +39,21 @@ class SensorHdiDump {
 public:
     SensorHdiDump();
     ~SensorHdiDump();
-    int32_t DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf *reply);
+    static int32_t DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf *reply);
 
 private:
-    int32_t SensorShowList(struct HdfSBuf *reply);
-    std::string SensorInfoDataToString(const float *data,
+    static int32_t SensorShowList(struct HdfSBuf *reply);
+    static std::string SensorInfoDataToString(const float *data,
                                        const int64_t timesTamp,
                                        const int32_t dataDimension,
                                        const int32_t sensorId);
-    int32_t ShowData(const float *data,
+    static int32_t ShowData(const float *data,
                      const int64_t timesTamp,
                      const int32_t dataDimension,
                      const int32_t sensorId,
                      struct HdfSBuf *reply);
-    int32_t SensorShowData(struct HdfSBuf *reply);
-    int32_t SensorShowClient(struct HdfSBuf *reply);
-
-    std::shared_ptr<SensorClientsManager> clientsManager_;
+    static int32_t SensorShowData(struct HdfSBuf *reply);
+    static int32_t SensorShowClient(struct HdfSBuf *reply);
 };
 
 int32_t GetSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply);
