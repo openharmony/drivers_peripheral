@@ -271,7 +271,7 @@ void SourceNode::PortHandler::CollectBuffers()
                 buffer->GetStreamId(), buffer->GetIndex(), buffer->GetSize(), bufferSize);
 
     if (buffer->GetVirAddress() == buffer->GetSuffaceBufferAddr()) {
-        CAMERA_LOGE("CollectBuffers begin malloc buffer");
+        CAMERA_LOGI("CollectBuffers begin malloc buffer");
         auto bufferAddr = malloc(bufferSize);
         if (bufferAddr != nullptr) {
             buffer->SetVirAddress(bufferAddr);
