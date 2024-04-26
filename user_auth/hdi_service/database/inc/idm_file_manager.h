@@ -29,7 +29,7 @@ extern "C" {
 LinkedList *LoadFileInfo(void);
 ResultCode UpdateFileInfo(LinkedList *userInfoList);
 ResultCode DeleteFile(void);
-ResultCode LoadGlobalConfigInfo(GlobalConfigParamHal *globalConfigInfoFile, uint32_t *configInfoNum);
+ResultCode LoadGlobalConfigInfo(GlobalConfigParamHal *globalConfigInfo, uint32_t len, uint32_t *configInfoNum);
 ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigInfo, uint32_t configInfoNum);
 
 #ifdef __cplusplus

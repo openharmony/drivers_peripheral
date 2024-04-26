@@ -47,11 +47,12 @@ namespace UserAuth {
 namespace {
 static std::mutex g_mutex;
 static std::recursive_mutex g_executorMessageMutex;
+sptr<HdiIMessageCallback> g_executorMessageCallback;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
 const std::string SCREEN_LOCK_NAME = "com.ohos.systemui";
 const std::string SETTRINGS_NAME = "com.ohos.settings";
-sptr<HdiIMessageCallback> g_executorMessageCallback;
+
 enum UserAuthCallerType : int32_t {
     TOKEN_INVALID = -1,
     TOKEN_HAP = 0,
