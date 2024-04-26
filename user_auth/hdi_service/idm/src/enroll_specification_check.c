@@ -62,6 +62,11 @@ ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
         LOG_ERROR("need pin token");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
+    if ((tokenPlain.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
+        || (tokenPlain.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
+        LOG_ERROR("need local auth");
+        return RESULT_VERIFY_TOKEN_FAIL;
+    }
     ret = CheckChallenge(tokenPlain.tokenDataPlain.challenge, CHALLENGE_LEN);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check challenge failed, token is invalid");
