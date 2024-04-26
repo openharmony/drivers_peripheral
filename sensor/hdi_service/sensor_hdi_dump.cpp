@@ -254,7 +254,7 @@ int32_t SensorHdiDump::DevHostSensorHdiDump(struct HdfSBuf *data, struct HdfSBuf
 
 int32_t GetSensorDump(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    DevHostSensorHdiDump(data, reply);
+    SensorHdiDump::DevHostSensorHdiDump(data, reply);
     return HDF_SUCCESS;
 }
 
