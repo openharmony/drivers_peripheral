@@ -172,11 +172,12 @@ HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
 
 HWTEST_F(IdmFileMgrTest, TestLoadGlobalConfigInfo, TestSize.Level0)
 {
-    EXPECT_EQ(LoadGlobalConfigInfo(nullptr, nullptr), RESULT_BAD_PARAM);
+    uint32_t len = 1;
+    EXPECT_EQ(LoadGlobalConfigInfo(nullptr, len, nullptr), RESULT_BAD_PARAM);
 
     uint32_t configInfoNum = 1;
     GlobalConfigParamHal *param = {};
-    EXPECT_EQ(LoadGlobalConfigInfo(param, &configInfoNum), RESULT_BAD_PARAM);
+    EXPECT_EQ(LoadGlobalConfigInfo(param, len, &configInfoNum), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace UserIam

@@ -43,6 +43,7 @@ IAM_STATIC UserInfo *g_currentUser = NULL;
 // Caches global config info.
 IAM_STATIC GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
 IAM_STATIC uint32_t g_globalConfigInfoNum = 0;
+
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
 IAM_STATIC UserInfo *QueryUserInfo(int32_t userId);
@@ -76,7 +77,7 @@ ResultCode InitUserInfoList(void)
         DestroyUserInfoList();
         return ret;
     }
-    ret = LoadGlobalConfigInfo(g_globalConfigArray, &g_globalConfigInfoNum);
+    ret = LoadGlobalConfigInfo(g_globalConfigArray, MAX_GLOBAL_CONFIG_NUM, &g_globalConfigInfoNum);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("load global config info failed");
     }
@@ -1254,7 +1255,7 @@ IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinC
     if (credList == NULL || credList->getSize(credList) == 0) {
         LOG_ERROR("pin credential is null");
         DestroyLinkedList(credList);
-        return RESULT_GENERAL_ERROR;
+        return RESULT_NOT_ENROLLED;
     }
     if (credList->head == NULL || credList->head->data == NULL) {
         LOG_ERROR("pin credList node is invalid");

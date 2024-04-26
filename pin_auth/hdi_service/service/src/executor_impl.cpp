@@ -15,7 +15,6 @@
 
 #include "attributes.h"
 #include <chrono>
-#include <cinttypes>
 #include "executor_impl.h"
 #include <hdf_base.h>
 #include <securec.h>
