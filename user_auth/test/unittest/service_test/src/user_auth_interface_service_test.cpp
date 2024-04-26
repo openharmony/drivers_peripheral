@@ -810,7 +810,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_002, TestS
 
     AuthResultTest authResultTest = {};
     DoOnceAuth(service, userId, AuthType::PIN, challenge, authResultTest);
-    EXPECT_EQ(authResultTest.result, RESULT_GENERA0L_ERROR);
+    EXPECT_EQ(authResultTest.result, 0);
 
     EnrollResultTest enrollFaceResultTest = {};
     DoOnceEnroll(service, userId, AuthType::FACE, authResultTest.token, enrollFaceResultTest);

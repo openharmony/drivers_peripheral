@@ -223,9 +223,10 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
         HDF_LOGE("%{public}s: get device name failed errormsg %{public}s", __func__, strerror(errno));
     } else {
         buffer[sizeof(buffer) - 1] = '\0';
-        int32_t ret = strcpy_s(detailInfo->attrSet.devName, DEVICE_INFO_SIZE, buffer);
+        int32_t ret = strcpy_s(detailInfo->attrSet.devName, DEV_NAME_LEN, buffer);
         if (ret) {
             HDF_LOGE("%{public}s: strcpy_s failed, ret %{public}d", __func__, ret);
+            return INPUT_FAILURE;
         }
     }
     // device detailInfo.
