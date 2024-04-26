@@ -126,6 +126,12 @@ typedef enum Atl {
     ATL4 = 40000,
 } Atl;
 
+typedef enum TokenType {
+    TOKEN_TYPE_LOCAL_AUTH = 0,
+    TOKEN_TYPE_LOCAL_RESIGN = 1,
+    TOKEN_TYPE_COAUTH = 2,
+} TokenType;
+
 #define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
     do { \
         if (cond) { \

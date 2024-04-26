@@ -169,6 +169,11 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
         LOG_ERROR("invalid cached unlock token");
         return RESULT_GENERAL_ERROR;
     }
+    if ((g_unlockAuthResult.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
+        || (g_unlockAuthResult.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
+        LOG_ERROR("need local auth");
+        return RESULT_GENERAL_ERROR;
+    }
     uint64_t time = GetSystemTime();
     if (time < g_unlockAuthResult.authToken.tokenDataPlain.time) {
         LOG_ERROR("bad system time");
@@ -214,6 +219,7 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, Reus
     *((UserAuthTokenHal *)reuseResult->token) = g_unlockAuthResult.authToken;
     reuseResult->authType = g_unlockAuthResult.authToken.tokenDataPlain.authType;
     ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
+    ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_RESIGN;
     if (memcpy_s(((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge,
         CHALLENGE_LEN) != EOK) {
         LOG_ERROR("challenge copy failed");
