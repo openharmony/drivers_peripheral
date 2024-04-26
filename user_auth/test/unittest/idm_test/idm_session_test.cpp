@@ -189,6 +189,12 @@ HWTEST_F(IdmSessionTest, TestCacheRootSecret, TestSize.Level0)
     DestoryBuffer(test);
 }
 
+HWTEST_F(IdmSessionTest, TestIsValidUserType, TestSize.Level0)
+{
+    constexpr int32_t userType = 1024;
+    EXPECT_EQ(IsValidUserType(userType), RESULT_BAD_PARAM);
+}
+
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

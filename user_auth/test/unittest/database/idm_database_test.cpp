@@ -61,9 +61,19 @@ public:
     void TearDown() {};
 };
 
-HWTEST_F(IdmDatabaseTest, TestInitUserInfoList, TestSize.Level0)
+HWTEST_F(IdmDatabaseTest, TestInitUserInfoList_001, TestSize.Level0)
 {
     EXPECT_EQ(InitUserInfoList(), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestInitUserInfoList_002, TestSize.Level0)
+{
+    constexpr int32_t userType = 1024;
+    UserInfo *userInfo = InitUserInfoNode();
+    EXPECT_EQ(InitUserInfoList(), RESULT_SUCCESS);
+    EXPECT_NE(userInfo->userType, userType);
+    DestroyUserInfoNode(userInfo);
     DestroyUserInfoList();
 }
 
@@ -306,9 +316,29 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
     EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_EXCEED_LIMIT);
 }
 
-HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo, TestSize.Level0)
+HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_001, TestSize.Level0)
 {
     EXPECT_EQ(AddCredentialInfo(111, nullptr, 0), RESULT_BAD_PARAM);
+}
+
+HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_002, TestSize.Level0)
+{
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    constexpr int32_t userId = 100;
+    constexpr int32_t userType = 2;
+    constexpr uint32_t authType = 1;
+    UserInfo *user = QueryUserInfo(userId);
+    EXPECT_EQ(user, nullptr);
+    user = CreateUser(userId, userType);
+    EXPECT_NE(user->userType, 0);
+
+    CredentialInfoHal credInfo = {};
+    credInfo.authType = authType;
+    EXPECT_EQ(AddUser(userId, &credInfo, userType), RESULT_SUCCESS);
+
+    EXPECT_EQ(AddCredentialInfo(userId, &credInfo, userType), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmDatabaseTest, TestMatchCredentialById, TestSize.Level0)
