@@ -178,8 +178,8 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     std::string sensorInfoData = "";
     sensorInfoData += "bestSensorConfigMap={\n";
     for (auto &entry2 : bestSensorConfigMap) {
-        const auto &sensorId = entry2.first;
-        const auto &bestSensorConfig = entry2.second;
+        auto sensorId = entry2.first;
+        auto bestSensorConfig = entry2.second;
         sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
         sensorInfoData += "bestSensorConfig={";
         sensorInfoData += "samplingInterval=" + std::to_string(bestSensorConfig.samplingInterval) + ",";
@@ -188,13 +188,13 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     }
     sensorInfoData += "}\n\n";
     for (auto &entry : sensorClientInfoMap) {
-        const auto &serviceId = entry.first;
-        const auto &sensorClientInfo = entry.second;
+        auto serviceId = entry.first;
+        auto sensorClientInfo = entry.second;
         sensorInfoData += "serviceId=" + std::to_string(serviceId) + " ";
         sensorInfoData += "sensorConfigMap_={\n";
         for (auto &entry2 : sensorClientInfo.sensorConfigMap_) {
-            const auto &sensorId = entry2.first;
-            const auto &sensorConfig = entry2.second;
+            auto sensorId = entry2.first;
+            auto sensorConfig = entry2.second;
             sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
             sensorInfoData += "sensorConfig={";
             sensorInfoData += "samplingInterval=" + std::to_string(sensorConfig.samplingInterval) + ",";
