@@ -645,6 +645,10 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_013, TestSiz
         std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
         uint8_t focusMode = entry.data.u8[i];
         meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, DATA_COUNT);
+        if (entry.data.u8[i] == OHOS_CAMERA_FOCUS_MODE_MANUAL) {
+            uint8_t focusedPoint[] = {1, 1, 1, 1};
+            meta->addEntry(OHOS_CONTROL_FOCUSED_POINT, &focusedPoint, DATA_COUNT);
+        }
         std::vector<uint8_t> setting;
         MetadataUtils::ConvertMetadataToVec(meta, setting);
         cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
@@ -1390,5 +1394,181 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
         cameraTest->streamInfosV1_1.clear();
     }
     
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Professional_Hdi_V1_3_031
+ * @tc.desc: OHOS_CONTROL_ISO_VALUE, OHOS_CONTROL_SUPPORTED_COLOR_MODES, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_031, TestSize.Level1)
+{
+    if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
+        cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
+        return;
+    }
+
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
+
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    int32_t isoValue = 50;
+    meta->addEntry(OHOS_CONTROL_ISO_VALUE, &isoValue, DATA_COUNT);
+    uint8_t colorMode = 1;
+    meta->addEntry(OHOS_CONTROL_SUPPORTED_COLOR_MODES, &colorMode, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Professional_Hdi_V1_3_032
+ * @tc.desc: OHOS_CONTROL_FOCUS_ASSIST_FLASH_SUPPORTED_MODE, OHOS_CONTROL_ZOOM_RATIO, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_032, TestSize.Level1)
+{
+    if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
+        cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
+        return;
+    }
+
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
+
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t focusAssistFlashMode = OHOS_CAMERA_FOCUS_ASSIST_FLASH_MODE_AUTO;
+    meta->addEntry(OHOS_CONTROL_FOCUS_ASSIST_FLASH_SUPPORTED_MODE, &focusAssistFlashMode, DATA_COUNT);
+    float zoomRatio = 1.0f;
+    meta->addEntry(OHOS_CONTROL_ZOOM_RATIO, &zoomRatio, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Professional_Hdi_V1_3_033
+ * @tc.desc: OHOS_CONTROL_METER_MODE, OHOS_CONTROL_ISO_VALUE, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_033, TestSize.Level1)
+{
+    if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
+        cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
+        return;
+    }
+
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
+
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t meteringMode = OHOS_CAMERA_SPOT_METERING;
+    meta->addEntry(OHOS_CONTROL_METER_MODE, &meteringMode, DATA_COUNT);
+    int32_t isoValue = 50;
+    meta->addEntry(OHOS_CONTROL_ISO_VALUE, &isoValue, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Professional_Hdi_V1_3_034
+ * @tc.desc: OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_034, TestSize.Level1)
+{
+    if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
+        cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
+        return;
+    }
+
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    GetSupportedPhysicalApertureValues(cameraTest->ability);
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
+
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    float physicalApertureValue = supportedPhysicalApertureValues_[0];
+    meta->addEntry(OHOS_CONTROL_CAMERA_PHYSICAL_APERTURE_VALUE, &physicalApertureValue, DATA_COUNT);
+    int32_t aeExposureCompensation = 4;
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &aeExposureCompensation, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
+
+/**
+ * @tc.name: Camera_Professional_Hdi_V1_3_035
+ * @tc.desc: OHOS_CONTROL_FOCUS_MODE, OHOS_CONTROL_AWB_MODE, PROFESSIONAL_PHOTO
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_035, TestSize.Level1)
+{
+    if (!g_isModeExists(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO)) {
+        cout << "skip this test, because PROFESSIONAL_PHOTO not in OHOS_ABILITY_CAMERA_MODES" << endl;
+        return;
+    }
+
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+    cameraTest->intents = {PREVIEW, STILL_CAPTURE};
+    cameraTest->StartProfessionalStream(cameraTest->intents, OHOS::HDI::Camera::V1_3::PROFESSIONAL_PHOTO);
+
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t focusMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
+    meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, DATA_COUNT);
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
+    meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
