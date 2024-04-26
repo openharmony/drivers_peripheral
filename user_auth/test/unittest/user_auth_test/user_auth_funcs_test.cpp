@@ -27,8 +27,6 @@ extern "C" {
     extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
-    extern ResultCode HandleAuthSuccessResult(const UserAuthContext *context, const ExecutorResultInfo *info,
-        AuthResult *result, UserAuthTokenHal *authToken);
 }
 
 namespace OHOS {
@@ -159,22 +157,6 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
-}
-
-HWTEST_F(UserAuthFuncsTest, TestHandleAuthSuccessResult, TestSize.Level0)
-{
-    UserAuthContext context = {};
-    ExecutorResultInfo info = {};
-    AuthResult result = {};
-    UserAuthTokenHal authToken = {};
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
-    context.authExpiredSysTime = 1;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
-    result.result = RESULT_SUCCESS;
-    context.authType = PIN_AUTH;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
-    context.isAuthResultCached = true;
-    EXPECT_EQ(HandleAuthSuccessResult(&context, &info, &result, &authToken), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
