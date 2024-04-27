@@ -59,7 +59,7 @@ static void FreeEventPkgs(InputEventPackage **eventPkgs, size_t count)
 {
     for (size_t i = 0; i < count; i++) {
         if (eventPkgs[i] != NULL) {
-            OsalMemFree(evtPkg[i]);
+            OsalMemFree(eventPkgs[i]);
             eventPkgs[i] = nullptr;
         }
     }
