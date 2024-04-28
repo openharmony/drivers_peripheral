@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include "defines.h"
+#include "idm_common.h"
 #include "linked_list.h"
 
 #ifdef __cplusplus
@@ -28,6 +29,8 @@ extern "C" {
 LinkedList *LoadFileInfo(void);
 ResultCode UpdateFileInfo(LinkedList *userInfoList);
 ResultCode DeleteFile(void);
+ResultCode LoadGlobalConfigInfo(GlobalConfigParamHal *globalConfigInfo, uint32_t len, uint32_t *configInfoNum);
+ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigInfo, uint32_t configInfoNum);
 
 #ifdef __cplusplus
 }

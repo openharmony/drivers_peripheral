@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,33 +53,32 @@ public:
 private:
     class ScheduleMap {
     public:
-        uint32_t AddScheduleInfo(const uint64_t scheduleId, const uint32_t commandId,
-            const sptr<HdiIExecutorCallback> callback, const uint64_t templateId,
-            const std::vector<uint8_t> algoParameter);
-        uint32_t GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId, sptr<HdiIExecutorCallback> &callback,
-            uint64_t &templateId, std::vector<uint8_t> &algoParameter);
-        uint32_t DeleteScheduleId(const uint64_t scheduleId);
-
-    private:
         struct ScheduleInfo {
             uint32_t commandId;
             sptr<HdiIExecutorCallback> callback;
             uint64_t templateId;
             std::vector<uint8_t> algoParameter;
+            uint64_t authExpiredSysTime;
         };
+        uint32_t AddScheduleInfo(const uint64_t scheduleId, const ScheduleInfo &scheduleInfo);
+        uint32_t GetScheduleInfo(const uint64_t scheduleId, ScheduleInfo &scheduleInfo);
+        uint32_t UpdateScheduleInfo(const uint64_t scheduleId, uint64_t authExpiredSysTime);
+        uint32_t DeleteScheduleId(const uint64_t scheduleId);
 
+    private:
         std::mutex mutex_;
         std::map<uint64_t, struct ScheduleInfo> scheduleInfo_;
     };
 
 private:
     void CallError(const sptr<HdiIExecutorCallback> &callbackObj, uint32_t errorCode);
-    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId,
+    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, uint64_t authExpiredSysTime,
         const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv);
     int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-        const sptr<HdiIExecutorCallback> &callbackObj);
+        const sptr<HdiIExecutorCallback> &callbackObj, uint64_t authExpiredSysTime);
     int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
+    int32_t GetAuthDataFromExtraInfo(const std::vector<uint8_t> &extraInfo, uint64_t &authExpiredSysTime);
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
     ScheduleMap scheduleMap_;
     OHOS::ThreadPool threadPool_;

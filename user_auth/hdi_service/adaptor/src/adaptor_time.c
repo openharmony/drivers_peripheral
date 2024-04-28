@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "adaptor_time.h"
 
 #include <time.h>
+#include <sys/time.h>
 #include "adaptor_log.h"
 
 #define MS_OF_S 1000
@@ -41,4 +42,15 @@ uint64_t GetSystemTime(void)
         return 0;
     }
     return curTime.tv_sec * MS_OF_S + curTime.tv_nsec / NS_OF_MS;
+}
+
+uint64_t GetReeTime(void)
+{
+    struct timeval curTime;
+    int res = gettimeofday(&curTime, NULL);
+    if (res != 0) {
+        LOG_ERROR("get time failed");
+        return 0;
+    }
+    return curTime.tv_sec * MS_OF_S + curTime.tv_usec / MS_OF_S;
 }

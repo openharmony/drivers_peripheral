@@ -41,11 +41,15 @@ ohos_unittest("UserAuthHdiTest") {
   ]
 
   sources = [
+    "src/attributes_test.cpp",
     "src/signature_operation.cpp",
     "src/user_auth_interface_service_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libuser_auth_interface_service_2.0" ]
+  deps = [
+    "../../../hdi_service:libuser_auth_interface_service_2.0",
+    "//third_party/googletest:gmock",
+  ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 

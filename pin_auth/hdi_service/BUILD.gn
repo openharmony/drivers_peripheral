@@ -1,4 +1,4 @@
-# Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (C) 2022-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -47,6 +47,7 @@ ohos_shared_library("libpin_auth_interface_service_2.0") {
     "database/src/pin_db_ops_v1.c",
     "main/src/pin_auth.cpp",
     "main/src/pin_func.c",
+    "service/src/attributes.cpp",
     "service/src/executor_impl.cpp",
     "service/src/pin_auth_interface_service.cpp",
   ]

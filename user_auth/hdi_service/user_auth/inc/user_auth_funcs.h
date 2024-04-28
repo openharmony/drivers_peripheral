@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 #define REUSED_UNLOCK_TOKEN_PERIOD (5 * 60 * 1000)
+#define NO_SET_PIN_EXPIRED_PERIOD (-1)
 
 typedef struct AuthResult {
     int32_t userId;
@@ -35,8 +36,9 @@ typedef struct AuthResult {
     int32_t remainTimes;
     int32_t result;
     Buffer *rootSecret;
-    uint16_t credentialDigest;
+    uint64_t credentialDigest;
     uint16_t credentialCount;
+    int64_t pinExpiredInfo;
 } AuthResult;
 
 typedef struct {
@@ -71,6 +73,8 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     AuthResult *result);
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
+ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *executorExpiredInfos,
+    uint32_t len, uint32_t *size);
 
 #ifdef __cplusplus
 }

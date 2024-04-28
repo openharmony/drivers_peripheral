@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "attributes.h"
+#include <chrono>
 #include "executor_impl.h"
 #include <hdf_base.h>
 #include <securec.h>
@@ -31,6 +33,7 @@ namespace {
     constexpr uint32_t AUTH_PIN = 1;
     constexpr uint32_t GENERAL_ERROR = 2;
     constexpr uint32_t SUCCESS = 0;
+    constexpr uint32_t NO_CHECK_AUTH_EXPIRED_TIME = 0;
 } // namespace
 
 ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi)
@@ -89,9 +92,13 @@ int32_t ExecutorImpl::OnRegisterFinish(const std::vector<uint64_t> &templateIdLi
 
 int32_t ExecutorImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t>& msg)
 {
-    static_cast<void>(scheduleId);
     static_cast<void>(srcRole);
-    static_cast<void>(msg);
+    uint64_t authExpiredSysTime = NO_CHECK_AUTH_EXPIRED_TIME;
+    if (GetAuthDataFromExtraInfo(msg, authExpiredSysTime) != SUCCESS) {
+        IAM_LOGE("GetAuthDataFromExtraInfo failed");
+        return HDF_FAILURE;
+    }
+    scheduleMap_.UpdateScheduleInfo(scheduleId, authExpiredSysTime);
     return HDF_SUCCESS;
 }
 
@@ -114,8 +121,14 @@ int32_t ExecutorImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t
         CallError(callbackObj, GENERAL_ERROR);
         return GENERAL_ERROR;
     }
-
-    int32_t result = scheduleMap_.AddScheduleInfo(scheduleId, ENROLL_PIN, callbackObj, 0, algoParameter);
+    struct ScheduleMap::ScheduleInfo info {
+        .commandId = ENROLL_PIN,
+        .callback = callbackObj,
+        .templateId = 0,
+        .algoParameter = algoParameter,
+        .authExpiredSysTime = NO_CHECK_AUTH_EXPIRED_TIME,
+    };
+    int32_t result = scheduleMap_.AddScheduleInfo(scheduleId, info);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
@@ -161,7 +174,7 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
 }
 
 int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-    const sptr<HdiIExecutorCallback> &callbackObj)
+    const sptr<HdiIExecutorCallback> &callbackObj, uint64_t authExpiredSysTime)
 {
     IAM_LOGI("start");
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
@@ -176,13 +189,42 @@ int32_t ExecutorImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId
         CallError(callbackObj, LOCKED);
         return GENERAL_ERROR;
     }
-    result = scheduleMap_.AddScheduleInfo(scheduleId, AUTH_PIN, callbackObj, templateId, algoParameter);
+    struct ScheduleMap::ScheduleInfo info {
+        .commandId = AUTH_PIN,
+        .callback = callbackObj,
+        .templateId = templateId,
+        .algoParameter = algoParameter,
+        .authExpiredSysTime = authExpiredSysTime,
+    };
+    result = scheduleMap_.AddScheduleInfo(scheduleId, info);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
         return GENERAL_ERROR;
     }
 
+    return SUCCESS;
+}
+
+int32_t ExecutorImpl::GetAuthDataFromExtraInfo(const std::vector<uint8_t> &extraInfo, uint64_t &authExpiredSysTime)
+{
+    Attributes attribute = Attributes(extraInfo);
+    std::vector<uint8_t> authRoot;
+    if (!attribute.GetUint8ArrayValue(Attributes::AUTH_ROOT, authRoot)) {
+        IAM_LOGE("GetUint8ArrayValue AUTH_ROOT failes");
+        return GENERAL_ERROR;
+    }
+    Attributes authRootAttr = Attributes(authRoot);
+    std::vector<uint8_t> authData;
+    if (!authRootAttr.GetUint8ArrayValue(Attributes::AUTH_DATA, authData)) {
+        IAM_LOGE("GetUint8ArrayValue AUTH_DATA failes");
+        return GENERAL_ERROR;
+    }
+    Attributes authDataAttr = Attributes(authData);
+    if (!authDataAttr.GetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime)) {
+        IAM_LOGE("GetUint64Value AUTH_EXPIRED_SYS_TIME failes");
+        return GENERAL_ERROR;
+    }
     return SUCCESS;
 }
 
@@ -199,17 +241,22 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
         CallError(callbackObj, INVALID_PARAMETERS);
         return HDF_SUCCESS;
     }
-    static_cast<void>(extraInfo);
+    uint64_t authExpiredSysTime = NO_CHECK_AUTH_EXPIRED_TIME;
+    int32_t result = GetAuthDataFromExtraInfo(extraInfo, authExpiredSysTime);
+    if (result != SUCCESS) {
+        IAM_LOGE("GetAuthDataFromExtraInfo failed");
+        return result;
+    }
     std::vector<uint8_t> algoParameter;
     uint32_t algoVersion = 0;
     uint64_t templateId = templateIdList[0];
-    int32_t result = pinHdi_->GetAlgoParameter(templateId, algoParameter, algoVersion);
+    result = pinHdi_->GetAlgoParameter(templateId, algoParameter, algoVersion);
     if (result != SUCCESS) {
         IAM_LOGE("Get algorithm parameter failed, fail code : %{public}d", result);
         CallError(callbackObj, result);
         return GENERAL_ERROR;
     }
-    result = AuthenticateInner(scheduleId, templateId, algoParameter, callbackObj);
+    result = AuthenticateInner(scheduleId, templateId, algoParameter, callbackObj, authExpiredSysTime);
     if (result != SUCCESS) {
         IAM_LOGE("AuthenticateInner failed, fail code : %{public}d", result);
         return HDF_SUCCESS;
@@ -229,7 +276,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
     return HDF_SUCCESS;
 }
 
-int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId,
+int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId, uint64_t authExpiredSysTime,
     const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv)
 {
     int32_t result = pinHdi_->AuthPin(scheduleId, templateId, data, resultTlv);
@@ -243,6 +290,13 @@ int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId,
         }
         hdi->WriteAntiBrute(id);
     });
+    uint64_t nowTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    if (authExpiredSysTime != NO_CHECK_AUTH_EXPIRED_TIME && authExpiredSysTime < nowTime) {
+        IAM_LOGE("pin is expired");
+        resultTlv.clear();
+        return PIN_EXPIRED;
+    }
     IAM_LOGI("Auth Pin success");
     return result;
 }
@@ -257,29 +311,25 @@ int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
     }
     std::vector<uint8_t> resultTlv;
     int32_t result = GENERAL_ERROR;
-    constexpr uint32_t INVALID_ID = 2;
-    uint32_t commandId = INVALID_ID;
-    sptr<HdiIExecutorCallback> callback = nullptr;
-    uint64_t templateId = 0;
-    std::vector<uint8_t> algoParameter(0, 0);
-    if (scheduleMap_.GetScheduleInfo(scheduleId, commandId, callback, templateId, algoParameter) != HDF_SUCCESS) {
+    ScheduleMap::ScheduleInfo scheduleInfo = {};
+    if (scheduleMap_.GetScheduleInfo(scheduleId, scheduleInfo) != HDF_SUCCESS) {
         IAM_LOGE("Get ScheduleInfo failed, fail code : %{public}d", result);
         return HDF_FAILURE;
     }
-    if (resultCode != SUCCESS && callback != nullptr) {
+    if (resultCode != SUCCESS && scheduleInfo.callback != nullptr) {
         IAM_LOGE("SetData failed, resultCode is %{public}d", resultCode);
-        CallError(callback, resultCode);
+        CallError(scheduleInfo.callback, resultCode);
         return resultCode;
     }
-    switch (commandId) {
+    switch (scheduleInfo.commandId) {
         case ENROLL_PIN:
-            result = pinHdi_->EnrollPin(scheduleId, authSubType, algoParameter, data, resultTlv);
+            result = pinHdi_->EnrollPin(scheduleId, authSubType, scheduleInfo.algoParameter, data, resultTlv);
             if (result != SUCCESS) {
                 IAM_LOGE("Enroll Pin failed, fail code : %{public}d", result);
             }
             break;
         case AUTH_PIN:
-            result = AuthPin(scheduleId, templateId, data, resultTlv);
+            result = AuthPin(scheduleId, scheduleInfo.templateId, scheduleInfo.authExpiredSysTime, data, resultTlv);
             if (result != SUCCESS) {
                 IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
             }
@@ -288,7 +338,7 @@ int32_t ExecutorImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
             IAM_LOGE("Error commandId");
     }
 
-    if (callback == nullptr || callback->OnResult(result, resultTlv) != SUCCESS) {
+    if (scheduleInfo.callback == nullptr || scheduleInfo.callback->OnResult(result, resultTlv) != SUCCESS) {
         IAM_LOGE("callbackObj Pin failed");
     }
     // Delete scheduleId from the scheduleMap_ when the enroll and authentication are successful
@@ -325,28 +375,15 @@ int32_t ExecutorImpl::Cancel(uint64_t scheduleId)
     return HDF_SUCCESS;
 }
 
-uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, const uint32_t commandId,
-    const sptr<HdiIExecutorCallback> callback, const uint64_t templateId, const std::vector<uint8_t> algoParameter)
+uint32_t ExecutorImpl::ScheduleMap::AddScheduleInfo(const uint64_t scheduleId, const ScheduleInfo &scheduleInfo)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
-    if (callback == nullptr) {
-        IAM_LOGE("callback is nullptr");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    struct ExecutorImpl::ScheduleMap::ScheduleInfo info {
-        .commandId = commandId,
-        .callback = callback,
-        .templateId = templateId,
-        .algoParameter = algoParameter
-    };
-    scheduleInfo_[scheduleId] = info;
-
+    scheduleInfo_[scheduleId] = scheduleInfo;
     return HDF_SUCCESS;
 }
 
-uint32_t ExecutorImpl::ScheduleMap::GetScheduleInfo(const uint64_t scheduleId, uint32_t &commandId,
-    sptr<HdiIExecutorCallback> &callback, uint64_t &templateId, std::vector<uint8_t> &algoParameter)
+uint32_t ExecutorImpl::ScheduleMap::UpdateScheduleInfo(const uint64_t scheduleId, uint64_t authExpiredSysTime)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
@@ -354,11 +391,19 @@ uint32_t ExecutorImpl::ScheduleMap::GetScheduleInfo(const uint64_t scheduleId, u
         IAM_LOGE("scheduleId is invalid");
         return HDF_FAILURE;
     }
-    commandId = scheduleInfo_[scheduleId].commandId;
-    callback = scheduleInfo_[scheduleId].callback;
-    templateId = scheduleInfo_[scheduleId].templateId;
-    algoParameter = scheduleInfo_[scheduleId].algoParameter;
+    scheduleInfo_[scheduleId].authExpiredSysTime = authExpiredSysTime;
+    return HDF_SUCCESS;
+}
 
+uint32_t ExecutorImpl::ScheduleMap::GetScheduleInfo(const uint64_t scheduleId, ScheduleInfo &scheduleInfo)
+{
+    IAM_LOGI("start");
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (scheduleInfo_.find(scheduleId) == scheduleInfo_.end()) {
+        IAM_LOGE("scheduleId is invalid");
+        return HDF_FAILURE;
+    }
+    scheduleInfo = scheduleInfo_[scheduleId];
     return HDF_SUCCESS;
 }
 
