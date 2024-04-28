@@ -19,6 +19,7 @@
 
 #include "securec.h"
 
+#include "attributes.h"
 #include "pin_auth_hdi.h"
 #include "executor_impl.h"
 
@@ -142,6 +143,33 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     templateIdList.push_back(1);
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_FAILURE);
+    delete impl;
+}
+
+/**
+ * @tc.name: Hdi_send_message test
+ * @tc.desc: verify Hdi_send_message
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(ExecutorImplTest, Hdi_Send_Message_test, TestSize.Level1)
+{
+    std::shared_ptr<PinAuth> pinHdi = std::make_shared<PinAuth>();
+    EXPECT_NE(pinHdi, nullptr);
+    pinHdi->Init();
+    ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
+    uint64_t scheduleId = 1;
+    int32_t srcRole = 1;
+    uint64_t authExpiredSysTime = 1;
+    std::vector<uint8_t> msg;
+    int32_t result = impl->SendMessage(scheduleId, srcRole, msg);
+    EXPECT_EQ(result, HDF_FAILURE);
+
+    Attributes attr = Attributes();
+    attr.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime);
+    msg = attr.Serialize();
+    result = impl->SendMessage(scheduleId, srcRole, msg);
+    EXPECT_EQ(result, HDF_SUCCESS);
     delete impl;
 }
 } // namespace PinAuth

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,22 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef IAM_ATTRIBUTES_TEST_H
+#define IAM_ATTRIBUTES_TEST_H
 
-#ifndef ADAPTOR_TIME_H
-#define ADAPTOR_TIME_H
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include <stdint.h>
+namespace OHOS {
+namespace HDI {
+namespace PinAuth {
+class AttributesTest : public testing::Test {
+public:
+    static void SetUpTestCase();
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+    static void TearDownTestCase();
 
-uint64_t GetSystemTime(void);
-uint64_t GetRtcTime(void);
-uint64_t GetReeTime(void);
+    void SetUp() override;
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+    void TearDown() override;
+};
+} // namespace PinAuth
+} // namespace HDI
+} // namespace OHOS
+#endif // IAM_ATTRIBUTES_TEST_H

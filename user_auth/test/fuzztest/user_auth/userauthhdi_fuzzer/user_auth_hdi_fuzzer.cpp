@@ -158,7 +158,7 @@ void FillFuzzAuthResultInfo(Parcel &parcel, AuthResultInfo &authResultInfo)
 
 void FillFuzzEnrolledState(Parcel &parcel, EnrolledState &enrolledState)
 {
-    enrolledState.credentialDigest = parcel.ReadUint16();
+    enrolledState.credentialDigest = parcel.ReadUint64();
     enrolledState.credentialCount = parcel.ReadUint16();
     IAM_LOGI("success");
 }
@@ -196,6 +196,13 @@ void FillFuzzEnrollParam(Parcel &parcel, EnrollParam &enrollParam)
     enrollParam.apiVersion = parcel.ReadInt32();
     enrollParam.userId = parcel.ReadInt32();
     enrollParam.userType = parcel.ReadInt32();
+    IAM_LOGI("success");
+}
+
+void FillFuzzGlobalConfigParam(Parcel &parcel, HdiGlobalConfigParam &configParam)
+{
+    configParam.value.pinExpiredPeriod = parcel.ReadUint64();
+    configParam.type = parcel.ReadUint32();
     IAM_LOGI("success");
 }
 
@@ -543,13 +550,22 @@ void FuzzGetSignedExecutorInfo(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzSetGlobalConfigParam(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    HdiGlobalConfigParam configParam;
+    g_service.FuzzSetGlobalConfigParam(configParam);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzInit);
 FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOpenSession, FuzzCloseSession,
     FuzzBeginEnrollment, FuzzUpdateEnrollmentResult, FuzzCancelEnrollment, FuzzDeleteCredential, FuzzGetCredential,
     FuzzGetSecureInfo, FuzzDeleteUser, FuzzEnforceDeleteUser, FuzzBeginAuthentication, FuzzUpdateAuthenticationResult,
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
     FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzGetEnrolledState, FuzzCheckReuseUnlockResult,
-    FuzzSendMessage, FuzzRegisterMessageCallback, FuzzGetLocalScheduleFromMessage, FuzzGetSignedExecutorInfo};
+    FuzzSendMessage, FuzzRegisterMessageCallback, FuzzGetLocalScheduleFromMessage, FuzzGetSignedExecutorInfo,
+    FuzzSetGlobalConfigParam};
 
 void UserAuthHdiFuzzTest(const uint8_t *data, size_t size)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,8 @@ typedef enum {
     AUTH_TIME_STAMP = 100031,
     /* root secret */
     AUTH_ROOT_SECRET = 100032,
+    /* pin expired sys time */
+    AUTH_EXPIRED_SYS_TIME = 100034,
 } AttributeKey;
 
 typedef void Attribute;

@@ -51,6 +51,8 @@ HWTEST_F(AdaptorTimeTest, Get_Time_test, TestSize.Level0)
     EXPECT_NE(result, 0);
     result = GetSystemTime();
     EXPECT_NE(result, 0);
+    result = GetReeTime();
+    EXPECT_NE(result, 0);
 }
 } // namespace UserAuth
 } // namespace UserIam
