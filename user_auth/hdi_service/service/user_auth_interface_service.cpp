@@ -20,6 +20,7 @@
 #include <hdf_base.h>
 #include "securec.h"
 #include <set>
+#include <string>
 
 #include "iam_logger.h"
 #include "iam_ptr.h"
@@ -45,6 +46,7 @@ namespace HDI {
 namespace UserAuth {
 namespace {
 static std::mutex g_mutex;
+static std::string g_deviceUdid;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
 enum UserAuthCallerType : int32_t {
@@ -66,12 +68,12 @@ extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
     return userAuthInterfaceService;
 }
 
-int32_t UserAuthInterfaceService::Init()
+int32_t UserAuthInterfaceService::Init(const std::string &deviceUdid)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
-    OHOS::UserIam::Common::Close();
-    return OHOS::UserIam::Common::Init();
+    g_deviceUdid = deviceUdid;
+    return HDF_SUCCESS;
 }
 
 static bool CopyScheduleInfo(const CoAuthSchedule *in, HdiScheduleInfo *out)
@@ -81,7 +83,7 @@ static bool CopyScheduleInfo(const CoAuthSchedule *in, HdiScheduleInfo *out)
         IAM_LOGE("executorSize is zero");
         return false;
     }
-    out->executors.clear();
+    out->executorIndexes.clear();
     out->templateIds.clear();
     out->scheduleId = in->scheduleId;
     out->authType = static_cast<AuthType>(in->authType);
@@ -91,25 +93,9 @@ static bool CopyScheduleInfo(const CoAuthSchedule *in, HdiScheduleInfo *out)
     out->executorMatcher = static_cast<uint32_t>(in->executors[0].executorMatcher);
     out->scheduleMode = static_cast<ScheduleMode>(in->scheduleMode);
     for (uint32_t i = 0; i < in->executorSize; ++i) {
-        HdiExecutorInfo temp = {};
-        temp.executorIndex = in->executors[i].executorIndex;
-        temp.info.authType = static_cast<AuthType>(in->executors[i].authType);
-        temp.info.executorRole = static_cast<ExecutorRole>(in->executors[i].executorRole);
-        temp.info.executorSensorHint = in->executors[i].executorSensorHint;
-        temp.info.executorMatcher = static_cast<uint32_t>(in->executors[i].executorMatcher);
-        temp.info.esl = static_cast<HdiExecutorSecureLevel>(in->executors[i].esl);
-        temp.info.publicKey.resize(PUBLIC_KEY_LEN);
-        if (memcpy_s(&temp.info.publicKey[0], temp.info.publicKey.size(),
-            in->executors[i].pubKey, PUBLIC_KEY_LEN) != EOK) {
-            IAM_LOGE("copy failed");
-            out->executors.clear();
-            out->templateIds.clear();
-            return false;
-        }
-        out->executors.push_back(temp);
+        out->executorIndexes.push_back(in->executors[i].executorIndex);
     }
     out->executorMessages.clear();
-    out->remoteMessage.clear();
     return true;
 }
 
@@ -1049,22 +1035,37 @@ int32_t UserAuthInterfaceService::RegisterMessageCallback(const sptr<IMessageCal
     return HDF_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::GetLocalScheduleFromMessage(const std::vector<uint8_t>& remoteDeviceId,
-    const std::vector<uint8_t>& message, HdiScheduleInfo& scheduleInfo)
+int32_t UserAuthInterfaceService::GetLocalScheduleFromMessage(const std::string& remoteUdid,
+    const std::vector<uint8_t>& message, HdiScheduleInfo &scheduleInfo)
 {
-    static_cast<void>(remoteDeviceId);
+    static_cast<void>(remoteUdid);
     static_cast<void>(message);
     static_cast<void>(scheduleInfo);
     return HDF_SUCCESS;
 }
 
 int32_t UserAuthInterfaceService::GetSignedExecutorInfo(const std::vector<int32_t>& authTypes, int32_t executorRole,
-    const std::vector<uint8_t>& remoteDeviceId, std::vector<uint8_t>& signedExecutorInfo)
+    const std::string& remoteUdid, std::vector<uint8_t>& signedExecutorInfo)
 {
     static_cast<void>(authTypes);
     static_cast<void>(executorRole);
-    static_cast<void>(remoteDeviceId);
+    static_cast<void>(remoteUdid);
     static_cast<void>(signedExecutorInfo);
+    return HDF_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::PrepareRemoteAuth(const std::string& remoteUdid)
+{
+    static_cast<void>(remoteUdid);
+    return HDF_SUCCESS;
+}
+
+int32_t UserAuthInterfaceService::GetAuthResultFromMessage(const std::string& remoteUdid,
+    const std::vector<uint8_t>& message, HdiAuthResultInfo &authResultInfo)
+{
+    static_cast<void>(remoteUdid);
+    static_cast<void>(message);
+    static_cast<void>(authResultInfo);
     return HDF_SUCCESS;
 }
 } // Userauth
