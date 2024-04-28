@@ -564,7 +564,7 @@ void DStreamOperator::GetCameraAttr(cJSON *rootValue, std::string formatStr, con
 }
 
 DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
-    const std::string &sourceAbilityInfo)
+    const std::string &sourceCodecInfo)
 {
     dhBase_ = dhBase;
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
@@ -573,7 +573,7 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    cJSON *srcRootValue = cJSON_Parse(sourceAbilityInfo.c_str());
+    cJSON *srcRootValue = cJSON_Parse(sourceCodecInfo.c_str());
     if (srcRootValue == nullptr || !cJSON_IsObject(srcRootValue)) {
         DHLOGE("Input source ablity info is not json object.");
         cJSON_Delete(rootValue);

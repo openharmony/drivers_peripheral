@@ -40,7 +40,7 @@ public:
     DMetadataProcessor& operator=(DMetadataProcessor &&other) = delete;
 
 public:
-    DCamRetCode InitDCameraAbility(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
+    DCamRetCode InitDCameraAbility(const std::string &sinkAbilityInfo);
     DCamRetCode GetDCameraAbility(std::shared_ptr<CameraAbility> &ability);
     DCamRetCode SetMetadataResultMode(const ResultCallbackMode &mode);
     DCamRetCode GetEnabledMetadataResults(std::vector<MetaType> &results);
@@ -54,7 +54,7 @@ public:
 
 private:
     DCamRetCode InitDCameraDefaultAbilityKeys(const std::string &sinkAbilityInfo);
-    DCamRetCode InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
+    DCamRetCode InitDCameraOutputAbilityKeys(const std::string &sinkAbilityInfo);
     DCamRetCode AddAbilityEntry(uint32_t tag, const void *data, size_t size);
     DCamRetCode UpdateAbilityEntry(uint32_t tag, const void *data, size_t size);
     void ConvertToCameraMetadata(common_metadata_header_t *&input,
@@ -64,33 +64,26 @@ private:
     void UpdateOnChanged(const uint64_t &resultTimestamp);
     uint32_t GetDataSize(uint32_t type);
     void* GetMetadataItemData(const camera_metadata_item_t &item);
-    std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo,
-        const bool isSink);
-    void ParsePhotoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
-        const bool isSink);
-    void ParsePreviewFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
-        const bool isSink);
-    void ParseVideoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats,
-        const bool isSink);
+    std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
+    void ParsePhotoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
+    void ParsePreviewFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
+    void ParseVideoFormats(cJSON* rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
     void InitDcameraBaseAbility();
     void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
-        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink);
+        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue);
     void GetNodeSupportedResolution(int format, const std::string rootNode,
-        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue, const bool isSink);
+        std::map<int, std::vector<DCResolution>>& supportedFormats, cJSON* rootValue);
     void SetFpsRanges();
-    void InitBasicConfigTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
-        std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs,
-        const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
-    void InitExtendConfigTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
-        std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkExtendStreamConfigs,
-        const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
+    void InitBasicConfigTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
+        std::vector<int32_t> &streamConfigs);
+    void InitExtendConfigTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
+        std::vector<int32_t> &extendStreamConfigs);
     void AddConfigs(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format,
         int32_t width, int32_t height, int32_t fps);
     void AddSrcConfigsToSinkOfExtendTag(std::vector<int32_t> &sinkExtendStreamConfigs, int32_t format);
-    void StoreSinkAndSrcConfig(int format, const std::string rootNode, const bool isSink,
-        std::vector<DCResolution> &resolutionVec);
-    void AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &sinkSupportedFormats,
-        std::map<int, std::vector<DCResolution>> &srcSupportedFormats, std::vector<int32_t> &sinkStreamConfigs);
+    void StoreSinkAndSrcConfig(int format, const std::string rootNode, std::vector<DCResolution> &resolutionVec);
+    void AddSrcConfigToSinkOfBasicTag(std::map<int, std::vector<DCResolution>> &supportedFormats,
+        std::vector<int32_t> &streamConfigs);
     cJSON* GetFormatObj(const std::string rootNode, cJSON* rootValue, std::string& formatStr);
     bool GetInfoFromJson(const std::string& sinkAbilityInfo);
 
