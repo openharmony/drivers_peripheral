@@ -56,7 +56,11 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
+#ifdef FASTER_RETRY_OF_SLEEP
+static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(100); // 100ms for phone and tablet
+#else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
+#endif
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
