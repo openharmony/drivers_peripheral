@@ -194,7 +194,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAddExecutor_002, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
     
     constexpr uint32_t publicKeySize = 32;
     ExecutorRegisterInfo info = {};
@@ -216,7 +217,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAddExecutor_003, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
     
     constexpr uint32_t publicKeySize = 32;
     ExecutorRegisterInfo info = {};
@@ -244,7 +246,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteExecutor_001, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t index1 = 1236584;
     constexpr uint64_t index2 = 9895255;
@@ -257,7 +260,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_001, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
     std::vector<uint8_t> authToken(10, 1);
@@ -272,7 +276,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_002, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
     std::vector<uint8_t> authToken;
@@ -287,7 +292,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_003, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
 
@@ -308,7 +314,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_004, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
 
@@ -330,7 +337,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_005, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
 
@@ -367,7 +375,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginEnrollment_006, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 123456;
     constexpr int32_t publicKeySize = 32;
@@ -408,7 +417,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_001, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> scheduleResult;
@@ -421,7 +431,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_002, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> scheduleResult(600000, 1);
@@ -434,7 +445,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_003, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> scheduleResult(100, 1);
@@ -447,7 +459,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_004, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> challenge;
@@ -465,7 +478,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_005, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> challenge;
@@ -502,7 +516,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateEnrollmentResult_006, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> challenge;
@@ -529,7 +544,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelEnrollment_001, TestSize.Level0
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     EXPECT_EQ(service->CancelEnrollment(userId), 0);
@@ -540,7 +556,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelEnrollment_002, TestSize.Level0
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 6978465;
     std::vector<uint8_t> challenge;
@@ -554,7 +571,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthentication_001, TestSize.Lev
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     constexpr uint32_t challengeSize = 100;
@@ -573,7 +591,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginAuthentication_002, TestSize.Lev
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     constexpr uint32_t challengeSize = 100;
@@ -592,7 +611,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_001, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     std::vector<uint8_t> scheduleResult;
@@ -607,7 +627,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_002, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     std::vector<uint8_t> scheduleResult(600000, 1);
@@ -622,7 +643,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_003, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     std::vector<uint8_t> scheduleResult;
@@ -638,7 +660,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateAuthenticationResult_004, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 314265;
     std::vector<uint8_t> challenge;
@@ -669,7 +692,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelAuthentication_001, TestSize.Le
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 256487;
     EXPECT_EQ(service->CancelAuthentication(contextId), 10006);
@@ -680,7 +704,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelAuthentication_002, TestSize.Le
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 314265;
     std::vector<uint8_t> challenge;
@@ -719,7 +744,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_001, TestSize.Lev
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 123456;
     AuthType authType = AuthType::PIN;
@@ -735,7 +761,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_002, TestSize.Lev
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 623159;
     AuthType authType = AuthType::FACE;
@@ -751,7 +778,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestBeginIdentification_003, TestSize.Lev
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     ExecutorRegisterInfo info = {};
     info.authType = AuthType::FACE;
@@ -778,7 +806,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_001, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 621327;
     std::vector<uint8_t> scheduleResult;
@@ -795,7 +824,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdateIdentificationResult_002, TestS
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 314265;
     std::vector<uint8_t> challenge;
@@ -846,7 +876,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelIdentification_001, TestSize.Le
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr uint64_t contextId = 653215;
     EXPECT_EQ(service->CancelIdentification(contextId), 10006);
@@ -857,7 +888,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCancelIdentification_002, TestSize.Le
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 314265;
     std::vector<uint8_t> challenge;
@@ -899,7 +931,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetCredential_001, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 635648;
     AuthType authType = AuthType::PIN;
@@ -914,7 +947,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetCredential_002, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 635648;
     AuthType authType = AuthType::PIN;
@@ -945,7 +979,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetUserInfo_001, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 635648;
     AuthType authType = AuthType::PIN;
@@ -978,7 +1013,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_001, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 321657;
     std::vector<uint8_t> authToken;
@@ -995,7 +1031,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestDeleteUser_002, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 321657;
     AuthType authType = AuthType::PIN;
@@ -1027,7 +1064,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnforceDeleteUser_001, TestSize.Level
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 635678;
     std::vector<CredentialInfo> deletedCredInfos;
@@ -1040,7 +1078,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnforceDeleteUser_002, TestSize.Level
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 635678;
     AuthType authType = AuthType::PIN;
@@ -1067,7 +1106,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_001, TestSize.Level
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 325614;
     AuthType authType = AuthType::PIN;
@@ -1080,7 +1120,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_002, TestSize.Level
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 325614;
     AuthType authType = AuthType::PIN;
@@ -1110,7 +1151,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestUpdatePin, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 325678;
     AuthType authType = AuthType::PIN;
@@ -1144,7 +1186,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnrollTwice, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 363156;
     AuthType authType = AuthType::PIN;
@@ -1177,7 +1220,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestInitTwice, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 368635;
     AuthType authType = AuthType::PIN;
@@ -1191,7 +1235,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestInitTwice, TestSize.Level0)
     DoOnceEnroll(service, userId, authType, authToken, enrollResultTest);
     EXPECT_EQ(enrollResultTest.result, 0);
 
-    EXPECT_EQ(service->Init(), 0);
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     std::vector<CredentialInfo> deletedCredInfos;
     EXPECT_EQ(service->EnforceDeleteUser(userId, deletedCredInfos), 0);
@@ -1205,7 +1249,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestAuthLock, TestSize.Level0)
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     constexpr int32_t userId = 365861;
     AuthType authType = AuthType::PIN;
@@ -1256,7 +1301,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestCheckReuseUnlockResult_001, TestSize.
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
 
-    EXPECT_EQ(service->Init(), 0);
+    const std::string deviceUdid = "12345678910";
+    EXPECT_EQ(service->Init(deviceUdid), 0);
 
     ReuseUnlockParam param;
     ReuseUnlockInfo info;
