@@ -18,6 +18,8 @@
 
 #include <cstdint>
 #include <cstddef>
+#include "v1_0/ichip_iface_callback.h"
+#include "v1_0/chip_types.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -25,6 +27,8 @@ extern "C"
 #endif
 
 #define IFNAMSIZ_WIFI 16
+#define ETH_ADDR_LEN 6
+#define BSS_STATUS_ASSOCIATED 1
 
 typedef unsigned char macAddr[6];
 
@@ -55,6 +59,17 @@ typedef enum {
     HAL_BUSY = -10
 } WifiError;
 
+enum Ieee80211Band {
+    IEEE80211_BAND_2GHZ,
+    IEEE80211_BAND_5GHZ,
+    IEEE80211_NUM_BANDS
+};
+
+typedef struct {
+    uint8_t associatedBssid[ETH_ADDR_LEN];
+    uint32_t associatedFreq;
+} AssociatedInfo;
+
 WifiError VendorHalInit(wifiHandle *handle);
 WifiError WaitDriverStart(void);
 
@@ -73,18 +88,40 @@ WifiError VendorHalSetRestartHandler(wifiHandle handle,
     VendorHalRestartHandler handler);
 
 typedef struct {
+    void (*onScanEvent) (int event);
+} WifiScanResHandler;
+
+typedef struct {
     WifiError (*vendorHalInit)(wifiHandle *);
     WifiError (*waitDriverStart)(void);
     void (*vendorHalExit)(wifiHandle, VendorHalExitHandler);
     void (*startHalLoop)(wifiHandle);
+    uint32_t (*wifiGetSupportedFeatureSet)(const char *);
+    WifiError (*wifiGetChipFeatureSet)(wifiHandle handle, uint64_t *set);
     WifiError (*vendorHalGetIfaces)(wifiHandle, int *, wifiInterfaceHandle **);
     WifiError (*vendorHalGetIfName)(wifiInterfaceHandle, char *name, size_t size);
-    WifiError (*vendorHalGetChannelsInBand)(wifiInterfaceHandle, int, int, int *, int *);
+    WifiError (*vendorHalGetChannelsInBand)(wifiInterfaceHandle, int, std::vector<uint32_t>&);
     WifiError (*vendorHalCreateIface)(wifiHandle handle, const char* ifname, HalIfaceType ifaceType);
     WifiError (*vendorHalDeleteIface)(wifiHandle handle, const char* ifname);
     WifiError (*vendorHalSetRestartHandler)(wifiHandle handle, VendorHalRestartHandler handler);
+    uint32_t (*getChipCaps)(const char *);
     WifiError (*vendorHalPreInit)(void);
     WifiError (*triggerVendorHalRestart)(wifiHandle handle);
+    WifiError (*wifiSetCountryCode)(wifiInterfaceHandle handle, const char *);
+    WifiError (*getPowerMode)(const char *, int *);
+    WifiError (*setPowerMode)(const char *, int);
+    WifiError (*wifiStartScan)(wifiInterfaceHandle handle,
+        const OHOS::HDI::Wlan::Chip::V1_0::ScanParams& scanParam);
+    WifiError (*wifiStartPnoScan)(wifiInterfaceHandle handle,
+        const OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams& pnoScanParam);
+    WifiError (*wifiStopPnoScan)(wifiInterfaceHandle handle);
+    WifiError (*getScanResults)(wifiInterfaceHandle handle,
+        std::vector<OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo>& mscanResults);
+    WifiError (*enablePowerMode)(const char *, int);
+    WifiError (*getSignalPollInfo)(wifiInterfaceHandle handle,
+        OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollResult);
+    WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
+    WifiError (*registerIfaceCallBack)(const char *, WifiScanResHandler);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);

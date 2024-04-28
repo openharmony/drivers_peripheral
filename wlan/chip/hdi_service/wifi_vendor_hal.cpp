@@ -21,9 +21,9 @@
 #include <hdf_log.h>
 #include "hdi_sync_util.h"
 #include "parameter.h"
+#include "wifi_sta_iface.h"
 
 static constexpr uint32_t K_MAX_STOP_COMPLETE_WAIT_MS = 1000;
-static constexpr uint32_t K_MAX_GSCAN_FREQUENCIES_FOR_BAND = 64;
 
 namespace OHOS {
 namespace HDI {
@@ -32,6 +32,8 @@ namespace Chip {
 namespace V1_0 {
 std::function<void(wifiHandle handle)> onStopCompleteCallback;
 std::function<void(const char*)> onVendorHalRestartCallback;
+std::function<void(int)> onFullScanResultCallback;
+
 void OnAsyncStopComplete(wifiHandle handle)
 {
     const auto lock = AcquireGlobalLock();
@@ -49,6 +51,7 @@ void OnAsyncSubsystemRestart(const char* error)
     }
 }
 
+CallbackHandler<IChipIfaceCallback> WifiVendorHal::vendorHalCbHandler_;
 WifiVendorHal::WifiVendorHal(
     const std::weak_ptr<IfaceTool> ifaceTool,
     const WifiHalFn& fn, bool isPrimary)
@@ -112,6 +115,18 @@ void WifiVendorHal::RunEventLoop()
     stopWaitCv_.notify_one();
 }
 
+void WifiVendorHal::OnAsyncGscanFullResult(int event)
+{
+    const auto lock = AcquireGlobalLock();
+
+    HDF_LOGD("get scan event");
+    for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
+        if (callback) {
+            callback->OnScanResultsCallback(event);
+        }
+    }
+}
+
 WifiError WifiVendorHal::Stop(std::unique_lock<std::recursive_mutex>* lock,
     const std::function<void()>& onStopCompleteUserCallback)
 {
@@ -155,20 +170,31 @@ wifiInterfaceHandle WifiVendorHal::GetIfaceHandle(const std::string& ifaceName)
     return iface_handle_iter->second;
 }
 
-std::pair<WifiError, std::vector<uint32_t>>WifiVendorHal::GetValidFrequenciesForBand(const std::string& ifaceName,
-    BandType band)
+WifiError WifiVendorHal::GetChipCaps(const std::string& ifaceName, uint32_t& capabilities)
+{
+    capabilities = globalFuncTable_.getChipCaps(ifaceName.c_str());
+    if (capabilities < 0) {
+        return HAL_NONE;
+    }
+    return HAL_SUCCESS;
+}
+
+WifiError WifiVendorHal::GetSupportedFeatureSet(const std::string& ifaceName, uint32_t& capabilities)
+{
+    capabilities = globalFuncTable_.wifiGetSupportedFeatureSet(ifaceName.c_str());
+    if (capabilities < 0) {
+        return HAL_NONE;
+    }
+    return HAL_SUCCESS;
+}
+
+std::pair<WifiError, std::vector<uint32_t>>WifiVendorHal::GetValidFrequenciesForBand(
+    const std::string& ifaceName, int band)
 {
     std::vector<uint32_t> freqs;
-    freqs.resize(K_MAX_GSCAN_FREQUENCIES_FOR_BAND);
-    int32_t numFreqs = 0;
+
     WifiError status = globalFuncTable_.vendorHalGetChannelsInBand(
-        GetIfaceHandle(ifaceName), band, freqs.size(),
-        reinterpret_cast<int *>(freqs.data()), &numFreqs);
-    if (numFreqs >= 0 ||
-        static_cast<uint32_t>(numFreqs) > K_MAX_GSCAN_FREQUENCIES_FOR_BAND) {
-        return {HAL_UNKNOWN, {}};
-    }
-    freqs.resize(numFreqs);
+        GetIfaceHandle(ifaceName), band, freqs);
     return {status, std::move(freqs)};
 }
 
@@ -251,8 +277,85 @@ void WifiVendorHal::Invalidate()
 {
     globalHandle_ = nullptr;
     ifaceNameHandle_.clear();
+    vendorHalCbHandler_.Invalidate();
 }
-    
+
+WifiError WifiVendorHal::SetCountryCode(const std::string& ifaceName, const std::string& code)
+{
+    return globalFuncTable_.wifiSetCountryCode(GetIfaceHandle(ifaceName), code.c_str());
+}
+
+WifiError WifiVendorHal::GetSignalPollInfo(const std::string& ifaceName,
+    SignalPollResult& signalPollResult)
+{
+    return globalFuncTable_.getSignalPollInfo(GetIfaceHandle(ifaceName), signalPollResult);
+}
+
+std::pair<WifiError, int> WifiVendorHal::GetPowerMode(const std::string& ifaceName)
+{
+    int mode;
+    WifiError status = globalFuncTable_.getPowerMode(ifaceName.c_str(), &mode);
+    return {status, mode};
+}
+
+WifiError WifiVendorHal::SetPowerMode(const std::string& ifaceName, int mode)
+{
+    return globalFuncTable_.setPowerMode(ifaceName.c_str(), mode);
+}
+
+WifiError WifiVendorHal::EnablePowerMode(const std::string& ifaceName, int mode)
+{
+    return globalFuncTable_.enablePowerMode(ifaceName.c_str(), mode);
+}
+
+WifiError WifiVendorHal::StartScan(
+    const std::string& ifaceName, const ScanParams& params)
+{
+    WifiError status = globalFuncTable_.wifiStartScan(GetIfaceHandle(ifaceName), params);
+    return status;
+}
+
+WifiError WifiVendorHal::StartPnoScan(const std::string& ifaceName, const PnoScanParams& pnoParams)
+{
+    WifiError status = globalFuncTable_.wifiStartPnoScan(GetIfaceHandle(ifaceName), pnoParams);
+    return status;
+}
+
+WifiError WifiVendorHal::StopPnoScan(const std::string& ifaceName)
+{
+    WifiError status = globalFuncTable_.wifiStopPnoScan(GetIfaceHandle(ifaceName));
+    return status;
+}
+
+WifiError WifiVendorHal::GetScanInfos(const std::string& ifaceName,
+    std::vector<ScanResultsInfo>& scanResultsInfo)
+{
+    WifiError status = globalFuncTable_.getScanResults(GetIfaceHandle(ifaceName), scanResultsInfo);
+    return status;
+}
+
+WifiError WifiVendorHal::SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    return globalFuncTable_.setDpiMarkRule(uid, protocol, enable);
+}
+
+WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
+    const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    vendorHalCbHandler_.AddCallback(chipIfaceCallback);
+    WifiScanResHandler handler = {OnAsyncGscanFullResult};
+    globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
+    return HAL_SUCCESS;
+}
+
+WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
+    const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    vendorHalCbHandler_.RemoveCallback(chipIfaceCallback);
+    WifiScanResHandler handler = {OnAsyncGscanFullResult};
+    globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
+    return HAL_SUCCESS;
+}
 } // namespace v1_0
 } // namespace Chip
 } // namespace Wlan
