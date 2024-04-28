@@ -86,7 +86,7 @@ void DStreamOperatorTest::TearDownTestCase(void)
 void DStreamOperatorTest::SetUp(void)
 {
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
-    dMetadataProcessor->InitDCameraAbility(TEST_ABILITY_VALUE, TEST_ABILITY_VALUE);
+    dMetadataProcessor->InitDCameraAbility(TEST_ABILITY_VALUE);
     dstreamOperator_ =  new (std::nothrow) DStreamOperator(dMetadataProcessor);
 }
 

@@ -31,9 +31,8 @@ void DstreamDetachBufferQueueFuzzTest(const uint8_t* data, size_t size)
     int32_t streamId = *(reinterpret_cast<const int*>(data));
 
     std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
-    std::string srcAbilityInfo(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor = std::make_shared<DMetadataProcessor>();
-    dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo, srcAbilityInfo);
+    dMetadataProcessor->InitDCameraAbility(sinkAbilityInfo);
     OHOS::sptr<DStreamOperator> dCameraStreamOperator(new (std::nothrow) DStreamOperator(dMetadataProcessor));
 
     dCameraStreamOperator->DetachBufferQueue(streamId);

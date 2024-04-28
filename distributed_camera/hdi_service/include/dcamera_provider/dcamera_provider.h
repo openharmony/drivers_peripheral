@@ -59,7 +59,7 @@ private:
     sptr<IDCameraProviderCallback> GetCallbackBydhBase(const DHBase &dhBase);
     OHOS::sptr<DCameraDevice> GetDCameraDevice(const DHBase &dhBase);
     bool GetAbilityInfo(const std::string& abilityInfo, std::string& sinkAbilityInfo,
-        std::string& sourceAbilityInfo);
+        std::string& sourceCodecInfo);
 
 private:
     class AutoRelease {
