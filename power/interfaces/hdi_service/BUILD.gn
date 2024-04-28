@@ -40,6 +40,8 @@ ohos_shared_library("libpower_interface_service_1.1") {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
 
+  defines = []
+
   if (drivers_peripheral_power_wakeup_cause_path) {
     sources += [ "src/power_config.cpp" ]
 
@@ -49,7 +51,11 @@ ohos_shared_library("libpower_interface_service_1.1") {
       external_deps += [ "config_policy:configpolicy_util" ]
     }
 
-    defines = [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+    defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
+  }
+
+  if (faster_retry_of_sleep) {
+    defines += [ "FASTER_RETRY_OF_SLEEP" ]
   }
 
   install_images = [ chipset_base_dir ]
