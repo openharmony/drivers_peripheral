@@ -23,7 +23,7 @@ ohos_shared_library("libril_service_1.3") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_power:libpower_proxy_1.1",
+      "drivers_interface_power:libpower_proxy_1.2",
       "drivers_interface_ril:ril_idl_headers_1.3",
       "hdf_core:libhdf_ipc_adapter",
       "hilog:libhilog",
