@@ -39,6 +39,7 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
   ]
 
   sources = [
+    "../../../../common/utils/attributes.cpp",
     "../../../../hdi_service/adaptor/src/adaptor_algorithm.c",
     "../../../../hdi_service/adaptor/src/adaptor_file.c",
     "../../../../hdi_service/adaptor/src/adaptor_memory.c",
