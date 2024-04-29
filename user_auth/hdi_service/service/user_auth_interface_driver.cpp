@@ -105,11 +105,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     deviceObject->service = &hdfUserAuthInterfaceHost->ioService;
-
-    int32_t ret = OHOS::UserIam::Common::Init();
-    if (ret != HDF_SUCCESS) {
-        IAM_LOGE("init fail");
-    }
+    static_cast<void>(serviceImpl->Init(""));
     return HDF_SUCCESS;
 }
 

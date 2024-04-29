@@ -52,10 +52,14 @@ ohos_unittest("PinAuthHdiUtTest") {
     "database/src/pin_db_test.cpp",
     "main/src/pin_auth_test.cpp",
     "main/src/pin_func_test.cpp",
+    "service/src/attributes_test.cpp",
     "service/src/executor_impl_test.cpp",
   ]
 
-  deps = [ "../../../hdi_service:libpin_auth_interface_service_2.0" ]
+  deps = [
+    "../../../hdi_service:libpin_auth_interface_service_2.0",
+    "//third_party/googletest:gmock",
+  ]
 
   external_deps = [
     "c_utils:utils",

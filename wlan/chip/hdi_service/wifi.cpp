@@ -81,7 +81,7 @@ int32_t Wifi::Init()
     if (runState_ == RunState::STARTED) {
         return HDF_SUCCESS;
     } else if (runState_ == RunState::STOPPING) {
-        return HDF_SUCCESS;
+        return HDF_FAILURE;
     }
     ErrorCode res = InitializVendorHal();
     if (res == ErrorCode::SUCCESS) {
@@ -97,6 +97,7 @@ int32_t Wifi::Init()
         for (auto& hal : vendorHals_) {
             chips_.push_back(new WifiChip(
                 chipId, chipId == K_PRIMARY_CHIP_ID, hal,
+                std::make_shared<IfaceUtil>(ifaceTool_),
                 chipModes_, onVendorHalRestartCallback));
             chipId++;
         }

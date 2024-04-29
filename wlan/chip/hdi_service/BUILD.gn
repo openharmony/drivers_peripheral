@@ -19,7 +19,8 @@ ohos_shared_library("libchip_controller_chip_interface_service_1.0") {
 
   sources = [
     "hdi_sync_util.cpp",
-    "interface_tool.cpp",
+    "iface_tool.cpp",
+    "iface_util.cpp",
     "wifi.cpp",
     "wifi_ap_iface.cpp",
     "wifi_chip.cpp",
