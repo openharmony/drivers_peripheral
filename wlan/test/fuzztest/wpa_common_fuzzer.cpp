@@ -808,11 +808,28 @@ void FuzzWpaInterfaceP2pConnect(struct IWpaInterface *interface, const uint8_t *
 
 void FuzzWpaInterfaceP2pHid2dConnect(struct IWpaInterface *interface, const uint8_t *rawData)
 {
+    const int macAddrIndexOne = 0;
+    const int macAddrIndexTwo = 1;
+    const int macAddrIndexThree = 2;
+    const int macAddrIndexFour = 3;
+    const int macAddrIndexFive = 4;
+    const int macAddrIndexSix = 5;
     const char *ifName = reinterpret_cast<const char *>(rawData);
     struct HdiHid2dConnectInfo info;
     (void)memset_s(&info, sizeof(struct HdiHid2dConnectInfo), 0, sizeof(struct HdiHid2dConnectInfo));
-
+    info.bssidLen = ETH_ADDR_LEN;
+    info.bssid = static_cast<uint8_t *>(OsalMemCalloc(sizeof(uint8_t) * (info.bssidLen)));
+    if (info.bssid == nullptr) {
+        return;
+    }
+    info.bssid[macAddrIndexOne] = 0x00;
+    info.bssid[macAddrIndexTwo] = 0x00;
+    info.bssid[macAddrIndexThree] = 0x00;
+    info.bssid[macAddrIndexFour] = 0x00;
+    info.bssid[macAddrIndexFive] = 0x00;
+    info.bssid[macAddrIndexSix] = 0x00;
     interface->P2pHid2dConnect(interface, ifName, &info);
+    OsalMemFree(info.bssid);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
