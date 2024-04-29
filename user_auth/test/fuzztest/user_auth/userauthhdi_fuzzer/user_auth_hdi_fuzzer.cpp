@@ -554,7 +554,7 @@ void FuzzSetGlobalConfigParam(Parcel &parcel)
 {
     IAM_LOGI("begin");
     HdiGlobalConfigParam configParam;
-    g_service.FuzzSetGlobalConfigParam(configParam);
+    g_service.SetGlobalConfigParam(configParam);
     IAM_LOGI("end");
 }
 
