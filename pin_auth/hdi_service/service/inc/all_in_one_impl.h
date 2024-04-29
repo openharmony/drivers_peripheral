@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
-#define OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
+#ifndef OHOS_HDI_PIN_AUTH_ALL_IN_ONE_IMPL_H
+#define OHOS_HDI_PIN_AUTH_ALL_IN_ONE_IMPL_H
 
-#include <map>
+#include <list>
 #include <mutex>
-#include <set>
 #include <vector>
 
 #include "nocopyable.h"
@@ -30,10 +29,10 @@
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-class ExecutorImpl : public HdiIExecutor, public NoCopyable {
+class AllInOneImpl : public HdiIAllInOneExecutor, public NoCopyable {
 public:
-    explicit ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
-    ~ExecutorImpl() override;
+    explicit AllInOneImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
+    ~AllInOneImpl() override;
 
     int32_t GetExecutorInfo(HdiExecutorInfo &info) override;
     int32_t OnRegisterFinish(const std::vector<uint64_t> &templateIdList,
@@ -51,40 +50,40 @@ public:
         HdiProperty &property) override;
 
 private:
-    class ScheduleMap {
-    public:
-        struct ScheduleInfo {
-            uint32_t commandId;
-            sptr<HdiIExecutorCallback> callback;
-            uint64_t templateId;
-            std::vector<uint8_t> algoParameter;
-            uint64_t authExpiredSysTime;
-        };
-        uint32_t AddScheduleInfo(const uint64_t scheduleId, const ScheduleInfo &scheduleInfo);
-        uint32_t GetScheduleInfo(const uint64_t scheduleId, ScheduleInfo &scheduleInfo);
-        uint32_t UpdateScheduleInfo(const uint64_t scheduleId, uint64_t authExpiredSysTime);
-        uint32_t DeleteScheduleId(const uint64_t scheduleId);
+    struct ScheduleInfo {
+        uint64_t scheduleId{0};
+        uint32_t commandId{0};
+        sptr<HdiIExecutorCallback> callback;
+        uint64_t templateId{0};
+        std::vector<uint8_t> algoParameter;
+        uint64_t authExpiredSysTime;
+    };
 
+    class ScheduleList {
+    public:
+        bool AddScheduleInfo(const ScheduleInfo &scheduleInfo);
+        bool GetAndDelScheduleInfo(uint64_t scheduleId, ScheduleInfo &scheduleInfo);
+        void UpdateScheduleInfo(uint64_t scheduleId, uint64_t authExpiredSysTime);
+        void DelScheduleInfo(uint64_t scheduleId);
     private:
         std::mutex mutex_;
-        std::map<uint64_t, struct ScheduleInfo> scheduleInfo_;
+        std::list<struct ScheduleInfo> scheduleInfoList_;
     };
 
 private:
-    void CallError(const sptr<HdiIExecutorCallback> &callbackObj, uint32_t errorCode);
     int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, uint64_t authExpiredSysTime,
         const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv);
     int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
         const sptr<HdiIExecutorCallback> &callbackObj, uint64_t authExpiredSysTime);
     int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
-    int32_t GetAuthDataFromExtraInfo(const std::vector<uint8_t> &extraInfo, uint64_t &authExpiredSysTime);
+
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
-    ScheduleMap scheduleMap_;
+    ScheduleList scheduleList_;
     OHOS::ThreadPool threadPool_;
 };
 } // PinAuth
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
+#endif // OHOS_HDI_PIN_AUTH_ALL_IN_ONE_IMPL_H

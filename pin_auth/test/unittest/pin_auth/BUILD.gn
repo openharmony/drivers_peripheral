@@ -45,15 +45,16 @@ ohos_unittest("PinAuthHdiUtTest") {
     "adaptor/src/adaptor_memory_test.cpp",
     "adaptor/src/adaptor_time_test.cpp",
     "common/src/buffer_test.cpp",
+    "common/src/common_impl.c",
     "database/src/pin_db_ops_base_test.cpp",
     "database/src/pin_db_ops_test.cpp",
     "database/src/pin_db_ops_v0_test.cpp",
     "database/src/pin_db_ops_v1_test.cpp",
     "database/src/pin_db_test.cpp",
+    "main/src/all_in_one_func_test.cpp",
     "main/src/pin_auth_test.cpp",
-    "main/src/pin_func_test.cpp",
+    "service/src/all_in_one_impl_test.cpp",
     "service/src/attributes_test.cpp",
-    "service/src/executor_impl_test.cpp",
   ]
 
   deps = [
