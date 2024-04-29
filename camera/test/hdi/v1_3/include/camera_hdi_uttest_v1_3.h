@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_HDI_UTTEST_V1_2_H
-#define CAMERA_HDI_UTTEST_V1_2_H
+#ifndef CAMERA_HDI_UTTEST_V1_3_H
+#define CAMERA_HDI_UTTEST_V1_3_H
 
 #include "hdi_common_v1_3.h"
 
