@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace UserIam {
 namespace PinAuth {
-class ExecutorImplTest : public testing::Test {
+class AllInOneImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
 

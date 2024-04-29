@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#include "executor_impl_test.h"
+#include "all_in_one_impl_test.h"
 
 #include <gtest/gtest.h>
 
 #include "securec.h"
 
 #include "attributes.h"
+#include "all_in_one_impl.h"
+#include "common_impl.h"
 #include "pin_auth_hdi.h"
-#include "executor_impl.h"
 
 namespace OHOS {
 namespace UserIam {
@@ -30,19 +31,19 @@ using namespace testing;
 using namespace testing::ext;
 using namespace HDI::PinAuth;
 
-void ExecutorImplTest::SetUpTestCase()
+void AllInOneImplTest::SetUpTestCase()
 {
 }
 
-void ExecutorImplTest::TearDownTestCase()
+void AllInOneImplTest::TearDownTestCase()
 {
 }
 
-void ExecutorImplTest::SetUp()
+void AllInOneImplTest::SetUp()
 {
 }
 
-void ExecutorImplTest::TearDown()
+void AllInOneImplTest::TearDown()
 {
 }
 
@@ -52,9 +53,9 @@ void ExecutorImplTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
+HWTEST_F(AllInOneImplTest, Hdi_is_nullptr_test, TestSize.Level1)
 {
-    ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(nullptr);
+    AllInOneImpl *impl = new (std::nothrow) AllInOneImpl(nullptr);
     HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_FAILURE);
@@ -99,19 +100,22 @@ HWTEST_F(ExecutorImplTest, Hdi_is_nullptr_test, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
+HWTEST_F(AllInOneImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
 {
     std::shared_ptr<PinAuth> pinHdi = std::make_shared<PinAuth>();
     EXPECT_NE(pinHdi, nullptr);
     pinHdi->Init();
-    ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
+    AllInOneImpl *impl = new (std::nothrow) AllInOneImpl(pinHdi);
     HdiExecutorInfo info = {};
     int32_t result = impl->GetExecutorInfo(info);
     EXPECT_EQ(result, HDF_SUCCESS);
 
+    KeyPair *keyPair = GenerateEd25519KeyPair();
+    ASSERT_NE(keyPair, nullptr);
+
     uint64_t templateId = 0;
     std::vector<uint64_t> templateIdList;
-    std::vector<uint8_t> frameworkPublicKey;
+    std::vector<uint8_t> frameworkPublicKey(keyPair->pubKey->buf, keyPair->pubKey->buf + keyPair->pubKey->contentSize);
     std::vector<uint8_t> extraInfo;
     result = impl->OnRegisterFinish(templateIdList, frameworkPublicKey, extraInfo);
     EXPECT_EQ(result, HDF_SUCCESS);
@@ -120,6 +124,11 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     result = impl->Enroll(scheduleId, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
+    uint8_t challenge[32] = {0};
+    Buffer *fwkExtraInfo = GetAuthFwkExtraInfo(scheduleId, keyPair, challenge, 32);
+    ASSERT_NE(fwkExtraInfo, nullptr);
+
+    std::vector<uint8_t> authExtraInfo(fwkExtraInfo->buf, fwkExtraInfo->buf + fwkExtraInfo->contentSize);
     result = impl->Authenticate(scheduleId, templateIdList, extraInfo, nullptr);
     EXPECT_EQ(result, HDF_ERR_INVALID_PARAM);
 
@@ -130,7 +139,7 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Delete(templateId);
-    EXPECT_EQ(result, 2);
+    EXPECT_EQ(result, HDF_FAILURE);
 
     result = impl->Cancel(scheduleId);
     EXPECT_EQ(result, HDF_FAILURE);
@@ -144,6 +153,8 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     result = impl->GetProperty(templateIdList, propertyTypes, property);
     EXPECT_EQ(result, HDF_FAILURE);
     delete impl;
+    DestroyKeyPair(keyPair);
+    DestroyBuffer(fwkExtraInfo);
 }
 
 /**
@@ -152,18 +163,18 @@ HWTEST_F(ExecutorImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(ExecutorImplTest, Hdi_Send_Message_test, TestSize.Level1)
+HWTEST_F(AllInOneImplTest, Hdi_Send_Message_test, TestSize.Level1)
 {
     std::shared_ptr<PinAuth> pinHdi = std::make_shared<PinAuth>();
     EXPECT_NE(pinHdi, nullptr);
     pinHdi->Init();
-    ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
+    AllInOneImpl *impl = new (std::nothrow) AllInOneImpl(pinHdi);
     uint64_t scheduleId = 1;
-    int32_t srcRole = 1;
+    int32_t srcRole = 0;
     uint64_t authExpiredSysTime = 1;
     std::vector<uint8_t> msg;
     int32_t result = impl->SendMessage(scheduleId, srcRole, msg);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_SUCCESS);
 
     Attributes attr = Attributes();
     attr.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime);

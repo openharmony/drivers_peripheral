@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "pin_func_test.h"
+#include "all_in_one_func_test.h"
 
 #include <gtest/gtest.h>
 
-#include "pin_func.h"
+#include "all_in_one_func.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -26,19 +26,19 @@ namespace PinAuth {
 using namespace testing;
 using namespace testing::ext;
 
-void PinFuncTest::SetUpTestCase()
+void AllInOneFuncTest::SetUpTestCase()
 {
 }
 
-void PinFuncTest::TearDownTestCase()
+void AllInOneFuncTest::TearDownTestCase()
 {
 }
 
-void PinFuncTest::SetUp()
+void AllInOneFuncTest::SetUp()
 {
 }
 
-void PinFuncTest::TearDown()
+void AllInOneFuncTest::TearDown()
 {
 }
 
@@ -48,7 +48,7 @@ void PinFuncTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, DoEnrollPin_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoEnrollPin_test, TestSize.Level1)
 {
     PinEnrollParam *pinEnrollParam = new (std::nothrow) PinEnrollParam();
     EXPECT_NE(pinEnrollParam, nullptr);
@@ -69,7 +69,7 @@ HWTEST_F(PinFuncTest, DoEnrollPin_test, TestSize.Level1)
     result = DoEnrollPin(pinEnrollParam, retTlv);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
     delete pinEnrollParam;
-    DestoryBuffer(retTlv);
+    DestroyBuffer(retTlv);
 }
 
 /**
@@ -78,7 +78,7 @@ HWTEST_F(PinFuncTest, DoEnrollPin_test, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, DoAuthPin_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoAuthPin_test, TestSize.Level1)
 {
     PinAuthParam *pinAuthParam = new (std::nothrow) PinAuthParam();
     EXPECT_NE(pinAuthParam, nullptr);
@@ -102,7 +102,7 @@ HWTEST_F(PinFuncTest, DoAuthPin_test, TestSize.Level1)
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     delete pinAuthParam;
-    DestoryBuffer(retTlv);
+    DestroyBuffer(retTlv);
 }
 
 /**
@@ -111,7 +111,7 @@ HWTEST_F(PinFuncTest, DoAuthPin_test, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, DoQueryPinInfo_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoQueryPinInfo_test, TestSize.Level1)
 {
     PinCredentialInfos *pinCredentialInfo = new (std::nothrow) PinCredentialInfos();
     EXPECT_NE(pinCredentialInfo, nullptr);
@@ -133,52 +133,46 @@ HWTEST_F(PinFuncTest, DoQueryPinInfo_test, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, DoDeleteTemplate_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoDeleteTemplate_test, TestSize.Level1)
 {
     uint32_t result = DoDeleteTemplate(INVALID_TEMPLATE_ID);
     EXPECT_EQ(result, RESULT_BAD_DEL);
 }
 
 /**
- * @tc.name: GenerateRetTlv test
- * @tc.desc: verify GenerateRetTlv
+ * @tc.name: DoGetAllInOneExecutorInfo test
+ * @tc.desc: verify DoGetAllInOneExecutorInfo
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, GenerateRetTlv_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoGetExecutorInfo_test, TestSize.Level1)
 {
-    Buffer *rootSecret = CreateBufferBySize(ROOT_SECRET_LEN);
-    EXPECT_NE(rootSecret, nullptr);
-    uint32_t result =GenerateRetTlv(0, 1, 2, nullptr, rootSecret);
+    uint32_t result = DoGetAllInOneExecutorInfo(nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 }
 
 /**
- * @tc.name: DoGetExecutorInfo test
- * @tc.desc: verify DoGetExecutorInfo
+ * @tc.name: DoSetAllInOneFwkParam test
+ * @tc.desc: verify DoSetAllInOneFwkParam
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinFuncTest, DoGetExecutorInfo_test, TestSize.Level1)
-{
-    uint32_t result = DoGetExecutorInfo(nullptr);
-    EXPECT_EQ(result, RESULT_BAD_PARAM);
-}
-
-/**
- * @tc.name: DoVerifyTemplateData test
- * @tc.desc: verify DoVerifyTemplateData
- * @tc.type: FUNC
- * @tc.require: #I64XCB
- */
-HWTEST_F(PinFuncTest, DoVerifyTemplateData_test, TestSize.Level1)
+HWTEST_F(AllInOneFuncTest, DoSetAllInOneFwkParam_test, TestSize.Level1)
 {
     std::vector<uint64_t> templateIdList = {1, 0};
     uint32_t templateIdListLen = 2;
-    uint32_t result = DoVerifyTemplateData(nullptr, templateIdListLen);
+    std::vector<uint8_t> fwkPubKey(32, 0);
+    uint32_t fwkPubKeyLen = 32;
+    ResultCode result = DoSetAllInOneFwkParam(nullptr, templateIdListLen, nullptr, 0);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = DoVerifyTemplateData(&templateIdList[0], templateIdListLen);
+    result = DoSetAllInOneFwkParam(templateIdList.data(), templateIdListLen, nullptr, 0);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = DoSetAllInOneFwkParam(templateIdList.data(), templateIdListLen, fwkPubKey.data(), 0);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = DoSetAllInOneFwkParam(templateIdList.data(), templateIdListLen, fwkPubKey.data(), fwkPubKeyLen);
     EXPECT_EQ(result, RESULT_SUCCESS);
 }
 } // namespace PinAuth

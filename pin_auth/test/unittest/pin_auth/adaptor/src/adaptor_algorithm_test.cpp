@@ -49,7 +49,7 @@ void AdaptorAlgorithmTest::TearDown()
  */
 HWTEST_F(AdaptorAlgorithmTest, KeyPair_Test, TestSize.Level1)
 {
-    DestoryKeyPair(nullptr);
+    DestroyKeyPair(nullptr);
 
     std::vector<uint8_t> dataTest(32, 1);
     Buffer *data = CreateBufferByData(&dataTest[0], 32);
@@ -60,7 +60,7 @@ HWTEST_F(AdaptorAlgorithmTest, KeyPair_Test, TestSize.Level1)
     EXPECT_NE(keyPair2.priKey, nullptr);
     bool result = IsEd25519KeyPairValid(&keyPair2);
     EXPECT_EQ(result, false);
-    DestoryBuffer(keyPair2.priKey);
+    DestroyBuffer(keyPair2.priKey);
 
     KeyPair keyPair3 = {};
     keyPair3.priKey = nullptr;
@@ -68,14 +68,14 @@ HWTEST_F(AdaptorAlgorithmTest, KeyPair_Test, TestSize.Level1)
     EXPECT_NE(keyPair3.pubKey, nullptr);
     result = IsEd25519KeyPairValid(&keyPair3);
     EXPECT_EQ(result, false);
-    DestoryBuffer(keyPair3.pubKey);
-    DestoryBuffer(data);
+    DestroyBuffer(keyPair3.pubKey);
+    DestroyBuffer(data);
 
     KeyPair *keyPair4 = GenerateEd25519KeyPair();
     EXPECT_NE(keyPair4, nullptr);
     result = IsEd25519KeyPairValid(keyPair4);
     EXPECT_EQ(result, true);
-    DestoryKeyPair(keyPair4);
+    DestroyKeyPair(keyPair4);
 }
 
 /**
@@ -106,9 +106,9 @@ HWTEST_F(AdaptorAlgorithmTest, Ed25519Sign_Test, TestSize.Level1)
     result = Ed25519Sign(keyPair, data, &signContent);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    DestoryBuffer(signContent);
-    DestoryKeyPair(keyPair);
-    DestoryBuffer(data);
+    DestroyBuffer(signContent);
+    DestroyKeyPair(keyPair);
+    DestroyBuffer(data);
 }
 
 /**
@@ -144,9 +144,9 @@ HWTEST_F(AdaptorAlgorithmTest, Ed25519Verify_Test, TestSize.Level1)
     result = Ed25519Verify(keyPair->pubKey, data, signContent);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    DestoryBuffer(signContent);
-    DestoryKeyPair(keyPair);
-    DestoryBuffer(data);
+    DestroyBuffer(signContent);
+    DestroyKeyPair(keyPair);
+    DestroyBuffer(data);
 }
 
 /**
@@ -157,9 +157,8 @@ HWTEST_F(AdaptorAlgorithmTest, Ed25519Verify_Test, TestSize.Level1)
  */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode1, TestSize.Level1)
 {
-    Buffer *cipherInfo = Aes256GcmEncryptNoPadding(nullptr, nullptr);
-    EXPECT_EQ(cipherInfo, nullptr);
-    DestoryBuffer(cipherInfo);
+    int32_t result = AesGcm256Encrypt(nullptr, nullptr, nullptr, nullptr);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
 }
 
 /**
@@ -172,13 +171,20 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode2, TestSize.Level1)
 {
     Buffer *plaintext = CreateBufferBySize(20);
     ASSERT_NE(plaintext, nullptr);
-    Buffer *key = CreateBufferBySize(10);
-    ASSERT_NE(key, nullptr);
-    Buffer *cipherInfo = Aes256GcmEncryptNoPadding(plaintext, key);
-    EXPECT_EQ(cipherInfo, nullptr);
-    DestoryBuffer(plaintext);
-    DestoryBuffer(key);
-    DestoryBuffer(cipherInfo);
+    int32_t result = AesGcm256Encrypt(plaintext, nullptr, nullptr, nullptr);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+    DestroyBuffer(plaintext);
+}
+
+static Buffer *RandomBuffer(uint32_t size)
+{
+    Buffer *buffer = CreateBufferBySize(size);
+    if (buffer == NULL) {
+        return buffer;
+    }
+    (void)SecureRandom(buffer->buf, buffer->maxSize);
+    buffer->contentSize = buffer->maxSize;
+    return buffer;
 }
 
 /**
@@ -189,24 +195,31 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode2, TestSize.Level1)
  */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesValid, TestSize.Level1)
 {
-    Buffer *plaintext1 = CreateBufferBySize(64);
+    Buffer *plaintext1 = RandomBuffer(64);
     ASSERT_NE(plaintext1, nullptr);
-    (void)SecureRandom(plaintext1->buf, plaintext1->maxSize);
-    plaintext1->contentSize = plaintext1->maxSize;
-    Buffer *key = CreateBufferBySize(AES256_KEY_SIZE);
-    ASSERT_NE(key, nullptr);
-    (void)SecureRandom(key->buf, key->maxSize);
-    key->contentSize = key->maxSize;
-    Buffer *cipherInfo = Aes256GcmEncryptNoPadding(plaintext1, key);
-    ASSERT_NE(cipherInfo, nullptr);
-    Buffer *plaintext2 = Aes256GcmDecryptNoPadding(cipherInfo, key);
-    ASSERT_NE(plaintext2, nullptr);
+    AesGcmParam param = {};
+    param.key = RandomBuffer(AES_GCM_256_KEY_SIZE);
+    ASSERT_NE(param.key, nullptr);
+    param.iv = RandomBuffer(AES_GCM_256_IV_SIZE);
+    ASSERT_NE(param.iv, nullptr);
+    Buffer *cipherText = NULL;
+    Buffer *tag = NULL;
+    int32_t result = AesGcm256Encrypt(plaintext1, &param, &cipherText, &tag);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
+    Buffer *plaintext2 = NULL;
+    result = AesGcm256Decrypt(cipherText, &param, tag, &plaintext2);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
     bool isSame = CompareBuffer(plaintext1, plaintext2);
     EXPECT_EQ(isSame, true);
-    DestoryBuffer(plaintext1);
-    DestoryBuffer(plaintext2);
-    DestoryBuffer(key);
-    DestoryBuffer(cipherInfo);
+
+    DestroyBuffer(plaintext1);
+    DestroyBuffer(param.key);
+    DestroyBuffer(param.iv);
+    DestroyBuffer(cipherText);
+    DestroyBuffer(tag);
+    DestroyBuffer(plaintext2);
 }
 
 /**
@@ -229,9 +242,9 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmDeriveDeviceKey, TestSize.Level1)
     Buffer *key = DeriveDeviceKey(pinData, secret);
     ASSERT_NE(key, nullptr);
     EXPECT_EQ(key->contentSize, SHA256_DIGEST_SIZE);
-    DestoryBuffer(key);
-    DestoryBuffer(pinData);
-    DestoryBuffer(secret);
+    DestroyBuffer(key);
+    DestroyBuffer(pinData);
+    DestroyBuffer(secret);
 }
 
 /**
@@ -246,16 +259,16 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmHkdf, TestSize.Level1)
     ASSERT_NE(salt, nullptr);
     (void)SecureRandom(salt->buf, salt->maxSize);
     salt->contentSize = salt->maxSize;
-    Buffer *rootKey = CreateBufferBySize(AES256_KEY_SIZE);
+    Buffer *rootKey = CreateBufferBySize(AES_GCM_256_KEY_SIZE);
     ASSERT_NE(rootKey, nullptr);
     (void)SecureRandom(rootKey->buf, rootKey->maxSize);
     rootKey->contentSize = rootKey->maxSize;
     Buffer *key = Hkdf(salt, rootKey);
     ASSERT_NE(key, nullptr);
     EXPECT_EQ(key->contentSize, SHA256_DIGEST_SIZE);
-    DestoryBuffer(salt);
-    DestoryBuffer(rootKey);
-    DestoryBuffer(key);
+    DestroyBuffer(salt);
+    DestroyBuffer(rootKey);
+    DestroyBuffer(key);
 }
 
 /**
@@ -273,8 +286,8 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmSha256, TestSize.Level1)
     Buffer *key = Sha256Adaptor(data);
     ASSERT_NE(key, nullptr);
     EXPECT_EQ(key->contentSize, SHA256_DIGEST_SIZE);
-    DestoryBuffer(data);
-    DestoryBuffer(key);
+    DestroyBuffer(data);
+    DestroyBuffer(key);
 }
 } // namespace PinAuth
 } // namespace UserIam

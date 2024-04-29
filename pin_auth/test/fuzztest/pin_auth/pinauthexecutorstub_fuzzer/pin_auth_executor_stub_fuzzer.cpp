@@ -17,7 +17,7 @@
 #include "parcel.h"
 #include "iam_logger.h"
 #include "pin_auth_hdi.h"
-#include "executor_impl.h"
+#include "all_in_one_impl.h"
 #include "v2_0/all_in_one_executor_service.h"
 #include "v2_0/all_in_one_executor_stub.h"
 
@@ -43,7 +43,7 @@ bool PinAuthExecutorStubFuzzTest(const uint8_t *rawData, size_t size)
         return false;
     }
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi = std::make_shared<OHOS::UserIam::PinAuth::PinAuth>();
-    ExecutorImpl *impl = new (std::nothrow) ExecutorImpl(pinHdi);
+    AllInOneImpl *impl = new (std::nothrow) AllInOneImpl(pinHdi);
     if (impl == nullptr) {
         IAM_LOGE("%{public}s:get serviceImpl failed.", __func__);
         return false;

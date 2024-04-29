@@ -49,8 +49,7 @@ HWTEST_F(AttributesTest, AttributesInit, TestSize.Level0)
 
 HWTEST_F(AttributesTest, AttributesSerialize, TestSize.Level0)
 {
-    const std::vector<Attributes::AttributeKey> desired = {Attributes::AUTH_ROOT, Attributes::AUTH_DATA,
-        Attributes::AUTH_EXPIRED_SYS_TIME};
+    const std::vector<Attributes::AttributeKey> desired = {Attributes::AUTH_EXPIRED_SYS_TIME};
 
     Attributes attrs;
     EXPECT_TRUE(attrs.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, UINT64_MAX));
