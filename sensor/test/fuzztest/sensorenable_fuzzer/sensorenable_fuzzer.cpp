@@ -15,7 +15,6 @@
 
 #include "sensorenable_fuzzer.h"
 #include "hdf_base.h"
-#include "sensor_impl.h"
 #include "v2_0/sensor_interface_proxy.h"
 
 using namespace OHOS::HDI::Sensor::V2_0;
