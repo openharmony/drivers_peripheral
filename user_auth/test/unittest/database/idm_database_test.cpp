@@ -27,14 +27,14 @@ extern "C" {
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
     extern bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid);
-    extern UserInfo *CreateUser(int32_t userId);
+    extern UserInfo *CreateUser(int32_t userId, int32_t userType);
     extern ResultCode DeleteUser(int32_t userId);
     extern bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentialId);
     extern bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolledId);
     extern ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
     extern ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType);
     extern ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credentialInfo);
-    extern ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo);
+    extern ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType);
     extern bool MatchCredentialById(const void *data, const void *condition);
     extern bool MatchEnrolledInfoByType(const void *data, const void *condition);
     extern CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
@@ -63,9 +63,19 @@ public:
     void TearDown() {};
 };
 
-HWTEST_F(IdmDatabaseTest, TestInitUserInfoList, TestSize.Level0)
+HWTEST_F(IdmDatabaseTest, TestInitUserInfoList_001, TestSize.Level0)
 {
     EXPECT_EQ(InitUserInfoList(), RESULT_SUCCESS);
+    DestroyUserInfoList();
+}
+
+HWTEST_F(IdmDatabaseTest, TestInitUserInfoList_002, TestSize.Level0)
+{
+    constexpr int32_t userType = 1024;
+    UserInfo *userInfo = InitUserInfoNode();
+    EXPECT_EQ(InitUserInfoList(), RESULT_SUCCESS);
+    EXPECT_NE(userInfo->userType, userType);
+    DestroyUserInfoNode(userInfo);
     DestroyUserInfoList();
 }
 
@@ -211,7 +221,7 @@ HWTEST_F(IdmDatabaseTest, TestCreateUser, TestSize.Level0)
 {
     g_userInfoList = nullptr;
     constexpr int32_t userId = 123;
-    EXPECT_EQ(CreateUser(userId), nullptr);
+    EXPECT_EQ(CreateUser(userId, 0), nullptr);
 }
 
 HWTEST_F(IdmDatabaseTest, TestDeleteUser, TestSize.Level0)
@@ -297,7 +307,7 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
 {
     g_currentUser = nullptr;
     g_userInfoList = nullptr;
-    EXPECT_EQ(AddUser(111, nullptr), RESULT_NEED_INIT);
+    EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_NEED_INIT);
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
     constexpr uint32_t userNum = 1002;
@@ -305,12 +315,32 @@ HWTEST_F(IdmDatabaseTest, TestAddUser, TestSize.Level0)
     for (uint32_t i = 0; i < userNum; ++i) {
         g_userInfoList->insert(g_userInfoList, static_cast<void *>(&info));
     }
-    EXPECT_EQ(AddUser(111, nullptr), RESULT_EXCEED_LIMIT);
+    EXPECT_EQ(AddUser(111, nullptr, 0), RESULT_EXCEED_LIMIT);
 }
 
-HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo, TestSize.Level0)
+HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_001, TestSize.Level0)
 {
-    EXPECT_EQ(AddCredentialInfo(111, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(AddCredentialInfo(111, nullptr, 0), RESULT_BAD_PARAM);
+}
+
+HWTEST_F(IdmDatabaseTest, TestAddCredentialInfo_002, TestSize.Level0)
+{
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    constexpr int32_t userId = 100;
+    constexpr int32_t userType = 2;
+    constexpr uint32_t authType = 1;
+    UserInfo *user = QueryUserInfo(userId);
+    EXPECT_EQ(user, nullptr);
+    user = CreateUser(userId, userType);
+    EXPECT_NE(user->userType, 0);
+
+    CredentialInfoHal credInfo = {};
+    credInfo.authType = authType;
+    EXPECT_EQ(AddUser(userId, &credInfo, userType), RESULT_SUCCESS);
+
+    EXPECT_EQ(AddCredentialInfo(userId, &credInfo, userType), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmDatabaseTest, TestMatchCredentialById, TestSize.Level0)

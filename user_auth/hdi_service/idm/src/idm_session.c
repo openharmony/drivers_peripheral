@@ -321,3 +321,13 @@ ResultCode GetChallenge(uint8_t *challenge, uint32_t challengeLen)
 
     return RESULT_SUCCESS;
 }
+
+ResultCode IsValidUserType(int32_t userType)
+{
+    if (userType != MAIN_USER && userType != SUB_USER && userType != PRIVATE_USER) {
+        LOG_ERROR("userType is invalid");
+        return RESULT_BAD_PARAM;
+    }
+    LOG_INFO("userType is valid");
+    return RESULT_SUCCESS;
+}
