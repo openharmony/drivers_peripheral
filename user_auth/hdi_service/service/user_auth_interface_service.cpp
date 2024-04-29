@@ -356,6 +356,8 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
     enrolledStateOut.credentialCount = infoIn.credentialCount;
     infoOut.pinExpiredInfo = infoIn.pinExpiredInfo;
     if (infoOut.result == RESULT_SUCCESS) {
+        infoOut.userId = infoIn.userId;
+        IAM_LOGI("matched userId: %{public}d.", infoOut.userId);
         infoOut.token.resize(sizeof(UserAuthTokenHal));
         if (memcpy_s(infoOut.token.data(), infoOut.token.size(), &authTokenIn, sizeof(UserAuthTokenHal)) != EOK) {
                 IAM_LOGE("copy authToken failed");
@@ -373,8 +375,6 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
             }
         }
     }
-    infoOut.userId = infoIn.userId;
-    IAM_LOGI("matched userId: %{public}d.", infoOut.userId);
     DestoryBuffer(infoIn.rootSecret);
     return RESULT_SUCCESS;
 }
