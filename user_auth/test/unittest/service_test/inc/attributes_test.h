@@ -12,31 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef IAM_ATTRIBUTES_TEST_H
+#define IAM_ATTRIBUTES_TEST_H
 
-#ifndef HAL_WIFI_SYSTEM_INTERFACE_TOOL_H
-#define HAL_WIFI_SYSTEM_INTERFACE_TOOL_H
-
-#include <array>
-#include <cstdint>
-#include <linux/if_ether.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace OHOS {
 namespace HDI {
-namespace Wlan {
-namespace Chip {
-namespace V1_0 {
-
-class IfaceTool {
+namespace UserAuth {
+class AttributesTest : public testing::Test {
 public:
-    IfaceTool() = default;
-    virtual ~IfaceTool() = default;
-    virtual bool GetUpState(const char* ifName);
-    virtual bool SetUpState(const char* ifName, bool requestUp);
-    virtual bool SetWifiUpState(bool requestUp);
+    static void SetUpTestCase();
+
+    static void TearDownTestCase();
+
+    void SetUp() override;
+
+    void TearDown() override;
 };
-}
-}
-}
-}
-}
-#endif
+} // namespace UserAuth
+} // namespace HDI
+} // namespace OHOS
+#endif // IAM_ATTRIBUTES_TEST_H

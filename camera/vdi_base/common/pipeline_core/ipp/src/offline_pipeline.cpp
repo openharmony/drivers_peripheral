@@ -181,7 +181,7 @@ void OfflinePipeline::HandleBuffers()
             return;
         }
     }
-    CAMERA_LOGE("OfflinePipeline::HandleBuffers, begin to ProcessCache buffer, size = %{public}d ", buffers.size());
+    CAMERA_LOGI("OfflinePipeline::HandleBuffers, begin to ProcessCache buffer, size = %{public}d ", buffers.size());
     ProcessCache(buffers);
     return;
 }

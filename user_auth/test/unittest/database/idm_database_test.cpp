@@ -22,6 +22,7 @@ typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
+    extern GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
     extern bool MatchUserInfo(const void *data, const void *condition);
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
@@ -742,6 +743,38 @@ HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
     EXPECT_EQ(removed, false);
 }
 
+HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
+{
+    EXPECT_EQ(SaveGlobalConfigParam(nullptr), RESULT_BAD_PARAM);
+
+    GlobalConfigParamHal param = {};
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
+
+    param.type = PIN_EXPIRED_PERIOD;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
+}
+
+HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
+{
+    int32_t userId = 1;
+    EXPECT_EQ(GetPinExpiredInfo(userId, nullptr), RESULT_BAD_PARAM);
+
+    PinExpiredInfo info = {};
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
+
+    g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
+    g_globalConfigArray[0].value.pinExpiredPeriod = 1;
+    g_currentUser = nullptr;
+    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
+    EXPECT_NE(g_userInfoList, nullptr);
+    UserInfo userInfo = {};
+    userInfo.userId = 1;
+    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
+    CredentialInfoHal credentialInfo1 = {1, 1, 1, 1, 0, 1, 0};
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credentialInfo1));
+    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

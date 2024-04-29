@@ -552,7 +552,6 @@ void PowerSupplyProvider::CreateFile(const std::string& path, const std::string&
 
 void PowerSupplyProvider::InitBatteryPath()
 {
-    InitChargerSysfs();
     std::string sysLowercaseBatteryPath = "/sys/class/power_supply/battery";
 
     if (access(sysLowercaseBatteryPath.c_str(), F_OK) == 0) {
@@ -566,6 +565,7 @@ void PowerSupplyProvider::InitBatteryPath()
         }
         InitDefaultSysfs();
     }
+    InitChargerSysfs();
 }
 
 int32_t PowerSupplyProvider::InitPowerSupplySysfs()
