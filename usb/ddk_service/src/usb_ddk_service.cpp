@@ -374,6 +374,49 @@ FINISHED:
     return ret;
 }
 
+int32_t UsbDdkService::SendPipeRequestWithAshmem(
+    const UsbRequestPipe &pipe, const UsbAshmem &ashmem, uint32_t &transferredLength)
+{
+    uint64_t handle = 0;
+    int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s unhash failed %{public}d", __func__, ret);
+        return ret;
+    }
+
+    const UsbInterfaceHandle *handleConvert = reinterpret_cast<const UsbInterfaceHandle *>(handle);
+    struct UsbRequest *request = UsbAllocRequestByAshmem(handleConvert, 0, ashmem.size, ashmem.ashmemFd);
+    if (request == nullptr) {
+        HDF_LOGE("%{public}s alloc request failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    struct UsbRequestParams params;
+    (void)memset_s(&params, sizeof(struct UsbRequestParams), 0, sizeof(struct UsbRequestParams));
+    params.pipeId = pipe.endpoint;
+    params.pipeAddress = pipe.endpoint;
+    params.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
+    params.timeout = pipe.timeout;
+    params.dataReq.length = ashmem.bufferLength;
+
+    ret = UsbFillRequestByMmap(request, handleConvert, &params);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s fill request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    ret = UsbSubmitRequestSync(request);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s submit request failed %{public}d", __func__, ret);
+        goto FINISHED;
+    }
+
+    transferredLength = request->compInfo.actualLength;
+FINISHED:
+    (void)UsbFreeRequestByMmap(request);
+    return ret;
+}
+
 int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
 {
     int32_t ret = UsbGetDeviceMemMapFd(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
