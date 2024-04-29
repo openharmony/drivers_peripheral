@@ -932,6 +932,11 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     struct UsbDevice *dev = NULL;
     struct UsbDeviceHandle *handle = NULL;
 
+    if (session == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param session.\n", __func__, __LINE__);
+        return NULL;
+    }
+
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
         return handle;
