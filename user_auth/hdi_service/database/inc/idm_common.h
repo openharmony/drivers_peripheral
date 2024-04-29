@@ -51,6 +51,7 @@ typedef struct {
     uint64_t cachePinSubType;
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
+    int32_t userType;
 } UserInfo;
 
 typedef struct {

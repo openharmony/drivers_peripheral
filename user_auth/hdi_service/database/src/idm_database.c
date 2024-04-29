@@ -301,7 +301,7 @@ IAM_STATIC bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUi
     return false;
 }
 
-IAM_STATIC UserInfo *CreateUser(int32_t userId)
+IAM_STATIC UserInfo *CreateUser(int32_t userId, int32_t userType)
 {
     UserInfo *user = InitUserInfoNode();
     if (!IsUserInfoValid(user)) {
@@ -310,6 +310,7 @@ IAM_STATIC UserInfo *CreateUser(int32_t userId)
         return NULL;
     }
     user->userId = userId;
+    user->userType = userType;
     ResultCode ret = GenerateDeduplicateUint64(g_userInfoList, &user->secUid, IsSecureUidDuplicate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("generate secureUid failed");
@@ -477,7 +478,7 @@ IAM_STATIC ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *cre
     return ret;
 }
 
-IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
+IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType)
 {
     if (g_userInfoList == NULL) {
         LOG_ERROR("please init");
@@ -494,12 +495,12 @@ IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
         return RESULT_BAD_PARAM;
     }
 
-    user = CreateUser(userId);
+    user = CreateUser(userId, userType);
     if (user == NULL) {
         LOG_ERROR("create user failed");
         return RESULT_UNKNOWN;
     }
-
+    LOG_INFO("user userType %{public}d", user->userType);
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential to user failed");
@@ -518,7 +519,7 @@ FAIL:
     return ret;
 }
 
-ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
+ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType)
 {
     if ((credentialInfo == NULL) || (credentialInfo->authType == DEFAULT_AUTH_TYPE)) {
         LOG_ERROR("credentialInfo is invalid");
@@ -526,7 +527,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     }
     UserInfo *user = QueryUserInfo(userId);
     if (user == NULL && credentialInfo->authType == PIN_AUTH) {
-        ResultCode ret = AddUser(userId, credentialInfo);
+        ResultCode ret = AddUser(userId, credentialInfo, userType);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("add user failed");
             return ret;
