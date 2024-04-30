@@ -60,19 +60,12 @@ void FillFuzzExecutorRegisterInfo(Parcel &parcel, ExecutorRegisterInfo &executor
     IAM_LOGI("success");
 }
 
-void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
-{
-    executorInfo.executorIndex = parcel.ReadUint64();
-    FillFuzzExecutorRegisterInfo(parcel, executorInfo.info);
-    IAM_LOGI("success");
-}
-
-void FillFuzzExecutorInfoVector(Parcel &parcel, vector<ExecutorInfo> &vector)
+void FillFuzzExecutorInfoIndexVector(Parcel &parcel, vector<uint64_t> &vector)
 {
     uint32_t len = parcel.ReadInt32() % MAX_FUZZ_STRUCT_LEN;
     vector.resize(len);
     for (uint32_t i = 0; i < len; i++) {
-        FillFuzzExecutorInfo(parcel, vector[i]);
+        vector[i] = parcel.ReadUint64();
     }
     IAM_LOGI("success");
 }
@@ -84,8 +77,7 @@ void FillFuzzScheduleInfo(Parcel &parcel, ScheduleInfo &scheduleInfo)
     scheduleInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
     scheduleInfo.executorMatcher = parcel.ReadUint32();
     scheduleInfo.scheduleMode = static_cast<ScheduleMode>(parcel.ReadInt32());
-    FillFuzzExecutorInfoVector(parcel, scheduleInfo.executors);
-    FillFuzzUint8Vector(parcel, scheduleInfo.remoteMessage);
+    FillFuzzExecutorInfoIndexVector(parcel, scheduleInfo.executorIndexes);
     IAM_LOGI("success");
 }
 
@@ -121,8 +113,6 @@ void FillFuzzAuthParam(Parcel &parcel, AuthParam &authParam)
     } else {
         authParam.isOsAccountVerified = false;
     }
-    FillFuzzUint8Vector(parcel, authParam.remoteDeviceId);
-    FillFuzzUint8Vector(parcel, authParam.remoteExecutorInfo);
     IAM_LOGI("success");
 }
 
@@ -247,7 +237,8 @@ void FillFuzzEnrolledInfoVector(Parcel &parcel, vector<EnrolledInfo> &vector)
 void FuzzInit(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    g_service.Init();
+    const std::string deviceUdid = "12345678910";
+    g_service.Init(deviceUdid);
     IAM_LOGI("end");
 }
 
@@ -526,13 +517,13 @@ void FuzzSendMessage(Parcel &parcel)
 void FuzzGetLocalScheduleFromMessage(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    std::vector<uint8_t> remoteDeviceId;
-    FillFuzzUint8Vector(parcel, remoteDeviceId);
+    std::string remoteUdid;
+    FillFuzzString(parcel, remoteUdid);
     std::vector<uint8_t> msg;
     FillFuzzUint8Vector(parcel, msg);
     ScheduleInfo scheduleInfo;
     FillFuzzScheduleInfo(parcel, scheduleInfo);
-    g_service.GetLocalScheduleFromMessage(remoteDeviceId, msg, scheduleInfo);
+    g_service.GetLocalScheduleFromMessage(remoteUdid, msg, scheduleInfo);
     IAM_LOGI("end");
 }
 
@@ -542,11 +533,11 @@ void FuzzGetSignedExecutorInfo(Parcel &parcel)
     std::vector<int32_t> authTypes;
     FillFuzzInt32Vector(parcel, authTypes);
     int32_t executorRole = parcel.ReadInt32();
-    std::vector<uint8_t> remoteDeviceId;
-    FillFuzzUint8Vector(parcel, remoteDeviceId);
+    std::string remoteUdid;
+    FillFuzzString(parcel, remoteUdid);
     std::vector<uint8_t> signedExecutorInfo;
     FillFuzzUint8Vector(parcel, signedExecutorInfo);
-    g_service.GetSignedExecutorInfo(authTypes, executorRole, remoteDeviceId, signedExecutorInfo);
+    g_service.GetSignedExecutorInfo(authTypes, executorRole, remoteUdid, signedExecutorInfo);
     IAM_LOGI("end");
 }
 
