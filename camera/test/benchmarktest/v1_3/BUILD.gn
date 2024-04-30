@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,80 +11,69 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../camera.gni")
-camera_test_path = "//drivers/peripheral/camera/test/hdi/"
-
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
-module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+# NOSORT
+import("../../../camera.gni")
 
-config("camhdi_host_config") {
+# NOSORT
+import("$hdf_core_path/adapter/uhdf2/uhdf.gni")
+module_output_path = "drivers_peripheral_camera/camera"
+camera_include_path = "//drivers/peripheral/camera/test/hdi/"
+
+config("hdf_camera_benchmark_test_config") {
   visibility = [ ":*" ]
   cflags_cc = [
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
   ]
+  cflags_cc += [ "-std=c++17" ]
 }
 
-ohos_fuzztest("camera_host_fuzztest") {
-  testonly = true
+ohos_benchmarktest("hdf_camera_benchmark_test_v1_3") {
   module_out_path = module_output_path
-  fuzz_config_file = "$camera_path/../../test/fuzztest/camera_host"
+
   sources = [
-    "../common/src/common.cpp",
-    "./camera_host_fuzzer.cpp",
+    "./src/benchmark_common.cpp",
+    "./src/camera_benchmark_securestream_test.cpp",
+    "./src/camera_benchmark_test.cpp",
   ]
 
   include_dirs = [
-    # common includes
-    "../common/include",
-    "$camera_test_path/v1_2/include",
+    "./include/",
+    "$camera_include_path/v1_3/include/",
+    "//third_party/googletest/googletest/include",
     "$camera_path/../../../display/interfaces/include",
     "$camera_path/../../../display/hdi_service/gralloc/include",
     "$camera_path/../../interfaces/include",
     "$camera_path/include",
   ]
 
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
+  deps = [
+    "//third_party/benchmark",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
+      "drivers_interface_camera:libcamera_proxy_1.3",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-
   external_deps += [
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-    "drivers_interface_camera:libcamera_proxy_1.2",
-    "drivers_interface_camera:libcamera_proxy_1.3",
     "drivers_interface_camera:metadata",
     "graphic_surface:surface",
     "samgr:samgr_proxy",
   ]
-  public_configs = [ ":camhdi_host_config" ]
-}
-
-group("fuzztest") {
-  testonly = true
-  deps = []
-  deps += [
-    # dep file
-    ":camera_host_fuzztest",
-  ]
+  public_configs = [ ":hdf_camera_benchmark_test_config" ]
 }
