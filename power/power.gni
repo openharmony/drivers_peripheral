@@ -16,7 +16,7 @@ declare_args() {
 }
 
 declare_args() {
-  faster_retry_of_sleep = false
+  drivers_peripheral_power_faster_retry_of_sleep = false
 }
 
 if (!defined(global_parts_info) ||
