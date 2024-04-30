@@ -675,7 +675,7 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
         config.multiAp = wpaParam->multiAp;
         if (wpaParam->bssidLen > 0) {
             if (strncpy_s(config.bssid, sizeof(config.bssid),(const char *)wpaParam->bssid,
-                strlen((const char *)wpaParam->bssid)) != 0) {
+                wpaParam->bssidLen) != 0) {
                 HDF_LOGE("%{public}s: strncpy_s bssid fail", __func__);
                 return HDF_FAILURE;
             }
