@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,28 @@
  * limitations under the License.
  */
 
-#include "sensorenable_fuzzer.h"
+#include "sensorsetsdcsensor_fuzzer.h"
 #include "hdf_base.h"
 #include "v2_0/sensor_interface_proxy.h"
+#include <hdf_log.h>
+#include <securec.h>
 
 using namespace OHOS::HDI::Sensor::V2_0;
 
 namespace OHOS {
-    bool SensorEnableFuzzTest(const uint8_t* data, size_t size)
+    bool SensorSetSdcSensorFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
-        if (!g_sensorInterface->Enable(*(int32_t *)data)) {
+        
+        if (!g_sensorInterface->SetSdcSensor(*(int32_t *)data, *(bool *)data, *(int32_t *)data)) {
             result = true;
         }
         return result;
     }
 }
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if (data == nullptr) {
@@ -40,7 +44,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::SensorEnableFuzzTest(data, size);
+    /* Run your code on data */
+    OHOS::SensorSetSdcSensorFuzzTest(data, size);
     return 0;
 }
 
