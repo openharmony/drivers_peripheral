@@ -56,13 +56,14 @@ void UsbDdkDelHashRecord(uint64_t hashVal)
     g_hashMap.erase(hashVal);
 }
 
-uint64_t UsbDdkGetRecordByVal(const InterfaceInfo &info)
+bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal)
 {
     std::lock_guard<std::mutex> lock(g_mapMutex);
-    for (auto it = g_hashMap.begin(); it != g_hashMap.end();) {
+    for (auto it = g_hashMap.begin(); it != g_hashMap.end(); it++) {
         if (it->second.busNum == info.busNum && it->second.devNum == info.devNum) {
-            return it->first;
+            hashVal = it->first;
+            return true;
         }
     }
-    return 0;
+    return false;
 }

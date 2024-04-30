@@ -87,8 +87,11 @@ static int32_t UsbdPnpEventHandler(void *priv, uint32_t id, HdfSBuf *data)
             return HDF_ERR_INVALID_PARAM;
         }
 
-        HDF_LOGI("%{public}s: delete record success", __func__);
-        ReleaseUsbInterface(UsbDdkGetRecordByVal({0, infoTable->busNum, infoTable->devNum}));
+        uint64_t interfaceHandle = 0;
+        if (UsbDdkGetRecordByVal({0, infoTable->busNum, infoTable->devNum}, interfaceHandle)) {
+            HDF_LOGD("%{public}s: need release interface", __func__);
+            ReleaseUsbInterface(interfaceHandle);
+        }
     }
     return HDF_SUCCESS;
 }

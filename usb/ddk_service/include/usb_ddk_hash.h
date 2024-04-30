@@ -25,5 +25,5 @@ struct InterfaceInfo {
 int32_t UsbDdkHash(const InterfaceInfo &info, uint64_t &hashVal);
 int32_t UsbDdkUnHash(uint64_t hashVal, uint64_t &addr);
 void UsbDdkDelHashRecord(uint64_t hashVal);
-uint64_t UsbDdkGetRecordByVal(const InterfaceInfo &info);
+bool UsbDdkGetRecordByVal(const InterfaceInfo &info, uint64_t &hashVal);
 #endif // USB_DDK_IMPL_H
