@@ -215,7 +215,7 @@ void UsbImpl::MakeSetActiveUsbControlParams(
     controlParams->request = USB_DDK_REQ_SET_CONFIGURATION;
     controlParams->target = USB_REQUEST_TARGET_DEVICE;
     controlParams->reqType = USB_REQUEST_TYPE_STANDARD;
-    controlParams->directon = USB_REQUEST_DIR_FROM_DEVICE;
+    controlParams->directon = USB_REQUEST_DIR_TO_DEVICE;
     controlParams->value = value;
     controlParams->index = index;
     controlParams->data = buffer;
