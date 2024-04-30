@@ -54,7 +54,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
-  if (faster_retry_of_sleep) {
+  if (drivers_peripheral_power_faster_retry_of_sleep) {
     defines += [ "FASTER_RETRY_OF_SLEEP" ]
   }
 
