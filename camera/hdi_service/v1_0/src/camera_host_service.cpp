@@ -20,6 +20,7 @@
 #include "v1_0/icamera_device.h"
 #include "camera_host_service_callback.h"
 #include "camera_device_service_callback.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 OHOS::sptr<CameraHostService> CameraHostService::cameraHostService_ = nullptr;
@@ -202,6 +203,7 @@ int32_t CameraHostService::GetCameraAbility(const std::string &cameraId,
 int32_t CameraHostService::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
     sptr<ICameraDevice> &device)
 {
+    CAMERAHALPERFSYSEVENT(TIME_FOR_OPEN_CAMERA);
     ICameraHostVdi* cameraHostVdi = GetCameraHostVdi(cameraId);
     CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHostVdi, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
 
