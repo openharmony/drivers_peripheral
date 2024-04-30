@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -13,14 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_DEVICE_FUZZER_H
-#define CAMERA_DEVICE_FUZZER_H
+#ifndef CAMERA_HDI_UTTEST_SECURESTREAM_V1_3_H
+#define CAMERA_HDI_UTTEST_SECURESTREAM_V1_3_H
 
-#define FUZZ_PROJECT_NAME "camerahost_fuzzer"
-#include "common.h"
-#include "v1_2/icamera_host.h"
-#include "v1_3/icamera_host.h"
-namespace OHOS {
-    std::shared_ptr<OHOS::Camera::CameraManager> cameraTest = nullptr;
-}
+#include "hdi_common_v1_3.h"
+
+class CameraHdiUtTestSecureStreamV1_3 : public testing::Test {
+public:
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp(void);
+    void TearDown(void);
+    std::shared_ptr<OHOS::Camera::Test> cameraTest = nullptr;
+};
 #endif

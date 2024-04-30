@@ -29,6 +29,7 @@ enum HostCmdId {
     CAMERA_HOST_NOTIFY_DEVICE_STATE_CHANGE_INFO,
     CAMERA_HOST_PRE_CAMERA_SWITCH,
     CAMERA_HOST_PRELAUNCH_WITH_OPMODE,
+    CAMERA_HOST_OPEN_SECURECAMERA,
     CAMERA_HOST_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
@@ -105,6 +106,15 @@ void FuncPrelaunchWithOpMode(const uint8_t *rawData, size_t size)
     cameraTest->serviceV1_2->PrelaunchWithOpMode(*cameraTest->prelaunchConfig, data[0]);
 }
 
+void FuncOpenSecureCamera(const uint8_t *rawData, size_t size)
+{
+    sptr<HDI::Camera::V1_3::ICameraDevice> g_CameraDevice = nullptr;
+    const sptr<HDI::Camera::V1_0::ICameraDeviceCallback> callback =
+        new Camera::CameraManager::DemoCameraDeviceCallback();
+    cameraTest->serviceV1_3->OpenSecureCamera(
+        const_cast<char*>(reinterpret_cast<const char*>(rawData)), callback, g_CameraDevice);
+}
+
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     switch (cmd) {
@@ -144,6 +154,10 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
             FuncPrelaunchWithOpMode(rawData, size);
             break;
         }
+        case CAMERA_HOST_OPEN_SECURECAMERA: {
+            FuncOpenSecureCamera(rawData, size);
+            break;
+        }
         default:
             return;
     }
@@ -159,12 +173,12 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->InitV1_2();
-    if (cameraTest->serviceV1_2 == nullptr) {
+    cameraTest->InitV1_3();
+    if (cameraTest->serviceV1_3 == nullptr) {
         return false;
     }
-    cameraTest->OpenV1_2();
-    if (cameraTest->cameraDeviceV1_1 == nullptr) {
+    cameraTest->OpenV1_3();
+    if (cameraTest->cameraDeviceV1_3 == nullptr) {
         return false;
     }
 

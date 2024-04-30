@@ -80,6 +80,7 @@ class Test {
 public:
     void Init();
     void Open(int cameraId);
+    void OpenSecureCamera(int cameraId);
     void Close();
     void GetCameraMetadata(int cameraId);
     void DefaultPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);

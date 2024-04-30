@@ -108,6 +108,27 @@ void Test::Open(int cameraId)
     }
 }
 
+void Test::OpenSecureCamera(int cameraId)
+{
+    if (cameraDeviceV1_3 == nullptr) {
+        EXPECT_NE(serviceV1_3, nullptr);
+        serviceV1_3->GetCameraIds(cameraIds);
+        EXPECT_NE(cameraIds.size(), 0);
+        GetCameraMetadata(cameraId);
+        deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+
+        EXPECT_NE(serviceV1_3, nullptr);
+        if (DEVICE_1 == cameraId) {
+            rc = serviceV1_3->OpenSecureCamera(cameraIds[1], deviceCallback, cameraDeviceV1_3);
+        } else {
+            rc = serviceV1_3->OpenSecureCamera(cameraIds[0], deviceCallback, cameraDeviceV1_3);
+        }
+        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
+        EXPECT_NE(cameraDeviceV1_3, nullptr);
+        CAMERA_LOGI("OpenSecureCamera success");
+    }
+}
+
 
 void Test::GetCameraMetadata(int cameraId)
 {
