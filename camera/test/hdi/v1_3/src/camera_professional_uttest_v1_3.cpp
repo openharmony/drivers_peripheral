@@ -189,19 +189,19 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     }
 
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
-    // Get Stream Operator
+    // Get stream operator
     cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
     EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
-    // preview streamInfo
+    // Preview streamInfo
     cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
 
-    // capture extended streamInfo
+    // Capture extended streamInfo
     OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo;
     extendedStreamInfo.type =
         static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(OHOS::HDI::Camera::V1_3::EXTENDED_STREAM_INFO_RAW);
@@ -218,13 +218,13 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     extendedStreamInfo.format = OHOS_CAMERA_FORMAT_DNG;
     extendedStreamInfo.dataspace = 0;
 
-    // capture streamInfo
+    // Capture streamInfo
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->streamInfoCapture->extendedStreamInfos = {extendedStreamInfo};
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
-    // create and commitstreams
+    // Create and commitstreams
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
@@ -232,7 +232,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
         cameraTest->abilityVec);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
 
-    // start capture
+    // Start capture
     cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
     cameraTest->captureIds = {cameraTest->captureIdPreview};
@@ -1353,7 +1353,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_029, TestSiz
 */
 HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSize.Level1)
 {
-    //Get Stream Operator
+    // Get stream operator
     cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
     cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
         cameraTest->streamOperator_V1_3);
@@ -1361,21 +1361,21 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     
     for (uint8_t i = 0; i < RESOLUTION_COUNT; i++) {
-        //preview streamInfo
+        // Preview streamInfo
         cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
         cameraTest->streamInfoPre->v1_0.width_ = g_supportedResolution[i][0];
         cameraTest->streamInfoPre->v1_0.height_ = g_supportedResolution[i][1];
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoPre);
         
-        //capture streamInfo
+        // Capture streamInfo
         cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
         cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
         cameraTest->streamInfoCapture->v1_0.width_ = g_supportedResolution[i][0];
         cameraTest->streamInfoCapture->v1_0.height_ = g_supportedResolution[i][1];
         cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
         
-        //create and commit stream
+        // Create and commit stream
         cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
@@ -1383,11 +1383,11 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_030, TestSiz
             cameraTest->abilityVec);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         
-        //start capture
+        // Start capture
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
         cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
         
-        //stop stream
+        // Stop stream
         cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdCapture};
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
