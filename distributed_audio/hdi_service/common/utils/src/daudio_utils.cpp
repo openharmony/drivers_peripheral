@@ -203,7 +203,7 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
     return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
 
-void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
+void SaveFile(const std::string fileName, uint8_t *audioData, int32_t size)
 {
     char path[PATH_MAX + 1] = {0x00};
     if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
