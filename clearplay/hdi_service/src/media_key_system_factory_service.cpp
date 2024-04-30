@@ -89,8 +89,8 @@ int32_t MediaKeySystemFactoryService::CreateMediaKeySystem(sptr<OHOS::HDI::Drm::
 int32_t MediaKeySystemFactoryService::GetMediaKeySystemDescription(std::string &name, std::string &uuid)
 {
     HDF_LOGI("%{public}s: start", __func__);
-    name = CLEARPLAY_UUID;
-    uuid = CLEARPLAY_NAME;
+    name = CLEARPLAY_NAME;
+    uuid = CLEARPLAY_UUID;
     HDF_LOGI("%{public}s: end", __func__);
     return HDF_SUCCESS;
 }
