@@ -143,6 +143,7 @@ void DoOnceAuth(const std::shared_ptr<UserAuthInterfaceService> &service, int32_
     authResultTest.result = service->UpdateAuthenticationResult(contextId, authScheduleResult, authResultInfo,
         enrolledState);
     EXPECT_EQ(authResultTest.result, 0);
+    EXPECT_EQ(authResultInfo.userId, authParam.baseParam.userId);
     authResultTest.token = authResultInfo.token;
 }
 

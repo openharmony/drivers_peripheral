@@ -79,9 +79,6 @@ static inline void DataFifoSkip(struct DataFifo *fifo, uint32_t size)
 
 static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
-    if (fifo->size == 0) {
-        return 0;
-    }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
@@ -96,9 +93,6 @@ static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint3
 
 static inline uint32_t DataFifoRead(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
-    if (fifo->size == 0) {
-        return 0;
-    }
     uint32_t mask = fifo->size - 1;
     uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
