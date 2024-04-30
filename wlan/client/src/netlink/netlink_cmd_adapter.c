@@ -442,7 +442,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
-        HDF_LOGD(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
+        HILOG_LOGD(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
