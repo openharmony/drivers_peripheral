@@ -256,6 +256,7 @@ int32_t PinAuth::QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredent
     pinCredentialInfoRet.subType = pinCredentialInfosRet.subType;
     pinCredentialInfoRet.remainTimes = pinCredentialInfosRet.remainTimes;
     pinCredentialInfoRet.freezingTime = pinCredentialInfosRet.freezeTime;
+    pinCredentialInfoRet.nextFailLockoutDuration = pinCredentialInfosRet.nextFailLockoutDuration;
 
     return RESULT_SUCCESS;
 }
@@ -275,10 +276,12 @@ int32_t PinAuth::DeleteTemplate(uint64_t templateId)
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl)
+int32_t PinAuth::GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl,
+    uint32_t &maxTemplateAcl)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
+    maxTemplateAcl = PIN_CAPABILITY_LEVEL;
     PinExecutorInfo pinExecutorInfo = {};
     int32_t result = RESULT_GENERAL_ERROR;
     switch (executorRole) {

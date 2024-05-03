@@ -1291,7 +1291,7 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
         return RESULT_SUCCESS;
     }
     CredentialInfoHal pinCredential = {};
-    if(QueryPinCredential(userId, &pinCredential) != RESULT_SUCCESS) {
+    if (QueryPinCredential(userId, &pinCredential) != RESULT_SUCCESS) {
         LOG_INFO("not enrolled pin");
         return RESULT_NOT_ENROLLED;
     }

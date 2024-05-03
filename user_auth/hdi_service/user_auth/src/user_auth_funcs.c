@@ -18,6 +18,7 @@
 #include <math.h>
 #include "securec.h"
 
+#include "auth_level.h"
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
@@ -321,4 +322,47 @@ ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpired
         }
     }
     return RESULT_SUCCESS;
+}
+
+void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)
+{
+    (*checkResult) = GetAuthTrustLevel(userId, authType, authTrustLevel);
+    if ((*checkResult) != RESULT_SUCCESS) {
+        LOG_ERROR("GetAuthTrustLevel failed");
+        return;
+    }
+
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    if (authType != DEFAULT_AUTH_TYPE) {
+        SetCredentialConditionAuthType(&condition, authType);
+    }
+    LinkedList *creds = QueryCredentialLimit(&condition);
+    if (creds == NULL || creds->getSize(creds) == 0) {
+        LOG_ERROR("query credential failed");
+        DestroyLinkedList(creds);
+        (*checkResult) = RESULT_NOT_ENROLLED;
+        return;
+    }
+    DestroyLinkedList(creds);
+
+    PinExpiredInfo expiredInfo = {};
+    (*checkResult) = GetPinExpiredInfo(userId, &expiredInfo);
+    if ((*checkResult) != RESULT_SUCCESS) {
+        LOG_ERROR("GetPinExpiredInfo failed");
+        return;
+    }
+    if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        LOG_ERROR("pinExpiredPeriod is not set");
+        (*checkResult) = RESULT_SUCCESS;
+        return;
+    }
+    uint64_t nowTime = GetReeTime();
+    if (nowTime > expiredInfo.pinExpiredPeriod + expiredInfo.pinEnrolledSysTime) {
+        LOG_ERROR("pin is expired");
+        (*checkResult) = RESULT_PIN_EXPIRED;
+        return;
+    }
+    (*checkResult) = RESULT_SUCCESS;
+    return;
 }

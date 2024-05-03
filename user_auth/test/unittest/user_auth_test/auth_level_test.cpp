@@ -25,7 +25,7 @@ extern "C" {
     extern void DestroyExecutorInfo(void *data);
     extern ResultCode QueryScheduleAsl(const CoAuthSchedule *coAuthSchedule, uint32_t *asl);
     extern ResultCode GetAsl(uint32_t authType, uint32_t *asl);
-    extern ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl);
+    extern ResultCode GetAslAndAcl(uint32_t authType, uint32_t *asl, uint32_t *acl);
 }
 
 namespace OHOS {
@@ -83,14 +83,15 @@ HWTEST_F(AuthLevelTest, TestQueryScheduleAtl, TestSize.Level0)
     EXPECT_EQ(QueryScheduleAtl(&schedule, 0, &atl), RESULT_BAD_PARAM);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAsl_001, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetAslAndAcl_001, TestSize.Level0)
 {
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
-    EXPECT_EQ(GetAsl(authType, &asl), RESULT_UNKNOWN);
+    uint32_t acl = 0;
+    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_UNKNOWN);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAsl_002, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetAslAndAcl_002, TestSize.Level0)
 {
     g_poolList = CreateLinkedList(DestroyExecutorInfo);
     EXPECT_NE(g_poolList, nullptr);
@@ -100,10 +101,11 @@ HWTEST_F(AuthLevelTest, TestGetAsl_002, TestSize.Level0)
     g_poolList->insert(g_poolList, static_cast<void *>(&executorInfo));
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
-    EXPECT_EQ(GetAsl(authType, &asl), RESULT_GENERAL_ERROR);
+    uint32_t acl = 0;
+    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_GENERAL_ERROR);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAsl_003, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetAslAndAcl_003, TestSize.Level0)
 {
     g_poolList = CreateLinkedList(DestroyExecutorInfo);
     EXPECT_NE(g_poolList, nullptr);
@@ -114,28 +116,11 @@ HWTEST_F(AuthLevelTest, TestGetAsl_003, TestSize.Level0)
     g_poolList->insert(g_poolList, static_cast<void *>(&executorInfo));
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
-    EXPECT_EQ(GetAsl(authType, &asl), RESULT_SUCCESS);
-}
-
-HWTEST_F(AuthLevelTest, TestGetAcl, TestSize.Level0)
-{
-    constexpr int32_t userId = 21361;
-    constexpr uint32_t authType = 1;
     uint32_t acl = 0;
-    EXPECT_EQ(GetAcl(userId, authType, &acl), RESULT_NOT_ENROLLED);
-    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    EXPECT_NE(g_userInfoList, nullptr);
-    EXPECT_EQ(GetAcl(userId, authType, &acl), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
 }
 
-HWTEST_F(AuthLevelTest, TestSingleAuthTrustLevel_001, TestSize.Level0)
-{
-    constexpr int32_t userId = 21356;
-    constexpr uint32_t authType = 1;
-    EXPECT_EQ(SingleAuthTrustLevel(userId, authType, nullptr), RESULT_BAD_PARAM);
-}
-
-HWTEST_F(AuthLevelTest, TestSingleAuthTrustLevel_002, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetAuthTrustLevel_001, TestSize.Level0)
 {
     g_poolList = CreateLinkedList(DestroyExecutorInfo);
     EXPECT_NE(g_poolList, nullptr);
@@ -148,7 +133,7 @@ HWTEST_F(AuthLevelTest, TestSingleAuthTrustLevel_002, TestSize.Level0)
     constexpr int32_t userId = 21356;
     constexpr uint32_t authType = 1;
     uint32_t atl = 0;
-    EXPECT_EQ(SingleAuthTrustLevel(userId, authType, &atl), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetAuthTrustLevel(userId, authType, atl), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam
