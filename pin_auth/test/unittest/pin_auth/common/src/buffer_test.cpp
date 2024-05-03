@@ -67,7 +67,7 @@ HWTEST_F(BufferTest, CreateBufferBySize_test, TestSize.Level1)
     EXPECT_NE(buffer3, nullptr);
     result = IsBufferValid(buffer3);
     EXPECT_EQ(result, true);
-    DestoryBuffer(buffer3);
+    DestroyBuffer(buffer3);
 }
 
 /**
@@ -108,8 +108,8 @@ HWTEST_F(BufferTest, CreateBufferByData_test, TestSize.Level1)
     result = IsBufferValid(buffer5);
     EXPECT_EQ(result, true);
 
-    DestoryBuffer(buffer5);
-    DestoryBuffer(data);
+    DestroyBuffer(buffer5);
+    DestroyBuffer(data);
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(BufferTest, CheckBufferWithSize_test, TestSize.Level1)
     result = CheckBufferWithSize(data, 5);
     EXPECT_EQ(result, true);
 
-    DestoryBuffer(data);
+    DestroyBuffer(data);
 }
 
 /**
@@ -151,7 +151,7 @@ HWTEST_F(BufferTest, InitBuffer_test, TestSize.Level1)
     EXPECT_NE(buffer1, nullptr);
     uint32_t result = InitBuffer(buffer1, nullptr, 0);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
-    DestoryBuffer(buffer1);
+    DestroyBuffer(buffer1);
 
     Buffer *data = CreateBufferBySize(5);
     EXPECT_NE(data, nullptr);
@@ -162,14 +162,14 @@ HWTEST_F(BufferTest, InitBuffer_test, TestSize.Level1)
     EXPECT_NE(buffer2, nullptr);
     result = InitBuffer(buffer2, data->buf, data->contentSize);
     EXPECT_EQ(result, RESULT_BAD_COPY);
-    DestoryBuffer(buffer2);
+    DestroyBuffer(buffer2);
 
     Buffer *buffer3 = CreateBufferBySize(5);
     EXPECT_NE(buffer3, nullptr);
     result = InitBuffer(buffer3, data->buf, data->contentSize);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    DestoryBuffer(buffer3);
-    DestoryBuffer(data);
+    DestroyBuffer(buffer3);
+    DestroyBuffer(data);
 }
 
 /**
@@ -189,8 +189,8 @@ HWTEST_F(BufferTest, CopyBuffer_test, TestSize.Level1)
     EXPECT_NE(buffer2, nullptr);
     result = CopyBuffer(buffer2);
     EXPECT_NE(result, nullptr);
-    DestoryBuffer(buffer2);
-    DestoryBuffer(result);
+    DestroyBuffer(buffer2);
+    DestroyBuffer(result);
 }
 
 /**
@@ -212,8 +212,8 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level1)
     buffer2->contentSize = buffer2->maxSize;
     result = CompareBuffer(buffer1, buffer2);
     EXPECT_EQ(result, false);
-    DestoryBuffer(buffer1);
-    DestoryBuffer(buffer2);
+    DestroyBuffer(buffer1);
+    DestroyBuffer(buffer2);
 
     Buffer *buffer3 = CreateBufferBySize(5);
     EXPECT_NE(buffer3, nullptr);
@@ -226,8 +226,8 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level1)
     buffer4->contentSize = buffer4->maxSize;
     result = CompareBuffer(buffer3, buffer4);
     EXPECT_EQ(result, false);
-    DestoryBuffer(buffer3);
-    DestoryBuffer(buffer4);
+    DestroyBuffer(buffer3);
+    DestroyBuffer(buffer4);
 
     Buffer *buffer5 = CreateBufferBySize(5);
     EXPECT_NE(buffer5, nullptr);
@@ -235,7 +235,7 @@ HWTEST_F(BufferTest, CompareBuffer_test, TestSize.Level1)
     buffer5->contentSize = buffer5->maxSize;
     result = CompareBuffer(buffer5, buffer5);
     EXPECT_EQ(result, true);
-    DestoryBuffer(buffer5);
+    DestroyBuffer(buffer5);
 }
 
 /**
@@ -263,7 +263,7 @@ HWTEST_F(BufferTest, GetBufferData_test, TestSize.Level1)
 
     result = GetBufferData(buffer1, res->buf, &(res->contentSize));
     EXPECT_EQ(result, RESULT_BAD_COPY);
-    DestoryBuffer(res);
+    DestroyBuffer(res);
 
     Buffer *res1 = CreateBufferBySize(5);
     EXPECT_NE(res1, nullptr);
@@ -271,9 +271,9 @@ HWTEST_F(BufferTest, GetBufferData_test, TestSize.Level1)
 
     result = GetBufferData(buffer1, res1->buf, &(res1->contentSize));
     EXPECT_EQ(result, RESULT_SUCCESS);
-    DestoryBuffer(res1);
+    DestroyBuffer(res1);
 
-    DestoryBuffer(buffer1);
+    DestroyBuffer(buffer1);
 }
 } // namespace PinAuth
 } // namespace UserIam

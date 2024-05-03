@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef IAM_PIN_FUNC_TEST_H
-#define IAM_PIN_FUNC_TEST_H
 
-#include <gtest/gtest.h>
+#ifndef IAM_COMMON_IMPL_TEST_H
+#define IAM_COMMON_IMPL_TEST_H
 
-namespace OHOS {
-namespace UserIam {
-namespace PinAuth {
-class PinFuncTest : public testing::Test {
-public:
-    static void SetUpTestCase();
+#include "adaptor_algorithm.h"
+#include "buffer.h"
 
-    static void TearDownTestCase();
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
-    void SetUp() override;
+Buffer *GetAuthFwkExtraInfo(uint64_t scheduleId, KeyPair *keyPair, uint8_t *challenge, uint8_t challengeSize);
 
-    void TearDown() override;
-};
-} // namespace PinAuth
-} // namespace UserIam
-} // namespace OHOS
-#endif // IAM_PIN_FUNC_TEST_H
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // IAM_COMMON_IMPL_TEST_H

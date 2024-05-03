@@ -21,9 +21,19 @@
 #include "adaptor_file.h"
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
+#include "adaptor_time.h"
 #include "file_operator.h"
 
 #include "pin_db_ops_base.h"
+
+void GetMaxLockedAntiBruteInfo(AntiBruteInfoV0 *antiBruteInfoV0)
+{
+    if (antiBruteInfoV0 == NULL) {
+        return;
+    }
+    antiBruteInfoV0->authErrorCount = ATTI_BRUTE_SECOND_STAGE;
+    antiBruteInfoV0->startFreezeTime = GetRtcTime();
+}
 
 static ResultCode GetPinIndexV0(uint8_t *data, uint32_t dataLen, PinDbV0 *pinDbV0)
 {
@@ -50,9 +60,10 @@ static ResultCode GetPinIndexV0(uint8_t *data, uint32_t dataLen, PinDbV0 *pinDbV
             sizeof(pinDbV0->pinIndex[i].antiBruteInfo),
             pinDbV0->pinIndex[i].pinInfo.templateId, ANTI_BRUTE_SUFFIX) != RESULT_SUCCESS) {
             LOG_ERROR("read AntiBruteInfo fail.");
-            Free(pinDbV0->pinIndex);
-            pinDbV0->pinIndex = NULL;
-            return RESULT_BAD_READ;
+            GetMaxLockedAntiBruteInfo(&(pinDbV0->pinIndex[i].antiBruteInfo));
+            (void)WritePinFile((uint8_t *)(&(pinDbV0->pinIndex[i].antiBruteInfo)),
+                sizeof(pinDbV0->pinIndex[i].antiBruteInfo),
+                pinDbV0->pinIndex[i].pinInfo.templateId, ANTI_BRUTE_SUFFIX);
         }
     }
     return RESULT_SUCCESS;

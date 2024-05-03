@@ -149,8 +149,10 @@ PinDbV1 *ReadPinDb(void)
         return NULL;
     }
     PinDbV1 *pinDb = LoadAndUpdatePinDb(data, dataLen);
-    (void)memset_s(data, dataLen, 0, dataLen);
-    Free(data);
+    if (data != NULL) {
+        (void)memset_s(data, dataLen, 0, dataLen);
+        Free(data);
+    }
     if (pinDb == NULL) {
         LOG_ERROR("LoadAndUpdatePinDb fail.");
     }

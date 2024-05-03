@@ -23,7 +23,7 @@
 
 #include "iam_logger.h"
 #include "iam_fuzz_test.h"
-#include "executor_impl.h"
+#include "all_in_one_impl.h"
 
 #undef LOG_TAG
 #define LOG_TAG "PIN_AUTH_HDI"
@@ -74,7 +74,7 @@ private:
     int32_t onMessageResult_;
 };
 
-ExecutorImpl g_executorImpl(make_shared<OHOS::UserIam::PinAuth::PinAuth>());
+AllInOneImpl g_executorImpl(make_shared<OHOS::UserIam::PinAuth::PinAuth>());
 
 void FillFuzzExecutorInfo(Parcel &parcel, HdiExecutorInfo &executorInfo)
 {
