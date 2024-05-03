@@ -29,8 +29,7 @@ typedef enum CollectorState {
     COLLECTOR_STATE_FINISH = 3,
 } CollectorState;
 
-typedef struct CollectorSchedule
-{
+typedef struct CollectorSchedule {
     uint64_t scheduleId;
     uint64_t timeStamp;
     Buffer *selfUdid;

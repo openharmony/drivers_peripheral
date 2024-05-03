@@ -39,10 +39,10 @@ namespace PinAuth {
 namespace {
 class DummyIExecutorCallback : public HdiIExecutorCallback {
 public:
-    DummyIExecutorCallback(int32_t onResultResult, int32_t onGetDataResult, int32_t OnTipResult,
-        int32_t OnMessageResult)
-        : onResultResult_(onResultResult), onGetDataResult_(onGetDataResult), onTipResult_(OnTipResult),
-        onMessageResult_(OnMessageResult)
+    DummyIExecutorCallback(int32_t onResultResult, int32_t onGetDataResult, int32_t onTipResult,
+        int32_t onMessageResult)
+        : onResultResult_(onResultResult), onGetDataResult_(onGetDataResult), onTipResult_(onTipResult),
+        onMessageResult_(onMessageResult)
     {
     }
 

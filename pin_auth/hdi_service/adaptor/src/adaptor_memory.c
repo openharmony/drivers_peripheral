@@ -16,6 +16,9 @@
 #include "adaptor_memory.h"
 
 #include <stdlib.h>
+
+#include "securec.h"
+
 #define MAX_SIZE 1073741824
 
 void *Malloc(const size_t size)
@@ -23,7 +26,13 @@ void *Malloc(const size_t size)
     if (size == 0 || size > MAX_SIZE) {
         return NULL;
     }
-    return malloc(size);
+
+    void *data = malloc(size);
+    if (data != NULL) {
+        (void)memset_s(data, size, 0, size);
+    }
+
+    return data;
 }
 
 void Free(void *ptr)
