@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,9 @@
 
 #include "pin_auth_hdi.h"
 #include "pin_auth.h"
-#include "executor_impl.h"
+#include "all_in_one_impl.h"
+#include "collector_impl.h"
+#include "verifier_impl.h"
 
 #undef LOG_TAG
 #define LOG_TAG "PIN_AUTH_HDI"
@@ -40,7 +42,7 @@ extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
     return pinAuthInterfaceService;
 }
 
-int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIExecutor>>& allInOneExecutors,
+int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIAllInOneExecutor>>& allInOneExecutors,
     std::vector<sptr<HdiIVerifier>>& verifiers, std::vector<sptr<HdiICollector>>& collectors)
 {
     IAM_LOGI("start");
@@ -52,12 +54,12 @@ int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIExecutor>>
         IAM_LOGE("Generate pinHdi failed");
         return HDF_FAILURE;
     }
-    sptr<HdiIExecutor> executor = new (std::nothrow) ExecutorImpl(pinHdi);
-    if (executor == nullptr) {
-        IAM_LOGE("Generate executor failed");
+    sptr<HdiIAllInOneExecutor> allInOneImpl(new (std::nothrow) AllInOneImpl(pinHdi));
+    if (allInOneImpl == nullptr) {
+        IAM_LOGE("Generate all in one executor failed");
         return HDF_FAILURE;
     }
-    allInOneExecutors.push_back(executor);
+    allInOneExecutors.push_back(allInOneImpl);
     IAM_LOGI("end");
     return HDF_SUCCESS;
 }

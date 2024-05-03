@@ -53,6 +53,8 @@ void *UpdatePinDbFrom0To1(void *pinDb)
         Free(pinDbV1);
         return NULL;
     }
+    (void)memset_s(pinDbV1->pinIndex,
+        sizeof(PinIndexV1) * pinDbV1->pinIndexLen, 0, sizeof(PinIndexV1) * pinDbV1->pinIndexLen);
     for (uint32_t i = 0; i < pinDbV1->pinIndexLen; i++) {
         pinDbV1->pinIndex[i].antiBruteInfo = pinDbV0->pinIndex[i].antiBruteInfo;
         pinDbV1->pinIndex[i].pinInfo.subType = pinDbV0->pinIndex[i].pinInfo.subType;
@@ -73,6 +75,8 @@ static ResultCode GetPinIndexV1(uint8_t *data, uint32_t dataLen, PinDbV1 *pinDbV
         LOG_ERROR("pinIndex malloc fail.");
         return RESULT_NO_MEMORY;
     }
+    (void)memset_s(pinDbV1->pinIndex,
+        sizeof(PinIndexV1) * pinDbV1->pinIndexLen, 0, sizeof(PinIndexV1) * pinDbV1->pinIndexLen);
     uint8_t *temp = data;
     uint32_t tempLen = dataLen;
     for (uint32_t i = 0; i < pinDbV1->pinIndexLen; i++) {
@@ -87,9 +91,10 @@ static ResultCode GetPinIndexV1(uint8_t *data, uint32_t dataLen, PinDbV1 *pinDbV
             sizeof(pinDbV1->pinIndex[i].antiBruteInfo),
             pinDbV1->pinIndex[i].pinInfo.templateId, ANTI_BRUTE_SUFFIX) != RESULT_SUCCESS) {
             LOG_ERROR("read AntiBruteInfo fail.");
-            Free(pinDbV1->pinIndex);
-            pinDbV1->pinIndex = NULL;
-            return RESULT_BAD_READ;
+            GetMaxLockedAntiBruteInfo(&(pinDbV1->pinIndex[i].antiBruteInfo));
+            (void)WritePinFile((uint8_t *)(&(pinDbV1->pinIndex[i].antiBruteInfo)),
+                sizeof(pinDbV1->pinIndex[i].antiBruteInfo),
+                pinDbV1->pinIndex[i].pinInfo.templateId, ANTI_BRUTE_SUFFIX);
         }
     }
     return RESULT_SUCCESS;
@@ -228,11 +233,12 @@ ResultCode WritePinDbV1(void *pinDb)
         LOG_ERROR("malloc data fail.");
         return RESULT_GENERAL_ERROR;
     }
+    (void)memset_s(data, dataLen, 0, dataLen);
     ResultCode ret = RESULT_BAD_WRITE;
     uint8_t *temp = data;
     uint32_t tempLen = dataLen;
     if (GetBufFromData((uint8_t *)(&(pinDbV1->dbVersion)), sizeof(pinDbV1->dbVersion),
-        &temp, &tempLen)!= RESULT_SUCCESS) {
+        &temp, &tempLen) != RESULT_SUCCESS) {
         LOG_ERROR("get version fail.");
         goto EXIT;
     }

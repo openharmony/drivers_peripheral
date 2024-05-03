@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,6 @@ extern "C" {
 #define INIT_START_FREEZE_TIMES 0
 #define CONST_PIN_DATA_LEN 64U
 #define CONST_SALT_LEN 32U
-#define CONST_PUB_KEY_LEN 32U
 #define RESULT_TLV_LEN 240U
 
 typedef struct {
@@ -46,8 +45,7 @@ ResultCode DoGetAlgoParameter(uint64_t templateId, uint8_t *salt, uint32_t *salt
 ResultCode DoGenerateAlgoParameter(uint8_t *algoParameter, uint32_t *algoParameterLength, uint32_t *algoVersion,
     uint8_t *localDeviceId, uint32_t deviceUuidLength);
 ResultCode DelPinById(uint64_t templateId);
-ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
-    Buffer *outRootSecret, ResultCode *compareRet);
+ResultCode AuthPinById(const Buffer *inputPinData, uint64_t templateId, Buffer *outRootSecret, ResultCode *compareRet);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorCount);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);

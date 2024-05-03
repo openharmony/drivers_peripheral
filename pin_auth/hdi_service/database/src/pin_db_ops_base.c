@@ -125,3 +125,32 @@ ResultCode ReadPinFile(uint8_t *data, uint32_t dataLen, uint64_t templateId, con
 
     return RESULT_SUCCESS;
 }
+
+/* This is for example only, Should be implemented in trusted environment. */
+ResultCode WritePinFile(const uint8_t *data, uint32_t dataLen, uint64_t templateId, const char *suffix)
+{
+    if (data == NULL || suffix == NULL) {
+        LOG_ERROR("bad parameter.");
+        return RESULT_BAD_PARAM;
+    }
+    FileOperator *fileOp = GetFileOperator(DEFAULT_FILE_OPERATOR);
+    if (!IsFileOperatorValid(fileOp)) {
+        LOG_ERROR("fileOp invalid.");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    char fileName[MAX_FILE_NAME_LEN] = {'\0'};
+    ResultCode ret = GenerateFileName(templateId, DEFAULT_FILE_HEAD, suffix, fileName, MAX_FILE_NAME_LEN);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinFile Generate Pin FileName fail.");
+        return RESULT_GENERAL_ERROR;
+    }
+    ret = (ResultCode)fileOp->writeFile(fileName, data, dataLen);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinFile fail.");
+        return ret;
+    }
+    LOG_INFO("WritePinFile succ.");
+
+    return RESULT_SUCCESS;
+}

@@ -20,6 +20,22 @@
 extern "C" {
 #endif // __cplusplus
 
+#define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return (retVal); \
+        } \
+    } while (0)
+
+#define IF_TRUE_LOGE_AND_RETURN(cond) \
+    do { \
+        if (cond) { \
+            LOG_ERROR("(" #cond ") check fail, return"); \
+            return; \
+        } \
+    } while (0)
+
 typedef enum ResultCode {
     RESULT_SUCCESS = 0x0,
     RESULT_GENERAL_ERROR = 0x1,
@@ -114,6 +130,8 @@ typedef enum AuthSubType {
 } AuthSubType;
 
 #define MAX_DULPLICATE_CHECK 100
+
+#define MAX_EXECUTOR_MSG_LEN 2048
 
 #ifdef __cplusplus
 }
