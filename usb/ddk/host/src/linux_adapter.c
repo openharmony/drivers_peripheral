@@ -1474,7 +1474,7 @@ static bool AdapterGetInterfaceActiveStatus(const struct UsbDeviceHandle *devHan
 {
     bool ret;
     if (devHandle == NULL) {
-        return HDF_ERR_INVALID_PARAM;
+        return false;
     }
     struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
     ret = ioctl(devHandle->fd, USBDEVFS_GETDRIVER, &getDriver);
