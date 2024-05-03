@@ -61,7 +61,8 @@ int32_t AllInOneImpl::GetExecutorInfo(HdiExecutorInfo &info)
     info.executorRole = HdiExecutorRole::ALL_IN_ONE;
     info.authType = HdiAuthType::PIN;
     uint32_t eslRet = 0;
-    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::ALL_IN_ONE, info.publicKey, eslRet);
+    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::ALL_IN_ONE, info.publicKey, eslRet,
+        info.maxTemplateAcl);
     if (result != SUCCESS) {
         IAM_LOGE("Get all in one ExecutorInfo failed, fail code:%{public}d", result);
         return HDF_FAILURE;
@@ -364,6 +365,7 @@ int32_t AllInOneImpl::GetProperty(
     property.authSubType = infoRet.subType;
     property.remainAttempts = infoRet.remainTimes;
     property.lockoutDuration = infoRet.freezingTime;
+    property.nextFailLockoutDuration = infoRet.nextFailLockoutDuration;
     return HDF_SUCCESS;
 }
 

@@ -170,7 +170,8 @@ HWTEST_F(PinAuthTest, GetExecutorInfo_test, TestSize.Level1)
     EXPECT_NE(pinAuth, nullptr);
     std::vector<uint8_t> pubKey;
     uint32_t esl = 0;
-    int32_t result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::SCHEDULER, pubKey, esl);
+    uint32_t acl = 0;
+    int32_t result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::SCHEDULER, pubKey, esl, acl);
     EXPECT_EQ(result, GENERAL_ERROR);
     delete pinAuth;
 }
@@ -288,7 +289,8 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
 
     std::vector<uint8_t> pubKey;
     uint32_t esl = 0;
-    result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::ALL_IN_ONE, pubKey, esl);
+    uint32_t acl = 0;
+    result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::ALL_IN_ONE, pubKey, esl, acl);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(esl, 2);
 

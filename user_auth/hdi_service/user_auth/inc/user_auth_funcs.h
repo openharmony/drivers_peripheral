@@ -75,6 +75,7 @@ ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledState
 ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
 ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *executorExpiredInfos,
     uint32_t len, uint32_t *size);
+void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult);
 
 #ifdef __cplusplus
 }

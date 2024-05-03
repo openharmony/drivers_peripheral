@@ -49,7 +49,8 @@ int32_t CollectorImpl::GetExecutorInfo(HdiExecutorInfo &executorInfo)
     executorInfo.executorRole = HdiExecutorRole::COLLECTOR;
     executorInfo.authType = HdiAuthType::PIN;
     uint32_t eslRet = 0;
-    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::COLLECTOR, executorInfo.publicKey, eslRet);
+    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::COLLECTOR, executorInfo.publicKey, eslRet,
+        executorInfo.maxTemplateAcl);
     if (result != SUCCESS) {
         IAM_LOGE("Get collector ExecutorInfo failed, fail code:%{public}d", result);
         return HDF_FAILURE;

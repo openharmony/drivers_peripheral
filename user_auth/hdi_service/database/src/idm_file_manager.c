@@ -257,7 +257,7 @@ EXIT:
 }
 
 IAM_STATIC ResultCode StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigParamHal globalConfigInfo)
-{  
+{
     ResultCode result = StreamWrite(parcel, &(globalConfigInfo.type), sizeof(int32_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("StreamWrite global config type failed");
@@ -574,7 +574,7 @@ IAM_STATIC Buffer *ReadGlobalConfigFile(FileOperator *fileOperator)
 }
 
 IAM_STATIC ResultCode StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalConfigParamHal *globalConfigInfo)
-{  
+{
     ResultCode result = StreamRead(parcel, index, &(globalConfigInfo->type), sizeof(int32_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("read globalConfig type failed");
@@ -595,8 +595,8 @@ IAM_STATIC ResultCode StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, Gl
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigParamHal *globalConfigInfo, uint32_t *configInfoNum,
-    uint32_t maxNum)
+IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigParamHal *globalConfigInfo,
+    uint32_t *configInfoNum, uint32_t maxNum)
 {
     uint32_t index = 0;
     uint32_t version = 0;

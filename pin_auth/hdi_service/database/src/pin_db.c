@@ -780,10 +780,34 @@ static uint64_t GetWaitTime(uint32_t authErrorCount)
         }
         return 0;
     }
-    if (authErrorCount > ATTI_BRUTE_SECOND_STAGE) {
+    if (authErrorCount >= ATTI_BRUTE_SECOND_STAGE) {
         return ONE_DAY_TIME * MS_OF_S;
     }
     return ExponentialFuncTime(authErrorCount) * MS_OF_S;
+}
+
+int32_t GetNextFailLockoutDuration(uint32_t authErrorCount)
+{
+    if (authErrorCount < FIRST_ANTI_BRUTE_COUNT) {
+        return ONE_MIN_TIME * MS_OF_S;
+    }
+    if (authErrorCount < SECOND_ANTI_BRUTE_COUNT) {
+        return TEN_MIN_TIME * MS_OF_S;
+    }
+    if (authErrorCount < THIRD_ANTI_BRUTE_COUNT) {
+        return THIRTY_MIN_TIME * MS_OF_S;
+    }
+    if (authErrorCount < ATTI_BRUTE_FIRST_STAGE -
+        (ATTI_BRUTE_FIRST_STAGE - FIRST_ANTI_BRUTE_COUNT) % ANTI_BRUTE_COUNT_FREQUENCY) {
+        return ONE_HOUR_TIME * MS_OF_S;
+    }
+    if (authErrorCount < ATTI_BRUTE_FIRST_STAGE) {
+        return (int32_t)ExponentialFuncTime(ATTI_BRUTE_FIRST_STAGE) * MS_OF_S;
+    }
+    if (authErrorCount < ATTI_BRUTE_SECOND_STAGE - 1) {
+        return (int32_t)ExponentialFuncTime(authErrorCount + 1) * MS_OF_S;
+    }
+    return ONE_DAY_TIME * MS_OF_S;
 }
 
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime)
