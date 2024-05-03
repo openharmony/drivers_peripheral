@@ -1884,7 +1884,7 @@ bool UsbGetInterfaceActiveStatus(
     bool claimFlag = false;
     bool unactivated;
     if (realSession == NULL) {
-        return NULL;
+        return false;
     }
     SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
     interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
@@ -1892,14 +1892,14 @@ bool UsbGetInterfaceActiveStatus(
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
             HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
-            return NULL;
+            return false;
         }
     }
 
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
     if (interfaceObj == NULL) {
         HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
-        return NULL;
+        return false;
     }
 
     devHandle = interfacePool->device->devHandle;
