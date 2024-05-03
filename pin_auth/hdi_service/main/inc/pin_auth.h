@@ -28,6 +28,7 @@ struct PinCredentialInfo {
     uint64_t subType;
     uint32_t remainTimes;
     uint32_t freezingTime;
+    int32_t nextFailLockoutDuration;
 };
 
 struct PinAlgoParam {
@@ -45,7 +46,8 @@ public:
     int32_t Init();
     int32_t Close();
 
-    int32_t GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl);
+    int32_t GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl,
+        uint32_t &maxTemplateAcl);
 
     // for all in one executor
     int32_t SetAllInOneFwkParam(

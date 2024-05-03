@@ -50,7 +50,8 @@ int32_t VerifierImpl::GetExecutorInfo(HdiExecutorInfo &executorInfo)
     executorInfo.executorRole = HdiExecutorRole::VERIFIER;
     executorInfo.authType = HdiAuthType::PIN;
     uint32_t eslRet = 0;
-    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::VERIFIER, executorInfo.publicKey, eslRet);
+    int32_t result = pinHdi_->GetExecutorInfo(HdiExecutorRole::VERIFIER, executorInfo.publicKey, eslRet,
+        executorInfo.maxTemplateAcl);
     if (result != SUCCESS) {
         IAM_LOGE("Get verifier ExecutorInfo failed, fail code:%{public}d", result);
         return HDF_FAILURE;

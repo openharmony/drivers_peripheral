@@ -445,13 +445,14 @@ void FuzzCancelIdentification(Parcel &parcel)
     IAM_LOGI("end");
 }
 
-void FuzzGetAuthTrustLevel(Parcel &parcel)
+void FuzzGetAvailableStatus(Parcel &parcel)
 {
     IAM_LOGI("begin");
     int32_t userId = parcel.ReadInt32();
     AuthType authType = static_cast<AuthType>(parcel.ReadInt32());
     uint32_t authTrustLevel = parcel.ReadUint32();
-    g_service.GetAuthTrustLevel(userId, authType, authTrustLevel);
+    int32_t checkRet = parcel.ReadInt32();
+    g_service.GetAvailableStatus(userId, authType, authTrustLevel, checkRet);
     IAM_LOGI("end");
 }
 
@@ -555,7 +556,7 @@ FuzzFunc *g_fuzzFuncs[] = {FuzzInit, FuzzAddExecutor, FuzzDeleteExecutor, FuzzOp
     FuzzBeginEnrollment, FuzzUpdateEnrollmentResult, FuzzCancelEnrollment, FuzzDeleteCredential, FuzzGetCredential,
     FuzzGetSecureInfo, FuzzDeleteUser, FuzzEnforceDeleteUser, FuzzBeginAuthentication, FuzzUpdateAuthenticationResult,
     FuzzCancelAuthentication, FuzzBeginIdentification, FuzzUpdateIdentificationResult, FuzzCancelIdentification,
-    FuzzGetAuthTrustLevel, FuzzGetValidSolution, FuzzGetEnrolledState, FuzzCheckReuseUnlockResult,
+    FuzzGetAvailableStatus, FuzzGetValidSolution, FuzzGetEnrolledState, FuzzCheckReuseUnlockResult,
     FuzzSendMessage, FuzzRegisterMessageCallback, FuzzGetLocalScheduleFromMessage, FuzzGetSignedExecutorInfo,
     FuzzSetGlobalConfigParam};
 

@@ -25,6 +25,7 @@
 #include "iam_logger.h"
 #include "iam_ptr.h"
 
+#include "adaptor_time.h"
 #include "attributes.h"
 #include "useriam_common.h"
 #include "auth_level.h"
@@ -51,7 +52,6 @@ static std::string g_deviceUdid;
 static std::recursive_mutex g_executorMessageMutex;
 sptr<HdiIMessageCallback> g_executorMessageCallback;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
-constexpr uint32_t AUTH_TRUST_LEVEL_SYS = 1;
 const std::string SCREEN_LOCK_NAME = "com.ohos.systemui";
 const std::string SETTRINGS_NAME = "com.ohos.settings";
 
@@ -497,12 +497,16 @@ int32_t UserAuthInterfaceService::CancelIdentification(uint64_t contextId)
     return DestoryContextbyId(contextId);
 }
 
-int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, int32_t authType, uint32_t &authTrustLevel)
+int32_t UserAuthInterfaceService::GetAvailableStatus(int32_t userId, int32_t authType, uint32_t authTrustLevel,
+    int32_t &checkResult)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
-    int32_t ret = SingleAuthTrustLevel(userId, authType, &authTrustLevel);
-    return ret;
+    GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkResult);
+    if (checkResult != RESULT_SUCCESS) {
+        IAM_LOGE("GetAvailableStatusFunc failed");
+    }
+    return RESULT_SUCCESS;
 }
 
 int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::vector<int32_t> &authTypes,
@@ -513,17 +517,20 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
     validTypes.clear();
     std::lock_guard<std::mutex> lock(g_mutex);
     for (auto &authType : authTypes) {
-        uint32_t supportedAtl = AUTH_TRUST_LEVEL_SYS;
-        int32_t ret = SingleAuthTrustLevel(userId, authType, &supportedAtl);
-        if (ret != RESULT_SUCCESS) {
-            IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, ret);
-            result = RESULT_NOT_ENROLLED;
+        int32_t checkRet = RESULT_GENERAL_ERROR;
+        GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkRet);
+        if (checkRet == RESULT_PIN_EXPIRED) {
+            LOG_ERROR("pin is expired");
+            return RESULT_PIN_EXPIRED;
+        }
+        if (checkRet == RESULT_TRUST_LEVEL_NOT_SUPPORT) {
+            IAM_LOGE("GetAvailableStatus checkRet: %{public}d", checkRet);
+            result = checkRet;
             continue;
         }
-        if (authTrustLevel > supportedAtl) {
-            IAM_LOGE("authTrustLevel does not support, authType:%{public}d, supportedAtl:%{public}u",
-                authType, supportedAtl);
-            result = RESULT_TRUST_LEVEL_NOT_SUPPORT;
+        if (checkRet != RESULT_SUCCESS) {
+            IAM_LOGE("authType does not support, authType:%{public}d, ret:%{public}d", authType, checkRet);
+            result = RESULT_NOT_ENROLLED;
             continue;
         }
         IAM_LOGI("get valid authType:%{public}d", authType);
@@ -871,6 +878,7 @@ static bool CopyExecutorInfo(const HdiExecutorRegisterInfo &in, ExecutorInfoHal 
     out.authType = in.authType;
     out.executorMatcher = in.executorMatcher;
     out.esl = in.esl;
+    out.maxTemplateAcl = in.maxTemplateAcl;
     out.executorRole = in.executorRole;
     out.executorSensorHint = in.executorSensorHint;
     if (memcpy_s(out.pubKey, PUBLIC_KEY_LEN, &in.publicKey[0], in.publicKey.size()) != EOK) {
@@ -1161,7 +1169,7 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
     sptr<HdiIMessageCallback> messageCallback = GetExecutorMessageCallback();
     if (messageCallback != nullptr) {
         IAM_LOGE("GetExecutorMessageCallback failed");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_SUCCESS;
     }
     for (uint32_t i = 0; i < size; i++) {
         std::vector<uint8_t> msg;

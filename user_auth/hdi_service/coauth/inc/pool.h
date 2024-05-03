@@ -39,6 +39,7 @@ typedef struct ExecutorInfoHal {
     uint32_t executorRole;
     uint32_t executorMatcher;
     uint32_t esl;
+    uint32_t maxTemplateAcl;
     uint8_t pubKey[PUBLIC_KEY_LEN];
 } ExecutorInfoHal;
 
