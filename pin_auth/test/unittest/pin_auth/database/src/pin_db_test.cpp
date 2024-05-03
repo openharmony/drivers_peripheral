@@ -339,6 +339,41 @@ HWTEST_F(PinDataBaseTest, VerifyTemplateDataPin_test, TestSize.Level1)
     result = VerifyTemplateDataPin(nullptr, 1);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 }
+
+/**
+ * @tc.name: GetNextFailLockoutDuration test
+ * @tc.desc: get next fail lockout duration
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(PinDataBaseTest, GetNextFailLockoutDuration_test, TestSize.Level1)
+{
+    const uint32_t MS_OF_S = 1000uLL;
+    const uint32_t ONE_MIN_TIME = 60;
+    EXPECT_EQ(ONE_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(0));
+
+    const uint32_t FIRST_ANTI_BRUTE_COUNT = 5;
+    const uint32_t TEN_MIN_TIME = 600;
+    EXPECT_EQ(TEN_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(FIRST_ANTI_BRUTE_COUNT));
+
+    const uint32_t SECOND_ANTI_BRUTE_COUNT = 8;
+    const uint32_t THIRTY_MIN_TIME = 1800;
+    EXPECT_EQ(THIRTY_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(SECOND_ANTI_BRUTE_COUNT));
+
+    const uint32_t THIRD_ANTI_BRUTE_COUNT = 11;
+    const uint32_t ONE_HOUR_TIME = 3600;
+    EXPECT_EQ(ONE_HOUR_TIME * MS_OF_S, GetNextFailLockoutDuration(THIRD_ANTI_BRUTE_COUNT));
+
+    const uint32_t AUTH_ERROR_COUNT01 = 98;
+    const uint32_t FAIL_LOCKOUT_DURATION01 = 3840;
+    const uint32_t ATTI_BRUTE_FIRST_STAGE = 100;
+    EXPECT_EQ(FAIL_LOCKOUT_DURATION01 * MS_OF_S, GetNextFailLockoutDuration(AUTH_ERROR_COUNT01));
+    EXPECT_EQ(FAIL_LOCKOUT_DURATION01 * MS_OF_S, GetNextFailLockoutDuration(ATTI_BRUTE_FIRST_STAGE));
+
+    const uint32_t ATTI_BRUTE_SECOND_STAGE = 140;
+    const uint32_t ONE_DAY_TIME = 86400;
+    EXPECT_EQ(ONE_DAY_TIME * MS_OF_S, GetNextFailLockoutDuration(ATTI_BRUTE_SECOND_STAGE - 1));
+}
 } // namespace PinAuth
 } // namespace UserIam
 } // namespace OHOS

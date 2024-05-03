@@ -52,6 +52,7 @@ ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
 ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorCount, uint64_t *startFreezeTime);
 ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
+int32_t GetNextFailLockoutDuration(uint32_t authErrorCount);
 
 #ifdef __cplusplus
 }

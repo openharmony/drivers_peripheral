@@ -31,6 +31,7 @@ namespace {
 constexpr uint16_t SENSOR_ID = 123;
 constexpr uint32_t EXECUTOR_TYPE = 123;
 constexpr size_t PUBLIC_KEY_LEN = 32;
+constexpr uint32_t FACE_CAPABILITY_LEVEL = 3;
 } // namespace
 
 AllInOneExecutorImpl::AllInOneExecutorImpl()
@@ -40,9 +41,11 @@ AllInOneExecutorImpl::AllInOneExecutorImpl()
         .executorMatcher = EXECUTOR_TYPE,
         .executorRole = ExecutorRole::ALL_IN_ONE,
         .authType = AuthType::FACE,
-        .esl = ExecutorSecureLevel::ESL0,
         .publicKey = std::vector<uint8_t>(PUBLIC_KEY_LEN, 0),
         .extraInfo = {},
+        // esl and maxTemplateAcl are for example only. Should be implemented in trusted environment.
+        .esl = ExecutorSecureLevel::ESL2,
+        .maxTemplateAcl = FACE_CAPABILITY_LEVEL,
     };
 }
 

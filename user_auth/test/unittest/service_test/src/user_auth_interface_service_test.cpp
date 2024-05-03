@@ -1102,7 +1102,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestEnforceDeleteUser_002, TestSize.Level
     EXPECT_EQ(service->CloseSession(userId), 0);
 }
 
-HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_001, TestSize.Level0)
+HWTEST_F(UserAuthInterfaceServiceTest, TestGetAvailableStatus_001, TestSize.Level0)
 {
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
@@ -1113,10 +1113,12 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_001, TestSize.Level
     constexpr int32_t userId = 325614;
     AuthType authType = AuthType::PIN;
     uint32_t authTrustLevel = 0;
-    EXPECT_EQ(service->GetAuthTrustLevel(userId, authType, authTrustLevel), 5);
+    int32_t checkRet;
+    EXPECT_EQ(service->GetAvailableStatus(userId, authType, authTrustLevel, checkRet), RESULT_SUCCESS);
+    EXPECT_EQ(checkRet, RESULT_TYPE_NOT_SUPPORT);
 }
 
-HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_002, TestSize.Level0)
+HWTEST_F(UserAuthInterfaceServiceTest, TestGetAvailableStatus_002, TestSize.Level0)
 {
     auto service = UserIam::Common::MakeShared<UserAuthInterfaceService>();
     EXPECT_NE(service, nullptr);
@@ -1137,7 +1139,8 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestGetAuthTrustLevel_002, TestSize.Level
     EXPECT_EQ(enrollResultTest.result, 0);
 
     uint32_t authTrustLevel = 0;
-    EXPECT_EQ(service->GetAuthTrustLevel(userId, authType, authTrustLevel), 0);
+    int32_t checkRet;
+    EXPECT_EQ(service->GetAvailableStatus(userId, authType, authTrustLevel, checkRet), 0);
 
     std::vector<CredentialInfo> deletedCredInfos;
     EXPECT_EQ(service->EnforceDeleteUser(userId, deletedCredInfos), 0);
