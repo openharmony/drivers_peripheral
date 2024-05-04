@@ -1167,7 +1167,7 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         return ret;
     }
     sptr<HdiIMessageCallback> messageCallback = GetExecutorMessageCallback();
-    if (messageCallback != nullptr) {
+    if (messageCallback == nullptr) {
         IAM_LOGE("GetExecutorMessageCallback failed");
         return RESULT_SUCCESS;
     }
