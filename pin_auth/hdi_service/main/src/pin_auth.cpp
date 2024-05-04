@@ -281,7 +281,6 @@ int32_t PinAuth::GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pub
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    maxTemplateAcl = PIN_CAPABILITY_LEVEL;
     PinExecutorInfo pinExecutorInfo = {};
     int32_t result = RESULT_GENERAL_ERROR;
     switch (executorRole) {
@@ -303,6 +302,7 @@ int32_t PinAuth::GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pub
         goto ERROR;
     }
     esl = pinExecutorInfo.esl;
+    maxTemplateAcl = pinExecutorInfo.maxTemplateAcl;
     pubKey.resize(ED25519_FIX_PUBKEY_BUFFER_SIZE);
     if (memcpy_s(pubKey.data(), ED25519_FIX_PUBKEY_BUFFER_SIZE,
         pinExecutorInfo.pubKey, ED25519_FIX_PUBKEY_BUFFER_SIZE) != EOK) {

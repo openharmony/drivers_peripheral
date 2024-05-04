@@ -186,6 +186,7 @@ ResultCode DoGetAllInOneExecutorInfo(PinExecutorInfo *pinExecutorInfo)
         return RESULT_UNKNOWN;
     }
     pinExecutorInfo->esl = PIN_EXECUTOR_SECURITY_LEVEL;
+    pinExecutorInfo->maxTemplateAcl = PIN_CAPABILITY_LEVEL;
     return RESULT_SUCCESS;
 }
 
