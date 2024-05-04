@@ -54,6 +54,7 @@ typedef enum RemotePinMsgId {
 typedef struct PinExecutorInfo {
     uint32_t esl;
     uint8_t pubKey[ED25519_FIX_PUBKEY_BUFFER_SIZE];
+    uint32_t maxTemplateAcl;
 } PinExecutorInfo;
 
 typedef struct {
