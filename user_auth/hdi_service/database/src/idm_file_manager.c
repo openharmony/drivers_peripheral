@@ -610,11 +610,12 @@ IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigParamHal 
         LOG_ERROR("read configInfoNum failed");
         return RESULT_GENERAL_ERROR;
     }
-    for (uint32_t i = 0; i < (*configInfoNum); i++)
-    result = StreamReadGlobalConfig(parcel, &index, &globalConfigInfo[i]);
-    if (result != RESULT_SUCCESS) {
-        LOG_ERROR("read StreamReadExpiredPeriod failed");
-        return RESULT_GENERAL_ERROR;
+    for (uint32_t i = 0; i < (*configInfoNum); i++) {
+        result = StreamReadGlobalConfig(parcel, &index, &globalConfigInfo[i]);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("read StreamReadExpiredPeriod failed");
+            return RESULT_GENERAL_ERROR;
+        }
     }
     return RESULT_SUCCESS;
 }

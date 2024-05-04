@@ -180,7 +180,7 @@ HWTEST_F(AllInOneImplTest, Hdi_Send_Message_test, TestSize.Level1)
     attr.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime);
     msg = attr.Serialize();
     result = impl->SendMessage(scheduleId, srcRole, msg);
-    EXPECT_EQ(result, HDF_FAILURE);
+    EXPECT_EQ(result, HDF_SUCCESS);
     delete impl;
 }
 } // namespace PinAuth
