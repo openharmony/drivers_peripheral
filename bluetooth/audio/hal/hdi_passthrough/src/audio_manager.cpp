@@ -16,6 +16,7 @@
 #include "audio_adapter_info_common.h"
 #include "audio_internal.h"
 #include "audio_bluetooth_manager.h"
+#include "fast_audio_render.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    struct AudioAdapterDescriptor **descs,
@@ -68,7 +69,15 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     OHOS::Bluetooth::GetProxy();
     OHOS::Bluetooth::RegisterObserver();
 #else
-    if (!OHOS::Bluetooth::SetUp()) {
+    bool ret = false;
+    if (strcmp(desc->adapterName, "bt_a2dp_fast") == 0) {
+        HDF_LOGI("%{public}s, fast set up", __func__);
+        ret = OHOS::Bluetooth::FastSetUp();
+    } else {
+        HDF_LOGI("%{public}s, normal set up", __func__);
+        ret = OHOS::Bluetooth::SetUp();
+    }
+    if (!ret) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #endif
@@ -82,6 +91,9 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     if (manager == NULL || hwAdapter == NULL) {
         return;
     }
+#ifdef A2DP_HDI_SERVICE
+    bool isFastAdapter = (strcmp(hwAdapter->adapterDescriptor.adapterName, "bt_a2dp_fast") == 0);
+#endif
     if (hwAdapter->portCapabilitys != NULL) {
         int32_t portNum = hwAdapter->adapterDescriptor.portNum;
         int32_t i = 0;
@@ -99,7 +111,11 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
 #ifndef A2DP_HDI_SERVICE
     OHOS::Bluetooth::DeRegisterObserver();
 #else
-    OHOS::Bluetooth::TearDown();
+    if (isFastAdapter) {
+        OHOS::Bluetooth::FastTearDown();
+    } else {
+        OHOS::Bluetooth::TearDown();
+    }
 #endif
 }
 

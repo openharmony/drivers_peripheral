@@ -347,7 +347,9 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     }
 
     LOGV("%s, WriteFrame", __func__);
-    return OHOS::Bluetooth::WriteFrame(reinterpret_cast<const uint8_t *>(frame), static_cast<uint32_t>(requestBytes));
+    const uint8_t *data = reinterpret_cast<const uint8_t *>(frame);
+    AudioSampleAttributes *attrs = &hwRender->renderParam.frameRenderMode.attrs;
+    return OHOS::Bluetooth::WriteFrame(data, static_cast<uint32_t>(requestBytes), attrs);
 }
 
 int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)

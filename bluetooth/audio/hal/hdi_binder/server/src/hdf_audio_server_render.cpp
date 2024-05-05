@@ -816,13 +816,41 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     if (HdiServiceReqMmapBuffer(&desc, data) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
+    ret = render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
+    if (ret < 0) {
+        HDF_LOGE("reqmmapbuffer failed");
+        return ret;
+    }
+    if (!HdfSbufWriteFileDescriptor(reply, desc.memoryFd)) {
+        HDF_LOGE("memoryFd write failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.totalBufferFrames)) {
+        HDF_LOGE("totalBufferFrames write failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.transferFrameSize)) {
+        HDF_LOGE("transferFrameSize write failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.isShareable)) {
+        HDF_LOGE("isShareable write failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteUint32(reply, desc.offset)) {
+        HDF_LOGE("offset write failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -840,7 +868,6 @@ int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     if (HdiServicePositionWrite(reply, frames, time) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("%{public}s: out", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 
