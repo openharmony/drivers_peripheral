@@ -374,30 +374,6 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
     client.sensorConfigMap_[sensorId] = sensorConfig;
 }
 
-bool SensorClientsManager::IsNotNeedReportData(int32_t serviceId, int32_t sensorId)
-{
-    if (!IsSensorContinues(sensorId)) {
-        return false;
-    }
-    std::unique_lock<std::mutex> lock(clientsMutex_);
-    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
-    if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
-        HDF_LOGE("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
-        return false;
-    }
-    auto &sensorClientInfo = clients_[groupId].find(serviceId)->second;
-    if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
-        return false;
-    }
-    sensorClientInfo.curCountMap_[sensorId]++;
-    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
-    if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
-        sensorClientInfo.curCountMap_[sensorId] = 0;
-        return false;
-    }
-    return true;
-}
-
 bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
 {
     return std::find(continuesSensor.begin(), continuesSensor.end(), sensorId) != continuesSensor.end();
