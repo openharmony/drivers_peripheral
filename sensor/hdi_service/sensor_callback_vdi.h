@@ -38,15 +38,16 @@ public:
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
     std::mutex timestampMapMutex_;
-    static bool servicesChanged = true;
-    static bool clientsChanged = true;
-    static std::unordered_map<int32_t, std::set<int32_t>> servicesMap_;
-    static std::unordered_map<int, SensorClientInfo> sensorClientInfos_;
+    static bool servicesChanged;
+    static bool clientsChanged;
+    std::unordered_map<int32_t, std::set<int32_t>> servicesMap_;
+    std::unordered_map<int, SensorClientInfo> sensorClientInfos_;
 private:
     void PrintData(const HdfSensorEvents &event);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
     int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
     bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId, int32_t &serviceId);
+    sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
 };
 

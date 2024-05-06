@@ -32,8 +32,8 @@ namespace {
     static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
 }
 
-std::unordered_map<int32_t, std::set<int32_t>> SensorCallbackVdi::servicesMap_;
-std::unordered_map<int, SensorClientInfo> SensorCallbackVdi::sensorClientInfos_;
+bool SensorCallbackVdi::servicesChanged = true;
+bool SensorCallbackVdi::clientsChanged = true;
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
@@ -51,7 +51,6 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 
 int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
 {
-    int32_t ret;
     SensorClientsManager::GetInstance()->CopyEventData(event);
     PrintData(event);
     if (servicesChanged) {
@@ -69,6 +68,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
         HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
         return HDF_FAILURE;
     }
+    int32_t ret = ReportEachClient(servicesMap_.find(event.sensorId)->second, event);
     return HDF_SUCCESS;
 }
 
