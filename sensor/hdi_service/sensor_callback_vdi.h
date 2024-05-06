@@ -36,8 +36,6 @@ public:
     explicit SensorCallbackVdi(sptr<ISensorCallback> sensorCallback) : sensorCallback_(sensorCallback) {}
     int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
-    int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
-    bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId, int32_t &serviceId);
     sptr<IRemoteObject> HandleCallbackDeath() override;
     std::mutex timestampMapMutex_;
     static bool servicesChanged = true;
@@ -47,6 +45,8 @@ public:
 private:
     void PrintData(const HdfSensorEvents &event);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
+    int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
+    bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId, int32_t &serviceId);
     SensorClientInfo sensorClientInfo_;
 };
 
