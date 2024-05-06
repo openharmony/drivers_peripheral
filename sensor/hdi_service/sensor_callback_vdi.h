@@ -42,8 +42,8 @@ public:
     std::mutex timestampMapMutex_;
     static bool servicesChanged = true;
     static bool clientsChanged = true;
-    std::unordered_map<int32_t, std::set<int32_t>> servicesMap_;
-    std::unordered_map<int, SensorClientInfo> sensorClientInfos_;
+    static std::unordered_map<int32_t, std::set<int32_t>> servicesMap_;
+    static std::unordered_map<int, SensorClientInfo> sensorClientInfos_;
 private:
     void PrintData(const HdfSensorEvents &event);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
