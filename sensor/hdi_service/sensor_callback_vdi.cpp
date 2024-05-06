@@ -69,18 +69,19 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
         return HDF_FAILURE;
     }
     int32_t ret = ReportEachClient(servicesMap_.find(event.sensorId)->second, event);
-    return HDF_SUCCESS;
+    return ret;
 }
 
-int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event)
+int32_t SensorCallbackVdi::ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event)
 {
     std::string result = "";
+    int32_t sensorId = event.sensorId;
     for (auto it = services.begin(); it != services.end(); ++it) {
         int32_t serviceId = *it;
         if (sensorClientInfos_.find(serviceId) == sensorClientInfos_.end()) {
             continue;
         }
-        SensorClientInfo &sensorClientInfo = sensorClientInfos.find(serviceId)->second;
+        SensorClientInfo &sensorClientInfo = sensorClientInfos_.find(serviceId)->second;
         if (IsNotNeedReportData(sensorClientInfo, sensorId, serviceId)) {
             continue;
         }
@@ -91,7 +92,7 @@ int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvent
         }
         StartTrace(HITRACE_TAG_HDF, "ODE,serviceId=" + std::to_string(serviceId) + ",sensorId=" +
                                     std::to_string(event.sensorId));
-        ret = callback->OnDataEvent(event);
+        int32_t ret = callback->OnDataEvent(event);
         FinishTrace(HITRACE_TAG_HDF);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
@@ -100,12 +101,13 @@ int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvent
         }
     }
     HDF_LOGD("%{public}s sensorId=%{public}d, services=%{public}s", __func__, event.sensorId, result.c_str());
+    return HDF_SUCCESS;
 }
 
 bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId,
                                                int32_t &serviceId)
 {
-    if (!IsSensorContinues(sensorId)) {
+    if (!SensorClientsManager::IsSensorContinues(sensorId)) {
         return false;
     }
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
