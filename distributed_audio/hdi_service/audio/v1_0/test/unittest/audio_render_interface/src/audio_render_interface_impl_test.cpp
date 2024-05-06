@@ -38,7 +38,9 @@ void AudioRenderInterfaceImplTest::SetUp(void)
     desc_.portId = 0;
     desc_.pins = PIN_NONE;
     desc_.desc = "mic";
-    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_, callback_);
+    uint32_t renderId = 0;
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId);
 }
 
 void AudioRenderInterfaceImplTest::TearDown(void)
@@ -600,7 +602,9 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderDesc_001, TestSize.Level1)
     desc_.portId = 0;
     desc_.pins = PIN_NONE;
     desc_.desc = "mic";
-    auto audioRenderInterfaceImplTmp = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_, callback_);
+    uint32_t renderId = 0;
+    auto audioRenderInterfaceImplTmp = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId);
     AudioDeviceDescriptor descriptorTmp = audioRenderInterfaceImplTmp->GetRenderDesc();
 
     EXPECT_EQ(desc_.portId, descriptorTmp.portId);

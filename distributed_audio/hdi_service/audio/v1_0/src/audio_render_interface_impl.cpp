@@ -35,9 +35,9 @@ namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
 AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
+    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, uint32_t renderId)
     : adapterName_(adpName), devDesc_(desc),
-    devAttrs_(attrs), audioExtCallback_(callback)
+    devAttrs_(attrs), renderId_(renderId), audioExtCallback_(callback)
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
         AUDIO_NORMAL_INTERVAL, false);
@@ -106,7 +106,8 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         return HDF_FAILURE;
     }
 
-    AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0, devAttrs_.frameSize};
+    AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0,
+        devAttrs_.frameSize, devAttrs_.type};
     AudioData data = { param, frame };
 #ifdef DUMP_RENDER_FILE
     if (dumpFlag_) {
