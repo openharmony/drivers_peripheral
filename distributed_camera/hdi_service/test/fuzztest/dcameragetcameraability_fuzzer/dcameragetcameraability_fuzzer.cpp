@@ -29,9 +29,7 @@ void DcameraGetCameraAbilityFuzzTest(const uint8_t* data, size_t size)
     }
     std::string deviceId = "1";
     std::string dhId = "2";
-    std::string cameraId = "1";
-    std::string dcameraBase = "2";
-    DCameraHost::GetInstance()->dhBaseHashDCamIdMap_.emplace(dcameraBase, cameraId);
+    std::string cameraId = "1__2";
     std::vector<uint8_t> cameraAbility;
     cameraAbility.push_back(* data);
     DHBase dhBase;

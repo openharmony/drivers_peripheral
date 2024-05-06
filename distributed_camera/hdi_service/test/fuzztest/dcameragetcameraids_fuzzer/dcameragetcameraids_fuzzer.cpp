@@ -27,9 +27,18 @@ void DCameraGetCameraIdsFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string cameraId = "1";
-    std::string dcameraBase = "2";
-    DCameraHost::GetInstance()->dhBaseHashDCamIdMap_.emplace(dcameraBase, cameraId);
+    std::string cameraId = "1__2";
+    DHBase dhBase;
+    dhBase.deviceId_ = "1";
+    dhBase.dhId_ = "2";
+    std::string sinkAbilityInfo = "sink";
+    std::string sourceAbilityInfo = "source";
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
+        sourceAbilityInfo));
+    if (dcameraDevice == nullptr) {
+        return;
+    }
+    DCameraHost::GetInstance()->dCameraDeviceMap_.emplace(cameraId, dcameraDevice);
     std::vector<std::string> cameraIds;
     cameraIds.push_back(cameraId);
     DCameraHost::GetInstance()->GetCameraIds(cameraIds);
