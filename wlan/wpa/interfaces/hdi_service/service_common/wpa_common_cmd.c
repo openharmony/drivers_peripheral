@@ -37,6 +37,8 @@
 #include <dlfcn.h>
 #include <string.h>
 
+#define BUF_SIZE 512
+
 pthread_t g_tid;
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
@@ -659,7 +661,7 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
 {
     HDF_LOGI("enter %{public}s ", __func__);
     (void)self;
-    if (ifName == NULL || wpaParam == NULL || wpaParam->bssid == NULL || wpaParam->pinCode == NULL) {
+    if (ifName == NULL || wpaParam == NULL || wpaParam->bssid == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -676,8 +678,8 @@ int32_t WpaInterfaceWpsPbcMode(struct IWpaInterface *self, const char *ifName, c
         config.anyFlag = wpaParam->anyFlag;
         config.multiAp = wpaParam->multiAp;
         if (wpaParam->bssidLen > 0) {
-            if (strncpy_s(config.bssid, sizeof(config.bssid), macToStr(wpaParam->bssid),
-                strlen(macToStr(wpaParam->bssid))) != 0) {
+            if (strncpy_s(config.bssid, sizeof(config.bssid),(const char *)wpaParam->bssid,
+                wpaParam->bssidLen) != 0) {
                 HDF_LOGE("%{public}s: strncpy_s bssid fail", __func__);
                 return HDF_FAILURE;
             }
@@ -1502,10 +1504,32 @@ static int32_t ProcessEventWpaAuthReject(
 int32_t ProcessEventStaNotify(struct HdfWpaRemoteNode *node, char *notifyParam, const char *ifName)
 {
     int32_t ret = HDF_FAILURE;
+    if (notifyParam == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_FAILURE;
+    }
+    char *notifyStr = (char*)malloc(BUF_SIZE);
+    if (notifyStr == NULL) {
+        HDF_LOGE("%{public}s notifyStr malloc failed", __func__);
+        return HDF_FAILURE;
+    }
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaNotify == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        free(notifyStr);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (memset_s(notifyStr, BUF_SIZE, 0, BUF_SIZE) != EOK) {
+        HDF_LOGE("%{public}s memset failed", __func__);
+        free(notifyStr);
+        return HDF_FAILURE;
+    }
+    if (strcpy_s(notifyStr, BUF_SIZE, notifyParam) != EOK) {
+        HDF_LOGE("%{public}s strcpy failed", __func__);
+        free(notifyStr);
+        return HDF_FAILURE;
+    }
+    ret = node->callbackObj->OnEventStaNotify(node->callbackObj, notifyStr, ifName);
+    free(notifyStr);
     return ret;
 }
 
@@ -2006,33 +2030,22 @@ int32_t WpaInterfaceReassociate(struct IWpaInterface *self, const char *ifName)
 
 int32_t WpaInterfaceStaShellCmd(struct IWpaInterface *self, const char *ifName, const char *cmd)
 {
-    struct wpa_supplicant *wpaSupp;
-    size_t replyLen = 0;
-    char *buf;
-
     (void)self;
+    HDF_LOGI("enter %{public}s", __func__);
     if (ifName == NULL || cmd == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    wpaSupp = getWpaWlan();
-    if (wpaSupp == NULL) {
-        HDF_LOGE("%{public}s wpaSupp == NULL", __func__);
+    WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(ifName);
+    if (pStaIfc == NULL) {
+        HDF_LOGE("%{public}s: pStaIfc = NULL", __func__);
         return HDF_FAILURE;
     }
-
-    buf = (char *)malloc(CMD_SIZE);
-    if (buf == NULL) {
-        HDF_LOGE("%{public}s malloc failed!", __func__);
+    int ret = pStaIfc->wpaCliCmdStaShellCmd(pStaIfc, cmd);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: fail ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    os_memcpy(buf, cmd, strlen(cmd));
-    char *reply = wpa_supplicant_ctrl_iface_process(wpaSupp, buf, &replyLen);
-    if (strcmp(reply, "FAIL\n") == 0 || reply == NULL) {
-        HDF_LOGE("%{public}s reply is NULL or FAIL!", __func__);
-        free(buf);
-        return HDF_FAILURE;
-    }
-    free(buf);
+    HDF_LOGI("%{public}s: success", __func__);
     return HDF_SUCCESS;
 }
