@@ -423,10 +423,11 @@ ResultCode GetAttributeUint8Array(const Attribute *attributePub, AttributeKey ke
         errno_t memcpyRet = memcpy_s(retData->data, retData->len, attribute->values[attributeIndex]->data,
             attribute->values[attributeIndex]->len);
         IF_TRUE_LOGE_AND_RETURN_VAL(memcpyRet != EOK, RESULT_GENERAL_ERROR);
+        retData->len = attribute->values[attributeIndex]->len;
     } else {
         LOG_INFO("the current data is an empty array");
+        retData->len = 0;
     }
-    retData->len = attribute->values[attributeIndex]->len;
 
     return RESULT_SUCCESS;
 }

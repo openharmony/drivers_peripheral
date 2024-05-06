@@ -367,13 +367,15 @@ int32_t GetDistributeKey(const Buffer *peerUdid, const Buffer *salt, Buffer **ke
         LOG_ERROR("CreateBufferBySize keyData fail");
         return RESULT_NO_MEMORY;
     }
-    if (memcpy_s(keyData->buf, keyData->maxSize, REMOTE_PIN_DISTRIBUTE_DEVICE_KEY, REMOTE_PIN_DISTRIBUTE_DEVICE_KEY_SIZE) != EOK) {
+    if (memcpy_s(keyData->buf, keyData->maxSize,
+        REMOTE_PIN_DISTRIBUTE_DEVICE_KEY, REMOTE_PIN_DISTRIBUTE_DEVICE_KEY_SIZE) != EOK) {
         LOG_ERROR("copy fix tag fail");
         DestroyBuffer(keyData);
         return RESULT_NO_MEMORY;
     }
     keyData->contentSize += REMOTE_PIN_DISTRIBUTE_DEVICE_KEY_SIZE;
-    if (memcpy_s(keyData->buf + keyData->contentSize, keyData->maxSize - keyData->contentSize, salt->buf, salt->contentSize) != EOK) {
+    if (memcpy_s(keyData->buf + keyData->contentSize,
+        keyData->maxSize - keyData->contentSize, salt->buf, salt->contentSize) != EOK) {
         LOG_ERROR("copy salt fail");
         DestroyBuffer(keyData);
         return RESULT_NO_MEMORY;
