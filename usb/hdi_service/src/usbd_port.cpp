@@ -115,7 +115,7 @@ int32_t UsbdPort::ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &m
     }
 
     char modeBuf[PATH_MAX] = {'\0'};
-    int32_t ret = read(fd, modeBuf, PATH_MAX);
+    int32_t ret = read(fd, modeBuf, PATH_MAX - 1);
     close(fd);
 
     if (ret < 0) {
