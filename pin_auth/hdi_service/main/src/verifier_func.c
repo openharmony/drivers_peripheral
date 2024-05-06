@@ -31,8 +31,7 @@ typedef enum VerifierState {
     VERIFIER_STATE_FINISH = 3,
 } VerifierState;
 
-typedef struct VerifierSchedule
-{
+typedef struct VerifierSchedule {
     uint64_t scheduleId;
     uint64_t templateId;
     uint64_t timeStamp;
