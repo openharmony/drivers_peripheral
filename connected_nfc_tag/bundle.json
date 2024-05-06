@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_connected_nfc_tag",
   "description": "connected nfc tag device driver",
-  "version": "3.1",
+  "version": "5.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -12,9 +12,6 @@
   "component": {
     "name": "drivers_peripheral_connected_nfc_tag",
     "subsystem": "hdf",
-    "syscap": [
-      "SystemCapability.Communication.ConnectedTag"
-    ],
     "adapted_system_type": ["standard"],
     "rom": "1000KB",
     "ram": "1000KB",
@@ -30,7 +27,7 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/connected_nfc_tag/hdi_service:connected_nfc_tag_entry"
+        "//drivers/peripheral/connected_nfc_tag:connected_nfc_tag_entry"
       ]
     }
   }
