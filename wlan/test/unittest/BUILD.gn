@@ -104,7 +104,10 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/wpa/client:wpa_hdi_client",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:hdf_posix_osal" ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "hilog:libhilog",
+    ]
 
     cflags = configFlag
   }
