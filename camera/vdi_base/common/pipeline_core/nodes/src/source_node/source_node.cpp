@@ -356,7 +356,7 @@ void SourceNode::PortHandler::DistributeBuffers()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::unique_lock<std::mutex> l(rblock);
-        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(5000); // 5000ms
+        auto timeout = std::chrono::system_clock::now() + std::chrono::milliseconds(500); // 500ms
         if (!rbcv.wait_until(l, timeout, [this] {
             return (!dbtRun || !respondBufferList.empty());
             })) {
