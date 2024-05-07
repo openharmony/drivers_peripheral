@@ -112,14 +112,14 @@ int32_t AllocatorService::LoadVdi()
 
 void AllocatorService::TimeBegin()
 {
-    gettimeofday(&firstTimeStamp, nullptr);
+    gettimeofday(&firstTimeStamp_, nullptr);
 }
 
 void AllocatorService::TimeEnd(const char *func, int32_t time)
 {
-    gettimeofday(&secondTimeStamp, nullptr);
-    int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
-        (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
+    gettimeofday(&secondTimeStamp_, nullptr);
+    int32_t runTime = (int32_t)((secondTimeStamp_.tv_sec - firstTimeStamp_.tv_sec) * TIME_1000 +
+        (secondTimeStamp_.tv_usec - firstTimeStamp_.tv_usec) / TIME_1000);
     if (runTime > time) {
         HDF_LOGW("run %{public}s over time, [%{public}d]ms", func, runTime);
     }
