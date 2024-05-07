@@ -713,7 +713,7 @@ static int32_t ProcessEventScanResult(struct HdfWlanRemoteNode *node, uint32_t e
 static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t event,
     WifiScanResults *wifiScanResults, const char *ifName)
 {
-    HDF_LOGI("hal enter %{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
+    HDF_LOGD("hal enter %{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
     struct HdfWifiScanResults *scanResults = NULL;
     uint32_t size;
     int32_t ret = HDF_FAILURE;
@@ -744,7 +744,7 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
         ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
     }
     HdfWifiScanResultsFree(scanResults, true);
-    HDF_LOGI("hal exit %{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
+    HDF_LOGI("%{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
     return ret;
 }
 
@@ -781,7 +781,7 @@ static int32_t ProcessEventActionReceived(struct HdfWlanRemoteNode *node, uint32
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
-    HDF_LOGI("%{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
+    HDF_LOGD("%{public}s, event:%{public}u ifName:%{public}s", __FUNCTION__, event, ifName);
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = NULL;
     int32_t *code = NULL;
@@ -825,7 +825,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
                 break;
         }
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
         }
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
