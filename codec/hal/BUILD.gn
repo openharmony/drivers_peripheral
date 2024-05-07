@@ -15,7 +15,10 @@ import("//build/ohos.gni")
 import("../codec.gni")
 
 config("headers_config") {
-  include_dirs = [ "../interfaces/include" ]
+  include_dirs = [
+    "../interfaces/include",
+    "../hal/include",
+  ]
 }
 
 ohos_shared_library("libcodec_hdi_omx_server") {
