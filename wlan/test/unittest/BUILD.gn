@@ -92,8 +92,12 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/interfaces/include",
       "$TEST_ROOT_DIR/wpa/client/include",
     ]
-
-    sources = [ "client/hdf_client_test.cpp" ]
+    sources = [
+      "$TEST_ROOT_DIR/client/src/sbuf/sbuf_wpa_cmd_adapter.c",
+      "$TEST_ROOT_DIR/hostapd/client/src/hostapd_client.c",
+      "$TEST_ROOT_DIR/test/unittest/client/hdf_client_test.cpp",
+      "$TEST_ROOT_DIR/wpa/client/src/wpa_client.c",
+    ]
     public_deps = [
       "$TEST_ROOT_DIR/client:wifi_driver_client",
       "//third_party/bounds_checking_function:libsec_shared",
@@ -175,9 +179,12 @@ if (defined(ohos_lite)) {
     ]
 
     sources = [
-      "../../client/src/sbuf/sbuf_wpa_cmd_adapter.c",
-      "./client/hdf_client_test.cpp",
+      "$TEST_ROOT_DIR/client/src/sbuf/sbuf_wpa_cmd_adapter.c",
+      "$TEST_ROOT_DIR/hostapd/client/src/hostapd_client.c",
+      "$TEST_ROOT_DIR/test/unittest/client/hdf_client_test.cpp",
+      "$TEST_ROOT_DIR/wpa/client/src/wpa_client.c",
     ]
+
     resource_config_file =
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
