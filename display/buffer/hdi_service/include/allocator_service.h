@@ -34,6 +34,10 @@ public:
 
 private:
     int32_t LoadVdi();
+    void TimeBegin();
+    void TimeEnd(const char *func, int32_t time);
+    struct timeval firstTimeStamp_;
+    struct timeval secondTimeStamp_;
     std::mutex mutex_;
     void *libHandle_;
     IDisplayBufferVdi *vdiImpl_;
