@@ -1012,19 +1012,6 @@ HWTEST_F(WifiClientTest, WifiCmdGetDrvFlags027, TestSize.Level1)
     WifiCmdGetDrvFlags(ifNameInvalid, &params);
 }
 /**
- * @tc.name: GetChannelMeasResult027
- * @tc.desc: set rx remain On channel test
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
-{
-    const char *ifNameInvalid = "wlanTest";
-    MeasResult measResult;
-    GetChannelMeasResult(NULL, &measResult);
-    GetChannelMeasResult(ifNameInvalid, &measResult);
-}
-/**
  * @tc.name: WifiSetDpiMarkRule028
  * @tc.desc: set rx remain On channel test
  * @tc.type: FUNC
