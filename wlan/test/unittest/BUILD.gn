@@ -105,7 +105,6 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
-      "c_utils:utils",
       "hdf_core:hdf_posix_osal",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
