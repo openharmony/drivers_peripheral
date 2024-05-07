@@ -102,7 +102,7 @@ int32_t DoSetVerifierFwkParam(const uint8_t *fwkPubKey, uint32_t fwkPubKeySize)
     return RESULT_SUCCESS;
 }
 
-static void DestroyVerifierSchedule()
+static void DestroyVerifierSchedule(void)
 {
     if (g_verifierSchedule == NULL) {
         return;
