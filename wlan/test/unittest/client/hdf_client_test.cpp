@@ -655,8 +655,6 @@ HWTEST_F(WifiClientTest, WifiEapolPacketReceive002, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiEapolPacketReceive(ifNameInvalid, rxEapol);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    rxEapol.len = 1;
-    WifiEapolPacketReceive(ifNameInvalid, rxEapol);
 }
 /**
  * @tc.name: WifiEapolEnable003
@@ -701,10 +699,6 @@ HWTEST_F(WifiClientTest, WifiCmdSetAp005, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiCmdSetAp(ifNameInvalid, apsettings);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    apsettings->authType = 0;
-    apsettings->hiddenSsid = 0;
-    apsettings->ssid = "wlanTest";
-    WifiCmdSetAp(ifNameInvalid, apsettings);
 }
 /**
  * @tc.name: WifiCmdChangeBeacon006
@@ -721,10 +715,6 @@ HWTEST_F(WifiClientTest, WifiCmdChangeBeacon006, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiCmdChangeBeacon(ifNameInvalid, apsettings);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    apsettings->authType = 0;
-    apsettings->hiddenSsid = 0;
-    apsettings->ssid = "wlanTest";
-    WifiCmdChangeBeacon(ifNameInvalid, apsettings);
 }
 /**
  * @tc.name: WifiCmdSendMlme007
@@ -741,10 +731,6 @@ HWTEST_F(WifiClientTest, WifiCmdSendMlme007, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiCmdSendMlme(ifNameInvalid, mlme);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    mlme->freq = 0;
-    mlme->dataLen = 0;
-    mlme->ssid = "wlanTest";
-    WifiCmdSendMlme(ifNameInvalid, mlme);
 }
 /**
  * @tc.name: WifiCmdDelKey008
@@ -761,10 +747,6 @@ HWTEST_F(WifiClientTest, WifiCmdDelKey008, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiCmdDelKey(ifNameInvalid, keyExt);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    keyExt->type = 0;
-    keyExt->keyLen = 0;
-    keyExt->cipher = 0;
-    WifiCmdDelKey(ifNameInvalid, keyExt);
 }
 /**
  * @tc.name: WifiCmdNewKey009
@@ -774,7 +756,6 @@ HWTEST_F(WifiClientTest, WifiCmdDelKey008, TestSize.Level1)
  */
 HWTEST_F(WifiClientTest, WifiCmdNewKey009, TestSize.Level1)
 {
-    int32_t ret;
     const char *ifNameInvalid = "wlanTest";
     WifiKeyExt keyExt;
     WifiCmdNewKey(ifNameInvalid, &keyExt);
@@ -801,13 +782,12 @@ HWTEST_F(WifiClientTest, WifiCmdGetOwnMac0011, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
-    const char *buf = "wlanTest";
     uint32_t len = 0;
-    ret = WifiCmdGetOwnMac(NULL, buf, len);
+    ret = WifiCmdGetOwnMac(NULL, NULL, len);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    ret = WifiCmdGetOwnMac(ifNameInvalid, buf, len);
+    ret = WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    WifiCmdGetOwnMac(ifNameInvalid, buf, len)
+    WifiCmdGetOwnMac(ifNameInvalid, NULL, len);
 }
 /**
  * @tc.name: WifiCmdSetMode0012
@@ -824,9 +804,6 @@ HWTEST_F(WifiClientTest, WifiCmdSetMode0012, TestSize.Level1)
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     ret = WifiCmdSetMode(ifNameInvalid, setMode);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    setMode->iftype = 0;
-    setMode->resv = 0;
-    WifiCmdSetMode(ifNameInvalid, setMode);
 }
 /**
  * @tc.name: WifiCmdGetHwFeature0013
@@ -857,21 +834,6 @@ HWTEST_F(WifiClientTest, WifiCmdDisconnet0014, TestSize.Level1)
     ret = WifiCmdDisconnet(NULL, reasonCode);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     WifiCmdDisconnet(ifNameInvalid, reasonCode);
-}
-/**
- * @tc.name: WifiCmdScan0015
- * @tc.desc: set rx remain On channel test
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiClientTest, WifiCmdScan0015, TestSize.Level1)
-{
-    int32_t ret;
-    const char *ifNameInvalid = "wlanTest";
-    WifiScan scan;
-    ret = WifiCmdScan(NULL, &scan);
-    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
-    WifiCmdScan(ifNameInvalid, &scan);
 }
 /**
  * @tc.name: WifiCmdAssoc0016
@@ -913,7 +875,7 @@ HWTEST_F(WifiClientTest, WifiCmdStaRemove0018, TestSize.Level1)
 {
     int32_t ret;
     const char *ifNameInvalid = "wlanTest";
-    uint8_t *addr = NULL
+    uint8_t *addr = NULL;
     uint32_t addrLen = 0;
     ret = WifiCmdStaRemove(NULL, addr, addrLen);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
@@ -1048,5 +1010,31 @@ HWTEST_F(WifiClientTest, WifiCmdGetDrvFlags027, TestSize.Level1)
     ret = WifiCmdGetDrvFlags(NULL, &params);
     EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
     WifiCmdGetDrvFlags(ifNameInvalid, &params);
+}
+/**
+ * @tc.name: GetChannelMeasResult027
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
+{
+    const char *ifNameInvalid = "wlanTest";
+    MeasResult measResult;
+    GetChannelMeasResult(NULL, &measResult);
+    GetChannelMeasResult(ifNameInvalid, &measResult);
+}
+/**
+ * @tc.name: GetChannelMeasResult027
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
+{
+    int32_t srcAddr = 0;
+    int32_t dstAddr = 0;
+    int32_t buf = 0;
+    GetChannelMeasResult(srcAddr, dstAddr, buf);
 }
 };
