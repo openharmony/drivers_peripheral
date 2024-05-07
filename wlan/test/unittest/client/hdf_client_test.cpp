@@ -1082,7 +1082,7 @@ HWTEST_F(WifiClientTest, HostapdEventReport, TestSize.Level1)
     int32_t dstAddr = 0;
     void *data = NULL;
     const char *ifNameInvalid = "wlanTest";
-    HostapdEventReport(Hid2dFunCb2, dstAddr, ifNameInvalid);
+    HostapdEventReport(ifNameInvalid, dstAddr, data);
 }
 /**
  * @tc.name: HostapdRegisterEventCallback
