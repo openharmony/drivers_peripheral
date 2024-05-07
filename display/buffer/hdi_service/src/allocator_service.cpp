@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <sys/time.h>
 #include "display_log.h"
 #include "hdf_trace.h"
 
@@ -25,6 +26,8 @@
 #define LOG_TAG "ALLOC_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+#define TIME_1000 1000
+#define TIME_10 10
 
 namespace OHOS {
 namespace HDI {
@@ -111,10 +114,19 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
 {
     HdfTrace trace(__func__, "HDI:DISP:");
 
+    struct timeval firstTimeStamp = {0, 0};
+    struct timeval secondTimeStamp = {0, 0};
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
+    gettimeofday(&firstTimeStamp, nullptr);
     int32_t ec = vdiImpl_->AllocMem(info, buffer);
+    gettimeofday(&secondTimeStamp, nullptr);
+    int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+        (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
+    if (runTime > TIME_10) {
+        HDF_LOGW("%{public}s: run AllocMem over time, [%{public}d]ms", __func__, runTime);
+    }
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
         return ec;
@@ -126,13 +138,29 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         delete handle;
         HdfTrace traceTwo("FreeMem-1", "HDI:VDI:");
+        gettimeofday(&firstTimeStamp, nullptr);
         vdiImpl_->FreeMem(*buffer);
+        gettimeofday(&secondTimeStamp, nullptr);
+        runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+            (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
+        if (runTime > TIME_10) {
+            HDF_LOGW("%{public}s: run AllocMem over time, [%{public}d]ms", __func__, runTime);
+        }
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
+        struct timeval firstTimeStamp = {0, 0};
+        struct timeval secondTimeStamp = {0, 0};
         HdfTrace traceThree("FreeMem-2", "HDI:VDI:");
+        gettimeofday(&firstTimeStamp, nullptr);
         vdiImpl_->FreeMem(*freeBuffer);
+        gettimeofday(&secondTimeStamp, nullptr);
+        int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+            (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
+        if (runTime > TIME_10) {
+            HDF_LOGW("%{public}s: run AllocMem over time, [%{public}d]ms", __func__, runTime);
+        }
     });
     return HDF_SUCCESS;
 }
