@@ -1025,16 +1025,16 @@ HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
     GetChannelMeasResult(ifNameInvalid, &measResult);
 }
 /**
- * @tc.name: GetChannelMeasResult027
+ * @tc.name: WifiSetDpiMarkRule028
  * @tc.desc: set rx remain On channel test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WifiClientTest, GetChannelMeasResult027, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
 {
     int32_t srcAddr = 0;
     int32_t dstAddr = 0;
     int32_t buf = 0;
-    GetChannelMeasResult(srcAddr, dstAddr, buf);
+    WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
 }
 };
