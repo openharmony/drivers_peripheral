@@ -17,7 +17,7 @@
 #define OHOS_DAUDIO_LOG_H
 
 #include <cstring>
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "hilog/log.h"
 

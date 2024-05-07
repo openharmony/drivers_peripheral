@@ -17,7 +17,7 @@
 #define OHOS_DISTRIBUTED_CAMERA_LOG_H
 
 #include <string>
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "hilog/log.h"
 
