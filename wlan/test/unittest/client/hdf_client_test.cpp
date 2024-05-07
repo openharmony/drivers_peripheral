@@ -1042,7 +1042,7 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
- #ifdef OHOS_ARCH_LITE
+#ifdef OHOS_ARCH_LITE
 HWTEST_F(WifiClientTest, WpaEventReport, TestSize.Level1)
 {
     int32_t dstAddr = 0;
