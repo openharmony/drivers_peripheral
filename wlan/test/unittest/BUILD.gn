@@ -169,7 +169,10 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
     ]
-    sources = [ "./client/hdf_client_test.cpp" ]
+    sources = [
+      "../../client/src/sbuf/sbuf_wpa_cmd_adapter.c",
+      "./client/hdf_client_test.cpp",
+    ]
     resource_config_file =
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
