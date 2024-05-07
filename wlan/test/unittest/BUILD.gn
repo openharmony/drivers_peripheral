@@ -106,7 +106,6 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "hdf_core:hdf_posix_osal",
-      "hdf_core:libhdf_utils",
       "hilog:libhilog",
     ]
 
