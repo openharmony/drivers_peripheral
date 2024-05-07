@@ -158,7 +158,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         frameCount_++;
     } else {
         int ret = bufferQueue_->CancelBuffer(sb);
-        CAMERA_LOGE("CancelBuffer done, streamId = %{public}d, index = %{public}d, ret = %{public}d",
+        CAMERA_LOGI("CancelBuffer done, streamId = %{public}d, index = %{public}d, ret = %{public}d",
             buffer->GetStreamId(), buffer->GetIndex(), ret);
         stats_.CancelBufferResult(ret);
     }
