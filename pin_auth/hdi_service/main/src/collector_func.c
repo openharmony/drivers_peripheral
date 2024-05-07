@@ -100,7 +100,7 @@ int32_t DoSetCollectorFwkParam(const uint8_t *fwkPubKey, uint32_t fwkPubKeySize)
     return RESULT_SUCCESS;
 }
 
-static void DestroyCollectorSchedule()
+static void DestroyCollectorSchedule(void)
 {
     if (g_collectorSchedule == NULL) {
         return;
