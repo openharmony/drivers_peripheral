@@ -1056,7 +1056,6 @@ HWTEST_F(WifiClientTest, WpaEventReport, TestSize.Level1)
 HWTEST_F(WifiClientTest, WpaRegisterEventCallback, TestSize.Level1)
 {
     int32_t dstAddr = 0;
-    void *data = NULL;
     const char *ifNameInvalid = "wlanTest";
     WpaRegisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
 }
@@ -1069,9 +1068,8 @@ HWTEST_F(WifiClientTest, WpaRegisterEventCallback, TestSize.Level1)
 HWTEST_F(WifiClientTest, WpaUnregisterEventCallback, TestSize.Level1)
 {
     int32_t dstAddr = 0;
-    void *data = NULL;
     const char *ifNameInvalid = "wlanTest";
-    WpaUnregisterEventCallback(ifNameInvalid, dstAddr, data);
+    WpaUnregisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
 }
 /**
  * @tc.name: HostapdEventReport
@@ -1095,7 +1093,6 @@ HWTEST_F(WifiClientTest, HostapdEventReport, TestSize.Level1)
 HWTEST_F(WifiClientTest, HostapdRegisterEventCallback, TestSize.Level1)
 {
     int32_t dstAddr = 0;
-    void *data = NULL;
     const char *ifNameInvalid = "wlanTest";
     HostapdRegisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
 }
@@ -1108,8 +1105,9 @@ HWTEST_F(WifiClientTest, HostapdRegisterEventCallback, TestSize.Level1)
 HWTEST_F(WifiClientTest, HostapdUnregisterEventCallback, TestSize.Level1)
 {
     int32_t dstAddr = 0;
-    void *data = NULL;
     const char *ifNameInvalid = "wlanTest";
     HostapdUnregisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
+}
+}
 }
 };

@@ -180,7 +180,11 @@ if (defined(ohos_lite)) {
         "$HDF_CORE_DIR/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [ "$TEST_ROOT_DIR/client:wifi_driver_client" ]
+    deps = [
+      "$TEST_ROOT_DIR/client:wifi_driver_client",
+      "$TEST_ROOT_DIR/hostapd/client:hostapd_hdi_client",
+      "$TEST_ROOT_DIR/wpa/client:wpa_hdi_client",
+    ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
