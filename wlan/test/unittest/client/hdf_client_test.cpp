@@ -16,8 +16,10 @@
 #include <gtest/gtest.h>
 #include <osal_mem.h>
 #include "wifi_driver_client.h"
+ #ifdef OHOS_ARCH_LITE
 #include "hostapd_client.h"
 #include "wpa_client.h"
+#endif
 #include "securec.h"
 
 using namespace testing::ext;
@@ -1040,6 +1042,7 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
+ #ifdef OHOS_ARCH_LITE
 HWTEST_F(WifiClientTest, WpaEventReport, TestSize.Level1)
 {
     int32_t dstAddr = 0;
@@ -1110,4 +1113,5 @@ HWTEST_F(WifiClientTest, HostapdUnregisterEventCallback, TestSize.Level1)
 }
 }
 }
+#endif
 };
