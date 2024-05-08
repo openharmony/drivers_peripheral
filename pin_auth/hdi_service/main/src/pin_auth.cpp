@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,17 +14,24 @@
  */
 
 #include "pin_auth.h"
+
 #include <map>
 #include <sys/stat.h>
 #include <vector>
 #include <unistd.h>
-#include "pthread.h"
-#include "adaptor_memory.h"
-#include "adaptor_log.h"
-#include "pin_func.h"
+#include <pthread.h>
+
+#include "parameter.h"
 #include "securec.h"
 #include "sysparam_errno.h"
-#include "parameter.h"
+
+#include "adaptor_memory.h"
+#include "adaptor_log.h"
+#include "all_in_one_func.h"
+#include "collector_func.h"
+#include "executor_func_common.h"
+#include "pin_auth_hdi.h"
+#include "verifier_func.h"
 
 namespace OHOS {
 namespace UserIam {
@@ -51,8 +58,16 @@ int32_t PinAuth::Init()
         LOG_ERROR("LoadPinDb fail!");
         return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
     }
-    if (GenerateKeyPair() != RESULT_SUCCESS) {
-        LOG_ERROR("GenerateKeyPair fail!");
+    if (GenerateAllInOneKeyPair() != RESULT_SUCCESS) {
+        LOG_ERROR("GenerateAllInOneKeyPair fail!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+    if (GenerateCollectorKeyPair() != RESULT_SUCCESS) {
+        LOG_ERROR("GenerateCollectorKeyPair fail!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+    if (GenerateVerifierKeyPair() != RESULT_SUCCESS) {
+        LOG_ERROR("GenerateVerifierKeyPair fail!");
         return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
     }
     LOG_INFO("InIt pinAuth succ");
@@ -65,7 +80,9 @@ int32_t PinAuth::Close()
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    DestoryGlobalKeyPair();
+    DestroyAllInOneKeyPair();
+    DestroyCollectorKeyPair();
+    DestroyVerifierKeyPair();
     DestroyPinDb();
     LOG_INFO("Close pinAuth succ");
 
@@ -73,7 +90,7 @@ int32_t PinAuth::Close()
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::PinResultToCoAuthResult(int resultCode)
+int32_t PinAuth::PinResultToCoAuthResult(int32_t resultCode)
 {
     LOG_INFO("PinAuth::PinResultToCoAuthResult enter");
     if (g_convertResult.count(resultCode) == 0) {
@@ -124,7 +141,7 @@ int32_t PinAuth::EnrollPin(uint64_t scheduleId, uint64_t subType, std::vector<ui
     }
 
 ERROR:
-    DestoryBuffer(retTlv);
+    DestroyBuffer(retTlv);
     return PinResultToCoAuthResult(result);
 }
 
@@ -148,27 +165,36 @@ int32_t PinAuth::GenerateAlgoParameter(std::vector<uint8_t> &algoParameter, uint
     }
     if (algoParameterLen != CONST_SALT_LEN) {
         LOG_ERROR("algoParameterLen is error!");
-        return PinResultToCoAuthResult(GENERAL_ERROR);
+        return GENERAL_ERROR;
     }
 
     return SUCCESS;
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::GetAlgoParameter(uint64_t templateId, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion)
+int32_t PinAuth::AllInOneAuth(
+    uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo, PinAlgoParam &pinAlgoParam)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
-    uint32_t algoParameterLen = CONST_SALT_LEN;
-    algoParameter.resize(algoParameterLen);
-    ResultCode result = DoGetAlgoParameter(templateId, &(algoParameter[0]), &algoParameterLen, &algoVersion);
+    AlgoParamOut authAlgoParam = {};
+    ResultCode result = DoAllInOneAuth(scheduleId, templateId, extraInfo.data(), extraInfo.size(), &authAlgoParam);
     if (result != RESULT_SUCCESS) {
-        LOG_ERROR("DoGetAlgoParameter fail!");
+        LOG_ERROR("DoAllInOneAuth fail!");
         return PinResultToCoAuthResult(result);
     }
-    if (algoParameterLen != CONST_SALT_LEN) {
-        LOG_ERROR("algoParameterLen is error!");
-        return PinResultToCoAuthResult(GENERAL_ERROR);
+    pinAlgoParam.algoVersion = authAlgoParam.algoVersion;
+    pinAlgoParam.subType = authAlgoParam.subType;
+    int32_t transResult = SetVectorByBuffer(
+        pinAlgoParam.algoParameter, authAlgoParam.algoParameter, sizeof(authAlgoParam.algoParameter));
+    if (transResult != RESULT_SUCCESS) {
+        LOG_ERROR("set algoParameter fail!");
+        return PinResultToCoAuthResult(transResult);
+    }
+    transResult = SetVectorByBuffer(pinAlgoParam.challenge, authAlgoParam.challenge, sizeof(authAlgoParam.challenge));
+    if (transResult != RESULT_SUCCESS) {
+        LOG_ERROR("set challenge fail!");
+        return PinResultToCoAuthResult(transResult);
     }
 
     return RESULT_SUCCESS;
@@ -212,7 +238,7 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
     result = compareRet;
 
 ERROR:
-    DestoryBuffer(retTlv);
+    DestroyBuffer(retTlv);
     return PinResultToCoAuthResult(result);
 }
 
@@ -222,7 +248,7 @@ int32_t PinAuth::QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredent
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
     PinCredentialInfos pinCredentialInfosRet = {};
-    ResultCode result = DoQueryPinInfo(templateId, &pinCredentialInfosRet);
+    int32_t result = DoQueryPinInfo(templateId, &pinCredentialInfosRet);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("DoQueryPinInfo fail!");
         return PinResultToCoAuthResult(result);
@@ -230,6 +256,7 @@ int32_t PinAuth::QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredent
     pinCredentialInfoRet.subType = pinCredentialInfosRet.subType;
     pinCredentialInfoRet.remainTimes = pinCredentialInfosRet.remainTimes;
     pinCredentialInfoRet.freezingTime = pinCredentialInfosRet.freezeTime;
+    pinCredentialInfoRet.nextFailLockoutDuration = pinCredentialInfosRet.nextFailLockoutDuration;
 
     return RESULT_SUCCESS;
 }
@@ -249,42 +276,62 @@ int32_t PinAuth::DeleteTemplate(uint64_t templateId)
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::GetExecutorInfo(std::vector<uint8_t> &pubKey, uint32_t &esl)
+int32_t PinAuth::GetExecutorInfo(int32_t executorRole, std::vector<uint8_t> &pubKey, uint32_t &esl,
+    uint32_t &maxTemplateAcl)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
     PinExecutorInfo pinExecutorInfo = {};
-    ResultCode result = DoGetExecutorInfo(&pinExecutorInfo);
+    int32_t result = RESULT_GENERAL_ERROR;
+    switch (executorRole) {
+        case HDI::PinAuth::HdiExecutorRole::ALL_IN_ONE:
+            result = DoGetAllInOneExecutorInfo(&pinExecutorInfo);
+            break;
+        case HDI::PinAuth::HdiExecutorRole::COLLECTOR:
+            result = DoGetCollectorExecutorInfo(&pinExecutorInfo);
+            break;
+        case HDI::PinAuth::HdiExecutorRole::VERIFIER:
+            result = DoGetVerifierExecutorInfo(&pinExecutorInfo);
+            break;
+        default:
+            LOG_ERROR("unknown role");
+            break;
+    }
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("DoGetExecutorInfo fail!");
         goto ERROR;
     }
     esl = pinExecutorInfo.esl;
-    pubKey.resize(CONST_PUB_KEY_LEN);
-    if (memcpy_s(pubKey.data(), CONST_PUB_KEY_LEN, &(pinExecutorInfo.pubKey[0]), CONST_PUB_KEY_LEN) != EOK) {
+    maxTemplateAcl = pinExecutorInfo.maxTemplateAcl;
+    pubKey.resize(ED25519_FIX_PUBKEY_BUFFER_SIZE);
+    if (memcpy_s(pubKey.data(), ED25519_FIX_PUBKEY_BUFFER_SIZE,
+        pinExecutorInfo.pubKey, ED25519_FIX_PUBKEY_BUFFER_SIZE) != EOK) {
         LOG_ERROR("copy pinExecutorInfo to pubKey fail!");
         result = RESULT_GENERAL_ERROR;
         goto ERROR;
     }
 
 ERROR:
-    static_cast<void>(memset_s(&(pinExecutorInfo.pubKey[0]), CONST_PUB_KEY_LEN, 0, CONST_PUB_KEY_LEN));
+    static_cast<void>(memset_s(
+        pinExecutorInfo.pubKey, ED25519_FIX_PUBKEY_BUFFER_SIZE, 0, ED25519_FIX_PUBKEY_BUFFER_SIZE));
     return PinResultToCoAuthResult(result);
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-int32_t PinAuth::VerifyTemplateData(std::vector<uint64_t> templateIdList)
+int32_t PinAuth::SetAllInOneFwkParam(
+    const std::vector<uint64_t> &templateIdList, const std::vector<uint8_t> &frameworkPublicKey)
 {
     LOG_INFO("start");
     std::lock_guard<std::mutex> gurard(mutex_);
     uint32_t templateIdListLen = templateIdList.size();
     if (templateIdListLen > MAX_TEMPLATEID_LEN) {
-        LOG_ERROR("DoVerifyTemplateData fail!");
+        LOG_ERROR("check templateIdListLen fail!");
         return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
     }
-    ResultCode result = DoVerifyTemplateData(&templateIdList[0], templateIdListLen);
+    ResultCode result = DoSetAllInOneFwkParam(
+        &templateIdList[0], templateIdListLen, frameworkPublicKey.data(), frameworkPublicKey.size());
     if (result != RESULT_SUCCESS) {
-        LOG_ERROR("DoVerifyTemplateData fail!");
+        LOG_ERROR("DoSetAllInOneFwkParam fail!");
     }
 
     return PinResultToCoAuthResult(result);
@@ -299,6 +346,218 @@ void PinAuth::WriteAntiBrute(uint64_t templateId)
     }
 }
 
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::SetCollectorFwkParam(const std::vector<uint8_t> &frameworkPublicKey)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    int32_t result = DoSetCollectorFwkParam(frameworkPublicKey.data(), frameworkPublicKey.size());
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoSetCollectorFwkParam fail!");
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+int32_t PinAuth::SetVectorByBuffer(std::vector<uint8_t> &vec, const uint8_t *buf, uint32_t bufSize)
+{
+    if (bufSize == 0) {
+        vec.clear();
+        return RESULT_SUCCESS;
+    }
+    vec.resize(bufSize);
+    if (memcpy_s(vec.data(), vec.size(), buf, bufSize) != EOK) {
+        LOG_ERROR("copy buf fail!");
+        return RESULT_BAD_COPY;
+    }
+    return RESULT_SUCCESS;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::Collect(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &msg)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    uint8_t *out = new (std::nothrow) uint8_t[MAX_EXECUTOR_MSG_LEN];
+    if (out == nullptr) {
+        LOG_ERROR("malloc out fail!");
+        return GENERAL_ERROR;
+    }
+    uint32_t outSize = MAX_EXECUTOR_MSG_LEN;
+    int32_t result = DoCollect(scheduleId, extraInfo.data(), extraInfo.size(), out, &outSize);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoCollect fail!");
+        delete[] out;
+        return PinResultToCoAuthResult(result);
+    }
+    result = SetVectorByBuffer(msg, out, outSize);
+    delete[] out;
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg fail!");
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::CancelCollect()
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    int32_t result = DoCancelCollect();
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoCancelCollect fail!");
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::SendMessageToCollector(
+    uint64_t scheduleId, const std::vector<uint8_t> &msg, PinAlgoParam &pinAlgoParam)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    AlgoParamOut algoParam = {};
+    int32_t result = DoSendMessageToCollector(scheduleId, msg.data(), msg.size(), &algoParam);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoSendMessageToCollector fail!");
+        return PinResultToCoAuthResult(result);
+    }
+    pinAlgoParam.algoVersion = algoParam.algoVersion;
+    pinAlgoParam.subType = algoParam.subType;
+    result = SetVectorByBuffer(pinAlgoParam.algoParameter, algoParam.algoParameter, sizeof(algoParam.algoParameter));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set algoParameter fail!");
+        return PinResultToCoAuthResult(result);
+    }
+    result = SetVectorByBuffer(pinAlgoParam.challenge, algoParam.challenge, sizeof(algoParam.challenge));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set challenge fail!");
+        return PinResultToCoAuthResult(result);
+    }
+
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::SetDataToCollector(uint64_t scheduleId, const std::vector<uint8_t> &data, std::vector<uint8_t> &msg)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    int32_t result = RESULT_GENERAL_ERROR;
+    uint8_t *pinData = const_cast<uint8_t *>(data.data());
+    uint8_t *out = new (std::nothrow) uint8_t[MAX_EXECUTOR_MSG_LEN];
+    uint32_t outSize = MAX_EXECUTOR_MSG_LEN;
+    if (out == nullptr) {
+        LOG_ERROR("new out fail!");
+        goto EXIT;
+    }
+    result = DoSetDataToCollector(scheduleId, pinData, data.size(), out, &outSize);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoSetDataToCollector fail!");
+        goto EXIT;
+    }
+    result = SetVectorByBuffer(msg, out, outSize);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg fail!");
+    }
+
+EXIT:
+    if (data.size() != 0) {
+        (void)memset_s(pinData, data.size(), 0, data.size());
+    }
+    if (out != nullptr) {
+        delete[] out;
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::SetVerifierFwkParam(const std::vector<uint8_t> &frameworkPublicKey)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    int32_t result = DoSetVerifierFwkParam(frameworkPublicKey.data(), frameworkPublicKey.size());
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoSetVerifierFwkParam fail!");
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::VerifierAuth(
+    uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &extraInfo, std::vector<uint8_t> &msgOut)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    uint8_t *out = new (std::nothrow) uint8_t[MAX_EXECUTOR_MSG_LEN];
+    if (out == nullptr) {
+        LOG_ERROR("new out fail!");
+        return GENERAL_ERROR;
+    }
+    VerifierMsg verifierMsg = {
+        .msgIn = const_cast<uint8_t *>(extraInfo.data()),
+        .msgInSize = extraInfo.size(),
+        .msgOut = out,
+        .msgOutSize = MAX_EXECUTOR_MSG_LEN,
+        .isAuthEnd = false,
+        .authResult = RESULT_GENERAL_ERROR,
+    };
+    int32_t result = DoVerifierAuth(scheduleId, templateId, &verifierMsg);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoVerifierAuth fail!");
+        delete[] out;
+        return PinResultToCoAuthResult(result);
+    }
+    if (verifierMsg.authResult == RESULT_SUCCESS) {
+        delete[] out;
+        return SUCCESS;
+    }
+    result = SetVectorByBuffer(msgOut, verifierMsg.msgOut, verifierMsg.msgOutSize);
+    delete[] out;
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg fail!");
+        return PinResultToCoAuthResult(result);
+    }
+    return PinResultToCoAuthResult(verifierMsg.authResult);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::CancelVerifierAuth()
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    int32_t result = DoCancelVerifierAuth();
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoCancelVerifierAuth fail!");
+    }
+    return PinResultToCoAuthResult(result);
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+int32_t PinAuth::SendMessageToVerifier(uint64_t scheduleId,
+    const std::vector<uint8_t> &msgIn, std::vector<uint8_t> &msgOut, bool &isAuthEnd, int32_t &compareResult)
+{
+    std::lock_guard<std::mutex> gurard(mutex_);
+    uint8_t *out = new (std::nothrow) uint8_t[MAX_EXECUTOR_MSG_LEN];
+    if (out == nullptr) {
+        LOG_ERROR("new out fail!");
+        return GENERAL_ERROR;
+    }
+    VerifierMsg verifierMsg = {
+        .msgIn = const_cast<uint8_t *>(msgIn.data()),
+        .msgInSize = msgIn.size(),
+        .msgOut = out,
+        .msgOutSize = MAX_EXECUTOR_MSG_LEN,
+        .isAuthEnd = false,
+        .authResult = RESULT_GENERAL_ERROR,
+    };
+    int32_t result = DoSendMessageToVerifier(scheduleId, &verifierMsg);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoSendMessageToVerifier fail!");
+        delete[] out;
+        return PinResultToCoAuthResult(result);
+    }
+    result = SetVectorByBuffer(msgOut, out, verifierMsg.msgOutSize);
+    delete[] out;
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg fail!");
+        return PinResultToCoAuthResult(result);
+    }
+    isAuthEnd = verifierMsg.isAuthEnd;
+    compareResult = PinResultToCoAuthResult(verifierMsg.authResult);
+    return PinResultToCoAuthResult(result);
+}
 } // namespace PinAuth
 } // namespace UserIam
 } // namespace OHOS

@@ -37,6 +37,7 @@ extern "C" {
     extern bool IsContextDuplicate(uint64_t contextId);
     extern bool MatchSchedule(const void *data, const void *condition);
     extern void DestroyContextNode(void *data);
+    extern ResultCode SetContextExpiredTime(UserAuthContext *contextData);
 }
 
 namespace OHOS {
@@ -381,6 +382,25 @@ HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
     EXPECT_EQ(FillInContext(context, &credentialId, &info, SCHEDULE_MODE_ENROLL), RESULT_UNKNOWN);
 
     DestroyContextNode(context);
+}
+
+HWTEST_F(ContextManagerTest, TestSetContextExpiredTime, TestSize.Level0)
+{
+    EXPECT_EQ(SetContextExpiredTime(NULL), RESULT_BAD_PARAM);
+
+    UserAuthContext context = {};
+    EXPECT_EQ(SetContextExpiredTime(&context), RESULT_SUCCESS);
+}
+
+HWTEST_F(ContextManagerTest, TestUpdateExecutorExpiredInfo, TestSize.Level0)
+{
+    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, NULL), RESULT_BAD_PARAM);
+
+    uint32_t size = 1;
+    ExecutorExpiredInfo expiredInfo = {};
+    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, NULL), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, &size), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace UserIam

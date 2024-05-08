@@ -414,7 +414,7 @@ static int32_t PthreadMutexLock(void)
 
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_LOGD(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t rc = RET_CODE_FAILURE;
     struct nl_cb *cb = NULL;
 
@@ -442,7 +442,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
 
     do {
         rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
-        HILOG_INFO(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
+        HILOG_LOGD(LOG_CORE, "nl_send_auto cmdSock, rc=%{public}d", rc);
         if (rc < 0) {
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
@@ -482,9 +482,9 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_INFO(LOG_CORE, "nl_recvmsgs cmdSock, rc=%{public}d error=%{public}d", rc, error);
         }
 
-        if (error < 0) {
+        if (error == -1) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink error", __FUNCTION__);
-            rc = RET_CODE_FAILURE;
+            rc = RET_CODE_UNKNOW;
         }
         if (error == -NLE_MSGTYPE_NOSUPPORT) {
             HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
@@ -498,7 +498,7 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_LOGD(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
     return rc;
 }
 

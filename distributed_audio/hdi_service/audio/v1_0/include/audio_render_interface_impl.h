@@ -42,7 +42,7 @@ constexpr uint32_t CUR_FRAME_INIT_VALUE = 0;
 class AudioRenderInterfaceImpl : public AudioRenderInterfaceImplBase {
 public:
     AudioRenderInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
-        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback);
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, uint32_t renderId);
     ~AudioRenderInterfaceImpl() override;
 
     int32_t GetLatency(uint32_t &ms) override;

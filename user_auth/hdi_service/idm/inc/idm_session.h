@@ -39,6 +39,7 @@ ResultCode GetUserId(int32_t *userId);
 ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen);
 ResultCode GetIsUpdate(bool *isUpdate);
 ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType);
+ResultCode IsValidUserType(int32_t userType);
 
 void RefreshValidTokenTime(void);
 bool IsValidTokenTime(uint64_t tokenTime);

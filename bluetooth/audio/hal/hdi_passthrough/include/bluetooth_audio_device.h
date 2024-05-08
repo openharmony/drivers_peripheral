@@ -16,6 +16,8 @@
 #ifndef BLUETOOTH_A2DP_DEVICE_H
 #define BLUETOOTH_A2DP_DEVICE_H
 
+#include <cstdint>
+
 namespace OHOS {
 namespace bluetooth {
 namespace audio {
@@ -31,11 +33,12 @@ enum class BTAudioStreamState : uint8_t {
 typedef bool (*SetUpFunc)();
 typedef void (*TearDownFunc)();
 typedef BTAudioStreamState (*GetStateFunc)();
-typedef bool (*StartPlayingFunc)();
+typedef bool (*StartPlayingFunc)(uint32_t sampleRate, uint32_t channelCount, uint32_t format);
 typedef bool (*SuspendPlayingFunc)();
 typedef bool (*StopPlayingFunc)();
 typedef size_t (*WriteFrameFunc)(const void* data, size_t size);
-
+typedef int32_t (*ReqMmapBufferFunc)(int32_t ashmemLength);
+typedef void (*ReadMmapPositionFunc)(int64_t &sec, int64_t &nSec, uint64_t &frames);
 }
 }
 }

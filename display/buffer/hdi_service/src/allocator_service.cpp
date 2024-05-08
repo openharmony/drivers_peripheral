@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <sys/time.h>
 #include "display_log.h"
 #include "hdf_trace.h"
 
@@ -25,6 +26,8 @@
 #define LOG_TAG "ALLOC_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+#define TIME_1000 1000
+#define TIME_10 10
 
 namespace OHOS {
 namespace HDI {
@@ -107,6 +110,24 @@ int32_t AllocatorService::LoadVdi()
     return HDF_SUCCESS;
 }
 
+void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
+{
+    gettimeofday(firstTimeStamp, nullptr);
+    return;
+}
+
+void AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval firstTimeStamp)
+{
+    struct timeval secondTimeStamp;
+    gettimeofday(&secondTimeStamp, nullptr);
+    int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+        (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
+    if (runTime > time) {
+        HDF_LOGW("run %{public}s over time, [%{public}d]ms", func, runTime);
+    }
+    return;
+}
+
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
     HdfTrace trace(__func__, "HDI:DISP:");
@@ -114,7 +135,10 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
+    struct timeval firstTimeStamp;
+    TimeBegin(&firstTimeStamp);
     int32_t ec = vdiImpl_->AllocMem(info, buffer);
+    TimeEnd("AllocMem", TIME_10, firstTimeStamp);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
         return ec;
@@ -126,13 +150,19 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         delete handle;
         HdfTrace traceTwo("FreeMem-1", "HDI:VDI:");
+        struct timeval firstTimeStamp;
+        TimeBegin(&firstTimeStamp);
         vdiImpl_->FreeMem(*buffer);
+        TimeEnd("FreeMem", TIME_10, firstTimeStamp);
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
         HdfTrace traceThree("FreeMem-2", "HDI:VDI:");
+        struct timeval firstTimeStamp;
+        TimeBegin(&firstTimeStamp);
         vdiImpl_->FreeMem(*freeBuffer);
+        TimeEnd("FreeMem", TIME_10, firstTimeStamp);
     });
     return HDF_SUCCESS;
 }

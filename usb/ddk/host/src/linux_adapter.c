@@ -932,6 +932,11 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     struct UsbDevice *dev = NULL;
     struct UsbDeviceHandle *handle = NULL;
 
+    if (session == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param session.\n", __func__, __LINE__);
+        return NULL;
+    }
+
     handle = OsGetDeviceHandle(session, busNum, usbAddr);
     if (handle != NULL) {
         return handle;
@@ -1314,12 +1319,14 @@ static struct UsbHostRequest *AdapterAllocRequestByMmap(
         return NULL;
     }
 
-    ftruncate(handle->mmapFd, len);
+    int32_t fd = handle->isAshmem ? handle->ashmemFd : handle->mmapFd;
 
-    memBuf = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, handle->mmapFd, 0);
+    ftruncate(fd, len);
+    memBuf = mmap(
+        NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (memBuf == MAP_FAILED) {
-        HDF_LOGE("%{public}s fd:%{public}d mmap failed, errno=%{public}d, len %{public}zu", __func__, handle->mmapFd,
-            errno, len);
+        HDF_LOGE("%{public}s fd:%{public}d mmap failed, errno=%{public}d, len=%{public}zu",
+            __func__, fd, errno, len);
         return NULL;
     }
 
@@ -1474,7 +1481,7 @@ static bool AdapterGetInterfaceActiveStatus(const struct UsbDeviceHandle *devHan
 {
     bool ret;
     if (devHandle == NULL) {
-        return HDF_ERR_INVALID_PARAM;
+        return false;
     }
     struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
     ret = ioctl(devHandle->fd, USBDEVFS_GETDRIVER, &getDriver);

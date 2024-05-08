@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_1 {
+namespace V1_2 {
 int32_t RunningLockCounter::Increase(const RunningLockInfo &info)
 {
     auto iterator = runninglockInfos_.find(info.name);
@@ -79,7 +79,7 @@ void RunningLockCounter::NotifyHiView(const RunningLockInfo &info, ChangedType c
         "BUNDLENAME", bundleName, "LOG_LEVEL", logLevel, "TAG", tag);
 #endif
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

@@ -1537,6 +1537,21 @@ static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
     return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
+static int WpaCliCmdStaShellCmd(WifiWpaStaInterface *this, const char *params)
+{
+    if (this == NULL || params == NULL) {
+        return -1;
+    }
+    char cmd[CMD_BUFFER_SIZE] = {0};
+    char buf[REPLY_BUF_SMALL_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s STA_SHELL %s",
+        this->ifname, params) < 0) {
+        HDF_LOGE("WpaCliCmdStaShellCmd, snprintf_s err");
+        return -1;
+    }
+    return WpaCliCmd(cmd, buf, sizeof(buf));
+}
+
 WifiWpaStaInterface *GetWifiStaInterface(const char *name)
 {
     WifiWpaStaInterface *p = g_wpaStaInterface;
@@ -1591,6 +1606,7 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     p->wpaCliCmdWepKeyTxKeyIdx = WpaCliCmdWepKeyTxKeyIdx;
     p->wpaCliCmdGetRequirePmf = WpaCliCmdGetRequirePmf;
     p->wpaCliCmdGetConnectionCapabilities = WpaCliCmdGetConnectionCapabilities;
+    p->wpaCliCmdStaShellCmd = WpaCliCmdStaShellCmd;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 

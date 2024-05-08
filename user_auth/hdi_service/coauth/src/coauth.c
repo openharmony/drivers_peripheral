@@ -325,6 +325,7 @@ CoAuthSchedule *GenerateSchedule(const ScheduleParam *param)
     coAuthSchedule->associateId = param->associateId;
     coAuthSchedule->scheduleMode = param->scheduleMode;
     coAuthSchedule->authType = param->authType;
+    coAuthSchedule->userType = param->userType;
     if (param->templateIds != NULL) {
         ret = CopyTemplateArrays(param->templateIds, &(coAuthSchedule->templateIds));
         if (ret != RESULT_SUCCESS) {

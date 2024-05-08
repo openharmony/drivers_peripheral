@@ -15,8 +15,10 @@
 
 #include "user_auth_funcs.h"
 
+#include <math.h>
 #include "securec.h"
 
+#include "auth_level.h"
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
@@ -51,6 +53,13 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
     }
+    if (!authContext->isExpiredReturnSuccess && authContext->authExpiredSysTime != NO_CHECK_PIN_EXPIRED_PERIOD) {
+        uint64_t nowTime = GetReeTime();
+        if (nowTime > authContext->authExpiredSysTime) {
+            LOG_ERROR("pin is expired");
+            return RESULT_PIN_EXPIRED;
+        }
+    }
     ResultCode ret = CopySchedules(authContext, schedules);
     if (ret != RESULT_SUCCESS) {
         DestoryContext(authContext);
@@ -76,6 +85,37 @@ IAM_STATIC void SetAuthResult(int32_t userId, uint32_t authType, const ExecutorR
     result->result = info->result;
 }
 
+IAM_STATIC ResultCode GetExpiredInfoForResult(const UserAuthContext *context, AuthResult *result)
+{
+    if (context == NULL || result == NULL) {
+        LOG_INFO("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    if (context->authExpiredSysTime == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        LOG_INFO("pinExpiredPeriod is not set");
+        result->pinExpiredInfo = NO_SET_PIN_EXPIRED_PERIOD;
+        return RESULT_SUCCESS;
+    }
+    uint64_t currentTime = GetReeTime();
+    if (currentTime < context->authExpiredSysTime) {
+        // MAX_JS_NUMBER_VALUE is 2^50.
+        const uint64_t MAX_JS_NUMBER_VALUE = 1125899906842624;
+        result->pinExpiredInfo = MAX_JS_NUMBER_VALUE;
+        if (context->authExpiredSysTime - currentTime < MAX_JS_NUMBER_VALUE) {
+            result->pinExpiredInfo = context->authExpiredSysTime - currentTime;
+        }
+        LOG_INFO("pin is not expired");
+        return RESULT_SUCCESS;
+    }
+    result->pinExpiredInfo = 0;
+    if (!context->isExpiredReturnSuccess) {
+        LOG_ERROR("pin is expired");
+        return RESULT_PIN_EXPIRED;
+    }
+    LOG_INFO("caller is screenLock or setting");
+    return RESULT_SUCCESS;
+}
+
 IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, const ExecutorResultInfo *info,
     AuthResult *result, UserAuthTokenHal *authToken)
 {
@@ -84,10 +124,6 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         result->credentialDigest = enrolledState.credentialDigest;
         result->credentialCount = enrolledState.credentialCount;
     }
-    if (context->isAuthResultCached) {
-        LOG_INFO("cache unlock auth result");
-        CacheUnlockAuthResult(context->userId, authToken);
-    }
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH) {
         result->rootSecret = CopyBuffer(info->rootSecret);
         if (!IsBufferValid(result->rootSecret)) {
@@ -95,6 +131,15 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
             return RESULT_NO_MEMORY;
         }
         CacheRootSecret(context->userId, result->rootSecret);
+    }
+    ResultCode ret = GetExpiredInfoForResult(context, result);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetExpiredInfoForResult failed");
+        return ret;
+    }
+    if (context->isAuthResultCached) {
+        LOG_INFO("cache unlock auth result");
+        CacheUnlockAuthResult(context->userId, authToken);
     }
     return RESULT_SUCCESS;
 }
@@ -169,6 +214,11 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
         LOG_ERROR("invalid cached unlock token");
         return RESULT_GENERAL_ERROR;
     }
+    if ((g_unlockAuthResult.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
+        || (g_unlockAuthResult.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
+        LOG_ERROR("need local auth");
+        return RESULT_GENERAL_ERROR;
+    }
     uint64_t time = GetSystemTime();
     if (time < g_unlockAuthResult.authToken.tokenDataPlain.time) {
         LOG_ERROR("bad system time");
@@ -214,6 +264,7 @@ IAM_STATIC ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, Reus
     *((UserAuthTokenHal *)reuseResult->token) = g_unlockAuthResult.authToken;
     reuseResult->authType = g_unlockAuthResult.authToken.tokenDataPlain.authType;
     ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.authMode = SCHEDULE_MODE_REUSE_UNLOCK_AUTH_RESULT;
+    ((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_RESIGN;
     if (memcpy_s(((UserAuthTokenHal *)reuseResult->token)->tokenDataPlain.challenge, CHALLENGE_LEN, info->challenge,
         CHALLENGE_LEN) != EOK) {
         LOG_ERROR("challenge copy failed");
@@ -249,4 +300,69 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
         return ret;
     }
     return ret;
+}
+
+ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *expiredInfos, uint32_t len,
+    uint32_t *size)
+{
+    if (param == NULL || expiredInfos == NULL || size == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    ResultCode ret = SaveGlobalConfigParam(param);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("Save globalConfigParam failed");
+        return ret;
+    }
+    if (param->type == PIN_EXPIRED_PERIOD) {
+        ret = UpdateExecutorExpiredInfo(expiredInfos, len, size);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("refresh ExecutorExpiredInfo failed");
+            return ret;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
+void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)
+{
+    (*checkResult) = GetAuthTrustLevel(userId, authType, authTrustLevel);
+    if ((*checkResult) != RESULT_SUCCESS) {
+        LOG_ERROR("GetAuthTrustLevel failed");
+        return;
+    }
+
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    if (authType != DEFAULT_AUTH_TYPE) {
+        SetCredentialConditionAuthType(&condition, authType);
+    }
+    LinkedList *creds = QueryCredentialLimit(&condition);
+    if (creds == NULL || creds->getSize(creds) == 0) {
+        LOG_ERROR("query credential failed");
+        DestroyLinkedList(creds);
+        (*checkResult) = RESULT_NOT_ENROLLED;
+        return;
+    }
+    DestroyLinkedList(creds);
+
+    PinExpiredInfo expiredInfo = {};
+    (*checkResult) = GetPinExpiredInfo(userId, &expiredInfo);
+    if ((*checkResult) != RESULT_SUCCESS) {
+        LOG_ERROR("GetPinExpiredInfo failed");
+        return;
+    }
+    if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
+        LOG_ERROR("pinExpiredPeriod is not set");
+        (*checkResult) = RESULT_SUCCESS;
+        return;
+    }
+    uint64_t nowTime = GetReeTime();
+    if (nowTime > expiredInfo.pinExpiredPeriod + expiredInfo.pinEnrolledSysTime) {
+        LOG_ERROR("pin is expired");
+        (*checkResult) = RESULT_PIN_EXPIRED;
+        return;
+    }
+    (*checkResult) = RESULT_SUCCESS;
+    return;
 }

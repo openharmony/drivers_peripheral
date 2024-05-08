@@ -15,11 +15,12 @@
 
 #ifndef CAMERA_HAL_HISYSEVENT_H
 #define CAMERA_HAL_HISYSEVENT_H
-
+#include <chrono>
 #include <string>
 #include <map>
 #include "hisysevent.h"
 #include "camera.h"
+#include <memory>
 
 namespace OHOS::Camera {
 
@@ -34,11 +35,37 @@ enum ErrorEventType {
     FORMAT_CAST_ERROR
 };
 
+enum PerformanceEventType {
+    TIME_FOR_OPEN_CAMERA,
+    TIME_FOR_CAPTURE,
+    TIME_FOR_FIRST_FRAME
+};
+
 class CameraHalHisysevent {
 public:
     static std::string CreateMsg(const char* format, ...);
     static void WriteFaultHisysEvent(const std::string &name, const std::string &msg);
     static std::string GetEventName(ErrorEventType errorEventType);
 };
+
+class CameraHalPerfSysevent final {
+    PerformanceEventType perfEventType_;
+    bool isPrint_;
+    const char *const funcName_;
+    std::chrono::system_clock::time_point begin;
+public:
+    CameraHalPerfSysevent(PerformanceEventType perfEventType, bool isPrint, const char *name);
+    ~CameraHalPerfSysevent();
+    CameraHalPerfSysevent(const CameraHalPerfSysevent&) = delete;
+    CameraHalPerfSysevent(CameraHalPerfSysevent&&) = delete;
+    CameraHalPerfSysevent& operator = (const CameraHalPerfSysevent&) = delete;
+    CameraHalPerfSysevent& operator = (CameraHalPerfSysevent&&) = delete;
+};
+
+#define CAMERAHALPERFSYSEVENT_COND(pet, cond) CameraHalPerfSysevent cameraHalPerfSysevent(pet, cond, __FUNCTION__)
+
+#define CAMERAHALPERFSYSEVENT(pet) CAMERAHALPERFSYSEVENT_COND(pet, true)
+
+#define CAMERAHALPERFSYSEVENT_EQUAL(arg, x, pet) CAMERAHALPERFSYSEVENT_COND(pet, ((arg) == (x)))
 }  // namespace OHOS::Camera
 #endif

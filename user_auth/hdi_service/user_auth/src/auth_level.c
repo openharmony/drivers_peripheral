@@ -80,9 +80,10 @@ ResultCode QueryScheduleAtl(const CoAuthSchedule *coAuthSchedule, uint32_t acl, 
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetAsl(uint32_t authType, uint32_t *asl)
+IAM_STATIC ResultCode GetAslAndAcl(uint32_t authType, uint32_t *asl, uint32_t *acl)
 {
     uint32_t allInOneMaxEsl = 0;
+    uint32_t allInOneMaxAcl = 0;
     ExecutorCondition condition = {};
     SetExecutorConditionAuthType(&condition, authType);
     LinkedList *executorList = QueryExecutor(&condition);
@@ -109,66 +110,44 @@ IAM_STATIC ResultCode GetAsl(uint32_t authType, uint32_t *asl)
         if (executorInfo->executorRole == ALL_IN_ONE && allInOneMaxEsl < executorInfo->esl) {
             allInOneMaxEsl = executorInfo->esl;
         }
+        if (executorInfo->executorRole == ALL_IN_ONE && allInOneMaxAcl < executorInfo->maxTemplateAcl) {
+            allInOneMaxAcl = executorInfo->maxTemplateAcl;
+        }
         temp = temp->next;
     }
     *asl = allInOneMaxEsl;
+    *acl = allInOneMaxAcl;
     DestroyLinkedList(executorList);
+
+    LOG_INFO("allInOneMaxEsl:%{public}d, allInOneMaxAcl:%{public}u", allInOneMaxEsl, allInOneMaxAcl);
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl)
+ResultCode GetAuthTrustLevel(int32_t userId, uint32_t authType, uint32_t atl)
 {
-    CredentialCondition condition = {};
-    SetCredentialConditionAuthType(&condition, authType);
-    SetCredentialConditionUserId(&condition, userId);
-    LinkedList *credList = QueryCredentialLimit(&condition);
-    if (credList == NULL || credList->getSize(credList) == 0) {
-        LOG_ERROR("query credential failed");
-        DestroyLinkedList(credList);
-        return RESULT_NOT_ENROLLED;
-    }
-    *acl = 0;
-    LinkedListNode *temp =  credList->head;
-    while (temp != NULL) {
-        if (temp->data == NULL) {
-            LOG_ERROR("link node is invalid");
-            DestroyLinkedList(credList);
-            return RESULT_UNKNOWN;
-        }
-        CredentialInfoHal *credInfo = (CredentialInfoHal *)temp->data;
-        *acl = *acl < credInfo->capabilityLevel ? credInfo->capabilityLevel : *acl;
-        temp = temp->next;
-    }
-    DestroyLinkedList(credList);
-    return RESULT_SUCCESS;
-}
-
-ResultCode SingleAuthTrustLevel(int32_t userId, uint32_t authType, uint32_t *atl)
-{
-    if (atl == NULL) {
-        LOG_ERROR("atl is null");
-        return RESULT_BAD_PARAM;
-    }
     uint32_t authSecureLevel;
-    ResultCode ret = GetAsl(authType, &authSecureLevel);
+    uint32_t maxTemplateAcl;
+    ResultCode ret = GetAslAndAcl(authType, &authSecureLevel, &maxTemplateAcl);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get asl failed");
         return ret;
     }
 
-    uint32_t authCapabilityLevel;
-    ret = GetAcl(userId, authType, &authCapabilityLevel);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get acl failed");
-        return ret;
-    }
-
+    uint32_t supportedAtl = 0;
     for (uint32_t i = 0; i < sizeof(g_generationAtl) / sizeof(AtlGeneration); ++i) {
-        if (authSecureLevel >= g_generationAtl[i].asl && authCapabilityLevel >= g_generationAtl[i].acl) {
-            *atl = g_generationAtl[i].atl;
-            return RESULT_SUCCESS;
+        if (authSecureLevel >= g_generationAtl[i].asl && maxTemplateAcl >= g_generationAtl[i].acl) {
+            supportedAtl = g_generationAtl[i].atl;
+            break;
         }
     }
+    if (supportedAtl == 0) {
+        LOG_ERROR("no match atl");
+        return RESULT_NOT_FOUND;
+    }
+    if (atl > supportedAtl) {
+        LOG_ERROR("atl does not support, authType:%{public}d, supportedAtl:%{public}u", authType, supportedAtl);
+        return RESULT_TRUST_LEVEL_NOT_SUPPORT;
+    }
 
-    return RESULT_NOT_FOUND;
+    return RESULT_SUCCESS;
 }

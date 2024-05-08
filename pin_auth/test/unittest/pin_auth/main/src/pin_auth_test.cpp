@@ -17,9 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include "pin_auth.h"
-#include "defines.h"
 #include "securec.h"
+
+#include "attribute.h"
+#include "common_impl.h"
+#include "defines.h"
+#include "pin_auth.h"
+#include "pin_auth_hdi.h"
+
+#include "adaptor_log.h"
 
 namespace OHOS {
 namespace UserIam {
@@ -72,22 +78,26 @@ HWTEST_F(PinAuthTest, EnrollPin_test, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetAlgoParameter test
- * @tc.desc: verify GetAlgoParameter
+ * @tc.name: AllInOneAuth test
+ * @tc.desc: verify AllInOneAuth
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinAuthTest, GetAlgoParameter_test, TestSize.Level1)
+HWTEST_F(PinAuthTest, AllInOneAuth_test, TestSize.Level1)
 {
     std::vector<uint8_t> salt;
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
-    uint32_t algoVersion;
-    int32_t result = pinAuth->GetAlgoParameter(INVALID_TEMPLATE_ID, salt, algoVersion);
+    std::vector<uint8_t> extraInfo;
+    PinAlgoParam pinAlgoParam = {};
+    int32_t result = pinAuth->AllInOneAuth(0, INVALID_TEMPLATE_ID, extraInfo, pinAlgoParam);
     EXPECT_EQ(result, INVALID_PARAMETERS);
 
-    result = pinAuth->GetAlgoParameter(0, salt, algoVersion);
-    EXPECT_EQ(result, GENERAL_ERROR);
+    std::vector<uint64_t> templateIdList;
+    std::vector<uint8_t> fwkPubKey(32);
+    result = pinAuth->SetAllInOneFwkParam(templateIdList, fwkPubKey);
+    EXPECT_EQ(result, SUCCESS);
+
     delete pinAuth;
 }
 
@@ -160,25 +170,72 @@ HWTEST_F(PinAuthTest, GetExecutorInfo_test, TestSize.Level1)
     EXPECT_NE(pinAuth, nullptr);
     std::vector<uint8_t> pubKey;
     uint32_t esl = 0;
-    int32_t result = pinAuth->GetExecutorInfo(pubKey, esl);
+    uint32_t acl = 0;
+    int32_t result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::SCHEDULER, pubKey, esl, acl);
     EXPECT_EQ(result, GENERAL_ERROR);
     delete pinAuth;
 }
 
 /**
- * @tc.name: VerifyTemplateData test
- * @tc.desc: verify VerifyTemplateData
+ * @tc.name: SetAllInOneFwkParam test
+ * @tc.desc: verify SetAllInOneFwkParam
  * @tc.type: FUNC
  * @tc.require: #I64XCB
  */
-HWTEST_F(PinAuthTest, VerifyTemplateData_test, TestSize.Level1)
+HWTEST_F(PinAuthTest, SetAllInOneFwkParam_test, TestSize.Level1)
 {
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
     std::vector<uint64_t> templateIdList = {};
-    int32_t result = pinAuth->VerifyTemplateData(templateIdList);
+    std::vector<uint8_t> fwkPubKey = {};
+
+    int32_t result = pinAuth->SetAllInOneFwkParam(templateIdList, fwkPubKey);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
+
+    fwkPubKey.resize(32);
+    result = pinAuth->SetAllInOneFwkParam(templateIdList, fwkPubKey);
     EXPECT_EQ(result, SUCCESS);
     delete pinAuth;
+}
+
+static bool GetTemplateIdFromTlv(std::vector<uint8_t> resultTlv, uint64_t &templateId)
+{
+    bool ret = false;
+    Uint8Array uint8array = {
+        .data = resultTlv.data(),
+        .len = resultTlv.size(),
+    };
+    Attribute *attrbute = CreateAttributeFromSerializedMsg(uint8array);
+    if (attrbute == NULL) {
+        return false;
+    }
+    ResultCode result = GetAttributeUint8Array(attrbute, ATTR_ROOT, &uint8array);
+    if (result != RESULT_SUCCESS) {
+        goto EXIT;
+    }
+    FreeAttribute(&attrbute);
+    attrbute = CreateAttributeFromSerializedMsg(uint8array);
+    if (attrbute == NULL) {
+        goto EXIT;
+    }
+    result = GetAttributeUint8Array(attrbute, ATTR_DATA, &uint8array);
+    if (result != RESULT_SUCCESS) {
+        goto EXIT;
+    }
+    FreeAttribute(&attrbute);
+    attrbute = CreateAttributeFromSerializedMsg(uint8array);
+    if (attrbute == NULL) {
+        goto EXIT;
+    }
+    result = GetAttributeUint64(attrbute, ATTR_TEMPLATE_ID, &templateId);
+    if (result != RESULT_SUCCESS) {
+        goto EXIT;
+    };
+    ret = true;
+
+EXIT:
+    FreeAttribute(&attrbute);
+    return ret;
 }
 
 /**
@@ -192,21 +249,35 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
     PinAuth *pinAuth = new (std::nothrow) PinAuth();
     EXPECT_NE(pinAuth, nullptr);
     pinAuth->Init();
+
+    KeyPair *keyPair = GenerateEd25519KeyPair();
+    ASSERT_NE(keyPair, nullptr);
+
+    std::vector<uint64_t> templateIdList;
+    std::vector<uint8_t> frameworkPublicKey(keyPair->pubKey->buf, keyPair->pubKey->buf + keyPair->pubKey->contentSize);
+    int32_t result = pinAuth->SetAllInOneFwkParam(templateIdList, frameworkPublicKey);
+    EXPECT_EQ(result, SUCCESS);
+
     std::vector<uint8_t> resultTlv;
     std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
     std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
-    int32_t result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
+    result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
     EXPECT_EQ(result, SUCCESS);
     uint64_t templateId = 0;
-    (void)memcpy_s(&templateId, 8, &(resultTlv[36]), 8);
+    bool ret = GetTemplateIdFromTlv(resultTlv, templateId);
+    ASSERT_EQ(ret, true);
 
     result = pinAuth->AuthPin(0, templateId, pinData, resultTlv);
     EXPECT_EQ(result, SUCCESS);
 
-    std::vector<uint8_t> saltRet;
-    uint32_t algoVersion;
-    result = pinAuth->GetAlgoParameter(templateId, saltRet, algoVersion);
-    EXPECT_EQ(algoVersion, 0);
+    uint8_t challenge[32] = {0};
+    Buffer *fwkExtraInfo = GetAuthFwkExtraInfo(0, keyPair, challenge, 32);
+    ASSERT_NE(fwkExtraInfo, nullptr);
+
+    std::vector<uint8_t> authExtraInfo(fwkExtraInfo->buf, fwkExtraInfo->buf + fwkExtraInfo->contentSize);
+    PinAlgoParam pinAlgoParam;
+    result = pinAuth->AllInOneAuth(0, templateId, authExtraInfo, pinAlgoParam);
+    EXPECT_EQ(pinAlgoParam.algoVersion, 0);
     EXPECT_EQ(result, SUCCESS);
 
     PinCredentialInfo pinCredentialInfo = {};
@@ -218,19 +289,17 @@ HWTEST_F(PinAuthTest, Pin_Auth_Succ_test, TestSize.Level1)
 
     std::vector<uint8_t> pubKey;
     uint32_t esl = 0;
-    result = pinAuth->GetExecutorInfo(pubKey, esl);
+    uint32_t acl = 0;
+    result = pinAuth->GetExecutorInfo(HDI::PinAuth::HdiExecutorRole::ALL_IN_ONE, pubKey, esl, acl);
     EXPECT_EQ(result, SUCCESS);
     EXPECT_EQ(esl, 2);
 
     result = pinAuth->DeleteTemplate(templateId);
     EXPECT_EQ(result, SUCCESS);
 
-    std::vector<uint64_t> templateIdList = {templateId, 1};
-    result = pinAuth->VerifyTemplateData(templateIdList);
-    EXPECT_EQ(result, SUCCESS);
-
     pinAuth->Close();
     delete pinAuth;
+    DestroyBuffer(fwkExtraInfo);
 }
 
 /**
@@ -249,7 +318,8 @@ HWTEST_F(PinAuthTest, Pin_Auth_AntiBruteInfo1_test, TestSize.Level1)
     std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
     int32_t result = pinAuth->EnrollPin(0, 10010, salt, pinData, resultTlv);
     EXPECT_EQ(result, SUCCESS);
-    (void)memcpy_s(&g_antiTemplateId, 8, &(resultTlv[36]), 8);
+    bool ret = GetTemplateIdFromTlv(resultTlv, g_antiTemplateId);
+    ASSERT_EQ(ret, true);
 
     /* The first auth failed */
     std::vector<uint8_t> pinErrorData(CONST_PIN_DATA_LEN, 2);

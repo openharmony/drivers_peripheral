@@ -182,6 +182,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
+    SensorCallbackVdi::servicesChanged = true;
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
         return HDF_SUCCESS;
     }
@@ -209,6 +210,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
+    SensorCallbackVdi::servicesChanged = true;
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         HDF_LOGE("%{public}s There are still some services enable", __func__);
         return HDF_SUCCESS;
@@ -379,6 +381,7 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     } else {
         SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, serviceId, callbackObj);
     }
+    SensorCallbackVdi::clientsChanged = true;
     return ret;
 }
 
@@ -393,6 +396,7 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
         HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
     }
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
+    SensorCallbackVdi::clientsChanged = true;
     if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
         return HDF_SUCCESS;

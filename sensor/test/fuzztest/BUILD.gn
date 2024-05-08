@@ -17,11 +17,14 @@ import("//build/test.gni")
 group("hdf_sensor_fuzztest") {
   testonly = true
   deps = [
+    "sensor_fuzzer:hdf_fuzztest_sensor",
     "sensordisable_fuzzer:fuzztest",
     "sensorenable_fuzzer:fuzztest",
+    "sensorgetsdcsensorInfo_fuzzer:fuzztest",
     "sensorregisterandunregistercallback_fuzzer:fuzztest",
     "sensorsetbatch_fuzzer:fuzztest",
     "sensorsetmode_fuzzer:fuzztest",
     "sensorsetoption_fuzzer:fuzztest",
+    "sensorsetsdcsensor_fuzzer:fuzztest",
   ]
 }

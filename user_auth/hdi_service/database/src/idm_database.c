@@ -15,10 +15,12 @@
 
 #include "idm_database.h"
 
+#include "inttypes.h"
 #include "securec.h"
 
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
+#include "adaptor_time.h"
 #include "idm_file_manager.h"
 
 #define MAX_DUPLICATE_CHECK 100
@@ -37,6 +39,10 @@ IAM_STATIC LinkedList *g_userInfoList = NULL;
 
 // Caches the current user to reduce the number of user list traversal times.
 IAM_STATIC UserInfo *g_currentUser = NULL;
+
+// Caches global config info.
+IAM_STATIC GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
+IAM_STATIC uint32_t g_globalConfigInfoNum = 0;
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
@@ -70,6 +76,10 @@ ResultCode InitUserInfoList(void)
         LOG_ERROR("clear invalid user failed");
         DestroyUserInfoList();
         return ret;
+    }
+    ret = LoadGlobalConfigInfo(g_globalConfigArray, MAX_GLOBAL_CONFIG_NUM, &g_globalConfigInfoNum);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("load global config info failed");
     }
     LOG_INFO("InitUserInfoList end");
     return RESULT_SUCCESS;
@@ -291,7 +301,7 @@ IAM_STATIC bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUi
     return false;
 }
 
-IAM_STATIC UserInfo *CreateUser(int32_t userId)
+IAM_STATIC UserInfo *CreateUser(int32_t userId, int32_t userType)
 {
     UserInfo *user = InitUserInfoNode();
     if (!IsUserInfoValid(user)) {
@@ -300,6 +310,7 @@ IAM_STATIC UserInfo *CreateUser(int32_t userId)
         return NULL;
     }
     user->userId = userId;
+    user->userType = userType;
     ResultCode ret = GenerateDeduplicateUint64(g_userInfoList, &user->secUid, IsSecureUidDuplicate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("generate secureUid failed");
@@ -458,6 +469,7 @@ IAM_STATIC ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *cre
         Free(credential);
         return RESULT_BAD_COPY;
     }
+    credential->enrolledSysTime = GetReeTime();
     ret = credentialList->insert(credentialList, credential);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("insert credential failed");
@@ -466,7 +478,7 @@ IAM_STATIC ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *cre
     return ret;
 }
 
-IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
+IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType)
 {
     if (g_userInfoList == NULL) {
         LOG_ERROR("please init");
@@ -483,12 +495,12 @@ IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
         return RESULT_BAD_PARAM;
     }
 
-    user = CreateUser(userId);
+    user = CreateUser(userId, userType);
     if (user == NULL) {
         LOG_ERROR("create user failed");
         return RESULT_UNKNOWN;
     }
-
+    LOG_INFO("user userType %{public}d", user->userType);
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential to user failed");
@@ -507,7 +519,7 @@ FAIL:
     return ret;
 }
 
-ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
+ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType)
 {
     if ((credentialInfo == NULL) || (credentialInfo->authType == DEFAULT_AUTH_TYPE)) {
         LOG_ERROR("credentialInfo is invalid");
@@ -515,7 +527,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     }
     UserInfo *user = QueryUserInfo(userId);
     if (user == NULL && credentialInfo->authType == PIN_AUTH) {
-        ResultCode ret = AddUser(userId, credentialInfo);
+        ResultCode ret = AddUser(userId, credentialInfo, userType);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("add user failed");
             return ret;
@@ -1185,14 +1197,104 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     }
     enrolledStateHal->credentialCount = credentialCount;
     LinkedListNode *enrolledInfoTemp = user->enrolledInfoList->head;
-    const static uint16_t num = 0xFFFF;
     while (enrolledInfoTemp != NULL) {
         EnrolledInfoHal *nodeInfo = enrolledInfoTemp->data;
         if (nodeInfo != NULL && nodeInfo->authType == authType) {
-            enrolledStateHal->credentialDigest = nodeInfo->enrolledId & num;
+            enrolledStateHal->credentialDigest = nodeInfo->enrolledId;
             break;
         }
         enrolledInfoTemp = enrolledInfoTemp->next;
     }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode SavePinExpiredPeriod(int64_t pinExpiredPeriod)
+{
+    if (pinExpiredPeriod < 0) {
+        pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+    }
+    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
+        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
+            g_globalConfigArray[i].value.pinExpiredPeriod = pinExpiredPeriod;
+            return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+        }
+    }
+    if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
+        g_globalConfigInfoNum++;
+        g_globalConfigArray[g_globalConfigInfoNum - 1].type = PIN_EXPIRED_PERIOD;
+        g_globalConfigArray[g_globalConfigInfoNum - 1].value.pinExpiredPeriod = pinExpiredPeriod;
+        return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+    }
+    LOG_ERROR("SavePinExpiredPeriod failed");
+    return RESULT_GENERAL_ERROR;
+}
+
+
+ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
+{
+    if (param == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    if (param->type == PIN_EXPIRED_PERIOD) {
+        return SavePinExpiredPeriod(param->value.pinExpiredPeriod);
+    }
+    LOG_ERROR("SaveGlobalConfigParam type %{public}d failed", param->type);
+    return RESULT_GENERAL_ERROR;
+}
+
+IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinCredential)
+{
+    if (pinCredential == NULL) {
+        LOG_ERROR("no need to get pin credential");
+        return RESULT_BAD_PARAM;
+    }
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    SetCredentialConditionAuthType(&condition, PIN_AUTH);
+    LinkedList *credList = QueryCredentialLimit(&condition);
+    if (credList == NULL || credList->getSize(credList) == 0) {
+        LOG_ERROR("pin credential is null");
+        DestroyLinkedList(credList);
+        return RESULT_NOT_ENROLLED;
+    }
+    if (credList->head == NULL || credList->head->data == NULL) {
+        LOG_ERROR("pin credList node is invalid");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (memcpy_s(pinCredential, sizeof(CredentialInfoHal), credList->head->data, sizeof(CredentialInfoHal)) != EOK) {
+        LOG_ERROR("credential copy fail");
+        DestroyLinkedList(credList);
+        return RESULT_GENERAL_ERROR;
+    }
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
+{
+    if (expiredInfo == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    (void)memset_s(expiredInfo, sizeof(PinExpiredInfo), 0, sizeof(PinExpiredInfo));
+    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
+        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
+            expiredInfo->pinExpiredPeriod = g_globalConfigArray[i].value.pinExpiredPeriod;
+            break;
+        }
+    }
+    if (expiredInfo->pinExpiredPeriod <= 0) {
+        expiredInfo->pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+        LOG_INFO("no need check pinExpiredPeriod");
+        return RESULT_SUCCESS;
+    }
+    CredentialInfoHal pinCredential = {};
+    if (QueryPinCredential(userId, &pinCredential) != RESULT_SUCCESS) {
+        LOG_INFO("not enrolled pin");
+        return RESULT_NOT_ENROLLED;
+    }
+    expiredInfo->pinEnrolledSysTime = pinCredential.enrolledSysTime;
     return RESULT_SUCCESS;
 }

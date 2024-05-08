@@ -44,6 +44,15 @@ StartPlayingFunc startPlayingFunc;
 SuspendPlayingFunc suspendPlayingFunc;
 StopPlayingFunc stopPlayingFunc;
 WriteFrameFunc writeFrameFunc;
+
+SetUpFunc fastSetUpFunc;
+TearDownFunc fastTearDownFunc;
+GetStateFunc fastGetStateFunc;
+StartPlayingFunc fastStartPlayingFunc;
+SuspendPlayingFunc fastSuspendPlayingFunc;
+StopPlayingFunc fastStopPlayingFunc;
+ReqMmapBufferFunc fastReqMmapBufferFunc;
+ReadMmapPositionFunc fastReadMmapPositionFunc;
 #endif
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
@@ -151,7 +160,16 @@ void DeRegisterObserver()
 }
 
 #ifdef A2DP_HDI_SERVICE
-static bool InitAudioDeviceSoHandle(const char* path)
+#define GET_SYM_ERRPR_RET(handle, funcType, funcPtr, funcStr)       \
+    do {                                                            \
+        funcPtr = (funcType)dlsym(handle, funcStr);                 \
+        if (funcPtr == nullptr) {                                   \
+            HDF_LOGE("%{public}s: lib so func not found", funcStr); \
+            return false;                                           \
+        }                                                           \
+    } while (0)
+
+static bool InitAudioDeviceSoHandle(const char *path)
 {
     if (path == NULL) {
         HDF_LOGE("%{public}s: path is NULL", __func__);
@@ -167,19 +185,23 @@ static bool InitAudioDeviceSoHandle(const char* path)
             HDF_LOGE("%{public}s: open lib so fail, reason:%{public}s ", __func__, dlerror());
             return false;
         }
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, setUpFunc, "SetUp");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, tearDownFunc, "TearDown");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, getStateFunc, "GetState");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartPlayingFunc, startPlayingFunc, "StartPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendPlayingFunc, "SuspendPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopPlayingFunc, "StopPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, WriteFrameFunc, writeFrameFunc, "WriteFrame");
 
-        setUpFunc = (SetUpFunc)dlsym(g_ptrAudioDeviceHandle, "SetUp");
-        tearDownFunc = (TearDownFunc)dlsym(g_ptrAudioDeviceHandle, "TearDown");
-        getStateFunc = (GetStateFunc)dlsym(g_ptrAudioDeviceHandle, "GetState");
-        startPlayingFunc = (StartPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StartPlaying");
-        suspendPlayingFunc = (SuspendPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "SuspendPlaying");
-        stopPlayingFunc = (StopPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StopPlaying");
-        writeFrameFunc = (WriteFrameFunc)dlsym(g_ptrAudioDeviceHandle, "WriteFrame");
-        if (setUpFunc == NULL || tearDownFunc == NULL || getStateFunc == NULL || startPlayingFunc == NULL ||
-            suspendPlayingFunc == NULL || stopPlayingFunc == NULL || writeFrameFunc == NULL) {
-                HDF_LOGE("%{public}s: lib so func not found", __func__);
-                return false;
-        }
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, fastSetUpFunc, "FastSetUp");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, fastTearDownFunc, "FastTearDown");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetStateFunc, fastGetStateFunc, "FastGetState");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StartPlayingFunc, fastStartPlayingFunc, "FastStartPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, fastSuspendPlayingFunc, "FastSuspendPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, fastStopPlayingFunc, "FastStopPlaying");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReqMmapBufferFunc, fastReqMmapBufferFunc, "FastReqMmapBuffer");
+        GET_SYM_ERRPR_RET(
+            g_ptrAudioDeviceHandle, ReadMmapPositionFunc, fastReadMmapPositionFunc, "FastReadMmapPosition");
     }
     return true;
 }
@@ -201,17 +223,79 @@ void TearDown()
 {
     tearDownFunc();
 }
+
+bool FastSetUp()
+{
+    bool ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
+    if (ret) {
+        ret = fastSetUpFunc();
+    }
+    if (!ret) {
+        HDF_LOGE("%{public}s failed", __func__);
+    }
+    return ret;
+}
+
+void FastTearDown()
+{
+    fastTearDownFunc();
+}
+
+int FastStartPlaying(uint32_t sampleRate, uint32_t channelCount, uint32_t format)
+{
+    BTAudioStreamState state = fastGetStateFunc();
+    if (state != BTAudioStreamState::STARTED) {
+        HDF_LOGI("%{public}s, state=%{public}hhu", __func__, state);
+        if (!fastStartPlayingFunc(sampleRate, channelCount, format)) {
+            HDF_LOGE("%{public}s, fail to startPlaying", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+int FastSuspendPlaying()
+{
+    int ret = 0;
+    BTAudioStreamState state = fastGetStateFunc();
+    if (state == BTAudioStreamState::STARTED) {
+        ret = (fastSuspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s, state=%{public}hhu is bad state", __func__, state);
+    }
+    return ret;
+}
+
+int FastStopPlaying()
+{
+    BTAudioStreamState state = fastGetStateFunc();
+    HDF_LOGI("%{public}s, state=%{public}hhu", __func__, state);
+    if (state != BTAudioStreamState::INVALID) {
+        fastStopPlayingFunc();
+    }
+    return HDF_SUCCESS;
+}
+
+int FastReqMmapBuffer(int32_t ashmemLength)
+{
+    return fastReqMmapBufferFunc(ashmemLength);
+}
+
+void FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames)
+{
+    fastReadMmapPositionFunc(sec, nSec, frames);
+}
 #endif
 
 
-int WriteFrame(const uint8_t *data, uint32_t size)
+int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)
 {
     HDF_LOGD("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
     BTAudioStreamState state = getStateFunc();
     if (state != BTAudioStreamState::STARTED) {
         HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
-        if (!startPlayingFunc()) {
+        if (!startPlayingFunc(attrs->sampleRate, attrs->channelCount, static_cast<uint32_t>(attrs->format))) {
             HDF_LOGE("%{public}s: fail to startPlaying", __func__);
             return HDF_FAILURE;
         }

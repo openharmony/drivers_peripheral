@@ -38,7 +38,7 @@ ohos_unittest("hdi_unittest_power") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [ "../../../../interface/power/v1_1:libpower_stub_1.1" ]
+  deps = [ "../../../../interface/power/v1_2:libpower_stub_1.2" ]
 
   external_deps = [
     "hdf_core:libhdf_utils",

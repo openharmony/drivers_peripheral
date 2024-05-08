@@ -36,7 +36,8 @@
                 "hilog",
                 "hdf_core",
                 "drivers_interface_audio",
-                "bounds_checking_function"
+                "bounds_checking_function",
+                "hitrace"
             ],
             "third_party": [
                 "cJSON",

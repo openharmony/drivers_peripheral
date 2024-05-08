@@ -59,7 +59,7 @@ ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds);
 LinkedList *QueryCredentialLimit(const CredentialCondition *limit);
 ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId);
 
-ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo);
+ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo, int32_t userType);
 ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType);
 ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType);
 ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
@@ -75,6 +75,8 @@ void SetCredentiaConditionNeedCachePin(CredentialCondition *condition);
 
 ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, uint32_t *userInfoCount);
 ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
+ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param);
+ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo);
 
 #ifdef __cplusplus
 }

@@ -21,6 +21,7 @@
 #include <hdf_base.h>
 #include <hdi_base.h>
 #include "iremote_object.h"
+#include "v2_0/sensor_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -41,6 +42,7 @@ class ISensorCallbackVdi : public HdiBase {
 public:
     virtual ~ISensorCallbackVdi() = default;
     virtual int32_t OnDataEventVdi(const HdfSensorEventsVdi& eventVdi) = 0;
+    virtual int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) = 0;
     virtual sptr<IRemoteObject> HandleCallbackDeath() = 0;
 };
 

@@ -35,6 +35,7 @@ IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.userId = param->userId;
     scheduleParam.authType = param->authType;
+    scheduleParam.userType = param->userType;
     scheduleParam.scheduleMode = SCHEDULE_MODE_ENROLL;
     scheduleParam.collectorSensorHint = param->executorSensorHint;
     if (scheduleParam.collectorSensorHint != INVALID_SENSOR_HINT) {
@@ -109,7 +110,12 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("scheduleId is null");
         return RESULT_BAD_PARAM;
     }
-    ResultCode ret = CheckSessionValid(param.userId);
+    ResultCode ret = IsValidUserType(param.userType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("userType is invalid");
+        return ret;
+    }
+    ret = CheckSessionValid(param.userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("session is invalid");
         return ret;
@@ -168,7 +174,7 @@ IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const Execu
 }
 
 IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
-    CredentialInfoHal *credentialInfo)
+    CredentialInfoHal *credentialInfo, const CoAuthSchedule *schedule)
 {
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
@@ -181,11 +187,6 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("idm session is time out");
         return ret;
-    }
-    const CoAuthSchedule *schedule = GetCoAuthSchedule(executorInfo->scheduleId);
-    if (schedule == NULL) {
-        LOG_ERROR("schedule is null");
-        return RESULT_GENERAL_ERROR;
     }
     GetInfoFromResult(credentialInfo, executorInfo, schedule);
     return RESULT_SUCCESS;
@@ -260,13 +261,18 @@ ResultCode AddCredentialFunc(
         LOG_ERROR("executorResultInfo is null");
         return RESULT_UNKNOWN;
     }
+    const CoAuthSchedule *schedule = GetCoAuthSchedule(executorResultInfo->scheduleId);
+    if (schedule == NULL) {
+        LOG_ERROR("schedule is null");
+        return RESULT_GENERAL_ERROR;
+    }
     CredentialInfoHal credentialInfo;
-    ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo);
+    ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo, schedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("failed to get credential info result");
         goto EXIT;
     }
-    ret = AddCredentialInfo(userId, &credentialInfo);
+    ret = AddCredentialInfo(userId, &credentialInfo, schedule->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("add credential failed");
         goto EXIT;
@@ -446,7 +452,7 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
     }
     CredentialInfoHal credentialInfo;
     GetInfoFromResult(&credentialInfo, executorResultInfo, schedule);
-    ret = AddCredentialInfo(userId, &credentialInfo);
+    ret = AddCredentialInfo(userId, &credentialInfo, schedule->userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("failed to add credential");
         goto EXIT;

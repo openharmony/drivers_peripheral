@@ -108,6 +108,27 @@ void Test::Open(int cameraId)
     }
 }
 
+void Test::OpenSecureCamera(int cameraId)
+{
+    if (cameraDeviceV1_3 == nullptr) {
+        EXPECT_NE(serviceV1_3, nullptr);
+        serviceV1_3->GetCameraIds(cameraIds);
+        EXPECT_NE(cameraIds.size(), 0);
+        GetCameraMetadata(cameraId);
+        deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+
+        EXPECT_NE(serviceV1_3, nullptr);
+        if (DEVICE_1 == cameraId) {
+            rc = serviceV1_3->OpenSecureCamera(cameraIds[1], deviceCallback, cameraDeviceV1_3);
+        } else {
+            rc = serviceV1_3->OpenSecureCamera(cameraIds[0], deviceCallback, cameraDeviceV1_3);
+        }
+        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
+        EXPECT_NE(cameraDeviceV1_3, nullptr);
+        CAMERA_LOGI("OpenSecureCamera success");
+    }
+}
+
 
 void Test::GetCameraMetadata(int cameraId)
 {
@@ -214,6 +235,18 @@ void Test::DefaultInfosCapture(
     consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
 }
 
+void Test::DefaultInfosProfessionalCapture(
+    std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
+{
+    DefaultCapture(infos);
+    std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
+    infos->v1_0.bufferQueue_ = consumer_capture->CreateProducerSeq([this](void* addr, uint32_t size) {
+        DumpImageFile(streamIdCapture, "yuv", addr, size);
+    });
+    infos->v1_0.bufferQueue_->producer_->SetQueueSize(UT_DATA_SIZE);
+    consumerMap_[StreamIntent::STILL_CAPTURE] = consumer_capture;
+}
+
 void Test::DefaultInfosVideo(
     std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos)
 {
@@ -304,7 +337,7 @@ void Test::StartProfessionalStream(std::vector<StreamIntent> intents, uint8_t pr
             DefaultInfosAnalyze(streamInfoAnalyze);
             streamInfos.push_back(*streamInfoAnalyze);
         } else {
-            DefaultInfosCapture(streamInfoCapture);
+            DefaultInfosProfessionalCapture(streamInfoCapture);
             streamInfos.push_back(*streamInfoCapture);
         }
     }

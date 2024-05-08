@@ -705,7 +705,7 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
             nodeNamePathMap_["type"] = path;
         }
 
-        for (auto & iter : nodeNamePathMap_) {
+        for (auto& iter : nodeNamePathMap_) {
             if ((strcmp(entry->d_name, iter.first.c_str()) == 0) && (nodeNamePathMap_[iter.first].empty())) {
                 nodeNamePathMap_[iter.first] = path;
             }
@@ -1032,7 +1032,7 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
         return HDF_ERR_IO;
     }
 
-    ssize_t size = value.length();
+    ssize_t size = static_cast<ssize_t>(value.length());
     if (write(fd, value.c_str(), size) != size) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to write file %{public}s, errno: %{public}d",
             path.c_str(), errno);

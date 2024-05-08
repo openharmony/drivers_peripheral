@@ -37,7 +37,8 @@ void RenderFrameFuzzTest(const uint8_t* data, size_t size)
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
     sptr<IDAudioCallback> callback = nullptr;
-    auto audioRender = std::make_shared<AudioRenderInterfaceImpl>(adpName, desc, attrs, callback);
+    uint32_t renderId = *(reinterpret_cast<const uint32_t*>(data));
+    auto audioRender = std::make_shared<AudioRenderInterfaceImpl>(adpName, desc, attrs, callback, renderId);
 
     std::vector<int8_t> frame;
     uint64_t replyBytes = *(reinterpret_cast<const uint64_t*>(data));
