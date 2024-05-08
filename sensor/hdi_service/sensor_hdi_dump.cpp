@@ -177,7 +177,7 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
     (void)HdfSbufWriteString(reply, "============== all clients information ==============\n\n");
     std::string sensorInfoData = "";
     sensorInfoData += "bestSensorConfigMap={\n";
-    for (auto &entry2 : bestSensorConfigMap) {
+    for (const auto &entry2 : bestSensorConfigMap) {
         auto sensorId = entry2.first;
         auto bestSensorConfig = entry2.second;
         sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
@@ -187,12 +187,12 @@ int32_t SensorHdiDump::SensorShowClient(struct HdfSBuf *reply)
         sensorInfoData += "}}\n";
     }
     sensorInfoData += "}\n\n";
-    for (auto &entry : sensorClientInfoMap) {
+    for (const auto &entry : sensorClientInfoMap) {
         auto serviceId = entry.first;
         auto sensorClientInfo = entry.second;
         sensorInfoData += "serviceId=" + std::to_string(serviceId) + " ";
         sensorInfoData += "sensorConfigMap_={\n";
-        for (auto &entry2 : sensorClientInfo.sensorConfigMap_) {
+        for (const auto &entry2 : sensorClientInfo.sensorConfigMap_) {
             auto sensorId = entry2.first;
             auto sensorConfig = entry2.second;
             sensorInfoData += "{sensorId=" + std::to_string(sensorId) + ",";
