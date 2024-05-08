@@ -33,9 +33,15 @@ void DcameraRemoveDCameraDeviceFuzzTest(const uint8_t* data, size_t size)
     DHBase dhBase;
     dhBase.deviceId_ = deviceId;
     dhBase.dhId_ = dhId;
-    std::string cameraId = "1";
-    std::string dcameraBase = "12";
-    DCameraHost::GetInstance()->dhBaseHashDCamIdMap_.emplace(dcameraBase, cameraId);
+    std::string cameraId = "1__2";
+    std::string sinkAbilityInfo(reinterpret_cast<const char*>(data), size);
+    std::string sourceAbilityInfo(reinterpret_cast<const char*>(data), size);
+    OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
+        sourceAbilityInfo));
+    if (dcameraDevice == nullptr) {
+        return;
+    }
+    DCameraHost::GetInstance()->dCameraDeviceMap_.emplace(cameraId, dcameraDevice);
 
     DCameraHost::GetInstance()->RemoveDCameraDevice(dhBase);
 }
