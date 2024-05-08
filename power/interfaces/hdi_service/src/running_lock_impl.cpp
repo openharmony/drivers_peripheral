@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 const std::string RUNNINGLOCK_TAG_BACKGROUND_INVALID = "OHOS.RunningLock.Background.Invalid";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_PHONE = "OHOS.RunningLock.Background.Phone";
@@ -269,7 +269,7 @@ void RunningLockImpl::NotifyChanged(const RunningLockInfo &info,
     }
 }
 
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
