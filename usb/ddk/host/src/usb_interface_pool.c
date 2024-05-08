@@ -1594,6 +1594,49 @@ struct UsbRequest *UsbAllocRequestByMmap(const UsbInterfaceHandle *interfaceHand
     return (struct UsbRequest *)requestObj;
 }
 
+struct UsbRequest *UsbAllocRequestByAshmem(
+    const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length, int32_t fd)
+{
+    struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
+    struct UsbIfRequest *requestObj = NULL;
+    struct UsbHostRequest *hostRequest = NULL;
+
+    if (ifaceHdl == NULL || ifaceHdl->devHandle == NULL) {
+        HDF_LOGE("%{public}s: handle is null", __func__);
+        return NULL;
+    }
+
+    requestObj = (struct UsbIfRequest *)RawUsbMemCalloc(sizeof(struct UsbIfRequest));
+    if (requestObj == NULL) {
+        HDF_LOGE("%{public}s: RawUsbMemCalloc UsbRequest error", __func__);
+        return NULL;
+    }
+
+    ifaceHdl->devHandle->ashmemFd = fd;
+    ifaceHdl->devHandle->isAshmem = true;
+
+    hostRequest = RawAllocRequestByMmap(ifaceHdl->devHandle, isoPackets, length);
+    if (hostRequest == NULL) {
+        HDF_LOGE("%{public}s: RawAllocRequest error", __func__);
+        RawUsbMemFree(requestObj);
+        return NULL;
+    }
+    hostRequest->devHandle = ifaceHdl->devHandle;
+
+    ++g_usbRequestObjectId;
+    g_usbRequestObjectId %= MAX_OBJECT_ID;
+    requestObj->request.object.objectId = g_usbRequestObjectId;
+    DListHeadInit(&requestObj->request.object.entry);
+    requestObj->request.compInfo.type = USB_REQUEST_TYPE_INVALID;
+    requestObj->request.compInfo.buffer = hostRequest->buffer;
+    requestObj->request.compInfo.length = (uint32_t)hostRequest->length;
+    requestObj->hostRequest = hostRequest;
+    requestObj->isSyncReq = false;
+    hostRequest->privateObj = requestObj;
+
+    return (struct UsbRequest *)requestObj;
+}
+
 int32_t UsbFreeRequest(const struct UsbRequest *request)
 {
     struct UsbHostRequest *hostRequest = NULL;
@@ -1841,7 +1884,7 @@ bool UsbGetInterfaceActiveStatus(
     bool claimFlag = false;
     bool unactivated;
     if (realSession == NULL) {
-        return NULL;
+        return false;
     }
     SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
     interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
@@ -1849,14 +1892,14 @@ bool UsbGetInterfaceActiveStatus(
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
             HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
-            return NULL;
+            return false;
         }
     }
 
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
     if (interfaceObj == NULL) {
         HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
-        return NULL;
+        return false;
     }
 
     devHandle = interfacePool->device->devHandle;

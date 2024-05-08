@@ -40,8 +40,7 @@
         "//drivers/peripheral/wlan:wlan_entry",
         "//drivers/peripheral/wlan/wpa:wpa_entry",
         "//drivers/peripheral/wlan/hostapd:hostapd_entry",
-        "//drivers/peripheral/wlan/chip:wlan_chip_entry",
-        "//drivers/peripheral/wlan/wifi_hal_default:hal_default_entry"
+        "//drivers/peripheral/wlan/chip:wlan_chip_entry"
       ],
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"

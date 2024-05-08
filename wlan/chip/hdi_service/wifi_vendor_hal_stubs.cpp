@@ -48,6 +48,8 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->waitDriverStart);
     PopulateStubFor(&halFn->vendorHalExit);
     PopulateStubFor(&halFn->startHalLoop);
+    PopulateStubFor(&halFn->wifiGetSupportedFeatureSet);
+    PopulateStubFor(&halFn->wifiGetChipFeatureSet);
     PopulateStubFor(&halFn->vendorHalGetIfaces);
     PopulateStubFor(&halFn->vendorHalGetIfName);
     PopulateStubFor(&halFn->vendorHalGetChannelsInBand);
@@ -56,6 +58,18 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->vendorHalSetRestartHandler);
     PopulateStubFor(&halFn->vendorHalPreInit);
     PopulateStubFor(&halFn->triggerVendorHalRestart);
+    PopulateStubFor(&halFn->wifiSetCountryCode);
+    PopulateStubFor(&halFn->getChipCaps);
+    PopulateStubFor(&halFn->getPowerMode);
+    PopulateStubFor(&halFn->setPowerMode);
+    PopulateStubFor(&halFn->wifiStartScan);
+    PopulateStubFor(&halFn->wifiStartPnoScan);
+    PopulateStubFor(&halFn->wifiStopPnoScan);
+    PopulateStubFor(&halFn->getScanResults);
+    PopulateStubFor(&halFn->enablePowerMode);
+    PopulateStubFor(&halFn->getSignalPollInfo);
+    PopulateStubFor(&halFn->setDpiMarkRule);
+    PopulateStubFor(&halFn->registerIfaceCallBack);
     return true;
 }
     

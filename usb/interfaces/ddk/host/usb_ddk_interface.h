@@ -452,6 +452,8 @@ int32_t UsbClearInterfaceHalt(const UsbInterfaceHandle *interfaceHandle, uint8_t
  */
 struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length);
 struct UsbRequest *UsbAllocRequestByMmap(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length);
+struct UsbRequest *UsbAllocRequestByAshmem(
+    const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length, int32_t fd);
 /**
  * @brief Releases a request object.
  *

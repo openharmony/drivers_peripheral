@@ -26,6 +26,8 @@ extern "C" {
 #define MAX_USER 32
 #define MAX_CREDENTIAL 100
 #define ROOT_SECRET_LEN 32
+#define NO_CHECK_PIN_EXPIRED_PERIOD 0
+#define MAX_GLOBAL_CONFIG_NUM 1
 
 typedef struct {
     uint64_t credentialId;
@@ -34,6 +36,7 @@ typedef struct {
     uint32_t executorSensorHint;
     uint32_t executorMatcher;
     uint32_t capabilityLevel;
+    uint64_t enrolledSysTime;
 } CredentialInfoHal;
 
 typedef struct {
@@ -48,6 +51,7 @@ typedef struct {
     uint64_t cachePinSubType;
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
+    int32_t userType;
 } UserInfo;
 
 typedef struct {
@@ -59,9 +63,27 @@ typedef struct {
 } UserInfoResult;
 
 typedef struct {
-    uint16_t credentialDigest;
+    uint64_t credentialDigest;
     uint16_t credentialCount;
 } EnrolledStateHal;
+
+enum GlobalConfigTypeHal : int32_t {
+    PIN_EXPIRED_PERIOD = 1,
+};
+
+union GlobalConfigValueHal {
+    int64_t pinExpiredPeriod;
+};
+
+typedef struct {
+    int32_t type;
+    union GlobalConfigValueHal value;
+} GlobalConfigParamHal;
+
+typedef struct {
+    uint64_t pinEnrolledSysTime;
+    int64_t pinExpiredPeriod;
+} PinExpiredInfo;
 
 void DestroyUserInfoNode(void *userInfo);
 void DestroyCredentialNode(void *credential);

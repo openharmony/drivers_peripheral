@@ -208,6 +208,7 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 {
     DHLOGI("Notify event, adapter name: %{public}s. event type: %{public}d", GetAnonyString(adpName).c_str(),
         event.type);
+    std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
     auto adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end()) {
         DHLOGE("Notify failed, can not find adapter.");

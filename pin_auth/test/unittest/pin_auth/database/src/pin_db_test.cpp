@@ -64,39 +64,44 @@ HWTEST_F(PinDataBaseTest, AddAndAuth_test, TestSize.Level1)
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
 
-    uint8_t pinData[CONST_PIN_DATA_LEN] = {1};
-    (void)memset_s(pinData, CONST_PIN_DATA_LEN, 1, CONST_PIN_DATA_LEN);
+    Buffer *pinData = CreateBufferBySize(CONST_PIN_DATA_LEN);
+    ASSERT_NE(pinData, nullptr);
+    (void)memset_s(pinData->buf, pinData->maxSize, 1, pinData->maxSize);
+    pinData->contentSize = pinData->maxSize;
     ResultCode compareRet = RESULT_GENERAL_ERROR;
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, 0, outRootSecret, &compareRet);
+    result = AuthPinById(pinData, 0, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_MATCH);
 
-    result = AuthPinById(nullptr, CONST_PIN_DATA_LEN, 0, outRootSecret, &compareRet);
+    result = AuthPinById(nullptr, 0, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = AuthPinById(pinData, 0, templateId, outRootSecret, &compareRet);
+    pinData->contentSize = 0;
+    result = AuthPinById(pinData, templateId, outRootSecret, &compareRet);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+    pinData->contentSize = pinData->maxSize;
+
+    result = AuthPinById(pinData, INVALID_TEMPLATE_ID, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, INVALID_TEMPLATE_ID, outRootSecret, &compareRet);
+    result = AuthPinById(pinData, templateId, nullptr, &compareRet);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
+    result = AuthPinById(pinData, templateId, outRootSecret, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, nullptr, &compareRet);
-    EXPECT_EQ(result, RESULT_BAD_PARAM);
-
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, nullptr);
-    EXPECT_EQ(result, RESULT_BAD_PARAM);
-
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, &compareRet);
+    result = AuthPinById(pinData, templateId, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(compareRet, RESULT_SUCCESS);
 
-    (void)memset_s(pinData, CONST_PIN_DATA_LEN, 2, CONST_PIN_DATA_LEN);
-    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, &compareRet);
+    (void)memset_s(pinData->buf, pinData->maxSize, 2, pinData->maxSize);
+    result = AuthPinById(pinData, templateId, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(compareRet, RESULT_COMPARE_FAIL);
 
     result = DelPinById(templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
+    DestroyBuffer(pinData);
 }
 
 /**
@@ -123,7 +128,7 @@ HWTEST_F(PinDataBaseTest, DoGetAlgoParameter_test, TestSize.Level1)
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
 
     uint32_t satLen = CONST_SALT_LEN;
     std::vector<uint8_t> saltRes(CONST_SALT_LEN, 0);
@@ -172,7 +177,7 @@ HWTEST_F(PinDataBaseTest, ComputeFreezeTime_test, TestSize.Level1)
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
 
     uint32_t freezeTime = 0;
     result = ComputeFreezeTime(INVALID_TEMPLATE_ID, &freezeTime, 0, 0);
@@ -215,7 +220,7 @@ HWTEST_F(PinDataBaseTest, GetRemainTimes_test, TestSize.Level1)
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
 
     uint32_t remainingAuthTimes = 0;
     result = GetRemainTimes(INVALID_TEMPLATE_ID, &remainingAuthTimes, 0);
@@ -255,7 +260,7 @@ HWTEST_F(PinDataBaseTest, GetSubType_test, TestSize.Level1)
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
 
     uint64_t subType = 0;
     result = GetSubType(INVALID_TEMPLATE_ID, &subType);
@@ -295,7 +300,7 @@ HWTEST_F(PinDataBaseTest, GetAntiBruteInfo_test, TestSize.Level1)
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
-    DestoryBuffer(outRootSecret);
+    DestroyBuffer(outRootSecret);
 
     uint32_t authErrorCount = 0;
     uint64_t startFreezeTime = 0;
@@ -333,6 +338,41 @@ HWTEST_F(PinDataBaseTest, VerifyTemplateDataPin_test, TestSize.Level1)
 
     result = VerifyTemplateDataPin(nullptr, 1);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
+}
+
+/**
+ * @tc.name: GetNextFailLockoutDuration test
+ * @tc.desc: get next fail lockout duration
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(PinDataBaseTest, GetNextFailLockoutDuration_test, TestSize.Level1)
+{
+    const uint32_t MS_OF_S = 1000uLL;
+    const uint32_t ONE_MIN_TIME = 60;
+    EXPECT_EQ(ONE_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(0));
+
+    const uint32_t FIRST_ANTI_BRUTE_COUNT = 5;
+    const uint32_t TEN_MIN_TIME = 600;
+    EXPECT_EQ(TEN_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(FIRST_ANTI_BRUTE_COUNT));
+
+    const uint32_t SECOND_ANTI_BRUTE_COUNT = 8;
+    const uint32_t THIRTY_MIN_TIME = 1800;
+    EXPECT_EQ(THIRTY_MIN_TIME * MS_OF_S, GetNextFailLockoutDuration(SECOND_ANTI_BRUTE_COUNT));
+
+    const uint32_t THIRD_ANTI_BRUTE_COUNT = 11;
+    const uint32_t ONE_HOUR_TIME = 3600;
+    EXPECT_EQ(ONE_HOUR_TIME * MS_OF_S, GetNextFailLockoutDuration(THIRD_ANTI_BRUTE_COUNT));
+
+    const uint32_t AUTH_ERROR_COUNT01 = 98;
+    const uint32_t FAIL_LOCKOUT_DURATION01 = 3840;
+    const uint32_t ATTI_BRUTE_FIRST_STAGE = 100;
+    EXPECT_EQ(FAIL_LOCKOUT_DURATION01 * MS_OF_S, GetNextFailLockoutDuration(AUTH_ERROR_COUNT01));
+    EXPECT_EQ(FAIL_LOCKOUT_DURATION01 * MS_OF_S, GetNextFailLockoutDuration(ATTI_BRUTE_FIRST_STAGE));
+
+    const uint32_t ATTI_BRUTE_SECOND_STAGE = 140;
+    const uint32_t ONE_DAY_TIME = 86400;
+    EXPECT_EQ(ONE_DAY_TIME * MS_OF_S, GetNextFailLockoutDuration(ATTI_BRUTE_SECOND_STAGE - 1));
 }
 } // namespace PinAuth
 } // namespace UserIam

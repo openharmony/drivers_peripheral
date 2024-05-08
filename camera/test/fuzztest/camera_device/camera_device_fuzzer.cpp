@@ -30,6 +30,7 @@ enum DeviceCmdId {
     CAMERA_DEVICE_ENABLE_RESULT,
     CAMERA_DEVICE_DISABLE_RESULT,
     CAMERA_DEVICE_GET_STATUS,
+    CAMERA_DEVICE_GET_SECURECAMERASEQ,
     CAMERA_DEVICE_END, // Enumerated statistical value. The new enumerated value is added before
 };
 
@@ -112,6 +113,17 @@ void FuncGetStatus(const uint8_t *rawData, size_t size)
     cameraTest->cameraDeviceV1_2->GetStatus(result, resultOut);
 }
 
+void FuncGetSecureCameraSeq(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    if (nullptr == cameraTest->cameraDeviceV1_3) {
+        return;
+    }
+    uint64_t SeqId;
+    // Output do not need fuzz
+    cameraTest->cameraDeviceV1_3->GetSecureCameraSeq(SeqId);
+}
+
 static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
 {
     CAMERA_LOGI("DeviceFuncSwitch start, the cmd is:%{public}u", cmd);
@@ -149,6 +161,10 @@ static void DeviceFuncSwitch(uint32_t cmd, const uint8_t *rawData, size_t size)
             FuncGetStatus(rawData, size);
             break;
         }
+        case CAMERA_DEVICE_GET_SECURECAMERASEQ: {
+            FuncGetSecureCameraSeq(rawData, size);
+            break;
+        }
         default: {
             CAMERA_LOGW("The interfaces is not tested, the cmd is:%{public}u", cmd);
             return;
@@ -166,11 +182,11 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
-    cameraTest->Init();
+    cameraTest->InitV1_3();
     if (cameraTest->serviceV1_1 == nullptr) {
         return false;
     }
-    cameraTest->Open();
+    cameraTest->OpenV1_3();
     if (cameraTest->cameraDeviceV1_1 == nullptr) {
         return false;
     }

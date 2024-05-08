@@ -117,6 +117,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdWepKeyTxKeyIdx)(WifiWpaStaInterface *this, int *keyIdx);
     int (*wpaCliCmdGetRequirePmf)(WifiWpaStaInterface *this, int *enable);
     int (*wpaCliCmdGetConnectionCapabilities)(WifiWpaStaInterface *this, struct ConnectionCapabilities *connectionCap);
+    int (*wpaCliCmdStaShellCmd)(WifiWpaStaInterface *this, const char *params);
 };
 
 WifiWpaStaInterface *GetWifiStaInterface(const char *name);

@@ -61,12 +61,14 @@ void InvalidateAndClearP2pIface(std::vector<sptr<WifiP2pIface>>& ifaces)
 WifiChip::WifiChip(
     int32_t chipId, bool isPrimary,
     const std::weak_ptr<WifiVendorHal> vendorHal,
+    const std::shared_ptr<IfaceUtil> ifaceUtil,
     const std::weak_ptr<WifiChipModes> chipModes,
     const std::function<void(const std::string&)>& handler)
     : chipId_(chipId),
     vendorHal_(vendorHal),
     isValid_(true),
     currentModeId_(chip_mode_ids::K_INVALID),
+    ifaceUtil_(ifaceUtil),
     modes_(chipModes.lock()->GetChipModes(isPrimary)),
     subsystemCallbackHandler_(handler)
 {}
@@ -121,6 +123,19 @@ std::string WifiChip::GetUsedIfaceName()
     }
     HDF_LOGI("No active wlan interfaces in use! Using default");
     return GetIfaceName(IfaceType::STA, 0);
+}
+
+int32_t WifiChip::GetChipCaps(uint32_t& capabilities)
+{
+    WifiError status;
+
+    const auto ifname = GetUsedIfaceName();
+    status = vendorHal_.lock()->GetChipCaps(ifname, capabilities);
+    if (status != HAL_SUCCESS) {
+        return HDF_FAILURE;
+    } else {
+        return HDF_SUCCESS;
+    }
 }
 
 int32_t WifiChip::GetChipModes(std::vector<UsableMode>& modes)
@@ -354,7 +369,6 @@ std::string WifiChip::AllocIfaceName(IfaceType type, uint32_t startIdx)
         if (FindStaUsingName(staIfaces_, ifname)) {
             continue;
         }
-        HDF_LOGI("0314: %{public}s: %{public}s", __FUNCTION__, ifname.c_str());
         return ifname;
     }
     HDF_LOGE("All wlan interfaces in use already!");
@@ -474,7 +488,7 @@ sptr<WifiApIface> WifiChip::NewApIface(std::string& ifname)
 {
     std::vector<std::string> ap_instances;
     sptr<WifiApIface> iface =
-        new WifiApIface(ifname, ap_instances, vendorHal_);
+        new WifiApIface(ifname, ap_instances, vendorHal_, ifaceUtil_);
     apIfaces_.push_back(iface);
     SetUsedIfaceNameProperty(GetUsedIfaceName());
     return iface;
@@ -540,7 +554,7 @@ int32_t WifiChip::CreateP2pService(sptr<IChipIface>& iface)
         return HDF_FAILURE;
     }
     std::string ifname = GetDefaultP2pIfaceName();
-    sptr<WifiP2pIface> ifa = new WifiP2pIface(ifname, vendorHal_);
+    sptr<WifiP2pIface> ifa = new WifiP2pIface(ifname, vendorHal_, ifaceUtil_);
     p2pIfaces_.push_back(ifa);
     iface = ifa;
     return HDF_SUCCESS;
@@ -599,7 +613,7 @@ int32_t WifiChip::CreateStaService(sptr<IChipIface>& iface)
         HDF_LOGE("Failed to add interface: %{public}s, error: %{public}d", ifname.c_str(), status);
         return HDF_FAILURE;
     }
-    sptr<WifiStaIface> ifa = new WifiStaIface(ifname, vendorHal_);
+    sptr<WifiStaIface> ifa = new WifiStaIface(ifname, vendorHal_, ifaceUtil_);
     staIfaces_.push_back(ifa);
     iface = ifa;
     SetUsedIfaceNameProperty(GetUsedIfaceName());

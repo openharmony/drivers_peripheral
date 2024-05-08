@@ -105,7 +105,7 @@ int HdfUserAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     deviceObject->service = &hdfUserAuthInterfaceHost->ioService;
-    static_cast<void>(serviceImpl->Init());
+    static_cast<void>(serviceImpl->Init(""));
     return HDF_SUCCESS;
 }
 

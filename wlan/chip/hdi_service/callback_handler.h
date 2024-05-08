@@ -30,6 +30,17 @@ public:
     CallbackHandler() {}
     ~CallbackHandler() = default;
 
+    bool RemoveCallback(const sptr<CallbackType>& cb)
+    {
+        if (cb == nullptr) {
+            return false;
+        }
+        if (cbSet_.find(cb) != cbSet_.end()) {
+            cbSet_.erase(cb);
+        }
+        return true;
+    }
+
     bool AddCallback(const sptr<CallbackType>& cb)
     {
         if (cb == nullptr) {
@@ -41,7 +52,7 @@ public:
         cbSet_.insert(cb);
         return true;
     }
-    
+
     const std::set<sptr<CallbackType>>& GetCallbacks()
     {
         return cbSet_;

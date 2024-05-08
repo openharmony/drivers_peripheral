@@ -89,6 +89,11 @@ HWTEST_F(UserAuthFuncsTest, TestGetReuseUnlockResult, TestSize.Level0)
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
 
+    userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
+    CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
+    EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_GENERAL_ERROR);
+
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime();
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
     EXPECT_EQ(GetReuseUnlockResult(&info, &reuseResult), RESULT_SUCCESS);
@@ -116,6 +121,8 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     userAuthTokenCached.tokenDataPlain.authType = 1;
     userAuthTokenCached.tokenDataPlain.authTrustLevel = ATL3;
     userAuthTokenCached.tokenDataPlain.time = GetSystemTime() + 300;
+    userAuthTokenCached.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    userAuthTokenCached.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     EnrolledStateHal enrolledState;
     CacheUnlockAuthResult(userIdCached, &userAuthTokenCached, &enrolledState);
 
@@ -157,6 +164,17 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(CheckReuseUnlockResultFunc(&info, &reuseResult), RESULT_SUCCESS);
     (void)memset_s(&g_unlockAuthResult, sizeof(UnlockAuthResultCache), 0, sizeof(UnlockAuthResultCache));
+}
+
+HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
+{
+    GlobalConfigParamHal param = {};
+    ExecutorExpiredInfo expiredInfo = {};
+    uint32_t size = 0;
+    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr, &expiredInfo, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, nullptr, 0, &size), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, &size), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam

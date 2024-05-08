@@ -51,7 +51,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
             id, srcBufferInfo.format, dstBufferInfo.format);
         return -1;
     }
-    CAMERA_LOGE("NodeUtils::ImageFormatConvert Start ====== id = %{public}d", id);
+    CAMERA_LOGI("NodeUtils::ImageFormatConvert Start ====== id = %{public}d", id);
     CAMERA_LOGE("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
         srcBufferInfo.width, srcBufferInfo.height, dstBufferInfo.width, dstBufferInfo.height,
         srcBufferInfo.format, dstBufferInfo.format);
@@ -78,7 +78,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     sws_freeContext(imgCtx);
     av_frame_free(&pFrameSrc);
     av_frame_free(&pFrameDst);
-    CAMERA_LOGE("NodeUtils::ImageFormatConvert End [%{public}d] ====== %{public}d", ret, id);
+    CAMERA_LOGD("NodeUtils::ImageFormatConvert End [%{public}d] ====== %{public}d", ret, id);
 
     return 0;
 }

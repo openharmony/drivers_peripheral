@@ -143,6 +143,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
     }
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
+        CAMERAHALPERFSYSEVENT_EQUAL(0, frameCount_, TIME_FOR_FIRST_FRAME);
         PrepareBufferBeforeFlush(buffer, sb);
         CameraDumper& dumper = CameraDumper::GetInstance();
         dumper.DumpBuffer("BeforeFlushSurface", ENABLE_STREAM_TUNNEL, buffer);
@@ -157,7 +158,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         frameCount_++;
     } else {
         int ret = bufferQueue_->CancelBuffer(sb);
-        CAMERA_LOGE("CancelBuffer done, streamId = %{public}d, index = %{public}d, ret = %{public}d",
+        CAMERA_LOGI("CancelBuffer done, streamId = %{public}d, index = %{public}d, ret = %{public}d",
             buffer->GetStreamId(), buffer->GetIndex(), ret);
         stats_.CancelBufferResult(ret);
     }

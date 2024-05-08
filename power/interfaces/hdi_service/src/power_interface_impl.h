@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_1_POWERINTERFACEIMPL_H
-#define OHOS_HDI_POWER_V1_1_POWERINTERFACEIMPL_H
+#ifndef OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H
+#define OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H
 
 #include <functional>
 
 #include "iremote_object.h"
 #include "refbase.h"
-#include "v1_1/ipower_interface.h"
-#include "v1_1/running_lock_types.h"
+#include "v1_2/ipower_interface.h"
+#include "v1_2/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_1 {
+namespace V1_2 {
 class PowerInterfaceImpl : public IPowerInterface {
 public:
     ~PowerInterfaceImpl() override {};
@@ -45,6 +45,8 @@ public:
     int32_t StopSuspend() override;
 
     int32_t ForceSuspend() override;
+
+    int32_t Hibernate() override;
 
     int32_t SuspendBlock(const std::string &name) override;
 
@@ -66,8 +68,8 @@ public:
 
     class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl) :
-            powerInterfaceImpl_(powerInterfaceImpl) {};
+        explicit PowerDeathRecipient(const wptr<PowerInterfaceImpl> &powerInterfaceImpl)
+            : powerInterfaceImpl_(powerInterfaceImpl) {};
         ~PowerDeathRecipient() override {};
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 
@@ -82,9 +84,9 @@ private:
     void CreateAutoSuspendThread();
     void CreateForceSuspendThread();
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_POWER_V1_1_POWERINTERFACEIMPL_H
+#endif // OHOS_HDI_POWER_V1_2_POWERINTERFACEIMPL_H

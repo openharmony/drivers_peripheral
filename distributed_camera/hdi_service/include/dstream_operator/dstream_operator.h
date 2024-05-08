@@ -59,7 +59,7 @@ public:
         const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperator> &offlineOperator) override;
 
     DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &sinkAbilityInfo,
-        const std::string &sourceAbilityInfo);
+        const std::string &sourceCodecInfo);
     std::vector<DCEncodeType> ParseEncoderTypes(cJSON* rootValue);
     DCamRetCode ParsePhotoFormats(cJSON* rootValue);
     DCamRetCode ParsePreviewFormats(cJSON* rootValue);

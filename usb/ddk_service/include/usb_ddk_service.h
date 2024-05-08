@@ -53,6 +53,9 @@ public:
     int32_t SendPipeRequest(const UsbRequestPipe &pipe, uint32_t size, uint32_t offset, uint32_t length,
         uint32_t &transferedLength) override;
 
+    int32_t SendPipeRequestWithAshmem(const UsbRequestPipe &pipe, const UsbAshmem &ashmem,
+        uint32_t &transferredLength) override;
+
     int32_t GetDeviceMemMapFd(uint64_t deviceId, int &fd) override;
 };
 } // namespace V1_0

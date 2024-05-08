@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include "securec.h"
+#include "audio_types.h"
 namespace OHOS::HDI::Audio_Bluetooth {
 enum {INFO};
 #define FILE_NAME_LEN 256

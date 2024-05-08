@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -103,7 +103,7 @@ Buffer *CreateBufferByData(const uint8_t *data, const uint32_t dataSize)
 
     if (memcpy_s(buffer->buf, dataSize, data, dataSize) != EOK) {
         LOG_ERROR("Cpy buffer error");
-        DestoryBuffer(buffer);
+        DestroyBuffer(buffer);
         return NULL;
     }
     buffer->maxSize = dataSize;
@@ -128,12 +128,12 @@ ResultCode InitBuffer(Buffer *buffer, const uint8_t *buf, const uint32_t bufSize
     return RESULT_SUCCESS;
 }
 
-void DestoryBuffer(Buffer *buffer)
+void DestroyBuffer(Buffer *buffer)
 {
     if (buffer != NULL) {
         if (buffer->buf != NULL) {
             if (memset_s(buffer->buf, buffer->maxSize, 0, buffer->maxSize) != EOK) {
-                LOG_ERROR("DestoryBuffer memset fail!");
+                LOG_ERROR("DestroyBuffer memset fail!");
             }
             Free(buffer->buf);
             buffer->buf = NULL;
@@ -166,7 +166,7 @@ Buffer *CopyBuffer(const Buffer *buffer)
     return copyBuffer;
 
 FAIL:
-    DestoryBuffer(copyBuffer);
+    DestroyBuffer(copyBuffer);
 
     return NULL;
 }

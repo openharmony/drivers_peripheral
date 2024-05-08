@@ -33,7 +33,7 @@ void FuzzGetExecutorList(Parcel &parcel)
     IAM_LOGI("begin");
     std::vector<sptr<HdiICollector>> collectors;
     std::vector<sptr<HdiIVerifier>> verifiers;
-    std::vector<sptr<HdiIExecutor>> allInOneExecutors;
+    std::vector<sptr<HdiIAllInOneExecutor>> allInOneExecutors;
     g_pinAuthInterFaceService.GetExecutorList(allInOneExecutors, verifiers, collectors);
     IAM_LOGI("end");
 }

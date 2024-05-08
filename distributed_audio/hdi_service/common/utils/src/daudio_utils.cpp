@@ -124,9 +124,9 @@ int32_t SetAudioParamStr(std::string &params, const std::string &key, const std:
 
 int32_t GetDevTypeByDHId(int32_t dhId)
 {
-    if ((uint32_t)dhId & 0x8000000) {
+    if (static_cast<uint32_t>(dhId) & 0x8000000) {
         return AUDIO_DEVICE_TYPE_MIC;
-    } else if ((uint32_t)dhId & 0x7ffffff) {
+    } else if (static_cast<uint32_t>(dhId) & 0x7ffffff) {
         return AUDIO_DEVICE_TYPE_SPEAKER;
     }
     return AUDIO_DEVICE_TYPE_UNKNOWN;
@@ -203,7 +203,7 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
     return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
 
-void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
+void SaveFile(const std::string fileName, uint8_t *audioData, int32_t size)
 {
     char path[PATH_MAX + 1] = {0x00};
     if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {

@@ -18,6 +18,8 @@
 
 namespace OHOS::Camera {
 
+#define TOSTR(x) #x
+
 std::map<ErrorEventType, std::string> g_eventNameMap = {
     {CREATE_PIPELINE_ERROR, "CREATE_PIPELINE_ERROR"},
     {TURN_BUFFER_ERROR, "TURN_BUFFER_ERROR"},
@@ -27,6 +29,12 @@ std::map<ErrorEventType, std::string> g_eventNameMap = {
     {TYPE_CAST_ERROR, "TYPE_CAST_ERROR"},
     {OPEN_DEVICE_NODE_ERROR, "OPEN_DEVICE_NODE_ERROR"},
     {FORMAT_CAST_ERROR, "FORMAT_CAST_ERROR"}
+};
+
+std::map<PerformanceEventType, std::string> g_perfEventNameMap = {
+    {TIME_FOR_OPEN_CAMERA, std::string(TOSTR(TIME_FOR_OPEN_CAMERA))},
+    {TIME_FOR_CAPTURE, std::string(TOSTR(TIME_FOR_CAPTURE))},
+    {TIME_FOR_FIRST_FRAME, std::string(TOSTR(TIME_FOR_FIRST_FRAME))}
 };
 
 std::string CameraHalHisysevent::CreateMsg(const char* format, ...)
@@ -59,6 +67,25 @@ void CameraHalHisysevent::WriteFaultHisysEvent(const std::string &name, const st
                                   OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, "NAME", name, "MSG", msg);
     if (ret != 0) {
         CAMERA_LOGE("WriteFaultHisysEvent filed name:%{public}s ret:%{public}d", name.c_str(), ret);
+    }
+}
+
+CameraHalPerfSysevent::CameraHalPerfSysevent(PerformanceEventType perfEventType, bool isPrint, const char *name)
+    : perfEventType_(perfEventType), isPrint_(isPrint), funcName_(name)
+{
+    begin = std::chrono::system_clock::now();
+}
+
+CameraHalPerfSysevent::~CameraHalPerfSysevent()
+{
+    if (isPrint_) {
+        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+        auto microsec = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_PERFORMANCE",
+                OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                "NAME", g_perfEventNameMap[perfEventType_],
+                "FUNCTION", std::string(funcName_),
+                "TIMECOST", microsec);
     }
 }
 }

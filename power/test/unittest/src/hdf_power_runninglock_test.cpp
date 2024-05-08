@@ -20,7 +20,7 @@
 #include "running_lock_impl.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Power::V1_1;
+using namespace OHOS::HDI::Power::V1_2;
 using namespace testing::ext;
 
 namespace {
@@ -965,6 +965,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest022, TestSize.Level1)
 
     powerState = PowerHdfState::SLEEP;
     EXPECT_NE(HDF_SUCCESS, RunningLockImpl::HoldLock(runinglockInfo1, powerState));
-    EXPECT_NE(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::UnholdLock(runinglockInfo1));
 }
 }

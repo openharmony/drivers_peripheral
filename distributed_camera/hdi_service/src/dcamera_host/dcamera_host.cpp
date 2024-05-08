@@ -60,11 +60,11 @@ int32_t DCameraHost::SetCallback(const sptr<ICameraHostCallback> &callbackObj)
 
 int32_t DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
 {
-    std::lock_guard<std::mutex> autoLock(dCamIdMapLock_);
-    auto iter = dhBaseHashDCamIdMap_.begin();
-    while (iter != dhBaseHashDCamIdMap_.end()) {
-        if (!(iter->second).empty()) {
-            cameraIds.push_back(iter->second);
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+    auto iter = dCameraDeviceMap_.begin();
+    while (iter != dCameraDeviceMap_.end()) {
+        if (!(iter->first).empty()) {
+            cameraIds.push_back(iter->first);
         }
         iter++;
     }
@@ -231,11 +231,6 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_[dCameraId] = dcameraDevice;
     }
-    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
-    {
-        std::lock_guard<std::mutex> autoLock(dCamIdMapLock_);
-        dhBaseHashDCamIdMap_.emplace(dcameraBase, dCameraId);
-    }
     if (callback == nullptr) {
         DHLOGE("DCameraHost::SetProviderCallback failed, callback is null");
         return DCamRetCode::INVALID_ARGUMENT;
@@ -278,13 +273,10 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
         sptr<IDCameraProviderCallback> callback = dcameraDevice->GetProviderCallback();
         if (callback != nullptr) {
             sptr<IRemoteObject> remoteObj = OHOS::HDI::hdi_objcast<IDCameraProviderCallback>(callback);
-            remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+            if (remoteObj != nullptr) {
+                remoteObj->RemoveDeathRecipient(dCameraHostRecipient_);
+            }
         }
-    }
-    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
-    {
-        std::lock_guard<std::mutex> autoLock(dCamIdMapLock_);
-        dhBaseHashDCamIdMap_.erase(dcameraBase);
     }
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
@@ -306,10 +298,10 @@ bool DCameraHost::IsCameraIdInvalid(const std::string &cameraId)
         return true;
     }
 
-    std::lock_guard<std::mutex> autoLock(dCamIdMapLock_);
-    auto iter = dhBaseHashDCamIdMap_.begin();
-    while (iter != dhBaseHashDCamIdMap_.end()) {
-        if (cameraId == iter->second) {
+    std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+    auto iter = dCameraDeviceMap_.begin();
+    while (iter != dCameraDeviceMap_.end()) {
+        if (cameraId == iter->first) {
             return false;
         }
         iter++;
@@ -319,13 +311,8 @@ bool DCameraHost::IsCameraIdInvalid(const std::string &cameraId)
 
 std::string DCameraHost::GetCameraIdByDHBase(const DHBase &dhBase)
 {
-    std::lock_guard<std::mutex> autoLock(dCamIdMapLock_);
-    std::string dcameraBase = dhBase.deviceId_ + dhBase.dhId_;
-    auto iter = dhBaseHashDCamIdMap_.find(dcameraBase);
-    if (iter == dhBaseHashDCamIdMap_.end()) {
-        return "";
-    }
-    return iter->second;
+    std::string dcameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
+    return dcameraId;
 }
 
 OHOS::sptr<DCameraDevice> DCameraHost::GetDCameraDeviceByDHBase(const DHBase &dhBase)

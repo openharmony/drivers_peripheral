@@ -21,9 +21,11 @@ namespace Wlan {
 namespace Chip {
 namespace V1_0 {
 WifiP2pIface::WifiP2pIface(
-    const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal)
+    const std::string& ifname, const std::weak_ptr<WifiVendorHal> vendorHal,
+    const std::weak_ptr<IfaceUtil> ifaceUtil)
     : ifname_(ifname),
       vendorHal_(vendorHal),
+      ifaceUtil_(ifaceUtil),
       isValid_(true) {}
 
 void WifiP2pIface::Invalidate()
@@ -54,9 +56,79 @@ int32_t WifiP2pIface::GetIfaceName(std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t WifiP2pIface::GetSupportFreqs(BandType band, std::vector<uint32_t>& frequencies)
+int32_t WifiP2pIface::GetSupportFreqs(int band, std::vector<uint32_t>& frequencies)
 {
     return HDF_SUCCESS;
+}
+
+int32_t WifiP2pIface::GetIfaceCap(uint32_t& capabilities)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t WifiP2pIface::SetMacAddress(const std::string& mac)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::SetCountryCode(const std::string& code)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::GetPowerMode(int32_t& powerMode)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::SetPowerMode(int32_t powerMode)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::RegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::UnRegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::StartScan(const ScanParams& scanParam)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::GetScanInfos(std::vector<ScanResultsInfo>& scanResultsInfo)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::StartPnoScan(const PnoScanParams& pnoParams)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::StopPnoScan()
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::GetSignalPollInfo(SignalPollResult& signalPollResult)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::EnablePowerMode(int32_t mode)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t WifiP2pIface::SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+{
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 }

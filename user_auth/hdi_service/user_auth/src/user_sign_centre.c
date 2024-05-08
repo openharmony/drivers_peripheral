@@ -186,6 +186,7 @@ IAM_STATIC ResultCode GetTokenDataPlain(UserAuthContext *context, uint32_t authM
     authToken->tokenDataPlain.authTrustLevel = context->authTrustLevel;
     authToken->tokenDataPlain.authType = context->authType;
     authToken->tokenDataPlain.authMode = authMode;
+    authToken->tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     return RESULT_SUCCESS;
 }
 

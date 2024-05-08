@@ -56,6 +56,8 @@ struct UsbDeviceHandle {
     uint32_t caps;
     int32_t fd;
     int32_t mmapFd;
+    int32_t ashmemFd;
+    bool isAshmem;
     uint64_t detachedInterfaces;
     uint64_t attachedInterfaces;
 };

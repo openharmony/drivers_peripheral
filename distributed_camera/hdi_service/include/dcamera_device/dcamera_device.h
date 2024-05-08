@@ -32,7 +32,7 @@ namespace DistributedHardware {
 using namespace OHOS::HDI::Camera::V1_0;
 class DCameraDevice : public ICameraDevice {
 public:
-    DCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo, const std::string& sourceAbilityInfo);
+    DCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo, const std::string& sourceCodecInfo);
     DCameraDevice() = default;
     virtual ~DCameraDevice() = default;
     DCameraDevice(const DCameraDevice &other) = delete;
@@ -64,7 +64,7 @@ public:
     void SetDcameraAbility(const std::string& sinkAbilityInfo);
 
 private:
-    void Init(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo);
+    void Init(const std::string &sinkAbilityInfo);
     DCamRetCode CreateDStreamOperator();
     std::string GenerateCameraId(const DHBase &dhBase);
     void NotifyStartCaptureError();
@@ -75,7 +75,7 @@ private:
     std::string dCameraId_;
     DHBase dhBase_;
     std::string dCameraAbilityInfo_;
-    std::string sourceAbilityInfo_;
+    std::string sourceCodecInfo_;
     OHOS::sptr<ICameraDeviceCallback> dCameraDeviceCallback_;
     OHOS::sptr<IDCameraProviderCallback> dCameraProviderCallback_;
     OHOS::sptr<DStreamOperator> dCameraStreamOperator_;

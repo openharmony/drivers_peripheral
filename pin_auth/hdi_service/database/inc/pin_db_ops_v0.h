@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +49,8 @@ typedef struct {
 
 void *GetPinDbV0(uint8_t *data, uint32_t dataLen);
 void FreePinDbV0(void **pinDb);
+
+void GetMaxLockedAntiBruteInfo(AntiBruteInfoV0 *antiBruteInfoV0);
 
 #ifdef __cplusplus
 }

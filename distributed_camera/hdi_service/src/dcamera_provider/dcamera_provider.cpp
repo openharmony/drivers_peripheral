@@ -44,7 +44,7 @@ OHOS::sptr<DCameraProvider> DCameraProvider::GetInstance()
 }
 
 bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string& sinkAbilityInfo,
-    std::string& sourceAbilityInfo)
+    std::string& sourceCodecInfo)
 {
     cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
     if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
@@ -59,7 +59,7 @@ bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string
         return false;
     }
 
-    cJSON *srcRootValue = cJSON_GetObjectItemCaseSensitive(rootValue, "SourceAbility");
+    cJSON *srcRootValue = cJSON_GetObjectItemCaseSensitive(rootValue, "SourceCodec");
     if (srcRootValue == nullptr || !cJSON_IsObject(srcRootValue)) {
         cJSON_Delete(rootValue);
         DHLOGE("Get source ability error.");
@@ -79,7 +79,7 @@ bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string
         cJSON_free(jsonSink);
         return false;
     }
-    sourceAbilityInfo = std::string(jsonSource);
+    sourceCodecInfo = std::string(jsonSource);
     cJSON_Delete(rootValue);
     cJSON_free(jsonSink);
     cJSON_free(jsonSource);
@@ -110,13 +110,13 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
     }
-    std::string sourceAbilityInfo;
+    std::string sourceCodecInfo;
     std::string sinkAbilityInfo;
-    if (!GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceAbilityInfo)) {
+    if (!GetAbilityInfo(abilityInfo, sinkAbilityInfo, sourceCodecInfo)) {
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, sinkAbilityInfo, sourceAbilityInfo, callbackObj);
+    DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, sinkAbilityInfo, sourceCodecInfo, callbackObj);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("DCameraProvider::EnableDCameraDevice failed, ret = %{public}d.", ret);
     }

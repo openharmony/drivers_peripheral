@@ -81,6 +81,13 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_001, TestSize.Level0)
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
     token.tokenDataPlain.authType = PIN_AUTH;
     GENERATE_TOKEN(data, token, tokenKey);
+    EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
+    token.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    token.tokenDataPlain.tokenType = TOKEN_TYPE_COAUTH;
+    GENERATE_TOKEN(data, token, tokenKey);
+    EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_VERIFY_TOKEN_FAIL);
+    token.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
+    GENERATE_TOKEN(data, token, tokenKey);
     EXPECT_EQ(CheckIdmOperationToken(0, &token), RESULT_BAD_MATCH);
 }
 
@@ -99,6 +106,8 @@ HWTEST_F(EnrollCheckTest, TestCheckIdmOperationToken_002, TestSize.Level0)
     EXPECT_EQ(GenerateChallenge(session.challenge, CHALLENGE_LEN), RESULT_SUCCESS);
     UserAuthTokenHal token = {};
     token.tokenDataPlain.authType = authType;
+    token.tokenDataPlain.authMode = SCHEDULE_MODE_AUTH;
+    token.tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
     token.tokenDataPlain.time = GetSystemTime();
     TokenDataToEncrypt data = {
         .userId = 0,

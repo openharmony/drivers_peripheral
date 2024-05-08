@@ -332,7 +332,7 @@ enum AudioServiceNameType {
     AUDIO_SERVICE_MAX,
 };
 
-int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender);
+int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender, const char *adapterName);
 int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type);
 int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs);
 int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *format);

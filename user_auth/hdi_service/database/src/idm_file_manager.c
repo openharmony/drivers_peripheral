@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "idm_common.h"
 
 #define IDM_USER_INFO "/data/service/el1/public/userauth/userinfo"
+#define GLOBAL_CONFIG_INFO "/data/service/el1/public/userauth/globalConfigInfo"
 #define MAX_BUFFER_LEN 512000
 #define DEFAULT_EXPANSION_RATIO 2
 #define PRE_APPLY_LEN 2048
@@ -162,6 +163,13 @@ IAM_STATIC ResultCode StreamWriteUserInfo(Buffer *parcel, UserInfo *userInfo)
         LOG_ERROR("userId streamWrite failed");
         return result;
     }
+    LOG_INFO("userInfo userId %{public}d", userInfo->userId);
+    result = StreamWrite(parcel, &userInfo->userType, sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("userType streamWrite failed");
+        return result;
+    }
+    LOG_INFO("userInfo userType %{public}d", userInfo->userType);
     result = StreamWrite(parcel, &userInfo->secUid, sizeof(uint64_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("secUid streamWrite failed");
@@ -245,6 +253,76 @@ ResultCode UpdateFileInfo(LinkedList *userInfoList)
 
 EXIT:
     DestoryBuffer(parcel);
+    return ret;
+}
+
+IAM_STATIC ResultCode StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigParamHal globalConfigInfo)
+{
+    ResultCode result = StreamWrite(parcel, &(globalConfigInfo.type), sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("StreamWrite global config type failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    switch (globalConfigInfo.type) {
+        case PIN_EXPIRED_PERIOD:
+            result = StreamWrite(parcel, &(globalConfigInfo.value.pinExpiredPeriod), sizeof(int64_t));
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", globalConfigInfo.type);
+            result = RESULT_GENERAL_ERROR;
+    }
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("StreamWrite pinExpiredPeriod failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigArray, uint32_t configInfoNum)
+{
+    LOG_INFO("start");
+    if (globalConfigArray == NULL) {
+        LOG_ERROR("globalConfigArray is null");
+        return RESULT_BAD_PARAM;
+    }
+    FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
+    if (!IsFileOperatorValid(fileOperator)) {
+        LOG_ERROR("invalid file operation");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    int32_t configInfoSize = sizeof(uint32_t) * 2 + sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM;
+    Buffer *parcel = CreateBufferBySize(configInfoSize);
+    if (parcel == NULL) {
+        LOG_ERROR("parcel is null");
+        return RESULT_BAD_PARAM;
+    }
+    uint32_t version = VERSION;
+    ResultCode ret = StreamWrite(parcel, &version, sizeof(uint32_t));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("StreamWrite failed");
+        DestoryBuffer(parcel);
+        return RESULT_GENERAL_ERROR;
+    }
+    ret = StreamWrite(parcel, &configInfoNum, sizeof(uint32_t));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("StreamWrite failed");
+        DestoryBuffer(parcel);
+        return RESULT_GENERAL_ERROR;
+    }
+    for (uint32_t i = 0; i < configInfoNum; i++) {
+        ret = StreamWriteGlobalConfig(parcel, globalConfigArray[i]);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("StreamWriteGlobalConfig failed");
+            DestoryBuffer(parcel);
+            return RESULT_GENERAL_ERROR;
+        }
+    }
+    // This is for example only. Should be implemented in trusted environment.
+    ret = (ResultCode)fileOperator->writeFile(GLOBAL_CONFIG_INFO, parcel->buf, parcel->contentSize);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("write file failed, %{public}u", parcel->contentSize);
+    }
     return ret;
 }
 
@@ -345,6 +423,13 @@ IAM_STATIC ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserIn
         LOG_ERROR("Read userId failed");
         return RESULT_GENERAL_ERROR;
     }
+    LOG_INFO("userInfo userId %{public}d", userInfo->userId);
+    result = StreamRead(parcel, index, &userInfo->userType, sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("Read userType failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    LOG_INFO("userInfo userType %{public}d", userInfo->userType);
     result = StreamRead(parcel, index, &userInfo->secUid, sizeof(uint64_t));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("Read secUid failed");
@@ -463,4 +548,110 @@ LinkedList *LoadFileInfo(void)
     }
     DestoryBuffer(parcel);
     return userInfoList;
+}
+
+IAM_STATIC Buffer *ReadGlobalConfigFile(FileOperator *fileOperator)
+{
+    uint32_t fileSize;
+    int32_t ret = fileOperator->getFileLen(GLOBAL_CONFIG_INFO, &fileSize);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("open file failed");
+        return NULL;
+    }
+    Buffer *parcel = CreateBufferBySize(fileSize);
+    if (parcel == NULL) {
+        LOG_ERROR("parcel create failed");
+        DestoryBuffer(parcel);
+        return NULL;
+    }
+    if (fileOperator->readFile(GLOBAL_CONFIG_INFO, parcel->buf, parcel->maxSize) != RESULT_SUCCESS) {
+        LOG_ERROR("read failed");
+        DestoryBuffer(parcel);
+        return NULL;
+    }
+    parcel->contentSize = fileSize;
+    return parcel;
+}
+
+IAM_STATIC ResultCode StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalConfigParamHal *globalConfigInfo)
+{
+    ResultCode result = StreamRead(parcel, index, &(globalConfigInfo->type), sizeof(int32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("read globalConfig type failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    switch (globalConfigInfo->type) {
+        case PIN_EXPIRED_PERIOD:
+            result = StreamRead(parcel, index, &(globalConfigInfo->value.pinExpiredPeriod), sizeof(int64_t));
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", globalConfigInfo->type);
+            result = RESULT_GENERAL_ERROR;
+    }
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("read pinExpiredPeriod value failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigParamHal *globalConfigInfo,
+    uint32_t *configInfoNum, uint32_t maxNum)
+{
+    uint32_t index = 0;
+    uint32_t version = 0;
+    ResultCode result = StreamRead(parcel, &index, &version, sizeof(uint32_t));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("read version failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = StreamRead(parcel, &index, configInfoNum, sizeof(uint32_t));
+    if (result != RESULT_SUCCESS || (*configInfoNum) > maxNum) {
+        LOG_ERROR("read configInfoNum failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    for (uint32_t i = 0; i < (*configInfoNum); i++) {
+        result = StreamReadGlobalConfig(parcel, &index, &globalConfigInfo[i]);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("read StreamReadExpiredPeriod failed");
+            return RESULT_GENERAL_ERROR;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode LoadGlobalConfigInfo(GlobalConfigParamHal *globalConfigInfo, uint32_t len, uint32_t *configInfoNum)
+{
+    LOG_INFO("start");
+    if (globalConfigInfo == NULL || configInfoNum == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    (void)memset_s(globalConfigInfo, sizeof(GlobalConfigParamHal) * len, 0, sizeof(GlobalConfigParamHal) * len);
+    *configInfoNum = 0;
+    FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
+    if (!IsFileOperatorValid(fileOperator)) {
+        LOG_ERROR("invalid file operation");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (!fileOperator->isFileExist(GLOBAL_CONFIG_INFO)) {
+        LOG_ERROR("file is not exist");
+        *configInfoNum = 0;
+        return RESULT_SUCCESS;
+    }
+    Buffer *parcel = ReadGlobalConfigFile(fileOperator);
+    if (parcel == NULL) {
+        LOG_ERROR("ReadGlobalConfigFile failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    ResultCode ret = ReadGlobalConfigInfo(parcel, globalConfigInfo, configInfoNum, len);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("ReadGlobalConfigInfo failed");
+        DestoryBuffer(parcel);
+        (void)memset_s(globalConfigInfo, sizeof(GlobalConfigParamHal) * len, 0, sizeof(GlobalConfigParamHal) * len);
+        *configInfoNum = 0;
+        return ret;
+    }
+    DestoryBuffer(parcel);
+    return RESULT_SUCCESS;
 }

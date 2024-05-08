@@ -59,7 +59,7 @@ static void FreeEventPkgs(InputEventPackage **eventPkgs, size_t count)
 {
     for (size_t i = 0; i < count; i++) {
         if (eventPkgs[i] != NULL) {
-            free(eventPkgs[i]);
+            OsalMemFree(eventPkgs[i]);
             eventPkgs[i] = nullptr;
         }
     }
@@ -149,7 +149,7 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event *event, size_t si
         if (evtPkg[i] == nullptr) {
             HDF_LOGE("%{public}s: OsalMemAlloc failed, line: %{public}d", __func__, __LINE__);
             FreeEventPkgs(evtPkg, i);
-            free(evtPkg);
+            OsalMemFree(evtPkg);
             evtPkg = nullptr;
             return;
         }
@@ -223,9 +223,10 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
         HDF_LOGE("%{public}s: get device name failed errormsg %{public}s", __func__, strerror(errno));
     } else {
         buffer[sizeof(buffer) - 1] = '\0';
-        int32_t ret = strcpy_s(detailInfo->attrSet.devName, DEVICE_INFO_SIZE, buffer);
+        int32_t ret = strcpy_s(detailInfo->attrSet.devName, DEV_NAME_LEN, buffer);
         if (ret) {
             HDF_LOGE("%{public}s: strcpy_s failed, ret %{public}d", __func__, ret);
+            return INPUT_FAILURE;
         }
     }
     // device detailInfo.

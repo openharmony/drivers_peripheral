@@ -24,7 +24,7 @@
 #include "securec.h"
 #include "unique_fd.h"
 #include "power_hdf_log.h"
-#include "v1_1/power_types.h"
+#include "v1_2/power_types.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -47,7 +47,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_1 {
+namespace V1_2 {
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const int32_t FORCE_SLEEP_MAX_COUNT = 100;
 
@@ -56,7 +56,11 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
+#ifdef FASTER_RETRY_OF_SLEEP
+static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(100); // 100ms for phone and tablet
+#else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
+#endif
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
@@ -95,7 +99,7 @@ bool g_isHdiStart = false;
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Power::V1_1::PowerInterfaceImpl;
+    using OHOS::HDI::Power::V1_2::PowerInterfaceImpl;
     PowerInterfaceImpl *service = new (std::nothrow) PowerInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -315,6 +319,12 @@ int32_t PowerInterfaceImpl::ForceSuspend()
     return HDF_SUCCESS;
 }
 
+int32_t PowerInterfaceImpl::Hibernate()
+{
+    HDF_LOGI("hibernate begin.");
+    return HDF_SUCCESS;
+}
+
 int32_t PowerInterfaceImpl::SuspendBlock(const std::string &name)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -492,7 +502,7 @@ int32_t PowerInterfaceImpl::GetWakeupReason(std::string &reason)
     return HDF_FAILURE;
 #endif
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Power
 } // namespace HDI
 } // namespace OHOS

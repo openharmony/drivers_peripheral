@@ -18,6 +18,7 @@
 #include "stream_operator_service.h"
 #include "stream_operator_service_callback.h"
 #include "camera_service_type_converter.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 
@@ -107,6 +108,7 @@ int32_t StreamOperatorService::DetachBufferQueue(int32_t streamId)
 
 int32_t StreamOperatorService::Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
+    CAMERAHALPERFSYSEVENT(TIME_FOR_CAPTURE);
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamOperatorVdi_, OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT);
     VdiCaptureInfo vdiInfo;
     ConvertCaptureInfoHdiToVdi(info, vdiInfo);
