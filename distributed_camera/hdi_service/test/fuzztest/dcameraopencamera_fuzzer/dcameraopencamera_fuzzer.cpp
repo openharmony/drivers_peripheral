@@ -45,9 +45,7 @@ void DcameraOpenCameraFuzzTest(const uint8_t* data, size_t size)
     }
     std::string deviceId = "1";
     std::string dhId = "2";
-    std::string cameraId = "1";
-    std::string dcameraBase = "2";
-    DCameraHost::GetInstance()->dhBaseHashDCamIdMap_.emplace(dcameraBase, cameraId);
+    std::string cameraId = "1__2";
     sptr<ICameraDeviceCallback> callbackObj(new DemoCameraDeviceCallback());
     sptr<ICameraDevice> demoCameraDevice = nullptr;
     DHBase dhBase;
