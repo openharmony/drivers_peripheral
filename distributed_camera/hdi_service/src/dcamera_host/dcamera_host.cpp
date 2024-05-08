@@ -176,7 +176,7 @@ int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
 }
 
 DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo,
-    const std::string &sourceAbilityInfo, const sptr<IDCameraProviderCallback> &callback)
+    const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback)
 {
     if (IsDhBaseInfoInvalid(dhBase)) {
         DHLOGE("DCameraHost::AddDCameraDevice, devId or dhId is invalid.");
@@ -190,8 +190,8 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (sourceAbilityInfo.empty() || sourceAbilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
-        DHLOGE("DCameraHost::AddDCameraDevice, input sourceAbilityInfo is invalid.");
+    if (sourceCodecInfo.empty() || sourceCodecInfo.length() > ABILITYINFO_MAX_LENGTH) {
+        DHLOGE("DCameraHost::AddDCameraDevice, input sourceCodecInfo is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
     if (GetCamDevNum() > MAX_DCAMERAS_NUMBER) {
@@ -199,7 +199,7 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
-        sourceAbilityInfo));
+        sourceCodecInfo));
     if (dcameraDevice == nullptr) {
         DHLOGE("DCameraHost::AddDCameraDevice, create dcamera device failed.");
         return DCamRetCode::INVALID_ARGUMENT;
