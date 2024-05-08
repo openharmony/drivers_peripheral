@@ -233,6 +233,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamQPRange,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamLowLatency,
+    /** CodecParamOverlayBuffer */
+    OMX_IndexParamOverlayBuffer,
 };
 
 /**
@@ -370,6 +372,17 @@ struct CodecQPRangeParam {
     union OMX_VERSIONTYPE version;               /** Component version */
     uint32_t minQp;
     uint32_t maxQp;
+};
+
+struct CodecParamOverlayBuffer {
+    uint32_t size;                               /** Size of the structure */
+    union OMX_VERSIONTYPE version;               /** Component version */
+    bool enable;
+    uint32_t dstX;
+    uint32_t dstY;
+    uint32_t dstW;
+    uint32_t dstH;
+    void* bufferHandle;
 };
 
 #ifdef __cplusplus
