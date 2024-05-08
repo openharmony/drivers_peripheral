@@ -267,17 +267,20 @@ static int32_t OsParseConfigDescriptors(struct UsbDevice *dev)
 
         if (descLen < USB_DDK_DT_CONFIG_SIZE) {
             HDF_LOGE("%{public}s:%d read %zu", __func__, __LINE__, descLen);
+            RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         configDesc = (struct UsbConfigDescriptor *)buffer;
         if ((configDesc->bDescriptorType != USB_DDK_DT_CONFIG) || (configDesc->bLength < USB_DDK_DT_CONFIG_SIZE)) {
             HDF_LOGE("%{public}s:%d config desc error: type 0x%02x, length %u", __func__, __LINE__,
                 configDesc->bDescriptorType, configDesc->bLength);
+            RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         configLen = LE16_TO_CPU(configDesc->wTotalLength);
         if (configLen < USB_DDK_DT_CONFIG_SIZE) {
             HDF_LOGE("invalid wTotalLength value %u", configLen);
+            RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         if (configLen > descLen) {
