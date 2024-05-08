@@ -351,6 +351,7 @@ static int32_t ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const ui
     ret = memcpy_s(extra, len + endPoint->extraLength, buffer, len);
     if (ret != EOK) {
         HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
+        RawUsbMemFree(extra);
         return HDF_ERR_IO;
     }
     endPoint->extra = extra;
@@ -434,6 +435,7 @@ static int32_t ParseInterfaceCopy(struct UsbRawInterfaceDescriptor * const ifp, 
     ret = memcpy_s((void *)ifp->extra, len + ifp->extraLength, buffer, len);
     if (ret != EOK) {
         HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+        RawUsbMemFree((void *)ifp->extra);
         return ret;
     }
     ifp->extraLength = len;
@@ -558,6 +560,7 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
         struct UsbInterfaceDescriptor *ifDesc = (struct UsbInterfaceDescriptor *)buffer;
         if (config->configDescriptor.bNumInterfaces >= USB_MAXINTERFACES) {
             HDF_LOGE("%{public}d: bNumInterfaces overlong.", config->configDescriptor.bNumInterfaces);
+            RawUsbMemFree((void *)config->extra);
             return HDF_FAILURE;
         }
         for (i = 0; i < config->configDescriptor.bNumInterfaces; ++i) {
