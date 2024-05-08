@@ -430,9 +430,6 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
                 return HDF_FAILURE;
             }
             break;
-        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
-            DHLOGE("Parameter is unknown.");
-            break;
         default:
             DHLOGE("Parameter is invalid.");
             return HDF_ERR_INVALID_PARAM;
@@ -453,9 +450,6 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
                 DHLOGE("Get audio parameters failed.");
                 return HDF_FAILURE;
             }
-            break;
-        case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE:
-            DHLOGE("Parameter is unknown.");
             break;
         default:
             DHLOGE("Parameter is invalid.");
