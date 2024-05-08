@@ -651,12 +651,13 @@ static int32_t GetUpdateResult(int32_t userId, HdiEnrollResultInfo &info, Buffer
             DestoryBuffer(output.rootSecret);
             return RESULT_BAD_COPY;
         }
+        info.credentialId = output.credentialId;
+        CopyCredentialInfo(output.deletedCredential, info.oldInfo);
         DestoryBuffer(output.rootSecret);
         DestoryBuffer(output.oldRootSecret);
     }
-    CopyCredentialInfo(output.deletedCredential, info.oldInfo);
 
-    return RESULT_SUCCESS;
+    return ret;
 }
 
 static int32_t GetEnrollResult(int32_t userId, HdiEnrollResultInfo &info, Buffer *scheduleResultBuffer)
