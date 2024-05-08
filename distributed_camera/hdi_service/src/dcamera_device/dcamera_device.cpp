@@ -28,26 +28,26 @@ namespace DistributedHardware {
 using ErrorCallback = std::function<void (ErrorType, int32_t)>;
 using ResultCallback = std::function<void (uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)>;
 DCameraDevice::DCameraDevice(const DHBase &dhBase, const std::string &sinkAbilityInfo,
-    const std::string &sourceAbilityInfo)
+    const std::string &sourceCodecInfo)
     : isOpened_(false),
       dCameraId_(GenerateCameraId(dhBase)),
       dhBase_(dhBase),
       dCameraAbilityInfo_(sinkAbilityInfo),
-      sourceAbilityInfo_(sourceAbilityInfo),
+      sourceCodecInfo_(sourceCodecInfo),
       dCameraDeviceCallback_(nullptr),
       dCameraStreamOperator_(nullptr),
       dMetadataProcessor_(nullptr)
 {
     DHLOGI("DCameraDevice construct");
-    Init(sinkAbilityInfo, sourceAbilityInfo);
+    Init(sinkAbilityInfo);
 }
 
-void DCameraDevice::Init(const std::string &sinkAbilityInfo, const std::string &sourceAbilityInfo)
+void DCameraDevice::Init(const std::string &sinkAbilityInfo)
 {
     if (dMetadataProcessor_ == nullptr) {
         dMetadataProcessor_ = std::make_shared<DMetadataProcessor>();
     }
-    dMetadataProcessor_->InitDCameraAbility(sinkAbilityInfo, sourceAbilityInfo);
+    dMetadataProcessor_->InitDCameraAbility(sinkAbilityInfo);
 }
 
 DCamRetCode DCameraDevice::CreateDStreamOperator()
@@ -61,7 +61,7 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
     }
 
     DCamRetCode ret = dCameraStreamOperator_->InitOutputConfigurations(dhBase_, dCameraAbilityInfo_,
-        sourceAbilityInfo_);
+        sourceCodecInfo_);
     if (ret != SUCCESS) {
         DHLOGE("Init distributed camera stream operator failed, ret=%{public}d.", ret);
         return ret;
