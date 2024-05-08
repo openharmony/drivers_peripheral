@@ -30,8 +30,8 @@ ohos_fuzztest("PowerHdiStubFuzzTest") {
   ]
   sources = [ "powerhdistub_fuzz.cpp" ]
   deps = [
-    "../../../../../interface/power/v1_1:libpower_stub_1.1",
-    "../../../interfaces/hdi_service:libpower_interface_service_1.1",
+    "../../../../../interface/power/v1_2:libpower_stub_1.2",
+    "../../../interfaces/hdi_service:libpower_interface_service_1.2",
   ]
   external_deps = [
     "hdf_core:libhdf_utils",

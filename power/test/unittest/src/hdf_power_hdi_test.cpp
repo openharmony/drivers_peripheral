@@ -17,12 +17,12 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 
-#include "v1_1/ipower_interface.h"
-#include "v1_1/power_types.h"
-#include "v1_1/running_lock_types.h"
+#include "v1_2/ipower_interface.h"
+#include "v1_2/power_types.h"
+#include "v1_2/running_lock_types.h"
 
 using namespace OHOS::HDI;
-using namespace OHOS::HDI::Power::V1_1;
+using namespace OHOS::HDI::Power::V1_2;
 using namespace testing::ext;
 
 namespace {

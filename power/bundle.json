@@ -27,10 +27,10 @@
           "hdf_core",
           "hilog", 
           "hisysevent",
+          "libxml2",
           "ipc"
         ],
         "third_party": [
-          "libxml2",
           "jsoncpp"
         ]
       },
