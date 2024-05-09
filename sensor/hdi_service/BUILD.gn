@@ -15,6 +15,10 @@ import("//build/ohos.gni")
 import("../sensor.gni")
 
 ohos_shared_library("libsensor_interface_service_2.0") {
+  defines = []
+  if (build_veriant != "user") {
+    defines += ["SENSOR_NOT_USER"]
+  }
   include_dirs = [
     ".",
     "../interfaces/include",
