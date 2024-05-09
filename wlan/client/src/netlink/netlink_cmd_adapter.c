@@ -1577,7 +1577,7 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
         for (i = 0; i < scan->numSsids; i++) {
             if (i >= wiphyInfo->scanCapabilities.maxNumScanSsids - 1) {
                 HILOG_INFO(LOG_CORE, "%s: Skip the excess hidden ssids for scan,current:%{public}d,max:%{public}d",
-                    __FUNCTION__, i ,wiphyInfo->scanCapabilities.maxNumScanSsids);
+                    __FUNCTION__, i, wiphyInfo->scanCapabilities.maxNumScanSsids);
                 break;
             }
             if (strlen((const char *)scan->ssids[i].ssid) == 0 || scan->ssids[i].ssidLen == 0) {
