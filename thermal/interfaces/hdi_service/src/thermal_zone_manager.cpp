@@ -85,7 +85,7 @@ void ThermalZoneManager::UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedTher
     }
 }
 
-void ThermalZoneManager::UpdateThermalZoneInfo(std::shared_ptr<SensorInfoConfig> infoConfig)
+void ThermalZoneManager::UpdateThermalZoneInfo(std::shared_ptr<SensorInfoConfig> &infoConfig)
 {
     auto tzInfoList = infoConfig->GetXMLThermalZoneInfo();
     auto tnInfoList = infoConfig->GetXMLThermalNodeInfo();
