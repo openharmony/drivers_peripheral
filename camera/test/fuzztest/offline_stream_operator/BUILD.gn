@@ -11,17 +11,74 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../fuzz.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../camera.gni")
 
-ohos_fuzztest("CameraOfflineStreamOperatorFuzzTest") {
+module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
+camera_test_path = "//drivers/peripheral/camera/test/hdi/"
+
+config("offline_stream_operator_config") {
+  visibility = [ ":*" ]
+  cflags_cc = [
+    "-DGST_DISABLE_DEPRECATED",
+    "-DHAVE_CONFIG_H",
+    "-DCOLORSPACE=\"videoconvert\"",
+  ]
+}
+
+ohos_fuzztest("offline_stream_operator_fuzztest") {
+  testonly = true
   module_out_path = module_output_path
-
   fuzz_config_file = "$camera_path/../../test/fuzztest/offline_stream_operator"
-
-  include_dirs += [ "$camera_path/../../test/fuzztest/common/include" ]
-
   sources = [
     "../common/src/common.cpp",
     "./offline_stream_operator_fuzzer.cpp",
   ]
+
+  include_dirs = [
+    "../common/include",
+    "$camera_test_path/v1_2/include",
+    "$camera_path/../../../display/interfaces/include",
+    "$camera_path/../../../display/hdi_service/gralloc/include",
+    "$camera_path/../../interfaces/include",
+    "$camera_path/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  external_deps += [
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
+    "drivers_interface_camera:libcamera_proxy_1.2",
+    "drivers_interface_camera:metadata",
+    "graphic_surface:surface",
+    "samgr:samgr_proxy",
+  ]
+  public_configs = [ ":offline_stream_operator_config" ]
+}
+
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [ ":offline_stream_operator_fuzztest" ]
 }
