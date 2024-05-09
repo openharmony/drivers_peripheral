@@ -1579,7 +1579,7 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
                     __FUNCTION__, i ,wiphyInfo->scanCapabilities.maxNumScanSsids);
                 break;
             }
-            if (strlen(scan->ssids[i - 1].ssid) == 0) {
+            if (strlen((const char *)scan->ssids[i - 1].ssid) == 0 || scan->ssids[i - 1].ssidLen == 0) {
                 HILOG_ERROR(LOG_CORE, "%s: nla_put ssid is empty", __FUNCTION__);
             }
             if (nla_put(msg, i + 1, scan->ssids[i - 1].ssidLen, scan->ssids[i - 1].ssid) != RET_CODE_SUCCESS) {
