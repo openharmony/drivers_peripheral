@@ -103,7 +103,7 @@ static void HdfMetadataDriverRelease(struct HdfDeviceObject *deviceObject)
     }
 }
 
-struct HdfDriverEntry g_metadataDriverEntry = {
+static struct HdfDriverEntry g_metadataDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "display_buffer",
     .Bind = HdfMetadataDriverBind,
