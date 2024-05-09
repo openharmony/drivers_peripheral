@@ -15,6 +15,8 @@
 
 #include "allocator_service.h"
 
+#include <sys/ioctl.h>
+#include <linux/dma-buf.h>
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
