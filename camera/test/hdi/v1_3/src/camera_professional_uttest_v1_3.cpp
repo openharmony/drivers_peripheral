@@ -208,6 +208,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
         return;
     }
 
+    FillCaptureSetting(cameraTest);
     cameraTest->imageDataSaveSwitch = SWITCH_ON;
     // Get stream operator
     cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
@@ -228,7 +229,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer2 =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     extendedStreamInfo.bufferQueue = consumer2->CreateProducerSeq([this](void *addr, uint32_t size) {
-        cameraTest->DumpImageFile(105, "yuv", addr, size);
+        cameraTest->DumpImageFile(105, "dng", addr, size);
     });
     EXPECT_NE(extendedStreamInfo.bufferQueue, nullptr);
     EXPECT_NE(extendedStreamInfo.bufferQueue->producer_, nullptr);
@@ -241,7 +242,7 @@ HWTEST_F(CameraProfessionalUtTestV1_3, Camera_Professional_Hdi_V1_3_004, TestSiz
     // Capture streamInfo
     cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->streamInfoCapture->extendedStreamInfos = {extendedStreamInfo};
-    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->DefaultInfosProfessionalCapture(cameraTest->streamInfoCapture);
     cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
 
     // Create and commitstreams
