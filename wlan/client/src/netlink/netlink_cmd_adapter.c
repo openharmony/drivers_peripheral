@@ -1590,7 +1590,7 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
             }
         }
         nla_nest_end(msg, nest);
-        HILOG_INFO(LOG_CORE, "numSsids:%{public}d", __FUNCTION__, attrtype - 1);
+        HILOG_INFO(LOG_CORE, "%{public}s numSsids:%{public}d", __FUNCTION__, attrtype - 1);
     }
     return RET_CODE_SUCCESS;
 }
