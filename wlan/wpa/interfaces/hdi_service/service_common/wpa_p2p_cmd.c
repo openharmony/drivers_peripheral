@@ -32,8 +32,8 @@
 #include "bssid_ignore.h"
 #include "config.h"
 
-#include "v1_0/iwpa_callback.h"
-#include "v1_0/iwpa_interface.h"
+#include "v1_1/iwpa_callback.h"
+#include "v1_1/iwpa_interface.h"
 
 #include "wpa_p2p_hal.h"
 
@@ -1326,6 +1326,35 @@ int32_t WpaInterfaceP2pSaveConfig(struct IWpaInterface *self, const char *ifName
     return HDF_SUCCESS;
 }
 
+int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifName,
+    int32_t cmdType, int32_t dataType, const char *carryData)
+{
+    HDF_LOGI("Ready to enter hdi %{public}s", __func__);
+    (void)self;
+    (void)ifName;
+    char cmd[CMD_SIZE] = {0};
+    char buf[CMD_SIZE] = {0};
+
+    int32_t ret = 0;
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s",
+        ifName, cmdType, dataType, carryData);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
+        return HDF_FAILURE;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        HDF_LOGE("%{public}s command failed!", __func__);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%{public}s success", __func__);
+    return HDF_SUCCESS;
+}
+
 int32_t WpaInterfaceVendorExtProcessCmd(struct IWpaInterface *self, const char *ifName, const char *cmd)
 {
 #define NEW_CMD_MAX_LEN 400
@@ -1402,8 +1431,8 @@ static int32_t WpaFillP2pDeviceFoundParam(struct P2pDeviceInfoParam *deviceInfoP
             ret = HDF_FAILURE;
             break;
         }
-        if (FillData(&hdiP2pDeviceInfoParam->wfdDeviceInfo, &hdiP2pDeviceInfoParam->wfdDeviceInfoLen,
-            deviceInfoParam->wfdDeviceInfo, WIFI_P2P_WFD_DEVICE_INFO_LENGTH) != HDF_SUCCESS) {
+        if (deviceInfoParam->wfdLength != 0 && FillData(&hdiP2pDeviceInfoParam->wfdDeviceInfo, &hdiP2pDeviceInfoParam->wfdDeviceInfoLen,
+            deviceInfoParam->wfdDeviceInfo, deviceInfoParam->wfdLength) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fill bssid fail!", __func__);
             ret = HDF_FAILURE;
             break;
