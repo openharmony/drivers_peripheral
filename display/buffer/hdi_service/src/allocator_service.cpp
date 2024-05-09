@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include "display_log.h"
 #include "hdf_trace.h"
+#include "hdf_remote_service.h"
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_SRV"
@@ -28,6 +29,7 @@
 #define LOG_DOMAIN 0xD002515
 #define TIME_1000 1000
 #define TIME_10 10
+#define BUFF_SIZE 16
 
 namespace OHOS {
 namespace HDI {
@@ -128,6 +130,15 @@ void AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval fi
     return;
 }
 
+void AllocatorService::WriteAllocPidToDma(int32_t fd)
+{
+    pid_t remotePid = HdfRemoteGetCallingPid();
+    char pidStr[BUFF_SIZE] = { 0 };
+    if (sprintf_s(pidStr, BUFF_SIZE, "%d", remotePid) >= 0) {
+        ioctl(fd, DMA_BUF_SET_NAME_A, pidStr);
+    }
+}
+
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
     HdfTrace trace(__func__, "HDI:DISP:");
@@ -144,6 +155,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         return ec;
     }
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
+    WriteAllocPidToDma(buffer->fd);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
