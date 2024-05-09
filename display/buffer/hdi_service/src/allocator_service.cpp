@@ -17,6 +17,7 @@
 
 #include <sys/ioctl.h>
 #include <linux/dma-buf.h>
+#include <securec.h>
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
