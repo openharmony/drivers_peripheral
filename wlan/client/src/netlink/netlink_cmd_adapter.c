@@ -1578,7 +1578,7 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
                 HILOG_INFO(LOG_CORE, "%s: Skip the excess hidden ssids for scan", __FUNCTION__);
                 break;
             }
-            if (nla_put(msg, i + 1, scan->ssids[i].ssidLen, scan->ssids[i].ssid) != RET_CODE_SUCCESS) {
+            if (nla_put(msg, i + 1, scan->ssids[i - 1].ssidLen, scan->ssids[i - 1].ssid) != RET_CODE_SUCCESS) {
                 HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed", __FUNCTION__);
                 return RET_CODE_FAILURE;
             }
