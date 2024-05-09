@@ -141,42 +141,48 @@ void AllocatorService::WriteAllocPidToDma(int32_t fd)
     }
 }
 
+void AllocatorService::FreeMemVdi(BufferHandle* handle)
+{
+    struct timeval firstTimeStamp;
+    TimeBegin(&firstTimeStamp);
+    {
+        HdfTrace traceTwo("FreeMem", "HDI:VDI:");
+        vdiImpl_->FreeMem(*handle);
+    }
+    TimeEnd("FreeMem", TIME_10, firstTimeStamp);
+}
+
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
 {
     HdfTrace trace(__func__, "HDI:DISP:");
 
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
     struct timeval firstTimeStamp;
     TimeBegin(&firstTimeStamp);
-    int32_t ec = vdiImpl_->AllocMem(info, buffer);
-    TimeEnd("AllocMem", TIME_10, firstTimeStamp);
-    if (ec != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
-        return ec;
+    {
+        HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
+        int32_t ec = vdiImpl_->AllocMem(info, buffer);
+        if (ec != HDF_SUCCESS) {
+            TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+            HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
+            return ec;
+        }
     }
+    TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
     WriteAllocPidToDma(buffer->fd);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
-        delete handle;
-        HdfTrace traceTwo("FreeMem-1", "HDI:VDI:");
-        struct timeval firstTimeStamp;
-        TimeBegin(&firstTimeStamp);
-        vdiImpl_->FreeMem(*buffer);
-        TimeEnd("FreeMem", TIME_10, firstTimeStamp);
+        FreeMemVdi(buffer);
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
-        HdfTrace traceThree("FreeMem-2", "HDI:VDI:");
-        struct timeval firstTimeStamp;
-        TimeBegin(&firstTimeStamp);
-        vdiImpl_->FreeMem(*freeBuffer);
-        TimeEnd("FreeMem", TIME_10, firstTimeStamp);
+        FreeMemVdi(freeBuffer);
     });
     return HDF_SUCCESS;
 }
