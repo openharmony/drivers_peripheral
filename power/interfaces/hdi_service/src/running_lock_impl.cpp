@@ -31,6 +31,7 @@ const std::string RUNNINGLOCK_TAG_BACKGROUND_AUDIO = "OHOS.RunningLock.Backgroun
 const std::string RUNNINGLOCK_TAG_BACKGROUND_SPORT = "OHOS.RunningLock.Background.Sport";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION = "OHOS.RunningLock.Background.Navigation";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_TASK = "OHOS.RunningLock.Background.Task";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_PHONEEXT = "OHOS.RunningLock.Background.PhoneExt";
 constexpr int32_t DEFAULT_TIMEOUT = 3000;
 } // namespace
 std::mutex RunningLockImpl::mutex_;
@@ -115,10 +116,7 @@ int32_t RunningLockImpl::HoldLock(const RunningLockInfo &info, PowerHdfState sta
         HDF_LOGW("HoldLock failed, type=%{public}d or state=%{public}d is invalid", info.type, state);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t status = SystemOperation::WriteWakeLock(GetRunningLockTag(info.type));
-    if (status == HDF_SUCCESS) {
-        RunningLockImpl::NotifyChanged(info, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_ADD");
-    }
+    int32_t status = SystemOperation::WriteWakeLock(GetRunningLockTagInner(info.type));
     return status;
 }
 
@@ -130,10 +128,7 @@ int32_t RunningLockImpl::UnholdLock(const RunningLockInfo &info,
         HDF_LOGW("UnholdLock failed, type=%{public}d is invalid", info.type);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t status = SystemOperation::WriteWakeUnlock(GetRunningLockTag(info.type));
-    if (status == HDF_SUCCESS) {
-        RunningLockImpl::NotifyChanged(info, lockid, bundleName, "DUBAI_TAG_RUNNINGLOCK_REMOVE");
-    }
+    int32_t status = SystemOperation::WriteWakeUnlock(GetRunningLockTagInner(info.type));
     return status;
 }
 
@@ -209,6 +204,28 @@ RunningLockInfo RunningLockImpl::FillRunningLockInfo(const RunningLockInfo &info
 }
 
 std::string RunningLockImpl::GetRunningLockTag(RunningLockType type)
+{
+    switch (type) {
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE:
+            return RUNNINGLOCK_TAG_BACKGROUND_PHONEEXT;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION:
+            return RUNNINGLOCK_TAG_BACKGROUND_NOTIFICATION;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO:
+            return RUNNINGLOCK_TAG_BACKGROUND_AUDIO;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT:
+            return RUNNINGLOCK_TAG_BACKGROUND_SPORT;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION:
+            return RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_TASK:
+            return RUNNINGLOCK_TAG_BACKGROUND_TASK;
+        default: {
+            HDF_LOGE("type=%{public}d is invalid, there is no corresponding tag", type);
+            return RUNNINGLOCK_TAG_BACKGROUND_INVALID;
+        }
+    }
+}
+
+std::string RunningLockImpl::GetRunningLockTagInner(RunningLockType type)
 {
     switch (type) {
         case RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE:
