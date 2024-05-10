@@ -50,7 +50,8 @@ public:
     int32_t OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
          sptr<ICameraDevice> &device) override;
     int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
-
+    int32_t GetCameraAbilityFromDev(const std::string &cameraId,
+        std::shared_ptr<CameraAbility> &cameraAbility);
     DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &sinkAbilityInfo,
         const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback);
     DCamRetCode AddDeviceParamCheck(const DHBase &dhBase, const std::string &sinkAbilityInfo,

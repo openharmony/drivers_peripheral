@@ -59,6 +59,10 @@ public:
     {
         return DCamRetCode::SUCCESS;
     }
+    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
+    {
+        return DCamRetCode::SUCCESS;
+    }
 
 private:
     std::string devId_;

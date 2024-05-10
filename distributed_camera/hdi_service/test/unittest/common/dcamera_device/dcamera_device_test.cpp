@@ -146,5 +146,26 @@ HWTEST_F(DCameraDeviceTest, dcamera_device_test_004, TestSize.Level1)
     CamRetCode rc = dcameraDevice_->GetDCameraAbility(ability);
     EXPECT_EQ(true, rc == CamRetCode::NO_ERROR);
 }
+
+/**
+ * @tc.name: dcamera_device_test_005
+ * @tc.desc: Verify GetDCameraAbility
+ * @tc.type: FUNC
+ * @tc.require: AR
+ */
+HWTEST_F(DCameraDeviceTest, dcamera_device_test_005, TestSize.Level1)
+{
+    EXPECT_EQ(false, dcameraDevice_ == nullptr);
+
+    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::string sinkAbility = "sink";
+    dcameraDevice_->SetDcameraAbility(sinkAbility);
+    CamRetCode rc = dcameraDevice_->GetDCameraAbility(ability);
+    EXPECT_EQ(true, rc == CamRetCode::INVALID_ARGUMENT);
+
+    dcameraDevice_->SetDcameraAbility(TEST_ABILITY);
+    rc = dcameraDevice_->GetDCameraAbility(ability);
+    EXPECT_EQ(true, rc == CamRetCode::NO_ERROR);
+}
 }
 }
