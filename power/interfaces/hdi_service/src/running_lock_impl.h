@@ -43,6 +43,7 @@ public:
     static void Clean();
     static uint32_t GetCount(RunningLockType type);
     static std::string GetRunningLockTag(RunningLockType type);
+    static std::string GetRunningLockTagInner(RunningLockType type);
     static void SetDefaultTimeOutMs(int32_t timeOutMs);
 
     static void RegisterRunningLockCallback(const sptr<IPowerRunningLockCallback>
