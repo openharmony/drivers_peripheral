@@ -64,13 +64,13 @@ static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingSta
 
     std::string addr = device.GetAddress();
     if (playingState) {
-	for (const auto &it : g_playdevices) {
-	    if (strcmp(it.second.c_str(), device.GetAddress().c_str()) == 0) {
-	        return;
+        for (const auto &it : g_playdevices) {
+            if (strcmp(it.second.c_str(), device.GetAddress().c_str()) == 0) {
+                return;
 	    }
-	}
-	g_playdevices.insert(std::make_pair(playingState, addr));
-	g_playState = playingState;
+        }
+        g_playdevices.insert(std::make_pair(playingState, addr));
+        g_playState = playingState;
     } else {
         std::map<int, std::string>::iterator it;
         for (it = g_playdevices.begin(); it != g_playdevices.end(); it++) {
