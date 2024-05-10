@@ -85,6 +85,33 @@ void ThermalZoneManager::UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedTher
     }
 }
 
+void ThermalZoneManager::UpdateThermalZoneInfo(std::shared_ptr<SensorInfoConfig> &infoConfig)
+{
+    auto tzInfoList = infoConfig->GetXMLThermalZoneInfo();
+    auto tnInfoList = infoConfig->GetXMLThermalNodeInfo();
+    infoConfig->thermalDataList_.clear();
+    for (auto tzIter : tzInfoList) {
+        if (tznMap_.empty()) {
+            break;
+        }
+        auto typeIter = tznMap_.find(tzIter.type);
+        if (typeIter != tznMap_.end()) {
+            ReportedThermalData data;
+            UpdateDataType(tzIter, data, typeIter->second);
+            infoConfig->thermalDataList_.push_back(data);
+        }
+    }
+    for (auto tnIter : tnInfoList) {
+        ReportedThermalData data;
+        data.type = tnIter.type;
+        if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
+            THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
+            data.tempPath = tnIter.path;
+        }
+        infoConfig->thermalDataList_.push_back(data);
+    }
+}
+
 int32_t ThermalZoneManager::UpdateThermalZoneData()
 {
     {
@@ -92,32 +119,11 @@ int32_t ThermalZoneManager::UpdateThermalZoneData()
         std::lock_guard<std::mutex> lock(mutex_);
         for (auto &polling : pollingMap_) {
             for (auto &group : polling.second) {
-                auto tzInfoList = group.second->GetXMLThermalZoneInfo();
-                auto tnInfoList = group.second->GetXMLThermalNodeInfo();
-                group.second->thermalDataList_.clear();
-                for (auto tzIter : tzInfoList) {
-                    if (tznMap_.empty()) {
-                        break;
-                    }
-                    auto typeIter = tznMap_.find(tzIter.type);
-                    if (typeIter != tznMap_.end()) {
-                        ReportedThermalData data;
-                        UpdateDataType(tzIter, data, typeIter->second);
-                        group.second->thermalDataList_.push_back(data);
-                    }
-                }
-                for (auto tnIter : tnInfoList) {
-                    ReportedThermalData data;
-                    data.type = tnIter.type;
-                    if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
-                        THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
-                        data.tempPath = tnIter.path;
-                    }
-                    group.second->thermalDataList_.push_back(data);
-                }
+                UpdateThermalZoneInfo(group.second);
             }
         }
     }
+
     CalculateMaxCd();
     return HDF_SUCCESS;
 }
