@@ -16,7 +16,7 @@ import("../sensor.gni")
 
 ohos_shared_library("libsensor_interface_service_2.0") {
   defines = []
-  if (build_veriant == "root") {
+  if (build_variant == "root") {
     defines += ["SENSOR_DEBUG"]
   }
   include_dirs = [
