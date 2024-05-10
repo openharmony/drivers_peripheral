@@ -53,6 +53,8 @@ public:
 
     DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &sinkAbilityInfo,
         const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback);
+    DCamRetCode AddDeviceParamCheck(const DHBase &dhBase, const std::string &sinkAbilityInfo,
+        const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback);
     DCamRetCode RemoveDCameraDevice(const DHBase &dhBase);
     OHOS::sptr<DCameraDevice> GetDCameraDeviceByDHBase(const DHBase &dhBase);
     void NotifyDCameraStatus(const DHBase &dhBase, int32_t result);

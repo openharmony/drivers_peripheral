@@ -496,5 +496,10 @@ bool DCameraDevice::IsOpened()
 {
     return isOpened_;
 }
+
+void DCameraDevice::SetDcameraAbility(const std::string& sinkAbilityInfo)
+{
+    dCameraAbilityInfo_ = sinkAbilityInfo;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

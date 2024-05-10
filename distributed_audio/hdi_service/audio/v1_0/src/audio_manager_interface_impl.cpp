@@ -86,6 +86,7 @@ int32_t AudioManagerInterfaceImpl::LoadAdapter(const AudioAdapterDescriptor &des
         return HDF_FAILURE;
     }
 
+    mapAddFlags_.clear();
     adapter = adp->second;
     DHLOGI("Load adapter success.");
     return HDF_SUCCESS;
@@ -150,14 +151,16 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         DHLOGE("Add audio device failed, adapter return: %{public}d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
-
-    DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD,
-                             0, adp->second->GetVolumeGroup(dhId),
-                             adp->second->GetInterruptGroup(dhId) };
-    ret = NotifyFwk(event);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
-        return ret;
+    std::string flagString = adpName + std::to_string(dhId);
+    if (mapAddFlags_.find(flagString) == mapAddFlags_.end()) {
+        DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_ADD, 0, adp->second->GetVolumeGroup(dhId),
+            adp->second->GetInterruptGroup(dhId) };
+        ret = NotifyFwk(event);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
+            return ret;
+        }
+        mapAddFlags_.insert(std::make_pair(flagString, true));
     }
     sptr<IRemoteObject> remote = GetRemote(adpName);
     if (remote != nullptr) {
@@ -187,6 +190,7 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio fwk failed, ret = %{public}d.", ret);
     }
+    mapAddFlags_.erase(adpName + std::to_string(dhId));
     if (adp->second->IsPortsNoReg()) {
         mapAudioAdapter_.erase(adpName);
         sptr<IRemoteObject> remote = GetRemote(adpName);

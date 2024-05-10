@@ -175,7 +175,7 @@ int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo,
+DCamRetCode DCameraHost::AddDeviceParamCheck(const DHBase &dhBase, const std::string& sinkAbilityInfo,
     const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback)
 {
     if (IsDhBaseInfoInvalid(dhBase)) {
@@ -198,14 +198,35 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         DHLOGE("DCameraHost::AddDCameraDevice, cameras exceed the upper limit.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
+    return DCamRetCode::SUCCESS;
+}
+
+DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string& sinkAbilityInfo,
+    const std::string &sourceCodecInfo, const sptr<IDCameraProviderCallback> &callback)
+{
+    if (AddDeviceParamCheck(dhBase, sinkAbilityInfo, sourceCodecInfo, callback) != DCamRetCode::SUCCESS) {
+        DHLOGE("DCameraHost::AddDCameraDevice, input param is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    std::string dCameraId = dhBase.deviceId_ + "__" + dhBase.dhId_;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        if (dCameraDeviceMap_.find(dCameraId) != dCameraDeviceMap_.end()) {
+            if (dCameraDeviceMap_[dCameraId] == nullptr) {
+                DHLOGI("AddDCameraDevice device is null");
+                return DCamRetCode::INVALID_ARGUMENT;
+            }
+            dCameraDeviceMap_[dCameraId]->SetDcameraAbility(sinkAbilityInfo);
+            DHLOGI("AddDCameraDevice refresh data success");
+            return DCamRetCode::SUCCESS;
+        }
+    }
     OHOS::sptr<DCameraDevice> dcameraDevice(new (std::nothrow) DCameraDevice(dhBase, sinkAbilityInfo,
         sourceCodecInfo));
     if (dcameraDevice == nullptr) {
         DHLOGE("DCameraHost::AddDCameraDevice, create dcamera device failed.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-
-    std::string dCameraId = dcameraDevice->GetDCameraId();
     {
         std::lock_guard<std::mutex> autoLock(deviceMapLock_);
         dCameraDeviceMap_[dCameraId] = dcameraDevice;
@@ -215,7 +236,6 @@ DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::strin
         return DCamRetCode::INVALID_ARGUMENT;
     }
     dcameraDevice->SetProviderCallback(callback);
-
     if (dCameraHostCallback_ != nullptr) {
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
