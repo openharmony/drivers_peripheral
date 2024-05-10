@@ -164,7 +164,6 @@ IAM_STATIC ResultCode SetAuthResultMsgToAttribute(Attribute *attribute, AuthResu
         LOG_ERROR("SetAttributeInt32 result failed");
         return ret;
     }
-    // todo AUTH_NEXT_LOCKOUT_DURATION
     ret = SetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, result->freezingTime);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeInt32 freezingTime failed");
@@ -190,17 +189,23 @@ IAM_STATIC ResultCode SetAuthResultMsgToAttribute(Attribute *attribute, AuthResu
 IAM_STATIC ResultCode GenerateRemoteAuthResultMsg(AuthResult *result, uint64_t scheduleId, Uint8Array collectorUdid,
     UserAuthTokenHal *authToken)
 {
-    Attribute *attribute = CreateEmptyAttribute();
-    IF_TRUE_LOGE_AND_RETURN_VAL(attribute == NULL, RESULT_GENERAL_ERROR);
-
-    ResultCode ret = RESULT_GENERAL_ERROR;
+    Attribute *attribute = NULL;
+    Uint8Array retInfo = {};
+    ResultCode funcRet = RESULT_GENERAL_ERROR;
     do {
+        attribute = CreateEmptyAttribute();
+        retInfo = (Uint8Array){ Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+        if (attribute == NULL || retInfo.data == NULL) {
+            LOG_ERROR("create attribute or malloc failed");
+            break;
+        }
+
         Uint8Array authTokenIn = { (uint8_t *)(&authToken), sizeof(UserAuthTokenHal) };
         if (SetAuthResultMsgToAttribute(attribute, result, scheduleId, authTokenIn) != RESULT_SUCCESS) {
             LOG_ERROR("SetAuthResultMsgToAttribute failed");
             break;
         }
-        Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+
         SignParam signParam = {
             .needSignature = true,
             .keyType = KEY_TYPE_CROSS_DEVICE,
@@ -211,11 +216,12 @@ IAM_STATIC ResultCode GenerateRemoteAuthResultMsg(AuthResult *result, uint64_t s
             break;
         }
         result->remoteAuthResultMsg = CreateBufferByData(retInfo.data, retInfo.len);
-        ret = RESULT_SUCCESS;
+        funcRet = RESULT_SUCCESS;
     } while (0);
 
     FreeAttribute(&attribute);
-    return ret;
+    Free(retInfo.data);
+    return funcRet;
 }
 
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,

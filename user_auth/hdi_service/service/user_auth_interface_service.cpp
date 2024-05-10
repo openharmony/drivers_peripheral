@@ -200,12 +200,8 @@ static int32_t SetAttributeToCollectorExecMsg(AuthParamHal paramHal, HdiSchedule
             IAM_LOGE("SetAttributeUint32 executorRole failed");
             break;
         }
-        if (SetAttributeInt32(attribute, ATTR_SCHEDULE_MODE, info.scheduleMode) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint64 scheduleMode failed");
-            break;
-        }
         if (SetAttributeToCoAuthExecMsg(paramHal, info, publicKey, attribute) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint8Array challenge failed");
+            IAM_LOGE("SetAttributeToCoAuthExecMsg failed");
             break;
         }
 
@@ -296,7 +292,7 @@ static int32_t SetAttributeToVerifierExecMsg(AuthParamHal paramHal, HdiScheduleI
             break;
         }
         if (SetAttributeToCoAuthExecMsg(paramHal, info, publicKey, attribute) != RESULT_SUCCESS) {
-            IAM_LOGE("SetAttributeUint8Array challenge failed");
+            IAM_LOGE("SetAttributeToCoAuthExecMsg failed");
             break;
         }
 
@@ -1200,33 +1196,23 @@ static bool CopyExecutorInfo(const HdiExecutorRegisterInfo &in, ExecutorInfoHal 
         return false;
     }
 
-    if (in.deviceUdid.empty()) {
-        IAM_LOGI("device udid not set, use local udid");
-        if (memcpy_s(out.deviceUdid, sizeof(out.deviceUdid), g_localUdid.c_str(), g_localUdid.length()) != EOK) {
-            IAM_LOGE("memcpy failed");
-            return false;
-        }
-    } else {
-        if (memcpy_s(out.deviceUdid, sizeof(out.deviceUdid), in.deviceUdid.c_str(), in.deviceUdid.length()) != EOK) {
-            IAM_LOGE("memcpy failed");
-            return false;
-        }
-        if (g_localUdid != in.deviceUdid) {
-            IAM_LOGE("verify remote executor register info");
-            if (!verifyExecutorRegisterInfo(in, out)) {
-                IAM_LOGE("verifyExecutorRegisterInfo failed");
-                return false;
-            }
-        }
+    if (memcpy_s(out.deviceUdid, sizeof(out.deviceUdid), in.deviceUdid.c_str(), in.deviceUdid.length()) != EOK) {
+        IAM_LOGE("memcpy failed");
+        return false;
     }
 
     char publicKeyStrBuffer[PUBLIC_KEY_STR_LEN] = {0};
     FormatHexString(&out.deviceUdid[0], PUBLIC_KEY_LEN, publicKeyStrBuffer, PUBLIC_KEY_STR_LEN);
-    if (in.signedRemoteExecutorInfo.size() != 0) {
+    if (g_localUdid != in.deviceUdid) {
+        IAM_LOGI("verify remote executor register info");
+        if (!verifyExecutorRegisterInfo(in, out)) {
+            IAM_LOGE("verifyExecutorRegisterInfo failed");
+            return false;
+        }
         IAM_LOGI("add remote executor authType %{public}d executorRole %{public}d publicKey %{public}s",
             in.authType, in.executorRole, publicKeyStrBuffer);
     } else {
-        IAM_LOGI("add remote executor authType %{public}d executorRole %{public}d publicKey %{public}s",
+        IAM_LOGI("add local executor authType %{public}d executorRole %{public}d publicKey %{public}s",
             in.authType, in.executorRole, publicKeyStrBuffer);
     }
     return true;
