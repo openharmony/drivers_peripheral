@@ -16,6 +16,7 @@
 #ifndef DISTRIBUTED_CAMERA_DEVICE_H
 #define DISTRIBUTED_CAMERA_DEVICE_H
 
+#include <atomic>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -70,6 +71,9 @@ private:
     void NotifyStartCaptureError();
     void NotifyCameraError(const ErrorType type);
     void IsOpenSessFailedState(bool state);
+    CamRetCode TriggerGetFullCaps();
+    void SetRefreshFlag(bool flag);
+    bool GetRefreshFlag();
 private:
     bool isOpened_;
     std::string dCameraId_;
@@ -85,6 +89,9 @@ private:
     std::condition_variable openSessCV_;
     bool isOpenSessFailed_ = false;
     std::mutex isOpenSessFailedlock_;
+    std::mutex getFullLock_;
+    std::condition_variable getFullWaitCond_;
+    std::atomic<bool> refreshFlag_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
