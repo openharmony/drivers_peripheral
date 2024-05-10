@@ -19,7 +19,7 @@ import("../../../camera.gni")
 module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
-config("CameraOfflineStreamOperatorFuzzTest") {
+config("offline_stream_operator_config") {
   visibility = [ ":*" ]
   cflags_cc = [
     "-DGST_DISABLE_DEPRECATED",
@@ -28,7 +28,7 @@ config("CameraOfflineStreamOperatorFuzzTest") {
   ]
 }
 
-ohos_fuzztest("offline_stream_operator_fuzztest") {
+ohos_fuzztest("CameraOfflineStreamOperatorFuzzTest") {
   testonly = true
   module_out_path = module_output_path
   fuzz_config_file = "$camera_path/../../test/fuzztest/offline_stream_operator"
