@@ -126,6 +126,7 @@ private:
     void CollectCallbackInfo(
         HdfThermalCallbackInfo &callbackInfo, const std::shared_ptr<SensorInfoConfig> &sensorInfo, int32_t reportTime);
     void UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data, int32_t tzn);
+    void UpdateThermalZoneInfo(std::shared_ptr<SensorInfoConfig> &infoConfig);
     int32_t GetIntervalCommonDivisor(std::vector<int32_t> intervalList);
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;
