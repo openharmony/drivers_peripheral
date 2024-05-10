@@ -29,7 +29,8 @@
         "graphic_surface",
         "c_utils",
         "hitrace",
-        "hisysevent"
+        "hisysevent",
+        "bounds_checking_function"
       ],
       "third_party": [
         "ffmpeg",
