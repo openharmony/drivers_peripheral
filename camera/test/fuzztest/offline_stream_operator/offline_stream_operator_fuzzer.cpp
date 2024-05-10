@@ -13,35 +13,97 @@
  * limitations under the License.
  */
 
-#include "common.h"
-#include "offline_stream_operator.h"
+#include "offline_stream_operator_fuzzer.h"
+
+using namespace OHOS::Camera;
 
 namespace OHOS {
-bool CameraOfflineStreamOperatorFuzzTest(const uint8_t *rawData, size_t size)
+const size_t THRESHOLD = 10;
+
+enum HostCmdId {
+    OFFLINE_STREAM_OPERATOR_CONCERCAPTURE,
+    OFFLINE_STREAM_OPERATOR_RELEASESTREAMS,
+    OFFLINE_STREAM_OPERATOR_RELEASE,
+    OFFLINE_STREAM_OPERATOR_END,
+};
+
+enum BitOperat {
+    INDEX_0 = 0,
+    INDEX_1,
+    INDEX_2,
+    INDEX_3,
+    MOVE_EIGHT_BITS = 8,
+    MOVE_SIXTEEN_BITS = 16,
+    MOVE_TWENTY_FOUR_BITS = 24,
+};
+
+static uint32_t ConvertUint32(const uint8_t *bitOperat)
+{
+    if (bitOperat == nullptr) {
+        return 0;
+    }
+
+    return (bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | (bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
+        (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
+}
+
+void FuncCancelCapture(const uint8_t *rawData)
+{
+    cameraTest->intents = {STILL_CAPTURE};
+    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator);
+
+    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
+    cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new
+        OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+
+    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
+        {cameraTest->streamInfoSnapshot->v1_0.streamId_}, streamOperatorCallback, offlineStreamOperator);
+
+    sleep(UT_SECOND_TIMES);
+
+    cameraTest->rc = (CamRetCode)offlineStreamOperator->CancelCapture(*rawData);
+    cameraTest->streamInfos.clear();
+}
+
+static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 {
     if (rawData == nullptr) {
         return false;
     }
-    constexpr uint32_t sleepTime = 2;
-    uint32_t code = U32_AT(rawData);
-    rawData = rawData + OFFSET;
-    size = size - OFFSET;
+    FuncCancelCapture(rawData);
+}
 
-    MessageParcel data;
-    data.WriteInterfaceToken(IOfflineStreamOperator::GetDescriptor());
-    data.WriteBuffer(rawData, size);
-    data.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
+bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
+{
+    (void)size;
+    if (rawData == nullptr) {
+        return false;
+    }
 
-    sptr<IOfflineStreamOperator> offlineStreamOperator = new OHOS::Camera::OfflineStreamOperator();
-    CHECK_IF_PTR_NULL_RETURN_VALUE(offlineStreamOperator, false);
-    sptr<OfflineStreamOperatorStub> IpcOfflineStream = new OfflineStreamOperatorStub(offlineStreamOperator);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcOfflineStream, false);
-    
-    sleep(sleepTime); // sleep two second
-    IpcOfflineStream->OnRemoteRequest(code, data, reply, option);
+    uint32_t cmd = ConvertUint32(rawData);
+    rawData += sizeof(cmd);
 
+    cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
+    cameraTest->Init();
+    if (cameraTest->serviceV1_2 == nullptr) {
+        return false;
+    }
+    cameraTest->Open();
+    if (cameraTest->cameraDeviceV1_2 == nullptr) {
+        return false;
+    }
+
+    for (cmd = 0; cmd < OFFLINE_STREAM_OPERATOR_END; cmd++) {
+        HostFuncSwitch(cmd, rawData);
+    }
+    cameraTest->Close();
     return true;
 }
 
@@ -51,7 +113,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    CameraOfflineStreamOperatorFuzzTest(data, size);
+    OHOS::DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
-}
+} // namespace OHOS
