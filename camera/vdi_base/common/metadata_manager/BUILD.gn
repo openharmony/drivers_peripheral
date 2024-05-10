@@ -73,9 +73,9 @@ if (!defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
     external_deps += [
+      "bounds_checking_function:libsec_shared",
       "drivers_interface_camera:metadata",
       "ipc:ipc_single",
-      "bounds_checking_function:libsec_shared",
     ]
 
     public_configs = [ ":camera_metadata_manager_config" ]
