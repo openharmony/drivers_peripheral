@@ -539,7 +539,8 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto dev = mapAudioDevice_.find(devId);
     if (dev != mapAudioDevice_.end()) {
-        DHLOGI("Device has been add, do not repeat add.");
+        mapAudioDevice_[devId] = caps;
+        DHLOGI("Device has been add, refresh caps.");
         return DH_SUCCESS;
     }
     mapAudioDevice_.insert(std::make_pair(devId, caps));
