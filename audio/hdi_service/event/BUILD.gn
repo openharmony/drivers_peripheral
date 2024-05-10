@@ -29,7 +29,6 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       "$hdf_audio_path/hal/hdi_binder/server/include",
       "$hdf_hdi_service_path/primary_impl/include",
       "$hdf_hdi_service_path/vendor_interface/utils",
-      "//third_party/bounds_checking_function/include",
     ]
 
     defines = []
@@ -60,6 +59,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
 
     shlib_type = "hdi"
     install_images = [ chipset_base_dir ]
