@@ -49,7 +49,6 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
 
 void funcCancelCapture(const uint8_t *rawData)
 {
-    cameraTest->Open();
     cameraTest->intents = {STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
     cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
@@ -70,6 +69,7 @@ void funcCancelCapture(const uint8_t *rawData)
     sleep(UT_SECOND_TIMES);
 
     cameraTest->rc = (CamRetCode)offlineStreamOperator->CancelCapture(*rawData);
+    cameraTest->streamInfos.clear();
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
