@@ -47,7 +47,7 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
         (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
 }
 
-void funcCancelCapture(const uint8_t *rawData)
+void FuncCancelCapture(const uint8_t *rawData)
 {
     cameraTest->intents = {STILL_CAPTURE};
     cameraTest->StartStream(cameraTest->intents);
@@ -77,7 +77,7 @@ static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
     if (rawData == nullptr) {
         return false;
     }
-    funcCancelCapture(rawData);
+    FuncCancelCapture(rawData);
 }
 
 bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
