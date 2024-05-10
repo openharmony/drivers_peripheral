@@ -46,7 +46,7 @@
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 #define HDC_CONFIG_STORAGE              "hisuite_mass_storage"
 #else
-#define HDC_CONFIG_STORAGE              "mass_storage"
+#define HDC_CONFIG_STORAGE              "storage"
 #endif
 
 #define HDC_CONFIG_RNDIS_HDC            "rndis_hdc"
