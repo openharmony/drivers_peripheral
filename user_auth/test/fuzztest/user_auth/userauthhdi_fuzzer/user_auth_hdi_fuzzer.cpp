@@ -57,6 +57,8 @@ void FillFuzzExecutorRegisterInfo(Parcel &parcel, ExecutorRegisterInfo &executor
     executorRegisterInfo.executorMatcher = parcel.ReadUint32();
     executorRegisterInfo.esl = static_cast<ExecutorSecureLevel>(parcel.ReadInt32());
     FillFuzzUint8Vector(parcel, executorRegisterInfo.publicKey);
+    executorRegisterInfo.deviceUdid = parcel.ReadString();
+    FillFuzzUint8Vector(parcel, executorRegisterInfo.signedRemoteExecutorInfo);
     IAM_LOGI("success");
 }
 
@@ -113,6 +115,7 @@ void FillFuzzAuthParam(Parcel &parcel, AuthParam &authParam)
     } else {
         authParam.isOsAccountVerified = false;
     }
+    authParam.collectorUdid = parcel.ReadString();
     IAM_LOGI("success");
 }
 
@@ -143,6 +146,7 @@ void FillFuzzAuthResultInfo(Parcel &parcel, AuthResultInfo &authResultInfo)
     FillFuzzUint8Vector(parcel, authResultInfo.rootSecret);
     authResultInfo.userId = parcel.ReadInt32();
     authResultInfo.credentialId = parcel.ReadUint64();
+    FillFuzzUint8Vector(parcel, authResultInfo.remoteAuthResultMsg);
     IAM_LOGI("success");
 }
 
@@ -237,8 +241,7 @@ void FillFuzzEnrolledInfoVector(Parcel &parcel, vector<EnrolledInfo> &vector)
 void FuzzInit(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    const std::string deviceUdid = "12345678910";
-    g_service.Init(deviceUdid);
+    g_service.Init(parcel.ReadString());
     IAM_LOGI("end");
 }
 
@@ -518,8 +521,7 @@ void FuzzSendMessage(Parcel &parcel)
 void FuzzGetLocalScheduleFromMessage(Parcel &parcel)
 {
     IAM_LOGI("begin");
-    std::string remoteUdid;
-    FillFuzzString(parcel, remoteUdid);
+    std::string remoteUdid = parcel.ReadString();
     std::vector<uint8_t> msg;
     FillFuzzUint8Vector(parcel, msg);
     ScheduleInfo scheduleInfo;
@@ -534,8 +536,7 @@ void FuzzGetSignedExecutorInfo(Parcel &parcel)
     std::vector<int32_t> authTypes;
     FillFuzzInt32Vector(parcel, authTypes);
     int32_t executorRole = parcel.ReadInt32();
-    std::string remoteUdid;
-    FillFuzzString(parcel, remoteUdid);
+    std::string remoteUdid = parcel.ReadString();
     std::vector<uint8_t> signedExecutorInfo;
     FillFuzzUint8Vector(parcel, signedExecutorInfo);
     g_service.GetSignedExecutorInfo(authTypes, executorRole, remoteUdid, signedExecutorInfo);

@@ -22,7 +22,10 @@
 #include "adaptor_time.h"
 #include "coauth.h"
 #include "ed25519_key.h"
+#include "hmac_key.h"
 #include "idm_database.h"
+#include "udid_manager.h"
+#include "user_sign_centre.h"
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -30,7 +33,7 @@
 #define IAM_STATIC static
 #endif
 
-IAM_STATIC ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv)
+IAM_STATIC ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv, SignParam signParam)
 {
     Buffer data = GetTmpBuffer(dataTlv->data, dataTlv->len, dataTlv->len);
     if (!IsBufferValid(&data)) {
@@ -38,17 +41,16 @@ IAM_STATIC ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTl
         return RESULT_GENERAL_ERROR;
     }
     ResultCode result = RESULT_SUCCESS;
-    Buffer *signData = ExecutorMsgSign(&data);
+    Buffer *signData = NULL;
+    if (signParam.keyType == KEY_TYPE_CROSS_DEVICE) {
+        signData = HmacSign(&data, signParam);
+    } else {
+        signData = ExecutorMsgSign(&data);
+    }
     if (!IsBufferValid(signData)) {
         LOG_ERROR("signData is invalid");
         return RESULT_GENERAL_ERROR;
     }
-    if (signData->contentSize != ED25519_FIX_SIGN_BUFFER_SIZE) {
-        LOG_ERROR("sign data len invalid");
-        result = RESULT_GENERAL_ERROR;
-        goto FAIL;
-    }
-
     if (memcpy_s(signDataTlv->data, signDataTlv->len, signData->buf, signData->contentSize) != EOK) {
         LOG_ERROR("copy sign to signDtaTlv failed");
         result = RESULT_GENERAL_ERROR;
@@ -62,8 +64,8 @@ FAIL:
     return result;
 }
 
-IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
-    Uint8Array *retDataAndSignTlv)
+IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, Uint8Array *retDataAndSignTlv,
+    SignParam signParam)
 {
     Attribute *dataAndSignAttribute = CreateEmptyAttribute();
     Uint8Array dataTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
@@ -81,18 +83,18 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
             break;
         }
 
-        result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, dataTlv);
+        result = SetAttributeUint8Array(dataAndSignAttribute, ATTR_DATA, dataTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("SetAttributeUint8Array for data fail");
             break;
         }
-        if (needSignature) {
-            result = SignData(&dataTlv, &signTlv);
+        if (signParam.needSignature) {
+            result = SignData(&dataTlv, &signTlv, signParam);
             if (result != RESULT_SUCCESS) {
                 LOG_ERROR("SignData fail");
                 break;
             }
-            result = SetAttributeUint8Array(dataAndSignAttribute, AUTH_SIGNATURE, signTlv);
+            result = SetAttributeUint8Array(dataAndSignAttribute, ATTR_SIGNATURE, signTlv);
             if (result != RESULT_SUCCESS) {
                 LOG_ERROR("SetAttributeUint8Array for signature fail");
                 break;
@@ -111,7 +113,7 @@ IAM_STATIC ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, boo
     return result;
 }
 
-ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg)
+ResultCode GetAttributeExecutorMsg(const Attribute *attribute, Uint8Array *retMsg, SignParam signParam)
 {
     IF_TRUE_LOGE_AND_RETURN_VAL(attribute == NULL, RESULT_GENERAL_ERROR);
     IF_TRUE_LOGE_AND_RETURN_VAL(retMsg == NULL, RESULT_GENERAL_ERROR);
@@ -127,12 +129,12 @@ ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignatur
             break;
         }
 
-        result = GetAttributeDataAndSignTlv(attribute, needSignature, &dataAndSignTlv);
+        result = GetAttributeDataAndSignTlv(attribute, &dataAndSignTlv, signParam);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("GetAttributeDataAndSignTlv fail");
             break;
         }
-        result = SetAttributeUint8Array(rootAttribute, AUTH_ROOT, dataAndSignTlv);
+        result = SetAttributeUint8Array(rootAttribute, ATTR_ROOT, dataAndSignTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("SetAttributeUint8Array fail");
             break;
@@ -180,7 +182,8 @@ FAIL:
     return result;
 }
 
-IAM_STATIC ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv)
+IAM_STATIC ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv,
+    SignParam signParam)
 {
     Attribute *dataAttribute = CreateAttributeFromSerializedMsg(dataTlv);
     Uint8Array signTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
@@ -191,22 +194,31 @@ IAM_STATIC ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribu
             LOG_ERROR("dataAttribute or signTlv is null");
             break;
         }
-        result = GetAttributeUint8Array(dataAndSignAttribute, AUTH_SIGNATURE, &signTlv);
+        result = GetAttributeUint8Array(dataAndSignAttribute, ATTR_SIGNATURE, &signTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("GetAttributeUint8Array fail");
             break;
         }
-
-        uint64_t scheduleId;
-        result = GetAttributeUint64(dataAttribute, AUTH_SCHEDULE_ID, &scheduleId);
-        if (result != RESULT_SUCCESS) {
-            LOG_ERROR("GetAttributeUint64 scheduleId fail");
-            break;
-        }
-        result = Ed25519VerifyData(scheduleId, dataTlv, signTlv);
-        if (result != RESULT_SUCCESS) {
-            LOG_ERROR("Ed25519VerifyData fail");
-            break;
+        if (signParam.keyType == KEY_TYPE_CROSS_DEVICE) {
+            Buffer data = GetTmpBuffer(dataTlv.data, dataTlv.len, dataTlv.len);
+            Buffer sign = GetTmpBuffer(signTlv.data, signTlv.len, signTlv.len);
+            result = HmacVerify(&data, &sign, signParam);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("HmacVerify fail");
+                break;
+            }
+        } else {
+            uint64_t scheduleId;
+            result = GetAttributeUint64(dataAttribute, ATTR_SCHEDULE_ID, &scheduleId);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("GetAttributeUint64 scheduleId fail");
+                break;
+            }
+            result = Ed25519VerifyData(scheduleId, dataTlv, signTlv);
+            if (result != RESULT_SUCCESS) {
+                LOG_ERROR("Ed25519VerifyData fail");
+                break;
+            }
         }
     } while (0);
 
@@ -215,7 +227,7 @@ IAM_STATIC ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribu
     return result;
 }
 
-IAM_STATIC Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, bool needVerifySignature)
+IAM_STATIC Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, SignParam signParam)
 {
     Attribute *dataAndSignAttribute = CreateAttributeFromSerializedMsg(dataAndSignTlv);
     Uint8Array dataTlv = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
@@ -226,12 +238,12 @@ IAM_STATIC Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAnd
             LOG_ERROR("dataAndSignAttribute or dataTlv is null");
             break;
         }
-        if (GetAttributeUint8Array(dataAndSignAttribute, AUTH_DATA, &dataTlv) != RESULT_SUCCESS) {
+        if (GetAttributeUint8Array(dataAndSignAttribute, ATTR_DATA, &dataTlv) != RESULT_SUCCESS) {
             LOG_ERROR("GetAttributeUint8Array fail");
             break;
         }
-        if (needVerifySignature) {
-            if (VerifyDataTlvSignature(dataAndSignAttribute, dataTlv) != RESULT_SUCCESS) {
+        if (signParam.needSignature) {
+            if (VerifyDataTlvSignature(dataAndSignAttribute, dataTlv, signParam) != RESULT_SUCCESS) {
                 LOG_ERROR("VerifyDataTlvSignature fail");
                 break;
             }
@@ -248,7 +260,7 @@ IAM_STATIC Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAnd
     return attribute;
 }
 
-IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, bool needVerifySignature)
+IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, SignParam signParam)
 {
     IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(msg), NULL);
 
@@ -262,13 +274,13 @@ IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, bool 
             break;
         }
 
-        ResultCode result = GetAttributeUint8Array(msgAttribute, AUTH_ROOT, &dataAndSignTlv);
+        ResultCode result = GetAttributeUint8Array(msgAttribute, ATTR_ROOT, &dataAndSignTlv);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("GetAttributeUint8Array fail");
             break;
         }
 
-        attribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, needVerifySignature);
+        attribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, signParam);
         if (attribute == NULL) {
             LOG_ERROR("CreateAttributeFromDataAndSignTlv fail");
             break;
@@ -285,7 +297,7 @@ IAM_STATIC void GetRootSecretFromAttribute(const Attribute *attribute, ExecutorR
 {
     Uint8Array array = { Malloc(ROOT_SECRET_LEN), ROOT_SECRET_LEN };
     IF_TRUE_LOGE_AND_RETURN(IS_ARRAY_NULL(array));
-    ResultCode result = GetAttributeUint8Array(attribute, AUTH_ROOT_SECRET, &(array));
+    ResultCode result = GetAttributeUint8Array(attribute, ATTR_ROOT_SECRET, &(array));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("There is no rootSecret in this attribute");
         goto EXIT;
@@ -309,37 +321,37 @@ EXIT:
 IAM_STATIC ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo)
 {
     ResultCode result = RESULT_GENERAL_ERROR;
-    result = GetAttributeInt32(attribute, AUTH_RESULT_CODE, &(resultInfo->result));
+    result = GetAttributeInt32(attribute, ATTR_RESULT_CODE, &(resultInfo->result));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeInt32 result failed");
         return result;
     }
-    result = GetAttributeUint64(attribute, AUTH_TEMPLATE_ID, &(resultInfo->templateId));
+    result = GetAttributeUint64(attribute, ATTR_TEMPLATE_ID, &(resultInfo->templateId));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint64 templateId failed");
         return result;
     }
-    result = GetAttributeUint64(attribute, AUTH_SCHEDULE_ID, &(resultInfo->scheduleId));
+    result = GetAttributeUint64(attribute, ATTR_SCHEDULE_ID, &(resultInfo->scheduleId));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint64 scheduleId failed");
         return result;
     }
-    result = GetAttributeUint64(attribute, AUTH_SUB_TYPE, &(resultInfo->authSubType));
+    result = GetAttributeUint64(attribute, ATTR_PIN_SUB_TYPE, &(resultInfo->authSubType));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint64 authSubType failed");
         return result;
     }
-    result = GetAttributeInt32(attribute, AUTH_REMAIN_COUNT, &(resultInfo->remainTimes));
+    result = GetAttributeInt32(attribute, ATTR_REMAIN_ATTEMPTS, &(resultInfo->remainTimes));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeInt32 remainTimes failed");
         return result;
     }
-    result = GetAttributeInt32(attribute, AUTH_REMAIN_TIME, &(resultInfo->freezingTime));
+    result = GetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, &(resultInfo->freezingTime));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeInt32 freezingTime failed");
         return result;
     }
-    result = GetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, &(resultInfo->capabilityLevel));
+    result = GetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, &(resultInfo->capabilityLevel));
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint32 capabilityLevel failed");
         return result;
@@ -358,7 +370,8 @@ ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv)
     }
 
     Uint8Array msg = { tlv->buf, tlv->contentSize };
-    Attribute *attribute = CreateAttributeFromExecutorMsg(msg, true);
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    Attribute *attribute = CreateAttributeFromExecutorMsg(msg, signParam);
     if (attribute == NULL) {
         LOG_ERROR("CreateAttributeFromExecutorMsg failed");
         return NULL;
@@ -375,7 +388,7 @@ ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv)
     if (GetExecutorResultInfoFromAttribute(attribute, result) != RESULT_SUCCESS) {
         LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
         FreeAttribute(&attribute);
-        DestoryExecutorResultInfo(result);
+        DestroyExecutorResultInfo(result);
         return NULL;
     }
 
@@ -383,7 +396,7 @@ ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv)
     return result;
 }
 
-void DestoryExecutorResultInfo(ExecutorResultInfo *result)
+void DestroyExecutorResultInfo(ExecutorResultInfo *result)
 {
     if (result == NULL) {
         return;
@@ -397,24 +410,24 @@ void DestoryExecutorResultInfo(ExecutorResultInfo *result)
 IAM_STATIC ResultCode SetExecutorMsgToAttribute(uint32_t authType, uint32_t authPropertyMode,
     const Uint64Array *templateIds, Attribute *attribute)
 {
-    ResultCode result = SetAttributeUint32(attribute, AUTH_PROPERTY_MODE, authPropertyMode);
+    ResultCode result = SetAttributeUint32(attribute, ATTR_PROPERTY_MODE, authPropertyMode);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint32 propertyMode failed");
         return RESULT_GENERAL_ERROR;
     }
-    result = SetAttributeUint32(attribute, AUTH_TYPE, authType);
+    result = SetAttributeUint32(attribute, ATTR_TYPE, authType);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint32 authType failed");
         return RESULT_GENERAL_ERROR;
     }
     Uint64Array templateIdsIn = { templateIds->data, templateIds->len };
-    result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, templateIdsIn);
+    result = SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, templateIdsIn);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint64Array templateIdsIn failed");
         return RESULT_GENERAL_ERROR;
     }
     uint64_t time = GetSystemTime();
-    result = SetAttributeUint64(attribute, AUTH_TIME_STAMP, time);
+    result = SetAttributeUint64(attribute, ATTR_TIME_STAMP, time);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("SetAttributeUint64 time failed");
         return RESULT_GENERAL_ERROR;
@@ -445,9 +458,11 @@ IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMod
     }
 
     if (authPropertyMode == PROPERTY_MODE_UNFREEZE) {
-        result = GetAttributeExecutorMsg(attribute, true, &retInfo);
+        SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+        result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
     } else {
-        result = GetAttributeExecutorMsg(attribute, false, &retInfo);
+        SignParam signParam = { .needSignature = false };
+        result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
     }
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeExecutorMsg failed");
@@ -619,4 +634,509 @@ ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedL
         *executorMsg = NULL;
     }
     return ret;
+}
+
+IAM_STATIC ResultCode GetExecutorInfoHalFromAttribute(const Attribute *attribute, ExecutorInfoHal *resultInfo)
+{
+    ResultCode result = RESULT_GENERAL_ERROR;
+    result = GetAttributeUint64(attribute, ATTR_EXECUTOR_INDEX, &(resultInfo->executorIndex));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint64 executorIndex failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, ATTR_TYPE, &(resultInfo->authType));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 authType failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, ATTR_EXECUTOR_ROLE, &(resultInfo->executorRole));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 executorRole failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, ATTR_ESL, &(resultInfo->esl));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 esl failed");
+        return result;
+    }
+    Uint8Array pubKeyTlv = {resultInfo->pubKey, PUBLIC_KEY_LEN };
+    result = GetAttributeUint8Array(attribute, ATTR_PUBLIC_KEY, &pubKeyTlv);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array pubKey fail");
+        return result;
+    }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetExecutorInfoHal(Uint8Array tlv, ExecutorInfoHal *executorInfo)
+{
+    Attribute *attribute = CreateAttributeFromSerializedMsg(tlv);
+    if (attribute == NULL) {
+        LOG_ERROR("CreateAttributeFromSerializedMsg fail");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    ResultCode result = GetExecutorInfoHalFromAttribute(attribute, executorInfo);
+    FreeAttribute(&attribute);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetAuthAttrsFromAttribute(const Attribute *attribute, Uint8Array *authAttrs)
+{
+    ResultCode result = GetAttributeUint8Array(attribute, ATTR_ATTRS, authAttrs);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array authAttrs fail");
+    }
+    return result;
+}
+
+IAM_STATIC ResultCode GetRemoteExecutorInfoInner(Attribute *attribute, Uint8Array *authAttrs, Uint8Array *subMsgs,
+    int *subMsgSize)
+{
+    if (GetAuthAttrsFromAttribute(attribute, authAttrs) != RESULT_SUCCESS) {
+        LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    if (ParseMultiDataSerializedMsg(*authAttrs, subMsgs, subMsgSize) != RESULT_SUCCESS) {
+        LOG_ERROR("ParseMultiDataSerializedMsg failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetRemoteExecutorInfo(const Buffer *msg, Uint8Array peerUdid, Uint8Array *subMsgs, int *subMsgSize)
+{
+    Uint8Array msgArray = { msg->buf, msg->contentSize };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid = peerUdid};
+    Attribute *attribute = CreateAttributeFromExecutorMsg(msgArray, signParam);
+    Uint8Array authAttrs = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    if (attribute == NULL || authAttrs.data == NULL) {
+        LOG_ERROR("CreateAttributeFromExecutorMsg or malloc failed");
+        FreeAttribute(&attribute);
+        Free(authAttrs.data);
+        return RESULT_GENERAL_ERROR;
+    }
+
+    ResultCode result = GetRemoteExecutorInfoInner(attribute, &authAttrs, subMsgs, subMsgSize);
+
+    FreeAttribute(&attribute);
+    Free(authAttrs.data);
+    return result;
+}
+
+static bool CheckRemoteExecutorInfoInner(Uint8Array *subMsgs, int subMsgSize, ExecutorInfoHal *infoToCheck)
+{
+    for (int i = 0; i < subMsgSize; i++) {
+        Uint8Array array = subMsgs[i];
+        ExecutorInfoHal executorInfo = {};
+        ResultCode result = GetExecutorInfoHal(array, &executorInfo);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("GetExecutorInfoHal failed");
+            return false;
+        }
+        if ((executorInfo.authType == infoToCheck->authType)
+            && (executorInfo.executorRole == infoToCheck->executorRole)
+            && (executorInfo.esl == infoToCheck->esl)
+            && (memcmp(executorInfo.pubKey, infoToCheck->pubKey, PUBLIC_KEY_LEN) == 0)) {
+            return true;
+        }
+    }
+    LOG_ERROR("no matching executor info found");
+    return false;
+}
+
+bool CheckRemoteExecutorInfo(const Buffer *msg, ExecutorInfoHal *infoToCheck)
+{
+    if (!IsBufferValid(msg) || (infoToCheck == NULL)) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
+    }
+    int subMsgSize = 0;
+    Uint8Array peerUdid = { infoToCheck->deviceUdid, sizeof(infoToCheck->deviceUdid) };
+    Uint8Array subMsgs[MAX_SUB_MSG_NUM] = {0};
+    subMsgSize = MAX_SUB_MSG_NUM;
+    ResultCode result = GetRemoteExecutorInfo(msg, peerUdid, &subMsgs[0], &subMsgSize);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetRemoteExecutorInfo failed");
+        return false;
+    }
+
+    bool checkPass = CheckRemoteExecutorInfoInner(subMsgs, subMsgSize, infoToCheck);
+
+    for (int i = 0; i < MAX_SUB_MSG_NUM; i++) {
+        Free(subMsgs[i].data);
+    }
+
+    return checkPass;
+}
+
+IAM_STATIC ResultCode SetExecutorCollectMsgToAttribute(ScheduleInfoParam *scheduleInfo, const Uint8Array *publicKey, const Uint8Array challenge, Attribute *attribute)
+{
+    Uint8Array localUdid = { scheduleInfo->localUdid, sizeof(scheduleInfo->localUdid) };
+    Uint8Array remoteUdid = { scheduleInfo->remoteUdid, sizeof(scheduleInfo->remoteUdid) };
+
+    ResultCode result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleInfo->scheduleId);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint64 scheduleId failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    result = SetAttributeUint8Array(attribute, ATTR_LOCAL_UDID, localUdid);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for localUdid fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint8Array(attribute, ATTR_PEER_UDID, remoteUdid);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for peerUdid fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    Uint8Array publicKeyIn = { publicKey->data, publicKey->len };
+    result = SetAttributeUint8Array(attribute, ATTR_PUBLIC_KEY, publicKeyIn);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for publicKey fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint8Array(attribute, ATTR_CHALLENGE, challenge);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for challenge fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC Buffer *CreateExecutorCollectMsg(const Attribute *attributeSchedule, ScheduleInfoParam *scheduleInfo)
+{
+    uint8_t publicKeyData[PUBLIC_KEY_LEN] = {};
+    Uint8Array publicKey = { publicKeyData, PUBLIC_KEY_LEN };
+    ResultCode result = GetAttributeUint8Array(attributeSchedule, ATTR_PUBLIC_KEY, &publicKey);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array publicKey fail");
+        return NULL;
+    }
+
+    uint8_t challengeData[CHALLENGE_LEN] = {};
+    Uint8Array challenge = { challengeData, CHALLENGE_LEN };
+    ResultCode getChallengeRet = GetAttributeUint8Array(attributeSchedule, ATTR_CHALLENGE, &challenge);
+    if (getChallengeRet != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array challenge fail");
+        return NULL;
+    }
+
+    Buffer *retBuffer = NULL;
+    Attribute *attribute = CreateEmptyAttribute();
+    Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    if (attribute == NULL || IS_ARRAY_NULL(retInfo)) {
+        LOG_ERROR("generate attribute or retInfo or localUdid or remoteUdid failed");
+        goto FAIL;
+    }
+    result = SetExecutorCollectMsgToAttribute(scheduleInfo, &publicKey, challenge, attribute);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg to attribute failed");
+        goto FAIL;
+    }
+
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeExecutorMsg failed");
+        goto FAIL;
+    }
+
+    retBuffer = CreateBufferByData(retInfo.data, retInfo.len);
+    if (!IsBufferValid(retBuffer)) {
+        LOG_ERROR("generate result buffer failed");
+        goto FAIL;
+    }
+    LOG_INFO("CreateExecutorMsg success");
+
+FAIL:
+    FreeAttribute(&attribute);
+    Free(retInfo.data);
+    return retBuffer;
+}
+
+static ResultCode GetExecutorIndexByCondition(uint32_t authType, uint32_t executorMatcher,
+    Uint8Array deviceUdid, uint32_t executorRole, uint64_t *executorIndex)
+{
+    ExecutorCondition condition = {};
+    SetExecutorConditionAuthType(&condition, authType);
+    SetExecutorConditionExecutorMatcher(&condition, executorMatcher);
+    SetExecutorConditionExecutorRole(&condition, executorRole);
+    SetExecutorConditionDeviceUdid(&condition, deviceUdid);
+
+    LinkedList *executorList = QueryExecutor(&condition);
+    if (executorList == NULL) {
+        LOG_ERROR("query executor failed");
+        return RESULT_UNKNOWN;
+    }
+
+    if (executorList->getSize(executorList) != 1) {
+        LOG_ERROR("executor list len is invalid");
+        DestroyLinkedList(executorList);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
+
+    LinkedListNode *temp = executorList->head;
+    ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
+    if (executorInfo == NULL) {
+        LOG_ERROR("executorInfo is invalid");
+        DestroyLinkedList(executorList);
+        return RESULT_UNKNOWN;
+    }
+
+    *executorIndex = executorInfo->executorIndex;
+    DestroyLinkedList(executorList);
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, ScheduleInfoParam *scheduleInfo)
+{
+    ResultCode result = GetAttributeUint64(attribute, ATTR_SCHEDULE_ID, &(scheduleInfo->scheduleId));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint64 scheduleId failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, ATTR_TYPE, &(scheduleInfo->authType));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 authType failed");
+        return result;
+    }
+    result = GetAttributeUint32(attribute, ATTR_EXECUTOR_MATCHER, &(scheduleInfo->executorMatcher));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 executorMatcher failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, ATTR_SCHEDULE_MODE, &(scheduleInfo->scheduleMode));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 scheduleMode failed");
+        return result;
+    }
+    uint32_t executorRole;
+    result = GetAttributeUint32(attribute, ATTR_EXECUTOR_ROLE, &executorRole);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 scheduleMode failed");
+        return result;
+    }
+
+    Uint8Array remoteUdid = { scheduleInfo->remoteUdid, UDID_LEN };
+    result = GetAttributeUint8Array(attribute, ATTR_VERIFIER_UDID, &remoteUdid);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array remoteUdid failed");
+        return result;
+    }
+
+    Uint8Array collectorUdid = { scheduleInfo->localUdid, UDID_LEN };
+    result = GetAttributeUint8Array(attribute, ATTR_COLLECTOR_UDID, &collectorUdid);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array localUdid failed");
+        return result;
+    }
+
+    if (!IsLocalUdid(collectorUdid)) {
+        LOG_ERROR("collector udid is not local udid");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    result = GetExecutorIndexByCondition(scheduleInfo->authType, scheduleInfo->executorMatcher,
+        collectorUdid, executorRole, &scheduleInfo->executorIndex);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetExecutorIndex failed");
+        return result;
+    }
+
+    Buffer *executorMsg = CreateExecutorCollectMsg(attribute, scheduleInfo);
+    if (!IsBufferValid(executorMsg)) {
+        LOG_ERROR("executorMsg is invalid");
+        return RESULT_GENERAL_ERROR;
+    }
+    scheduleInfo->executorMessages = CopyBuffer(executorMsg);
+    if (!IsBufferValid(scheduleInfo->executorMessages))
+    {
+        LOG_ERROR("CopyBuffer executorMsg failed");
+        result = RESULT_GENERAL_ERROR;
+    }
+    DestoryBuffer(executorMsg);
+    return result;
+}
+
+ResultCode CreateScheduleInfo(const Buffer *tlv, Uint8Array peerUdid, ScheduleInfoParam *scheduleInfo)
+{
+    if (!IsBufferValid(tlv) || (scheduleInfo == NULL)) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
+    }
+
+    Uint8Array msg = { tlv->buf, tlv->contentSize };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid =  peerUdid };
+    Attribute *attribute = CreateAttributeFromExecutorMsg(msg, signParam);
+    if (attribute == NULL) {
+        LOG_ERROR("CreateAttributeFromExecutorMsg failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    ResultCode result = GetScheduleInfoFromAttribute(attribute, scheduleInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetScheduleInfoFromAttribute failed");
+    }
+    FreeAttribute(&attribute);
+    return result;
+}
+
+IAM_STATIC ResultCode GetAuthResultInfoFromAttribute(const Attribute *attribute, AuthResultParam *authResultInfo)
+{
+    ResultCode result = GetAttributeInt32(attribute, ATTR_RESULT, &(authResultInfo->result));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 result failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, &(authResultInfo->lockoutDuration));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 lockoutDuration failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, ATTR_REMAIN_ATTEMPTS, &(authResultInfo->remainAttempts));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 remainAttempts failed");
+        return result;
+    }
+    result = GetAttributeInt32(attribute, ATTR_USER_ID, &(authResultInfo->userId));
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeInt32 userId failed");
+        return result;
+    }
+
+    uint8_t tokenData[AUTH_TOKEN_LEN] = {};
+    Uint8Array tokenArray = { tokenData, AUTH_TOKEN_LEN };
+    result = GetAttributeUint8Array(attribute, ATTR_TOKEN, &tokenArray);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint8Array token fail");
+        return result;
+    }
+    authResultInfo->token = CreateBufferByData(tokenArray.data, tokenArray.len);
+    return RESULT_SUCCESS;
+}
+
+ResultCode CreateAuthResultInfo(const Buffer *tlv, AuthResultParam *authResultInfo)
+{
+    if (!IsBufferValid(tlv) || (authResultInfo == NULL)) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
+    }
+
+    Uint8Array msg = { tlv->buf, tlv->contentSize };
+    Uint8Array peerUdid = { .data = authResultInfo->remoteUdid, .len = UDID_LEN };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid = peerUdid };
+    Attribute *attribute = CreateAttributeFromExecutorMsg(msg, signParam);
+    if (attribute == NULL) {
+        LOG_ERROR("CreateAttributeFromExecutorMsg failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    ResultCode result = GetAuthResultInfoFromAttribute(attribute, authResultInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAuthResultInfoFromAttribute failed");
+    }
+    FreeAttribute(&attribute);
+    return result;
+}
+
+IAM_STATIC ResultCode SetExecutorInfoMsgToAttribute(ExecutorInfoHal *executorInfo, Attribute *attribute)
+{
+    ResultCode result = SetAttributeUint64(attribute, ATTR_EXECUTOR_INDEX, executorInfo->executorIndex);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint64 executorIndex failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint32(attribute, ATTR_TYPE, executorInfo->authType);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 authType failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint32(attribute, ATTR_EXECUTOR_ROLE, executorInfo->executorRole);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 executorRole failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetAttributeUint32(attribute, ATTR_ESL, executorInfo->esl);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint32 esl failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    Uint8Array publicKeyIn = { executorInfo->pubKey, PUBLIC_KEY_LEN };
+    result = SetAttributeUint8Array(attribute, ATTR_PUBLIC_KEY, publicKeyIn);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for pubKey fail");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetExecutorInfoMsg(ExecutorInfoHal *executorInfo, Uint8Array *retMsg)
+{
+    ResultCode result = RESULT_GENERAL_ERROR;
+    Attribute *attribute = CreateEmptyAttribute();
+    if (attribute == NULL) {
+        LOG_ERROR("generate attribute or retInfo failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    result = SetExecutorInfoMsgToAttribute(executorInfo, attribute);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("set msg to attribute failed");
+        goto FAIL;
+    }
+    result = GetAttributeSerializedMsg(attribute, retMsg);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeSerializedMsg fail");
+        goto FAIL;
+    }
+
+FAIL:
+    FreeAttribute(&attribute);
+    return result;
+}
+
+Buffer *GetExecutorInfoTlv(Uint8Array attrsTlv, Uint8Array peerUdid)
+{
+    if (IS_ARRAY_NULL(attrsTlv)) {
+        LOG_ERROR("attrsTlv is NULL");
+        return NULL;
+    }
+
+    Buffer *retBuffer = NULL;
+    Attribute *attribute = CreateEmptyAttribute();
+    Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    if (attribute == NULL || IS_ARRAY_NULL(retInfo)) {
+        LOG_ERROR("attribute or retInfo is NULL");
+        goto FAIL;
+    }
+    ResultCode result = SetAttributeUint8Array(attribute, ATTR_ATTRS, attrsTlv);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for attrs fail");
+        goto FAIL;
+    }
+
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_CROSS_DEVICE, .peerUdid = peerUdid };
+    result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeExecutorMsg failed");
+        goto FAIL;
+    }
+
+    retBuffer = CreateBufferByData(retInfo.data, retInfo.len);
+    if (!IsBufferValid(retBuffer)) {
+        LOG_ERROR("generate result buffer failed");
+        goto FAIL;
+    }
+    LOG_INFO("CreateExecutorMsg success");
+
+FAIL:
+    FreeAttribute(&attribute);
+    Free(retInfo.data);
+    return retBuffer;
 }

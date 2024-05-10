@@ -21,6 +21,7 @@
 #include "auth_level.h"
 #include "coauth.h"
 #include "idm_database.h"
+#include "udid_manager.h"
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -77,11 +78,27 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
     context->scheduleList = CreateLinkedList(DestroyScheduleNode);
     context->isAuthResultCached = params.isAuthResultCached;
     context->isExpiredReturnSuccess = params.isExpiredReturnSuccess;
+
+    if (memcpy_s(context->localUdid, sizeof(context->localUdid), params.localUdid,
+        sizeof(params.localUdid)) != EOK) {
+        LOG_ERROR("localUdid copy failed");
+        Free(context);
+        return NULL;
+    }
+
+    if (memcpy_s(context->collectorUdid, sizeof(context->collectorUdid), params.collectorUdid,
+        sizeof(params.collectorUdid)) != EOK) {
+        LOG_ERROR("collectorUdid copy failed");
+        Free(context);
+        return NULL;
+    }
+
     if (context->scheduleList == NULL) {
         LOG_ERROR("schedule list create failed");
         Free(context);
         return NULL;
     }
+
     return context;
 }
 
@@ -161,6 +178,14 @@ IAM_STATIC ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoA
     scheduleParam.collectorSensorHint = context->collectorSensorHint;
     scheduleParam.verifierSensorHint = context->collectorSensorHint;
     scheduleParam.scheduleMode = SCHEDULE_MODE_IDENTIFY;
+    Uint8Array localUdid = { scheduleParam.localUdid, UDID_LEN };
+    bool getLocalUdidRet = GetLocalUdid(&localUdid);
+    Uint8Array collectorUdid = { scheduleParam.collectorUdid, UDID_LEN };
+    bool getCollectorUdidRet = GetLocalUdid(&collectorUdid);
+    if (!getLocalUdidRet || !getCollectorUdidRet) {
+        LOG_ERROR("get udid failed");
+        return RESULT_GENERAL_ERROR;
+    }
     *schedule = GenerateSchedule(&scheduleParam);
     if (*schedule == NULL) {
         LOG_ERROR("GenerateSchedule failed");
@@ -268,15 +293,18 @@ IAM_STATIC ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_
         LOG_ERROR("authMode is invalid");
         return result;
     }
+
     if (result != RESULT_SUCCESS) {
         LOG_INFO("create schedule fail %{public}d", result);
         return result;
     }
+
     if (AddCoAuthSchedule(schedule) != RESULT_SUCCESS) {
         LOG_ERROR("AddCoAuthSchedule failed");
         DestroyCoAuthSchedule(schedule);
         return RESULT_UNKNOWN;
     }
+
     if (InsertScheduleToContext(schedule, context) != RESULT_SUCCESS) {
         RemoveCoAuthSchedule(schedule->scheduleId);
         DestroyCoAuthSchedule(schedule);
@@ -388,6 +416,17 @@ IAM_STATIC ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedul
     scheduleParam.templateIds = &templateIds;
     scheduleParam.executorMatcher = executorMatcher;
     scheduleParam.scheduleMode = SCHEDULE_MODE_AUTH;
+    if (memcpy_s(scheduleParam.localUdid, sizeof(scheduleParam.localUdid), context->localUdid,
+        sizeof(context->localUdid)) != EOK) {
+        LOG_ERROR("localUdid copy failed");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (memcpy_s(scheduleParam.collectorUdid, sizeof(scheduleParam.collectorUdid), context->collectorUdid,
+        sizeof(context->collectorUdid)) != EOK) {
+        LOG_ERROR("collectorUdid copy failed");
+        return RESULT_GENERAL_ERROR;
+    }
     *schedule = GenerateSchedule(&scheduleParam);
     if (*schedule == NULL) {
         LOG_ERROR("schedule is null");
@@ -504,7 +543,7 @@ IAM_STATIC bool MatchContextSelf(const void *data, const void *condition)
     return data == condition;
 }
 
-void DestoryContext(UserAuthContext *context)
+void DestroyContext(UserAuthContext *context)
 {
     if (context == NULL) {
         LOG_ERROR("context is null");
@@ -542,14 +581,14 @@ IAM_STATIC void DestroyContextNode(void *data)
     Free(data);
 }
 
-ResultCode DestoryContextbyId(uint64_t contextId)
+ResultCode DestroyContextbyId(uint64_t contextId)
 {
     UserAuthContext *authContext = GetContext(contextId);
     if (authContext == NULL) {
         LOG_ERROR("get context failed");
         return RESULT_NOT_FOUND;
     }
-    DestoryContext(authContext);
+    DestroyContext(authContext);
     return RESULT_SUCCESS;
 }
 
@@ -632,11 +671,11 @@ ResultCode FillInContext(UserAuthContext *context, uint64_t *credentialId, Execu
         return ret;
     }
     ret = RESULT_UNKNOWN;
-    uint32_t veriferSensorHint = GetScheduleVeriferSensorHint(schedule);
+    uint32_t verifierSensorHint = GetScheduleVerifierSensorHint(schedule);
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, context->authType);
     SetCredentialConditionTemplateId(&condition, info->templateId);
-    SetCredentialConditionExecutorSensorHint(&condition, veriferSensorHint);
+    SetCredentialConditionExecutorSensorHint(&condition, verifierSensorHint);
     LinkedList *credList = QueryCredentialLimit(&condition);
     if (credList == NULL || credList->getSize(credList) != 1) {
         LOG_ERROR("query credential failed");

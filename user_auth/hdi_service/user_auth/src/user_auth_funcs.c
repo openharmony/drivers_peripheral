@@ -24,8 +24,10 @@
 #include "adaptor_time.h"
 #include "context_manager.h"
 #include "executor_message.h"
+#include "hmac_key.h"
 #include "idm_database.h"
 #include "idm_session.h"
+#include "udid_manager.h"
 #include "user_sign_centre.h"
 
 #ifdef IAM_TEST_ENABLE
@@ -62,7 +64,7 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
     }
     ResultCode ret = CopySchedules(authContext, schedules);
     if (ret != RESULT_SUCCESS) {
-        DestoryContext(authContext);
+        DestroyContext(authContext);
         return ret;
     }
     return ret;
@@ -124,7 +126,12 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         result->credentialDigest = enrolledState.credentialDigest;
         result->credentialCount = enrolledState.credentialCount;
     }
-    if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH) {
+    if (context->isAuthResultCached) {
+        LOG_INFO("cache unlock auth result");
+        CacheUnlockAuthResult(context->userId, authToken);
+    }
+    if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH &&
+        memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
         result->rootSecret = CopyBuffer(info->rootSecret);
         if (!IsBufferValid(result->rootSecret)) {
             LOG_ERROR("rootSecret is invalid");
@@ -144,12 +151,79 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC ResultCode SetAuthResultMsgToAttribute(Attribute *attribute, AuthResult *result,
+    uint64_t scheduleId, Uint8Array authToken)
+{
+    ResultCode ret = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint64 scheduleId failed");
+        return ret;
+    }
+    ret = SetAttributeInt32(attribute, ATTR_RESULT, result->result);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 result failed");
+        return ret;
+    }
+    // todo AUTH_NEXT_LOCKOUT_DURATION
+    ret = SetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, result->freezingTime);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 freezingTime failed");
+        return ret;
+    }
+    ret = SetAttributeInt32(attribute, ATTR_REMAIN_ATTEMPTS, result->remainTimes);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 remainTimes failed");
+        return ret;
+    }
+    ret = SetAttributeInt32(attribute, ATTR_USER_ID, result->userId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeInt32 userId failed");
+        return ret;
+    }
+    ret = SetAttributeUint8Array(attribute, ATTR_TOKEN, authToken);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("SetAttributeUint8Array for authToken fail");
+    }
+    return ret;
+}
+
+IAM_STATIC ResultCode GenerateRemoteAuthResultMsg(AuthResult *result, uint64_t scheduleId, Uint8Array collectorUdid,
+    UserAuthTokenHal *authToken)
+{
+    Attribute *attribute = CreateEmptyAttribute();
+    IF_TRUE_LOGE_AND_RETURN_VAL(attribute == NULL, RESULT_GENERAL_ERROR);
+
+    ResultCode ret = RESULT_GENERAL_ERROR;
+    do {
+        Uint8Array authTokenIn = { (uint8_t *)(&authToken), sizeof(UserAuthTokenHal) };
+        if (SetAuthResultMsgToAttribute(attribute, result, scheduleId, authTokenIn) != RESULT_SUCCESS) {
+            LOG_ERROR("SetAuthResultMsgToAttribute failed");
+            break;
+        }
+        Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+        SignParam signParam = {
+            .needSignature = true,
+            .keyType = KEY_TYPE_CROSS_DEVICE,
+            .peerUdid = collectorUdid
+        };
+        if (GetAttributeExecutorMsg(attribute, &retInfo, signParam) != RESULT_SUCCESS) {
+            LOG_ERROR("GetAttributeExecutorMsg failed");
+            break;
+        }
+        result->remoteAuthResultMsg = CreateBufferByData(retInfo.data, retInfo.len);
+        ret = RESULT_SUCCESS;
+    } while (0);
+
+    FreeAttribute(&attribute);
+    return ret;
+}
+
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result)
 {
     if (!IsBufferValid(scheduleResult) || authToken == NULL || result == NULL || result->rootSecret != NULL) {
         LOG_ERROR("param is invalid");
-        DestoryContextbyId(contextId);
+        DestroyContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
 
@@ -162,38 +236,47 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
     if (executorResultInfo == NULL) {
         LOG_ERROR("CreateExecutorResultInfo fail");
-        DestoryContext(userAuthContext);
+        DestroyContext(userAuthContext);
         return RESULT_GENERAL_ERROR;
     }
 
-    ResultCode ret = RESULT_GENERAL_ERROR;
-    if (executorResultInfo->result != RESULT_SUCCESS) {
-        ret = RESULT_SUCCESS;
-        LOG_ERROR("executor result is not success, result:%{public}d", executorResultInfo->result);
-        goto EXIT;
-    }
 
     uint64_t credentialId;
-    ret = FillInContext(userAuthContext, &credentialId, executorResultInfo, SCHEDULE_MODE_AUTH);
+    ResultCode ret = FillInContext(userAuthContext, &credentialId, executorResultInfo, SCHEDULE_MODE_AUTH);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("FillInContext fail");
         goto EXIT;
     }
 
-    ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("sign token failed");
-        goto EXIT;
+    if (executorResultInfo->result == RESULT_SUCCESS) {
+        ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("sign token failed");
+            goto EXIT;
+        }
     }
-    ret = HandleAuthSuccessResult(userAuthContext, executorResultInfo, result, authToken);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("handle auth success result failed");
+
+    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
+    Uint8Array collectorUdid = { userAuthContext->collectorUdid, sizeof(userAuthContext->collectorUdid) };
+    if (!IsLocalUdid(collectorUdid)) {
+        ret = GenerateRemoteAuthResultMsg(result, executorResultInfo->scheduleId, collectorUdid, authToken);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("generate remote auth result failed");
+            goto EXIT;
+        }
+    }
+
+    if (executorResultInfo->result == RESULT_SUCCESS) {
+        ret = HandleAuthSuccessResult(userAuthContext, executorResultInfo, result, authToken);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("handle auth success result failed");
+            goto EXIT;
+        }
     }
 
 EXIT:
-    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
-    DestoryExecutorResultInfo(executorResultInfo);
-    DestoryContext(userAuthContext);
+    DestroyExecutorResultInfo(executorResultInfo);
+    DestroyContext(userAuthContext);
     return ret;
 }
 
@@ -217,7 +300,7 @@ IAM_STATIC ResultCode CheckReuseUnlockTokenValid(const ReuseUnlockParamHal *info
     if ((g_unlockAuthResult.authToken.tokenDataPlain.authMode != SCHEDULE_MODE_AUTH)
         || (g_unlockAuthResult.authToken.tokenDataPlain.tokenType != TOKEN_TYPE_LOCAL_AUTH)) {
         LOG_ERROR("need local auth");
-        return RESULT_GENERAL_ERROR;
+        return RESULT_VERIFY_TOKEN_FAIL;
     }
     uint64_t time = GetSystemTime();
     if (time < g_unlockAuthResult.authToken.tokenDataPlain.time) {
@@ -365,4 +448,152 @@ void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrust
     }
     (*checkResult) = RESULT_SUCCESS;
     return;
+}
+
+ResultCode GenerateScheduleFunc(const Buffer *tlv, Uint8Array remoteUdid, ScheduleInfoParam *scheduleInfo)
+{
+    if (!IsBufferValid(tlv) || (scheduleInfo == NULL)) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
+    }
+    ResultCode result = CreateScheduleInfo(tlv, remoteUdid, scheduleInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("CreateScheduleInfo failed");
+    }
+    return result;
+}
+
+ResultCode GenerateAuthResultFunc(const Buffer *tlv, AuthResultParam *authResultInfo)
+{
+    if (!IsBufferValid(tlv) || (authResultInfo == NULL)) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
+    }
+    ResultCode result = CreateAuthResultInfo(tlv, authResultInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("CreateAuthResultInfo failed");
+    }
+    return result;
+}
+
+ResultCode GetExecutorInfoLinkedList(uint32_t authType, uint32_t executorRole, LinkedList *allExecutorInfoList)
+{
+    uint8_t localUdidData[UDID_LEN] = { 0 };
+    Uint8Array localUdid = { localUdidData, UDID_LEN };
+    bool getLocalUdidRet = GetLocalUdid(&localUdid);
+    IF_TRUE_LOGE_AND_RETURN_VAL(!getLocalUdidRet, RESULT_GENERAL_ERROR);
+
+    ExecutorCondition condition = {};
+    SetExecutorConditionAuthType(&condition, authType);
+    SetExecutorConditionExecutorRole(&condition, executorRole);
+    SetExecutorConditionDeviceUdid(&condition, localUdid);
+
+    LinkedList *executorList = QueryExecutor(&condition);
+    if (executorList == NULL) {
+        LOG_ERROR("query executor failed");
+        return RESULT_UNKNOWN;
+    }
+    if (executorList->getSize(executorList) == 0) {
+        LOG_ERROR("executor is not found");
+        DestroyLinkedList(executorList);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
+    LinkedListNode *temp = executorList->head;
+    while (temp != NULL) {
+        ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
+        if (executorInfo == NULL) {
+            LOG_ERROR("executorInfo is invalid");
+            DestroyLinkedList(executorList);
+            return RESULT_UNKNOWN;
+        }
+        ExecutorInfoHal *copiedExecutorInfo = CopyExecutorInfo(executorInfo);
+        if (executorInfo == NULL) {
+            LOG_ERROR("copiedExecutorInfo is invalid");
+            DestroyLinkedList(executorList);
+            return RESULT_UNKNOWN;
+        }
+        if (allExecutorInfoList->insert(allExecutorInfoList, copiedExecutorInfo) != RESULT_SUCCESS) {
+            LOG_ERROR("insert executor info failed");
+            DestroyLinkedList(executorList);
+            return RESULT_GENERAL_ERROR;
+        }
+        temp = temp->next;
+    }
+    DestroyLinkedList(executorList);
+    return RESULT_SUCCESS;
+}
+
+static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *executorList, Uint8Array executorInfoTlvMsg,
+    Uint8Array *executorInfoArray)
+{
+    LinkedListNode *temp = executorList->head;
+    uint32_t index = 0;
+    while (temp != NULL) {
+        ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
+        if (executorInfo == NULL) {
+            LOG_ERROR("executorInfo is invalid");
+            return NULL;
+        }
+        ResultCode result = GetExecutorInfoMsg(executorInfo, &executorInfoArray[index]);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("get executor info msg fail");
+            return NULL;
+        }
+        index++;
+        temp = temp->next;
+    }
+    ResultCode result = GetMultiDataSerializedMsg(executorInfoArray, executorList->size, &executorInfoTlvMsg);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetMultiDataSerializedMsg failed");
+        return NULL;
+    }
+    return GetExecutorInfoTlv(executorInfoTlvMsg, peerUdid);
+}
+
+Buffer *GetSignExecutorInfoFunc(Uint8Array peerUdid, LinkedList *executorList)
+{
+    if (executorList == NULL) {
+        LOG_ERROR("executorList is null");
+        return NULL;
+    }
+    if (executorList->getSize(executorList) == 0) {
+        LOG_ERROR("executor is unregistered");
+        return NULL;
+    }
+
+    Uint8Array executorInfoTlvMsg = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    IF_TRUE_LOGE_AND_RETURN_VAL(executorInfoTlvMsg.data == NULL, NULL);
+
+    Uint8Array executorInfoArray[executorList->size];
+    bool mallocOk = true;
+    for (uint32_t i = 0; i < executorList->size; i++) {
+        executorInfoArray[i] = (Uint8Array){ Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+        if (executorInfoArray[i].data == NULL) {
+            LOG_ERROR("malloc fail");
+            mallocOk = false;
+            continue;
+        }
+    }
+
+    Buffer *signedExecutorInfo = NULL;
+    if (mallocOk) {
+        signedExecutorInfo = GetSignExecutorInfoFuncInner(peerUdid, executorList, executorInfoTlvMsg, executorInfoArray);
+    }
+
+    Free(executorInfoTlvMsg.data);
+    for (uint32_t i = 0; i < executorList->size; i++) {
+        Free(executorInfoArray[i].data);
+    }
+
+    return signedExecutorInfo;
+}
+
+void DestroyAuthResult(AuthResult *authResult)
+{
+    if (authResult == NULL) {
+        return;
+    }
+    DestoryBuffer(authResult->rootSecret);
+    DestoryBuffer(authResult->remoteAuthResultMsg);
+    (void)memset_s(authResult, sizeof(AuthResult), 0, sizeof(AuthResult));
 }

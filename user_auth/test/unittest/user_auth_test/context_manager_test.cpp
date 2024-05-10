@@ -253,12 +253,12 @@ HWTEST_F(ContextManagerTest, TestScheduleOnceFinish, TestSize.Level0)
     EXPECT_EQ(ScheduleOnceFinish(&context, scheduleId), RESULT_BAD_PARAM);
 }
 
-HWTEST_F(ContextManagerTest, TestDestoryContext, TestSize.Level0)
+HWTEST_F(ContextManagerTest, TestDestroyContext, TestSize.Level0)
 {
-    DestoryContext(nullptr);
+    DestroyContext(nullptr);
     UserAuthContext *context = nullptr;
     g_contextList = nullptr;
-    DestoryContext(context);
+    DestroyContext(context);
 
     g_contextList = CreateLinkedList(DestroyContextNode);
     ASSERT_NE(g_contextList, nullptr);
@@ -267,7 +267,7 @@ HWTEST_F(ContextManagerTest, TestDestoryContext, TestSize.Level0)
     (void)memset_s(context, sizeof(UserAuthContext), 0, sizeof(UserAuthContext));
     g_contextList->insert(g_contextList, static_cast<void *>(context));
     EXPECT_EQ(g_contextList->getSize(g_contextList), 1);
-    DestoryContext(context);
+    DestroyContext(context);
     EXPECT_EQ(g_contextList->getSize(g_contextList), 0);
     DestoryUserAuthContextList();
 }
@@ -360,19 +360,6 @@ HWTEST_F(ContextManagerTest, TestFillInContext_004, TestSize.Level0)
     executorInfo.executorRole = ALL_IN_ONE;
     schedule->executors[0] = executorInfo;
     context->scheduleList->insert(context->scheduleList, static_cast<void *>(schedule));
-
-    g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
-    EXPECT_NE(g_userInfoList, nullptr);
-    UserInfo userInfo = {};
-    userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
-    EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.authType = 2;
-    credInfo.templateId = 20;
-    credInfo.executorSensorHint = 10;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
-    g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
 
     context->authType = 2;
     uint64_t credentialId = 10;

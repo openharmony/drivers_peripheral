@@ -27,7 +27,7 @@ extern "C" {
     extern bool IsScheduleIdDuplicate(uint64_t scheduleId);
     extern ResultCode GenerateValidScheduleId(uint64_t *scheduleId);
     extern ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule *coAuthSchedule,
-        uint32_t sensorHint, uint32_t executorRole);
+        uint32_t sensorHint, uint32_t executorRole, Uint8Array deviceUdid);
     extern void DestroyExecutorInfo(void *data);
     extern ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *coAuthSchedule);
 }
@@ -165,9 +165,11 @@ HWTEST_F(CoAuthTest, TestMountExecutorOnce_001, TestSize.Level0)
     CoAuthSchedule schedule = {};
     constexpr uint32_t sensorHint = 3565;
     constexpr uint32_t excutorRole = 6636;
-    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, excutorRole), RESULT_NOT_FOUND);
+    uint8_t deviceUdidBuffer[64] = { 0 };
+    Uint8Array deviceUdid = { deviceUdidBuffer, 64 };
+    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, excutorRole, deviceUdid), RESULT_NOT_FOUND);
     executor->insert(executor, nullptr);
-    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, excutorRole), RESULT_UNKNOWN);
+    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, excutorRole, deviceUdid), RESULT_UNKNOWN);
 }
 
 HWTEST_F(CoAuthTest, TestMountExecutorOnce_002, TestSize.Level0)
@@ -191,9 +193,11 @@ HWTEST_F(CoAuthTest, TestMountExecutorOnce_002, TestSize.Level0)
     ExecutorInfoHal info3 = {};
     info3.executorRole = excutorRole2;
     executor->insert(executor, static_cast<void *>(&info3));
-    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, executorRole), RESULT_SUCCESS);
+    uint8_t deviceUdidBuffer[64] = { 0 };
+    Uint8Array deviceUdid = { deviceUdidBuffer, 64 };
+    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, executorRole, deviceUdid), RESULT_SUCCESS);
     sensorHint = 10;
-    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, executorRole), RESULT_SUCCESS);
+    EXPECT_EQ(MountExecutorOnce(executor, &schedule, sensorHint, executorRole, deviceUdid), RESULT_SUCCESS);
 }
 
 HWTEST_F(CoAuthTest, TestMountExecutor_001, TestSize.Level0)
@@ -294,20 +298,20 @@ HWTEST_F(CoAuthTest, TestMountExecutor_005, TestSize.Level0)
     EXPECT_EQ(MountExecutor(&param, &schedule), RESULT_SUCCESS);
 }
 
-HWTEST_F(CoAuthTest, TestGetScheduleVeriferSensorHint_001, TestSize.Level0)
+HWTEST_F(CoAuthTest, TestGetScheduleVerifierSensorHint_001, TestSize.Level0)
 {
     constexpr uint32_t executorSensorHint = 10;
-    EXPECT_EQ(GetScheduleVeriferSensorHint(nullptr), INVALID_SENSOR_HINT);
+    EXPECT_EQ(GetScheduleVerifierSensorHint(nullptr), INVALID_SENSOR_HINT);
     CoAuthSchedule schedule = {};
     ExecutorInfoHal info = {};
     info.executorSensorHint = executorSensorHint;
     info.executorRole = VERIFIER;
     schedule.executorSize = 1;
     schedule.executors[0] = info;
-    EXPECT_EQ(GetScheduleVeriferSensorHint(&schedule), info.executorSensorHint);
+    EXPECT_EQ(GetScheduleVerifierSensorHint(&schedule), info.executorSensorHint);
 }
 
-HWTEST_F(CoAuthTest, TestGetScheduleVeriferSensorHint_002, TestSize.Level0)
+HWTEST_F(CoAuthTest, TestGetScheduleVerifierSensorHint_002, TestSize.Level0)
 {
     constexpr uint32_t executorSensorHint = 10;
     constexpr uint32_t excutorSize = 1;
@@ -317,9 +321,9 @@ HWTEST_F(CoAuthTest, TestGetScheduleVeriferSensorHint_002, TestSize.Level0)
     info.executorRole = COLLECTOR;
     schedule.executorSize = excutorSize;
     schedule.executors[0] = info;
-    EXPECT_EQ(GetScheduleVeriferSensorHint(&schedule), INVALID_SENSOR_HINT);
+    EXPECT_EQ(GetScheduleVerifierSensorHint(&schedule), INVALID_SENSOR_HINT);
     schedule.executors[0].executorRole = ALL_IN_ONE;
-    EXPECT_EQ(GetScheduleVeriferSensorHint(&schedule), info.executorSensorHint);
+    EXPECT_EQ(GetScheduleVerifierSensorHint(&schedule), info.executorSensorHint);
 }
 
 HWTEST_F(CoAuthTest, TestGenerateSchedule_001, TestSize.Level0)

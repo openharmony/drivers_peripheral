@@ -27,13 +27,14 @@ extern "C" {
     extern LinkedList *g_scheduleList;
     extern LinkedList *g_userInfoList;
     extern void DestroyUserInfoList(void);
-    extern ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv);
-    extern ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, bool needSignature,
-        Uint8Array *retDataAndSignTlv);
+    extern ResultCode SignData(const Uint8Array *dataTlv, Uint8Array *signDataTlv, SignParam signParam);
+    extern ResultCode GetAttributeDataAndSignTlv(const Attribute *attribute, Uint8Array *retDataAndSignTlv,
+        SignParam signParam);
     extern ResultCode Ed25519VerifyData(uint64_t scheduleId, Uint8Array dataTlv, Uint8Array signTlv);
-    extern ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv);
-    extern Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, bool needVerifySignature);
-    extern Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, bool needVerifySignature);
+    extern ResultCode VerifyDataTlvSignature(const Attribute *dataAndSignAttribute, const Uint8Array dataTlv,
+        SignParam signParam);
+    extern Attribute *CreateAttributeFromDataAndSignTlv(const Uint8Array dataAndSignTlv, SignParam signParam);
+    extern Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, SignParam signParam);
     extern void GetRootSecretFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo);
     extern ResultCode GetExecutorResultInfoFromAttribute(const Attribute *attribute, ExecutorResultInfo *resultInfo);
     extern Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode,
@@ -67,17 +68,18 @@ public:
 HWTEST_F(ExecutorMessageTest, TestSignData, TestSize.Level0)
 {
     constexpr uint32_t len = 32;
-    Uint8Array dataTlv = { (uint8_t *)Malloc(len), len };
-    Uint8Array signData = { (uint8_t *)Malloc(len), len };
+    uint8_t dataTlvBuffer[len] = { 0 };
+    Uint8Array dataTlv = { dataTlvBuffer, len };
+    uint8_t signDataBuffer[len] = { 0 };
+    Uint8Array signData = { signDataBuffer, len };
     dataTlv.len = 0;
-    ResultCode result = SignData(&dataTlv, &signData);
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    ResultCode result = SignData(&dataTlv, &signData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     (void)memset_s(dataTlv.data, dataTlv.len, 1, dataTlv.len);
     dataTlv.len = len;
-    result = SignData(&dataTlv, &signData);
+    result = SignData(&dataTlv, &signData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    Free(dataTlv.data);
-    Free(signData.data);
 }
 
 HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
@@ -85,7 +87,8 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     Uint8Array retData = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = GetAttributeDataAndSignTlv(nullptr, false, &retData);
+    SignParam signParam = { .needSignature = false };
+    ResultCode result = GetAttributeDataAndSignTlv(nullptr, &retData, signParam);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     constexpr uint32_t testUint32 = 123;
@@ -95,20 +98,21 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeDataAndSignTlv, TestSize.Level0)
     uint64_t testUint64Buffer[] = { 123, 456, 789 };
     Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) };
     Uint64Array testUint64Array = { testUint64Buffer, sizeof(testUint64Buffer) };
-    result = SetAttributeUint32(attribute, AUTH_IDENTIFY_MODE, testUint32);
+    result = SetAttributeUint32(attribute, ATTR_IDENTIFY_MODE, testUint32);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, testInt32);
+    result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, testInt32);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, testUint64);
+    result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, testUint64);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint8Array(attribute, AUTH_SIGNATURE, testUint8Array);
+    result = SetAttributeUint8Array(attribute, ATTR_SIGNATURE, testUint8Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
+    result = SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, testUint64Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    result = GetAttributeDataAndSignTlv(attribute, false, &retData);
+    result = GetAttributeDataAndSignTlv(attribute, &retData, signParam);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeDataAndSignTlv(attribute, true, &retData);
+    signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    result = GetAttributeDataAndSignTlv(attribute, &retData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     Free(retData.data);
     FreeAttribute(&attribute);
@@ -119,12 +123,13 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeExecutorMsg, TestSize.Level0)
     Uint8Array retData = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = GetAttributeExecutorMsg(nullptr, false, &retData);
+    SignParam signParam = { .needSignature = false };
+    ResultCode result = GetAttributeExecutorMsg(nullptr, &retData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    result = GetAttributeExecutorMsg(attribute, false, nullptr);
+    result = GetAttributeExecutorMsg(attribute, nullptr, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     retData.len = 0;
-    result = GetAttributeExecutorMsg(attribute, false, &retData);
+    result = GetAttributeExecutorMsg(attribute, &retData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
     constexpr uint32_t testUint32 = 123;
@@ -134,20 +139,21 @@ HWTEST_F(ExecutorMessageTest, TestGetAttributeExecutorMsg, TestSize.Level0)
     uint64_t testUint64Buffer[] = { 123, 456, 789 };
     Uint8Array testUint8Array = { testUint8Buffer, sizeof(testUint8Buffer) };
     Uint64Array testUint64Array = { testUint64Buffer, sizeof(testUint64Buffer) };
-    result = SetAttributeUint32(attribute, AUTH_IDENTIFY_MODE, testUint32);
+    result = SetAttributeUint32(attribute, ATTR_IDENTIFY_MODE, testUint32);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, testInt32);
+    result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, testInt32);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, testUint64);
+    result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, testUint64);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint8Array(attribute, AUTH_SIGNATURE, testUint8Array);
+    result = SetAttributeUint8Array(attribute, ATTR_SIGNATURE, testUint8Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64Array(attribute, AUTH_TEMPLATE_ID_LIST, testUint64Array);
+    result = SetAttributeUint64Array(attribute, ATTR_TEMPLATE_ID_LIST, testUint64Array);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    result = GetAttributeExecutorMsg(attribute, false, &retData);
+    result = GetAttributeExecutorMsg(attribute, &retData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
-    result = GetAttributeExecutorMsg(attribute, true, &retData);
+    signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    result = GetAttributeExecutorMsg(attribute, &retData, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     Free(retData.data);
     FreeAttribute(&attribute);
@@ -170,78 +176,83 @@ HWTEST_F(ExecutorMessageTest, TestVerifyDataTlvSignature, TestSize.Level0)
     constexpr uint32_t dataLen = 12;
     uint8_t array[dataLen] = { 1, 2, 3, 4, 5, 6 };
     Uint8Array dataTlv = { &array[0], dataLen };
-    ResultCode result = SetAttributeUint8Array(attribute, AUTH_SIGNATURE, dataTlv);
+    ResultCode result = SetAttributeUint8Array(attribute, ATTR_SIGNATURE, dataTlv);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint8Array(attribute, AUTH_DATA, dataTlv);
+    result = SetAttributeUint8Array(attribute, ATTR_DATA, dataTlv);
     EXPECT_EQ(result, RESULT_SUCCESS);
     uint64_t scheduleId = 10;
-    result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId);
+    result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
-    result = VerifyDataTlvSignature(nullptr, dataTlv);
+    SignParam signParam = { .needSignature = false };
+    result = VerifyDataTlvSignature(nullptr, dataTlv, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     FreeAttribute(&attribute);
 }
 
 HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromDataAndSignTlv, TestSize.Level0)
 {
-    Uint8Array retInfo = { (uint8_t *)Malloc(MAX_EXECUTOR_SIZE), MAX_EXECUTOR_SIZE };
-    Attribute *retAttribute = CreateAttributeFromDataAndSignTlv(retInfo, true);
+    uint8_t retInfoBuffer[MAX_EXECUTOR_SIZE] = { 0 };
+    Uint8Array retInfo = { retInfoBuffer, MAX_EXECUTOR_SIZE };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    Attribute *retAttribute = CreateAttributeFromDataAndSignTlv(retInfo, signParam);
     EXPECT_EQ(retAttribute, nullptr);
     retInfo.len = 0;
-    retAttribute = CreateAttributeFromDataAndSignTlv(retInfo, true);
+    retAttribute = CreateAttributeFromDataAndSignTlv(retInfo, signParam);
     EXPECT_EQ(retAttribute, nullptr);
     constexpr int32_t resultCode = 123;
     constexpr uint32_t authType1 = 1;
     constexpr uint64_t templateId = 456;
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
+    ResultCode result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint32(attribute, AUTH_TYPE, authType1);
+    result = SetAttributeUint32(attribute, ATTR_TYPE, authType1);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, templateId);
+    result = SetAttributeUint64(attribute, ATTR_TEMPLATE_ID, templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeExecutorMsg(attribute, true, &retInfo);
+    result = GetAttributeExecutorMsg(attribute, &retInfo, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
     Uint8Array dataAndSignTlv = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     EXPECT_NE(dataAndSignTlv.data, nullptr);
     Attribute *msgAttribute = CreateAttributeFromSerializedMsg(retInfo);
     EXPECT_EQ(msgAttribute, nullptr);
-    result = GetAttributeUint8Array(msgAttribute, AUTH_ROOT, &dataAndSignTlv);
+    result = GetAttributeUint8Array(msgAttribute, ATTR_ROOT, &dataAndSignTlv);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
-    retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, true);
+    retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, signParam);
     EXPECT_EQ(retAttribute, nullptr);
-    retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, false);
+    signParam = { .needSignature = false };
+    retAttribute = CreateAttributeFromDataAndSignTlv(dataAndSignTlv, signParam);
     EXPECT_EQ(retAttribute, nullptr);
 
     FreeAttribute(&retAttribute);
     FreeAttribute(&msgAttribute);
     Free(dataAndSignTlv.data);
     FreeAttribute(&attribute);
-    Free(retInfo.data);
 }
 
 HWTEST_F(ExecutorMessageTest, TestCreateAttributeFromExecutorMsg, TestSize.Level0)
 {
-    Uint8Array msg = { (uint8_t *)Malloc(MAX_EXECUTOR_SIZE), MAX_EXECUTOR_SIZE };
-    Attribute *retAttribute = CreateAttributeFromExecutorMsg(msg, true);
+    Uint8Array msg = { (uint8_t *)Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
+    SignParam signParam = { .needSignature = true, .keyType = KEY_TYPE_EXECUTOR };
+    Attribute *retAttribute = CreateAttributeFromExecutorMsg(msg, signParam);
     EXPECT_EQ(retAttribute, nullptr);
     constexpr int32_t resultCode = 1;
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
-    ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
+    ResultCode result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
-    result = GetAttributeExecutorMsg(attribute, true, &msg);
+    result = GetAttributeExecutorMsg(attribute, &msg, signParam);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
 
-    retAttribute = CreateAttributeFromExecutorMsg(msg, false);
+    SignParam signParam1 = { .needSignature = false };
+    retAttribute = CreateAttributeFromExecutorMsg(msg, signParam1);
     EXPECT_EQ(retAttribute, nullptr);
-    retAttribute = CreateAttributeFromExecutorMsg(msg, true);
+    retAttribute = CreateAttributeFromExecutorMsg(msg, signParam);
     EXPECT_EQ(retAttribute, nullptr);
     int32_t retCode;
-    result = GetAttributeInt32(attribute, AUTH_RESULT_CODE, &retCode);
+    result = GetAttributeInt32(attribute, ATTR_RESULT_CODE, &retCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
     EXPECT_EQ(retCode, resultCode);
     FreeAttribute(&retAttribute);
@@ -257,7 +268,7 @@ HWTEST_F(ExecutorMessageTest, TestGetRootSecretFromAttribute, TestSize.Level0)
     GetRootSecretFromAttribute(attribute, &resultInfo);
     uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
     Uint8Array rootSecret = { testUint8Buffer, sizeof(testUint8Buffer) };
-    ResultCode result = SetAttributeUint8Array(attribute, AUTH_ROOT_SECRET, rootSecret);
+    ResultCode result = SetAttributeUint8Array(attribute, ATTR_ROOT_SECRET, rootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     GetRootSecretFromAttribute(attribute, &resultInfo);
     FreeAttribute(&attribute);
@@ -271,41 +282,41 @@ HWTEST_F(ExecutorMessageTest, TestGetExecutorResultInfoFromAttribute, TestSize.L
     ResultCode result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr int32_t resultCode = 0;
-    result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
+    result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr uint64_t templateId = 123;
-    result = SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, templateId);
+    result = SetAttributeUint64(attribute, ATTR_TEMPLATE_ID, templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr uint64_t scheduleId = 234;
-    result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId);
+    result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr uint64_t subType = 0;
-    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, subType);
+    result = SetAttributeUint64(attribute, ATTR_PIN_SUB_TYPE, subType);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr int32_t remainTimes = 10;
-    result = SetAttributeInt32(attribute, AUTH_REMAIN_COUNT, remainTimes);
+    result = SetAttributeInt32(attribute, ATTR_REMAIN_ATTEMPTS, remainTimes);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr int32_t freezingTime = 0;
-    result = SetAttributeInt32(attribute, AUTH_REMAIN_TIME, freezingTime);
+    result = SetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, freezingTime);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(result, RESULT_GENERAL_ERROR);
     constexpr uint32_t capabilityLevel = 2;
-    result = SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel);
+    result = SetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, capabilityLevel);
     EXPECT_EQ(result, RESULT_SUCCESS);
     uint8_t testUint8Buffer[] = { 'a', 'b', 'c' };
     Uint8Array rootSecret = { testUint8Buffer, sizeof(testUint8Buffer) };
-    result = SetAttributeUint8Array(attribute, AUTH_ROOT_SECRET, rootSecret);
+    result = SetAttributeUint8Array(attribute, ATTR_ROOT_SECRET, rootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     result = GetExecutorResultInfoFromAttribute(attribute, &resultInfo);
     EXPECT_EQ(resultInfo.result, resultCode);
@@ -323,31 +334,32 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorResultInfo, TestSize.Level0)
     Attribute *attribute = CreateEmptyAttribute();
     EXPECT_NE(attribute, nullptr);
     constexpr int32_t resultCode = 0;
-    ResultCode result = SetAttributeInt32(attribute, AUTH_RESULT_CODE, resultCode);
+    ResultCode result = SetAttributeInt32(attribute, ATTR_RESULT_CODE, resultCode);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr uint64_t templateId = 123;
-    result = SetAttributeUint64(attribute, AUTH_TEMPLATE_ID, templateId);
+    result = SetAttributeUint64(attribute, ATTR_TEMPLATE_ID, templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr uint64_t scheduleId = 234;
-    result = SetAttributeUint64(attribute, AUTH_SCHEDULE_ID, scheduleId);
+    result = SetAttributeUint64(attribute, ATTR_SCHEDULE_ID, scheduleId);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr uint64_t subType = 0;
-    result = SetAttributeUint64(attribute, AUTH_SUB_TYPE, subType);
+    result = SetAttributeUint64(attribute, ATTR_PIN_SUB_TYPE, subType);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr int32_t remainTimes = 10;
-    result = SetAttributeInt32(attribute, AUTH_REMAIN_COUNT, remainTimes);
+    result = SetAttributeInt32(attribute, ATTR_REMAIN_ATTEMPTS, remainTimes);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr int32_t freezingTime = 0;
-    result = SetAttributeInt32(attribute, AUTH_REMAIN_TIME, freezingTime);
+    result = SetAttributeInt32(attribute, ATTR_LOCKOUT_DURATION, freezingTime);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr uint32_t capabilityLevel = 2;
-    result = SetAttributeUint32(attribute, AUTH_CAPABILITY_LEVEL, capabilityLevel);
+    result = SetAttributeUint32(attribute, ATTR_CAPABILITY_LEVEL, capabilityLevel);
     EXPECT_EQ(result, RESULT_SUCCESS);
     constexpr uint32_t dataLen = 120;
     std::vector<uint8_t> data;
     data.resize(dataLen);
     Uint8Array retExtraInfo = { data.data(), data.size() };
-    result = GetAttributeExecutorMsg(attribute, false, &retExtraInfo);
+    SignParam signParam = { .needSignature = false };
+    result = GetAttributeExecutorMsg(attribute, &retExtraInfo, signParam);
     EXPECT_EQ(result, RESULT_SUCCESS);
     Buffer *buf = CreateBufferByData(retExtraInfo.data, retExtraInfo.len);
     EXPECT_NE(buf, nullptr);
@@ -357,17 +369,17 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorResultInfo, TestSize.Level0)
     FreeAttribute(&attribute);
 }
 
-HWTEST_F(ExecutorMessageTest, TestDestoryExecutorResultInfo, TestSize.Level0)
+HWTEST_F(ExecutorMessageTest, TestDestroyExecutorResultInfo, TestSize.Level0)
 {
-    DestoryExecutorResultInfo(nullptr);
+    DestroyExecutorResultInfo(nullptr);
     ExecutorResultInfo *info1 = new ExecutorResultInfo();
     EXPECT_NE(info1, nullptr);
     info1->rootSecret = CreateBufferBySize(10);
-    DestoryExecutorResultInfo(info1);
+    DestroyExecutorResultInfo(info1);
     ExecutorResultInfo *info2 = new ExecutorResultInfo();
     EXPECT_NE(info2, nullptr);
     info2->rootSecret = nullptr;
-    DestoryExecutorResultInfo(info2);
+    DestroyExecutorResultInfo(info2);
 }
 
 HWTEST_F(ExecutorMessageTest, TestCreateExecutorMsg, TestSize.Level0)

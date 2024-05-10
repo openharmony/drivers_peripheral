@@ -20,8 +20,11 @@
 
 #include "attribute.h"
 #include "buffer.h"
+#include "coauth.h"
 #include "defines.h"
 #include "linked_list.h"
+#include "pool.h"
+#include "sign_param.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,9 +47,15 @@ typedef struct ExecutorMsg {
 } ExecutorMsg;
 
 ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv);
-ResultCode GetAttributeExecutorMsg(const Attribute *attribute, bool needSignature, Uint8Array *retMsg);
-void DestoryExecutorResultInfo(ExecutorResultInfo *result);
+ResultCode GetAttributeExecutorMsg(const Attribute *attribute, Uint8Array *retMsg, SignParam signParam);
+void DestroyExecutorResultInfo(ExecutorResultInfo *result);
 ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedList **executorMsg);
+
+bool CheckRemoteExecutorInfo(const Buffer *tlv, ExecutorInfoHal *infoToCheck);
+ResultCode CreateScheduleInfo(const Buffer *tlv, Uint8Array peerUdid, ScheduleInfoParam *scheduleInfo);
+ResultCode CreateAuthResultInfo(const Buffer *tlv, AuthResultParam *authResultInfo);
+ResultCode GetExecutorInfoMsg(ExecutorInfoHal *executorInfo, Uint8Array *retMsg);
+Buffer *GetExecutorInfoTlv(Uint8Array attrsTlv, Uint8Array peerUdid);
 
 #ifdef __cplusplus
 }
