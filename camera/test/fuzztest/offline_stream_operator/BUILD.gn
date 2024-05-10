@@ -19,7 +19,7 @@ import("../../../camera.gni")
 module_output_path = "drivers_peripheral_camera/drivers_peripheral_camera"
 camera_test_path = "//drivers/peripheral/camera/test/hdi/"
 
-config("offline_stream_operator_config") {
+config("CameraOfflineStreamOperatorFuzzTest") {
   visibility = [ ":*" ]
   cflags_cc = [
     "-DGST_DISABLE_DEPRECATED",
