@@ -56,9 +56,9 @@ void funcCancelCapture(const uint8_t *rawData)
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
 
-    cameraTest->streamInfo = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
-    cameraTest->DefaultInfosCapture(cameraTest->streamInfo);
-    cameraTest->streamInfos.push_back(*cameraTest->streamInfo);
+    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
+    cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
     cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new
         OHOS::Camera::CameraManager::TestStreamOperatorCallback();
