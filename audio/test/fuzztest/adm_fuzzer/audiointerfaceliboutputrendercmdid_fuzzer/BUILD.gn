@@ -41,7 +41,6 @@ ohos_fuzztest("AudioInterfaceliboutputrenderCmdidFuzzTest") {
     "$hdf_audio_path/supportlibs/adm_adapter/include",
     "$hdf_audio_path/hal/hdi_passthrough/include",
     "$hdf_audio_path/interfaces/include",
-    "//third_party/bounds_checking_function/include",
     "./",
     "$hdf_fuzztest_path/common/include",
   ]
@@ -54,6 +53,7 @@ ohos_fuzztest("AudioInterfaceliboutputrenderCmdidFuzzTest") {
   if (enable_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
+  external_deps += [ "bounds_checking_function:libsec_shared" ]
   defines = []
   if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_SO" ]

@@ -39,7 +39,6 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/supportlibs/interfaces/include",
       "$hdf_audio_path/hal/hdi_passthrough/include",
       "$hdf_audio_path/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "$hdf_audio_test_path/common/lib_common/include",
       "$hdf_audio_test_path/common/hdi_common/include",
       "$hdf_audio_test_path/supportlibs/common/capture/include",
@@ -48,8 +47,8 @@ if (defined(ohos_lite)) {
     public_deps = [
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+    public_external_deps = [ "bounds_checking_function:libsec_shared" ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
@@ -76,7 +75,6 @@ if (defined(ohos_lite)) {
       "$hdf_audio_test_path/supportlibs/common/capture/include",
     ]
     deps = [
-      "//third_party/bounds_checking_function:libsec_shared",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
@@ -84,6 +82,7 @@ if (defined(ohos_lite)) {
     if (enable_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_SO" ]
