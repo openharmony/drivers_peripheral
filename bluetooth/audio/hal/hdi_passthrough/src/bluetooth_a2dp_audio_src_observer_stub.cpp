@@ -84,10 +84,13 @@ ErrCode BluetoothA2dpAudioSrcObserverStub::OnPlayingStatusChangedInner(MessagePa
 ErrCode BluetoothA2dpAudioSrcObserverStub::OnConfigurationChangedInner(MessageParcel &data, MessageParcel &reply)
 {
     std::string addr = data.ReadString();
-    BluetoothA2dpCodecInfo info = *data.ReadParcelable<BluetoothA2dpCodecInfo>();
+    std::shared_ptr<BluetoothA2dpCodecInfo> info(data.ReadParcelable<BluetoothA2dpCodecInfo>());
+    if (info == nullptr) {
+        HDF_LOGE("Read a2dp code info failed");
+    }
     int error = data.ReadInt32();
     HDF_LOGI("BluetoothA2dpAudioSrcObserverStub::OnConfigurationChangedInner");
-    OnConfigurationChanged(RawAddress(addr), info, error);
+    OnConfigurationChanged(RawAddress(addr), *info, error);
 
     return NO_ERROR;
 }
