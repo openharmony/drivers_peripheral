@@ -282,6 +282,15 @@ public:
             const std::vector<HDI::Camera::V1_2::CaptureStartedInfo> &infos) override;
     };
 
+    class DemoCameraDeviceCallback : public ICameraDeviceCallback {
+    public:
+        DemoCameraDeviceCallback() = default;
+        virtual ~DemoCameraDeviceCallback() = default;
+ 
+        int32_t OnError(ErrorType type, int32_t errorMsg) override;
+        int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t> &result) override;
+    };
+
     class TestCameraHostCallback : public ICameraHostCallback {
     public:
         TestCameraHostCallback() = default;
