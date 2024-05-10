@@ -247,12 +247,11 @@ ResultCode ParseMultiDataSerializedMsg(const Uint8Array msg, Uint8Array *subMsgD
 
         if (length > 0) {
             IF_TRUE_LOGE_AND_RETURN_VAL(subMsgIndex >= *subMsgSize, GENERAL_ERROR);
-
-            Uint8Array readData = { Malloc(length), length };
-            IF_TRUE_LOGE_AND_RETURN_VAL(readData.data == NULL, GENERAL_ERROR);
-            ResultCode readDataResult = ReadDataFromMsg(msg, &readIndex, &readData);
+            // subMsgData is freed in outer function
+            subMsgData[subMsgIndex] = (Uint8Array){ Malloc(length), length };
+            IF_TRUE_LOGE_AND_RETURN_VAL(subMsgData[subMsgIndex].data == NULL, GENERAL_ERROR);
+            ResultCode readDataResult = ReadDataFromMsg(msg, &readIndex, &subMsgData[subMsgIndex]);
             IF_TRUE_LOGE_AND_RETURN_VAL(readDataResult != SUCCESS, GENERAL_ERROR);
-            subMsgData[subMsgIndex] = readData;
             subMsgIndex++;
         }
     }

@@ -287,7 +287,6 @@ IAM_STATIC Attribute *CreateAttributeFromExecutorMsg(const Uint8Array msg, SignP
         }
     } while (0);
 
-    (void)memset_s(dataAndSignTlv.data, MAX_EXECUTOR_MSG_LEN, 0, MAX_EXECUTOR_MSG_LEN);
     Free(dataAndSignTlv.data);
     FreeAttribute(&msgAttribute);
     return attribute;
@@ -732,9 +731,9 @@ IAM_STATIC ResultCode GetRemoteExecutorInfo(const Buffer *msg, Uint8Array peerUd
 static bool CheckRemoteExecutorInfoInner(Uint8Array *subMsgs, int subMsgSize, ExecutorInfoHal *infoToCheck)
 {
     for (int i = 0; i < subMsgSize; i++) {
-        Uint8Array array = subMsgs[i];
+        Uint8Array subMsg = subMsgs[i];
         ExecutorInfoHal executorInfo = {};
-        ResultCode result = GetExecutorInfoHal(array, &executorInfo);
+        ResultCode result = GetExecutorInfoHal(subMsg, &executorInfo);
         if (result != RESULT_SUCCESS) {
             LOG_ERROR("GetExecutorInfoHal failed");
             return false;
@@ -756,10 +755,9 @@ bool CheckRemoteExecutorInfo(const Buffer *msg, ExecutorInfoHal *infoToCheck)
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    int subMsgSize = 0;
     Uint8Array peerUdid = { infoToCheck->deviceUdid, sizeof(infoToCheck->deviceUdid) };
     Uint8Array subMsgs[MAX_SUB_MSG_NUM] = {0};
-    subMsgSize = MAX_SUB_MSG_NUM;
+    int subMsgSize = MAX_SUB_MSG_NUM;
     ResultCode result = GetRemoteExecutorInfo(msg, peerUdid, &subMsgs[0], &subMsgSize);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetRemoteExecutorInfo failed");

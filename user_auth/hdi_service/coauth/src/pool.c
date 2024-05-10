@@ -61,7 +61,8 @@ IAM_STATIC bool IsExecutorNodeMatch(const void *data, const void *condition)
     const ExecutorInfoHal *executorInfo = (const ExecutorInfoHal *)data;
     return (executorInfo->executorRole == executorIndex->executorRole &&
         executorInfo->authType == executorIndex->authType &&
-        executorInfo->executorSensorHint == executorIndex->executorSensorHint);
+        executorInfo->executorSensorHint == executorIndex->executorSensorHint) &&
+        memcmp(executorInfo->deviceUdid, executorIndex->deviceUdid, UDID_LEN) == 0;
 }
 
 IAM_STATIC bool IsInit(void)
