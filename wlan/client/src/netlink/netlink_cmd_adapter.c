@@ -1570,27 +1570,28 @@ static int32_t CmdScanPutSsidsMsg(struct nl_msg *msg, const WifiScan *scan, cons
         }
         int attrtype = 1;
         /*add an empty ssid for a wildcard scan*/
-        if (nla_put(msg, attrtype++, 0, NULL) != RET_CODE_SUCCESS) {
+        if (nla_put(msg, attrtype, 0, NULL) != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: nla_put NULL failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
         for (i = 0; i < scan->numSsids; i++) {
-            if (i >= wiphyInfo->scanCapabilities.maxNumScanSsids - 1) {
+            if (attrtype >= wiphyInfo->scanCapabilities.maxNumScanSsids) {
                 HILOG_INFO(LOG_CORE, "%s: Skip the excess hidden ssids for scan,current:%{public}d,max:%{public}d",
-                    __FUNCTION__, i, wiphyInfo->scanCapabilities.maxNumScanSsids);
+                    __FUNCTION__, attrtype, wiphyInfo->scanCapabilities.maxNumScanSsids);
                 break;
             }
             if (strlen((const char *)scan->ssids[i].ssid) == 0 || scan->ssids[i].ssidLen == 0) {
                 HILOG_ERROR(LOG_CORE, "%s: nla_put ssid is empty", __FUNCTION__);
                 continue;
             }
-            if (nla_put(msg, attrtype++, scan->ssids[i].ssidLen, scan->ssids[i].ssid) != RET_CODE_SUCCESS) {
+            attrtype++;
+            if (nla_put(msg, attrtype, scan->ssids[i].ssidLen, scan->ssids[i].ssid) != RET_CODE_SUCCESS) {
                 HILOG_ERROR(LOG_CORE, "%s: nla_put ssid failed", __FUNCTION__);
                 return RET_CODE_FAILURE;
             }
         }
         nla_nest_end(msg, nest);
-        HILOG_INFO(LOG_CORE, "%{public}s numSsids:%{public}d", __FUNCTION__, attrtype - 1);
+        HILOG_INFO(LOG_CORE, "%{public}s numSsids:%{public}d", __FUNCTION__, attrtype);
     }
     return RET_CODE_SUCCESS;
 }
