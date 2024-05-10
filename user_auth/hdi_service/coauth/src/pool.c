@@ -133,12 +133,14 @@ IAM_STATIC ResultCode GenerateValidExecutorId(uint64_t *executorIndex)
     return RESULT_GENERAL_ERROR;
 }
 
-IAM_STATIC LinkedList *QueryRepeatExecutor(const ExecutorInfoHal *executorInfo)
+IAM_STATIC LinkedList *QueryRepeatExecutor(ExecutorInfoHal *executorInfo)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionAuthType(&condition, executorInfo->authType);
     SetExecutorConditionSensorHint(&condition, executorInfo->executorSensorHint);
     SetExecutorConditionExecutorRole(&condition, executorInfo->executorRole);
+    const Uint8Array udid = { executorInfo->deviceUdid, UDID_LEN };
+    SetExecutorConditionDeviceUdid(&condition, udid);
     return QueryExecutor(&condition);
 }
 
@@ -241,6 +243,10 @@ IAM_STATIC bool IsExecutorMatch(const ExecutorCondition *condition, const Execut
     }
     if ((condition->conditonFactor & EXECUTOR_CONDITION_MATCHER) != 0 &&
         condition->executorMatcher != credentialInfo->executorMatcher) {
+        return false;
+    }
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_UDID) != 0 &&
+        memcmp(condition->deviceUdid, credentialInfo->deviceUdid, UDID_LEN) != 0) {
         return false;
     }
     return true;
@@ -401,4 +407,17 @@ void SetExecutorConditionExecutorMatcher(ExecutorCondition *condition, uint32_t 
     }
     condition->executorMatcher = executorMatcher;
     condition->conditonFactor |= EXECUTOR_CONDITION_MATCHER;
+}
+
+void SetExecutorConditionDeviceUdid(ExecutorCondition *condition, Uint8Array deviceUdid)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    if (memcpy_s(condition->deviceUdid, UDID_LEN, deviceUdid.data, deviceUdid.len) != EOK) {
+        LOG_ERROR("copy udid failed");
+        return;
+    }
+    condition->conditonFactor |= EXECUTOR_CONDITION_UDID;
 }

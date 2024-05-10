@@ -26,11 +26,11 @@ class Attributes final {
 public:
     enum AttributeKey : uint32_t {
         /* Root tag */
-        AUTH_ROOT = 100000,
+        ATTR_ROOT = 100000,
         /* Tag of data */
-        AUTH_DATA = 100020,
+        ATTR_DATA = 100020,
         /* Pin expired sys time. */
-        AUTH_EXPIRED_SYS_TIME = 100034,
+        ATTR_EXPIRED_SYS_TIME = 100034,
     };
 
     Attributes();

@@ -42,6 +42,8 @@ typedef struct ScheduleParam {
     uint32_t verifierSensorHint;
     uint32_t executorMatcher;
     int32_t userType;
+    uint8_t localUdid[UDID_LEN];
+    uint8_t collectorUdid[UDID_LEN];
 } ScheduleParam;
 
 typedef struct CoAuthSchedule {
@@ -55,6 +57,28 @@ typedef struct CoAuthSchedule {
     int32_t userType;
 } CoAuthSchedule;
 
+typedef struct ScheduleInfoParam {
+    uint64_t scheduleId;
+    uint32_t authType;
+    uint32_t executorMatcher;
+    int32_t scheduleMode;
+    uint64_t executorIndex;
+    Buffer *executorMessages;
+    uint8_t localUdid[UDID_LEN];
+    uint8_t remoteUdid[UDID_LEN];
+} ScheduleInfoParam;
+
+typedef struct AuthResultParam {
+    int32_t result;
+    int32_t lockoutDuration;
+    int32_t remainAttempts;
+    int32_t userId;
+    Buffer *token;
+    Buffer *remoteAuthResultMsg;
+    uint8_t localUdid[UDID_LEN];
+    uint8_t remoteUdid[UDID_LEN];
+} AuthResultParam;
+
 ResultCode InitCoAuth(void);
 void DestoryCoAuth(void);
 
@@ -63,7 +87,7 @@ CoAuthSchedule *GenerateSchedule(const ScheduleParam *param);
 ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule);
 ResultCode RemoveCoAuthSchedule(uint64_t scheduleId);
 const CoAuthSchedule *GetCoAuthSchedule(uint64_t scheduleId);
-uint32_t GetScheduleVeriferSensorHint(const CoAuthSchedule *coAuthSchedule);
+uint32_t GetScheduleVerifierSensorHint(const CoAuthSchedule *coAuthSchedule);
 void DestroyCoAuthSchedule(CoAuthSchedule *coAuthSchedule);
 CoAuthSchedule *CopyCoAuthSchedule(const CoAuthSchedule *coAuthSchedule);
 void DestroyScheduleNode(void *data);

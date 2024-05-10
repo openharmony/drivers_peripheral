@@ -60,6 +60,18 @@ int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<HdiIAllInOneEx
         return HDF_FAILURE;
     }
     allInOneExecutors.push_back(allInOneImpl);
+    sptr<HdiIVerifier> verifierImpl(new (std::nothrow) VerifierImpl(pinHdi));
+    if (verifierImpl == nullptr) {
+        IAM_LOGE("Generate verifierImpl failed");
+        return HDF_FAILURE;
+    }
+    verifiers.push_back(verifierImpl);
+    sptr<HdiICollector> collectorImpl(new (std::nothrow) CollectorImpl(pinHdi));
+    if (collectorImpl == nullptr) {
+        IAM_LOGE("Generate collectorImpl failed");
+        return HDF_FAILURE;
+    }
+    collectors.push_back(collectorImpl);
     IAM_LOGI("end");
     return HDF_SUCCESS;
 }

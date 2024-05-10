@@ -31,33 +31,44 @@
 #define INVALID_PARAMETERS RESULT_BAD_PARAM
 
 AttributeKey g_attributeKeyArray[] = {
-    AUTH_RESULT_CODE,
-    AUTH_SIGNATURE,
-    AUTH_IDENTIFY_MODE,
-    AUTH_TEMPLATE_ID,
-    AUTH_TEMPLATE_ID_LIST,
-    AUTH_REMAIN_COUNT,
-    AUTH_REMAIN_TIME,
-    AUTH_CALLER_NAME,
-    AUTH_SCHEDULE_ID,
-    AUTH_SCHEDULE_VERSION,
-    AUTH_LOCK_OUT_TEMPLATE,
-    AUTH_UNLOCK_TEMPLATE,
-    AUTH_DATA,
-    AUTH_SUB_TYPE,
-    AUTH_SCHEDULE_MODE,
-    AUTH_PROPERTY_MODE,
-    AUTH_TYPE,
-    AUTH_CREDENTIAL_ID,
-    AUTH_CONTROLLER,
-    AUTH_CALLER_UID,
-    AUTH_RESULT,
-    AUTH_CAPABILITY_LEVEL,
-    AUTH_ALGORITHM_INFO,
-    AUTH_TIME_STAMP,
-    AUTH_ROOT_SECRET,
-    AUTH_ROOT,
-    AUTH_EXPIRED_SYS_TIME,
+    ATTR_RESULT_CODE,
+    ATTR_SIGNATURE,
+    ATTR_IDENTIFY_MODE,
+    ATTR_TEMPLATE_ID,
+    ATTR_TEMPLATE_ID_LIST,
+    ATTR_REMAIN_ATTEMPTS,
+    ATTR_LOCKOUT_DURATION,
+    ATTR_SCHEDULE_ID,
+    ATTR_DATA,
+    ATTR_PIN_SUB_TYPE,
+    ATTR_SCHEDULE_MODE,
+    ATTR_PROPERTY_MODE,
+    ATTR_TYPE,
+    ATTR_CREDENTIAL_ID,
+    ATTR_CONTROLLER,
+    ATTR_CALLER_UID,
+    ATTR_RESULT,
+    ATTR_CAPABILITY_LEVEL,
+    ATTR_ALGORITHM_INFO,
+    ATTR_TIME_STAMP,
+    ATTR_ROOT_SECRET,
+    ATTR_ROOT,
+    ATTR_ATTRS,
+    ATTR_EXECUTOR_INDEX,
+    ATTR_PUBLIC_KEY,
+    ATTR_EXECUTOR_MATCHER,
+    ATTR_LOCAL_UDID,
+    ATTR_PEER_UDID,
+    ATTR_LOCKOUT_DURATION,
+    ATTR_REMAIN_ATTEMPTS,
+    ATTR_USER_ID,
+    ATTR_TOKEN,
+    ATTR_EXECUTOR_ROLE,
+    ATTR_ESL,
+    ATTR_VERIFIER_UDID,
+    ATTR_COLLECTOR_UDID,
+    ATTR_CHALLENGE,
+    ATTR_EXPIRED_SYS_TIME,
 };
 
 #define ARRAY_LENGTH(array) (uint32_t)(sizeof(array) / sizeof((array)[0]))
@@ -220,6 +231,34 @@ IAM_STATIC ResultCode ParseAttributeSerializedMsg(Attribute *attribute, const Ui
     DestroyUint8Array(&readBuffer);
 
     return result;
+}
+
+ResultCode ParseMultiDataSerializedMsg(const Uint8Array msg, Uint8Array *subMsgData, int *subMsgSize)
+{
+    IF_TRUE_LOGE_AND_RETURN_VAL(subMsgSize == NULL, GENERAL_ERROR);
+    IF_TRUE_LOGE_AND_RETURN_VAL(subMsgData == NULL, GENERAL_ERROR);
+
+    uint32_t readIndex = 0;
+    uint32_t subMsgIndex = 0;
+    while (readIndex < msg.len) {
+        uint32_t length;
+        ResultCode readLengthResult = ReadUint32FromMsg(msg, &readIndex, &length);
+        IF_TRUE_LOGE_AND_RETURN_VAL(readLengthResult != SUCCESS, GENERAL_ERROR);
+
+        if (length > 0) {
+            IF_TRUE_LOGE_AND_RETURN_VAL(subMsgIndex >= *subMsgSize, GENERAL_ERROR);
+
+            Uint8Array readData = { Malloc(length), length };
+            IF_TRUE_LOGE_AND_RETURN_VAL(readData.data == NULL, GENERAL_ERROR);
+            ResultCode readDataResult = ReadDataFromMsg(msg, &readIndex, &readData);
+            IF_TRUE_LOGE_AND_RETURN_VAL(readDataResult != SUCCESS, GENERAL_ERROR);
+            subMsgData[subMsgIndex] = readData;
+            subMsgIndex++;
+        }
+    }
+
+    *subMsgSize = subMsgIndex;
+    return SUCCESS;
 }
 
 Attribute *CreateEmptyAttribute(void)
@@ -458,4 +497,25 @@ ResultCode SetAttributeUint64Array(Attribute *attribute, AttributeKey key, const
 
     DestroyUint64Array(&netOrderData);
     return result;
+}
+
+ResultCode GetMultiDataSerializedMsg(Uint8Array sourceArrayMsg[], uint32_t size, Uint8Array *retMsg)
+{
+    IF_TRUE_LOGE_AND_RETURN_VAL(retMsg == NULL, INVALID_PARAMETERS);
+    IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(*retMsg), INVALID_PARAMETERS);
+
+    uint32_t writeIndex = 0;
+    for (uint32_t i = 0; i < size; i++) {
+        Uint8Array sourceMsg = sourceArrayMsg[i];
+        if (sourceMsg.len == 0) {
+            continue;
+        }
+        ResultCode writeLengthResult = WriteUInt32ToMsg(retMsg, &writeIndex, sourceMsg.len);
+        IF_TRUE_LOGE_AND_RETURN_VAL(writeLengthResult != SUCCESS, GENERAL_ERROR);
+
+        ResultCode writeDataResult = WriteDataToMsg(retMsg, &writeIndex, sourceMsg);
+        IF_TRUE_LOGE_AND_RETURN_VAL(writeDataResult != SUCCESS, GENERAL_ERROR);
+    }
+    retMsg->len = writeIndex;
+    return SUCCESS;
 }

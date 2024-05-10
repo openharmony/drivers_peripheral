@@ -1182,6 +1182,11 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
         LOG_ERROR("user is null");
         return RESULT_NOT_ENROLLED;
     }
+    if (user->credentialInfoList == NULL) {
+        LOG_ERROR("credentialInfoList is null");
+        return RESULT_NOT_ENROLLED;
+    }
+
     uint16_t credentialCount = 0;
     LinkedListNode *credentialInfoTemp = user->credentialInfoList->head;
     while (credentialInfoTemp != NULL) {
@@ -1196,6 +1201,10 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
         return RESULT_NOT_ENROLLED;
     }
     enrolledStateHal->credentialCount = credentialCount;
+    if (user->enrolledInfoList == NULL) {
+        LOG_ERROR("enrolledInfoList is null");
+        return RESULT_NOT_ENROLLED;
+    }
     LinkedListNode *enrolledInfoTemp = user->enrolledInfoList->head;
     while (enrolledInfoTemp != NULL) {
         EnrolledInfoHal *nodeInfo = enrolledInfoTemp->data;

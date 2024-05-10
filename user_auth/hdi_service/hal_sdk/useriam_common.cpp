@@ -32,6 +32,11 @@ static bool g_isInitUserIAM = false;
 
 int32_t Init()
 {
+    if (g_isInitUserIAM) {
+        LOG_INFO("already init");
+        return RESULT_SUCCESS;
+    }
+
     if (InitUserAuthContextList() != RESULT_SUCCESS) {
         LOG_ERROR("init context list failed");
         goto FAIL;
