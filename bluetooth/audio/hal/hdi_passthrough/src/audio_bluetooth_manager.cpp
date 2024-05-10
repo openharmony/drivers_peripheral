@@ -67,7 +67,7 @@ static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingSta
         for (const auto &it : g_playdevices) {
             if (strcmp(it.second.c_str(), device.GetAddress().c_str()) == 0) {
                 return;
-	    }
+            }
         }
         g_playdevices.insert(std::make_pair(playingState, addr));
         g_playState = playingState;
