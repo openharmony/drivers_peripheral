@@ -49,7 +49,7 @@ static void PrintMetaDataInfo(const shared_ptr<CameraMetadata> &metadata)
     cout << "item_capacity : " << header->item_capacity << endl;
     cout << "data_count    : " << header->data_count << endl;
     cout << "data_capacity : " << header->data_capacity << endl;
-    cout << "PrintMetaDataInfo begin-----------" << endl;
+    cout << "PrintMetaDataInfo end-----------" << endl;
 }
 
 /**
