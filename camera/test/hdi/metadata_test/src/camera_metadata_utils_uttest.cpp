@@ -142,11 +142,6 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_003, TestSize.Level1)
     std::cout << "metaString: " << metaString << std::endl;
 }
 
-constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
-constexpr uint32_t MAX_SUPPORTED_ITEMS = 12000;
-constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
-constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
-
 /**
  * @tc.name: Metadata_Utils_004
  * @tc.desc: metadata is invalid
