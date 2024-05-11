@@ -52,10 +52,10 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
         return -1;
     }
     CAMERA_LOGI("NodeUtils::ImageFormatConvert Start ====== id = %{public}d", id);
-    CAMERA_LOGE("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
+    CAMERA_LOGI("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
         srcBufferInfo.width, srcBufferInfo.height, dstBufferInfo.width, dstBufferInfo.height,
         srcBufferInfo.format, dstBufferInfo.format);
-    CAMERA_LOGE("====buffer: %{public}p [%{public}d] -> %{public}p [%{public}d]",
+    CAMERA_LOGI("====buffer: %{public}p [%{public}d] -> %{public}p [%{public}d]",
         srcBufferInfo.bufferAddr, srcBufferInfo.bufferSize,
         dstBufferInfo.bufferAddr, dstBufferInfo.bufferSize);
 
