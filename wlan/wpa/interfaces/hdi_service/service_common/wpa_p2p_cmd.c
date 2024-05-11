@@ -1136,11 +1136,47 @@ int32_t WpaInterfaceP2pGetPeer(struct IWpaInterface *self, const char *ifName, c
     char *savedPtr = NULL;
     char *token = strtok_r(reply, "\n", &savedPtr);
     info->srcAddress = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+    if (info->srcAddress == NULL) {
+        HDF_LOGE("malloc srcAddress failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->p2pDeviceAddress = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+    if (info->p2pDeviceAddress == NULL) {
+        HDF_LOGE("malloc p2pDeviceAddress failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->primaryDeviceType = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_TYPE_LENGTH);
+    if (info->primaryDeviceType == NULL) {
+        HDF_LOGE("malloc primaryDeviceType failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->deviceName = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
+    if (info->deviceName == NULL) {
+        HDF_LOGE("malloc deviceName failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->wfdDeviceInfo = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_WFD_DEVICE_INFO_LENGTH);
+    if (info->wfdDeviceInfo == NULL) {
+        HDF_LOGE("malloc wfdDeviceInfo failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->operSsid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
+    if (info->operSsid == NULL) {
+        HDF_LOGE("malloc operSsid failed!");
+        free(reply);
+        HdiP2pDeviceInfoFree(info, false);
+        return HDF_FAILURE;
+    }
     info->srcAddressLen = ETH_ADDR_LEN + 1;
     info->p2pDeviceAddressLen = ETH_ADDR_LEN + 1;
     info->primaryDeviceTypeLen = WIFI_P2P_DEVICE_TYPE_LENGTH;
@@ -1282,6 +1318,11 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
         return HDF_FAILURE;
     }
     infoList->infos = (struct HdiP2pNetworkInfo *)OsalMemCalloc(sizeof(struct HdiP2pNetworkInfo) * infoList->infoNum);
+    if (infoList->infos == NULL) {
+        HDF_LOGE("malloc infos failed!");
+        free(reply);
+        return HDF_FAILURE;
+    }
     infoList->infosLen = (uint32_t)infoList->infoNum;
     char *tmpBuf = token + 1;
     char *savedPtr = NULL;
@@ -1292,10 +1333,25 @@ int32_t WpaInterfaceP2pListNetworks(struct IWpaInterface *self, const char *ifNa
             break;
         }
         infoList->infos[index].ssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_SSID_LENGTH);
+        if (infoList->infos[index].ssid == NULL) {
+            HDF_LOGE("malloc ssid failed!");
+            HdiP2pNetworkInfoFree(&(infoList->infos[index]), true);
+            break;
+        }
         infoList->infos[index].ssidLen = WIFI_SSID_LENGTH;
         infoList->infos[index].bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+        if (infoList->infos[index].bssid == NULL) {
+            HDF_LOGE("malloc bssid failed!");
+            HdiP2pNetworkInfoFree(&(infoList->infos[index]), true);
+            break;
+        }
         infoList->infos[index].bssidLen = ETH_ADDR_LEN + 1;
         infoList->infos[index].flags = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * WIFI_NETWORK_FLAGS_LENGTH);
+        if (infoList->infos[index].flags == NULL) {
+            HDF_LOGE("malloc flags failed!");
+            HdiP2pNetworkInfoFree(&(infoList->infos[index]), true);
+            break;
+        }
         infoList->infos[index].flagsLen = WIFI_NETWORK_FLAGS_LENGTH;
         GetHalNetworkInfos(token, &(infoList->infos[index]));
         index++;
