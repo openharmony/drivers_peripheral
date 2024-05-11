@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
