@@ -47,10 +47,57 @@ static uint32_t ConvertUint32(const uint8_t *bitOperat)
         (bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | (bitOperat[INDEX_3]);
 }
 
+static int32_t ConvertInt32(const uint8_t *bitOperat)
+{
+    if (bitOperat == nullptr) {
+        return 0;
+    }
+
+    return ((int32_t)bitOperat[INDEX_0] << MOVE_TWENTY_FOUR_BITS) | ((int32_t)bitOperat[INDEX_1] << MOVE_SIXTEEN_BITS) |
+        ((int32_t)bitOperat[INDEX_2] << MOVE_EIGHT_BITS) | ((int32_t)bitOperat[INDEX_3]);
+}
+
 void FuncCancelCapture(const uint8_t *rawData)
 {
-    cameraTest->intents = {STILL_CAPTURE};
-    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
+    cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
+    cameraTest->captureInfo = std::make_shared<CaptureInfo>();
+    cameraTest->captureInfo->streamIds_ = {101};
+    cameraTest->captureInfo->captureSetting_ = cameraTest->abilityVec;
+    cameraTest->captureInfo->enableShutterCallback_ = true;
+    bool isStreaming = true;
+    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->Capture(*rawData, *cameraTest->captureInfo, isStreaming);
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+
+    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
+        {cameraTest->streamInfoSnapshot->v1_0.streamId_}, streamOperatorCallback, offlineStreamOperator);
+    cameraTest->rc = (CamRetCode)offlineStreamOperator->CancelCapture(*rawData);
+}
+
+void FuncReleaseStreams(const uint8_t *rawData)
+{
+    if (rawData == nullptr) {
+        return;
+    }
+    cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
+        cameraTest->streamOperator);
+
+    int32_t data = static_cast<int32_t>(ConvertInt32(rawData));
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+
+    cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
+        {data}, streamOperatorCallback, offlineStreamOperator);
+    cameraTest->rc = (CamRetCode)offlineStreamOperator->ReleaseStreams({data});
+}
+
+void FuncRelease()
+{
     cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
     cameraTest->rc = cameraTest->cameraDevice->GetStreamOperator(cameraTest->streamOperatorCallback,
         cameraTest->streamOperator);
@@ -58,26 +105,32 @@ void FuncCancelCapture(const uint8_t *rawData)
     cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
-    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, true);
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new
-        OHOS::Camera::CameraManager::TestStreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback =
+        new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 
     cameraTest->rc = (CamRetCode)cameraTest->streamOperator->ChangeToOfflineStream(
         {cameraTest->streamInfoSnapshot->v1_0.streamId_}, streamOperatorCallback, offlineStreamOperator);
-
-    sleep(UT_SECOND_TIMES);
-
-    cameraTest->rc = (CamRetCode)offlineStreamOperator->CancelCapture(*rawData);
-    cameraTest->streamInfos.clear();
+    cameraTest->rc = (CamRetCode)offlineStreamOperator->Release();
 }
 
 static void HostFuncSwitch(uint32_t cmd, const uint8_t *rawData)
 {
-    if (rawData == nullptr) {
-        return false;
+    switch (cmd) {
+        case OFFLINE_STREAM_OPERATOR_CONCERCAPTURE: {
+            FuncCancelCapture(rawData);
+            break;
+        }
+        case OFFLINE_STREAM_OPERATOR_RELEASESTREAMS: {
+            FuncReleaseStreams(rawData);
+            break;
+        }
+        case OFFLINE_STREAM_OPERATOR_RELEASE:
+            FuncRelease();
+            break;
+        default:
+            return;
     }
-    FuncCancelCapture(rawData);
 }
 
 bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
@@ -91,6 +144,7 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     rawData += sizeof(cmd);
 
     cameraTest = std::make_shared<OHOS::Camera::CameraManager>();
+    cameraTest->intents = {STILL_CAPTURE};
     cameraTest->Init();
     if (cameraTest->serviceV1_2 == nullptr) {
         return false;
@@ -99,7 +153,8 @@ bool DoSomethingInterestingWithMyApi(const uint8_t *rawData, size_t size)
     if (cameraTest->cameraDeviceV1_2 == nullptr) {
         return false;
     }
-
+    cameraTest->StartStream(cameraTest->intents);
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
     for (cmd = 0; cmd < OFFLINE_STREAM_OPERATOR_END; cmd++) {
         HostFuncSwitch(cmd, rawData);
     }
