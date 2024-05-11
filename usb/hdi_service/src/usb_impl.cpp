@@ -951,12 +951,12 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
     (void)data;
     if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
         if (loadUsbService_.LoadService() != 0) {
-            HDF_LOGE("usbdev LoadUsbServer error");
+            HDF_LOGE("loadUsbService_ LoadService error");
             return HDF_FAILURE;
         }
         if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
             if (loadHdfEdm_.LoadService() != 0) {
-                HDF_LOGE("usbdev LoadUsbServer error");
+                HDF_LOGE("loadHdfEdm_ LoadService error");
                 return HDF_FAILURE;
             }
         }
