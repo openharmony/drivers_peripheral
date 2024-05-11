@@ -54,6 +54,7 @@ namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<PowerInterfaceStub> g_fuzzService = nullptr;
 shared_ptr<PowerFuzzTest> g_fuzzTest = nullptr;
+const uint32_t POWER_INTERFACE_STUB_FUNC_MAX_SIZE = 32;
 } // namespace
 
 static void PowerStubFuzzTest(const uint8_t *data, size_t size)
@@ -65,6 +66,7 @@ static void PowerStubFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
+    code %= POWER_INTERFACE_STUB_FUNC_MAX_SIZE;
 
     MessageParcel datas;
     datas.WriteInterfaceToken(IPowerInterface::GetDescriptor());

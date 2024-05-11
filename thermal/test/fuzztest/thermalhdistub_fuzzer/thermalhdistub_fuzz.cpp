@@ -35,6 +35,7 @@ namespace V1_1 {
 namespace {
 const int32_t REWIND_READ_DATA = 0;
 shared_ptr<ThermalInterfaceStub> g_fuzzService = nullptr;
+const uint32_t THERMAL_INTERFACE_STUB_FUNC_MAX_SIZE = 32;
 } // namespace
 
 static void ThermalStubFuzzTest(const uint8_t *data, size_t size)
@@ -46,6 +47,7 @@ static void ThermalStubFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
+    code %= THERMAL_INTERFACE_STUB_FUNC_MAX_SIZE;
 
     MessageParcel datas;
     datas.WriteInterfaceToken(IThermalInterface::GetDescriptor());
