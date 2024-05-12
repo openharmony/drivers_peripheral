@@ -46,7 +46,7 @@ private:
     void PrintData(const HdfSensorEvents &event);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
     int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
-    bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId, int32_t &serviceId);
+    bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId, const int32_t &serviceId);
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
 };
