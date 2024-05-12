@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,22 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
+#include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include "v1_0/connected_nfc_tag_stub.h"
+#include "v1_1/connected_nfc_tag_stub.h"
 
-using namespace OHOS::HDI::ConnectedNfcTag::V1_0;
+#define HDF_LOG_TAG connected_nfc_tag_driver
+
+using namespace OHOS::HDI::ConnectedNfcTag::V1_1;
 
 struct HdfConnectedNfcTagHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t ConnectedNfcTagDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+static int32_t ConnectedNfcTagDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     auto *hdfConnectedNfcTagHost =
@@ -37,11 +39,11 @@ static int32_t ConnectedNfcTagDispatch(struct HdfDeviceIoClient *client, int cmd
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        HDF_LOGE("%{public}s: invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        HDF_LOGE("%{public}s: invalid reply sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -50,25 +52,25 @@ static int32_t ConnectedNfcTagDispatch(struct HdfDeviceIoClient *client, int cmd
 
 static int HdfConnectedNfcTagDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfConnectedNfcTagDriverInit enter");
+    HDF_LOGI("%{public}s: driver init start", __func__);
     return HDF_SUCCESS;
 }
 
 static int HdfConnectedNfcTagDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfConnectedNfcTagDriverBind enter");
+    HDF_LOGI("%{public}s: driver bind start", __func__);
 
     auto *hdfConnectedNfcTagHost = new (std::nothrow) HdfConnectedNfcTagHost;
     if (hdfConnectedNfcTagHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create HdfConnectedNfcTagDriverBind Object!", __func__);
+        HDF_LOGE("%{public}s: failed to create HdfConnectedNfcTagHost Object!", __func__);
         return HDF_FAILURE;
     }
 
-    hdfConnectedNfcTagHost->ioService.Dispatch = ConnectedNfcTagDispatch;
+    hdfConnectedNfcTagHost->ioService.Dispatch = ConnectedNfcTagDriverDispatch;
     hdfConnectedNfcTagHost->ioService.Open = nullptr;
     hdfConnectedNfcTagHost->ioService.Release = nullptr;
 
-    auto serviceImpl = IConnectedNfcTag::Get(true);
+    auto serviceImpl = OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTag::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfConnectedNfcTagHost;
@@ -76,7 +78,7 @@ static int HdfConnectedNfcTagDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfConnectedNfcTagHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IConnectedNfcTag::GetDescriptor());
+        OHOS::HDI::ConnectedNfcTag::V1_1::IConnectedNfcTag::GetDescriptor());
     if (hdfConnectedNfcTagHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfConnectedNfcTagHost;
@@ -90,19 +92,21 @@ static int HdfConnectedNfcTagDriverBind(struct HdfDeviceObject *deviceObject)
 
 static void HdfConnectedNfcTagDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfConnectedNfcTagDriverRelease enter");
+    HDF_LOGI("%{public}s: driver release start", __func__);
     if (deviceObject->service == nullptr) {
-        HDF_LOGE("HdfConnectedNfcTagDriverRelease not initted");
+        HDF_LOGE("HdfConnectedNfcTagDriverRelease not inited");
         return;
     }
 
     auto *hdfConnectedNfcTagHost =
         CONTAINER_OF(deviceObject->service, struct HdfConnectedNfcTagHost, ioService);
-    delete hdfConnectedNfcTagHost;
-    HDF_LOGI("HdfConnectedNfcTagDriverRelease Success");
+    if (hdfConnectedNfcTagHost != nullptr) {
+        delete hdfConnectedNfcTagHost;
+    }
+    HDF_LOGI("%{public}s: driver release Success", __func__);
 }
 
-static struct HdfDriverEntry g_ConnectedNfcTagDriverEntry = {
+static struct HdfDriverEntry g_connectedNfcTagDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "ConnectedNfcTag_service",
     .Bind = HdfConnectedNfcTagDriverBind,
@@ -113,7 +117,7 @@ static struct HdfDriverEntry g_ConnectedNfcTagDriverEntry = {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-HDF_INIT(g_ConnectedNfcTagDriverEntry);
+HDF_INIT(g_connectedNfcTagDriverEntry);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
