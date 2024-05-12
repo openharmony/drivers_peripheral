@@ -111,8 +111,9 @@ int32_t SensorIfService::Init()
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Init failed, error code is %{public}d", __func__, ret);
     }
+#ifdef SENSOR_DEBUG
     RegisteDumpHost();
-
+#endif
     return ret;
 }
 
