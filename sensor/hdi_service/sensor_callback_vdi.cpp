@@ -104,7 +104,8 @@ int32_t SensorCallbackVdi::ReportEachClient(std::set<int32_t> &services, const V
     return HDF_SUCCESS;
 }
 
-bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, int32_t &sensorId, int32_t &serviceId)
+bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId,
+                                            const int32_t &serviceId)
 {
     if (!SensorClientsManager::IsSensorContinues(sensorId)) {
         return false;
