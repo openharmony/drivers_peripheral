@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 using namespace OHOS::HDI::Camera::V1_0;
 class DCameraHost : public ICameraHost {
 const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;

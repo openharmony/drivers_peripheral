@@ -21,7 +21,7 @@
 #include "dcamera_provider.h"
 #include "v1_1/dcamera_provider_stub.h"
 
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 
 struct HdfDCameraProviderHost {
     struct IDeviceIoService ioService;
