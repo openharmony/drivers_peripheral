@@ -21,7 +21,7 @@
 
 #include "v1_0/icamera_host.h"
 #include "v1_0/icamera_host_callback.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "v1_0/types.h"
 #include "constants.h"
 #include "iremote_object.h"

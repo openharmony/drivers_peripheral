@@ -329,7 +329,7 @@ CamRetCode DCameraDevice::GetDCameraAbility(std::shared_ptr<CameraAbility> &abil
         return CamRetCode::DEVICE_ERROR;
     }
 
-    DCamRetCode ret = dMetadataProcessor_->GetDCameraAbility(ability);
+    ret = dMetadataProcessor_->GetDCameraAbility(ability);
     if (ret != SUCCESS) {
         DHLOGE("Get distributed camera ability failed, ret=%{public}d.", ret);
     }

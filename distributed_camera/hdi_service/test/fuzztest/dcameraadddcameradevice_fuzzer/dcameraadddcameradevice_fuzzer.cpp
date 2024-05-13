@@ -19,7 +19,7 @@
 #include <cstdint>
 
 #include "dcamera_host.h"
-#include "v1_0/id_camera_provider_callback.h"
+#include "v1_1/id_camera_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {

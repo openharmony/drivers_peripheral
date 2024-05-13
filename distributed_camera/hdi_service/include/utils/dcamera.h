@@ -18,7 +18,7 @@
 
 #include "camera_metadata_info.h"
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "v1_0/types.h"
 
 namespace OHOS {
