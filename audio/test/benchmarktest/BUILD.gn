@@ -49,7 +49,6 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
 
   deps = [
     "//third_party/benchmark",
-    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -70,5 +69,8 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "ipc:ipc_single",
+  ]
 }

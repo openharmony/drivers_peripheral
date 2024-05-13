@@ -69,7 +69,6 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/supportlibs/interfaces/include",
       "$hdf_audio_path/interfaces/include",
       "$hdf_audio_path/hal/hdi_passthrough/include",
-      "//third_party/bounds_checking_function/include",
       "$hdf_audio_test_path/common/lib_common/include",
       "$hdf_audio_test_path/common/hdi_common/include",
       "$hdf_audio_test_path/supportlibs/hardwaredependence/render/include",
@@ -84,6 +83,7 @@ if (defined(ohos_lite)) {
     if (enable_c_utils) {
       external_deps += [ "c_utils:utils" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_SO" ]

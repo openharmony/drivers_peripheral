@@ -34,7 +34,6 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
     "$hdf_audio_path/supportlibs/interfaces/include",
     "$hdf_audio_path/interfaces/include",
     "//third_party/cJSON/",
-    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [ "//third_party/cJSON:cjson" ]
@@ -48,6 +47,7 @@ ohos_fuzztest("AudioCardConfigFuzzTest") {
   if (enable_c_utils) {
     external_deps += [ "c_utils:utils" ]
   }
+  external_deps += [ "bounds_checking_function:libsec_shared" ]
 
   include_dirs += [ "//third_party/alsa-lib/include" ]
 }

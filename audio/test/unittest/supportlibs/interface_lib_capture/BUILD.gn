@@ -33,9 +33,10 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/interfaces/include",
       "$hdf_audio_path/supportlibs/adm_adapter/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     public_deps = [
       "$hdf_audio_path/hdi_service/supportlibs:audio_capture_adapter",
@@ -69,7 +70,6 @@ if (defined(ohos_lite)) {
       "$hdf_audio_path/hal/hdi_passthrough/include",
       "$hdf_audio_path/interfaces/include",
       "$hdf_audio_path/supportlibs/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
@@ -90,5 +90,6 @@ if (defined(ohos_lite)) {
     } else if (defined(ohos_lite)) {
       external_deps = [ "hilog_lite:hilog_shared" ]
     }
+    external_deps += [ "bounds_checking_function:libsec_shared" ]
   }
 }
