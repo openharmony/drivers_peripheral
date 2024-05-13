@@ -51,6 +51,7 @@ sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
 static sptr<BluetoothA2dpSrcObserver> g_btA2dpSrcObserverCallbacks = nullptr;
 int g_playState = A2DP_NOT_PLAYING;
 std::map<int, std::string> g_playdevices {};
+std::mutex g_playStateMutex;
 
 static void AudioOnConnectionStateChanged(const RawAddress &device, int state)
 {
@@ -61,7 +62,7 @@ static void AudioOnConnectionStateChanged(const RawAddress &device, int state)
 static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
 {
     HDF_LOGI("%{public}s, playingState:%{public}d", __func__, playingState);
-
+    std::lock_guard<std::mutex> lock(g_playStateMutex);
     std::string addr = device.GetAddress();
     if (playingState) {
         for (const auto &it : g_playdevices) {
