@@ -663,6 +663,9 @@ void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
             formatVector.push_back(it.fmtdesc.width);
             formatVector.push_back(it.fmtdesc.height);
             formatVector.push_back(fpsValue);
+            formatVector.push_back(fpsValue);
+            formatVector.push_back(fpsValue);
+            formatVector.push_back(END_SYMBOL);
         }
     }
     formatVector.push_back(END_SYMBOL);
