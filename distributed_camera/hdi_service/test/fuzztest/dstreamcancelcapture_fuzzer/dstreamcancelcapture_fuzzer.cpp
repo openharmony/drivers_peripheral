@@ -19,7 +19,7 @@
 #include <cstdint>
 
 #include "dstream_operator.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {

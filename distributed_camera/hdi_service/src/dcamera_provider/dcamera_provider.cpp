@@ -374,6 +374,20 @@ int32_t DCameraProvider::UpdateSettings(const DHBase &dhBase, const std::vector<
     return callback->UpdateSettings(dhBase, settings);
 }
 
+int32_t DCameraProvider::NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
+{
+    DHLOGI("DCameraProvider::OpenSession for {devId: %{public}s, dhId: %{public}s}.",
+        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
+
+    sptr<IDCameraProviderCallback> callback = GetCallbackBydhBase(dhBase);
+    if (callback == nullptr) {
+        DHLOGE("DCameraProvider::OpenSession, dcamera provider callback not found.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
+    return callback->NotifyEvent(dhBase, event);
+}
+
 bool DCameraProvider::IsDCameraSettingsInvalid(const DCameraSettings& result)
 {
     return result.value_.empty() || result.value_.length() > SETTING_VALUE_MAX_LENGTH;

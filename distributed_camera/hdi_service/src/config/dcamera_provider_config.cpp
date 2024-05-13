@@ -19,7 +19,7 @@
 #include <hdf_sbuf_ipc.h>
 
 #include "dcamera_provider.h"
-#include "v1_0/dcamera_provider_stub.h"
+#include "v1_1/dcamera_provider_stub.h"
 
 using namespace OHOS::HDI::DistributedCamera::V1_0;
 
