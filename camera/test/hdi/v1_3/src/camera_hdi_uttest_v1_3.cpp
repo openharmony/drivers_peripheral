@@ -1199,3 +1199,33 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_029, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name: Camera_Device_Hdi_V1_3_032
+ * @tc.desc: Get and Print all data in OHOS_ABILITY_CAMERA_MODES for all cameras
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_032, TestSize.Level1)
+{
+    cameraTest->serviceV1_3->GetCameraIds(cameraTest->cameraIds);
+    EXPECT_NE(cameraTest->cameraIds.size(), 0);
+
+    for (auto &cameraId : cameraTest->cameraIds) {
+        cameraTest->Close();
+        cameraTest->serviceV1_3->GetCameraAbility(cameraId, cameraTest->abilityVec);
+        MetadataUtils::ConvertVecToMetadata(cameraTest->abilityVec, cameraTest->ability);
+        cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+        cameraTest->rc = cameraTest->serviceV1_3->OpenCamera_V1_3(cameraId,
+            cameraTest->deviceCallback, cameraTest->cameraDeviceV1_3);
+        EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+        common_metadata_header_t* data = cameraTest->ability->get();
+
+        std::string metaString = cameraTest->ability->FormatCameraMetadataToString(data);
+
+        std::cout << "============= camera id: " << cameraId << " =============" << std::endl;
+        std::cout << metaString << std::endl;
+        std::cout << "==========================" << std::endl;
+    }
+}

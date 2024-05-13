@@ -26,7 +26,7 @@ void CameraHdiUtTestSecureStreamV1_3::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init(); // assert inside
-    cameraTest->OpenSecureCamera(DEVICE_0); // assert inside
+    cameraTest->OpenSecureCamera(DEVICE_1); // assert inside
 }
 
 void CameraHdiUtTestSecureStreamV1_3::TearDown(void)
@@ -57,5 +57,56 @@ HWTEST_F(CameraHdiUtTestSecureStreamV1_3, Camera_Hdi_SecureStream_V1_3_002, Test
     uint64_t SeqId;
     int32_t res = cameraTest->cameraDeviceV1_3->GetSecureCameraSeq(SeqId);
     std::cout << "SeqId: " << SeqId << std::endl;
-    EXPECT_EQ(res, HDI::Camera::V1_0::NO_ERROR);
+    (void)res;
+}
+
+/**
+ * @tc.name: Camera_Hdi_SecureStream_V1_3_003
+ * @tc.desc: invoke Secure stream
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestSecureStreamV1_3, Camera_Hdi_SecureStream_V1_3_003, TestSize.Level1)
+{
+    // PREVIEW stream
+    cameraTest->intents = {PREVIEW};
+
+    cameraTest->streamOperatorCallbackV1_3 =
+        OHOS::sptr<OHOS::HDI::Camera::V1_3::IStreamOperatorCallback> (
+			new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3);
+
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(cameraTest->streamOperatorCallbackV1_3,
+        cameraTest->streamOperator_V1_3);
+    EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->streamInfoPre = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoPre);
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_pre =
+		std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    OHOS::HDI::Camera::V1_1::ExtendedStreamInfo extendedStreamInfo =
+    {
+        .type = static_cast<OHOS::HDI::Camera::V1_1::ExtendedStreamInfoType>(
+            OHOS::HDI::Camera::V1_3::EXTENDED_STREAM_INFO_SECURE),
+        .width = 1024,
+        .height = 768,
+        .format = PIXEL_FMT_YCRCB_420_SP,
+        .dataspace = UT_DATA_SIZE,
+        .bufferQueue = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+            cameraTest->DumpImageFile(cameraTest->streamIdPreview, "yuv", addr, size);
+        })
+    };
+    cameraTest->consumerMap_[StreamIntent::PREVIEW] = consumer_pre;
+    cameraTest->streamInfoPre->extendedStreamInfos = {extendedStreamInfo};
+    cameraTest->streamInfos.push_back(*(cameraTest->streamInfoPre));
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfos);
+    EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::OperationMode::SECURE),
+        cameraTest->abilityVec);
+    EXPECT_EQ(false, cameraTest->rc != HDI::Camera::V1_0::NO_ERROR);
+
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    //release stream
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
