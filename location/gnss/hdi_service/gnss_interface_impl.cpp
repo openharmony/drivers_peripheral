@@ -27,10 +27,6 @@
 #include "location_vendor_lib.h"
 #include "string_utils.h"
 
-namespace {
-OHOS::HDI::Location::GnssConfigPara g_configPara;
-}
-
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -43,6 +39,7 @@ using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 const int32_t MAX_CALLBACK_SIZE = 1;
 LocationCallBackMap g_locationCallBackMap;
 GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
+GnssConfigParameter g_configPara;
 std::mutex g_mutex;
 std::mutex g_deathMutex;
 } // namespace
@@ -103,8 +100,8 @@ static void LocationUpdate(GnssLocation* location)
     locationNew.horizontalAccuracy = location->horizontalAccuracy;
     locationNew.speed = location->speed;
     locationNew.bearing = location->bearing;
-    locationNew.timeForFix = location->timestamp;
-    locationNew.timeSinceBoot = location->timestampSinceBoot;
+    locationNew.timeForFix = location->timeForFix;
+    locationNew.timeSinceBoot = location->timeSinceBoot;
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -113,7 +110,7 @@ static void LocationUpdate(GnssLocation* location)
     }
 }
 
-static void StatusCallback(uint16_t* status)
+static void GnssWorkingStatusUpdate(uint16_t* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
@@ -179,12 +176,12 @@ static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
     }
     device->size = sizeof(GnssCallbackStruct);
     device->locationUpdate = LocationUpdate;
-    device->statusUpdate = StatusCallback;
-    device->svStatusUpdate = SvStatusCallback;
+    device->gnssWorkingStatusUpdate = GnssWorkingStatusUpdate;
+    device->satelliteStatusUpdate = SvStatusCallback;
     device->nmeaUpdate = NmeaCallback;
     device->capabilitiesUpdate = nullptr;
-    device->refInfoRequest = nullptr;
-    device->downloadRequestCb = nullptr;
+    device->requestRefInfo = nullptr;
+    device->requestExtendedEphemeris = nullptr;
 }
 
 static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
@@ -193,7 +190,7 @@ static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
         return;
     }
     device->size = 0;
-    device->cachedLocationCb = nullptr;
+    device->cachedLocationUpdate = nullptr;
 }
 
 static void GetGnssCallbackMethods(GnssCallbackStruct* device)
@@ -204,10 +201,10 @@ static void GetGnssCallbackMethods(GnssCallbackStruct* device)
     device->size = sizeof(GnssCallbackStruct);
     static GnssBasicCallbackIfaces basicCallback;
     GetGnssBasicCallbackMethods(&basicCallback);
-    device->gnssCb = basicCallback;
+    device->gnssCallback = basicCallback;
     static GnssCacheCallbackIfaces cacheCallback;
     GetGnssCacheCallbackMethods(&cacheCallback);
-    device->gnssCacheCb = cacheCallback;
+    device->gnssCacheCallback = cacheCallback;
 }
 
 GnssInterfaceImpl::GnssInterfaceImpl()
@@ -227,10 +224,10 @@ int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    g_configPara.type = static_cast<uint32_t>(GnssStartClass::GNSS_START_CLASS_NORMAL);
+    g_configPara.startCategory = static_cast<uint32_t>(GnssStartCategory::GNSS_START_CATEGORY_NORMAL);
     g_configPara.u.gnssBasicConfig.gnssMode = para.gnssBasic.gnssMode;
     g_configPara.u.gnssBasicConfig.size = sizeof(GnssBasicConfigPara);
-    int ret = gnssInterface->set_gnss_config_para(&g_configPara);
+    int ret = gnssInterface->setGnssConfigPara(&g_configPara);
     HDF_LOGI("%{public}s, ret=%{public}d", __func__, ret);
     return ret;
 }
@@ -259,9 +256,9 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = gnssInterface->enable_gnss(&gnssCallback);
+    int ret = gnssInterface->enableGnss(&gnssCallback);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("enable_gnss failed.");
+        HDF_LOGE("enableGnss failed.");
         return HDF_FAILURE;
     }
     static GnssNetInitiatedCallbacks niCallback;
@@ -289,7 +286,7 @@ int32_t GnssInterfaceImpl::DisableGnss()
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = gnssInterface->disable_gnss();
+    int ret = gnssInterface->disableGnss();
     g_locationCallBackMap.clear();
     return ret;
 }
@@ -303,7 +300,7 @@ int32_t GnssInterfaceImpl::StartGnss(GnssStartType type)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = gnssInterface->start_gnss(startType);
+    int ret = gnssInterface->startGnss(startType);
     return ret;
 }
 
@@ -316,7 +313,7 @@ int32_t GnssInterfaceImpl::StopGnss(GnssStartType type)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = gnssInterface->stop_gnss(startType);
+    int ret = gnssInterface->stopGnss(startType);
     return ret;
 }
 
@@ -336,7 +333,7 @@ int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryDataType data)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    gnssInterface->remove_auxiliary_data(flags);
+    gnssInterface->removeAuxiliaryData(flags);
     return HDF_SUCCESS;
 }
 

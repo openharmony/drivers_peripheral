@@ -48,7 +48,7 @@ extern "C" IAGnssInterface* AGnssInterfaceImplGetInstance(void)
     return new (std::nothrow) AGnssInterfaceImpl();
 }
 
-static void OnStatusChangedCb(const AGnssStatusInfo* status)
+static void RequestSetupAgnssDataConnection(const AgnssDataConnectionRequest* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:status is nullptr.", __func__);
@@ -56,8 +56,8 @@ static void OnStatusChangedCb(const AGnssStatusInfo* status)
     }
     HDF_LOGI("%{public}s.", __func__);
     AGnssDataLinkRequest agnssStatus;
-    agnssStatus.agnssType = static_cast<AGnssUserPlaneProtocol>(status->agnssType);
-    agnssStatus.setUpType = static_cast<DataLinkSetUpType>(status->connStatus);
+    agnssStatus.agnssType = static_cast<AGnssUserPlaneProtocol>(status->agnssCategory);
+    agnssStatus.setUpType = static_cast<DataLinkSetUpType>(status->requestCategory);
     std::unique_lock<std::mutex> lock(g_mutex);
     for (const auto& iter : g_agnssCallBackMap) {
         auto& callback = iter.second;
@@ -92,15 +92,15 @@ static void GetRefLocationidCb(uint32_t type)
     }
 }
 
-static void GetAGnssCallbackMethods(AGnssCallbackIfaces* device)
+static void GetAGnssCallbackMethods(AgnssCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
     }
-    device->size = sizeof(AGnssCallbackIfaces);
-    device->agnssStatusChange = OnStatusChangedCb;
-    device->getSetid = GetSetidCb;
-    device->getRefLoc = GetRefLocationidCb;
+    device->size = sizeof(AgnssCallbackIfaces);
+    device->requestSetupDataLink = RequestSetupAgnssDataConnection;
+    device->requestSetid = GetSetidCb;
+    device->requestRefInfo = GetRefLocationidCb;
 }
 
 AGnssInterfaceImpl::AGnssInterfaceImpl()
@@ -133,20 +133,20 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
         return lhs == rhs ? HDF_SUCCESS : HDF_FAILURE;
     }
 
-    static AGnssCallbackIfaces agnsscallback;
+    static AgnssCallbackIfaces agnsscallback;
     GetAGnssCallbackMethods(&agnsscallback);
 
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    bool ret = agnssInterface->set_agnss_callback(&agnsscallback);
+    bool ret = agnssInterface->setAgnssCallback(&agnsscallback);
     if (!ret) {
-        HDF_LOGE("set_agnss_callback failed.");
+        HDF_LOGE("setAgnssCallback failed.");
     }
     AddAgnssDeathRecipient(callbackObj);
     g_agnssCallBackMap[remote.GetRefPtr()] = callbackObj;
@@ -159,15 +159,15 @@ int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     uint16_t type = static_cast<uint16_t>(server.type);
-    bool ret = agnssInterface->set_agnss_server(type, server.server.c_str(), server.server.length(), server.port);
+    bool ret = agnssInterface->setAgnssServer(type, server.server.c_str(), server.server.length(), server.port);
     if (!ret) {
-        HDF_LOGE("set_agnss_server failed.");
+        HDF_LOGE("setAgnssServer failed.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -178,32 +178,32 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     HDF_LOGI("%{public}s, g_refInfoType=%{public}d", __func__, refInfo.type);
-    AGnssRefLocInfo loc;
-    loc.type = g_refInfoType;
-    if (loc.type == static_cast<uint32_t>(AgnssRefLocClass::AGNSS_REF_LOC_CLASS_MAC)) {
+    AgnssReferenceInfo loc;
+    loc.category = g_refInfoType;
+    if (loc.category == static_cast<uint32_t>(AgnssRefInfoCategory::AGNSS_REF_INFO_CATEGORY_MAC)) {
         for (size_t i = 0; i < MAC_LEN; i++) {
             loc.u.mac.mac[i] = refInfo.mac.mac[i];
         }
         loc.u.mac.size = MAC_LEN;
-    } else if (loc.type == static_cast<uint32_t>(AgnssRefLocClass::AGNSS_REF_LOC_CLASS_CELLID)) {
+    } else if (loc.category == static_cast<uint32_t>(AgnssRefInfoCategory::AGNSS_REF_INFO_CATEGORY_CELLID)) {
         switch (refInfo.cellId.type) {
             case CELLID_TYPE_GSM:
-                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::GSM_CELLID);
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_GSM);
                 break;
             case CELLID_TYPE_UMTS:
-                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::UMTS_CELLID);
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_UMTS);
                 break;
             case CELLID_TYPE_LTE:
-                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::LTE_CELLID);
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_LTE);
                 break;
             case CELLID_TYPE_NR:
-                loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::NR_CELLID);
+                loc.u.cellId.category = static_cast<uint16_t>(CellIdCategory::CELLID_CATEGORY_NR);
                 break;
             default:
                 HDF_LOGE("%{public}s wrong cellType.", __func__);
@@ -215,10 +215,11 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
         loc.u.cellId.cid = refInfo.cellId.cid;
         loc.u.cellId.tac = refInfo.cellId.tac;
         loc.u.cellId.pcid = refInfo.cellId.pcid;
+        loc.u.cellId.nci = refInfo.cellId.nci;
     }
-    bool ret = agnssInterface->set_ref_location(&loc);
+    bool ret = agnssInterface->setAgnssReferenceInfo(&loc);
     if (!ret) {
-        HDF_LOGE("set_ref_location failed.");
+        HDF_LOGE("setAgnssReferenceInfo failed.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -230,15 +231,15 @@ int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::AGNSS_MODULE_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
+        static_cast<const AgnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     uint16_t type = static_cast<uint16_t>(id.type);
-    int ret = agnssInterface->set_setid(type, id.id.c_str(), id.id.length());
+    int ret = agnssInterface->setSetid(type, id.id.c_str(), id.id.length());
     if (!ret) {
-        HDF_LOGE("set_setid failed.");
+        HDF_LOGE("setSetid failed.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
