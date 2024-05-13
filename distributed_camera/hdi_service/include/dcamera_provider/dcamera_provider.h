@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraHost;
 class DCameraDevice;
 class DCameraProvider : public IDCameraProvider {
@@ -52,7 +52,6 @@ public:
     int32_t StartCapture(const DHBase &dhBase, const std::vector<DCCaptureInfo> &captureInfos);
     int32_t StopCapture(const DHBase &dhBase, const std::vector<int> &streamIds);
     int32_t UpdateSettings(const DHBase &dhBase, const std::vector<DCameraSettings> &settings);
-    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event);
 
 private:
     bool IsDCameraSettingsInvalid(const DCameraSettings& result);

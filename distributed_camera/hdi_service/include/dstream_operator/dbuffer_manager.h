@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 class DBufferManager {
 public:

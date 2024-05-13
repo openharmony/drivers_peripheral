@@ -18,7 +18,7 @@ ohos_shared_library("libdistributed_camera_provider_config") {
   include_dirs =
       [ "${distributedcamera_hdf_path}/hdi_service/include/dcamera_provider" ]
   sources = [ "./src/config/dcamera_provider_config.cpp" ]
-  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
+  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
 
   external_deps = [
     "cJSON:cjson",
@@ -48,7 +48,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
     "${distributedcamera_hdf_path}/hdi_service/include/utils",
   ]
   sources = [ "./src/config/dcamera_host_config.cpp" ]
-  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
+  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -72,7 +72,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
   part_name = "drivers_peripheral_distributed_camera"
 }
 
-ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
+ohos_shared_library("libdistributed_camera_hdf_service_1.1") {
   include_dirs = [
     "include/dcamera_device",
     "include/dcamera_host",
@@ -128,7 +128,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
 
 group("hdf_distributed_camera_service") {
   deps = [
-    ":libdistributed_camera_hdf_service_1.0",
+    ":libdistributed_camera_hdf_service_1.1",
     ":libdistributed_camera_host_config",
     ":libdistributed_camera_provider_config",
   ]
