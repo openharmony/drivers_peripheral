@@ -964,31 +964,28 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
     return HDF_SUCCESS;
 }
 
-int32_t UsbImpl::UpdateFunctionStatus()
+void UsbImpl::UpdateFunctionStatus()
 {
     char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
     int32_t ret = GetParameter("persist.sys.usb.config", "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
     if (ret <= 0) {
         HDF_LOGI("%{public}s: GetParameter failed", __func__);
-        return HDF_FAILURE;
     }
 
     std::string functionValue(cFunctionValue);
     auto it = configMap.find(functionValue);
     if (it != configMap.end()) {
         HDF_LOGI("Function is %{public}s", functionValue.c_str());
-        return UsbdFunction::UsbdUpdateFunction(it->second);
+        ret = UsbdFunction::UsbdUpdateFunction(it->second);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: UsbdUpdateFunction failed", __func__);
+        }
     }
-    return HDF_FAILURE;
 }
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
-    int32_t ret = UsbImpl::UpdateFunctionStatus();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: UpdateFunctionStatus failed", __func__);
-        return HDF_FAILURE;
-    }
+    UsbImpl::UpdateFunctionStatus();
     inst->parsePortPath();
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
