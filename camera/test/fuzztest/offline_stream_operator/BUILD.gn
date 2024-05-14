@@ -70,6 +70,7 @@ ohos_fuzztest("CameraOfflineStreamOperatorFuzzTest") {
   external_deps += [
     "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_proxy_1.2",
+    "drivers_interface_camera:libcamera_proxy_1.3",
     "drivers_interface_camera:metadata",
     "graphic_surface:surface",
     "samgr:samgr_proxy",
@@ -80,5 +81,5 @@ ohos_fuzztest("CameraOfflineStreamOperatorFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":offline_stream_operator_fuzztest" ]
+  deps += [ ":CameraOfflineStreamOperatorFuzzTest" ]
 }
