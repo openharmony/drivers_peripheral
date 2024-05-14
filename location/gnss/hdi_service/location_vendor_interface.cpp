@@ -75,9 +75,9 @@ void LocationVendorInterface::Init()
         HDF_LOGE("%{public}s:dlsym GnssInterface failed.", __func__);
         return;
     }
-    vendorInterface_ = gnssDevice->get_gnss_interface();
+    vendorInterface_ = gnssDevice->getGnssInterface();
     if (vendorInterface_ == nullptr) {
-        HDF_LOGE("%{public}s:get_gnss_interface failed.", __func__);
+        HDF_LOGE("%{public}s:getGnssInterface failed.", __func__);
         return;
     }
 }
@@ -97,7 +97,7 @@ const void *LocationVendorInterface::GetModuleInterface(int moduleId) const
         HDF_LOGE("%{public}s:can not get vendorInterface.", __func__);
         return nullptr;
     }
-    auto moduleInterface = vendorInterface->get_gnss_module_iface(moduleId);
+    auto moduleInterface = vendorInterface->getGnssModuleIface(moduleId);
     if (moduleInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get moduleInterface.", __func__);
     }
