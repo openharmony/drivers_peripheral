@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
-#include "v1_0/iwpa_interface.h"
+#include "v1_1/iwpa_interface.h"
 #include "wpa_impl.h"
 
 struct HdfWpaInterfaceHost {

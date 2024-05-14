@@ -13,17 +13,18 @@
 
 import("//build/ohos.gni")
 import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
+WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
 if (is_standard_system) {
-  ohos_shared_library("libwpa_interface_service_1.0") {
+  ohos_shared_library("libwpa_interface_service_1.1") {
     include_dirs = [
       "./service_common",
       "../../client/include",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/utils",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa_supplicant",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa_supplicant_lib",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src/utils",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/wpa_supplicant",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/wpa_supplicant_lib",
     ]
     sources = [
       "service_common/hdi_wpa_common.c",
@@ -55,7 +56,7 @@ if (is_standard_system) {
 
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwpa_stub_1.0",
+      "drivers_interface_wlan:libwpa_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
@@ -73,7 +74,7 @@ if (is_standard_system) {
 
     sources = [ "wpa_interface_drivers.c" ]
 
-    deps = [ ":libwpa_interface_service_1.0" ]
+    deps = [ ":libwpa_interface_service_1.1" ]
 
     cflags = [
       "-Wall",
@@ -86,7 +87,7 @@ if (is_standard_system) {
 
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_wlan:libwpa_stub_1.0",
+      "drivers_interface_wlan:libwpa_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -100,7 +101,7 @@ if (is_standard_system) {
     part_name = "drivers_peripheral_wlan"
   }
 } else {
-  ohos_shared_library("libwpa_interface_service_1.0") {
+  ohos_shared_library("libwpa_interface_service_1.1") {
     include_dirs = []
     sources = []
 
@@ -122,6 +123,6 @@ if (is_standard_system) {
 group("hdi_wpa_service") {
   deps = [
     ":libwpa_hdi_c_device",
-    ":libwpa_interface_service_1.0",
+    ":libwpa_interface_service_1.1",
   ]
 }
