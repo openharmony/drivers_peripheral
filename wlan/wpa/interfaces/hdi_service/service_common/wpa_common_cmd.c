@@ -1909,7 +1909,7 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
         HDF_LOGE("Failed to connect to wpa!");
         return HDF_FAILURE;
     }
-    AddInterfaceArgv addInterface;
+    AddInterfaceArgv addInterface = {0};
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
             strcpy_s(addInterface.confName, sizeof(addInterface.confName),

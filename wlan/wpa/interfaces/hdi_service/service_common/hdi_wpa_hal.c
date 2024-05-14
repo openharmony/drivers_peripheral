@@ -54,6 +54,8 @@
 #define MAC_AUTH_RSP4_TIMEOUT 5202
 #define MAC_ASSOC_RSP_TIMEOUT 5203
 #define SSID_EMPTY_LENGTH 1
+static const int MAX_IFACE_COUNT = 8;
+static const int MAX_IFACE_LEN = 6;
 
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 
@@ -113,11 +115,13 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         return -1;
     }
     WpaIfaceInfo *info = p->ifaces;
-    while (info != NULL) {
-        if (strcmp(info->name, argv->name) == 0) {
+    int count = 0;
+    while (info != NULL && count < MAX_IFACE_COUNT) {
+        if (strncmp(info->name, argv->name, MAX_IFACE_LEN) == 0) {
             return 0;
         }
         info = info->next;
+        count++;
     }
     info = (WpaIfaceInfo *)calloc(1, sizeof(WpaIfaceInfo));
     if (info == NULL) {
@@ -154,7 +158,7 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     WpaIfaceInfo *prev = NULL;
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
-        if (strcmp(info->name, name) == 0) {
+        if (strncmp(info->name, name, MAX_IFACE_LEN) == 0) {
             break;
         }
         prev = info;
@@ -213,6 +217,7 @@ WifiWpaInterface *GetWifiWpaGlobalInterface(void)
     g_wpaInterface->wpaCliAddIface = WpaCliAddIface;
     g_wpaInterface->wpaCliRemoveIface = WpaCliRemoveIface;
     g_wpaInterface->wpaCliTerminate = WpaCliWpaTerminate;
+    g_wpaInterface->ifaces = NULL;
     pthread_mutex_unlock(&g_mutex);
     return g_wpaInterface;
 }
