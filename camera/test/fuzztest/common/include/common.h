@@ -121,7 +121,7 @@ public:
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
-    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;    
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
