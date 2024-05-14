@@ -37,8 +37,8 @@ ohos_executable("codec_decode_test_ipc") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_display:display_buffer_idl_headers",
-      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
@@ -83,8 +83,8 @@ ohos_executable("codec_encode_test_ipc") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_display:display_buffer_idl_headers",
-      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
@@ -129,8 +129,8 @@ ohos_executable("codec_decode_test_async") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_display:display_buffer_idl_headers",
-      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
@@ -175,8 +175,8 @@ ohos_executable("codec_encode_test_async") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_display:display_buffer_idl_headers",
-      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
