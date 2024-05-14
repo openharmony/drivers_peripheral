@@ -29,8 +29,8 @@
 #include "bssid_ignore.h"
 #include "wpa_supplicant/config.h"
 #include "common/defs.h"
-#include "v1_0/iwpa_callback.h"
-#include "v1_0/iwpa_interface.h"
+#include "v1_1/iwpa_callback.h"
+#include "v1_1/iwpa_interface.h"
 #include "wpa_client.h"
 #include <unistd.h>
 #include <stdlib.h>
