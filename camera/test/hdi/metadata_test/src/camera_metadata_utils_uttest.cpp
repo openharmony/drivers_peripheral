@@ -169,19 +169,18 @@ HWTEST_F(CameraMetadataUtilsTest, Metadata_Utils_004, TestSize.Level1)
     ret = MetadataUtils::ConvertMetadataToVec(metaData1, metaVec);
     EXPECT_EQ(ret, false);
 
-    auto metaData2 = make_shared<CameraMetadata>(MAX_ITEM_CAPACITY, MAX_DATA_CAPACITY);
-    auto meta2 = metaData2->get();
-    meta2->data_capacity = MAX_DATA_CAPACITY + 1;
-    PrintMetaDataInfo(metaData2);
-    ret = MetadataUtils::ConvertMetadataToVec(metaData2, metaVec);
+    meta1->item_capacity = MAX_ITEM_CAPACITY;
+    meta1->data_capacity = MAX_DATA_CAPACITY + 1;
+    PrintMetaDataInfo(meta1);
+    ret = MetadataUtils::ConvertMetadataToVec(metaData1, metaVec);
     EXPECT_EQ(ret, false);
 
-    auto metaData3 = make_shared<CameraMetadata>(MAX_ITEM_CAPACITY, MAX_DATA_CAPACITY);
+    meta1->data_capacity = MAX_DATA_CAPACITY;
     auto itemData0 = new uint8_t[MAX_SUPPORTED_ITEMS + 1];
-    metaData3->addEntry(OHOS_ABILITY_CAMERA_TYPE, itemData0, MAX_SUPPORTED_ITEMS + 1);
+    meta1->addEntry(OHOS_ABILITY_CAMERA_TYPE, itemData0, MAX_SUPPORTED_ITEMS + 1);
     delete [] itemData0;
-    PrintMetaDataInfo(metaData3);
-    ret = MetadataUtils::ConvertMetadataToVec(metaData3, metaVec);
+    PrintMetaDataInfo(meta1);
+    ret = MetadataUtils::ConvertMetadataToVec(metaData1, metaVec);
     EXPECT_EQ(ret, false);
 }
 
