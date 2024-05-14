@@ -471,7 +471,7 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level
 
 /**
  * @tc.name: Camera_metedate_opertor_028
- * @tc.desc: item  = 131071
+ * @tc.desc: item  = 0
  * @tc.size: MediumTest
  * @tc.type: Function
  */
