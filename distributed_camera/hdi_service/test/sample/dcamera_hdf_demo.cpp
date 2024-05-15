@@ -862,9 +862,9 @@ RetCode DcameraHdfDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbili
     common_metadata_header_t* data = ability->get();
     std::vector<int32_t>  exposureCompensationRange;
     camera_metadata_item_t entry;
-    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_RANGE, &entry);
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_AE_COMPENSATION_RANGE, &entry);
     if (ret != 0) {
-        DHLOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_RANGE error");
+        DHLOGE("demo test: get OHOS_ABILITY_AE_COMPENSATION_RANGE error");
         return RC_ERROR;
     }
 
@@ -886,9 +886,9 @@ RetCode DcameraHdfDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbili
     common_metadata_header_t* data = ability->get();
     camera_rational_t exposureCompensationSteps;
     camera_metadata_item_t entry;
-    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_STEP, &entry);
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_AE_COMPENSATION_STEP, &entry);
     if (ret != 0) {
-        DHLOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_STEP error");
+        DHLOGE("demo test: get OHOS_ABILITY_AE_COMPENSATION_STEP error");
         return RC_ERROR;
     }
     exposureCompensationSteps.numerator = entry.data.r->numerator;
