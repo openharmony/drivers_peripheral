@@ -66,7 +66,7 @@ void ISensor::InitCompensationRange(CameraMetadata& camera_meta_data)
         0,
         0,
     };
-    camera_meta_data.addEntry(OHOS_CONTROL_AE_COMPENSATION_RANGE, aeCompensationRange.data(),
+    camera_meta_data.addEntry(OHOS_ABILITY_AE_COMPENSATION_RANGE, aeCompensationRange.data(),
                               aeCompensationRange.size());
 }
 

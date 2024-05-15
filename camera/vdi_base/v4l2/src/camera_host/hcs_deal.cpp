@@ -410,7 +410,7 @@ RetCode HcsDeal::DealAeCompensationRange(
     }
 
     bool ret =
-        metadata->addEntry(OHOS_CONTROL_AE_COMPENSATION_RANGE, aeCompensationRange.data(), aeCompensationRange.size());
+        metadata->addEntry(OHOS_ABILITY_AE_COMPENSATION_RANGE, aeCompensationRange.data(), aeCompensationRange.size());
     if (!ret) {
         CAMERA_LOGD("aeCompensationRange add failed");
         return RC_ERROR;
@@ -438,7 +438,7 @@ RetCode HcsDeal::DealAeCompensationSteps(
     pDevResIns->GetUint32ArrayElem(&metadataNode, AE_COMPENSATION_STEPS, 1, &nodeValue, -1);
     aeCompensationStep.denominator = (int32_t)nodeValue;
 
-    bool ret = metadata->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, &aeCompensationStep, 1);
+    bool ret = metadata->addEntry(OHOS_ABILITY_AE_COMPENSATION_STEP, &aeCompensationStep, 1);
     if (!ret) {
         CAMERA_LOGE("aeCompensationSteps add failed");
         return RC_ERROR;
