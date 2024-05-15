@@ -468,3 +468,16 @@ HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_027, TestSize.Level
     std::vector<vendorTag_t>tagVec;
     GetAllVendorTags(tagVec);
 }
+
+/**
+ * @tc.name: Camera_metedate_opertor_028
+ * @tc.desc: item  = 0, metadataHeader == nullptr
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraMetadataOperatorTest, Camera_metedate_opertor_028, TestSize.Level1)
+{
+    printf("CameraMetadataOperatorTest Camera_metedate_opertor_028 start...");
+    int ret = IsCameraMetadataItemExist(nullptr, 0);
+    EXPECT_EQ(ret, false);
+}
