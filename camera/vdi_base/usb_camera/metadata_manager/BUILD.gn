@@ -57,6 +57,7 @@ if (!defined(ohos_lite)) {
     deps = [ "$camera_path_usb/device_manager:usb_camera_device_manager" ]
 
     external_deps = [
+      "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "bounds_checking_function:libsec_shared",
       "drivers_interface_camera:metadata",
       "graphic_surface:surface",
