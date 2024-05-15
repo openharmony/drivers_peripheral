@@ -14,6 +14,10 @@
  */
 #include <gtest/gtest.h>
 #include <thread>
+#include <string>
+#include <vector>
+#include <securec.h>
+#include <sstream>
 
 #include "se_impl.h"
 #include "v1_0/isecure_element_interface.h"
@@ -28,17 +32,37 @@ using ISeHdiV1_0 = OHOS::HDI::SecureElement::V1_0::ISecureElementInterface;
 using OHOS::HDI::SecureElement::V1_0::SecureElementStatus;
 using OHOS::HDI::SecureElement::V1_0::ISecureElementCallback;
 using namespace OHOS::HDI::SecureElement::V1_0;
+
+// the max APDU response bytes
+static constexpr const uint16_t MAX_APDU_RESP_BYTES = 512;
+static constexpr const uint8_t HEX_BYTE_LEN = 2;
+
+static void HexStringToBytesArray(const std::string &src, std::vector<uint8_t> &bytes)
+{
+    // convert hex string to byte array
+    if (src.empty()) {
+        return;
+    }
+
+    uint32_t bytesLen = src.length() / HEX_BYTE_LEN;
+    std::string strByte;
+    unsigned int srcIntValue;
+    for (uint32_t i = 0; i < bytesLen; i++) {
+        strByte = src.substr(i * HEX_BYTE_LEN, HEX_BYTE_LEN);
+        if (sscanf_s(strByte.c_str(), "%x", &srcIntValue) <= 0) {
+            bytes.clear();
+            return;
+        }
+        bytes.push_back(static_cast<uint8_t>(srcIntValue & 0xFF));
+    }
+}
+
 class SeImplTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-public:
-    // the max APDU response bytes
-    static constexpr const uint16_t MAX_APDU_RESP_BYTES = 512;
-    static constexpr const uint8_t HEX_BYTE_LEN = 2;
-    void HexStringToBytesArray(const std::string &src, std::vector<uint8_t> &bytes);
 };
 
 class SeClientCallback : public ISecureElementCallback {
@@ -51,25 +75,7 @@ public:
         return HDF_SUCCESS;
     }
 };
-void SeImplTest::HexStringToBytesArray(const std::string &src, std::vector<uint8_t> &bytes)
-{
-    // convert hex string to byte array
-    if (src.empty()) {
-        return;
-    }
 
-    uint32_t bytesLen = src.length() / SeImplTest::HEX_BYTE_LEN;
-    std::string strByte;
-    unsigned int srcIntValue;
-    for (uint32_t i = 0; i < bytesLen; i++) {
-        strByte = src.substr(i * SeImplTest::HEX_BYTE_LEN, SeImplTest::HEX_BYTE_LEN);
-        if (sscanf_s(strByte.c_str(), "%x", &srcIntValue) <= 0) {
-            bytes.clear();
-            return;
-        }
-        bytes.push_back(static_cast<uint8_t>(srcIntValue & 0xFF));
-    }
-}
 void SeImplTest::SetUpTestCase()
 {
     std::cout << " SetUpTestCase SeImplTest." << std::endl;

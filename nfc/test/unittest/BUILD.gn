@@ -57,7 +57,7 @@ ohos_unittest("nfc_impl_test") {
 
   external_deps = unit_test_external_deps
 
-  part_name = "nfc"
+  part_name = "drivers_peripheral_nfc"
   subsystem_name = "hdf"
 }
 
