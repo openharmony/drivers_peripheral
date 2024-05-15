@@ -224,9 +224,52 @@ void ForceSuspendLoop()
     }
 }
 
+static std::string g_suspendTag;
+int32_t PowerInterfaceImpl::SetSuspendTag(const std::string &tag)
+{
+    HDF_LOGI("Set suspend tag: %{public}s", tag.c_str());
+    g_suspendTag = tag;
+    return HDF_SUCCESS;
+}
+
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+static constexpr const int32_t MAX_RETRY_COUNT = 5;
+int32_t DoSuspendWithTag()
+{
+    UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
+    if (suspendStateFd < 0) {
+        return HDF_FAILURE;
+    }
+
+    int loop;
+    for (loop = 0; loop < MAX_RETRY_COUNT; loop++) {
+        bool ret = SaveStringToFd(suspendStateFd, g_suspendTag);
+        if (ret) {
+            break;
+        }
+        HDF_LOGE("SaveStringToFd fail, tag:%{public}s loop:%{public}d", g_suspendTag.c_str(), loop);
+    }
+    HDF_LOGI("Do suspend %{public}d: echo %{public}s > /sys/power/state", loop, g_suspendTag.c_str());
+    if (loop == MAX_RETRY_COUNT) {
+        HDF_LOGE("DoSuspendWithTag fail: %s", g_suspendTag.c_str());
+        g_suspendTag.clear();
+        return HDF_FAILURE;
+    }
+    g_suspendTag.clear();
+    return HDF_SUCCESS;
+}
+#endif
+
 int32_t DoSuspend()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
+
+#ifdef DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG
+    if (!g_suspendTag.empty()) {
+        return DoSuspendWithTag();
+    }
+#endif
+
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
         return HDF_FAILURE;

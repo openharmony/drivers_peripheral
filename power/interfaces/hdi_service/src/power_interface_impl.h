@@ -40,6 +40,8 @@ public:
 
     int32_t UnRegisterRunningLockCallback() override;
 
+    int32_t SetSuspendTag(const std::string &tag) override;
+
     int32_t StartSuspend() override;
 
     int32_t StopSuspend() override;
