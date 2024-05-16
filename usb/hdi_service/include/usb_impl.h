@@ -98,6 +98,8 @@ public:
     static int32_t UsbdEventHandleRelease(void);
 
     HostDevice *FindDevFromService(uint8_t busNum, uint8_t devAddr);
+    int32_t GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated) override;
+    int32_t GetDeviceSpeed(const UsbDev &dev, uint8_t &speed) override;
 
 private:
     void MakeUsbControlParams(
@@ -136,8 +138,6 @@ private:
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
-    int32_t GetInterfaceActiveStatus(const UsbDev &dev, uint8_t interfaceId, bool &unactivated) override;
-    int32_t GetDeviceSpeed(const UsbDev &dev, uint8_t &speed) override;
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit UsbDeathRecipient(const sptr<IUsbdSubscriber> &deathSubscriber) : deathSubscriber_(deathSubscriber) {};
