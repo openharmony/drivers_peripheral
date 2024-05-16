@@ -349,7 +349,7 @@ uint64_t QueryCredentialExecutorIndex(uint32_t authType, uint32_t executorSensor
             continue;
         }
         if (executorInfo->authType == authType && executorInfo->executorSensorHint == executorSensorHint &&
-            (executorInfo->executorRole == VERIFIER || executorInfo->executorRole == ALL_IN_ONE)) {
+            executorInfo->executorRole == ALL_IN_ONE) {
             g_poolList->destroyIterator(iterator);
             return executorInfo->executorIndex;
         }

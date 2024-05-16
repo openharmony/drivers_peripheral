@@ -619,14 +619,7 @@ ResultCode GetExecutorMsgList(int32_t userId, uint32_t authPropertyMode, LinkedL
         LOG_ERROR("create list failed");
         return RESULT_NO_MEMORY;
     }
-    ResultCode ret = TraverseExecutor(userId, VERIFIER, authPropertyMode, *executorMsg);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("traverse verifier failed");
-        DestroyLinkedList(*executorMsg);
-        *executorMsg = NULL;
-        return ret;
-    }
-    ret = TraverseExecutor(userId, ALL_IN_ONE, authPropertyMode, *executorMsg);
+    ResultCode ret = TraverseExecutor(userId, ALL_IN_ONE, authPropertyMode, *executorMsg);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("traverse allInOne executor failed");
         DestroyLinkedList(*executorMsg);
