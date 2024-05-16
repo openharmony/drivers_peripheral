@@ -20,14 +20,14 @@
 #include "dimage_buffer.h"
 #include "dbuffer_manager.h"
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
 using namespace OHOS::HDI::Camera::V1_0;
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraStream {
 public:
     DCameraStream() = default;

@@ -19,7 +19,7 @@
 #include <cstdint>
 
 #include "dcamera_provider.h"
-#include "v1_0/id_camera_provider_callback.h"
+#include "v1_1/id_camera_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -56,6 +56,10 @@ public:
         return DCamRetCode::SUCCESS;
     }
     int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings)
+    {
+        return DCamRetCode::SUCCESS;
+    }
+    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
     {
         return DCamRetCode::SUCCESS;
     }

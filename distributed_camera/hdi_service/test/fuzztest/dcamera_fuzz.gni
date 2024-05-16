@@ -34,7 +34,7 @@ cflags = [
   "-Dprotected=public",
 ]
 
-dcamera_deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
+dcamera_deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.1" ]
 
 dcamera_external_deps = [
   "cJSON:cjson",
@@ -43,7 +43,7 @@ dcamera_external_deps = [
   "drivers_interface_camera:libcamera_proxy_1.0",
   "drivers_interface_camera:metadata",
   "drivers_interface_display:libdisplay_composer_stub_1.0",
-  "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.0",
+  "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.1",
   "graphic_surface:surface",
   "graphic_surface:sync_fence",
   "hdf_core:libhdi",
