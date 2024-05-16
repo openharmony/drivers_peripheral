@@ -31,7 +31,7 @@
         "hitrace",
         "hisysevent",
         "bounds_checking_function",
-        "libexif:libexif"
+        "libexif"
       ],
       "third_party": [
         "ffmpeg",
