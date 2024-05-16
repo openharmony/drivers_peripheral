@@ -283,7 +283,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "{\"dhId\":\"1\"}";
     std::string value = "world";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetExtraParams(key, condition, value));
     key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_LOWPOWER;
@@ -301,7 +301,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_001, TestSize.Level1)
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "hello";
     std::string value = "world";
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->GetExtraParams(key, condition, value));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, AdapterTest_->GetExtraParams(key, condition, value));
 }
 
 /**
