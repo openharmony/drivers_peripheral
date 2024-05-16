@@ -20,7 +20,7 @@
 
 #include "constants.h"
 #include "sync_fence.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {

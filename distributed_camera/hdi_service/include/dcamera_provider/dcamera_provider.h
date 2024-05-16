@@ -16,11 +16,11 @@
 #ifndef DISTRIBUTED_CAMERA_PROVIDER_H
 #define DISTRIBUTED_CAMERA_PROVIDER_H
 
-#include "v1_0/id_camera_provider.h"
+#include "v1_1/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraHost;
 class DCameraDevice;
 class DCameraProvider : public IDCameraProvider {

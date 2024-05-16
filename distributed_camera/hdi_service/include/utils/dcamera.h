@@ -18,13 +18,13 @@
 
 #include "camera_metadata_info.h"
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::Camera::V1_0;
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 using CameraAbility = OHOS::Camera::CameraMetadata;
 using CameraSetting = OHOS::Camera::CameraMetadata;
 using RetCode = uint32_t;

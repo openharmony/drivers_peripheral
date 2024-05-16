@@ -24,12 +24,12 @@
 #include "surface.h"
 #include "surface_buffer.h"
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "v1_0/display_composer_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 using namespace OHOS::HDI::Display::Composer::V1_0;
 class DBufferManager {
 public:

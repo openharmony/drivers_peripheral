@@ -24,7 +24,7 @@
 
 #include "v1_0/icamera_device.h"
 #include "v1_0/icamera_device_callback.h"
-#include "v1_0/id_camera_provider_callback.h"
+#include "v1_1/id_camera_provider_callback.h"
 #include "v1_0/types.h"
 
 namespace OHOS {
