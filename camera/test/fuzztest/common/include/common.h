@@ -121,6 +121,7 @@ public:
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_1::ICameraDevice> cameraDeviceV1_1 = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::ICameraDevice> cameraDeviceV1_2 = nullptr;
+    OHOS::sptr<OHOS::HDI::Camera::V1_3::ICameraDevice> cameraDeviceV1_3 = nullptr;
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
     OHOS::sptr<OHOS::HDI::Camera::V1_2::IStreamOperatorCallback> streamOperatorCallbackV1_2 = nullptr;
     OHOS::sptr<ICameraHostCallback> hostCallback = nullptr;
@@ -245,16 +246,6 @@ public:
         int64_t intervalTimestamp_ = 0;
         const int64_t ONESECOND_OF_MICROSECOND_UNIT = 1000000000;
         int64_t interval_ = ONESECOND_OF_MICROSECOND_UNIT;
-    };
-
-    class DemoCameraDeviceCallback : public ICameraDeviceCallback {
-    public:
-        std::shared_ptr<CameraMetadata> resultMeta = nullptr;
-        DemoCameraDeviceCallback() = default;
-        virtual ~DemoCameraDeviceCallback() = default;
-
-        int32_t OnError(ErrorType type, int32_t errorMsg) override;
-        int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t> &result) override;
     };
 
     using ResultCallback = std::function<void (uint64_t, const std::shared_ptr<CameraMetadata>)>;
