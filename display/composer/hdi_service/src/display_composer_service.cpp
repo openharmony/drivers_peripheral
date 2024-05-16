@@ -56,7 +56,8 @@ DisplayComposerService::DisplayComposerService()
     vdiImplV1_1_(nullptr),
     destroyVdiFuncV1_1_(nullptr),
     cmdResponserV1_1_(nullptr),
-    refreshCb_(nullptr)
+    refreshCb_(nullptr),
+    VBlankIdleCb_(nullptr)
 {
     int32_t ret = LoadVdiSo();
     if (ret != HDF_SUCCESS) {
@@ -163,7 +164,11 @@ int32_t DisplayComposerService::LoadVdiV1_0()
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     cacheMgr_ = DeviceCacheManager::GetInstance();
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+#ifdef DISPLAY_COMMUNITY
     cmdResponser_ = V1_2::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
+#else
+    cmdResponser_ = V1_0::HdiDisplayCmdResponser::Create(vdiImpl_, cacheMgr_);
+#endif
     CHECK_NULLPOINTER_RETURN_VALUE(cmdResponser_, HDF_FAILURE);
     return HDF_SUCCESS;
 }
@@ -690,9 +695,30 @@ int32_t DisplayComposerService::GetHDRCapabilityInfos(uint32_t devId, HDRCapabil
     return ret;
 }
 
-int32_t DisplayComposerService::CommitAndGetReleaseFence()
+void DisplayComposerService::OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data)
 {
-    return HDF_SUCCESS;
+    if (data == nullptr) {
+        DISPLAY_LOGE("cb data is nullptr");
+        return;
+    }
+
+    sptr<IVBlankIdleCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->VBlankIdleCb_;
+
+    if (remoteCb == nullptr) {
+        DISPLAY_LOGE("VBlankIdleCb_ is nullptr");
+        return;
+    }
+    remoteCb->OnVBlankIdleCallback(devId, ns);
+}
+
+int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankIdleCallback>& cb)
+{
+    DISPLAY_TRACE;
+    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    VBlankIdleCb_ = cb;
+    int32_t ret = vdiImplV1_1_->RegDisplayVBlankIdleCallback(OnVBlankIdleCallback, this);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    return ret;
 }
 
 } // namespace Composer
