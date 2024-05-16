@@ -191,6 +191,7 @@ IAM_STATIC ResultCode GetTokenDataPlain(UserAuthContext *context, uint32_t authM
     } else {
         authToken->tokenDataPlain.tokenType = TOKEN_TYPE_COAUTH;
     }
+    LOG_ERROR("signed token type %{public}u", authToken->tokenDataPlain.tokenType);
     return RESULT_SUCCESS;
 }
 
