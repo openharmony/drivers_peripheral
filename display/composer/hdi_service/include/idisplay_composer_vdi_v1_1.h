@@ -28,7 +28,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Composer {
-using namespace OHOS::HDI::Display::Composer::V1_1;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 
 class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     public:
@@ -43,6 +43,8 @@ class IDisplayComposerVdiV1_1 : public IDisplayComposerVdi {
     virtual int32_t RegRefreshCallback(RefreshCallback cb, void* data) = 0;
     virtual int32_t GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts) = 0;
     virtual int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) = 0;
+    virtual int32_t RegDisplayVBlankIdleCallback(VBlankIdleCallback cb, void* data) = 0;
+    virtual int32_t SetDisplayConstraint(uint32_t devId, uint64_t frameID, uint64_t ns, uint32_t type) = 0;
 };
 
 using CreateComposerVdiFuncV1_1 = IDisplayComposerVdiV1_1* (*)();
