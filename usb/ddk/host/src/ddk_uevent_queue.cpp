@@ -222,7 +222,7 @@ int32_t DdkUeventAddTask(const struct DdkUeventInfo *info)
         return HDF_SUCCESS;
     }
     HDF_LOGE("%{public}s: bind=%{public}s, subsystem=%{public}s, devType=%{public}s, devPath=%{public}s",
-         __func__, info->action, info->subSystem, info->devType, info->devPath);
+        __func__, info->action, info->subSystem, info->devType, info->devPath);
     DdkUeventTaskInfo task {
         {0x00},
         {0x00},
