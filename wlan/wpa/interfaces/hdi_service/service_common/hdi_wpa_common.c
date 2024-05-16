@@ -96,15 +96,6 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
     }
     int flag = 0;
     do {
-        pCtrl->pRecv = wpa_ctrl_open(ifname);
-        if (pCtrl->pRecv == NULL) {
-            HDF_LOGE("open wpa control recv interface failed!");
-            break;
-        }
-        if (wpa_ctrl_attach(pCtrl->pRecv) != 0) {
-            HDF_LOGE("attach monitor interface failed!");
-            break;
-        }
         pCtrl->pSend = wpa_ctrl_open(ifname);
         if (pCtrl->pSend == NULL) {
             HDF_LOGE("open wpa control send interface failed!");
