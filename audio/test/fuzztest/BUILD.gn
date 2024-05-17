@@ -13,7 +13,7 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("./../audio.gni")
+import("./../../audio.gni")
 
 group("fuzztest") {
   testonly = true
