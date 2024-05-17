@@ -71,6 +71,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
+      "libexif:libexi",
     ]
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
