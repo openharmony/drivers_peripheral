@@ -1654,6 +1654,7 @@ void *RawUsbMemCalloc(size_t size)
             if (g_usbRamTestHead == NULL) {
                 HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
                 OsalMemFree(buf);
+                buf = NULL;
                 return NULL;
             }
             OsalMutexInit(&g_usbRamTestHead->lock);
