@@ -1196,24 +1196,25 @@ static bool CopyExecutorInfo(const HdiExecutorRegisterInfo &in, ExecutorInfoHal 
         return false;
     }
 
-    if (memcpy_s(out.deviceUdid, sizeof(out.deviceUdid), in.deviceUdid.c_str(), in.deviceUdid.length()) != EOK) {
+    std::string deviceUdid = in.deviceUdid;
+    if (deviceUdid.empty()) {
+        deviceUdid = g_localUdid;
+    }
+
+    if (memcpy_s(out.deviceUdid, sizeof(out.deviceUdid), deviceUdid.c_str(), deviceUdid.length()) != EOK) {
         IAM_LOGE("memcpy failed");
         return false;
     }
 
-    char publicKeyStrBuffer[PUBLIC_KEY_STR_LEN] = {0};
-    FormatHexString(&out.deviceUdid[0], PUBLIC_KEY_LEN, publicKeyStrBuffer, PUBLIC_KEY_STR_LEN);
-    if (g_localUdid != in.deviceUdid) {
+    if (g_localUdid != deviceUdid) {
         IAM_LOGI("verify remote executor register info");
         if (!verifyExecutorRegisterInfo(in, out)) {
             IAM_LOGE("verifyExecutorRegisterInfo failed");
             return false;
         }
-        IAM_LOGI("add remote executor authType %{public}d executorRole %{public}d publicKey %{public}s",
-            in.authType, in.executorRole, publicKeyStrBuffer);
+        IAM_LOGI("add remote executor authType %{public}d executorRole %{public}d", in.authType, in.executorRole);
     } else {
-        IAM_LOGI("add local executor authType %{public}d executorRole %{public}d publicKey %{public}s",
-            in.authType, in.executorRole, publicKeyStrBuffer);
+        IAM_LOGI("add local executor authType %{public}d executorRole %{public}d", in.authType, in.executorRole);
     }
     return true;
 }
@@ -1276,7 +1277,7 @@ int32_t UserAuthInterfaceService::AddExecutor(const HdiExecutorRegisterInfo &inf
         IAM_LOGE("register executor failed");
         return ret;
     }
-    if (info.executorRole == VERIFIER || info.executorRole == ALL_IN_ONE) {
+    if (info.executorRole == ALL_IN_ONE) {
         return ObtainReconciliationData(executorInfoHal.authType, executorInfoHal.executorSensorHint, templateIds);
     }
     return RESULT_SUCCESS;
