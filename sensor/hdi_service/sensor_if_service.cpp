@@ -270,6 +270,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         return HDF_FAILURE;
     }
     StartTrace(HITRACE_TAG_HDF, "SetBatchSenior");
+    SensorCallbackVdi::clientsChanged = true;
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
 
     int64_t saSamplingInterval = samplingInterval;
@@ -291,6 +292,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     if (mode == SA) {
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
+        SensorCallbackVdi::clientsChanged = true;
     }
     if (mode == SDC) {
         SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
