@@ -13,14 +13,18 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
+import("./../../audio.gni")
 
 group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [
-    "adm_fuzzer:adm_fuzzer",
-    "audio_config_fuzzer:audio_config_fuzzer",
-    "audio_hdi_fuzzer:audio_hdi_fuzzer",
-  ]
+  if (drivers_peripheral_audio_feature_community) {
+    deps += [
+      "adm_fuzzer:adm_fuzzer",
+      "audio_config_fuzzer:audio_config_fuzzer",
+    ]
+  } else {
+    deps += [ "audio_hdi_fuzzer:audio_hdi_fuzzer" ]
+  }
 }
