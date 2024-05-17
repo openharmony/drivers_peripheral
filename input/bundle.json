@@ -28,7 +28,8 @@
         "hdf_core",
         "hilog",
         "hilog_lite",
-        "drivers_interface_input"
+        "drivers_interface_input",
+        "access_token"
       ],
       "third_party": [
         "bounds_checking_function"
