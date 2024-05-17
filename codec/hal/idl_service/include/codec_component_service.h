@@ -50,6 +50,8 @@ public:
     int32_t UseEglImage(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer,
                         const std::vector<int8_t> &eglImage) override;
     int32_t ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index) override;
+    int32_t SetParameterWithBuffer(uint32_t index, const std::vector<int8_t>& paramStruct,
+                                   const OmxCodecBuffer& inBuffer) override;
 
     const std::string &GetComponentCompName() const;
     void GetComponentNode(std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &dumpNode_);
