@@ -26,11 +26,22 @@ extern "C" {
 #define PROCESS_NAME_LEN 50
 
 /**
+ * @brief Enumerates the extended AVC profile.
+ */
+enum CodecAVCProfileExt {
+    OMX_VIDEO_AVC_LEVEL52  = 0x10000,  /**< Level 5.2 */
+    OMX_VIDEO_AVC_LEVEL6   = 0x20000,  /**< Level 6 */
+    OMX_VIDEO_AVC_LEVEL61  = 0x40000,  /**< Level 6.1 */
+    OMX_VIDEO_AVC_LEVEL62  = 0x80000,  /**< Level 6.2 */
+};
+
+/**
  * @brief Enumerates the extended codec codingtyps.
  */
 enum CodecVideoExType {
     CODEC_OMX_VIDEO_CodingVP9  = 10, /** VP9 Index in Codec HDI */
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
+    CODEC_OMX_VIDEO_CodingVVC = 12,  /** VVC Index in Codec HDI */
 };
 
 /**
@@ -227,14 +238,16 @@ enum OmxIndexCodecExType {
     OMX_IndexParamProcessName,
     /** AudioCodecParam */
     OMX_IndexParamAudioCodec,
+    /** CodecParamOverlayBuffer */
+    OMX_IndexParamOverlayBuffer,
     /** CodecLTRParam/CodecLTRPerFrameParam */
     OMX_IndexParamLTR,
     /** CodecQPRangeParam */
     OMX_IndexParamQPRange,
     /** OMX_CONFIG_BOOLEANTYPE */
     OMX_IndexParamLowLatency,
-    /** CodecParamOverlayBuffer */
-    OMX_IndexParamOverlayBuffer,
+    /** WirelessLowDelay */
+    OMX_IndexParamWirelessLowDelay,
 };
 
 /**

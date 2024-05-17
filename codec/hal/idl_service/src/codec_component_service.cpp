@@ -270,6 +270,12 @@ void CodecComponentService::SetComponentRole()
     }
 }
 
+int32_t CodecComponentService::SetParameterWithBuffer(uint32_t index, const std::vector<int8_t>& paramStruct,
+                                                      const OmxCodecBuffer& inBuffer)
+{
+    return OMX_ErrorNotImplemented;
+}
+
 const std::string &CodecComponentService::GetComponentCompName() const
 {
     return name_;
