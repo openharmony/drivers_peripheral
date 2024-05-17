@@ -53,6 +53,10 @@ ohos_shared_library("libpower_interface_service_1.2") {
     defines += [ "DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH" ]
   }
 
+  if (drivers_peripheral_power_suspend_with_tag) {
+    defines += [ "DRIVER_PERIPHERAL_POWER_SUSPEND_WITH_TAG" ]
+  }
+
   if (drivers_peripheral_power_faster_retry_of_sleep) {
     defines += [ "FASTER_RETRY_OF_SLEEP" ]
   }
