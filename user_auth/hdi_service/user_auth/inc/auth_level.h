@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-ResultCode GetAuthTrustLevel(int32_t userId, uint32_t authType, uint32_t atl);
+ResultCode CheckAtlByExecutorAndCred(int32_t userId, uint32_t authType, uint32_t atl);
 uint32_t GetAtl(uint32_t acl, uint32_t asl);
 ResultCode QueryScheduleAtl(const CoAuthSchedule *coAuthSchedule, uint32_t acl, uint32_t *atl);
 

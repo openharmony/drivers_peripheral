@@ -24,8 +24,7 @@ extern "C" {
     extern LinkedList *g_userInfoList;
     extern void DestroyExecutorInfo(void *data);
     extern ResultCode QueryScheduleAsl(const CoAuthSchedule *coAuthSchedule, uint32_t *asl);
-    extern ResultCode GetAsl(uint32_t authType, uint32_t *asl);
-    extern ResultCode GetAslAndAcl(uint32_t authType, uint32_t *asl, uint32_t *acl);
+    extern ResultCode GetExecutorAslAndAcl(uint32_t authType, uint32_t *asl, uint32_t *acl);
 }
 
 namespace OHOS {
@@ -83,15 +82,15 @@ HWTEST_F(AuthLevelTest, TestQueryScheduleAtl, TestSize.Level0)
     EXPECT_EQ(QueryScheduleAtl(&schedule, 0, &atl), RESULT_BAD_PARAM);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAslAndAcl_001, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetExecutorAslAndAcl_001, TestSize.Level0)
 {
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
     uint32_t acl = 0;
-    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_UNKNOWN);
+    EXPECT_EQ(GetExecutorAslAndAcl(authType, &asl, &acl), RESULT_UNKNOWN);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAslAndAcl_002, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetExecutorAslAndAcl_002, TestSize.Level0)
 {
     g_poolList = CreateLinkedList(DestroyExecutorInfo);
     EXPECT_NE(g_poolList, nullptr);
@@ -102,10 +101,10 @@ HWTEST_F(AuthLevelTest, TestGetAslAndAcl_002, TestSize.Level0)
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
     uint32_t acl = 0;
-    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetExecutorAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
 }
 
-HWTEST_F(AuthLevelTest, TestGetAslAndAcl_003, TestSize.Level0)
+HWTEST_F(AuthLevelTest, TestGetExecutorAslAndAcl_003, TestSize.Level0)
 {
     g_poolList = CreateLinkedList(DestroyExecutorInfo);
     EXPECT_NE(g_poolList, nullptr);
@@ -117,7 +116,7 @@ HWTEST_F(AuthLevelTest, TestGetAslAndAcl_003, TestSize.Level0)
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
     uint32_t acl = 0;
-    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
+    EXPECT_EQ(GetExecutorAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
 }
 } // namespace UserAuth
 } // namespace UserIam
