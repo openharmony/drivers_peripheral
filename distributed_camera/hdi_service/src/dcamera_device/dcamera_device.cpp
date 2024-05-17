@@ -322,13 +322,49 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
     return MapToExternalRetCode(retDCode);
 }
 
+CamRetCode DCameraDevice::TriggerGetFullCaps()
+{
+    DHLOGI("DCameraDevice TriggerGetFullCaps enter.");
+    DCameraHDFEvent dCameraEvent;
+    dCameraEvent.type_ = DCameraEventType::DCAMERE_GETFULLCAP;
+    if (dCameraProviderCallback_ == nullptr) {
+        DHLOGE("The dCameraProviderCallback_ is null.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+    dCameraProviderCallback_->NotifyEvent(dhBase_, dCameraEvent);
+    {
+        std::unique_lock<std::mutex> lck(getFullLock_);
+        DHLOGI("Wait get full caps");
+        auto status = getFullWaitCond_.wait_for(lck, std::chrono::seconds(GET_FULL_WAIT_SECONDS));
+        if (status == std::cv_status::timeout) {
+            DHLOGE("Wait get full caps timeout(%{public}ds).", GET_FULL_WAIT_SECONDS);
+            return CamRetCode::INVALID_ARGUMENT;
+        }
+        if (!GetRefreshFlag()) {
+            DHLOGI("It is not refreshed.");
+            return CamRetCode::INVALID_ARGUMENT;
+        }
+    }
+    DHLOGI("DCameraDevice TriggerGetFullCaps wait end.");
+    return CamRetCode::NO_ERROR;
+}
+
 CamRetCode DCameraDevice::GetDCameraAbility(std::shared_ptr<CameraAbility> &ability)
 {
+    DHLOGI("DCameraDevice GetDCameraAbility enter.");
+    if (dCameraAbilityInfo_.find(FULL_DATA_KEY) == dCameraAbilityInfo_.npos) {
+        auto res = TriggerGetFullCaps();
+        if (res != CamRetCode::NO_ERROR) {
+            DHLOGE("TriggerGetFullCaps failed");
+            return res;
+        }
+    } else {
+        DHLOGI("DCameraDevice has full ability, no need to GetDCameraAbility.");
+    }
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
         return CamRetCode::DEVICE_ERROR;
     }
-
     DCamRetCode ret = dMetadataProcessor_->GetDCameraAbility(ability);
     if (ret != SUCCESS) {
         DHLOGE("Get distributed camera ability failed, ret=%{public}d.", ret);
@@ -499,7 +535,28 @@ bool DCameraDevice::IsOpened()
 
 void DCameraDevice::SetDcameraAbility(const std::string& sinkAbilityInfo)
 {
-    dCameraAbilityInfo_ = sinkAbilityInfo;
+    DHLOGI("DCameraDevice SetDcameraAbility enter.");
+    if (dCameraAbilityInfo_.find(FULL_DATA_KEY) != sinkAbilityInfo.npos &&
+        sinkAbilityInfo.find(META_DATA_KEY) != sinkAbilityInfo.npos) {
+        SetRefreshFlag(false);
+        DHLOGE("The sinkAbilityInfo is meta data, it is not allowed to refresh full data.");
+    } else {
+        SetRefreshFlag(true);
+        dCameraAbilityInfo_ = sinkAbilityInfo;
+    }
+    std::lock_guard<std::mutex> dataLock(getFullLock_);
+    getFullWaitCond_.notify_all();
+    DHLOGI("DCameraDevice SetDcameraAbility end.");
+}
+
+void DCameraDevice::SetRefreshFlag(bool flag)
+{
+    refreshFlag_.store(flag);
+}
+
+bool DCameraDevice::GetRefreshFlag()
+{
+    return refreshFlag_.load();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

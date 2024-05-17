@@ -71,32 +71,44 @@ int32_t DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
     return CamRetCode::NO_ERROR;
 }
 
+int32_t DCameraHost::GetCameraAbilityFromDev(const std::string &cameraId, std::shared_ptr<CameraAbility> &cameraAbility)
+{
+    OHOS::sptr<DCameraDevice> device = nullptr;
+    {
+        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
+        auto iter = dCameraDeviceMap_.find(cameraId);
+        if (iter == dCameraDeviceMap_.end() || iter->second == nullptr) {
+            DHLOGE("DCameraHost::Get Cameradevice failed");
+            return CamRetCode::INVALID_ARGUMENT;
+        } else {
+            device = iter->second;
+        }
+    }
+    if (device->GetDCameraAbility(cameraAbility) != CamRetCode::NO_ERROR) {
+        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
+    return CamRetCode::NO_ERROR;
+}
+
 int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility)
 {
     if (IsCameraIdInvalid(cameraId)) {
         DHLOGE("DCameraHost::GetCameraAbility, input cameraId is invalid.");
         return CamRetCode::INVALID_ARGUMENT;
     }
-
-    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
-
-    std::shared_ptr<CameraAbility> ability = nullptr;
-    int32_t ret;
-    {
-        std::lock_guard<std::mutex> autoLock(deviceMapLock_);
-        auto iter = dCameraDeviceMap_.find(cameraId);
-        ret = (iter->second)->GetDCameraAbility(ability);
-        if (ret != CamRetCode::NO_ERROR) {
-            DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %{public}d.", ret);
-            return ret;
-        }
+    DHLOGI("DCameraHost::GetCameraAbility for cameraId: %{public}s", GetAnonyString(cameraId).c_str());
+    std::shared_ptr<CameraAbility> ability;
+    int32_t ret = GetCameraAbilityFromDev(cameraId, ability);
+    if (ret != CamRetCode::NO_ERROR) {
+        DHLOGE("DCameraHost::GetCameraAbility, GetCameraAbilityFromDev failed.");
+        return CamRetCode::INVALID_ARGUMENT;
     }
     bool retBool = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     if (!retBool) {
         DHLOGE("DCameraHost::GetCameraAbility, ConvertMetadataToVec failed.");
         return CamRetCode::INVALID_ARGUMENT;
     }
-
     do {
         camera_metadata_item_t item;
         constexpr uint32_t WIDTH_OFFSET = 1;

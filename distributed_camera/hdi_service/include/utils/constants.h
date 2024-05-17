@@ -56,12 +56,15 @@ const uint32_t INGNORE_STR_LEN = 2;
 
 const uint32_t WAIT_OPEN_TIMEOUT_SEC = 5;
 const uint32_t BUFFER_SYNC_FENCE_TIMEOUT = 100;
+const int32_t GET_FULL_WAIT_SECONDS = 10;
 
 const std::string ENCODE_TYPE_STR_H264 = "video/avc";
 const std::string ENCODE_TYPE_STR_H265 = "video/hevc";
 const std::string ENCODE_TYPE_STR_JPEG = "jpeg";
 const std::string ENCODE_TYPE_STR_MPEG4_ES = "video/mp4v-es";
 const std::string DC_LOG_TITLE_TAG = "DCAMERA";
+const std::string FULL_DATA_KEY = "ProtocolVer";
+const std::string META_DATA_KEY = "MetaData";
 constexpr int32_t LOG_MAX_LEN = 4096;
 constexpr uint64_t SEC_TO_NSEC_TIMES = 1000000000;
 
@@ -76,6 +79,8 @@ typedef enum {
 typedef enum {
     DCAMERA_MESSAGE = 0,
     DCAMERA_OPERATION = 1,
+    DCAMERA_SINK_STOP = 2,
+    DCAMERE_GETFULLCAP = 3,
 } DCameraEventType;
 
 typedef enum {
