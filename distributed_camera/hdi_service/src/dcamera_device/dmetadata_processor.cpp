@@ -122,11 +122,11 @@ void DMetadataProcessor::InitDcameraBaseAbility()
     AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_MODES, &aeAvailableModes, 1);
 
     const int32_t compensationRange[] = { 0, 0 };
-    AddAbilityEntry(OHOS_CONTROL_AE_COMPENSATION_RANGE, compensationRange,
+    AddAbilityEntry(OHOS_ABILITY_AE_COMPENSATION_RANGE, compensationRange,
         (sizeof(compensationRange) / sizeof(compensationRange[0])));
 
     const camera_rational_t compensationStep[] = { { 0, 1 } };
-    AddAbilityEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, compensationStep,
+    AddAbilityEntry(OHOS_ABILITY_AE_COMPENSATION_STEP, compensationStep,
         (sizeof(compensationStep) / sizeof(compensationStep[0])));
 
     const uint8_t afAvailableModes[] = { OHOS_CAMERA_AF_MODE_AUTO, OHOS_CAMERA_AF_MODE_OFF };
