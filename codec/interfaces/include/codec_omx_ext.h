@@ -248,6 +248,10 @@ enum OmxIndexCodecExType {
     OMX_IndexParamLowLatency,
     /** WirelessLowDelay */
     OMX_IndexParamWirelessLowDelay,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutQp,
+    /** OMX_S32 */
+    OMX_IndexParamEncOutMse,
 };
 
 /**
