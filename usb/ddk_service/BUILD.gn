@@ -36,6 +36,7 @@ ohos_shared_library("libusb_ddk_service_1.0") {
 
   sources = [
     "src/usb_ddk_hash.cpp",
+    "src/usb_ddk_permission.cpp",
     "src/usb_ddk_service.cpp",
   ]
   include_dirs = [
@@ -55,6 +56,7 @@ ohos_shared_library("libusb_ddk_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "access_token:libaccesstoken_sdk",
       "drivers_interface_usb:usb_ddk_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
