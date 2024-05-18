@@ -113,6 +113,8 @@ int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
         }
         if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
+            OsalMemFree(*dst);
+            *dst = NULL;
             return HDF_FAILURE;
         }
     }
@@ -1541,6 +1543,7 @@ static int32_t WpaFillWpaVendorExtInfo(struct WpaVendorExtInfo *wpaVendorExtInfo
         return HDF_ERR_INVALID_PARAM;
     }
 
+    wpaVendorInfo->data = NULL;
     wpaVendorInfo->type = wpaVendorExtInfo->type;
     wpaVendorInfo->freq = wpaVendorExtInfo->freq;
     wpaVendorInfo->width = wpaVendorExtInfo->width;
