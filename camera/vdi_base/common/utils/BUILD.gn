@@ -61,11 +61,9 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$camera_path/include",
       "$camera_path/utils/event",
-      "//third_party/libexif",
     ]
     libs = []
     defines = []
-    deps = [ "//third_party/libexif:libexif" ]
 
     external_deps = [
       "c_utils:utils",
@@ -73,6 +71,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
+      "libexif:libexif",
     ]
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]

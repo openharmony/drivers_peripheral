@@ -30,12 +30,12 @@
         "c_utils",
         "hitrace",
         "hisysevent",
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "libexif"
       ],
       "third_party": [
         "ffmpeg",
-        "libjpeg-turbo",
-        "libexif"
+        "libjpeg-turbo"
       ]
     },
     "build": {
