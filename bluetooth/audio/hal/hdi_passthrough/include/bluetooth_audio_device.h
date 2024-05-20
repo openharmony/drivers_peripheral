@@ -39,6 +39,7 @@ typedef bool (*StopPlayingFunc)();
 typedef size_t (*WriteFrameFunc)(const void* data, size_t size);
 typedef int32_t (*ReqMmapBufferFunc)(int32_t ashmemLength);
 typedef void (*ReadMmapPositionFunc)(int64_t &sec, int64_t &nSec, uint64_t &frames);
+typedef bool (*GetLatencyFunc)(uint32_t &latency);
 }
 }
 }
