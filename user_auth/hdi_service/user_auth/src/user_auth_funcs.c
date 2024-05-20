@@ -415,25 +415,11 @@ ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpired
 
 void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)
 {
-    (*checkResult) = GetAuthTrustLevel(userId, authType, authTrustLevel);
+    (*checkResult) = CheckAtlByExecutorAndCred(userId, authType, authTrustLevel);
     if ((*checkResult) != RESULT_SUCCESS) {
-        LOG_ERROR("GetAuthTrustLevel failed");
+        LOG_ERROR("CheckAtlByExecutorAndCred failed");
         return;
     }
-
-    CredentialCondition condition = {};
-    SetCredentialConditionUserId(&condition, userId);
-    if (authType != DEFAULT_AUTH_TYPE) {
-        SetCredentialConditionAuthType(&condition, authType);
-    }
-    LinkedList *creds = QueryCredentialLimit(&condition);
-    if (creds == NULL || creds->getSize(creds) == 0) {
-        LOG_ERROR("query credential failed");
-        DestroyLinkedList(creds);
-        (*checkResult) = RESULT_NOT_ENROLLED;
-        return;
-    }
-    DestroyLinkedList(creds);
 
     PinExpiredInfo expiredInfo = {};
     (*checkResult) = GetPinExpiredInfo(userId, &expiredInfo);
