@@ -295,7 +295,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         return ret;
     }
     if (mode == SA) {
-        SetDelay(saSamplingInterval, saReportInterval);
+        SetDelay(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
         SensorCallbackVdi::clientsChanged = true;
@@ -313,7 +313,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     return ret;
 }
 
-int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval)
+int32_t SensorIfService::SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
     HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], reportInterval is "
              "[%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
@@ -321,12 +321,14 @@ int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInt
         if (it->sensorId == sensorId) {
             if (samplingInterval < it->minDelay) {
                 samplingInterval = it->minDelay;
-                HDF_LOGE("%{public}s samplingInterval has been set minDelay %{public}d", __func__, samplingInterval);
+                HDF_LOGE("%{public}s samplingInterval has been set minDelay %{public}d", __func__,
+                         std::to_string(samplingInterval).c_str());
                 return SENSOR_SUCCESS;
             }
             if (samplingInterval > it->maxDelay) {
                 samplingInterval = it->maxDelay;
-                HDF_LOGE("%{public}s samplingInterval has been set maxDelay %{public}d", __func__, samplingInterval);
+                HDF_LOGE("%{public}s samplingInterval has been set maxDelay %{public}d", __func__,
+                         std::to_string(samplingInterval).c_str());
                 return SENSOR_SUCCESS;
             }
         }
