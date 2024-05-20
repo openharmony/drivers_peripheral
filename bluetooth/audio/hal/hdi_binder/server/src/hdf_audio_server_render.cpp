@@ -14,6 +14,13 @@
  */
 #include "hdf_audio_server_render.h"
 #include "hdf_audio_server_common.h"
+
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+
+#define LOG_DOMAIN 0xD000105
+
 namespace OHOS::HDI::Audio_Bluetooth {
 int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
@@ -627,7 +634,7 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     ret = render->RenderFrame(render, static_cast<const void *>(frame),
         static_cast<uint64_t>(requestBytes), &replyBytes);
     AudioSetRenderStatus(adapterName, false);
-    HDF_LOGE("%{public}s,%{public}u,%{public}ju", __func__, requestBytes, replyBytes);
+    HDF_LOGD("%{public}s,%{public}u,%{public}ju", __func__, requestBytes, replyBytes);
     if (ret < 0) {
         HDF_LOGE("%{public}s: HdiServiceRenderRenderFrame ", __func__);
         return ret;
