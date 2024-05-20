@@ -62,6 +62,7 @@ ohos_shared_library("usb_camera_v4l2_adapter") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:metadata",
     "graphic_surface:surface",
     "hdf_core:libhdf_host",

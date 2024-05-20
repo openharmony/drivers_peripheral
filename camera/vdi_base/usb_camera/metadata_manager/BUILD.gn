@@ -58,6 +58,7 @@ if (!defined(ohos_lite)) {
 
     external_deps = [
       "bounds_checking_function:libsec_shared",
+      "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
       "drivers_interface_camera:metadata",
       "graphic_surface:surface",
       "hdf_core:libhdf_host",
