@@ -344,7 +344,7 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size)
     }
 
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
         return;
     }
 
@@ -836,7 +836,7 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType)
     GetPluggedTypeName(buf, sizeof(buf));
     int32_t type = PluggedTypeEnumConverter(buf);
     if (type == PLUGGED_TYPE_BUTT) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "not support the online type %{public}s", buf);
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "not support the online type %{public}s", buf);
         return HDF_ERR_NOT_SUPPORT;
     }
 
