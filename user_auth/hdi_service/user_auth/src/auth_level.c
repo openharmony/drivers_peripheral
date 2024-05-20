@@ -134,7 +134,7 @@ IAM_STATIC ResultCode GetCredMaxAcl(int32_t userId, uint32_t authType, uint32_t 
     }
     *maxCredAcl = 0;
     LinkedListNode *temp = creds->head;
-    while(temp != NULL) {
+    while (temp != NULL) {
         if (temp->data == NULL) {
             LOG_ERROR("link node is invalid");
             DestroyLinkedList(creds);
