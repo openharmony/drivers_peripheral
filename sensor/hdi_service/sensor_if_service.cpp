@@ -110,6 +110,11 @@ int32_t SensorIfService::Init()
     int32_t ret = sensorVdiImpl_->Init();
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s Init failed, error code is %{public}d", __func__, ret);
+    } else {
+        ret = GetAllSensorInfo(hdfSensorInformations);
+        if (ret != SENSOR_SUCCESS) {
+            HDF_LOGE("%{public}s GetAllSensorInfo failed, error code is %{public}d", __func__, ret);
+        }
     }
 #ifdef SENSOR_DEBUG
     RegisteDumpHost();
@@ -290,6 +295,7 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         return ret;
     }
     if (mode == SA) {
+        SetDelay(saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
         SensorCallbackVdi::clientsChanged = true;
@@ -305,6 +311,28 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     FinishTrace(HITRACE_TAG_HDF);
 
     return ret;
+}
+
+int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval)
+{
+    HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], reportInterval is "
+             "[%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+    for (auto it = hdfSensorInformations.begin(); it != hdfSensorInformations.end(); ++it) {
+        if (it->sensorId == sensorId) {
+            if (samplingInterval < it->minDelay) {
+                samplingInterval = it->minDelay;
+                HDF_LOGE("%{public}s samplingInterval has been set minDelay %{public}d", __func__, samplingInterval);
+                return SENSOR_SUCCESS;
+            }
+            if (samplingInterval > it->maxDelay) {
+                samplingInterval = it->maxDelay;
+                HDF_LOGE("%{public}s samplingInterval has been set maxDelay %{public}d", __func__, samplingInterval);
+                return SENSOR_SUCCESS;
+            }
+        }
+    }
+    HDF_LOGE("%{public}s samplingInterval not change", __func__);
+    return SENSOR_SUCCESS;
 }
 
 int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
