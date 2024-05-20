@@ -33,7 +33,7 @@ namespace {
                                                   HDF_SENSOR_TYPE_GAME_ROTATION_VECTOR,
                                                   HDF_SENSOR_TYPE_GYROSCOPE_UNCALIBRATED, HDF_SENSOR_TYPE_DROP_DETECT,
                                                   HDF_SENSOR_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
-                                                  HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED};
+                                                  HDF_SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED, HDF_SENSOR_TYPE_BAROMETER};
     constexpr int64_t ERROR_INTERVAL = 0;
     constexpr int64_t STOP_INTERVAL = 0;
     constexpr int32_t INIT_CUR_COUNT = 0;
