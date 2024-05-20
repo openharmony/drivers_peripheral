@@ -221,7 +221,7 @@ int32_t DdkUeventAddTask(const struct DdkUeventInfo *info)
     if (!(isAddDevice || isRemoveDevice)) {
         return HDF_SUCCESS;
     }
-    HDF_LOGE("%{public}s: bind=%{public}s, subsystem=%{public}s, devType=%{public}s, devPath=%{public}s",
+    HDF_LOGI("%{public}s: bind=%{public}s, subsystem=%{public}s, devType=%{public}s, devPath=%{public}s",
         __func__, info->action, info->subSystem, info->devType, info->devPath);
     DdkUeventTaskInfo task {
         {0x00},
