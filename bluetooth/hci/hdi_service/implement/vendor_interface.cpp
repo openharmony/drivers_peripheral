@@ -155,13 +155,13 @@ void VendorInterface::CleanUp()
 
 size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet)
 {
+    std::lock_guard<std::mutex> lock(wakeupMutex_);
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("VendorInterface::SendPacket, vendorInterface_ is nullptr.");
         return BT_VENDOR_INVALID_DATA_LEN;
     }
 
     {
-        std::lock_guard<std::mutex> lock(wakeupMutex_);
         activity_ = true;
         watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
         if (!wakeupLock_) {

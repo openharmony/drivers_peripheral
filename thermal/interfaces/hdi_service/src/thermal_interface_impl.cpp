@@ -100,7 +100,7 @@ int32_t ThermalInterfaceImpl::Init()
 
     thermalZoneMgr_->Init();
     thermalZoneMgr_->CalculateMaxCd();
-    ret = thermalZoneMgr_->ParseThermalZoneInfo();
+    ret = thermalZoneMgr_->UpdateThermalZoneData();
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -161,7 +161,7 @@ int32_t ThermalInterfaceImpl::SetBatteryCurrent(int32_t current)
 int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 {
     if (thermalZoneMgr_ != nullptr) {
-        thermalZoneMgr_->ParseThermalZoneInfo();
+        thermalZoneMgr_->UpdateThermalZoneData();
         event.info = thermalZoneMgr_->GetCallbackInfo().info;
     }
     return HDF_SUCCESS;

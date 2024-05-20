@@ -224,7 +224,6 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
             if (titlePath != nullptr) {
                 ThermalHdfUtils::ReadNode(
                     std::string(reinterpret_cast<char*>(titlePath)), title);
-                THERMAL_HILOGD(COMP_HDI, "title form path");
                 xmlFree(titlePath);
             }
 
