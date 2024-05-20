@@ -346,6 +346,13 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnFillBufferDone");
+    auto appPrivate = static_cast<OMXBufferAppPrivateData *>(buffer->pAppPrivate);
+    if (appPrivate != nullptr && appPrivate->param != nullptr) {
+        codecOmxBuffer.alongParam.resize(appPrivate->sizeOfParam);
+        std::copy(static_cast<uint8_t*>(appPrivate->param),
+                  static_cast<uint8_t*>(appPrivate->param) + appPrivate->sizeOfParam,
+                  codecOmxBuffer.alongParam.begin());
+    }
     (void)omxCallback_->FillBufferDone(appData_, codecOmxBuffer);
     return OMX_ErrorNone;
 }
@@ -403,7 +410,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
         (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
         return OMX_ErrorInvalidComponent;
     }
-
+    bufferHdrType->pAppPrivate = nullptr;
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
@@ -489,6 +496,7 @@ int32_t ComponentNode::EmptyThisBuffer(OmxCodecBuffer &buffer)
     }
 
     err = OMX_EmptyThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
+    bufferHdrType->pAppPrivate = nullptr;
     return err;
 }
 
