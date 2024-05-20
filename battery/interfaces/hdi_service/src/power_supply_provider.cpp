@@ -529,7 +529,7 @@ void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
     if (path.empty()) {
-        BATTERY_HILOGD(FEATURE_BATT_INFO, "path is empty");
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "path is empty");
         return;
     }
     path_ = path;
