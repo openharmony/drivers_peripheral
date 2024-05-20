@@ -155,6 +155,7 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libexif:libexif",
   ]
 
   public_configs = [ ":pipe_config" ]
