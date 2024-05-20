@@ -15,7 +15,6 @@
 #include <exif_utils.h>
 #include <securec.h>
 #include "camera_dump.h"
-#include <chrono>
 
 namespace OHOS::Camera {
 RKExifNode::RKExifNode(const std::string &name, const std::string &type, const std::string &cameraId)
@@ -49,7 +48,6 @@ RetCode RKExifNode::Flush(const int32_t streamId)
 
 void RKExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 {
-    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     if (buffer == nullptr) {
         CAMERA_LOGE("RKExifNode::DeliverBuffer frameSpec is null");
         return;
@@ -82,13 +80,9 @@ void RKExifNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
         if (it->format_.streamId_ == id) {
             it->DeliverBuffer(buffer);
             CAMERA_LOGI("RKExifNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-            int durationTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-            CAMERA_LOGI("rkexif deliver buffer to offline stream time : %{public}d", durationTime);
             return;
         }
     }
-
 }
 
 RetCode RKExifNode::Config(const int32_t streamId, const CaptureMeta &meta)

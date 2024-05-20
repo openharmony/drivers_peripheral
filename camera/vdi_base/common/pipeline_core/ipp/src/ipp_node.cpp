@@ -15,7 +15,6 @@
 #include "camera_metadata_operator.h"
 #include "metadata_controller.h"
 #include "ipp_node.h"
-#include <chrono>
 
 namespace OHOS::Camera {
 IppNode::IppNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -423,11 +422,7 @@ void IppNode::DeliverAlgoProductBuffer(std::shared_ptr<IBuffer>& result)
             CAMERA_LOGE("can't find out port, deliver algo product failed.");
             return;
         }
-        std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
         outPort->DeliverBuffer(result);
-        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-        int durationTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-        CAMERA_LOGI("DeliverAlgoProductBuffer deliver buffer to offline stream time : %{public}d", durationTime);
     }
 
     return;
