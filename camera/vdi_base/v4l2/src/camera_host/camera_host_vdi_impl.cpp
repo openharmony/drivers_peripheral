@@ -143,8 +143,12 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
 
     common_metadata_header_t *data = ability->get();
     camera_metadata_item_t entry;
-    if (FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry) == 0) {
-        (void)DeleteCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS);
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry) == 0) {
+        uint8_t conectType = *(entry.data.u8);
+        if (conectType == OHOS_CAMERA_CONNECTION_TYPE_BUILTIN &&
+            FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry) == 0) {
+            (void)DeleteCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS);
+        }
     }
 
     CameraDumper &dumper = CameraDumper::GetInstance();

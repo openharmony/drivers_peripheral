@@ -13,7 +13,6 @@
 
 #include "sink_node.h"
 #include "metadata_controller.h"
-#include <chrono>
 
 namespace OHOS::Camera {
 SinkNode::SinkNode(const std::string& name, const std::string& type, const std::string &cameraId)
@@ -36,16 +35,12 @@ RetCode SinkNode::Stop(const int32_t streamId)
 
 void SinkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     cb_(buffer);
     int32_t streamId = buffer->GetStreamId();
     constexpr uint32_t DEVICE_STREAM_ID = 0;
     MetadataController& metaDataController = MetadataController::GetInstance();
     metaDataController.NotifyMetaData(streamId);
     metaDataController.NotifyMetaData(DEVICE_STREAM_ID);
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    int durationTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-    CAMERA_LOGI("sink deliver buffer to offline stream time : %{public}d", durationTime);
     return;
 }
 

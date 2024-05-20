@@ -14,7 +14,6 @@
 #include "codec_node.h"
 #include <securec.h>
 #include "camera_dump.h"
-#include <chrono>
 
 extern "C" {
 #include <jpeglib.h>
@@ -330,7 +329,6 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
 
 void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     if (buffer == nullptr) {
         CAMERA_LOGE("CodecNode::DeliverBuffer frameSpec is null");
         return;
@@ -354,13 +352,9 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         if (it->format_.streamId_ == id) {
             it->DeliverBuffer(buffer);
             CAMERA_LOGI("CodecNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-            int durationTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-            CAMERA_LOGI("rkcodec deliver buffer to offline stream time : %{public}d", durationTime);
             return;
         }
     }
-
 }
 
 RetCode CodecNode::Capture(const int32_t streamId, const int32_t captureId)
