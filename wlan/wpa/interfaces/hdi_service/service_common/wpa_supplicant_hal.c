@@ -1570,6 +1570,7 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     if(strncpy_s(staNo, sizeof(staNo), name + strlen("wlan"), STA_NO_LEN) != EOK) {
         HDF_LOGE("GetWifiStaInterface, strncpy_s err");
         free(p);
+        p = NULL;
         return NULL;
     }
     p->staNo =  atoi(staNo);
