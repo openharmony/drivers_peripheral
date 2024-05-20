@@ -560,7 +560,7 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
         struct UsbInterfaceDescriptor *ifDesc = (struct UsbInterfaceDescriptor *)buffer;
         if (config->configDescriptor.bNumInterfaces >= USB_MAXINTERFACES) {
             HDF_LOGE("%{public}d: bNumInterfaces overlong.", config->configDescriptor.bNumInterfaces);
-            RawUsbMemFree((void *)config->extra);
+            RawClearConfiguration(config);
             return HDF_FAILURE;
         }
         for (i = 0; i < config->configDescriptor.bNumInterfaces; ++i) {
