@@ -529,7 +529,7 @@ void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
     if (path.empty()) {
-        BATTERY_HILOGI(FEATURE_BATT_INFO, "path is empty");
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "path is empty");
         return;
     }
     path_ = path;
@@ -1012,7 +1012,7 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
     if (ret < HDF_SUCCESS) {
         return ret;
     }
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "Exit");
     return HDF_SUCCESS;
 }
 
@@ -1041,13 +1041,13 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
     }
     close(fd);
 
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath exit");
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::string& result)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath enter, path: %{public}s", path.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "GetConfigByPath enter, path: %{public}s", path.c_str());
     if (path.empty()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "the featurePath is empty");
         result = "";
@@ -1063,20 +1063,20 @@ int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::strin
     }
     Trim(buf);
     result = buf;
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath exit, value:%{public}s", result.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "GetConfigByPath exit, value:%{public}s", result.c_str());
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::CheckPathExists(const std::string& path, bool& result)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists enter, path: %{public}s", path.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "CheckPathExists enter, path: %{public}s", path.c_str());
     if (path.empty()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "the path is empty");
         result = false;
         return HDF_ERR_INVALID_PARAM;
     }
     result = access(path.c_str(), F_OK) == 0;
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists exit, value:%{public}d", result);
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "CheckPathExists exit, value:%{public}d", result);
     return HDF_SUCCESS;
 }
 }  // namespace V2_0
