@@ -511,7 +511,6 @@ int32_t UsbdDispatcher::ReturnGetPipes(int32_t ret, HostDevice *dev)
 {
     UsbdCloseInterfaces(dev);
     UsbdReleaseInterfaces(dev);
-    UsbExitHostSdk(dev->service->session_);
     dev->service->session_ = nullptr;
     return ret;
 }
@@ -519,14 +518,12 @@ int32_t UsbdDispatcher::ReturnGetPipes(int32_t ret, HostDevice *dev)
 int32_t UsbdDispatcher::ReturnOpenInterfaces(int32_t ret, HostDevice *dev)
 {
     UsbdReleaseInterfaces(dev);
-    UsbExitHostSdk(dev->service->session_);
     dev->service->session_ = nullptr;
     return ret;
 }
 
 int32_t UsbdDispatcher::ReturnClainInterfaces(int32_t ret, HostDevice *dev)
 {
-    UsbExitHostSdk(dev->service->session_);
     dev->service->session_ = nullptr;
     return ret;
 }
@@ -873,8 +870,8 @@ int32_t UsbdDispatcher::FunAttachDevice(HostDevice *port, HdfSBuf *data, HdfSBuf
         ret = UsbdInit(port);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:UsbInit failed ret:%{public}d", __func__, ret);
-            UsbdRelease(port);
             RemoveDevFromService(port->service, port);
+            UsbdRelease(port);
             OsalMemFree(port);
             return ret;
         }
@@ -918,7 +915,6 @@ int32_t UsbdDispatcher::UsbdDeviceCreateAndAttach(const sptr<UsbImpl> &service, 
         ret = FunAttachDevice(port, nullptr, nullptr);
         if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:FunAttachDevice error ret:%{public}d", __func__, ret);
-            HdfSListRemove(&service->devList_, &port->node);
         }
         port = nullptr;
     } else {
