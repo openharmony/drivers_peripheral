@@ -35,7 +35,7 @@ public:
 private:
     int32_t LoadVdi();
     void TimeBegin(struct timeval *firstTimeStamp);
-    int32_t TimeEnd(int32_t time, struct timeval firstTimeStamp);
+    int32_t TimeEnd(struct timeval &firstTimeStamp);
     void WriteAllocPidToDma(int32_t fd);
     void FreeMemVdi(BufferHandle* handle);
     std::mutex mutex_;
