@@ -651,7 +651,7 @@ IAM_STATIC ResultCode GetExecutorInfoHalFromAttribute(const Attribute *attribute
         LOG_ERROR("GetAttributeUint32 esl failed");
         return result;
     }
-    Uint8Array pubKeyTlv = {resultInfo->pubKey, PUBLIC_KEY_LEN };
+    Uint8Array pubKeyTlv = { resultInfo->pubKey, PUBLIC_KEY_LEN };
     result = GetAttributeUint8Array(attribute, ATTR_PUBLIC_KEY, &pubKeyTlv);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint8Array pubKey fail");
@@ -671,7 +671,7 @@ IAM_STATIC ResultCode GetExecutorInfoHal(Uint8Array tlv, ExecutorInfoHal *execut
     ResultCode result = GetExecutorInfoHalFromAttribute(attribute, executorInfo);
     FreeAttribute(&attribute);
     if (result != RESULT_SUCCESS) {
-        LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
+        LOG_ERROR("GetExecutorInfoHalFromAttribute failed");
         return RESULT_GENERAL_ERROR;
     }
 
@@ -691,7 +691,7 @@ IAM_STATIC ResultCode GetRemoteExecutorInfoInner(Attribute *attribute, Uint8Arra
     int *subMsgSize)
 {
     if (GetAuthAttrsFromAttribute(attribute, authAttrs) != RESULT_SUCCESS) {
-        LOG_ERROR("GetExecutorResultInfoFromAttribute failed");
+        LOG_ERROR("GetAuthAttrsFromAttribute failed");
         return RESULT_GENERAL_ERROR;
     }
     if (ParseMultiDataSerializedMsg(*authAttrs, subMsgs, subMsgSize) != RESULT_SUCCESS) {
@@ -708,7 +708,7 @@ IAM_STATIC ResultCode GetRemoteExecutorInfo(const Buffer *msg, Uint8Array peerUd
     Attribute *attribute = CreateAttributeFromExecutorMsg(msgArray, signParam);
     Uint8Array authAttrs = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     if (attribute == NULL || authAttrs.data == NULL) {
-        LOG_ERROR("CreateAttributeFromExecutorMsg or malloc failed");
+        LOG_ERROR("authAttrs malloc failed");
         FreeAttribute(&attribute);
         Free(authAttrs.data);
         return RESULT_GENERAL_ERROR;
@@ -731,10 +731,10 @@ static bool CheckRemoteExecutorInfoInner(Uint8Array *subMsgs, int subMsgSize, Ex
             LOG_ERROR("GetExecutorInfoHal failed");
             return false;
         }
-        if ((executorInfo.authType == infoToCheck->authType)
-            && (executorInfo.executorRole == infoToCheck->executorRole)
-            && (executorInfo.esl == infoToCheck->esl)
-            && (memcmp(executorInfo.pubKey, infoToCheck->pubKey, PUBLIC_KEY_LEN) == 0)) {
+        if ((executorInfo.authType == infoToCheck->authType) &&
+            (executorInfo.executorRole == infoToCheck->executorRole) &&
+            (executorInfo.esl == infoToCheck->esl) &&
+            (memcmp(executorInfo.pubKey, infoToCheck->pubKey, PUBLIC_KEY_LEN) == 0)) {
             return true;
         }
     }
@@ -823,7 +823,7 @@ IAM_STATIC Buffer *CreateExecutorCollectMsg(const Attribute *attributeSchedule, 
     Attribute *attribute = CreateEmptyAttribute();
     Uint8Array retInfo = { Malloc(MAX_EXECUTOR_MSG_LEN), MAX_EXECUTOR_MSG_LEN };
     if (attribute == NULL || IS_ARRAY_NULL(retInfo)) {
-        LOG_ERROR("generate attribute or retInfo or localUdid or remoteUdid failed");
+        LOG_ERROR("attribute is null");
         goto FAIL;
     }
     result = SetExecutorCollectMsgToAttribute(scheduleInfo, &publicKey, challenge, attribute);
@@ -844,7 +844,7 @@ IAM_STATIC Buffer *CreateExecutorCollectMsg(const Attribute *attributeSchedule, 
         LOG_ERROR("generate result buffer failed");
         goto FAIL;
     }
-    LOG_INFO("CreateExecutorMsg success");
+    LOG_INFO("CreateExecutorCollectMsg success");
 
 FAIL:
     FreeAttribute(&attribute);
@@ -874,6 +874,11 @@ static ResultCode GetExecutorIndexByCondition(uint32_t authType, uint32_t execut
     }
 
     LinkedListNode *temp = executorList->head;
+    if (temp == NULL) {
+        LOG_ERROR("get executorList head failed");
+        DestroyLinkedList(executorList);
+        return RESULT_UNKNOWN;
+    }
     ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
     if (executorInfo == NULL) {
         LOG_ERROR("executorInfo is invalid");
@@ -886,7 +891,7 @@ static ResultCode GetExecutorIndexByCondition(uint32_t authType, uint32_t execut
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, ScheduleInfoParam *scheduleInfo)
+IAM_STATIC ResultCode GetScheduleInfoFromAttributeInner(const Attribute *attribute, ScheduleInfoParam *scheduleInfo)
 {
     ResultCode result = GetAttributeUint64(attribute, ATTR_SCHEDULE_ID, &(scheduleInfo->scheduleId));
     if (result != RESULT_SUCCESS) {
@@ -908,17 +913,25 @@ IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, S
         LOG_ERROR("GetAttributeInt32 scheduleMode failed");
         return result;
     }
-    uint32_t executorRole;
-    result = GetAttributeUint32(attribute, ATTR_EXECUTOR_ROLE, &executorRole);
-    if (result != RESULT_SUCCESS) {
-        LOG_ERROR("GetAttributeInt32 scheduleMode failed");
-        return result;
-    }
-
     Uint8Array remoteUdid = { scheduleInfo->remoteUdid, UDID_LEN };
     result = GetAttributeUint8Array(attribute, ATTR_VERIFIER_UDID, &remoteUdid);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetAttributeUint8Array remoteUdid failed");
+    }
+    return result;
+}
+
+IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, ScheduleInfoParam *scheduleInfo)
+{
+    ResultCode result = GetScheduleInfoFromAttributeInner(attribute, scheduleInfo);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetScheduleInfoFromAttributeInner failed");
+        return result;
+    }
+    uint32_t executorRole;
+    result = GetAttributeUint32(attribute, ATTR_EXECUTOR_ROLE, &executorRole);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GetAttributeUint32 scheduleMode failed");
         return result;
     }
 
@@ -941,24 +954,18 @@ IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, S
         return result;
     }
 
-    Buffer *executorMsg = CreateExecutorCollectMsg(attribute, scheduleInfo);
-    if (!IsBufferValid(executorMsg)) {
-        LOG_ERROR("executorMsg is invalid");
-        return RESULT_GENERAL_ERROR;
-    }
-    scheduleInfo->executorMessages = CopyBuffer(executorMsg);
+    scheduleInfo->executorMessages = CreateExecutorCollectMsg(attribute, scheduleInfo);
     if (!IsBufferValid(scheduleInfo->executorMessages))
     {
-        LOG_ERROR("CopyBuffer executorMsg failed");
+        LOG_ERROR("create executorMessages failed");
         result = RESULT_GENERAL_ERROR;
     }
-    DestoryBuffer(executorMsg);
     return result;
 }
 
 ResultCode CreateScheduleInfo(const Buffer *tlv, Uint8Array peerUdid, ScheduleInfoParam *scheduleInfo)
 {
-    if (!IsBufferValid(tlv) || (scheduleInfo == NULL)) {
+    if (!IsBufferValid(tlv) || IS_ARRAY_NULL(peerUdid) || (scheduleInfo == NULL)) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -1010,6 +1017,10 @@ IAM_STATIC ResultCode GetAuthResultInfoFromAttribute(const Attribute *attribute,
         return result;
     }
     authResultInfo->token = CreateBufferByData(tokenArray.data, tokenArray.len);
+    if (!IsBufferValid(authResultInfo->token)) {
+        LOG_ERROR("CreateBuffer token fail");
+        return RESULT_BAD_COPY;
+    }
     return RESULT_SUCCESS;
 }
 
@@ -1073,7 +1084,7 @@ ResultCode GetExecutorInfoMsg(ExecutorInfoHal *executorInfo, Uint8Array *retMsg)
     ResultCode result = RESULT_GENERAL_ERROR;
     Attribute *attribute = CreateEmptyAttribute();
     if (attribute == NULL) {
-        LOG_ERROR("generate attribute or retInfo failed");
+        LOG_ERROR("CreateEmptyAttribute failed");
         return RESULT_GENERAL_ERROR;
     }
     result = SetExecutorInfoMsgToAttribute(executorInfo, attribute);
@@ -1094,7 +1105,7 @@ FAIL:
 
 Buffer *GetExecutorInfoTlv(Uint8Array attrsTlv, Uint8Array peerUdid)
 {
-    if (IS_ARRAY_NULL(attrsTlv)) {
+    if (IS_ARRAY_NULL(attrsTlv) || IS_ARRAY_NULL(peerUdid)) {
         LOG_ERROR("attrsTlv is NULL");
         return NULL;
     }
@@ -1124,7 +1135,7 @@ Buffer *GetExecutorInfoTlv(Uint8Array attrsTlv, Uint8Array peerUdid)
         LOG_ERROR("generate result buffer failed");
         goto FAIL;
     }
-    LOG_INFO("CreateExecutorMsg success");
+    LOG_INFO("GetExecutorInfoTlv success");
 
 FAIL:
     FreeAttribute(&attribute);

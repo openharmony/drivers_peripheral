@@ -31,24 +31,33 @@
 #define IAM_STATIC static
 #endif
 
-IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param)
+IAM_STATIC ResultCode SetScheduleParam(const PermissionCheckParam *param, ScheduleParam *scheduleParam)
 {
-    ScheduleParam scheduleParam = {};
-    scheduleParam.associateId.userId = param->userId;
-    scheduleParam.authType = param->authType;
-    scheduleParam.userType = param->userType;
-    scheduleParam.scheduleMode = SCHEDULE_MODE_ENROLL;
-    scheduleParam.collectorSensorHint = param->executorSensorHint;
+    scheduleParam->associateId.userId = param->userId;
+    scheduleParam->authType = param->authType;
+    scheduleParam->userType = param->userType;
+    scheduleParam->scheduleMode = SCHEDULE_MODE_ENROLL;
+    scheduleParam->collectorSensorHint = param->executorSensorHint;
 
-    Uint8Array localUdid = { scheduleParam.localUdid, UDID_LEN };
+    Uint8Array localUdid = { scheduleParam->localUdid, UDID_LEN };
     bool getLocalUdidRet = GetLocalUdid(&localUdid);
-    Uint8Array collectorUdid = { scheduleParam.collectorUdid, UDID_LEN };
+    Uint8Array collectorUdid = { scheduleParam->collectorUdid, UDID_LEN };
     bool getCollectorUdidRet = GetLocalUdid(&collectorUdid);
     if (!getLocalUdidRet || !getCollectorUdidRet) {
         LOG_ERROR("get udid failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
+}
+
+IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param)
+{
+    ScheduleParam scheduleParam = {};
+    if (SetScheduleParam(param, &scheduleParam) != RESULT_SUCCESS) {
+        LOG_ERROR("SetScheduleParam failed");
         return NULL;
     }
-
+    
     if (scheduleParam.collectorSensorHint != INVALID_SENSOR_HINT) {
         ResultCode ret = QueryCollecterMatcher(scheduleParam.authType, scheduleParam.collectorSensorHint,
             &scheduleParam.executorMatcher);
