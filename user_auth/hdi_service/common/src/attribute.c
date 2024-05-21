@@ -498,13 +498,15 @@ ResultCode SetAttributeUint64Array(Attribute *attribute, AttributeKey key, const
     return result;
 }
 
-ResultCode GetMultiDataSerializedMsg(Uint8Array sourceArrayMsg[], uint32_t size, Uint8Array *retMsg)
+ResultCode GetMultiDataSerializedMsg(Uint8Array *sourceArrayMsg, uint32_t size, Uint8Array *retMsg)
 {
+    IF_TRUE_LOGE_AND_RETURN_VAL(sourceArrayMsg == NULL, INVALID_PARAMETERS);
     IF_TRUE_LOGE_AND_RETURN_VAL(retMsg == NULL, INVALID_PARAMETERS);
     IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(*retMsg), INVALID_PARAMETERS);
 
     uint32_t writeIndex = 0;
     for (uint32_t i = 0; i < size; i++) {
+        IF_TRUE_LOGE_AND_RETURN_VAL(sourceArrayMsg[i].data == NULL, GENERAL_ERROR);
         Uint8Array sourceMsg = sourceArrayMsg[i];
         if (sourceMsg.len == 0) {
             continue;

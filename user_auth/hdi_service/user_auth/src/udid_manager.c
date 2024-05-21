@@ -21,10 +21,11 @@
 
 #include "adaptor_log.h"
 
-static uint8_t g_localUdidBuffer[UDID_LEN] = {};
+static uint8_t g_localUdidBuffer[UDID_LEN] = { 0 };
 
 bool SetLocalUdid(const char *udid)
 {
+    IF_TRUE_LOGE_AND_RETURN_VAL(udid == NULL, false);
     if (strlen(udid) != UDID_LEN) {
         LOG_ERROR("udid size is invalid");
         return false;
@@ -36,10 +37,23 @@ bool SetLocalUdid(const char *udid)
     return true;
 }
 
+static bool IsLocalUdidExit()
+{
+    uint8_t emptyUdid[UDID_LEN] = { 0 };
+    if (memcmp(emptyUdid, g_localUdidBuffer, UDID_LEN) == 0) {
+        LOG_ERROR("g_localUdidBuffer not set");
+        return false;
+    }
+    return true;
+}
+
 bool GetLocalUdid(Uint8Array *udid)
 {
     if (udid == NULL || udid->data == NULL || udid->len < UDID_LEN) {
         LOG_ERROR("invalid parameter");
+        return false;
+    }
+    if (!IsLocalUdidExit()) {
         return false;
     }
     if (memcpy_s(udid->data, udid->len, g_localUdidBuffer, sizeof(g_localUdidBuffer)) != EOK) {
@@ -57,6 +71,8 @@ Buffer GetLocalUdidTmpBuffer()
 
 bool IsLocalUdid(Uint8Array udid)
 {
+    IF_TRUE_LOGE_AND_RETURN_VAL(IS_ARRAY_NULL(udid), false);
+    
     if (udid.len != UDID_LEN) {
         return false;
     }

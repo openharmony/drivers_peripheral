@@ -412,7 +412,7 @@ void SetExecutorConditionExecutorMatcher(ExecutorCondition *condition, uint32_t 
 
 void SetExecutorConditionDeviceUdid(ExecutorCondition *condition, Uint8Array deviceUdid)
 {
-    if (condition == NULL) {
+    if (condition == NULL || IS_ARRAY_NULL(deviceUdid)) {
         LOG_ERROR("condition is null");
         return;
     }

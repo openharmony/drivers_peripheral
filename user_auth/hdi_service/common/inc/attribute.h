@@ -122,7 +122,7 @@ ResultCode GetAttributeUint64Array(const Attribute *attribute, AttributeKey key,
 ResultCode SetAttributeUint64Array(Attribute *attribute, AttributeKey key, const Uint64Array data);
 
 ResultCode ParseMultiDataSerializedMsg(const Uint8Array msg, Uint8Array *subMsgData, int *subMsgSize);
-ResultCode GetMultiDataSerializedMsg(Uint8Array sourceArrayMsg[], uint32_t size, Uint8Array *retMsg);
+ResultCode GetMultiDataSerializedMsg(Uint8Array *sourceArrayMsg, uint32_t size, Uint8Array *retMsg);
 
 #ifdef __cplusplus
 }

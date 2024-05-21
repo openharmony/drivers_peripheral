@@ -17,6 +17,7 @@
 #define AUTH_RESOURCE_POOL_H
 
 #include "buffer.h"
+#include "c_array.h"
 #include "linked_list.h"
 
 #ifdef __cplusplus
