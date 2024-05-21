@@ -121,7 +121,7 @@ void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
     return;
 }
 
-void AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval firstTimeStamp)
+int32_t AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval firstTimeStamp)
 {
     struct timeval secondTimeStamp;
     gettimeofday(&secondTimeStamp, nullptr);
@@ -129,8 +129,9 @@ void AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval fi
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
     if (runTime > time) {
         HDF_LOGW("run %{public}s over time, [%{public}d]ms", func, runTime);
+        return HDF_FAILURE
     }
-    return;
+    return HDF_SUCCESS;
 }
 
 void AllocatorService::WriteAllocPidToDma(int32_t fd)
@@ -165,12 +166,20 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
         int32_t ec = vdiImpl_->AllocMem(info, buffer);
         if (ec != HDF_SUCCESS) {
-            TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+            if(TimeEnd("AllocMem", TIME_10, firstTimeStamp) != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: width[%{public}u], height[%{public}u], \
+                    usage[%{public}lu], format[%{public}d], size[%{public}u]",
+                    __func__, width, height, usage, format, expectedSize);
+            }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
             return ec;
         }
     }
-    TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+    if(TimeEnd("AllocMem", TIME_10, firstTimeStamp) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: width[%{public}u], height[%{public}u], \
+            usage[%{public}lu], format[%{public}d], size[%{public}u]",
+            __func__, width, height, usage, format, expectedSize);
+    }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
     WriteAllocPidToDma(buffer->fd);
