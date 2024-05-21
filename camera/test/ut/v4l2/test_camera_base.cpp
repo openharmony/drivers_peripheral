@@ -122,6 +122,10 @@ void TestCameraBase::PrintFaceDetectInfo(const unsigned char *bufStart, const ui
 {
     common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>(
         const_cast<unsigned char*>(bufStart));
+    if (data->item_count > MAX_ITEM_CAPACITY || data->data_count > MAX_DATA_CAPACITY) {
+        CAMERA_LOGE("demo test: invalid item_count or data_count");
+        return;
+    }
     camera_metadata_item_t entry;
     int ret = 0;
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
@@ -261,12 +265,14 @@ OHOS::Camera::RetCode TestCameraBase::FBInit()
     if (ioctl(fbFd_, FBIOGET_VSCREENINFO, &vinfo_) < 0) {
         CAMERA_LOGE("main test:cannot retrieve vscreenInfo!");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
     if (ioctl(fbFd_, FBIOGET_FSCREENINFO, &finfo_) < 0) {
         CAMERA_LOGE("main test:can't retrieve fscreenInfo!");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
@@ -277,6 +283,7 @@ OHOS::Camera::RetCode TestCameraBase::FBInit()
     if (displayBuf_ == nullptr) {
         CAMERA_LOGE("main test:error displayBuf_ mmap error");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
     return RC_OK;
