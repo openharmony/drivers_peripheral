@@ -14,4 +14,7 @@
 group("wpa_entry") {
   deps = [ "interfaces/hdi_service:hdi_wpa_service" ]
   deps += [ "client:wpa_hdi_client" ]
+  if (is_standard_system) {
+    deps += [ "interfaces/hdi_service:hdi_wpa_updater" ]
+  }
 }
