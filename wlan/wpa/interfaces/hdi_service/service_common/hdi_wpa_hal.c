@@ -116,6 +116,7 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
     }
     WpaIfaceInfo *info = p->ifaces;
     int count = 0;
+    pthread_mutex_lock(&g_mutex);
     while (info != NULL && count < MAX_IFACE_COUNT) {
         if (strncmp(info->name, argv->name, MAX_IFACE_LEN) == 0) {
             return 0;
@@ -123,6 +124,7 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         info = info->next;
         count++;
     }
+    pthread_mutex_unlock(&g_mutex);
     info = (WpaIfaceInfo *)calloc(1, sizeof(WpaIfaceInfo));
     if (info == NULL) {
         return -1;
@@ -144,8 +146,10 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         return -1;
     }
     HDF_LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
+    pthread_mutex_lock(&g_mutex);
     info->next = p->ifaces;
     p->ifaces = info;
+    pthread_mutex_unlock(&g_mutex);
     return 0;
 }
 
@@ -157,13 +161,17 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     }
     WpaIfaceInfo *prev = NULL;
     WpaIfaceInfo *info = p->ifaces;
-    while (info != NULL) {
+    int count = 0;
+    pthread_mutex_lock(&g_mutex);
+    while (info != NULL && count < MAX_IFACE_COUNT) {
         if (strncmp(info->name, name, MAX_IFACE_LEN) == 0) {
             break;
         }
         prev = info;
         info = info->next;
+        count++;
     }
+    pthread_mutex_unlock(&g_mutex);
     if (info == NULL) {
         HDF_LOGI("the WpaInterface info is null");
         return 0;
@@ -174,14 +182,17 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         return -1;
     }
+    pthread_mutex_lock(&g_mutex);
     if (prev == NULL) {
         p->ifaces = info->next;
     } else {
         prev->next = info->next;
     }
+    info->next = NULL;
     HDF_LOGI("Remove interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
     free(info);
     info = NULL;
+    pthread_mutex_unlock(&g_mutex);
     return 0;
 }
 
@@ -231,6 +242,7 @@ void ReleaseWpaGlobalInterface(void)
     WpaIfaceInfo *p = g_wpaInterface->ifaces;
     while (p != NULL) {
         WpaIfaceInfo *q = p->next;
+        p->next = NULL;
         free(p);
         p = q;
     }
