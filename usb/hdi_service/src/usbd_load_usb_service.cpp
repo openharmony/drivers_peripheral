@@ -34,7 +34,15 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_1 {
-OnDemandLoadCallback::OnDemandLoadCallback() {}
+OnDemandLoadCallback::OnDemandLoadCallback()
+{
+    HDF_LOGI("%{public}s:construct", __func__);
+}
+
+OnDemandLoadCallback::~OnDemandLoadCallback()
+{
+    HDF_LOGI("%{public}s:deconstruct", __func__);
+}
 
 void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
@@ -48,6 +56,15 @@ void OnDemandLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
     HDF_LOGI("%{public}s: OnLoadSystemAbilityFail systemAbilityId: %{public}d", __func__, systemAbilityId);
 }
 
+UsbdLoadService::UsbdLoadService(int32_t saId) : saId_(saId)
+{
+    HDF_LOGI("%{public}s:construct", __func__);
+}
+
+UsbdLoadService::~UsbdLoadService()
+{
+    HDF_LOGI("%{public}s:deconstruct", __func__);
+}
 int32_t UsbdLoadService::LoadService()
 {
     if (loadCallback_ != nullptr && loadCallback_->loading_) {
