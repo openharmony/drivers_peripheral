@@ -436,6 +436,7 @@ static int32_t ParseInterfaceCopy(struct UsbRawInterfaceDescriptor * const ifp, 
     if (ret != EOK) {
         HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
         RawUsbMemFree((void *)ifp->extra);
+        ifp->extra = NULL;
         return ret;
     }
     ifp->extraLength = len;
@@ -1664,6 +1665,7 @@ void *RawUsbMemCalloc(size_t size)
         if (testEntry == NULL) {
             HDF_LOGE("%{public}s:%d testEntry is NULL", __func__, __LINE__);
             OsalMemFree(buf);
+            buf = NULL;
             return buf;
         }
         testEntry->address = (uintptr_t)buf;
