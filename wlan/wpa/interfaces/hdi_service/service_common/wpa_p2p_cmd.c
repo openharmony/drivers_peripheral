@@ -1487,7 +1487,8 @@ static int32_t WpaFillP2pDeviceFoundParam(struct P2pDeviceInfoParam *deviceInfoP
             ret = HDF_FAILURE;
             break;
         }
-        if (deviceInfoParam->wfdLength != 0 && FillData(&hdiP2pDeviceInfoParam->wfdDeviceInfo, &hdiP2pDeviceInfoParam->wfdDeviceInfoLen,
+        if (deviceInfoParam->wfdLength != 0 &&
+            FillData(&hdiP2pDeviceInfoParam->wfdDeviceInfo, &hdiP2pDeviceInfoParam->wfdDeviceInfoLen,
             deviceInfoParam->wfdDeviceInfo, deviceInfoParam->wfdLength) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fill bssid fail!", __func__);
             ret = HDF_FAILURE;
