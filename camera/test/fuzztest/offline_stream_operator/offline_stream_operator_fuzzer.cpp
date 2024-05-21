@@ -59,6 +59,10 @@ static int32_t ConvertInt32(const uint8_t *bitOperat)
 
 void FuncCancelCapture(const uint8_t *rawData)
 {
+    if (rawData == nullptr) {
+        CAMERA_LOGI("%{public}s rawData is null", __FUNCTION__);
+        return;
+    }
     cameraTest->streamInfoSnapshot = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
     cameraTest->DefaultInfosCapture(cameraTest->streamInfoSnapshot);
     cameraTest->streamInfos.push_back(*cameraTest->streamInfoSnapshot);
@@ -80,6 +84,7 @@ void FuncCancelCapture(const uint8_t *rawData)
 void FuncReleaseStreams(const uint8_t *rawData)
 {
     if (rawData == nullptr) {
+        CAMERA_LOGI("%{public}s rawData is null", __FUNCTION__);
         return;
     }
     cameraTest->streamOperatorCallback = new OHOS::Camera::CameraManager::TestStreamOperatorCallback();
