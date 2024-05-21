@@ -264,7 +264,7 @@ static void UpdateSettingsForSlowMotionMode(std::shared_ptr<OHOS::Camera::Test> 
     cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
     int32_t slowMotionControl = OHOS_CAMERA_MOTION_DETECTION_ENABLE;
-    meta->addEntry(OHOS_CONTROL_MOTION_DETECTION, &slowMotionControl, DATA_CAPACITY);
+    meta->addEntry(OHOS_CONTROL_MOTION_DETECTION, &slowMotionControl, DATA_COUNT);
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     cameraTest->rc = (CamRetCode)cameraTest->cameraDeviceV1_3->UpdateSettings(setting);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
