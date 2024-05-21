@@ -265,12 +265,14 @@ OHOS::Camera::RetCode TestCameraBase::FBInit()
     if (ioctl(fbFd_, FBIOGET_VSCREENINFO, &vinfo_) < 0) {
         CAMERA_LOGE("main test:cannot retrieve vscreenInfo!\n");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
     if (ioctl(fbFd_, FBIOGET_FSCREENINFO, &finfo_) < 0) {
         CAMERA_LOGE("main test:can't retrieve fscreenInfo!\n");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
@@ -281,6 +283,7 @@ OHOS::Camera::RetCode TestCameraBase::FBInit()
     if (displayBuf_ == nullptr) {
         CAMERA_LOGE("main test:error displayBuf_ mmap error\n");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
     return RC_OK;
