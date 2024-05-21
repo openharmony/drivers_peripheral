@@ -152,8 +152,6 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "$camera_path/utils:peripheral_camera_utils",
   ]
 
-  public_deps = []
-
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_utils",
