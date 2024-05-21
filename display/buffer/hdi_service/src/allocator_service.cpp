@@ -121,16 +121,12 @@ void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
     return;
 }
 
-int32_t AllocatorService::TimeEnd(int32_t time, struct timeval firstTimeStamp)
+int32_t AllocatorService::TimeEnd(struct timeval &firstTimeStamp)
 {
     struct timeval secondTimeStamp;
     gettimeofday(&secondTimeStamp, nullptr);
-    int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+    return (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
-    if (runTime > time) {
-        return runTime;
-    }
-    return HDF_SUCCESS;
 }
 
 void AllocatorService::WriteAllocPidToDma(int32_t fd)
@@ -150,8 +146,8 @@ void AllocatorService::FreeMemVdi(BufferHandle* handle)
         HdfTrace traceTwo("FreeMem", "HDI:VDI:");
         vdiImpl_->FreeMem(*handle);
     }
-    int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
-    if (runTime > 0) {
+    int32_t runTime = TimeEnd(firstTimeStamp);
+    if (runTime > TIME_10) {
         HDF_LOGW("run %{public}s over time, [%{public}d]ms", __func__, runTime);
     }
 }
@@ -168,21 +164,21 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
         int32_t ec = vdiImpl_->AllocMem(info, buffer);
         if (ec != HDF_SUCCESS) {
-            int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
-            if(runTime > 0) {
+            int32_t runTime = TimeEnd(firstTimeStamp);
+            if(runTime > TIME_10) {
                 HDF_LOGE("%{public}s: runTime[%{public}d], width[%{public}u], height[%{public}u], \
                     usage[%{public}lu], format[%{public}d], size[%{public}u]",
-                    __func__, runTime, width, height, usage, format, expectedSize);
+                    __func__, runTime, info.width, info.height, info.usage, info.format, info.expectedSize);
             }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
             return ec;
         }
     }
-    int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
-    if(runTime > 0) {
+    int32_t runTime = TimeEnd(firstTimeStamp);
+    if(runTime > TIME_10) {
         HDF_LOGE("%{public}s: runTime[%{public}d], width[%{public}u], height[%{public}u], \
             usage[%{public}lu], format[%{public}d], size[%{public}u]",
-            __func__, runTime, width, height, usage, format, expectedSize);
+            __func__, runTime, info.width, info.height, info.usage, info.format, info.expectedSize);
     }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
