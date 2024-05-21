@@ -35,6 +35,11 @@
         "libjpeg-turbo",
         "ffmpeg"
       ],
+      "third_party": [
+        "ffmpeg",
+        "libjpeg-turbo",
+        "libexif"
+      ]
     },
     "build": {
       "sub_component": [
