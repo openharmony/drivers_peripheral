@@ -143,7 +143,6 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "$camera_path_usb/device_manager:usb_camera_device_manager",
     "$camera_path_usb/metadata_manager:usb_camera_metadata_manager",
     "$camera_path_vdi/utils:peripheral_camera_utils",
-    "$third_path/libjpeg-turbo:turbojpeg_static",
   ]
 
   external_deps = [
@@ -156,6 +155,8 @@ ohos_shared_library("usb_camera_pipeline_core") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "libexif:libexif",
+    "libjpeg-turbo:turbojpeg",
+    "ffmpeg:libohosffmpeg",
   ]
 
   public_configs = [ ":pipe_config" ]
@@ -164,8 +165,8 @@ ohos_shared_library("usb_camera_pipeline_core") {
   part_name = "drivers_peripheral_camera"
 
   if (device_usb_camera_ffmpeg_enable) {
-    deps += [ "$third_path/ffmpeg:libohosffmpeg" ]
-    include_dirs += [ "$third_path/ffmpeg" ]
+    deps += []
+    include_dirs += []
     configs = [ ":weak_ffmpeg" ]
   }
 }
