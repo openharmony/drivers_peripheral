@@ -64,6 +64,8 @@ private:
     GroupIdCallBackMap callbackMap = {};
     sptr<SensorCallbackVdi> traditionalCb = nullptr;
     sptr<SensorCallbackVdi> medicalCb = nullptr;
+    std::vector<HdfSensorInformation> hdfSensorInformations;
+    int32_t SetDelay(int32_t sensorId, int64_t &samplingInterval, int64_t &reportInterval);
 };
 } // V2_0
 } // Sensor
