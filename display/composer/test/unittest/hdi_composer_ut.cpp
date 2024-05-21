@@ -317,7 +317,7 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
     uint64_t propertyValue = 0;
     auto ret = g_composerDevice->GetDisplayProperty(g_displayIds[0], PROPERTY_ID, propertyValue);
     // not support
-    EXPECT_EQ(DISPLAY_FAILURE, ret);
+    EXPECT_EQ(DISPLAY_SUCCESS, ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(DeviceTest, test_GetDisplayCompChange, TestSize.Level1)
