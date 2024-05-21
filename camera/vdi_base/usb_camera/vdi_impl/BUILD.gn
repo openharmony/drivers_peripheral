@@ -143,7 +143,6 @@ ohos_shared_library("camera_daemon") {
 ohos_static_library("camera_daemon_static") {
   sources = host_sources
   include_dirs = host_includes
-  include_dirs += []
 
   deps = [
     "$camera_path_usb/buffer_manager:usb_camera_buffer_manager",
