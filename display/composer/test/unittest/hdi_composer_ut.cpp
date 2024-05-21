@@ -31,6 +31,7 @@
 #include "timer.h"
 #include <sys/time.h>
 #include <thread>
+#include "hdf_base.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_1;
