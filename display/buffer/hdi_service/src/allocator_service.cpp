@@ -121,15 +121,14 @@ void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
     return;
 }
 
-int32_t AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval firstTimeStamp)
+int32_t AllocatorService::TimeEnd(int32_t time, struct timeval firstTimeStamp)
 {
     struct timeval secondTimeStamp;
     gettimeofday(&secondTimeStamp, nullptr);
     int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
     if (runTime > time) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", func, runTime);
-        return HDF_FAILURE
+        return runTime;
     }
     return HDF_SUCCESS;
 }
@@ -151,7 +150,10 @@ void AllocatorService::FreeMemVdi(BufferHandle* handle)
         HdfTrace traceTwo("FreeMem", "HDI:VDI:");
         vdiImpl_->FreeMem(*handle);
     }
-    TimeEnd("FreeMem", TIME_10, firstTimeStamp);
+    int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
+    if (runTime > 0) {
+        HDF_LOGW("run %{public}s over time, [%{public}d]ms", __func__, runTime);
+    }
 }
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
@@ -166,19 +168,21 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
         int32_t ec = vdiImpl_->AllocMem(info, buffer);
         if (ec != HDF_SUCCESS) {
-            if(TimeEnd("AllocMem", TIME_10, firstTimeStamp) != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s: width[%{public}u], height[%{public}u], \
+            int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
+            if(runTime > 0) {
+                HDF_LOGE("%{public}s: runTime[%{public}d], width[%{public}u], height[%{public}u], \
                     usage[%{public}lu], format[%{public}d], size[%{public}u]",
-                    __func__, width, height, usage, format, expectedSize);
+                    __func__, runTime, width, height, usage, format, expectedSize);
             }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
             return ec;
         }
     }
-    if(TimeEnd("AllocMem", TIME_10, firstTimeStamp) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: width[%{public}u], height[%{public}u], \
+    int32_t runTime = TimeEnd(TIME_10, firstTimeStamp);
+    if(runTime > 0) {
+        HDF_LOGE("%{public}s: runTime[%{public}d], width[%{public}u], height[%{public}u], \
             usage[%{public}lu], format[%{public}d], size[%{public}u]",
-            __func__, width, height, usage, format, expectedSize);
+            __func__, runTime, width, height, usage, format, expectedSize);
     }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
