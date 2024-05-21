@@ -528,6 +528,7 @@ static int WpaCliCmdGetCountryCode(WifiWpaStaInterface *this, char *countryCode,
     return 0;
 }
 
+#ifndef OHOS_EUPDATER
 static int WpaCliCmdGetConnectionCapabilities(WifiWpaStaInterface *this, struct ConnectionCapabilities *connectionCap)
 {
     if (this == NULL || connectionCap == NULL) {
@@ -565,6 +566,7 @@ static int WpaCliCmdGetConnectionCapabilities(WifiWpaStaInterface *this, struct 
         connectionCap->channelBandwidth);
     return 0;
 }
+#endif
 
 static int WpaCliCmdGetRequirePmf(WifiWpaStaInterface *this, int *enable)
 {
@@ -1607,7 +1609,9 @@ WifiWpaStaInterface *GetWifiStaInterface(const char *name)
     p->wpaCliCmdWepKey = WpaCliCmdWepKey;
     p->wpaCliCmdWepKeyTxKeyIdx = WpaCliCmdWepKeyTxKeyIdx;
     p->wpaCliCmdGetRequirePmf = WpaCliCmdGetRequirePmf;
+#ifndef OHOS_EUPDATER
     p->wpaCliCmdGetConnectionCapabilities = WpaCliCmdGetConnectionCapabilities;
+#endif
     p->wpaCliCmdStaShellCmd = WpaCliCmdStaShellCmd;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;

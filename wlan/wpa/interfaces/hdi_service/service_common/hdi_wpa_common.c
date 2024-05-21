@@ -18,7 +18,9 @@
 #include <string.h>
 #include "common/wpa_ctrl.h"
 #include "hdi_wpa_hal.h"
+#ifndef OHOS_EUPDATER
 #include "wpa_common_cmd.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HdiHalWpaCommon"
