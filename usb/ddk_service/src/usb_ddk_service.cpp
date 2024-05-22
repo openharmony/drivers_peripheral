@@ -21,6 +21,7 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "usb_ddk_hash.h"
 #include "usb_ddk_interface.h"
+#include "usb_ddk_permission.h"
 #include "usb_raw_api.h"
 #include "usbd_wrapper.h"
 #define HDF_LOG_TAG usb_ddk_service
@@ -43,6 +44,8 @@ namespace V1_0 {
 
 #define MAX_BUFF_SIZE         16384
 #define MAX_CONTROL_BUFF_SIZE 1024
+
+static const std::string PERMISSION_NAME = "ohos.permission.ACCESS_DDK_USB";
 
 extern "C" IUsbDdk *UsbDdkImplGetInstance(void)
 {
@@ -101,6 +104,10 @@ static HdfDevEventlistener *g_pnpListener = nullptr;
 int32_t UsbDdkService::Init()
 {
     HDF_LOGI("usb ddk init");
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
     if (g_pnpListener == nullptr) {
         g_pnpListener = new HdfDevEventlistener();
         if (g_pnpListener == nullptr) {
@@ -120,11 +127,21 @@ int32_t UsbDdkService::Init()
 int32_t UsbDdkService::Release()
 {
     HDF_LOGI("usb ddk exit");
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     return UsbExitHostSdk(nullptr);
 }
 
 int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescriptor &desc)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (rawHandle == nullptr) {
         HDF_LOGE("%{public}s open device failed", __func__);
@@ -148,6 +165,11 @@ int32_t UsbDdkService::GetDeviceDescriptor(uint64_t deviceId, UsbDeviceDescripto
 
 int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configIndex, std::vector<uint8_t> &configDesc)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     UsbRawHandle *rawHandle = UsbRawOpenDevice(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (rawHandle == nullptr) {
         HDF_LOGE("%{public}s open device failed", __func__);
@@ -185,6 +207,11 @@ int32_t UsbDdkService::GetConfigDescriptor(uint64_t deviceId, uint8_t configInde
 
 int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex, uint64_t &interfaceHandle)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     struct UsbInterface *interface =
         UsbClaimInterface(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId), interfaceIndex);
     if (interface == nullptr) {
@@ -206,11 +233,21 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
 }
 int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     return ReleaseUsbInterface(interfaceHandle);
 }
 
 int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t settingIndex)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -225,6 +262,11 @@ int32_t UsbDdkService::SelectInterfaceSetting(uint64_t interfaceHandle, uint8_t 
 
 int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint8_t &settingIndex)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -239,6 +281,11 @@ int32_t UsbDdkService::GetCurrentInterfaceSetting(uint64_t interfaceHandle, uint
 int32_t UsbDdkService::SendControlReadRequest(
     uint64_t interfaceHandle, const UsbControlRequestSetup &setup, uint32_t timeout, std::vector<uint8_t> &data)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -287,6 +334,11 @@ FINISHED:
 int32_t UsbDdkService::SendControlWriteRequest(
     uint64_t interfaceHandle, const UsbControlRequestSetup &setup, uint32_t timeout, const std::vector<uint8_t> &data)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -337,6 +389,11 @@ FINISHED:
 int32_t UsbDdkService::SendPipeRequest(
     const UsbRequestPipe &pipe, uint32_t size, uint32_t offset, uint32_t length, uint32_t &transferedLength)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -380,6 +437,11 @@ FINISHED:
 int32_t UsbDdkService::SendPipeRequestWithAshmem(
     const UsbRequestPipe &pipe, const UsbAshmem &ashmem, uint32_t &transferredLength)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+
     uint64_t handle = 0;
     int32_t ret = UsbDdkUnHash(pipe.interfaceHandle, handle);
     if (ret != HDF_SUCCESS) {
@@ -422,6 +484,11 @@ FINISHED:
 
 int32_t UsbDdkService::GetDeviceMemMapFd(uint64_t deviceId, int &fd)
 {
+    if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
+        HDF_LOGE("%{public}s: no permission", __func__);
+        return HDF_ERR_NOPERM;
+    }
+    
     int32_t ret = UsbGetDeviceMemMapFd(nullptr, GET_BUS_NUM(deviceId), GET_DEV_NUM(deviceId));
     if (ret < 0) {
         HDF_LOGE("%{public}s UsbGetDeviceMemMapFd failed %{public}d", __func__, ret);

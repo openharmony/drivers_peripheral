@@ -36,7 +36,8 @@
                 "hitrace",
                 "c_utils",
                 "drivers_interface_usb",
-                "hisysevent"
+                "hisysevent",
+                "access_token"
             ],
             "third_party": []
         },
