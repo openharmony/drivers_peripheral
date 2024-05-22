@@ -235,8 +235,10 @@ WifiWpaInterface *GetWifiWpaGlobalInterface(void)
 
 void ReleaseWpaGlobalInterface(void)
 {
+    pthread_mutex_lock(&g_mutex);
     HDF_LOGI("enter ReleaseWpaGlobalInterface.");
     if (g_wpaInterface == NULL) {
+        pthread_mutex_unlock(&g_mutex);
         return;
     }
     WpaIfaceInfo *p = g_wpaInterface->ifaces;
@@ -249,6 +251,7 @@ void ReleaseWpaGlobalInterface(void)
     WpaCliClose(g_wpaInterface);
     free(g_wpaInterface);
     g_wpaInterface = NULL;
+    pthread_mutex_unlock(&g_mutex);
 }
 
 WpaCtrl *GetStaCtrl(void)
