@@ -121,16 +121,12 @@ void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
     return;
 }
 
-void AllocatorService::TimeEnd(const char *func, int32_t time, struct timeval firstTimeStamp)
+int32_t AllocatorService::TimeEnd(struct timeval &firstTimeStamp)
 {
     struct timeval secondTimeStamp;
     gettimeofday(&secondTimeStamp, nullptr);
-    int32_t runTime = (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
+    return (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
-    if (runTime > time) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", func, runTime);
-    }
-    return;
 }
 
 void AllocatorService::WriteAllocPidToDma(int32_t fd)
@@ -150,7 +146,10 @@ void AllocatorService::FreeMemVdi(BufferHandle* handle)
         HdfTrace traceTwo("FreeMem", "HDI:VDI:");
         vdiImpl_->FreeMem(*handle);
     }
-    TimeEnd("FreeMem", TIME_10, firstTimeStamp);
+    int32_t runTime = TimeEnd(firstTimeStamp);
+    if (runTime > TIME_10) {
+        HDF_LOGW("run %{public}s over time, [%{public}d]ms", __func__, runTime);
+    }
 }
 
 int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle)
@@ -165,12 +164,20 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
         int32_t ec = vdiImpl_->AllocMem(info, buffer);
         if (ec != HDF_SUCCESS) {
-            TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+            int32_t runTime = TimeEnd(firstTimeStamp);
+            if (runTime > TIME_10) {
+                HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
+                    __func__, runTime, info.usage, info.format, info.expectedSize);
+            }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
             return ec;
         }
     }
-    TimeEnd("AllocMem", TIME_10, firstTimeStamp);
+    int32_t runTime = TimeEnd(firstTimeStamp);
+    if (runTime > TIME_10) {
+        HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
+            __func__, runTime, info.usage, info.format, info.expectedSize);
+    }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
     WriteAllocPidToDma(buffer->fd);
