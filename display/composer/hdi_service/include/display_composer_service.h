@@ -74,7 +74,7 @@ public:
     int32_t GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts) override;
     int32_t GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info) override;
     int32_t RegRefreshCallback(const sptr<IRefreshCallback>& cb) override;
-    int32_t CommitAndGetReleaseFence() override;
+    int32_t RegDisplayVBlankIdleCallback (const sptr<IVBlankIdleCallback>& cb) override;
 
 private:
     void HidumperInit();
@@ -86,7 +86,7 @@ private:
     static void OnMode(uint32_t modeId, uint64_t vBlankPeriod, void* data);
     static void OnSeamlessChange(uint32_t devId, void* data);
     static void OnRefresh(uint32_t devId, void *data);
-
+    static void OnVBlankIdleCallback(uint32_t devId, uint64_t ns, void* data);
 private:
     /* Common */
     void* libHandle_;
@@ -101,13 +101,18 @@ private:
     /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
+#ifdef DISPLAY_COMMUNITY
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
+#else
+    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
+#endif
 
     /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;
     DestroyComposerVdiFuncV1_1 destroyVdiFuncV1_1_;
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponserV1_1_;
     sptr<IRefreshCallback> refreshCb_;
+    sptr<IVBlankIdleCallback> VBlankIdleCb_;
 };
 } // namespace Composer
 } // namespace Display
