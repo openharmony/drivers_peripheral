@@ -258,7 +258,7 @@ static int WpaCliCmdSetNetwork(WifiWpaStaInterface *this, const struct WpaSetNet
 
     res = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET_NETWORK %d %s %s", this->ifname,
             argv->id, g_wpaHalSsidFields[pos].fieldName, argv->value);
-    HDF_LOGI("%{public}s cmd= %{public}s", __func__, cmd);
+    HDF_LOGI("%{public}s cmd= %{private}s", __func__, cmd);
     if (res < 0) {
         HDF_LOGE("%{public}s Internal error, set request message failed!", __func__);
         return -1;
