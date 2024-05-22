@@ -16,7 +16,10 @@ import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../input.gni")
 
 ohos_shared_library("libhid_ddk_service_1.0") {
-  sources = [ "src/hid_ddk_service.cpp" ]
+  sources = [
+    "src/hid_ddk_permission.cpp",
+    "src/hid_ddk_service.cpp",
+  ]
   include_dirs = [
     "include/",
     "include/emit_event_manager/",
@@ -25,6 +28,7 @@ ohos_shared_library("libhid_ddk_service_1.0") {
   deps = [ "${input_driver_path}/ddk_service/src/emit_event_manager:emit_event_manager" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "drivers_interface_input:hid_ddk_idl_headers",
     "hdf_core:libhdf_utils",
