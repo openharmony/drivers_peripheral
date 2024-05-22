@@ -543,6 +543,11 @@ void DCameraDevice::SetDcameraAbility(const std::string& sinkAbilityInfo)
     } else {
         SetRefreshFlag(true);
         dCameraAbilityInfo_ = sinkAbilityInfo;
+        DCamRetCode ret = dMetadataProcessor_->InitDCameraAbility(sinkAbilityInfo);
+        if (ret != SUCCESS) {
+            DHLOGE("The dMetadataProcessor_ InitDCameraAbility failed, check.");
+            SetRefreshFlag(false);
+        }
     }
     std::lock_guard<std::mutex> dataLock(getFullLock_);
     getFullWaitCond_.notify_all();
