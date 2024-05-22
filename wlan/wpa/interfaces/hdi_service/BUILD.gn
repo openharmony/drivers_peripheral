@@ -165,11 +165,21 @@ if (is_standard_system) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
   }
+
+  ohos_shared_library("hdi_wpa_updater") {
+    include_dirs = []
+    sources = []
+
+    install_images = [ updater_vendor_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_wlan"
+  }
 }
 
 group("hdi_wpa_service") {
   deps = [
     ":libwpa_hdi_c_device",
     ":libwpa_interface_service_1.1",
+    ":hdi_wpa_updater",
   ]
 }
