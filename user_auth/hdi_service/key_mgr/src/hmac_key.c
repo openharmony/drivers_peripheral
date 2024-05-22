@@ -16,6 +16,7 @@
 #include "ed25519_key.h"
 
 #include <stddef.h>
+#include <string.h>
 
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
@@ -95,6 +96,7 @@ Buffer *HmacSign(const Buffer *data, SignParam signParam)
         return NULL;
     }
 
+    LOG_INFO("HmacSign success");
     return signature;
 }
 
@@ -129,6 +131,7 @@ ResultCode HmacVerify(const Buffer *data, const Buffer *sign, SignParam signPara
         DestoryBuffer(rightSign);
         return RESULT_BAD_SIGN;
     }
+    LOG_INFO("HmacVerify success");
     DestoryBuffer(rightSign);
     return RESULT_SUCCESS;
 }

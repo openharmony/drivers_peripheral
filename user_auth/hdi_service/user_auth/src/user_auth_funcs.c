@@ -126,10 +126,6 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         result->credentialDigest = enrolledState.credentialDigest;
         result->credentialCount = enrolledState.credentialCount;
     }
-    if (context->isAuthResultCached) {
-        LOG_INFO("cache unlock auth result");
-        CacheUnlockAuthResult(context->userId, authToken);
-    }
     if (result->result == RESULT_SUCCESS && context->authType == PIN_AUTH &&
         memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
         result->rootSecret = CopyBuffer(info->rootSecret);
@@ -224,6 +220,30 @@ IAM_STATIC ResultCode GenerateRemoteAuthResultMsg(AuthResult *result, uint64_t s
     return funcRet;
 }
 
+IAM_STATIC ResultCode RequestAuthResultFuncInner(UserAuthContext *userAuthContext,
+    ExecutorResultInfo *executorResultInfo, UserAuthTokenHal *authToken, AuthResult *result)
+{
+    ResultCode ret = RESULT_SUCCESS;
+    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
+    Uint8Array collectorUdid = { userAuthContext->collectorUdid, sizeof(userAuthContext->collectorUdid) };
+    if (!IsLocalUdid(collectorUdid)) {
+        ret = GenerateRemoteAuthResultMsg(result, executorResultInfo->scheduleId, collectorUdid, authToken);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("generate remote auth result failed");
+            return ret;
+        }
+    }
+
+    if (executorResultInfo->result == RESULT_SUCCESS) {
+        ret = HandleAuthSuccessResult(userAuthContext, executorResultInfo, result, authToken);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("handle auth success result failed");
+            return ret;
+        }
+    }
+    return ret;
+}
+
 ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result)
 {
@@ -261,23 +281,9 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
             goto EXIT;
         }
     }
-
-    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
-    Uint8Array collectorUdid = { userAuthContext->collectorUdid, sizeof(userAuthContext->collectorUdid) };
-    if (!IsLocalUdid(collectorUdid)) {
-        ret = GenerateRemoteAuthResultMsg(result, executorResultInfo->scheduleId, collectorUdid, authToken);
-        if (ret != RESULT_SUCCESS) {
-            LOG_ERROR("generate remote auth result failed");
-            goto EXIT;
-        }
-    }
-
-    if (executorResultInfo->result == RESULT_SUCCESS) {
-        ret = HandleAuthSuccessResult(userAuthContext, executorResultInfo, result, authToken);
-        if (ret != RESULT_SUCCESS) {
-            LOG_ERROR("handle auth success result failed");
-            goto EXIT;
-        }
+    if (RequestAuthResultFuncInner(userAuthContext, executorResultInfo, authToken, result) != RESULT_SUCCESS) {
+        LOG_ERROR("RequestAuthResultFuncInner failed");
+        goto EXIT;
     }
 
 EXIT:
@@ -444,7 +450,7 @@ void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrust
 
 ResultCode GenerateScheduleFunc(const Buffer *tlv, Uint8Array remoteUdid, ScheduleInfoParam *scheduleInfo)
 {
-    if (!IsBufferValid(tlv) || (scheduleInfo == NULL)) {
+    if (!IsBufferValid(tlv) || IS_ARRAY_NULL(remoteUdid) || (scheduleInfo == NULL)) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -470,6 +476,7 @@ ResultCode GenerateAuthResultFunc(const Buffer *tlv, AuthResultParam *authResult
 
 ResultCode GetExecutorInfoLinkedList(uint32_t authType, uint32_t executorRole, LinkedList *allExecutorInfoList)
 {
+    IF_TRUE_LOGE_AND_RETURN_VAL(allExecutorInfoList == NULL, RESULT_BAD_PARAM);
     uint8_t localUdidData[UDID_LEN] = { 0 };
     Uint8Array localUdid = { localUdidData, UDID_LEN };
     bool getLocalUdidRet = GetLocalUdid(&localUdid);
@@ -515,8 +522,8 @@ ResultCode GetExecutorInfoLinkedList(uint32_t authType, uint32_t executorRole, L
     return RESULT_SUCCESS;
 }
 
-static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *executorList, Uint8Array executorInfoTlvMsg,
-    Uint8Array *executorInfoArray)
+static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *executorList,
+    Uint8Array executorInfoTlvMsg, Uint8Array *executorInfoArray, uint32_t executorInfoArraySize)
 {
     LinkedListNode *temp = executorList->head;
     uint32_t index = 0;
@@ -524,6 +531,10 @@ static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *exe
         ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
         if (executorInfo == NULL) {
             LOG_ERROR("executorInfo is invalid");
+            return NULL;
+        }
+        if (index >= executorInfoArraySize) {
+            LOG_ERROR("executor size is invalid");
             return NULL;
         }
         ResultCode result = GetExecutorInfoMsg(executorInfo, &executorInfoArray[index]);
@@ -534,7 +545,7 @@ static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *exe
         index++;
         temp = temp->next;
     }
-    ResultCode result = GetMultiDataSerializedMsg(executorInfoArray, executorList->size, &executorInfoTlvMsg);
+    ResultCode result = GetMultiDataSerializedMsg(executorInfoArray, executorInfoArraySize, &executorInfoTlvMsg);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("GetMultiDataSerializedMsg failed");
         return NULL;
@@ -544,12 +555,16 @@ static Buffer *GetSignExecutorInfoFuncInner(Uint8Array peerUdid, LinkedList *exe
 
 Buffer *GetSignExecutorInfoFunc(Uint8Array peerUdid, LinkedList *executorList)
 {
-    if (executorList == NULL) {
-        LOG_ERROR("executorList is null");
+    if (IS_ARRAY_NULL(peerUdid) || executorList == NULL) {
+        LOG_ERROR("params is null");
         return NULL;
     }
     if (executorList->getSize(executorList) == 0) {
         LOG_ERROR("executor is unregistered");
+        return NULL;
+    }
+    if (executorList->size > UINT32_MAX / sizeof(Uint8Array)) {
+        LOG_ERROR("invalid executorList size");
         return NULL;
     }
 
@@ -569,7 +584,8 @@ Buffer *GetSignExecutorInfoFunc(Uint8Array peerUdid, LinkedList *executorList)
 
     Buffer *signedExecutorInfo = NULL;
     if (mallocOk) {
-        signedExecutorInfo = GetSignExecutorInfoFuncInner(peerUdid, executorList, executorInfoTlvMsg, executorInfoArray);
+        signedExecutorInfo = GetSignExecutorInfoFuncInner(peerUdid, executorList,
+            executorInfoTlvMsg, executorInfoArray, executorList->size);
     }
 
     Free(executorInfoTlvMsg.data);

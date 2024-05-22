@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 #include "adaptor_log.h"
-#include "c_array.h"
 
 #ifdef __cplusplus
 extern "C" {

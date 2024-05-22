@@ -185,6 +185,10 @@ ResultCode GetBufferData(const Buffer *buffer, uint8_t *data, uint32_t *dataSize
 
 Buffer *MergeBuffers(const Buffer *buffer1, const Buffer *buffer2)
 {
+    if (!IsBufferValid(buffer1) || !IsBufferValid(buffer2)) {
+        LOG_ERROR("invalid params");
+        return NULL;
+    }
     Buffer *merged = CreateBufferBySize(buffer1->maxSize + buffer2->maxSize);
     if (!IsBufferValid(merged)) {
         LOG_ERROR("create buffer failed");
