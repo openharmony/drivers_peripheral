@@ -99,9 +99,7 @@ IAM_STATIC ResultCode GetAslAndAcl(uint32_t authType, uint32_t *asl, uint32_t *a
     LinkedListNode *temp = executorList->head;
     while (temp != NULL) {
         ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
-
-        // currently only all in one is supported
-        if (executorInfo == NULL || executorInfo->executorRole != ALL_IN_ONE) {
+        if (executorInfo == NULL) {
             *asl = 0;
             LOG_ERROR("executorInfo is invalid");
             DestroyLinkedList(executorList);
