@@ -319,13 +319,12 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
 static int32_t OsParseConfigDescriptors(struct UsbDevice *dev)
 {
     uint8_t i;
-    uint8_t numConfigs;
     uint8_t *buffer = NULL;
     size_t descLen;
     UsbAdapterDeviceDescriptor *deviceDesc = NULL;
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     deviceDesc = &osDev->adapterDevice->ddesc;
-    numConfigs = deviceDesc->bNumConfigurations;
+    uint8_t numConfigs = deviceDesc->bNumConfigurations;
     if (numConfigs == 0) {
         return HDF_SUCCESS;
     }
