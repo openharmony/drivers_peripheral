@@ -31,7 +31,6 @@
 #include "timer.h"
 #include <sys/time.h>
 #include <thread>
-#include "hdf_base.h"
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 using namespace OHOS::HDI::Display::Composer::V1_1;
@@ -318,7 +317,7 @@ HWTEST_F(DeviceTest, test_GetDisplayProperty, TestSize.Level1)
     uint64_t propertyValue = 0;
     auto ret = g_composerDevice->GetDisplayProperty(g_displayIds[0], PROPERTY_ID, propertyValue);
     int32_t result = DISPLAY_FAILURE;
-    if (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT) {
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
         result = DISPLAY_SUCCESS;
     }
     EXPECT_EQ(DISPLAY_SUCCESS, result);
