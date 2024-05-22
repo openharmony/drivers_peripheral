@@ -33,7 +33,7 @@ class OnDemandLoadCallback : public SystemAbilityLoadCallbackStub {
 public:
     std::atomic_bool loading_ {false};
     explicit OnDemandLoadCallback();
-
+    ~OnDemandLoadCallback();
     void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject);
     void OnLoadSystemAbilityFail(int32_t systemAbilityId);
 
@@ -42,8 +42,8 @@ private:
 
 class UsbdLoadService {
 public:
-    UsbdLoadService(int32_t saId) : saId_(saId) {};
-    ~UsbdLoadService() = default;
+    UsbdLoadService(int32_t saId);
+    ~UsbdLoadService();
     int32_t LoadService();
 
 private:
