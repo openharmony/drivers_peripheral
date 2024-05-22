@@ -101,15 +101,7 @@ if (is_standard_system) {
     part_name = "drivers_peripheral_wlan"
   }
 
-  config("hdi_wpa_updater_config") {
-    include_dirs = [
-      "./service_common",
-      "../../client/include",
-    ]
-  }
-
   ohos_shared_library("hdi_wpa_updater") {
-    public_configs = [ ":hdi_wpa_updater_config" ]
     sources = [
       "service_common/hdi_wpa_common.c",
       "service_common/hdi_wpa_hal.c",
@@ -165,21 +157,14 @@ if (is_standard_system) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
   }
-
-  ohos_shared_library("hdi_wpa_updater") {
-    include_dirs = []
-    sources = []
-
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_wlan"
-  }
 }
 
 group("hdi_wpa_service") {
   deps = [
-    ":hdi_wpa_updater",
     ":libwpa_hdi_c_device",
     ":libwpa_interface_service_1.1",
   ]
+  if (is_standard_system) {
+    deps += [ ":hdi_wpa_updater" ]
+  }
 }
