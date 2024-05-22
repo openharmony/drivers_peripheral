@@ -102,6 +102,10 @@ if (is_standard_system) {
   }
 
   ohos_shared_library("hdi_wpa_updater") {
+    include_dirs = [
+      "./service_common",
+      "../../client/include",
+    ]
     sources = [
       "service_common/hdi_wpa_common.c",
       "service_common/hdi_wpa_hal.c",
