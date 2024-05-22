@@ -32,13 +32,10 @@
         "hisysevent",
         "bounds_checking_function",
         "libexif",
-        "libjpeg-turbo",
         "ffmpeg"
       ],
       "third_party": [
-        "ffmpeg",
-        "libjpeg-turbo",
-        "libexif"
+        "libjpeg-turbo"
       ]
     },
     "build": {
