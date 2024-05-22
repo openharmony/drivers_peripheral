@@ -1397,8 +1397,8 @@ int32_t WpaInterfaceDeliverP2pData(struct IWpaInterface *self, const char *ifNam
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s",
-        ifName, cmdType, dataType, carryData);
+    ret = snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+        "IFNAME=%s P2P_DELIVER_DATA cmdType=%d dataType=%d carryData=%s", ifName, cmdType, dataType, carryData);
     if (ret < 0) {
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s, count = %{public}d", __func__, cmd, ret);
         return HDF_FAILURE;
