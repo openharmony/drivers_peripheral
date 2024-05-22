@@ -61,21 +61,21 @@ void TestCameraBase::StoreImage(const unsigned char *bufStart, const uint32_t si
     struct timeval start = {};
     gettimeofday(&start, nullptr);
     if (sprintf_s(path, sizeof(path), "%spicture_%ld.jpeg", prefix, start.tv_usec) < 0) {
-        CAMERA_LOGE("sprintf_s error .....\n");
+        CAMERA_LOGE("sprintf_s error .....");
         return;
     }
 
     imgFD = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
     if (imgFD == -1) {
-        CAMERA_LOGE("demo test:open image file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:open image file error %{public}s.....", strerror(errno));
         return;
     }
 
-    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d\n", path, size);
+    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d", path, size);
 
     ret = write(imgFD, bufStart, size);
     if (ret == -1) {
-        CAMERA_LOGE("demo test:write image file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:write image file error %{public}s.....", strerror(errno));
     }
 
     close(imgFD);
@@ -87,9 +87,9 @@ void TestCameraBase::StoreVideo(const unsigned char *bufStart, const uint32_t si
 
     ret = write(videoFd_, bufStart, size);
     if (ret == -1) {
-        CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
+        CAMERA_LOGE("demo test:write video file error %{public}s.....", strerror(errno));
     }
-    CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
+    CAMERA_LOGD("demo test:StoreVideo size == %{public}d", size);
 }
 
 void TestCameraBase::OpenVideoFile()
@@ -122,11 +122,15 @@ void TestCameraBase::PrintFaceDetectInfo(const unsigned char *bufStart, const ui
 {
     common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>(
         const_cast<unsigned char*>(bufStart));
+    if (data->item_count > MAX_ITEM_CAPACITY || data->data_count > MAX_DATA_CAPACITY) {
+        CAMERA_LOGE("demo test: invalid item_count or data_count");
+        return;
+    }
     camera_metadata_item_t entry;
     int ret = 0;
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_SWITCH error\n");
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_SWITCH error");
         return;
     }
     uint8_t switchValue = *(entry.data.u8);
@@ -134,7 +138,7 @@ void TestCameraBase::PrintFaceDetectInfo(const unsigned char *bufStart, const ui
 
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_RECTANGLES error\n");
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_RECTANGLES error");
         return;
     }
     uint32_t rectCount = entry.count;
@@ -153,7 +157,7 @@ void TestCameraBase::PrintFaceDetectInfo(const unsigned char *bufStart, const ui
 
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_IDS error\n");
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_IDS error");
         return;
     }
     uint32_t idCount = entry.count;
@@ -197,7 +201,7 @@ int TestCameraBase::DoFbMunmap(unsigned char* addr)
 {
     int ret;
     unsigned int size = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size;
-    CAMERA_LOGI("main test:munmapped size = %d\n", size);
+    CAMERA_LOGI("main test:munmapped size = %d", size);
     ret = (munmap(addr, finfo_.smem_len));
     return ret;
 }
@@ -208,75 +212,78 @@ unsigned char* TestCameraBase::DoFbMmap(int* pmemfd)
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
     ret = static_cast<unsigned char*>(mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0));
     if (ret == MAP_FAILED) {
-        CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
+        CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)", strerror(errno), errno);
         return nullptr;
     }
-    CAMERA_LOGI("main test:do_mmap: pmem mmap fd %d len %u\n", *pmemfd, screensize);
+    CAMERA_LOGI("main test:do_mmap: pmem mmap fd %d len %u", *pmemfd, screensize);
     return ret;
 }
 
 void TestCameraBase::FBLog()
 {
-    CAMERA_LOGI("the fixed information is as follow:\n");
-    CAMERA_LOGI("id=%s\n", finfo_.id);
-    CAMERA_LOGI("sem_start=%lx\n", finfo_.smem_start);
-    CAMERA_LOGI("smem_len=%u\n", finfo_.smem_len);
-    CAMERA_LOGI("type=%u\n", finfo_.type);
-    CAMERA_LOGI("line_length=%u\n", finfo_.line_length);
-    CAMERA_LOGI("mmio_start=%lu\n", finfo_.mmio_start);
-    CAMERA_LOGI("mmio_len=%d\n", finfo_.mmio_len);
-    CAMERA_LOGI("visual=%d\n", finfo_.visual);
+    CAMERA_LOGI("the fixed information is as follow:");
+    CAMERA_LOGI("id=%s", finfo_.id);
+    CAMERA_LOGI("sem_start=%lx", finfo_.smem_start);
+    CAMERA_LOGI("smem_len=%u", finfo_.smem_len);
+    CAMERA_LOGI("type=%u", finfo_.type);
+    CAMERA_LOGI("line_length=%u", finfo_.line_length);
+    CAMERA_LOGI("mmio_start=%lu", finfo_.mmio_start);
+    CAMERA_LOGI("mmio_len=%d", finfo_.mmio_len);
+    CAMERA_LOGI("visual=%d", finfo_.visual);
 
-    CAMERA_LOGI("variable information is as follow:\n");
-    CAMERA_LOGI("The xres is :%u\n", vinfo_.xres);
-    CAMERA_LOGI("The yres is :%u\n", vinfo_.yres);
-    CAMERA_LOGI("xres_virtual=%u\n", vinfo_.xres_virtual);
-    CAMERA_LOGI("yres_virtual=%u\n", vinfo_.yres_virtual);
-    CAMERA_LOGI("xoffset=%u\n", vinfo_.xoffset);
-    CAMERA_LOGI("yoffset=%u\n", vinfo_.yoffset);
-    CAMERA_LOGI("bits_per_pixel is :%u\n", vinfo_.bits_per_pixel);
-    CAMERA_LOGI("red.offset=%u\n", vinfo_.red.offset);
-    CAMERA_LOGI("red.length=%u\n", vinfo_.red.length);
-    CAMERA_LOGI("red.msb_right=%u\n", vinfo_.red.msb_right);
-    CAMERA_LOGI("green.offset=%d\n", vinfo_.green.offset);
-    CAMERA_LOGI("green.length=%d\n", vinfo_.green.length);
-    CAMERA_LOGI("green.msb_right=%d\n", vinfo_.green.msb_right);
-    CAMERA_LOGI("blue.offset=%d\n", vinfo_.blue.offset);
-    CAMERA_LOGI("blue.length=%d\n", vinfo_.blue.length);
-    CAMERA_LOGI("blue.msb_right=%d\n", vinfo_.blue.msb_right);
-    CAMERA_LOGI("transp.offset=%d\n", vinfo_.transp.offset);
-    CAMERA_LOGI("transp.length=%d\n", vinfo_.transp.length);
-    CAMERA_LOGI("transp.msb_right=%d\n", vinfo_.transp.msb_right);
-    CAMERA_LOGI("height=%x\n", vinfo_.height);
+    CAMERA_LOGI("variable information is as follow:");
+    CAMERA_LOGI("The xres is :%u", vinfo_.xres);
+    CAMERA_LOGI("The yres is :%u", vinfo_.yres);
+    CAMERA_LOGI("xres_virtual=%u", vinfo_.xres_virtual);
+    CAMERA_LOGI("yres_virtual=%u", vinfo_.yres_virtual);
+    CAMERA_LOGI("xoffset=%u", vinfo_.xoffset);
+    CAMERA_LOGI("yoffset=%u", vinfo_.yoffset);
+    CAMERA_LOGI("bits_per_pixel is :%u", vinfo_.bits_per_pixel);
+    CAMERA_LOGI("red.offset=%u", vinfo_.red.offset);
+    CAMERA_LOGI("red.length=%u", vinfo_.red.length);
+    CAMERA_LOGI("red.msb_right=%u", vinfo_.red.msb_right);
+    CAMERA_LOGI("green.offset=%d", vinfo_.green.offset);
+    CAMERA_LOGI("green.length=%d", vinfo_.green.length);
+    CAMERA_LOGI("green.msb_right=%d", vinfo_.green.msb_right);
+    CAMERA_LOGI("blue.offset=%d", vinfo_.blue.offset);
+    CAMERA_LOGI("blue.length=%d", vinfo_.blue.length);
+    CAMERA_LOGI("blue.msb_right=%d", vinfo_.blue.msb_right);
+    CAMERA_LOGI("transp.offset=%d", vinfo_.transp.offset);
+    CAMERA_LOGI("transp.length=%d", vinfo_.transp.length);
+    CAMERA_LOGI("transp.msb_right=%d", vinfo_.transp.msb_right);
+    CAMERA_LOGI("height=%x", vinfo_.height);
 }
 
 OHOS::Camera::RetCode TestCameraBase::FBInit()
 {
     fbFd_ = open("/dev/fb0", O_RDWR);
     if (fbFd_ < 0) {
-        CAMERA_LOGE("main test:cannot open framebuffer %s file node\n", "/dev/fb0");
+        CAMERA_LOGE("main test:cannot open framebuffer %s file node", "/dev/fb0");
         return RC_ERROR;
     }
 
     if (ioctl(fbFd_, FBIOGET_VSCREENINFO, &vinfo_) < 0) {
-        CAMERA_LOGE("main test:cannot retrieve vscreenInfo!\n");
+        CAMERA_LOGE("main test:cannot retrieve vscreenInfo!");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
     if (ioctl(fbFd_, FBIOGET_FSCREENINFO, &finfo_) < 0) {
-        CAMERA_LOGE("main test:can't retrieve fscreenInfo!\n");
+        CAMERA_LOGE("main test:can't retrieve fscreenInfo!");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
 
     FBLog();
 
-    CAMERA_LOGI("main test:allocating display buffer memory\n");
+    CAMERA_LOGI("main test:allocating display buffer memory");
     displayBuf_ = DoFbMmap(&fbFd_);
     if (displayBuf_ == nullptr) {
-        CAMERA_LOGE("main test:error displayBuf_ mmap error\n");
+        CAMERA_LOGE("main test:error displayBuf_ mmap error");
         close(fbFd_);
+        fbFd_ = -1;
         return RC_ERROR;
     }
     return RC_OK;
@@ -701,7 +708,7 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::vector<uint8_t>& resu
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error");
         return;
     }
     videoStabiliMode = *(entry.data.u8);
@@ -726,7 +733,7 @@ void DemoCameraDeviceCallback::PrintFpsInfo(const std::vector<uint8_t>& result)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret != 0) {
-        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error");
         return;
     }
 
