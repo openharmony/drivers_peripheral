@@ -955,8 +955,7 @@ IAM_STATIC ResultCode GetScheduleInfoFromAttribute(const Attribute *attribute, S
     }
 
     scheduleInfo->executorMessages = CreateExecutorCollectMsg(attribute, scheduleInfo);
-    if (!IsBufferValid(scheduleInfo->executorMessages))
-    {
+    if (!IsBufferValid(scheduleInfo->executorMessages)) {
         LOG_ERROR("create executorMessages failed");
         result = RESULT_GENERAL_ERROR;
     }
