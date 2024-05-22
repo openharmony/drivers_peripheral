@@ -14,7 +14,10 @@
 import("//build/ohos.gni")
 
 config("wpa_hdi_client_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "../interfaces/hdi_service/service_common",
+  ]
 }
 
 if (defined(ohos_lite)) {

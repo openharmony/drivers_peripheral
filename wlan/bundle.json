@@ -65,13 +65,6 @@
           }
         },
         {
-          "name": "//drivers/peripheral/wlan/wpa/interfaces/hdi_service:hdi_wpa_updater",
-          "header": {
-            "header_files": [],
-            "header_base": "//drivers/peripheral/wlan/wpa/interfaces/hdi_service/service_common"
-          }
-        },
-        {
           "name": "//drivers/peripheral/wlan/hostapd/client:hostapd_hdi_client",
           "header": {
             "header_files": [
