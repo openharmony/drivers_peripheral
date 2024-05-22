@@ -368,7 +368,8 @@ int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, 
 
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayProperty(devId, id, value);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
 
