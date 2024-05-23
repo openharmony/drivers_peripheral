@@ -52,7 +52,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   ]
 
   deps = [
-    "${root_path}/third_party/libdrm:libdrm",
+    "libdrm:libdrm",
     "../../buffer/vdi_base:display_buffer_vdi_impl_default",
   ]
   cflags_cc = [

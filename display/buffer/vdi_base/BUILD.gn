@@ -48,7 +48,7 @@ ohos_shared_library("display_buffer_vdi_impl_default") {
     "-Wno-macro-redefined",
   ]
 
-  deps = [ "${root_path}/third_party/libdrm:libdrm" ]
+  deps = [ "libdrm:libdrm" ]
 
   external_deps = [
     "c_utils:utils",
