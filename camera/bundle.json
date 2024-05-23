@@ -31,10 +31,10 @@
         "hitrace",
         "hisysevent",
         "bounds_checking_function",
-        "libexif"
+        "libexif",
+        "ffmpeg"
       ],
       "third_party": [
-        "ffmpeg",
         "libjpeg-turbo"
       ]
     },
