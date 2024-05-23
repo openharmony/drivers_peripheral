@@ -166,8 +166,8 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
         if (ec != HDF_SUCCESS) {
             int32_t runTime = TimeEnd(firstTimeStamp);
             if (runTime > TIME_10) {
-                HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
-                    __func__, runTime, info.usage, info.format, info.expectedSize);
+                HDF_LOGW("%{public}s: runTime[%{public}d], format[%{public}d], size[%{public}u]",
+                    __func__, runTime, info.format, info.expectedSize);
             }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
             return ec;
@@ -175,8 +175,8 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     }
     int32_t runTime = TimeEnd(firstTimeStamp);
     if (runTime > TIME_10) {
-        HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
-            __func__, runTime, info.usage, info.format, info.expectedSize);
+        HDF_LOGW("%{public}s: runTime[%{public}d], format[%{public}d], size[%{public}u]",
+            __func__, runTime, info.format, info.expectedSize);
     }
 
     CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
