@@ -29,6 +29,7 @@ if (!defined(ohos_lite)) {
     include_dirs = [ "./../../../common/hdi_service_common/include" ]
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "drivers_interface_audio:libaudio_proxy_3.0",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",

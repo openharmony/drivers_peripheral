@@ -20,13 +20,11 @@ ohos_shared_library("audio_path_select") {
   sources = [
     "$hdf_audio_path/hal/pathselect/src/audio_pathselect.c",
     "$hdf_hdi_service_path/primary_impl/src/audio_common.c",
-    "//third_party/cJSON/cJSON.c",
   ]
 
   include_dirs = [
     "$hdf_hdi_service_path/primary_impl/include",
     "$hdf_audio_path/hal/pathselect/include",
-    "//third_party/cJSON",
     "$hdf_hdi_service_path/vendor_interface/utils",
   ]
 
@@ -51,7 +49,10 @@ ohos_shared_library("audio_path_select") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "bounds_checking_function:libsec_shared" ]
+  external_deps += [
+    "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
+  ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

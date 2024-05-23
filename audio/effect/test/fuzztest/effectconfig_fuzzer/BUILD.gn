@@ -30,13 +30,13 @@ ohos_fuzztest("EffectConfigFuzzTest") {
   ]
   include_dirs = [
     "$effect_config_path/include",
-    "//third_party/cJSON/",
     "$hdf_audio_path/hdi_service/vendor_interface/utils",
   ]
 
-  deps = [ "//third_party/cJSON:cjson" ]
-
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  external_deps = [
+    "cJSON:cjson",
+    "hdf_core:libhdf_utils",
+  ]
   if (defined(ohos_lite)) {
     external_deps += [ "hilog_lite:hilog_share" ]
   } else {

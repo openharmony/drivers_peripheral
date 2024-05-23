@@ -24,6 +24,7 @@ ohos_systemtest("hdf_audio_idlhdi_adapter_test") {
     "src/audio_idlhdi_adapter_test.cpp",
   ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "drivers_interface_audio:libaudio_proxy_3.0",
     "hdf_core:libhdf_utils",
   ]

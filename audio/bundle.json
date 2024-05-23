@@ -33,16 +33,14 @@
         "deps": {
             "components": [
                 "c_utils",
+                "cJSON",
                 "hilog",
                 "hdf_core",
                 "drivers_interface_audio",
                 "bounds_checking_function",
                 "hitrace"
             ],
-            "third_party": [
-                "cJSON",
-                "alsa-lib"
-            ]
+            "third_party": [ "alsa-lib" ]
         },
         "build": {
             "sub_component": [
