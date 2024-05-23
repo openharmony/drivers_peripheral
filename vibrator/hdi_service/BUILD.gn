@@ -28,7 +28,6 @@ if (defined(ohos_lite)) {
       "../utils/include",
     ]
     sources = [ "vibrator_if_service.cpp" ]
-    deps = [ "../hal:hdi_vibrator" ]
 
     cflags = [
       "-Wall",

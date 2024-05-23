@@ -23,7 +23,6 @@ ohos_shared_library("liblight_interface_service_1.0") {
   ]
 
   sources = [ "light_if_service.cpp" ]
-  deps = [ "../hal:hdi_light" ]
 
   cflags = [
     "-Wall",
