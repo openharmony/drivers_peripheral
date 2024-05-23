@@ -98,9 +98,10 @@ ohos_shared_library("libmapper_service_1.0") {
 
 ohos_shared_library("libmapper_service_1.2") {
   include_dirs = [ "include" ]
-  sources = [ "src/mapper_service_1_2.cpp" ]
-
-  deps = [ ":libmapper_service_1.0" ]
+  sources = [
+    "src/mapper_service_1_2.cpp",
+    "src/mapper_service_1_2.cpp"
+  ]
 
   external_deps = [
     "c_utils:utils",

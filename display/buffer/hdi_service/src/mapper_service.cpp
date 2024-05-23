@@ -33,10 +33,6 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-extern "C" Buffer::V1_2::IMapper* MapperImplGetInstance(void)
-{
-    return new (std::nothrow) MapperService();
-}
 
 MapperService::MapperService()
     : libHandle_(nullptr),
