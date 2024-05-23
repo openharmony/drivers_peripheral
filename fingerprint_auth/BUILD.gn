@@ -11,6 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  oh_fingerprintauth_driver_enabled = true
+}
+
 if (defined(ohos_lite)) {
   group("fingerprint_auth_entry") {
     deps = []
