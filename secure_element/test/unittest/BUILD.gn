@@ -24,13 +24,6 @@ config("se_unit_test_config") {
     "$SE_DIR/vendor_adaptor",
   ]
 
-  defines = []
-  deps = []
-
-  if (drivers_peripheral_secure_element_use_ca) {
-    defines += [ "SE_VENDOR_ADAPTION_USE_CA" ]
-    deps += [ "../secure_element_ca_proxy:secure_element_ca_proxy" ]
-  }
   cflags_cc = [ "-fexceptions" ]
   cflags = [ "--coverage" ]
   ldflags = [ "--coverage" ]
