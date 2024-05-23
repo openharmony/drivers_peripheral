@@ -34,8 +34,8 @@ ohos_fuzztest("EffectConfigFuzzTest") {
   ]
 
   external_deps = [
-    "hdf_core:libhdf_utils",
     "cJSON:cjson",
+    "hdf_core:libhdf_utils",
   ]
   if (defined(ohos_lite)) {
     external_deps += [ "hilog_lite:hilog_share" ]
