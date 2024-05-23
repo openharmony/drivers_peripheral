@@ -103,7 +103,6 @@ void VerifierImpl::CancelCurrentAuth(int32_t errorCode)
     CallError(callback_, errorCode);
     scheduleId_ = std::nullopt;
     callback_ = nullptr;
-    authExpiredSysTime_ = 0;
 }
 
 int32_t VerifierImpl::Cancel(uint64_t scheduleId)
@@ -121,27 +120,9 @@ int32_t VerifierImpl::Cancel(uint64_t scheduleId)
     return HDF_SUCCESS;
 }
 
-void VerifierImpl::HandleSchedulerMsg(const std::vector<uint8_t> &msg)
-{
-    IAM_LOGI("start");
-    uint64_t authExpiredSysTime = 0;
-    if (GetAuthExpiredSysTime(msg, authExpiredSysTime) != SUCCESS) {
-        IAM_LOGE("GetAuthExpiredSysTime failed");
-        return;
-    }
-    IAM_LOGI("Update authExpiredSysTime %{public}" PRIu64, authExpiredSysTime);
-    authExpiredSysTime_ = authExpiredSysTime;
-}
-
 void VerifierImpl::HandleVerifierMsg(uint64_t scheduleId, const std::vector<uint8_t> &msg)
 {
     IAM_LOGI("start");
-    if (!CheckAuthExpired(authExpiredSysTime_)) {
-        IAM_LOGE("CheckAuthExpired fail");
-        CancelCurrentAuth(PIN_EXPIRED);
-        return;
-    }
-
     std::vector<uint8_t> msgOut;
     bool isAuthEnd = false;
     int32_t compareResult = FAIL;
@@ -176,9 +157,6 @@ int32_t VerifierImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const st
     threadPool_.AddTask([this, id = scheduleId, role = srcRole, msgIn = msg]() {
         if (!IsCurrentSchedule(id)) {
             return;
-        }
-        if (role == HdiExecutorRole::SCHEDULER) {
-            return HandleSchedulerMsg(msgIn);
         }
         if (role == HdiExecutorRole::COLLECTOR) {
             return HandleVerifierMsg(id, msgIn);

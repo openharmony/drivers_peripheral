@@ -56,14 +56,12 @@ private:
         sptr<HdiIExecutorCallback> callback;
         uint64_t templateId{0};
         std::vector<uint8_t> algoParameter;
-        uint64_t authExpiredSysTime;
     };
 
     class ScheduleList {
     public:
         bool AddScheduleInfo(const ScheduleInfo &scheduleInfo);
         bool GetAndDelScheduleInfo(uint64_t scheduleId, ScheduleInfo &scheduleInfo);
-        void UpdateScheduleInfo(uint64_t scheduleId, uint64_t authExpiredSysTime);
         void DelScheduleInfo(uint64_t scheduleId);
     private:
         std::mutex mutex_;
@@ -71,10 +69,10 @@ private:
     };
 
 private:
-    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, uint64_t authExpiredSysTime,
-        const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv);
+    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &data,
+        std::vector<uint8_t> &resultTlv);
     int32_t AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-        const sptr<HdiIExecutorCallback> &callbackObj, uint64_t authExpiredSysTime);
+        const sptr<HdiIExecutorCallback> &callbackObj);
     int32_t EnrollInner(uint64_t scheduleId, const std::vector<uint8_t> &extraInfo,
         const sptr<HdiIExecutorCallback> &callbackObj, std::vector<uint8_t> &algoParameter, uint32_t &algoVersion);
 
