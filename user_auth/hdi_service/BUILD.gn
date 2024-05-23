@@ -38,7 +38,6 @@ ohos_shared_library("libuser_auth_interface_service_2.0") {
     "../common/utils",
   ]
   sources = [
-    "../common/utils/attributes.cpp",
     "adaptor/src/adaptor_algorithm.c",
     "adaptor/src/adaptor_file.c",
     "adaptor/src/adaptor_memory.c",

@@ -19,7 +19,6 @@
 #include <cinttypes>
 #include <hdf_base.h>
 
-#include "attributes.h"
 #include "defines.h"
 #include "executor_impl_common.h"
 #include "iam_logger.h"
@@ -89,20 +88,12 @@ int32_t AllInOneImpl::OnRegisterFinish(const std::vector<uint64_t> &templateIdLi
     return HDF_SUCCESS;
 }
 
-int32_t AllInOneImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t>& msg)
+int32_t AllInOneImpl::SendMessage(uint64_t scheduleId, int32_t srcRole, const std::vector<uint8_t> &msg)
 {
-    IAM_LOGI("start");
-    if (srcRole != HdiExecutorRole::SCHEDULER) {
-        IAM_LOGI("only SCHEDULER src needed");
-        return HDF_SUCCESS;
-    }
-    uint64_t authExpiredSysTime = 0;
-    if (GetAuthExpiredSysTime(msg, authExpiredSysTime) != SUCCESS) {
-        IAM_LOGE("GetAuthExpiredSysTime failed");
-        return HDF_FAILURE;
-    }
-    IAM_LOGI("Update authExpiredSysTime %{public}" PRIu64, authExpiredSysTime);
-    scheduleList_.UpdateScheduleInfo(scheduleId, authExpiredSysTime);
+    static_cast<void>(scheduleId);
+    static_cast<void>(srcRole);
+    static_cast<void>(msg);
+    IAM_LOGI("send message success");
     return HDF_SUCCESS;
 }
 
@@ -123,7 +114,6 @@ int32_t AllInOneImpl::EnrollInner(uint64_t scheduleId, const std::vector<uint8_t
         .callback = callbackObj,
         .templateId = 0,
         .algoParameter = algoParameter,
-        .authExpiredSysTime = 0,
     };
     if (!scheduleList_.AddScheduleInfo(scheduleInfo)) {
         IAM_LOGE("Add scheduleInfo failed");
@@ -168,7 +158,7 @@ int32_t AllInOneImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
 }
 
 int32_t AllInOneImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId, std::vector<uint8_t> &algoParameter,
-    const sptr<HdiIExecutorCallback> &callbackObj, uint64_t authExpiredSysTime)
+    const sptr<HdiIExecutorCallback> &callbackObj)
 {
     IAM_LOGI("start");
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
@@ -189,7 +179,6 @@ int32_t AllInOneImpl::AuthenticateInner(uint64_t scheduleId, uint64_t templateId
         .callback = callbackObj,
         .templateId = templateId,
         .algoParameter = algoParameter,
-        .authExpiredSysTime = authExpiredSysTime,
     };
     if (!scheduleList_.AddScheduleInfo(scheduleInfo)) {
         IAM_LOGE("Add scheduleInfo failed");
@@ -213,11 +202,6 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
         CallError(callbackObj, INVALID_PARAMETERS);
         return HDF_SUCCESS;
     }
-    uint64_t authExpiredSysTime = 0;
-    if (!GetAuthExpiredSysTime(extraInfo, authExpiredSysTime)) {
-        CallError(callbackObj, GENERAL_ERROR);
-        return HDF_SUCCESS;
-    }
     OHOS::UserIam::PinAuth::PinAlgoParam pinAlgoParam = {};
     int32_t result = pinHdi_->AllInOneAuth(scheduleId, templateIdList[0], extraInfo, pinAlgoParam);
     if (result != SUCCESS) {
@@ -228,7 +212,7 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
     IAM_LOGI("algorithm parameter len:%{public}zu version:%{public}u",
         pinAlgoParam.algoParameter.size(), pinAlgoParam.algoVersion);
     result = AuthenticateInner(
-        scheduleId, templateIdList[0], pinAlgoParam.algoParameter, callbackObj, authExpiredSysTime);
+        scheduleId, templateIdList[0], pinAlgoParam.algoParameter, callbackObj);
     if (result != SUCCESS) {
         IAM_LOGE("AuthenticateInner failed, fail code : %{public}d", result);
         return HDF_SUCCESS;
@@ -247,13 +231,9 @@ int32_t AllInOneImpl::Authenticate(uint64_t scheduleId, const std::vector<uint64
     return HDF_SUCCESS;
 }
 
-int32_t AllInOneImpl::AuthPin(uint64_t scheduleId, uint64_t templateId, uint64_t authExpiredSysTime,
-    const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv)
+int32_t AllInOneImpl::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &data,
+    std::vector<uint8_t> &resultTlv)
 {
-    if (!CheckAuthExpired(authExpiredSysTime)) {
-        IAM_LOGE("CheckAuthExpired fail");
-        return PIN_EXPIRED;
-    }
     int32_t result = pinHdi_->AuthPin(scheduleId, templateId, data, resultTlv);
     if (result != SUCCESS) {
         IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
@@ -297,7 +277,7 @@ int32_t AllInOneImpl::SetData(uint64_t scheduleId, uint64_t authSubType, const s
             }
             break;
         case AUTH_PIN:
-            result = AuthPin(scheduleId, scheduleInfo.templateId, scheduleInfo.authExpiredSysTime, data, resultTlv);
+            result = AuthPin(scheduleId, scheduleInfo.templateId, data, resultTlv);
             if (result != SUCCESS) {
                 IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
             }
@@ -415,20 +395,6 @@ bool AllInOneImpl::ScheduleList::GetAndDelScheduleInfo(uint64_t scheduleId, Sche
 
     IAM_LOGE("Get scheduleId not exist");
     return false;
-}
-
-void AllInOneImpl::ScheduleList::UpdateScheduleInfo(uint64_t scheduleId, uint64_t authExpiredSysTime)
-{
-    IAM_LOGI("start");
-    std::lock_guard<std::mutex> guard(mutex_);
-    for (auto iter = scheduleInfoList_.begin(); iter != scheduleInfoList_.end(); ++iter) {
-        if ((*iter).scheduleId == scheduleId) {
-            (*iter).authExpiredSysTime = authExpiredSysTime;
-            return;
-        }
-    }
-
-    IAM_LOGI("schedule %{public}04x not found", static_cast<uint16_t>(scheduleId));
 }
 
 void AllInOneImpl::ScheduleList::DelScheduleInfo(uint64_t scheduleId)

@@ -45,7 +45,6 @@ ohos_shared_library("libpin_auth_interface_service_2.0_fuzzer") {
     "../../../../hdi_service/main/src/pin_auth.cpp",
     "../../../../hdi_service/main/src/verifier_func.c",
     "../../../../hdi_service/service/src/all_in_one_impl.cpp",
-    "../../../../hdi_service/service/src/attributes.cpp",
     "../../../../hdi_service/service/src/collector_impl.cpp",
     "../../../../hdi_service/service/src/executor_impl_common.cpp",
     "../../../../hdi_service/service/src/pin_auth_interface_service.cpp",

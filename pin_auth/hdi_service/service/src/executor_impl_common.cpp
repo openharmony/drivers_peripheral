@@ -15,7 +15,6 @@
 
 #include "executor_impl_common.h"
 
-#include "attributes.h"
 #include "defines.h"
 #include "iam_logger.h"
 
@@ -35,43 +34,6 @@ void CallError(const sptr<HdiIExecutorCallback> &callback, uint32_t errorCode)
     if (callback->OnResult(errorCode, ret) != SUCCESS) {
         IAM_LOGE("callback failed");
     }
-}
-
-bool GetAuthExpiredSysTime(const std::vector<uint8_t> &extraInfo, uint64_t &authExpiredSysTime)
-{
-    Attributes attribute = Attributes(extraInfo);
-    std::vector<uint8_t> authRoot;
-    if (!attribute.GetUint8ArrayValue(Attributes::AUTH_ROOT, authRoot)) {
-        IAM_LOGE("GetUint8ArrayValue AUTH_ROOT failes");
-        return false;
-    }
-    Attributes authRootAttr = Attributes(authRoot);
-    std::vector<uint8_t> authData;
-    if (!authRootAttr.GetUint8ArrayValue(Attributes::AUTH_DATA, authData)) {
-        IAM_LOGE("GetUint8ArrayValue AUTH_DATA failes");
-        return false;
-    }
-    Attributes authDataAttr = Attributes(authData);
-    if (!authDataAttr.GetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime)) {
-        IAM_LOGE("GetUint64Value AUTH_EXPIRED_SYS_TIME failes");
-        return false;
-    }
-    return true;
-}
-
-bool CheckAuthExpired(uint64_t authExpiredSysTime)
-{
-    if (authExpiredSysTime <= 0) {
-        IAM_LOGE("no need check auth expired");
-        return true;
-    }
-    uint64_t nowTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
-    if (authExpiredSysTime < nowTime) {
-        IAM_LOGE("pin auth expired");
-        return false;
-    }
-    return true;
 }
 } // PinAuth
 } // HDI
