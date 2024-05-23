@@ -43,7 +43,7 @@ if (defined(ohos_lite)) {
       "display_gralloc_client.cpp",
       "mapper_adapter.cpp",
     ]
-    deps = [ "../../../../../interface/display/v1_0:libdisplay_gralloc" ]
+    deps = [ "drivers_interface_display:libdisplay_gralloc" ]
 
     if (is_standard_system) {
       external_deps = [
