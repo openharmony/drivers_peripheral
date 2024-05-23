@@ -21,18 +21,22 @@ using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
 namespace WifiP2pIfaceTest {
+const std::string P2P_IFNAME = "P2P0";
+const std::string TEST_MAC = "000000";
+
 class WifiP2pIfaceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     void SetUp()
     {
-        std::string ifname = "p2p";
         std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn;
         std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-        p2pIface = new (std::nothrow) WifiP2pIface(ifname, vendorHal);
+        p2pIface = new (std::nothrow) WifiP2pIface(P2P_IFNAME, vendorHal,
+            std::make_shared<IfaceUtil>(ifaceTool));
         if (p2pIface == nullptr) {
+            HDF_LOGE("iface is null");
             return;
         }
     }
@@ -56,21 +60,149 @@ public:
  */
 HWTEST_F(WifiP2pIfaceTest, WifiP2pIfaceTest, TestSize.Level1)
 {
-    HDF_LOGI("WifiP2pIfaceTest start");
+    HDF_LOGI("WifiP2pIfaceTest started");
     if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
         return;
     }
     p2pIface->Invalidate();
     EXPECT_FALSE(p2pIface->IsValid());
-    EXPECT_TRUE(p2pIface->GetName() == "p2p");
+    EXPECT_TRUE(p2pIface->GetName() == P2P_IFNAME);
     IfaceType type = IfaceType::STA;
     EXPECT_TRUE(p2pIface->GetIfaceType(type) == HDF_SUCCESS);
     EXPECT_TRUE(type == IfaceType::P2P);
-    std::string name = "test";
+    std::string name;
     EXPECT_TRUE(p2pIface->GetIfaceName(name) == HDF_SUCCESS);
-    EXPECT_TRUE(name == "p2p");
+    EXPECT_TRUE(name == P2P_IFNAME);
     std::vector<uint32_t> frequencies;
-    BandType band = BandType::TYPE_5GHZ;
-    EXPECT_TRUE(p2pIface->GetSupportFreqs(band, frequencies) == HDF_SUCCESS);
+    EXPECT_TRUE(p2pIface->GetSupportFreqs(1, frequencies) == HDF_SUCCESS);
+}
+
+HWTEST_F(WifiP2pIfaceTest, SetMacAddressTest, TestSize.Level1)
+{
+    HDF_LOGI("SetMacAddressTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->SetMacAddress(TEST_MAC) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, SetCountryCodeTest, TestSize.Level1)
+{
+    HDF_LOGI("SetCountryCodeTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->SetCountryCode("CN") == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, GetPowerModeTest, TestSize.Level1)
+{
+    HDF_LOGI("GetPowerModeTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    int32_t mode;
+    EXPECT_TRUE(p2pIface->GetPowerMode(mode) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, SetPowerModeTest, TestSize.Level1)
+{
+    HDF_LOGI("SetPowerModeTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->SetPowerMode(0) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, GetIfaceCapTest, TestSize.Level1)
+{
+    HDF_LOGI("GetIfaceCapTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    uint32_t cap;
+    EXPECT_TRUE(p2pIface->GetIfaceCap(cap) == HDF_SUCCESS);
+}
+
+HWTEST_F(WifiP2pIfaceTest, StartScanTest, TestSize.Level1)
+{
+    HDF_LOGI("StartScanTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    ScanParams scanParam;
+    scanParam.bssid = TEST_MAC;
+    EXPECT_TRUE(p2pIface->StartScan(scanParam) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, GetScanInfosTest, TestSize.Level1)
+{
+    HDF_LOGI("GetScanInfosTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    std::vector<ScanResultsInfo> scanResult;
+    EXPECT_TRUE(p2pIface->GetScanInfos(scanResult) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, StartPnoScanTest, TestSize.Level1)
+{
+    HDF_LOGI("StartPnoScanTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    PnoScanParams pnoParam;
+    pnoParam.min2gRssi = 1;
+    EXPECT_TRUE(p2pIface->StartPnoScan(pnoParam) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, StopPnoScanTest, TestSize.Level1)
+{
+    HDF_LOGI("StopPnoScanTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->StopPnoScan() == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, GetSignalPollInfoTest, TestSize.Level1)
+{
+    HDF_LOGI("GetSignalPollInfoTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    SignalPollResult info;
+    EXPECT_TRUE(p2pIface->GetSignalPollInfo(info) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
+{
+    HDF_LOGI("SetDpiMarkRuleTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->SetDpiMarkRule(0, 0, 0) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiP2pIfaceTest, EnablePowerModeTest, TestSize.Level1)
+{
+    HDF_LOGI("EnablePowerModeTest started");
+    if (p2pIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(p2pIface->EnablePowerMode(0) == HDF_ERR_NOT_SUPPORT);
 }
 }
