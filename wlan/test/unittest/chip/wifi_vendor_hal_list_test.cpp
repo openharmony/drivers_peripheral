@@ -38,6 +38,7 @@ public:
     void GetHalsTest()
     {
         if (vendorHalListTest == nullptr) {
+            HDF_LOGE("vendorHalListTest is null");
             return;
         }
         EXPECT_TRUE(vendorHalListTest->GetHals().size() != 0);
@@ -55,7 +56,7 @@ public:
  */
 HWTEST_F(WifiVendorHalListTest, GetHalsTest, TestSize.Level1)
 {
-    HDF_LOGI("GetHalsTest start");
+    HDF_LOGI("GetHalsTest started");
     GetHalsTest();
 }
 }
