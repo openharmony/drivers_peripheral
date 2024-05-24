@@ -244,7 +244,7 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Leve
     struct AudioSceneDescriptor scenes = {};
     ASSERT_NE(nullptr, capture);
 
-    scenes.scene.id = 7; // invlalid id
+    scenes.scene.id = 99; // invlalid id
     scenes.desc.pins = PIN_OUT_HDMI;
     scenes.desc.desc = strdup("mic");
     ret = capture->SelectScene(capture, &scenes);
