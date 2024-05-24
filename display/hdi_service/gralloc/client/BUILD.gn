@@ -60,6 +60,6 @@ if (defined(ohos_lite)) {
     }
     external_deps += [ "graphic_surface:buffer_handle" ]
     subsystem_name = "hdf"
-    part_name = "drivers_interface_display"
+    part_name = "drivers_peripheral_display"
   }
 }
