@@ -296,6 +296,11 @@ int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
     }
     uint32_t periodMs = (periodCount * periodSize * 1000) / byteRate;
     *ms = periodMs;
+#ifdef A2DP_HDI_SERVICE
+    uint32_t latency = 0;
+    OHOS::Bluetooth::GetLatency(latency);
+    *ms = latency;
+#endif
     return AUDIO_HAL_SUCCESS;
 }
 

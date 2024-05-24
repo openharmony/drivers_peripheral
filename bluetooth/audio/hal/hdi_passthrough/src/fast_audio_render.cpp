@@ -211,6 +211,12 @@ int32_t FastRenderGetLatency(struct AudioRender *render, uint32_t *ms)
     HDF_LOGI("%{public}s enter", __func__);
     (void)render;
     (void)ms;
+#ifdef A2DP_HDI_SERVICE
+    uint32_t latency = 0;
+    OHOS::Bluetooth::FastGetLatency(latency);
+    *ms = latency;
+    return AUDIO_HAL_SUCCESS;
+#endif
     return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 

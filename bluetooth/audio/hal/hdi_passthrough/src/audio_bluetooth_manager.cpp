@@ -44,6 +44,7 @@ StartPlayingFunc startPlayingFunc;
 SuspendPlayingFunc suspendPlayingFunc;
 StopPlayingFunc stopPlayingFunc;
 WriteFrameFunc writeFrameFunc;
+GetLatencyFunc getLatencyFunc;
 
 SetUpFunc fastSetUpFunc;
 TearDownFunc fastTearDownFunc;
@@ -53,6 +54,7 @@ SuspendPlayingFunc fastSuspendPlayingFunc;
 StopPlayingFunc fastStopPlayingFunc;
 ReqMmapBufferFunc fastReqMmapBufferFunc;
 ReadMmapPositionFunc fastReadMmapPositionFunc;
+GetLatencyFunc fastGetLatencyFunc;
 #endif
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
@@ -192,6 +194,7 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SuspendPlayingFunc, suspendPlayingFunc, "SuspendPlaying");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, StopPlayingFunc, stopPlayingFunc, "StopPlaying");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, WriteFrameFunc, writeFrameFunc, "WriteFrame");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetLatencyFunc, getLatencyFunc, "GetLatency");
 
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, SetUpFunc, fastSetUpFunc, "FastSetUp");
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, TearDownFunc, fastTearDownFunc, "FastTearDown");
@@ -202,6 +205,7 @@ static bool InitAudioDeviceSoHandle(const char *path)
         GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, ReqMmapBufferFunc, fastReqMmapBufferFunc, "FastReqMmapBuffer");
         GET_SYM_ERRPR_RET(
             g_ptrAudioDeviceHandle, ReadMmapPositionFunc, fastReadMmapPositionFunc, "FastReadMmapPosition");
+        GET_SYM_ERRPR_RET(g_ptrAudioDeviceHandle, GetLatencyFunc, fastGetLatencyFunc, "FastGetLatency");
     }
     return true;
 }
@@ -285,8 +289,12 @@ void FastReadMmapPosition(int64_t &sec, int64_t &nSec, uint64_t &frames)
 {
     fastReadMmapPositionFunc(sec, nSec, frames);
 }
-#endif
 
+int FastGetLatency(uint32_t &latency)
+{
+    return (fastGetLatencyFunc(latency) ? HDF_SUCCESS : HDF_FAILURE);
+}
+#endif
 
 int WriteFrame(const uint8_t *data, uint32_t size, const HDI::Audio_Bluetooth::AudioSampleAttributes *attrs)
 {
@@ -366,6 +374,16 @@ int StopPlaying()
         return RET_BAD_STATUS;
     }
     return g_proxy_->StopPlaying(g_proxy_->GetActiveSinkDevice());
+#endif
+}
+
+int GetLatency(uint32_t &latency)
+{
+    HDF_LOGI("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    return (getLatencyFunc(latency) ? HDF_SUCCESS : HDF_FAILURE);
+#else
+    return HDF_ERR_NOT_SUPPORT;
 #endif
 }
 }
