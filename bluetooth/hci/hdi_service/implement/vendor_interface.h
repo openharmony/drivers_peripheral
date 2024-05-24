@@ -59,13 +59,13 @@ private:
     InitializeCompleteCallback initializeCompleteCallback_;
     ReceiveDataCallback eventDataCallback_;
     void* vendorHandle_ = nullptr;
+    std::mutex vendorInterfaceAndWakeupLockMutex_;
     BtVendorInterfaceT *vendorInterface_ = nullptr;
     static BtVendorCallbacksT vendorCallbacks_;
     HciWatcher watcher_;
     std::shared_ptr<Hci::HciProtocol> hci_ = nullptr;
     uint16_t vendorSentOpcode_ = 0;
     uint32_t lpmTimer_ = 0;
-    std::mutex wakeupMutex_;
     bool wakeupLock_ = false;
     bool activity_ = false;
 
