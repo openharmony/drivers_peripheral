@@ -537,6 +537,8 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
         return HDF_FAILURE;
     }
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
+        OsalMemFree(port);
+        port = NULL;
         HDF_LOGE("%s: init lock failed!", __func__);
         return HDF_FAILURE;
     }
@@ -703,6 +705,8 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
 
     ret = memcpy_s(data, g_syncRequest->compInfo.actualLength, g_syncRequest->compInfo.buffer, count);
     if (ret != EOK) {
+        OsalMemFree(data);
+        data = NULL;
         HDF_LOGE("memcpy_s error %s, %d", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -860,9 +864,18 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     return (int32_t)size;
 }
 
+static void FreeMem()
+{
+    if (g_acmReadBuffer == NULL) {
+        return;
+    } else {
+        OsalMemFree(g_acmReadBuffer);
+        g_acmReadBuffer = NULL;
+    }
+}
+
 static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
 {
-    int32_t ret;
     int32_t cmdType = HOST_ACM_ASYNC_READ;
 
     if ((port == NULL) || (data == NULL)) {
@@ -898,8 +911,9 @@ static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
         }
     }
 
-    ret = UsbSerialAllocFifo((struct DataFifo *)&port->readFifo, READ_BUF_SIZE);
+    int32_t ret = UsbSerialAllocFifo((struct DataFifo *)&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
+        FreeMem();
         HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -912,8 +926,7 @@ static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
     }
     return HDF_SUCCESS;
 ERR:
-    OsalMemFree(g_acmReadBuffer);
-    g_acmReadBuffer = NULL;
+    FreeMem();
     UsbSerialFreeFifo((struct DataFifo *)&port->readFifo);
     return ret;
 }
