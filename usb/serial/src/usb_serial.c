@@ -864,7 +864,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     return (int32_t)size;
 }
 
-static void MemFree()
+static void FreeMem()
 {
     if (g_acmReadBuffer == NULL) {
         return;
@@ -913,7 +913,7 @@ static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
 
     int32_t ret = UsbSerialAllocFifo((struct DataFifo *)&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
-        MemFree();
+        FreeMem();
         HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -926,7 +926,7 @@ static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
     }
     return HDF_SUCCESS;
 ERR:
-    MemFree();
+    FreeMem();
     UsbSerialFreeFifo((struct DataFifo *)&port->readFifo);
     return ret;
 }
