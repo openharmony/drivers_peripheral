@@ -43,7 +43,6 @@ if (defined(ohos_lite)) {
       "display_gralloc_client.cpp",
       "mapper_adapter.cpp",
     ]
-    deps = [ "drivers_interface_display:libdisplay_gralloc" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -54,6 +53,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libpub_utils",
         "hilog:libhilog",
         "ipc:ipc_single",
+        "drivers_interface_display:libdisplay_gralloc",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
