@@ -102,7 +102,7 @@ HWTEST_F(AuthLevelTest, TestGetAslAndAcl_002, TestSize.Level0)
     constexpr uint32_t authType = 1;
     uint32_t asl = 0;
     uint32_t acl = 0;
-    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(GetAslAndAcl(authType, &asl, &acl), RESULT_SUCCESS);
 }
 
 HWTEST_F(AuthLevelTest, TestGetAslAndAcl_003, TestSize.Level0)
