@@ -99,7 +99,7 @@ ohos_shared_library("libmapper_service_1.0") {
 ohos_shared_library("libmapper_service_1.2") {
   include_dirs = [ "include" ]
   sources = [
-    "src/mapper_service_1_2.cpp",
+    "src/mapper_service.cpp",
     "src/mapper_service_1_2.cpp"
   ]
 
