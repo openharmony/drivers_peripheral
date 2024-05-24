@@ -868,7 +868,7 @@ static void MemFree()
 {
     if (g_acmReadBuffer == NULL) {
         return;
-    }else{
+    } else {
         OsalMemFree(g_acmReadBuffer);
         g_acmReadBuffer = NULL;
     }
