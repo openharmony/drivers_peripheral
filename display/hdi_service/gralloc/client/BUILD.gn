@@ -20,7 +20,7 @@ config("gralloc_client_public_config") {
   ]
 }
 if (defined(ohos_lite)) {
-  group("hdi_gralloc_client") {
+  ohos_shared_library("hdi_gralloc_client") {
     deps = []
     public_configs = []
   }
@@ -29,7 +29,7 @@ if (defined(ohos_lite)) {
     drivers_peripheral_display_hdi_gralloc_client =
         ":libhdi_display_gralloc_client"
   }
-  group("hdi_gralloc_client") {
+  ohos_shared_library("hdi_gralloc_client") {
     public_configs = [ ":gralloc_client_public_config" ]
   }
 
