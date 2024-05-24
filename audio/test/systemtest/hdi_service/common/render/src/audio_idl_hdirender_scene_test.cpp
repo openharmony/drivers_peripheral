@@ -243,7 +243,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, AudioAudioRenderSelectScene_005, TestSize.L
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    scenes.scene.id = 7;
+    scenes.scene.id = 99;
     scenes.desc.pins = PIN_OUT_HDMI;
     scenes.desc.desc = strdup("mic");
 
