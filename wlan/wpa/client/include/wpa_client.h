@@ -177,6 +177,7 @@ struct P2pGroupStartedParam {
     unsigned char psk[WIFI_P2P_PASSWORD_SIZE];
     unsigned char passphrase[WIFI_P2P_PASSWORD_SIZE];
     unsigned char goDeviceAddress[ETH_ADDR_LEN];
+    unsigned char goRandomDeviceAddress[ETH_ADDR_LEN];
 };
 
 struct P2pGroupRemovedParam {
