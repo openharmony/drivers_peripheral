@@ -65,6 +65,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_TSVC[] = "isSupportTSVC";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
     constexpr char CODEC_CONFIG_KEY_MAX_LTR_FRAME_NUM[] = "maxLTRFrameNum";
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK[] = "isSupportWaterMark";
 
     constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
     constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
@@ -366,6 +367,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
             CODEC_LOGE("failed to get %{public}s maxLTRFrameNum!", childNode.name);
         }
     }
+    cap.port.video.isSupportWaterMark = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_WATERMARK);
     return HDF_SUCCESS;
 }
 
