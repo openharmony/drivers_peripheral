@@ -57,15 +57,12 @@ VendorInterface::~VendorInterface()
 bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 {
     int channel[HCI_MAX_CHANNEL] = {0};
-    int channelCount = 0;
-    {
-        std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
-        channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
-        if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
-            HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
-            return false;
-        }
+    int channelCount = vendorInterface_->op(BtOpcodeT::BT_OP_HCI_CHANNEL_OPEN, channel);
+    if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
+        HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
+        return false;
     }
+
     if (channelCount == 1) {
         auto h4 = std::make_shared<Hci::H4Protocol>(channel[0],
             receiveCallback.onAclReceive,
@@ -101,13 +98,8 @@ bool VendorInterface::Initialize(
         return false;
     }
 
-    std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
     vendorInterface_ =
         reinterpret_cast<BtVendorInterfaceT *>(dlsym(vendorHandle_, BT_VENDOR_INTERFACE_SYMBOL_NAME));
-    if (vendorInterface_ == nullptr) {
-        HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
-        return false;
-    }
 
     auto bluetoothAddress = BluetoothAddress::GetDeviceAddress();
     std::vector<uint8_t> address = { 0, 0, 0, 0, 0, 0 };
@@ -115,6 +107,10 @@ bool VendorInterface::Initialize(
         bluetoothAddress->ReadAddress(address);
     }
 
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
+        return false;
+    }
     int result = vendorInterface_->init(&vendorCallbacks_, address.data());
     if (result != 0) {
         HDF_LOGE("vendorInterface_->init failed.");
@@ -143,7 +139,6 @@ bool VendorInterface::Initialize(
 
 void VendorInterface::CleanUp()
 {
-    std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("VendorInterface::CleanUp, vendorInterface_ is nullptr.");
         return;
@@ -165,12 +160,13 @@ void VendorInterface::CleanUp()
 
 size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet)
 {
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("VendorInterface::SendPacket, vendorInterface_ is nullptr.");
+        return BT_VENDOR_INVALID_DATA_LEN;
+    }
+
     {
-        std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
-        if (vendorInterface_ == nullptr) {
-            HDF_LOGE("VendorInterface::SendPacket, vendorInterface_ is nullptr.");
-            return BT_VENDOR_INVALID_DATA_LEN;
-        }
+        std::lock_guard<std::mutex> lock(wakeupMutex_);
         activity_ = true;
         watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
         if (!wakeupLock_) {
@@ -239,7 +235,6 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
         buff->offset = 0;
         buff->layer_specific = 0;
         (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
-        std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
         if (vendorInterface_ && vendorInterface_->op) {
             vendorInterface_->op(BtOpcodeT::BT_OP_EVENT_CALLBACK, buff);
         }
@@ -256,7 +251,6 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
             buff->layer_specific = 0;
             (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
             vendorSentOpcode_ = 0;
-            std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
             if (vendorInterface_ && vendorInterface_->op) {
                 vendorInterface_->op(BtOpcodeT::BT_OP_EVENT_CALLBACK, buff);
             }
@@ -269,7 +263,7 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
 
 void VendorInterface::WatcherTimeout()
 {
-    std::lock_guard<std::mutex> lock(vendorInterfaceAndWakeupLockMutex_);
+    std::lock_guard<std::mutex> lock(wakeupMutex_);
     if (!activity_ && wakeupLock_ && vendorInterface_ && vendorInterface_->op) {
         vendorInterface_->op(BtOpcodeT::BT_OP_WAKEUP_UNLOCK, nullptr);
         wakeupLock_ = false;
