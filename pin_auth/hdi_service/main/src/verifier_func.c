@@ -462,7 +462,8 @@ static int32_t AuthPin(VerifierMsg *verifierMsg, Buffer *pinDataBuf)
     ResultCode ret = DoQueryPinInfo(g_verifierSchedule->templateId, &pinCredentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("DoQueryPinInfo fail.");
-        return ret;
+        verifierMsg->msgOutSize = 0;
+        return RESULT_SUCCESS;
     }
 
     if (pinCredentialInfo.freezeTime == 0) {
@@ -480,8 +481,9 @@ static int32_t AuthPin(VerifierMsg *verifierMsg, Buffer *pinDataBuf)
     ret = GetResultTlv(verifierMsg);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetResultTlv fail!");
+        verifierMsg->msgOutSize = 0;
     }
-    return ret;
+    return RESULT_SUCCESS;
 }
 
 static int32_t DoHandleCollectorAck(VerifierMsg *verifierMsg)
