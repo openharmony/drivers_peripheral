@@ -64,6 +64,8 @@ struct IWpaInterface *WpaInterfaceImplGetInstance(void)
     service->interface.SetSuspendMode = WpaInterfaceSetSuspendMode;
     service->interface.RegisterEventCallback = WpaInterfaceRegisterEventCallback;
     service->interface.UnregisterEventCallback = WpaInterfaceUnregisterEventCallback;
+    service->interface.RegisterWpaEventCallback = WpaInterfaceRegisterEventCallback;
+    service->interface.UnregisterWpaEventCallback = WpaInterfaceUnregisterEventCallback;
     service->interface.GetConnectionCapabilities = WpaInterfaceGetConnectionCapabilities;
     service->interface.GetScanSsid = WpaInterfaceGetScanSsid;
     service->interface.GetPskPassphrase = WpaInterfaceGetPskPassphrase;
