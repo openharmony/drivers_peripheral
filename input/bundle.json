@@ -29,7 +29,8 @@
         "hilog",
         "hilog_lite",
         "drivers_interface_input",
-        "access_token"
+        "access_token",
+        "FreeBSD"
       ],
       "third_party": [
         "bounds_checking_function"
