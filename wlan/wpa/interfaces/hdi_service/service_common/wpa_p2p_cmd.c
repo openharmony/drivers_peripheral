@@ -1652,18 +1652,14 @@ static int32_t WpaFillP2pInvitationResultParam(struct P2pInvitationResultParam *
     return ret;
 }
 
-static int32_t WpaFillP2pGroupStartedParam(struct P2pGroupStartedParam *groupStartedParam,
-    struct HdiP2pGroupStartedParam *hdiP2pGroupStartedParam)
+static int32_t FillHdiP2pGroupInfoStartedParam(struct P2pGroupStartedParam *groupStartedParam,
+    struct HdiP2pGroupInfoStartedParam *hdiP2pGroupStartedParam)
 {
     int32_t ret = HDF_SUCCESS;
     if (groupStartedParam == NULL || hdiP2pGroupStartedParam == NULL) {
         HDF_LOGE("%{public}s: groupStartedParam or hdiP2pGroupStartedParam is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pGroupStartedParam->isGo = groupStartedParam->isGo;
-    hdiP2pGroupStartedParam->isPersistent = groupStartedParam->isPersistent;
-    hdiP2pGroupStartedParam->frequency = groupStartedParam->frequency;
-
     do {
         if (FillData(&hdiP2pGroupStartedParam->groupIfName, &hdiP2pGroupStartedParam->groupIfNameLen,
             groupStartedParam->groupIfName, WIFI_P2P_GROUP_IFNAME_LENGTH) != HDF_SUCCESS) {
@@ -1694,8 +1690,28 @@ static int32_t WpaFillP2pGroupStartedParam(struct P2pGroupStartedParam *groupSta
             HDF_LOGE("%{public}s: fill ssid fail!", __func__);
             ret = HDF_FAILURE;
         }
+        if (FillData(&hdiP2pGroupStartedParam->goRandomDeviceAddress,
+            &hdiP2pGroupStartedParam->goRandomDeviceAddressLen,
+            groupStartedParam->goRandomDeviceAddress, ETH_ADDR_LEN) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
+            ret = HDF_FAILURE;
+        }
     } while (0);
-
+    return ret;
+}
+ 
+static int32_t WpaFillP2pGroupInfoStartedParam(struct P2pGroupStartedParam *groupStartedParam,
+    struct HdiP2pGroupInfoStartedParam *hdiP2pGroupStartedParam)
+{
+    int32_t ret = HDF_SUCCESS;
+    if (groupStartedParam == NULL || hdiP2pGroupStartedParam == NULL) {
+        HDF_LOGE("%{public}s: groupStartedParam or hdiP2pGroupStartedParam is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    hdiP2pGroupStartedParam->isGo = groupStartedParam->isGo;
+    hdiP2pGroupStartedParam->isPersistent = groupStartedParam->isPersistent;
+    hdiP2pGroupStartedParam->frequency = groupStartedParam->frequency;
+    ret = FillHdiP2pGroupInfoStartedParam(groupStartedParam, hdiP2pGroupStartedParam);
     if (ret != HDF_SUCCESS) {
         if (hdiP2pGroupStartedParam->groupIfName != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->groupIfName);
@@ -1712,22 +1728,8 @@ static int32_t WpaFillP2pGroupStartedParam(struct P2pGroupStartedParam *groupSta
         if (hdiP2pGroupStartedParam->goDeviceAddress != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->goDeviceAddress);
         }
-    }
-    return ret;
-}
-
-static int32_t WpaFillP2pGroupStartedParam(struct P2pGroupStartedParam *groupStartedParam,
-    struct HdiP2pGroupStartedParam *hdiP2pGroupStartedParam)
-{
-    int32_t ret = WpaFillP2pGroupStartedParam(groupStartedParam, hdiP2pGroupStartedParam);
-    if (ret == HDF_SUCCESS) {
-        if (FillData(&hdiP2pGroupStartedParam->goRandomDeviceAddress, &hdiP2pGroupStartedParam->goRandomDeviceAddressLen,
-            groupStartedParam->goRandomDeviceAddress, ETH_ADDR_LEN) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill goRandomDeviceAddress fail!", __func__);
-            if (hdiP2pGroupStartedParam->goRandomDeviceAddress != NULL) {
-                OsalMemFree(hdiP2pGroupStartedParam->goRandomDeviceAddress);
-            }
-            ret = HDF_FAILURE;
+        if (hdiP2pGroupStartedParam->goRandomDeviceAddress != NULL) {
+            OsalMemFree(hdiP2pGroupStartedParam->goRandomDeviceAddress);
         }
     }
     return ret;
@@ -2071,12 +2073,17 @@ int32_t ProcessEventP2pGroupFormationFailure(struct HdfWpaRemoteNode *node, char
     return ret;
 }
 
-int32_t ProcessEventP2pGroupInfoStarted(struct HdfWpaRemoteNode *node,
+int32_t ProcessEventP2pGroupStarted(struct HdfWpaRemoteNode *node,
     struct P2pGroupStartedParam *groupStartedParam, const char *ifName)
 {
     struct HdiP2pGroupInfoStartedParam *hdiP2pGroupInfoStartedParam = NULL;
     int32_t ret = HDF_FAILURE;
-    hdiP2pGroupInfoStartedParam = (struct HdiP2pGroupInfoStartedParam *)OsalMemCalloc(sizeof(struct HdiP2pGroupInfoStartedParam));
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGroupStarted == NULL
+        || node->callbackObj->OnEventGroupInfoStarted == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    hdiP2pGroupInfoStartedParam = (struct HdiP2pGroupInfoStartedParam *)OsalMemCalloc(sizeof(struct P2pGroupStartedParam));
     if ((hdiP2pGroupInfoStartedParam == NULL) || (WpaFillP2pGroupInfoStartedParam(groupStartedParam, hdiP2pGroupInfoStartedParam)
         != HDF_SUCCESS)) {
         HDF_LOGE("%{public}s: hdiP2pGroupStartedParam is NULL or groupStartedParam fialed!", __func__);
@@ -2084,29 +2091,6 @@ int32_t ProcessEventP2pGroupInfoStarted(struct HdfWpaRemoteNode *node,
         ret = node->callbackObj->OnEventGroupInfoStarted(node->callbackObj, hdiP2pGroupInfoStartedParam, ifName);
     }
     HdiP2pGroupInfoStartedParamFree(hdiP2pGroupInfoStartedParam, true);
-    return ret;
-}
-
-int32_t ProcessEventP2pGroupStarted(struct HdfWpaRemoteNode *node,
-    struct P2pGroupStartedParam *groupStartedParam, const char *ifName)
-{
-    struct HdiP2pGroupStartedParam *hdiP2pGroupStartedParam = NULL;
-    int32_t ret = HDF_FAILURE;
-    if (node != NULL && node->callbackObj != NULL && node->callbackObj->OnEventGroupInfoStarted != NULL) {
-        return ProcessEventP2pGroupInfoStarted(node, groupStartedParam, ifName);
-    }
-    if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGroupStarted == NULL) {
-        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    hdiP2pGroupStartedParam = (struct HdiP2pGroupStartedParam *)OsalMemCalloc(sizeof(struct P2pGroupStartedParam));
-    if ((hdiP2pGroupStartedParam == NULL) || (WpaFillP2pGroupStartedParam(groupStartedParam, hdiP2pGroupStartedParam)
-        != HDF_SUCCESS)) {
-        HDF_LOGE("%{public}s: hdiP2pGroupStartedParam is NULL or groupStartedParam fialed!", __func__);
-    } else {
-        ret = node->callbackObj->OnEventGroupStarted(node->callbackObj, hdiP2pGroupStartedParam, ifName);
-    }
-    HdiP2pGroupStartedParamFree(hdiP2pGroupStartedParam, true);
     return ret;
 }
 
