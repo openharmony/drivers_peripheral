@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/peripheral/distributed_camera/distributedcamera.gni")
 
-fuzz_test_output_path = "distributed_camera/distributed_camera"
+fuzz_test_output_path = "drivers_peripheral_distributed_camera/drivers_peripheral_distributed_camera"
 
 include_dirs = [
   "${distributedcamera_hdf_path}/hdi_service/include/dcamera_device",
