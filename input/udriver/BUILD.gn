@@ -37,8 +37,8 @@ if (drivers_peripheral_input_feature_udriver) {
 
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "FreeBSD:libfreebsd_static",
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
