@@ -424,6 +424,16 @@ int32_t GnssInterfaceImpl::SendNetworkInitiatedMsg(const std::string& msg, int l
     return HDF_SUCCESS;
 }
 
+int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCallback>& callbackObj)
+{
+    return HDF_SUCCESS;
+}
+
+int32_t GnssInterfaceImpl::DisableGnssMeasurement()
+{
+    return HDF_SUCCESS;
+}
+
 void GnssInterfaceImpl::ResetGnssDeathRecipient()
 {
     std::unique_lock<std::mutex> lock(g_mutex);
