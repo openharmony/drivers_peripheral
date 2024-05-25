@@ -43,7 +43,7 @@
 #include <sys/time.h>
 
 #ifndef _UAPI_INPUT_H
-#include <input-event-codes.h>
+#include <sys\dev\evdev\input-event-codes.h>
 #endif
 
 #ifdef __cplusplus
