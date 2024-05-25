@@ -63,9 +63,7 @@ if (defined(ohos_lite)) {
 } else {
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
-    include_dirs = [
-      "$INPUT_ROOT_DIR/interfaces/include",
-    ]
+    include_dirs = [ "$INPUT_ROOT_DIR/interfaces/include" ]
   }
 
   ohos_shared_library("hdi_input") {
@@ -92,8 +90,8 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
     if (is_standard_system) {
       external_deps = [
-        "c_utils:utils",
         "FreeBSD:libfreebsd_static",
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
