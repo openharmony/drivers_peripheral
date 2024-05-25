@@ -26,7 +26,6 @@ if (drivers_peripheral_input_feature_udriver) {
       "$INPUT_ROOT_DIR/udriver/include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "$INPUT_ROOT_DIR/utils/include",
-      "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
     cflags = [
@@ -39,11 +38,15 @@ if (drivers_peripheral_input_feature_udriver) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "FreeBSD:libfreebsd_static",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
     } else {
-      external_deps = [ "hilog:libhilog" ]
+      external_deps = [
+        "FreeBSD:libfreebsd_static",
+        "hilog:libhilog",
+      ]
     }
 
     install_images = [
@@ -56,7 +59,7 @@ if (drivers_peripheral_input_feature_udriver) {
     part_name = "drivers_peripheral_input"
   }
 } else {
-  group("hdi_input_udriver") {
+  ohos_shared_library("hdi_input_udriver") {
     deps = []
   }
 }
