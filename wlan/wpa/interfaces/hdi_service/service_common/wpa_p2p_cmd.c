@@ -1539,11 +1539,6 @@ static int32_t WpaFillP2pDeviceLostParam(struct P2pDeviceLostParam  *deviceLostP
             HDF_LOGE("%{public}s: fill bssid fail!", __func__);
             ret = HDF_FAILURE;
     }
-    if (ret != HDF_SUCCESS) {
-        if (hdiP2pDeviceLostParam->p2pDeviceAddress != NULL) {
-            OsalMemFree(hdiP2pDeviceLostParam->p2pDeviceAddress);
-        }
-    }
     return ret;
 }
 
