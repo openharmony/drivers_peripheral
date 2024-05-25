@@ -1663,37 +1663,37 @@ static int32_t FillHdiP2pGroupInfoStartedParam(struct P2pGroupStartedParam *grou
     do {
         if (FillData(&hdiP2pGroupStartedParam->groupIfName, &hdiP2pGroupStartedParam->groupIfNameLen,
             groupStartedParam->groupIfName, WIFI_P2P_GROUP_IFNAME_LENGTH) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill bssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill groupIfName fail!", __func__);
             ret = HDF_FAILURE;
             break;
         }
         if (FillData(&hdiP2pGroupStartedParam->ssid, &hdiP2pGroupStartedParam->ssidLen,
             groupStartedParam->ssid, WIFI_SSID_LENGTH) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill bssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
             ret = HDF_FAILURE;
             break;
         }
         if (FillData(&hdiP2pGroupStartedParam->psk, &hdiP2pGroupStartedParam->pskLen,
             groupStartedParam->psk, WIFI_P2P_PASSWORD_SIZE) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill psk fail!", __func__);
             ret = HDF_FAILURE;
             break;
         }
         if (FillData(&hdiP2pGroupStartedParam->passphrase, &hdiP2pGroupStartedParam->passphraseLen,
             groupStartedParam->passphrase, WIFI_P2P_PASSWORD_SIZE) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill passphrase fail!", __func__);
             ret = HDF_FAILURE;
             break;
         }
         if (FillData(&hdiP2pGroupStartedParam->goDeviceAddress, &hdiP2pGroupStartedParam->goDeviceAddressLen,
             groupStartedParam->goDeviceAddress, ETH_ADDR_LEN) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill goDeviceAddress fail!", __func__);
             ret = HDF_FAILURE;
         }
         if (FillData(&hdiP2pGroupStartedParam->goRandomDeviceAddress,
             &hdiP2pGroupStartedParam->goRandomDeviceAddressLen,
             groupStartedParam->goRandomDeviceAddress, ETH_ADDR_LEN) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: fill ssid fail!", __func__);
+            HDF_LOGE("%{public}s: fill goRandomDeviceAddress fail!", __func__);
             ret = HDF_FAILURE;
         }
     } while (0);
