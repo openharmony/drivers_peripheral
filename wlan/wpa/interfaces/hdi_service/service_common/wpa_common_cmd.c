@@ -1703,6 +1703,9 @@ static int32_t HdfP2pDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_IFACE_CREATED:
             ret = ProcessEventP2pIfaceCreated(pos, (struct P2pIfaceCreatedParam *)data, ifName);
             break;
+        case WPA_EVENT_STA_NOTIFY:
+            ret = ProcessEventStaNotify(pos, (char *)data, ifName);
+            break;
         default:
             HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
             break;
