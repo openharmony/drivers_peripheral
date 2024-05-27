@@ -24,8 +24,8 @@ ohos_executable("codec_hdi_adapter_decode") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_peripheral_display:hdi_gralloc_client",
       "drivers_peripheral_codec:libcodec_hdi_passthrough_impl",
+      "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -56,12 +56,12 @@ ohos_executable("codec_hdi_adapter_encode") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
-      "drivers_peripheral_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "drivers_peripheral_codec:libcodec_hdi_passthrough_impl",
+      "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
