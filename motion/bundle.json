@@ -17,7 +17,7 @@
       "drivers_peripheral_motion_feature_community"
     ],
     "syscap": [],
-    "adapted_system_type": ["standard"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "650KB",
     "ram": "7600KB",
     "deps": {
