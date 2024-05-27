@@ -110,7 +110,7 @@ static int32_t AcmStartDb(struct AcmDevice *acm, struct AcmDb * const db, struct
     int32_t rc;
     rc = UsbSubmitRequestAsync(db->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d \n", rc);
+        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%{public}d ", rc);
         db->use = 0;
     }
     return rc;
@@ -185,7 +185,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
     db->use = 0;
     if (!g_speedFlag) {
         if (SerialBegin(db->instance) != HDF_SUCCESS) {
-            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+            HDF_LOGW("%{public}s:%{public}d SerialBegin error!", __func__, __LINE__);
         }
         g_send_count++;
     }
@@ -239,7 +239,7 @@ static struct UsbPipeInfo *EnumePipe(
         if ((p.pipeDirection == pipeDirection) && (p.pipeType == pipeType)) {
             struct UsbPipeInfo *pi = OsalMemCalloc(sizeof(*pi));
             if (pi == NULL) {
-                HDF_LOGE("%s: Alloc pipe failed", __func__);
+                HDF_LOGE("%{public}s: Alloc pipe failed", __func__);
                 return NULL;
             }
             p.interfaceId = info->interfaceIndex;
@@ -254,7 +254,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm, UsbPipeType pipe
 {
     uint8_t i;
     if (acm == NULL) {
-        HDF_LOGE("%s: invalid parmas", __func__);
+        HDF_LOGE("%{public}s: invalid parmas", __func__);
         return NULL;
     }
     for (i = 0; i < acm->interfaceCnt; i++) {
@@ -301,7 +301,7 @@ static void UsbGetDevInfo(int32_t * const busNum, int32_t * const devNum)
     paraData.productId = USB_DEVICE_PRODUCT_ID;
     usbPnpDevice = UsbPnpNotifyGetUsbDevice(paraData);
     if (usbPnpDevice == NULL) {
-        HDF_LOGE("%s:%d UsbPnpNotifyGetUsbDevice is null!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d UsbPnpNotifyGetUsbDevice is null!", __func__, __LINE__);
         return;
     }
     *busNum = (int)usbPnpDevice->address;
@@ -387,10 +387,10 @@ static int32_t UsbSpeedDdkInit(void)
         if (g_acm->iface[i]) {
             g_acm->devHandle[i] = UsbOpenInterface(g_acm->iface[i]);
             if (g_acm->devHandle[i] == NULL) {
-                HDF_LOGI("%s: UsbOpenInterface null", __func__);
+                HDF_LOGI("%{public}s: UsbOpenInterface null", __func__);
             }
         } else {
-            HDF_LOGE("%{public}s:%{public}d g_acm->iface[%hhu] is null.", __func__, __LINE__, i);
+            HDF_LOGE("%{public}s:%{public}d g_acm->iface[%{public}hhu] is null.", __func__, __LINE__, i);
             return HDF_FAILURE;
         }
     }
@@ -530,17 +530,17 @@ static int32_t AcmDeviceDispatch(
 {
     (void)reply;
     if (client == NULL) {
-        HDF_LOGE("%s: client is NULL", __func__);
+        HDF_LOGE("%{public}s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%s: client->device is NULL", __func__);
+        HDF_LOGE("%{public}s: client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%s: client->device->service is NULL", __func__);
+        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -563,13 +563,13 @@ static int32_t AcmDeviceDispatch(
 static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
-        HDF_LOGE("%s: device is null", __func__);
+        HDF_LOGE("%{public}s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     g_acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*g_acm));
     if (g_acm == NULL) {
-        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
+        HDF_LOGE("%{public}s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 

@@ -56,7 +56,7 @@ static int DdkUeventOpen(int *fd)
 
     int socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (socketfd < 0) {
-        HDF_LOGE("%{public}s: socketfd failed! ret = %d", __func__, socketfd);
+        HDF_LOGE("%{public}s: socketfd failed! ret = %{public}d", __func__, socketfd);
         return HDF_FAILURE;
     }
 

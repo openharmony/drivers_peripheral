@@ -89,13 +89,13 @@ static int32_t UsbIoThread(void *data)
         }
 
         if (g_stopIoThreadFlag) {
-            HDF_LOGD("%s:%d", __func__, __LINE__);
+            HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
             g_stopIoThreadFlag = false;
             break;
         }
     }
 
-    HDF_LOGE("%s:%d exit", __func__, __LINE__);
+    HDF_LOGE("%{public}s:%{public}d exit", __func__, __LINE__);
 
     return HDF_SUCCESS;
 }
@@ -108,7 +108,7 @@ static int32_t UsbIoSendThread(void *data)
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         if (!g_speedFlag) {
             if (SerialBegin(acm) != HDF_SUCCESS) {
-                HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+                HDF_LOGW("%{public}s:%{public}d SerialBegin error!", __func__, __LINE__);
             }
             g_send_count++;
         }
@@ -121,7 +121,7 @@ static int32_t UsbStartIo(struct AcmDevice * const acm)
     struct OsalThreadParam threadCfg;
     int32_t ret;
 
-    HDF_LOGI("%s start", __func__);
+    HDF_LOGI("%{public}s start", __func__);
     g_stopIoThreadFlag = false;
 
     /* create Io thread */
@@ -132,13 +132,13 @@ static int32_t UsbStartIo(struct AcmDevice * const acm)
 
     ret = OsalThreadCreate(&acm->ioThread, (OsalThreadEntry)UsbIoThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -148,13 +148,13 @@ static int32_t UsbStartIo(struct AcmDevice * const acm)
     threadCfg.stackSize = USB_IO_THREAD_STACK_SIZE;
     ret = OsalThreadCreate(&acm->ioSendThread, (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioSendThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -214,7 +214,7 @@ static int32_t UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConf
         printf("%s:%d UsbRawGetConfiguration failed, ret=%d", __func__, __LINE__, ret);
         return HDF_FAILURE;
     }
-    HDF_LOGE("%s:%d activeConfig=%d", __func__, __LINE__, activeConfig);
+    HDF_LOGE("%{public}s:%{public}d activeConfig=%{public}d", __func__, __LINE__, activeConfig);
     dev = UsbRawGetDevice(devHandle);
     if (dev == NULL) {
         printf("%s:%d UsbRawGetDevice failed", __func__, __LINE__);
@@ -236,7 +236,7 @@ static int32_t UsbSpeedGetBulkEndpoint(struct AcmDevice * const acm, const struc
         /* get bulk in endpoint */
         acm->dataInEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
         if (acm->dataInEp == NULL) {
-            HDF_LOGE("%s:%d allocate dataInEp failed", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d allocate dataInEp failed", __func__, __LINE__);
             return HDF_FAILURE;
         }
         acm->dataInEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
@@ -246,7 +246,7 @@ static int32_t UsbSpeedGetBulkEndpoint(struct AcmDevice * const acm, const struc
         /* get bulk out endpoint */
         acm->dataOutEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
         if (acm->dataOutEp == NULL) {
-            HDF_LOGE("%s:%d allocate dataOutEp failed", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d allocate dataOutEp failed", __func__, __LINE__);
             return HDF_FAILURE;
         }
         acm->dataOutEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
@@ -438,12 +438,12 @@ static void AcmTestBulkCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
     if (req == NULL) {
-        HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{pulib}d req is NULL!", __func__, __LINE__);
         return;
     }
     struct AcmDb *db = (struct AcmDb *)req->userData;
     if (db == NULL) {
-        HDF_LOGE("%s:%{pulib}d userData(db) is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{pulib}d userData(db) is NULL!", __func__, __LINE__);
         return;
     }
 
@@ -602,24 +602,24 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
 
     ret = UsbRawInit((struct UsbSession **)&session);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbRawInit failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbRawInit failed", __func__);
         return HDF_FAILURE;
     }
 
     devHandle = UsbRawOpenDevice(session, g_acm->busNum, g_acm->devAddr);
     if (devHandle == NULL) {
-        HDF_LOGE("%s: UsbRawOpenDevice failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbRawOpenDevice failed", __func__);
         return HDF_FAILURE;
     }
     g_acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbGetConfigDescriptor failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbGetConfigDescriptor failed", __func__);
         return HDF_FAILURE;
     }
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbParseConfigDescriptor failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbParseConfigDescriptor failed", __func__);
         return HDF_FAILURE;
     }
     g_acm->dataSize = TEST_LENGTH;
@@ -627,20 +627,20 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
 
     ret = AcmDataBufAlloc(g_acm);
     if (ret < 0) {
-        HDF_LOGE("%s: AcmDataBufAlloc failed\n", __func__);
+        HDF_LOGE("%{public}s: AcmDataBufAlloc failed", __func__);
         AcmDataBufFree(g_acm);
         return HDF_FAILURE;
     }
     ret = UsbAllocDataRequests(g_acm);
     if (ret < 0) {
-        HDF_LOGE("%s: UsbAllocDataRequests failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbAllocDataRequests failed", __func__);
         UsbFreeDataRequests(g_acm);
         return HDF_FAILURE;
     }
 
     ret = UsbStartIo(g_acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbAllocReadRequests failed\n", __func__);
+        HDF_LOGE("%{public}s: UsbAllocReadRequests failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -652,10 +652,10 @@ static void UsbSpeedDdkExit(const struct UsbSession *session)
     int32_t i;
 
     if (UsbStopIo(g_acm) != HDF_SUCCESS) {
-        HDF_LOGE("%s UsbStopIo error!", __func__);
+        HDF_LOGE("%{public}s UsbStopIo error!", __func__);
     }
     if (UsbFreeDataRequests(g_acm) != HDF_SUCCESS) {
-        HDF_LOGE("%s UsbFreeDataRequests error!", __func__);
+        HDF_LOGE("%{public}s UsbFreeDataRequests error!", __func__);
     }
     AcmDataBufFree(g_acm);
     for (i = 0; i < g_acm->interfaceCnt; i++) {
@@ -731,17 +731,17 @@ static int32_t AcmDeviceDispatch(
 {
     (void)reply;
     if (client == NULL) {
-        HDF_LOGE("%s: client is NULL", __func__);
+        HDF_LOGE("%{public}s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%s: client->device is NULL", __func__);
+        HDF_LOGE("%{public}s: client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%s: client->device->service is NULL", __func__);
+        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -764,13 +764,13 @@ static int32_t AcmDeviceDispatch(
 static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
-        HDF_LOGE("%s: device is null", __func__);
+        HDF_LOGE("%{public}s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     g_acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*g_acm));
     if (g_acm == NULL) {
-        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
+        HDF_LOGE("%{public}s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 

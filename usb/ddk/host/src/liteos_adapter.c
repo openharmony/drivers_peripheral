@@ -55,13 +55,13 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 
     mem = RawUsbMemAlloc(newSize);
     if (mem == NULL) {
-        HDF_LOGE("%{public}s:%d", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
         goto OUT;
     }
 
     if (oldSize > 0) {
         if (memmove_s(mem, newSize, ptr, oldSize) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%d", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
             RawUsbMemFree(mem);
             mem = NULL;
             goto OUT;
@@ -268,12 +268,12 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
     size_t allocLen = 0;
     int32_t ret;
     if (dev == NULL) {
-        HDF_LOGE("%{public}s:%d dev is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d dev is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     if ((osDev == NULL) || (osDev->adapterDevice == NULL) || (osDev->adapterDevice->cdesc == NULL)) {
-        HDF_LOGE("%{public}s:%d is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -569,7 +569,7 @@ static int32_t OsSubmitBulkRequestHandleUrb(
     UsbAdapterUrb *urb = NULL;
 
     if (bulkBufferLen == 0) {
-        HDF_LOGE("%{public}s:%d bulkBufferLen can not be zero", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d bulkBufferLen can not be zero", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1156,7 +1156,7 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         return;
     }
     if (RawKillSignal(handle, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%d RawKillSignal failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d RawKillSignal failed", __func__, __LINE__);
     }
     dev = handle->dev;
     if (AdapterAtomicDec(&dev->refcnt)) {
@@ -1387,7 +1387,7 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
     struct Async *as = NULL;
     struct UsbHostRequest *request = NULL;
     if ((devHandle == NULL) || (devHandle->dev == NULL) || (devHandle->dev->privateData == NULL)) {
-        HDF_LOGE("%{public}s:%d invalid parameter", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     dev = devHandle->dev;
@@ -1461,7 +1461,7 @@ int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *handle, UsbRawTidType tid)
         if (osDev != NULL) {
             g_CompleteExit = true;
             OsalSemPost(&osDev->cvWait);
-            HDF_LOGD("%{public}s:%d signal post", __func__, __LINE__);
+            HDF_LOGD("%{public}s:%{public}d signal post", __func__, __LINE__);
             return HDF_SUCCESS;
         } else {
             return HDF_FAILURE;

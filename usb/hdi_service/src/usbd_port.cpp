@@ -119,7 +119,7 @@ int32_t UsbdPort::ReadPortFile(int32_t &powerRole, int32_t &dataRole, int32_t &m
     close(fd);
 
     if (ret < 0) {
-        HDF_LOGE("%{public}s: read error: %s", __func__, path_.c_str());
+        HDF_LOGE("%{public}s: read error: %{public}s", __func__, path_.c_str());
         return HDF_FAILURE;
     }
 

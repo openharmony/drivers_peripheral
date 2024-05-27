@@ -162,25 +162,25 @@ static int32_t OsParseConfigDescriptors(UsbDevice *dev)
     size_t descLen = dev->descriptorsLength - USB_DDK_DT_DEVICE_SIZE;
     for (uint8_t i = 0; i < numConfigs; i++) {
         if (descLen < USB_DDK_DT_CONFIG_SIZE) {
-            HDF_LOGE("%{public}s: read %zu", __func__, descLen);
+            HDF_LOGE("%{public}s: read %{public}zu", __func__, descLen);
             RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         UsbConfigDescriptor *configDesc = reinterpret_cast<UsbConfigDescriptor *>(buffer);
         if ((configDesc->bDescriptorType != USB_DDK_DT_CONFIG) || (configDesc->bLength < USB_DDK_DT_CONFIG_SIZE)) {
-            HDF_LOGE("%{public}s: config desc error: type 0x%02x, length %u", __func__, configDesc->bDescriptorType,
-                configDesc->bLength);
+            HDF_LOGE("%{public}s: config desc error: type 0x%{public}02x, length %{public}u",
+                __func__, configDesc->bDescriptorType, configDesc->bLength);
             RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         uint16_t configLen = LE16_TO_CPU(configDesc->wTotalLength);
         if (configLen < USB_DDK_DT_CONFIG_SIZE) {
-            HDF_LOGE("invalid wTotalLength value %u", configLen);
+            HDF_LOGE("invalid wTotalLength value %{public}u", configLen);
             RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
         if (configLen > descLen) {
-            HDF_LOGI("%{public}s: read %zu/%u", __func__, descLen, configLen);
+            HDF_LOGI("%{public}s: read %{public}zu/%{public}u", __func__, descLen, configLen);
             configLen = static_cast<uint16_t>(descLen);
         }
         dev->configDescriptors[i].desc = configDesc;
@@ -256,7 +256,7 @@ void FuncAdapterCloseDevice(UsbDeviceHandle *handle)
     struct UsbDevice *dev = NULL;
 
     if ((handle == NULL) || (handle->dev == NULL)) {
-        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return;
     }
 

@@ -52,7 +52,7 @@ static void TestWrite(const char *buf)
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
     }
 }
 
@@ -100,7 +100,7 @@ static void Test02(void)
     char str[STR_LEN] = {0};
     char *getStr = NULL;
     if (OsalMutexInit(&g_lock) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         return;
     }
     while (1) {
@@ -120,7 +120,7 @@ static void Test02(void)
             getchar();
             getStr = gets_s(str, STR_LEN - 1);
             if (getStr == NULL) {
-                HDF_LOGE("%s: gets_s failed", __func__);
+                HDF_LOGE("%{public}s: gets_s failed", __func__);
             }
             TestWrite(str);
         } else if (ch == 'q') {
@@ -136,20 +136,20 @@ int32_t AcmTest(int32_t argc, const char *argv[])
     int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSbufObtainDefaultSize();
     g_reply = HdfSbufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
 
@@ -157,7 +157,7 @@ int32_t AcmTest(int32_t argc, const char *argv[])
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }
 

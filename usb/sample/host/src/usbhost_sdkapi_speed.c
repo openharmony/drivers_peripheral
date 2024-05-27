@@ -104,7 +104,7 @@ static int32_t AcmStartDb(struct AcmDevice *acm, struct AcmDb *db, struct UsbPip
     int32_t rc;
     rc = UsbSubmitRequestAsync(db->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d \n", rc);
+        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%{public}d ", rc);
         db->use = 0;
     }
     return rc;
@@ -169,7 +169,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
     db->use = 0;
     if (!g_speedFlag) {
         if (SerialBegin(db->instance) != HDF_SUCCESS) {
-            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+            HDF_LOGW("%{public}s:%{public}d SerialBegin error!", __func__, __LINE__);
         }
         g_send_count++;
     }
@@ -228,7 +228,7 @@ static struct UsbPipeInfo *EnumePipe(
         if ((p.pipeDirection == pipeDirection) && (p.pipeType == pipeType)) {
             struct UsbPipeInfo *pi = OsalMemCalloc(sizeof(*pi));
             if (pi == NULL) {
-                HDF_LOGE("%s: Alloc pipe failed", __func__);
+                HDF_LOGE("%{public}s: Alloc pipe failed", __func__);
                 return NULL;
             }
             p.interfaceId = info->interfaceIndex;
@@ -243,7 +243,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm, UsbPipeType pipe
 {
     uint8_t i;
     if (acm == NULL) {
-        HDF_LOGE("%s: invalid parmas", __func__);
+        HDF_LOGE("%{public}s: invalid parmas", __func__);
         return NULL;
     }
     for (i = 0; i < acm->interfaceCnt; i++) {
@@ -326,7 +326,7 @@ static struct AcmDevice *CheckParam(int32_t argc, const char *argv[])
 
     acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
-        HDF_LOGE("%s: Alloc usb serial device failed", __func__);
+        HDF_LOGE("%{public}s: Alloc usb serial device failed", __func__);
         goto END;
     }
     acm->busNum = busNum;
@@ -341,7 +341,7 @@ static int32_t InitUsbDdk(struct AcmDevice *acm)
 {
     int32_t ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbInitHostSdk failed", __func__);
+        HDF_LOGE("%{public}s: UsbInitHostSdk failed", __func__);
         ret = HDF_ERR_IO;
         goto END;
     }
@@ -354,7 +354,7 @@ static int32_t InitUsbDdk(struct AcmDevice *acm)
         if (acm->iface[i]) {
             acm->devHandle[i] = UsbOpenInterface(acm->iface[i]);
             if (acm->devHandle[i] == NULL) {
-                HDF_LOGE("%s: UsbOpenInterface null", __func__);
+                HDF_LOGE("%{public}s: UsbOpenInterface null", __func__);
             }
         } else {
             ret = HDF_FAILURE;
@@ -372,7 +372,7 @@ static int32_t InitUsbDdk(struct AcmDevice *acm)
 
     acm->dataSize = TEST_LENGTH;
     if (AcmDataBufAlloc(acm) < 0) {
-        HDF_LOGE("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d AcmDataBufAlloc fail", __func__, __LINE__);
     }
 END:
     return ret;
@@ -384,7 +384,7 @@ static int32_t FillRequest(struct AcmDevice * const acm)
         struct AcmDb *snd = &(acm->db[i]);
         snd->request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), 0, acm->dataSize);
         if (snd->request == NULL) {
-            HDF_LOGE("%s:%d snd request fail", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d snd request fail", __func__, __LINE__);
         }
         int32_t rc;
         acm->transmitting++;
@@ -403,7 +403,7 @@ static int32_t FillRequest(struct AcmDevice * const acm)
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
-            HDF_LOGE("%s:UsbFillRequest failed,ret=%d \n", __func__, rc);
+            HDF_LOGE("%{public}s:UsbFillRequest failed,ret=%{public}d ", __func__, rc);
             return rc;
         }
     }
@@ -447,7 +447,7 @@ int32_t main(int32_t argc, char *argv[])
     printf("test SDK API [%s]\n", g_writeOrRead ? "write" : "read");
     for (i = 0; i < TEST_CYCLE; i++) {
         if (SerialBegin(acm) != HDF_SUCCESS) {
-            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+            HDF_LOGW("%{public}s:%{public}d SerialBegin error!", __func__, __LINE__);
         }
         g_send_count++;
     }

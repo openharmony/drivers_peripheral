@@ -131,12 +131,12 @@ static void UsbEcmRxPush(struct UsbEcm *port)
         switch (req->status) {
             case USB_REQUEST_NO_DEVICE:
                 disconnect = true;
-                HDF_LOGV("%s: the device is disconnected", __func__);
+                HDF_LOGV("%{public}s: the device is disconnected", __func__);
                 break;
             case USB_REQUEST_COMPLETED:
                 break;
             default:
-                HDF_LOGV("%s: unexpected status %d", __func__, req->status);
+                HDF_LOGV("%{public}s: unexpected status %{public}d", __func__, req->status);
                 break;
         }
         if (req->actual && req->status == 0) {
@@ -148,7 +148,7 @@ static void UsbEcmRxPush(struct UsbEcm *port)
             }
             uint32_t count = DataFifoWrite(&port->readFifo, data, size);
             if (count != size) {
-                HDF_LOGW("%s: write %u less than expected %u", __func__, count, size);
+                HDF_LOGW("%{public}s: write %{public}u less than expected %{public}u", __func__, count, size);
             }
             OsalMutexUnlock(&port->lockReadFifo);
         }
@@ -196,10 +196,10 @@ static void UsbEcmWriteComplete(uint8_t pipe, struct UsbFnRequest *req)
             UsbEcmStartTx(port);
             break;
         case USB_REQUEST_NO_DEVICE:
-            HDF_LOGV("%s: ecm device was disconnected", __func__);
+            HDF_LOGV("%{public}s: ecm device was disconnected", __func__);
             break;
         default:
-            HDF_LOGV("%s: unexpected status %d", __func__, req->status);
+            HDF_LOGV("%{public}s: unexpected status %{public}d", __func__, req->status);
             break;
     }
     OsalMutexUnlock(&port->lock);
@@ -286,7 +286,7 @@ static int32_t UsbEcmAllocFifo(struct DataFifo *fifo, uint32_t size)
     if (!DataFifoIsInitialized(fifo)) {
         void *data = OsalMemAlloc(size);
         if (data == NULL) {
-            HDF_LOGE("%s: allocate fifo data buffer failed", __func__);
+            HDF_LOGE("%{public}s: allocate fifo data buffer failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
         DataFifoInit(fifo, size, data);
@@ -305,25 +305,25 @@ static int32_t UsbEcmOpen(struct UsbEcm *port)
     OsalMutexLock(&port->lock);
     ret = UsbEcmAllocFifo(&port->writeFifo, WRITE_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbEcmAllocFifo failed", __func__);
+        HDF_LOGE("%{public}s: UsbEcmAllocFifo failed", __func__);
         goto OUT;
     }
     ret = UsbEcmAllocFifo(&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbEcmAllocFifo failed", __func__);
+        HDF_LOGE("%{public}s: UsbEcmAllocFifo failed", __func__);
         goto OUT;
     }
     DataFifoReset(&port->writeFifo);
     DataFifoReset(&port->readFifo);
 
     if (port->refCount++) {
-        HDF_LOGE("%s: refCount failed", __func__);
+        HDF_LOGE("%{public}s: refCount failed", __func__);
         goto OUT;
     }
 
     /* the ecm is enabled, start the io stream */
     if (port->ecm) {
-        HDF_LOGD("%s: start usb io", __func__);
+        HDF_LOGD("%{public}s: start usb io", __func__);
         ret = UsbEcmStartIo(port);
         if (ret != HDF_SUCCESS) {
             goto OUT;
@@ -347,7 +347,7 @@ static int32_t UsbEcmClose(struct UsbEcm *port)
         goto OUT;
     }
 
-    HDF_LOGD("%s: close usb serial", __func__);
+    HDF_LOGD("%{public}s: close usb serial", __func__);
 
     DataFifoReset(&port->writeFifo);
     DataFifoReset(&port->readFifo);
@@ -373,7 +373,7 @@ static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
 
     buf = (uint8_t *)OsalMemCalloc(DataFifoLen(&port->readFifo) + sizeof(uint32_t));
     if (buf == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc error", __func__);
+        HDF_LOGE("%{public}s: OsalMemCalloc error", __func__);
         OsalMutexUnlock(&port->lockReadFifo);
         OsalMutexUnlock(&port->lock);
         return HDF_ERR_MALLOC_FAIL;
@@ -381,7 +381,7 @@ static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
 
     len = DataFifoRead(&port->readFifo, buf, DataFifoLen(&port->readFifo));
     if (len == 0) {
-        HDF_LOGE("%s: no data", __func__);
+        HDF_LOGE("%{public}s: no data", __func__);
         ret = HDF_ERR_IO;
         OsalMutexUnlock(&port->lockReadFifo);
         goto OUT;
@@ -434,7 +434,7 @@ void UsbFnNotifyRequest(struct UsbFnRequest *req, struct UsbEcmDevice *ecm)
     status = UsbFnSubmitRequestAsync(req);
     if (status < 0) {
         ecm->notifyReq = req;
-        HDF_LOGD("notify --> %d\n", status);
+        HDF_LOGD("notify --> %{public}d", status);
     }
 }
 
@@ -466,7 +466,7 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
             event->wLength = 0;
             req->length = sizeof(*event);
 
-            HDF_LOGD("notify connect %s\n", ecm->isOpen ? "true" : "false");
+            HDF_LOGD("notify connect %{public}s", ecm->isOpen ? "true" : "false");
             ecm->notifyState = ECM_NOTIFY_SPEED;
             break;
 
@@ -481,7 +481,7 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
             data[0] = CPU_TO_LE32(EcmBitrate());
             data[1] = data[0];
 
-            HDF_LOGD("notify speed %d\n", EcmBitrate());
+            HDF_LOGD("notify speed %{public}d", EcmBitrate());
             ecm->notifyState = ECM_NOTIFY_NONE;
             break;
 
@@ -501,7 +501,7 @@ static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
     if (req->status == 0) {
         EcmDoNotify(ecm);
     } else {
-        HDF_LOGD("event %d --> %d\n", event->bNotificationType, req->status);
+        HDF_LOGD("event %{public}d --> %{public}d", event->bNotificationType, req->status);
     }
 }
 
@@ -519,21 +519,23 @@ static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRe
             if (length != 0 || index != ecm->ctrlId) {
                 break;
             }
-            HDF_LOGD("packet filter %02x\n", value);
+            HDF_LOGD("packet filter %{public}02x", value);
             ret = 0;
             break;
 
         default:
             HDF_LOGW(
-                "invalid control req%02x.%02x v%04x i%04x l%hu\n", ctrl->reqType, ctrl->request, value, index, length);
+                "invalid control req%{public}02x.%{public}02x v%{public}04x i%{public}04x l%{public}hu",
+                ctrl->reqType, ctrl->request, value, index, length);
     }
 
     if (ret >= 0) {
-        HDF_LOGD("ecm req%02x.%02x v%04x i%04x l%d\n", ctrl->reqType, ctrl->request, value, index, length);
+        HDF_LOGD("ecm req%{public}02x.%{public}02x v%{public}04x i%{public}04x l%{public}d",
+            ctrl->reqType, ctrl->request, value, index, length);
         req->length = (uint32_t)ret;
         ret = UsbFnSubmitRequestSync(req, 0);
         if (ret < 0) {
-            HDF_LOGD("ecm req %02x.%02x response err %d\n", ctrl->reqType, ctrl->request, ret);
+            HDF_LOGD("ecm req %{public}02x.%{public}02x response err %{public}d", ctrl->reqType, ctrl->request, ret);
         }
     }
 
@@ -547,11 +549,11 @@ static int32_t EcmDeviceDispatch(
     struct UsbEcm *port = NULL;
     int32_t ret;
     if (client == NULL || client->device == NULL || client->device->service == NULL) {
-        HDF_LOGE("%s: client is NULL", __func__);
+        HDF_LOGE("%{public}s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
     if (data == NULL || reply == NULL) {
-        HDF_LOGE("%s: data or reply is NULL", __func__);
+        HDF_LOGE("%{public}s: data or reply is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -655,7 +657,7 @@ static int32_t EcmAllocNotifyRequest(struct UsbEcmDevice *ecm)
     ecm->notifyReq =
         UsbFnAllocRequest(ecm->ctrlIface.handle, ecm->notifyPipe.id, sizeof(struct UsbCdcNotification) * USBCDC_LEN);
     if (ecm->notifyReq == NULL) {
-        HDF_LOGE("%s: allocate notify request failed", __func__);
+        HDF_LOGE("%{public}s: allocate notify request failed", __func__);
         return HDF_FAILURE;
     }
     ecm->notifyReq->complete = EcmNotifyComplete;
@@ -669,7 +671,7 @@ static int32_t EcmAllocEp0Request(struct UsbEcmDevice *ecm)
     /* allocate notification request */
     ecm->ep0Req = UsbFnAllocCtrlRequest(ecm->ctrlIface.handle, ECM_STATUS_BYTECOUNT);
     if (ecm->ep0Req == NULL) {
-        HDF_LOGE("%s: allocate ep0Req request failed", __func__);
+        HDF_LOGE("%{public}s: allocate ep0Req request failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -684,7 +686,7 @@ static int32_t EcmParseEachPipe(struct UsbEcmDevice *ecm, struct UsbEcmInterface
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
         int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, (uint8_t)i, &pipeInfo);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: get pipe info error", __func__);
+            HDF_LOGE("%{public}s: get pipe info error", __func__);
             return HDF_FAILURE;
         }
 
@@ -710,7 +712,7 @@ static int32_t EcmParseEachPipe(struct UsbEcmDevice *ecm, struct UsbEcmInterface
                     i--;
                 }
                 repetIdx++;
-                HDF_LOGE("%s: pipe type %{public}d don't support", __func__, pipeInfo.type);
+                HDF_LOGE("%{public}s: pipe type %{public}d don't support", __func__, pipeInfo.type);
                 break;
         }
     }
@@ -724,7 +726,7 @@ static int32_t EcmParseEcmIface(struct UsbEcmDevice *ecm, struct UsbFnInterface 
     struct UsbEcmInterface iface;
     UsbFnInterfaceHandle handle = UsbFnOpenInterface(fnIface);
     if (handle == NULL) {
-        HDF_LOGE("%s: open interface failed", __func__);
+        HDF_LOGE("%{public}s: open interface failed", __func__);
         return HDF_FAILURE;
     }
     iface.fn = fnIface;
@@ -745,7 +747,7 @@ static int32_t EcmParseEachIface(struct UsbEcmDevice *ecm, struct UsbFnDevice *f
     for (i = 0; i < fnDev->numInterfaces; i++) {
         fnIface = (struct UsbFnInterface *)UsbFnGetInterface(fnDev, i);
         if (fnIface == NULL) {
-            HDF_LOGE("%s: get interface failed", __func__);
+            HDF_LOGE("%{public}s: get interface failed", __func__);
             return HDF_FAILURE;
         }
 
@@ -753,7 +755,7 @@ static int32_t EcmParseEachIface(struct UsbEcmDevice *ecm, struct UsbFnDevice *f
             (void)EcmParseEcmIface(ecm, fnIface);
             fnIface = (struct UsbFnInterface *)UsbFnGetInterface(fnDev, i + 1);
             if (fnIface == NULL) {
-                HDF_LOGE("%s: get interface failed", __func__);
+                HDF_LOGE("%{public}s: get interface failed", __func__);
                 return HDF_FAILURE;
             }
             (void)EcmParseEcmIface(ecm, fnIface);
@@ -770,19 +772,19 @@ static int32_t EcmCreateFuncDevice(struct UsbEcmDevice *ecm, struct DeviceResour
     int32_t ret;
 
     if (iface->GetString(ecm->device->property, "udc_name", (const char **)&ecm->udcName, UDC_NAME) != HDF_SUCCESS) {
-        HDF_LOGE("%s: read udc_name failed, use default", __func__);
+        HDF_LOGE("%{public}s: read udc_name failed, use default", __func__);
         return HDF_FAILURE;
     }
 
     fnDev = (struct UsbFnDevice *)UsbFnGetDevice(ecm->udcName);
     if (fnDev == NULL) {
-        HDF_LOGE("%s: create usb function device failed", __func__);
+        HDF_LOGE("%{public}s: create usb function device failed", __func__);
         return HDF_FAILURE;
     }
 
     ret = EcmParseEachIface(ecm, fnDev);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: get pipes failed", __func__);
+        HDF_LOGE("%{public}s: get pipes failed", __func__);
         goto ERR;
     }
 
@@ -800,7 +802,7 @@ static void EcmFreeNotifyRequest(struct UsbEcmDevice *ecm)
     /* free notification request */
     ret = UsbFnFreeRequest(ecm->notifyReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: free notify request failed", __func__);
+        HDF_LOGE("%{public}s: free notify request failed", __func__);
         return;
     }
     ecm->notifyReq = NULL;
@@ -810,7 +812,7 @@ static int32_t EcmReleaseFuncDevice(struct UsbEcmDevice *ecm)
 {
     int32_t ret = HDF_SUCCESS;
     if (ecm->fnDev == NULL) {
-        HDF_LOGE("%s: fnDev is null", __func__);
+        HDF_LOGE("%{public}s: fnDev is null", __func__);
         return HDF_FAILURE;
     }
     (void)UsbFnFreeRequest(ecm->ep0Req);
@@ -827,25 +829,25 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
     port = (struct UsbEcm *)OsalMemCalloc(sizeof(*port));
     if (port == NULL) {
-        HDF_LOGE("%s: Alloc usb serial port failed", __func__);
+        HDF_LOGE("%{public}s: Alloc usb serial port failed", __func__);
         return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         OsalMemFree(port);
         return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lockRW) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         OsalMutexDestroy(&port->lock);
         OsalMemFree(port);
         return HDF_FAILURE;
     }
 
     if (OsalMutexInit(&port->lockReadFifo) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         OsalMutexDestroy(&port->lock);
         OsalMutexDestroy(&port->lockRW);
         OsalMemFree(port);
@@ -853,7 +855,7 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
     }
 
     if (OsalMutexInit(&port->lockWriteFifo) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         OsalMutexDestroy(&port->lock);
         OsalMutexDestroy(&port->lockRW);
         OsalMutexDestroy(&port->lockReadFifo);
@@ -885,19 +887,19 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     struct UsbEcmDevice *ecm = NULL;
 
     if (device == NULL) {
-        HDF_LOGE("%s: device is null", __func__);
+        HDF_LOGE("%{public}s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     ecm = (struct UsbEcmDevice *)OsalMemCalloc(sizeof(*ecm));
     if (ecm == NULL) {
-        HDF_LOGE("%s: Alloc usb ecm device failed", __func__);
+        HDF_LOGE("%{public}s: Alloc usb ecm device failed", __func__);
         return HDF_FAILURE;
     }
     ecm->ctrlId = 0;
     ecm->dataId = 1;
     if (OsalMutexInit(&ecm->lock) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%{public}s: init lock fail!", __func__);
         OsalMemFree(ecm);
         return HDF_FAILURE;
     }
@@ -923,51 +925,51 @@ static int32_t EcmInit(struct HdfDeviceObject *device)
     int32_t ret;
 
     if (device == NULL) {
-        HDF_LOGE("%s: device is null", __func__);
+        HDF_LOGE("%{public}s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     ecm = (struct UsbEcmDevice *)device->service;
     if (ecm == NULL || ecm->initFlag) {
-        HDF_LOGE("%s: ecm is null", __func__);
+        HDF_LOGE("%{public}s: ecm is null", __func__);
         return HDF_FAILURE;
     }
 
     iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL || iface->GetUint32 == NULL) {
-        HDF_LOGE("%s: face is invalid", __func__);
+        HDF_LOGE("%{public}s: face is invalid", __func__);
         return HDF_FAILURE;
     }
 
     ret = EcmCreateFuncDevice(ecm, iface);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmCreateFuncDevice failed", __func__);
+        HDF_LOGE("%{public}s: EcmCreateFuncDevice failed", __func__);
         return ret;
     }
 
     ret = UsbEcmAlloc(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbEcmAlloc failed", __func__);
+        HDF_LOGE("%{public}s: UsbEcmAlloc failed", __func__);
         return ret;
     }
 
     ret = EcmAllocEp0Request(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmAllocEp0Request failed", __func__);
+        HDF_LOGE("%{public}s: EcmAllocEp0Request failed", __func__);
         UsbEcmFree(ecm);
         return ret;
     }
 
     ret = EcmAllocNotifyRequest(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmAllocNotifyRequest failed", __func__);
+        HDF_LOGE("%{public}s: EcmAllocNotifyRequest failed", __func__);
         UsbEcmFree(ecm);
         return ret;
     }
 
     ret = UsbFnStartRecvInterfaceEvent(ecm->ctrlIface.fn, RECEIVE_ALL_EVENTS, UsbEcmEventCallback, ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: register event callback failed", __func__);
+        HDF_LOGE("%{public}s: register event callback failed", __func__);
         UsbEcmFree(ecm);
         return ret;
     }
@@ -980,17 +982,17 @@ static int32_t EcmRelease(struct HdfDeviceObject *device)
     struct UsbEcmDevice *ecm = NULL;
 
     if (device == NULL) {
-        HDF_LOGE("%s: device is NULL", __func__);
+        HDF_LOGE("%{public}s: device is NULL", __func__);
         return HDF_FAILURE;
     }
 
     ecm = (struct UsbEcmDevice *)device->service;
     if (ecm == NULL) {
-        HDF_LOGE("%s: ecm is null", __func__);
+        HDF_LOGE("%{public}s: ecm is null", __func__);
         return HDF_FAILURE;
     }
     if (ecm->initFlag == false) {
-        HDF_LOGE("%s: ecm not init!", __func__);
+        HDF_LOGE("%{public}s: ecm not init!", __func__);
         return HDF_FAILURE;
     }
     (void)EcmReleaseFuncDevice(ecm);
@@ -1005,7 +1007,7 @@ static int32_t EcmRelease(struct HdfDeviceObject *device)
 static int32_t EcmDriverInit(struct HdfDeviceObject *device)
 {
     (void)device;
-    HDF_LOGE("%s: usbfn do nothing...", __func__);
+    HDF_LOGE("%{public}s: usbfn do nothing...", __func__);
     return 0;
 }
 
@@ -1019,7 +1021,7 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
 
     ecm = (struct UsbEcmDevice *)device->service;
     if (ecm == NULL) {
-        HDF_LOGE("%s: ecm is null", __func__);
+        HDF_LOGE("%{public}s: ecm is null", __func__);
         return;
     }
     UsbEcmFree(ecm);
