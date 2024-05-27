@@ -1715,21 +1715,27 @@ static int32_t WpaFillP2pGroupInfoStartedParam(struct P2pGroupStartedParam *grou
     if (ret != HDF_SUCCESS) {
         if (hdiP2pGroupStartedParam->groupIfName != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->groupIfName);
+            hdiP2pGroupStartedParam->groupIfName = NULL;
         }
         if (hdiP2pGroupStartedParam->ssid != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->ssid);
+            hdiP2pGroupStartedParam->ssid = NULL;
         }
         if (hdiP2pGroupStartedParam->psk != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->psk);
+            hdiP2pGroupStartedParam->psk = NULL;
         }
         if (hdiP2pGroupStartedParam->passphrase != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->passphrase);
+            hdiP2pGroupStartedParam->passphrase = NULL;
         }
         if (hdiP2pGroupStartedParam->goDeviceAddress != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->goDeviceAddress);
+            hdiP2pGroupStartedParam->goDeviceAddress = NULL;
         }
         if (hdiP2pGroupStartedParam->goRandomDeviceAddress != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->goRandomDeviceAddress);
+            hdiP2pGroupStartedParam->goRandomDeviceAddress = NULL;
         }
     }
     return ret;
