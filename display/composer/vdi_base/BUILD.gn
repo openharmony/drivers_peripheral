@@ -52,7 +52,6 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   ]
 
   deps = [
-    "libdrm:libdrm",
     "../../buffer/vdi_base:display_buffer_vdi_impl_default",
   ]
   cflags_cc = [
@@ -69,6 +68,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "libdrm:libdrm",
   ]
   install_enable = false
   install_images = [ chipset_base_dir ]

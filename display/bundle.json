@@ -28,11 +28,10 @@
         "drivers_interface_display",
         "graphic_surface",
         "init",
-        "hitrace"
-      ],
-      "third_party": [
+        "hitrace",
         "libdrm"
-      ]
+      ],
+      "third_party": []
     },
     "build": {
       "sub_component": [
