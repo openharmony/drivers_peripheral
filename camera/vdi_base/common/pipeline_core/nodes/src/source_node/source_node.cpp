@@ -202,7 +202,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     collector = std::make_unique<std::thread>([this, &streamId] {
         std::string name = "collect#" + std::to_string(streamId);
         prctl(PR_SET_NAME, name.c_str());
-        CAMERA_LOGI("[ZG]StartCollectBuffers thread start, name = %{public}s", name.c_str());
+        CAMERA_LOGI("StartCollectBuffers thread start, name = %{public}s", name.c_str());
         while (true) {
             {
                 std::unique_lock<std::mutex> l(cltLock);
@@ -213,7 +213,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
             }
             CollectBuffers();
         }
-        CAMERA_LOGI("[ZG]StartCollectBuffers thread end, name = %{public}d", name.c_str());
+        CAMERA_LOGI("StartCollectBuffers thread end, name = %{public}d", name.c_str());
     });
 
     return RC_OK;
@@ -302,7 +302,7 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
         int id = format.streamId_;
         std::string name = "distribute#" + std::to_string(id);
         prctl(PR_SET_NAME, name.c_str());
-        CAMERA_LOGI("[ZG]StartDistributeBuffers thread start, name = %{public}s", name.c_str());
+        CAMERA_LOGI("StartDistributeBuffers thread start, name = %{public}s", name.c_str());
 
         while (true) {
             {
@@ -314,7 +314,7 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
             }
             DistributeBuffers();
         }
-        CAMERA_LOGI("[ZG]StartDistributeBuffers thread end, name = %{public}s", name.c_str());
+        CAMERA_LOGI("StartDistributeBuffers thread end, name = %{public}s", name.c_str());
     });
 
     return RC_OK;

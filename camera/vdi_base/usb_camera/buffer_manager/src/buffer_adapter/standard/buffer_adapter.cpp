@@ -41,7 +41,7 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
     buffer->SetVirAddress(surfaceBuffer->GetVirAddr());
     buffer->SetSuffaceBufferAddr(surfaceBuffer->GetVirAddr());
     buffer->SetSuffaceBufferSize(static_cast<uint32_t>(bufHandle->size));
-    CAMERA_LOGD("[ZG]SurfaceBufferToCameraBuffer");
+    CAMERA_LOGD("SurfaceBufferToCameraBuffer");
 
     return RC_OK;
 }
