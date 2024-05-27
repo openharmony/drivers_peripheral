@@ -52,7 +52,7 @@ static void AcmWriteBulk(struct UsbRequest *req)
     int32_t status;
 
     if (req == nullptr) {
-        HDF_LOGE("%s:%d req is nullptr!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d req is nullptr!", __func__, __LINE__);
         return;
     }
 
@@ -95,7 +95,7 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
     if (req == nullptr) {
-        HDF_LOGE("%s:%d req is nullptr!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d req is nullptr!", __func__, __LINE__);
         return;
     }
     int32_t status = req->compInfo.status;

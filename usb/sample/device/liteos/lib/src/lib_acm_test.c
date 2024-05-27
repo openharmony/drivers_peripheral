@@ -44,11 +44,11 @@ struct HdfIoService *g_acmService;
 static int32_t check_service()
 {
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -59,17 +59,17 @@ void AcmOpen(void)
     int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     g_data = HdfSbufObtainDefaultSize();
     g_reply = HdfSbufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
     }
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
     }
 }
 
@@ -77,12 +77,12 @@ void AcmClose(void)
 {
     int32_t status;
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
     HdfSbufRecycle(g_data);
     HdfSbufRecycle(g_reply);
@@ -92,14 +92,14 @@ void AcmClose(void)
 void AcmWrite(const char *buf)
 {
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
         return;
     }
     printf("AcmWrite:%s\n", buf);
@@ -110,21 +110,21 @@ void AcmRead(char * const str, int32_t timeout)
     int32_t ret;
     uint32_t maxLen = 256;
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     while (timeout-- > 0) {
         HdfSbufFlush(g_reply);
         int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
         if (status != HDF_SUCCESS) {
-            HDF_LOGE("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
+            HDF_LOGE("%{public}s: Dispatch USB_SERIAL_READ failed status = %{public}d", __func__, status);
             return;
         }
         const char *tmp = HdfSbufReadString(g_reply);
         if (str && tmp && strlen(tmp) > 0) {
             ret = memcpy_s(str, maxLen, tmp, strlen(tmp));
             if (ret != EOK) {
-                HDF_LOGE("%s:%d ret=%d memcpy_s error", __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%{public}d ret=%{public}d memcpy_s error", __func__, __LINE__, ret);
             }
             printf("AcmRead:%s\n", tmp);
             return;
@@ -136,7 +136,7 @@ void AcmRead(char * const str, int32_t timeout)
 void acm_prop_regist(const char *propName, const char *propValue)
 {
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     HdfSbufFlush(g_data);
@@ -144,7 +144,7 @@ void acm_prop_regist(const char *propName, const char *propValue)
     (void)HdfSbufWriteString(g_data, propValue);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_REGIST_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
         return;
     }
     printf("prop_regist:%s = %s\n", propName, propValue);
@@ -153,7 +153,7 @@ void acm_prop_regist(const char *propName, const char *propValue)
 void acm_prop_write(const char *propName, const char *propValue)
 {
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     HdfSbufFlush(g_data);
@@ -161,12 +161,12 @@ void acm_prop_write(const char *propName, const char *propValue)
     (void)HdfSbufWriteString(g_data, propName);
     (void)HdfSbufWriteString(g_data, propValue);
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_SET_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
         return;
     }
     printf("prop_write:%s = %s\n", propName, propValue);
@@ -175,7 +175,7 @@ void acm_prop_write(const char *propName, const char *propValue)
 void acm_prop_read(const char *propName, char *propValue)
 {
     if (check_service()) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return;
     }
     HdfSbufFlush(g_data);
@@ -183,7 +183,8 @@ void acm_prop_read(const char *propName, char *propValue)
     (void)HdfSbufWriteString(g_data, propName);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_GET_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d Dispatch USB_SERIAL_GET_PROP failed status = %d", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d Dispatch USB_SERIAL_GET_PROP failed status = %{public}d",
+            __func__, __LINE__, status);
         return;
     }
     const char *tmp = HdfSbufReadString(g_reply);
@@ -191,7 +192,7 @@ void acm_prop_read(const char *propName, char *propValue)
         uint32_t maxLen = 256;
         errno_t err = memcpy_s(propValue, maxLen, tmp, strlen(tmp));
         if (err != EOK) {
-            HDF_LOGE("%s:%d err=%d memcpy_s error", __func__, __LINE__, err);
+            HDF_LOGE("%{public}s:%{public}d err=%{public}d memcpy_s error", __func__, __LINE__, err);
         }
         printf("prop_read:%s\n", tmp);
         return;
