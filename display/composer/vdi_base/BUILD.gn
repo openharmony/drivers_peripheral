@@ -51,9 +51,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
     "${root_path}/drivers/interface/display/composer/hdifd_parcelable",
   ]
 
-  deps = [
-    "../../buffer/vdi_base:display_buffer_vdi_impl_default",
-  ]
+  deps = [ "../../buffer/vdi_base:display_buffer_vdi_impl_default" ]
   cflags_cc = [
     "-Wno-error=unused-function",
     "-Wno-error=missing-braces",

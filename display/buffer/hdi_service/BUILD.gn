@@ -103,7 +103,7 @@ ohos_shared_library("libmapper_service_1.2") {
   ]
   sources = [
     "src/mapper_service.cpp",
-    "src/mapper_service_1_2.cpp"
+    "src/mapper_service_1_2.cpp",
   ]
 
   external_deps = [

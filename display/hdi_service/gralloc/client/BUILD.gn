@@ -47,13 +47,13 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_display:libdisplay_gralloc",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdi",
         "hdf_core:libpub_utils",
         "hilog:libhilog",
         "ipc:ipc_single",
-        "drivers_interface_display:libdisplay_gralloc",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
