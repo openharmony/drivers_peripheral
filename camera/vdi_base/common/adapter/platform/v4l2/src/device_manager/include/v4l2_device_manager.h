@@ -20,6 +20,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <mutex>
 #include "create_devicemanager_factory.h"
 #include "icontroller.h"
 #include "idevice_manager.h"
@@ -151,6 +152,7 @@ private:
     std::shared_ptr<EnumeratorManager> enumeratorManager_;
     std::vector<HardwareConfiguration> hardwareList_;
     std::vector<std::shared_ptr<IManager>> managerList_;
+    std::mutex mtx_;
 };
 } // namespace OHOS::Camera
 #endif
