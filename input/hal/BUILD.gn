@@ -37,7 +37,7 @@ if (defined(ohos_lite)) {
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
-      "FreeBSD:libfreebsd",
+      "FreeBSD:libfreebsd_input",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
@@ -90,14 +90,14 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
     if (is_standard_system) {
       external_deps = [
-        "FreeBSD:libfreebsd",
+        "FreeBSD:libfreebsd_input",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
     } else {
       external_deps = [
-        "FreeBSD:libfreebsd",
+        "FreeBSD:libfreebsd_input",
         "hilog:libhilog",
       ]
     }
