@@ -189,7 +189,6 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     } else {
         prev->next = info->next;
     }
-    info->next = NULL;
     HDF_LOGI("Remove interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
     free(info);
     info = NULL;
