@@ -44,20 +44,20 @@ static int32_t DispatcherInit(void)
 {
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
-        HDF_LOGE("%s: HDIServiceManagerGet err", __func__);
+        HDF_LOGE("%{public}s: HDIServiceManagerGet err", __func__);
         return HDF_FAILURE;
     }
     g_acmService = servmgr->GetService(servmgr, ACM_SERVICE_NAME);
     HDIServiceManagerRelease(servmgr);
     if (g_acmService == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSbufTypedObtain(SBUF_IPC);
     g_reply = HdfSbufTypedObtain(SBUF_IPC);
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -74,20 +74,20 @@ static int32_t TestPropGet(const char *propName)
     int32_t status = -1;
     const char *propVal = NULL;
     if (!HdfSbufWriteString(g_data, propName)) {
-        HDF_LOGE("%s:failed to write result", __func__);
+        HDF_LOGE("%{public}s:failed to write result", __func__);
         goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_GET_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_GET_PROP failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_GET_PROP failed status = %{public}d", __func__, status);
         goto FAIL;
     }
     propVal = HdfSbufReadString(g_reply);
     if (propVal == NULL) {
-        HDF_LOGE("%s:failed to write result", __func__);
+        HDF_LOGE("%{public}s:failed to write result", __func__);
         goto FAIL;
     }
-    HDF_LOGE("%s: %s = %s\n", __func__, propName, propVal);
+    HDF_LOGE("%{public}s: %{public}s = %{public}s", __func__, propName, propVal);
 
 FAIL:
     return status;
@@ -97,16 +97,16 @@ static int32_t TestPropSet(const char *propName, const char *propValue)
 {
     int32_t status = -1;
     if (!HdfSbufWriteString(g_data, propName)) {
-        HDF_LOGE("%s:failed to write propName : %s", __func__, propName);
+        HDF_LOGE("%{public}s:failed to write propName : %{public}s", __func__, propName);
         goto FAIL;
     }
     if (!HdfSbufWriteString(g_data, propValue)) {
-        HDF_LOGE("%s:failed to write propValue : %s", __func__, propValue);
+        HDF_LOGE("%{public}s:failed to write propValue : %{public}s", __func__, propValue);
         goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_SET_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_SET_PROP failed", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_SET_PROP failed", __func__);
     }
 FAIL:
     return status;
@@ -118,25 +118,25 @@ static int32_t TestPropRegist(const char *propName, const char *propValue)
 
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(g_data, propName)) {
-        HDF_LOGE("%s:failed to write propName : %s", __func__, propName);
+        HDF_LOGE("%{public}s:failed to write propName : %{public}s", __func__, propName);
         goto FAIL;
     }
     if (!HdfSbufWriteString(g_data, propValue)) {
-        HDF_LOGE("%s:failed to write propValue : %s", __func__, propValue);
+        HDF_LOGE("%{public}s:failed to write propValue : %{public}s", __func__, propValue);
         goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_REGIST_PROP, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_SET_PROP failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_SET_PROP failed status = %{public}d", __func__, status);
     }
 FAIL:
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }
 
@@ -189,7 +189,7 @@ int32_t PropTest(int32_t argc, const char *argv[])
     }
     DispatcherDeInit();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: ret is not success", __func__);
+        HDF_LOGE("%{public}s: ret is not success", __func__);
         return HDF_FAILURE;
     }
     return 0;

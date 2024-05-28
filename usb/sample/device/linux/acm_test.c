@@ -50,7 +50,7 @@ static void TestWrite(char *buf)
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
     }
 }
 
@@ -104,13 +104,13 @@ static int32_t StartThreadRead(void)
 
     ret = OsalThreadCreate(&g_thread, (OsalThreadEntry)ReadThread, NULL);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_thread, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
     return 0;
@@ -143,7 +143,7 @@ static void StopAcmTest(int32_t signo)
     g_running = 0;
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &g_orgOpts);
     printf("AcmTest exit.\n");
@@ -156,13 +156,13 @@ int32_t AcmTest(int32_t argc, const char *argv[])
     int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
-        HDF_LOGE("%s: HDIServiceManagerGet err", __func__);
+        HDF_LOGE("%{public}s: HDIServiceManagerGet err", __func__);
         return HDF_FAILURE;
     }
     g_acmService = servmgr->GetService(servmgr, "usbfn_cdcacm");
     HDIServiceManagerRelease(servmgr);
     if (g_acmService == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
@@ -174,7 +174,7 @@ int32_t AcmTest(int32_t argc, const char *argv[])
     g_data = HdfSbufTypedObtain(SBUF_IPC);
     g_reply = HdfSbufTypedObtain(SBUF_IPC);
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
+        HDF_LOGE("%{public}s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
@@ -185,7 +185,7 @@ int32_t AcmTest(int32_t argc, const char *argv[])
 
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
     printf("Press any key to send.\n");

@@ -36,7 +36,7 @@ static void TestWrite(char *buf)
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
     }
 }
 
@@ -46,7 +46,7 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
 {
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
-        HDF_LOGE("%s: HDIServiceManagerGet err", __func__);
+        HDF_LOGE("%{public}s: HDIServiceManagerGet err", __func__);
         return HDF_FAILURE;
     }
     g_acmService = servmgr->GetService(servmgr, "usbfn_cdcacm");
@@ -72,12 +72,12 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
         status = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, send data[%s] to host\n", time.tv_sec,
             time.tv_usec, argv[1]);
         if (status < 0) {
-            HDF_LOGE("%s: snprintf_s failed", __func__);
+            HDF_LOGE("%{public}s: snprintf_s failed", __func__);
             return HDF_FAILURE;
         }
         FILE *fp = fopen("/data/acm_write_xts", "a+");
         if (fp == NULL) {
-            HDF_LOGE("%s: fopen failed", __func__);
+            HDF_LOGE("%{public}s: fopen failed", __func__);
             return HDF_FAILURE;
         }
         (void)fwrite(str, strlen(str), 1, fp);
@@ -86,7 +86,7 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }
 
