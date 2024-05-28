@@ -141,7 +141,7 @@ void UsbRawSdkIfTest::TearDownTestCase()
 {
     g_acm = &g_deviceService;
     if (UsbStopIo(g_acm) != HDF_SUCCESS) {
-        HDF_LOGW("%s:%d UsbStopIo error!", __func__, __LINE__);
+        HDF_LOGW("%{public}s:%{public}d UsbStopIo error!", __func__, __LINE__);
     }
 }
 

@@ -32,19 +32,19 @@ int32_t main(int32_t argc, const char *argv[])
 {
     g_usbInterface = IUsbInterface::Get();
     if (g_usbInterface == nullptr) {
-        HDF_LOGE("%s:IUsbInterface::Get() failed\n", __func__);
+        HDF_LOGE("%{public}s:IUsbInterface::Get() failed", __func__);
         return HDF_FAILURE;
     }
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    HDF_LOGI("%s: bind usbd subscriber\n", __func__);
+    HDF_LOGI("%{public}s: bind usbd subscriber", __func__);
     if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%s: bind usbd subscriber failed\n", __func__);
+        HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
         return HDF_FAILURE;
     }
     OsalSleep(BIND_TIME);
-    HDF_LOGI("%s: unbind usbd subscriber\n", __func__);
+    HDF_LOGI("%{public}s: unbind usbd subscriber", __func__);
     if (g_usbInterface->UnbindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGE("%s: unbind usbd subscriber failed\n", __func__);
+        HDF_LOGE("%{public}s: unbind usbd subscriber failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

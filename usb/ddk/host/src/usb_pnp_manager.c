@@ -53,7 +53,7 @@ static int32_t UsbPnpManagerDispatch(
     (void)data;
     (void)reply;
 
-    HDF_LOGI("received cmd = %d", cmd);
+    HDF_LOGI("received cmd = %{public}d", cmd);
     return HDF_SUCCESS;
 }
 
