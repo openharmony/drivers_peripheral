@@ -1747,10 +1747,9 @@ void StoreFile(const unsigned char *bufStart, const uint32_t size, const char* s
     int fd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
     if (fd < 0) {
         CAMERA_LOGE("demo test:StoreFile open %s %{public}s failed", path, strerror(errno));
+        return;
     }
-    int ret = 0;
-
-    ret = write(fd, bufStart, size);
+    int ret = write(fd, bufStart, size);
     if (ret == -1) {
         CAMERA_LOGE("demo test:StoreFile write video file error %{public}s.....\n", strerror(errno));
     }
@@ -1856,7 +1855,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0055)
     streamInfo.dataspace_ = 8; // 8:picture dataspace
     streamInfo.intent_ = VIDEO;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
+    streamInfo.bufferQueue_ = new(std::nothrow) BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
     ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
     streamInfos.push_back(streamInfo);
