@@ -59,7 +59,7 @@ if (drivers_peripheral_input_feature_udriver) {
     part_name = "drivers_peripheral_input"
   }
 } else {
-  ohos_shared_library("hdi_input_udriver") {
+  group("hdi_input_udriver_group") {
     deps = []
   }
 }
