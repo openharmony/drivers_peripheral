@@ -148,7 +148,6 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         return -1;
     }
     HDF_LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
-    pthread_mutex_lock(&g_mutex);
     info->next = p->ifaces;
     p->ifaces = info;
     pthread_mutex_unlock(&g_mutex);
@@ -185,7 +184,6 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
         pthread_mutex_unlock(&g_mutex);
         return -1;
     }
-    pthread_mutex_lock(&g_mutex);
     if (prev == NULL) {
         p->ifaces = info->next;
     } else {
