@@ -109,27 +109,31 @@ static void WpaCliClose(WifiWpaInterface *p)
 
 static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, bool isWpaAdd)
 {
+    pthread_mutex_lock(&g_mutex);
+
     HDF_LOGI("enter WpaCliAddIface");
     if (p == NULL || argv == NULL) {
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     WpaIfaceInfo *info = p->ifaces;
-    pthread_mutex_lock(&g_mutex);
     while (info != NULL) {
         if (strncmp(info->name, argv->name, MAX_IFACE_LEN) == 0) {
+            pthread_mutex_unlock(&g_mutex);
             return 0;
         }
         info = info->next;
     }
-    pthread_mutex_unlock(&g_mutex);
     info = (WpaIfaceInfo *)calloc(1, sizeof(WpaIfaceInfo));
     if (info == NULL) {
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     if (strcpy_s(info->name, sizeof(info->name), argv->name) != 0) {
         HDF_LOGI("WpaCliAddIface strcpy_s fail");
         free(info);
         info = NULL;
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     char cmd[WPA_CMD_BUF_LEN] = {0};
@@ -140,6 +144,7 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         free(info);
         info = NULL;
         HDF_LOGI("WpaCliAddIface failed, cmd: %{public}s, buf: %{public}s", cmd, buf);
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     HDF_LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
@@ -152,13 +157,15 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
 
 static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
 {
+    pthread_mutex_lock(&g_mutex);
+
     HDF_LOGI("enter WpaCliRemoveIface.");
     if (p == NULL || name == NULL) {
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     WpaIfaceInfo *prev = NULL;
     WpaIfaceInfo *info = p->ifaces;
-    pthread_mutex_lock(&g_mutex);
     while (info != NULL) {
         if (strncmp(info->name, name, MAX_IFACE_LEN) == 0) {
             break;
@@ -166,15 +173,16 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
         prev = info;
         info = info->next;
     }
-    pthread_mutex_unlock(&g_mutex);
     if (info == NULL) {
         HDF_LOGI("the WpaInterface info is null");
+        pthread_mutex_unlock(&g_mutex);
         return 0;
     }
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_REMOVE %s", name) < 0 ||
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        pthread_mutex_unlock(&g_mutex);
         return -1;
     }
     pthread_mutex_lock(&g_mutex);
@@ -231,6 +239,7 @@ WifiWpaInterface *GetWifiWpaGlobalInterface(void)
 void ReleaseWpaGlobalInterface(void)
 {
     pthread_mutex_lock(&g_mutex);
+
     HDF_LOGI("enter ReleaseWpaGlobalInterface.");
     if (g_wpaInterface == NULL) {
         pthread_mutex_unlock(&g_mutex);
