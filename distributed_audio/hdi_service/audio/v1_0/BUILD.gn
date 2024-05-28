@@ -22,7 +22,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "${hdf_service_path}/hdi_service/common/utils/include",
   ]
 
-  if (distributed_audio_extension) {
+  if (drivers_peripheral_distributed_audio_extension) {
     include_dirs +=
         [ "${distributedaudio_ext_path}/hdf_service_extension/include/" ]
   }
@@ -34,7 +34,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "./src/audio_render_interface_impl.cpp",
   ]
 
-  if (distributed_audio_extension) {
+  if (drivers_peripheral_distributed_audio_extension) {
     sources += [
       "${distributedaudio_ext_path}/hdf_service_extension/src/audio_capture_ext_impl.cpp",
       "${distributedaudio_ext_path}/hdf_service_extension/src/audio_render_ext_impl.cpp",
@@ -55,7 +55,7 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "samgr:samgr_proxy",
   ]
 
-  if (distributed_audio_extension) {
+  if (drivers_peripheral_distributed_audio_extension) {
     cflags = [ "-DDAUDIO_SUPPORT_EXTENSION" ]
   }
 

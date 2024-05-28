@@ -37,6 +37,7 @@ using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 
 constexpr uint32_t DURATION_FRAMES = 100;
+constexpr uint32_t DURATION_FRAMES_MINUS = 99;
 constexpr uint32_t CUR_FRAME_INIT_VALUE = 0;
 
 class AudioRenderInterfaceImpl : public AudioRenderInterfaceImplBase {

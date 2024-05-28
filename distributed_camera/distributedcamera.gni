@@ -16,5 +16,5 @@ distributedcamera_hdf_path = "//drivers/peripheral/distributed_camera"
 camera_hdf_path = "//drivers/peripheral"
 
 declare_args() {
-  dcamera_driver_common = true
+  drivers_peripheral_distributed_camera_extension = true
 }

@@ -25,5 +25,5 @@ distributedaudio_fuzz_path = "distributed_audio/distributed_audio"
 build_flags = [ "-Werror" ]
 
 declare_args() {
-  distributed_audio_extension = false
+  drivers_peripheral_distributed_audio_extension = false
 }
