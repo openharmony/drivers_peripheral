@@ -349,7 +349,7 @@ void AudioReleaseRenderHandle(struct AudioHwRender *hwRender)
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
-    HDF_LOGI("%s", __func__);
+    HDF_LOGD("%s", __func__);
     if (hwAdapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
         HDF_LOGE("Pointer is null!");
         return HDF_FAILURE;
