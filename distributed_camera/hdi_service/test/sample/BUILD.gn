@@ -41,7 +41,7 @@ ohos_executable("dcamera_hdf_demo") {
     "-Wall",
   ]
 
-  if (!dcamera_driver_common) {
+  if (!drivers_peripheral_distributed_camera_extension) {
     cflags += [ "-DDCAMERA_DRIVER_YUV" ]
   }
 
