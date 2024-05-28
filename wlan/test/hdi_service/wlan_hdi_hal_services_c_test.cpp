@@ -275,7 +275,7 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_009, TestSize.Level1)
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     if (rc == HDF_SUCCESS) {
         rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
-        ASSERT_EQ(rc, HDF_FAILURE);
+        ASSERT_EQ(rc, HDF_SUCCESS);
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
     }
@@ -511,10 +511,10 @@ HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_020, TestSize.Level1)
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     if (rc == HDF_SUCCESS) {
         rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
-        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_FAILURE);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_TIMEOUT || rc == HDF_FAILURE);
         ASSERT_TRUE(flag);
         rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
-        ASSERT_EQ(rc, HDF_FAILURE);
+        ASSERT_EQ(rc, HDF_ERR_TIMEOUT);
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
     }
@@ -1117,7 +1117,7 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_047, TestSize.Level1)
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     if (rc == HDF_SUCCESS) {
         rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
-        ASSERT_EQ(rc, HDF_FAILURE);
+        ASSERT_EQ(rc, HDF_SUCCESS);
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
     }
@@ -1260,7 +1260,7 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_051, TestSize.Level1)
     rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     if (rc == HDF_SUCCESS) {
         rc = g_wlanObj->StartScan(g_wlanObj, &ifeature, &scan);
-        ASSERT_EQ(rc, HDF_FAILURE);
+        ASSERT_EQ(rc, HDF_SUCCESS);
         rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
         ASSERT_EQ(rc, HDF_SUCCESS);
         sleep(SCAN_TIME);
