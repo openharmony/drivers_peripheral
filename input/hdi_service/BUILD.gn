@@ -34,7 +34,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "FreeBSD:libfreebsd",
+      "FreeBSD:libfreebsd_input",
       "c_utils:utils",
       "drivers_interface_input:input_idl_headers",
       "hdf_core:libhdf_utils",
@@ -43,7 +43,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     ]
   } else {
     external_deps = [
-      "FreeBSD:libfreebsd",
+      "FreeBSD:libfreebsd_input",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
