@@ -36,7 +36,6 @@ namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
 using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
-const int32_t MAX_CALLBACK_SIZE = 1;
 LocationCallBackMap g_locationCallBackMap;
 GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
 GnssConfigParameter g_configPara;
@@ -245,10 +244,6 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:invalid remote", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_locationCallBackMap.size() >= MAX_CALLBACK_SIZE) {
-        HDF_LOGE("%{public}s:gnss has been enabled already", __func__);
-        return HDF_SUCCESS;
-    }
     static GnssCallbackStruct gnssCallback;
     GetGnssCallbackMethods(&gnssCallback);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
@@ -271,7 +266,16 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
     } else {
         HDF_LOGE("%{public}s:can not get gnssNiInterface.", __func__);
     }
-
+    
+    if (g_locationCallBackMap.size() > 0) {
+        for (const auto& iter : g_locationCallBackMap) {
+            const auto& callback = iter.second;
+            if (callback != nullptr) {
+                RemoveGnssDeathRecipient(callback);
+            }
+        }
+        g_locationCallBackMap.clear();
+    }
     AddGnssDeathRecipient(callbackObj);
     g_locationCallBackMap[remote.GetRefPtr()] = callbackObj;
     return ret;
