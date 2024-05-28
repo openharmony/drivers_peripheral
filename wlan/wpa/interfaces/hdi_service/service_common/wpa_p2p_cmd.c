@@ -1504,21 +1504,27 @@ static int32_t WpaFillP2pDeviceFoundParam(struct P2pDeviceInfoParam *deviceInfoP
     if (ret != HDF_SUCCESS) {
         if (hdiP2pDeviceInfoParam->srcAddress != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->srcAddress);
+            hdiP2pDeviceInfoParam->srcAddress = NULL;
         }
         if (hdiP2pDeviceInfoParam->p2pDeviceAddress != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->p2pDeviceAddress);
+            hdiP2pDeviceInfoParam->p2pDeviceAddress = NULL;
         }
         if (hdiP2pDeviceInfoParam->primaryDeviceType != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->primaryDeviceType);
+            hdiP2pDeviceInfoParam->primaryDeviceType = NULL;
         }
         if (hdiP2pDeviceInfoParam->deviceName != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->deviceName);
+            hdiP2pDeviceInfoParam->deviceName = NULL;
         }
         if (hdiP2pDeviceInfoParam->wfdDeviceInfo != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->wfdDeviceInfo);
+            hdiP2pDeviceInfoParam->wfdDeviceInfo = NULL;
         }
         if (hdiP2pDeviceInfoParam->operSsid != NULL) {
             OsalMemFree(hdiP2pDeviceInfoParam->operSsid);
+            hdiP2pDeviceInfoParam->operSsid = NULL;
         }
     }
     return ret;
@@ -1542,6 +1548,7 @@ static int32_t WpaFillP2pDeviceLostParam(struct P2pDeviceLostParam  *deviceLostP
     if (ret != HDF_SUCCESS) {
         if (hdiP2pDeviceLostParam->p2pDeviceAddress != NULL) {
             OsalMemFree(hdiP2pDeviceLostParam->p2pDeviceAddress);
+            hdiP2pDeviceLostParam->p2pDeviceAddress = NULL;
         }
     }
     return ret;
@@ -1565,6 +1572,7 @@ static int32_t WpaFillP2pGoNegotiationRequestParam(struct P2pGoNegotiationReques
     if (ret != HDF_SUCCESS) {
         if (hdiP2pGoNegotiationRequestParam->srcAddress != NULL) {
             OsalMemFree(hdiP2pGoNegotiationRequestParam->srcAddress);
+            hdiP2pGoNegotiationRequestParam->srcAddress = NULL;
         }
     }
     return ret;
@@ -1618,12 +1626,15 @@ static int32_t WpaFillP2pInvitationReceivedParam(struct P2pInvitationReceivedPar
     if (ret != HDF_SUCCESS) {
         if (hdiP2pInvitationReceivedParam->srcAddress != NULL) {
             OsalMemFree(hdiP2pInvitationReceivedParam->srcAddress);
+            hdiP2pInvitationReceivedParam->srcAddress = NULL;
         }
         if (hdiP2pInvitationReceivedParam->goDeviceAddress != NULL) {
             OsalMemFree(hdiP2pInvitationReceivedParam->goDeviceAddress);
+            hdiP2pInvitationReceivedParam->goDeviceAddress = NULL;
         }
         if (hdiP2pInvitationReceivedParam->bssid != NULL) {
             OsalMemFree(hdiP2pInvitationReceivedParam->bssid);
+            hdiP2pInvitationReceivedParam->bssid = NULL;
         }
     }
     return ret;
@@ -1647,6 +1658,7 @@ static int32_t WpaFillP2pInvitationResultParam(struct P2pInvitationResultParam *
     if (ret != HDF_SUCCESS) {
         if (hdiP2pInvitationResultParam->bssid != NULL) {
             OsalMemFree(hdiP2pInvitationResultParam->bssid);
+            hdiP2pInvitationResultParam->bssid = NULL;
         }
     }
     return ret;
@@ -1699,18 +1711,23 @@ static int32_t WpaFillP2pGroupStartedParam(struct P2pGroupStartedParam *groupSta
     if (ret != HDF_SUCCESS) {
         if (hdiP2pGroupStartedParam->groupIfName != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->groupIfName);
+            hdiP2pGroupStartedParam->groupIfName = NULL;
         }
         if (hdiP2pGroupStartedParam->ssid != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->ssid);
+            hdiP2pGroupStartedParam->ssid = NULL;
         }
         if (hdiP2pGroupStartedParam->psk != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->psk);
+            hdiP2pGroupStartedParam->psk = NULL;
         }
         if (hdiP2pGroupStartedParam->passphrase != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->passphrase);
+            hdiP2pGroupStartedParam->passphrase = NULL;
         }
         if (hdiP2pGroupStartedParam->goDeviceAddress != NULL) {
             OsalMemFree(hdiP2pGroupStartedParam->goDeviceAddress);
+            hdiP2pGroupStartedParam->goDeviceAddress = NULL;
         }
     }
     return ret;
@@ -1734,6 +1751,7 @@ static int32_t WpaFillP2pGroupRemovedParam(struct P2pGroupRemovedParam *groupRem
     if (ret != HDF_SUCCESS) {
         if (hdiP2pGroupRemovedParam->groupIfName != NULL) {
             OsalMemFree(hdiP2pGroupRemovedParam->groupIfName);
+            hdiP2pGroupRemovedParam->groupIfName = NULL;
         }
     }
     return ret;
@@ -1772,9 +1790,11 @@ static int32_t WpaFillP2pProvisionDiscoveryCompletedParam(struct P2pProvisionDis
     if (ret != HDF_SUCCESS) {
         if (hdiP2pProvisionDiscoveryCompletedParam->p2pDeviceAddress != NULL) {
             OsalMemFree(hdiP2pProvisionDiscoveryCompletedParam->p2pDeviceAddress);
+            hdiP2pProvisionDiscoveryCompletedParam->p2pDeviceAddress = NULL;
         }
         if (hdiP2pProvisionDiscoveryCompletedParam->generatedPin != NULL) {
             OsalMemFree(hdiP2pProvisionDiscoveryCompletedParam->generatedPin);
+            hdiP2pProvisionDiscoveryCompletedParam->generatedPin = NULL;
         }
     }
     return ret;
@@ -1809,9 +1829,11 @@ static int32_t WpaFillP2pServDiscReqParam(struct P2pServDiscReqInfoParam *servDi
     if (ret != HDF_SUCCESS) {
         if (hdiP2pServDiscReqInfo->mac != NULL) {
             OsalMemFree(hdiP2pServDiscReqInfo->mac);
+            hdiP2pServDiscReqInfo->mac = NULL;
         }
         if (hdiP2pServDiscReqInfo->tlvs != NULL) {
             OsalMemFree(hdiP2pServDiscReqInfo->tlvs);
+            hdiP2pServDiscReqInfo->tlvs = NULL;
         }
     }
     return ret;
@@ -1844,9 +1866,11 @@ static int32_t WpaFillP2pServDiscRespParam(struct P2pServDiscRespParam *servDisc
     if (ret != HDF_SUCCESS) {
         if (hdiP2pServDiscRespParam->srcAddress != NULL) {
             OsalMemFree(hdiP2pServDiscRespParam->srcAddress);
+            hdiP2pServDiscRespParam->srcAddress = NULL;
         }
         if (hdiP2pServDiscRespParam->tlvs != NULL) {
             OsalMemFree(hdiP2pServDiscRespParam->tlvs);
+            hdiP2pServDiscRespParam->tlvs = NULL;
         }
     }
     return ret;
@@ -1878,9 +1902,11 @@ static int32_t WpaFillP2pStaConnectStateParam(struct P2pStaConnectStateParam *st
     if (ret != HDF_SUCCESS) {
         if (hdiP2pStaConnectStateParam->srcAddress != NULL) {
             OsalMemFree(hdiP2pStaConnectStateParam->srcAddress);
+            hdiP2pStaConnectStateParam->srcAddress = NULL;
         }
         if (hdiP2pStaConnectStateParam->p2pDeviceAddress != NULL) {
             OsalMemFree(hdiP2pStaConnectStateParam->p2pDeviceAddress);
+            hdiP2pStaConnectStateParam->p2pDeviceAddress = NULL;
         }
     }
     return ret;
@@ -2019,6 +2045,7 @@ int32_t ProcessEventP2pInvitationResult(struct HdfWpaRemoteNode *node,
     } else {
         ret = node->callbackObj->OnEventInvitationResult(node->callbackObj, &hdiP2pInvitationResultParam, ifName);
     }
+    HdiP2pInvitationResultParamFree(&hdiP2pInvitationResultParam, false);
     return ret;
 }
 
@@ -2051,6 +2078,7 @@ int32_t ProcessEventP2pGroupFormationFailure(struct HdfWpaRemoteNode *node, char
         ret = node->callbackObj->OnEventGroupFormationFailure(node->callbackObj, hdiReason, ifName);
     }
     OsalMemFree(hdiReason);
+    hdiReason = NULL;
     return ret;
 }
 
@@ -2183,6 +2211,7 @@ int32_t ProcessEventP2pStaConnectState(struct HdfWpaRemoteNode *node,
     } else {
         ret = node->callbackObj->OnEventStaConnectState(node->callbackObj, &hdiP2pStaConnectStateParam, ifName);
     }
+    HdiP2pStaConnectStateParamFree(&hdiP2pStaConnectStateParam, false);
     return ret;
 }
 

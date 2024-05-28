@@ -85,6 +85,7 @@ static int HdfHostapdInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     struct HdfRemoteService **stubObj = StubCollectorGetOrNewObject(IHOSTAPDINTERFACE_INTERFACE_DESC, serviceImpl);
     if (stubObj == NULL) {
         OsalMemFree(hostapdinterfaceHost);
+        hostapdinterfaceHost = NULL;
         IHostapdInterfaceRelease(serviceImpl, true);
         return HDF_FAILURE;
     }
@@ -112,6 +113,7 @@ static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &stubData->remoteListHead, struct HdfHostapdRemoteNode, node) {
         DListRemove(&(pos->node));
         OsalMemFree(pos);
+        pos = NULL;
     }
 
     OsalMutexDestroy(&stubData->mutex);
@@ -120,6 +122,7 @@ static void HdfHostapdInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
         StubCollectorRemoveObject(IHOSTAPDINTERFACE_INTERFACE_DESC, hostapdinterfaceHost->service);
         IHostapdInterfaceRelease(hostapdinterfaceHost->service, true);
         OsalMemFree(hostapdinterfaceHost);
+        hostapdinterfaceHost = NULL;
 }
 
 struct HdfDriverEntry g_hostapdinterfaceDriverEntry = {
