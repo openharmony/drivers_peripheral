@@ -1855,7 +1855,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0055)
     streamInfo.dataspace_ = 8; // 8:picture dataspace
     streamInfo.intent_ = VIDEO;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
-    streamInfo.bufferQueue_ = new(std::nothrow) BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
+    streamInfo.bufferQueue_ = new (std::nothrow) BufferProducerSequenceable(streamCustomerVideo->CreateProducer());
     ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
     streamInfos.push_back(streamInfo);
