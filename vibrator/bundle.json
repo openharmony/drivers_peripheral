@@ -18,7 +18,7 @@
       "drivers_peripheral_vibrator_feature_lite_support_test"
     ],
     "syscap": [],
-    "adapted_system_type": ["standard"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "675KB",
     "ram": "7400KB",
     "deps": {
