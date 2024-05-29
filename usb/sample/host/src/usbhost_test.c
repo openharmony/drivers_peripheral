@@ -67,7 +67,7 @@ static void TestHelp(void)
 static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t *cmdType, char *apiType)
 {
     if ((cmdParam == NULL) || (cmdType == NULL) || (apiType == NULL) || (strlen(cmdParam) < PARAM_CMD_LENGTH)) {
-        HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d command or cmdType is NULL or cmdParam length is error", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -229,7 +229,7 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
     int32_t cnt = 0;
 
     if (TestGetExitFlag() == true) {
-        HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
+        HDF_LOGD("%{public}s:%{public}d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -303,13 +303,13 @@ static int32_t StartThreadGetChar()
 
     ret = OsalThreadCreate(&g_Getchar, (OsalThreadEntry)GetCharThread, NULL);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_Getchar, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 #endif
@@ -323,7 +323,7 @@ int32_t main(int32_t argc, char *argv[])
     char apiType[DATA_MAX_LEN];
 
     if ((argc < ARGV_CMD_TYPE) || (argc < PARAM_GET_CMD_LEN) || (argv[ARGV_CMD_TYPE] == NULL)) {
-        HDF_LOGE("%s:%d invalid parma, argc=%d", __func__, __LINE__, argc);
+        HDF_LOGE("%{public}s:%{public}d invalid parma, argc=%{public}d", __func__, __LINE__, argc);
         return HDF_FAILURE;
     }
 
@@ -338,7 +338,7 @@ int32_t main(int32_t argc, char *argv[])
     status = TestParaseCommand(argc, argv[ARGV_CMD_TYPE], &cmdType, apiType);
     if (status != HDF_SUCCESS) {
         run = 0;
-        HDF_LOGE("%s:%d TestParaseCommand status=%d err", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d TestParaseCommand status=%{public}d err", __func__, __LINE__, status);
         TestHelp();
         return status;
     }
@@ -346,7 +346,7 @@ int32_t main(int32_t argc, char *argv[])
     status = UsbHostDdkTestInit(apiType);
     if (status != HDF_SUCCESS) {
         run = 0;
-        HDF_LOGE("%s:%d UsbHostDdkTestInit status=%d err", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d UsbHostDdkTestInit status=%{public}d err", __func__, __LINE__, status);
         return status;
     }
 
