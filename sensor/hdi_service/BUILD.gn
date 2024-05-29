@@ -45,7 +45,7 @@ ohos_shared_library("libsensor_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_sensor:sensor_idl_headers",
+      "drivers_interface_sensor:libsensor_stub_2.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

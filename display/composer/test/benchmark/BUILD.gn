@@ -35,10 +35,10 @@ ohos_benchmarktest("hdf_display_benchmark_test") {
   ]
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_display:display_buffer_idl_headers",
-    "drivers_interface_display:display_composer_idl_headers_1.1",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
+    "drivers_interface_display:libdisplay_buffer_stub_1.0",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
+    "drivers_interface_display:libdisplay_composer_stub_1.1",
     "googletest:gtest",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

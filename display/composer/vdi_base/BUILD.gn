@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../../display_config.gni")
 
 root_path = "../../../../.."
@@ -52,10 +51,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
     "${root_path}/drivers/interface/display/composer/hdifd_parcelable",
   ]
 
-  deps = [
-    "${root_path}/third_party/libdrm:libdrm",
-    "../../buffer/vdi_base:display_buffer_vdi_impl_default",
-  ]
+  deps = [ "../../buffer/vdi_base:display_buffer_vdi_impl_default" ]
   cflags_cc = [
     "-Wno-error=unused-function",
     "-Wno-error=missing-braces",
@@ -63,13 +59,14 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   ]
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_display:display_buffer_idl_headers",
-    "drivers_interface_display:display_composer_idl_headers",
+    "drivers_interface_display:libdisplay_buffer_stub_1.0",
+    "drivers_interface_display:libdisplay_composer_stub_1.0",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "libdrm:libdrm",
   ]
   install_enable = false
   install_images = [ chipset_base_dir ]
