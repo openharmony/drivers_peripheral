@@ -79,7 +79,7 @@ void UsbnetWriteLog(char *buff, int size, int tag)
 
         FILE *fp = fopen(str, "a+");
         if (!fp) {
-            HDF_LOGE("%s: fopen failed", __func__);
+            HDF_LOGE("%{public}s: fopen failed", __func__);
             return;
         }
         (void)fwrite(buff, size, 1, fp);
@@ -264,7 +264,7 @@ static int32_t UsbnetHostSnedbufToUrb(struct UsbnetHost *usbNet,  struct HdfSBuf
 
     int flag = HdfSbufReadBuffer(data, (const void **)(&(buf)), &bufSize);
     if ((!flag) || buf == NULL) {
-        HDF_LOGE("%s: fail to read infoTable in event data, flag = %d", __func__, flag);
+        HDF_LOGE("%{public}s: fail to read infoTable in event data, flag = %{public}d", __func__, flag);
         return HDF_ERR_INVALID_PARAM;
     }
     size = bufSize;
@@ -635,20 +635,20 @@ static int32_t UsbIoThread(void *data)
     HARCH_INFO_PRINT("begin");
     while (true) {
         if (usbNet == NULL) {
-            HDF_LOGE("%s:%d usbNet is null", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d usbNet is null", __func__, __LINE__);
             OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
             continue;
         }
 
         if (usbNet->devHandle == NULL) {
-            HDF_LOGE("%s:%d usbNet->devHandle is null", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d usbNet->devHandle is null", __func__, __LINE__);
             OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
             continue;
         }
 
         ret = UsbRawHandleRequests(usbNet->devHandle);
         if ((ret < 0) || (usbNet->usbIoStatus != USB_RAW_IO_PROCESS_RUNNING)) {
-            HDF_LOGE("%s:%d UsbIoThread failed, usbNet->usbIoStatus =%{public}d ret=%{public}d ",
+            HDF_LOGE("%{public}s:%{public}d UsbIoThread failed, usbNet->usbIoStatus =%{public}d ret=%{public}d ",
                 __func__, __LINE__, usbNet->usbIoStatus, ret);
             break;
         }
@@ -682,13 +682,13 @@ static int32_t UsbStartIo(struct UsbnetHost *usbNet)
 
     ret = OsalThreadCreate(&usbNet->ioThread, (OsalThreadEntry)UsbIoThread, (void *)usbNet);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate failed, ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&usbNet->ioThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart failed, ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -712,14 +712,14 @@ static void UsbStopIo(struct UsbnetHost *usbNet)
         i++;
         OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
         if (i > USB_RAW_IO_STOP_WAIT_MAX_TIME) {
-            HDF_LOGD("%s:%d", __func__, __LINE__);
+            HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
             break;
         }
     }
 
     ret = OsalThreadDestroy(&usbNet->ioThread);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy failed, ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret = %{public}d", __func__, __LINE__, ret);
     }
 
     OsalMutexDestroy(&usbNet->usbIoLock);
@@ -775,7 +775,7 @@ static int32_t UsbnetHostAllocRequests(struct UsbnetHost *usbNet)
 
     ret = UsbStartIo(usbNet);
     if (ret) {
-        HDF_LOGE("%s:%d UsbAllocReadRequests failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d UsbAllocReadRequests failed", __func__, __LINE__);
         goto ERR_ALLOC_READ_REQS;
     }
 
@@ -1049,7 +1049,7 @@ static int32_t UsbnetHostUpdateFlags(struct UsbnetHost *usbNet, struct HdfSBuf *
     }
     HARCH_INFO_PRINT("before set flags usbNet->flags = %{public}d", usbNet->flags);
     if (!HdfSbufReadBuffer(data, (const void **)&flags, &readSize)) {
-        HDF_LOGE("%s:%d fail to read usbnet flags from usb net adapter", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d fail to read usbnet flags from usb net adapter", __func__, __LINE__);
         return HDF_FAILURE;
     }
     usbNet->flags = *flags;
@@ -1068,7 +1068,7 @@ static void UsbnetHostUpdateHardMtu(struct UsbnetHost *usbNet, struct HdfSBuf *d
 
     HARCH_INFO_PRINT("before hardMtu = %{public}d, rxUrbSize = %{public}d", usbNet->net.hardMtu, usbNet->net.rxUrbSize);
     if (!HdfSbufReadBuffer(data, (const void **)&usbNet->net, &readSize)) {
-        HDF_LOGE("%s:%d fail to read usbnet hardMtu from usb net adapter", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d fail to read usbnet hardMtu from usb net adapter", __func__, __LINE__);
         return;
     }
     HARCH_INFO_PRINT("after hardMtu = %{public}d, rxUrbSize = %{public}d, readSize = %{public}d",

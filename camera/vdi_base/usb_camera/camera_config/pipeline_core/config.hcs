@@ -559,12 +559,12 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
-        RKExif :: node_spec {
-            name = "RKExif#0";
+        Exif :: node_spec {
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -608,7 +608,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }
@@ -1084,12 +1084,12 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
         RKExif_1 :: node_spec {
-            name = "RKExif#0";
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -1122,7 +1122,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }
@@ -1237,12 +1237,12 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
         RKExif_1 :: node_spec {
-            name = "RKExif#0";
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -1275,7 +1275,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }
@@ -1428,12 +1428,12 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
         RKExif_1 :: node_spec {
-            name = "RKExif#0";
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -1482,7 +1482,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }
@@ -1649,7 +1649,7 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
@@ -1669,8 +1669,8 @@ root {
                 direction = 1;
             }
         }
-        RKExif :: node_spec {
-            name = "RKExif#0";
+        Exif :: node_spec {
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -1703,7 +1703,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }
@@ -1870,7 +1870,7 @@ root {
             out_port_0 :: port_spec {
                 name = "out0";
                 peerPortName = "in0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 1;
             }
         }
@@ -1890,8 +1890,8 @@ root {
                 direction = 1;
             }
         }
-        RKExif :: node_spec {
-            name = "RKExif#0";
+        Exif :: node_spec {
+            name = "Exif#0";
             status = "new";
             in_port_0 :: port_spec {
                 name = "in0";
@@ -1924,7 +1924,7 @@ root {
             in_port_0 :: port_spec {
                 name = "in0";
                 peerPortName = "out0";
-                peerPortNodeName = "RKExif#0";
+                peerPortNodeName = "Exif#0";
                 direction = 0;
             }
         }

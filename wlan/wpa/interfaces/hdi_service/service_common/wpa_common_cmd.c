@@ -330,12 +330,15 @@ static int32_t WpaFillWpaListNetworkParam(struct WifiNetworkInfo  *wifiWpaNetwor
     if (ret != HDF_SUCCESS) {
         if (hdiWifiWpaNetworkInfo->bssid != NULL) {
             OsalMemFree(hdiWifiWpaNetworkInfo->bssid);
+            hdiWifiWpaNetworkInfo->bssid = NULL;
         }
         if (hdiWifiWpaNetworkInfo->ssid != NULL) {
             OsalMemFree(hdiWifiWpaNetworkInfo->ssid);
+            hdiWifiWpaNetworkInfo->ssid = NULL;
         }
         if (hdiWifiWpaNetworkInfo->flags != NULL) {
             OsalMemFree(hdiWifiWpaNetworkInfo->flags);
+            hdiWifiWpaNetworkInfo->flags = NULL;
         }
     }
     return ret;
@@ -1076,6 +1079,7 @@ static void HdfWpaDelRemoteObj(struct IWpaCallback *self)
             DListRemove(&(pos->node));
             IWpaCallbackRelease(pos->callbackObj);
             OsalMemFree(pos);
+            pos = NULL;
             break;
         }
     }
@@ -1101,6 +1105,7 @@ static int32_t WpaFillWpaDisconnectParam(struct WpaDisconnectParam *disconnectPa
     if (ret != HDF_SUCCESS) {
         if (hdiWpaDisconnectParam->bssid != NULL) {
             OsalMemFree(hdiWpaDisconnectParam->bssid);
+            hdiWpaDisconnectParam->bssid = NULL;
         }
     }
     return ret;
@@ -1124,6 +1129,7 @@ static int32_t WpaFillWpaConnectParam(struct WpaConnectParam *connectParam,
     if (ret != HDF_SUCCESS) {
         if (hdiWpaConnectParam->bssid != NULL) {
             OsalMemFree(hdiWpaConnectParam->bssid);
+            hdiWpaConnectParam->bssid = NULL;
         }
     }
     return ret;
@@ -1154,9 +1160,11 @@ static int32_t WpaFillWpaBssidChangedParam(struct WpaBssidChangedParam *bssidCha
     if (ret != HDF_SUCCESS) {
         if (hdiWpaBssidChangedParam->bssid != NULL) {
             OsalMemFree(hdiWpaBssidChangedParam->bssid);
+            hdiWpaBssidChangedParam->bssid = NULL;
         }
         if (hdiWpaBssidChangedParam->reason != NULL) {
             OsalMemFree(hdiWpaBssidChangedParam->reason);
+            hdiWpaBssidChangedParam->reason = NULL;
         }
     }
     return ret;
@@ -1202,9 +1210,11 @@ static int32_t WpaFillWpaStateChangedParam(struct WpaStateChangedParam *stateCha
     if (ret != HDF_SUCCESS) {
         if (hdiWpaStateChangedParam->bssid != NULL) {
             OsalMemFree(hdiWpaStateChangedParam->bssid);
+            hdiWpaStateChangedParam->bssid = NULL;
         }
         if (hdiWpaStateChangedParam->ssid != NULL) {
             OsalMemFree(hdiWpaStateChangedParam->ssid);
+            hdiWpaStateChangedParam->ssid = NULL;
         }
     }
     return ret;
@@ -1238,9 +1248,11 @@ static int32_t WpaFillWpaTempDisabledParam(struct WpaTempDisabledParam *tempDisa
     if (ret != HDF_SUCCESS) {
         if (hdiWpaTempDisabledParam->reason != NULL) {
             OsalMemFree(hdiWpaTempDisabledParam->reason);
+            hdiWpaTempDisabledParam->reason = NULL;
         }
         if (hdiWpaTempDisabledParam->ssid != NULL) {
             OsalMemFree(hdiWpaTempDisabledParam->ssid);
+            hdiWpaTempDisabledParam->ssid = NULL;
         }
     }
     return ret;
@@ -1265,6 +1277,7 @@ static int32_t WpaFillWpaAssociateRejectParam(struct WpaAssociateRejectParam *as
     if (ret != HDF_SUCCESS) {
         if (hdiWpaAssociateRejectParam->bssid != NULL) {
             OsalMemFree(hdiWpaAssociateRejectParam->bssid);
+            hdiWpaAssociateRejectParam->bssid = NULL;
         }
     }
     return ret;
@@ -1303,6 +1316,7 @@ static int32_t WpaFillWpaAuthRejectParam(struct WpaAuthRejectParam *authRejectPa
     if (ret != HDF_SUCCESS) {
         if (hdiWpaAuthRejectParam->bssid != NULL) {
             OsalMemFree(hdiWpaAuthRejectParam->bssid);
+            hdiWpaAuthRejectParam->bssid = NULL;
         }
     }
     return ret;
@@ -1914,23 +1928,26 @@ int32_t WpaInterfaceAddWpaIface(struct IWpaInterface *self, const char *ifName, 
     }
     AddInterfaceArgv addInterface = {0};
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
             CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != EOK) {
             return HDF_FAILURE;
         }
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
             CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
             return HDF_FAILURE;
         }
     } else if (strncmp(ifName, "chba0", strlen("chba0")) == 0) {
-        if (strcpy_s(addInterface.name, sizeof(addInterface.name), ifName) != EOK ||
-            strcpy_s(addInterface.confName, sizeof(addInterface.confName),
+        if (strcpy_s(addInterface.name, sizeof(addInterface.name) - 1, ifName) != EOK ||
+            strcpy_s(addInterface.confName, sizeof(addInterface.confName) - 1,
             CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != EOK) {
             return HDF_FAILURE;
         }
+    } else {
+        HDF_LOGE("%{public}s Wrong ifname!", __func__);
+        return HDF_FAILURE;
     }
     if (pWpaInterface->wpaCliAddIface(pWpaInterface, &addInterface, true) < 0) {
         HDF_LOGE("%{public}s Failed to add wpa iface!", __func__);

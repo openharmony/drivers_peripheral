@@ -344,7 +344,7 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size)
     }
 
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
         return;
     }
 
@@ -836,7 +836,7 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType)
     GetPluggedTypeName(buf, sizeof(buf));
     int32_t type = PluggedTypeEnumConverter(buf);
     if (type == PLUGGED_TYPE_BUTT) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "not support the online type %{public}s", buf);
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "not support the online type %{public}s", buf);
         return HDF_ERR_NOT_SUPPORT;
     }
 
@@ -1012,7 +1012,7 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
     if (ret < HDF_SUCCESS) {
         return ret;
     }
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "Exit");
     return HDF_SUCCESS;
 }
 
@@ -1041,13 +1041,12 @@ int32_t PowerSupplyProvider::SetConfigByPath(const std::string& path, const std:
     }
     close(fd);
 
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "SetConfigByPath exit");
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "SetConfigByPath exit");
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::string& result)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath enter, path: %{public}s", path.c_str());
     if (path.empty()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "the featurePath is empty");
         result = "";
@@ -1063,20 +1062,20 @@ int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::strin
     }
     Trim(buf);
     result = buf;
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath exit, value:%{public}s", result.c_str());
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath(%{public}s) exit, value:%{public}s",
+        path.c_str(), result.c_str());
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::CheckPathExists(const std::string& path, bool& result)
 {
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists enter, path: %{public}s", path.c_str());
     if (path.empty()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "the path is empty");
         result = false;
         return HDF_ERR_INVALID_PARAM;
     }
     result = access(path.c_str(), F_OK) == 0;
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists exit, value:%{public}d", result);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "CheckPathExists(%{public}s) exit, value:%{public}d", path.c_str(), result);
     return HDF_SUCCESS;
 }
 }  // namespace V2_0

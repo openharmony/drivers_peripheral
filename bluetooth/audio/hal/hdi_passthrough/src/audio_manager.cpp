@@ -23,7 +23,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    int *size)
 {
     int32_t ret;
-    HDF_LOGI("%s", __func__);
+    HDF_LOGD("%s", __func__);
     if (manager == NULL || descs == NULL || size == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -38,7 +38,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
-    HDF_LOGI("%s", __func__);
+    HDF_LOGD("%s", __func__);
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }

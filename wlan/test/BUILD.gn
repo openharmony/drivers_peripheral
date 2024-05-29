@@ -40,6 +40,7 @@ if (defined(ohos_lite)) {
         "fuzztest:hdf_wlan_fuzztest",
         "hdi_service:WlanHdiServiceTestC",
         "performance:hdf_peripheral_wlan_test_performance",
+        "unittest:hdf_chip_wifi",
         "unittest:hdf_client_wifi",
         "unittest:hdf_hal_wifi",
       ]

@@ -208,6 +208,7 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
             if (g_hid2dEventMap[i] == NULL) {
                 g_hid2dEventMap[i] = event;
                 HDF_LOGI("%{public}s, g_hid2dEventMap i:%{public}d event!", __FUNCTION__, i);
+                OsalMemFree(event);
                 pthread_mutex_unlock(&g_hid2dEventMutex);
                 return RET_CODE_SUCCESS;
             }

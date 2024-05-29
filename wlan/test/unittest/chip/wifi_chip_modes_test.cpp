@@ -47,7 +47,7 @@ public:
  */
 HWTEST_F(WifiChipModesTest, GetChipModesTest, TestSize.Level1)
 {
-    HDF_LOGI("GetChipModesTest start");
+    HDF_LOGI("GetChipModesTest started");
     if (wifiChipModes == nullptr) {
         return;
     }

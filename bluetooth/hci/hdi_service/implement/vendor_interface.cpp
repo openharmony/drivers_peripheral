@@ -100,10 +100,6 @@ bool VendorInterface::Initialize(
 
     vendorInterface_ =
         reinterpret_cast<BtVendorInterfaceT *>(dlsym(vendorHandle_, BT_VENDOR_INTERFACE_SYMBOL_NAME));
-    if (vendorInterface_ == nullptr) {
-        HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
-        return false;
-    }
 
     auto bluetoothAddress = BluetoothAddress::GetDeviceAddress();
     std::vector<uint8_t> address = { 0, 0, 0, 0, 0, 0 };
@@ -111,6 +107,10 @@ bool VendorInterface::Initialize(
         bluetoothAddress->ReadAddress(address);
     }
 
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
+        return false;
+    }
     int result = vendorInterface_->init(&vendorCallbacks_, address.data());
     if (result != 0) {
         HDF_LOGE("vendorInterface_->init failed.");

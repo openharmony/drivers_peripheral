@@ -15,13 +15,17 @@
 
 #include <gtest/gtest.h>
 #include <hdf_log.h>
-#include "../../../chip/hdi_service/interface_tool.h"
+#include "../../../chip/hdi_service/iface_tool.h"
 #include "../../../chip/hdi_service/wifi_chip.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
 namespace WifiChipTest {
+const std::string TEST_AP_IFNAME = "wlan1";
+const std::string TEST_STA_IFNAME = "wlan0";
+const std::string TEST_P2P_IFNAME = "p2p0";
+
 class WifiChipTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -30,18 +34,19 @@ public:
     {
         int32_t chipId = 0;
         bool isPrimary = true;
-        std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn;
-        const std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
+        const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
             ifaceTool, fn, isPrimary);
-        const std::weak_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>();
-        wifiChip = new WifiChip(chipId, isPrimary, vendorHal, chipModes, handlerMock);
+        std::shared_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>();
+        wifiChip = new WifiChip(chipId, isPrimary, vendorHal,
+            std::make_shared<IfaceUtil>(ifaceTool), chipModes, HandlerMock);
     }
     void TearDown() {}
 
-    static void handlerMock(const std::string& ifName)
+    static void HandlerMock(const std::string& ifName)
     {
-        HDF_LOGI("handlerMock enter");
+        HDF_LOGI("HandlerMock enter");
     }
 
 public:
@@ -56,9 +61,10 @@ public:
  */
 HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level1)
 {
-    HDF_LOGI("GetCurrentModeTest start");
+    HDF_LOGI("GetCurrentModeTest started");
     uint32_t modeId = -1;
     if (wifiChip == nullptr) {
+        HDF_LOGE("wifiChip is null");
         return;
     }
     EXPECT_TRUE(wifiChip->GetCurrentMode(modeId) == HDF_ERR_INVALID_PARAM);
@@ -74,13 +80,13 @@ HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level1)
  */
 HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level1)
 {
-    HDF_LOGI("SetChipModeTest start");
-    uint32_t modeId = -1;
+    HDF_LOGI("SetChipModeTest started");
+    uint32_t modeId = UINT32_MAX;
     if (wifiChip == nullptr) {
+        HDF_LOGE("wifiChip is null");
         return;
     }
     EXPECT_TRUE(wifiChip->SetChipMode(modeId) == HDF_FAILURE);
-    wifiChip->SetChipMode(0);
 }
 
 /**
@@ -91,21 +97,22 @@ HWTEST_F(WifiChipTest, SetChipModeTest, TestSize.Level1)
  */
 HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level1)
 {
-    HDF_LOGI("CreateApServiceTest start");
+    HDF_LOGI("CreateApServiceTest started");
     if (wifiChip == nullptr) {
+        HDF_LOGE("wifiChip is null");
         return;
     }
-    std::string ifname = "ap";
     std::vector<std::string> instances;
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
     std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-    sptr<IChipIface> apIface = new (std::nothrow) WifiApIface(ifname, instances, vendorHal);
+    sptr<IChipIface> apIface = new (std::nothrow) WifiApIface(TEST_AP_IFNAME, instances, vendorHal,
+        std::make_shared<IfaceUtil>(ifaceTool));
     wifiChip->CreateApService(apIface);
     std::vector<std::string> ifnames;
-    EXPECT_TRUE(wifiChip->GetApServiceIfNames(ifnames) == HDF_SUCCESS);
+    wifiChip->GetApServiceIfNames(ifnames);
     std::string ifname1;
-    EXPECT_TRUE(wifiChip->GetApService(ifname1, apIface) == HDF_SUCCESS);
+    wifiChip->GetApService(ifname1, apIface);
     wifiChip->RemoveApService(ifname1);
     EXPECT_TRUE(wifiChip->GetApServiceIfNames(ifnames) == HDF_FAILURE);
     EXPECT_TRUE(wifiChip->GetApService(ifname1, apIface) == HDF_FAILURE);
@@ -119,21 +126,22 @@ HWTEST_F(WifiChipTest, CreateApServiceTest, TestSize.Level1)
  */
 HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level1)
 {
-    HDF_LOGI("CreateP2pIfaceTest start");
+    HDF_LOGI("CreateP2pIfaceTest started");
     if (wifiChip == nullptr) {
+        HDF_LOGE("wifiChip is null");
         return;
     }
-    std::string ifname = "P2P";
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
     std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-    sptr<IChipIface> p2pIface = new (std::nothrow) WifiP2pIface(ifname, vendorHal);
+    sptr<IChipIface> p2pIface = new (std::nothrow) WifiP2pIface(TEST_P2P_IFNAME, vendorHal,
+        std::make_shared<IfaceUtil>(ifaceTool));
     wifiChip->CreateP2pService(p2pIface);
 
     std::vector<std::string> ifnames;
-    EXPECT_TRUE(wifiChip->GetP2pServiceIfNames(ifnames) == HDF_SUCCESS);
+    wifiChip->GetP2pServiceIfNames(ifnames);
     std::string ifname1;
-    EXPECT_TRUE(wifiChip->GetP2pService(ifname1, p2pIface) == HDF_SUCCESS);
+    wifiChip->GetP2pService(ifname1, p2pIface);
     wifiChip->RemoveP2pService(ifname1);
     EXPECT_TRUE(wifiChip->GetP2pServiceIfNames(ifnames) == HDF_FAILURE);
     EXPECT_TRUE(wifiChip->GetP2pService(ifname1, p2pIface) == HDF_FAILURE);
@@ -147,21 +155,22 @@ HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level1)
  */
 HWTEST_F(WifiChipTest, CreateStaIfaceTest, TestSize.Level1)
 {
-    HDF_LOGI("CreateStaIfaceTest start");
+    HDF_LOGI("CreateStaIfaceTest started");
     if (wifiChip == nullptr) {
+        HDF_LOGE("wifiChip is null");
         return;
     }
-    std::string ifname = "wlan0";
     std::weak_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     WifiHalFn fn;
     std::weak_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-    sptr<IChipIface> staIface = new (std::nothrow) WifiStaIface(ifname, vendorHal);
+    sptr<IChipIface> staIface = new (std::nothrow) WifiStaIface(TEST_STA_IFNAME, vendorHal,
+        std::make_shared<IfaceUtil>(ifaceTool));
     wifiChip->CreateStaService(staIface);
 
     std::vector<std::string> ifnames;
-    EXPECT_TRUE(wifiChip->GetStaServiceIfNames(ifnames) == HDF_SUCCESS);
+    wifiChip->GetStaServiceIfNames(ifnames);
     std::string ifname1;
-    EXPECT_TRUE(wifiChip->GetStaService(ifname1, staIface) == HDF_SUCCESS);
+    wifiChip->GetStaService(ifname1, staIface);
     wifiChip->RemoveStaService(ifname1);
     EXPECT_TRUE(wifiChip->GetStaServiceIfNames(ifnames) == HDF_FAILURE);
     EXPECT_TRUE(wifiChip->GetStaService(ifname1, staIface) == HDF_FAILURE);

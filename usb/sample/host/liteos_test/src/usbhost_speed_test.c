@@ -169,13 +169,13 @@ static enum speedServer checkServer(const char *input)
 {
     char middle[10] = {0};
     if (input == NULL) {
-        HDF_LOGE("%s:%d input is NULL", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d input is NULL", __func__, __LINE__);
         return SDKAPI_SERVER;
     }
 
     int32_t ret = strncpy_s(middle, sizeof(middle), input, (uint32_t)strlen(input));
     if (ret != EOK) {
-        HDF_LOGE("%s:%d strncpy_s failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d strncpy_s failed", __func__, __LINE__);
         return SDKAPI_SERVER;
     }
 
