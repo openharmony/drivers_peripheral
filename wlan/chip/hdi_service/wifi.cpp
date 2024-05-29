@@ -137,7 +137,7 @@ int32_t Wifi::Release()
 int32_t Wifi::GetAvailableChips(std::vector<uint32_t>& chipIds)
 {
     for (auto& chip : chips_) {
-        int32_t chipId = GetChipIdFromWifiChip(chip);
+        uint32_t chipId = GetChipIdFromWifiChip(chip);
         if (chipId != UINT32_MAX) chipIds.emplace_back(chipId);
     }
 #ifdef FEATURE_ANCO_WIFI
@@ -212,14 +212,14 @@ ErrorCode Wifi::InitializVendorHal()
     return res;
 }
 
-int32_t Wifi::GetChipIdFromWifiChip(sptr <WifiChip>& chip)
+uint32_t Wifi::GetChipIdFromWifiChip(sptr <WifiChip>& chip)
 {
-    int chipId = UINT32_MAX;
+    uint32_t chipId = UINT32_MAX;
     int32_t id;
 
     if (chip) {
         chip->GetChipId(id);
-        chipId = id;
+        chipId = static_cast<uint32_t>(id);
     }
     return chipId;
 }

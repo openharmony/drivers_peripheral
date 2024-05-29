@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <hdf_log.h>
-#include "../../../chip/hdi_service/interface_tool.h"
+#include "../../../chip/hdi_service/iface_tool.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
@@ -37,9 +37,10 @@ public:
  */
 HWTEST_F(IfaceToolTest, SetWifiUpStateTest, TestSize.Level1)
 {
-    HDF_LOGI("SetWifiUpStateTest start");
+    HDF_LOGI("SetWifiUpStateTest started");
     std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
     if (ifaceTool == nullptr) {
+        HDF_LOGE("ifaceTool is null");
         return;
     }
     bool requestUp = true;
