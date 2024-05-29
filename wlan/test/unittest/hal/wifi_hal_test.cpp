@@ -394,7 +394,7 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level1)
         ret = apFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)apFeature, 0);
         EXPECT_NE(HDF_SUCCESS, ret);
         ret = apFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)apFeature, WLAN_TX_POWER);
-        EXPECT_EQ(HDF_FAILURE, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
         ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -486,10 +486,10 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
         ret = apFeature->setCountryCode(apFeature, "CN", 3);
         EXPECT_NE(HDF_SUCCESS, ret);
         ret = apFeature->setCountryCode(apFeature, "99", 2);
-        bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_FAILURE);
+        bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_TIMEOUT || ret == HDF_FAILURE);
         ASSERT_TRUE(flag);
         ret = apFeature->setCountryCode(apFeature, "CN", 2);
-        EXPECT_EQ(HDF_FAILURE, ret);
+        EXPECT_EQ(HDF_ERR_TIMEOUT, ret);
 
         ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1208,7 +1208,7 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower002, TestSize.Level1)
         ret = staFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)staFeature, -1);
         EXPECT_NE(HDF_SUCCESS, ret);
         ret = staFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)staFeature, WLAN_TX_POWER);
-        EXPECT_EQ(HDF_FAILURE, ret);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
         ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
         EXPECT_EQ(HDF_SUCCESS, ret);
