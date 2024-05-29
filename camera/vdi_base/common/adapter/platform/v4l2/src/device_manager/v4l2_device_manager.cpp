@@ -33,10 +33,8 @@ V4L2DeviceManager::~V4L2DeviceManager() {}
 RetCode V4L2DeviceManager::Init()
 {
     RetCode rc = RC_ERROR;
-
-    hardwareList_.clear();
     std::vector<std::string> hardwareName;
-
+    hardwareList_.clear();
     for (auto it = hardware.cbegin(); it != hardware.cend(); ++it) {
         if (it->controllerId == DM_C_SENSOR) {
             hardwareName.push_back(it->hardwareName);
@@ -289,6 +287,7 @@ void V4L2DeviceManager::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDa
 
 std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId managerId)
 {
+    std::lock_guard<std::mutex> l(mtx_);
     for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
         if ((*iter).managerId == managerId && (*iter).cameraId == cameraId) {
             return (*iter).hardwareName;
@@ -308,6 +307,7 @@ void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 
 void V4L2DeviceManager::AddHardware(CameraId id, const std::string hardwareName)
 {
+    std::lock_guard<std::mutex> l(mtx_);
     HardwareConfiguration hardware;
     hardware.cameraId = id;
     hardware.managerId = DM_M_SENSOR;
@@ -355,7 +355,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CameraId id = ReturnEnableCameraId(hardwareName);
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
-
+        
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend();) {
             if ((*iter).cameraId != id) {
                 iter++;
@@ -367,7 +367,10 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
                 uvcCb_(meta, uvcState, id);
             }
-            hardwareList_.erase(iter);
+            {
+                std::lock_guard<std::mutex> l(mtx_);
+                hardwareList_.erase(iter);
+            }
         }
         CAMERA_LOGI("uvc plug out %{public}s end", hardwareName.c_str());
     }

@@ -764,6 +764,7 @@ static void HdfHostapdDelRemoteObj(struct IHostapdCallback *self)
             DListRemove(&(pos->node));
             IHostapdCallbackRelease(pos->callbackObj);
             OsalMemFree(pos);
+            pos = NULL;
             break;
         }
     }

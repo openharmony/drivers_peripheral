@@ -408,7 +408,7 @@ static int32_t UsbFnAdapterOpenPipe(const char *interfaceName, int32_t epIndex)
         usleep(SLEEP_DELAY);
     }
     if (ep < 0) {
-        HDF_LOGE("unable to open %s", epName);
+        HDF_LOGE("unable to open %{public}s", epName);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     return ep;
@@ -1170,7 +1170,7 @@ static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeou
     for (i = 0; i < event->ep0Num; i++) {
         if (event->ep0[i] <= 0) {
             UsbFnMemFree(pfds);
-            HDF_LOGE("%{public}s: ep[%d] = %d", __func__, i, event->ep0[i]);
+            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->ep0[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i].fd = event->ep0[i];
@@ -1179,7 +1179,7 @@ static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeou
     for (i = 0; i < event->epNum; i++) {
         if (event->epx[i] <= 0) {
             UsbFnMemFree(pfds);
-            HDF_LOGE("%{public}s: ep[%d] = %d", __func__, i, event->epx[i]);
+            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->epx[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i + event->ep0Num].fd = event->epx[i];

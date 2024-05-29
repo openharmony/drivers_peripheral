@@ -37,7 +37,7 @@ int32_t main(int32_t argc, char *argv[])
 {
     if (argc < OPTION_LENGTH) {
         printf("argv too flew\n");
-        HDF_LOGE("%s:%d argc=%d is too flew!", __func__, __LINE__, argc);
+        HDF_LOGE("%{public}s:%{public}d argc=%{public}d is too flew!", __func__, __LINE__, argc);
         return -1;
     }
     const char **arg = (const char **)&argv[1];
