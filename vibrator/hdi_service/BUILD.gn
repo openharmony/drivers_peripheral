@@ -28,7 +28,6 @@ if (defined(ohos_lite)) {
       "../utils/include",
     ]
     sources = [ "vibrator_if_service.cpp" ]
-    deps = [ "../hal:hdi_vibrator" ]
 
     cflags = [
       "-Wall",
@@ -41,7 +40,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "drivers_interface_vibrator:vibrator_idl_headers",
+        "drivers_interface_vibrator:libvibrator_stub_1.3",
         "hdf_core:libhdf_host",
         "hilog:libhilog",
         "hitrace:hitrace_meter",

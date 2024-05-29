@@ -43,11 +43,11 @@ if (defined(ohos_lite)) {
       "display_gralloc_client.cpp",
       "mapper_adapter.cpp",
     ]
-    deps = [ "../../../../../interface/display/v1_0:libdisplay_gralloc" ]
 
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_display:libdisplay_gralloc",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdi",
@@ -60,6 +60,6 @@ if (defined(ohos_lite)) {
     }
     external_deps += [ "graphic_surface:buffer_handle" ]
     subsystem_name = "hdf"
-    part_name = "drivers_interface_display"
+    part_name = "drivers_peripheral_display"
   }
 }
