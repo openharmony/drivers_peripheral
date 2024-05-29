@@ -758,11 +758,9 @@ HWTEST_F(DeviceTest, test_SetLayerMaskInfo, TestSize.Level1)
     MaskInfo maskInfo = MaskInfo::LAYER_HBM_SYNC;
     auto ret = g_composerDevice->SetLayerMaskInfo(g_displayIds[0], layer->GetId(), maskInfo);
 
-    PrepareAndCommit();
+    HdiTestDevice::GetInstance().Clear();
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
-
-    DestroyLayer(layer);
 }
 
 HWTEST_F(DeviceTest, test_SetLayerColor, TestSize.Level1)
