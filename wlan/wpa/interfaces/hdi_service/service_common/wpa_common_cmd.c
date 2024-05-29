@@ -1589,9 +1589,9 @@ static int32_t WpaFillWpaVendorExtInfo(struct WpaVendorExtInfo *wpaVendorExtInfo
     }
 
     HDF_LOGI("wpaVendorInfo type %{public}d, freq %{public}d, reason %{public}d, "
-             "data %{public}s id %{public}d status %{public}d!",
+             "id %{public}d status %{public}d!",
              wpaVendorInfo->type, wpaVendorInfo->freq, wpaVendorInfo->reason,
-             wpaVendorInfo->data, wpaVendorInfo->id, wpaVendorInfo->status);
+             wpaVendorInfo->id, wpaVendorInfo->status);
     return HDF_SUCCESS;
 }
 
