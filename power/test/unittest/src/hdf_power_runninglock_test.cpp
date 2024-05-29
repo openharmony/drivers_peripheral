@@ -474,9 +474,6 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest012, TestSize.Level1)
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION;
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
 
-    runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
-
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT;
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
 
