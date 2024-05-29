@@ -26,7 +26,6 @@ if (drivers_peripheral_input_feature_udriver) {
       "$INPUT_ROOT_DIR/udriver/include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "$INPUT_ROOT_DIR/utils/include",
-      "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
     cflags = [
@@ -38,12 +37,16 @@ if (drivers_peripheral_input_feature_udriver) {
 
     if (is_standard_system) {
       external_deps = [
+        "FreeBSD:libfreebsd_input",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
     } else {
-      external_deps = [ "hilog:libhilog" ]
+      external_deps = [
+        "FreeBSD:libfreebsd_input",
+        "hilog:libhilog",
+      ]
     }
 
     install_images = [
