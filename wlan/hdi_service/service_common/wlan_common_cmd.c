@@ -569,6 +569,8 @@ static int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t 
     }
     if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
         HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
+        OsalMemFree(*dst);
+        *dst = NULL;
         return HDF_FAILURE;
     }
     *dstLen = srcLen;
