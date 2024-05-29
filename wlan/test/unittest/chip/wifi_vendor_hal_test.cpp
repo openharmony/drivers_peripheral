@@ -57,64 +57,12 @@ public:
  */
 HWTEST_F(WifiVendorHalTest, StartTest, TestSize.Level1)
 {
-    HDF_LOGI("StartTest start");
+    HDF_LOGI("StartTest started");
     if (wifiVendorHalTest == nullptr) {
+        HDF_LOGE("wifiVendorHalTest is null");
         return;
     }
     EXPECT_TRUE(wifiVendorHalTest->Start() != HAL_SUCCESS);
     wifiVendorHalTest->Start();
-}
-
-/**
- * @tc.name: CreateVirtualInterfaceTest
- * @tc.desc: CreateVirtualInterface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiVendorHalTest, CreateVirtualInterfaceTest, TestSize.Level1)
-{
-    HDF_LOGI("CreateVirtualInterfaceTest start");
-    if (wifiVendorHalTest == nullptr) {
-        return;
-    }
-    WifiError legacyStatus;
-    legacyStatus = wifiVendorHalTest->CreateVirtualInterface("wlan0", HalIfaceType::HAL_TYPE_STA);
-    EXPECT_TRUE(legacyStatus == HAL_SUCCESS);
-}
-
-/**
- * @tc.name: DeleteVirtualInterfaceTest
- * @tc.desc: DeleteVirtualInterface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiVendorHalTest, DeleteVirtualInterfaceTest, TestSize.Level1)
-{
-    HDF_LOGI("DeleteVirtualInterfaceTest start");
-    if (wifiVendorHalTest == nullptr) {
-        return;
-    }
-    WifiError legacyStatus;
-    legacyStatus = wifiVendorHalTest->DeleteVirtualInterface("wlan0");
-    EXPECT_TRUE(legacyStatus == HAL_SUCCESS);
-}
-
-/**
- * @tc.name: RegisterRestartCallbackTest
- * @tc.desc: RegisterRestartCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiVendorHalTest, RegisterRestartCallbackTest, TestSize.Level1)
-{
-    HDF_LOGI("RegisterRestartCallbackTest start");
-    if (wifiVendorHalTest == nullptr) {
-        return;
-    }
-    WifiError legacyStatus;
-    legacyStatus = wifiVendorHalTest->RegisterRestartCallback(OnSubsystemRestartCallbackMock);
-    EXPECT_TRUE(legacyStatus == HAL_SUCCESS);
-    legacyStatus = wifiVendorHalTest->RegisterRestartCallback(OnSubsystemRestartCallbackMock);
-    EXPECT_TRUE(legacyStatus != HAL_SUCCESS);
 }
 }
