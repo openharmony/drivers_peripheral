@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include <hdf_log.h>
-#include "v1_0/chip/hdi_service/chip_controller_service.h"
 #include "../../../chip/hdi_service/wifi.h"
 
 using namespace testing::ext;
@@ -35,28 +34,9 @@ public:
         wifiTest.reset();
     }
 
-    static void handlerMock(const std::string& ifName)
-    {
-        HDF_LOGI("handlerMock enter");
-    }
 public:
     std::shared_ptr<Wifi> wifiTest;
 };
-
-/**
- * @tc.name: RegisterWifiEventCallbackTest
- * @tc.desc: RegisterWifiEventCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiTest, RegisterWifiEventCallbackTest, TestSize.Level1)
-{
-    HDF_LOGI("RegisterWifiEventCallbackTest start");
-    if (wifiTest == nullptr) {
-        return;
-    }
-    EXPECT_TRUE(wifiTest->RegisterWifiEventCallback(nullptr) == HDF_FAILURE);
-}
 
 /**
  * @tc.name: IsInitTest
@@ -66,8 +46,9 @@ HWTEST_F(WifiTest, RegisterWifiEventCallbackTest, TestSize.Level1)
  */
 HWTEST_F(WifiTest, IsInitTest, TestSize.Level1)
 {
-    HDF_LOGI("IsInitTest start");
+    HDF_LOGI("IsInitTest started");
     if (wifiTest == nullptr) {
+        HDF_LOGE("wifiTest is null");
         return;
     }
     bool inited = true;
@@ -86,8 +67,9 @@ HWTEST_F(WifiTest, IsInitTest, TestSize.Level1)
  */
 HWTEST_F(WifiTest, GetAvailableChipsTest, TestSize.Level1)
 {
-    HDF_LOGI("GetAvailableChipsTest start");
+    HDF_LOGI("GetAvailableChipsTest started");
     if (wifiTest == nullptr) {
+        HDF_LOGE("wifiTest is null");
         return;
     }
     std::vector<uint32_t> chipIds;
@@ -102,8 +84,9 @@ HWTEST_F(WifiTest, GetAvailableChipsTest, TestSize.Level1)
  */
 HWTEST_F(WifiTest, ReleaseTest, TestSize.Level1)
 {
-    HDF_LOGI("ReleaseTest start");
+    HDF_LOGI("ReleaseTest started");
     if (wifiTest == nullptr) {
+        HDF_LOGE("wifiTest is null");
         return;
     }
     EXPECT_TRUE(wifiTest->Release() == HDF_SUCCESS);

@@ -586,7 +586,7 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(
     }
     ret = UsbFnCfgMgrParseDescriptor(node, drsOps, descBuff, descType, length);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: length = 0x%x, descType = 0x%x Parse fail", __func__, length, descType);
+        HDF_LOGE("%{public}s: length = 0x%{public}x, descType = 0x%{public}x Parse fail", __func__, length, descType);
         UsbFnMemFree(descBuff);
         return NULL;
     }
@@ -1251,14 +1251,14 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
         } else {
             fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, registInfo->name);
             if (fnCfgPropMgr == NULL) {
-                HDF_LOGE("%{public}s:%s not found", __func__, registInfo->name);
+                HDF_LOGE("%{public}s:%{public}s not found", __func__, registInfo->name);
                 return HDF_FAILURE;
             }
         }
     } else {
         fnCfgPropMgr = UsbFnMemCalloc(sizeof(struct UsbFnCfgPropMgr));
         if (fnCfgPropMgr == NULL) {
-            HDF_LOGE("%{public}s:%d UsbFnMemCalloc failed", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d UsbFnMemCalloc failed", __func__, __LINE__);
             return HDF_FAILURE;
         }
     }

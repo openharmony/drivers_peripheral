@@ -84,6 +84,7 @@ static int HdfWpaInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     struct HdfRemoteService **stubObj = StubCollectorGetOrNewObject(IWPAINTERFACE_INTERFACE_DESC, serviceImpl);
     if (stubObj == NULL) {
         OsalMemFree(wpainterfaceHost);
+        wpainterfaceHost = NULL;
         IWpaInterfaceRelease(serviceImpl, true);
         return HDF_FAILURE;
     }
@@ -111,6 +112,7 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &stubData->remoteListHead, struct HdfWpaRemoteNode, node) {
         DListRemove(&(pos->node));
         OsalMemFree(pos);
+        pos = NULL;
     }
     OsalMutexDestroy(&stubData->mutex);
     struct HdfWpaInterfaceHost *wpainterfaceHost = CONTAINER_OF(
@@ -118,6 +120,7 @@ static void HdfWpaInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     StubCollectorRemoveObject(IWPAINTERFACE_INTERFACE_DESC, wpainterfaceHost->service);
     IWpaInterfaceRelease(wpainterfaceHost->service, true);
     OsalMemFree(wpainterfaceHost);
+    wpainterfaceHost = NULL;
 }
 
 struct HdfDriverEntry g_wpainterfaceDriverEntry = {

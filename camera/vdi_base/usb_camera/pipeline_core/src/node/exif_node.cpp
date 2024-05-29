@@ -171,5 +171,5 @@ RetCode ExifNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-REGISTERNODE(ExifNode, {"RKExif"})
+REGISTERNODE(ExifNode, {"Exif"})
 } // namespace OHOS::Camera
