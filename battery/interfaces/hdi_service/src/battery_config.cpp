@@ -16,7 +16,7 @@
 #include "battery_config.h"
 
 #include "battery_log.h"
-
+#include <climits>
 #include "string_ex.h"
 #include "config_policy_utils.h"
 
@@ -42,6 +42,7 @@ constexpr int32_t MAX_DEPTH = 5;
 constexpr int32_t MIN_DEPTH = 1;
 constexpr uint32_t MOVE_LEFT_16 = 16;
 constexpr uint32_t MOVE_LEFT_8 = 8;
+constexpr uint32_t SYSTEM_PATH_CHECK = 4;
 }
 std::shared_ptr<BatteryConfig> BatteryConfig::instance_ = nullptr;
 std::mutex BatteryConfig::mutex_;
@@ -246,39 +247,85 @@ void BatteryConfig::ParseChargeSceneConfig(const Json::Value& chargeSceneConfig)
     for (auto iter = members.begin(); iter != members.end(); iter++) {
         std::string key = *iter;
         Json::Value valueObj = chargeSceneConfig[key];
-        if (key.empty() || valueObj.isNull() || !valueObj.isObject()) {
-            BATTERY_HILOGW(COMP_HDI, "The charge scene config is invalid, key=%{public}s", key.c_str());
-            continue;
-        }
-
-        Json::Value supportPath = GetValue(valueObj, "support.path");
-        Json::Value type = GetValue(valueObj, "support.type");
-        Json::Value expectValue = GetValue(valueObj, "support.expect_value");
-        Json::Value setPath = GetValue(valueObj, "set.path");
-        Json::Value getPath = GetValue(valueObj, "get.path");
-        if (!isValidJsonString(supportPath) && !isValidJsonString(setPath) && !isValidJsonString(getPath)) {
-            BATTERY_HILOGW(COMP_HDI, "The charge scene config path is invalid, key=%{public}s", key.c_str());
+        if (!IsValidChargeSceneConfig(key, valueObj)) {
             continue;
         }
 
         BatteryConfig::ChargeSceneConfig tempChargeSceneConfig;
-        if (isValidJsonString(supportPath)) {
-            tempChargeSceneConfig.supportPath = supportPath.asString();
-            tempChargeSceneConfig.type = isValidJsonString(type) ? type.asString() : "";
-            tempChargeSceneConfig.expectValue = isValidJsonString(expectValue) ? expectValue.asString() : "";
-        }
+        ParseChargeSceneSupport(valueObj, tempChargeSceneConfig);
+        ParseChargeSceneSet(valueObj, tempChargeSceneConfig);
+        ParseChargeSceneGet(valueObj, tempChargeSceneConfig);
 
-        if (isValidJsonString(setPath)) {
-            tempChargeSceneConfig.setPath = setPath.asString();
-        }
-
-        if (isValidJsonString(getPath)) {
-            tempChargeSceneConfig.getPath = getPath.asString();
-        }
         chargeSceneConfigMap_.insert(std::make_pair(key, tempChargeSceneConfig));
     }
+
     BATTERY_HILOGI(COMP_HDI, "The charge scene config size: %{public}d",
         static_cast<int32_t>(chargeSceneConfigMap_.size()));
+}
+
+bool BatteryConfig::IsValidChargeSceneConfig(const std::string& key, const Json::Value& valueObj)
+{
+    if (key.empty() || valueObj.isNull() || !valueObj.isObject()) {
+        BATTERY_HILOGW(COMP_HDI, "The charge scene config is invalid, key=%{public}s", key.c_str());
+        return false;
+    }
+
+    Json::Value supportPath = GetValue(valueObj, "support.path");
+    Json::Value setPath = GetValue(valueObj, "set.path");
+    Json::Value getPath = GetValue(valueObj, "get.path");
+    if (!isValidJsonString(supportPath) && !isValidJsonString(setPath) && !isValidJsonString(getPath)) {
+        BATTERY_HILOGW(COMP_HDI, "The charge scene config path is invalid, key=%{public}s", key.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+void BatteryConfig::ParseChargeSceneSupport(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config)
+{
+    Json::Value supportPath = GetValue(valueObj, "support.path");
+    Json::Value type = GetValue(valueObj, "support.type");
+    Json::Value expectValue = GetValue(valueObj, "support.expect_value");
+    if (isValidJsonString(supportPath)) {
+        std::string path = supportPath.asString();
+        if (IsValidSysPath(path)) {
+            config.supportPath = path;
+            config.type = isValidJsonString(type) ? type.asString() : "";
+            config.expectValue = isValidJsonString(expectValue) ? expectValue.asString() : "";
+        }
+    }
+}
+
+void BatteryConfig::ParseChargeSceneSet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config)
+{
+    Json::Value setPath = GetValue(valueObj, "set.path");
+    if (isValidJsonString(setPath)) {
+        std::string path = setPath.asString();
+        if (IsValidSysPath(path)) {
+            config.setPath = path;
+        }
+    }
+}
+
+void BatteryConfig::ParseChargeSceneGet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config)
+{
+    Json::Value getPath = GetValue(valueObj, "get.path");
+    if (isValidJsonString(getPath)) {
+        std::string path = getPath.asString();
+        if (IsValidSysPath(path)) {
+            config.getPath = path;
+        }
+    }
+}
+
+bool BatteryConfig::IsValidSysPath(const std::string& path)
+{
+    char resolvedPath[PATH_MAX] = {};
+    if ((realpath(path.c_str(), resolvedPath) == nullptr) ||
+        (strncmp(resolvedPath, "/sys", SYSTEM_PATH_CHECK) != 0)) {
+        return false;
+    }
+    return true;
 }
 
 void BatteryConfig::ParseUeventConfig(const Json::Value& ueventConfig)
