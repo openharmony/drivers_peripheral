@@ -866,7 +866,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     return (int32_t)size;
 }
 
-static void FreeMem()
+static void FreeMem(void)
 {
     if (g_acmReadBuffer == NULL) {
         return;
