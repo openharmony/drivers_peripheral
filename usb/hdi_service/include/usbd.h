@@ -122,7 +122,7 @@ struct RequestMsg {
 struct UsbControlParams {
     uint8_t request;
     UsbRequestTargetType target;
-    UsbControlRequestType reqType;
+    uint8_t reqType;
     UsbRequestDirection directon;
     uint16_t value;
     uint16_t index;

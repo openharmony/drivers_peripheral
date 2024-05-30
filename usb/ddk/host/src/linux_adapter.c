@@ -1484,13 +1484,13 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
 
 static bool AdapterGetInterfaceActiveStatus(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber)
 {
-    bool ret;
+    int32_t ret;
     if (devHandle == NULL) {
         return false;
     }
     struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
     ret = ioctl(devHandle->fd, USBDEVFS_GETDRIVER, &getDriver);
-    if (ret == 0 && strcmp(getDriver.driver, "usbfs") == 0) {
+    if (ret < 0 || strcmp(getDriver.driver, "usbfs") == 0) {
         return false;
     }
     return true;
