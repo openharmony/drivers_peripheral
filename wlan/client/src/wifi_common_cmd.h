@@ -175,6 +175,7 @@ typedef enum {
 #define NO_ACK        1
 #define ACK           2
 #define BYTE_UNIT_8   8
+typedef struct genlmsghdr Genlmsghdr;
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
 void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen);
