@@ -59,7 +59,7 @@ if (drivers_peripheral_input_feature_udriver) {
     part_name = "drivers_peripheral_input"
   }
 } else if (is_standard_system) {
-  ohos_static_library("hdi_input_udriver") {
+  ohos_shared_library("hdi_input_udriver") {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_input"
   }
