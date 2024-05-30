@@ -3078,7 +3078,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
         return;
     }
     g_cookieSucess = (uint32_t)nla_get_u64(attr[NL80211_ATTR_COOKIE]);
-    HILOG_ERROR(LOG_CORE, "%{public}s: g_cookieStart = %{public}u g_cookieSucess = %{public}u "
+    HILOG_INFO(LOG_CORE, "%{public}s: g_cookieStart = %{public}u g_cookieSucess = %{public}u "
         "ack = %{public}d", __FUNCTION__, g_cookieStart, g_cookieSucess,
         attr[NL80211_ATTR_ACK] != NULL);
  
@@ -3104,7 +3104,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
 static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    Genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     if (hdr == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
         return NL_SKIP;
@@ -3117,7 +3117,6 @@ static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
     }
     g_cookieStart = (uint32_t)nla_get_u64(attr[NL80211_ATTR_COOKIE]);
     HILOG_INFO(LOG_CORE, "%{public}s: g_cookieStart = %{public}u", __FUNCTION__, g_cookieStart);
- 
     return NL_SKIP;
 }
 
