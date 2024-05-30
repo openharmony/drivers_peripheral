@@ -169,6 +169,9 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "graphic_surface:surface",
     "hdf_core:libhdf_host",
     "ipc:ipc_single",
+  ]
+
+  external_public_deps += [
     "libjpeg-turbo:turbojpeg_static",
   ]
 
