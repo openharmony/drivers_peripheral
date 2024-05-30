@@ -61,6 +61,10 @@ ohos_shared_library("libpower_interface_service_1.2") {
     defines += [ "FASTER_RETRY_OF_SLEEP" ]
   }
 
+  if (drivers_peripheral_power_slower_retry_of_sleep) {
+    defines += [ "SLOWER_RETRY_OF_SLEEP" ]
+  }
+
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_power"

@@ -23,6 +23,10 @@ declare_args() {
   drivers_peripheral_power_faster_retry_of_sleep = false
 }
 
+declare_args() {
+  drivers_peripheral_power_slower_retry_of_sleep = false
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.commonlibrary_c_utils)) {
   has_power_c_utils_part = true
