@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/components/hdi/hdi.gni")
 import("//build/ohos.gni")
+import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../input.gni")
 
 ohos_shared_library("libhid_ddk_service_1.0") {
