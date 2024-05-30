@@ -27,31 +27,13 @@ int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct Usb
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    switch (ctrlReq->reqType) {
-        case USB_REQUEST_TYPE_STANDARD:
-        case USB_REQUEST_TYPE_CLASS:
-            setupData->requestType = (((uint8_t)ctrlReq->directon) << USB_DIR_OFFSET) |
-                ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
-                ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
-            setupData->request     = ctrlReq->request;
-            setupData->value       = CPU_TO_LE16(ctrlReq->value);
-            setupData->index       = CPU_TO_LE16(ctrlReq->index);
-            setupData->length      = CPU_TO_LE16(ctrlReq->length);
-            break;
-        case USB_REQUEST_TYPE_VENDOR:
-            setupData->requestType = ((uint8_t)ctrlReq->directon << USB_DIR_OFFSET) |
-                ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
-                ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
-            setupData->request     = ctrlReq->request;
-            setupData->value       = CPU_TO_LE16(ctrlReq->value);
-            setupData->index       = CPU_TO_LE16(ctrlReq->index);
-            setupData->length      = CPU_TO_LE16(ctrlReq->length);
-            break;
-        default:
-            ret = HDF_ERR_INVALID_PARAM;
-            HDF_LOGE("%{public}s:%{public}d invalid request type", __func__, __LINE__);
-            break;
-    }
+   
+    setupData->requestType = ctrlReq->reqType;
+    setupData->request     = ctrlReq->request;
+    setupData->value       = CPU_TO_LE16(ctrlReq->value);
+    setupData->index       = CPU_TO_LE16(ctrlReq->index);
+    setupData->length      = CPU_TO_LE16(ctrlReq->length);
+     
     return ret;
 }
 

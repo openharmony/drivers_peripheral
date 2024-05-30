@@ -891,7 +891,7 @@ int32_t RawDetachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
     int32_t ret = osAdapterOps->detachKernelDriver(devHandle, interfaceNumber);
     if (ret >= 0) {
         devHandle->detachedInterfaces |= 1U << interfaceNumber;
-        devHandle->attachedInterfaces = 0;
+        devHandle->attachedInterfaces &= ~(1U << interfaceNumber);
         OsalMutexUnlock(&devHandle->lock);
         return HDF_SUCCESS;
     }
@@ -916,7 +916,7 @@ int32_t RawAttachInterface(struct UsbDeviceHandle *devHandle, uint32_t interface
     int32_t ret = osAdapterOps->attachKernelDriver(devHandle, interfaceNumber);
     if (ret >= 0) {
         devHandle->attachedInterfaces |= 1U << interfaceNumber;
-        devHandle->detachedInterfaces = 0;
+        devHandle->attachedInterfaces &= ~(1U << interfaceNumber);
         OsalMutexUnlock(&devHandle->lock);
         return HDF_SUCCESS;
     }

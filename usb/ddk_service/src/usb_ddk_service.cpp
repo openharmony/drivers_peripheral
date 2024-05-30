@@ -231,6 +231,7 @@ int32_t UsbDdkService::ClaimInterface(uint64_t deviceId, uint8_t interfaceIndex,
     }
     return ret;
 }
+
 int32_t UsbDdkService::ReleaseInterface(uint64_t interfaceHandle)
 {
     if (!DdkPermissionManager::VerifyPermission(PERMISSION_NAME)) {
