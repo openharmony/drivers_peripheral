@@ -120,6 +120,14 @@ ohos_shared_library("libusb_pnp_manager") {
     sources += [ "host/src/ddk_uevent_queue.cpp" ]
   }
 
+  if (drivers_peripheral_usb_feature_emulator_mode) {
+    if (defined(defines)) {
+      defines += [ "USB_EMULATOR_MODE" ]
+    } else {
+      defines = [ "USB_EMULATOR_MODE" ]
+    }
+  }
+
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
