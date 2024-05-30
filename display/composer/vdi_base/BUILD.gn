@@ -40,6 +40,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   include_dirs = [
     "include/",
     "../../buffer/vdi_base/include",
+    "../../composer/vdi_base/include",
     "../../buffer/hdi_service/include",
     "../../display/buffer/hdi_service/include",
     "../hdi_service/include",

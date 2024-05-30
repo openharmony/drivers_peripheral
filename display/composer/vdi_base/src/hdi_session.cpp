@@ -16,7 +16,6 @@
 #include <hdi_session.h>
 #include <cerrno>
 #include <mutex>
-#include "common/include/display_common.h"
 #include "display_log.h"
 #include "v1_0/display_composer_type.h"
 #include "hdf_trace.h"
