@@ -41,7 +41,8 @@ using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
-
+constexpr uint8_t  USB_PARAM_REQTYPE = 128;
+constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -120,7 +121,7 @@ void UsbImpl::MakeUsbControlParams(
 
     controlParams->request = USB_DDK_REQ_GET_DESCRIPTOR;
     controlParams->target = USB_REQUEST_TARGET_DEVICE;
-    controlParams->reqType = USB_REQUEST_TYPE_STANDARD;
+    controlParams->reqType = USB_PARAM_REQTYPE;
     controlParams->directon = USB_REQUEST_DIR_FROM_DEVICE;
     controlParams->value = value;
     controlParams->index = index;
@@ -138,7 +139,7 @@ void UsbImpl::MakeGetActiveUsbControlParams(
 
     controlParams->request = USB_DDK_REQ_GET_CONFIGURATION;
     controlParams->target = USB_REQUEST_TARGET_DEVICE;
-    controlParams->reqType = USB_REQUEST_TYPE_STANDARD;
+    controlParams->reqType = USB_PARAM_REQTYPE;
     controlParams->directon = USB_REQUEST_DIR_FROM_DEVICE;
     controlParams->value = value;
     controlParams->index = index;
@@ -214,7 +215,7 @@ void UsbImpl::MakeSetActiveUsbControlParams(
 
     controlParams->request = USB_DDK_REQ_SET_CONFIGURATION;
     controlParams->target = USB_REQUEST_TARGET_DEVICE;
-    controlParams->reqType = USB_REQUEST_TYPE_STANDARD;
+    controlParams->reqType = USB_PARAM_STAND_REQTYPE;
     controlParams->directon = USB_REQUEST_DIR_TO_DEVICE;
     controlParams->value = value;
     controlParams->index = index;
@@ -1396,8 +1397,7 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
     controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrl.requestType)) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType =
-        (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);
+    controlParams.reqType = static_cast<uint32_t>(ctrl.requestType);
     controlParams.size = MAX_CONTROL_BUFF_SIZE;
     controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
@@ -1439,8 +1439,7 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
     controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrl.requestType)) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType =
-        (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);
+    controlParams.reqType = static_cast<uint32_t>(ctrl.requestType);
     controlParams.size = data.size();
     controlParams.data = static_cast<void *>(const_cast<uint8_t *>(data.data()));
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
