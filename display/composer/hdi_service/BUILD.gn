@@ -25,7 +25,6 @@ ohos_shared_library("libdisplay_composer_service_1.2") {
   defines = []
   defines += display_defines
   include_dirs = [
-    "../../../../interface/display/composer",
     "../../utils/include",
     "include",
   ]
