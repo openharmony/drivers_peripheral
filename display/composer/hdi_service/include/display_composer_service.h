@@ -110,7 +110,7 @@ private:
     /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;
     DestroyComposerVdiFuncV1_1 destroyVdiFuncV1_1_;
-    std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponserV1_1_;
+    std::unique_ptr<V1_2::HdiDisplayCmdResponser_1_1> cmdResponserV1_1_;
     sptr<IRefreshCallback> refreshCb_;
     sptr<IVBlankIdleCallback> VBlankIdleCb_;
 };
