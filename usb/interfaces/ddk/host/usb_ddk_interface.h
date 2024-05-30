@@ -228,7 +228,7 @@ struct UsbControlRequest {
     /** Type of the received control request packet. For details, see {@link UsbRequestTargetType}. */
     UsbRequestTargetType target;
     /** Control request type. For details, see {@link UsbControlRequestType}. */
-    UsbControlRequestType reqType;
+    uint8_t reqType;
     /** Request data direction. For details, see {@link UsbRequestDirection}. */
     UsbRequestDirection directon;
     /** Request command */
