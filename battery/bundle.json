@@ -22,9 +22,7 @@
         "drivers_interface_battery",
         "hdf_core",
         "hilog",
-        "ipc"
-      ],
-      "third_party": [
+        "ipc",
         "jsoncpp"
       ]
     },

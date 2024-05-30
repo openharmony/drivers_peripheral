@@ -23,9 +23,7 @@
         "init",
         "ipc",
         "hdf_core",
-        "hilog"
-      ],
-      "third_party": [
+        "hilog",
         "libxml2",
         "zlib"
       ]

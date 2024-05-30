@@ -46,7 +46,6 @@ ohos_unittest("test_hdisrv") {
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
@@ -56,6 +55,7 @@ ohos_unittest("test_hdisrv") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
   ]
   if (has_battery_c_utils_part) {
     external_deps += [ "c_utils:utils" ]

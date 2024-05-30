@@ -11,15 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../thermal.gni")
 
 ohos_shared_library("libthermal_interface_service_1.1") {
-  include_dirs = [
-    "../../../../../hiperf/include",
-    "//third_party/libxml2/include",
-    "include",
-  ]
+  include_dirs = [ "include" ]
   sources = [
     "src/base_info_config.cpp",
     "src/isolate_info_config.cpp",
@@ -34,11 +29,6 @@ ohos_shared_library("libthermal_interface_service_1.1") {
     "src/thermal_zone_manager.cpp",
   ]
 
-  deps = [
-    "//third_party/libxml2:xml2",
-    "//third_party/zlib:libz",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_thermal:thermal_idl_headers",
@@ -47,6 +37,8 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_single",
+      "libxml2:libxml2",
+      "zlib:libz",
     ]
     if (has_thermal_c_utils_part) {
       external_deps += [ "c_utils:utils" ]
@@ -60,6 +52,8 @@ ohos_shared_library("libthermal_interface_service_1.1") {
       "hilog:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
+      "libxml2:libxml2",
+      "zlib:libz",
     ]
   }
 
