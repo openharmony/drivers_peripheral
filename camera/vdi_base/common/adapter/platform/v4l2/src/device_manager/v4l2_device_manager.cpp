@@ -369,7 +369,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             }
             {
                 std::lock_guard<std::mutex> l(mtx_);
-                hardwareList_.erase(iter);
+                iter = hardwareList_.erase(iter);
             }
         }
         CAMERA_LOGI("uvc plug out %{public}s end", hardwareName.c_str());
