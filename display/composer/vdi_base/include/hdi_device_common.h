@@ -17,7 +17,6 @@
 #define HDI_DEVICE_COMMON_H
 #include <memory>
 #include <unordered_map>
-#include "common/include/display_common.h"
 
 namespace OHOS {
 namespace HDI {

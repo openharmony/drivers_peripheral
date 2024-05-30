@@ -14,8 +14,6 @@
 import("//build/ohos.gni")
 import("./../../display_config.gni")
 
-root_path = "../../../../.."
-
 config("libdisplay_buffer_vdi_impl_default_config") {
   include_dirs = [ "include/" ]
 }
@@ -33,12 +31,9 @@ ohos_shared_library("display_buffer_vdi_impl_default") {
 
   include_dirs = [
     "include/",
-    "${root_path}/drivers/peripheral/base",
-    "${root_path}/drivers/interface/display/composer/hdifd_parcelable",
-    "${root_path}/drivers/interface/display/buffer",
-    "${root_path}/drivers/peripheral/display/utils/include",
-    "${root_path}/drivers/peripheral/display/buffer/hdi_service/include",
-    "${root_path}/foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "../../../base",
+    "../../utils/include",
+    "../hdi_service/include",
   ]
 
   output_name = "display_buffer_vdi_impl_default"
