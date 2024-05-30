@@ -38,6 +38,6 @@ struct WifiThreadParam {
 };
 int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data);
 void *EventThread(void *para);
-
+void WifiEventTxStatus(const char *ifName, struct nlattr **attr);
 
 #endif /* end of netlink_adapter.h */
