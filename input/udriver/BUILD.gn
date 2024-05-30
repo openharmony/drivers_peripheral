@@ -59,7 +59,9 @@ if (drivers_peripheral_input_feature_udriver) {
     part_name = "drivers_peripheral_input"
   }
 } else {
-  group("hdi_input_udriver") {
+  ohos_shared_library("hdi_input_udriver") {
     deps = []
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_input"
   }
 }
