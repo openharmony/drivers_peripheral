@@ -34,6 +34,13 @@
 #define HDF_LOG_TAG    usb_pnp_manager
 #define MODULENAMESIZE 128
 
+#ifdef USB_EMULATOR_MODE
+#define USB_GADGET_STATE_PATH "gadget_state_path"
+#define USB_GADGET_UEVENT_PATH "gadget_uevent_path"
+const char USB_EMULATOR_DEFAULT_STATE_PATH[] =  "/sys/class/gadget_usb/gadget0/state";
+const char USB_EMULATOR_DEFAULT_UEVENT_PATH[] = "/devices/virtual/gadget_usb/gadget0";
+#endif
+
 bool UsbPnpManagerWriteModuleName(struct HdfSBuf *sbuf, const char *moduleName)
 {
     char modName[MODULENAMESIZE] = {0};
@@ -105,10 +112,22 @@ static const char *UsbPnpMgrGetGadgetPath(struct HdfDeviceObject *device, const 
         HDF_LOGE("%{public}s: device is empty\n", __func__);
         return NULL;
     }
+#ifdef USB_EMULATOR_MODE
+    if (iface->GetString(device->property, attrName, &path, pathDef) != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s: emulator read %{public}s failed", __func__, attrName);
+
+        if (strncmp(attrName, USB_GADGET_STATE_PATH, strlen(USB_GADGET_STATE_PATH)) == 0) {
+            path = USB_EMULATOR_DEFAULT_STATE_PATH;
+        } else {
+            path = USB_EMULATOR_DEFAULT_UEVENT_PATH;
+        }
+    }
+#else
     if (iface->GetString(device->property, attrName, &path, pathDef) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read %{public}s failed", __func__, attrName);
         return NULL;
     }
+#endif
     return path;
 }
 
