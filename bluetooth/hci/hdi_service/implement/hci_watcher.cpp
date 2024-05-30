@@ -108,6 +108,8 @@ bool HciWatcher::Stop()
     return true;
 }
 
+#define FD_SETSIZE 1024
+
 void HciWatcher::WatcherThread()
 {
     fd_set readFds;
@@ -116,6 +118,10 @@ void HciWatcher::WatcherThread()
 
     while (running_) {
         FD_ZERO(&readFds);
+        if (wakeupPipe_[0] > FD_SETSIZE) {
+            HDF_LOGW("fd[%d]", wakeupPipe_[0]);
+            return;
+        }
         FD_SET(wakeupPipe_[0], &readFds);
         nfds = wakeupPipe_[0];
         {
