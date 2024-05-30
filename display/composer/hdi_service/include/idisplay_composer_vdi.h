@@ -19,7 +19,6 @@
 #include <vector>
 #include <string>
 #include "buffer_handle.h"
-#include "common/include/display_common.h"
 #include "v1_0/display_composer_type.h"
 
 namespace OHOS {
