@@ -54,6 +54,10 @@ public:
 
     int32_t SendNetworkInitiatedMsg(const std::string& msg, int32_t length) override;
 
+    int32_t EnableGnssMeasurement(const sptr<IGnssMeasurementCallback>& callbackObj) override;
+
+    int32_t DisableGnssMeasurement() override;
+
     void ResetGnss();
 private:
     int32_t AddGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj);
