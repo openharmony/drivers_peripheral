@@ -103,6 +103,7 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pin)
     }
     switch (pin) {
         case PIN_OUT_SPEAKER:
+        case PIN_OUT_BLUETOOTH_A2DP:
             return SPEAKER;
         case PIN_OUT_HEADSET:
             return HEADPHONES;
@@ -368,6 +369,7 @@ static int32_t AudioRenderParseDevice(struct AudioHwRenderParam *renderParam, cJ
             ret = SetMatchRenderDefaultDevicePath(renderParam, cJsonObj);
             break;
         case PIN_OUT_SPEAKER:
+        case PIN_OUT_BLUETOOTH_A2DP:
             /* 1.open speaker */
             ret = SetMatchRenderDevicePath(tpins, renderParam, cJsonObj, SPEAKER, AUDIO_DEV_ON);
 #ifndef ALSA_LIB_MODE
