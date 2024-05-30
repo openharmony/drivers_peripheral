@@ -33,7 +33,6 @@ ohos_unittest("codec_idl_omx_test") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_codec:libcodec_proxy_3.0",
-      "drivers_interface_codec:libcodec_proxy_3.0",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
       "drivers_interface_display:libdisplay_buffer_proxy_1.0",
       "drivers_interface_display:libdisplay_composer_hdi_impl",
