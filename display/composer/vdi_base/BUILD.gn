@@ -14,8 +14,6 @@
 import("//build/ohos.gni")
 import("./../../display_config.gni")
 
-root_path = "../../../../.."
-
 ohos_shared_library("display_composer_vdi_impl_default") {
   defines = []
   defines += display_defines
@@ -42,13 +40,11 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   include_dirs = [
     "include/",
     "../../buffer/vdi_base/include",
-    "${root_path}/drivers/peripheral/display/buffer/hdi_service/include",
-    "${root_path}/drivers/peripheral/display/composer/hdi_service/include",
-    "${root_path}/drivers/peripheral/display/utils/include",
-    "${root_path}/drivers/peripheral/base",
-    "${root_path}/drivers/interface/display/composer",
-    "${root_path}/foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${root_path}/drivers/interface/display/composer/hdifd_parcelable",
+    "../../composer/vdi_base/include",
+    "../../buffer/hdi_service/include",
+    "../../display/buffer/hdi_service/include",
+    "../hdi_service/include",
+    "../../utils/include",
   ]
 
   deps = [ "../../buffer/vdi_base:display_buffer_vdi_impl_default" ]
@@ -60,6 +56,7 @@ ohos_shared_library("display_composer_vdi_impl_default") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:libdisplay_buffer_stub_1.0",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_stub_1.0",
     "graphic_surface:buffer_handle",
     "hdf_core:libhdf_utils",

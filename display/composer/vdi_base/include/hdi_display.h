@@ -22,6 +22,7 @@
 #include "hdi_composer.h"
 #include "hdi_layer.h"
 #include "v1_0/display_composer_type.h"
+#include "v1_2/include/idisplay_composer_interface.h"
 
 namespace OHOS {
 namespace HDI {
