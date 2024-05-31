@@ -339,6 +339,10 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
         case NL80211_CMD_TRIGGER_SCAN:
             HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_TRIGGER_SCAN");
             break;
+        case NL80211_CMD_FRAME_TX_STATUS:
+            HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_FRAME_TX_STATUS");
+            WifiEventTxStatus(ifName, attr);
+            break;
         default:
             HILOG_INFO(LOG_CORE, "not supported cmd");
             break;
