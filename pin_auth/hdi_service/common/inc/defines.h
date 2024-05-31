@@ -113,10 +113,6 @@ typedef enum ResultCodeForCoAuth {
      * Indicates that the user has not enrolled the authenticator.
      */
     NOT_ENROLLED = 10,
-    /**
-     * The result is fail, because the pin credential is expired.
-    */
-    PIN_EXPIRED = 13,
 } ResultCodeForCoAuth;
 
 typedef enum AuthType {

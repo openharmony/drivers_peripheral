@@ -169,12 +169,8 @@ HWTEST_F(UserAuthFuncsTest, TestCheckReuseUnlockResultFunc002, TestSize.Level0)
 HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
 {
     GlobalConfigParamHal param = {};
-    ExecutorExpiredInfo expiredInfo = {};
-    uint32_t size = 0;
-    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr, &expiredInfo, 0, &size), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, nullptr, 0, &size), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param, &expiredInfo, 0, &size), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SetGlobalConfigParamFunc(nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param), RESULT_GENERAL_ERROR);
 }
 } // namespace UserAuth
 } // namespace UserIam

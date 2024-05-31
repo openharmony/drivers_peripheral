@@ -52,7 +52,6 @@ private:
     OHOS::ThreadPool threadPool_;
     std::optional<uint64_t> scheduleId_;
     sptr<HdiIExecutorCallback> callback_;
-    uint64_t authExpiredSysTime_;
 };
 } // PinAuth
 } // HDI

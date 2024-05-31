@@ -26,7 +26,6 @@
 #include "iam_ptr.h"
 
 #include "adaptor_time.h"
-#include "attributes.h"
 #include "useriam_common.h"
 #include "auth_level.h"
 #include "buffer.h"
@@ -52,8 +51,6 @@ namespace UserAuth {
 namespace {
 static std::mutex g_mutex;
 static std::string g_localUdid;
-static std::recursive_mutex g_executorMessageMutex;
-sptr<HdiIMessageCallback> g_executorMessageCallback;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 const std::string SCREEN_LOCK_NAME = "com.ohos.systemui";
 const std::string SETTRINGS_NAME = "com.ohos.settings";
@@ -1399,25 +1396,9 @@ int32_t UserAuthInterfaceService::SendMessage(uint64_t scheduleId, int32_t srcRo
     return HDF_SUCCESS;
 }
 
-static sptr<HdiIMessageCallback> GetExecutorMessageCallback()
-{
-    std::lock_guard<std::recursive_mutex> lock(g_executorMessageMutex);
-    if (g_executorMessageCallback == nullptr) {
-        IAM_LOGE("bad messageCallback");
-        return nullptr;
-    }
-    return g_executorMessageCallback;
-}
-
 int32_t UserAuthInterfaceService::RegisterMessageCallback(const sptr<IMessageCallback>& messageCallback)
 {
-    IAM_LOGI("start");
-    if (messageCallback == nullptr) {
-        IAM_LOGE("RegisterMessageCallback bad param");
-        return RESULT_BAD_PARAM;
-    }
-    std::lock_guard<std::recursive_mutex> lock(g_executorMessageMutex);
-    g_executorMessageCallback = messageCallback;
+    static_cast<void>(messageCallback);
     return HDF_SUCCESS;
 }
 
@@ -1670,31 +1651,6 @@ FAIL:
     return ret;
 }
 
-static uint32_t SetExecutorMessage(uint64_t authExpiredSysTime, std::vector<uint8_t> executorMsg)
-{
-    Attributes attr = Attributes();
-    if (!attr.SetUint64Value(Attributes::ATTR_EXPIRED_SYS_TIME, authExpiredSysTime)) {
-        IAM_LOGE("SetUint64Value authExpiredSysTime failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    std::vector<uint8_t> authData = attr.Serialize();
-
-    Attributes authDataAttr = Attributes();
-    if (!authDataAttr.SetUint8ArrayValue(Attributes::ATTR_DATA, authData)) {
-        IAM_LOGE("SetUint8ArrayValue authData failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    std::vector<uint8_t> authRoot = authDataAttr.Serialize();
-
-    Attributes authRootAttr = Attributes();
-    if (!authRootAttr.SetUint8ArrayValue(Attributes::ATTR_ROOT, authRoot)) {
-        IAM_LOGE("SetUint8ArrayValue authRoot failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    executorMsg = authRootAttr.Serialize();
-    return RESULT_SUCCESS;
-}
-
 int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
 {
     IAM_LOGI("start");
@@ -1709,30 +1665,10 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         paramHal.value.pinExpiredPeriod = param.value.pinExpiredPeriod;
     }
 
-    ExecutorExpiredInfo expiredInfos[MAX_SCHEDULE_NUM];
-    uint32_t size = 0;
-    uint32_t ret = SetGlobalConfigParamFunc(&paramHal, expiredInfos, MAX_SCHEDULE_NUM, &size);
+    uint32_t ret = SetGlobalConfigParamFunc(&paramHal);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetGlobalConfigParamFunc failed");
-        return ret;
     }
-    sptr<HdiIMessageCallback> messageCallback = GetExecutorMessageCallback();
-    if (messageCallback == nullptr) {
-        IAM_LOGE("GetExecutorMessageCallback failed");
-        return RESULT_SUCCESS;
-    }
-    for (uint32_t i = 0; i < size; i++) {
-        std::vector<uint8_t> msg;
-        if (SetExecutorMessage(expiredInfos[i].authExpiredSysTime, msg) != RESULT_SUCCESS) {
-            continue;
-        }
-        if (messageCallback->OnMessage(expiredInfos[i].scheduleId, expiredInfos[i].scheduleMode, msg) !=
-            RESULT_SUCCESS) {
-            IAM_LOGE("SendMessage failed");
-            continue;
-        }
-    }
-    IAM_LOGI("send expiredSysTime success size is %{public}d", size);
     return ret;
 }
 } // Userauth

@@ -19,7 +19,6 @@
 
 #include "securec.h"
 
-#include "attributes.h"
 #include "all_in_one_impl.h"
 #include "common_impl.h"
 #include "pin_auth_hdi.h"
@@ -155,33 +154,6 @@ HWTEST_F(AllInOneImplTest, Hdi_is_not_nullptr_test, TestSize.Level1)
     delete impl;
     DestroyKeyPair(keyPair);
     DestroyBuffer(fwkExtraInfo);
-}
-
-/**
- * @tc.name: Hdi_send_message test
- * @tc.desc: verify Hdi_send_message
- * @tc.type: FUNC
- * @tc.require: #I64XCB
- */
-HWTEST_F(AllInOneImplTest, Hdi_Send_Message_test, TestSize.Level1)
-{
-    std::shared_ptr<PinAuth> pinHdi = std::make_shared<PinAuth>();
-    EXPECT_NE(pinHdi, nullptr);
-    pinHdi->Init();
-    AllInOneImpl *impl = new (std::nothrow) AllInOneImpl(pinHdi);
-    uint64_t scheduleId = 1;
-    int32_t srcRole = 0;
-    uint64_t authExpiredSysTime = 1;
-    std::vector<uint8_t> msg;
-    int32_t result = impl->SendMessage(scheduleId, srcRole, msg);
-    EXPECT_EQ(result, HDF_SUCCESS);
-
-    Attributes attr = Attributes();
-    attr.SetUint64Value(Attributes::AUTH_EXPIRED_SYS_TIME, authExpiredSysTime);
-    msg = attr.Serialize();
-    result = impl->SendMessage(scheduleId, srcRole, msg);
-    EXPECT_EQ(result, HDF_SUCCESS);
-    delete impl;
 }
 } // namespace PinAuth
 } // namespace UserIam
