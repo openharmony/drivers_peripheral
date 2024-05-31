@@ -54,8 +54,6 @@ ohos_benchmarktest("hdf_audio_benchmark_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_audio:audio_idl_headers",
-      "drivers_interface_audio:effect_idl_headers",
       "drivers_interface_audio:libaudio_proxy_3.0",
       "drivers_interface_audio:libeffect_proxy_1.0",
       "hdf_core:libhdf_utils",
