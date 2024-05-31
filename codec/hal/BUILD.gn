@@ -26,7 +26,6 @@ ohos_shared_library("libcodec_hdi_omx_server") {
     "../hal/v2.0/hdi_impl/include",
     "../hal/include",
     "../utils/include",
-    "../../base",
   ]
   configs = [ ":headers_config" ]
 
@@ -89,7 +88,6 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
     "../hal/v2.0/hdi_impl/include",
     "../hal/include",
     "../utils/include",
-    "../../base",
   ]
   sources = [
     "../utils/src/codec_util.c",
