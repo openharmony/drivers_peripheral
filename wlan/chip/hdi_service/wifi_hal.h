@@ -122,6 +122,7 @@ typedef struct {
         OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollResult);
     WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
     WifiError (*registerIfaceCallBack)(const char *, WifiScanResHandler);
+    WifiError (*setTxPower)(const char *, int);
 } WifiHalFn;
 
 WifiError InitWifiVendorHalFuncTable(WifiHalFn *fn);
