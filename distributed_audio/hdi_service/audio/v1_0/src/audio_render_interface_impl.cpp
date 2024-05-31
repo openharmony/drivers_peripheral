@@ -114,7 +114,9 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         SaveFile(HDF_RENDER_FILENAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
     }
 #endif
-    FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
+    if (currentFrame_ < DURATION_FRAMES_MINUS) {
+        FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
+    }
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;

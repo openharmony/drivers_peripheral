@@ -9,6 +9,9 @@
     "component": {
       "name": "drivers_peripheral_distributed_audio",
       "subsystem": "hdf",
+      "features": [
+        "drivers_peripheral_distributed_audio_extension"
+      ],
       "adapted_system_type": [
         "standard"
       ],
