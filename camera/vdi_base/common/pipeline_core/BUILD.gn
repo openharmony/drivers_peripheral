@@ -152,8 +152,6 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "$camera_path/utils:peripheral_camera_utils",
   ]
 
-  public_deps = [ "//third_party/libjpeg-turbo:turbojpeg_static" ]
-
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_utils",
@@ -170,6 +168,8 @@ ohos_shared_library("peripheral_camera_pipeline_core") {
     "hdf_core:libhdf_host",
     "ipc:ipc_single",
   ]
+
+  public_external_deps = [ "libjpeg-turbo:turbojpeg_static" ]
 
   public_configs = [ ":pipe_config" ]
   install_images = [ chipset_base_dir ]
