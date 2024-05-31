@@ -64,7 +64,6 @@ ohos_shared_library("libcodec_image_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libimage_proxy_1.0",
       "drivers_interface_codec:libimage_stub_1.0",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
