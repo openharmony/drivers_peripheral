@@ -44,7 +44,7 @@ if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
 
     if (is_standard_system) {
       external_deps = [
-        "drivers_interface_audio:audio_idl_headers",
+        "drivers_interface_audio:libaudio_proxy_3.0",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
