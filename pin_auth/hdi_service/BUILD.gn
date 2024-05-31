@@ -53,7 +53,6 @@ ohos_shared_library("libpin_auth_interface_service_2.0") {
     "main/src/pin_auth.cpp",
     "main/src/verifier_func.c",
     "service/src/all_in_one_impl.cpp",
-    "service/src/attributes.cpp",
     "service/src/collector_impl.cpp",
     "service/src/executor_impl_common.cpp",
     "service/src/pin_auth_interface_service.cpp",

@@ -378,17 +378,6 @@ HWTEST_F(ContextManagerTest, TestSetContextExpiredTime, TestSize.Level0)
     UserAuthContext context = {};
     EXPECT_EQ(SetContextExpiredTime(&context), RESULT_SUCCESS);
 }
-
-HWTEST_F(ContextManagerTest, TestUpdateExecutorExpiredInfo, TestSize.Level0)
-{
-    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, NULL), RESULT_BAD_PARAM);
-
-    uint32_t size = 1;
-    ExecutorExpiredInfo expiredInfo = {};
-    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, NULL), RESULT_BAD_PARAM);
-    EXPECT_EQ(UpdateExecutorExpiredInfo(NULL, 0, &size), RESULT_BAD_PARAM);
-    EXPECT_EQ(UpdateExecutorExpiredInfo(&expiredInfo, 0, &size), RESULT_BAD_PARAM);
-}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

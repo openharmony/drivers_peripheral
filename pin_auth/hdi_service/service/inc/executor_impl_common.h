@@ -25,8 +25,6 @@ constexpr uint32_t EXECUTOR_MATCHER = 0;
 constexpr uint16_t SENSOR_ID = 1;
 
 void CallError(const sptr<HdiIExecutorCallback> &callback, uint32_t errorCode);
-bool GetAuthExpiredSysTime(const std::vector<uint8_t> &extraInfo, uint64_t &authExpiredSysTime);
-bool CheckAuthExpired(uint64_t authExpiredSysTime);
 } // PinAuth
 } // HDI
 } // OHOS

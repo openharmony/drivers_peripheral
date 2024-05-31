@@ -397,26 +397,17 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
     return ret;
 }
 
-ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param, ExecutorExpiredInfo *expiredInfos, uint32_t len,
-    uint32_t *size)
+ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param)
 {
-    if (param == NULL || expiredInfos == NULL || size == NULL) {
+    if (param == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
     ResultCode ret = SaveGlobalConfigParam(param);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("Save globalConfigParam failed");
-        return ret;
     }
-    if (param->type == PIN_EXPIRED_PERIOD) {
-        ret = UpdateExecutorExpiredInfo(expiredInfos, len, size);
-        if (ret != RESULT_SUCCESS) {
-            LOG_ERROR("refresh ExecutorExpiredInfo failed");
-            return ret;
-        }
-    }
-    return RESULT_SUCCESS;
+    return ret;
 }
 
 void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)

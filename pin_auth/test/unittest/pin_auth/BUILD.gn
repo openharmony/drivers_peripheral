@@ -54,13 +54,9 @@ ohos_unittest("PinAuthHdiUtTest") {
     "main/src/all_in_one_func_test.cpp",
     "main/src/pin_auth_test.cpp",
     "service/src/all_in_one_impl_test.cpp",
-    "service/src/attributes_test.cpp",
   ]
 
-  deps = [
-    "../../../hdi_service:libpin_auth_interface_service_2.0",
-    "//third_party/googletest:gmock",
-  ]
+  deps = [ "../../../hdi_service:libpin_auth_interface_service_2.0" ]
 
   external_deps = [
     "c_utils:utils",

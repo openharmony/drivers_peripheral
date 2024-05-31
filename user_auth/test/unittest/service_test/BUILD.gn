@@ -41,7 +41,6 @@ ohos_unittest("UserAuthHdiTest") {
   ]
 
   sources = [
-    "src/attributes_test.cpp",
     "src/signature_operation.cpp",
     "src/user_auth_interface_service_test.cpp",
   ]
