@@ -1248,6 +1248,14 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    int32_t ret = 0;
+    if (port->ctrDevHandle != nullptr) {
+        ret = UsbCloseInterface(port->ctrDevHandle);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
+            return HDF_FAILURE;
+        }
+    }
     return HDF_SUCCESS;
 }
 
