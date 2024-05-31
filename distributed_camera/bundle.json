@@ -13,6 +13,9 @@
     "component":{
         "name":"drivers_peripheral_distributed_camera",
         "subsystem":"hdf",
+        "features": [
+            "drivers_peripheral_distributed_camera_extension"
+        ],
         "adapted_system_type":[
             "standard"
         ],
