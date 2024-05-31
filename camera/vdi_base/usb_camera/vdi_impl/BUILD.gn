@@ -89,7 +89,7 @@ host_includes = [
   "$camera_path_vdi/pipeline_core/pipeline_impl/src/strategy",
   "$camera_path_vdi/pipeline_core/ipp/include",
 
-  "$camera_path_hdf_core/adapter/uhdf2/ipc/include",
+  # "$camera_path_hdf_core/adapter/uhdf2/ipc/include",
 ]
 
 ohos_shared_library("camera_daemon") {
