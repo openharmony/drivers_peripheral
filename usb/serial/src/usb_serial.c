@@ -701,7 +701,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     }
     uint32_t count = g_syncRequest->compInfo.actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
-    if ((data == NULL) || (!g_syncRequest)) {
+    if (data == NULL) {
         return HDF_FAILURE;
     }
 
