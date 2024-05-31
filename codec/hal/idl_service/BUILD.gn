@@ -83,7 +83,6 @@ ohos_shared_library("libcodec_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_codec:libcodec_proxy_3.0",
       "drivers_interface_codec:libcodec_stub_3.0",
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_host",
