@@ -3104,7 +3104,7 @@ void WifiEventTxStatus(const char *ifName, struct nlattr **attr)
 static int32_t WifiSendActionFrameHandler(struct nl_msg *msg, void *arg)
 {
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
-    Genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     if (hdr == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
         return NL_SKIP;
