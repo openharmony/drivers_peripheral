@@ -72,7 +72,8 @@ host_includes = [
   "$camera_path_vdi/device_manager/include",
   "$camera_path_vdi/buffer_manager/src/buffer_adapter/standard",
   "$camera_path_vdi/utils/event",
-  "$camera_path_vdi/../../../display/interfaces/include",
+
+  # "$camera_path_vdi/../../../display/interfaces/include",
   "$camera_path_vdi/dump/include",
 
   #producer
