@@ -50,6 +50,7 @@ public:
     int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor) override;
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
     int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd) override;
+    int32_t GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd) override;
     int32_t SetConfig(const UsbDev &dev, uint8_t configIndex) override;
     int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex) override;
     int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t force) override;

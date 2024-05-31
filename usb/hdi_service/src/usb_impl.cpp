@@ -1147,6 +1147,21 @@ int32_t UsbImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr || port->ctrDevHandle == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+
+    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
+    OsalMutexLock(&handle->devHandle->lock);
+    fd = handle->devHandle->fd;
+    OsalMutexUnlock(&handle->devHandle->lock);
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
