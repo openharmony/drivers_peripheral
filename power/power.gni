@@ -20,6 +20,10 @@ declare_args() {
 }
 
 declare_args() {
+  drivers_peripheral_power_enable_s4 = false
+}
+
+declare_args() {
   drivers_peripheral_power_faster_retry_of_sleep = false
 }
 
