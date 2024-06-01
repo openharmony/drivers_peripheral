@@ -251,6 +251,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutQp,
     /** double */
     OMX_IndexParamEncOutMse,
+    /** CodecEncOutLTRParam */
+    OMX_IndexParamEncOutLTR,
 };
 
 /**
@@ -381,6 +383,11 @@ struct CodecLTRPerFrameParam {
     bool markAsLTR;
     bool useLTR;
     uint32_t useLTRPoc;
+};
+
+struct CodecEncOutLTRParam {
+    bool isLTR;
+    uint32_t poc;
 };
 
 struct CodecQPRangeParam {
