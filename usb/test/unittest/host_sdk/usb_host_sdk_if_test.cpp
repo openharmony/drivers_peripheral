@@ -554,7 +554,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = UsbCloseInterface(g_acm->int_devHandle,false);
+    ret = UsbCloseInterface(g_acm->int_devHandle, false);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
