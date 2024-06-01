@@ -1217,25 +1217,31 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode SavePinExpiredPeriod(int64_t pinExpiredPeriod)
+IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t index)
 {
-    if (pinExpiredPeriod < 0) {
-        pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+    memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
+    g_globalConfigArray[index].type = param->type;
+    switch(param->type) {
+        case PIN_EXPIRED_PERIOD:
+            g_globalConfigArray[index].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
+            break;
+        case ENABLE_STATUS:
+            g_globalConfigArray[index].value.enableStatus = param->value.enableStatus;
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
+            return RESULT_GENERAL_ERROR;
     }
-    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
-        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
-            g_globalConfigArray[i].value.pinExpiredPeriod = pinExpiredPeriod;
-            return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
-        }
+
+    g_globalConfigArray[index].userIdNum = param->userIdNum;
+    for (uint32_t i = 0; i < param->userIdNum; i++) {
+        g_globalConfigArray[index].userIds[i] = param->userIds[i];
     }
-    if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
-        g_globalConfigInfoNum++;
-        g_globalConfigArray[g_globalConfigInfoNum - 1].type = PIN_EXPIRED_PERIOD;
-        g_globalConfigArray[g_globalConfigInfoNum - 1].value.pinExpiredPeriod = pinExpiredPeriod;
-        return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+    g_globalConfigArray[index].authTypeNum = param->authTypeNum;
+    for (uint32_t i = 0; i < param->authTypeNum; i++) {
+        g_globalConfigArray[index].authTypes[i] = param->authTypes[i];
     }
-    LOG_ERROR("SavePinExpiredPeriod failed");
-    return RESULT_GENERAL_ERROR;
+    return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
 }
 
 
@@ -1245,9 +1251,17 @@ ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
-    if (param->type == PIN_EXPIRED_PERIOD) {
-        return SavePinExpiredPeriod(param->value.pinExpiredPeriod);
+
+    for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
+        if (g_globalConfigArray[infoIndex].type == param->type) {
+            return UpdateGlobalConfigArray(param, infoIndex);
+        }
     }
+    if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
+        g_globalConfigInfoNum++;
+        return UpdateGlobalConfigArray(param, g_globalConfigInfoNum - 1);
+    }
+
     LOG_ERROR("SaveGlobalConfigParam type %{public}d failed", param->type);
     return RESULT_GENERAL_ERROR;
 }
