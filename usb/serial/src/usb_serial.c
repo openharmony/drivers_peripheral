@@ -1549,12 +1549,12 @@ static void AcmCloseInterfaces(struct AcmDevice *acm)
 {
     for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         if (acm->devHandle[i]) {
-            UsbCloseInterface(acm->devHandle[i]);
+            UsbCloseInterface(acm->devHandle[i], false);
             acm->devHandle[i] = NULL;
         }
     }
     if (acm->ctrDevHandle) {
-        UsbCloseInterface(acm->ctrDevHandle);
+        UsbCloseInterface(acm->ctrDevHandle, false);
         acm->ctrDevHandle = NULL;
     }
 }
