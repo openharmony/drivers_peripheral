@@ -199,8 +199,8 @@ void V4L2SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
-    CAMERA_LOGI("V4L2SourceNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
-        buffer->GetStreamId(), buffer->GetIndex());
+    CAMERA_LOGI("V4L2SourceNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d], width:%{public}d, high_:%{public}d",
+        buffer->GetStreamId(), buffer->GetIndex(), wide_, high_);
     buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
