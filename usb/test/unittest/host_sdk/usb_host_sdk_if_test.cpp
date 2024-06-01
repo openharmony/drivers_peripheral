@@ -528,7 +528,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface001, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = UsbCloseInterface(g_acm->data_devHandle);
+    ret = UsbCloseInterface(g_acm->data_devHandle, false);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -554,7 +554,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = UsbCloseInterface(g_acm->int_devHandle);
+    ret = UsbCloseInterface(g_acm->int_devHandle,false);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -580,7 +580,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface003, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = UsbCloseInterface(NULL);
+    ret = UsbCloseInterface(NULL, false);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
@@ -594,7 +594,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface004, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = UsbCloseInterface(g_acm->ctrl_devHandle);
+    ret = UsbCloseInterface(g_acm->ctrl_devHandle, false);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
