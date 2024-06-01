@@ -201,8 +201,8 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
         return;
     }
-    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d]",
-        buffer->GetStreamId(), buffer->GetIndex());
+    CAMERA_LOGI("UvcNode::DeliverBuffer Begin, streamId[%{public}d], index[%{public}d], wide_[%{public}d], high_[%{public}d]",
+        buffer->GetStreamId(), buffer->GetIndex(), wide_, high_);
 
     buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_422_P);
     buffer->SetCurWidth(wide_);
