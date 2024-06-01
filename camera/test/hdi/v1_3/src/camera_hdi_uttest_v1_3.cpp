@@ -1289,7 +1289,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_034, TestSize.Level1)
             ss.str("");
         }
     }
-        CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value end.");
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value end.");
 }
 
 /**
@@ -1320,5 +1320,5 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_035, TestSize.Level1)
             ss.str("");
         }
     }
-        CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value end.");
+    CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value end.");
 }
