@@ -491,6 +491,7 @@ int32_t StreamOperatorVdiImpl::Capture(int32_t captureId, const VdiCaptureInfo &
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
                                          info.enableShutterCallback_, isStreaming);
+    request->SetFirstRequest(!isStreaming);
     for (auto id : info.streamIds_) {
         RetCode rc = streamMap_[id]->AddRequest(request);
         if (rc != RC_OK) {
