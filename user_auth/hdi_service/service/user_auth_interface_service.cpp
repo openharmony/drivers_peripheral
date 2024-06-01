@@ -1653,17 +1653,36 @@ FAIL:
 
 int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
 {
-    IAM_LOGI("start");
-    if (param.type != PIN_EXPIRED_PERIOD) {
-        IAM_LOGE("bad global config type");
+    IAM_LOGI("start, global config type is %{public}d", param.type);
+    GlobalConfigParamHal paramHal = {};
+    switch (param.type) {
+        case PIN_EXPIRED_PERIOD:
+            paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
+            if (param.value.pinExpiredPeriod > 0) {
+                paramHal.value.pinExpiredPeriod = param.value.pinExpiredPeriod;
+            }
+            break;
+        case ENABLE_STATUS:
+            paramHal.value.enableStatus = param.value.enableStatus;
+            break;
+        default:
+            IAM_LOGE("bad global config type");
+            return RESULT_BAD_PARAM;
+    }
+    paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
+
+    if (param.userIds.size() > MAX_USER || param.authTypes.size() > MAX_AUTH_TYPE_LEN) {
+        IAM_LOGE("bad pinExpiredPeriod value");
         return RESULT_BAD_PARAM;
     }
-    GlobalConfigParamHal paramHal = {};
-    paramHal.type = PIN_EXPIRED_PERIOD;
-    paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
-    if (param.value.pinExpiredPeriod > 0) {
-        paramHal.value.pinExpiredPeriod = param.value.pinExpiredPeriod;
+    for (uint32_t i = 0; i < param.userIds.size(); i++) {
+        paramHal.userIds[i] = static_cast<int32_t>(param.userIds[i]);
     }
+    paramHal.userIdNum = param.userIds.size();
+    for (uint32_t i = 0; i < param.authTypes.size(); i++) {
+        paramHal.authTypes[i] = static_cast<uint32_t>(param.authTypes[i]);
+    }
+    paramHal.authTypeNum = param.authTypes.size();
 
     uint32_t ret = SetGlobalConfigParamFunc(&paramHal);
     if (ret != RESULT_SUCCESS) {
