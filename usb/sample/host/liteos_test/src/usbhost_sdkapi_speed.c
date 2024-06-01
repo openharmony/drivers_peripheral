@@ -456,7 +456,7 @@ static void UsbSpeedDdkExit(void)
     }
     AcmDataBufFree(g_acm);
     for (i = 0; i < g_acm->interfaceCnt; i++) {
-        UsbCloseInterface(g_acm->devHandle[i]);
+        UsbCloseInterface(g_acm->devHandle[i], false);
         UsbReleaseInterface(g_acm->iface[i]);
     }
     UsbExitHostSdk(NULL);

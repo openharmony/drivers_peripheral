@@ -402,7 +402,7 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle);
+int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle, bool isCtrInterface);
 
 /**
  * @brief Sets the optional configuration.
