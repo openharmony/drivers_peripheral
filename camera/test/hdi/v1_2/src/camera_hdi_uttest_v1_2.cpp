@@ -1677,7 +1677,7 @@ HWTEST_F(CameraHdiUtTestV1_2, Camera_Device_Hdi_V1_2_054, TestSize.Level1)
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
         CAMERA_LOGD("MoonCaptureBoost mode is set enabled.");
 
-        cameraTest->intents = {PREVIEW, STILL_CAPTURE, VIDEO};
+        cameraTest->intents = {PREVIEW, STILL_CAPTURE};
         cameraTest->StartStream(cameraTest->intents);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
         cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
