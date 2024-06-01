@@ -31,7 +31,7 @@ ohos_shared_library("libthermal_interface_service_1.1") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_thermal:thermal_idl_headers",
+      "drivers_interface_thermal:libthermal_stub_1.1",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "init:libbeget_proxy",

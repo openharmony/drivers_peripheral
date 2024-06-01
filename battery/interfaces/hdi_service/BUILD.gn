@@ -28,7 +28,7 @@ ohos_shared_library("libbattery_interface_service_2.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_battery:battery_idl_headers",
+      "drivers_interface_battery:libbattery_stub_2.0",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
       "ipc:ipc_single",
