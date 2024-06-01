@@ -1229,3 +1229,96 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_032, TestSize.Level1)
         std::cout << "==========================" << std::endl;
     }
 }
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_033
+ * @tc.desc:OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_033, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL> value end.");
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_034
+ * @tc.desc:OHOS_ABILITY_AVAILABLE_CONFIGURATIONS
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_034, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_CONFIGURATIONS, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_CONFIGURATIONS is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value end.");
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_035
+ * @tc.desc:OHOS_ABILITY_CONFLICT_CONFIGURATIONS
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_035, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CONFLICT_CONFIGURATIONS, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_CONFLICT_CONFIGURATIONS is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+        CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value end.");
+}
