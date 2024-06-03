@@ -54,10 +54,7 @@
                     "header":{
                         "header_files":[
                         ],
-                        "header_base":[
-                            "//drivers/peripheral/usb/hdi_service/include",
-                            "//drivers/peripheral/usb/utils/include"
-                        ]
+                        "header_base":[ ]
                     }
                 }
             ]
