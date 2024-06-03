@@ -53,7 +53,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
-      "FreeBSD:libfreebsd_input",
+      "FreeBSD:libfreebsd_static",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
