@@ -49,7 +49,11 @@
             "test": [
                 "//drivers/peripheral/usb/test:hdf_test_usb"
             ],
-            "inner_kits": []
+            "inner_kits": [
+                {
+                    "name":"//drivers/peripheral/usb/hdi_service:libusb_interface_service_1.1"
+                }
+            ]
         }
     }
 }
