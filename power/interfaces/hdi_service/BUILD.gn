@@ -16,7 +16,6 @@ import("../../power.gni")
 ohos_shared_library("libpower_interface_service_1.2") {
   include_dirs = [ "../../utils/include" ]
   sources = [
-    "src/hibernate.cpp",
     "src/power_interface_impl.cpp",
     "src/running_lock_counter.cpp",
     "src/running_lock_impl.cpp",
@@ -66,6 +65,7 @@ ohos_shared_library("libpower_interface_service_1.2") {
   }
 
   if (drivers_peripheral_power_enable_s4) {
+    sources += [ "src/hibernate.cpp" ]
     defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_S4" ]
   }
 
