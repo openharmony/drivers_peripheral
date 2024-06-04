@@ -26,7 +26,9 @@ extern "C" {
 #endif
 
 #define ETH_ADDR_LEN 6
+#ifndef IFNAMSIZ
 #define IFNAMSIZ 16
+#endif
 #define WIFI_REASON_LENGTH 32
 #define WIFI_SSID_LENGTH 132
 
