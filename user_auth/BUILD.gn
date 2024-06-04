@@ -12,7 +12,7 @@
 # limitations under the License.
 
 declare_args() {
-  oh_useriam_driver_enabled = true
+  drivers_peripheral_user_auth_enabled = true
 }
 
 if (defined(ohos_lite)) {
