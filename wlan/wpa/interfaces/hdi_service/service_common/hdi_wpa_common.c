@@ -275,7 +275,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
     } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
         return P2pCliCmd(GetP2pCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "chba", strlen("chba")) == 0) {
-        return ChbaCliCmd(GetP2pCtrl(), cmd, buf, bufLen);
+        return ChbaCliCmd(GetChbaCtrl(), cmd, buf, bufLen);
     } else if (strncmp(ifName, "common", strlen("common")) == 0) {
         return CommonCliCmd(GetCommonCtrl(), cmd, buf, bufLen);
     } else {
