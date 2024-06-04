@@ -250,7 +250,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
     int pos = 0;
     const char* retVal;
 
-    CAMERA_LOGI("UVC:V4L2GetUsbString enter\n");
+    CAMERA_LOGD("UVC:V4L2GetUsbString enter\n");
 
     lineLen = strlen(buf);
     while (pos + lineLen < len && lineLen) {
@@ -260,7 +260,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
                 action = "";
             } else {
                 action = std::string(retVal);
-                CAMERA_LOGI("UVC:V4L2GetUsbString action %{public}s\n", action.c_str());
+                CAMERA_LOGD("UVC:V4L2GetUsbString action %{public}s\n", action.c_str());
             }
         }
 
@@ -270,7 +270,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
                 subsystem = "";
             } else {
                 subsystem = std::string(retVal);
-                CAMERA_LOGI("UVC:V4L2GetUsbString subsystem %{public}s\n", subsystem.c_str());
+                CAMERA_LOGD("UVC:V4L2GetUsbString subsystem %{public}s\n", subsystem.c_str());
             }
         }
 
@@ -280,7 +280,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
                 devnode = "";
             } else {
                 devnode = std::string(retVal);
-                CAMERA_LOGI("UVC:V4L2GetUsbString devnode %{public}s\n", devnode.c_str());
+                CAMERA_LOGD("UVC:V4L2GetUsbString devnode %{public}s\n", devnode.c_str());
             }
         }
 
@@ -288,7 +288,7 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
         lineLen = strlen(buf + pos);
     }
 
-    CAMERA_LOGI("UVC:V4L2GetUsbString exit\n");
+    CAMERA_LOGD("UVC:V4L2GetUsbString exit\n");
 }
 
 void HosV4L2UVC::loopUvcDevice()
@@ -318,8 +318,8 @@ void HosV4L2UVC::loopUvcDevice()
             CAMERA_LOGI("UVC:No Device from udev_monitor_receive_device() or exit uvcDetectEnable = %{public}d\n",
                 g_uvcDetectEnable);
         }
-        CAMERA_LOGI("UVC: device detect thread exit");
     }
+    CAMERA_LOGI("UVC: device detect thread exit");
 }
 
 int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)

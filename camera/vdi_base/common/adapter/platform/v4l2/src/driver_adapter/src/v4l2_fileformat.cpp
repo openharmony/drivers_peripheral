@@ -45,7 +45,7 @@ void HosFileFormat::V4L2GetCurrentFormat(int fd, std::vector<DeviceFormat>& fmtD
 
         fmtDesc.push_back(currentFormat);
 
-        CAMERA_LOGI("frame interval: %{public}d, %{public}d\n\n",
+        CAMERA_LOGD("frame interval: %{public}d, %{public}d\n\n",
             fraMival.discrete.numerator, fraMival.discrete.denominator);
     }
 }
@@ -65,7 +65,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
             break;
         }
 
-        CAMERA_LOGI("[%{public}d]Supported format with description = %{public}s\n\n", i, enumFmtDesc.description);
+        CAMERA_LOGD("[%{public}d]Supported format with description = %{public}s\n\n", i, enumFmtDesc.description);
 
         for (j = 0; j < fmtMax; ++j) {
             frmSize.index = j;
@@ -75,7 +75,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
             }
 
             if (frmSize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-                CAMERA_LOGI("V4L2_FRMSIZE_TYPE_DISCRETE width %{public}d x height %{public}d\n\n",
+                CAMERA_LOGD("V4L2_FRMSIZE_TYPE_DISCRETE width %{public}d x height %{public}d\n\n",
                     frmSize.discrete.width, frmSize.discrete.height);
             }
 
