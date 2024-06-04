@@ -43,6 +43,9 @@
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
 #include "power_config.h"
 #endif
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
+#include "hibernate.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
@@ -119,6 +122,10 @@ int32_t PowerInterfaceImpl::Init()
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
     powerConfig.ParseConfig();
+#endif
+
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
+    Hibernate::GetInstance().Init();
 #endif
     return HDF_SUCCESS;
 }
@@ -366,8 +373,13 @@ int32_t PowerInterfaceImpl::ForceSuspend()
 
 int32_t PowerInterfaceImpl::Hibernate()
 {
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
     HDF_LOGI("hibernate begin.");
-    return HDF_SUCCESS;
+    return Hibernate::GetInstance().DoHibernate();
+#else
+    HDF_LOGI("hdf hibernate interface not supported.");
+    return HDF_FAILURE;
+#endif
 }
 
 int32_t PowerInterfaceImpl::SuspendBlock(const std::string &name)
