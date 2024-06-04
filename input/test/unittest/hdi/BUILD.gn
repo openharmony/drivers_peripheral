@@ -26,6 +26,7 @@ ohos_unittest("hdi_unittest_input") {
     "$INPUT_ROOT_DIR/interfaces",
     "$INPUT_ROOT_DIR/utils/include",
     "$INPUT_ROOT_DIR/test/common/include",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 
   sources = [
@@ -43,7 +44,6 @@ ohos_unittest("hdi_unittest_input") {
 
   if (is_standard_system) {
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "c_utils:utils",
       "drivers_interface_input:libinput_proxy_1.0",
       "hdf_core:libhdf_utils",
@@ -52,7 +52,6 @@ ohos_unittest("hdi_unittest_input") {
     ]
   } else {
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "hilog:libhilog",
     ]
   }

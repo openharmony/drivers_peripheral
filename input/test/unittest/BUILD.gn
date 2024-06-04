@@ -31,6 +31,7 @@ if (defined(ohos_lite)) {
       "$INPUT_ROOT_DIR/hal/include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "$INPUT_ROOT_DIR/utils/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
     sources = [ "./common/hdi_input_test.cpp" ]
@@ -53,7 +54,6 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
