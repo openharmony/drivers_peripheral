@@ -1221,7 +1221,7 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
 {
     memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
     g_globalConfigArray[index].type = param->type;
-    switch(param->type) {
+    switch (param->type) {
         case PIN_EXPIRED_PERIOD:
             g_globalConfigArray[index].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
             break;
@@ -1247,7 +1247,7 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
 
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 {
-    if (param == NULL) {
+    if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }

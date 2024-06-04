@@ -1653,7 +1653,8 @@ FAIL:
 
 int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
 {
-    IAM_LOGI("start, global config type is %{public}d", param.type);
+    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}u, authTypes size %{public}u",
+        param.type, param.userIds.size(), param.authTypes.size());
     GlobalConfigParamHal paramHal = {};
     switch (param.type) {
         case PIN_EXPIRED_PERIOD:

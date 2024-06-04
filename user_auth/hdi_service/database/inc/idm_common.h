@@ -27,7 +27,7 @@ extern "C" {
 #define MAX_CREDENTIAL 100
 #define ROOT_SECRET_LEN 32
 #define NO_CHECK_PIN_EXPIRED_PERIOD 0
-#define MAX_GLOBAL_CONFIG_NUM 1
+#define MAX_GLOBAL_CONFIG_NUM 2
 
 typedef struct {
     uint64_t credentialId;
