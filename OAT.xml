@@ -100,8 +100,13 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filepath" name="wlan/figures/.*.png" desc="wlan architecture diagram"/>
                 <filteritem type="filepath" name="camera/figures/.*.png" desc="camera architecture diagram"/>
                 <filteritem type="filepath" name="usb/figures/.*.png" desc="usb architecture diagram"/>
-                <filteritem type="filepath" name="display/test/resource/.*.bmp" desc="display test image"/>
+                <filteritem type="filepath" name="display/test/resources/.*.bmp" desc="display test image"/>
                 <filteritem type="filepath" name="battery/charger/resources/HarmonyOS_Sans_SC_Regular_Small.ttf" desc="charger font library"/>
+                <filteritem type="filepath" name="motion/figures/.*.png" desc="motion architecture diagram"/>
+                <filteritem type="filepath" name="audio/test/resource/.*.wav" desc="audio architecture audio"/>
+                <filteritem type="filepath" name="ril/figures/.*.png" desc="ril architecture diagram"/>
+                <filteritem type="filepath" name="vibrator/figures/.*.png" desc="vibrator architecture diagram"/>
+                <filteritem type="filepath" name="light/figures/.*.png" desc="light architecture diagram"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
