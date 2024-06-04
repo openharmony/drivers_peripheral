@@ -50,12 +50,7 @@
             ],
             "inner_kits": [
                 {
-                    "name":"//drivers/peripheral/usb/hdi_service:libusb_interface_service_1.1",
-                    "header":{
-                        "header_files":[
-                        ],
-                        "header_base":[ ]
-                    }
+                    "name":"//drivers/peripheral/usb/hdi_service:libusb_interface_service_1.1"
                 }
             ]
         }
