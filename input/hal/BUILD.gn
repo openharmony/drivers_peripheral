@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
       "include",
       "$INPUT_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
     ]
   }
 
@@ -37,7 +38,6 @@ if (defined(ohos_lite)) {
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "hdf_core:libhdf_utils",
       "hilog_lite:hilog_shared",
     ]
@@ -63,7 +63,10 @@ if (defined(ohos_lite)) {
 } else {
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
-    include_dirs = [ "$INPUT_ROOT_DIR/interfaces/include" ]
+    include_dirs = [
+      "$INPUT_ROOT_DIR/interfaces/include"，
+      "//third_party/FreeBSD/sys/dev/evdev",
+    ]
   }
 
   ohos_shared_library("hdi_input") {
@@ -90,16 +93,12 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
     if (is_standard_system) {
       external_deps = [
-        "FreeBSD:libfreebsd_static",
         "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
     } else {
-      external_deps = [
-        "FreeBSD:libfreebsd_static",
-        "hilog:libhilog",
-      ]
+      external_deps = [ "hilog:libhilog" ]
     }
     install_images = [
       chipset_base_dir,

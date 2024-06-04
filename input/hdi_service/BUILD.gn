@@ -20,6 +20,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     "$INPUT_ROOT_DIR/interfaces/include/",
     "$INPUT_ROOT_DIR/utils/include",
     "$INPUT_ROOT_DIR/hal/include/",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
   if (drivers_peripheral_input_feature_model) {
     deps = [ "$INPUT_ROOT_DIR/hal:hdi_input" ]
@@ -34,7 +35,6 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "c_utils:utils",
       "drivers_interface_input:input_idl_headers",
       "hdf_core:libhdf_utils",
@@ -43,7 +43,6 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     ]
   } else {
     external_deps = [
-      "FreeBSD:libfreebsd_static",
       "hilog:libhilog",
       "ipc:ipc_single",
     ]
