@@ -64,7 +64,7 @@ if (defined(ohos_lite)) {
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
-      "$INPUT_ROOT_DIR/interfaces/include"，
+      "$INPUT_ROOT_DIR/interfaces/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
   }
