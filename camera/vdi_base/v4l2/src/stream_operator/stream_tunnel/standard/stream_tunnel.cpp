@@ -145,7 +145,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
         CAMERAHALPERFSYSEVENT_EQUAL(0, frameCount_, TIME_FOR_FIRST_FRAME);
         CameraDumper& dumper = CameraDumper::GetInstance();
-        dumper.DumpBuffer("BeforeFlushSurface", ENABLE_STREAM_TUNNEL, buffer, buffer->GetCurWidth(), GetCurHeight());
+        dumper.DumpBuffer("BeforeFlushSurface", ENABLE_STREAM_TUNNEL, buffer,
+            buffer->GetCurWidth(), buffer->GetCurHeight());
         PrepareBufferBeforeFlush(buffer, sb);
         int64_t timestamp = 0;
         sb->GetExtraData()->ExtraGet(OHOS::Camera::timeStamp, timestamp);
