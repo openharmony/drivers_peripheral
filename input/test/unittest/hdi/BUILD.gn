@@ -51,9 +51,7 @@ ohos_unittest("hdi_unittest_input") {
       "ipc:ipc_single",
     ]
   } else {
-    external_deps = [
-      "hilog:libhilog",
-    ]
+    external_deps = [ hilog:libhilog" ]
   }
   external_deps += [ "ipc:ipc_single" ]
 }
