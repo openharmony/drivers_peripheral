@@ -67,7 +67,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "include",
       "$HAL_ROOT_DIR/interfaces/include",
-      "//third_party/bounds_checking_function/include",
       "$HAL_ROOT_DIR/client/include",
     ]
     deps = [ "$HAL_ROOT_DIR/client:wifi_driver_client" ]
