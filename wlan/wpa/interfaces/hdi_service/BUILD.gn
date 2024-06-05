@@ -170,6 +170,6 @@ group("hdi_wpa_service") {
     ":libwpa_interface_service_1.1",
   ]
   if (is_standard_system) {
-    deps += [ ":hdi_wpa_updater" ]
+    deps += [ ":hdi_wpa_base_mini" ]
   }
 }
