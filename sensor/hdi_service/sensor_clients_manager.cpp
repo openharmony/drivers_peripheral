@@ -338,6 +338,17 @@ bool SensorClientsManager::IsClientsEmpty(int groupId)
     return false;
 }
 
+bool SensorClientsManager::IsNoSensorUsed()
+{
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    for (auto it = sensorUsed_.begin(); it != sensorUsed_.end(); ++it) {
+        if (!it->second.empty()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
     std::unique_lock<std::mutex> lock(clientsMutex_);
