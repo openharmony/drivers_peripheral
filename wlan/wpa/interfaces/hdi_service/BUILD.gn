@@ -101,7 +101,7 @@ if (is_standard_system) {
     part_name = "drivers_peripheral_wlan"
   }
 
-  ohos_shared_library("hdi_wpa_updater") {
+  ohos_shared_library("hdi_wpa_base_mini") {
     include_dirs = [
       "./service_common",
       "../../client/include",
@@ -133,6 +133,7 @@ if (is_standard_system) {
 
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_wlan:libwpa_stub_1.1",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
