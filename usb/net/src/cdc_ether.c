@@ -1009,13 +1009,13 @@ static void EcmCloseInterfaces(struct EcmDevice *ecm)
 {
     for (uint8_t i = 0; i < ecm->interfaceCnt; i++) {
         if (ecm->devHandle[i]) {
-            UsbCloseInterface(ecm->devHandle[i]);
+            UsbCloseInterface(ecm->devHandle[i], false);
             ecm->devHandle[i] = NULL;
         }
     }
 
     if (ecm->ctrDevHandle) {
-        UsbCloseInterface(ecm->ctrDevHandle);
+        UsbCloseInterface(ecm->ctrDevHandle, false);
         ecm->ctrDevHandle = NULL;
     }
 }

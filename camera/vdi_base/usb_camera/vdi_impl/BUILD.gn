@@ -72,7 +72,6 @@ host_includes = [
   "$camera_path_vdi/device_manager/include",
   "$camera_path_vdi/buffer_manager/src/buffer_adapter/standard",
   "$camera_path_vdi/utils/event",
-  "$camera_path_vdi/../../../display/interfaces/include",
   "$camera_path_vdi/dump/include",
 
   #producer
@@ -89,8 +88,6 @@ host_includes = [
   "$camera_path_vdi/pipeline_core/pipeline_impl/src/parser",
   "$camera_path_vdi/pipeline_core/pipeline_impl/src/strategy",
   "$camera_path_vdi/pipeline_core/ipp/include",
-
-  "$camera_path_hdf_core/adapter/uhdf2/ipc/include",
 ]
 
 ohos_shared_library("camera_daemon") {

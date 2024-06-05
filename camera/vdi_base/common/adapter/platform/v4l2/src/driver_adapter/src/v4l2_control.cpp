@@ -135,7 +135,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
 
 RetCode HosV4L2Control::V4L2GetCtrl(int fd, unsigned int id, int& value)
 {
-    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrl in fd %{public}d\n", fd);
+    CAMERA_LOGD("HosV4L2Control::V4L2GetCtrl in fd %{public}d\n", fd);
     int rc = 0;
     struct v4l2_control ctrl;
 
@@ -148,7 +148,7 @@ RetCode HosV4L2Control::V4L2GetCtrl(int fd, unsigned int id, int& value)
     }
 
     value = ctrl.value;
-    CAMERA_LOGI("HosV4L2Control::V4L2GetCtrl out fd %{public}d\n", fd);
+    CAMERA_LOGD("HosV4L2Control::V4L2GetCtrl out fd %{public}d\n", fd);
     return RC_OK;
 }
 
@@ -174,7 +174,7 @@ RetCode HosV4L2Control::V4L2SetCtrl(int fd, unsigned int id, int value)
 int HosV4L2Control::ExtControl(int fd, struct v4l2_queryctrl *ctrl)
 {
     int ret = 0;
-    CAMERA_LOGI("ExtControl in fd = %{public}d\n", fd);
+    CAMERA_LOGD("ExtControl in fd = %{public}d\n", fd);
     if (ctrl == nullptr) {
         CAMERA_LOGE("HosV4L2Control::ExtControl ctrl == nullptr");
         return -1;
@@ -182,14 +182,16 @@ int HosV4L2Control::ExtControl(int fd, struct v4l2_queryctrl *ctrl)
 
     ctrl->id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     ret = ioctl(fd, VIDIOC_QUERYCTRL, ctrl);
-    CAMERA_LOGI("ExtControl out fd = %{public}d, ret = %{public}d\n", fd, ret);
+    if (ret < 0) {
+        CAMERA_LOGI("ExtControl out fd = %{public}d, ret = %{public}d\n", fd, ret);
+    }
     return ret;
 }
 
 void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     DeviceControl& ctrl, v4l2_queryctrl& qCtrl)
 {
-    CAMERA_LOGI("V4L2SetValue in fd = %{public}d\n", fd);
+    CAMERA_LOGD("V4L2SetValue in fd = %{public}d\n", fd);
     int value, rc;
 
     ctrl.id = qCtrl.id;
@@ -211,12 +213,12 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     rc = V4L2GetCtrl(fd, qCtrl.id, value);
     if (rc != RC_ERROR) {
         ctrl.value = value;
-        CAMERA_LOGI("%{public}s-14s : id=%{public}x-08x, type=%{public}d, minimum=%{public}d, maximum=%{public}d\n"
+        CAMERA_LOGD("%{public}s-14s : id=%{public}x-08x, type=%{public}d, minimum=%{public}d, maximum=%{public}d\n"
             "\t\t value = %{public}d, step=%{public}d, default_value=%{public}d\n",
             qCtrl.name, qCtrl.id, qCtrl.type, qCtrl.minimum, qCtrl.maximum,
             value, qCtrl.step, qCtrl.default_value);
     }
-    CAMERA_LOGI("V4L2SetValue out fd = %{public}d\n", fd);
+    CAMERA_LOGD("V4L2SetValue out fd = %{public}d\n", fd);
 }
 
 void HosV4L2Control::V4L2EnumExtControl(int fd, v4l2_queryctrl &qCtrl, DeviceControl &ctrl)

@@ -1217,10 +1217,9 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t index)
+IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t index, bool isAdd)
 {
     memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
-    g_globalConfigArray[index].type = param->type;
     switch (param->type) {
         case PIN_EXPIRED_PERIOD:
             g_globalConfigArray[index].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
@@ -1230,8 +1229,10 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
             break;
         default:
             LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
+            memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
             return RESULT_GENERAL_ERROR;
     }
+    g_globalConfigArray[index].type = param->type;
 
     g_globalConfigArray[index].userIdNum = param->userIdNum;
     for (uint32_t i = 0; i < param->userIdNum; i++) {
@@ -1240,6 +1241,10 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
     g_globalConfigArray[index].authTypeNum = param->authTypeNum;
     for (uint32_t i = 0; i < param->authTypeNum; i++) {
         g_globalConfigArray[index].authTypes[i] = param->authTypes[i];
+    }
+
+    if (isAdd) {
+        g_globalConfigInfoNum++;
     }
     return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
 }
@@ -1254,12 +1259,11 @@ ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 
     for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
         if (g_globalConfigArray[infoIndex].type == param->type) {
-            return UpdateGlobalConfigArray(param, infoIndex);
+            return UpdateGlobalConfigArray(param, infoIndex, false);
         }
     }
     if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
-        g_globalConfigInfoNum++;
-        return UpdateGlobalConfigArray(param, g_globalConfigInfoNum - 1);
+        return UpdateGlobalConfigArray(param, g_globalConfigInfoNum, true);
     }
 
     LOG_ERROR("SaveGlobalConfigParam type %{public}d failed", param->type);

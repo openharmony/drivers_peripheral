@@ -701,7 +701,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     }
     uint32_t count = g_syncRequest->compInfo.actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
-    if ((data == NULL) || (!g_syncRequest)) {
+    if (data == NULL) {
         return HDF_FAILURE;
     }
 
@@ -1549,12 +1549,12 @@ static void AcmCloseInterfaces(struct AcmDevice *acm)
 {
     for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         if (acm->devHandle[i]) {
-            UsbCloseInterface(acm->devHandle[i]);
+            UsbCloseInterface(acm->devHandle[i], false);
             acm->devHandle[i] = NULL;
         }
     }
     if (acm->ctrDevHandle) {
-        UsbCloseInterface(acm->ctrDevHandle);
+        UsbCloseInterface(acm->ctrDevHandle, false);
         acm->ctrDevHandle = NULL;
     }
 }

@@ -20,7 +20,6 @@ ohos_shared_library("audio_primary_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -50,7 +49,6 @@ ohos_shared_library("audio_manager_service_3.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

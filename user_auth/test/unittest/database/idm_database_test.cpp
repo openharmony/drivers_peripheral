@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "idm_database.h"
+#include "securec.h"
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
@@ -775,13 +776,31 @@ HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
 
 HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
 {
+    memset_s(g_globalConfigArray, sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM, 0,
+        sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM);
     EXPECT_EQ(SaveGlobalConfigParam(nullptr), RESULT_BAD_PARAM);
 
     GlobalConfigParamHal param = {};
+    param.type = ENABLE_STATUS;
+    param.value.enableStatus = true;
+    param.userIdNum = 1;
+    param.userIds[0] = 1;
+    param.authTypeNum = 1;
+    param.authTypes[0] = 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
+    param.authTypeNum = MAX_AUTH_TYPE_LEN + 1;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
+    param.userIdNum = MAX_USER + 1;
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
 
-    param.type = PIN_EXPIRED_PERIOD;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
+    GlobalConfigParamHal param1 = {};
+    param1.type = PIN_EXPIRED_PERIOD;
+    param1.value.pinExpiredPeriod = 1;
+    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_GENERAL_ERROR);
+
+    GlobalConfigParamHal param2 = {};
+    EXPECT_EQ(SaveGlobalConfigParam(&param2), RESULT_GENERAL_ERROR);
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)

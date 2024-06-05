@@ -1147,6 +1147,21 @@ int32_t UsbImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
     return HDF_SUCCESS;
 }
 
+int32_t UsbImpl::GetDeviceFileDescriptor(const UsbDev &dev, int32_t &fd)
+{
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr || port->ctrDevHandle == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+
+    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
+    OsalMutexLock(&handle->devHandle->lock);
+    fd = handle->devHandle->fd;
+    OsalMutexUnlock(&handle->devHandle->lock);
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
 {
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
@@ -1284,6 +1299,14 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
     if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
         return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t ret = 0;
+    if (port->ctrDevHandle != nullptr) {
+        ret = UsbCloseInterface(port->ctrDevHandle, true);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
+            return HDF_FAILURE;
+        }
     }
     return HDF_SUCCESS;
 }
