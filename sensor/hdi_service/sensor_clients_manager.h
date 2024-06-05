@@ -49,6 +49,7 @@ public:
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
     bool GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map);
     bool IsClientsEmpty(int groupId);
+    bool IsNoSensorUsed();
     std::unordered_map<int32_t, std::set<int32_t>> GetSensorUsed();
     bool IsNeedOpenSensor(int sensorId, int serviceId);
     bool IsNeedCloseSensor(int sensorId, int serviceId);

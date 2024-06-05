@@ -421,6 +421,10 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
 int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId >= SENSOR_GROUP_TYPE_MAX) {
+        HDF_LOGE("%{public}s: groupId %{public}d is error", __func__, groupId);
+        return SENSOR_INVALID_PARAM;
+    }
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Unregister function, groupId %{public}d, service %{public}d",
         __func__, groupId, serviceId);
@@ -432,6 +436,10 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
     SensorCallbackVdi::clientsChanged = true;
     if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
+        return HDF_SUCCESS;
+    }
+    if (!SensorClientsManager::GetInstance()->IsNoSensorUsed()) {
+        HDF_LOGD("%{public}s: sensorUsed is not empty, do not unregister", __func__);
         return HDF_SUCCESS;
     }
 
