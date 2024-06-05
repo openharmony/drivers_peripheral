@@ -118,9 +118,7 @@ struct WifiWpaStaInterface {
     int (*wpaCliCmdWepKey)(WifiWpaStaInterface *this, int keyIdx, unsigned char *wepKey, unsigned int *wepKeyLen);
     int (*wpaCliCmdWepKeyTxKeyIdx)(WifiWpaStaInterface *this, int *keyIdx);
     int (*wpaCliCmdGetRequirePmf)(WifiWpaStaInterface *this, int *enable);
-#ifndef OHOS_EUPDATER
     int (*wpaCliCmdGetConnectionCapabilities)(WifiWpaStaInterface *this, struct ConnectionCapabilities *connectionCap);
-#endif
     int (*wpaCliCmdStaShellCmd)(WifiWpaStaInterface *this, const char *params);
 };
 

@@ -20,9 +20,7 @@
 #include "securec.h"
 #include "hdi_wpa_hal.h"
 #include "hdi_wpa_common.h"
-#ifndef OHOS_EUPDATER
 #include "wpa_common_cmd.h"
-#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HdiWpaHal"
@@ -58,10 +56,6 @@
 #define SSID_EMPTY_LENGTH 1
 static const int MAX_IFACE_COUNT = 8;
 static const int MAX_IFACE_LEN = 6;
-
-#ifdef OHOS_EUPDATER
-#define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
-#endif
 
 #define WPA_CTRL_OPEN_IFNAME "@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
 
