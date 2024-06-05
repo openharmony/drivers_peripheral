@@ -307,7 +307,7 @@ int32_t UsbDdkService::SendControlReadRequest(
     params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     params.timeout = timeout;
     params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
-    params.ctrlReq.reqType = static_cast<UsbControlRequestType>(GET_CTRL_REQ_TYPE(setup.requestType));
+    params.ctrlReq.reqType = setup.requestType;
     params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
     params.ctrlReq.request = setup.requestCmd;
     params.ctrlReq.value = setup.value;
@@ -362,7 +362,7 @@ int32_t UsbDdkService::SendControlWriteRequest(
     params.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     params.timeout = timeout;
     params.ctrlReq.target = static_cast<UsbRequestTargetType>(GET_CTRL_REQ_RECIP(setup.requestType));
-    params.ctrlReq.reqType = static_cast<UsbControlRequestType>(GET_CTRL_REQ_TYPE(setup.requestType));
+    params.ctrlReq.reqType = setup.requestType;
     params.ctrlReq.directon = static_cast<UsbRequestDirection>(GET_CTRL_REQ_DIR(setup.requestType));
     params.ctrlReq.request = setup.requestCmd;
     params.ctrlReq.value = setup.value;
