@@ -70,6 +70,7 @@ bool InitHalFuncTableWithStubs(WifiHalFn* halFn)
     PopulateStubFor(&halFn->getSignalPollInfo);
     PopulateStubFor(&halFn->setDpiMarkRule);
     PopulateStubFor(&halFn->registerIfaceCallBack);
+    PopulateStubFor(&halFn->setTxPower);
     return true;
 }
     

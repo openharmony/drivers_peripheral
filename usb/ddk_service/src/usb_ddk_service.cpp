@@ -70,7 +70,7 @@ int32_t ReleaseUsbInterface(uint64_t interfaceHandle)
         return ret;
     }
 
-    ret = UsbCloseInterface(handleConvert);
+    ret = UsbCloseInterface(handleConvert, false);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s close interface failed %{public}d", __func__, ret);
         return ret;

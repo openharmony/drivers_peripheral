@@ -24,7 +24,7 @@ ohos_shared_library("libpower_interface_service_1.2") {
   ]
 
   external_deps = [
-    "drivers_interface_power:power_idl_headers",
+    "drivers_interface_power:libpower_stub_1.2",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
@@ -62,6 +62,11 @@ ohos_shared_library("libpower_interface_service_1.2") {
 
   if (drivers_peripheral_power_slower_retry_of_sleep) {
     defines += [ "SLOWER_RETRY_OF_SLEEP" ]
+  }
+
+  if (drivers_peripheral_power_enable_s4) {
+    sources += [ "src/hibernate.cpp" ]
+    defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_S4" ]
   }
 
   install_images = [ chipset_base_dir ]

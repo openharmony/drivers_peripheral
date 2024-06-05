@@ -67,6 +67,7 @@ public:
     WifiError RegisterIfaceCallBack(const std::string& ifaceName, const sptr<IChipIfaceCallback>& chipIfaceCallback);
     WifiError UnRegisterIfaceCallBack(const std::string& ifaceName, const sptr<IChipIfaceCallback>& chipIfaceCallback);
     static void OnAsyncGscanFullResult(int event);
+    WifiError SetTxPower(const std::string& ifaceName, int mode);
 
 private:
     WifiError RetrieveIfaceHandles();

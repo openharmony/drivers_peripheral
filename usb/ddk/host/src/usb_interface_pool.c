@@ -1330,7 +1330,7 @@ int32_t GetInterfaceByHandle(const UsbInterfaceHandle *interfaceHandle, struct U
     return HDF_SUCCESS;
 }
 
-int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle)
+int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle, bool isCtrInterface)
 {
     HDF_STATUS ret;
     struct UsbInterfaceHandleEntity *ifaceHdl = NULL;
@@ -1369,8 +1369,11 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle)
         }
     }
     AdapterAtomicDec(&interfaceObj->refCount);
-    ifaceHdl->devHandle = NULL;
-    RawUsbMemFree(ifaceHdl);
+    if (!isCtrInterface) {
+        ifaceHdl->devHandle = NULL;
+        RawUsbMemFree(ifaceHdl);
+    }
+    
     OsalMutexUnlock(&interfacePool->interfaceLock);
 
     return HDF_SUCCESS;

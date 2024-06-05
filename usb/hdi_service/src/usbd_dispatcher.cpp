@@ -429,12 +429,12 @@ void UsbdDispatcher::UsbdCloseInterfaces(HostDevice *dev)
 
     for (int32_t i = 0; i < USB_MAX_INTERFACES; ++i) {
         if (dev->devHandle[i] != nullptr) {
-            UsbCloseInterface(dev->devHandle[i]);
+            UsbCloseInterface(dev->devHandle[i], false);
             dev->devHandle[i] = nullptr;
         }
     }
     if (dev->ctrDevHandle != nullptr) {
-        UsbCloseInterface(dev->ctrDevHandle);
+        UsbCloseInterface(dev->ctrDevHandle, false);
         dev->ctrDevHandle = nullptr;
     }
 }

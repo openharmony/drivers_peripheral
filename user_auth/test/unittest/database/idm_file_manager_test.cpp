@@ -168,6 +168,11 @@ HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
 
     GlobalConfigParamHal globalConfigInfo = {};
     EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+
+    globalConfigInfo.type = PIN_EXPIRED_PERIOD;
+    globalConfigInfo.value.pinExpiredPeriod = 1;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+
 }
 
 HWTEST_F(IdmFileMgrTest, TestLoadGlobalConfigInfo, TestSize.Level0)

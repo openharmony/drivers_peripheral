@@ -1651,11 +1651,8 @@ FAIL:
     return ret;
 }
 
-int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
+static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalConfigParamHal paramHal)
 {
-    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}u, authTypes size %{public}u",
-        param.type, param.userIds.size(), param.authTypes.size());
-    GlobalConfigParamHal paramHal = {};
     switch (param.type) {
         case PIN_EXPIRED_PERIOD:
             paramHal.value.pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
@@ -1664,6 +1661,10 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
             }
             break;
         case ENABLE_STATUS:
+            if (param.authTypes.size() == 0) {
+                IAM_LOGE("ENABLE_STATUS bad authType size");
+                return RESULT_BAD_PARAM;
+            }
             paramHal.value.enableStatus = param.value.enableStatus;
             break;
         default:
@@ -1672,10 +1673,6 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
     }
     paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
 
-    if (param.userIds.size() > MAX_USER || param.authTypes.size() > MAX_AUTH_TYPE_LEN) {
-        IAM_LOGE("bad pinExpiredPeriod value");
-        return RESULT_BAD_PARAM;
-    }
     for (uint32_t i = 0; i < param.userIds.size(); i++) {
         paramHal.userIds[i] = static_cast<int32_t>(param.userIds[i]);
     }
@@ -1684,8 +1681,25 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
         paramHal.authTypes[i] = static_cast<uint32_t>(param.authTypes[i]);
     }
     paramHal.authTypeNum = param.authTypes.size();
+    return RESULT_SUCCESS;
+}
 
-    uint32_t ret = SetGlobalConfigParamFunc(&paramHal);
+int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
+{
+    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}u, authTypes size %{public}u",
+        param.type, param.userIds.size(), param.authTypes.size());
+    if (param.userIds.size() > MAX_USER || param.authTypes.size() > MAX_AUTH_TYPE_LEN) {
+        IAM_LOGE("bad pinExpiredPeriod value");
+        return RESULT_BAD_PARAM;
+    }
+    GlobalConfigParamHal paramHal = {};
+    int32_t ret = CopyGlobalConfigParam(param, paramHal);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("CopyGlobalConfigParam failed");
+        return ret;
+    }
+
+    ret = SetGlobalConfigParamFunc(&paramHal);
     if (ret != RESULT_SUCCESS) {
         IAM_LOGE("SetGlobalConfigParamFunc failed");
     }
