@@ -113,11 +113,12 @@ bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, 
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
         return false;
     }
-    sensorClientInfo.curCountMap_[sensorId]++;
+    if (sensorClientInfo.curCountMap_[sensorId]++ == 0) {
+        return false;
+    }
     sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
-        return false;
     }
     return true;
 }
