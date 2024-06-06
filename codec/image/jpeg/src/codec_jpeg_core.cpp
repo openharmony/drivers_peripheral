@@ -37,7 +37,7 @@ void CodecJpegCore::AddVendorLib()
     CODEC_LOGI("start load jpeg dependency library!");
     libHandle_ = dlopen(CODEC_JPEG_VDI_LIB_NAME, RTLD_LAZY);
     if (libHandle_ == nullptr) {
-        CODEC_LOGE("Failed to dlopen %{public}s, error [%{public}s]", libName.c_str(), dlerror());
+        CODEC_LOGE("Failed to dlopen %{public}s, error [%{public}s]", CODEC_JPEG_VDI_LIB_NAME, dlerror());
         return;
     }
 
