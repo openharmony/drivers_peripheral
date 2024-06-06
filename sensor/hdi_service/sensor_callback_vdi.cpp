@@ -115,7 +115,7 @@ bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, 
     }
     bool result = true;
     sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
-    if (sensorClientInfo.curCountMap_[sensorId] != 0) {
+    if (sensorClientInfo.curCountMap_[sensorId] == 0) {
         result = false;
     }
     sensorClientInfo.curCountMap_[sensorId]++;
