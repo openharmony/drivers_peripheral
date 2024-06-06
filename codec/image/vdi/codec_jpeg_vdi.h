@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#define CODEC_JPEG_VDI_NAME "libjpeg_vdi_impl"
+#define CODEC_JPEG_VDI_LIB_NAME "libjpeg_vdi_impl.z.so"
 
 struct ICodecJpegHwi {
     int32_t (*JpegInit)();
