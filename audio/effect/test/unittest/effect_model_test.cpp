@@ -142,7 +142,7 @@ HWTEST_F(EffectModelTest, HdfAudioGetAllEffectDescriptors003, TestSize.Level1)
         EXPECT_NE(nullptr, descs[i].effectId);
     }
 
-    EffectControllerReleaseDescs(descs, &descsLen);
+    OHOS::Audio::EffectControllerReleaseDescs(descs, &descsLen);
 }
 
 /**
@@ -243,6 +243,6 @@ HWTEST_F(EffectModelTest, HdfAudioGetEffectDescriptor002, TestSize.Level1)
     EXPECT_STREQ(desc.effectName, "mock_effect");
     EXPECT_STREQ(desc.libName, libName_);
     EXPECT_STREQ(desc.supplier, "mock");
-    EffectControllerReleaseDesc(&desc);
+    OHOS::Audio::EffectControllerReleaseDesc(&desc);
 }
 } // end of namespace
