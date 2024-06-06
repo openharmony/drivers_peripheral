@@ -113,14 +113,16 @@ bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, 
     if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
         return false;
     }
+    bool result = false;
     sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
-    if (sensorClientInfo.curCountMap_[sensorId]++ == 0) {
-        return false;
+    if (sensorClientInfo.curCountMap_[sensorId] != 0) {
+        result = true;
     }
+    sensorClientInfo.curCountMap_[sensorId]++;
     if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
         sensorClientInfo.curCountMap_[sensorId] = 0;
     }
-    return true;
+    return result;
 }
 
 void SensorCallbackVdi::PrintData(const HdfSensorEvents &event)
