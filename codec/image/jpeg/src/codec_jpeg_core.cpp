@@ -35,13 +35,7 @@ CodecJpegCore::~CodecJpegCore()
 void CodecJpegCore::AddVendorLib()
 {
     CODEC_LOGI("start load jpeg dependency library!");
-    std::string libName = HDF_LIBRARY_FULL_PATH(CODEC_JPEG_VDI_NAME);
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(libName.c_str(), pathBuf) == nullptr) {
-        CODEC_LOGE("realpath failed! path = [%{public}s]", pathBuf);
-        return;
-    }
-    libHandle_ = dlopen(pathBuf, RTLD_LAZY);
+    libHandle_ = dlopen(CODEC_JPEG_VDI_LIB_NAME, RTLD_LAZY);
     if (libHandle_ == nullptr) {
         CODEC_LOGE("Failed to dlopen %{public}s, error [%{public}s]", libName.c_str(), dlerror());
         return;
