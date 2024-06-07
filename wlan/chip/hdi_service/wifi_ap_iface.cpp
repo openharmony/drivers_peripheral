@@ -169,7 +169,13 @@ int32_t WifiApIface::SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enabl
 
 int32_t WifiApIface::SetTxPower(int32_t power)
 {
-    return HDF_ERR_NOT_SUPPORT;
+{
+    WifiError status = vendorHal_.lock()->SetTxPower(ifname_, power);
+    if (status == HAL_SUCCESS) {
+        return HDF_SUCCESS;
+    }
+    return HDF_FAILURE;
+}
 }
 
 }
