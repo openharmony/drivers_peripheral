@@ -29,8 +29,8 @@ extern "C" {
 struct IEffectControlVdi {
     int32_t (*EffectProcess)(struct IEffectControlVdi *self, const struct AudioEffectBufferVdi *input,
         struct AudioEffectBufferVdi *output);
-    int32_t (*SendCommand)(struct IEffectControlVdi *self,  enum EffectCommandTableIndexVdi cmdId, const int8_t *cmdData, uint32_t cmdDataLen,
-        int8_t *replyData, uint32_t *replyDataLen);
+    int32_t (*SendCommand)(struct IEffectControlVdi *self,  enum EffectCommandTableIndexVdi cmdId,
+        const int8_t *cmdData, uint32_t cmdDataLen, int8_t *replyData, uint32_t *replyDataLen);
     int32_t (*GetEffectDescriptor)(struct IEffectControlVdi *self, struct EffectControllerDescriptorVdi *desc);
     int32_t (*EffectReverse)(struct IEffectControlVdi *self, const struct AudioEffectBufferVdi *input,
         struct AudioEffectBufferVdi *output);

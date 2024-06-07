@@ -1174,7 +1174,7 @@ static void AudioDevExtInfoFree(struct AudioDevExtInfo *dataBlock, bool freeSelf
     }
 }
 
-static inline bool AudioInfoBlockUnmarshalling(enum AudioPortType type, struct HdfSBuf *data, RouteExtInfo *dataBlock)
+static bool AudioInfoBlockUnmarshalling(enum AudioPortType type, struct HdfSBuf *data, RouteExtInfo *dataBlock)
 {
     if (data == NULL || dataBlock == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
