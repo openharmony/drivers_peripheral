@@ -523,7 +523,7 @@ void *EventThread(void *para)
 
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
-        HILOG_INFO(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d status:%{public}d", ret, *status);
+        HILOG_DEBUG(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d status:%{public}d", ret, *status);
         if (ret < 0) {
             HILOG_ERROR(LOG_CORE, "%{public}s: fail poll", __FUNCTION__);
             break;
