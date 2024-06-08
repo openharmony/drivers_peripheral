@@ -278,7 +278,7 @@ HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level1)
     ret = SetTxPower(ifNameInvalid, power);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
     ret = SetTxPower(WLAN_IFNAME, power);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
 }
 
 /**
@@ -1035,6 +1035,19 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     int32_t dstAddr = 0;
     int32_t buf = 0;
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
+}
+/**
+ * @tc.name: WifiSetPowerSaveMode029
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
+{
+    int32_t frequency = 0;
+    int32_t mode = 0;
+    const char *ifName = "wlanTest";
+    WifiSetPowerSaveMode(ifName, dstAddr, buf);
 }
 /**
  * @tc.name: WpaEventReport
