@@ -506,6 +506,10 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::vector<HdiScheduleInfo> &infos)
 {
     IAM_LOGI("start");
+    if (!GetEnableStatus(param.baseParam.userId, param.baseParam.authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     infos.clear();
     AuthParamHal paramHal = {};
     int32_t ret = CopyAuthParamToHal(contextId, param, paramHal);
@@ -718,6 +722,10 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, int32_
         IAM_LOGE("param is invalid");
         return RESULT_BAD_PARAM;
     }
+    if (!GetEnableStatus(INVALID_USER_ID, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     IdentifyParam param = {};
     param.contextId = contextId;
     param.authType = static_cast<uint32_t>(authType);
@@ -795,6 +803,11 @@ int32_t UserAuthInterfaceService::GetAvailableStatus(int32_t userId, int32_t aut
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        checkResult = RESULT_TYPE_NOT_SUPPORT;
+        return RESULT_SUCCESS;
+    }
     GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkResult);
     if (checkResult != RESULT_SUCCESS) {
         IAM_LOGE("GetAvailableStatusFunc failed");
@@ -860,6 +873,10 @@ int32_t UserAuthInterfaceService::BeginEnrollment(
     const std::vector<uint8_t> &authToken, const HdiEnrollParam &param, HdiScheduleInfo &info)
 {
     IAM_LOGI("start");
+    if (!GetEnableStatus(param.userId, param.authType)) {
+        LOG_ERROR("authType is not support %{public}d", param.authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     if (authToken.size() != sizeof(UserAuthTokenHal) && authToken.size() != 0) {
         IAM_LOGE("authToken len is invalid");
         return RESULT_BAD_PARAM;
@@ -1324,6 +1341,10 @@ int32_t UserAuthInterfaceService::GetAllExtUserInfo(std::vector<ExtUserInfo> &us
 int32_t UserAuthInterfaceService::GetEnrolledState(int32_t userId, int32_t authType, HdiEnrolledState &enrolledState)
 {
     IAM_LOGI("start");
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     EnrolledStateHal *enrolledStateHal = (EnrolledStateHal *) Malloc(sizeof(EnrolledStateHal));
     if (enrolledStateHal == NULL) {
         IAM_LOGE("malloc failed");
