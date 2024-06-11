@@ -448,7 +448,7 @@ static int32_t AudioManagerIncreaseAdapterRef(struct IAudioManager *manager, uin
     *adapter = &(audioManagerSer->adapterInfos[infoIndex].adapterServicePtr->common);
 
     AUDIO_FUNC_LOGI("load adaptername[%{public}s], refCount[%{public}d] increase",
-    audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
+        audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
     return AUDIO_SUCCESS;
 }
 
@@ -463,7 +463,7 @@ static int32_t AudioManagerDecreaseAdapterRef(struct IAudioManager *manager, uin
 
     audioManagerSer->adapterInfos[infoIndex].refCnt--;
     AUDIO_FUNC_LOGI("unload adaptername[%{public}s], refCount[%{public}d] decrease",
-    audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
+        audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
     return AUDIO_SUCCESS;
 }
 
