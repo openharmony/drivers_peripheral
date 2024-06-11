@@ -188,8 +188,8 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
-    SensorCallbackVdi::servicesChanged = true;
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
+        SensorCallbackVdi::servicesChanged = true;
         return HDF_SUCCESS;
     }
     
@@ -204,6 +204,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
         HDF_LOGE("%{public}s Enable failed, error code is %{public}d", __func__, ret);
     } else {
         SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
+        SensorCallbackVdi::servicesChanged = true;
     }
     FinishTrace(HITRACE_TAG_HDF);
 
@@ -216,11 +217,12 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
     HDF_LOGD("%{public}s:Enter the Disable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
-    SensorCallbackVdi::servicesChanged = true;
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         HDF_LOGE("%{public}s There are still some services enable", __func__);
+        SensorCallbackVdi::servicesChanged = true;
         return HDF_SUCCESS;
     }
+    SensorCallbackVdi::servicesChanged = true;
 
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
@@ -275,8 +277,8 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         return HDF_FAILURE;
     }
     StartTrace(HITRACE_TAG_HDF, "SetBatchSenior");
-    SensorCallbackVdi::clientsChanged = true;
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
+    SensorCallbackVdi::clientsChanged = true;
 
     int64_t saSamplingInterval = samplingInterval;
     int64_t saReportInterval = reportInterval;
