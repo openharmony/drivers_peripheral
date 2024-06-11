@@ -27,7 +27,8 @@ extern "C" {
 #define IEFFECT_VDI_MODEL_MAJOR_VERSION 1
 #define IEFFECT_VDI_MODEL_MINOR_VERSION 0
 
-typedef int32_t (*ComandProccess)(const int8_t *commandData, uint32_t commandSize, int8_t *replyData, uint32_t *replySize);
+typedef int32_t (*ComandProccess)(const int8_t *commandData, uint32_t commandSize,
+    int8_t *replyData, uint32_t *replySize);
 struct EffectCommandTable {
     enum EffectCommandTableIndexVdi cmd;
     ComandProccess func;
@@ -86,7 +87,8 @@ struct EffectFactory {
      * @since 4.0
      * @version 1.0
      */
-    int32_t (*GetDescriptor)(struct EffectFactory *self, const char *effectId, struct EffectControllerDescriptorVdi *desc);
+    int32_t (*GetDescriptor)(struct EffectFactory *self, const char *effectId,
+        struct EffectControllerDescriptorVdi *desc);
 };
 
 /* this name is going to get effect lib, it has to be realized */
