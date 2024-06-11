@@ -18,7 +18,8 @@
 #include <osal_mem.h>
 
 static const int32_t HDF_EFFECT_NUM_MAX = 32;
-
+namespace OHOS {
+namespace Audio {
 void EffectControllerReleaseDesc(struct EffectControllerDescriptor *desc)
 {
     if (desc == nullptr) {
@@ -47,4 +48,7 @@ void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, cons
     for (uint32_t i = 0; i < *descsLen; i++) {
         EffectControllerReleaseDesc(&descs[i]);
     }
+}
+
+}
 }

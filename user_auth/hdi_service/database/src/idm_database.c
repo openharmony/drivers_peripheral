@@ -1229,7 +1229,6 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
             break;
         default:
             LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
-            memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
             return RESULT_GENERAL_ERROR;
     }
     g_globalConfigArray[index].type = param->type;
@@ -1326,11 +1325,11 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
     return RESULT_SUCCESS;
 }
 
-static bool isEnableStatusExist(const GlobalConfigParamHal *enableStatusPara, int32_t userId, uint32_t authType)
+static bool IsEnableStatusExist(const GlobalConfigParamHal *enableStatus, int32_t userId, uint32_t authType)
 {
     bool isAuthTypeExist = false;
-    for (uint32_t i = 0; i < enableStatusPara->authTypeNum; i++) {
-        if (authType == enableStatusPara->authTypes[i]) {
+    for (uint32_t i = 0; i < enableStatus->authTypeNum; i++) {
+        if (authType == enableStatus->authTypes[i]) {
             isAuthTypeExist = true;
             break;
         }
@@ -1341,11 +1340,11 @@ static bool isEnableStatusExist(const GlobalConfigParamHal *enableStatusPara, in
     }
 
     bool isUserIdExist = false;
-    if (userId == INVALID_USER_ID) {
+    if (userId == INVALID_USER_ID || enableStatus->userIdNum == 0) {
         return true;
     }
-    for (uint32_t i = 0; i < enableStatusPara->userIdNum; i++) {
-        if (userId == enableStatusPara->userIds[i]) {
+    for (uint32_t i = 0; i < enableStatus->userIdNum; i++) {
+        if (userId == enableStatus->userIds[i]) {
             isUserIdExist = true;
             break;
         }
@@ -1363,7 +1362,7 @@ bool GetEnableStatus(int32_t userId, uint32_t authType)
         if (g_globalConfigArray[i].type != ENABLE_STATUS) {
             continue;
         }
-        if (isEnableStatusExist(&g_globalConfigArray[i], userId, authType)) {
+        if (IsEnableStatusExist(&g_globalConfigArray[i], userId, authType)) {
             LOG_INFO("enableStatus is %{public}d", g_globalConfigArray[i].value.enableStatus);
             return g_globalConfigArray[i].value.enableStatus;
         }

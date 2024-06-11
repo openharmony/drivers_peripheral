@@ -17,8 +17,10 @@
 #define EFFECT_COMMON_H
 
 #include "v1_0/effect_types.h"
-
+namespace OHOS {
+namespace Audio {
 void EffectControllerReleaseDesc(struct EffectControllerDescriptor *desc);
 void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, const uint32_t *descsLen);
-
+}
+}
 #endif

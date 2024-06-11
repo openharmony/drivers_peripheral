@@ -14,7 +14,10 @@
 import("//build/ohos.gni")
 
 config("wpa_hdi_client_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "../interfaces/hdi_service/service_common",
+  ]
 }
 
 if (defined(ohos_lite)) {
@@ -64,7 +67,10 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
 
-    install_images = [ chipset_base_dir ]
+    install_images = [
+      chipset_base_dir,
+      updater_vendor_base_dir,
+    ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
   }

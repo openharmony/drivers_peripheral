@@ -100,6 +100,50 @@ if (is_standard_system) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
   }
+
+  ohos_shared_library("hdi_wpa_base_mini") {
+    include_dirs = [
+      "./service_common",
+      "../../client/include",
+    ]
+    sources = [
+      "service_common/hdi_wpa_common.c",
+      "service_common/hdi_wpa_hal.c",
+      "service_common/wpa_hdi_util.c",
+      "service_common/wpa_supplicant_hal.c",
+    ]
+
+    defines = [
+      "__OHOS__USER__",
+      "OHOS_EUPDATER",
+    ]
+
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+      "-DCONFIG_CTRL_IFACE",
+      "-DCONFIG_P2P",
+      "-DCONFIG_WEP",
+      "-DCONFIG_WPS",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_wlan:libwpa_stub_1.1",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hilog:libhilog",
+      "wpa_supplicant:wpa_client_updater",
+    ]
+
+    install_images = [ updater_vendor_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_wlan"
+  }
 } else {
   ohos_shared_library("libwpa_interface_service_1.1") {
     include_dirs = []
@@ -125,4 +169,7 @@ group("hdi_wpa_service") {
     ":libwpa_hdi_c_device",
     ":libwpa_interface_service_1.1",
   ]
+  if (is_standard_system) {
+    deps += [ ":hdi_wpa_base_mini" ]
+  }
 }
