@@ -1325,3 +1325,49 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
     expiredInfo->pinEnrolledSysTime = pinCredential.enrolledSysTime;
     return RESULT_SUCCESS;
 }
+
+static bool isEnableStatusExist(const GlobalConfigParamHal *enableStatusPara, int32_t userId, uint32_t authType)
+{
+    bool isAuthTypeExist = false;
+    for (uint32_t i = 0; i < enableStatusPara->authTypeNum; i++) {
+        if (authType == enableStatusPara->authTypes[i]) {
+            isAuthTypeExist = true;
+            break;
+        }
+    }
+    if (!isAuthTypeExist) {
+        LOG_INFO("enableStatus for authType %{public}u is not exist", authType);
+        return false;
+    }
+
+    bool isUserIdExist = false;
+    if (userId == INVALID_USER_ID) {
+        return true;
+    }
+    for (uint32_t i = 0; i < enableStatusPara->userIdNum; i++) {
+        if (userId == enableStatusPara->userIds[i]) {
+            isUserIdExist = true;
+            break;
+        }
+    }
+    if (!isUserIdExist) {
+        LOG_INFO("enableStatus for userId %{public}d is not exist", userId);
+        return false;
+    }
+    return true;
+}
+
+bool GetEnableStatus(int32_t userId, uint32_t authType)
+{
+    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
+        if (g_globalConfigArray[i].type != ENABLE_STATUS) {
+            continue;
+        }
+        if (isEnableStatusExist(&g_globalConfigArray[i], userId, authType)) {
+            LOG_INFO("enableStatus is %{public}d", g_globalConfigArray[i].value.enableStatus);
+            return g_globalConfigArray[i].value.enableStatus;
+        }
+        return true;
+    }
+    return true;
+}

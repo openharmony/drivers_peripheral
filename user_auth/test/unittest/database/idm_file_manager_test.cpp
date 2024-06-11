@@ -168,9 +168,19 @@ HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
 
     GlobalConfigParamHal globalConfigInfo = {};
     EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+    globalConfigInfo.type = ENABLE_STATUS;
+    globalConfigInfo.value.enableStatus = true;
+    globalConfigInfo.userIds[0] = 1;
+    globalConfigInfo.userIdNum = 1;
+    globalConfigInfo.authTypes[0] = 1;
+    globalConfigInfo.authTypeNum = 1;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+    globalConfigInfo.value.enableStatus = false;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
 
-    globalConfigInfo.type = PIN_EXPIRED_PERIOD;
-    globalConfigInfo.value.pinExpiredPeriod = 1;
+    GlobalConfigParamHal globalConfigInfo1 = {};
+    globalConfigInfo1.type = PIN_EXPIRED_PERIOD;
+    globalConfigInfo1.value.pinExpiredPeriod = 1;
     EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
 
 }
