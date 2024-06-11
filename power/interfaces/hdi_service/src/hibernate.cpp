@@ -57,7 +57,8 @@ constexpr int32_t SWAP_HEADER_SIZE = 129;
 constexpr int32_t SWAP_HEADER_INFO_BOOTBITS_SIZE = 1024;
 constexpr int32_t SWAP_HEADER_BUF_LEN = 1024;
 constexpr int32_t FILE_MAP_BUF_LEN = 2048;
-constexpr uint64_t SWAP_FILE_SIZE = 17179869184;
+// The swap file size, which can be configured in subsequent version.
+constexpr uint64_t SWAP_FILE_SIZE = 17179869184; // 16G
 constexpr uint32_t SWAP_FILE_MODE = 0660;
 
 constexpr int32_t UUID_VERSION_OFFSET = 6;
@@ -75,7 +76,9 @@ constexpr const char * const SYS_POWER_RESUME = "/sys/power/resume";
 constexpr const char * const SYS_POWER_RESUME_OFFSET = "/sys/power/resume_offset";
 constexpr const char * const HIBERNATE_STATE_PATH = "/sys/power/state";
 constexpr const char * const HIBERNATE_STATE = "disk";
-constexpr const char * const RESUME = "/dev/nvme0n1p60";
+
+// Partition the swap file is located, which can be configured in subsequent version.
+constexpr const char * const RESUME = "/dev/nvme0n1p61";
 
 struct SwapfileCfg {
     unsigned long long len;
@@ -147,7 +150,7 @@ int32_t Hibernate::MkSwap()
         }
         unsigned int pages = (SWAP_FILE_SIZE / pagesize) - 1;
         char buff[SWAP_HEADER_BUF_LEN];
-        uint32_t *swap = (uint32_t *)buff;
+        uint32_t *swap = reinterpret_cast<uint32_t *>(buff);
 
         swap[0] = SWAP_HEADER_INFO_VERSION;
         swap[1] = pages;
@@ -156,7 +159,7 @@ int32_t Hibernate::MkSwap()
             break;
         }
 
-        char *uuid = (char *)(swap + SWAP_HEADER_INFO_UUID_OFFSET);
+        char *uuid = reinterpret_cast<char *>(swap + SWAP_HEADER_INFO_UUID_OFFSET);
         if (getrandom(uuid, UUID_BUF_LEN, GRND_RANDOM) != UUID_BUF_LEN) {
             HDF_LOGE("create uuid failed when mkswap.");
             break;
@@ -224,7 +227,7 @@ int32_t Hibernate::CheckSwapFileSize(bool &isRightSize)
     }
 
     isRightSize = true;
-    if (SWAP_FILE_SIZE != swapFileStat.st_size) {
+    if (swapFileStat.st_size != SWAP_FILE_SIZE) {
         HDF_LOGE("swap file size error, actual_size=%{public}lld expected_size=%{public}lld",
             static_cast<long long>(swapFileStat.st_size), static_cast<long long>(SWAP_FILE_SIZE));
         isRightSize = false;
