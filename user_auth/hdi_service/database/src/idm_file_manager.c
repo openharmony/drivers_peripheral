@@ -347,6 +347,7 @@ ResultCode UpdateGlobalConfigFile(GlobalConfigParamHal *globalConfigArray, uint3
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("write file failed, %{public}u", parcel->contentSize);
     }
+    DestoryBuffer(parcel);
     return ret;
 }
 
@@ -597,7 +598,7 @@ IAM_STATIC Buffer *ReadGlobalConfigFile(FileOperator *fileOperator)
     return parcel;
 }
 
-IAM_STATIC ResultCode StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalConfigParamHal *configInfo)
+IAM_STATIC bool StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalConfigParamHal *configInfo)
 {
     if (StreamRead(parcel, index, &(configInfo->type), sizeof(int32_t)) != RESULT_SUCCESS) {
         LOG_ERROR("read globalConfig type failed");

@@ -164,7 +164,7 @@ typedef enum TokenType {
 #define MAX_ENROLL_OUTPUT 5
 #define MAX_AUTH_TYPE_LEN 3
 #define UDID_LEN 64
-#define INVALID_USER_ID -1
+#define INVALID_USER_ID (-1)
 
 #ifdef __cplusplus
 }

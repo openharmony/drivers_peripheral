@@ -14,7 +14,7 @@
  */
 
 #include "thermal_hdf_config.h"
-#include <climits>
+
 #include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 #include "hdf_remote_service.h"
@@ -26,7 +26,6 @@ namespace HDI {
 namespace Thermal {
 namespace V1_1 {
 namespace {
-const uint32_t DATA_PATH_CHECK = 9;
 const int32_t DEFAULT_POLLING_INTERVAL = 30000;
 }
 
@@ -202,12 +201,8 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
     xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
     if (xmlOutpath != nullptr) {
-        char resolvedPath[PATH_MAX] = {};
-        if ((realpath(reinterpret_cast<char *>(xmlOutpath), resolvedPath) != nullptr) &&
-            (strncmp(resolvedPath, "/data/log", DATA_PATH_CHECK) == 0)) {
-            this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
-            xmlFree(xmlOutpath);
-        }
+        this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
+        xmlFree(xmlOutpath);
     }
 
     auto cur  = node->xmlChildrenNode;

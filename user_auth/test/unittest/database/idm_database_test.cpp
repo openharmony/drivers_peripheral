@@ -824,6 +824,29 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
 }
+
+HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
+{
+    int32_t userId = 1;
+    uint32_t authType = 1;
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+
+    g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
+    g_globalConfigArray[0].value.pinExpiredPeriod = 1;
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+
+    g_globalConfigArray[0].type = ENABLE_STATUS;
+    g_globalConfigArray[0].value.enableStatus = false;
+    g_globalConfigArray[0].authTypes[0] = 0;
+    g_globalConfigArray[0].userIds[0] = 0;
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+
+    g_globalConfigArray[0].authTypes[0] = 1;
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+
+    g_globalConfigArray[0].value.enableStatus = true;
+    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+}
 } // namespace UserAuth
 } // namespace UserIam
 } // namespace OHOS

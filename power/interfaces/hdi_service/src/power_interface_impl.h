@@ -83,8 +83,6 @@ private:
     int32_t UnRegister();
     int32_t AddPowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
     int32_t RemovePowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
-    void CreateAutoSuspendThread();
-    void CreateForceSuspendThread();
 };
 } // namespace V1_2
 } // namespace Power

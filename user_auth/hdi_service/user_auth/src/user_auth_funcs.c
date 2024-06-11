@@ -45,6 +45,10 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
         LOG_ERROR("schedules is null");
         return RESULT_BAD_PARAM;
     }
+    if (!GetEnableStatus(param.userId, param.authType)) {
+        LOG_ERROR("authType is not support %{public}d", param.authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     UserAuthContext *authContext = NULL;
     ResultCode result = GenerateAuthContext(param, &authContext);
     if (result != RESULT_SUCCESS) {
@@ -294,6 +298,10 @@ EXIT:
 
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal)
 {
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     ResultCode ret = GetEnrolledState(userId, authType, enrolledStateHal);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetEnrolledState failed");
@@ -412,6 +420,11 @@ ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param)
 
 void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)
 {
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        (*checkResult) = RESULT_TYPE_NOT_SUPPORT;
+        return;
+    }
     (*checkResult) = CheckAtlByExecutorAndCred(userId, authType, authTrustLevel);
     if ((*checkResult) != RESULT_SUCCESS) {
         LOG_ERROR("CheckAtlByExecutorAndCred failed");

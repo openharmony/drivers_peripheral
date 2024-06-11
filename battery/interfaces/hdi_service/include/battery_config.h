@@ -67,9 +67,9 @@ private:
     void ParseLightConfig(const Json::Value& lightConfig);
     void ParseChargeSceneConfig(const Json::Value& chargeSceneConfig);
     bool IsValidChargeSceneConfig(const std::string& key, const Json::Value& valueObj);
-    void ParseChargeSceneSupport(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
-    void ParseChargeSceneSet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
-    void ParseChargeSceneGet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
+    bool ParseChargeSceneSupport(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
+    bool ParseChargeSceneSet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
+    bool ParseChargeSceneGet(const Json::Value& valueObj, BatteryConfig::ChargeSceneConfig& config);
     bool IsValidSysPath(const std::string& path);
     void ParseChargerConfig(const Json::Value& chargerConfig);
     void ParseUeventConfig(const Json::Value& ueventConfig);
