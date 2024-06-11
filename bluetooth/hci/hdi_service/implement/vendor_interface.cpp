@@ -132,6 +132,10 @@ bool VendorInterface::Initialize(
         return false;
     }
 
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("vendorInterface_ is nullptr");
+        return false;
+    }
     vendorInterface_->op(BtOpcodeT::BT_OP_INIT, nullptr);
 
     return true;
