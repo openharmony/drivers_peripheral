@@ -1219,25 +1219,17 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_030, TestSize.Level1)
         for (size_t i = 0; i < entry.count; i++) {
             uint8_t captureMirror = entry.data.u8[i];
             if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
-                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture mirror is supported, mirror capture tag is: %{public}d", captureMirror);
             } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
-                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE_VIDEO] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture mirror is supported, mirror capture video tag is: %{public}d", captureMirror);
+                std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
                 uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_ON;
-                bool result;
-                if (cameraTest->rc != CAM_META_SUCCESS) {
-                    CAMERA_LOGI("Not found TAG[OHOS_CONTROL_CAPTURE_MIRROR], insert one");
-                    result = cameraTest->ability->addEntry(OHOS_CONTROL_CAPTURE_MIRROR,
-                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
-                    EXPECT_EQ(true, result);
-                } else {
-                    CAMERA_LOGI("Found TAG[OHOS_CONTROL_CAPTURE_MIRROR], Update it");
-                    result = cameraTest->ability->updateEntry(OHOS_CONTROL_CAPTURE_MIRROR,
-                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
-                    EXPECT_EQ(true, result);
-                }
+                meta->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &cameraMirrorControl, DATA_COUNT);
+                std::vector<uint8_t> metaVec;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+                cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
 
                 cameraTest->imageDataSaveSwitch = SWITCH_ON;
-                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(cameraTest->ability, cameraTest->abilityVec);
                 cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
                 cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
 
@@ -1247,7 +1239,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_030, TestSize.Level1)
                 cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
             } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
-                CAMERA_LOGI("Capture Mirror is not supported, tag[OHOS_CAMERA_MIRROR_NOT_SUPPORT] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture Mirror is not supported, tag is: %{public}d", captureMirror);
             }
         }
     }
@@ -1272,25 +1264,17 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_031, TestSize.Level1)
         for (size_t i = 0; i < entry.count; i++) {
             uint8_t captureMirror = entry.data.u8[i];
             if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
-                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture mirror is supported, mirror capture tag is: %{public}d", captureMirror);
             } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
-                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE_VIDEO] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture mirror is supported, mirror capture video tag is: %{public}d", captureMirror);
+                std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
                 uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_OFF;
-                bool result;
-                if (cameraTest->rc != CAM_META_SUCCESS) {
-                    CAMERA_LOGI("Not found TAG[OHOS_CONTROL_CAPTURE_MIRROR], insert one");
-                    result = cameraTest->ability->addEntry(OHOS_CONTROL_CAPTURE_MIRROR,
-                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
-                    EXPECT_EQ(true, result);
-                } else {
-                    CAMERA_LOGI("Found TAG[OHOS_CONTROL_CAPTURE_MIRROR], Update it");
-                    result = cameraTest->ability->updateEntry(OHOS_CONTROL_CAPTURE_MIRROR,
-                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
-                    EXPECT_EQ(true, result);
-                }
+                meta->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &cameraMirrorControl, DATA_COUNT);
+                std::vector<uint8_t> metaVec;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+                cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
 
                 cameraTest->imageDataSaveSwitch = SWITCH_ON;
-                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(cameraTest->ability, cameraTest->abilityVec);
                 cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
                 cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
 
@@ -1300,7 +1284,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_031, TestSize.Level1)
                 cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 
             } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
-                CAMERA_LOGI("Capture Mirror is not supported, tag[OHOS_CAMERA_MIRROR_NOT_SUPPORT] is: %{public}d", captureMirror);
+                CAMERA_LOGI("Capture Mirror is not supported, tag is: %{public}d", captureMirror);
             }
         }
     }
