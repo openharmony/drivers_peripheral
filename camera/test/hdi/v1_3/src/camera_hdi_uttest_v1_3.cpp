@@ -1201,6 +1201,112 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_029, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Camera_Device_Hdi_V1_3_030
+ * @tc.desc: OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_030, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_TRUE(entry.count > 0);
+        for (size_t i = 0; i < entry.count; i++) {
+            uint8_t captureMirror = entry.data.u8[i];
+            if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
+                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE] is: %{public}d", captureMirror);
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
+                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE_VIDEO] is: %{public}d", captureMirror);
+                uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_ON;
+                bool result;
+                if (cameraTest->rc != CAM_META_SUCCESS) {
+                    CAMERA_LOGI("Not found TAG[OHOS_CONTROL_CAPTURE_MIRROR], insert one");
+                    result = cameraTest->ability->addEntry(OHOS_CONTROL_CAPTURE_MIRROR,
+                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
+                    EXPECT_EQ(true, result);
+                } else {
+                    CAMERA_LOGI("Found TAG[OHOS_CONTROL_CAPTURE_MIRROR], Update it");
+                    result = cameraTest->ability->updateEntry(OHOS_CONTROL_CAPTURE_MIRROR,
+                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
+                    EXPECT_EQ(true, result);
+                }
+
+                cameraTest->imageDataSaveSwitch = SWITCH_ON;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(cameraTest->ability, cameraTest->abilityVec);
+                cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+                cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+                cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+                cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+                cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+                cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
+                CAMERA_LOGI("Capture Mirror is not supported, tag[OHOS_CAMERA_MIRROR_NOT_SUPPORT] is: %{public}d", captureMirror);
+            }
+        }
+    }
+}
+
+/**
++ * @tc.name:Camera_Device_Hdi_V1_3_031
++ * @tc.desc:Dynamic capture mirror configuration, fixed capture mirror setting, streams capture mirror constrain
++ * @tc.size:MediumTest
++ * @tc.type:Function
++*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_031, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_TRUE(entry.count > 0);
+        for (size_t i = 0; i < entry.count; i++) {
+            uint8_t captureMirror = entry.data.u8[i];
+            if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
+                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE] is: %{public}d", captureMirror);
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
+                CAMERA_LOGI("Capture Mirror is supported, tag[OHOS_CAMERA_MIRROR_CAPTURE_VIDEO] is: %{public}d", captureMirror);
+                uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_OFF;
+                bool result;
+                if (cameraTest->rc != CAM_META_SUCCESS) {
+                    CAMERA_LOGI("Not found TAG[OHOS_CONTROL_CAPTURE_MIRROR], insert one");
+                    result = cameraTest->ability->addEntry(OHOS_CONTROL_CAPTURE_MIRROR,
+                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
+                    EXPECT_EQ(true, result);
+                } else {
+                    CAMERA_LOGI("Found TAG[OHOS_CONTROL_CAPTURE_MIRROR], Update it");
+                    result = cameraTest->ability->updateEntry(OHOS_CONTROL_CAPTURE_MIRROR,
+                        &cameraMirrorControl, sizeof(cameraMirrorControl) / sizeof(uint8_t));
+                    EXPECT_EQ(true, result);
+                }
+
+                cameraTest->imageDataSaveSwitch = SWITCH_ON;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(cameraTest->ability, cameraTest->abilityVec);
+                cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+                cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+                cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+                cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+                cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+                cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
+                CAMERA_LOGI("Capture Mirror is not supported, tag[OHOS_CAMERA_MIRROR_NOT_SUPPORT] is: %{public}d", captureMirror);
+            }
+        }
+    }
+}
+
+/**
  * @tc.name: Camera_Device_Hdi_V1_3_032
  * @tc.desc: Get and Print all data in OHOS_ABILITY_CAMERA_MODES for all cameras
  * @tc.size: MediumTest
