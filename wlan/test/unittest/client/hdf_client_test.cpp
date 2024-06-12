@@ -1037,19 +1037,6 @@ HWTEST_F(WifiClientTest, WifiSetDpiMarkRule028, TestSize.Level1)
     WifiSetDpiMarkRule(srcAddr, dstAddr, buf);
 }
 /**
- * @tc.name: WifiSetPowerSaveMode029
- * @tc.desc: set rx remain On channel test
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
-{
-    int32_t frequency = 0;
-    int32_t mode = 0;
-    const char *ifName = "wlanTest";
-    WifiSetPowerSaveMode(ifName, dstAddr, buf);
-}
-/**
  * @tc.name: WpaEventReport
  * @tc.desc: set rx remain On channel test
  * @tc.type: FUNC
@@ -1123,6 +1110,19 @@ HWTEST_F(WifiClientTest, HostapdUnregisterEventCallback, TestSize.Level1)
     int32_t dstAddr = 0;
     const char *ifNameInvalid = "wlanTest";
     HostapdUnregisterEventCallback(Hid2dFunCb2, dstAddr, ifNameInvalid);
+}
+/**
+ * @tc.name: WifiSetPowerSaveMode029
+ * @tc.desc: set rx remain On channel test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
+{
+    int32_t frequency = 0;
+    int32_t mode = 0;
+    const char *ifName = "wlanTest";
+    WifiSetPowerSaveMode(ifName, dstAddr, buf);
 }
 }
 }
