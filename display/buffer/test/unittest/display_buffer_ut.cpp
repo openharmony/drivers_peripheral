@@ -17,7 +17,7 @@
 
 #include "gtest/gtest.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/display_composer_type.h"
+#include "v1_2/display_composer_type.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 
@@ -26,9 +26,28 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace testing::ext;
-using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_2;
 using namespace OHOS::HDI::Display::Buffer::V1_1;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
+using OHOS::HDI::Display::Composer::V1_2::HBM_USE_MEM_DMA;
+using OHOS::HDI::Display::Composer::V1_2::HBM_USE_CPU_READ;
+using OHOS::HDI::Display::Composer::V1_2::HBM_USE_CPU_WRITE;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBX_8888;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_8888;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRA_8888;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCBCR_420_SP;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_420_SP;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCBCR_420_P;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_YCRCB_420_P;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGB_888;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_8888;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBA_4444;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_RGBX_4444;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRA_4444;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_4444;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGR_565;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRA_5551;
+using OHOS::HDI::Display::Composer::V1_1::PIXEL_FMT_BGRX_5551;
 #ifndef DISPLAY_TEST_CHK_RETURN
 #define DISPLAY_TEST_CHK_RETURN(val, ret, ...) \
     do {                                       \
@@ -130,76 +149,233 @@ const AllocInfo DISPLAY_BUFFER_TEST_SETS[] = {
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGBX_8888
     },
+    //HBM_USE_CPU_HW_BOTH
+    // num12
+    {
+        .width = ALLOC_SIZE_1920,
+        .height = ALLOC_SIZE_1080,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    },
+    // num13
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    },
+    // num14
+    {
+        .width = ALLOC_SIZE_1280,
+        .height = ALLOC_SIZE_720,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    },
+    // num15
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBA_8888
+    },
+    // num16
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRA_8888
+    },
+    // num17
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_SP
+    },
+    // num18
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCRCB_420_SP
+    },
+    // num19
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCBCR_420_P
+    },
+    // num20
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_YCRCB_420_P
+    },
+    // num21
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH,
+        .format = PIXEL_FMT_RGBX_8888
+    },
+    // num22
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ,
+        .format = PIXEL_FMT_RGBX_8888
+    },
+    // num23
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_8888
+    },
 #ifdef DISPLAY_COMMUNITY
-     // num12
+     // num24
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGB_888
     },
-    // num13
+    // num25
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRX_8888
     },
-    // num14
+    // num26
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGBA_4444
     },
-    // num15
+    // num27
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGBX_4444
     },
-    // num16
+    // num28
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRA_4444
     },
-    // num17
+    // num29
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRX_4444
     },
-    // num18
+    // num30
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGR_565
     },
-    // num19
+    // num31
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRA_5551
     },
-    // num20
+    // num32
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_BGRX_5551
     },
+    //HBM_USE_CPU_HW_BOTH
+    // num33
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGB_888
+    },
+    // num34
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRX_8888
+    },
+    // num35
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBA_4444
+    },
+    // num36
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBX_4444
+    },
+    // num37
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRA_4444
+    },
+    // num38
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRX_4444
+    },
+    // num39
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGR_565
+    },
+    // num40
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRA_5551
+    },
+    // num41
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_BGRX_5551
+    },
 #else
-    // num21
+    // num42
     {
         .width = ALLOC_SIZE_1080,
         .height = ALLOC_SIZE_1920,
         .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_WRITE,
+        .format = PIXEL_FMT_RGBA_1010102
+    },
+    //HBM_USE_CPU_HW_BOTH
+    // num43
+    {
+        .width = ALLOC_SIZE_1080,
+        .height = ALLOC_SIZE_1920,
+        .usage = HBM_USE_CPU_HW_BOTH | HBM_USE_CPU_WRITE,
         .format = PIXEL_FMT_RGBA_1010102
     },
 #endif // DISPLAY_COMMUNITY
