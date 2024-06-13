@@ -1421,7 +1421,7 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrl.requestType)) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = static_cast<uint32_t>(ctrl.requestType);
-    controlParams.size = MAX_CONTROL_BUFF_SIZE;
+    controlParams.size = ctrl.length;
     controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
         HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
