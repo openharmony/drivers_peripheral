@@ -135,10 +135,7 @@ int32_t WifiP2pIface::SetTxPower(int32_t power)
 {
 {
     WifiError status = vendorHal_.lock()->SetTxPower(ifname_, power);
-    if (status == HAL_SUCCESS) {
-        return HDF_SUCCESS;
-    }
-    return HDF_FAILURE;
+    return status;
 }
 }
 
