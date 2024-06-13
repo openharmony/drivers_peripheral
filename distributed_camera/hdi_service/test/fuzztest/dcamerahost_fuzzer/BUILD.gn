@@ -12,9 +12,9 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-base_root = "../../../../../../../../../"
+base_root = "../"
 import(
-    "$base_root/drivers/peripheral/distributed_camera/hdi_service/test/fuzztest/dcamera_fuzz.gni")
+    "$base_root/dcamera_fuzz.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("DCameraHostFuzzTest") {
   module_out_path = "${fuzz_test_output_path}/dcamerahost"
