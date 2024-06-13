@@ -69,7 +69,7 @@ BENCHMARK_F(UsbBenchmarkDeviceTest, OpenDevice)(benchmark::State &state)
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
     ASSERT_NE(subscriber, nullptr);
     if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: bind usbd subscriber failed\n", __func__);
+        HDF_LOGW("%{public}s: bind usbd subscriber failed", __func__);
     }
     g_dev = {subscriber->busNum_, subscriber->devAddr_};
     int32_t ret;
@@ -96,7 +96,7 @@ BENCHMARK_F(UsbBenchmarkDeviceTest, CloseDevice)(benchmark::State &state)
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
     ASSERT_NE(subscriber, nullptr);
     if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: bind usbd subscriber failed\n", __func__);
+        HDF_LOGW("%{public}s: bind usbd subscriber failed", __func__);
     }
     g_dev = {subscriber->busNum_, subscriber->devAddr_};
     int32_t ret;

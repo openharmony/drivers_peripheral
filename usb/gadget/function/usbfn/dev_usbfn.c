@@ -132,17 +132,17 @@ static int32_t UsbFnDriverBind(struct HdfDeviceObject *device)
 {
     struct DevUsbFnMgr *devMgr = NULL;
     if (device == NULL) {
-        HDF_LOGE("%{public}s: device is null\n", __func__);
+        HDF_LOGE("%{public}s: device is null", __func__);
         return HDF_FAILURE;
     }
     devMgr = (struct DevUsbFnMgr *)OsalMemCalloc(sizeof(*devMgr));
     if (devMgr == NULL) {
-        HDF_LOGE("%{public}s: usbfn Alloc usb devMgr failed\n", __func__);
+        HDF_LOGE("%{public}s: usbfn Alloc usb devMgr failed", __func__);
         return HDF_FAILURE;
     }
 
     if (HdfDeviceObjectSetInterfaceDesc(device, "hdf.usb.usbfn") != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Set Desc fail!\n", __func__);
+        HDF_LOGE("%{public}s: Set Desc fail!", __func__);
         OsalMemFree(devMgr);
         return HDF_FAILURE;
     }
@@ -160,7 +160,7 @@ static int32_t UsbFnDriverInit(struct HdfDeviceObject *device)
 
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL || iface->GetUint32 == NULL || device == NULL) {
-        HDF_LOGE("%{public}s: iface is invalid\n", __func__);
+        HDF_LOGE("%{public}s: iface is invalid", __func__);
         return HDF_FAILURE;
     }
     devMgr = (struct DevUsbFnMgr *)device->service;
