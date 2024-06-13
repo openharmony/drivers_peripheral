@@ -15,6 +15,7 @@
 
 #include "thermal_dfx.h"
 #include <cerrno>
+#include <climits>
 #include <cstdio>
 #include <deque>
 #include <fcntl.h>
@@ -40,6 +41,7 @@ namespace HDI {
 namespace Thermal {
 namespace V1_1 {
 namespace {
+constexpr uint32_t DATA_PATH_CHECK = 9;
 constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MAX_FILE_NUM = 10;
 constexpr int32_t MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -272,6 +274,12 @@ void ThermalDfx::CreateLogFile()
     if (g_firstCreate) {
         g_currentLogIndex = 0;
         g_logTime = GetCurrentTime(TIME_FORMAT_1);
+        char resolvedPath[PATH_MAX] = {};
+        if ((realpath(g_outPath.c_str(), resolvedPath) == nullptr) ||
+            (strncmp(resolvedPath, "/data/log", DATA_PATH_CHECK) != 0)) {
+            THERMAL_HILOGE(COMP_HDI, "g_outPath is invaild");
+            return;
+        }
         g_firstCreate = false;
     }
     std::string logFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
