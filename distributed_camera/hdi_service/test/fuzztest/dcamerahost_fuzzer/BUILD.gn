@@ -13,8 +13,8 @@
 
 #####################hydra-fuzz###################
 base_root = "../"
-import(
-    "$base_root/dcamera_fuzz.gni")
+import("$base_root/dcamera_fuzz.gni")
+
 ##############################fuzztest##########################################
 ohos_fuzztest("DCameraHostFuzzTest") {
   module_out_path = "${fuzz_test_output_path}/dcamerahost"
