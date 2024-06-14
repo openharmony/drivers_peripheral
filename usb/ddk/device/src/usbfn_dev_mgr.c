@@ -546,7 +546,7 @@ static int32_t UsbFnEventProcess(void *arg)
     if (devMgr) {
         devMgr->running = true;
     }
-    HDF_LOGI("%{public}s, exit\n", __func__);
+    HDF_LOGI("%{public}s, exit", __func__);
     return 0;
 }
 
