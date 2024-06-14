@@ -31,14 +31,15 @@ ohos_fuzztest("UsbGetInterfaceStatusFuzzTest") {
   deps = [
     "../../../ddk:libusb_core",
     "../../../hdi_service:libusb_interface_service_1.1",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_usb:libusb_ddk_stub_1.0",
     "drivers_interface_usb:libusb_proxy_1.1",
-    "drivers_interface_usb:usb_idl_headers_1.1",
+    "drivers_interface_usb:usb_ddk_idl_headers",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
