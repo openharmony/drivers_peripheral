@@ -802,7 +802,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice()
 {
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
         return HDF_FAILURE;
     }
     const char *udcName = nullptr;
