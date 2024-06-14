@@ -241,7 +241,7 @@ int32_t CodecEnumerateCapability(uint32_t index, CodecCapability *cap)
             *cap = group->capablitis[cursor];
             return HDF_SUCCESS;
         } else {
-            cursor -= group->num;
+            cursor -= (uint32_t)group->num;
         }
     }
 #endif
