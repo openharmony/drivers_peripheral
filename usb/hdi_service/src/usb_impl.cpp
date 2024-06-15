@@ -967,9 +967,9 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 void UsbImpl::UpdateFunctionStatus()
 {
     char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
-    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
+    int32_t ret = GetParameter(PERSIST_SYS_USB_CONFIG, "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
     if (ret <= 0) {
-        HDF_LOGI("%{public}s: GetParameter failed", __func__);
+        HDF_LOGE("%{public}s: GetParameter failed", __func__);
     }
 
     std::string functionValue(cFunctionValue);
