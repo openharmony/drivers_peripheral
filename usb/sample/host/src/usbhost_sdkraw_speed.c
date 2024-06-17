@@ -479,11 +479,11 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
     } else {
-        HDF_LOGE("no buf\n");
+        HDF_LOGE("no buf");
         return 0;
     }
     if (dbn < 0) {
-        HDF_LOGE("AcmDbAlloc failed\n");
+        HDF_LOGE("AcmDbAlloc failed");
         return HDF_FAILURE;
     }
     db = &acm->db[dbn];
