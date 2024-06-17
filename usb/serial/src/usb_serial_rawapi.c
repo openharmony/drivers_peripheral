@@ -856,11 +856,11 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     if (g_syncRequest == NULL) {
         g_syncRequest = UsbRawAllocRequest(acm->devHandle, 0, acm->dataInEp->maxPacketSize);
         if (g_syncRequest == NULL) {
-            HDF_LOGE("UsbRawAllocRequest g_syncRequest failed\n");
+            HDF_LOGE("UsbRawAllocRequest g_syncRequest failed");
             return HDF_ERR_MALLOC_FAIL;
         }
     }
-    HDF_LOGD("%{public}s:%{public}d g_syncRequest \n", __func__, __LINE__);
+    HDF_LOGD("%{public}s:%{public}d g_syncRequest ", __func__, __LINE__);
 
     requestData.endPoint = acm->dataInEp->addr;
     requestData.data = g_syncRequest->buffer;

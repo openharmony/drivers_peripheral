@@ -1017,7 +1017,7 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
                 HILOG_ERROR(LOG_CORE, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
             }
-            HILOG_INFO(LOG_CORE, "%{public}s: ifName = %{public}s", __FUNCTION__, ifName);
+            HILOG_DEBUG(LOG_CORE, "%{public}s: ifName = %{public}s", __FUNCTION__, ifName);
             infoResult->nums++;
         }
         free(namelist[i]);

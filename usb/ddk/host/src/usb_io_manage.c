@@ -209,7 +209,7 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
 
     ret = OsalSemWait((struct OsalSem *)&msgQueue->sem, HDF_WAIT_FOREVER);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalSemWait failed, ret=%{public}d\n", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalSemWait failed, ret=%{public}d", __func__, __LINE__, ret);
         goto ERROR;
     }
     if (DListIsEmpty(&msgQueue->entry)) {

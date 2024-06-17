@@ -46,6 +46,8 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
     tempNode->node = std::make_shared<ComponentNode>(callbacks, appData, compName);
     if (tempNode->node == nullptr) {
         CODEC_LOGE("fail to init ComponentNode");
+        delete tempNode;
+        tempNode = nullptr;
         return HDF_FAILURE;
     }
     auto err = g_mgr.CreateComponentInstance(compName, &ComponentNode::callbacks_, tempNode->node.get(), &comp);
