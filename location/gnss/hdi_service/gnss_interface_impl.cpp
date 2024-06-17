@@ -144,21 +144,6 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
     gnssMeasurementInfoNew.uncertainty = gnssMeasurementInfo->uncertainty;
     gnssMeasurementInfoNew.measurementCount = gnssMeasurementInfo->measurementCount;
 
-    HDF_LOGI("%{public}s:fieldValidFlags:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.fieldValidFlags).c_str());
-    HDF_LOGI("%{public}s:leapSecond:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.leapSecond).c_str());
-    HDF_LOGI("%{public}s:receiverClockTime:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.receiverClockTime).c_str());
-    HDF_LOGI("%{public}s:timeUncertainty:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.timeUncertainty).c_str());
-    HDF_LOGI("%{public}s:rcvClockFullBias:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.rcvClockFullBias).c_str());
-    HDF_LOGI("%{public}s:biasUncertainty:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.biasUncertainty).c_str());
-    HDF_LOGI("%{public}s:clockDrift:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.clockDrift).c_str());
-    HDF_LOGI("%{public}s:clockDriftUncertainty:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.clockDriftUncertainty).c_str());
-    HDF_LOGI("%{public}s:clockJumpThreshold:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.clockJumpThreshold).c_str());
-    HDF_LOGI("%{public}s:clockHWFreBiasIndicator:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.clockHWFreBiasIndicator).c_str());
-    HDF_LOGI("%{public}s:clockHWFreDriftIndicator:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->gnssClock.clockHWFreDriftIndicator).c_str());
-    HDF_LOGI("%{public}s:elapsedRealtime:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->elapsedRealtime).c_str());
-    HDF_LOGI("%{public}s:uncertainty:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->uncertainty).c_str());
-    HDF_LOGI("%{public}s:measurementCount:%{public}s ", __func__,std::to_string(gnssMeasurementInfo->measurementCount).c_str());
-
     std::vector<OHOS::HDI::Location::Gnss::V2_0::GnssMeasurement> gnssMeasurements;
     for (OHOS::HDI::Location::GnssMeasurement infoItem : gnssMeasurementInfo->measurements) {
         OHOS::HDI::Location::Gnss::V2_0::GnssMeasurement gnssMeasurement;
