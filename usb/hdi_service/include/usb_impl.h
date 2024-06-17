@@ -59,6 +59,8 @@ public:
     int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex) override;
     int32_t BulkTransferRead(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data) override;
+    int32_t BulkTransferReadwithLength(const UsbDev &dev,
+        const UsbPipe &pipe, int32_t timeout, int32_t length, std::vector<uint8_t> &data) override;
     int32_t BulkTransferWrite(
         const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data) override;
     int32_t ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data) override;
