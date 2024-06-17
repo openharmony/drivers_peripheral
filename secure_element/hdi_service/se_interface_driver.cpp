@@ -64,7 +64,7 @@ static int HdfSeInterfaceDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGE("%{public}s: Enter", __func__);
 #ifdef SE_DRIVER_USE_CA
-    int ret = OHOS::HDI::SecureElement::SecureElementCaProxy::GetInstance().VendorSecureElementCaInit();
+    int ret = OHOS::HDI::SecureElement::SecureElementCaProxy::GetInstance().VendorSecureElementCaOnStart();
     if (ret != SECURE_ELEMENT_CA_RET_OK) {
         HDF_LOGE("%{public}s: Failed", __func__);
         return HDF_ERR_INVALID_PARAM;
