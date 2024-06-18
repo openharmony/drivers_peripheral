@@ -23,11 +23,23 @@
 #include <vector>
 #include "batteryd_api.h"
 #include "v2_0/ibattery_interface.h"
+#include "ffrt_utils.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V2_0 {
+
+class ConfigPathLogData : public PowerMgr::LogFilterData {
+public:
+    ConfigPathLogData(const std::string &path = "", const std::string &value = "");
+    virtual bool IsSame(const PowerMgr::LogFilterData *other) const override;
+    virtual bool Update(const PowerMgr::LogFilterData *other) override;
+    virtual void Print(uint32_t count) const override;
+    std::string path_;
+    std::string value_;
+};
+
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h
@@ -161,6 +173,9 @@ private:
     std::map<std::string, int32_t> nodeCacheFiles_;
     std::string path_;
     int32_t index_;
+    // log filter
+    void LogFilterInit();
+    PowerMgr::LogFilter *logFilter_ {nullptr};
 };
 }  // namespace V2_0
 }  // namespace Battery
