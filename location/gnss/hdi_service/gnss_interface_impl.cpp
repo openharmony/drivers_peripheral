@@ -324,7 +324,42 @@ int32_t GnssInterfaceImpl::StopGnss(GnssStartType type)
 int32_t GnssInterfaceImpl::SetGnssReferenceInfo(const GnssRefInfo& refInfo)
 {
     HDF_LOGI("%{public}s.", __func__);
-    return HDF_SUCCESS;
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
+    if (gnssInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    GnssReferenceInfo referenceInfo;
+    referenceInfo.category = refInfo.type;
+    switch (refInfo.type) {
+        case GNSS_REF_INFO_TIME:
+            referenceInfo.u.time.size = sizeof(GnssRefTime);
+            referenceInfo.u.time.time = refInfo.time.time;
+            referenceInfo.u.time.elapsedRealtime = refInfo.time.elapsedRealtime;
+            referenceInfo.u.time.uncertaintyOfTime = refInfo.time.uncertaintyOfTime;
+            referenceInfo.size = sizeof(GnssReferenceInfo);
+            return gnssInterface->injectsGnssReferenceInfo(referenceInfo.category, &referenceInfo);
+        case GNSS_REF_INFO_LOCATION:
+            referenceInfo.u.gnssLocation.size = sizeof(GnssLocation);
+            referenceInfo.u.gnssLocation.fieldValidity = refInfo.gnssLocation.fieldValidity;
+            referenceInfo.u.gnssLocation.latitude = refInfo.gnssLocation.latitude;
+            referenceInfo.u.gnssLocation.longitude = refInfo.gnssLocation.longitude;
+            referenceInfo.u.gnssLocation.altitude = refInfo.gnssLocation.altitude;
+            referenceInfo.u.gnssLocation.speed = refInfo.gnssLocation.speed;
+            referenceInfo.u.gnssLocation.bearing = refInfo.gnssLocation.bearing;
+            referenceInfo.u.gnssLocation.horizontalAccuracy = refInfo.gnssLocation.horizontalAccuracy;
+            referenceInfo.u.gnssLocation.verticalAccuracy = refInfo.gnssLocation.verticalAccuracy;
+            referenceInfo.u.gnssLocation.speedAccuracy = refInfo.gnssLocation.speedAccuracy;
+            referenceInfo.u.gnssLocation.bearingAccuracy = refInfo.gnssLocation.bearingAccuracy;
+            referenceInfo.u.gnssLocation.timeForFix = refInfo.gnssLocation.timeForFix;
+            referenceInfo.u.gnssLocation.timeSinceBoot = refInfo.gnssLocation.timeSinceBoot;
+            referenceInfo.u.gnssLocation.timeUncertainty = refInfo.gnssLocation.timeUncertainty;
+            referenceInfo.size = sizeof(GnssReferenceInfo);
+            return gnssInterface->injectsGnssReferenceInfo(referenceInfo.category, &referenceInfo);
+        default:
+            HDF_LOGI("%{public}s: do not support now", __func__);
+            return HDF_ERR_INVALID_PARAM;
+    }
 }
 
 int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryDataType data)
