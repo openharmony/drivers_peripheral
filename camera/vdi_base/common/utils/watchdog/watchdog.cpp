@@ -28,7 +28,6 @@ void WatchDog::Init(int ms, std::function<void()> executor, bool isKill)
     timeMs_ = ms;
     isKill_ = isKill;
     executor_ = executor;
-    handleThread_ = std::make_unique<std::thread>(&WatchDog::WaitForWakeUP, this);
     handleThread_ = std::make_unique<std::thread>([this] {this->WaitForWakeUP(); });
 }
 
