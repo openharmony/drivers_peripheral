@@ -69,57 +69,10 @@ struct BatteryAssigner {
     void (*Assigner)(const char*, struct BatterydInfo*);
 };
 
-ConfigPathLogData::ConfigPathLogData(const std::string &path, const std::string &value):
-    path_(path), value_(value)
-{
-}
-
-bool ConfigPathLogData::IsSame(const LogFilterData *other) const
-{
-    const ConfigPathLogData *data = static_cast<const ConfigPathLogData*>(other);
-    return data != nullptr && path_ == data->path_ && value_ == data->value_;
-}
-
-bool ConfigPathLogData::Update(const LogFilterData *other)
-{
-    const ConfigPathLogData *data = static_cast<const ConfigPathLogData*>(other);
-    if (data == nullptr) {
-        return false;
-    }
-    path_ = data->path_;
-    value_ = data->value_;
-    return true;
-}
-
-void ConfigPathLogData::Print(uint32_t count) const
-{
-    if (count == 0) {
-        BATTERY_HILOGI(FEATURE_BATT_INFO, "'GetConfigByPath(%{public}s) exit, value:%{public}s'",
-            path.c_str(), value_.c_str());
-    } else {
-        BATTERY_HILOGI(FEATURE_BATT_INFO, "'GetConfigByPath(%{public}s) exit, value:%{public}s' x %{public}u",
-            path.c_str(), value_.c_str(), count);
-    }
-}
-
-void PowerSupplyProvider::LogFilterInit()
-{
-    static ConfigPathLogData data;
-    logFilter_ = PowerMgr::LogFilter::GetInstance();
-    if (logFilter_ == nullptr) {
-        return;
-    }
-
-    bool result = logFilter_->RegisterLogEntry(PowerMgr::LOG_FILTER_ID_GET_CONFIG_BY_PATH, &data);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "RegisterLogEntry[%{public}d] ret=%{public}d",
-        PowerMgr::LOG_FILTER_ID_GET_CONFIG_BY_PATH, result);
-}
-
 PowerSupplyProvider::PowerSupplyProvider()
 {
     path_ = POWER_SUPPLY_BASE_PATH;
     index_ = 0;
-    LogFilterInit();
 }
 
 PowerSupplyProvider::~PowerSupplyProvider()
@@ -356,8 +309,7 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path(%{public}s) failed, ret: %{public}d",
-            (path != nullptr ? path : "NULL"), ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -405,7 +357,8 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size)
     std::string typePath = path_ + "/" + typeNode + "/" + "type";
     ret = ReadSysfsFile(typePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read type path failed, ret: %{public}d", ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path(%{public}s) failed, ret: %{public}d",
+            (path != nullptr ? path : "NULL"), ret);
         return;
     }
     Trim(buf);
@@ -1110,12 +1063,8 @@ int32_t PowerSupplyProvider::GetConfigByPath(const std::string& path, std::strin
     }
     Trim(buf);
     result = buf;
-    auto data = ConfigPathLogData(path.c_str(), result.c_str());
-    if (logFilter_ && logFilter_->AddLog(PowerMgr::LOG_FILTER_ID_GET_CONFIG_BY_PATH, &data)) {
-        // log filter is working, do nothing
-    } else {
-        data.Print(0);
-    }
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "GetConfigByPath(%{public}s) exit, value:%{public}s",
+        path.c_str(), result.c_str());
     return HDF_SUCCESS;
 }
 

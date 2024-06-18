@@ -23,9 +23,7 @@
         "hdf_core",
         "hilog",
         "ipc",
-        "jsoncpp",
-        "power_manager",
-        "ffrt"
+        "jsoncpp"
       ]
     },
     "build": {
