@@ -33,8 +33,6 @@ ohos_shared_library("libbattery_interface_service_2.0") {
       "hilog:libhilog",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
-      "power_manager:power_ffrt",
-      "ffrt:libffrt",
     ]
     if (has_battery_config_policy_part) {
       external_deps += [ "config_policy:configpolicy_util" ]
