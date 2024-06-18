@@ -95,10 +95,10 @@ void ConfigPathLogData::Print(uint32_t count) const
 {
     if (count == 0) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "'GetConfigByPath(%{public}s) exit, value:%{public}s'",
-            path.c_str(), result.c_str());
+            path.c_str(), value_.c_str());
     } else {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "'GetConfigByPath(%{public}s) exit, value:%{public}s' x %{public}u",
-            path.c_str(), result.c_str(), count);
+            path.c_str(), value_.c_str(), count);
     }
 }
 
@@ -112,7 +112,7 @@ void PowerSupplyProvider::LogFilterInit()
 
     bool result = logFilter_->RegisterLogEntry(PowerMgr::LOG_FILTER_ID_GET_CONFIG_BY_PATH, &data);
     BATTERY_HILOGI(FEATURE_BATT_INFO, "RegisterLogEntry[%{public}d] ret=%{public}d",
-        LOG_FILTER_ID_OVERRIDE_BRIGHTNESS, result);
+        PowerMgr::LOG_FILTER_ID_GET_CONFIG_BY_PATH, result);
 }
 
 PowerSupplyProvider::PowerSupplyProvider()
