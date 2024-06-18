@@ -560,7 +560,7 @@ void MetadataController::Start()
     changeDataKeys_.clear();
 
     if (notifyChangedMetadata_ == nullptr) {
-        notifyChangedMetadata_ = new (std::nothrow) std::thread([this]{
+        notifyChangedMetadata_ = new (std::nothrow) std::thread([this] {
             this->DealMessage();
             });
         if (notifyChangedMetadata_ == nullptr) {
