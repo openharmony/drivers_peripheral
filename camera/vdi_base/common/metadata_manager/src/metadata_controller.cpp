@@ -560,7 +560,9 @@ void MetadataController::Start()
     changeDataKeys_.clear();
 
     if (notifyChangedMetadata_ == nullptr) {
-        notifyChangedMetadata_ = new (std::nothrow) std::thread([this]{ this->DealMessage(); });
+        notifyChangedMetadata_ = new (std::nothrow) std::thread([this]{
+            this->DealMessage();
+            });
         if (notifyChangedMetadata_ == nullptr) {
             CAMERA_LOGE("notifyChangedMetadata_ create failed\n");
             return;
