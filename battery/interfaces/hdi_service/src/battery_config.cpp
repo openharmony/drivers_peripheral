@@ -43,6 +43,7 @@ constexpr int32_t MIN_DEPTH = 1;
 constexpr uint32_t MOVE_LEFT_16 = 16;
 constexpr uint32_t MOVE_LEFT_8 = 8;
 constexpr uint32_t SYSTEM_PATH_CHECK = 4;
+constexpr uint32_t DATA_PATH_CHECK = 5;
 }
 std::shared_ptr<BatteryConfig> BatteryConfig::instance_ = nullptr;
 std::mutex BatteryConfig::mutex_;
@@ -329,7 +330,8 @@ bool BatteryConfig::IsValidSysPath(const std::string& path)
 {
     char resolvedPath[PATH_MAX] = {};
     if ((realpath(path.c_str(), resolvedPath) == nullptr) ||
-        (strncmp(resolvedPath, "/sys", SYSTEM_PATH_CHECK) != 0)) {
+        ((strncmp(resolvedPath, "/sys", SYSTEM_PATH_CHECK) != 0) &&
+        (strncmp(resolvedPath, "/data", DATA_PATH_CHECK) != 0))) {
         return false;
     }
     return true;
