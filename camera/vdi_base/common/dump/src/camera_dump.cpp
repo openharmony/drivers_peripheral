@@ -390,7 +390,7 @@ void CameraDumper::StartCheckDiskInfo()
         terminate_ = false;
     }
 
-    handleThread_ = std::make_unique<std::thread>([this]{
+    handleThread_ = std::make_unique<std::thread>([this] {
         this->ThreadWorkFun();
         });
 }
