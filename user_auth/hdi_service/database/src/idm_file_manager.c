@@ -622,7 +622,8 @@ IAM_STATIC bool StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalCo
             return false;
     }
 
-    if (StreamRead(parcel, index, &(configInfo->userIdNum), sizeof(uint32_t)) != RESULT_SUCCESS) {
+    if (StreamRead(parcel, index, &(configInfo->userIdNum), sizeof(uint32_t)) != RESULT_SUCCESS ||
+        configInfo->userIdNum > MAX_USER) {
         LOG_ERROR("read userIdNum failed");
         return false;
     }
@@ -632,7 +633,8 @@ IAM_STATIC bool StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalCo
             return false;
         }
     }
-    if (StreamRead(parcel, index, &(configInfo->authTypeNum), sizeof(uint32_t)) != RESULT_SUCCESS) {
+    if (StreamRead(parcel, index, &(configInfo->authTypeNum), sizeof(uint32_t)) != RESULT_SUCCESS ||
+        configInfo->authTypeNum > MAX_AUTH_TYPE_LEN) {
         LOG_ERROR("read authTypeNum failed");
         return false;
     }
