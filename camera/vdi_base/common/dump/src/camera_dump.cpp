@@ -129,7 +129,6 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
-    CAMERA_LOGI("CameraDumper DumpBuffer name:%{public}s, width: %{public}d, height: %{public}d", name.c_str(), width, height);
     uint32_t defaultWidth = (width == 0) ? buffer->GetCurWidth() : width;
     uint32_t defaultHeight = (height == 0) ? buffer->GetCurHeight() : height;
     void* srcAddr = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferAddr() : buffer->GetVirAddress();

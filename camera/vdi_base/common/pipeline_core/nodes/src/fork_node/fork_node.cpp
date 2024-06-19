@@ -155,7 +155,6 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             forkBuffer->SetCurFormat(buffer->GetCurFormat());
             forkBuffer->SetCurWidth(buffer->GetCurWidth());
             forkBuffer->SetCurHeight(buffer->GetCurHeight());
-            CAMERA_LOGI("ForkNode DeliverBuffer width:%{public}d height:%{public}d", buffer->GetCurWidth(), buffer->GetCurHeight());
             forkBuffer->SetIsValidDataInSurfaceBuffer(false);
             if (isDeliveryForkBufferInAloneThread_) {
                 std::lock_guard<std::mutex> l(mtx_);

@@ -440,7 +440,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
 
     g_uvcDetectEnable = true;
     uvcDetectEnable_ = 1;
-    uvcDetectThread_ = new (std::nothrow) std::thread(&HosV4L2UVC::loopUvcDevice, this);
+    uvcDetectThread_ = new (std::nothrow) std::thread([this] {this->loopUvcDevice();});
     if (uvcDetectThread_ == nullptr) {
         g_uvcDetectEnable = false;
         CAMERA_LOGE("UVC:V4L2Detect create loopUVCDevice thread error\n");

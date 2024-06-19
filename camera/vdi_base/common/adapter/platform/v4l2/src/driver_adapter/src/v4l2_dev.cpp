@@ -372,7 +372,7 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
     if (streamNumber_ == 0) {
         streamNumber_++;
         CAMERA_LOGE("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
-        streamThread_ = new (std::nothrow) std::thread(&HosV4L2Dev::loopBuffers, this);
+        streamThread_ = new (std::nothrow) std::thread([this] {this->loopBuffers();});
         if (streamThread_ == nullptr) {
             CAMERA_LOGE("V4L2 StartStream start thread failed\n");
             streamNumber_--;
