@@ -386,7 +386,7 @@ Json::Value BatteryConfig::GetValue(const Json::Value& config, std::string key) 
     std::string firstKey = keys[MAP_KEY_INDEX];
     Json::Value value = (config.isObject() && config.isMember(firstKey)) ? config[firstKey] : Json::Value();
     if (value.isNull()) {
-        BATTERY_HILOGW(COMP_HDI, "Value is empty. key=%{public}s", keys[MAP_KEY_INDEX].c_str());
+        BATTERY_HILOGD(COMP_HDI, "Value is empty. key=%{public}s", key.c_str());
         return value;
     }
 
