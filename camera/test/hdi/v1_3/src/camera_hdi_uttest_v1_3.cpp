@@ -1201,6 +1201,96 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_029, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Camera_Device_Hdi_V1_3_030
+ * @tc.desc: OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_030, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_TRUE(entry.count > 0);
+        for (size_t i = 0; i < entry.count; i++) {
+            uint8_t captureMirror = entry.data.u8[i];
+            if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
+                CAMERA_LOGI("Capture mirror is supported, mirror capture tag is: %{public}d", captureMirror);
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
+                CAMERA_LOGI("Capture mirror is supported, mirror capture video tag is: %{public}d", captureMirror);
+                std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+                uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_ON;
+                meta->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &cameraMirrorControl, DATA_COUNT);
+                std::vector<uint8_t> metaVec;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+                cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+
+                cameraTest->imageDataSaveSwitch = SWITCH_ON;
+                cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+                cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+                cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+                cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+                cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+                cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
+                CAMERA_LOGI("Capture Mirror is not supported, tag is: %{public}d", captureMirror);
+            }
+        }
+    }
+}
+
+/**
++ * @tc.name:Camera_Device_Hdi_V1_3_031
++ * @tc.desc:Dynamic capture mirror configuration, fixed capture mirror setting, streams capture mirror constrain
++ * @tc.size:MediumTest
++ * @tc.type:Function
++*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_031, TestSize.Level1)
+{
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+
+    if (ret == HDI::Camera::V1_0::NO_ERROR) {
+        EXPECT_TRUE(entry.data.u8 != nullptr);
+        EXPECT_TRUE(entry.count > 0);
+        for (size_t i = 0; i < entry.count; i++) {
+            uint8_t captureMirror = entry.data.u8[i];
+            if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE) {
+                CAMERA_LOGI("Capture mirror is supported, mirror capture tag is: %{public}d", captureMirror);
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_CAPTURE_VIDEO) {
+                CAMERA_LOGI("Capture mirror is supported, mirror capture video tag is: %{public}d", captureMirror);
+                std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+                uint8_t cameraMirrorControl = OHOS_CAMERA_MIRROR_OFF;
+                meta->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &cameraMirrorControl, DATA_COUNT);
+                std::vector<uint8_t> metaVec;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(meta, metaVec);
+                cameraTest->cameraDeviceV1_3->UpdateSettings(metaVec);
+
+                cameraTest->imageDataSaveSwitch = SWITCH_ON;
+                cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+                cameraTest->StartCapture(cameraTest->streamIdVideo, cameraTest->captureIdVideo, false, true);
+
+                cameraTest->captureIds = {cameraTest->captureIdPreview, cameraTest->captureIdVideo};
+                cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdVideo};
+                cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+                cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+
+            } else if (captureMirror == OHOS_CAMERA_MIRROR_NOT_SUPPORT) {
+                CAMERA_LOGI("Capture Mirror is not supported, tag is: %{public}d", captureMirror);
+            }
+        }
+    }
+}
+
+/**
  * @tc.name: Camera_Device_Hdi_V1_3_032
  * @tc.desc: Get and Print all data in OHOS_ABILITY_CAMERA_MODES for all cameras
  * @tc.size: MediumTest
@@ -1228,4 +1318,97 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_032, TestSize.Level1)
         std::cout << metaString << std::endl;
         std::cout << "==========================" << std::endl;
     }
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_033
+ * @tc.desc:OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_033, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_PROFILE_LEVEL> value end.");
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_034
+ * @tc.desc:OHOS_ABILITY_AVAILABLE_CONFIGURATIONS
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_034, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_AVAILABLE_CONFIGURATIONS, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_AVAILABLE_CONFIGURATIONS is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_AVAILABLE_CONFIGURATIONS> value end.");
+}
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_035
+ * @tc.desc:OHOS_ABILITY_CONFLICT_CONFIGURATIONS
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_035, TestSize.Level1)
+{
+    EXPECT_NE(cameraTest->ability, nullptr);
+    common_metadata_header_t* data = cameraTest->ability->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_CONFLICT_CONFIGURATIONS, &entry);
+    if (cameraTest->rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGI("OHOS_ABILITY_CONFLICT_CONFIGURATIONS is not support");
+        return;
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value start.");
+    constexpr size_t step = 20; // print step
+    std::stringstream ss;
+    for (size_t i = 0; i < entry.count; i++) {
+        ss << entry.data.i32[i] << " ";
+        if ((i != 0) && (i % step == 0 || i == entry.count - 1)) {
+            CAMERA_LOGI("%{public}s\n", ss.str().c_str());
+            ss.clear();
+            ss.str("");
+        }
+    }
+    CAMERA_LOGI("print tag<OHOS_ABILITY_CONFLICT_CONFIGURATIONS> value end.");
 }

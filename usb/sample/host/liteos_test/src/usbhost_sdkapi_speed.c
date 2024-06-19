@@ -199,11 +199,11 @@ static int32_t SerialBegin(struct AcmDevice * const acm)
     if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
     } else {
-        HDF_LOGE("no buf\n");
+        HDF_LOGE("no buf");
         return 0;
     }
     if (dbn < 0) {
-        HDF_LOGE("AcmDbAlloc failed\n");
+        HDF_LOGE("AcmDbAlloc failed");
         return HDF_FAILURE;
     }
     db = &acm->db[dbn];
@@ -400,7 +400,7 @@ static int32_t UsbSpeedDdkInit(void)
         g_acm->dataPipe = GetPipe(g_acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     }
     if (g_acm->dataPipe == NULL) {
-        HDF_LOGE("%{public}s:%{public}d dataPipe is null\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d dataPipe is null", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -456,7 +456,7 @@ static void UsbSpeedDdkExit(void)
     }
     AcmDataBufFree(g_acm);
     for (i = 0; i < g_acm->interfaceCnt; i++) {
-        UsbCloseInterface(g_acm->devHandle[i]);
+        UsbCloseInterface(g_acm->devHandle[i], false);
         UsbReleaseInterface(g_acm->iface[i]);
     }
     UsbExitHostSdk(NULL);

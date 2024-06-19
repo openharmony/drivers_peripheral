@@ -208,14 +208,21 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 {
     DHLOGI("Notify event, adapter name: %{public}s. event type: %{public}d", GetAnonyString(adpName).c_str(),
         event.type);
-    std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
-    auto adp = mapAudioAdapter_.find(adpName);
-    if (adp == mapAudioAdapter_.end()) {
-        DHLOGE("Notify failed, can not find adapter.");
-        return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
+    sptr<AudioAdapterInterfaceImpl> adp = nullptr;
+    {
+        std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
+        auto adpIter = mapAudioAdapter_.find(adpName);
+        if (adpIter == mapAudioAdapter_.end()) {
+            DHLOGE("Notify failed, can not find adapter.");
+            return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
+        }
+        adp = adpIter->second;
     }
-
-    int32_t ret = adp->second->Notify(devId, streamId, event);
+    if (adp == nullptr) {
+        DHLOGE("The audio adapter is nullptr.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
+    int32_t ret = adp->Notify(devId, streamId, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify failed, adapter return: %{public}d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;

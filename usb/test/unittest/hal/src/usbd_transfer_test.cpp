@@ -59,7 +59,7 @@ int32_t InitAshmemOne(sptr<Ashmem> &asmptr, int32_t asmSize, uint8_t rflg)
 {
     asmptr = Ashmem::CreateAshmem("ttashmem000", asmSize);
     if (asmptr == nullptr) {
-        HDF_LOGE("InitAshmemOne CreateAshmem failed\n");
+        HDF_LOGE("InitAshmemOne CreateAshmem failed");
         return HDF_FAILURE;
     }
 
@@ -72,7 +72,7 @@ int32_t InitAshmemOne(sptr<Ashmem> &asmptr, int32_t asmSize, uint8_t rflg)
 
         int32_t retSafe = memset_s(tdata, sizeof(tdata), 'Y', ASHMEM_MAX_SIZE);
         if (retSafe != EOK) {
-            HDF_LOGE("InitAshmemOne memset_s failed\n");
+            HDF_LOGE("InitAshmemOne memset_s failed");
             return HDF_FAILURE;
         }
         while (offset < asmSize) {
@@ -113,7 +113,7 @@ void UsbdTransferTest::SetUpTestCase(void)
         exit(0);
     }
     if (g_usbInterface->BindUsbdSubscriber(subscriber_) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber_ failed\n", __func__);
+        HDF_LOGE("%{public}s: bind usbd subscriber_ failed", __func__);
         exit(0);
     }
 

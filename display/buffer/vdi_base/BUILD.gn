@@ -31,7 +31,6 @@ ohos_shared_library("display_buffer_vdi_impl_default") {
 
   include_dirs = [
     "include/",
-    "../../../base",
     "../../utils/include",
     "../hdi_service/include",
   ]

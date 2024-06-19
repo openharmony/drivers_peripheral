@@ -238,20 +238,18 @@ void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         wide_, high_);
     int ret = memcpy_s(static_cast<uint8_t *>(buffer->GetVirAddress()), buffer->GetSize(),
         static_cast<uint8_t *>(jBuf), buffer->GetSize());
-    if (ret == 0) {
-        buffer->SetEsFrameSize(buffer->GetSize());
-    } else {
+    buffer->SetEsFrameSize(0);
+    if (ret != 0) {
         CAMERA_LOGI("Memcpy_s failed, ret = %{public}d\n", ret);
-        buffer->SetEsFrameSize(0);
     }
     free(jBuf);
-
-    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer, wide_, high_);
 
     buffer->SetCurFormat(CAMERA_FORMAT_YCRCB_420_P);
     CAMERA_LOGI("UvcNode DeliverBuffer wide_:%{public}d high_:%{public}d", wide_, high_);
     buffer->SetCurWidth(wide_);
     buffer->SetCurHeight(high_);
+    buffer->SetIsValidDataInSurfaceBuffer(false);
+    dumper.DumpBuffer("YUV420", ENABLE_UVC_NODE_CONVERTED, buffer, wide_, high_);
     SourceNode::DeliverBuffer(buffer);
     return;
 }

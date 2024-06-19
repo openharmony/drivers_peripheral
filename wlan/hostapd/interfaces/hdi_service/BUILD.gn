@@ -13,14 +13,15 @@
 
 import("//build/ohos.gni")
 import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
+WPA_ROOT_DIR = "//third_party/wpa_supplicant"
 
 if (is_standard_system) {
   ohos_shared_library("libhostapd_interface_service_1.0") {
     include_dirs = [
       "./service_common",
       "../../client/include",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/hostapd",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/src",
+      "$WPA_ROOT_DIR/wpa_supplicant-2.9_standard/hostapd",
     ]
     sources = [
       "hostapd_interface_service.c",

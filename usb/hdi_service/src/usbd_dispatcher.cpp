@@ -277,7 +277,7 @@ int32_t UsbdDispatcher::UsbdRequestSyncInit(
     requestSync->ifHandle = ifHandle;
     requestSync->request = UsbAllocRequest(requestSync->ifHandle, 0, requestSync->pipe.maxPacketSize);
     if (requestSync->request == nullptr) {
-        HDF_LOGE("%{public}s:alloc request failed\n", __func__);
+        HDF_LOGE("%{public}s:alloc request failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     UsbRequestParamsWSyncInit(&requestSync->params, USB_CTRL_SET_TIMEOUT, &requestSync->pipe);
@@ -429,12 +429,12 @@ void UsbdDispatcher::UsbdCloseInterfaces(HostDevice *dev)
 
     for (int32_t i = 0; i < USB_MAX_INTERFACES; ++i) {
         if (dev->devHandle[i] != nullptr) {
-            UsbCloseInterface(dev->devHandle[i]);
+            UsbCloseInterface(dev->devHandle[i], false);
             dev->devHandle[i] = nullptr;
         }
     }
     if (dev->ctrDevHandle != nullptr) {
-        UsbCloseInterface(dev->ctrDevHandle);
+        UsbCloseInterface(dev->ctrDevHandle, false);
         dev->ctrDevHandle = nullptr;
     }
 }
@@ -733,7 +733,7 @@ int32_t UsbdDispatcher::UsbdRequestASyncInit(
     request->ifHandle = ifHandle;
     request->reqMsg.request = UsbAllocRequest(request->ifHandle, 0, request->pipe.maxPacketSize);
     if (request->reqMsg.request == nullptr) {
-        HDF_LOGE("%{public}s:alloc request failed\n", __func__);
+        HDF_LOGE("%{public}s:alloc request failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     FillReqAyncParams(request, &request->pipe, &request->params, nullptr, 0);
