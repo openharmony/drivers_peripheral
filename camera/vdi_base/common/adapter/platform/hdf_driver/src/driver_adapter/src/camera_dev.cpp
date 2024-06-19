@@ -382,7 +382,7 @@ RetCode CameraDev::StartStream(const std::string &cameraId, int type)
         return RC_ERROR;
     }
     if (streamNumber_ == 0) {
-        streamThread_ = new (std::nothrow) std::thread(&CameraDev::LoopBuffers, this, cameraId, type);
+        streamThread_ = new (std::nothrow) std::thread([this, cameraId, type] {this->LoopBuffers(cameraId, type);});
         if (streamThread_ == nullptr) {
             CAMERA_LOGE("error: start thread failed\n");
             return RC_ERROR;
