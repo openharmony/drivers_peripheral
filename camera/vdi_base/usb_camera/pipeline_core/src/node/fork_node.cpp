@@ -139,7 +139,6 @@ void PcForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             forkBuffer->SetCurFormat(buffer->GetCurFormat());
             forkBuffer->SetCurWidth(buffer->GetCurWidth());
             forkBuffer->SetCurHeight(buffer->GetCurHeight());
-            CAMERA_LOGI("uvc ForkNode DeliverBuffer width:%{public}d height:%{public}d", buffer->GetCurWidth(), buffer->GetCurHeight());
             CameraDumper& dumper = CameraDumper::GetInstance();
             dumper.DumpBuffer("PcForkNode", ENABLE_FORK_NODE_CONVERTED, buffer);
             auto id = forkBuffer->GetStreamId();

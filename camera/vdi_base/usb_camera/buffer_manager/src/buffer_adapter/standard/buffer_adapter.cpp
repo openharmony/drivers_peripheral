@@ -34,7 +34,6 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
     buffer->SetStride(bufHandle->stride);
     buffer->SetWidth(bufHandle->width);
     buffer->SetHeight(bufHandle->height);
-    CAMERA_LOGE("BufferAdapter SurfaceBufferToCameraBuffer width:%{public}d, heighe:%{public}d", bufHandle->width, bufHandle->height);
     int32_t format = static_cast<int32_t>(PixelFormatToCameraFormat(static_cast<PixelFormat>(bufHandle->format)));
     buffer->SetFormat(format);
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
@@ -64,7 +63,6 @@ RetCode BufferAdapter::CameraBufferToSurfaceBuffer(const std::shared_ptr<IBuffer
     pHandle->stride = static_cast<int32_t>(buffer->GetStride());
     pHandle->width = static_cast<int32_t>(buffer->GetWidth());
     pHandle->height = static_cast<int32_t>(buffer->GetHeight());
-    CAMERA_LOGE("BufferAdapter CameraBufferToSurfaceBuffer width:%{public}d, heighe:%{public}d", buffer->GetWidth(), buffer->GetHeight());
     pHandle->format = CameraFormatToPixelFormat(buffer->GetFormat());
     pHandle->usage =
         static_cast<uint64_t>(GrallocUsageToCameraUsage(buffer->GetUsage()));
