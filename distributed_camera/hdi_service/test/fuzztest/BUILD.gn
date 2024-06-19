@@ -31,6 +31,7 @@ group("hdf_dcamera_fuzztest") {
     "dcameragetcameraability_fuzzer:fuzztest",
     "dcameragetcameraids_fuzzer:fuzztest",
     "dcameragetdevicebydhbase_fuzzer:fuzztest",
+    "dcamerahost_fuzzer:fuzztest",
     "dcamerahostsetcallback_fuzzer:fuzztest",
     "dcameraisstreamssupported_fuzzer:fuzztest",
     "dcameranotify_fuzzer:fuzztest",

@@ -650,22 +650,22 @@ static int32_t EcmGetPipes(struct EcmDevice *ecm)
 {
     ecm->dataInPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     if (ecm->dataInPipe == NULL) {
-        HDF_LOGE("dataInPipe is NULL\n");
+        HDF_LOGE("dataInPipe is NULL");
         goto ERROR;
     }
     ecm->dataOutPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
     if (ecm->dataOutPipe == NULL) {
-        HDF_LOGE("dataOutPipe is NULL\n");
+        HDF_LOGE("dataOutPipe is NULL");
         goto ERROR;
     }
     ecm->ctrPipe = EcmEnumePipe(ecm, ecm->ctrIface->info.interfaceIndex, USB_PIPE_TYPE_CONTROL, USB_PIPE_DIRECTION_OUT);
     if (ecm->ctrPipe == NULL) {
-        HDF_LOGE("ctrPipe is NULL\n");
+        HDF_LOGE("ctrPipe is NULL");
         goto ERROR;
     }
     ecm->intPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_INTERRUPT, USB_PIPE_DIRECTION_IN);
     if (ecm->intPipe == NULL) {
-        HDF_LOGE("intPipe is NULL\n");
+        HDF_LOGE("intPipe is NULL");
         goto ERROR;
     }
 
@@ -845,7 +845,7 @@ static void EcmReadBulk(struct UsbRequest *req)
 static void EcmAllocWriteReq(struct EcmDevice * const ecm)
 {
     if (EcmWriteBufAlloc(ecm) < 0) {
-        HDF_LOGE("EcmAllocWriteReq buf alloc failed\n");
+        HDF_LOGE("EcmAllocWriteReq buf alloc failed");
         return;
     }
 
@@ -855,7 +855,7 @@ static void EcmAllocWriteReq(struct EcmDevice * const ecm)
         snd->instance = ecm;
         snd->use = 0;
         if (snd->request == NULL) {
-            HDF_LOGE("snd request fail\n");
+            HDF_LOGE("snd request fail");
             goto ERR;
         }
     }
@@ -1009,13 +1009,13 @@ static void EcmCloseInterfaces(struct EcmDevice *ecm)
 {
     for (uint8_t i = 0; i < ecm->interfaceCnt; i++) {
         if (ecm->devHandle[i]) {
-            UsbCloseInterface(ecm->devHandle[i]);
+            UsbCloseInterface(ecm->devHandle[i], false);
             ecm->devHandle[i] = NULL;
         }
     }
 
     if (ecm->ctrDevHandle) {
-        UsbCloseInterface(ecm->ctrDevHandle);
+        UsbCloseInterface(ecm->ctrDevHandle, false);
         ecm->ctrDevHandle = NULL;
     }
 }

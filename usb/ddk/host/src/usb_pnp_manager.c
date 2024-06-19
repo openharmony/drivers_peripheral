@@ -75,7 +75,7 @@ static int32_t UsbPnpManagerBind(struct HdfDeviceObject *device)
     }
 
     device->service = &pnpLoaderService;
-    HDF_LOGI("usb pnp manager bind success\n");
+    HDF_LOGI("usb pnp manager bind success");
 
     return HDF_SUCCESS;
 }
@@ -102,14 +102,14 @@ static const char *UsbPnpMgrGetGadgetPath(struct HdfDeviceObject *device, const 
 {
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
         return NULL;
     }
 
     const char *path = NULL;
     const char *pathDef = NULL;
     if (device == NULL) {
-        HDF_LOGE("%{public}s: device is empty\n", __func__);
+        HDF_LOGE("%{public}s: device is empty", __func__);
         return NULL;
     }
 #ifdef USB_EMULATOR_MODE

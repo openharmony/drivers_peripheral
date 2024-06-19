@@ -530,7 +530,7 @@ BENCHMARK_F(HdfUsbdBenchmarkTransferTest, UnbindUsbdSubscriber)(benchmark::State
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
     ASSERT_NE(subscriber, nullptr);
     if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: bind usbd subscriber failed\n", __func__);
+        HDF_LOGW("%{public}s: bind usbd subscriber failed", __func__);
     }
     g_dev = {subscriber->busNum_, subscriber->devAddr_};
     auto ret = g_usbInterface->OpenDevice(g_dev);

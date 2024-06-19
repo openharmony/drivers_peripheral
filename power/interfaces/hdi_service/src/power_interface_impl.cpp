@@ -43,14 +43,15 @@
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
 #include "power_config.h"
 #endif
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
+#include "hibernate.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_2 {
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
-static constexpr const int32_t FORCE_SLEEP_MAX_COUNT = 100;
-
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
@@ -59,36 +60,25 @@ static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count
 #ifdef FASTER_RETRY_OF_SLEEP
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(100); // 100ms for phone and tablet
 #elif defined(SLOWER_RETRY_OF_SLEEP)
-static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(2000); // 2000ms for slower PC
+static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(2000); // 2000ms for PC
 #else
 static constexpr std::chrono::milliseconds DEFAULT_WAIT_TIME(1000); // 1000ms
 #endif
 static constexpr std::chrono::milliseconds MAX_WAIT_TIME(1000 * 60); // 1min
 static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
-static std::chrono::milliseconds forceThreadWaitTime_(100); // 100ms
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
-static std::mutex g_forceSuspendMutex;
-static std::mutex g_autoSuspendThreadCreatedMutex;
-static std::mutex g_forceSuspendThreadCreatedMutex;
-static std::mutex g_controlSuspendThreadMutex;
-
+static std::mutex g_forceMutex;
 static std::condition_variable g_suspendCv;
-static std::condition_variable g_forceSuspendCv;
 static std::unique_ptr<std::thread> g_daemon;
-static std::unique_ptr<std::thread> g_forceDaemon;
-
-static std::atomic_bool g_suspendRetry {false};
-static std::atomic_bool g_forceSuspendRetry {false};
-static std::atomic_bool g_autoSuspendThreadCreated {false};
-static std::atomic_bool g_forceSuspendThreadCreated {false};
-
+static std::atomic_bool g_suspending;
+static std::atomic_bool g_suspendRetry;
+static std::atomic_bool g_forceSuspendStart;
 static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
 static PowerHdfState g_powerState {PowerHdfState::AWAKE};
 static void AutoSuspendLoop();
-static void ForceSuspendLoop();
 static int32_t DoSuspend();
 static void LoadStringFd(int32_t fd, std::string &content);
 static std::string ReadWakeCount();
@@ -119,6 +109,10 @@ int32_t PowerInterfaceImpl::Init()
 #ifdef DRIVER_PERIPHERAL_POWER_WAKEUP_CAUSE_PATH
     auto& powerConfig = PowerConfig::GetInstance();
     powerConfig.ParseConfig();
+#endif
+
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
+    Hibernate::GetInstance().Init();
 #endif
     return HDF_SUCCESS;
 }
@@ -168,6 +162,22 @@ int32_t PowerInterfaceImpl::UnRegisterRunningLockCallback()
     return HDF_SUCCESS;
 }
 
+int32_t PowerInterfaceImpl::StartSuspend()
+{
+    HDF_LOGI("start suspend");
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_suspendRetry = true;
+    if (g_suspending) {
+        g_powerState = PowerHdfState::INACTIVE;
+        g_suspendCv.notify_one();
+        return HDF_SUCCESS;
+    }
+    g_suspending = true;
+    g_daemon = std::make_unique<std::thread>(&AutoSuspendLoop);
+    g_daemon->detach();
+    return HDF_SUCCESS;
+}
+
 void AutoSuspendLoop()
 {
     auto suspendLock = std::unique_lock(g_suspendMutex);
@@ -184,46 +194,15 @@ void AutoSuspendLoop()
         if (!WriteWakeCount(wakeupCount)) {
             continue;
         }
-        if (g_forceSuspendRetry) {
-            continue;
-        }
-        NotifyCallback(CMD_ON_SUSPEND);
-        g_powerState = PowerHdfState::SLEEP;
-        DoSuspend();
-        g_powerState = PowerHdfState::AWAKE;
-        NotifyCallback(CMD_ON_WAKEUP);
-    }
-}
-
-void ForceSuspendLoop()
-{
-    auto suspendLock = std::unique_lock(g_forceSuspendMutex);
-    while (true) {
-        if (!g_forceSuspendRetry) {
-            g_forceSuspendCv.wait(suspendLock);
-        }
 
         NotifyCallback(CMD_ON_SUSPEND);
         g_powerState = PowerHdfState::SLEEP;
         DoSuspend();
         g_powerState = PowerHdfState::AWAKE;
         NotifyCallback(CMD_ON_WAKEUP);
-        /*
-         * Sleep for 10s when wake up form non-configuration source,
-         * and just sleep until g_forceSuspendRetry is false when wake up
-         * form configuration source in order to reduce response time of
-         * next force suspend.
-         */
-        int count = 1;
-        while (count <= FORCE_SLEEP_MAX_COUNT) {
-            if (!g_forceSuspendRetry) {
-                HDF_LOGI("do not need to sleep.");
-                break;
-            }
-            std::this_thread::sleep_for(forceThreadWaitTime_);
-            count++;
-        }
     }
+    g_suspending = false;
+    g_suspendRetry = false;
 }
 
 static std::string g_suspendTag;
@@ -286,32 +265,6 @@ int32_t DoSuspend()
     return HDF_SUCCESS;
 }
 
-void PowerInterfaceImpl::CreateAutoSuspendThread()
-{
-    std::lock_guard<std::mutex> lock(g_autoSuspendThreadCreatedMutex);
-    if (g_autoSuspendThreadCreated) {
-        return;
-    }
-
-    HDF_LOGI("create auto sleep thread");
-    g_daemon = std::make_unique<std::thread>(&AutoSuspendLoop);
-    g_daemon->detach();
-    g_autoSuspendThreadCreated = true;
-}
-
-void PowerInterfaceImpl::CreateForceSuspendThread()
-{
-    std::lock_guard<std::mutex> lock(g_forceSuspendThreadCreatedMutex);
-    if (g_forceSuspendThreadCreated) {
-        return;
-    }
-
-    HDF_LOGI("create force sleep thread");
-    g_forceDaemon = std::make_unique<std::thread>(&ForceSuspendLoop);
-    g_forceDaemon->detach();
-    g_forceSuspendThreadCreated = true;
-}
-
 void NotifyCallback(int code)
 {
     if (g_callback == nullptr) {
@@ -332,23 +285,10 @@ void NotifyCallback(int code)
 int32_t PowerInterfaceImpl::StopSuspend()
 {
     HDF_LOGI("stop suspend");
-    std::lock_guard<std::mutex> lock(g_controlSuspendThreadMutex);
+    std::lock_guard<std::mutex> lock(g_forceMutex);
+    g_forceSuspendStart = false;
     g_suspendRetry = false;
-    g_forceSuspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
-    return HDF_SUCCESS;
-}
-
-int32_t PowerInterfaceImpl::StartSuspend()
-{
-    HDF_LOGI("start suspend");
-    {
-        std::lock_guard<std::mutex> lock(g_controlSuspendThreadMutex);
-        g_powerState = PowerHdfState::INACTIVE;
-        g_suspendRetry = true;
-        g_suspendCv.notify_one();
-    }
-    CreateAutoSuspendThread();
     return HDF_SUCCESS;
 }
 
@@ -356,18 +296,33 @@ int32_t PowerInterfaceImpl::ForceSuspend()
 {
     HDF_LOGI("force suspend");
     {
-        std::lock_guard<std::mutex> lock(g_controlSuspendThreadMutex);
-        g_forceSuspendRetry = true;
-        g_forceSuspendCv.notify_one();
+        std::lock_guard<std::mutex> lock(g_forceMutex);
+        g_forceSuspendStart = true;
+        g_suspendRetry = false;
     }
-    CreateForceSuspendThread();
+
+    NotifyCallback(CMD_ON_SUSPEND);
+    g_powerState = PowerHdfState::SLEEP;
+    DoSuspend();
+    g_powerState = PowerHdfState::AWAKE;
+    NotifyCallback(CMD_ON_WAKEUP);
+
+    std::lock_guard<std::mutex> lock(g_forceMutex);
+    if (g_forceSuspendStart) {
+        StartSuspend();
+    }
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::Hibernate()
 {
+#ifdef DRIVERS_PERIPHERAL_POWER_ENABLE_S4
     HDF_LOGI("hibernate begin.");
-    return HDF_SUCCESS;
+    return Hibernate::GetInstance().DoHibernate();
+#else
+    HDF_LOGI("hdf hibernate interface not supported.");
+    return HDF_FAILURE;
+#endif
 }
 
 int32_t PowerInterfaceImpl::SuspendBlock(const std::string &name)

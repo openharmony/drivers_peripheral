@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_EVENT_OPERATE_H
-#define INPUT_EVENT_OPERATE_H
+#ifndef DCAMERAHOST_FUZZER_H
+#define DCAMERAHOST_FUZZER_H
 
-#include "libinput.h"
-#include "input_type.h"
+#define FUZZ_PROJECT_NAME "dcamerahost_fuzzer"
 
-namespace OHOS {
-namespace Input {
-RetStatus TransformEvent(IfInputEvent &inputEvent, libinput_event *libinputEvent);
-RetStatus CopyTouchEvent(IfInputEvent &inputEvent, libinput_event *libinputEvent);
-bool IsTouchEvent(libinput_event_type type);
-}
-}
-#endif // INPUT_EVENT_OPERATE_H
+#endif

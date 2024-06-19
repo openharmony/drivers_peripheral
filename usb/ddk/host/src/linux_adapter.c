@@ -73,7 +73,7 @@ static struct UsbDeviceHandle *OsGetDeviceHandle(struct UsbSession *session, uin
     struct UsbDeviceHandle *handle = NULL;
 
     if (session == NULL) {
-        HDF_LOGE("%{public}s:%{public}d invalid param session.\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid param session.", __func__, __LINE__);
         return NULL;
     }
 
@@ -937,7 +937,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
     struct UsbDeviceHandle *handle = NULL;
 
     if (session == NULL) {
-        HDF_LOGE("%{public}s:%{public}d invalid param session.\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid param session.", __func__, __LINE__);
         return NULL;
     }
 

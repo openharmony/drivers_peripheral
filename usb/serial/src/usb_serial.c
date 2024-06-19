@@ -155,7 +155,7 @@ static int32_t AcmStartWbSync(struct AcmDevice *acm, struct AcmWb *wb, struct Us
     parmas.callback = NULL;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(acm, acm->dataOutPipe->interfaceId), &parmas);
     if (rc != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:UsbFillRequest failed, ret = %{public}d\n", __func__, rc);
+        HDF_LOGE("%{public}s:UsbFillRequest failed, ret = %{public}d", __func__, rc);
         return rc;
     }
     acm->writeReq = wb->request;
@@ -701,7 +701,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     }
     uint32_t count = g_syncRequest->compInfo.actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
-    if ((data == NULL) || (!g_syncRequest)) {
+    if (data == NULL) {
         return HDF_FAILURE;
     }
 
@@ -831,7 +831,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     if (AcmWbIsAvail(acm)) {
         wbn = AcmWbAlloc(acm);
     } else {
-        HDF_LOGE("no write buf\n");
+        HDF_LOGE("no write buf");
         return 0;
     }
     if (wbn >= ACM_NW || wbn < 0) {
@@ -1258,7 +1258,7 @@ static void AcmProcessNotification(const struct AcmDevice *acm, const unsigned c
             HDF_LOGE("%{public}s - network connection: %{public}d", __func__, dr->wValue);
             break;
         case USB_DDK_CDC_NOTIFY_SERIAL_STATE:
-            HDF_LOGE("the serial State change\n");
+            HDF_LOGE("the serial State change");
             break;
         default:
             HDF_LOGE("%{public}s-%{public}d received: index %{public}d len %{public}d",
@@ -1549,12 +1549,12 @@ static void AcmCloseInterfaces(struct AcmDevice *acm)
 {
     for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         if (acm->devHandle[i]) {
-            UsbCloseInterface(acm->devHandle[i]);
+            UsbCloseInterface(acm->devHandle[i], false);
             acm->devHandle[i] = NULL;
         }
     }
     if (acm->ctrDevHandle) {
-        UsbCloseInterface(acm->ctrDevHandle);
+        UsbCloseInterface(acm->ctrDevHandle, false);
         acm->ctrDevHandle = NULL;
     }
 }

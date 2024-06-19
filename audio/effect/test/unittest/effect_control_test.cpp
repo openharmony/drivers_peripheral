@@ -313,7 +313,7 @@ HWTEST_F(EffectControlTest, HdfAudioGetDescriptor002, TestSize.Level1)
     EXPECT_STREQ(desc.effectName, "mock_effect");
     EXPECT_STREQ(desc.libName, libName_);
     EXPECT_STREQ(desc.supplier, "mock");
-    EffectControllerReleaseDesc(&desc);
+    OHOS::Audio::EffectControllerReleaseDesc(&desc);
 }
 
 /**

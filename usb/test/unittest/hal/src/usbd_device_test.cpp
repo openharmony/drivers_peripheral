@@ -61,7 +61,7 @@ void UsbdDeviceTest::SetUpTestCase(void)
 
     subscriber_ = new UsbSubscriberTest();
     if (g_usbInterface->BindUsbdSubscriber(subscriber_) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: bind usbd subscriber_ failed\n", __func__);
+        HDF_LOGE("%{public}s: bind usbd subscriber_ failed", __func__);
         exit(0);
     }
     dev_ = {subscriber_->busNum_, subscriber_->devAddr_};

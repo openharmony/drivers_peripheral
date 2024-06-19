@@ -356,6 +356,12 @@ WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
+
+WifiError WifiVendorHal::SetTxPower(const std::string& ifaceName, int mode)
+{
+    return globalFuncTable_.setTxPower(ifaceName.c_str(), mode);
+}
+
 } // namespace v1_0
 } // namespace Chip
 } // namespace Wlan

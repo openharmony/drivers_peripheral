@@ -43,7 +43,7 @@ static void TestWrite(char *buf)
     HdfSbufFlush(g_data);
 
     if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
-        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d write interface token fail", __func__, __LINE__);
         return;
     }
 
@@ -59,7 +59,7 @@ static void TestRead(void)
     HdfSbufFlush(g_reply);
 
     if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
-        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d write interface token fail", __func__, __LINE__);
         return;
     }
 
@@ -167,7 +167,7 @@ int32_t AcmTest(int32_t argc, const char *argv[])
     }
 
     if (HdfRemoteServiceSetInterfaceDesc(g_acmService, "hdf.usb.usbfn") == false) {
-        HDF_LOGE("%{public}s:%{public}d set desc fail\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d set desc fail", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -179,7 +179,7 @@ int32_t AcmTest(int32_t argc, const char *argv[])
     }
 
     if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
-        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d write interface token fail", __func__, __LINE__);
         return HDF_FAILURE;
     }
 

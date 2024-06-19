@@ -244,7 +244,7 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
         FreeScanResult(scanResult);
         return NL_SKIP;
     }
-    HILOG_INFO(LOG_CORE, "%{public}s, line:%{public}d num:%{public}u scanResultCapacity:%{public}u", __FUNCTION__,
+    HILOG_DEBUG(LOG_CORE, "%{public}s, line:%{public}d num:%{public}u scanResultCapacity:%{public}u", __FUNCTION__,
         __LINE__, scanResults->num, scanResults->scanResultCapacity);
     scanResults->num++;
     if (scanResults->num == scanResults->scanResultCapacity) {
@@ -270,7 +270,7 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
 
 static void WifiEventScanResultProcess(const char *ifName)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s", __FUNCTION__);
     int32_t ret;
     WifiScanResults scanResults = {0};
     WifiScanResultArg arg;
@@ -296,7 +296,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     HILOG_INFO(LOG_CORE, "%s: scanResults.num = %u", __FUNCTION__, scanResults.num);
     FreeScanResults(&scanResults);
     nlmsg_free(msg);
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 static void WifiEventScanAbortedProcess(const char *ifName)
@@ -312,7 +312,7 @@ static void WifiEventScanAbortedProcess(const char *ifName)
 
 static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
 {
-    HILOG_INFO(LOG_CORE, "hal enter %{public}s cmd=%{public}d ifName=%{public}s", __FUNCTION__, cmd, ifName);
+    HILOG_DEBUG(LOG_CORE, "hal enter %{public}s cmd=%{public}d ifName=%{public}s", __FUNCTION__, cmd, ifName);
     switch (cmd) {
         case NL80211_CMD_VENDOR:
             HILOG_INFO(LOG_CORE, "receive cmd NL80211_CMD_VENDOR");
@@ -347,7 +347,7 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             HILOG_INFO(LOG_CORE, "not supported cmd");
             break;
     }
-    HILOG_INFO(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
+    HILOG_DEBUG(LOG_CORE, "hal exit %{public}s", __FUNCTION__);
 }
 
 static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
@@ -523,7 +523,7 @@ void *EventThread(void *para)
 
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
-        HILOG_INFO(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d status:%{public}d", ret, *status);
+        HILOG_DEBUG(LOG_CORE, "EventThread TEMP_FAILURE_RETRY ret:%{public}d status:%{public}d", ret, *status);
         if (ret < 0) {
             HILOG_ERROR(LOG_CORE, "%{public}s: fail poll", __FUNCTION__);
             break;
