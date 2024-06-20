@@ -26,8 +26,8 @@
 
 #define SENSOR_TRACE_TAG HITRACE_TAG_OHOS
 #define SENSOR_TRACE HITRACE_METER_NAME(SENSOR_TRACE_TAG, __func__)
-#define SENSOR_TRACE_MSG(msg) HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
-#define SENSOR_TRACE_START(msg) StartTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
-#define SENSOR_TRACE_FINISH FinishTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
+#define SENSOR_TRACE_MSG(msg) HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + (msg)).c_str())
+#define SENSOR_TRACE_START(msg) StartTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + (msg)).c_str())
+#define SENSOR_TRACE_FINISH FinishTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + (msg)).c_str())
 
 #endif //SENSOR_UHDF_LOG_H
