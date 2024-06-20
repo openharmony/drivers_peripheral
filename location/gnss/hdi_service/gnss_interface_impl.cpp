@@ -34,9 +34,11 @@ namespace Gnss {
 namespace V2_0 {
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
+using GnssMeasurementCallbackMap = std::unordered_map<IRemoteObject*, sptr<IGnssMeasurementCallback>>;
 using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 LocationCallBackMap g_locationCallBackMap;
+GnssMeasurementCallbackMap g_gnssMeasurementCallbackMap;
 GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
 GnssConfigParameter g_configPara;
 std::mutex g_mutex;
@@ -105,6 +107,77 @@ static void LocationUpdate(GnssLocation* location)
         auto& callback = iter.second;
         if (callback != nullptr) {
             callback->ReportLocation(locationNew);
+        }
+    }
+}
+
+static void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeasurementInfoNew,
+    OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
+{
+    gnssMeasurementInfoNew->gnssClock.fieldValidFlags = gnssMeasurementInfo->gnssClock.fieldValidFlags;
+    gnssMeasurementInfoNew->gnssClock.leapSecond = gnssMeasurementInfo->gnssClock.leapSecond;
+    gnssMeasurementInfoNew->gnssClock.receiverClockTime = gnssMeasurementInfo->gnssClock.receiverClockTime;
+    gnssMeasurementInfoNew->gnssClock.timeUncertainty = gnssMeasurementInfo->gnssClock.timeUncertainty;
+    gnssMeasurementInfoNew->gnssClock.rcvClockFullBias = gnssMeasurementInfo->gnssClock.rcvClockFullBias;
+    gnssMeasurementInfoNew->gnssClock.rcvClockSubBias = gnssMeasurementInfo->gnssClock.rcvClockSubBias;
+    gnssMeasurementInfoNew->gnssClock.biasUncertainty = gnssMeasurementInfo->gnssClock.biasUncertainty;
+    gnssMeasurementInfoNew->gnssClock.clockDrift = gnssMeasurementInfo->gnssClock.clockDrift;
+    gnssMeasurementInfoNew->gnssClock.clockDriftUncertainty = gnssMeasurementInfo->gnssClock.clockDriftUncertainty;
+    gnssMeasurementInfoNew->gnssClock.clockInterruptCnt = gnssMeasurementInfo->gnssClock.clockInterruptCnt;
+    gnssMeasurementInfoNew->gnssClock.clockJumpThreshold = gnssMeasurementInfo->gnssClock.clockJumpThreshold;
+    gnssMeasurementInfoNew->gnssClock.clockHWFreBiasIndicator = gnssMeasurementInfo->gnssClock.clockHWFreBiasIndicator;
+    gnssMeasurementInfoNew->gnssClock.clockHWFreDriftIndicator =
+        gnssMeasurementInfo->gnssClock.clockHWFreDriftIndicator;
+}
+
+static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
+{
+    if (gnssMeasurementInfo == nullptr) {
+        HDF_LOGE("%{public}s:gnssMeasurementInfo is nullptr.", __func__);
+        return;
+    }
+    HDF_LOGI("%{public}s:GnssMeasurementUpdate.", __func__);
+    std::unique_lock<std::mutex> lock(g_mutex);
+    OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo gnssMeasurementInfoNew;
+    SetGnssClock(&gnssMeasurementInfoNew, gnssMeasurementInfo);
+    gnssMeasurementInfoNew.elapsedRealtime = gnssMeasurementInfo->elapsedRealtime;
+    gnssMeasurementInfoNew.uncertainty = gnssMeasurementInfo->uncertainty;
+    gnssMeasurementInfoNew.measurementCount = gnssMeasurementInfo->measurementCount;
+
+    std::vector<OHOS::HDI::Location::Gnss::V2_0::GnssMeasurement> gnssMeasurements;
+    for (OHOS::HDI::Location::GnssMeasurement infoItem : gnssMeasurementInfo->measurements) {
+        OHOS::HDI::Location::Gnss::V2_0::GnssMeasurement gnssMeasurement;
+        gnssMeasurement.fieldValidflags = infoItem.fieldValidflags;
+        gnssMeasurement.satelliteId = infoItem.satelliteId;
+        gnssMeasurement.constellationCategory = infoItem.constellationCategory;
+        gnssMeasurement.timeOffset = infoItem.timeOffset;
+        gnssMeasurement.syncState = infoItem.syncState;
+        gnssMeasurement.receivedSatelliteTime = infoItem.receivedSatelliteTime;
+        gnssMeasurement.receivedSatelliteTimeUncertainty = infoItem.receivedSatelliteTimeUncertainty;
+        gnssMeasurement.cn0 = infoItem.cn0;
+        gnssMeasurement.pseudorangeRate = infoItem.pseudorangeRate;
+        gnssMeasurement.pseudorangeRateUncertainty = infoItem.pseudorangeRateUncertainty;
+        gnssMeasurement.accumulatedDeltaRangeFlag = infoItem.accumulatedDeltaRangeFlag;
+        gnssMeasurement.accumulatedDeltaRange = infoItem.accumulatedDeltaRange;
+        gnssMeasurement.accumulatedDeltaRangeUncertainty = infoItem.accumulatedDeltaRangeUncertainty;
+        gnssMeasurement.carrierFrequency = infoItem.carrierFrequency;
+        gnssMeasurement.carrierCyclesCount = infoItem.carrierCyclesCount;
+        gnssMeasurement.carrierPhase = infoItem.carrierPhase;
+        gnssMeasurement.carrierPhaseUncertainty = infoItem.carrierPhaseUncertainty;
+        gnssMeasurement.multipathFlag = infoItem.multipathFlag;
+        gnssMeasurement.agcGain = infoItem.agcGain;
+        gnssMeasurement.codeCategory = infoItem.codeCategory;
+        gnssMeasurement.ionoCorrect = infoItem.ionoCorrect;
+        gnssMeasurement.tropCorrect = infoItem.tropCorrect;
+        gnssMeasurement.satelliteClockBias = infoItem.satelliteClockBias;
+        gnssMeasurement.satelliteClockDriftBias = infoItem.satelliteClockDriftBias;
+        gnssMeasurements.push_back(gnssMeasurement);
+    }
+    gnssMeasurementInfoNew.measurements = gnssMeasurements;
+    for (const auto& iter : g_gnssMeasurementCallbackMap) {
+        auto& callback = iter.second;
+        if (callback != nullptr) {
+            callback->ReportGnssMeasurementInfo(gnssMeasurementInfoNew);
         }
     }
 }
@@ -204,6 +277,15 @@ static void GetGnssCallbackMethods(GnssCallbackStruct* device)
     static GnssCacheCallbackIfaces cacheCallback;
     GetGnssCacheCallbackMethods(&cacheCallback);
     device->gnssCacheCallback = cacheCallback;
+}
+
+static void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* device)
+{
+    if (device == nullptr) {
+        return;
+    }
+    device->size = sizeof(GnssMeasurementCallbackIfaces);
+    device->gnssMeasurementUpdate = GnssMeasurementUpdate;
 }
 
 GnssInterfaceImpl::GnssInterfaceImpl()
@@ -465,11 +547,52 @@ int32_t GnssInterfaceImpl::SendNetworkInitiatedMsg(const std::string& msg, int l
 
 int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCallback>& callbackObj)
 {
-    return HDF_SUCCESS;
+    HDF_LOGI("%{public}s.", __func__);
+    if (callbackObj == nullptr) {
+        HDF_LOGE("%{public}s:invalid callbackObj", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::unique_lock<std::mutex> lock(g_mutex);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssMeasurementCallback>(callbackObj);
+    if (remote == nullptr) {
+        HDF_LOGE("%{public}s:invalid remote", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    static GnssMeasurementCallbackIfaces gnssMeasurementCallback;
+    GetGnssMeasurementCallbackMethods(&gnssMeasurementCallback);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_MEASUREMENT_MODULE_INTERFACE);
+    auto gnssMeasurementInterface = static_cast<const GnssMeasurementInterface*>
+        (LocationVendorInterface::GetInstance()->GetModuleInterface(moduleType));
+    if (gnssMeasurementInterface == nullptr) {
+        HDF_LOGE("%{public}s:GetModuleInterface return nullptr.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int ret = gnssMeasurementInterface->enable(&gnssMeasurementCallback);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("enableGnssMeasurement failed.");
+        return HDF_FAILURE;
+    }
+    if (g_gnssMeasurementCallbackMap.size() > 0) {
+        g_gnssMeasurementCallbackMap.clear();
+    }
+    g_gnssMeasurementCallbackMap[remote.GetRefPtr()] = callbackObj;
+    return ret;
 }
 
 int32_t GnssInterfaceImpl::DisableGnssMeasurement()
 {
+    HDF_LOGI("%{public}s.", __func__);
+    std::unique_lock<std::mutex> lock(g_mutex);
+    int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_MEASUREMENT_MODULE_INTERFACE);
+    auto gnssMeasurementInterface = static_cast<const GnssMeasurementInterface*>
+        (LocationVendorInterface::GetInstance()->GetModuleInterface(moduleType));
+    if (gnssMeasurementInterface == nullptr) {
+        HDF_LOGE("%{public}s:GnssMeasurementInterface return nullptr.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    gnssMeasurementInterface->disable();
+    g_gnssMeasurementCallbackMap.clear();
     return HDF_SUCCESS;
 }
 
