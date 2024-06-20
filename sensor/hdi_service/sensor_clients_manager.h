@@ -22,6 +22,7 @@
 #include "v2_0/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_client_info.h"
+#include "sensor_trace.h"
 
 namespace OHOS {
 namespace HDI {
