@@ -451,8 +451,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
             continue;
         }
-        HdfTrace traceODE("ODE", "serviceId=" + std::to_string(serviceId) + ",sensorId=" +
-            std::to_string(event.sensorId));
+        SENSOR_TRACE_MSG("serviceId=" + std::to_string(serviceId) + ",sensorId=" + std::to_string(event.sensorId));
         int32_t ret = callback->OnDataEvent(event);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
