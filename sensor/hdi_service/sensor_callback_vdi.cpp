@@ -32,9 +32,6 @@ namespace {
     static std::unordered_map<int32_t, int64_t> lastTimestampMap_;
 }
 
-bool SensorCallbackVdi::servicesChanged = true;
-bool SensorCallbackVdi::clientsChanged = true;
-
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
     struct HdfSensorEvents event;
