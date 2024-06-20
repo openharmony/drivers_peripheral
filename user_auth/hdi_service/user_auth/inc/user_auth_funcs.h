@@ -75,7 +75,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
 ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param);
-void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult);
+ResultCode GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel);
 
 ResultCode GenerateScheduleFunc(const Buffer *tlv, Uint8Array remoteUdid, ScheduleInfoParam *scheduleInfo);
 ResultCode GenerateAuthResultFunc(const Buffer *tlv, AuthResultParam *authResultInfo);

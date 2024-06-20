@@ -1346,15 +1346,15 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Le
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
 
     param.type = PIN_EXPIRED_PERIOD;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
     param.value.pinExpiredPeriod = 1;
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
 
     param.type = ENABLE_STATUS;
     param.value.enableStatus = true;
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
     param.authTypes.push_back(1);
-    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_SUCCESS);
     param.authTypes.push_back(2);
     param.authTypes.push_back(4);
     param.authTypes.push_back(4);

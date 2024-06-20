@@ -795,7 +795,7 @@ int32_t UserAuthInterfaceService::GetAvailableStatus(int32_t userId, int32_t aut
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(g_mutex);
-    GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkResult);
+    checkResult = GetAvailableStatusFunc(userId, authType, authTrustLevel);
     if (checkResult != RESULT_SUCCESS) {
         IAM_LOGE("GetAvailableStatusFunc failed");
     }
@@ -810,8 +810,7 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
     validTypes.clear();
     std::lock_guard<std::mutex> lock(g_mutex);
     for (auto &authType : authTypes) {
-        int32_t checkRet = RESULT_GENERAL_ERROR;
-        GetAvailableStatusFunc(userId, authType, authTrustLevel, &checkRet);
+        int32_t checkRet = GetAvailableStatusFunc(userId, authType, authTrustLevel);
         if (checkRet == RESULT_SUCCESS) {
             IAM_LOGI("get valid authType:%{public}d", authType);
             validTypes.push_back(authType);
@@ -1666,10 +1665,6 @@ static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalCo
             }
             break;
         case ENABLE_STATUS:
-            if (param.authTypes.size() == 0) {
-                IAM_LOGE("ENABLE_STATUS bad authType size");
-                return RESULT_BAD_PARAM;
-            }
             paramHal.value.enableStatus = param.value.enableStatus;
             break;
         default:
@@ -1693,8 +1688,9 @@ int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigPara
 {
     IAM_LOGI("start, global config type is %{public}d, userIds size %{public}u, authTypes size %{public}u",
         param.type, param.userIds.size(), param.authTypes.size());
-    if (param.userIds.size() > MAX_USER || param.authTypes.size() > MAX_AUTH_TYPE_LEN) {
-        IAM_LOGE("bad pinExpiredPeriod value");
+    if (param.authTypes.size() > MAX_AUTH_TYPE_LEN || param.authTypes.size() == 0 ||
+        param.userIds.size() > MAX_USER) {
+        IAM_LOGE("SetGlobalConfigParam bad param");
         return RESULT_BAD_PARAM;
     }
     GlobalConfigParamHal paramHal = {};
