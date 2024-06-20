@@ -23,7 +23,7 @@ typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
-    extern GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
+    extern GlobalConfigInfo *g_globalConfigArray;
     extern bool MatchUserInfo(const void *data, const void *condition);
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
@@ -787,8 +787,8 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     param.userIds[0] = 1;
     param.authTypeNum = 1;
     param.authTypes[0] = 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
-    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
+    EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_SUCCESS);
     param.authTypeNum = MAX_AUTH_TYPE_LEN + 1;
     EXPECT_EQ(SaveGlobalConfigParam(&param), RESULT_BAD_PARAM);
     param.userIdNum = MAX_USER + 1;
@@ -797,7 +797,7 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     GlobalConfigParamHal param1 = {};
     param1.type = PIN_EXPIRED_PERIOD;
     param1.value.pinExpiredPeriod = 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_SUCCESS);
 
     GlobalConfigParamHal param2 = {};
     EXPECT_EQ(SaveGlobalConfigParam(&param2), RESULT_GENERAL_ERROR);
@@ -809,7 +809,7 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
     EXPECT_EQ(GetPinExpiredInfo(userId, nullptr), RESULT_BAD_PARAM);
 
     PinExpiredInfo info = {};
-    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_NOT_ENROLLED);
 
     g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
     g_globalConfigArray[0].value.pinExpiredPeriod = 1;
@@ -837,11 +837,11 @@ HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
 
     g_globalConfigArray[0].type = ENABLE_STATUS;
     g_globalConfigArray[0].value.enableStatus = false;
-    g_globalConfigArray[0].authTypes[0] = 0;
+    g_globalConfigArray[0].authType = 0;
     g_globalConfigArray[0].userIds[0] = 0;
     EXPECT_EQ(GetEnableStatus(userId, authType), true);
 
-    g_globalConfigArray[0].authTypes[0] = 1;
+    g_globalConfigArray[0].authType = 1;
     EXPECT_EQ(GetEnableStatus(userId, authType), true);
 
     g_globalConfigArray[0].value.enableStatus = true;

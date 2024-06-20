@@ -22,6 +22,7 @@
 #include "adaptor_log.h"
 #include "adaptor_time.h"
 #include "idm_file_manager.h"
+#include "global_config_file_manager.h"
 
 #define MAX_DUPLICATE_CHECK 100
 #define PRE_APPLY_NUM 5
@@ -41,7 +42,7 @@ IAM_STATIC LinkedList *g_userInfoList = NULL;
 IAM_STATIC UserInfo *g_currentUser = NULL;
 
 // Caches global config info.
-IAM_STATIC GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
+IAM_STATIC GlobalConfigInfo g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
 IAM_STATIC uint32_t g_globalConfigInfoNum = 0;
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
@@ -1217,56 +1218,65 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t index, bool isAdd)
+IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t authType)
 {
-    memset_s(&g_globalConfigArray[index], sizeof(GlobalConfigParamHal), 0, sizeof(GlobalConfigParamHal));
+    bool isGlobalConfigTypeExist = false;
+    uint32_t infoIndex = 0;
+    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
+        if (g_globalConfigArray[i].type == param->type && g_globalConfigArray[infoIndex].authType == authType) {
+            infoIndex = i;
+            isGlobalConfigTypeExist = true;
+            break;
+        }
+    }
+    if ((!isGlobalConfigTypeExist) && (g_globalConfigInfoNum >= MAX_GLOBAL_CONFIG_NUM)) {
+        LOG_ERROR("globalConfigArray is exceed limit");
+        return RESULT_EXCEED_LIMIT;
+    }
+    if ((!isGlobalConfigTypeExist) && (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM)) {
+        infoIndex = g_globalConfigInfoNum;
+        g_globalConfigInfoNum++;
+        LOG_INFO("globalConfig is not exist and add the value");
+    }
+
+    memset_s(&g_globalConfigArray[infoIndex], sizeof(GlobalConfigInfo), 0, sizeof(GlobalConfigInfo));
     switch (param->type) {
         case PIN_EXPIRED_PERIOD:
-            g_globalConfigArray[index].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
+            g_globalConfigArray[infoIndex].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
             break;
         case ENABLE_STATUS:
-            g_globalConfigArray[index].value.enableStatus = param->value.enableStatus;
+            g_globalConfigArray[infoIndex].value.enableStatus = param->value.enableStatus;
             break;
         default:
             LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
-            return RESULT_GENERAL_ERROR;
+            if (!isGlobalConfigTypeExist) {
+                g_globalConfigInfoNum--;
+            }
+            return RESULT_BAD_PARAM;
     }
-    g_globalConfigArray[index].type = param->type;
-
-    g_globalConfigArray[index].userIdNum = param->userIdNum;
+    g_globalConfigArray[infoIndex].type = param->type;
+    g_globalConfigArray[infoIndex].authType = authType;
+    g_globalConfigArray[infoIndex].userIdNum = param->userIdNum;
     for (uint32_t i = 0; i < param->userIdNum; i++) {
-        g_globalConfigArray[index].userIds[i] = param->userIds[i];
+        g_globalConfigArray[infoIndex].userIds[i] = param->userIds[i];
     }
-    g_globalConfigArray[index].authTypeNum = param->authTypeNum;
-    for (uint32_t i = 0; i < param->authTypeNum; i++) {
-        g_globalConfigArray[index].authTypes[i] = param->authTypes[i];
-    }
-
-    if (isAdd) {
-        g_globalConfigInfoNum++;
-    }
-    return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+    return RESULT_SUCCESS;
 }
-
 
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 {
-    if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN) {
+    if (param == NULL) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
-
-    for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
-        if (g_globalConfigArray[infoIndex].type == param->type) {
-            return UpdateGlobalConfigArray(param, infoIndex, false);
+    for (uint32_t i = 0; i < param->authTypeNum; i++) {
+        ResultCode ret = UpdateGlobalConfigArray(param, param->authTypes[i]);
+        if (ret != RESULT_SUCCESS) {
+            return ret;
         }
     }
-    if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
-        return UpdateGlobalConfigArray(param, g_globalConfigInfoNum, true);
-    }
 
-    LOG_ERROR("SaveGlobalConfigParam type %{public}d failed", param->type);
-    return RESULT_GENERAL_ERROR;
+    return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
 }
 
 IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinCredential)
@@ -1325,48 +1335,23 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
     return RESULT_SUCCESS;
 }
 
-static bool IsEnableStatusExist(const GlobalConfigParamHal *enableStatus, int32_t userId, uint32_t authType)
-{
-    bool isAuthTypeExist = false;
-    for (uint32_t i = 0; i < enableStatus->authTypeNum; i++) {
-        if (authType == enableStatus->authTypes[i]) {
-            isAuthTypeExist = true;
-            break;
-        }
-    }
-    if (!isAuthTypeExist) {
-        LOG_INFO("enableStatus for authType %{public}u is not exist", authType);
-        return false;
-    }
-
-    bool isUserIdExist = false;
-    if (userId == INVALID_USER_ID || enableStatus->userIdNum == 0) {
-        return true;
-    }
-    for (uint32_t i = 0; i < enableStatus->userIdNum; i++) {
-        if (userId == enableStatus->userIds[i]) {
-            isUserIdExist = true;
-            break;
-        }
-    }
-    if (!isUserIdExist) {
-        LOG_INFO("enableStatus for userId %{public}d is not exist", userId);
-        return false;
-    }
-    return true;
-}
-
 bool GetEnableStatus(int32_t userId, uint32_t authType)
 {
-    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
-        if (g_globalConfigArray[i].type != ENABLE_STATUS) {
+    for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
+        if (g_globalConfigArray[infoIndex].type != ENABLE_STATUS &&
+            g_globalConfigArray[infoIndex].authType != authType) {
             continue;
         }
-        if (IsEnableStatusExist(&g_globalConfigArray[i], userId, authType)) {
-            LOG_INFO("enableStatus is %{public}d", g_globalConfigArray[i].value.enableStatus);
-            return g_globalConfigArray[i].value.enableStatus;
+
+        if (userId == INVALID_USER_ID || g_globalConfigArray[infoIndex].userIdNum == 0) {
+            return g_globalConfigArray[infoIndex].value.enableStatus;
         }
-        return true;
+        for (uint32_t i = 0; i < g_globalConfigArray[infoIndex].userIdNum; i++) {
+            if (userId == g_globalConfigArray[infoIndex].userIds[i]) {
+                return g_globalConfigArray[infoIndex].value.enableStatus;
+            }
+        }
+        return (!g_globalConfigArray[infoIndex].value.enableStatus);
     }
     return true;
 }
