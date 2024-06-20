@@ -17,6 +17,7 @@
 #define SENSOR_UHDF_LOG_H
 
 #include "hdf_log.h"
+#include "hitrace_meter.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
