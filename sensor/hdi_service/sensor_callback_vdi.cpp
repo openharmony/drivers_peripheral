@@ -52,95 +52,33 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
 {
     SensorClientsManager::GetInstance()->CopyEventData(event);
-    PrintData(event);
-    if (servicesChanged) {
-        servicesMap_ = SensorClientsManager::GetInstance()->GetSensorUsed();
-        servicesChanged = false;
-    }
-    if (clientsChanged) {
-        if (!SensorClientsManager::GetInstance()->GetClients(HDF_TRADITIONAL_SENSOR_TYPE, sensorClientInfos_)) {
-            HDF_LOGD("%{public}s groupId %{public}d is not used by anyone", __func__, HDF_TRADITIONAL_SENSOR_TYPE);
-            return HDF_FAILURE;
-        }
-        clientsChanged = false;
-    }
-    if (servicesMap_.find(event.sensorId) == servicesMap_.end()) {
-        HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, event.sensorId);
-        return HDF_FAILURE;
-    }
-    int32_t ret = ReportEachClient(servicesMap_.find(event.sensorId)->second, event);
-    return ret;
+    std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(services, event);
+    PrintData(event, reportResult);
+    return HHDF_SUCCESS;
 }
 
-int32_t SensorCallbackVdi::ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event)
-{
-    std::string result = "";
-    int32_t sensorId = event.sensorId;
-    for (auto it = services.begin(); it != services.end(); ++it) {
-        int32_t serviceId = *it;
-        if (sensorClientInfos_.find(serviceId) == sensorClientInfos_.end()) {
-            continue;
-        }
-        SensorClientInfo &sensorClientInfo = sensorClientInfos_.find(serviceId)->second;
-        if (IsNotNeedReportData(sensorClientInfo, sensorId, serviceId)) {
-            continue;
-        }
-        const sptr<ISensorCallback> &callback = sensorClientInfo.GetReportDataCb();
-        if (callback == nullptr) {
-            HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
-            continue;
-        }
-        StartTrace(HITRACE_TAG_HDF, "ODE,serviceId=" + std::to_string(serviceId) + ",sensorId=" +
-                                    std::to_string(event.sensorId));
-        int32_t ret = callback->OnDataEvent(event);
-        FinishTrace(HITRACE_TAG_HDF);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
-        } else {
-            result += std::to_string(serviceId) + " ";
-        }
-    }
-    HDF_LOGD("%{public}s sensorId=%{public}d, services=%{public}s", __func__, event.sensorId, result.c_str());
-    return HDF_SUCCESS;
-}
-
-bool SensorCallbackVdi::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId,
-                                            const int32_t &serviceId)
-{
-    if (!SensorClientsManager::IsSensorContinues(sensorId)) {
-        return false;
-    }
-    if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
-        return false;
-    }
-    bool result = true;
-    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
-    if (sensorClientInfo.curCountMap_[sensorId] == 0) {
-        result = false;
-    }
-    sensorClientInfo.curCountMap_[sensorId]++;
-    if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
-        sensorClientInfo.curCountMap_[sensorId] = 0;
-    }
-    return result;
-}
-
-void SensorCallbackVdi::PrintData(const HdfSensorEvents &event)
+void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, std::string &reportResult)
 {
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
+    bool result = false;
     if (firstTimestampMap_[event.sensorId] == 0) {
         firstTimestampMap_[event.sensorId] = event.timestamp;
+        result = true;
     } else {
         lastTimestampMap_[event.sensorId] = event.timestamp;
     }
 
     if (lastTimestampMap_[event.sensorId] - firstTimestampMap_[event.sensorId] >= REPOPRT_TIME) {
         firstTimestampMap_[event.sensorId] = lastTimestampMap_[event.sensorId];
+        result = true;
+    }
+
+    if (result) {
         std::string st = {0};
         DataToStr(st, event);
+        st += reportResult;
         HDF_LOGI("%{public}s: %{public}s", __func__, st.c_str());
     }
-    return;
 }
 
 void SensorCallbackVdi::DataToStr(std::string &str, const HdfSensorEvents &event)

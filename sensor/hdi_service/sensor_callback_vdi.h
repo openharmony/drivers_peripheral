@@ -37,18 +37,12 @@ public:
     int32_t OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi) override;
     int32_t OnDataEvent(const V2_0::HdfSensorEvents& event) override;
     sptr<IRemoteObject> HandleCallbackDeath() override;
-    static bool servicesChanged;
-    static bool clientsChanged;
 private:
-    void PrintData(const HdfSensorEvents &event);
+    void PrintData(const HdfSensorEvents &event, std::string &reportResult);
     void DataToStr(std::string &str, const HdfSensorEvents &event);
-    int32_t ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
-    bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId, const int32_t &serviceId);
     sptr<ISensorCallback> sensorCallback_;
     SensorClientInfo sensorClientInfo_;
     std::mutex timestampMapMutex_;
-    std::unordered_map<int32_t, std::set<int32_t>> servicesMap_;
-    std::unordered_map<int, SensorClientInfo> sensorClientInfos_;
 };
 
 } // V2_0
