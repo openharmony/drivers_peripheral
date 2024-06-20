@@ -23,7 +23,7 @@
 
 #define SENSOR_TRACE_PID do { \
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid()); \
-    std::string st = std::string(__func__) + ":pid " + std::string(serviceId); \
+    std::string st = std::string(__func__) + ":pid " + std::to_string(serviceId); \
     HITRACE_METER_NAME(SENSOR_TRACE_TAG, st.c_str()); \
 } while (0)
 
@@ -34,7 +34,7 @@
 
 #define SENSOR_TRACE_PID_MSG(msg) do { \
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid()); \
-    std::string st = std::string(__func__) + ":pid " + std::string(serviceId) + "," + (msg); \
+    std::string st = std::string(__func__) + ":pid " + std::to_string(serviceId) + "," + (msg); \
     HITRACE_METER_NAME(SENSOR_TRACE_TAG, st.c_str()); \
 } while (0)
 
