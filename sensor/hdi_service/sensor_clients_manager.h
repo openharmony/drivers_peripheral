@@ -47,7 +47,7 @@ public:
     void EraseSdcSensorBestConfig(int sensorId);
     bool IsUpadateSensorState(int sensorId, int serviceId, bool isOpen);
     bool IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId, const int32_t &serviceId);
-    std::string ReportEachClient(std::set<int32_t> &services, const V2_0::HdfSensorEvents& event);
+    std::string ReportEachClient(const V2_0::HdfSensorEvents& event);
     bool GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client);
     std::set<int32_t> GetServiceIds(int32_t &sensorId);
     bool GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map);

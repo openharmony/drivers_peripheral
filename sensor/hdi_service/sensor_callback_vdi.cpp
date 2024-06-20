@@ -17,7 +17,6 @@
 #include "osal_mem.h"
 #include <securec.h>
 #include <unordered_map>
-#include "hitrace_meter.h"
 
 #define HDF_LOG_TAG uhdf_sensor_callback_vdi
 
@@ -49,9 +48,9 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
 {
     SensorClientsManager::GetInstance()->CopyEventData(event);
-    std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(services, event);
+    std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     PrintData(event, reportResult);
-    return HHDF_SUCCESS;
+    return HDF_SUCCESS;
 }
 
 void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, std::string &reportResult)

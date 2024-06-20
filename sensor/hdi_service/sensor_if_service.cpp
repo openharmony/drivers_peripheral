@@ -17,7 +17,6 @@
 #include <refbase.h>
 #include <cinttypes>
 #include "sensor_uhdf_log.h"
-#include "hitrace_meter.h"
 #include "sensor_type.h"
 #include "sensor_callback_vdi.h"
 #include <hdf_remote_service.h>
