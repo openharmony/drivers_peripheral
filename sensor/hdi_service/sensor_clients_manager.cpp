@@ -392,7 +392,7 @@ bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
 }
 
 bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId,
-                                            const int32_t &serviceId)
+                                               const int32_t &serviceId)
 {
     SENSOR_TRACE;
     if (!SensorClientsManager::IsSensorContinues(sensorId)) {
