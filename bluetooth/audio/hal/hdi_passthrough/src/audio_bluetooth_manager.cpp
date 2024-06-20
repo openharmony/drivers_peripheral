@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <map>
 #include <hdf_log.h>
 #include "audio_internal.h"
 #include "i_bluetooth_a2dp_src.h"
@@ -60,6 +61,8 @@ GetLatencyFunc fastGetLatencyFunc;
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
 static sptr<BluetoothA2dpSrcObserver> g_btA2dpSrcObserverCallbacks = nullptr;
 int g_playState = A2DP_NOT_PLAYING;
+std::map<int, std::string> g_playdevices {};
+std::mutex g_playStateMutex;
 
 static void AudioOnConnectionStateChanged(const RawAddress &device, int state, int cause)
 {
@@ -71,7 +74,28 @@ static void AudioOnConnectionStateChanged(const RawAddress &device, int state, i
 static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
 {
     HDF_LOGI("%{public}s, playingState:%{public}d", __func__, playingState);
-    g_playState = playingState;
+    std::lock_guard<std::mutex> lock(g_playStateMutex);
+    std::string addr = device.GetAddress();
+    if (playingState) {
+        for (const auto &it : g_playdevices) {
+            if (strcmp(it.second.c_str(), device.GetAddress().c_str()) == 0) {
+                return;
+            }
+        }
+        g_playdevices.insert(std::make_pair(playingState, addr));
+        g_playState = playingState;
+    } else {
+        std::map<int, std::string>::iterator it;
+        for (it = g_playdevices.begin(); it != g_playdevices.end(); it++) {
+            if (strcmp(it->second.c_str(), device.GetAddress().c_str()) == 0) {
+                g_playdevices.erase(it);
+                break;
+            }
+        }
+        if (g_playdevices.empty()) {
+            g_playState = playingState;
+        }
+    }
     (void) error;
 }
 
