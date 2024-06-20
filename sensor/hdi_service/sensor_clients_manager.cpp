@@ -458,7 +458,7 @@ std::string SensorCallbackVdi::ReportEachClient(const V2_0::HdfSensorEvents& eve
         }
     }
     HDF_LOGD("%{public}s sensorId=%{public}d, %{public}s", __func__, event.sensorId, result.c_str());
-    return HDF_SUCCESS;
+    return result;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()
