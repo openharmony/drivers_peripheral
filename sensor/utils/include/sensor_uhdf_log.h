@@ -17,12 +17,17 @@
 #define SENSOR_UHDF_LOG_H
 
 #include "hdf_log.h"
-#include "hdf_trace.h"
+#include "hitrace_meter.h"
 
 #ifdef LOG_DOMAIN
 #undef LOG_DOMAIN
 #endif
 #define LOG_DOMAIN 0xD002516
-#define SENSOR_TRACE HdfTrace trace(__func__, "")
+
+#define SENSOR_TRACE_TAG HITRACE_TAG_OHOS
+#define SENSOR_TRACE HITRACE_METER_NAME(SENSOR_TRACE_TAG, __func__)
+#define SENSOR_TRACE_MSG(msg) HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
+#define SENSOR_TRACE_START(msg) StartTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
+#define SENSOR_TRACE_FINISH FinishTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + msg).c_str())
 
 #endif //SENSOR_UHDF_LOG_H
