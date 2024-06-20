@@ -23,5 +23,6 @@
 #undef LOG_DOMAIN
 #endif
 #define LOG_DOMAIN 0xD002516
+#define SENSOR_TRACE HdfTrace trace(__func__, "")
 
 #endif //SENSOR_UHDF_LOG_H

@@ -394,6 +394,7 @@ bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
 bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId,
                                             const int32_t &serviceId)
 {
+    SENSOR_TRACE;
     if (!SensorClientsManager::IsSensorContinues(sensorId)) {
         return false;
     }
@@ -414,6 +415,7 @@ bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInf
 
 std::set<int32_t> SensorClientsManager::GetServiceIds(int32_t &sensorId)
 {
+    SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     if (sensorUsed_.find(sensorId) == sensorUsed_.end()) {
         HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, sensorId);
@@ -424,6 +426,7 @@ std::set<int32_t> SensorClientsManager::GetServiceIds(int32_t &sensorId)
 
 std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& event)
 {
+    SENSOR_TRACE;
     std::string result = "services=";
     int32_t sensorId = event.sensorId;
     const std::set<int32_t> &services = GetServiceIds(sensorId);
@@ -448,10 +451,9 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
             continue;
         }
-        StartTrace(HITRACE_TAG_HDF, "ODE,serviceId=" + std::to_string(serviceId) + ",sensorId=" +
-                                    std::to_string(event.sensorId));
+        HdfTrace traceODE("ODE", "serviceId=" + std::to_string(serviceId) + ",sensorId=" +
+            std::to_string(event.sensorId));
         int32_t ret = callback->OnDataEvent(event);
-        FinishTrace(HITRACE_TAG_HDF);
         if (ret != HDF_SUCCESS) {
             HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
         } else {

@@ -33,6 +33,7 @@ namespace {
 
 int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSensorEventsVdi& eventVdi)
 {
+    SENSOR_TRACE;
     struct HdfSensorEvents event;
     event.sensorId = eventVdi.sensorId;
     event.version = eventVdi.version;
@@ -47,6 +48,7 @@ int32_t SensorCallbackVdi::OnDataEventVdi(const OHOS::HDI::Sensor::V1_1::HdfSens
 
 int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
 {
+    SENSOR_TRACE;
     SensorClientsManager::GetInstance()->CopyEventData(event);
     std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
     PrintData(event, reportResult);
@@ -55,6 +57,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
 
 void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, std::string &reportResult)
 {
+    SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);
     bool result = false;
     if (firstTimestampMap_[event.sensorId] == 0) {
