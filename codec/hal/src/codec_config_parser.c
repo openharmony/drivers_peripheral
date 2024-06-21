@@ -315,6 +315,9 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     }
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode) {
         cap = &(capsGroup->capablitis[index++]);
+        if (cap == NULL) {
+            continue;
+        }
         if (GetOneCapability(iface, childNode, cap, isVideoGroup) != HDF_SUCCESS) {
             CODEC_LOGE("GetOneCapability failed, role is %{public}d!", cap->role);
         }
