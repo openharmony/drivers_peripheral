@@ -515,6 +515,7 @@ static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
             }
             if (g_isWriteDone) {
                 UsbFnFreeRequest(req);
+                req = NULL;
             } else {
                 if (memset_s(req->buf, req->length, 'a', req->length) != EOK) {
                     HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
