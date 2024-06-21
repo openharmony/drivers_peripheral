@@ -20,7 +20,7 @@ using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
 using namespace OHOS::HDI::Camera;
-
+constexpr uint32_t DATA_COUNT = 1;
 void CameraFrontUtTestV1_3::SetUpTestCase(void) {}
 void CameraFrontUtTestV1_3::TearDownTestCase(void) {}
 void CameraFrontUtTestV1_3::SetUp(void)
