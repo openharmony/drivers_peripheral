@@ -1098,7 +1098,6 @@ void UsbFnMemFree(const void *mem)
         OsalMemFree((void *)mem);
         mem = NULL;
     }
-
 }
 
 int32_t UsbFnAdpMemTestTrigger(bool enable)
