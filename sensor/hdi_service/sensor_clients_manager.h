@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <hdf_remote_service.h>
 #include "v2_0/isensor_interface.h"
 #include "isensor_interface_vdi.h"
 #include "sensor_client_info.h"
