@@ -17,7 +17,6 @@
 #include <refbase.h>
 #include <cinttypes>
 #include "sensor_uhdf_log.h"
-#include "hitrace_meter.h"
 #include "sensor_type.h"
 #include "sensor_callback_vdi.h"
 #include <hdf_remote_service.h>
@@ -189,10 +188,9 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     HDF_LOGD("%{public}s:Enter the Enable function, sensorId %{public}d, service %{public}d",
              __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, ENABLE_SENSOR)) {
-        SensorCallbackVdi::servicesChanged = true;
         return HDF_SUCCESS;
     }
-    
+
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
@@ -204,7 +202,6 @@ int32_t SensorIfService::Enable(int32_t sensorId)
         HDF_LOGE("%{public}s Enable failed, error code is %{public}d", __func__, ret);
     } else {
         SensorClientsManager::GetInstance()->OpenSensor(sensorId, serviceId);
-        SensorCallbackVdi::servicesChanged = true;
     }
     FinishTrace(HITRACE_TAG_HDF);
 
@@ -219,16 +216,14 @@ int32_t SensorIfService::Disable(int32_t sensorId)
              __func__, sensorId, serviceId);
     if (!SensorClientsManager::GetInstance()->IsUpadateSensorState(sensorId, serviceId, DISABLE_SENSOR)) {
         HDF_LOGE("%{public}s There are still some services enable", __func__);
-        SensorCallbackVdi::servicesChanged = true;
         return HDF_SUCCESS;
     }
-    SensorCallbackVdi::servicesChanged = true;
 
     if (sensorVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
         return HDF_FAILURE;
     }
-    
+
     int32_t ret;
     if (SensorClientsManager::GetInstance()->IsExistSdcSensorEnable(sensorId)) {
         ret = sensorVdiImpl_->SetSaBatch(sensorId, REPORT_INTERVAL, REPORT_INTERVAL);
@@ -278,7 +273,6 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
     }
     StartTrace(HITRACE_TAG_HDF, "SetBatchSenior");
     SensorClientsManager::GetInstance()->SetClientSenSorConfig(sensorId, serviceId, samplingInterval, reportInterval);
-    SensorCallbackVdi::clientsChanged = true;
 
     int64_t saSamplingInterval = samplingInterval;
     int64_t saReportInterval = reportInterval;
@@ -300,7 +294,6 @@ int32_t SensorIfService::SetBatchSenior(int32_t serviceId, int32_t sensorId, int
         SetDelay(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateSensorConfig(sensorId, saSamplingInterval, saReportInterval);
         SensorClientsManager::GetInstance()->UpdateClientPeriodCount(sensorId, saSamplingInterval, saReportInterval);
-        SensorCallbackVdi::clientsChanged = true;
     }
     if (mode == SDC) {
         SensorClientsManager::GetInstance()->UpdateSdcSensorConfig(sensorId, sdcSamplingInterval, sdcReportInterval);
@@ -416,7 +409,6 @@ int32_t SensorIfService::Register(int32_t groupId, const sptr<ISensorCallback> &
     } else {
         SensorClientsManager::GetInstance()->ReportDataCbRegister(groupId, serviceId, callbackObj);
     }
-    SensorCallbackVdi::clientsChanged = true;
     return ret;
 }
 
@@ -435,7 +427,6 @@ int32_t SensorIfService::Unregister(int32_t groupId, const sptr<ISensorCallback>
         HDF_LOGE("%{public}s: RemoveCallbackMap failed groupId[%{public}d]", __func__, groupId);
     }
     SensorClientsManager::GetInstance()->ReportDataCbUnRegister(groupId, serviceId, callbackObj);
-    SensorCallbackVdi::clientsChanged = true;
     if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
         HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
         return HDF_SUCCESS;
