@@ -43,7 +43,7 @@ const std::string READ_NDEF_FUNC_NAME = "NfcTagReadNdefMessage";
 static const int MAX_NDEF_LEN = 256;
 }
 
-const char* GetNfcChipType(void)
+std::string GetNfcChipType(void)
 {
     HDF_LOGE("%{public}s:begin", __func__);
     void *srvHandle = dlopen(NFC_HAL_VENDOR_SERVICE.c_str(), RTLD_LAZY | RTLD_GLOBAL);
@@ -63,12 +63,14 @@ const char* GetNfcChipType(void)
     const char* chipType = getChipFunc();
     if (chipType == nullptr || chipType[0] == '\0') {
         HDF_LOGW("%{public}s: chipType Invalid", __func__);
-        chipType = "t001";
+        chipType = "";
     }
 
     HDF_LOGE("%{public}s: end chipType %{public}s", __func__, chipType);
+    // 调用dlcose后，对应so占用的内存会被释放，继续访问getChipFunc返回的字符串，调用者线程会crash
+    std::string strChipType = chipType;
     dlclose(srvHandle);
-    return chipType;
+    return strChipType;
 }
 
 ConnectedNfcTagVendorAdapter::ConnectedNfcTagVendorAdapter(): halHandle(nullptr)
@@ -138,9 +140,9 @@ int32_t ConnectedNfcTagVendorAdapter::GetInterfaceFromHal()
 
 int32_t ConnectedNfcTagVendorAdapter::Init()
 {
-    const char* nfcChipType = GetNfcChipType();
-    if (nfcChipType == nullptr || nfcChipType[0] == '\0') {
-        HDF_LOGE("nfcChipType NULL");
+    std::string nfcChipType = GetNfcChipType();
+    if (nfcChipType == "") {
+        HDF_LOGE("nfcChipType empty");
         return -1;
     }
 
