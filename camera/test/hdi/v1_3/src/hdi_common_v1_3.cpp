@@ -129,6 +129,22 @@ void Test::OpenSecureCamera(int cameraId)
     }
 }
 
+void Test::OpenCameraWithCameraId(int cameraId)
+{
+    if (cameraDeviceV1_3 == nullptr) {
+        EXPECT_NE(serviceV1_3, nullptr);
+        serviceV1_3->GetCameraIds(cameraIds);
+        EXPECT_NE(cameraIds.size(), 0);
+        GetCameraMetadataWithCameraId(cameraId);
+        deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
+
+        EXPECT_NE(serviceV1_3, nullptr);
+        rc = serviceV1_3->OpenCamera_V1_3(cameraIds[1], deviceCallback, cameraDeviceV1_3);
+        EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
+        EXPECT_NE(cameraDeviceV1_3, nullptr);
+        CAMERA_LOGI("OpenCameraWithCameraId success");
+    }
+}
 
 void Test::GetCameraMetadata(int cameraId)
 {
@@ -139,6 +155,16 @@ void Test::GetCameraMetadata(int cameraId)
     }
     if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("GetCameraAbility failed, rc = %{public}d", rc);
+    }
+    MetadataUtils::ConvertVecToMetadata(abilityVec, ability);
+    EXPECT_NE(ability, nullptr);
+}
+
+void Test::GetCameraMetadataWithCameraId(int cameraId)
+{
+    rc = serviceV1_3->GetCameraAbility(cameraIds[1], abilityVec);
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
+        CAMERA_LOGE("GetCameraMetadataWithCameraId failed, rc = %{public}d", rc);
     }
     MetadataUtils::ConvertVecToMetadata(abilityVec, ability);
     EXPECT_NE(ability, nullptr);
