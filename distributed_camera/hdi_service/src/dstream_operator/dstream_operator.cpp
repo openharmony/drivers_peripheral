@@ -770,7 +770,9 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
     }
 
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
-    dMetadataProcessor_->UpdateResultMetadata(resultTimestamp);
+    if (dMetadataProcessor_ != nullptr) {
+        dMetadataProcessor_->UpdateResultMetadata(resultTimestamp);
+    }
 
     bool enableShutter = FindEnableShutter(streamId);
     if (!enableShutter) {
@@ -796,7 +798,9 @@ DCamRetCode DStreamOperator::SetDeviceCallback(
     std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk)
 {
     errorCallback_ = errorCbk;
-    dMetadataProcessor_->SetResultCallback(resultCbk);
+    if (dMetadataProcessor_ != nullptr) {
+        dMetadataProcessor_->SetResultCallback(resultCbk);
+    }
     return SUCCESS;
 }
 
