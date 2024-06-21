@@ -81,6 +81,7 @@ static int32_t UsbFnAdapterCreateFconfigString(struct FconfigString * const conf
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed!", __func__);
         UsbFnMemFree(configString->s);
+        configString->s = NULL;
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -1095,7 +1096,9 @@ void UsbFnMemFree(const void *mem)
 
     if (mem != NULL) {
         OsalMemFree((void *)mem);
+        mem = NULL;
     }
+
 }
 
 int32_t UsbFnAdpMemTestTrigger(bool enable)

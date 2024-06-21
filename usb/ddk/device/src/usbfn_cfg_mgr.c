@@ -723,8 +723,10 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(
 FREE_FUNTION:
     while ((--iCount) > 0) {
         UsbFnMemFree((void *)fnConfig->functions[iCount]);
+        fnConfig->functions[iCount] = NULL;
     }
     UsbFnMemFree(fnConfig->functions);
+    fnConfig->functions = NULL;
     return HDF_FAILURE;
 }
 
@@ -805,8 +807,10 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(
 FREE_CONFIG:
     while ((--count) >= 0) {
         UsbFnMemFree(fnDevDesc->deviceStrings[count]);
+        fnDevDesc->deviceStrings[count] = NULL;
     }
     UsbFnMemFree(fnDevDesc->deviceStrings);
+    fnDevDesc->deviceStrings = NULL;
     return HDF_FAILURE;
 }
 

@@ -1718,6 +1718,7 @@ void RawUsbMemFree(void *mem)
 
     if (mem != NULL) {
         OsalMemFree(mem);
+        mem = NULL;
     }
 }
 

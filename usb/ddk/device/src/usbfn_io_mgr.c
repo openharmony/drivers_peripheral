@@ -332,9 +332,11 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
         }
         handle->fds[i] = -1;
         UsbFnMemFree(handle->reqEvent[i]);
+        handle->reqEvent[i] = NULL;
     }
 
     UsbFnMemFree(handle);
+    handle = NULL;
     interfaceMgr->isOpen = false;
     interfaceMgr->handle = NULL;
     return 0;

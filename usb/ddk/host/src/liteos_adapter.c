@@ -69,6 +69,7 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
     }
 
     RawUsbMemFree(ptr);
+    ptr = NULL;
 OUT:
     return mem;
 }
@@ -1183,6 +1184,7 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
 
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
 }
 
 static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex, void *buffer, size_t len)
