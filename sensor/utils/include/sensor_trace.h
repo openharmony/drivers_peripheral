@@ -21,27 +21,15 @@
 #define SENSOR_TRACE_TAG HITRACE_TAG_OHOS
 #define SENSOR_TRACE HITRACE_METER_NAME(SENSOR_TRACE_TAG, __func__)
 
-#define SENSOR_TRACE_PID do { \
-    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid()); \
-    std::string st = std::string(__func__) + ":pid " + std::to_string(serviceId); \
-    HITRACE_METER_NAME(SENSOR_TRACE_TAG, st.c_str()); \
-} while (0)
+#define SENSOR_TRACE_PID HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":pid " + \
+    std::to_string(static_cast<uint32_t>(HdfRemoteGetCallingPid()))).c_str())
 
-#define SENSOR_TRACE_MSG(msg) do { \
-    std::string st = std::string(__func__) + ":" + (msg); \
-    HITRACE_METER_NAME(SENSOR_TRACE_TAG, st.c_str()); \
-} while (0)
+#define SENSOR_TRACE_MSG(msg) HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + (msg)).c_str())
 
-#define SENSOR_TRACE_PID_MSG(msg) do { \
-    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid()); \
-    std::string st = std::string(__func__) + ":pid " + std::to_string(serviceId) + "," + (msg); \
-    HITRACE_METER_NAME(SENSOR_TRACE_TAG, st.c_str()); \
-} while (0)
+#define SENSOR_TRACE_PID_MSG(msg) HITRACE_METER_NAME(SENSOR_TRACE_TAG, (std::string(__func__) + ":pid " + \
+    std::to_string(static_cast<uint32_t>(HdfRemoteGetCallingPid())) + "," + (msg)).c_str())
 
-#define SENSOR_TRACE_START(msg) do { \
-    std::string st = std::string(__func__) + ":" + (msg); \
-    StartTrace(SENSOR_TRACE_TAG, st.c_str()); \
-} while (0)
+#define SENSOR_TRACE_START(msg) StartTrace(SENSOR_TRACE_TAG, (std::string(__func__) + ":" + (msg)).c_str())
 
 #define SENSOR_TRACE_FINISH FinishTrace(SENSOR_TRACE_TAG)
 
