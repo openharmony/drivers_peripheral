@@ -20,9 +20,6 @@ using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
 using namespace OHOS::HDI::Camera;
-constexpr uint32_t ITEM_CAPACITY = 100;
-constexpr uint32_t DATA_CAPACITY = 2000;
-constexpr uint32_t DATA_COUNT = 1;
 
 void CameraFrontUtTestV1_3::SetUpTestCase(void) {}
 void CameraFrontUtTestV1_3::TearDownTestCase(void) {}
@@ -38,58 +35,13 @@ void CameraFrontUtTestV1_3::TearDown(void)
     cameraTest->Close();
 }
 
-bool IsTagValueVaild(std::shared_ptr<CameraMetadata> ability, uint32_t tag, uint8_t value)
-{
-    common_metadata_header_t* data = ability->get();
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, tag, &entry);
-    EXPECT_EQ(ret, 0);
-    EXPECT_NE(entry.count, 0);
-    for (int i = 0; i < entry.count; i++) {
-        if (entry.data.u8[i] == value) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void PrintAllTagData(std::shared_ptr<CameraMetadata> ability, uint32_t tag)
-{
-    common_metadata_header_t* data = ability->get();
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, tag, &entry);
-    EXPECT_EQ(ret, 0);
-    EXPECT_NE(entry.count, 0);
-    cout << "----tag = " << tag << "count = " << entry.count << endl;
-    for (int i = 0; i < entry.count; i++) {
-        int v = entry.data.u8[i];
-        cout << "tag[" << tag << "][" << i << "] = " << v << endl;
-    }
-    cout << "--------------------------------" << endl;
-}
-
 /**
- * @tc.name: Camera_Device_Hdi_V1_3_001
- * @tc.desc: Get and Print all data in OHOS_ABILITY_CAMERA_MODES
- * @tc.size: MediumTest
- * @tc.type: Function
- */
-HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_001, TestSize.Level1)
-{
-    EXPECT_NE(cameraTest->ability, nullptr);
-    (void)ITEM_CAPACITY;
-    (void)DATA_CAPACITY;
-    (void)DATA_COUNT;
-    PrintAllTagData(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES);
-}
-
-/**
- * @tc.name: Camera_Front_Hdi_V1_3_002
+ * @tc.name: Camera_Front_Hdi_V1_3_001
  * @tc.desc: OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED
  * @tc.size: MediumTest
  * @tc.type: Function
  */
-HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_002, TestSize.Level1)
+HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_001, TestSize.Level1)
 {
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
@@ -130,12 +82,12 @@ HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_002, TestSize.Level1)
 }
 
 /**
-+ * @tc.name:Camera_Front_Hdi_V1_3_003
++ * @tc.name:Camera_Front_Hdi_V1_3_002
 + * @tc.desc:Dynamic capture mirror configuration, fixed capture mirror setting, streams capture mirror constrain
 + * @tc.size:MediumTest
 + * @tc.type:Function
 +*/
-HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_003, TestSize.Level1)
+HWTEST_F(CameraFrontUtTestV1_3, Camera_Front_Hdi_V1_3_002, TestSize.Level1)
 {
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
