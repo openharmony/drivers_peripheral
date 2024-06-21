@@ -81,8 +81,10 @@ public:
     void Init();
     void Open(int cameraId);
     void OpenSecureCamera(int cameraId);
+    void OpenCameraWithCameraId(int cameraId);
     void Close();
     void GetCameraMetadata(int cameraId);
+    void GetCameraMetadataWithCameraId(int cameraId);
     void DefaultPreview(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultCapture(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
     void DefaultSketch(std::shared_ptr<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1> &infos);
