@@ -309,7 +309,8 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path failed, ret: %{public}d", ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path(%{public}s) failed, ret: %{public}d",
+            (path != nullptr ? path : "NULL"), ret);
         return ret;
     }
 
