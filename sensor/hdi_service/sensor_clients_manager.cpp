@@ -429,7 +429,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
     SENSOR_TRACE;
     std::string result = "services=";
     int32_t sensorId = event.sensorId;
-    const std::set<int32_t> &services = GetServiceIds(sensorId);
+    const std::set<int32_t> services = GetServiceIds(sensorId);
     std::unique_lock<std::mutex> lock(clientsMutex_);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
     if (clients_.find(groupId) == clients_.end() || clients_.find(groupId)->second.empty()) {
