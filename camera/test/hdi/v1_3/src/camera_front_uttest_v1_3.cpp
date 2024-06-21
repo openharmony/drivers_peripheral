@@ -27,7 +27,7 @@ void CameraFrontUtTestV1_3::SetUp(void)
 {
     cameraTest = std::make_shared<OHOS::Camera::Test>();
     cameraTest->Init(); // assert inside
-    cameraTest->OpenCameraWithCameraId(DEVICE_1); // assert inside
+    cameraTest->Open(DEVICE_1); // assert inside
 }
 
 void CameraFrontUtTestV1_3::TearDown(void)
