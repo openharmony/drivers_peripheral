@@ -51,6 +51,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
     SENSOR_TRACE;
     SensorClientsManager::GetInstance()->CopyEventData(event);
     std::string reportResult = SensorClientsManager::GetInstance()->ReportEachClient(event);
+    HDF_LOGD("%{public}s sensorId=%{public}d, %{public}s", __func__, event.sensorId, reportResult.c_str());
     PrintData(event, reportResult);
     return HDF_SUCCESS;
 }

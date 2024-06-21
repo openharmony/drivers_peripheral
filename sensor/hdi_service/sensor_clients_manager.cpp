@@ -459,7 +459,6 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             result += std::to_string(serviceId) + " ";
         }
     }
-    HDF_LOGD("%{public}s sensorId=%{public}d, %{public}s", __func__, event.sensorId, result.c_str());
     return result;
 }
 
