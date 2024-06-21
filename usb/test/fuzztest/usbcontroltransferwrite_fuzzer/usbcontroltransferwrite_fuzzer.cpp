@@ -23,6 +23,8 @@
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
+constexpr size_t THRESHOLD = 10;
+constexpr int32_t OFFSET = 4;
 namespace USB {
 bool UsbControlTransferWriteFuzzTest(const uint8_t *data, size_t size)
 {
@@ -41,7 +43,7 @@ bool UsbControlTransferWriteFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->ControlTransferWrite(dev, ctrl, reinterpret_cast<const std::vector<uint8_t> &>(data));
+    ret = usbInterface->ControlTransferWrite(dev, ctrl, reinterpret_cast<const std::vector<uint8_t> &>(data + OFFSET));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: control transfer write succeed", __func__);
     }
@@ -58,6 +60,9 @@ bool UsbControlTransferWriteFuzzTest(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (size < OHOS::THRESHOLD) {
+        return 0;
+    }
     OHOS::USB::UsbControlTransferWriteFuzzTest(data, size);
     return 0;
 }
