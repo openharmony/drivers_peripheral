@@ -42,7 +42,7 @@ public:
 
     int32_t SetGnssReferenceInfo(const GnssRefInfo& refInfo) override;
 
-    int32_t DeleteAuxiliaryData(GnssAuxiliaryDataType data) override;
+    int32_t DeleteAuxiliaryData(unsigned short data) override;
 
     int32_t SetPredictGnssData(const std::string& data) override;
 
