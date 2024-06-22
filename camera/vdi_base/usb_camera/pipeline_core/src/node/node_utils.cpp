@@ -60,11 +60,20 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
         dstBufferInfo.bufferAddr, dstBufferInfo.bufferSize);
 
     AVFrame *pFrameSrc = av_frame_alloc();
+    if (pFrameSrc == nullptr) {
+        CAMERA_LOGE("ImageFormatConvert Error pFrameSrc == nullptr");
+        return OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT;
+    }
     AVFrame *pFrameDst = av_frame_alloc();
+    if (pFrameDst == nullptr) {
+        CAMERA_LOGE("ImageFormatConvert Error pFrameDst == nullptr");
+        av_frame_free(&pFrameSrc);
+        return OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT;
+    }
 
-    av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, (uint8_t *)srcBufferInfo.bufferAddr,
+    av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, static_cast<uint8_t *>(srcBufferInfo.bufferAddr),
         srcAVFmt, srcBufferInfo.width, srcBufferInfo.height, 1);
-    av_image_fill_arrays(pFrameDst->data, pFrameDst->linesize, (uint8_t *)dstBufferInfo.bufferAddr,
+    av_image_fill_arrays(pFrameDst->data, pFrameDst->linesize, static_cast<uint8_t *>(dstBufferInfo.bufferAddr),
         dstAVFmt, dstBufferInfo.width, dstBufferInfo.height, 1);
 
     struct SwsContext* imgCtx = sws_getContext(
