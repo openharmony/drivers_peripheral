@@ -571,10 +571,6 @@ int32_t SensorIfService::RemoveCallbackMap(int32_t groupId, int serviceId, const
         }
         std::unordered_map<int, std::set<int>> sensorUsed = SensorClientsManager::GetInstance()->GetSensorUsed();
         if (sensorUsed.find(iter.first) == sensorUsed.end()) {
-            if (sensorVdiImpl_ == nullptr) {
-                HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
-                return HDF_FAILURE;
-            }
             SENSOR_TRACE_START("sensorVdiImpl_->Disable");
             int32_t ret = sensorVdiImpl_->Disable(iter.first);
             SENSOR_TRACE_FINISH;
@@ -650,8 +646,9 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
         });
         if (callBackIter != callbackMap[groupId].end()) {
             int32_t serviceId = SensorClientsManager::GetInstance()->GetServiceId(groupId, *callBackIter);
-            if (serviceId == HDF_FAILURE) {
-                HDF_LOGE("%{public}s: GetServiceId failed", __func__);
+            if (sensorVdiImpl_ == nullptr) {
+                HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
+                continue;
             }
             int32_t ret = RemoveCallbackMap(groupId, serviceId, *callBackIter);
             if (ret != SENSOR_SUCCESS) {
@@ -659,10 +656,6 @@ void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
             }
             if (!SensorClientsManager::GetInstance()->IsClientsEmpty(groupId)) {
                 HDF_LOGD("%{public}s: clients is not empty, do not unregister", __func__);
-                continue;
-            }
-            if (sensorVdiImpl_ == nullptr) {
-                HDF_LOGE("%{public}s: get sensor vdi impl failed", __func__);
                 continue;
             }
             sptr<SensorCallbackVdi> sensorCb = GetSensorCb(groupId, *callBackIter, UNREGISTER_SENSOR);
