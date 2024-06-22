@@ -14,6 +14,7 @@
 #include "node_utils.h"
 #include "map"
 #include "camera.h"
+#include "camera_device_service_callback.h"
 extern "C" {
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
 #include "libavutil/frame.h"
