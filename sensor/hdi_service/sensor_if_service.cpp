@@ -280,9 +280,9 @@ int32_t SensorIfService::Disable(int32_t sensorId)
 int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     SENSOR_TRACE;
-    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
         reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
+    std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
 
     int32_t ret = SetBatchSenior(serviceId, sensorId, SA, samplingInterval, reportInterval);
