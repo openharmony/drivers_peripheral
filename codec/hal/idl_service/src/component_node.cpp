@@ -347,7 +347,8 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecOnFillBufferDone");
     auto appPrivate = static_cast<OMXBufferAppPrivateData *>(buffer->pAppPrivate);
-    if (appPrivate != nullptr && appPrivate->param != nullptr) {
+    if (appPrivate != nullptr && appPrivate->param != nullptr &&
+        appPrivate->sizeOfParam < 1024) { // 1024: to protect from taint data
         codecOmxBuffer.alongParam.resize(appPrivate->sizeOfParam);
         std::copy(static_cast<uint8_t*>(appPrivate->param),
                   static_cast<uint8_t*>(appPrivate->param) + appPrivate->sizeOfParam,
