@@ -89,7 +89,8 @@ WifiError VendorHalSetRestartHandler(wifiHandle handle,
 
 typedef struct {
     void (*onScanEvent) (int event);
-} WifiScanResHandler;
+    void (*OnRssiReport) (int index, int c0Rssi, int c1Rssi);
+} WifiCallbackHandler;
 
 typedef struct {
     WifiError (*vendorHalInit)(wifiHandle *);
@@ -121,7 +122,7 @@ typedef struct {
     WifiError (*getSignalPollInfo)(wifiInterfaceHandle handle,
         OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult& signalPollResult);
     WifiError (*setDpiMarkRule)(int32_t, int32_t, int32_t);
-    WifiError (*registerIfaceCallBack)(const char *, WifiScanResHandler);
+    WifiError (*registerIfaceCallBack)(const char *, WifiCallbackHandler);
     WifiError (*setTxPower)(const char *, int);
 } WifiHalFn;
 
