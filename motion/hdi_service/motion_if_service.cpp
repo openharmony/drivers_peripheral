@@ -80,7 +80,7 @@ int32_t MotionIfService::Init()
 
 int32_t MotionIfService::EnableMotion(int32_t motionType)
 {
-    HDF_LOGD("%{public}s: Enter the EnableMotion function, motionType is %{public}d", __func__, motionType);
+    HDF_LOGI("%{public}s: motionType is %{public}d", __func__, motionType);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -102,7 +102,7 @@ int32_t MotionIfService::EnableMotion(int32_t motionType)
 
 int32_t MotionIfService::DisableMotion(int32_t motionType)
 {
-    HDF_LOGD("%{public}s: Enter the DisableMotion function, motionType is %{public}d", __func__, motionType);
+    HDF_LOGI("%{public}s: motionType is %{public}d", __func__, motionType);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -124,7 +124,7 @@ int32_t MotionIfService::DisableMotion(int32_t motionType)
 
 int32_t MotionIfService::Register(const sptr<IMotionCallback> &callbackObj)
 {
-    HDF_LOGD("%{public}s: Enter the Register function.", __func__);
+    HDF_LOGI("%{public}s", __func__);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -143,7 +143,7 @@ int32_t MotionIfService::Register(const sptr<IMotionCallback> &callbackObj)
 
 int32_t MotionIfService::Unregister(const sptr<IMotionCallback> &callbackObj)
 {
-    HDF_LOGD("%{public}s: Enter the Unregister function.", __func__);
+    HDF_LOGI("%{public}s", __func__);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
@@ -162,7 +162,7 @@ int32_t MotionIfService::Unregister(const sptr<IMotionCallback> &callbackObj)
 
 int32_t MotionIfService::SetMotionConfig(int32_t motionType, const std::vector<uint8_t>& data)
 {
-    HDF_LOGD("%{public}s: Enter the SetMotionConfig function.", __func__);
+    HDF_LOGI("%{public}s: motionType is %{public}d", __func__, motionType);
     if (motionVdiImpl_ == nullptr) {
         HDF_LOGE("%{public}s motionVdiImpl_ is nullptr", __func__);
         return HDF_FAILURE;
