@@ -119,10 +119,22 @@ void WifiVendorHal::OnAsyncGscanFullResult(int event)
 {
     const auto lock = AcquireGlobalLock();
 
-    HDF_LOGD("get scan event");
+    HDF_LOGD("OnAsyncGscanFullResult::OnScanResultsCallback");
     for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
         if (callback) {
             callback->OnScanResultsCallback(event);
+        }
+    }
+}
+
+void WifiVendorHal::OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi)
+{
+    const auto lock = AcquireGlobalLock();
+
+    HDF_LOGD("OnAsyncRssiReport::OnRssiReport");
+    for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
+        if (callback) {
+            callback->OnRssiReport(event);
         }
     }
 }
@@ -343,7 +355,7 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalCbHandler_.AddCallback(chipIfaceCallback);
-    WifiScanResHandler handler = {OnAsyncGscanFullResult};
+    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
@@ -352,7 +364,7 @@ WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
     vendorHalCbHandler_.RemoveCallback(chipIfaceCallback);
-    WifiScanResHandler handler = {OnAsyncGscanFullResult};
+    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
 }
