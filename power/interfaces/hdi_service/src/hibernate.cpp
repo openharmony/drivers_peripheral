@@ -381,19 +381,25 @@ int32_t Hibernate::DoHibernate()
     if (EnableSwap() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (WriteResume() != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    if (WriteOffset() != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    if (WritePowerState() != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
+    int32_t ret = HDF_SUCCESS;
+    do {
+        if (WriteResume() != HDF_SUCCESS) {
+            ret = HDF_FAILURE;
+            break;
+        }
+        if (WriteOffset() != HDF_SUCCESS) {
+            ret = HDF_FAILURE;
+            break;
+        }
+        if (WritePowerState() != HDF_SUCCESS) {
+            ret = HDF_FAILURE;
+            break;
+        }
+    } while (0);
     if (swapoff(SWAP_FILE_PATH) != 0) {
         HDF_LOGE("swap off failed, errno=%{public}d", errno);
     }
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t Hibernate::GetResumeOffset(uint64_t &resumeOffset)
