@@ -15,6 +15,11 @@
 
 #include "file_manager_utils.h"
 
+#include "securec.h"
+
+#include "adaptor_log.h"
+#include "adaptor_memory.h"
+
 #define MAX_BUFFER_LEN 512000
 #define DEFAULT_EXPANSION_RATIO 2
 
@@ -87,6 +92,10 @@ ResultCode StreamWrite(Buffer *parcel, void *from, uint32_t size)
 
 ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t size)
 {
+    if (!IsBufferValid(parcel) || index == NULL || to == NULL) {
+        LOG_ERROR("invalid params");
+        return RESULT_BAD_PARAM;
+    }
     if (parcel->contentSize <= *index || parcel->contentSize - *index < size) {
         LOG_ERROR("the buffer length is insufficient");
         return RESULT_BAD_PARAM;

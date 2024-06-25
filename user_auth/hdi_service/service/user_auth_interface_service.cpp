@@ -1674,7 +1674,7 @@ static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalCo
     paramHal.type = static_cast<GlobalConfigTypeHal>(param.type);
 
     for (uint32_t i = 0; i < param.userIds.size(); i++) {
-        paramHal.userIds[i] = static_cast<int32_t>(param.userIds[i]);
+        paramHal.userIds[i] = param.userIds[i];
     }
     paramHal.userIdNum = param.userIds.size();
     for (uint32_t i = 0; i < param.authTypes.size(); i++) {
@@ -1686,7 +1686,7 @@ static int32_t CopyGlobalConfigParam(const HdiGlobalConfigParam &param, GlobalCo
 
 int32_t UserAuthInterfaceService::SetGlobalConfigParam(const HdiGlobalConfigParam &param)
 {
-    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}u, authTypes size %{public}u",
+    IAM_LOGI("start, global config type is %{public}d, userIds size %{public}zu, authTypes size %{public}zu",
         param.type, param.userIds.size(), param.authTypes.size());
     if (param.authTypes.size() > MAX_AUTH_TYPE_LEN || param.authTypes.size() == 0 ||
         param.userIds.size() > MAX_USER) {

@@ -412,10 +412,10 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
     OsalMutexLock(&requestSync->lock);
     requestSync->params.timeout = 500; // 500 is timeout
     uint32_t msize = requestSync->pipe.maxPacketSize;
-    while (tcur + msize < size) {
+    do {
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d \n", __func__, ret);
+            HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d ", __func__, ret);
             break;
         }
 
@@ -444,7 +444,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
             HDF_LOGE("%{public}s:tcur:%{public}u ret:%{public}d", __func__, tcur, ret);
             break;
         }
-    }
+    } while (tcur + msize <= size);
     OsalMutexUnlock(&requestSync->lock);
 
     *actlength = tcur;
@@ -647,13 +647,13 @@ int32_t UsbImpl::UsbdRequestASyncReleaseData(UsbdRequestASync *request)
     }
 
     if (request->reqMsg.buffer != nullptr) {
-        HDF_LOGI("%{public}s:free buffer\n", __func__);
+        HDF_LOGI("%{public}s:free buffer", __func__);
         OsalMemFree(request->reqMsg.buffer);
         request->reqMsg.buffer = nullptr;
     }
     request->reqMsg.length = 0;
     if (request->reqMsg.clientData) {
-        HDF_LOGI("%{public}s:free clientData\n", __func__);
+        HDF_LOGI("%{public}s:free clientData", __func__);
         OsalMemFree(request->reqMsg.clientData);
         request->reqMsg.clientData = nullptr;
     }
@@ -968,9 +968,9 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 void UsbImpl::UpdateFunctionStatus()
 {
     char cFunctionValue[FUNCTION_VALUE_MAX_LEN] = {0};
-    int32_t ret = GetParameter("persist.sys.usb.config", "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
+    int32_t ret = GetParameter(PERSIST_SYS_USB_CONFIG, "invalid", cFunctionValue, FUNCTION_VALUE_MAX_LEN);
     if (ret <= 0) {
-        HDF_LOGI("%{public}s: GetParameter failed", __func__);
+        HDF_LOGE("%{public}s: GetParameter failed", __func__);
     }
 
     std::string functionValue(cFunctionValue);
@@ -1373,6 +1373,44 @@ int32_t UsbImpl::BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_
     return ret;
 }
 
+int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
+    const UsbPipe &pipe, int32_t timeout, int32_t length, std::vector<uint8_t> &data)
+{
+    if (length<= 0 || length > READ_BUF_SIZE) {
+        HDF_LOGE("%{public}s:invalid length param, length: %{public}d.", __func__, length);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
+    if (port == nullptr) {
+        HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+
+    uint8_t tbuf[READ_BUF_SIZE] = {0};
+    uint32_t tsize = length;
+    uint32_t actlength = 0;
+    UsbdRequestSync *requestSync = nullptr;
+    int32_t ret = UsbdFindRequestSyncAndCreat(port, pipe.intfId, pipe.endpointId, &requestSync);
+    if (ret != HDF_SUCCESS || requestSync == nullptr) {
+        HDF_LOGE("%{public}s:UsbdFindRequestSyncAndCreat failed.", __func__);
+        return ret;
+    }
+    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN || requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
+        HDF_LOGE("%{public}s:invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s:UsbdBulkReadSyncBase ret:%{public}d, actlength:%{public}u", __func__, ret, actlength);
+    }
+
+    if (actlength > 0) {
+        data.assign(tbuf, tbuf + actlength);
+        ret = HDF_SUCCESS;
+    }
+    return ret;
+}
+
 int32_t UsbImpl::BulkTransferWrite(
     const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data)
 {
@@ -1429,7 +1467,7 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     }
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d\n", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d", __func__, __LINE__, ret);
     }
 
     uint8_t *dataValue = static_cast<uint8_t *>(controlParams.data);
@@ -1467,7 +1505,7 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.data = static_cast<void *>(const_cast<uint8_t *>(data.data()));
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d\n", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
 }
@@ -1731,12 +1769,12 @@ void UsbImpl::parsePortPath()
     const char *pathDef_ = nullptr;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == nullptr) {
-        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
         return;
     }
 
     if (device_ == nullptr) {
-        HDF_LOGE("%{public}s: device_ is empty\n", __func__);
+        HDF_LOGE("%{public}s: device_ is empty", __func__);
         return;
     }
     if (iface->GetString(device_->property, "port_file_path", &path_, pathDef_) != HDF_SUCCESS) {

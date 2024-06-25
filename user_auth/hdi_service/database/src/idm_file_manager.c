@@ -15,6 +15,15 @@
 
 #include "idm_file_manager.h"
 
+#include "securec.h"
+
+#include "adaptor_file.h"
+#include "adaptor_log.h"
+#include "adaptor_memory.h"
+#include "adaptor_time.h"
+#include "file_manager_utils.h"
+#include "idm_common.h"
+
 #define IDM_USER_INFO "/data/service/el1/public/userauth/userinfo"
 #define PRE_APPLY_LEN 2048
 #define VERSION 0

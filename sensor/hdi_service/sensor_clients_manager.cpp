@@ -94,6 +94,7 @@ void SensorClientsManager::CopyEventData(const struct HdfSensorEvents event)
 
 int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     for (auto &iter : clients_[groupId]) {
         if (iter.second.GetReportDataCb() == callbackObj) {
@@ -105,6 +106,7 @@ int SensorClientsManager::GetServiceId(int groupId, const sptr<ISensorCallback> 
 
 void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         if (callbackObj == nullptr) {
@@ -125,6 +127,7 @@ void SensorClientsManager::ReportDataCbRegister(int groupId, int serviceId, cons
 
 void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, const sptr<ISensorCallback> &callbackObj)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].find(serviceId) == clients_[groupId].end()) {
         HDF_LOGD("%{public}s: service %{public}d already UnRegister", __func__, serviceId);
@@ -139,6 +142,7 @@ void SensorClientsManager::ReportDataCbUnRegister(int groupId, int serviceId, co
 
 void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it != sensorConfig_.end()) {
@@ -154,6 +158,7 @@ void SensorClientsManager::UpdateSensorConfig(int sensorId, int64_t samplingInte
 
 void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
     if (it != sdcSensorConfig_.end()) {
@@ -169,6 +174,7 @@ void SensorClientsManager::UpdateSdcSensorConfig(int sensorId, int64_t samplingI
 
 void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    SENSOR_TRACE_PID;
     HDF_LOGD("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "],"
         "reportInterval is [%{public}" PRId64 "]", __func__, sensorId,
         samplingInterval, reportInterval);
@@ -181,6 +187,7 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return;
     }
+    std::string result = "";
     for (auto &entry : clients_[groupId]) {
         auto &client = entry.second;
         if (client.curCountMap_.find(sensorId) == client.curCountMap_.end()) {
@@ -188,16 +195,18 @@ void SensorClientsManager::UpdateClientPeriodCount(int sensorId, int64_t samplin
         }
         if (client.sensorConfigMap_.find(sensorId) != client.sensorConfigMap_.end()) {
             int32_t periodCount = client.sensorConfigMap_.find(sensorId)->second.samplingInterval / samplingInterval;
-            HDF_LOGI("%{public}s: serviceId=%{public}d, sensorId=%{public}d, periodCount="
-                     "%{public}d/%{public}" PRId64 "=%{public}d", __func__, entry.first, sensorId,
-                     client.sensorConfigMap_.find(sensorId)->second.samplingInterval, samplingInterval, periodCount);
+            result += " serviceId=" + std::to_string(entry.first) + ", sensorId=" + std::to_string(sensorId) +
+                      ", periodCount=" + std::to_string(client.sensorConfigMap_.find(sensorId)->second.samplingInterval)
+                      + "/" + std::to_string(samplingInterval) + "=" + std::to_string(periodCount);
             client.periodCountMap_[sensorId] = periodCount;
         }
     }
+    HDF_LOGI("%{public}s: %{public}s", __func__, result.c_str());
 }
 
 void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
@@ -215,6 +224,7 @@ void SensorClientsManager::SetSensorBestConfig(int sensorId, int64_t &samplingIn
 
 void SensorClientsManager::SetSdcSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
     if (it == sdcSensorConfig_.end()) {
@@ -233,6 +243,7 @@ void SensorClientsManager::SetSdcSensorBestConfig(int sensorId, int64_t &samplin
 
 void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingInterval, int64_t &reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     auto it = sensorConfig_.find(sensorId);
     if (it == sensorConfig_.end()) {
@@ -252,6 +263,7 @@ void SensorClientsManager::GetSensorBestConfig(int sensorId, int64_t &samplingIn
 
 void SensorClientsManager::EraseSdcSensorBestConfig(int sensorId)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
     if (it == sdcSensorConfig_.end()) {
@@ -265,6 +277,7 @@ void SensorClientsManager::EraseSdcSensorBestConfig(int sensorId)
 
 void SensorClientsManager::OpenSensor(int sensorId, int serviceId)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     std::set<int> service = {serviceId};
     sensorUsed_.emplace(sensorId, service);
@@ -273,6 +286,7 @@ void SensorClientsManager::OpenSensor(int sensorId, int serviceId)
 
 bool SensorClientsManager::IsNeedOpenSensor(int sensorId, int serviceId)
 {
+    SENSOR_TRACE_PID;
     auto it = sensorUsed_.find(sensorId);
     if (it == sensorUsed_.end()) {
         HDF_LOGD("%{public}s: sensor %{public}d is enabled by service: %{public}d", __func__,  sensorId, serviceId);
@@ -288,6 +302,7 @@ bool SensorClientsManager::IsNeedOpenSensor(int sensorId, int serviceId)
 
 bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
 {
+    SENSOR_TRACE_PID;
     auto it = sensorUsed_.find(sensorId);
     if (it == sensorUsed_.end()) {
         HDF_LOGE("%{public}s: sensor %{public}d has been disabled  or not support", __func__, sensorId);
@@ -308,6 +323,7 @@ bool SensorClientsManager::IsNeedCloseSensor(int sensorId, int serviceId)
 
 bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sdcSensorConfigMutex_);
     auto it = sdcSensorConfig_.find(sensorId);
     if (it == sdcSensorConfig_.end()) {
@@ -319,6 +335,7 @@ bool SensorClientsManager::IsExistSdcSensorEnable(int sensorId)
 
 bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, bool isOpen)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     if (isOpen && IsNeedOpenSensor(sensorId, serviceId)) {
         return true;
@@ -331,6 +348,7 @@ bool SensorClientsManager::IsUpadateSensorState(int sensorId, int serviceId, boo
 
 bool SensorClientsManager::IsClientsEmpty(int groupId)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     if (clients_.find(groupId) == clients_.end() || clients_[groupId].empty()) {
         return true;
@@ -340,6 +358,7 @@ bool SensorClientsManager::IsClientsEmpty(int groupId)
 
 bool SensorClientsManager::IsNoSensorUsed()
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorUsedMutex_);
     for (auto it = sensorUsed_.begin(); it != sensorUsed_.end(); ++it) {
         if (!it->second.empty()) {
@@ -351,6 +370,7 @@ bool SensorClientsManager::IsNoSensorUsed()
 
 bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, SensorClientInfo> &client)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     auto it = clients_.find(groupId);
     if (it == clients_.end() || it->second.empty()) {
@@ -362,6 +382,7 @@ bool SensorClientsManager::GetClients(int groupId, std::unordered_map<int32_t, S
 
 bool SensorClientsManager::GetBestSensorConfigMap(std::unordered_map<int32_t, struct BestSensorConfig> &map)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(sensorConfigMutex_);
     map = sensorConfig_;
     return true;
@@ -370,6 +391,7 @@ bool SensorClientsManager::GetBestSensorConfigMap(std::unordered_map<int32_t, st
 void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t serviceId, int64_t samplingInterval,
                                                  int64_t &reportInterval)
 {
+    SENSOR_TRACE_PID;
     std::unique_lock<std::mutex> lock(clientsMutex_);
     HDF_LOGD("%{public}s: service %{public}d enter the SetClientSenSorConfig function, sensorId is %{public}d, "
              "samplingInterval is %{public}s, reportInterval is %{public}s", __func__, serviceId, sensorId,
@@ -389,6 +411,77 @@ void SensorClientsManager::SetClientSenSorConfig(int32_t sensorId, int32_t servi
 bool SensorClientsManager::IsSensorContinues(int32_t sensorId)
 {
     return std::find(continuesSensor.begin(), continuesSensor.end(), sensorId) != continuesSensor.end();
+}
+
+bool SensorClientsManager::IsNotNeedReportData(SensorClientInfo &sensorClientInfo, const int32_t &sensorId,
+                                               const int32_t &serviceId)
+{
+    SENSOR_TRACE;
+    if (!SensorClientsManager::IsSensorContinues(sensorId)) {
+        return false;
+    }
+    if (sensorClientInfo.periodCountMap_.find(sensorId) == sensorClientInfo.periodCountMap_.end()) {
+        return false;
+    }
+    bool result = true;
+    sensorClientInfo.PrintClientMapInfo(serviceId, sensorId);
+    if (sensorClientInfo.curCountMap_[sensorId] == 0) {
+        result = false;
+    }
+    sensorClientInfo.curCountMap_[sensorId]++;
+    if (sensorClientInfo.curCountMap_[sensorId] >= sensorClientInfo.periodCountMap_[sensorId]) {
+        sensorClientInfo.curCountMap_[sensorId] = 0;
+    }
+    return result;
+}
+
+std::set<int32_t> SensorClientsManager::GetServiceIds(int32_t &sensorId)
+{
+    SENSOR_TRACE;
+    std::unique_lock<std::mutex> lock(sensorUsedMutex_);
+    if (sensorUsed_.find(sensorId) == sensorUsed_.end()) {
+        HDF_LOGD("%{public}s sensor %{public}d is not enabled by anyone", __func__, sensorId);
+        return std::set<int32_t>();
+    }
+    return sensorUsed_.find(sensorId)->second;
+}
+
+std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& event)
+{
+    SENSOR_TRACE;
+    std::string result = "services=";
+    int32_t sensorId = event.sensorId;
+    const std::set<int32_t> services = GetServiceIds(sensorId);
+    std::unique_lock<std::mutex> lock(clientsMutex_);
+    int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
+    if (clients_.find(groupId) == clients_.end() || clients_.find(groupId)->second.empty()) {
+        HDF_LOGE("%{public}s groupId %{public}d is not enabled by anyone", __func__, sensorId);
+        return result;
+    }
+    std::unordered_map<int, SensorClientInfo> &sensorClientInfos = clients_.find(groupId)->second;
+    for (auto it = services.begin(); it != services.end(); ++it) {
+        int32_t serviceId = *it;
+        if (sensorClientInfos.find(serviceId) == sensorClientInfos.end()) {
+            continue;
+        }
+        SensorClientInfo &sensorClientInfo = sensorClientInfos.find(serviceId)->second;
+        if (IsNotNeedReportData(sensorClientInfo, sensorId, serviceId)) {
+            continue;
+        }
+        const sptr<ISensorCallback> &callback = sensorClientInfo.GetReportDataCb();
+        if (callback == nullptr) {
+            HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
+            continue;
+        }
+        SENSOR_TRACE_MSG("serviceId=" + std::to_string(serviceId) + ",sensorId=" + std::to_string(event.sensorId));
+        int32_t ret = callback->OnDataEvent(event);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGD("%{public}s Sensor OnDataEvent failed, error code is %{public}d", __func__, ret);
+        } else {
+            result += std::to_string(serviceId) + " ";
+        }
+    }
+    return result;
 }
 
 std::unordered_map<int32_t, std::set<int32_t>> SensorClientsManager::GetSensorUsed()

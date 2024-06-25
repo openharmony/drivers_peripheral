@@ -74,6 +74,7 @@ void SecureElementCaProxy::InitFunc()
             return;
         }
     }
+    vendorSecureElementCaOnStartFunc_ = loader_->FindTheFunc<VendorSecureElementCaOnStartT>(CA_ON_START_SYMBOL);
     vendorSecureElementCaInitFunc_ = loader_->FindTheFunc<VendorSecureElementCaInitT>(CA_INIT_SYMBOL);
     vendorSecureElementCaUninitFunc_ = loader_->FindTheFunc<VendorSecureElementCaUninitT>(CA_UNINIT_SYMBOL);
     vendorSecureElementCaGetAtrFunc_ = loader_->FindTheFunc<VendorSecureElementCaGetAtrT>(CA_GET_ATR_SYMBOL);
@@ -92,6 +93,11 @@ void SecureElementCaProxy::InitFunc()
     }                                        \
     HDF_LOGE("func is null!");               \
     return SECURE_ELEMENT_CA_RET_LOAD_FAIL
+
+int SecureElementCaProxy::VendorSecureElementCaOnStart() const
+{
+    CA_FUNCTION_INVOKE_RETURN(vendorSecureElementCaOnStartFunc_);
+}
 
 int SecureElementCaProxy::VendorSecureElementCaInit() const
 {

@@ -16,17 +16,14 @@
 #ifndef GLOBAL_CONFIG_FILE_MANAGER_H
 #define GLOBAL_CONFIG_FILE_MANAGER_H
 
-#include "defines.h"
-#include "file_manager_utils.h"
 #include "idm_common.h"
-#include "linked_list.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ResultCode LoadGlobalConfigInfo(GlobalConfigInfo *globalConfigInfo, uint32_t len, uint32_t *configInfoNum);
-ResultCode UpdateGlobalConfigFile(GlobalConfigInfo *globalConfigInfo, uint32_t configInfoNum);
+ResultCode LoadGlobalConfigInfo(GlobalConfigInfo *globalConfigArray, uint32_t len, uint32_t *configInfoNum);
+ResultCode UpdateGlobalConfigFile(GlobalConfigInfo *globalConfigArray, uint32_t configInfoNum);
 
 #ifdef __cplusplus
 }

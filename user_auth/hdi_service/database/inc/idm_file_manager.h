@@ -17,8 +17,6 @@
 #define IDM_FILE_MANAGER_H
 
 #include "defines.h"
-#include "file_manager_utils.h"
-#include "idm_common.h"
 #include "linked_list.h"
 
 #ifdef __cplusplus

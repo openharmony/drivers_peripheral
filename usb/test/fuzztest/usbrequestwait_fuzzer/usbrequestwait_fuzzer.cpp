@@ -22,6 +22,9 @@
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
+constexpr size_t THRESHOLD = 10;
+constexpr int32_t OFFSET = 4;
+constexpr int32_t OFFSET_BYTE = 8;
 namespace USB {
 bool UsbRequestWaitFuzzTest(const uint8_t *data, size_t size)
 {
@@ -35,7 +38,7 @@ bool UsbRequestWaitFuzzTest(const uint8_t *data, size_t size)
     }
 
     ret = usbInterface->RequestWait(dev, reinterpret_cast<std::vector<uint8_t> &>(data),
-        reinterpret_cast<std::vector<uint8_t> &>(data), *(reinterpret_cast<int32_t *>(*data)));
+        reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET), *(reinterpret_cast<int32_t *>(*data + OFFSET_BYTE)));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: request wait succeed", __func__);
     }
@@ -52,6 +55,9 @@ bool UsbRequestWaitFuzzTest(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (size < OHOS::THRESHOLD) {
+        return 0;
+    }
     OHOS::USB::UsbRequestWaitFuzzTest(data, size);
     return 0;
 }

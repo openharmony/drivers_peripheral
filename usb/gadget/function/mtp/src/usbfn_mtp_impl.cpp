@@ -802,7 +802,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceCreateFuncDevice()
 {
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (iface == NULL) {
-        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed", __func__);
         return HDF_FAILURE;
     }
     const char *udcName = nullptr;
@@ -903,6 +903,7 @@ int32_t UsbfnMtpImpl::UsbMtpDeviceFree()
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMemFree(mtpDev_->mtpPort);
+    mtpDev_->mtpPort = nullptr;
     return HDF_SUCCESS;
 }
 
@@ -1335,6 +1336,7 @@ int32_t UsbfnMtpImpl::ReceiveFileEx()
     HDF_LOGV("%{public}s: wait async rx", __func__);
     sem_wait(&asyncReq_);
     (void)OsalMemFree(mtpDev_->asyncRecvWriteTempContent);
+    mtpDev_->asyncRecvWriteTempContent = nullptr;
     if (syncfs(mtpDev_->xferFd) != 0) {
         HDF_LOGE("%{public}s: failed: commit filesystem caches to disk", __func__);
         return HDF_ERR_IO;

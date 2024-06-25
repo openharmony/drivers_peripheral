@@ -82,6 +82,8 @@ typedef enum AuthType {
     PIN_AUTH = 1,
     FACE_AUTH = 2,
     FINGER_AUTH = 4,
+    RECOVERY_KEY = 8,
+    MAX_AUTH_TYPE_LEN = 4,
 } AuthType;
 
 typedef enum ScheduleMode {

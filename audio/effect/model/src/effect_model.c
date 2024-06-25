@@ -76,7 +76,7 @@ static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
 }
 
 static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const char *uuid,
-     struct EffectControllerDescriptor *desc)
+    struct EffectControllerDescriptor *desc)
 {
     HDF_LOGD("enter to %{public}s", __func__);
     uint32_t i;
@@ -110,7 +110,7 @@ static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const c
 }
 
 static int32_t EffectModelCreateEffectController(struct IEffectModel *self, const struct EffectInfo *info,
-     struct IEffectControl **contoller, struct ControllerId *contollerId)
+    struct IEffectControl **contoller, struct ControllerId *contollerId)
 {
     if (self == NULL || info == NULL || contoller == NULL || contollerId == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
