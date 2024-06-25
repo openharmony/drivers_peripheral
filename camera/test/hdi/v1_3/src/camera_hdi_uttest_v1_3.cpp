@@ -1446,7 +1446,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
 
     std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
     uint8_t lightPainting = OHOS_CAMERA_LIGHT_PAINTING_LIGHT;
-    uint8_t lightFlush = 1
+    uint8_t lightFlush = 1;
     modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_TYPE, &lightPainting, 1);
     modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
     std::vector<uint8_t> metaVec;
