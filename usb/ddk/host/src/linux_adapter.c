@@ -49,6 +49,7 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
     }
 
     RawUsbMemFree(ptr);
+    ptr = NULL;
     return mem;
 }
 
@@ -1006,6 +1007,7 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     close(handle->mmapFd);
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
+    handle = NULL;
 }
 
 static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex, void *buffer, size_t len)
@@ -1363,6 +1365,7 @@ static int32_t AdapterFreeRequestByMmap(struct UsbHostRequest *request)
         return HDF_ERR_IO;
     }
     RawUsbMemFree(request);
+    request = NULL;
     return HDF_SUCCESS;
 }
 
@@ -1379,6 +1382,7 @@ static int32_t AdapterFreeRequest(struct UsbHostRequest *request)
     request->urbs = NULL;
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     RawUsbMemFree(request);
+    request = NULL;
 #else
     size_t allocSize = sizeof(struct UsbHostRequest) +
         (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets)) + (size_t)request->bufLen;

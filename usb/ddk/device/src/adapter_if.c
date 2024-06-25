@@ -1282,6 +1282,7 @@ void UsbFnMemFree(const void *mem)
 
     if (mem != NULL) {
         OsalMemFree((void *)mem);
+        mem = NULL;
     }
 }
 
