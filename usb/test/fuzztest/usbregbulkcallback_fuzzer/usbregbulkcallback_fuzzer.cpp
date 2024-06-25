@@ -24,6 +24,8 @@
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
+constexpr size_t THRESHOLD = 10;
+constexpr int32_t OFFSET = 4;
 namespace USB {
 bool UsbRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
 {
@@ -42,7 +44,7 @@ bool UsbRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->RegBulkCallback(dev, pipe, reinterpret_cast<const sptr<IUsbdBulkCallback> &>(data));
+    ret = usbInterface->RegBulkCallback(dev, pipe, reinterpret_cast<const sptr<IUsbdBulkCallback> &>(data + OFFSET));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: reg bulk callback succeed", __func__);
     }
@@ -59,6 +61,9 @@ bool UsbRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (size < OHOS::THRESHOLD) {
+        return 0;
+    }
     OHOS::USB::UsbRegBulkCallbackFuzzTest(data, size);
     return 0;
 }
