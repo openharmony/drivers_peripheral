@@ -363,7 +363,7 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
 WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
-    vendorHalCbHandler_.RemoveCallback(chipIfaceCallback);
+    vendorHalCbHandler_.Invalidate(); // instead of RemoveCallback temporarily
     WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
     return HAL_SUCCESS;
