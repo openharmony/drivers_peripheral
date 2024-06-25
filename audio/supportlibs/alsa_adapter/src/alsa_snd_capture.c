@@ -802,7 +802,7 @@ static int32_t CaptureInitImpl(struct AlsaCapture* captureIns)
 }
 
 static int32_t CaptureSelectSceneImpl(struct AlsaCapture *captureIns, enum AudioPortPin descPins,
-        const struct PathDeviceInfo *deviceInfo)
+    const struct PathDeviceInfo *deviceInfo)
 {
     AUDIO_FUNC_LOGE("Not yet realized");
     return HDF_SUCCESS;

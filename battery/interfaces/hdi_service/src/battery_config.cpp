@@ -43,6 +43,7 @@ constexpr int32_t MIN_DEPTH = 1;
 constexpr uint32_t MOVE_LEFT_16 = 16;
 constexpr uint32_t MOVE_LEFT_8 = 8;
 constexpr uint32_t SYSTEM_PATH_CHECK = 4;
+constexpr uint32_t DATA_PATH_CHECK = 5;
 }
 std::shared_ptr<BatteryConfig> BatteryConfig::instance_ = nullptr;
 std::mutex BatteryConfig::mutex_;
@@ -329,7 +330,8 @@ bool BatteryConfig::IsValidSysPath(const std::string& path)
 {
     char resolvedPath[PATH_MAX] = {};
     if ((realpath(path.c_str(), resolvedPath) == nullptr) ||
-        (strncmp(resolvedPath, "/sys", SYSTEM_PATH_CHECK) != 0)) {
+        ((strncmp(resolvedPath, "/sys", SYSTEM_PATH_CHECK) != 0) &&
+        (strncmp(resolvedPath, "/data", DATA_PATH_CHECK) != 0))) {
         return false;
     }
     return true;
@@ -384,7 +386,7 @@ Json::Value BatteryConfig::GetValue(const Json::Value& config, std::string key) 
     std::string firstKey = keys[MAP_KEY_INDEX];
     Json::Value value = (config.isObject() && config.isMember(firstKey)) ? config[firstKey] : Json::Value();
     if (value.isNull()) {
-        BATTERY_HILOGW(COMP_HDI, "Value is empty. key=%{public}s", keys[MAP_KEY_INDEX].c_str());
+        BATTERY_HILOGD(COMP_HDI, "Value is empty. key=%{public}s", key.c_str());
         return value;
     }
 

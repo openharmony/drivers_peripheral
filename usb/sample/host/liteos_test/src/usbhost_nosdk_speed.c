@@ -171,7 +171,7 @@ static int32_t BeginProcessHandleFirst(void)
         if (urb[i].urb == NULL) {
             urb[i].urb = OsalMemCalloc(sizeof(struct urb));
             if (urb[i].urb == NULL) {
-                HDF_LOGE("%{public}s:%{public}d urb calloc err\n", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%{public}d urb calloc err", __func__, __LINE__);
                 return -1;
             }
         }
@@ -183,7 +183,7 @@ static int32_t BeginProcessHandleFirst(void)
         if (data == NULL) {
             data = OsalMemCalloc(TEST_LENGTH);
             if (data == NULL) {
-                HDF_LOGE("%{public}s:%{public}d data calloc err\n", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%{public}d data calloc err", __func__, __LINE__);
                 return -1;
             }
         }
@@ -384,7 +384,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
     if (input == NULL || size != sizeof(struct UsbSpeedTest)) {
-        HDF_LOGE("%{public}s: %{public}d sbuf read buffer failed\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s: %{public}d sbuf read buffer failed", __func__, __LINE__);
         ret = HDF_ERR_IO;
         goto END;
     }

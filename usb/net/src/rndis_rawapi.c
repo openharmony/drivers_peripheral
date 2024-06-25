@@ -357,7 +357,7 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     HARCH_INFO_PRINT("retval = %{public}d", retval);
     HARCH_INFO_PRINT("RNDIS_MSG_QUERY(0x%{public}08x) %{public}d\n", queryParam.oid, retval);
     if (retval < 0) {
-        HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d\n", queryParam.oid, retval);
+        HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) failed, %{public}d", queryParam.oid, retval);
         return retval;
     }
 
@@ -380,7 +380,7 @@ static int32_t HostRndisQuery(struct UsbnetHost *usbNet, struct RndisQueryParam 
     return retval;
 
 response_error:
-    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d\n",
+    HDF_LOGE("RNDIS_MSG_QUERY(0x%{public}08x) invalid response - off %{public}d len %{public}d",
         queryParam.oid, off, len);
 
     return -EDOM;
@@ -407,7 +407,7 @@ static void HostRndisInitUsbnet(struct UsbnetHost **ppUsbNet, int32_t *retval)
 
     HARCH_INFO_PRINT("maxpacket = %{public}d\n", (*ppUsbNet)->net.maxpacket);
     if ((*ppUsbNet)->net.maxpacket == 0) {
-        HDF_LOGE("usbNet->maxpacket can't be 0\n");
+        HDF_LOGE("usbNet->maxpacket can't be 0");
         *retval = HDF_ERR_INVALID_PARAM;
         return;
     }
@@ -423,12 +423,12 @@ static void HostRndisUpdateMtu(struct UsbnetHost **ppUsbNet, int32_t *retval)
     if (tmp < (*ppUsbNet)->net.hardMtu) {
         if (tmp <= (*ppUsbNet)->net.hardHeaderLen) {
             HARCH_INFO_PRINT("RNDIS init failed, %{public}d", *retval);
-            HDF_LOGE("usbNet can't take %{public}u byte packets (max %{public}u)\n", (*ppUsbNet)->net.hardMtu, tmp);
+            HDF_LOGE("usbNet can't take %{public}u byte packets (max %{public}u)", (*ppUsbNet)->net.hardMtu, tmp);
             *retval = HDF_ERR_INVALID_PARAM;
         }
         HARCH_INFO_PRINT("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u\n",
             (*ppUsbNet)->net.hardMtu, tmp, tmp - (*ppUsbNet)->net.hardHeaderLen);
-        HDF_LOGW("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u\n",
+        HDF_LOGW("usbNet can't take %{public}u byte packets (max %{public}u) adjusting MTU to %{public}u",
             (*ppUsbNet)->net.hardMtu, tmp, tmp - (*ppUsbNet)->net.hardHeaderLen);
         (*ppUsbNet)->net.hardMtu = tmp;
         (*ppUsbNet)->net.mtu = (*ppUsbNet)->net.hardMtu - (*ppUsbNet)->net.hardHeaderLen;
@@ -444,7 +444,7 @@ static void HostRndisSetmacAddrByBp(struct UsbnetHost **ppUsbNet, int32_t *retva
     struct RndisQueryParam queryParam = {g_u.buf, RNDIS_OID_802_3_PERMANENT_ADDRESS, RNDIS_QUERY_INPUT_LENGTH};
     *retval = HostRndisQuery(*ppUsbNet, queryParam, (void **)&bp, &replyLen);
     if (*retval < 0) {
-        HDF_LOGE("rndis get ethaddr, %{public}d\n", *retval);
+        HDF_LOGE("rndis get ethaddr, %{public}d", *retval);
         *retval = HDF_ERR_NOPERM;
     }
 
@@ -483,13 +483,13 @@ static void HostRndisSetmacAddr(struct UsbnetHost **ppUsbNet, int32_t *retval)
 
     if (((*ppUsbNet)->flags & FLAG_RNDIS_PHYM_WIRELESS) &&
         CPU_TO_LE32(*phym) != RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
-        HDF_LOGE("driver requires wireless physical medium, but device is not\n");
+        HDF_LOGE("driver requires wireless physical medium, but device is not");
         *retval = HDF_ERR_NOPERM;
     }
 
     if (((*ppUsbNet)->flags & FLAG_RNDIS_PHYM_NOT_WIRELESS) &&
         CPU_TO_LE32(*phym) == RNDIS_PHYSICAL_MEDIUM_WIRELESS_LAN) {
-        HDF_LOGE("driver requires non-wireless physical medium, but device is wireless\n");
+        HDF_LOGE("driver requires non-wireless physical medium, but device is wireless");
         *retval = HDF_ERR_NOPERM;
     }
 
@@ -502,7 +502,7 @@ static int32_t HostRndisInitUnion(struct UsbnetHost *usbNet, int32_t *retval)
     int32_t ret = HDF_SUCCESS;
     g_u.buf = OsalMemAlloc(CONTROL_BUFFER_SIZE);
     if (!g_u.buf) {
-        HDF_LOGE("g_u.buf can't be 0\n");
+        HDF_LOGE("g_u.buf can't be 0");
         ret = HDF_ERR_MALLOC_FAIL;
     }
 
@@ -539,6 +539,7 @@ static int32_t HostRndisEnableDataTransfers(struct UsbnetHost *usbNet)
         ret = HDF_FAILURE;
     }
     OsalMemFree(g_u.buf);
+    g_u.buf = NULL;
     return ret;
 }
 
@@ -572,6 +573,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     } else if (ret == HDF_DEV_ERR_OP) {
         HDF_LOGE("%{public}s:%{public}d HostRndisInitUnion failed", __func__, __LINE__);
         OsalMemFree(g_u.buf);
+        g_u.buf = NULL;
         return ret;
     }
 

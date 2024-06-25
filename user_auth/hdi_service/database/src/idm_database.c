@@ -1220,28 +1220,26 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
 
 IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t authType)
 {
-    bool isGlobalConfigTypeExist = false;
     uint32_t infoIndex = 0;
-    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
-        if (g_globalConfigArray[i].type == param->type && g_globalConfigArray[infoIndex].authType == authType) {
-            infoIndex = i;
-            isGlobalConfigTypeExist = true;
+    for (infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
+        if (g_globalConfigArray[infoIndex].type == param->type &&
+            g_globalConfigArray[infoIndex].authType == authType) {
+            LOG_INFO("globalConfig is already exist, type:%{public}d, authType:%{public}u", param->type, authType);
             break;
         }
     }
-    if ((!isGlobalConfigTypeExist) && (g_globalConfigInfoNum >= MAX_GLOBAL_CONFIG_NUM)) {
+    if (infoIndex >= MAX_GLOBAL_CONFIG_NUM) {
         LOG_ERROR("globalConfigArray is exceed limit");
         return RESULT_EXCEED_LIMIT;
     }
-    if ((!isGlobalConfigTypeExist) && (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM)) {
-        infoIndex = g_globalConfigInfoNum;
-        g_globalConfigInfoNum++;
-        LOG_INFO("globalConfig is not exist and add the value");
-    }
-
     memset_s(&g_globalConfigArray[infoIndex], sizeof(GlobalConfigInfo), 0, sizeof(GlobalConfigInfo));
+
     switch (param->type) {
         case PIN_EXPIRED_PERIOD:
+            if (authType != PIN_AUTH) {
+                LOG_ERROR("bad authType:%{public}u for PIN_EXPIRED_PERIOD", authType);
+                return RESULT_BAD_PARAM;
+            }
             g_globalConfigArray[infoIndex].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
             break;
         case ENABLE_STATUS:
@@ -1249,9 +1247,6 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
             break;
         default:
             LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
-            if (!isGlobalConfigTypeExist) {
-                g_globalConfigInfoNum--;
-            }
             return RESULT_BAD_PARAM;
     }
     g_globalConfigArray[infoIndex].type = param->type;
@@ -1260,12 +1255,16 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
     for (uint32_t i = 0; i < param->userIdNum; i++) {
         g_globalConfigArray[infoIndex].userIds[i] = param->userIds[i];
     }
+    if (infoIndex == g_globalConfigInfoNum) {
+        g_globalConfigInfoNum++;
+    }
     return RESULT_SUCCESS;
 }
 
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 {
-    if (param == NULL) {
+    if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN ||
+        param->authTypeNum == 0) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
@@ -1338,11 +1337,12 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
 bool GetEnableStatus(int32_t userId, uint32_t authType)
 {
     for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
-        if (g_globalConfigArray[infoIndex].type != ENABLE_STATUS &&
+        if (g_globalConfigArray[infoIndex].type != ENABLE_STATUS ||
             g_globalConfigArray[infoIndex].authType != authType) {
             continue;
         }
-
+        LOG_INFO("enableStatus:%{public}d authType:%{public}u", g_globalConfigArray[infoIndex].value.enableStatus,
+            authType);
         if (userId == INVALID_USER_ID || g_globalConfigArray[infoIndex].userIdNum == 0) {
             return g_globalConfigArray[infoIndex].value.enableStatus;
         }
@@ -1351,7 +1351,8 @@ bool GetEnableStatus(int32_t userId, uint32_t authType)
                 return g_globalConfigArray[infoIndex].value.enableStatus;
             }
         }
-        return (!g_globalConfigArray[infoIndex].value.enableStatus);
+        LOG_INFO("enableStatus is not set for userId:%{public}d", userId);
+        return true;
     }
     return true;
 }

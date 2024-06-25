@@ -68,6 +68,7 @@ private:
     std::mutex wakeupMutex_;
     bool wakeupLock_ = false;
     bool activity_ = false;
+    std::mutex initAndCleanupProcessMutex_;
 
     DECLARE_DELAYED_SINGLETON(VendorInterface);
     DISALLOW_COPY_AND_MOVE(VendorInterface);

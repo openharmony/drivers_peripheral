@@ -46,6 +46,7 @@ public:
         return instance;
     }
 
+    int VendorSecureElementCaOnStart() const;
     int VendorSecureElementCaInit() const;
     int VendorSecureElementCaUninit() const;
     int VendorSecureElementCaGetAtr(uint8_t *rsp, uint32_t *rspLen) const;
@@ -98,6 +99,7 @@ private:
     using VendorSecureElementCaOpenBasicChannelT = int (*)(uint8_t *aid, uint32_t len, uint8_t *rsp, uint32_t *rspLen);
     using VendorSecureElementCaCloseChannelT = int (*)(uint32_t channelNum);
     using VendorSecureElementCaTransmitT = int (*)(uint8_t *cmd, uint32_t cmdLen, uint8_t *rsp, uint32_t *rspLen);
+    using VendorSecureElementCaOnStartT = int (*)(void);
     const char *const LIB_NAME = "libsecure_element_ca.z.so";
     const char *const CA_INIT_SYMBOL = "VendorSecureElementCaInit";
     const char *const CA_UNINIT_SYMBOL = "VendorSecureElementCaUninit";
@@ -106,10 +108,12 @@ private:
     const char *const CA_OPEN_BASIC_SYMBOL = "VendorSecureElementCaOpenBasicChannel";
     const char *const CA_CLOSE_SYMBOL = "VendorSecureElementCaCloseChannel";
     const char *const CA_TRANS_SYMBOL = "VendorSecureElementCaTransmit";
+    const char *const CA_ON_START_SYMBOL = "VendorSecureElementOnStart";
 
     SecureElementCaProxy();
 
     void InitFunc();
+    VendorSecureElementCaOnStartT vendorSecureElementCaOnStartFunc_{nullptr};
     VendorSecureElementCaInitT vendorSecureElementCaInitFunc_{nullptr};
     VendorSecureElementCaUninitT vendorSecureElementCaUninitFunc_{nullptr};
     VendorSecureElementCaGetAtrT vendorSecureElementCaGetAtrFunc_{nullptr};

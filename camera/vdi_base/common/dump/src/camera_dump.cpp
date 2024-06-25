@@ -129,7 +129,6 @@ bool CameraDumper::DumpBuffer(std::string name, std::string type, const std::sha
     if (!IsDumpOpened(OpenType) || !IsDumpCommandOpened(type) || (buffer == nullptr)) {
         return false;
     }
-
     uint32_t defaultWidth = (width == 0) ? buffer->GetCurWidth() : width;
     uint32_t defaultHeight = (height == 0) ? buffer->GetCurHeight() : height;
     void* srcAddr = buffer->GetIsValidDataInSurfaceBuffer() ? buffer->GetSuffaceBufferAddr() : buffer->GetVirAddress();
@@ -390,7 +389,7 @@ void CameraDumper::StartCheckDiskInfo()
         terminate_ = false;
     }
 
-    handleThread_ = std::make_unique<std::thread>(&CameraDumper::ThreadWorkFun, this);
+    handleThread_ = std::make_unique<std::thread>([this] { this->ThreadWorkFun(); });
 }
 
 void CameraDumper::StopCheckDiskInfo()

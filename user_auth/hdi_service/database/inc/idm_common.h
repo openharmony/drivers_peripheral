@@ -88,10 +88,10 @@ typedef struct {
 
 typedef struct {
     int32_t type;
-    uint32_t authType;
     union GlobalConfigValueHal value;
     int32_t userIds[MAX_USER];
     uint32_t userIdNum;
+    uint32_t authType;
 } GlobalConfigInfo;
 
 typedef struct {

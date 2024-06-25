@@ -129,7 +129,6 @@ void Test::OpenSecureCamera(int cameraId)
     }
 }
 
-
 void Test::GetCameraMetadata(int cameraId)
 {
     if (DEVICE_1 == cameraId) {

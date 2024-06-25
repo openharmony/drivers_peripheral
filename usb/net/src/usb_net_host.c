@@ -54,14 +54,14 @@ static int printf_char_buffer(char *buff, int size, bool isPrint)
 {
     if (isPrint) {
         int i = 0;
-        HDF_LOGI("===-harch-=== printf_char_buffer begin\n");
+        HDF_LOGI("===-harch-=== printf_char_buffer begin");
         for (i = 0; i < size; i++) {
             HDF_LOGI("%{public}02x ", buff[i]);
             if ((i + 1) % PRINT_LINE_MAX == 0) {
                 HDF_LOGI("");
             }
         }
-        HDF_LOGI("===-harch-=== printf_char_buffer end\n");
+        HDF_LOGI("===-harch-=== printf_char_buffer end");
     }
     return 0;
 }
@@ -458,7 +458,7 @@ static int32_t UsbnetHostAllocStatusRequests(struct UsbnetHost *usbNet)
 
     usbNet->statusReq = UsbRawAllocRequest(usbNet->devHandle, 0, size);
     if (!usbNet->statusReq) {
-        HDF_LOGE("statusReq request fail\n");
+        HDF_LOGE("statusReq request fail");
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -564,7 +564,7 @@ static int32_t UsbnetHostAllocReadRequests(struct UsbnetHost *usbNet)
         HARCH_INFO_PRINT("UsbRawAllocRequest read num = %{public}d", i);
         usbNet->readReq[i] = UsbRawAllocRequest(usbNet->devHandle, 0, size);
         if (!usbNet->readReq[i]) {
-            HDF_LOGE("readReq request failed\n");
+            HDF_LOGE("readReq request failed");
             return HDF_ERR_MALLOC_FAIL;
         }
 
@@ -578,7 +578,7 @@ static int32_t UsbnetHostAllocReadRequests(struct UsbnetHost *usbNet)
         HARCH_INFO_PRINT("UsbRawFillBulkRequest read num = %{public}d", i);
         int32_t ret = UsbRawFillBulkRequest(usbNet->readReq[i], usbNet->devHandle, &reqData);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: FillBulkRequest failed, ret=%{public}d\n", __func__, ret);
+            HDF_LOGE("%{public}s: FillBulkRequest failed, ret=%{public}d", __func__, ret);
             return HDF_FAILURE;
         }
     }
@@ -895,7 +895,7 @@ static int32_t UsbnetHostGetConfigDescriptor(UsbRawHandle *devHandle, struct Usb
 
     ret = UsbRawGetConfigDescriptor(dev, activeConfig, config);
     if (ret) {
-        HDF_LOGE("UsbRawGetConfigDescriptor failed, ret = %{public}d\n", ret);
+        HDF_LOGE("UsbRawGetConfigDescriptor failed, ret = %{public}d", ret);
         return HDF_FAILURE;
     }
 

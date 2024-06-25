@@ -23,3 +23,17 @@ group("hdi_audio_bluetooth") {
     "hal/hdi_passthrough:hdi_audio_bluetooth",
   ]
 }
+
+config("hdi_audio_bluetooth_header_config") {
+  include_dirs = [
+    "interfaces/include",
+    "hal/hdi_binder/proxy/include",
+  ]
+}
+
+ohos_static_library("hdi_audio_bluetooth_header") {
+  public_configs = [ ":hdi_audio_bluetooth_header_config" ]
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_bluetooth"
+}

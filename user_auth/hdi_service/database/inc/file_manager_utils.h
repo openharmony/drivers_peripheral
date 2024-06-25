@@ -13,15 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef FILE_MANAGER_UTILS
-#define FILE_MANAGER_UTILS
+#ifndef FILE_MANAGER_UTILS_H
+#define FILE_MANAGER_UTILS_H
 
-#include <stdint.h>
-#include "securec.h"
-
-#include "adaptor_file.h"
-#include "adaptor_log.h"
-#include "adaptor_memory.h"
 #include "buffer.h"
 
 #ifdef __cplusplus
@@ -35,4 +29,4 @@ ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t size);
 }
 #endif
 
-#endif // FILE_MANAGER_UTILS
+#endif // FILE_MANAGER_UTILS_H

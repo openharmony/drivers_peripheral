@@ -89,6 +89,7 @@ bool VendorInterface::Initialize(
     InitializeCompleteCallback initializeCompleteCallback, const ReceiveCallback &receiveCallback)
 {
     HDF_LOGI("VendorInterface %{public}s, ", __func__);
+    std::lock_guard<std::mutex> lock(initAndCleanupProcessMutex_);
     initializeCompleteCallback_ = initializeCompleteCallback;
     eventDataCallback_ = receiveCallback.onEventReceive;
 
@@ -132,6 +133,10 @@ bool VendorInterface::Initialize(
         return false;
     }
 
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("vendorInterface_ is nullptr");
+        return false;
+    }
     vendorInterface_->op(BtOpcodeT::BT_OP_INIT, nullptr);
 
     return true;
@@ -139,6 +144,7 @@ bool VendorInterface::Initialize(
 
 void VendorInterface::CleanUp()
 {
+    std::lock_guard<std::mutex> lock(initAndCleanupProcessMutex_);
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("VendorInterface::CleanUp, vendorInterface_ is nullptr.");
         return;

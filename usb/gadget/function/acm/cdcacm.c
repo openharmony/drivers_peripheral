@@ -223,7 +223,7 @@ static int32_t SpeedReadThread(void *arg)
     }
     timeUse = (double)(g_readTimeEnd.tv_sec - g_readTimeStart.tv_sec) + (double)g_readTimeEnd.tv_usec / usec -
         (double)g_readTimeStart.tv_usec / usec;
-    HDF_LOGD("timeUse = %{public}lf\n", timeUse);
+    HDF_LOGD("timeUse = %{public}lf", timeUse);
     g_readSpeed = (float)((double)g_readCnt / k / k / timeUse);
     HDF_LOGD("%{public}s: g_speed = %{public}f MB/s", __func__, g_readSpeed);
     return HDF_SUCCESS;
@@ -515,6 +515,7 @@ static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
             }
             if (g_isWriteDone) {
                 UsbFnFreeRequest(req);
+                req = NULL;
             } else {
                 if (memset_s(req->buf, req->length, 'a', req->length) != EOK) {
                     HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
@@ -575,7 +576,7 @@ static int32_t SpeedThread(void *arg)
     }
     timeUse = (double)(g_timeEnd.tv_sec - g_timeStart.tv_sec) + (double)g_timeEnd.tv_usec / usec -
         (double)g_timeStart.tv_usec / usec;
-    HDF_LOGE("timeUse = %{public}lf\n", timeUse);
+    HDF_LOGE("timeUse = %{public}lf", timeUse);
     g_speed = (float)((double)g_writeCnt / k / k / timeUse);
     HDF_LOGD("%{public}s: g_speed = %{public}f MB/s", __func__, g_speed);
     return HDF_SUCCESS;
@@ -1277,7 +1278,7 @@ static int32_t AcmNotifySerialState(struct UsbAcmDevice *acm)
     uint16_t serialState;
 
     if (acm->notifyReq) {
-        HDF_LOGI("acm serial state %{public}04x\n", acm->serialState);
+        HDF_LOGI("acm serial state %{public}04x", acm->serialState);
         serialState = CPU_TO_LE16(acm->serialState);
         ret = AcmSendNotifyRequest(acm, USB_DDK_CDC_NOTIFY_SERIAL_STATE, 0, &serialState, sizeof(acm->serialState));
     } else {

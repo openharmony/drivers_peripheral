@@ -205,8 +205,8 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
     int32_t ret;
-    priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc
-    (sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
+    priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
+        sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
     CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
 
     priv->vdiDescsCount = *descsLen;
