@@ -26,6 +26,9 @@ extern "C" {
 
 namespace OHOS::Camera {
 using namespace std;
+
+const int32_t INVALID_ARGUMENT = -1;
+
 static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
 {
     static map<uint32_t, enum AVPixelFormat> ohosFormat2AVPixelFormatMap = {
@@ -63,13 +66,13 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     AVFrame *pFrameSrc = av_frame_alloc();
     if (pFrameSrc == nullptr) {
         CAMERA_LOGE("ImageFormatConvert Error pFrameSrc == nullptr");
-        return OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT;
+        return INVALID_ARGUMENT;
     }
     AVFrame *pFrameDst = av_frame_alloc();
     if (pFrameDst == nullptr) {
         CAMERA_LOGE("ImageFormatConvert Error pFrameDst == nullptr");
         av_frame_free(&pFrameSrc);
-        return OHOS::HDI::Camera::V1_0::INVALID_ARGUMENT;
+        return INVALID_ARGUMENT;
     }
 
     av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, static_cast<uint8_t *>(srcBufferInfo.bufferAddr),
