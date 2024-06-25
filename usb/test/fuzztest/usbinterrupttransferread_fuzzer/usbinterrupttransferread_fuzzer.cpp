@@ -44,7 +44,7 @@ bool UsbInterruptTransferReadFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    int32_t timeout = *(reinterpret_cast<int32_t *>(*data + OFFSET));
+    int32_t timeout = *(reinterpret_cast<int32_t *>(*(data + OFFSET)));
     ret = usbInterface->InterruptTransferRead(
         dev, pipe, timeout, reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET_BYTE));
     if (ret == HDF_SUCCESS) {
