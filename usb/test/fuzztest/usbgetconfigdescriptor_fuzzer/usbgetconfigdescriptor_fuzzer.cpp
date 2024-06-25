@@ -22,6 +22,8 @@
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
+constexpr size_t THRESHOLD = 10;
+constexpr int32_t OFFSET = 4;
 namespace USB {
 bool UsbGetConfigDescriptorFuzzTest(const uint8_t *data, size_t size)
 {
@@ -34,7 +36,7 @@ bool UsbGetConfigDescriptorFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    ret = usbInterface->GetConfigDescriptor(dev, *data, reinterpret_cast<std::vector<uint8_t> &>(data));
+    ret = usbInterface->GetConfigDescriptor(dev, *data, reinterpret_cast<std::vector<uint8_t> &>(data + OFFSET));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: get config descriptor succeed", __func__);
     }
@@ -51,6 +53,9 @@ bool UsbGetConfigDescriptorFuzzTest(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (size < OHOS::THRESHOLD) {
+        return 0;
+    }
     OHOS::USB::UsbGetConfigDescriptorFuzzTest(data, size);
     return 0;
 }
