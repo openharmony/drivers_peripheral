@@ -539,6 +539,7 @@ static int32_t HostRndisEnableDataTransfers(struct UsbnetHost *usbNet)
         ret = HDF_FAILURE;
     }
     OsalMemFree(g_u.buf);
+    g_u.buf = NULL;
     return ret;
 }
 
@@ -572,6 +573,7 @@ static int32_t HostRndisBind(struct UsbnetHost *usbNet)
     } else if (ret == HDF_DEV_ERR_OP) {
         HDF_LOGE("%{public}s:%{public}d HostRndisInitUnion failed", __func__, __LINE__);
         OsalMemFree(g_u.buf);
+        g_u.buf = NULL;
         return ret;
     }
 
