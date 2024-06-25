@@ -1403,7 +1403,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
         cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
         cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
         cameraTest->imageDataSaveSwitch = SWITCH_OFF;
-    }    
+    }
 }
 
 /**
