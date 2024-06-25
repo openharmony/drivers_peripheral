@@ -1384,8 +1384,9 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
 
         cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
         EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-        cameraTest->rc = cameraTest->streamOperator_V1_3->
-            CommitStreams(OperationMode::LIGHT_PAINTING, cameraTest->abilityVec);
+        cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+            static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::LIGHT_PAINTING),
+            cameraTest->abilityVec);
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
         std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
@@ -1438,7 +1439,9 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
 
     cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
-    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams(OperationMode::LIGHT_PAINTING, cameraTest->abilityVec);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams_V1_1(
+        static_cast<OHOS::HDI::Camera::V1_1::OperationMode_V1_1>(OHOS::HDI::Camera::V1_3::LIGHT_PAINTING),
+        cameraTest->abilityVec);
     EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
 
     std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
