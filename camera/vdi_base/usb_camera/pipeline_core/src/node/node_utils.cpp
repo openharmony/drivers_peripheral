@@ -14,7 +14,6 @@
 #include "node_utils.h"
 #include "map"
 #include "camera.h"
-#include "camera_device_service_callback.h"
 extern "C" {
 #ifdef DEVICE_USAGE_FFMPEG_ENABLE
 #include "libavutil/frame.h"
@@ -53,7 +52,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     if (srcAVFmt == AV_PIX_FMT_NONE || dstAVFmt == AV_PIX_FMT_NONE) {
         CAMERA_LOGE("NodeUtils::ImageFormatConvert err, id = %{public}d, unsupport format: %{public}d -> %{public}d",
             id, srcBufferInfo.format, dstBufferInfo.format);
-        return -1;
+        return INVALID_ARGUMENT;
     }
     CAMERA_LOGI("NodeUtils::ImageFormatConvert Start ====== id = %{public}d", id);
     CAMERA_LOGI("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
