@@ -74,9 +74,9 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
         return INVALID_ARGUMENT;
     }
 
-    av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, static_cast<uint8_t *>(srcBufferInfo.bufferAddr),
+    av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, (uint8_t *)srcBufferInfo.bufferAddr,
         srcAVFmt, srcBufferInfo.width, srcBufferInfo.height, 1);
-    av_image_fill_arrays(pFrameDst->data, pFrameDst->linesize, static_cast<uint8_t *>(dstBufferInfo.bufferAddr),
+    av_image_fill_arrays(pFrameDst->data, pFrameDst->linesize, (uint8_t *)dstBufferInfo.bufferAddr,
         dstAVFmt, dstBufferInfo.width, dstBufferInfo.height, 1);
 
     struct SwsContext* imgCtx = sws_getContext(
