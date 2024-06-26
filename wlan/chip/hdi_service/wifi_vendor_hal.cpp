@@ -134,7 +134,7 @@ void WifiVendorHal::OnAsyncRssiReport(int32_t index, int32_t c0Rssi, int32_t c1R
     HDF_LOGD("OnAsyncRssiReport::OnRssiReport");
     for (const auto& callback : vendorHalCbHandler_.GetCallbacks()) {
         if (callback) {
-            callback->OnRssiReport(event);
+            callback->OnRssiReport(index, c0Rssi, c1Rssi);
         }
     }
 }
