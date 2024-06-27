@@ -38,5 +38,9 @@ int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttribut
     struct AudioSampleAttributesVdi *vdiAttrs);
 int32_t AudioCommonVdiSampleAttrToSampleAttrVdi(const struct AudioSampleAttributesVdi *vdiAttrs,
     struct AudioSampleAttributes *attrs);
+int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameLen,
+    struct AudioCaptureFrameInfoVdi *frameInfoVdi);
+int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *frameInfoVdi,
+    struct AudioCaptureFrameInfo *frameInfo);
 
 #endif // AUDIO_COMMON_VDI_H
