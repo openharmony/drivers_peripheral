@@ -23,6 +23,7 @@
 #include <string>
 
 #include "iam_logger.h"
+#include "iam_para2str.h"
 #include "iam_ptr.h"
 
 #include "adaptor_time.h"
@@ -614,7 +615,9 @@ static int32_t CopyAuthResult(AuthResult &infoIn, UserAuthTokenHal &authTokenIn,
     infoOut.pinExpiredInfo = infoIn.pinExpiredInfo;
     if (infoOut.result == RESULT_SUCCESS) {
         infoOut.userId = infoIn.userId;
-        IAM_LOGI("matched userId: %{public}d.", infoOut.userId);
+        infoOut.credentialId = infoIn.credentialId;
+        IAM_LOGI("matched userId: %{public}d, credentialId: %{public}s.",
+            infoOut.userId, GET_MASKED_STRING(infoOut.credentialId).c_str());
         infoOut.token.resize(sizeof(UserAuthTokenHal));
         if (memcpy_s(infoOut.token.data(), infoOut.token.size(), &authTokenIn, sizeof(UserAuthTokenHal)) != EOK) {
                 IAM_LOGE("copy authToken failed");

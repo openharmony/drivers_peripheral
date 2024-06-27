@@ -78,10 +78,12 @@ IAM_STATIC void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *un
     g_unlockAuthResult.authToken = *unlockToken;
 }
 
-IAM_STATIC void SetAuthResult(int32_t userId, uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
+IAM_STATIC void SetAuthResult(uint64_t credentialId,
+    const UserAuthContext *context, const ExecutorResultInfo *info, AuthResult *result)
 {
-    result->userId = userId;
-    result->authType = authType;
+    result->credentialId = credentialId;
+    result->userId = context->userId;
+    result->authType = context->authType;
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;
     result->result = info->result;
@@ -224,7 +226,6 @@ IAM_STATIC ResultCode RequestAuthResultFuncInner(UserAuthContext *userAuthContex
     ExecutorResultInfo *executorResultInfo, UserAuthTokenHal *authToken, AuthResult *result)
 {
     ResultCode ret = RESULT_SUCCESS;
-    SetAuthResult(userAuthContext->userId, userAuthContext->authType, executorResultInfo, result);
     Uint8Array collectorUdid = { userAuthContext->collectorUdid, sizeof(userAuthContext->collectorUdid) };
     if (!IsLocalUdid(collectorUdid)) {
         ret = GenerateRemoteAuthResultMsg(result, executorResultInfo->scheduleId, collectorUdid, authToken);
@@ -281,6 +282,7 @@ ResultCode RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResul
             goto EXIT;
         }
     }
+    SetAuthResult(credentialId, userAuthContext, executorResultInfo, result);
     if (RequestAuthResultFuncInner(userAuthContext, executorResultInfo, authToken, result) != RESULT_SUCCESS) {
         LOG_ERROR("RequestAuthResultFuncInner failed");
         goto EXIT;
