@@ -46,7 +46,7 @@ void InputDeviceManager::Init()
     inputDevList_.clear();
     reportEventPkgCallback_.clear();
     GetInputDeviceInfoList();
-    std::thread t1(std::bind(&InputDeviceManager::WorkerThread, this));
+    std::thread t1([this] {this->WorkerThread();});
     std::string wholeName1 = std::to_string(getpid()) + "_" + std::to_string(gettid());
     thread_ = std::move(t1);
     thread_.detach();
