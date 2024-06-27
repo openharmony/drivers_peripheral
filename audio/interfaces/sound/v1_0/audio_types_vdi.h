@@ -349,7 +349,7 @@ struct AudioSampleAttributesVdi {
     int32_t streamId;
     int32_t sourceType;
     struct AudioOffloadInfoVdi offloadInfo;
-    struct EcSampleAttributesVdi EcSampleAttributes;
+    struct EcSampleAttributesVdi ecSampleAttributes;
 } __attribute__ ((aligned(8)));
 
 struct AudioTimeStampVdi {
