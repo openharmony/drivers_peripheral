@@ -87,6 +87,42 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     return HDF_SUCCESS;
 }
 
+int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct AudioFrameLen *frameLen,
+    struct AudioCaptureFrameInfo *frameInfo)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
+
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrameEc, HDF_ERR_INVALID_PARAM);
+    struct AudioCaptureFrameInfoVdi frameInfoVdi;
+    (void)memset_s((void *)&frameInfoVdi, sizeof(frameInfoVdi), 0, sizeof(frameInfoVdi));
+    int32_t ret = AudioCommonFrameInfoToVdiFrameInfoVdi(frameLen, &frameInfoVdi);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture FrameInfo To VdiFrameInfo fail");
+        return ret;
+    }
+
+    HdfAudioStartTrace("Hdi:AudioCaptureFrameEcVdi", 0);
+    ret = vdiCapture->CaptureFrameEc(vdiCapture, &frameInfoVdi);
+    HdfAudioFinishTrace();
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture EC frame fail, ret=%{public}d", ret);
+        return ret;
+    }
+
+    ret = AudioCommonVdiFrameInfoToFrameInfoVdi(&frameInfoVdi, frameInfo);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture VdiFrameInfo To FrameInfo fail");
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t AudioGetCapturePositionVdi(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
@@ -707,6 +743,7 @@ int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, b
 static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioCaptureFrameVdi;
+    capture->CaptureFrameEc = AudioCaptureFrameEcVdi;
     capture->GetCapturePosition = AudioGetCapturePositionVdi;
     capture->CheckSceneCapability = AudioCaptureCheckSceneCapabilityVdi;
     capture->SelectScene = AudioCaptureSelectSceneVdi;
