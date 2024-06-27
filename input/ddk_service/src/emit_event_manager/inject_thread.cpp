@@ -38,7 +38,7 @@ InjectThread::~InjectThread()
 
 void InjectThread::Start()
 {
-    thread_ = std::thread([this] {this->RunThread(this);});;
+    thread_ = std::thread([this] {this->RunThread(this);});
     pthread_setname_np(thread_.native_handle(), "emitEvent");
 }
 
