@@ -136,7 +136,6 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
         HDF_LOGE("%{public}s:gnssMeasurementInfo is nullptr.", __func__);
         return;
     }
-    HDF_LOGI("%{public}s:GnssMeasurementUpdate.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo gnssMeasurementInfoNew;
     SetGnssClock(&gnssMeasurementInfoNew, gnssMeasurementInfo);
