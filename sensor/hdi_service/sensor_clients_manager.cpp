@@ -462,7 +462,7 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
     }
     for (auto it = services.begin(); it != services.end(); ++it) {
         int32_t serviceId = *it;
-        const sptr<ISensorCallback> callback;
+        sptr<ISensorCallback> callback;
         {
             std::unique_lock<std::mutex> lock(clientsMutex_);
             if (clients_.find(groupId)->second.find(serviceId) == clients_.find(groupId)->second.end()) {
