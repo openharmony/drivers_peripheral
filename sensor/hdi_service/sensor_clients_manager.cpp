@@ -460,7 +460,6 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
             return result;
         }
     }
-    std::unordered_map<int, SensorClientInfo> &sensorClientInfos = clients_.find(groupId)->second;
     for (auto it = services.begin(); it != services.end(); ++it) {
         int32_t serviceId = *it;
         const sptr<ISensorCallback> callback;
