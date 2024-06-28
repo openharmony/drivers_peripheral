@@ -452,26 +452,32 @@ std::string SensorClientsManager::ReportEachClient(const V2_0::HdfSensorEvents& 
     std::string result = "services=";
     int32_t sensorId = event.sensorId;
     const std::set<int32_t> services = GetServiceIds(sensorId);
-    std::unique_lock<std::mutex> lock(clientsMutex_);
     int32_t groupId = HDF_TRADITIONAL_SENSOR_TYPE;
-    if (clients_.find(groupId) == clients_.end() || clients_.find(groupId)->second.empty()) {
-        HDF_LOGE("%{public}s groupId %{public}d is not enabled by anyone", __func__, sensorId);
-        return result;
+    {
+        std::unique_lock<std::mutex> lock(clientsMutex_);
+        if (clients_.find(groupId) == clients_.end() || clients_.find(groupId)->second.empty()) {
+            HDF_LOGE("%{public}s groupId %{public}d is not enabled by anyone", __func__, sensorId);
+            return result;
+        }
     }
     std::unordered_map<int, SensorClientInfo> &sensorClientInfos = clients_.find(groupId)->second;
     for (auto it = services.begin(); it != services.end(); ++it) {
         int32_t serviceId = *it;
-        if (sensorClientInfos.find(serviceId) == sensorClientInfos.end()) {
-            continue;
-        }
-        SensorClientInfo &sensorClientInfo = sensorClientInfos.find(serviceId)->second;
-        if (IsNotNeedReportData(sensorClientInfo, sensorId, serviceId)) {
-            continue;
-        }
-        const sptr<ISensorCallback> &callback = sensorClientInfo.GetReportDataCb();
-        if (callback == nullptr) {
-            HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
-            continue;
+        const sptr<ISensorCallback> &callback;
+        {
+            std::unique_lock<std::mutex> lock(clientsMutex_);
+            if (clients_.find(groupId)->second.find(serviceId) == clients_.find(groupId)->second.end()) {
+                continue;
+            }
+            SensorClientInfo &sensorClientInfo = clients_.find(groupId)->second.find(serviceId)->second;
+            if (IsNotNeedReportData(sensorClientInfo, sensorId, serviceId)) {
+                continue;
+            }
+            callback = sensorClientInfo.GetReportDataCb();
+            if (callback == nullptr) {
+                HDF_LOGD("%{public}s the callback of %{public}d is nullptr", __func__, serviceId);
+                continue;
+            }
         }
         SENSOR_TRACE_MSG("serviceId=" + std::to_string(serviceId) + ",sensorId=" + std::to_string(event.sensorId));
         int32_t ret = callback->OnDataEvent(event);
