@@ -24,6 +24,7 @@
 #include "codec_jpeg_service.h"
 
 constexpr uint32_t CODEC_IMAGE_MAX_BUFFER_SIZE = 50 * 1024 *1024;
+constexpr uint32_t CODEC_IMAGE_TIMEOUT_SECONDS = 20;
 namespace OHOS {
 namespace HDI {
 namespace Codec {

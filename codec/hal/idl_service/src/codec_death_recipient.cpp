@@ -31,24 +31,21 @@ static std::mutex g_mutex;
 
 void CleanResourceOfDiedService(sptr<IRemoteObject> object, wptr<CodecComponentManagerService> managerService)
 {
-    std::unique_lock<std::mutex> lk(g_mutex, std::defer_lock);
-
-    lk.lock();
-    auto remoteComps = g_remoteCompsMap.find(object.GetRefPtr());
-    if (remoteComps == g_remoteCompsMap.end()) {
-        CODEC_LOGE("can not find remote service in g_remoteCompsMap!");
-        lk.unlock();
-        return;
+    std::set<uint32_t> compIds {};
+    {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        auto remoteComps = g_remoteCompsMap.find(object.GetRefPtr());
+        if (remoteComps == g_remoteCompsMap.end()) {
+            CODEC_LOGE("can not find remote service in g_remoteCompsMap!");
+            return;
+        }
+        compIds = remoteComps->second;
+        g_remoteCompsMap.erase(remoteComps);
     }
-    lk.unlock();
 
-    std::set<uint32_t> compIds = remoteComps->second;
     for (auto id = compIds.begin(); id != compIds.end(); id++) {
         managerService->DestroyComponent(*id);
     }
-    lk.lock();
-    g_remoteCompsMap.erase(remoteComps);
-    lk.unlock();
     CODEC_LOGI("Clean died remoteService resource success!");
 }
 
@@ -96,6 +93,9 @@ void RemoveMapperOfDestoryedComponent(uint32_t componentId)
         return;
     }
     remoteComps->second.erase(componentId);
+    if (remoteComps->second.empty()) {
+        g_remoteCompsMap.erase(remoteComps);
+    }
     g_compRemoteMap.erase(compRemote);
 
     auto deathReci = g_deathReciMap.find(remote);
