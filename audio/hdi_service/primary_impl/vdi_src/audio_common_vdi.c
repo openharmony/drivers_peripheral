@@ -481,6 +481,7 @@ int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameL
     }
     frameInfoVdi->frameEc = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameLen->frameEcLen));
     if (frameInfoVdi->frameEc == NULL) {
+        OsalMemFree((void *)frameInfoVdi->frame);
         AUDIO_FUNC_LOGE("frameInfoVdi->frameEc null");
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -504,8 +505,6 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     int32_t ret = memcpy_s(frameInfo->frame, (size_t)frameInfo->frameLen, frameInfoVdi->frame,
         (size_t)frameInfoVdi->frameLen);
     if (ret != HDF_SUCCESS) {
-        OsalMemFree((void *)frameInfoVdi->frame);
-        OsalMemFree((void *)frameInfoVdi->frameEc);
         AUDIO_FUNC_LOGE("memcpy_s frame fail");
         return HDF_FAILURE;
     }
@@ -518,15 +517,11 @@ int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *f
     ret = memcpy_s(frameInfo->frameEc, (size_t)frameInfo->frameEcLen, frameInfoVdi->frameEc,
         (size_t)frameInfoVdi->frameEcLen);
     if (ret != HDF_SUCCESS) {
-        OsalMemFree((void *)frameInfoVdi->frame);
-        OsalMemFree((void *)frameInfoVdi->frameEc);
         AUDIO_FUNC_LOGE("memcpy_s frameEc fail");
         return HDF_FAILURE;
     }
     frameInfo->replyBytes = frameInfoVdi->replyBytes;
     frameInfo->replyBytesEc = frameInfoVdi->replyBytesEc;
-    OsalMemFree((void *)frameInfoVdi->frame);
-    OsalMemFree((void *)frameInfoVdi->frameEc);
 
     return HDF_SUCCESS;
 }
