@@ -43,7 +43,7 @@
 
             ],
             "test":[
-                "//drivers/peripheral/distributed_camera/hdi_service//test/fuzztest:hdf_dcamera_fuzztest",
+                "//drivers/peripheral/distributed_camera/hdi_service/test/fuzztest:hdf_dcamera_fuzztest",
                 "//drivers/peripheral/distributed_camera/hdi_service/test/sample:dcamera_hdf_demo",
                 "//drivers/peripheral/distributed_camera/hdi_service/test/unittest:hdf_service_test"
             ]
