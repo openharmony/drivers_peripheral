@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,7 @@ DCamRetCode DCameraStream::GetDCameraStreamInfo(shared_ptr<StreamInfo> &info)
 
 DCamRetCode DCameraStream::SetDCameraBufferQueue(const OHOS::sptr<BufferProducerSequenceable> &producer)
 {
+    CHECK_AND_RETURN_RET_LOG(dcStreamInfo_ == nullptr, DCamRetCode::FAILED, "dcStreamInfo_ is nullptr");
     if (dcStreamInfo_->bufferQueue_) {
         DHLOGE("Stream [%{public}d] has already have bufferQueue.", dcStreamId_);
         return DCamRetCode::SUCCESS;
@@ -121,10 +122,10 @@ DCamRetCode DCameraStream::ReleaseDCameraBufferQueue()
     }
 
     std::lock_guard<std::mutex> lockBuffer(bufferQueueMutex_);
-    if (dcStreamInfo_->bufferQueue_ != nullptr) {
+    if (dcStreamInfo_ != nullptr && dcStreamInfo_->bufferQueue_ != nullptr) {
         dcStreamInfo_->bufferQueue_->producer_ = nullptr;
+        dcStreamInfo_->bufferQueue_ = nullptr;
     }
-    dcStreamInfo_->bufferQueue_ = nullptr;
     if (dcStreamProducer_ != nullptr) {
         dcStreamProducer_->CleanCache();
         dcStreamProducer_ = nullptr;
@@ -186,6 +187,7 @@ DCamRetCode DCameraStream::GetNextRequest()
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = nullptr;
     OHOS::sptr<OHOS::SyncFence> syncFence = nullptr;
     int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
+    CHECK_AND_RETURN_RET_LOG(dcStreamInfo_ == nullptr, DCamRetCode::INVALID_ARGUMENT, "dcStreamInfo_ is nullptr");
     OHOS::BufferRequestConfig config = {
         .width = dcStreamInfo_->width_,
         .height = dcStreamInfo_->height_,
@@ -200,6 +202,8 @@ DCamRetCode DCameraStream::GetNextRequest()
         config.height = 1;
         config.format = GraphicPixelFormat::GRAPHIC_PIXEL_FMT_BLOB;
     }
+    CHECK_AND_RETURN_RET_LOG(
+        dcStreamProducer_ == nullptr, DCamRetCode::INVALID_ARGUMENT, "dcStreamProducer_ is nullptr");
     OHOS::SurfaceError surfaceError = dcStreamProducer_->RequestBuffer(surfaceBuffer, syncFence, config);
     if (surfaceError == OHOS::SURFACE_ERROR_NO_BUFFER) {
         DHLOGE("No available buffer to request in surface.");
@@ -227,6 +231,8 @@ DCamRetCode DCameraStream::SurfaceBufferToDImageBuffer(OHOS::sptr<OHOS::SurfaceB
 
     imageBuffer->SetIndex(++index_);
     imageBuffer->SetSyncFence(syncFence);
+    CHECK_AND_RETURN_RET_LOG(
+        dcStreamBufferMgr_ == nullptr, DCamRetCode::INVALID_ARGUMENT, "dcStreamBufferMgr_ is nullptr");
     ret = dcStreamBufferMgr_->AddBuffer(imageBuffer);
     if (ret != RC_OK) {
         DHLOGE("Add buffer to buffer manager failed. [streamId = %{public}d]", dcStreamInfo_->streamId_);
