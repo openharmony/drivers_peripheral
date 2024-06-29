@@ -118,9 +118,6 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
 
-    AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc);
-    AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
-
     pthread_mutex_lock(&g_adapterMutex);
     *render = FindRenderCreated(desc->pins, attrs, renderId);
     if (*render != NULL) {
@@ -128,6 +125,9 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         pthread_mutex_unlock(&g_adapterMutex);
         return HDF_SUCCESS;
     }
+    AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc);
+    AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
+
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
