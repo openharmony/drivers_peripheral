@@ -546,8 +546,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
     }
 
     if (request->length > MAX_BULK_DATA_BUFFER_LENGTH) {
-        HDF_LOGE("request->length greater than the maximum");
-        return HDF_FAILURE;
+        HDF_LOGW("request->length greater than the maximum");
     }
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {

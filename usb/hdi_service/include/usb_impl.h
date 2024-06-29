@@ -115,6 +115,8 @@ private:
     static int32_t ReOpenDevice(HostDevice *port);
     int32_t UsbdFindRequestSyncAndCreat(
         HostDevice *port, uint8_t interfaceId, uint8_t pipeAddr, UsbdRequestSync **request);
+    int32_t UsbdFindRequestSyncAndCreatwithLength(HostDevice *port, uint8_t interfaceId,
+        uint8_t pipeAddr, int32_t length, UsbdRequestSync **request);
     int32_t UsbdBulkReadSyncBase(
         int32_t timeout, uint8_t *buffer, uint32_t size, uint32_t *actlength, UsbdRequestSync *requestSync);
     int32_t UsbdBulkWriteSyncBase(
