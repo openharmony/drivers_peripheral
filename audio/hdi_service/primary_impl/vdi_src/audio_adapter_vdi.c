@@ -113,12 +113,6 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
     CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
-    *render = FindRenderCreated(desc->pins, attrs, renderId);
-    if (*render != NULL) {
-        AUDIO_FUNC_LOGE("already created");
-        return HDF_SUCCESS;
-    }
-
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
@@ -128,6 +122,12 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
     pthread_mutex_lock(&g_adapterMutex);
+    *render = FindRenderCreated(desc->pins, attrs, renderId);
+    if (*render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_SUCCESS;
+    }
     int32_t ret = vdiAdapter->CreateRender(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiRender);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -163,10 +163,14 @@ int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t renderId)
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
 
-    struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
-
     pthread_mutex_lock(&g_adapterMutex);
+    struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
+    if (vdiRender == NULL) {
+        AUDIO_FUNC_LOGE("vdiRender pointer is null");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
     int32_t ret = vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
     if (ret != HDF_SUCCESS) {
