@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,6 +81,7 @@ RetCode DBufferManager::SurfaceBufferToDImageBuffer(const OHOS::sptr<OHOS::Surfa
         return RC_ERROR;
     }
 
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, RC_ERROR, "buffer is nullptr");
     buffer->SetPhyAddress(bufHandle->phyAddr);
     buffer->SetFileDescriptor(bufHandle->fd);
     buffer->SetStride(bufHandle->stride);
@@ -142,6 +143,7 @@ uint32_t DBufferManager::PixelFormatToDCameraFormat(const PixelFormat format)
 RetCode DBufferManager::DImageBufferToDCameraBuffer(const std::shared_ptr<DImageBuffer> &imageBuffer,
     DCameraBuffer &buffer)
 {
+    CHECK_AND_RETURN_RET_LOG(imageBuffer == nullptr, RC_ERROR, "imageBuffer is nullptr");
     BufferHandle *bufHandle = imageBuffer->GetBufferHandle();
     if (bufHandle == nullptr) {
         DHLOGE("Convert image surface buffer failed, BufferHandle is null.");
