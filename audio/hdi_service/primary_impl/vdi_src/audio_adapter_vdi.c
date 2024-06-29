@@ -659,6 +659,7 @@ int32_t InitAdapterMutex(void)
     }
     return HDF_SUCCESS;
 }
+
 void DeinitAdapterMutex(void)
 {
     pthread_mutex_destroy(&g_adapterMutex);
