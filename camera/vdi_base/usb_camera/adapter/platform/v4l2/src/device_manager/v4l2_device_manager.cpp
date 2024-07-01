@@ -720,7 +720,7 @@ void V4L2DeviceManager::AddDefaultCameraConnectionType(std::shared_ptr<CameraMet
 void V4L2DeviceManager::AddDefaultCameraPosition(std::shared_ptr<CameraMetadata> metadata)
 {
     std::vector<uint8_t> cameraPositionVector;
-    cameraPositionVector.push_back(OHOS_CAMERA_POSITION_OTHER);
+    cameraPositionVector.push_back(OHOS_CAMERA_POSITION_FRONT);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CAMERA_POSITION, cameraPositionVector);
 }
 

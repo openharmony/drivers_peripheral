@@ -40,14 +40,15 @@ IAM_STATIC bool StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigInfo *config
     }
     switch (configInfo->type) {
         case PIN_EXPIRED_PERIOD:
-            if (StreamWrite(parcel, &(configInfo->value.pinExpiredPeriod), sizeof(int64_t)) != RESULT_SUCCESS) {
+            if (StreamWrite(parcel, &(configInfo->value.pinExpiredPeriod),
+                sizeof(configInfo->value.pinExpiredPeriod)) != RESULT_SUCCESS) {
                 LOG_ERROR("StreamWrite pinExpiredPeriod failed");
                 return false;
             }
             break;
         case ENABLE_STATUS:
             {
-                uint8_t enableStatus = (uint8_t)configInfo->value.enableStatus;
+                uint8_t enableStatus = configInfo->value.enableStatus ? 1 : 0;
                 if (StreamWrite(parcel, &enableStatus, sizeof(uint8_t)) != RESULT_SUCCESS) {
                     LOG_ERROR("StreamWrite enableStatus failed");
                     return false;
@@ -75,12 +76,13 @@ IAM_STATIC bool StreamWriteGlobalConfig(Buffer *parcel, GlobalConfigInfo *config
     return true;
 }
 
-IAM_STATIC bool ShouldSkipGlobalConfig(int32_t type) {
+IAM_STATIC bool CheckGlobalConfigType(int32_t type)
+{
     if (type != PIN_EXPIRED_PERIOD && type != ENABLE_STATUS) {
         LOG_ERROR("skip type %{public}d, and delete the globalConfig", type);
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 ResultCode UpdateGlobalConfigFile(GlobalConfigInfo *globalConfigArray, uint32_t configInfoNum)
@@ -116,7 +118,7 @@ ResultCode UpdateGlobalConfigFile(GlobalConfigInfo *globalConfigArray, uint32_t 
         return RESULT_GENERAL_ERROR;
     }
     for (uint32_t i = 0; i < configInfoNum; i++) {
-        if (!ShouldSkipGlobalConfig(globalConfigArray[i].type) &&
+        if (CheckGlobalConfigType(globalConfigArray[i].type) &&
             !StreamWriteGlobalConfig(parcel, &globalConfigArray[i])) {
             LOG_ERROR("StreamWriteGlobalConfig failed");
             DestoryBuffer(parcel);
@@ -174,7 +176,7 @@ IAM_STATIC bool StreamReadGlobalConfig(Buffer *parcel, uint32_t *index, GlobalCo
                     LOG_ERROR("read enableStatus failed");
                     return false;
                 }
-                configInfo->value.enableStatus = (bool)enableStatus;
+                configInfo->value.enableStatus = (enableStatus != 0) ? true : false;
             }
             break;
         default:
@@ -215,7 +217,7 @@ IAM_STATIC ResultCode ReadGlobalConfigInfo(Buffer *parcel, GlobalConfigInfo *glo
     }
     for (uint32_t i = 0; i < (*configInfoNum); i++) {
         if (!StreamReadGlobalConfig(parcel, &index, &globalConfigInfo[i])) {
-            LOG_ERROR("read StreamReadExpiredPeriod failed");
+            LOG_ERROR("read StreamReadGlobalConfig failed");
             return RESULT_GENERAL_ERROR;
         }
     }

@@ -1261,6 +1261,15 @@ IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint3
     return RESULT_SUCCESS;
 }
 
+IAM_STATIC bool CheckAuthType(uint32_t authType)
+{
+    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH && authType != RECOVERY_KEY) {
+        LOG_ERROR("bad authType %{public}u", authType);
+        return false;
+    }
+    return true;
+}
+
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 {
     if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN ||
@@ -1269,6 +1278,10 @@ ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
         return RESULT_BAD_PARAM;
     }
     for (uint32_t i = 0; i < param->authTypeNum; i++) {
+        if (!CheckAuthType(param->authTypes[i])) {
+            LOG_ERROR("bad authType %{public}u", param->authTypes[i]);
+            return RESULT_BAD_PARAM;
+        }
         ResultCode ret = UpdateGlobalConfigArray(param, param->authTypes[i]);
         if (ret != RESULT_SUCCESS) {
             return ret;
@@ -1352,7 +1365,7 @@ bool GetEnableStatus(int32_t userId, uint32_t authType)
             }
         }
         LOG_INFO("enableStatus is not set for userId:%{public}d", userId);
-        return true;
+        return (!g_globalConfigArray[infoIndex].value.enableStatus);
     }
     return true;
 }

@@ -646,6 +646,7 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
 void DMetadataProcessor::ConvertToCameraMetadata(common_metadata_header_t *&input,
     std::shared_ptr<OHOS::Camera::CameraMetadata> &output)
 {
+    CHECK_AND_RETURN_LOG(output == nullptr, "output is nullptr");
     auto ret = OHOS::Camera::CopyCameraMetadataItems(output->get(), input);
     if (ret != CAM_META_SUCCESS) {
         DHLOGE("Failed to copy the old metadata to new metadata.");

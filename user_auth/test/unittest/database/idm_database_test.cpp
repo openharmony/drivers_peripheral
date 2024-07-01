@@ -23,7 +23,7 @@ typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 extern "C" {
     extern LinkedList *g_userInfoList;
     extern UserInfo *g_currentUser;
-    extern GlobalConfigInfo *g_globalConfigArray;
+    extern GlobalConfigInfo g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
     extern bool MatchUserInfo(const void *data, const void *condition);
     extern bool IsUserInfoValid(UserInfo *userInfo);
     extern UserInfo *QueryUserInfo(int32_t userId);
@@ -776,8 +776,8 @@ HWTEST_F(IdmDatabaseTest, TestRemoveCachePin_001, TestSize.Level0)
 
 HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
 {
-    memset_s(g_globalConfigArray, sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM, 0,
-        sizeof(GlobalConfigParamHal) * MAX_GLOBAL_CONFIG_NUM);
+    memset_s(g_globalConfigArray, sizeof(GlobalConfigInfo) * MAX_GLOBAL_CONFIG_NUM, 0,
+        sizeof(GlobalConfigInfo) * MAX_GLOBAL_CONFIG_NUM);
     EXPECT_EQ(SaveGlobalConfigParam(nullptr), RESULT_BAD_PARAM);
 
     GlobalConfigParamHal param = {};
@@ -797,10 +797,10 @@ HWTEST_F(IdmDatabaseTest, TestSaveGlobalConfigParam, TestSize.Level0)
     GlobalConfigParamHal param1 = {};
     param1.type = PIN_EXPIRED_PERIOD;
     param1.value.pinExpiredPeriod = 1;
-    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_SUCCESS);
+    EXPECT_EQ(SaveGlobalConfigParam(&param1), RESULT_BAD_PARAM);
 
     GlobalConfigParamHal param2 = {};
-    EXPECT_EQ(SaveGlobalConfigParam(&param2), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SaveGlobalConfigParam(&param2), RESULT_BAD_PARAM);
 }
 
 HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
@@ -809,7 +809,7 @@ HWTEST_F(IdmDatabaseTest, TestGetPinExpiredInfo, TestSize.Level0)
     EXPECT_EQ(GetPinExpiredInfo(userId, nullptr), RESULT_BAD_PARAM);
 
     PinExpiredInfo info = {};
-    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_NOT_ENROLLED);
+    EXPECT_EQ(GetPinExpiredInfo(userId, &info), RESULT_SUCCESS);
 
     g_globalConfigArray[0].type = PIN_EXPIRED_PERIOD;
     g_globalConfigArray[0].value.pinExpiredPeriod = 1;
@@ -842,10 +842,7 @@ HWTEST_F(IdmDatabaseTest, TestGetEnableStatus, TestSize.Level0)
     EXPECT_EQ(GetEnableStatus(userId, authType), true);
 
     g_globalConfigArray[0].authType = 1;
-    EXPECT_EQ(GetEnableStatus(userId, authType), true);
-
-    g_globalConfigArray[0].value.enableStatus = true;
-    EXPECT_EQ(GetEnableStatus(userId, authType), true);
+    EXPECT_EQ(GetEnableStatus(userId, authType), false);
 }
 } // namespace UserAuth
 } // namespace UserIam

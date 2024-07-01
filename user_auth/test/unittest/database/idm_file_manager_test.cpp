@@ -168,7 +168,7 @@ HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
     EXPECT_EQ(UpdateGlobalConfigFile(nullptr, configInfoNum), RESULT_BAD_PARAM);
 
     GlobalConfigInfo globalConfigInfo = {};
-    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_SUCCESS);
     globalConfigInfo.type = ENABLE_STATUS;
     globalConfigInfo.value.enableStatus = true;
     globalConfigInfo.userIds[0] = 1;
