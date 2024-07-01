@@ -1396,7 +1396,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
             uint8_t lightFlush = 1;
             modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
         } else {
-            CAMERA_LOGI("Light painting can not support lighting);
+            CAMERA_LOGI("Light painting can not support lighting");
         }
         modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_TYPE, &lightPainting, 1);
         std::vector<uint8_t> metaVec;
