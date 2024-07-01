@@ -1361,13 +1361,13 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
         cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
-    CAMERA_LOGI("test Camera_Device_Hdi_V1_3_037 start.");
-    EXPCET_NE(cameraTest->ability, nullptr);
+
     common_metadata_header_t* data = cameraTest->ability->get();
     EXPECT_NE(data, nullptr);
     camera_metadata_item_t entry;
     cameraTest->rc = FindCameraMetadataItem(data, OHOS_ABILITY_LIGHT_PAINTING_TYPE, &entry);
     EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+
     for (uint8_t i = 0; i < entry.count; i++) {
         cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
         cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
@@ -1395,7 +1395,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
         if (lightPainting == OHOS_CAMERA_LIGHT_PAINTING_LIGHT) {
             uint8_t lightFlush = 1;
             modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
-            CAMERA_LOGI("Light painting supports lighting,the type is %{public}d",lightPainting);
+            CAMERA_LOGI("Light painting supports lighting,the type is %{public}d", lightPainting);
         } else {
             CAMERA_LOGI("Light painting can not support lighting);
         }
@@ -1422,7 +1422,8 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
 */
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
 {
-    if (!IsTagValueExistsU8(cameraTest->ability, OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
+    if (!IsTagValueExistsU8(cameraTest->ability,
+        OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
         cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
@@ -1479,7 +1480,7 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_038, TestSize.Level1)
 HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_039, TestSize.Level1)
 {
     if (!IsTagValueExistsU8(cameraTest->ability,
-        OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::HIGH_RESOLUTION_PHOTO)) {
+        OHOS_ABILITY_CAMERA_MODES, OHOS::HDI::Camera::V1_3::LIGHT_PAINTING)) {
         cout << "skip this test, because LIGHT_PAINTING not in OHOS_ABILITY_CAMERA_MODES" << endl;
         return;
     }
