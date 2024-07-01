@@ -1395,7 +1395,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_037, TestSize.Level1)
         if (lightPainting == OHOS_CAMERA_LIGHT_PAINTING_LIGHT) {
             uint8_t lightFlush = 1;
             modeSetting->addEntry(OHOS_CONTROL_LIGHT_PAINTING_FLASH, &lightFlush, 1);
-            CAMERA_LOGI("Light painting supports lighting,the type is %{public}d", lightPainting);
         } else {
             CAMERA_LOGI("Light painting can not support lighting);
         }
