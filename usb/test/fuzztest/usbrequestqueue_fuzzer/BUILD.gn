@@ -14,6 +14,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("./../fuzztest.gni")
 module_output_path = "drivers_peripheral_usb/drivers_peripheral_usb"
 
 ohos_fuzztest("UsbRequestQueueFuzzTest") {
@@ -30,13 +31,7 @@ ohos_fuzztest("UsbRequestQueueFuzzTest") {
 
   deps = [ "./../../../../ddk:libusb_core" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_usb:libusb_proxy_1.0",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-  ]
+  external_deps = usb_test_fuzzer_external_deps
 
   cflags = [
     "-g",

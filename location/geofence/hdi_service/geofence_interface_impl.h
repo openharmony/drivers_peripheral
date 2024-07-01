@@ -30,7 +30,7 @@ public:
 
     int32_t SetGeofenceCallback(const sptr<IGeofenceCallback>& callbackObj) override;
 
-    int32_t AddGnssGeofence(const GeofenceInfo& fence, GeofenceEvent monitorEvent) override;
+    int32_t AddGnssGeofence(const GeofenceInfo& fence, int monitorEvent) override;
 
     int32_t DeleteGnssGeofence(int32_t fenceIndex) override;
 };

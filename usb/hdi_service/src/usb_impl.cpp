@@ -1387,7 +1387,7 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     }
 
     uint8_t tbuf[READ_BUF_SIZE] = {0};
-    uint32_t tsize = length;
+    uint32_t tsize = static_cast<uint32_t>(length);
     uint32_t actlength = 0;
     UsbdRequestSync *requestSync = nullptr;
     int32_t ret = UsbdFindRequestSyncAndCreat(port, pipe.intfId, pipe.endpointId, &requestSync);

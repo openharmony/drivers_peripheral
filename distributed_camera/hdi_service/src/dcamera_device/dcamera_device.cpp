@@ -430,6 +430,7 @@ DCamRetCode DCameraDevice::OnSettingsResult(const std::shared_ptr<DCameraSetting
 
 DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
 {
+    CHECK_AND_RETURN_RET_LOG(event == nullptr, DCamRetCode::INVALID_ARGUMENT, "event is nullptr");
     DHLOGI("DCameraDevice::Notify for event type = %{public}d, result = %{public}d, content = %{public}s.",
         event->type_, event->result_, event->content_.c_str());
     if ((event->type_ != DCameraEventType::DCAMERA_MESSAGE) && (event->type_ != DCameraEventType::DCAMERA_OPERATION)) {
@@ -543,6 +544,7 @@ void DCameraDevice::SetDcameraAbility(const std::string& sinkAbilityInfo)
     } else {
         SetRefreshFlag(true);
         dCameraAbilityInfo_ = sinkAbilityInfo;
+        CHECK_AND_RETURN_LOG(dMetadataProcessor_ == nullptr, "dMetadataProcessor_ is nullptr");
         DCamRetCode ret = dMetadataProcessor_->InitDCameraAbility(sinkAbilityInfo);
         if (ret != SUCCESS) {
             DHLOGE("The dMetadataProcessor_ InitDCameraAbility failed, check.");

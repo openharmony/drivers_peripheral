@@ -25,6 +25,9 @@ extern "C" {
 
 namespace OHOS::Camera {
 using namespace std;
+
+const int32_t INVALID_ARGUMENT = -1;
+
 static enum AVPixelFormat ConvertOhosFormat2AVPixelFormat(uint32_t format)
 {
     static map<uint32_t, enum AVPixelFormat> ohosFormat2AVPixelFormatMap = {
@@ -49,7 +52,7 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
     if (srcAVFmt == AV_PIX_FMT_NONE || dstAVFmt == AV_PIX_FMT_NONE) {
         CAMERA_LOGE("NodeUtils::ImageFormatConvert err, id = %{public}d, unsupport format: %{public}d -> %{public}d",
             id, srcBufferInfo.format, dstBufferInfo.format);
-        return -1;
+        return INVALID_ARGUMENT;
     }
     CAMERA_LOGI("NodeUtils::ImageFormatConvert Start ====== id = %{public}d", id);
     CAMERA_LOGI("====imageSize: %{public}d * %{public}d -> %{public}d * %{public}d, format: %{public}d -> %{public}d",
@@ -60,7 +63,16 @@ int32_t NodeUtils::ImageFormatConvert(ImageBufferInfo &srcBufferInfo, ImageBuffe
         dstBufferInfo.bufferAddr, dstBufferInfo.bufferSize);
 
     AVFrame *pFrameSrc = av_frame_alloc();
+    if (pFrameSrc == nullptr) {
+        CAMERA_LOGE("ImageFormatConvert Error pFrameSrc == nullptr");
+        return INVALID_ARGUMENT;
+    }
     AVFrame *pFrameDst = av_frame_alloc();
+    if (pFrameDst == nullptr) {
+        CAMERA_LOGE("ImageFormatConvert Error pFrameDst == nullptr");
+        av_frame_free(&pFrameSrc);
+        return INVALID_ARGUMENT;
+    }
 
     av_image_fill_arrays(pFrameSrc->data, pFrameSrc->linesize, (uint8_t *)srcBufferInfo.bufferAddr,
         srcAVFmt, srcBufferInfo.width, srcBufferInfo.height, 1);

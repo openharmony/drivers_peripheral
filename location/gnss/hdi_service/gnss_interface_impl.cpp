@@ -61,7 +61,7 @@ static void NiNotifyCallback(OHOS::HDI::Location::GnssNiNotificationRequest *not
     GnssNiNotificationRequest niNotification;
     niNotification.gnssNiNotificationId = notification->gnssNiNotificationId;
     niNotification.gnssNiRequestCategory = GnssNiRequestCategory(notification->gnssNiRequestCategory);
-    niNotification.notificationCategory = GnssNiNotificationCategory(notification->notificationCategory);
+    niNotification.notificationCategory = notification->notificationCategory;
     niNotification.requestTimeout = notification->requestTimeout;
     niNotification.defaultResponseCmd = notification->defaultResponseCmd;
     niNotification.supplicantInfo = notification->supplicantInfo;
@@ -95,14 +95,19 @@ static void LocationUpdate(GnssLocation* location)
     HDF_LOGI("%{public}s:LocationUpdate.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     LocationInfo locationNew;
+    locationNew.fieldValidity = location->fieldValidity;
     locationNew.latitude = location->latitude;
     locationNew.longitude = location->longitude;
     locationNew.altitude = location->altitude;
     locationNew.horizontalAccuracy = location->horizontalAccuracy;
     locationNew.speed = location->speed;
     locationNew.bearing = location->bearing;
+    locationNew.verticalAccuracy = location->verticalAccuracy;
+    locationNew.speedAccuracy = location->speedAccuracy;
+    locationNew.bearingAccuracy = location->bearingAccuracy;
     locationNew.timeForFix = location->timeForFix;
     locationNew.timeSinceBoot = location->timeSinceBoot;
+    locationNew.timeUncertainty = location->timeUncertainty;
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
         if (callback != nullptr) {
@@ -136,7 +141,6 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
         HDF_LOGE("%{public}s:gnssMeasurementInfo is nullptr.", __func__);
         return;
     }
-    HDF_LOGI("%{public}s:GnssMeasurementUpdate.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo gnssMeasurementInfoNew;
     SetGnssClock(&gnssMeasurementInfoNew, gnssMeasurementInfo);
@@ -215,8 +219,7 @@ static void SvStatusCallback(GnssSatelliteStatus* svInfo)
         svStatus.azimuths.push_back(svInfo->satellitesList[i].azimuth);
         svStatus.carrierFrequencies.push_back(svInfo->satellitesList[i].carrierFrequency);
         svStatus.carrierToNoiseDensitys.push_back(svInfo->satellitesList[i].cn0);
-        svStatus.additionalInfo.push_back(
-            static_cast<SatelliteAdditionalInfo>(svInfo->satellitesList[i].satelliteAdditionalInfo));
+        svStatus.additionalInfo.push_back(svInfo->satellitesList[i].satelliteAdditionalInfo);
     }
     for (const auto& iter : g_locationCallBackMap) {
         auto& callback = iter.second;
@@ -444,10 +447,10 @@ int32_t GnssInterfaceImpl::SetGnssReferenceInfo(const GnssRefInfo& refInfo)
     }
 }
 
-int32_t GnssInterfaceImpl::DeleteAuxiliaryData(GnssAuxiliaryDataType data)
+int32_t GnssInterfaceImpl::DeleteAuxiliaryData(unsigned short data)
 {
     HDF_LOGI("%{public}s.", __func__);
-    uint16_t flags = static_cast<uint16_t>(data);
+    uint16_t flags = data;
     HDF_LOGI("%{public}s, flag=%{public}d", __func__, flags);
     auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {

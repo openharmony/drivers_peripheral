@@ -40,6 +40,7 @@ typedef struct AuthResult {
     uint16_t credentialCount;
     int64_t pinExpiredInfo;
     Buffer *remoteAuthResultMsg;
+    uint64_t credentialId;
 } AuthResult;
 
 typedef struct {
