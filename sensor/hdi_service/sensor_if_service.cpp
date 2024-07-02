@@ -625,7 +625,8 @@ int32_t SensorIfService::RemoveSensorDeathRecipient(const sptr<ISensorCallback> 
 void SensorIfService::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     SENSOR_TRACE_PID;
-    HDF_LOGI("%{public}s: service %{public}d", __func__, static_cast<uint32_t>(HdfRemoteGetCallingPid()));
+    uint32_t serviceId = static_cast<uint32_t>(HdfRemoteGetCallingPid());
+    HDF_LOGI("%{public}s: service %{public}d", __func__, serviceId);
     std::unique_lock<std::mutex> lock(sensorServiceMutex_);
     sptr<IRemoteObject> callbackObject = object.promote();
     if (callbackObject == nullptr) {
