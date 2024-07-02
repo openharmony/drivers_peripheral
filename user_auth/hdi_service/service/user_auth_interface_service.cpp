@@ -54,7 +54,9 @@ static std::mutex g_mutex;
 static std::string g_localUdid;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
 const std::string SCREEN_LOCK_NAME = "com.ohos.systemui";
+const std::string SCREEN_LOCK_NAME_PRIVATE = "com.ohos.sceneboard";
 const std::string SETTRINGS_NAME = "com.ohos.settings";
+const std::string SETTRINGS_NAME_PRIVATE = "com.huawei.hmos.settings";
 
 enum UserAuthCallerType : int32_t {
     TOKEN_INVALID = -1,
@@ -459,9 +461,34 @@ static bool CopyAuthScheduleInfo(AuthParamHal paramHal, const CoAuthSchedule *in
     return true;
 }
 
+static bool CheckAuthIntent(const HdiAuthParam &param)
+{
+    switch (param.authIntent) {
+        case HdiAuthIntent::DEFUALT:
+        case HdiAuthIntent::SILENT_AUTH:
+            return true;
+        case HdiAuthIntent::UNLOCK:
+        case UNLOCK_CURRENT_ONLY:
+            if (param.baseParam.callerType != TOKEN_HAP || (param.baseParam.callerName != SCREEN_LOCK_NAME &&
+                param.baseParam.callerName != SCREEN_LOCK_NAME_PRIVATE)) {
+                IAM_LOGE("bad authIntent");
+                return false;
+            }
+            return true;
+        default:
+            IAM_LOGE("not surpport authIntent %{public}d", param.authIntent);
+            return false;
+    }
+    return true;
+}
+
 static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
     AuthParamHal &paramHal)
 {
+    if (!CheckAuthIntent(param)) {
+        IAM_LOGE("checkAuthIntent failed");
+        return RESULT_BAD_PARAM;
+    }
     paramHal.contextId = contextId;
     paramHal.userId = param.baseParam.userId;
     paramHal.authType = static_cast<int32_t>(param.authType);
@@ -471,15 +498,11 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    paramHal.isAuthResultCached = false;
+    paramHal.authIntent = param.authIntent;
     paramHal.isExpiredReturnSuccess = false;
-    if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
-        param.baseParam.callerName == SCREEN_LOCK_NAME) {
-        IAM_LOGI("auth result will be cached");
-        paramHal.isAuthResultCached = true;
-        paramHal.isExpiredReturnSuccess = true;
-    } else if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
-        param.baseParam.callerName == SETTRINGS_NAME) {
+    if ((param.baseParam.callerType == TOKEN_HAP &&
+        (param.baseParam.callerName == SETTRINGS_NAME || param.baseParam.callerName == SETTRINGS_NAME_PRIVATE)) ||
+        param.authIntent == HdiAuthIntent::UNLOCK || param.authIntent == UNLOCK_CURRENT_ONLY) {
         paramHal.isExpiredReturnSuccess = true;
     }
     if (!param.collectorUdid.empty()) {

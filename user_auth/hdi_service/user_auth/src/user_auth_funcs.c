@@ -142,7 +142,7 @@ IAM_STATIC ResultCode HandleAuthSuccessResult(const UserAuthContext *context, co
         LOG_ERROR("GetExpiredInfoForResult failed");
         return ret;
     }
-    if (context->isAuthResultCached) {
+    if (context->authIntent == UNLOCK || context->authIntent == UNLOCK_CURRENT_ONLY) {
         LOG_INFO("cache unlock auth result");
         CacheUnlockAuthResult(context->userId, authToken);
     }
