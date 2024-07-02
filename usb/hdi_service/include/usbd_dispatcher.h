@@ -82,6 +82,8 @@ public:
     static void UsbRequestParamsWSyncInit(UsbRequestParams *params, int32_t timeout, const UsbPipeInfo *pipe);
     static int32_t UsbdRequestSyncInit(
         HostDevice *port, UsbInterfaceHandle *ifHandle, UsbPipeInfo *pipe, UsbdRequestSync *requestSync);
+    static int32_t UsbdRequestSyncInitwithLength(HostDevice *port, UsbInterfaceHandle *ifHandle,
+        UsbPipeInfo *pipe, int32_t length, UsbdRequestSync *requestSync);
     static int32_t UsbdRequestSyncRelease(UsbdRequestSync *requestSync);
     static void UsbRequestParamsInit(UsbRequestParams *params, int32_t timeout);
     static int32_t CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams *pCtrParams, uint32_t requestType);
