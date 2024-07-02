@@ -76,7 +76,7 @@ IAM_STATIC UserAuthContext *InitAuthContext(AuthParamHal params)
     context->authTrustLevel = params.authTrustLevel;
     context->collectorSensorHint = params.executorSensorHint;
     context->scheduleList = CreateLinkedList(DestroyScheduleNode);
-    context->isAuthResultCached = params.isAuthResultCached;
+    context->authIntent = params.authIntent;
     context->isExpiredReturnSuccess = params.isExpiredReturnSuccess;
 
     if (memcpy_s(context->localUdid, sizeof(context->localUdid), params.localUdid,
