@@ -288,6 +288,34 @@ int32_t UsbdDispatcher::UsbdRequestSyncInit(
     return HDF_SUCCESS;
 }
 
+int32_t UsbdDispatcher::UsbdRequestSyncInitwithLength(HostDevice *port, UsbInterfaceHandle *ifHandle,
+    UsbPipeInfo *pipe, int32_t length, UsbdRequestSync *requestSync)
+{
+    if (port == nullptr || requestSync == nullptr || ifHandle == nullptr || pipe == nullptr) {
+        HDF_LOGE("%{public}s:invalid params", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = memcpy_s(&requestSync->pipe, sizeof(UsbPipeInfo), pipe, sizeof(UsbPipeInfo));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s:%{public}d memcpy_s failed", __func__, ret);
+        return ret;
+    }
+
+    requestSync->ifHandle = ifHandle;
+    requestSync->request = UsbAllocRequest(requestSync->ifHandle, 0, length);
+    if (requestSync->request == nullptr) {
+        HDF_LOGE("%{public}s:alloc request failed", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    UsbRequestParamsWSyncInit(&requestSync->params, USB_CTRL_SET_TIMEOUT, &requestSync->pipe);
+    requestSync->params.userData = port;
+    OsalMutexLock(&port->reqSyncLock);
+    HdfSListAdd(&port->reqSyncList, &requestSync->node);
+    OsalMutexUnlock(&port->reqSyncLock);
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdDispatcher::UsbdRequestSyncRelease(UsbdRequestSync *requestSync)
 {
     int32_t ret = HDF_SUCCESS;
