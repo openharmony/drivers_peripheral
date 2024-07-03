@@ -15,8 +15,8 @@
 #include "usb_ddk_permission.h"
 
 #include <hdf_log.h>
+#include <dlfcn.h>
 
-#include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 
 namespace OHOS {
@@ -24,12 +24,54 @@ namespace HDI {
 namespace Usb {
 namespace Ddk {
 namespace V1_0 {
-using namespace OHOS::Security::AccessToken;
+using VerifyAccessTokenFunc = int(*)(uint32_t callerToken, const std::string &permissionName);
 
-bool DdkPermissionManager::VerifyPermission(std::string permissionName)
+static constexpr int PERMISSION_GRANTED = 0;
+
+static void *g_libHandle = nullptr;
+static VerifyAccessTokenFunc g_verifyAccessToken = nullptr;
+
+static void InitVerifyAccessToken()
 {
-    AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    if (g_verifyAccessToken != nullptr) {
+        return;
+    }
+
+    g_libHandle = dlopen("libusb_ddk_dynamic_library_wrapper.z.so", RTLD_LAZY);
+    if (g_libHandle == nullptr) {
+        HDF_LOGE("%{public}s dlopen failed: %{public}s", __func__, dlerror());
+        return;
+    }
+
+    void *funcPtr = dlsym(g_libHandle, "VerifyAccessToken");
+    if (funcPtr == nullptr) {
+        HDF_LOGE("%{public}s dlsym failed: %{public}s", __func__, dlerror());
+        dlclose(g_libHandle);
+        g_libHandle = nullptr;
+        return;
+    }
+
+    g_verifyAccessToken = reinterpret_cast<VerifyAccessTokenFunc>(funcPtr);
+}
+
+void DdkPermissionManager::Reset()
+{
+    g_verifyAccessToken = nullptr;
+    if (g_libHandle != nullptr) {
+        dlclose(g_libHandle);
+        g_libHandle = nullptr;
+    }
+}
+
+bool DdkPermissionManager::VerifyPermission(const std::string &permissionName)
+{
+    InitVerifyAccessToken();
+    if (g_verifyAccessToken == nullptr) {
+        return false;
+    }
+
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = g_verifyAccessToken(callerToken, permissionName);
     HDF_LOGI("%{public}s VerifyAccessToken: %{public}d", __func__, result);
     return result == PERMISSION_GRANTED;
 }
