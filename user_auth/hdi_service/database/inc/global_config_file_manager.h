@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef IDM_FILE_MANAGER_H
-#define IDM_FILE_MANAGER_H
+#ifndef GLOBAL_CONFIG_FILE_MANAGER_H
+#define GLOBAL_CONFIG_FILE_MANAGER_H
 
-#include "defines.h"
-#include "linked_list.h"
+#include "idm_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-LinkedList *LoadFileInfo(void);
-ResultCode UpdateFileInfo(LinkedList *userInfoList);
-ResultCode DeleteFile(void);
+ResultCode LoadGlobalConfigInfo(GlobalConfigInfo *globalConfigArray, uint32_t len, uint32_t *configInfoNum);
+ResultCode UpdateGlobalConfigFile(GlobalConfigInfo *globalConfigArray, uint32_t configInfoNum);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // IDM_FILE_MANAGER_H
+#endif // GLOBAL_CONFIG_FILE_MANAGER_H
