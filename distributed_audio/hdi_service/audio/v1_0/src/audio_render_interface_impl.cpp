@@ -59,11 +59,7 @@ int32_t AudioRenderInterfaceImpl::GetLatency(uint32_t &ms)
 
 float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex)
 {
-    if (currentIndex > durationIndex) {
-        return 1.0f;
-    }
-
-    if (durationIndex == 0) {
+    if (currentIndex > durationIndex || durationIndex == 0) {
         return 1.0f;
     }
     
