@@ -13,24 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef USB_DDK_PERMISSION_H
-#define USB_DDK_PERMISSION_H
+#include "accesstoken_kit.h"
 
-#include <iostream>
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-namespace OHOS {
-namespace HDI {
-namespace Usb {
-namespace Ddk {
-namespace V1_0 {
-class DdkPermissionManager {
-public:
-    static bool VerifyPermission(const std::string &permissionName);
-    static void Reset();
-};
-} // namespace V1_0
-} // namespace Ddk
-} // namespace Usb
-} // namespace HDI
-} // namespace OHOS
-#endif // USB_DDK_PERMISSION_H
+int VerifyAccessToken(uint32_t callerToken, const std::string &permissionName)
+{
+    return OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+}
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
