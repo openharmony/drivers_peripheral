@@ -43,7 +43,11 @@ AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName,
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format,
         AUDIO_NORMAL_INTERVAL, false);
     const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
-    framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) / sizePerSec;
+    if (sizePerSec == 0) {
+        DHLOGE("The 'sizePerSec' is zero. In the constructor for x, the denominator of the division is zero.");
+    } else {
+        framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) / sizePerSec;
+    }
     DHLOGD("Distributed audio capture constructed, period(%{public}d),frameSize(%{public}d).",
         attrs.period, devAttrs_.frameSize);
     DHLOGD("Distributed audio capture constructed, id(%{public}d).", desc.pins);
