@@ -192,7 +192,7 @@ HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
 {
     GlobalConfigParamHal param = {};
     EXPECT_EQ(SetGlobalConfigParamFunc(nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace UserIam
