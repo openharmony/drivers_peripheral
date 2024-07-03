@@ -224,8 +224,8 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
         goto ERROR;
     }
     reqEntry = DLIST_FIRST_ENTRY(&msgQueue->entry, struct UsbHostRequest, list);
-    if (reqEntry == NULL || reqEntry->list.prev == NULL || reqEntry->list.prev->next == NULL ||
-        reqEntry->list.next == NULL || reqEntry->list.next->prev == NULL) {
+    if (reqEntry == NULL || reqEntry->list.prev == NULL || reqEntry->list.next == NULL ||
+        reqEntry->list.prev->next != &reqEntry->list || reqEntry->list.next->prev != &reqEntry->list) {
         ret = HDF_ERR_INVALID_OBJECT;
         HDF_LOGE("%{public}s:%{public}d list node is invalid", __func__, __LINE__);
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
