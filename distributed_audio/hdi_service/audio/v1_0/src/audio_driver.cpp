@@ -20,8 +20,10 @@
 #include <v1_0/audio_manager_stub.h>
 
 #include "audio_manager_interface_impl.h"
+#include <shared_mutex>
 
 using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
+std::shared_mutex mutex;
 
 struct HdfAudioManagerHost {
     struct IDeviceIoService ioService;
@@ -31,7 +33,6 @@ struct HdfAudioManagerHost {
 static int32_t AudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    auto *hdfAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -46,6 +47,12 @@ static int32_t AudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int 
         return HDF_ERR_INVALID_PARAM;
     }
 
+    std::shared_lock lock(mutex_);
+    auto *hdfAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
+    if (hdfAudioManagerHost == NULL) {
+        HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return hdfAudioManagerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
@@ -93,6 +100,7 @@ int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf audio manager driver release.");
+    std::unique_lock lock(mutex_);
     auto *hdfAudioManagerHost = CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioService);
     delete hdfAudioManagerHost;
 }
