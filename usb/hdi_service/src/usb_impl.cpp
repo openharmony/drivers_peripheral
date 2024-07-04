@@ -43,6 +43,7 @@ constexpr uint16_t ENGLISH_US_LANGUAGE_ID = 0x409;
 constexpr uint32_t FUNCTION_VALUE_MAX_LEN = 32;
 constexpr uint8_t  USB_PARAM_REQTYPE = 128;
 constexpr uint8_t  USB_PARAM_STAND_REQTYPE = 0;
+constexpr int32_t  USB_TRANSFER_TIMEOUT = 1000;
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -1071,6 +1072,15 @@ int32_t UsbImpl::OpenDevice(const UsbDev &dev)
         return HDF_DEV_ERR_NO_DEVICE;
     }
     port->initFlag = true;
+    if (port->ctrDevHandle == nullptr && port->ctrIface != nullptr) {
+        HDF_LOGD("%{public}s:start openInterface, busNum: %{public}d, devAddr: %{public}d ",
+            __func__, dev.busNum, dev.devAddr);
+        port->ctrDevHandle = UsbOpenInterface(port->ctrIface);
+        if (port->ctrDevHandle == nullptr) {
+            HDF_LOGE("%{public}s:ctrDevHandle UsbOpenInterface nullptr", __func__);
+            return HDF_FAILURE;
+        }
+    }
     return HDF_SUCCESS;
 }
 
@@ -1080,6 +1090,23 @@ int32_t UsbImpl::CloseDevice(const UsbDev &dev)
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
+    }
+    int32_t ret = 0;
+    if (port->ctrDevHandle != nullptr) {
+        RawUsbCloseCtlProcess(port->ctrDevHandle);
+        uint8_t activeConfig = 0;
+        uint16_t length = 1;
+        UsbControlParams controlParams;
+        MakeGetActiveUsbControlParams(&controlParams, &activeConfig, length, 0, 0);
+        UsbControlTransferEx(port, &controlParams, USB_TRANSFER_TIMEOUT);
+        HDF_LOGD("%{public}s:start closeInterface,busNum: %{public}d, devAddr: %{public}d ",
+            __func__, dev.busNum, dev.devAddr);
+        ret = UsbCloseInterface(port->ctrDevHandle, true);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
+            return HDF_FAILURE;
+        }
+        port->ctrDevHandle = nullptr;
     }
     port->initFlag = false;
     return HDF_SUCCESS;
@@ -1342,14 +1369,7 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = 0;
-    if (port->ctrDevHandle != nullptr) {
-        ret = UsbCloseInterface(port->ctrDevHandle, true);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:usbCloseInterface ctrDevHandle failed.", __func__);
-            return HDF_FAILURE;
-        }
-    }
+
     return HDF_SUCCESS;
 }
 
@@ -1440,10 +1460,14 @@ int32_t UsbImpl::BulkTransferReadwithLength(const UsbDev &dev,
     int32_t ret = UsbdFindRequestSyncAndCreatwithLength(port, pipe.intfId, pipe.endpointId, length, &requestSync);
     if (ret != HDF_SUCCESS || requestSync == nullptr) {
         HDF_LOGE("%{public}s:UsbdFindRequestSyncAndCreat failed.", __func__);
+        free(tbuf);
+        tbuf = nullptr;
         return ret;
     }
     if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_IN || requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
         HDF_LOGE("%{public}s:invalid param", __func__);
+        free(tbuf);
+        tbuf = nullptr;
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);

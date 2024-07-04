@@ -77,6 +77,7 @@ struct UsbInterfacePool {
     struct UsbMessageQueue submitRequestQueue;
     UsbRawTidType ioProcessTid;
     UsbPoolProcessStatusType ioProcessStopStatus;
+    UsbPoolProcessStatusType ioRecvProcessStopStatus;
     struct OsalMutex ioStopLock;
     struct UsbDevice *device;
 };
@@ -118,5 +119,6 @@ HDF_STATUS UsbIfDestroyInterfaceObj(
     const struct UsbInterfacePool *interfacePool, const struct UsbSdkInterface *interfaceObj);
 int32_t UsbIfCreatInterfacePool(const struct UsbSession *session, uint8_t busNum, uint8_t devAddr,
     struct UsbInterfacePool **interfacePool);
+int32_t UsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle);
 
 #endif /* USB_INTERFACE_POOL_H */
