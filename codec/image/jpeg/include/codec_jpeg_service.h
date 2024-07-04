@@ -52,7 +52,6 @@ private:
     std::mutex mutex_;
     std::mutex initMutex_;
     std::unique_ptr<CodecJpegCore> core_;
-    std::map<uint32_t, BufferHandle*> bufferHandleMap_;
 };
 } // V1_0
 } // Image
