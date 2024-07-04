@@ -91,6 +91,14 @@
 #define TP_TYPE_UDP               17
 #define WZRY_MARK_NUM             0x5a
 
+#define INSTALL_WLAN_HEAD_LEN 2
+#define SUITE_INDEX_1 1
+#define SUITE_INDEX_2 2
+#define SUITE_INDEX_3 3
+#define SUITE_LEFT_LEN_24 24
+#define SUITE_LEFT_LEN_16 16
+#define SUITE_LEFT_LEN_8 8
+
 static inline uint32_t BIT(uint8_t x)
 {
     return 1U << x;
@@ -2129,6 +2137,136 @@ static int32_t SetRxRemainOnChannel(const char *ifName, const int8_t *data, uint
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName, &out);
 }
 
+static int32_t InitInstallWlanParam(const char *ifName, uint32_t interfaceId,
+    struct nl_msg **msg, struct nl_msg **keyMsg)
+{
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    *msg = nlmsg_alloc();
+    if (*msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+
+    *keyMsg = nlmsg_alloc();
+    if (*keyMsg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        nlmsg_free(*msg);
+        return RET_CODE_NOMEM;
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t InstallParam(struct nl_msg *msg, struct nl_msg *keyMsg)
+{
+    HILOG_INFO(LOG_CORE, "enter %{public}s", __FUNCTION__);
+    if (msg == NULL || keyMsg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL ", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    struct nlmsghdr *hdr = nlmsg_hdr(keyMsg);
+    void *data = nlmsg_data(hdr);
+    int len = hdr->nlmsg_len - NLMSG_HDRLEN;
+    if (memset_s(data, len, 0, len) != 0) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    return NetlinkSendCmdSync(msg, NULL, NULL);
+}
+
+static void FreeMsg(struct nl_msg *msg, struct nl_msg *keyMsg)
+{
+    if (msg != NULL) {
+        nlmsg_free(msg);
+    }
+    if (keyMsg != NULL) {
+        nlmsg_free(keyMsg);
+    }
+}
+
+int32_t WifiInstallWlanExtParam(const char *ifName, const InstallWlanParam *param)
+{
+    HILOG_INFO(LOG_CORE, "enter %{public}s", __FUNCTION__);
+    int32_t ret = RET_CODE_FAILURE;
+    if (ifName == NULL || param == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    uint32_t interfaceId = if_nametoindex(ifName);
+    struct nl_msg *msg = NULL;
+    struct nl_msg *keyMsg = NULL;
+    ret = InitInstallWlanParam(ifName, interfaceId, &msg, &keyMsg);
+    if (ret != RET_CODE_SUCCESS) {
+        goto err;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_NEW_KEY, 0)) {
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            break;
+        }
+        if (nla_put(keyMsg, NL80211_KEY_DATA, param->len, param->buf)  != RET_CODE_SUCCESS) {
+            break;
+        }
+
+        if (nla_put_u32(keyMsg, NL80211_KEY_CIPHER, param->suite)  != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 suite failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put(msg, NL80211_ATTR_MAC, ETH_ALEN, param->addr)  != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put addr failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u8(keyMsg, NL80211_KEY_IDX, param->id) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u8 index failed", __FUNCTION__);
+            break;
+        }
+        if (nla_put_nested(msg, NL80211_ATTR_KEY, keyMsg) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_nested failed", __FUNCTION__);
+            break;
+        }
+        ret = InstallParam(msg, keyMsg);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: install wlan ext param failed", __FUNCTION__);
+            break;
+        }
+    } while (0);
+err:
+    FreeMsg(msg, keyMsg);
+    return ret;
+}
+
+static int32_t InstallWlanExtParam(const char *ifName, const int8_t *data, uint32_t dataLen)
+{
+    uint8_t newData[dataLen];
+    for (int i = 0; i < dataLen; i++) {
+        newData[i] = (uint8_t)(data[i]);
+    }
+
+    uint8_t id = newData[0];
+    uint8_t len = newData[1];
+    const uint8_t *buf = newData + INSTALL_WLAN_HEAD_LEN;
+    const uint8_t *suite = buf + len;
+    const uint8_t *mac = buf + len + sizeof(uint32_t);
+    InstallWlanParam param;
+    param.id = id;
+    param.len = len;
+    param.suite = ((suite[0] << SUITE_LEFT_LEN_24) | (suite[SUITE_INDEX_1] << SUITE_LEFT_LEN_16) |
+        (suite[SUITE_INDEX_2] << SUITE_LEFT_LEN_8) | suite[SUITE_INDEX_3]);
+    if (memcpy_s(param.buf, MAX_BUF_LEN, buf, len) != EOK ||
+        memcpy_s(param.addr, ETH_ADDR_LEN, mac, ETH_ADDR_LEN) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed", __FUNCTION__);
+        return HDF_FAILURE;
+    }
+    return WifiInstallWlanExtParam(ifName, &param);
+}
+
 int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
 {
     int32_t ret;
@@ -2150,6 +2288,9 @@ int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam
             break;
         case CMD_ID_RX_REMAIN_ON_CHANNEL:
             ret = SetRxRemainOnChannel(ifName, param->buf, param->bufLen);
+            break;
+        case CMD_ID_INSTALL_WLAN_KEY:
+            ret = InstallWlanExtParam(ifName, param->buf, param->bufLen);
             break;
         default:
             HILOG_ERROR(LOG_CORE, "%{public}s: Invalid command id", __FUNCTION__);
