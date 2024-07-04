@@ -568,15 +568,15 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
 {
     dhBase_ = dhBase;
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
-    if (rootValue == nullptr || !cJSON_IsObject(rootValue)) {
-        DHLOGE("Input sink ablity info is not json object.");
-        return DCamRetCode::INVALID_ARGUMENT;
-    }
+    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, DCamRetCode::INVALID_ARGUMENT);
 
     cJSON *srcRootValue = cJSON_Parse(sourceCodecInfo.c_str());
-    if (srcRootValue == nullptr || !cJSON_IsObject(srcRootValue)) {
-        DHLOGE("Input source ablity info is not json object.");
+    CHECK_NULL_FREE_RETURN(srcRootValue, DCamRetCode::INVALID_ARGUMENT, rootValue);
+    
+    if (!cJSON_IsObject(srcRootValue)) {
+        cJSON_Delete(srcRootValue);
         cJSON_Delete(rootValue);
+        DHLOGE("Input source ablity info is not json object.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
     dcSupportedCodecType_ = ParseEncoderTypes(rootValue);
