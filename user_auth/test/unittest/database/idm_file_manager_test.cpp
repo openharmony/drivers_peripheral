@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "buffer.h"
+#include "global_config_file_manager.h"
 #include "idm_common.h"
 #include "idm_file_manager.h"
 
@@ -166,8 +167,21 @@ HWTEST_F(IdmFileMgrTest, TestUpdateGlobalConfigFile, TestSize.Level0)
     uint32_t configInfoNum = 1;
     EXPECT_EQ(UpdateGlobalConfigFile(nullptr, configInfoNum), RESULT_BAD_PARAM);
 
-    GlobalConfigParamHal globalConfigInfo = {};
-    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_GENERAL_ERROR);
+    GlobalConfigInfo globalConfigInfo = {};
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_SUCCESS);
+    globalConfigInfo.type = ENABLE_STATUS;
+    globalConfigInfo.value.enableStatus = true;
+    globalConfigInfo.userIds[0] = 1;
+    globalConfigInfo.userIdNum = 1;
+    globalConfigInfo.authType = 1;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_SUCCESS);
+    globalConfigInfo.value.enableStatus = false;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_SUCCESS);
+
+    GlobalConfigInfo globalConfigInfo1 = {};
+    globalConfigInfo1.type = PIN_EXPIRED_PERIOD;
+    globalConfigInfo1.value.pinExpiredPeriod = 1;
+    EXPECT_EQ(UpdateGlobalConfigFile(&globalConfigInfo, configInfoNum), RESULT_SUCCESS);
 }
 
 HWTEST_F(IdmFileMgrTest, TestLoadGlobalConfigInfo, TestSize.Level0)
@@ -176,7 +190,7 @@ HWTEST_F(IdmFileMgrTest, TestLoadGlobalConfigInfo, TestSize.Level0)
     EXPECT_EQ(LoadGlobalConfigInfo(nullptr, len, nullptr), RESULT_BAD_PARAM);
 
     uint32_t configInfoNum = 1;
-    GlobalConfigParamHal *param = {};
+    GlobalConfigInfo *param = {};
     EXPECT_EQ(LoadGlobalConfigInfo(param, len, &configInfoNum), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth

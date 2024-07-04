@@ -115,7 +115,10 @@ int32_t MapperService::FreeMem(const sptr<NativeBuffer>& handle)
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    vdiImpl_->FreeMem(*handle->Move());
+
+    BufferHandle* buffer = handle->Move();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    vdiImpl_->FreeMem(*buffer);
     return HDF_SUCCESS;
 }
 
@@ -124,7 +127,10 @@ int32_t MapperService::Mmap(const sptr<NativeBuffer>& handle)
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    void* retPtr = vdiImpl_->Mmap(*handle->GetBufferHandle());
+
+    BufferHandle* buffer = handle->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    void* retPtr = vdiImpl_->Mmap(*buffer);
     CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
     return HDF_SUCCESS;
 }
@@ -134,7 +140,10 @@ int32_t MapperService::Unmap(const sptr<NativeBuffer>& handle)
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->Unmap(*handle->GetBufferHandle());
+
+    BufferHandle* buffer = handle->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    int32_t ret = vdiImpl_->Unmap(*buffer);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
@@ -144,7 +153,10 @@ int32_t MapperService::FlushCache(const sptr<NativeBuffer>& handle)
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->FlushCache(*handle->GetBufferHandle());
+
+    BufferHandle* buffer = handle->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    int32_t ret = vdiImpl_->FlushCache(*buffer);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
@@ -154,7 +166,10 @@ int32_t MapperService::InvalidateCache(const sptr<NativeBuffer>& handle)
     DISPLAY_TRACE;
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->InvalidateCache(*handle->GetBufferHandle());
+
+    BufferHandle* buffer = handle->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    int32_t ret = vdiImpl_->InvalidateCache(*buffer);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }
@@ -163,7 +178,10 @@ int32_t MapperService::GetImageLayout(const sptr<NativeBuffer>& handle, V1_2::Im
 {
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->GetImageLayout(*handle->GetBufferHandle(), layout);
+
+    BufferHandle* buffer = handle->GetBufferHandle();
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    int32_t ret = vdiImpl_->GetImageLayout(*buffer, layout);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
 }

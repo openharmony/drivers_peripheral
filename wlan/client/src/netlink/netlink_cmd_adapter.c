@@ -120,6 +120,7 @@ static inline uint32_t BIT(uint8_t x)
 #define NETLINK_EXT_ACK 11
 #define SOL_NETLINK 270
 #define RECV_MAX_COUNT 100
+#define NETLINK_BUFF_LENGTH 262144
 
 // vendor attr
 enum AndrWifiAttr {
@@ -329,6 +330,10 @@ static int32_t ConnectCtrlSocket(void)
     if (g_wifiHalInfo.ctrlSock == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: fail to open ctrl socket", __FUNCTION__);
         return RET_CODE_FAILURE;
+    }
+
+    if (nl_socket_set_buffer_size(g_wifiHalInfo.ctrlSock, NETLINK_BUFF_LENGTH, 0) < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: fail to set buffer size", __FUNCTION__);
     }
 
     if (nl_socket_set_nonblocking(g_wifiHalInfo.ctrlSock) != 0) {

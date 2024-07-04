@@ -26,6 +26,7 @@
 #include "v4_0/iaudio_callback.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
+static pthread_mutex_t g_adapterMutex;
 
 struct AudioAdapterInfo {
     struct IAudioAdapterVdi *vdiAdapter;
@@ -85,11 +86,14 @@ int32_t AudioInitAllPortsVdi(struct IAudioAdapter *adapter)
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
 
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->InitAllPorts, HDF_ERR_INVALID_PARAM);
+    pthread_mutex_lock(&g_adapterMutex);
     int32_t ret = vdiAdapter->InitAllPorts(vdiAdapter);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter InitAllPorts fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_adapterMutex);
 
     return HDF_SUCCESS;
 }
@@ -109,17 +113,18 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
     CHECK_VALID_RANGE_RETURN(*renderId, 0, AUDIO_VDI_STREAM_NUM_MAX - 1, HDF_ERR_INVALID_PARAM);
 
-    *render = FindRenderCreated(desc->pins, attrs, renderId);
-    if (*render != NULL) {
-        AUDIO_FUNC_LOGE("already created");
-        return HDF_SUCCESS;
-    }
-
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
 
+    pthread_mutex_lock(&g_adapterMutex);
+    *render = FindRenderCreated(desc->pins, attrs, renderId);
+    if (*render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_SUCCESS;
+    }
     AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc);
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
 
@@ -127,6 +132,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateRender fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
     vdiRender->AddAudioEffect = NULL;
@@ -137,8 +143,10 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
     if (*render == NULL) {
         (void)vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
         AUDIO_FUNC_LOGE("Create audio render failed");
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_ERR_INVALID_PARAM;
     }
+    pthread_mutex_unlock(&g_adapterMutex);
     AUDIO_FUNC_LOGI("AudioCreateRenderVdi Success");
     return HDF_SUCCESS;
 }
@@ -155,17 +163,24 @@ int32_t AudioDestroyRenderVdi(struct IAudioAdapter *adapter, uint32_t renderId)
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
 
+    pthread_mutex_lock(&g_adapterMutex);
     struct IAudioRenderVdi *vdiRender = AudioGetVdiRenderByIdVdi(renderId);
-    CHECK_NULL_PTR_RETURN_VALUE(vdiRender, HDF_ERR_INVALID_PARAM);
-
+    if (vdiRender == NULL) {
+        AUDIO_FUNC_LOGE("vdiRender pointer is null");
+        pthread_mutex_unlock(&g_adapterMutex);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
     int32_t ret = vdiAdapter->DestroyRender(vdiAdapter, vdiRender);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyRender fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
 
     AudioDestroyRenderByIdVdi(renderId);
+    pthread_mutex_unlock(&g_adapterMutex);
     return HDF_SUCCESS;
 }
 
@@ -194,10 +209,12 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
 
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->CreateCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
+    pthread_mutex_lock(&g_adapterMutex);
     int32_t ret = vdiAdapter->CreateCapture(vdiAdapter, &vdiDesc, &vdiAttrs, &vdiCapture);
     OsalMemFree((void *)vdiDesc.desc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call CreateCapture fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
     vdiCapture->AddAudioEffect = NULL;
@@ -208,9 +225,11 @@ int32_t AudioCreateCaptureVdi(struct IAudioAdapter *adapter, const struct AudioD
     if (*capture == NULL) {
         (void)vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
         AUDIO_FUNC_LOGE("create audio capture failed");
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_ERR_INVALID_PARAM;
     }
     AUDIO_FUNC_LOGI("AudioCreateCaptureVdi Success");
+    pthread_mutex_unlock(&g_adapterMutex);
     return HDF_SUCCESS;
 }
 
@@ -227,16 +246,19 @@ int32_t AudioDestroyCaptureVdi(struct IAudioAdapter *adapter, uint32_t captureId
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterVdi(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter, HDF_ERR_INVALID_PARAM);
 
+    pthread_mutex_lock(&g_adapterMutex);
     struct IAudioCaptureVdi *vdiCapture = AudioGetVdiCaptureByIdVdi(captureId);
     CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(vdiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
     int32_t ret = vdiAdapter->DestroyCapture(vdiAdapter, vdiCapture);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiAdapter call DestroyCapture fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
 
     AudioDestroyCaptureByIdVdi(captureId);
+    pthread_mutex_unlock(&g_adapterMutex);
     return HDF_SUCCESS;
 }
 
@@ -627,4 +649,18 @@ void AudioReleaseAdapterVdi(uint32_t descIndex)
     priv->callback = NULL;
 
     AUDIO_FUNC_LOGD(" audio vdiAdapter release adapter success");
+}
+
+int32_t InitAdapterMutex(void)
+{
+    if (pthread_mutex_init(&g_adapterMutex, NULL) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("init g_adapterMutex failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+void DeinitAdapterMutex(void)
+{
+    pthread_mutex_destroy(&g_adapterMutex);
 }

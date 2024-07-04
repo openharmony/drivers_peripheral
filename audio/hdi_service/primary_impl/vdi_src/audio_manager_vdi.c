@@ -23,6 +23,7 @@
 #include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
+static pthread_mutex_t g_managerMutex;
 
 typedef struct IAudioManagerVdi* (*AudioManagerCreateIfInstanceVdi)(void);
 
@@ -205,6 +206,7 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
     int32_t ret;
+    pthread_mutex_lock(&g_managerMutex);
     priv->vdiDescs = (struct AudioAdapterDescriptorVdi *)OsalMemCalloc(
         sizeof(struct AudioAdapterDescriptorVdi) * (*descsLen));
     CHECK_NULL_PTR_RETURN_VALUE(priv->vdiDescs, HDF_ERR_NOT_SUPPORT);
@@ -216,8 +218,10 @@ int32_t AudioManagerPrivVdiGetAllAdapters(struct AudioManagerPrivVdi *priv,
         free(priv->vdiDescs);
         priv->vdiDescs = NULL;
         priv->vdiDescsCount = 0;
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_managerMutex);
 
     ret = AudioManagerVdiDescsToDescs(priv->vdiDescs, priv->vdiDescsCount, descs, descsLen);
     if (ret != HDF_SUCCESS) {
@@ -327,11 +331,13 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
         return HDF_FAILURE;
     }
 
+    pthread_mutex_lock(&g_managerMutex);
     struct IAudioAdapterVdi *vdiAdapter = NULL;
     ret = priv->vdiManager->LoadAdapter(priv->vdiManager, &vdiDesc, &vdiAdapter);
     AudioManagerReleaseVdiDesc(&vdiDesc);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio vdiManager call LoadAdapter fail, ret=%{public}d", ret);
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_FAILURE;
     }
 
@@ -339,8 +345,10 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
     if (*adapter == NULL) {
         AUDIO_FUNC_LOGE("audio vdiManager create adapter fail");
         priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_FAILURE;
     }
+    pthread_mutex_unlock(&g_managerMutex);
 
     AUDIO_FUNC_LOGD("audio vdiManager load vdiAdapter success");
     return HDF_SUCCESS;
@@ -355,27 +363,32 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
     CHECK_NULL_PTR_RETURN_VALUE(priv->vdiManager, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(priv->vdiManager->UnloadAdapter, HDF_ERR_INVALID_PARAM);
 
+    pthread_mutex_lock(&g_managerMutex);
     uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, adapterName);
     if (descIndex >= AUDIO_VDI_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("AudioManagerVendorUnloadAdapter descIndex error");
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct IAudioAdapterVdi *vdiAdapter = AudioGetVdiAdapterByDescIndexVdi(descIndex);
     if (vdiAdapter == NULL) {
         AUDIO_FUNC_LOGW("audio vdiManager vdiAdapter had unloaded, index=%{public}d", descIndex);
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_SUCCESS;
     }
 
     uint32_t count = AudioGetAdapterRefCntVdi(descIndex);
     if (count > 1 && count != UINT_MAX) {
         AudioDecreaseAdapterRefVdi(descIndex);
+        pthread_mutex_unlock(&g_managerMutex);
         return HDF_SUCCESS;
     }
 
     priv->vdiManager->UnloadAdapter(priv->vdiManager, vdiAdapter);
 
     AudioReleaseAdapterVdi(descIndex);
+    pthread_mutex_unlock(&g_managerMutex);
     AUDIO_FUNC_LOGD("audio vdiManager unload vdiAdapter success");
     return HDF_SUCCESS;
 }
@@ -460,6 +473,16 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
         return NULL;
     }
 
+    if (pthread_mutex_init(&g_managerMutex, NULL) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("init g_managerMutex failed.");
+        return NULL;
+    }
+    if (InitAdapterMutex() != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("init g_adapterMutex failed.");
+        pthread_mutex_destroy(&g_managerMutex);
+        return NULL;
+    }
+
     priv->interface.GetAllAdapters = AudioManagerVendorGetAllAdapters;
     priv->interface.LoadAdapter = AudioManagerVendorLoadAdapter;
     priv->interface.UnloadAdapter = AudioManagerVendorUnloadAdapter;
@@ -470,5 +493,8 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
 
 int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager)
 {
-    return ReleaseAudioManagerVendorObject(manager);
+    int32_t ret = ReleaseAudioManagerVendorObject(manager);
+    pthread_mutex_destroy(&g_managerMutex);
+    DeinitAdapterMutex();
+    return ret;
 }

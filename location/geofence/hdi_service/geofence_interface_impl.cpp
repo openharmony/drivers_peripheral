@@ -36,7 +36,7 @@ int32_t GeofenceInterfaceImpl::SetGeofenceCallback(const sptr<IGeofenceCallback>
     return HDF_SUCCESS;
 }
 
-int32_t GeofenceInterfaceImpl::AddGnssGeofence(const GeofenceInfo& fence, GeofenceEvent monitorEvent)
+int32_t GeofenceInterfaceImpl::AddGnssGeofence(const GeofenceInfo& fence, int monitorEvent)
 {
     return HDF_SUCCESS;
 }

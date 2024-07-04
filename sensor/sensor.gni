@@ -1,6 +1,7 @@
 declare_args() {
   drivers_peripheral_sensor_feature_community = true
   drivers_peripheral_sensor_feature_lite_support_test = false
+  drivers_peripheral_sensor_feature_model = false
 }
 
 c_utils_enable = true

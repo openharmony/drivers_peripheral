@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef IDM_FILE_MANAGER_H
-#define IDM_FILE_MANAGER_H
+#ifndef FILE_MANAGER_UTILS_H
+#define FILE_MANAGER_UTILS_H
 
-#include "defines.h"
-#include "linked_list.h"
+#include "buffer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-LinkedList *LoadFileInfo(void);
-ResultCode UpdateFileInfo(LinkedList *userInfoList);
-ResultCode DeleteFile(void);
+ResultCode StreamWrite(Buffer *parcel, void *from, uint32_t size);
+ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t size);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // IDM_FILE_MANAGER_H
+#endif // FILE_MANAGER_UTILS_H

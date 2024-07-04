@@ -27,6 +27,8 @@ extern "C" {
     extern ResultCode GetReuseUnlockResult(const ReuseUnlockParamHal *info, ReuseUnlockResult *reuseResult);
     extern void CacheUnlockAuthResult(int32_t userId, const UserAuthTokenHal *unlockToken,
         const EnrolledStateHal *enrolledState);
+    extern void SetAuthResult(uint64_t credentialId,
+        const UserAuthContext *context, const ExecutorResultInfo *info, AuthResult *result);
 }
 
 namespace OHOS {
@@ -64,6 +66,26 @@ HWTEST_F(UserAuthFuncsTest, TestRequestAuthResultFunc, TestSize.Level0)
     EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, nullptr), RESULT_BAD_PARAM);
     result.rootSecret = CreateBufferBySize(bufferSize);
     EXPECT_EQ(RequestAuthResultFunc(contextId, scheduleResult, &token, &result), RESULT_BAD_PARAM);
+}
+
+HWTEST_F(UserAuthFuncsTest, TestSetAuthResult, TestSize.Level0)
+{
+    uint64_t credentialId = 1;
+    UserAuthContext context = {};
+    context.userId = 123;
+    context.authType = 4;
+    ExecutorResultInfo info = {};
+    info.result = 0;
+    info.freezingTime = 0;
+    info.remainTimes = 5;
+    AuthResult result = {0};
+    SetAuthResult(credentialId, &context, &info, &result);
+    EXPECT_EQ(result.credentialId, 1);
+    EXPECT_EQ(result.userId, 123);
+    EXPECT_EQ(result.authType, 4);
+    EXPECT_EQ(result.freezingTime, 0);
+    EXPECT_EQ(result.remainTimes, 5);
+    EXPECT_EQ(result.result, 0);
 }
 
 HWTEST_F(UserAuthFuncsTest, TestGetEnrolledStateFunc, TestSize.Level0)
@@ -170,7 +192,7 @@ HWTEST_F(UserAuthFuncsTest, TestSetGlobalConfigParamFunc, TestSize.Level0)
 {
     GlobalConfigParamHal param = {};
     EXPECT_EQ(SetGlobalConfigParamFunc(nullptr), RESULT_BAD_PARAM);
-    EXPECT_EQ(SetGlobalConfigParamFunc(&param), RESULT_GENERAL_ERROR);
+    EXPECT_EQ(SetGlobalConfigParamFunc(&param), RESULT_BAD_PARAM);
 }
 } // namespace UserAuth
 } // namespace UserIam

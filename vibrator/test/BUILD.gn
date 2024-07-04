@@ -13,10 +13,6 @@
 
 import("../vibrator.gni")
 
-declare_args() {
-  drivers_peripheral_vibrator_feature_model = false
-}
-
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
