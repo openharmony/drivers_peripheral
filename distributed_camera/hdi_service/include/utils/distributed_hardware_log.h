@@ -85,6 +85,16 @@ namespace DistributedHardware {
             return (ret);                              \
         }                                              \
     } while (0)
+#define CHECK_NULL_AND_OBJECT_FREE_RETURN(root, ret, ...)           \
+    do {                                                            \
+        if ((root) == nullptr) {                                    \
+            return (ret);                                           \
+        }                                                           \
+        if (!cJSON_IsObject((root))) {                              \
+            cJSON_Delete((root));                                   \
+            return (ret);                                           \
+        }                                                           \
+    } while (0)
 
 #define CHECK_AND_FREE_RETURN_RET_LOG(cond, ret, root, fmt, ...)    \
     do {                                                            \
