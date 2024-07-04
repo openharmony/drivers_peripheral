@@ -23,7 +23,7 @@
 #include <shared_mutex>
 
 using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
-std::shared_mutex mutex;
+std::shared_mutex mutex_;
 
 struct HdfAudioManagerHost {
     struct IDeviceIoService ioService;
