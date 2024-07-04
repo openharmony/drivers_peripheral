@@ -1664,7 +1664,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_042, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
 
 /**
@@ -1720,7 +1719,6 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_043, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
 
 /**
@@ -1774,5 +1772,4 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_044, TestSize.Level1)
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
 }
