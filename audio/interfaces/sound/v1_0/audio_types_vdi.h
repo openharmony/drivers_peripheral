@@ -399,6 +399,7 @@ struct AudioDevExtInfoVdi {
 struct AudioMixExtInfoVdi {
     int32_t moduleId;
     int32_t streamId;
+    int32_t source;
 } __attribute__ ((aligned(8)));
 
 struct AudioSessionExtInfoVdi {

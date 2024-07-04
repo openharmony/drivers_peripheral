@@ -110,8 +110,8 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     ret = vdiCapture->CaptureFrameEc(vdiCapture, &frameInfoVdi);
     HdfAudioFinishTrace();
     if (ret != HDF_SUCCESS) {
-        OsalMemFree((void *)frameInfoVdi->frame);
-        OsalMemFree((void *)frameInfoVdi->frameEc);
+        OsalMemFree((void *)frameInfoVdi.frame);
+        OsalMemFree((void *)frameInfoVdi.frameEc);
         AUDIO_FUNC_LOGE("audio capture EC frame fail, ret=%{public}d", ret);
         return ret;
     }
@@ -120,8 +120,8 @@ int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct Audio
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio capture VdiFrameInfo To FrameInfo fail");
     }
-    OsalMemFree((void *)frameInfoVdi->frame);
-    OsalMemFree((void *)frameInfoVdi->frameEc);
+    OsalMemFree((void *)frameInfoVdi.frame);
+    OsalMemFree((void *)frameInfoVdi.frameEc);
 
     return ret;
 }
