@@ -48,6 +48,7 @@ extern "C" {
 
 #define INIT_SCAN_RES_NUM 200
 #define MAX_SSID_LEN 33 // 32 + \0
+#define MAX_BUF_LEN 32
 
 typedef enum {
     CMD_CLOSE_GO_CAC,
@@ -56,6 +57,7 @@ typedef enum {
     CMD_ID_MCC_STA_P2P_QUOTA_TIME,
     CMD_ID_CTRL_ROAM_CHANNEL,
     CMD_ID_RX_REMAIN_ON_CHANNEL,
+    CMD_ID_INSTALL_WLAN_KEY,
 } ProjectionScreenCmd;
 
 /* common related interface */
@@ -179,6 +181,14 @@ typedef struct {
     uint8_t rsv[2];
     uint32_t ieLen;
 } WifiDisconnect;
+
+typedef struct {
+    uint8_t id;
+    int32_t suite;
+    uint8_t addr[ETH_ADDR_LEN];
+    uint32_t len;
+    uint8_t buf[MAX_BUF_LEN];
+} InstallWlanParam;
 
 enum WifiClientType {
     /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<13 */
