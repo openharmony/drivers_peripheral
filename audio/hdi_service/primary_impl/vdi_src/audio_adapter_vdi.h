@@ -17,7 +17,7 @@
 #define AUDIO_ADAPTER_VDI_H
 
 #include "iaudio_adapter_vdi.h"
-#include "v3_0/iaudio_adapter.h"
+#include "v4_0/iaudio_adapter.h"
 
 struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter);
 void AudioReleaseAdapterVdi(uint32_t descIndex);

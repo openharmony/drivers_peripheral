@@ -17,7 +17,7 @@
 #define AUDIO_COMMON_VDI_H
 
 #include "audio_types_vdi.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/audio_types.h"
 
 #define AUDIO_VDI_ADAPTER_NUM_MAX        20 // Limit the number of sound cards supported to a maximum of 20
 #define AUDIO_VDI_PORT_NUM_MAX    10

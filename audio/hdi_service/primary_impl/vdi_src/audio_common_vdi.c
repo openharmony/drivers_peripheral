@@ -297,6 +297,7 @@ static int32_t AudioCommonRouteNodeToVdiRouteNodeVdi(struct AudioRouteNode *rout
     if (routeNode->type == AUDIO_VDI_PORT_MIX_TYPE) {
         vdiRouteNode->ext.mix.moduleId = routeNode->ext.mix.moduleId;
         vdiRouteNode->ext.mix.streamId = routeNode->ext.mix.streamId;
+        vdiRouteNode->ext.mix.source = routeNode->ext.mix.source;
         return HDF_SUCCESS;
     }
 
