@@ -56,6 +56,8 @@ ohos_unittest("UserAuthUserAuthTest") {
     "../../../hdi_service/common/src/buffer.c",
     "../../../hdi_service/common/src/c_array.c",
     "../../../hdi_service/common/src/linked_list.c",
+    "../../../hdi_service/database/src/file_manager_utils.c",
+    "../../../hdi_service/database/src/global_config_file_manager.c",
     "../../../hdi_service/database/src/idm_common.c",
     "../../../hdi_service/database/src/idm_database.c",
     "../../../hdi_service/database/src/idm_file_manager.c",

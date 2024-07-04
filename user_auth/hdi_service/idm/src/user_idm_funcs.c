@@ -130,6 +130,10 @@ ResultCode CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleI
         LOG_ERROR("scheduleId is null");
         return RESULT_BAD_PARAM;
     }
+    if (!GetEnableStatus(param.userId, param.authType)) {
+        LOG_ERROR("authType is not support %{public}d", param.authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     ResultCode ret = IsValidUserType(param.userType);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("userType is invalid");
@@ -162,6 +166,10 @@ ResultCode CheckUpdatePermission(PermissionCheckParam param, uint64_t *scheduleI
     if (scheduleId == NULL || param.authType != PIN_AUTH) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
+    }
+    if (!GetEnableStatus(param.userId, param.authType)) {
+        LOG_ERROR("authType is not support %{public}d", param.authType);
+        return RESULT_TYPE_NOT_SUPPORT;
     }
     ResultCode ret = CheckSessionValid(param.userId);
     if (ret != RESULT_SUCCESS) {

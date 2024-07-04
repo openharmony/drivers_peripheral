@@ -77,6 +77,7 @@ ResultCode GetAllExtUserInfo(UserInfoResult *userInfos, uint32_t userInfolen, ui
 ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal);
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param);
 ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo);
+bool GetEnableStatus(int32_t userId, uint32_t authType);
 
 #ifdef __cplusplus
 }

@@ -56,7 +56,7 @@ int32_t SensorCallbackVdi::OnDataEvent(const V2_0::HdfSensorEvents& event)
     return HDF_SUCCESS;
 }
 
-void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, std::string &reportResult)
+void SensorCallbackVdi::PrintData(const HdfSensorEvents &event, const std::string &reportResult)
 {
     SENSOR_TRACE;
     std::unique_lock<std::mutex> lock(timestampMapMutex_);

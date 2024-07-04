@@ -18,6 +18,7 @@
 
 #include "iaudio_adapter_vdi.h"
 #include "v4_0/iaudio_adapter.h"
+#include <pthread.h>
 
 struct IAudioAdapter *AudioCreateAdapterVdi(uint32_t descIndex, struct IAudioAdapterVdi *vdiAdapter);
 void AudioReleaseAdapterVdi(uint32_t descIndex);
@@ -26,5 +27,7 @@ int32_t AudioIncreaseAdapterRefVdi(uint32_t descIndex, struct IAudioAdapter **ad
 void AudioDecreaseAdapterRefVdi(uint32_t descIndex);
 uint32_t AudioGetAdapterRefCntVdi(uint32_t descIndex);
 void AudioEnforceClearAdapterRefCntVdi(uint32_t descIndex);
+int32_t InitAdapterMutex(void);
+void DeinitAdapterMutex(void);
 
 #endif // AUDIO_ADAPTER_VDI_H
