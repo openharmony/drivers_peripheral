@@ -109,6 +109,14 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
     if (inOut) {
         {
             std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
+            auto itr = std::find_if(HosV4L2Dev::deviceMatch.begin(), HosV4L2Dev::deviceMatch.end(),
+                [v4l2Device](const std::map<std::string, std::string>::value_type& pair) {
+                return pair.second == v4l2Device;
+            });
+            if (itr != HosV4L2Dev::deviceMatch.end()) {
+                CAMERA_LOGE("UVC:loop HosV4L2Dev::V4L2UvcMatchDev has insert %{public}s\n", itr->second.c_str());
+                return;
+            }
             iter = HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(devName), v4l2Device));
         }
         devNameSize = sizeof(devName);
