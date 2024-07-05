@@ -35,7 +35,7 @@ typedef struct UserAuthContext {
     uint32_t collectorSensorHint;
     LinkedList *scheduleList;
     uint64_t authExpiredSysTime;
-    bool isAuthResultCached;
+    int32_t authIntent;
     bool isExpiredReturnSuccess;
     uint8_t localUdid[UDID_LEN];
     uint8_t collectorUdid[UDID_LEN];
@@ -48,7 +48,7 @@ typedef struct {
     uint32_t authType;
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
-    bool isAuthResultCached;
+    int32_t authIntent;
     bool isExpiredReturnSuccess;
     uint8_t localUdid[UDID_LEN];
     uint8_t collectorUdid[UDID_LEN];
