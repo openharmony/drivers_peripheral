@@ -22,6 +22,7 @@
 #include "adaptor_log.h"
 #include "adaptor_time.h"
 #include "idm_file_manager.h"
+#include "global_config_file_manager.h"
 
 #define MAX_DUPLICATE_CHECK 100
 #define PRE_APPLY_NUM 5
@@ -41,7 +42,7 @@ IAM_STATIC LinkedList *g_userInfoList = NULL;
 IAM_STATIC UserInfo *g_currentUser = NULL;
 
 // Caches global config info.
-IAM_STATIC GlobalConfigParamHal g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
+IAM_STATIC GlobalConfigInfo g_globalConfigArray[MAX_GLOBAL_CONFIG_NUM];
 IAM_STATIC uint32_t g_globalConfigInfoNum = 0;
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
@@ -1217,39 +1218,77 @@ ResultCode GetEnrolledState(int32_t userId, uint32_t authType, EnrolledStateHal 
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode SavePinExpiredPeriod(int64_t pinExpiredPeriod)
+IAM_STATIC ResultCode UpdateGlobalConfigArray(GlobalConfigParamHal *param, uint32_t authType)
 {
-    if (pinExpiredPeriod < 0) {
-        pinExpiredPeriod = NO_CHECK_PIN_EXPIRED_PERIOD;
-    }
-    for (uint32_t i = 0; i < g_globalConfigInfoNum; i++) {
-        if (g_globalConfigArray[i].type == PIN_EXPIRED_PERIOD) {
-            g_globalConfigArray[i].value.pinExpiredPeriod = pinExpiredPeriod;
-            return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+    uint32_t infoIndex = 0;
+    for (infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
+        if (g_globalConfigArray[infoIndex].type == param->type &&
+            g_globalConfigArray[infoIndex].authType == authType) {
+            LOG_INFO("globalConfig is already exist, type:%{public}d, authType:%{public}u", param->type, authType);
+            break;
         }
     }
-    if (g_globalConfigInfoNum < MAX_GLOBAL_CONFIG_NUM) {
-        g_globalConfigInfoNum++;
-        g_globalConfigArray[g_globalConfigInfoNum - 1].type = PIN_EXPIRED_PERIOD;
-        g_globalConfigArray[g_globalConfigInfoNum - 1].value.pinExpiredPeriod = pinExpiredPeriod;
-        return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
+    if (infoIndex >= MAX_GLOBAL_CONFIG_NUM) {
+        LOG_ERROR("globalConfigArray is exceed limit");
+        return RESULT_EXCEED_LIMIT;
     }
-    LOG_ERROR("SavePinExpiredPeriod failed");
-    return RESULT_GENERAL_ERROR;
+    memset_s(&g_globalConfigArray[infoIndex], sizeof(GlobalConfigInfo), 0, sizeof(GlobalConfigInfo));
+
+    switch (param->type) {
+        case PIN_EXPIRED_PERIOD:
+            if (authType != PIN_AUTH) {
+                LOG_ERROR("bad authType:%{public}u for PIN_EXPIRED_PERIOD", authType);
+                return RESULT_BAD_PARAM;
+            }
+            g_globalConfigArray[infoIndex].value.pinExpiredPeriod = param->value.pinExpiredPeriod;
+            break;
+        case ENABLE_STATUS:
+            g_globalConfigArray[infoIndex].value.enableStatus = param->value.enableStatus;
+            break;
+        default:
+            LOG_ERROR("globalConfigType not support, type:%{public}d.", param->type);
+            return RESULT_BAD_PARAM;
+    }
+    g_globalConfigArray[infoIndex].type = param->type;
+    g_globalConfigArray[infoIndex].authType = authType;
+    g_globalConfigArray[infoIndex].userIdNum = param->userIdNum;
+    for (uint32_t i = 0; i < param->userIdNum; i++) {
+        g_globalConfigArray[infoIndex].userIds[i] = param->userIds[i];
+    }
+    if (infoIndex == g_globalConfigInfoNum) {
+        g_globalConfigInfoNum++;
+    }
+    return RESULT_SUCCESS;
 }
 
+IAM_STATIC bool CheckAuthType(uint32_t authType)
+{
+    if (authType != PIN_AUTH && authType != FACE_AUTH && authType != FINGER_AUTH && authType != RECOVERY_KEY) {
+        LOG_ERROR("bad authType %{public}u", authType);
+        return false;
+    }
+    return true;
+}
 
 ResultCode SaveGlobalConfigParam(GlobalConfigParamHal *param)
 {
-    if (param == NULL) {
+    if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN ||
+        param->authTypeNum == 0) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
-    if (param->type == PIN_EXPIRED_PERIOD) {
-        return SavePinExpiredPeriod(param->value.pinExpiredPeriod);
+    for (uint32_t i = 0; i < param->authTypeNum; i++) {
+        if (!CheckAuthType(param->authTypes[i])) {
+            LOG_ERROR("bad authType %{public}u", param->authTypes[i]);
+            return RESULT_BAD_PARAM;
+        }
+        ResultCode ret = UpdateGlobalConfigArray(param, param->authTypes[i]);
+        if (ret != RESULT_SUCCESS) {
+            return ret;
+        }
     }
-    LOG_ERROR("SaveGlobalConfigParam type %{public}d failed", param->type);
-    return RESULT_GENERAL_ERROR;
+
+    return UpdateGlobalConfigFile(g_globalConfigArray, g_globalConfigInfoNum);
 }
 
 IAM_STATIC ResultCode QueryPinCredential(int32_t userId, CredentialInfoHal *pinCredential)
@@ -1306,4 +1345,27 @@ ResultCode GetPinExpiredInfo(int32_t userId, PinExpiredInfo *expiredInfo)
     }
     expiredInfo->pinEnrolledSysTime = pinCredential.enrolledSysTime;
     return RESULT_SUCCESS;
+}
+
+bool GetEnableStatus(int32_t userId, uint32_t authType)
+{
+    for (uint32_t infoIndex = 0; infoIndex < g_globalConfigInfoNum; infoIndex++) {
+        if (g_globalConfigArray[infoIndex].type != ENABLE_STATUS ||
+            g_globalConfigArray[infoIndex].authType != authType) {
+            continue;
+        }
+        LOG_INFO("enableStatus:%{public}d authType:%{public}u", g_globalConfigArray[infoIndex].value.enableStatus,
+            authType);
+        if (userId == INVALID_USER_ID || g_globalConfigArray[infoIndex].userIdNum == 0) {
+            return g_globalConfigArray[infoIndex].value.enableStatus;
+        }
+        for (uint32_t i = 0; i < g_globalConfigArray[infoIndex].userIdNum; i++) {
+            if (userId == g_globalConfigArray[infoIndex].userIds[i]) {
+                return g_globalConfigArray[infoIndex].value.enableStatus;
+            }
+        }
+        LOG_INFO("enableStatus is not set for userId:%{public}d", userId);
+        return (!g_globalConfigArray[infoIndex].value.enableStatus);
+    }
+    return true;
 }

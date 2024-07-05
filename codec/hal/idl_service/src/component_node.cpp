@@ -245,6 +245,10 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
     unsigned long tunneledComp = static_cast<unsigned long>(omxHandleTypeTunneledComp);
+    if (comType->ComponentTunnelRequest == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     auto err = comType->ComponentTunnelRequest(comp_, port, reinterpret_cast<OMX_HANDLETYPE>(tunneledComp),
         tunneledPort, reinterpret_cast<OMX_TUNNELSETUPTYPE *>(&tunnelSetup));
     if (err != OMX_ErrorNone) {

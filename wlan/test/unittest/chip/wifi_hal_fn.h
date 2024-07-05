@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,22 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef IDM_FILE_MANAGER_H
-#define IDM_FILE_MANAGER_H
+#ifndef WIFI_HAL_FN_H
+#define WIFI_HAL_FN_H
 
-#include "defines.h"
-#include "linked_list.h"
+#include <hdf_log.h>
+#include "../../../chip/hdi_service/wifi_hal.h"
 
-#ifdef __cplusplus
-extern "C" {
+WifiError InitWifiHalFuncTable(WifiHalFn *fn);
+
 #endif
-
-LinkedList *LoadFileInfo(void);
-ResultCode UpdateFileInfo(LinkedList *userInfoList);
-ResultCode DeleteFile(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // IDM_FILE_MANAGER_H

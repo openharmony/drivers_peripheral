@@ -51,6 +51,8 @@ ohos_shared_library("libuser_auth_interface_service_2.0") {
     "common/src/buffer.c",
     "common/src/c_array.c",
     "common/src/linked_list.c",
+    "database/src/file_manager_utils.c",
+    "database/src/global_config_file_manager.c",
     "database/src/idm_common.c",
     "database/src/idm_database.c",
     "database/src/idm_file_manager.c",
