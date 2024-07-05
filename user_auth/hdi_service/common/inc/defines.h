@@ -82,6 +82,7 @@ typedef enum AuthType {
     PIN_AUTH = 1,
     FACE_AUTH = 2,
     FINGER_AUTH = 4,
+    RECOVERY_KEY = 8,
 } AuthType;
 
 typedef enum ScheduleMode {
@@ -162,8 +163,9 @@ typedef enum TokenType {
 #define CHALLENGE_LEN 32
 #define MAX_CREDENTIAL_OUTPUT 10
 #define MAX_ENROLL_OUTPUT 5
-#define MAX_AUTH_TYPE_LEN 3
+#define MAX_AUTH_TYPE_LEN 4
 #define UDID_LEN 64
+#define INVALID_USER_ID (-1)
 
 #ifdef __cplusplus
 }

@@ -45,6 +45,10 @@ ResultCode GenerateSolutionFunc(AuthParamHal param, LinkedList **schedules)
         LOG_ERROR("schedules is null");
         return RESULT_BAD_PARAM;
     }
+    if (!GetEnableStatus(param.userId, param.authType)) {
+        LOG_ERROR("authType is not support %{public}d", param.authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     UserAuthContext *authContext = NULL;
     ResultCode result = GenerateAuthContext(param, &authContext);
     if (result != RESULT_SUCCESS) {
@@ -296,6 +300,10 @@ EXIT:
 
 ResultCode GetEnrolledStateFunc(int32_t userId, uint32_t authType, EnrolledStateHal *enrolledStateHal)
 {
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
     ResultCode ret = GetEnrolledState(userId, authType, enrolledStateHal);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetEnrolledState failed");
@@ -401,7 +409,8 @@ ResultCode CheckReuseUnlockResultFunc(const ReuseUnlockParamHal *info, ReuseUnlo
 
 ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param)
 {
-    if (param == NULL) {
+    if (param == NULL || param->userIdNum > MAX_USER || param->authTypeNum > MAX_AUTH_TYPE_LEN ||
+        param->authTypeNum == 0 || (param->type != PIN_EXPIRED_PERIOD && param->type != ENABLE_STATUS)) {
         LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
@@ -412,33 +421,34 @@ ResultCode SetGlobalConfigParamFunc(GlobalConfigParamHal *param)
     return ret;
 }
 
-void GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel, int32_t *checkResult)
+ResultCode GetAvailableStatusFunc(int32_t userId, int32_t authType, uint32_t authTrustLevel)
 {
-    (*checkResult) = CheckAtlByExecutorAndCred(userId, authType, authTrustLevel);
-    if ((*checkResult) != RESULT_SUCCESS) {
+    if (!GetEnableStatus(userId, authType)) {
+        LOG_ERROR("authType is not support %{public}d", authType);
+        return RESULT_TYPE_NOT_SUPPORT;
+    }
+    ResultCode ret = CheckAtlByExecutorAndCred(userId, authType, authTrustLevel);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("CheckAtlByExecutorAndCred failed");
-        return;
+        return ret;
     }
 
     PinExpiredInfo expiredInfo = {};
-    (*checkResult) = GetPinExpiredInfo(userId, &expiredInfo);
-    if ((*checkResult) != RESULT_SUCCESS) {
+    ret = GetPinExpiredInfo(userId, &expiredInfo);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetPinExpiredInfo failed");
-        return;
+        return ret;
     }
     if (expiredInfo.pinExpiredPeriod == NO_CHECK_PIN_EXPIRED_PERIOD) {
         LOG_ERROR("pinExpiredPeriod is not set");
-        (*checkResult) = RESULT_SUCCESS;
-        return;
+        return RESULT_SUCCESS;
     }
     uint64_t nowTime = GetReeTime();
     if (nowTime > expiredInfo.pinExpiredPeriod + expiredInfo.pinEnrolledSysTime) {
         LOG_ERROR("pin is expired");
-        (*checkResult) = RESULT_PIN_EXPIRED;
-        return;
+        return RESULT_PIN_EXPIRED;
     }
-    (*checkResult) = RESULT_SUCCESS;
-    return;
+    return RESULT_SUCCESS;
 }
 
 ResultCode GenerateScheduleFunc(const Buffer *tlv, Uint8Array remoteUdid, ScheduleInfoParam *scheduleInfo)

@@ -33,6 +33,7 @@ int32_t UsbIoSendRequest(const struct UsbMessageQueue *msgQueue, const struct Us
 HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHostRequest **request);
 HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool);
 HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool);
+HDF_STATUS UsbIoRecvProcessStop(struct UsbInterfacePool *interfacePool);
 void UsbIoSetRequestCompletionInfo(const void *requestArg);
 
 #endif /* USB_IO_MANAGE_H */

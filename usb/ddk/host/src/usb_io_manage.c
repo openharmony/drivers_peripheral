@@ -95,7 +95,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
     }
-
+    HDF_LOGE("%{public}s, stop. ", __func__);
     return 0;
 }
 
@@ -128,7 +128,8 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
 
-        if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
+        if (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING ||
+            interfacePool->ioRecvProcessStopStatus != USB_POOL_PROCESS_RUNNING) {
             break;
         }
 
@@ -139,9 +140,10 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
             continue;
         }
     }
-
+    HDF_LOGE("%{public}s, recv thread end. ", __func__);
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOPED;
+    interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_STOPED;
     OsalSemPost(&interfacePool->submitRequestQueue.sem);
     OsalMutexUnlock(&interfacePool->ioStopLock);
 
@@ -224,8 +226,8 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
         goto ERROR;
     }
     reqEntry = DLIST_FIRST_ENTRY(&msgQueue->entry, struct UsbHostRequest, list);
-    if (reqEntry == NULL || reqEntry->list.prev == NULL || reqEntry->list.prev->next == NULL ||
-        reqEntry->list.next == NULL || reqEntry->list.next->prev == NULL) {
+    if (reqEntry == NULL || reqEntry->list.prev == NULL || reqEntry->list.next == NULL ||
+        reqEntry->list.prev->next != &reqEntry->list || reqEntry->list.next->prev != &reqEntry->list) {
         ret = HDF_ERR_INVALID_OBJECT;
         HDF_LOGE("%{public}s:%{public}d list node is invalid", __func__, __LINE__);
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
@@ -244,9 +246,7 @@ ERROR:
 
 HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
 {
-    HDF_STATUS ret;
     struct OsalThreadParam threadCfg;
-
     if (interfacePool == NULL) {
         HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -254,10 +254,11 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
 
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_RUNNING;
+    interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_RUNNING;
     OsalMutexUnlock(&interfacePool->ioStopLock);
 
     /* create IoSendProcess thread */
-    ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    HDF_STATUS ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     if (ret != EOK) {
         HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
         return ret;
@@ -307,11 +308,23 @@ ERR_DESTROY_RECV:
     return ret;
 }
 
+HDF_STATUS UsbIoRecvProcessStop(struct UsbInterfacePool *interfacePool)
+{
+    if ((interfacePool == NULL) || (interfacePool->device == NULL) || (interfacePool->device->devHandle == NULL)) {
+        HDF_LOGE("%{public}s:%{public}d param is NULL", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if ((interfacePool->ioRecvProcessStopStatus != USB_POOL_PROCESS_STOPED)) {
+        OsalMutexLock(&interfacePool->ioStopLock);
+        interfacePool->ioRecvProcessStopStatus = USB_POOL_PROCESS_STOP;
+        OsalSemPost(&interfacePool->submitRequestQueue.sem);
+        OsalMutexUnlock(&interfacePool->ioStopLock);
+    }
+    return HDF_SUCCESS;
+}
+
 HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
 {
-    HDF_STATUS ret;
-    int32_t i = 0;
-
     if ((interfacePool == NULL) || (interfacePool->device == NULL) || (interfacePool->device->devHandle == NULL)) {
         HDF_LOGE("%{public}s:%{public}d param is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -328,7 +341,7 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
                 __func__, __LINE__, interfacePool->ioProcessTid);
         }
     }
-
+    int32_t i = 0;
     while (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_STOPED) {
         i++;
         OsalMSleep(USB_IO_SLEEP_MS_TIME);
@@ -338,19 +351,15 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
         }
     }
 
-    ret = OsalThreadDestroy(&interfacePool->ioSendProcess);
+    HDF_STATUS ret = OsalThreadDestroy(&interfacePool->ioSendProcess);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
-
     ret = OsalThreadDestroy(&interfacePool->ioAsyncReceiveProcess);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d ", __func__, __LINE__, ret);
     }
-
-    OsalMutexDestroy(&interfacePool->ioStopLock);
-
     return ret;
 }
 

@@ -16,6 +16,7 @@
 #include "usb_raw_api_library.h"
 #include "linux_adapter.h"
 #include "usbd_wrapper.h"
+#include "usb_interface_pool.h"
 
 #define HDF_LOG_TAG USB_RAW_API_LIBRARY
 
@@ -1735,4 +1736,9 @@ bool RawGetInterfaceActiveStatus(struct UsbDeviceHandle *devHandle, uint32_t int
     bool ret = osAdapterOps->getInterfaceActiveStatus(devHandle, interfaceNumber);
     OsalMutexUnlock(&devHandle->lock);
     return ret;
+}
+
+int32_t RawUsbCloseCtlProcess(const UsbInterfaceHandle *interfaceHandle)
+{
+    return UsbCloseCtlProcess(interfaceHandle);
 }
