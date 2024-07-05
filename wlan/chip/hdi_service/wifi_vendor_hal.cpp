@@ -185,8 +185,8 @@ wifiInterfaceHandle WifiVendorHal::GetIfaceHandle(const std::string& ifaceName)
 WifiError WifiVendorHal::GetChipCaps(const std::string& ifaceName, uint32_t& capabilities)
 {
     capabilities = globalFuncTable_.getChipCaps(ifaceName.c_str());
-    if (capabilities < 0) {
-        return HAL_NONE;
+    if (capabilities == 0) {
+        return HAL_UNKNOWN;
     }
     return HAL_SUCCESS;
 }
@@ -194,8 +194,8 @@ WifiError WifiVendorHal::GetChipCaps(const std::string& ifaceName, uint32_t& cap
 WifiError WifiVendorHal::GetSupportedFeatureSet(const std::string& ifaceName, uint32_t& capabilities)
 {
     capabilities = globalFuncTable_.wifiGetSupportedFeatureSet(ifaceName.c_str());
-    if (capabilities < 0) {
-        return HAL_NONE;
+    if (capabilities == 0) {
+        return HAL_UNKNOWN;
     }
     return HAL_SUCCESS;
 }
@@ -363,9 +363,9 @@ WifiError WifiVendorHal::RegisterIfaceCallBack(const std::string& ifaceName,
 WifiError WifiVendorHal::UnRegisterIfaceCallBack(const std::string& ifaceName,
     const sptr<IChipIfaceCallback>& chipIfaceCallback)
 {
-    vendorHalCbHandler_.Invalidate(); // instead of RemoveCallback temporarily
-    WifiCallbackHandler handler = {OnAsyncGscanFullResult, OnAsyncRssiReport};
+    WifiCallbackHandler handler = {};
     globalFuncTable_.registerIfaceCallBack(ifaceName.c_str(), handler);
+    vendorHalCbHandler_.Invalidate(); // instead of RemoveCallback temporarily
     return HAL_SUCCESS;
 }
 
