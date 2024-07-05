@@ -16,12 +16,15 @@
 #include <gtest/gtest.h>
 #include <hdf_log.h>
 #include "../../../chip/hdi_service/wifi_sta_iface.h"
+#include "wifi_hal_fn.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
 
 namespace WifiStaIfaceTest {
 const std::string WLAN_IFNAME = "wlan0";
+const std::string AP_IFNAME = "wlan1";
+const std::string TEST_MAC = "000000";
 
 class WifiStaIfaceTest : public testing::Test {
 public:
@@ -29,22 +32,36 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        std::vector<std::string> instances = {WLAN_IFNAME};
+        ifaceTool = std::make_shared<IfaceTool>();
+        ifaceUtil = std::make_shared<IfaceUtil>(ifaceTool);
         WifiHalFn fn;
-        std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-        staIface = new (std::nothrow) WifiStaIface(WLAN_IFNAME, vendorHal,
-            std::make_shared<IfaceUtil>(ifaceTool));
+        InitWifiHalFuncTable(&fn);
+        wifiVendorHalTest = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
+        staIface = new (std::nothrow) WifiStaIface(WLAN_IFNAME, wifiVendorHalTest, ifaceUtil);
+        testIface = new (std::nothrow) WifiStaIface(AP_IFNAME, wifiVendorHalTest, ifaceUtil);
     }
     void TearDown()
     {
+        wifiVendorHalTest.reset();
+        ifaceTool.reset();
+        ifaceUtil.reset();
         delete staIface;
         if (staIface != nullptr) {
             staIface = nullptr;
         }
+        delete testIface;
+        if (testIface != nullptr) {
+            testIface = nullptr;
+        }
     }
 
 public:
+    std::shared_ptr<WifiVendorHal> wifiVendorHalTest;
+    std::shared_ptr<IfaceTool> ifaceTool;
+    std::shared_ptr<IfaceUtil> ifaceUtil;
     sptr<WifiStaIface> staIface;
+    sptr<WifiStaIface> testIface;
 };
 
 /**
@@ -70,5 +87,83 @@ HWTEST_F(WifiStaIfaceTest, WifiStaIfaceTest001, TestSize.Level1)
     std::string name;
     EXPECT_TRUE(staIface->GetIfaceName(name) == HDF_SUCCESS);
     EXPECT_TRUE(name == WLAN_IFNAME);
+}
+
+HWTEST_F(WifiStaIfaceTest, SetDpiMarkRuleTest, TestSize.Level1)
+{
+    HDF_LOGI("SetDpiMarkRuleTest started");
+    if (staIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(staIface->SetDpiMarkRule(0, 0, 0) == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->SetDpiMarkRule(1, 1, 1) == HDF_FAILURE);
+    EXPECT_TRUE(staIface->SetTxPower(0) == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->SetTxPower(1) == HDF_FAILURE);
+}
+
+HWTEST_F(WifiStaIfaceTest, EnablePowerModeTest, TestSize.Level1)
+{
+    HDF_LOGI("EnablePowerModeTest started");
+    if (staIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    EXPECT_TRUE(staIface->EnablePowerMode(0) == HDF_SUCCESS);
+    uint32_t cap;
+    EXPECT_TRUE(staIface->GetIfaceCap(cap) == HDF_SUCCESS);
+    EXPECT_TRUE(testIface->GetIfaceCap(cap) == HDF_FAILURE);
+}
+
+HWTEST_F(WifiStaIfaceTest, GetSupportFreqsTest, TestSize.Level1)
+{
+    HDF_LOGI("GetSupportFreqsTest started");
+    if (staIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    std::vector<uint32_t> freqs;
+    EXPECT_TRUE(staIface->GetSupportFreqs(0, freqs) == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->SetMacAddress(TEST_MAC) == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->SetCountryCode("cn") == HDF_SUCCESS);
+    EXPECT_TRUE(staIface->SetPowerMode(0) == HDF_ERR_NOT_SUPPORT);
+    int32_t mode;
+    EXPECT_TRUE(staIface->GetPowerMode(mode) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiStaIfaceTest, RegisterChipIfaceCallBackTest, TestSize.Level1)
+{
+    HDF_LOGI("RegisterChipIfaceCallBackTest started");
+    if (staIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    sptr<IChipIfaceCallback> ifaceCallback;
+    EXPECT_TRUE(staIface->RegisterChipIfaceCallBack(ifaceCallback) == HDF_FAILURE);
+    EXPECT_TRUE(staIface->UnRegisterChipIfaceCallBack(ifaceCallback) == HDF_FAILURE);
+}
+
+HWTEST_F(WifiStaIfaceTest, ScanTest, TestSize.Level1)
+{
+    HDF_LOGI("ScanTest started");
+    if (staIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    ScanParams scanParam;
+    scanParam.fastConnectFlag = 0;
+    EXPECT_TRUE(staIface->StartScan(scanParam) == HDF_SUCCESS);
+    scanParam.fastConnectFlag = 1;
+    EXPECT_TRUE(staIface->StartScan(scanParam) == HDF_FAILURE);
+    std::vector<ScanResultsInfo> scanInfo;
+    staIface->GetScanInfos(scanInfo);
+    SignalPollResult signalPollResult;
+    staIface->GetSignalPollInfo(signalPollResult);
+    PnoScanParams pnoParam;
+    pnoParam.min2gRssi = 0;
+    EXPECT_TRUE(staIface->StartPnoScan(pnoParam) == HDF_SUCCESS);
+    pnoParam.min2gRssi = 1;
+    EXPECT_TRUE(staIface->StartPnoScan(pnoParam) == HDF_FAILURE);
+    EXPECT_TRUE(staIface->StopPnoScan() == HDF_SUCCESS);
 }
 }

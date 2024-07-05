@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <hdf_log.h>
 #include "../../../chip/hdi_service/wifi_ap_iface.h"
+#include "wifi_hal_fn.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
@@ -29,12 +30,13 @@ public:
     static void TearDownTestCase() {}
     void SetUp()
     {
-        std::vector<std::string> instances;
-        std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
+        std::vector<std::string> instances = {AP_IFNAME};
+        ifaceTool = std::make_shared<IfaceTool>();
+        ifaceUtil = std::make_shared<IfaceUtil>(ifaceTool);
         WifiHalFn fn;
-        std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
-        apIface = new (std::nothrow) WifiApIface(AP_IFNAME, instances, vendorHal,
-            std::make_shared<IfaceUtil>(ifaceTool));
+        InitWifiHalFuncTable(&fn);
+        wifiVendorHalTest = std::make_shared<WifiVendorHal>(ifaceTool, fn, true);
+        apIface = new (std::nothrow) WifiApIface(AP_IFNAME, instances, wifiVendorHalTest, ifaceUtil);
         if (apIface == nullptr) {
             HDF_LOGE("iface is null");
             return;
@@ -42,6 +44,9 @@ public:
     }
     void TearDown()
     {
+        wifiVendorHalTest.reset();
+        ifaceTool.reset();
+        ifaceUtil.reset();
         delete apIface;
         if (apIface != nullptr) {
             apIface = nullptr;
@@ -49,6 +54,9 @@ public:
     }
 
 public:
+    std::shared_ptr<WifiVendorHal> wifiVendorHalTest;
+    std::shared_ptr<IfaceTool> ifaceTool;
+    std::shared_ptr<IfaceUtil> ifaceUtil;
     sptr<WifiApIface> apIface;
 };
 
@@ -167,5 +175,33 @@ HWTEST_F(WifiApIfaceTest, EnablePowerModeTest, TestSize.Level1)
         return;
     }
     EXPECT_TRUE(apIface->EnablePowerMode(0) == HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiApIfaceTest, GetSupportFreqsTest, TestSize.Level1)
+{
+    HDF_LOGI("GetSupportFreqsTest started");
+    if (apIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    std::vector<uint32_t> freqs;
+    EXPECT_TRUE(apIface->GetSupportFreqs(0, freqs) == HDF_SUCCESS);
+    EXPECT_TRUE(apIface->SetMacAddress(TEST_MAC) != HDF_SUCCESS);
+    EXPECT_TRUE(apIface->SetCountryCode("cn") == HDF_SUCCESS);
+    EXPECT_TRUE(apIface->SetPowerMode(0) == HDF_SUCCESS);
+    int32_t mode;
+    EXPECT_TRUE(apIface->GetPowerMode(mode) == HDF_SUCCESS);
+}
+
+HWTEST_F(WifiApIfaceTest, RegisterChipIfaceCallBackTest, TestSize.Level1)
+{
+    HDF_LOGI("RegisterChipIfaceCallBackTest started");
+    if (apIface == nullptr) {
+        HDF_LOGE("iface is null");
+        return;
+    }
+    sptr<IChipIfaceCallback> ifaceCallback;
+    EXPECT_TRUE(apIface->RegisterChipIfaceCallBack(ifaceCallback) == HDF_ERR_NOT_SUPPORT);
+    EXPECT_TRUE(apIface->UnRegisterChipIfaceCallBack(ifaceCallback) == HDF_ERR_NOT_SUPPORT);
 }
 }

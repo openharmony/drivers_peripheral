@@ -17,6 +17,7 @@
 #include <hdf_log.h>
 #include "../../../chip/hdi_service/iface_tool.h"
 #include "../../../chip/hdi_service/wifi_chip.h"
+#include "wifi_hal_fn.h"
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Wlan::Chip::V1_0;
@@ -36,6 +37,7 @@ public:
         bool isPrimary = true;
         std::shared_ptr<IfaceTool> ifaceTool = std::make_shared<IfaceTool>();
         WifiHalFn fn;
+        InitWifiHalFuncTable(&fn);
         const std::shared_ptr<WifiVendorHal> vendorHal = std::make_shared<WifiVendorHal>(
             ifaceTool, fn, isPrimary);
         std::shared_ptr<WifiChipModes> chipModes = std::make_shared<WifiChipModes>();
@@ -70,6 +72,7 @@ HWTEST_F(WifiChipTest, GetCurrentModeTest, TestSize.Level1)
     EXPECT_TRUE(wifiChip->GetCurrentMode(modeId) == HDF_ERR_INVALID_PARAM);
     modeId = 0;
     wifiChip->GetCurrentMode(modeId);
+    wifiChip->RegisterChipEventCallback(nullptr);
 }
 
 /**
@@ -137,7 +140,6 @@ HWTEST_F(WifiChipTest, CreateP2pIfaceTest, TestSize.Level1)
     sptr<IChipIface> p2pIface = new (std::nothrow) WifiP2pIface(TEST_P2P_IFNAME, vendorHal,
         std::make_shared<IfaceUtil>(ifaceTool));
     wifiChip->CreateP2pService(p2pIface);
-
     std::vector<std::string> ifnames;
     wifiChip->GetP2pServiceIfNames(ifnames);
     std::string ifname1;
