@@ -53,8 +53,7 @@ namespace {
 static std::mutex g_mutex;
 static std::string g_localUdid;
 constexpr uint32_t INVALID_CAPABILITY_LEVEL = 100;
-const std::string SCREEN_LOCK_NAME = "com.ohos.systemui";
-const std::string SETTRINGS_NAME = "com.ohos.settings";
+const std::string SETTRINGS_NAME = "settings";
 
 enum UserAuthCallerType : int32_t {
     TOKEN_INVALID = -1,
@@ -471,15 +470,11 @@ static int32_t CopyAuthParamToHal(uint64_t contextId, const HdiAuthParam &param,
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    paramHal.isAuthResultCached = false;
+    paramHal.authIntent = param.authIntent;
     paramHal.isExpiredReturnSuccess = false;
-    if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
-        param.baseParam.callerName == SCREEN_LOCK_NAME) {
-        IAM_LOGI("auth result will be cached");
-        paramHal.isAuthResultCached = true;
-        paramHal.isExpiredReturnSuccess = true;
-    } else if (param.baseParam.callerType == UserAuthCallerType::TOKEN_HAP &&
-        param.baseParam.callerName == SETTRINGS_NAME) {
+    if (param.baseParam.callerType == TOKEN_HAP &&
+        (param.baseParam.callerName.find(SETTRINGS_NAME) != std::string::npos ||
+        param.authIntent == HdiAuthIntent::UNLOCK)) {
         paramHal.isExpiredReturnSuccess = true;
     }
     if (!param.collectorUdid.empty()) {

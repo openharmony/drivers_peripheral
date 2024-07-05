@@ -141,6 +141,12 @@ typedef enum TokenType {
     TOKEN_TYPE_COAUTH = 2,
 } TokenType;
 
+typedef enum AuthIntent {
+    DEFUALT = 0,
+    UNLOCK = 1,
+    SILENT_AUTH = 2,
+} AuthIntent;
+
 #define IF_TRUE_LOGE_AND_RETURN_VAL(cond, retVal) \
     do { \
         if (cond) { \
