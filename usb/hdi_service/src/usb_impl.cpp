@@ -473,7 +473,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
         HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d ", __func__, ret);
         return HDF_FAILURE;
     }
-    requestSync->params.timeout = timeout;
+    requestSync->params.timeout = static_cast<uint32_t>(timeout);
     struct UsbIfRequest* requestObj = (struct UsbIfRequest *)requestSync->request;
     struct UsbHostRequest* hostRequest = requestObj->hostRequest;
     hostRequest->length = size;
