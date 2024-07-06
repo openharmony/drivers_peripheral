@@ -33,7 +33,12 @@ void AudioRenderInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioRenderInterfaceImplTest::TearDownTestCase(void) {}
 
-void AudioRenderInterfaceImplTest::SetUp(void) {}
+void AudioRenderInterfaceImplTest::SetUp(void)
+{
+    desc_.portId = 0;
+    desc_.pins = PIN_NONE;
+    desc_.desc = "mic";
+}
 
 void AudioRenderInterfaceImplTest::TearDown(void)
 {

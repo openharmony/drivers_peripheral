@@ -48,9 +48,6 @@ public:
     AudioDeviceDescriptor desc_;
     AudioSampleAttributes attrs_;
     sptr<IDAudioCallback> callback_  = new MockIDAudioCallback();
-    desc_.portId = 0;
-    desc_.pins = PIN_NONE;
-    desc_.desc = "mic";
     uint32_t renderId_ = 0;
     std::shared_ptr<AudioRenderInterfaceImpl> audioRenderInterfaceImpl_ = nullptr;
 };
