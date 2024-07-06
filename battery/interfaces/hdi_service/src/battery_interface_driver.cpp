@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
 #include "battery_log.h"

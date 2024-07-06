@@ -16,6 +16,7 @@ import("../../power.gni")
 ohos_shared_library("libpower_interface_service_1.2") {
   include_dirs = [ "../../utils/include" ]
   sources = [
+    "../../utils/power_xcollie.cpp",
     "src/power_interface_impl.cpp",
     "src/running_lock_counter.cpp",
     "src/running_lock_impl.cpp",
@@ -31,14 +32,18 @@ ohos_shared_library("libpower_interface_service_1.2") {
     "ipc:ipc_single",
     "libxml2:libxml2",
   ]
+
+  defines = []
   if (has_power_c_utils_part) {
     external_deps += [ "c_utils:utils" ]
   }
   if (has_power_hisysevent_part) {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
-
-  defines = []
+  if (has_power_xcollie_part) {
+    external_deps += [ "hicollie:libhicollie" ]
+    defines += [ "HICOLLIE_ENABLE" ]
+  }
 
   if (drivers_peripheral_power_wakeup_cause_path) {
     sources += [ "src/power_config.cpp" ]
