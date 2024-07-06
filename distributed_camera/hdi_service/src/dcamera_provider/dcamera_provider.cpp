@@ -47,7 +47,8 @@ bool DCameraProvider::GetAbilityInfo(const std::string& abilityInfo, std::string
     std::string& sourceCodecInfo)
 {
     cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
-    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, false);
+    CHECK_NULL_RETURN_LOG(rootValue, false, "The abilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, false, "The abilityInfo is not object.");
 
     cJSON *sinkRootValue = cJSON_GetObjectItemCaseSensitive(rootValue, "SinkAbility");
     if (sinkRootValue == nullptr || !cJSON_IsObject(sinkRootValue)) {
