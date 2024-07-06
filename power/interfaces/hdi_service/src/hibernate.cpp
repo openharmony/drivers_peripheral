@@ -98,7 +98,7 @@ static int UlongLen(unsigned long arg)
 void Hibernate::Init()
 {
     HDF_LOGI("hibernate init begin.");
-    auto myThread = std::thread(&Hibernate::InitSwap, this);
+    auto myThread = std::thread([this] { this->InitSwap(); });
     myThread.detach();
 }
 
