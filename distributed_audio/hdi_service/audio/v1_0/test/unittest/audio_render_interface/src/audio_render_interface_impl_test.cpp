@@ -33,15 +33,7 @@ void AudioRenderInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioRenderInterfaceImplTest::TearDownTestCase(void) {}
 
-void AudioRenderInterfaceImplTest::SetUp(void)
-{
-    desc_.portId = 0;
-    desc_.pins = PIN_NONE;
-    desc_.desc = "mic";
-    uint32_t renderId = 0;
-    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
-        callback_, renderId);
-}
+void AudioRenderInterfaceImplTest::SetUp(void) {}
 
 void AudioRenderInterfaceImplTest::TearDown(void)
 {
@@ -56,6 +48,8 @@ void AudioRenderInterfaceImplTest::TearDown(void)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t ms = 12;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetLatency(ms));
 }
@@ -68,6 +62,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetLatency_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
     EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
@@ -81,6 +77,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_002, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
     audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
@@ -96,6 +94,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_002, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_003, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
     audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
@@ -111,6 +111,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_003, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t frames = 0;
     AudioTimeStamp time;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetRenderPosition(frames, time));
@@ -124,6 +126,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderPosition_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float speed = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetRenderSpeed(speed));
 }
@@ -136,6 +140,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetRenderSpeed_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetRenderSpeed_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float speed;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetRenderSpeed(speed));
 }
@@ -148,6 +154,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderSpeed_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetChannelMode_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioChannelMode mode = AudioChannelMode::AUDIO_CHANNEL_NORMAL;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetChannelMode(mode));
 }
@@ -160,6 +168,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetChannelMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetChannelMode_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioChannelMode mode = AudioChannelMode::AUDIO_CHANNEL_MIX;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetChannelMode(mode));
 }
@@ -172,6 +182,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetChannelMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, RegCallback_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     sptr<IAudioCallback> cbObj = nullptr;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RegCallback(cbObj, 0));
 }
@@ -184,6 +196,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, RegCallback_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, DrainBuffer_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioDrainNotifyType type = AudioDrainNotifyType::AUDIO_DRAIN_EARLY_MODE;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->DrainBuffer(type));
 }
@@ -196,6 +210,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, DrainBuffer_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, IsSupportsDrain_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     bool support = true;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->IsSupportsDrain(support));
 }
@@ -208,6 +224,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, IsSupportsDrain_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Start_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
 
@@ -219,6 +237,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
     audioRenderInterfaceImpl_->audioExtCallback_ = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
@@ -232,6 +252,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     audioRenderInterfaceImpl_->firstOpenFlag_ = false;
     audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
@@ -245,6 +267,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Stop_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Stop());
     audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Stop());
@@ -258,6 +282,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Stop_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Pause_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Pause());
 }
 
@@ -269,6 +295,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Pause_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Resume_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Resume());
 }
 
@@ -280,6 +308,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Resume_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Flush_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Flush());
 }
 
@@ -291,6 +321,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, Flush_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, TurnStandbyMode_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->TurnStandbyMode());
 }
 
@@ -302,6 +334,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, TurnStandbyMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, AudioDevDump_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     int32_t range = 0;
     int32_t fd = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->AudioDevDump(range, fd));
@@ -315,6 +349,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, AudioDevDump_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, IsSupportsPauseAndResume_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     bool supportPause = true;
     bool supportResume = true;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->IsSupportsPauseAndResume(supportPause, supportResume));
@@ -328,6 +364,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, IsSupportsPauseAndResume_001, TestSize.Le
  */
 HWTEST_F(AudioRenderInterfaceImplTest, CheckSceneCapability_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioSceneDescriptor scene;
     bool support = true;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->CheckSceneCapability(scene, support));
@@ -341,6 +379,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, CheckSceneCapability_001, TestSize.Level1
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SelectScene_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioSceneDescriptor scene;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SelectScene(scene));
 }
@@ -353,6 +393,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SelectScene_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetMute_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     bool mute = true;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetMute(mute));
 }
@@ -365,6 +407,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetMute_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetMute_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     bool mute = true;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetMute(mute));
 }
@@ -377,6 +421,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetMute_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float volume = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetVolume(volume));
 }
@@ -389,6 +435,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetVolume_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float volume = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetVolume(volume));
 }
@@ -401,6 +449,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetGainThreshold_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float min = 0;
     float max = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetGainThreshold(min, max));
@@ -414,6 +464,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetGainThreshold_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetGain_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float gain = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetGain(gain));
 }
@@ -426,6 +478,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetGain_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetGain_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     float gain = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetGain(gain));
 }
@@ -438,6 +492,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetGain_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFrameSize_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t size = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetFrameSize(size));
 }
@@ -450,6 +506,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFrameSize_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFrameCount_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t count = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetFrameCount(count));
 }
@@ -462,6 +520,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFrameCount_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetSampleAttributes_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioSampleAttributes attrs = {
         .type = AUDIO_IN_MEDIA,
         .interleaved = true,
@@ -488,6 +548,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetSampleAttributes_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetSampleAttributes_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetSampleAttributes(attrs));
 }
@@ -500,6 +562,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetSampleAttributes_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetCurrentChannelId_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t channelId = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetCurrentChannelId(channelId));
 }
@@ -512,6 +576,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetCurrentChannelId_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     std::string keyValueList = "hello";
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->SetExtraParams(keyValueList));
 }
@@ -524,6 +590,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetExtraParams_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     std::string keyValueList;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetExtraParams(keyValueList));
 }
@@ -536,6 +604,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     int32_t reqSize = 1;
     AudioMmapBufferDescriptor desc;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
@@ -549,6 +619,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetMmapPosition_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t frame = 0;
     AudioTimeStamp time = {1, 1};
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetMmapPosition(frame, time));
@@ -562,6 +634,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetMmapPosition_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFrameBufferSize_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t bufferSize = 6;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->GetFrameBufferSize(bufferSize));
 }
@@ -574,6 +648,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFrameBufferSize_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, RemoveAudioEffect_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t effectid = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RemoveAudioEffect(effectid));
 }
@@ -587,6 +663,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, RemoveAudioEffect_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, AddAudioEffect_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint64_t id = 0;
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->AddAudioEffect(id));
 }
@@ -620,6 +698,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetRenderDesc_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetVolumeInner_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t volTmp = 2;
     uint32_t volTmpMin = 2;
     uint32_t volTmpMax = 10;
@@ -637,6 +717,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetVolumeInner_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetMaxVolumeInner_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t volTmpMin = 2;
     uint32_t volTmpMax = 10;
 
@@ -652,6 +734,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetMaxVolumeInner_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetMinVolumeInner_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t volTmpMin = 2;
     uint32_t volTmpMax = 10;
 
@@ -667,6 +751,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetMinVolumeInner_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t currentIndex = 2;
     const uint32_t durationIndex = 5;
 
@@ -683,6 +769,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_002, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t currentIndex = 3;
     const uint32_t durationIndex = 5;
 
@@ -699,6 +787,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_002, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_003, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     uint32_t currentIndex = 6;
     const uint32_t durationIndex = 5;
 
@@ -714,6 +804,8 @@ HWTEST_F(AudioRenderInterfaceImplTest, GetFadeRate_003, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, FadeInProcess_001, TestSize.Level1)
 {
+    audioRenderInterfaceImpl_ = std::make_shared<AudioRenderInterfaceImpl>(adpName_, desc_, attrs_,
+        callback_, renderId_);
     const uint32_t durationFrame = 10;
     const size_t frameLength = 4096;
     int8_t* frameData = new int8_t[frameLength];

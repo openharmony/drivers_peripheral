@@ -79,6 +79,11 @@ int32_t AudioManagerInterfaceImpl::LoadAdapter(const AudioAdapterDescriptor &des
         return HDF_FAILURE;
     }
 
+    if (adp->second == nullptr) {
+        DHLOGE("adapterimpl is nullptr.");
+        return HDF_FAILURE;
+    }
+
     int32_t ret = adp->second->AdapterLoad();
     if (ret != DH_SUCCESS) {
         DHLOGE("Load audio adapter failed, adapter return: %{public}d.", ret);
@@ -102,6 +107,11 @@ int32_t AudioManagerInterfaceImpl::UnloadAdapter(const std::string &adapterName)
         return HDF_SUCCESS;
     }
 
+    if (adp->second == nullptr) {
+        DHLOGE("adapterimpl is nullptr.");
+        return HDF_FAILURE;
+    }
+    
     int32_t ret = adp->second->AdapterUnload();
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload audio adapter failed, adapter return: %{public}d.", ret);

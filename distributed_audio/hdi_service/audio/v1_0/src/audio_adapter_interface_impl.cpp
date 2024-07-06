@@ -108,6 +108,10 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V2_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
+        if (audioRender == nullptr) {
+            DHLOGE("audioRender is null.");
+            return nullptr;
+        }
         audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
@@ -276,6 +280,10 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V2_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
+        if (audioCapture == nullptr) {
+            DHLOGE("audioCapture is null.");
+            return nullptr;
+        }
         audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
@@ -597,6 +605,10 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
         renderParam_.period, renderFlags_ == Audioext::V2_0::MMAP_MODE);
     renderParam_.renderFlags = renderFlags_;
 
+    if (extSpkCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extSpkCallback->SetParameters(renderId, renderParam_);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Set render parameters failed.");
@@ -673,6 +685,10 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
         attrs.format, captureParam_.period, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
+    if (extMicCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extMicCallback->SetParameters(captureId, captureParam_);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Set audio parameters failed.");
@@ -703,6 +719,10 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
         return DH_SUCCESS;
     }
     captureParam_ = {};
+    if (extMicCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extMicCallback->DestroyStream(captureId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
