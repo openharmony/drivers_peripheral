@@ -34,11 +34,15 @@ namespace Gnss {
 namespace V2_0 {
 namespace {
 using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
+#ifndef EMULATOR_ENABLED
 using GnssMeasurementCallbackMap = std::unordered_map<IRemoteObject*, sptr<IGnssMeasurementCallback>>;
+#endif
 using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 LocationCallBackMap g_locationCallBackMap;
+#ifndef EMULATOR_ENABLED
 GnssMeasurementCallbackMap g_gnssMeasurementCallbackMap;
+#endif
 GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
 GnssConfigParameter g_configPara;
 std::mutex g_mutex;
@@ -116,6 +120,7 @@ static void LocationUpdate(GnssLocation* location)
     }
 }
 
+#ifndef EMULATOR_ENABLED
 static void SetGnssClock(OHOS::HDI::Location::Gnss::V2_0::GnssMeasurementInfo* gnssMeasurementInfoNew,
     OHOS::HDI::Location::GnssMeasurementInfo* gnssMeasurementInfo)
 {
@@ -185,6 +190,7 @@ static void GnssMeasurementUpdate(OHOS::HDI::Location::GnssMeasurementInfo* gnss
         }
     }
 }
+#endif
 
 static void GnssWorkingStatusUpdate(uint16_t* status)
 {
@@ -282,6 +288,7 @@ static void GetGnssCallbackMethods(GnssCallbackStruct* device)
     device->gnssCacheCallback = cacheCallback;
 }
 
+#ifndef EMULATOR_ENABLED
 static void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* device)
 {
     if (device == nullptr) {
@@ -290,6 +297,7 @@ static void GetGnssMeasurementCallbackMethods(GnssMeasurementCallbackIfaces* dev
     device->size = sizeof(GnssMeasurementCallbackIfaces);
     device->gnssMeasurementUpdate = GnssMeasurementUpdate;
 }
+#endif
 
 GnssInterfaceImpl::GnssInterfaceImpl()
 {
@@ -550,6 +558,7 @@ int32_t GnssInterfaceImpl::SendNetworkInitiatedMsg(const std::string& msg, int l
 
 int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCallback>& callbackObj)
 {
+#ifndef EMULATOR_ENABLED
     HDF_LOGI("%{public}s.", __func__);
     if (callbackObj == nullptr) {
         HDF_LOGE("%{public}s:invalid callbackObj", __func__);
@@ -581,10 +590,14 @@ int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCall
     }
     g_gnssMeasurementCallbackMap[remote.GetRefPtr()] = callbackObj;
     return ret;
+#else
+    return HDF_SUCCESS;
+#endif
 }
 
 int32_t GnssInterfaceImpl::DisableGnssMeasurement()
 {
+#ifndef EMULATOR_ENABLED
     HDF_LOGI("%{public}s.", __func__);
     std::unique_lock<std::mutex> lock(g_mutex);
     int moduleType = static_cast<int>(GnssModuleIfaceCategory::GNSS_MEASUREMENT_MODULE_INTERFACE);
@@ -596,6 +609,7 @@ int32_t GnssInterfaceImpl::DisableGnssMeasurement()
     }
     gnssMeasurementInterface->disable();
     g_gnssMeasurementCallbackMap.clear();
+#endif
     return HDF_SUCCESS;
 }
 
