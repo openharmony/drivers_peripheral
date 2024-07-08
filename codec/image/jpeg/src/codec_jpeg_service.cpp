@@ -79,35 +79,29 @@ int32_t CodecJpegService::AllocateJpegInBuffer(CodecImageBuffer& inBuffer, uint3
     int32_t ret = core_->AllocateInBuffer(&bufferHandle, size);
     inBuffer.fenceFd = -1;
     CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "error = [%{public}d]", ret);
-    inBuffer.buffer = new NativeBuffer(bufferHandle);
+    inBuffer.buffer = new NativeBuffer();
     if (inBuffer.buffer == nullptr) {
         CODEC_LOGE("jpeg new NativeBuffer fail!");
         ret = core_->FreeInBuffer(bufferHandle);
         CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "free bufferhandle fail, error = [%{public}d]", ret);
         return HDF_FAILURE;
     }
+    inBuffer.buffer->SetBufferHandle(bufferHandle, true, [this](BufferHandle* freeBuffer) {
+        int32_t err = core_->FreeInBuffer(freeBuffer);
+        if (err != HDF_SUCCESS) {
+            CODEC_LOGE("free bufferhandle fail, error = [%{public}d]", err);
+        }
+    });
     std::lock_guard<std::mutex> lk(mutex_);
     inBuffer.id = GetNextBufferId();
-    bufferHandleMap_.emplace(std::make_pair(inBuffer.id, bufferHandle));
     CODEC_LOGI("success, bufferId [%{public}d]!", inBuffer.id);
     return ret;
 }
 
 int32_t CodecJpegService::FreeJpegInBuffer(const CodecImageBuffer& inBuffer)
 {
-    CODEC_LOGI("servcie impl, bufferId [%{public}d]!", inBuffer.id);
-    CHECK_AND_RETURN_RET_LOG(core_ != nullptr, HDF_FAILURE, "core_ is null");
-
-    uint32_t bufferId = inBuffer.id;
-    std::lock_guard<std::mutex> lk(mutex_);
-    auto entry = bufferHandleMap_.find(bufferId);
-    CHECK_AND_RETURN_RET_LOG(entry != bufferHandleMap_.end(), HDF_FAILURE, "not find bufferId:[%{public}d]", bufferId);
-
-    BufferHandle *bufferHandle = entry->second;
-    int32_t ret = core_->FreeInBuffer(bufferHandle);
-    CHECK_AND_RETURN_RET_LOG(ret == HDF_SUCCESS, ret, "error = [%{public}d]", ret);
-    bufferHandleMap_.erase(entry);
-    return ret;
+    // inBuffer has been automatically destructed during AllocateJpegInBuffer
+    return HDF_SUCCESS;
 }
 
 uint32_t CodecJpegService::GetNextBufferId(void)
