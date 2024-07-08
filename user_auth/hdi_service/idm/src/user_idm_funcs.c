@@ -222,9 +222,14 @@ IAM_STATIC ResultCode GetCredentialInfoFromSchedule(const ExecutorResultInfo *ex
 
 IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialInfo, int32_t userId)
 {
+    if (credentialInfo->authType != PIN_AUTH && credentialInfo->authType != DEFAULT_AUTH_TYPE) {
+        LOG_ERROR("bad authType");
+        return NULL;
+    }
     UserAuthContext context = {};
     context.userId = userId;
     context.authType = credentialInfo->authType;
+    context.authType = PIN_AUTH;
     context.authTrustLevel = ATL4;
     ResultCode ret = GetChallenge(context.challenge, CHALLENGE_LEN);
     if (ret != RESULT_SUCCESS) {
@@ -433,22 +438,35 @@ IAM_STATIC ResultCode CheckResultValid(uint64_t scheduleId, int32_t userId)
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetUpdateCredentialOutputRootSecret(
-    UpdateCredentialOutput *output, int32_t userId, const Buffer *rootSecret)
+IAM_STATIC ResultCode GetUpdateCredentialOutput(int32_t userId, const Buffer *rootSecret,
+    const CredentialInfoHal *credentialInfo, UpdateCredentialOutput *output)
 {
+    output->credentialId = credentialInfo->credentialId;
     output->rootSecret = CopyBuffer(rootSecret);
-    if (output->rootSecret == NULL) {
+    if (!IsBufferValid(output->rootSecret)) {
         LOG_ERROR("copy rootSecret fail");
-        return RESULT_NO_MEMORY;
+        goto ERROR;
     }
     output->oldRootSecret = GetCacheRootSecret(userId);
-    if (output->oldRootSecret == NULL) {
+    if (!IsBufferValid(output->oldRootSecret)) {
         LOG_ERROR("GetCacheRootSecret fail");
-        DestoryBuffer(output->rootSecret);
-        output->rootSecret = NULL;
-        return RESULT_NO_MEMORY;
+        goto ERROR;
+    }
+    output->authToken = GetAuthTokenForPinEnroll(credentialInfo, userId);
+    if (!IsBufferValid(output->authToken)) {
+        LOG_ERROR("authToken is invalid");
+        goto ERROR;
     }
     return RESULT_SUCCESS;
+
+ERROR:
+    DestoryBuffer(output->rootSecret);
+    output->rootSecret = NULL;
+    DestoryBuffer(output->oldRootSecret);
+    output->oldRootSecret = NULL;
+    DestoryBuffer(output->authToken);
+    output->authToken = NULL;
+    return RESULT_NO_MEMORY;
 }
 
 ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, UpdateCredentialOutput *output)
@@ -485,8 +503,7 @@ ResultCode UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, Up
         LOG_ERROR("failed to add credential");
         goto EXIT;
     }
-    output->credentialId = credentialInfo.credentialId;
-    ret = GetUpdateCredentialOutputRootSecret(output, userId, executorResultInfo->rootSecret);
+    ret = GetUpdateCredentialOutput(userId, executorResultInfo->rootSecret, &credentialInfo, output);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetUpdateCredentialOutputRootSecret fail");
         goto EXIT;
