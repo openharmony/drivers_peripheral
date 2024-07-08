@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
-#include "hdf_xcollie.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
@@ -73,8 +72,6 @@ int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
 
 int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData)
 {
-    OHOS::HdfXCollie hdfXCollie("HDFCodecSendCommand", CODEC_TIMEOUT_SECONDS, nullptr, nullptr,
-                                OHOS::HdfXCollie::HDF_XCOLLIE_FLAG_RECOVERY);
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSendCommand");
     CODEC_LOGI("commandType: [%{public}d], command [%{public}d]", cmd, param);
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
