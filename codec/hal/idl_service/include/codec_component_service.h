@@ -62,7 +62,6 @@ private:
     std::string name_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
-    static const uint32_t CODEC_TIMEOUT_SECONDS = 20;
 };
 }  // namespace V3_0
 }  // namespace Codec
