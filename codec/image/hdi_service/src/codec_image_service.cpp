@@ -17,7 +17,6 @@
 #include "codec_image_service.h"
 #include "hitrace_meter.h"
 #include <unistd.h>
-#include "hdf_xcollie.h"
 
 namespace OHOS {
 namespace HDI {
@@ -67,8 +66,6 @@ int32_t CodecImageService::DeInit(enum CodecImageRole role)
 int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const CodecImageBuffer& outBuffer,
     const CodecJpegDecInfo& decInfo)
 {
-    OHOS::HdfXCollie hdfXCollie("HdfCodecDoJpegDecode", CODEC_IMAGE_TIMEOUT_SECONDS, nullptr, nullptr,
-                                OHOS::HdfXCollie::HDF_XCOLLIE_FLAG_RECOVERY);
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
     CODEC_LOGI("servcie impl!");
     if (inBuffer.fenceFd >= 0) {
