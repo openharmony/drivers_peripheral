@@ -1122,7 +1122,7 @@ HWTEST_F(WifiClientTest, WifiSetPowerSaveMode029, TestSize.Level1)
     int32_t frequency = 0;
     int32_t mode = 0;
     const char *ifName = "wlanTest";
-    WifiSetPowerSaveMode(ifName, dstAddr, buf);
+    WifiSetPowerSaveMode(ifName, frequency, mode);
 }
 }
 }
