@@ -1761,8 +1761,12 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGE("%{public}s: pos is NULL", __func__);
             break;
         }
-        if (pos->service == NULL || pos->callbackObj == NULL) {
-            HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
+        if (pos->callbackObj == NULL) {
+            HDF_LOGW("%{public}s: pos->callbackObj NULL", __func__);
+            continue;
+        }
+        if (pos->service == NULL) {
+            HDF_LOGW("%{public}s: pos->service NULL", __func__);
             continue;
         }
         if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {
