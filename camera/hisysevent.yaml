@@ -23,3 +23,10 @@ CAMERA_HAL_PERFORMANCE:
   NAME: {type: STRING, desc: event name}
   FUNCTION: {type: STRING, desc: message}
   TIMECOST: {type: UINT64, desc: timeflag}
+  
+CAMERA_HAL_STATISTIC:
+  __BASE: {type: STATISTIC, level: MINOR, desc: camera hal error}
+  NAME: {type: STRING, desc: event name}
+  INFORMATION: {type: UINT8, desc: camera information}
+  PARAMETER: {type: STRING, desc: message}
+  TIMEPOINT: {type: UINT64, desc: timepoint}

@@ -20,6 +20,7 @@
 #include <map>
 #include "hisysevent.h"
 #include "camera.h"
+#include "camera_metadata_info.h"
 #include <memory>
 
 namespace OHOS::Camera {
@@ -39,6 +40,13 @@ enum PerformanceEventType {
     TIME_FOR_OPEN_CAMERA,
     TIME_FOR_CAPTURE,
     TIME_FOR_FIRST_FRAME
+};
+
+enum StatisicEventType {
+    TIME_OF_CAPTURE,
+    TIME_OF_VEDIOA_AND_DURATION,
+    INFORMATION_OF_CAMERA,
+    PARAMS_OFCAPTURE_OR_VEDIO
 };
 
 class CameraHalHisysevent {
@@ -67,5 +75,14 @@ public:
 #define CAMERAHALPERFSYSEVENT(pet) CAMERAHALPERFSYSEVENT_COND(pet, true)
 
 #define CAMERAHALPERFSYSEVENT_EQUAL(arg, x, pet) CAMERAHALPERFSYSEVENT_COND(pet, ((arg) == (x)))
+
+class CameraHalTimeSysevent {
+public:
+    static void WriteTimeStatisicEvent(const std::string &name);
+    static void WriteCameraInformationEvent(const std::string &name, common_metadata_header_t *data);
+    static void WriteCameraParameterEvent(const std::string &name, common_metadata_header_t *data);
+    static std::string GetEventName(StatisicEventType statisicEventType);
+};
+
 }  // namespace OHOS::Camera
 #endif
