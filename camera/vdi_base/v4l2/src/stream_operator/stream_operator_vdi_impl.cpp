@@ -331,6 +331,8 @@ int32_t StreamOperatorVdiImpl::CommitStreams(VdiOperationMode mode, const std::v
     std::shared_ptr<CameraMetadata> setting;
     MetadataUtils::ConvertVecToMetadata(modeSetting, setting);
     DynamicStreamSwitchMode method = streamPipeline_->CheckStreamsSupported(mode, setting, configs);
+    CameraHalTimeSysevent::WriteCameraParameterEvent(CameraHalTimeSysevent::GetEventName(PARAMS_OFCAPTURE_OR_VEDIO),
+                                                     setting->get());
     CHECK_IF_EQUAL_RETURN_VALUE(method, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT, INVALID_ARGUMENT);
     {
         std::lock_guard<std::mutex> l(streamLock_);

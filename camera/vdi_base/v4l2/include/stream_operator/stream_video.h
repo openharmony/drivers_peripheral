@@ -17,6 +17,7 @@
 #define HDI_STREAM_VIDEO_H
 
 #include "stream_base.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 class StreamVideo : public StreamBase {
@@ -30,6 +31,9 @@ public:
     StreamVideo(StreamVideo &&other) = delete;
     StreamVideo& operator=(const StreamVideo &other) = delete;
     StreamVideo& operator=(StreamVideo &&other) = delete;
+    
+public:
+    RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
 };
 } // end namespace OHOS::Camera
 #endif // HDI_STREAM_VIDEO_H
