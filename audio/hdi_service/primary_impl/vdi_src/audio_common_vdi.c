@@ -25,7 +25,7 @@
 #define AUDIO_SAMPLE_FORMAT_NUM_MAX 30
 #define AUDIO_SUB_PORT_NUM_MAX 10
 
-void AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
+int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc)
 {
     CHECK_NULL_PTR_RETURN(desc);
@@ -34,6 +34,11 @@ void AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     vdiDesc->portId = desc->portId;
     vdiDesc->pins = (enum AudioPortPinVdi)desc->pins;
     vdiDesc->desc = strdup(desc->desc); // free by caller
+    if (vdiDesc->desc == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
 void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, struct AudioSampleAttributesVdi *vdiAttrs)
@@ -76,6 +81,10 @@ int32_t AudioCommonPortToVdiPortVdi(const struct AudioPort *port, struct AudioPo
     vdiPort->dir = (enum AudioPortDirectionVdi)port->dir;
     vdiPort->portId = port->portId;
     vdiPort->portName = strdup(port->portName); // free by caller
+    if (vdiPort->portName == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, port->portName = %{public}s", port->portName);
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
 }
@@ -156,6 +165,10 @@ static int32_t AudioSubPortsToSubPortsVdi(const struct AudioSubPortCapabilityVdi
         subPortsTmp[i].portId = vdiSubPorts[i].portId;
         subPortsTmp[i].mask = (enum AudioPortPassthroughMode)vdiSubPorts[i].mask;
         subPortsTmp[i].desc = strdup(vdiSubPorts[i].desc);
+        if (subPortsTmp[i].desc == NULL) {
+            AUDIO_FUNC_LOGE("strdup fail, vdiSubPorts[%{public}d].desc = %{public}s", i, vdiSubPorts[i].desc);
+            return HDF_FAILURE;
+        }
     }
 
     *subPorts = subPortsTmp;
@@ -219,6 +232,7 @@ void AudioCommonVdiPortCapToPortCapVdi(const struct AudioPortCapabilityVdi *vdiP
         &portCap->subPorts, &portCap->subPortsLen);
     if (ret != HDF_SUCCESS) {
         OsalMemFree((void *)portCap->formats);
+        AudioReleaseSubPortsVdi(&portCap->subPorts, &portCap->subPortsLen);
         portCap->formats = NULL;
         AUDIO_FUNC_LOGE("VdiSubPortsToSubPorts fail");
         return;
@@ -279,6 +293,10 @@ static int32_t AudioCommonRouteNodeToVdiRouteNodeVdi(struct AudioRouteNode *rout
         vdiRouteNode->ext.device.moduleId = routeNode->ext.device.moduleId;
         vdiRouteNode->ext.device.type = (enum AudioPortPinVdi)routeNode->ext.device.type;
         vdiRouteNode->ext.device.desc = strdup(routeNode->ext.device.desc);
+        if (vdiRouteNode->ext.device.desc == NULL) {
+            AUDIO_FUNC_LOGE("strdup fail, routeNode->ext.device.desc = %{public}s", routeNode->ext.device.desc);
+            return HDF_FAILURE;
+        }
         return HDF_SUCCESS;
     }
 
@@ -392,9 +410,7 @@ int32_t AudioCommonSceneToVdiSceneVdi(const struct AudioSceneDescriptor *scene,
     CHECK_NULL_PTR_RETURN_VALUE(vdiScene, HDF_ERR_INVALID_PARAM);
 
     vdiScene->scene.id = scene->scene.id;
-    AudioCommonDevDescToVdiDevDescVdi(&scene->desc, &vdiScene->desc);
-
-    return HDF_SUCCESS;
+    return AudioCommonDevDescToVdiDevDescVdi(&scene->desc, &vdiScene->desc);
 }
 
 int32_t AudioCommonSampleAttrToVdiSampleAttrVdi(const struct AudioSampleAttributes *attrs,

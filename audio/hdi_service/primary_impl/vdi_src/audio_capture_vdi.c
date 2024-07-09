@@ -468,6 +468,10 @@ int32_t AudioCaptureReqMmapBufferVdi(struct IAudioCapture *capture, int32_t reqS
     desc->transferFrameSize = vdiDesc.transferFrameSize;
     desc->isShareable = vdiDesc.isShareable;
     desc->filePath = strdup("");  // which will be released after send reply
+    if (desc->filePath == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail");
+        return HDF_FAILURE;
+    }
     if (desc->totalBufferFrames < 0) {
         // make the totalBufferFrames valid
         desc->totalBufferFrames *= -1;
@@ -794,6 +798,12 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
+    if (priv->captureInfos[*captureId]->desc.desc == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
+        OsalMemFree(priv->captureInfos[*captureId]);
+        priv->captureInfos[*captureId] = NULL;
+        return NULL;
+    }
     priv->captureInfos[*captureId]->captureId = *captureId;
     priv->captureInfos[*captureId]->usrCount = 1;
     capture = &(priv->captureInfos[*captureId]->capture);
