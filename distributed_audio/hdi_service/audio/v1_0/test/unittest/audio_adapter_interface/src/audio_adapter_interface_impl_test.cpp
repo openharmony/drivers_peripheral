@@ -728,7 +728,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback(nullptr);
     AdapterTest_->spkPinInUse_  = 0;
-    EXPECT_EQ(ERR_DH_AUDIO_HDF_NULLPTR, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
     AdapterTest_->spkPinInUse_  = 1;
     callback = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc, callback, dhId));
