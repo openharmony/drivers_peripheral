@@ -62,7 +62,7 @@ float AudioRenderInterfaceImpl::GetFadeRate(uint32_t currentIndex, const uint32_
     if (currentIndex > durationIndex || durationIndex == 0) {
         return 1.0f;
     }
-    
+
     float fadeRate = static_cast<float>(currentIndex) / durationIndex * DAUDIO_FADE_NORMALIZATION_FACTOR;
     if (fadeRate < 1) {
         return pow(fadeRate, DAUDIO_FADE_POWER_NUM) / DAUDIO_FADE_NORMALIZATION_FACTOR;
@@ -215,6 +215,10 @@ int32_t AudioRenderInterfaceImpl::Start()
         cJSON_Delete(jParam);
         cJSON_free(jsonData);
         DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
+        if (audioExtCallback_ == nullptr) {
+            DHLOGE("Callback is nullptr.");
+            return HDF_FAILURE;
+        }
         int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
         if (ret != HDF_SUCCESS) {
             DHLOGE("Restart failed.");
@@ -247,6 +251,10 @@ int32_t AudioRenderInterfaceImpl::Stop()
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
+    if (audioExtCallback_ == nullptr) {
+        DHLOGE("Callback is nullptr.");
+        return HDF_FAILURE;
+    }
     int32_t ret = audioExtCallback_->NotifyEvent(renderId_, event);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Pause and clear cache streams failed.");
