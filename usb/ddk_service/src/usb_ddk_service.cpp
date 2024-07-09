@@ -132,6 +132,7 @@ int32_t UsbDdkService::Release()
         return HDF_ERR_NOPERM;
     }
 
+    DdkPermissionManager::Reset();
     return UsbExitHostSdk(nullptr);
 }
 
