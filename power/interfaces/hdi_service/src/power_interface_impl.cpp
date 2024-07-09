@@ -69,12 +69,10 @@ static constexpr int32_t WAIT_TIME_FACTOR = 2;
 static std::chrono::milliseconds waitTime_(DEFAULT_WAIT_TIME);
 static std::mutex g_mutex;
 static std::mutex g_suspendMutex;
-static std::mutex g_forceMutex;
 static std::condition_variable g_suspendCv;
 static std::unique_ptr<std::thread> g_daemon;
 static std::atomic_bool g_suspending;
 static std::atomic_bool g_suspendRetry;
-static std::atomic_bool g_forceSuspendStart;
 static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
 static PowerHdfState g_powerState {PowerHdfState::AWAKE};
@@ -285,8 +283,6 @@ void NotifyCallback(int code)
 int32_t PowerInterfaceImpl::StopSuspend()
 {
     HDF_LOGI("stop suspend");
-    std::lock_guard<std::mutex> lock(g_forceMutex);
-    g_forceSuspendStart = false;
     g_suspendRetry = false;
     g_powerState = PowerHdfState::AWAKE;
     return HDF_SUCCESS;
@@ -294,23 +290,9 @@ int32_t PowerInterfaceImpl::StopSuspend()
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
-    HDF_LOGI("force suspend");
-    {
-        std::lock_guard<std::mutex> lock(g_forceMutex);
-        g_forceSuspendStart = true;
-        g_suspendRetry = false;
-    }
-
-    NotifyCallback(CMD_ON_SUSPEND);
-    g_powerState = PowerHdfState::SLEEP;
-    DoSuspend();
-    g_powerState = PowerHdfState::AWAKE;
-    NotifyCallback(CMD_ON_WAKEUP);
-
-    std::lock_guard<std::mutex> lock(g_forceMutex);
-    if (g_forceSuspendStart) {
-        StartSuspend();
-    }
+    //force suspend changed into active suspend
+    HDF_LOGI("active suspend");
+    StartSuspend();
     return HDF_SUCCESS;
 }
 
