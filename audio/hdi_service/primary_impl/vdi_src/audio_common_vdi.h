@@ -23,7 +23,7 @@
 #define AUDIO_VDI_PORT_NUM_MAX    10
 #define AUDIO_VDI_STREAM_NUM_MAX  10
 
-void AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
+int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc);
 void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs,
     struct AudioSampleAttributesVdi *vdiAttrs);

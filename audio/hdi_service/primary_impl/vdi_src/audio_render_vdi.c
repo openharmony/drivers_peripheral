@@ -633,6 +633,10 @@ int32_t AudioRenderReqMmapBufferVdi(struct IAudioRender *render, int32_t reqSize
     desc->isShareable = vdiDesc.isShareable;
     desc->offset = vdiDesc.offset;
     desc->filePath = strdup("");
+    if (desc->filePath == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail");
+        return HDF_FAILURE;
+    }
 
     AUDIO_FUNC_LOGD("%{public}s success", __func__);
     return HDF_SUCCESS;
@@ -982,6 +986,12 @@ struct IAudioRender *AudioCreateRenderByIdVdi(const struct AudioSampleAttributes
     priv->renderInfos[*renderId]->desc.portId = desc->portId;
     priv->renderInfos[*renderId]->desc.pins = desc->pins;
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
+    if (priv->renderInfos[*renderId]->desc.desc == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
+        OsalMemFree(priv->renderInfos[*renderId]);
+        priv->renderInfos[*renderId] = NULL;
+        return NULL;
+    }
     priv->renderInfos[*renderId]->renderId = *renderId;
     priv->renderInfos[*renderId]->usrCount = 1;
     priv->renderInfos[*renderId]->callback = NULL;
