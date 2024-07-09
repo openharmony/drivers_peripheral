@@ -32,11 +32,7 @@ void AudioAdapterInterfaceImpTest::SetUpTestCase(void) {}
 
 void AudioAdapterInterfaceImpTest::TearDownTestCase(void) {}
 
-void AudioAdapterInterfaceImpTest::SetUp(void)
-{
-    AudioAdapterDescriptor adaDesc;
-    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
-}
+void AudioAdapterInterfaceImpTest::SetUp(void) {}
 
 void AudioAdapterInterfaceImpTest::TearDown(void)
 {
@@ -51,6 +47,9 @@ void AudioAdapterInterfaceImpTest::TearDown(void)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, InitAllPorts_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     sptr<IDAudioCallback> speakerCallback = nullptr;
     int32_t dhId = 1;
     AdapterTest_->SetSpeakerCallback(dhId, speakerCallback);
@@ -76,6 +75,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, InitAllPorts_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, CreateRender_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     sptr<IAudioRender> render = nullptr;
@@ -99,6 +101,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CreateRender_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     std::string adpterName = "adbcef";
@@ -127,6 +132,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, CreateCapture_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     sptr<IAudioCapture> capture = nullptr;
@@ -150,6 +158,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CreateCapture_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     std::string adpterName = "adbcef";
@@ -177,6 +188,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetPortCapability_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioPort port;
     AudioPortCapability capability;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->GetPortCapability(port, capability));
@@ -190,6 +204,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetPortCapability_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, SetPassthroughMode_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioPort port;
     AudioPortPassthroughMode mode = AudioPortPassthroughMode::PORT_PASSTHROUGH_LPCM;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetPassthroughMode(port, mode));
@@ -203,6 +220,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetPassthroughMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetPassthroughMode_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioPort port;
     AudioPortPassthroughMode mode = AudioPortPassthroughMode::PORT_PASSTHROUGH_LPCM;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->GetPassthroughMode(port, mode));
@@ -216,6 +236,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetPassthroughMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceStatus_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceStatus sta;
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->GetDeviceStatus(sta));
@@ -229,6 +252,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceStatus_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, SetMicMute_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     bool muteTmp = true;
     bool muteGetted;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetMicMute(muteTmp));
@@ -243,6 +269,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetMicMute_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, SetVoiceVolume_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     float vol = 1.0f;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetVoiceVolume(vol));
 }
@@ -255,6 +284,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetVoiceVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, UpdateAudioRoute_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioRoute route;
     int32_t handle = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->UpdateAudioRoute(route, handle));
@@ -268,6 +300,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, UpdateAudioRoute_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, ReleaseAudioRoute_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     int32_t handle = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->ReleaseAudioRoute(handle));
 }
@@ -280,6 +315,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, ReleaseAudioRoute_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "{\"dhId\":\"1\"}";
     std::string value = "world";
@@ -298,6 +336,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE;
     std::string condition = "hello";
     std::string value = "world";
@@ -312,6 +353,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     std::string condition = "hello";
     std::string value = "1";
@@ -326,6 +370,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string value = "1";
@@ -340,6 +387,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_003, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_004, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS;
     std::string condition = "hello";
     std::string value = "world";
@@ -354,6 +404,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetExtraParams_004, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, RegExtraParamObserver_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     sptr<IAudioCallback> cbObj = nullptr;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RegExtraParamObserver(cbObj, 0));
 }
@@ -366,6 +419,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, RegExtraParamObserver_001, TestSize.Level
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, RegExtraParamObserver_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AdapterTest_->paramCallback_ = new MockIAudioParamCallback();
     sptr<IAudioCallback> cbObj = new MockIAudioParamCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->RegExtraParamObserver(cbObj, 0));
@@ -379,6 +435,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, RegExtraParamObserver_002, TestSize.Level
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAdapterDesc_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AdapterTest_->mapAudioDevice_.insert(std::make_pair(64, "hello"));
     AudioPort port;
     port.dir = PORT_OUT_IN;
@@ -396,6 +455,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAdapterDesc_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceCapabilitys_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 88;
     std::string caps = "worldcup";
     AdapterTest_->AddAudioDevice(devId, caps);
@@ -411,6 +473,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceCapabilitys_001, TestSize.Level1
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceCapabilitys_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 88;
     std::string caps = "worldcup";
     AdapterTest_->RemoveAudioDevice(devId);
@@ -426,6 +491,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetDeviceCapabilitys_002, TestSize.Level1
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, AdapterLoad_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AdapterLoad());
 }
 
@@ -437,6 +505,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AdapterLoad_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, AdapterUnload_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AdapterUnload());
 
     std::string adpterName = "adbcef";
@@ -475,6 +546,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AdapterUnload_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, Notify_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event;
     event.type = 3;
     event.content = "VOLUME_LEVEL";
@@ -491,6 +565,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, Notify_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event;
     event.type = 10;
     event.content = "FOCUS_CHANGE";
@@ -516,6 +593,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, Notify_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event;
     event.type = 4;
     event.content = "OPEN_SPK_RESULT";
@@ -541,6 +621,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, Notify_003, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 64;
     std::string caps;
     AdapterTest_->mapAudioDevice_.insert(std::make_pair(64, "hello"));
@@ -556,6 +639,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 64;
     std::string caps = "hello";
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AddAudioDevice(devId, caps));
@@ -570,6 +656,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AddAudioDevice_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, RemoveAudioDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 64;
     std::string caps;
     AdapterTest_->mapAudioDevice_.insert(std::make_pair(64, "hello"));
@@ -589,6 +678,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, RemoveAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     int32_t dhId = 1;
@@ -608,6 +700,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     int32_t dhId = 1;
@@ -626,6 +721,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, OpenRenderDevice_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     int32_t dhId = 1;
     sptr<IDAudioCallback> callback(nullptr);
@@ -646,6 +744,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, OpenCaptureDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     int32_t dhId = DEFAULT_CAPTURE_ID;
@@ -663,6 +764,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, OpenCaptureDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, CloseCaptureDevice_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceDescriptor devDesc;
     int32_t dhId = DEFAULT_CAPTURE_ID;
     sptr<IDAudioCallback> callback(new MockIDAudioCallback());
@@ -679,6 +783,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseCaptureDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetVolumeGroup_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 88;
     int32_t dhId = DEFAULT_CAPTURE_ID;
     AdapterTest_->extCallbackMap_[dhId] = new MockIDAudioCallback();
@@ -693,6 +800,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetVolumeGroup_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetInterruptGroup_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     uint32_t devId = 88;
     int32_t dhId = 1;
 
@@ -708,6 +818,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetInterruptGroup_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string condition = "EVENT_TYPE=4;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     std::string param = "1";
     int32_t dhId = 1;
@@ -738,6 +851,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
@@ -760,6 +876,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
@@ -782,6 +901,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
@@ -804,6 +926,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_003, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_004, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
@@ -827,6 +952,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_004, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_005, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
@@ -850,6 +978,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_005, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_006, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AdapterTest_->renderDevs_[0] = std::make_pair(1, nullptr);
 
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
@@ -866,6 +997,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetAudioVolume_006, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, getEventTypeFromCondition_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     auto actualValue = AdapterTest_->getEventTypeFromCondition(condition);
     EXPECT_EQ(1, actualValue);
@@ -879,6 +1013,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, getEventTypeFromCondition_001, TestSize.L
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, getEventTypeFromCondition_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string condition = "EVENT_TYPE=12;VOLUME_GROUP_ID=2;AUDIO_VOLUME_TYPE=1;";
     auto actualValue = AdapterTest_->getEventTypeFromCondition(condition);
     EXPECT_EQ(12, actualValue);
@@ -892,6 +1029,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, getEventTypeFromCondition_002, TestSize.L
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, ParseDhIdFromJson_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string jsonArgs = "";
     EXPECT_EQ(-1, AdapterTest_->ParseDhIdFromJson(jsonArgs));
 }
@@ -904,6 +1044,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, ParseDhIdFromJson_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, ConvertString2Int_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string valueStr = "";
     int value = 0;
 
@@ -925,6 +1068,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, ConvertString2Int_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, GetRenderImpl_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     std::string content = "";
     EXPECT_EQ(nullptr, AdapterTest_->GetRenderImpl(content));
 
@@ -946,6 +1092,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, GetRenderImpl_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_VOLUME_CHANGE,
         "VOLUME_CHANAGE;AUDIO_STREAM_TYPE=1;VOLUME_LEVEL=1;IS_UPDATEUI=1;VOLUME_GROUP_ID=1;"};
     std::string adpterName = "adbcef";
@@ -972,6 +1121,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_001, TestSize.Lev
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_VOLUME_CHANGE, "V"};
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
@@ -992,6 +1144,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_002, TestSize.Lev
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_VOLUME_CHANGE, "V"};
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
@@ -1012,6 +1167,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleVolumeChangeEvent_003, TestSize.Lev
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
         "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
 
@@ -1028,6 +1186,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_001, TestSize.Leve
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_FOCUS_CHANGE,
         "INTERRUPT_EVENT;EVENT_TYPE=1;VOLUME_LEVEL=1;FORCE_TYPE=1;HINT_TYPE=1;"};
 
@@ -1043,6 +1204,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleFocusChangeEvent_002, TestSize.Leve
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE,
         "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
 
@@ -1059,6 +1223,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_001, TestSiz
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_RENDER_STATE_CHANGE,
         "RENDER_STATE_CHANGE_EVENT;STATE=0;"};
 
@@ -1074,6 +1241,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleRenderStateChangeEvent_002, TestSiz
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_SPK_RESULT, "RENDER_STATE_CHANGE_EVENT"};
     uint32_t streamId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
@@ -1087,6 +1257,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_SPK_RESULT, HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
@@ -1100,6 +1273,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_CLOSE_SPK_RESULT,
         HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
@@ -1116,6 +1292,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_003, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_004, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_OPEN_MIC_RESULT,
         HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
@@ -1132,6 +1311,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_004, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_005, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_CLOSE_MIC_RESULT, HDF_EVENT_RESULT_SUCCESS};
     uint32_t streamId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleSANotifyEvent(streamId, event));
@@ -1147,6 +1329,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_005, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_006, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     using namespace DistributedHardware;
     DAudioEvent event = {-1, "ddd"};
     uint32_t streamId = 0;
@@ -1161,6 +1346,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleSANotifyEvent_006, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     int flag = 1;
     uint32_t streamId = 0;
     std::thread th([&]() {
@@ -1189,6 +1377,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     int flag = 1;
     std::thread th([&]() {
         while (flag) {
@@ -1214,6 +1405,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     int flag = 1;
     uint32_t captureId = 0;
     std::thread th([&]() {
@@ -1243,6 +1437,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_003, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_004, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     int flag = 1;
     uint32_t captureId = 0;
     std::thread th([&]() {
@@ -1268,6 +1465,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_004, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_005, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     AudioDeviceEvent  event = EVENT_DEV_CLOSED;
     uint32_t captureId = 0;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(captureId, event));
@@ -1281,6 +1481,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_005, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_001, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_SPK_CLOSED, "gtest"};
     uint32_t streamId = 0;
 
@@ -1297,6 +1500,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_002, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_SPK_CLOSED, "gtest"};
     DAudioEvent event1 = {HDF_AUDIO_EVENT_MIC_CLOSED, "gmock"};
     uint32_t streamId = 0;
@@ -1317,6 +1523,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_002, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_003, TestSize.Level1)
 {
+    AudioAdapterDescriptor adaDesc;
+    AdapterTest_ = std::make_shared<AudioAdapterInterfaceImpl>(adaDesc);
+
     DAudioEvent event = {HDF_AUDIO_EVENT_SPK_CLOSED, "gtest"};
     uint32_t streamId = 0;
 

@@ -108,6 +108,10 @@ sptr<AudioRenderInterfaceImplBase> AudioAdapterInterfaceImpl::CreateRenderImpl(c
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V2_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
+        if (audioRender == nullptr) {
+            DHLOGE("audioRender is null.");
+            return audioRender;
+        }
         audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
@@ -276,6 +280,10 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V2_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
+        if (audioCapture == nullptr) {
+            DHLOGE("audioCapture is null.");
+            return HDF_FAILURE;
+        }
         audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
@@ -580,8 +588,11 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
     const int32_t dhId, const int32_t renderId)
 {
     DHLOGI("Open render device, pin: %{public}d.", dhId);
+    if (extSpkCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     std::lock_guard<std::mutex> devLck(renderOptMtx_);
-    spkPinInUse_ = static_cast<uint32_t>(dhId);
     renderParam_.format = attrs.format;
     renderParam_.channelCount = attrs.channelCount;
     renderParam_.sampleRate = attrs.sampleRate;
@@ -613,6 +624,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
         DHLOGE("Wait SA notify failed. ret: %{public}d", ret);
         return ret;
     }
+    spkPinInUse_ = static_cast<uint32_t>(dhId);
     DHLOGI("Open render device success.");
     return DH_SUCCESS;
 }
@@ -621,16 +633,16 @@ int32_t AudioAdapterInterfaceImpl::CloseRenderDevice(const AudioDeviceDescriptor
     sptr<IDAudioCallback> extSpkCallback, const int32_t dhId, const int32_t renderId)
 {
     DHLOGI("Close render device, pin: %{public}d.", dhId);
-    if (extSpkCallback == nullptr) {
-        DHLOGE("Callback is null.");
-        return ERR_DH_AUDIO_HDF_NULLPTR;
-    }
     std::lock_guard<std::mutex> devLck(renderOptMtx_);
     if (spkPinInUse_ == 0) {
         DHLOGI("No need close render device.");
         return DH_SUCCESS;
     }
     renderParam_ = {};
+    if (extSpkCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extSpkCallback->DestroyStream(renderId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
@@ -673,6 +685,10 @@ int32_t AudioAdapterInterfaceImpl::OpenCaptureDevice(const AudioDeviceDescriptor
         attrs.format, captureParam_.period, capturerFlags_ == Audioext::V2_0::MMAP_MODE);
     captureParam_.capturerFlags = capturerFlags_;
 
+    if (extMicCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extMicCallback->SetParameters(captureId, captureParam_);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Set audio parameters failed.");
@@ -703,6 +719,10 @@ int32_t AudioAdapterInterfaceImpl::CloseCaptureDevice(const AudioDeviceDescripto
         return DH_SUCCESS;
     }
     captureParam_ = {};
+    if (extMicCallback == nullptr) {
+        DHLOGE("Callback is null.");
+        return ERR_DH_AUDIO_HDF_NULLPTR;
+    }
     int32_t ret = extMicCallback->DestroyStream(captureId);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Close audio device failed.");
