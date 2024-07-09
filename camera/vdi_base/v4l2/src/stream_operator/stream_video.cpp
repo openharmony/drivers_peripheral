@@ -30,5 +30,16 @@ StreamVideo::~StreamVideo()
     CAMERA_LOGV("enter");
 }
 
+RetCode StreamVideo::Capture(const std::shared_ptr<CaptureRequest>& request)
+{
+    if (state_ == STREAM_STATE_OFFLINE) {
+        return RC_OK;
+    }
+    
+    CAMERA_LOGD("start StreamVideo::Capture! ");
+    CameraHalTimeSysevent::WriteTimeStatisicEvent(CameraHalTimeSysevent::GetEventName(TIME_OF_VEDIOA_AND_DURATION));
+    return StreamBase::Capture(request);
+}
+
 REGISTERSTREAM(StreamVideo, {"VIDEO"});
 } // namespace OHOS::Camera

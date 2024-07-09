@@ -18,6 +18,7 @@
 #include "idevice_manager.h"
 #include "camera_host_config.h"
 #include "metadata_utils.h"
+#include "camera_hal_hisysevent.h"
 
 #include "v1_0/icamera_host_vdi_callback.h"
 #include "camera_dump.h"
@@ -142,6 +143,8 @@ int32_t CameraHostVdiImpl::GetCameraAbility(const std::string &cameraId,
     }
 
     common_metadata_header_t *data = ability->get();
+    CameraHalTimeSysevent::WriteCameraInformationEvent(
+        CameraHalTimeSysevent::GetEventName(INFORMATION_OF_CAMERA), data);
     camera_metadata_item_t entry;
     if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry) == 0) {
         uint8_t conectType = *(entry.data.u8);

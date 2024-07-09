@@ -37,6 +37,13 @@ std::map<PerformanceEventType, std::string> g_perfEventNameMap = {
     {TIME_FOR_FIRST_FRAME, std::string(TOSTR(TIME_FOR_FIRST_FRAME))}
 };
 
+std::map<StatisicEventType, std::string> g_staEventNameMap = {
+    {TIME_OF_CAPTURE, std::string(TOSTR(TIME_OF_CAPTURE))},
+    {TIME_OF_VEDIOA_AND_DURATION, std::string(TOSTR(TIME_OF_VEDIOA_AND_DURATION))},
+    {INFORMATION_OF_CAMERA, std::string(TOSTR(INFORMATION_OF_CAMERA))},
+    {PARAMS_OFCAPTURE_OR_VEDIO, std::string(TOSTR(PARAMS_OFCAPTURE_OR_VEDIO))},
+};
+
 std::string CameraHalHisysevent::CreateMsg(const char* format, ...)
 {
     va_list args;
@@ -87,5 +94,60 @@ CameraHalPerfSysevent::~CameraHalPerfSysevent()
                 "FUNCTION", std::string(funcName_),
                 "TIMECOST", microsec);
     }
+}
+
+std::string CameraHalTimeSysevent::GetEventName(StatisicEventType statisicEventType)
+{
+    auto it = g_staEventNameMap.find(statisicEventType);
+    if (it != g_staEventNameMap.end()) {
+        return g_staEventNameMap[statisicEventType];
+    }
+    return "";
+}
+
+void CameraHalTimeSysevent::WriteTimeStatisicEvent(const std::string &name)
+{
+    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
+    std::time_t now = std::chrono::system_clock::to_time_t(begin);
+    std::string timepoint_str = std::ctime(&now);
+    CAMERA_LOGI("WriteTimeStatisicEvent name:%{public}s, timepoint:%{public}s", name.c_str(), timepoint_str.c_str());
+    int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_STATISTIC",
+                                  OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                                  "NAME", name, "TIMEPOINT", timepoint_str);
+    if (ret != 0) {
+        CAMERA_LOGE("WriteTimeStatisicEvent file name:%{public}s, ret:%{public}d", name.c_str(), ret);
+    }
+}
+
+void CameraHalTimeSysevent::WriteCameraInformationEvent(const std::string &name, common_metadata_header_t *data)
+{
+    CAMERA_LOGI("WriteCameraInformationEvent start!!");
+    camera_metadata_item_t entry;
+    if (FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry) == 0) {
+        uint8_t cameraConnectType = *(entry.data.u8);
+        if (static_cast<int>(cameraConnectType) == OHOS_CAMERA_CONNECTION_TYPE_BUILTIN) {
+            CAMERA_LOGI("cameraConnectType is %{public}d", cameraConnectType);
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_STATISTIC",
+                            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                            "NAME", name, "INFORMATION", cameraConnectType);
+        } else if (static_cast<int>(cameraConnectType) == OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN) {
+            CAMERA_LOGI("cameraConnectType is %{public}d", cameraConnectType);
+            HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_STATISTIC",
+                            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                            "NAME", name, "INFORMATION", cameraConnectType);
+        } else {
+            CAMERA_LOGE("cameraConnectType not start!!");
+        }
+    } else {
+        CAMERA_LOGE("OHOS_ABILITY_CAMERA_CONNECTION_TYPE not find!!");
+    }
+}
+
+void CameraHalTimeSysevent::WriteCameraParameterEvent(const std::string &name, common_metadata_header_t *data)
+{
+    CAMERA_LOGI("WriteCameraParameterEvent start!!");
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_STATISTIC",
+                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+                    "NAME", name, "PARAMETER", CameraMetadata::FormatCameraMetadataToString(data));
 }
 }
