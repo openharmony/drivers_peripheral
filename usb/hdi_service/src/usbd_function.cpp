@@ -15,6 +15,7 @@
 
 #include "usbd_function.h"
 
+#include <dlfcn.h>
 #include <unistd.h>
 
 #include "devmgr_hdi.h"
@@ -42,13 +43,64 @@ uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
 using OHOS::HDI::Usb::Gadget::Mtp::V1_0::IUsbfnMtpInterface;
-using OHOS::HDI::Usb::Gadget::Mtp::V1_0::UsbfnMtpImpl;
+using GetMtpImplFunc = void*(*)();
+
 constexpr uint32_t UDC_NAME_MAX_LEN = 32;
 constexpr int32_t WAIT_UDC_MAX_LOOP = 30;
 constexpr uint32_t WAIT_UDC_TIME = 100000;
 /* mtp and ptp use same driver and same service */
 static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 #define UDC_PATH "/config/usb_gadget/g1/UDC"
+
+static void *g_libHandle = nullptr;
+static GetMtpImplFunc g_getMtpImpl = nullptr;
+
+static void InitGetMtpImpl()
+{
+    if (g_getMtpImpl != nullptr) {
+        return;
+    }
+
+    g_libHandle = dlopen("libusbfn_mtp_interface_service_1.0.z.so", RTLD_LAZY);
+    if (g_libHandle == nullptr) {
+        HDF_LOGE("%{public}s dlopen failed: %{public}s", __func__, dlerror());
+        return;
+    }
+
+    void *funcPtr = dlsym(g_libHandle, "UsbfnMtpInterfaceImplGetInstance");
+    if (funcPtr == nullptr) {
+        HDF_LOGE("%{public}s dlsym failed: %{public}s", __func__, dlerror());
+        dlclose(g_libHandle);
+        g_libHandle = nullptr;
+        return;
+    }
+
+    g_getMtpImpl = reinterpret_cast<GetMtpImplFunc>(funcPtr);
+}
+
+static void ReleaseGetMtpImpl()
+{
+    g_getMtpImpl = nullptr;
+    if (g_libHandle != nullptr) {
+        dlclose(g_libHandle);
+        g_libHandle = nullptr;
+    }
+}
+
+static IUsbfnMtpInterface *GetUsbfnMtpImpl()
+{
+    InitGetMtpImpl();
+    if (g_getMtpImpl == nullptr) {
+        return nullptr;
+    }
+
+    void *instance = g_getMtpImpl();
+    if (instance != nullptr) {
+        return reinterpret_cast<IUsbfnMtpInterface *>(instance);
+    }
+    return nullptr;
+}
+
 int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
 {
     auto servMgr = IServiceManager::Get();
@@ -92,7 +144,7 @@ int32_t UsbdFunction::InitMtp()
         HDF_LOGE("%{public}s: register mtp device failed: %{public}d", __func__, ret);
         return ret;
     }
-    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    auto serviceImpl = GetUsbfnMtpImpl();
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         return HDF_FAILURE;
@@ -108,7 +160,7 @@ int32_t UsbdFunction::InitMtp()
 
 int32_t UsbdFunction::ReleaseMtp()
 {
-    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    auto serviceImpl = GetUsbfnMtpImpl();
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         return HDF_FAILURE;
@@ -117,6 +169,8 @@ int32_t UsbdFunction::ReleaseMtp()
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: release mtp device failed: %{public}d", __func__, ret);
     }
+    ReleaseGetMtpImpl();
+
     UsbdUnregisterDevice(MTP_PTP_SERVICE_NAME);
     HDF_LOGI("%{public}s: release Mtp done", __func__);
     return ret;
