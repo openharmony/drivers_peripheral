@@ -52,6 +52,8 @@ RetCode StreamStillCapture::Capture(const std::shared_ptr<CaptureRequest>& reque
         return RC_OK;
     }
 
+    CAMERA_LOGD("start StreamStillCapture::Capture! ");
+    CameraHalTimeSysevent::WriteTimeStatisicEvent(CameraHalTimeSysevent::GetEventName(TIME_OF_CAPTURE));
     return StreamBase::Capture(request);
 }
 
