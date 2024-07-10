@@ -20,11 +20,7 @@
 #include "v1_0/chip_types.h"
 #include <string>
 
-#define SUBCHIP_PROP "ohos.boot.odm.conn.schiptype"
 #define PROP_SUBCHIPTYPE_LEN 10
-#define SUPPORT_COEXCHIP "bisheng"
-#define TRIPLE_MODE_PROP "vendor.hw_mc.wifi.triplemodes"
-#define SAPCOEXIST_PROP "hw_mc.wifi.support_sapcoexist"
 #define PROP_MAX_LEN 128
 #define SUPPORT_SAPCOEXIST "const.wifi.support_sapcoexist"
 
