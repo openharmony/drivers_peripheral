@@ -15,6 +15,7 @@
 #include <securec.h>
 #include "camera_dump.h"
 #include "camera_hal_hisysevent.h"
+
 #include "node_utils.h"
 extern "C" {
 #include <jpeglib.h>
@@ -106,7 +107,7 @@ RetCode CodecNode::ConfigJpegOrientation(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
     if (ret != 0 || entry.data.i32 == nullptr) {
-        CAMERA_LOGI("tag not found");
+        CAMERA_LOGE("tag not found");
         return RC_ERROR;
     }
 
@@ -130,7 +131,7 @@ RetCode CodecNode::ConfigJpegQuality(common_metadata_header_t* data)
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
     if (ret != 0) {
-        CAMERA_LOGI("tag OHOS_JPEG_QUALITY not found");
+        CAMERA_LOGE("tag OHOS_JPEG_QUALITY not found");
         return RC_ERROR;
     }
 
@@ -259,6 +260,7 @@ void CodecNode::Yuv422ToJpeg(std::shared_ptr<IBuffer>& buffer)
     free(tmpBufferAddr);
     buffer->SetIsValidDataInSurfaceBuffer(true);
 }
+
 void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     if (buffer == nullptr) {
@@ -273,7 +275,7 @@ void CodecNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
     int32_t id = buffer->GetStreamId();
     CAMERA_LOGI("CodecNode::DeliverBuffer, streamId[%{public}d], index[%{public}d],\
-format = %{public}d, encode =  %{public}d",
+        format = %{public}d, encode =  %{public}d",
         id, buffer->GetIndex(), buffer->GetFormat(), buffer->GetEncodeType());
 
     if (buffer->GetEncodeType() == ENCODE_TYPE_JPEG) {

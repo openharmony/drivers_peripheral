@@ -213,7 +213,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
             }
             CollectBuffers();
         }
-        CAMERA_LOGI("StartCollectBuffers thread end, name = %{public}d", name.c_str());
+        CAMERA_LOGI("StartCollectBuffers thread end, name = %{public}s", name.c_str());
     });
 
     return RC_OK;

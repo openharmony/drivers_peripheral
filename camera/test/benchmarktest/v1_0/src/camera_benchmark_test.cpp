@@ -50,7 +50,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_OpenCamera_benchmark_001)(
         cameraTest->deviceCallback = new OHOS::Camera::Test::DemoCameraDeviceCallback();
         for (auto _ : st) {
             cameraTest->rc = cameraTest->service->OpenCamera(cameraTest->cameraIds.front(),
-                cameraTest->deviceCallback,cameraTest->cameraDevice);
+                cameraTest->deviceCallback, cameraTest->cameraDevice);
         }
         EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
     }
@@ -270,7 +270,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_ReleaseStreams_benchmark_0010)(
     cameraTest->intents = {PREVIEW};
     cameraTest->StartStream(cameraTest->intents);
     for (auto _ : st) {
-        cameraTest->rc = cameraTest->streamOperator->ReleaseStreams({cameraTest->streamIdPreview});   
+        cameraTest->rc = cameraTest->streamOperator->ReleaseStreams({cameraTest->streamIdPreview});
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_ReleaseStreams_benchmark_0010)->
@@ -295,7 +295,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_Capture_benchmark_0011)(
     cameraTest->captureInfo->captureSetting_ = cameraTest->abilityVec;
     cameraTest->captureInfo->enableShutterCallback_ = true;
     for (auto _ : st) {
-        cameraTest->rc = cameraTest->streamOperator->Capture(captureId, *cameraTest->captureInfo, true);   
+        cameraTest->rc = cameraTest->streamOperator->Capture(captureId, *cameraTest->captureInfo, true);
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_Capture_benchmark_0011)->
@@ -313,7 +313,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_Close_benchmark_0012)(
 {
     cameraTest->Open();
     for (auto _ : st) {
-        cameraTest->cameraDevice->Close();   
+        cameraTest->cameraDevice->Close();
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_Close_benchmark_0012)->

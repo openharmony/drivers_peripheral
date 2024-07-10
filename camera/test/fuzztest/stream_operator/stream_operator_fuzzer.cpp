@@ -19,6 +19,7 @@ namespace OHOS {
 const size_t THRESHOLD = 10;
 
 enum HostCmdId {
+    STREAM_OPERATOR_FUZZ_TEST,
     STREAM_OPERATOR_ISSTREAMSUPPORTED_V1_1,
     STREAM_OPERATOR_COMMITSTREAM_V1_1,
     STREAM_OPERATOR_UPDATESTREAMS,
@@ -165,7 +166,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyApi(data, size);
+    DoSomethingInterestingWithMyApi(data, size);
     return 0;
 }
-} // namespace OHOS
+}
