@@ -481,6 +481,7 @@ void TestCameraBase::OpenUsbCamera()
             std::cout << "OpenCamera success." << std::endl;
         } else {
             std::cout << "No usb camera plugged in" << std::endl;
+            GTEST_SKIP() << "No usb camera plugged in" << std::endl;
         }
     }
 }
