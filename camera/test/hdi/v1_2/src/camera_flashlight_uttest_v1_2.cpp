@@ -148,7 +148,6 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_005, TestSize.Le
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
-    cameraTest->Close();
 }
 
 /**
@@ -159,6 +158,9 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_005, TestSize.Le
 */
 HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Level1)
 {
+    //waiting for Flashlight powerdown
+    sleep(1);
+
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
@@ -191,6 +193,9 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_006, TestSize.Le
 */
 HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Level1)
 {
+    //waiting for Flashlight powerdown
+    sleep(1);
+
     int32_t ret;
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 1: set callback object
@@ -211,6 +216,9 @@ HWTEST_F(CameraFlashlightUtTestV1_2, Camera_Flashlight_Hdi_V1_2_007, TestSize.Le
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
     cameraTest->Close();
+    //waiting for Flashlight powerdown
+    sleep(1);
+
     EXPECT_EQ(true, cameraTest->cameraDevice == nullptr);
     // step 5: trun off the flashlight
     cameraTest->statusV1_2 = 0.0f;
