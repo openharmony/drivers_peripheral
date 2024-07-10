@@ -1042,7 +1042,7 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
 static bool NetLinkGetChipProp(void)
 {
     char preValue[SUBCHIP_WIFI_PROP_LEN] = { 0 };
-    int errCode = GetParameter(SUBCHIP_WIFI_PROP, 0, preValue, SUBCHIP_WIFI_PROP_LEN);
+    int errCode = GetParameter(SUBCHIP_WIFI_PROP, "0", preValue, SUBCHIP_WIFI_PROP_LEN);
     if (errCode > 0) {
         if (strncmp(preValue, SUPPORT_COEXCHIP, SUPPORT_COEXCHIP_LEN) == 0) {
             return true;
