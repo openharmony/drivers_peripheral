@@ -86,7 +86,7 @@ private:
     const std::string versionName = "version";
     const std::string decryptNumberName = "decryptNumber";
     const std::string errorDecryptNumberName = "errorDecryptNumber";
-    const std::string decryptTime = "decryptTimes";
+    const std::string decryptTime = "maxDecryptTimes";
     OHOS::sptr<MediaKeySystemCallbackService> vdiCallbackObj;
 };
 class MediaKeySystemServiceCallback : public virtual RefBase {
