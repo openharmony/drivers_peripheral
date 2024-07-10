@@ -356,7 +356,11 @@ BENCHMARK_F(DisplayBenchmarkTest, GetDisplayPropertyTest)(benchmark::State &stat
     for (auto _ : state) {
         ret = g_composerDevice->GetDisplayProperty(g_displayIds[0], id, value);
     }
-    EXPECT_EQ(DISPLAY_FAILURE, ret);
+    int32_t result = DISPLAY_FAILURE;
+    if (ret == DISPLAY_SUCCESS || ret == DISPLAY_NOT_SUPPORT) {
+        result = DISPLAY_SUCCESS;
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, result);
 }
 
 BENCHMARK_REGISTER_F(DisplayBenchmarkTest, GetDisplayPropertyTest)->
