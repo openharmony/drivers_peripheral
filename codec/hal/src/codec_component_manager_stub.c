@@ -127,6 +127,10 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
     ret = serviceImpl->CreateComponent(&component, &componentId, compName, appData, callback);
     if (component == NULL) {
         CODEC_LOGE("fail to create component");
+        if (compName != NULL) {
+            OsalMemFree(compName);
+            compName = NULL;
+        }
         return ret;
     }
     if (compName != NULL) {
