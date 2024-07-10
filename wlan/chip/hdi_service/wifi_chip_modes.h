@@ -26,6 +26,7 @@
 #define TRIPLE_MODE_PROP "vendor.hw_mc.wifi.triplemodes"
 #define SAPCOEXIST_PROP "hw_mc.wifi.support_sapcoexist"
 #define PROP_MAX_LEN 128
+#define SUPPORT_SAPCOEXIST "const.wifi.support_sapcoexist"
 
 namespace OHOS {
 namespace HDI {
