@@ -28,8 +28,8 @@
 int32_t AudioCommonDevDescToVdiDevDescVdi(const struct AudioDeviceDescriptor *desc,
     struct AudioDeviceDescriptorVdi *vdiDesc)
 {
-    CHECK_NULL_PTR_RETURN(desc);
-    CHECK_NULL_PTR_RETURN(vdiDesc);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_FAILURE);
+    CHECK_NULL_PTR_RETURN_VALUE(vdiDesc, HDF_FAILURE);
 
     vdiDesc->portId = desc->portId;
     vdiDesc->pins = (enum AudioPortPinVdi)desc->pins;
