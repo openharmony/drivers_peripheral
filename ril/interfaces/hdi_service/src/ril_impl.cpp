@@ -236,6 +236,11 @@ int32_t RilImpl::ActivatePdpContext(int32_t slotId, int32_t serialId, const Data
     return TaskSchedule(&Telephony::HRilManager::ActivatePdpContext, slotId, serialId, dataCallInfo);
 }
 
+int32_t RilImpl::ActivatePdpContext1_3(int32_t slotId, int32_t serialId, const DataCallInfo1_3 &dataCallInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::ActivatePdpContext1_3, slotId, serialId, dataCallInfo);
+}
+
 int32_t RilImpl::DeactivatePdpContext(int32_t slotId, int32_t serialId, const UniInfo &uniInfo)
 {
     return TaskSchedule(&Telephony::HRilManager::DeactivatePdpContext, slotId, serialId, uniInfo);
