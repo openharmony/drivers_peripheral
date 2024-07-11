@@ -106,7 +106,7 @@ int32_t ThermalDeviceMitigation::ExecuteCpuRequest(uint32_t freq, const std::str
     if (snprintf_s(nodeBuf, MAX_BUF_PATH, sizeof(nodeBuf) - 1, "%s", path.c_str()) < EOK) {
         return ret;
     }
-    if (snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%d", freq) < EOK) {
+    if (snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%u", freq) < EOK) {
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > NUM_ZERO) {
@@ -152,7 +152,7 @@ int32_t ThermalDeviceMitigation::GpuRequest(uint32_t freq)
     if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%d", freq);
+    ret = snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%u", freq);
     if (ret < EOK) {
         return ret;
     }
@@ -180,7 +180,7 @@ int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const s
     if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%d%s", current, "\n");
+    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%u%s", current, "\n");
     if (ret < EOK) {
         return ret;
     }
@@ -205,7 +205,7 @@ int32_t ThermalDeviceMitigation::BatteryCurrentRequest(uint32_t current)
     if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%d", current);
+    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%u", current);
     if (ret < EOK) {
         return ret;
     }
@@ -230,7 +230,7 @@ int32_t ThermalDeviceMitigation::BatteryVoltageRequest(uint32_t voltage)
     if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(voltageBuf, MAX_PATH, sizeof(voltageBuf) - 1, "%d", voltage);
+    ret = snprintf_s(voltageBuf, MAX_PATH, sizeof(voltageBuf) - 1, "%u", voltage);
     if (ret < EOK) {
         return ret;
     }
