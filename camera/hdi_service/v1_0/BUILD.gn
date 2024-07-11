@@ -120,6 +120,9 @@ if (defined(ohos_lite)) {
     if (use_hitrace) {
       defines += [ "HITRACE_LOG_ENABLED" ]
     }
+    if (drivers_peripheral_camera_feature_usb) {
+      defines += [ "CHIP_PROD_CAMERA_HOST_CONFIG" ]
+    }
 
     if (is_standard_system) {
       external_deps = [
