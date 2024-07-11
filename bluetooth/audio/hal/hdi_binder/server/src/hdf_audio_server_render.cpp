@@ -183,6 +183,7 @@ int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
     if (adapter == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    HDF_LOGI("%{public}s: DestroyRender.", __func__);
     ret = adapter->DestroyRender(adapter, render);
     if (ret < 0) {
         HDF_LOGE("%{public}s: DestroyRender failed!", __func__);
