@@ -486,7 +486,7 @@ static int32_t OsSubmitBulkRequestHandleUrb(
     urb->endPoint = request->endPoint;
     urb->buffer = request->buffer + (number * bulkBufferLen);
     if (number == request->numUrbs - 1) {
-        uint32_t len = (uint32_t)(request->length % bulkBufferLen);
+        uint32_t len = request->length % (uint32_t)(bulkBufferLen);
         urb->bufferLength = (int32_t)(len == 0) ? bulkBufferLen : len;
     } else {
         urb->bufferLength = bulkBufferLen;
