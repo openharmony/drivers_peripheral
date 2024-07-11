@@ -506,7 +506,9 @@ HWTEST_F(HdfPowerRunningLockTest, HdfPowerRunningLockTest013, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
 
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, RunningLockImpl::Hold(runinglockInfo, powerState));
+    runinglockInfo.name = setLockName + "task.13";
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Hold(runinglockInfo, powerState));
+    EXPECT_EQ(HDF_SUCCESS, RunningLockImpl::Unhold(runinglockInfo));
 
     runinglockInfo.name = setLockName + "phone.13";
     runinglockInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
