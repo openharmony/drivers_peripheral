@@ -71,6 +71,18 @@ void AudioCommonAttrsToVdiAttrsVdi(const struct AudioSampleAttributes *attrs, st
         vdiAttrs->offloadInfo.offloadBufferSize = attrs->offloadInfo.offloadBufferSize;
         vdiAttrs->offloadInfo.duration = attrs->offloadInfo.duration;
     }
+    vdiAttrs->ecSampleAttributes.ecInterleaved = attrs->ecSampleAttributes.ecInterleaved;
+    vdiAttrs->ecSampleAttributes.ecFormat = (enum AudioFormatVdi)attrs->ecSampleAttributes.ecFormat;
+    vdiAttrs->ecSampleAttributes.ecSampleRate = attrs->ecSampleAttributes.ecSampleRate;
+    vdiAttrs->ecSampleAttributes.ecChannelCount = attrs->ecSampleAttributes.ecChannelCount;
+    vdiAttrs->ecSampleAttributes.ecChannelLayout = attrs->ecSampleAttributes.ecChannelLayout;
+    vdiAttrs->ecSampleAttributes.ecPeriod = attrs->ecSampleAttributes.ecPeriod;
+    vdiAttrs->ecSampleAttributes.ecFrameSize = attrs->ecSampleAttributes.ecFrameSize;
+    vdiAttrs->ecSampleAttributes.ecIsBigEndian = attrs->ecSampleAttributes.ecIsBigEndian;
+    vdiAttrs->ecSampleAttributes.ecIsSignedData = attrs->ecSampleAttributes.ecIsSignedData;
+    vdiAttrs->ecSampleAttributes.ecStartThreshold = attrs->ecSampleAttributes.ecStartThreshold;
+    vdiAttrs->ecSampleAttributes.ecStopThreshold = attrs->ecSampleAttributes.ecStopThreshold;
+    vdiAttrs->ecSampleAttributes.ecSilenceThreshold = attrs->ecSampleAttributes.ecSilenceThreshold;
 }
 
 int32_t AudioCommonPortToVdiPortVdi(const struct AudioPort *port, struct AudioPortVdi *vdiPort)
@@ -303,6 +315,7 @@ static int32_t AudioCommonRouteNodeToVdiRouteNodeVdi(struct AudioRouteNode *rout
     if (routeNode->type == AUDIO_VDI_PORT_MIX_TYPE) {
         vdiRouteNode->ext.mix.moduleId = routeNode->ext.mix.moduleId;
         vdiRouteNode->ext.mix.streamId = routeNode->ext.mix.streamId;
+        vdiRouteNode->ext.mix.source = routeNode->ext.mix.source;
         return HDF_SUCCESS;
     }
 
@@ -466,6 +479,74 @@ int32_t AudioCommonVdiSampleAttrToSampleAttrVdi(const struct AudioSampleAttribut
     attrs->stopThreshold = vdiAttrs->stopThreshold;
     attrs->silenceThreshold = vdiAttrs->silenceThreshold;
     attrs->streamId = vdiAttrs->streamId;
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCommonFrameInfoToVdiFrameInfoVdi(const struct AudioFrameLen *frameLen,
+    struct AudioCaptureFrameInfoVdi *frameInfoVdi)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
+
+    if (frameLen->frameLen <= 0 || frameLen->frameEcLen <= 0) {
+        AUDIO_FUNC_LOGE("frameLen len err");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    frameInfoVdi->frameLen = frameLen->frameLen;
+    frameInfoVdi->frameEcLen = frameLen->frameEcLen;
+    frameInfoVdi->frame = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameLen->frameLen));
+    if (frameInfoVdi->frame == NULL) {
+        AUDIO_FUNC_LOGE("frameInfoVdi->frame null");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    frameInfoVdi->frameEc = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameLen->frameEcLen));
+    if (frameInfoVdi->frameEc == NULL) {
+        OsalMemFree((void *)frameInfoVdi->frame);
+        AUDIO_FUNC_LOGE("frameInfoVdi->frameEc null");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCommonVdiFrameInfoToFrameInfoVdi(struct AudioCaptureFrameInfoVdi *frameInfoVdi,
+    struct AudioCaptureFrameInfo *frameInfo)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfoVdi, HDF_ERR_INVALID_PARAM);
+
+    frameInfo->frameLen = frameInfoVdi->frameLen;
+    frameInfo->frameEcLen = frameInfoVdi->frameEcLen;
+    frameInfo->frame = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameInfo->frameLen));
+    if (frameInfo->frame == NULL) {
+        frameInfo->frameLen = 0;
+        AUDIO_FUNC_LOGE("frameInfo->frame null");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    int32_t ret = memcpy_s(frameInfo->frame, (size_t)frameInfo->frameLen, frameInfoVdi->frame,
+        (size_t)frameInfoVdi->frameLen);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("memcpy_s frame fail");
+        return HDF_FAILURE;
+    }
+
+    frameInfo->frameEc = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (frameInfo->frameEcLen));
+    if (frameInfo->frameEc == NULL) {
+        frameInfo->frameLen = 0;
+        frameInfo->frameEcLen = 0;
+        OsalMemFree((void *)frameInfo->frame);
+        AUDIO_FUNC_LOGE("frameInfo->frameEc null");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    ret = memcpy_s(frameInfo->frameEc, (size_t)frameInfo->frameEcLen, frameInfoVdi->frameEc,
+        (size_t)frameInfoVdi->frameEcLen);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("memcpy_s frameEc fail");
+        return HDF_FAILURE;
+    }
+    frameInfo->replyBytes = frameInfoVdi->replyBytes;
+    frameInfo->replyBytesEc = frameInfoVdi->replyBytesEc;
 
     return HDF_SUCCESS;
 }
