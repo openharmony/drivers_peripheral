@@ -87,5 +87,11 @@ const int32_t VIDEO_KEY_DEFERRED_PROCESSING_TYPE = 0x08;
 const std::string imageScore = "imageScore";
 const int32_t VIDEO_KEY_IMAGE_SCORE = 0x09;
 
+/**
+ * @brief Indicates the continuous shooting effect score. The value type is int32_t.
+ */
+const std::string deferredImageFormat = "deferredImageForamt";
+const int32_t VIDEO_KEY_DEFERRED_IMAGE_FORAMT = 0x0A;
+
 } // end namespace OHOS::Camera
 #endif
