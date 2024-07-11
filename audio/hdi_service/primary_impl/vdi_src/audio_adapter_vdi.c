@@ -126,6 +126,7 @@ int32_t AudioCreateRenderVdi(struct IAudioAdapter *adapter, const struct AudioDe
         return HDF_SUCCESS;
     }
     if (AudioCommonDevDescToVdiDevDescVdi(desc, &vdiDesc) != HDF_SUCCESS) {
+        pthread_mutex_unlock(&g_adapterMutex);
         return HDF_FAILURE;
     }
     AudioCommonAttrsToVdiAttrsVdi(attrs, &vdiAttrs);
