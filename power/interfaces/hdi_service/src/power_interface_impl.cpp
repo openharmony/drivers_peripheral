@@ -173,7 +173,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
         return HDF_SUCCESS;
     }
     g_suspending = true;
-    g_daemon = std::make_unique<std::thread>([] { AutoSuspendLoop(); });
+    g_daemon = std::make_unique<std::thread>(&AutoSuspendLoop);
     g_daemon->detach();
     return HDF_SUCCESS;
 }
