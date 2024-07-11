@@ -31,7 +31,6 @@ public:
 
     static int32_t ReadNodeToInt(const std::string& path);
     static bool ReadNode(const std::string& path, std::string& out);
-    static int32_t WriteNode(const std::string& path, std::string& data);
     static void TrimStr(std::string& str);
     static int32_t GetMaxCommonDivisor(int32_t a, int32_t b);
 };
