@@ -580,8 +580,8 @@ int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCall
         HDF_LOGE("%{public}s:GetModuleInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = gnssMeasurementInterface->enable(&gnssMeasurementCallback);
-    if (ret != HDF_SUCCESS) {
+    bool result = gnssMeasurementInterface->enable(&gnssMeasurementCallback);
+    if (!result) {
         HDF_LOGE("enableGnssMeasurement failed.");
         return HDF_FAILURE;
     }
@@ -589,7 +589,7 @@ int32_t GnssInterfaceImpl::EnableGnssMeasurement(const sptr<IGnssMeasurementCall
         g_gnssMeasurementCallbackMap.clear();
     }
     g_gnssMeasurementCallbackMap[remote.GetRefPtr()] = callbackObj;
-    return ret;
+    return HDF_SUCCESS;
 #else
     return HDF_SUCCESS;
 #endif
