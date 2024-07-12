@@ -109,11 +109,11 @@ void CameraHalTimeSysevent::WriteTimeStatisicEvent(const std::string &name)
 {
     std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     std::time_t now = std::chrono::system_clock::to_time_t(begin);
-    std::string timepoint_str = std::ctime(&now);
-    CAMERA_LOGI("WriteTimeStatisicEvent name:%{public}s, timepoint:%{public}s", name.c_str(), timepoint_str.c_str());
+    std::string timepointStr = std::ctime(&now);
+    CAMERA_LOGI("WriteTimeStatisicEvent name:%{public}s, timepoint:%{public}s", name.c_str(), timepointStr.c_str());
     int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::CAMERA_HAL, "CAMERA_HAL_STATISTIC",
                                   OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-                                  "NAME", name, "TIMEPOINT", timepoint_str);
+                                  "NAME", name, "TIMEPOINT", timepointStr);
     if (ret != 0) {
         CAMERA_LOGE("WriteTimeStatisicEvent file name:%{public}s, ret:%{public}d", name.c_str(), ret);
     }
