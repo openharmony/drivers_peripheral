@@ -17,6 +17,7 @@
 
 #include "../wpa_impl.h"
 #include <pthread.h>
+#include <hdf_remote_service.h>
 #include "utils/common.h"
 #include "wpa_supplicant_hal.h"
 
@@ -112,5 +113,8 @@ const char *macToStr(const u8 *addr);
 struct StWpaMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
+};
+struct RemoteServiceDeathRecipient {
+    struct HdfDeathRecipient recipient;
 };
 #endif
