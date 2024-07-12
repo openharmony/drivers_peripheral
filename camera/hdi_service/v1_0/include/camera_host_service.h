@@ -24,7 +24,11 @@
 #include "v1_0/icamera_host_vdi.h"
 
 namespace OHOS::Camera {
+#ifdef CHIP_PROD_CAMERA_HOST_CONFIG
+#define CONFIG_PATH_NAME HDF_CHIP_PROD_CONFIG_DIR"/camera_host_config.hcb"
+#else
 #define CONFIG_PATH_NAME HDF_CONFIG_DIR"/camera_host_config.hcb"
+#endif
 
 using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::VDI::Camera::V1_0;
