@@ -412,6 +412,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
 
 int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
+    HDF_LOGI("enter");
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
     if (hwAdapter == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -424,6 +425,7 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
+        HDF_LOGI("render not stop, first stop it.");
         int ret = render->control.Stop((AudioHandle)render);
         if (ret < 0) {
             HDF_LOGE("render Stop failed");
@@ -432,6 +434,7 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
     AudioReleaseRenderHandle(hwRender);
     AudioMemFree(reinterpret_cast<void **>(&hwRender->renderParam.frameRenderMode.buffer));
     AudioMemFree(reinterpret_cast<void **>(&render));
+    HDF_LOGI("AudioAdapterDestroyRender cleaned.");
     return AUDIO_HAL_SUCCESS;
 }
 
