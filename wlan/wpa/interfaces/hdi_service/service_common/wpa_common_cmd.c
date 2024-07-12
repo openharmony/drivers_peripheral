@@ -1043,20 +1043,18 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
 static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
 {
     HDF_LOGI("enter %{public}s ", __func__);
-    int id = 0;
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
-    if (hostapdHalDevice == NULL) {
-        HDF_LOGE("hostapdHalDevice is NULL");
+    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
+    if (pWpaInterface == NULL) {
+        HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
     }
-
-    if (hostapdHalDevice->stopAp(id) != 0) {
-        HDF_LOGE("stopAp failed");
+    int ret = pWpaInterface->wpaCliTerminate();
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: wpaCliTerminate failed!", __func__);
+    } else {
+        HDF_LOGI("%{public}s: wpaCliTerminate suc!", __func__);
     }
-
-    if (StopHostapdHal(id) != HDF_SUCCESS) {
-        HDF_LOGE("StopHostapdHal failed");
-    }
-    HDF_LOGI("%{public}s: hostapd stop successfully", __func__);
+    ReleaseWpaGlobalInterface();
+    HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
 }
 
 static struct RemoteServiceDeathRecipient g_deathRecipient = {
@@ -1065,7 +1063,7 @@ static struct RemoteServiceDeathRecipient g_deathRecipient = {
     }
 };
 
-static void AddDeathRecipientForService(struct IHostapdCallback *cbFunc)
+static void AddDeathRecipientForService(struct IWpaCallback *cbFunc)
 {
     HDF_LOGI("enter %{public}s ", __func__);
     if (cbFunc == NULL) {
