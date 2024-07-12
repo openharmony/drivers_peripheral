@@ -501,7 +501,7 @@ int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
 int32_t DisplayComposerService::RegSeamlessChangeCallback(const sptr<ISeamlessChangeCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->RegSeamlessChangeCallback(OnSeamlessChange, this);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -514,7 +514,7 @@ int32_t DisplayComposerService::RegSeamlessChangeCallback(const sptr<ISeamlessCh
 int32_t DisplayComposerService::GetDisplaySupportedModesExt(uint32_t devId, std::vector<DisplayModeInfoExt>& modes)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetDisplaySupportedModesExt(devId, modes);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -539,7 +539,7 @@ void DisplayComposerService::OnMode(uint32_t modeId, uint64_t vBlankPeriod, void
 int32_t DisplayComposerService::SetDisplayModeAsync(uint32_t devId, uint32_t modeId, const sptr<IModeCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->SetDisplayModeAsync(devId, modeId, OnMode, this);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -552,7 +552,7 @@ int32_t DisplayComposerService::SetDisplayModeAsync(uint32_t devId, uint32_t mod
 int32_t DisplayComposerService::GetDisplayVBlankPeriod(uint32_t devId, uint64_t& period)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetDisplayVBlankPeriod(devId, period);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -619,7 +619,7 @@ int32_t DisplayComposerService::SetLayerPerFrameParameter(uint32_t devId, uint32
     const std::vector<int8_t>& value)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->SetLayerPerFrameParameter(devId, layerId, key, value);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -629,7 +629,7 @@ int32_t DisplayComposerService::SetLayerPerFrameParameter(uint32_t devId, uint32
 int32_t DisplayComposerService::GetSupportedLayerPerFrameParameterKey(std::vector<std::string>& keys)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetSupportedLayerPerFrameParameterKey(keys);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -639,7 +639,7 @@ int32_t DisplayComposerService::GetSupportedLayerPerFrameParameterKey(std::vecto
 int32_t DisplayComposerService::SetDisplayOverlayResolution(uint32_t devId, uint32_t width, uint32_t height)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->SetDisplayOverlayResolution(devId, width, height);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -664,7 +664,7 @@ void DisplayComposerService::OnRefresh(uint32_t devId, void *data)
 int32_t DisplayComposerService::RegRefreshCallback(const sptr<IRefreshCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->RegRefreshCallback(OnRefresh, this);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -677,7 +677,7 @@ int32_t DisplayComposerService::RegRefreshCallback(const sptr<IRefreshCallback>&
 int32_t DisplayComposerService::GetDisplaySupportedColorGamuts(uint32_t devId, std::vector<ColorGamut>& gamuts)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetDisplaySupportedColorGamuts(devId, gamuts);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -687,7 +687,7 @@ int32_t DisplayComposerService::GetDisplaySupportedColorGamuts(uint32_t devId, s
 int32_t DisplayComposerService::GetHDRCapabilityInfos(uint32_t devId, HDRCapability& info)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     int32_t ret = vdiImplV1_1_->GetHDRCapabilityInfos(devId, info);
     DISPLAY_CHK_RETURN(ret == DISPLAY_NOT_SUPPORT, HDF_ERR_NOT_SUPPORT);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
@@ -713,7 +713,7 @@ void DisplayComposerService::OnVBlankIdleCallback(uint32_t devId, uint64_t ns, v
 int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankIdleCallback>& cb)
 {
     DISPLAY_TRACE;
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImplV1_1_, HDF_ERR_NOT_SUPPORT);
+    DISPLAY_CHK_RETURN(vdiImplV1_1_ == nullptr, HDF_ERR_NOT_SUPPORT);
     VBlankIdleCb_ = cb;
     int32_t ret = vdiImplV1_1_->RegDisplayVBlankIdleCallback(OnVBlankIdleCallback, this);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS && ret != HDF_ERR_NOT_SUPPORT, HDF_FAILURE, DISPLAY_LOGE(" fail"));
