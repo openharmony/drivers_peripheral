@@ -156,7 +156,7 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     // free after send reply
     contollerId->libName = strdup(info->libName);
     contollerId->effectId = strdup(info->effectId);
-    if (contollerId->libName == NULL || contollerId->effectId) {
+    if (contollerId->libName == NULL || contollerId->effectId == NULL) {
         HDF_LOGE("%{public}s: strdup failed, info->libName = %{public}s", __func__, info->libName);
         OsalMemFree(ctrlMgr->effectId);
         OsalMemFree(ctrlMgr);
