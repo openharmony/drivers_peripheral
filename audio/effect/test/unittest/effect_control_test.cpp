@@ -47,7 +47,9 @@ void EffectControlTest::SetUp()
 {
     // input testcase setup step,setup invoked before each testcases
     libName_ = strdup("libmock_effect_lib");
+    ASSERT_NE(libName_, nullptr);
     effectId_ = strdup("aaaabbbb-8888-9999-6666-aabbccdd9966ff");
+    ASSERT_NE(effectId_, nullptr);
     struct EffectInfo info = {
         .libName = libName_,
         .effectId = effectId_,
