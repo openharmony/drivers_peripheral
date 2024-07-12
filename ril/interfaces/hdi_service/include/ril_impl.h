@@ -76,7 +76,8 @@ public:
 
     // Data
     int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) override;
-    int32_t ActivatePdpContext1_3(int32_t slotId, int32_t serialId, const DataCallInfo1_3 &dataCallInfo) override;
+    int32_t ActivatePdpContextWithApnTypes(int32_t slotId, int32_t serialId,
+        const DataCallInfoWithApnTypes &dataCallInfo) override;
     int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const UniInfo &uniInfo) override;
     int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const UniInfo &uniInfo) override;
     int32_t SetInitApnInfo(int32_t slotId, int32_t serialId, const DataProfileDataInfo &dataProfileDataInfo) override;
