@@ -31,6 +31,8 @@ namespace OHOS {
 namespace DistributedHardware {
 std::string GetAnonyString(const std::string &value);
 
+std::string GetChangeDevIdMap(int32_t devId);
+
 int32_t GetAudioParamStr(const std::string &params, const std::string &key, std::string &value);
 
 int32_t GetAudioParamInt(const std::string &params, const std::string &key, int32_t &value);
