@@ -541,10 +541,6 @@ int32_t AudioAdapterListGetRender(const char *adapterName, struct AudioRender **
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (g_renderAndCaptureManage[i].adapter == NULL) {
-            HDF_LOGE("%{public}s: adapter is null ", __func__);
-            return HDF_ERR_INVALID_PARAM;
-        }
         if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
             if (g_renderAndCaptureManage[i].renderPid != pid) {
                 HDF_LOGE("%{public}s: renderPid != pid renderPid = %{public}u, pid = %{public}u",
