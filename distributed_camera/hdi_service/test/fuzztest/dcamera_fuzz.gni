@@ -40,7 +40,7 @@ dcamera_external_deps = [
   "cJSON:cjson",
   "c_utils:utils",
   "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
-  "drivers_interface_camera:libcamera_proxy_1.0",
+  "drivers_interface_camera:libcamera_proxy_1.3",
   "drivers_interface_camera:metadata",
   "drivers_interface_display:libdisplay_composer_stub_1.0",
   "drivers_interface_distributed_camera:libdistributed_camera_provider_stub_1.1",
