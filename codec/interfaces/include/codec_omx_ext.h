@@ -253,6 +253,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamEncOutMse,
     /** CodecEncOutLTRParam */
     OMX_IndexParamEncOutLTR,
+    /** CodecTemperalLayerParam */
+    OMX_IndexParamTemperalLayer,
 };
 
 /**
@@ -350,6 +352,12 @@ struct CodecQPRangeParam {
     union OMX_VERSIONTYPE version;               /** Component version */
     uint32_t minQp;
     uint32_t maxQp;
+};
+
+struct CodecTemperalLayerParam {
+    uint32_t size;                               /** Size of the structure */
+    union OMX_VERSIONTYPE version;               /** Component version */
+    uint32_t layerCnt;
 };
 
 struct CodecParamOverlayBuffer {

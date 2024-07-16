@@ -724,6 +724,45 @@ static int32_t HdfHostapdCallbackFun(uint32_t event, void *data, const char *ifN
     return ret;
 }
 
+static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    int id = 0;
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
+    if (hostapdHalDevice == NULL) {
+        HDF_LOGE("hostapdHalDevice is NULL");
+    }
+
+    if (hostapdHalDevice->stopAp(id) != 0) {
+        HDF_LOGE("stopAp failed");
+    }
+
+    if (StopHostapdHal(id) != HDF_SUCCESS) {
+        HDF_LOGE("StopHostapdHal failed");
+    }
+    HDF_LOGI("%{public}s: hostapd stop successfully", __func__);
+}
+
+static struct RemoteServiceDeathRecipient g_deathRecipient = {
+    .recipient = {
+        .OnRemoteDied = OnRemoteServiceDied,
+    }
+};
+
+static void AddDeathRecipientForService(struct IHostapdCallback *cbFunc)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    if (cbFunc == NULL) {
+        HDF_LOGE("invalid parameter");
+        return;
+    }
+    struct HdfRemoteService *remote = cbFunc->AsObject(cbFunc);
+    if (remote == NULL) {
+        HDF_LOGE("remote is NULL");
+        return;
+    }
+    HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
+}
 static int32_t HdfHostapdAddRemoteObj(struct IHostapdCallback *self)
 {
     struct HdfHostapdRemoteNode *pos = NULL;
@@ -750,6 +789,7 @@ static int32_t HdfHostapdAddRemoteObj(struct IHostapdCallback *self)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
+    AddDeathRecipientForService(self);
     return HDF_SUCCESS;
 }
 

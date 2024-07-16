@@ -1773,3 +1773,59 @@ HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_044, TestSize.Level1)
     cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
 }
+
+/**
+ * @tc.name:Camera_Device_Hdi_V1_3_045
+ * @tc.desc:OHOS_CONTROL_BURST_CAPTURE
+ * @tc.size:MediumTest
+ * @tc.type:Function
+*/
+HWTEST_F(CameraHdiUtTestV1_3, Camera_Device_Hdi_V1_3_045, TestSize.Level1)
+{
+    CAMERA_LOGI("test Camera_Device_Hdi_V1_3_039 start.");
+    cameraTest->imageDataSaveSwitch = SWITCH_ON;
+
+    // Get stream operator
+    cameraTest->streamOperatorCallbackV1_3 = new OHOS::Camera::Test::TestStreamOperatorCallbackV1_3();
+    cameraTest->rc = cameraTest->cameraDeviceV1_3->GetStreamOperator_V1_3(
+        cameraTest->streamOperatorCallbackV1_3, cameraTest->streamOperator_V1_3);
+    EXPECT_NE(cameraTest->streamOperator_V1_3, nullptr);
+
+    // Preview streamInfo
+    cameraTest->streamInfoV1_1 = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosPreview(cameraTest->streamInfoV1_1);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoV1_1);
+
+    // Capture streamInfo
+    cameraTest->streamInfoCapture = std::make_shared<OHOS::HDI::Camera::V1_1::StreamInfo_V1_1>();
+    cameraTest->DefaultInfosCapture(cameraTest->streamInfoCapture);
+    cameraTest->streamInfosV1_1.push_back(*cameraTest->streamInfoCapture);
+
+    // CreateStreams
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CreateStreams_V1_1(cameraTest->streamInfosV1_1);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, cameraTest->rc);
+    cameraTest->rc = cameraTest->streamOperator_V1_3->CommitStreams(OperationMode::NORMAL, cameraTest->abilityVec);
+    EXPECT_EQ(cameraTest->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // Set OHOS_CONTROL_BURST_CAPTURE_BEGIN, start burst
+    std::shared_ptr<CameraSetting> modeSetting = std::make_shared<CameraSetting>(ITEM_CAPACITY, DATA_CAPACITY);
+    uint8_t burstCapture = static_cast<uint8_t>(OHOS_CONTROL_BURST_CAPTURE_BEGIN);
+    modeSetting->addEntry(OHOS_CONTROL_BURST_CAPTURE, &burstCapture, 1);
+    std::vector<uint8_t> metaVec;
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->abilityVec = metaVec;
+    cameraTest->StartCapture(cameraTest->streamIdPreview, cameraTest->captureIdPreview, false, true);
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+
+    // Set OHOS_CONTROL_BURST_CAPTURE_END, close burst
+    burstCapture = static_cast<uint8_t>(OHOS_CONTROL_BURST_CAPTURE_END);
+    modeSetting->addEntry(OHOS_CONTROL_BURST_CAPTURE, &burstCapture, 1);
+    MetadataUtils::ConvertMetadataToVec(modeSetting, metaVec);
+    cameraTest->abilityVec = metaVec;
+    cameraTest->StartCapture(cameraTest->streamIdCapture, cameraTest->captureIdCapture, false, false);
+
+    cameraTest->captureIds = {cameraTest->captureIdPreview};
+    cameraTest->streamIds = {cameraTest->streamIdPreview, cameraTest->streamIdCapture};
+    cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
+    cameraTest->imageDataSaveSwitch = SWITCH_OFF;
+}
