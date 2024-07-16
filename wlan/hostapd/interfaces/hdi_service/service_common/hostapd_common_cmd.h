@@ -18,6 +18,7 @@
 #include "../hostapd_impl.h"
 #include "hdi_hostapd_hal.h"
 #include <pthread.h>
+#include <hdf_remote_service.h>
 
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define BUFFSIZE_REQUEST 4096
@@ -95,5 +96,9 @@ int32_t HostApdInterfaceShellCmd(struct IHostapdInterface *self, const char *ifN
 struct StApMainParam {
     int argc;
     char argv[MAX_WPA_MAIN_ARGC_NUM][MAX_WPA_MAIN_ARGV_LEN];
+};
+
+struct RemoteServiceDeathRecipient {
+    struct HdfDeathRecipient recipient;
 };
 #endif
