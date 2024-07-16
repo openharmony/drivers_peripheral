@@ -53,6 +53,25 @@ std::string GetAnonyString(const std::string &value)
     return res;
 }
 
+std::string GetChangeDevIdMap(int32_t devId)
+{
+    std::string result = PRINT_NONE;
+    switch (devId) {
+        case DEFAULT_CAPTURE_ID:
+            result = PRINT_MIC;
+            break;
+        case LOW_LATENCY_RENDER_ID:
+            result = PRINT_SPK;
+            break;
+        case DEFAULT_RENDER_ID:
+            result = PRINT_SPK;
+            break;
+        default:
+            break;
+    }
+    return result;
+}
+
 int32_t GetAudioParamStr(const std::string &params, const std::string &key, std::string &value)
 {
     size_t step = key.size();

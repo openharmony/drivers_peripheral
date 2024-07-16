@@ -543,7 +543,7 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const uint32_t s
 
 int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const std::string &caps)
 {
-    DHLOGI("Add distributed audio device %{public}d.", devId);
+    DHLOGI("Add distributed audio device %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto dev = mapAudioDevice_.find(devId);
     if (dev != mapAudioDevice_.end()) {
@@ -559,7 +559,7 @@ int32_t AudioAdapterInterfaceImpl::AddAudioDevice(const uint32_t devId, const st
 
 int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
 {
-    DHLOGI("Remove distributed audio device %{public}d.", devId);
+    DHLOGI("Remove distributed audio device %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         if (mapAudioDevice_.find(devId) == mapAudioDevice_.end()) {
@@ -745,7 +745,7 @@ uint32_t AudioAdapterInterfaceImpl::GetVolumeGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%{public}u.", devId);
+        DHLOGE("Can not find caps of dev:%{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
         return volGroup;
     }
 
@@ -762,7 +762,7 @@ uint32_t AudioAdapterInterfaceImpl::GetInterruptGroup(const uint32_t devId)
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     auto caps = mapAudioDevice_.find(devId);
     if (caps == mapAudioDevice_.end()) {
-        DHLOGE("Can not find caps of dev:%{public}u.", devId);
+        DHLOGE("Can not find caps of devType: %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
         return iptGroup;
     }
 
