@@ -20,17 +20,26 @@
 #include "dcamera_device.h"
 
 #include "v1_0/icamera_host.h"
+#include "v1_3/icamera_host.h"
+#include "v1_0/icamera_device_callback.h"
 #include "v1_0/icamera_host_callback.h"
+#include "v1_2/icamera_host_callback.h"
 #include "v1_1/dcamera_types.h"
 #include "v1_0/types.h"
+#include "v1_2/types.h"
 #include "constants.h"
 #include "iremote_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_1;
-using namespace OHOS::HDI::Camera::V1_0;
-class DCameraHost : public ICameraHost {
+using HDI::Camera::V1_3::ICameraDevice;
+using HDI::Camera::V1_0::ICameraDeviceCallback;
+using HDI::Camera::V1_0::FlashlightStatus;
+using HDI::Camera::V1_0::CameraStatus;
+using HDI::Camera::V1_3::ICameraHost;
+using HDI::Camera::V1_1::PrelaunchConfig;
+class DCameraHost : public OHOS::HDI::Camera::V1_3::ICameraHost {
 const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;
 const uint32_t ID_MAX_SIZE = 2 * DEVID_MAX_LENGTH;
 const size_t MAX_DCAMERAS_NUMBER = 32;
@@ -44,11 +53,31 @@ public:
 
 public:
     static OHOS::sptr<DCameraHost> GetInstance();
-    int32_t SetCallback(const sptr<ICameraHostCallback> &callbackObj) override;
+
+    int32_t OpenCamera_V1_3(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+        sptr<ICameraDevice> &device) override;
+    int32_t OpenSecureCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+        sptr<ICameraDevice> &device) override;
+    int32_t GetResourceCost(const std::string &cameraId,
+        OHOS::HDI::Camera::V1_3::CameraDeviceResourceCost &resourceCost) override;
+
+    int32_t OpenCamera_V1_2(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+        sptr<HDI::Camera::V1_2::ICameraDevice> &device) override;
+    int32_t NotifyDeviceStateChangeInfo(int notifyType, int deviceState) override;
+    int32_t SetCallback_V1_2(const sptr<HDI::Camera::V1_2::ICameraHostCallback> &callbackObj) override;
+    int32_t SetFlashlight_V1_2(float level) override;
+    int32_t PreCameraSwitch(const std::string &cameraId) override;
+    int32_t PrelaunchWithOpMode(const PrelaunchConfig &config, int32_t operationMode) override;
+
+    int32_t OpenCamera_V1_1(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+        sptr<HDI::Camera::V1_1::ICameraDevice> &device) override;
+    int32_t Prelaunch(const PrelaunchConfig &config) override;
+
+    int32_t SetCallback(const sptr<HDI::Camera::V1_0::ICameraHostCallback> &callbackObj) override;
     int32_t GetCameraIds(std::vector<std::string> &cameraIds) override;
     int32_t GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility) override;
     int32_t OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
-         sptr<ICameraDevice> &device) override;
+        sptr<HDI::Camera::V1_0::ICameraDevice> &device) override;
     int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
     int32_t GetCameraAbilityFromDev(const std::string &cameraId,
         std::shared_ptr<CameraAbility> &cameraAbility);
@@ -64,6 +93,9 @@ private:
     bool IsCameraIdInvalid(const std::string &cameraId);
     std::string GetCameraIdByDHBase(const DHBase &dhBase);
     size_t GetCamDevNum();
+
+    template<typename Callback, typename Device>
+    int32_t OpenCameraImpl(const std::string &cameraId, const Callback &callbackObj, Device &device);
 
 private:
     class AutoRelease {
@@ -84,7 +116,8 @@ private:
     static AutoRelease autoRelease_;
     static OHOS::sptr<DCameraHost> instance_;
 
-    OHOS::sptr<ICameraHostCallback> dCameraHostCallback_;
+    OHOS::sptr<HDI::Camera::V1_0::ICameraHostCallback> dCameraHostCallback_;
+    OHOS::sptr<HDI::Camera::V1_2::ICameraHostCallback> dCameraHostCallback_V1_2_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
     std::mutex deviceMapLock_;
 };

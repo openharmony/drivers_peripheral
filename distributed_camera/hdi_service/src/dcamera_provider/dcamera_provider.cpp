@@ -290,7 +290,8 @@ int32_t DCameraProvider::ConfigureStreams(const DHBase &dhBase, const std::vecto
 
     for (auto info = streamInfos.begin(); info != streamInfos.end(); info++) {
         DHLOGI("ConfigureStreams: id=%{public}d, width=%{public}d, height=%{public}d, format=%{public}d, "
-               "type=%{public}d.", info->streamId_, info->width_, info->height_, info->format_, info->type_);
+               "type=%{public}d, mode=%{public}d.", info->streamId_, info->width_, info->height_, info->format_,
+               info->type_, info->mode_);
     }
     return callback->ConfigureStreams(dhBase, streamInfos);
 }

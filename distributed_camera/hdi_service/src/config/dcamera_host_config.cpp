@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,9 @@
 #include <hdf_sbuf_ipc.h>
 
 #include "dcamera_host.h"
-#include "v1_0/camera_host_stub.h"
+#include "v1_3/camera_host_stub.h"
 
-using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::HDI::Camera::V1_3;
 
 struct HdfCameraHostHost {
     struct IDeviceIoService ioService;
@@ -86,7 +86,7 @@ static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfCameraHostHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        ICameraHost::GetDescriptor());
+        HDI::Camera::V1_3::ICameraHost::GetDescriptor());
     if (hdfCameraHostHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfCameraHostHost;
