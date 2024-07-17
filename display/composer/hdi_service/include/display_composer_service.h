@@ -101,11 +101,7 @@ private:
     /* V1_0, which is the version of vdi */
     IDisplayComposerVdi* vdiImpl_;
     DestroyComposerVdiFunc destroyVdiFunc_;
-#ifdef DISPLAY_COMMUNITY
     std::unique_ptr<V1_2::HdiDisplayCmdResponser> cmdResponser_;
-#else
-    std::unique_ptr<V1_0::HdiDisplayCmdResponser> cmdResponser_;
-#endif
 
     /* V1_1, which is the version of vdi */
     IDisplayComposerVdiV1_1* vdiImplV1_1_;
