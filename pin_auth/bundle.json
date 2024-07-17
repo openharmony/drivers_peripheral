@@ -11,8 +11,9 @@
   "scripts": {},
   "component": {
     "name": "drivers_peripheral_pin_auth",
-    "subsystem": "hdf",
+    "subsystem": "drivers",
     "adapted_system_type": ["standard"],
+    "features": ["drivers_peripheral_pin_auth_enabled"],
     "rom": "1000KB",
     "ram": "1000KB",
     "deps": {
