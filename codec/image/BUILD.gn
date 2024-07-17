@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("..//codec.gni")
 
 ohos_shared_library("libcodec_image_service_1.0") {
   include_dirs = [
@@ -28,6 +29,9 @@ ohos_shared_library("libcodec_image_service_1.0") {
     "jpeg/src/codec_jpeg_service.cpp",
   ]
   defines = [ "LOG_TAG_IMAGE" ]
+  if (drivers_peripheral_codec_feature_support_xcollie) {
+    defines += [ "HICOLLIE_ENABLE" ]
+  }
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -35,6 +39,7 @@ ohos_shared_library("libcodec_image_service_1.0") {
       "graphic_surface:buffer_handle",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
+      "hicollie:libhicollie",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
