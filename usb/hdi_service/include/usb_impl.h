@@ -92,6 +92,7 @@ public:
     int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem) override;
     int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe) override;
+    int32_t ClearHalt(const UsbDev &dev, const UsbPipe &pipe) override;
 
     static int32_t UsbdRequestSyncReleaseList(HostDevice *port);
     static int32_t UsbdRequestASyncReleaseList(HostDevice *port);
