@@ -378,25 +378,16 @@ std::string WifiChip::AllocIfaceName(IfaceType type, uint32_t startIdx)
 std::vector<std::string> GetPredefinedApIfaceNames(bool is_bridged)
 {
     std::vector<std::string> ifnames;
-    char propValue[PROP_MAX_LEN] = {0};
-    int errCode = GetParameter(SAPCOEXIST_PROP, 0, propValue, PROP_BOOL_VALUE_LEN);
-    if (errCode > 0) {
-        if (strncmp(propValue, "true", strlen("true")) == 0) {
-            HDF_LOGI("support sapcoexist default interface wlan1");
-            ifnames.push_back("wlan1");
-            return ifnames;
-        }
-    }
     std::array<char, PROP_MAX_LEN> buffer;
     buffer.fill(0);
-    errCode = GetParameter("ro.vendor.wifi.sap.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN);
+    int errCode = GetParameter("ro.vendor.wifi.sap.interface", "0", buffer.data(), PROP_BOOL_VALUE_LEN);
     if (errCode < 0) {
         return ifnames;
     }
     ifnames.push_back(buffer.data());
     if (is_bridged) {
         buffer.fill(0);
-        if (GetParameter("ro.vendor.wifi.sap.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN) < 0) {
+        if (GetParameter("ro.vendor.wifi.sap.interface", "0", buffer.data(), PROP_BOOL_VALUE_LEN) < 0) {
             return ifnames;
         }
         ifnames.push_back(buffer.data());
@@ -563,7 +554,7 @@ int32_t WifiChip::CreateP2pService(sptr<IChipIface>& iface)
 std::string WifiChip::GetDefaultP2pIfaceName()
 {
     std::array<char, PROP_MAX_LEN> buffer;
-    int errCode = GetParameter("wifi.direct.interface", 0, buffer.data(), PROP_BOOL_VALUE_LEN);
+    int errCode = GetParameter("wifi.direct.interface", "0", buffer.data(), PROP_BOOL_VALUE_LEN);
     if (errCode < 0) {
         return "p2p0";
     }
