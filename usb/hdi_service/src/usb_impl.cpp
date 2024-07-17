@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "parameter.h"
+#include "parameters.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_device_manager.h"
 #include "device_resource_if.h"
@@ -80,6 +81,9 @@ UsbImpl::UsbImpl() : session_(nullptr), device_(nullptr)
 {
     HdfSListInit(&devList_);
     OsalMutexInit(&lock_);
+    if (OHOS::system::GetBoolParameter("const.security.developermode.state", true)) {
+        loadUsbService_.LoadService();
+    }
 }
 
 UsbImpl::~UsbImpl()
@@ -1833,10 +1837,6 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
-    if ((!isGadgetConnected_) && (!DdkDevMgrGetGadgetLinkStatus())) {
-        HDF_LOGE("%{public}s:gadget is not connected", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
-    }
     OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
