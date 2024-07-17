@@ -20,11 +20,4 @@ group("hdf_demo_codec") {
     "jpeg:codec_hdi_jpeg_demo",
     "v2.0:codec_hdi_omx_demo",
   ]
-
-  if (drivers_peripheral_codec_feature_support_hdi_v1) {
-    deps += [
-      "adapter:codec_hdi_adapter_demo",
-      "v1.0:codec_hdi_demo",
-    ]
-  }
 }
