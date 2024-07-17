@@ -14,8 +14,8 @@
  */
 #include "device_manager_test.h"
 
-void UtestDeviceManagerTest::SetUpTestCase(void){}
-void UtestDeviceManagerTest::TearDownTestCase(void){}
+void UtestDeviceManagerTest::SetUpTestCase(void) {}
+void UtestDeviceManagerTest::TearDownTestCase(void) {}
 void UtestDeviceManagerTest::SetUp(void)
 {
     if (cameraBase == nullptr)
