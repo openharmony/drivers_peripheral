@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file excepted in compliance with the License.
+ * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
  *
  *       http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- #include "device_manager_test.h"
+#include "device_manager_test.h"
 
 void UtestDeviceManagerTest::SetUpTestCase(void) {}
 void UtestDeviceManagerTest::TearDownTestCase(void) {}
@@ -36,8 +36,8 @@ void UtestDeviceManagerTest::TearDown(void)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-  TEST_F(UtestDeviceManagerTest, camera_devMan_0001)
-  {
+TEST_F(UtestDeviceManagerTest, camera_devMan_0001)
+{
     std::cout << "==========[test log] Preview stream, expected success." << std::endl;
     // Get the stream manager
     cameraBase->AchieveStreamOperator();
@@ -50,4 +50,4 @@ void UtestDeviceManagerTest::TearDown(void)
     cameraBase->captureIds = {cameraBase->CAPTURE_ID_PREVIEW};
     cameraBase->streamIds = {cameraBase->STREAM_ID_PREVIEW};
     cameraBase->StopStream(cameraBase->captureIds, cameraBase->streamIds);
-  }
+}
