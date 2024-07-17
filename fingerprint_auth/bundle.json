@@ -11,7 +11,7 @@
     "scripts": {},
     "component": {
       "name": "drivers_peripheral_fingerprint_auth",
-      "subsystem": "drivers",
+      "subsystem": "hdf",
       "adapted_system_type": ["standard"],
       "features": ["drivers_peripheral_fingerprint_auth_enabled"],
       "rom": "1000KB",
