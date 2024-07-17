@@ -17,7 +17,8 @@
       "drivers_peripheral_codec_feature_set_omx_role",
       "drivers_peripheral_codec_feature_support_hdi_v1",
       "drivers_peripheral_codec_feature_support_high_work_frequency",
-      "drivers_peripheral_codec_feature_support_dma_buffer"
+      "drivers_peripheral_codec_feature_support_dma_buffer",
+      "drivers_peripheral_codec_feature_support_xcollie"
     ],
     "syscap": [],
     "adapted_system_type": ["standard"],
@@ -34,6 +35,7 @@
         "hdf_core",
         "hitrace",
         "hilog",
+        "hicollie",
         "ipc",
         "openmax"
       ],
