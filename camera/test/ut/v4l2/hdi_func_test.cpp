@@ -271,7 +271,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0200)
 
 /**
   * @tc.name: CancelCapture
-  * @tc.desc: CancelCapture captureID = -1
+  * @tc.desc: CancelCapture captureID = -1.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -318,7 +318,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
-  //*/
+  // */
 TEST_F(UtestHdiFuncTest, camera_hdi_0210)
 {
     std::cout << "==========[test log] AttachBufferQueue, normal input." << std::endl;
@@ -383,7 +383,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
-    auto callback = [this] (std::shared_ptr<SurfaceBuffer> b) {
+    auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
@@ -482,7 +482,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
-    auto callback = [this] (std::shared_ptr<SurfaceBuffer> b) {
+    auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
@@ -538,7 +538,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
-    auto callback = [this] (std::shared_ptr<SurfaceBuffer> b) {
+    auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
@@ -567,7 +567,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     std::cout << "==========[test log] streamOperator->DetachBufferQueue's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc != NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
-        std::cout << "==========[test log] DetachBufferQueue success." << std::endl;
+        std::cout << "==========[test log] DetachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << cameraBase->rc << std::endl;
     }
