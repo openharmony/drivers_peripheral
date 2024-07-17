@@ -29,7 +29,15 @@ struct HdfDAudioManagerHost {
 static int32_t DAudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
+    if (client == nullptr || client->device == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     auto *hdfDAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfDAudioManagerHost, ioService);
+    if (hdfDAudioManagerHost == NULL || hdfDAudioManagerHost->stub == NULL) {
+        HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -57,6 +65,10 @@ int HdfDAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf daudio manager driver bind.");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: deviceObject is nullptr", __func__);
+        return HDF_FAILURE;
+    }
 
     auto *hdfDAudioManagerHost = new (std::nothrow) HdfDAudioManagerHost;
     if (hdfDAudioManagerHost == nullptr) {
@@ -90,7 +102,7 @@ int HdfDAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfDAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf daudio manager driver release.");
-    if (deviceObject->service == nullptr) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfDAudioManagerDriverRelease not initted");
         return;
     }

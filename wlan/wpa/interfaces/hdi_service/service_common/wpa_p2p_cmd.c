@@ -1941,113 +1941,103 @@ static int32_t WpaFillP2pIfaceCreatedParam(struct P2pIfaceCreatedParam *ifaceCre
 int32_t ProcessEventP2pDeviceFound(struct HdfWpaRemoteNode *node,
     struct P2pDeviceInfoParam *deviceInfoParam, const char *ifName)
 {
-    struct HdiP2pDeviceInfoParam *hdiP2pDeviceInfo = NULL;
+    struct HdiP2pDeviceInfoParam hdiP2pDeviceInfo = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventDeviceFound == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pDeviceInfo = (struct HdiP2pDeviceInfoParam *)OsalMemCalloc(sizeof(struct P2pDeviceInfoParam));
-    if ((hdiP2pDeviceInfo == NULL) || (WpaFillP2pDeviceFoundParam(deviceInfoParam, hdiP2pDeviceInfo) != HDF_SUCCESS)) {
+    if (WpaFillP2pDeviceFoundParam(deviceInfoParam, &hdiP2pDeviceInfo) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pDeviceInfo is NULL or deviceInfoParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventDeviceFound(node->callbackObj, hdiP2pDeviceInfo, ifName);
+        ret = node->callbackObj->OnEventDeviceFound(node->callbackObj, &hdiP2pDeviceInfo, ifName);
     }
-    HdiP2pDeviceInfoParamFree(hdiP2pDeviceInfo, true);
+    HdiP2pDeviceInfoParamFree(&hdiP2pDeviceInfo, false);
     return ret;
 }
 
 int32_t ProcessEventP2pDeviceLost(struct HdfWpaRemoteNode *node,
     struct P2pDeviceLostParam *deviceLostParam, const char *ifName)
 {
-    struct HdiP2pDeviceLostParam *hdiP2pDeviceLostParam = NULL;
+    struct HdiP2pDeviceLostParam hdiP2pDeviceLostParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventDeviceLost == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pDeviceLostParam = (struct HdiP2pDeviceLostParam *)OsalMemCalloc(sizeof(struct P2pDeviceLostParam));
-    if ((hdiP2pDeviceLostParam == NULL) || (WpaFillP2pDeviceLostParam(deviceLostParam, hdiP2pDeviceLostParam)
-        != HDF_SUCCESS)) {
+    if (WpaFillP2pDeviceLostParam(deviceLostParam, &hdiP2pDeviceLostParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pDeviceLostParam is NULL or deviceLostParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventDeviceLost(node->callbackObj, hdiP2pDeviceLostParam, ifName);
+        ret = node->callbackObj->OnEventDeviceLost(node->callbackObj, &hdiP2pDeviceLostParam, ifName);
     }
-    HdiP2pDeviceLostParamFree(hdiP2pDeviceLostParam, true);
+    HdiP2pDeviceLostParamFree(&hdiP2pDeviceLostParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pGoNegotiationRequest(struct HdfWpaRemoteNode *node,
     struct P2pGoNegotiationRequestParam *goNegotiationRequestParam, const char *ifName)
 {
-    struct HdiP2pGoNegotiationRequestParam *hdiP2pGoNegotiationRequestParam = NULL;
+    struct HdiP2pGoNegotiationRequestParam hdiP2pGoNegotiationRequestParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGoNegotiationRequest == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pGoNegotiationRequestParam = (struct HdiP2pGoNegotiationRequestParam *)OsalMemCalloc(
-        sizeof(struct P2pGoNegotiationRequestParam));
-    if ((hdiP2pGoNegotiationRequestParam == NULL) || (WpaFillP2pGoNegotiationRequestParam(goNegotiationRequestParam,
-        hdiP2pGoNegotiationRequestParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pGoNegotiationRequestParam(goNegotiationRequestParam,
+        &hdiP2pGoNegotiationRequestParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pGoNegotiationRequestParam is NULL or goNegotiationRequestParam fialed!", __func__);
     } else {
         ret = node->callbackObj->OnEventGoNegotiationRequest(node->callbackObj,
-            hdiP2pGoNegotiationRequestParam, ifName);
+            &hdiP2pGoNegotiationRequestParam, ifName);
     }
-    HdiP2pGoNegotiationRequestParamFree(hdiP2pGoNegotiationRequestParam, true);
+    HdiP2pGoNegotiationRequestParamFree(&hdiP2pGoNegotiationRequestParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pGoNegotiationCompleted(struct HdfWpaRemoteNode *node, struct P2pGoNegotiationCompletedParam
     *goNegotiationCompletedParam, const char *ifName)
 {
-    struct HdiP2pGoNegotiationCompletedParam *hdiP2pGoNegotiationCompletedParam = NULL;
+    struct HdiP2pGoNegotiationCompletedParam hdiP2pGoNegotiationCompletedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGoNegotiationCompleted == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pGoNegotiationCompletedParam = (struct HdiP2pGoNegotiationCompletedParam *)OsalMemCalloc(
-        sizeof(struct P2pGoNegotiationCompletedParam));
-    if ((hdiP2pGoNegotiationCompletedParam == NULL) || (WpaFillP2pGoNegotiationCompletedParam(
-        goNegotiationCompletedParam, hdiP2pGoNegotiationCompletedParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pGoNegotiationCompletedParam(goNegotiationCompletedParam,
+        &hdiP2pGoNegotiationCompletedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pGoNegotiationCompletedParam is NULL or goNegotiationCompletedParam fialed!",
             __func__);
     } else {
         ret = node->callbackObj->OnEventGoNegotiationCompleted(node->callbackObj,
-            hdiP2pGoNegotiationCompletedParam, ifName);
+            &hdiP2pGoNegotiationCompletedParam, ifName);
     }
-    HdiP2pGoNegotiationCompletedParamFree(hdiP2pGoNegotiationCompletedParam, true);
+    HdiP2pGoNegotiationCompletedParamFree(&hdiP2pGoNegotiationCompletedParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pInvitationReceived(struct HdfWpaRemoteNode *node,
     struct P2pInvitationReceivedParam *invitationReceivedParam, const char *ifName)
 {
-    struct HdiP2pInvitationReceivedParam *hdiP2pInvitationReceivedParam = NULL;
+    struct HdiP2pInvitationReceivedParam hdiP2pInvitationReceivedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventInvitationReceived == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pInvitationReceivedParam = (struct HdiP2pInvitationReceivedParam *)OsalMemCalloc(
-        sizeof(struct P2pInvitationReceivedParam));
-    if ((hdiP2pInvitationReceivedParam == NULL) || (WpaFillP2pInvitationReceivedParam(
-        invitationReceivedParam, hdiP2pInvitationReceivedParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pInvitationReceivedParam(invitationReceivedParam, &hdiP2pInvitationReceivedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pInvitationReceivedParam is NULL or invitationReceivedParam fialed!", __func__);
         return ret;
     } else {
-        ret = node->callbackObj->OnEventInvitationReceived(node->callbackObj, hdiP2pInvitationReceivedParam, ifName);
+        ret = node->callbackObj->OnEventInvitationReceived(node->callbackObj, &hdiP2pInvitationReceivedParam, ifName);
     }
-    HdiP2pInvitationReceivedParamFree(hdiP2pInvitationReceivedParam, true);
+    HdiP2pInvitationReceivedParamFree(&hdiP2pInvitationReceivedParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pInvitationResult(struct HdfWpaRemoteNode *node,
     struct P2pInvitationResultParam *invitationResultParam, const char *ifName)
 {
-    struct HdiP2pInvitationResultParam hdiP2pInvitationResultParam;
+    struct HdiP2pInvitationResultParam hdiP2pInvitationResultParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventInvitationResult == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
@@ -2099,63 +2089,56 @@ int32_t ProcessEventP2pGroupFormationFailure(struct HdfWpaRemoteNode *node, char
 int32_t ProcessEventP2pGroupStarted(struct HdfWpaRemoteNode *node,
     struct P2pGroupStartedParam *groupStartedParam, const char *ifName)
 {
-    struct HdiP2pGroupInfoStartedParam *hdiP2pGroupInfoStartedParam = NULL;
+    struct HdiP2pGroupInfoStartedParam hdiP2pGroupInfoStartedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGroupInfoStarted == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pGroupInfoStartedParam =
-        (struct HdiP2pGroupInfoStartedParam *)OsalMemCalloc(sizeof(struct P2pGroupStartedParam));
-    if ((hdiP2pGroupInfoStartedParam == NULL) || (WpaFillP2pGroupInfoStartedParam(groupStartedParam,
-        hdiP2pGroupInfoStartedParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pGroupInfoStartedParam(groupStartedParam, &hdiP2pGroupInfoStartedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pGroupStartedParam is NULL or groupStartedParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventGroupInfoStarted(node->callbackObj, hdiP2pGroupInfoStartedParam, ifName);
+        ret = node->callbackObj->OnEventGroupInfoStarted(node->callbackObj, &hdiP2pGroupInfoStartedParam, ifName);
     }
-    HdiP2pGroupInfoStartedParamFree(hdiP2pGroupInfoStartedParam, true);
+    HdiP2pGroupInfoStartedParamFree(&hdiP2pGroupInfoStartedParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pGroupRemoved(struct HdfWpaRemoteNode *node,
     struct P2pGroupRemovedParam *groupRemovedParam, const char *ifName)
 {
-    struct HdiP2pGroupRemovedParam *hdiP2pGroupRemovedParam = NULL;
+    struct HdiP2pGroupRemovedParam hdiP2pGroupRemovedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventGroupRemoved == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pGroupRemovedParam = (struct HdiP2pGroupRemovedParam *)OsalMemCalloc(sizeof(struct P2pGroupRemovedParam));
-    if ((hdiP2pGroupRemovedParam == NULL) || (WpaFillP2pGroupRemovedParam(groupRemovedParam, hdiP2pGroupRemovedParam)
-        != HDF_SUCCESS)) {
+    if (WpaFillP2pGroupRemovedParam(groupRemovedParam, &hdiP2pGroupRemovedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pGroupRemovedParam is NULL or groupRemovedParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventGroupRemoved(node->callbackObj, hdiP2pGroupRemovedParam, ifName);
+        ret = node->callbackObj->OnEventGroupRemoved(node->callbackObj, &hdiP2pGroupRemovedParam, ifName);
     }
-    HdiP2pGroupRemovedParamFree(hdiP2pGroupRemovedParam, true);
+    HdiP2pGroupRemovedParamFree(&hdiP2pGroupRemovedParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pProvisionDiscoveryCompleted(struct HdfWpaRemoteNode *node,
     struct P2pProvisionDiscoveryCompletedParam *provisionDiscoveryCompletedParam, const char *ifName)
 {
-    struct HdiP2pProvisionDiscoveryCompletedParam *hdiP2pProvisionDiscoveryCompletedParam = NULL;
+    struct HdiP2pProvisionDiscoveryCompletedParam hdiP2pProvisionDiscoveryCompletedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventProvisionDiscoveryCompleted == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pProvisionDiscoveryCompletedParam = (struct HdiP2pProvisionDiscoveryCompletedParam *)OsalMemCalloc(
-        sizeof(struct P2pProvisionDiscoveryCompletedParam));
-    if ((hdiP2pProvisionDiscoveryCompletedParam == NULL) || (WpaFillP2pProvisionDiscoveryCompletedParam(
-        provisionDiscoveryCompletedParam, hdiP2pProvisionDiscoveryCompletedParam) != HDF_SUCCESS)) {
+    if (WpaFillP2pProvisionDiscoveryCompletedParam(provisionDiscoveryCompletedParam,
+        &hdiP2pProvisionDiscoveryCompletedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Param is NULL or provisionDiscoveryCompletedParam fialed!", __func__);
     } else {
         ret = node->callbackObj->OnEventProvisionDiscoveryCompleted(node->callbackObj,
-            hdiP2pProvisionDiscoveryCompletedParam, ifName);
+            &hdiP2pProvisionDiscoveryCompletedParam, ifName);
     }
-    HdiP2pProvisionDiscoveryCompletedParamFree(hdiP2pProvisionDiscoveryCompletedParam, true);
+    HdiP2pProvisionDiscoveryCompletedParamFree(&hdiP2pProvisionDiscoveryCompletedParam, false);
     return ret;
 }
 
@@ -2174,48 +2157,43 @@ int32_t ProcessEventP2pFindStopped(struct HdfWpaRemoteNode *node,
 int32_t ProcessEventP2pServDiscReq(struct HdfWpaRemoteNode *node,
     struct P2pServDiscReqInfoParam *servDiscReqInfo, const char *ifName)
 {
-    struct HdiP2pServDiscReqInfoParam *hdiP2pServDiscReqInfo = NULL;
+    struct HdiP2pServDiscReqInfoParam hdiP2pServDiscReqInfo = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventServDiscReq == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pServDiscReqInfo = (struct HdiP2pServDiscReqInfoParam *)OsalMemCalloc(
-        sizeof(struct P2pServDiscReqInfoParam));
-    if ((hdiP2pServDiscReqInfo == NULL) || (WpaFillP2pServDiscReqParam(servDiscReqInfo, hdiP2pServDiscReqInfo)
-        != HDF_SUCCESS)) {
+    if (WpaFillP2pServDiscReqParam(servDiscReqInfo, &hdiP2pServDiscReqInfo) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pServDiscReqInfo is NULL or servDiscReqInfo fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventServDiscReq(node->callbackObj, hdiP2pServDiscReqInfo, ifName);
+        ret = node->callbackObj->OnEventServDiscReq(node->callbackObj, &hdiP2pServDiscReqInfo, ifName);
     }
-    HdiP2pServDiscReqInfoParamFree(hdiP2pServDiscReqInfo, true);
+    HdiP2pServDiscReqInfoParamFree(&hdiP2pServDiscReqInfo, false);
     return ret;
 }
 
 int32_t ProcessEventP2pServDiscResp(struct HdfWpaRemoteNode *node,
     struct P2pServDiscRespParam *servDiscRespParam, const char *ifName)
 {
-    struct HdiP2pServDiscRespParam *hdiP2pServDiscRespParam = NULL;
+    struct HdiP2pServDiscRespParam hdiP2pServDiscRespParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventServDiscResp == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pServDiscRespParam = (struct HdiP2pServDiscRespParam *)OsalMemCalloc(sizeof(struct P2pServDiscRespParam));
-    if ((hdiP2pServDiscRespParam == NULL) || (WpaFillP2pServDiscRespParam(servDiscRespParam, hdiP2pServDiscRespParam)
-        != HDF_SUCCESS)) {
+    if (WpaFillP2pServDiscRespParam(servDiscRespParam, &hdiP2pServDiscRespParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pServDiscRespParam is NULL or servDiscRespParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventServDiscResp(node->callbackObj, hdiP2pServDiscRespParam, ifName);
+        ret = node->callbackObj->OnEventServDiscResp(node->callbackObj, &hdiP2pServDiscRespParam, ifName);
     }
-    HdiP2pServDiscRespParamFree(hdiP2pServDiscRespParam, true);
+    HdiP2pServDiscRespParamFree(&hdiP2pServDiscRespParam, false);
     return ret;
 }
 
 int32_t ProcessEventP2pStaConnectState(struct HdfWpaRemoteNode *node,
     struct P2pStaConnectStateParam *staConnectStateParam, const char *ifName)
 {
-    struct HdiP2pStaConnectStateParam hdiP2pStaConnectStateParam;
+    struct HdiP2pStaConnectStateParam hdiP2pStaConnectStateParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventStaConnectState == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
@@ -2233,19 +2211,17 @@ int32_t ProcessEventP2pStaConnectState(struct HdfWpaRemoteNode *node,
 int32_t ProcessEventP2pIfaceCreated(struct HdfWpaRemoteNode *node, struct P2pIfaceCreatedParam *ifaceCreatedParam,
     const char *ifName)
 {
-    struct HdiP2pIfaceCreatedParam *hdiP2pIfaceCreatedParam = NULL;
+    struct HdiP2pIfaceCreatedParam hdiP2pIfaceCreatedParam = {0};
     int32_t ret = HDF_FAILURE;
     if (node == NULL || node->callbackObj == NULL || node->callbackObj->OnEventIfaceCreated == NULL) {
         HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    hdiP2pIfaceCreatedParam = (struct HdiP2pIfaceCreatedParam *)OsalMemCalloc(sizeof(struct P2pIfaceCreatedParam));
-    if ((hdiP2pIfaceCreatedParam == NULL) || (WpaFillP2pIfaceCreatedParam(ifaceCreatedParam, hdiP2pIfaceCreatedParam)
-        != HDF_SUCCESS)) {
+    if (WpaFillP2pIfaceCreatedParam(ifaceCreatedParam, &hdiP2pIfaceCreatedParam) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: hdiP2pIfaceCreatedParam is NULL or ifaceCreatedParam fialed!", __func__);
     } else {
-        ret = node->callbackObj->OnEventIfaceCreated(node->callbackObj, hdiP2pIfaceCreatedParam, ifName);
+        ret = node->callbackObj->OnEventIfaceCreated(node->callbackObj, &hdiP2pIfaceCreatedParam, ifName);
     }
-    HdiP2pIfaceCreatedParamFree(hdiP2pIfaceCreatedParam, true);
+    HdiP2pIfaceCreatedParamFree(&hdiP2pIfaceCreatedParam, false);
     return ret;
 }

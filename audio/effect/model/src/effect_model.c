@@ -122,32 +122,24 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     struct IEffectControlVdi *ctrlOps = NULL;
 
     lib = GetEffectLibFromList(info->libName);
-    if (lib == NULL) {
-        HDF_LOGE("%{public}s: not match any lib", __func__);
-        return HDF_FAILURE;
-    }
-
-    if (lib->CreateController == NULL) {
-        HDF_LOGE("%{public}s: lib has no create method", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(lib, HDF_FAILURE);
+    CHECK_NULL_PTR_RETURN_VALUE(lib->CreateController, HDF_FAILURE);
     
     struct EffectInfoVdi *infoVdi = (struct EffectInfoVdi *)info;
     lib->CreateController(lib, infoVdi, &ctrlOps);
-    if (ctrlOps == NULL) {
-        HDF_LOGE("%{public}s: lib create controller failed.", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(ctrlOps, HDF_FAILURE);
 
     /* ctrlMgr mark it and using it in release process */
     ctrlMgr = (struct ControllerManager *)OsalMemCalloc(sizeof(struct ControllerManager));
-    if (ctrlMgr == NULL) {
-        HDF_LOGE("%{public}s: malloc ControllerManager obj failed!", __func__);
-        return HDF_FAILURE;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(ctrlMgr, HDF_FAILURE);
 
     ctrlMgr->ctrlOps = ctrlOps;
     ctrlMgr->effectId = strdup(info->effectId);
+    if (ctrlMgr->effectId == NULL) {
+        HDF_LOGE("%{public}s: strdup failed, info->effectId = %{public}s", __func__, info->effectId);
+        OsalMemFree(ctrlMgr);
+        return HDF_FAILURE;
+    }
     ctrlMgr->ctrlImpls.EffectProcess = EffectControlEffectProcess;
     ctrlMgr->ctrlImpls.SendCommand = EffectControlSendCommand;
     ctrlMgr->ctrlImpls.GetEffectDescriptor = EffectGetOwnDescriptor;
@@ -155,13 +147,22 @@ static int32_t EffectModelCreateEffectController(struct IEffectModel *self, cons
     *contoller = &ctrlMgr->ctrlImpls;
     if (RegisterControllerToList(ctrlMgr) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register ctroller to list failed.", __func__);
+        OsalMemFree(ctrlMgr->effectId);
         OsalMemFree(ctrlMgr);
+        *contoller = NULL;
         return HDF_FAILURE;
     }
 
     // free after send reply
     contollerId->libName = strdup(info->libName);
     contollerId->effectId = strdup(info->effectId);
+    if (contollerId->libName == NULL || contollerId->effectId == NULL) {
+        HDF_LOGE("%{public}s: strdup failed, info->libName = %{public}s", __func__, info->libName);
+        OsalMemFree(ctrlMgr->effectId);
+        OsalMemFree(ctrlMgr);
+        *contoller = NULL;
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -332,5 +333,10 @@ void EffectModelImplRelease(struct IEffectModel *instance)
 
     AudioEffectReleaseCfgDesc(g_cfgDescs);
     ReleaseLibFromList();
-    OsalMemFree(instance);
+    struct EffectModelService *service = CONTAINER_OF(instance, struct EffectModelService, interface);
+    if (service == NULL) {
+        return;
+    }
+    OsalMemFree(service);
+    service = NULL;
 }

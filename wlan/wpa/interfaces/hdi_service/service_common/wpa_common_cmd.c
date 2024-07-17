@@ -274,7 +274,7 @@ int32_t WpaInterfaceSetNetwork(struct IWpaInterface *self, const char *ifName,
     }
     conf.id = networkId;
     int pos = -1;
-    for (unsigned int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
+    for (int i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
         if (strcmp(g_wpaSsidFields[i].fieldName, name) == 0) {
             pos = i;
             conf.param = g_wpaSsidFields[i].field;
@@ -372,6 +372,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         free(infos);
         return HDF_FAILURE;
     }
+    WifiNetworkInfo *infosTmp = infos;
     HDF_LOGI("%{public}s: wpaCliCmdListNetworks success size = %{public}d", __func__, size);
     for (int i = 0; i < ((size > MAX_NETWORKS_NUM) ? MAX_NETWORKS_NUM : size); i++) {
         WpaFillWpaListNetworkParam(infos, networkInfo);
@@ -379,7 +380,7 @@ int32_t WpaInterfaceListNetworks(struct IWpaInterface *self, const char *ifName,
         networkInfo++;
     }
     *networkInfoLen = size;
-    free(infos);
+    free(infosTmp);
     return HDF_SUCCESS;
 }
 
@@ -1040,6 +1041,44 @@ int32_t WpaInterfaceSetCountryCode(struct IWpaInterface *self, const char *ifNam
     return HDF_SUCCESS;
 }
 
+static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    WifiWpaInterface *pWpaInterface = GetWifiWpaGlobalInterface();
+    if (pWpaInterface == NULL) {
+        HDF_LOGE("%{public}s: Get wpa global interface failed!", __func__);
+    }
+    int ret = pWpaInterface->wpaCliTerminate();
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: wpaCliTerminate failed!", __func__);
+    } else {
+        HDF_LOGI("%{public}s: wpaCliTerminate suc!", __func__);
+    }
+    ReleaseWpaGlobalInterface();
+    HDF_LOGI("%{public}s: call ReleaseWpaGlobalInterface finish", __func__);
+}
+
+static struct RemoteServiceDeathRecipient g_deathRecipient = {
+    .recipient = {
+        .OnRemoteDied = OnRemoteServiceDied,
+    }
+};
+
+static void AddDeathRecipientForService(struct IWpaCallback *cbFunc)
+{
+    HDF_LOGI("enter %{public}s ", __func__);
+    if (cbFunc == NULL) {
+        HDF_LOGE("invalid parameter");
+        return;
+    }
+    struct HdfRemoteService *remote = cbFunc->AsObject(cbFunc);
+    if (remote == NULL) {
+        HDF_LOGE("remote is NULL");
+        return;
+    }
+    HdfRemoteServiceAddDeathRecipient(remote, &g_deathRecipient.recipient);
+}
+
 static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
 {
     struct HdfWpaRemoteNode *pos = NULL;
@@ -1065,6 +1104,7 @@ static int32_t HdfWpaAddRemoteObj(struct IWpaCallback *self)
     newRemoteNode->callbackObj = self;
     newRemoteNode->service = self->AsObject(self);
     DListInsertTail(&newRemoteNode->node, head);
+    AddDeathRecipientForService(self);
     return HDF_SUCCESS;
 }
 
@@ -1761,8 +1801,12 @@ static int32_t HdfWpaCallbackFun(uint32_t event, void *data, const char *ifName)
             HDF_LOGE("%{public}s: pos is NULL", __func__);
             break;
         }
-        if (pos->service == NULL || pos->callbackObj == NULL) {
-            HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
+        if (pos->callbackObj == NULL) {
+            HDF_LOGW("%{public}s: pos->callbackObj NULL", __func__);
+            continue;
+        }
+        if (pos->service == NULL) {
+            HDF_LOGW("%{public}s: pos->service NULL", __func__);
             continue;
         }
         if (strncmp(ifName, "wlan", strlen("wlan")) == 0 || strncmp(ifName, "common", strlen("common")) == 0) {

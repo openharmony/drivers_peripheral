@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,10 @@
 #include <shared_mutex>
 
 using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
-std::shared_mutex mutex_;
+
+namespace {
+    std::shared_mutex mutex_;
+}
 
 struct HdfAudioManagerHost {
     struct IDeviceIoService ioService;
@@ -47,8 +50,12 @@ static int32_t AudioManagerDriverDispatch(struct HdfDeviceIoClient *client, int 
     }
 
     std::shared_lock lock(mutex_);
+    if (client == nullptr || client->device == nullptr) {
+        HDF_LOGE("%{public}s: client or client.device is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     auto *hdfAudioManagerHost = CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
-    if (hdfAudioManagerHost == NULL) {
+    if (hdfAudioManagerHost == NULL || hdfAudioManagerHost->stub == NULL) {
         HDF_LOGE("%{public}s:invalid hdfAudioManagerHost", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -66,6 +73,11 @@ int HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf audio manager driver bind.");
+
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: deviceObject is nullptr", __func__);
+        return HDF_FAILURE;
+    }
 
     auto *hdfAudioManagerHost = new (std::nothrow) HdfAudioManagerHost;
     if (hdfAudioManagerHost == nullptr) {
@@ -99,6 +111,10 @@ int HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("Hdf audio manager driver release.");
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s: deviceObject is nullptr", __func__);
+        return;
+    }
     std::unique_lock lock(mutex_);
     auto *hdfAudioManagerHost = CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioService);
     delete hdfAudioManagerHost;

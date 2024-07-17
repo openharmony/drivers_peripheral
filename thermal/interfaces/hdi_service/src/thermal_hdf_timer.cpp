@@ -117,7 +117,7 @@ void ThermalHdfTimer::LoopingThreadEntry()
 
 void ThermalHdfTimer::Run()
 {
-    callbackThread_ = std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this);
+    callbackThread_ = std::make_unique<std::thread>([this] { this->LoopingThreadEntry(); });
 }
 
 void ThermalHdfTimer::StartThread()

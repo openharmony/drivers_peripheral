@@ -20,7 +20,7 @@
 #include <hdf_base.h>
 #include "audio_uhdf_log.h"
 #include "audio_adapter_vdi.h"
-#include "v3_0/iaudio_adapter.h"
+#include "v4_0/iaudio_adapter.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 static pthread_mutex_t g_managerMutex;
@@ -126,6 +126,10 @@ static int32_t AudioManagerPortToVdiPort(const struct AudioAdapterDescriptor *de
 
     for (uint32_t i = 0; i < desc->portsLen; i++) {
         vdiPorts[i].portName = strdup(desc->ports[i].portName);
+        if (vdiPorts[i].portName == NULL) {
+            AUDIO_FUNC_LOGE("strdup fail, desc->ports[%{public}d].portName = %{public}s", i, desc->ports[i].portName);
+            return HDF_FAILURE;
+        }
         vdiPorts[i].portId = desc->ports[i].portId;
         vdiPorts[i].dir = (enum AudioPortDirectionVdi)desc->ports[i].dir;
     }
@@ -152,6 +156,11 @@ static int32_t AudioManagerVdiPortToPort(struct AudioAdapterDescriptorVdi *vdiDe
 
     for (uint32_t i = 0; i < vdiDesc->portsLen; i++) {
         ports[i].portName = strdup(vdiDesc->ports[i].portName);
+        if (ports[i].portName == NULL) {
+            AUDIO_FUNC_LOGE("strdup fail, vdiDesc->ports[%{public}d].portName = %{public}s",
+                i, vdiDesc->ports[i].portName);
+            return HDF_FAILURE;
+        }
         ports[i].portId = vdiDesc->ports[i].portId;
         ports[i].dir = (enum AudioPortDirection)vdiDesc->ports[i].dir;
     }
@@ -172,6 +181,10 @@ static int32_t AudioManagerDescToVdiDesc(const struct AudioAdapterDescriptor *de
     }
 
     vdiDesc->adapterName = strdup(desc->adapterName);
+    if (vdiDesc->adapterName == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->adapterName = %{public}s", desc->adapterName);
+        return HDF_FAILURE;
+    }
     AUDIO_FUNC_LOGI("audio vdiManager load adapterName=%{public}s", vdiDesc->adapterName);
 
     return HDF_SUCCESS;
@@ -195,6 +208,10 @@ static int32_t AudioManagerVdiDescsToDescs(struct AudioAdapterDescriptorVdi *vdi
             return HDF_FAILURE;
         }
         descs[i].adapterName = strdup(vdiDescs[i].adapterName); // audio stub free adapterName
+        if (descs[i].adapterName == NULL) {
+            AUDIO_FUNC_LOGE("strdup fail, descs[%{public}d].adapterName = %{public}s", i, descs[i].adapterName);
+            return HDF_FAILURE;
+        }
         AUDIO_FUNC_LOGI("audio vdiManager get adapterName=%{public}s", descs[i].adapterName);
     }
 

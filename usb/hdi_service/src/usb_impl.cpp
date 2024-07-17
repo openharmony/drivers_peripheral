@@ -1238,6 +1238,10 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
 
     uint8_t configIdOld = 0;
     uint8_t configIdNew = 0;
@@ -1306,6 +1310,10 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
     if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1369,7 +1377,7 @@ int32_t UsbImpl::ReleaseInterface(const UsbDev &dev, uint8_t interfaceId)
         HDF_LOGE("%{public}s:ReleaseInterface failed.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    port->initFlag = false;
     return HDF_SUCCESS;
 }
 
@@ -1378,6 +1386,10 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
     HostDevice *port = FindDevFromService(dev.busNum, dev.devAddr);
     if (port == nullptr) {
         HDF_LOGE("%{public}s:FindDevFromService failed", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    if (!port->initFlag) {
+        HDF_LOGE("%{public}s: openPort failed", __func__);
         return HDF_DEV_ERR_NO_DEVICE;
     }
 

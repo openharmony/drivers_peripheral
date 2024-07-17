@@ -42,7 +42,9 @@ void EffectModelTest::SetUp()
 {
     // input testcase setup step,setup invoked before each testcases
     libName_ = strdup("libmock_effect_lib");
+    ASSERT_NE(nullptr, libName_);
     effectId_ = strdup("aaaabbbb-8888-9999-6666-aabbccdd9966ff");
+    ASSERT_NE(nullptr, effectId_);
     model_ = IEffectModelGet(IS_DIRECTLY_CALL);
     ASSERT_NE(nullptr, model_);
 }

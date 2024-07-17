@@ -228,7 +228,6 @@ IAM_STATIC Buffer *GetAuthTokenForPinEnroll(const CredentialInfoHal *credentialI
     }
     UserAuthContext context = {};
     context.userId = userId;
-    context.authType = credentialInfo->authType;
     context.authType = PIN_AUTH;
     context.authTrustLevel = ATL4;
     ResultCode ret = GetChallenge(context.challenge, CHALLENGE_LEN);

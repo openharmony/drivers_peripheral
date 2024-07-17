@@ -957,11 +957,11 @@ static int32_t GetUpdateResult(int32_t userId, HdiEnrollResultInfo &info, Buffer
     }
 
 ERROR:
-    (void)memset_s(info.rootSecret.data(), ROOT_SECRET_LEN, 0, ROOT_SECRET_LEN);
+    (void)memset_s(info.rootSecret.data(), info.rootSecret.size(), 0, info.rootSecret.size());
     info.rootSecret.clear();
-    (void)memset_s(info.oldRootSecret.data(), ROOT_SECRET_LEN, 0, ROOT_SECRET_LEN);
+    (void)memset_s(info.oldRootSecret.data(), info.oldRootSecret.size(), 0, info.oldRootSecret.size());
     info.oldRootSecret.clear();
-    (void)memset_s(info.authToken.data(), AUTH_TOKEN_LEN, 0, AUTH_TOKEN_LEN);
+    (void)memset_s(info.authToken.data(), info.authToken.size(), 0, info.authToken.size());
     info.authToken.clear();
 
 EXIT:

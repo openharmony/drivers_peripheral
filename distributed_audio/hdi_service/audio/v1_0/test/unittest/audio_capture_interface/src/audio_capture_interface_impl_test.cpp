@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,14 +33,7 @@ void AudioCaptureInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioCaptureInterfaceImplTest::TearDownTestCase(void) {}
 
-void AudioCaptureInterfaceImplTest::SetUp(void)
-{
-    std::string adpName;
-    AudioDeviceDescriptor desc;
-    AudioSampleAttributes attrs;
-    sptr<IDAudioCallback> callback;
-    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName, desc, attrs, callback);
-}
+void AudioCaptureInterfaceImplTest::SetUp(void) {}
 
 void AudioCaptureInterfaceImplTest::TearDown(void)
 {
@@ -55,6 +48,7 @@ void AudioCaptureInterfaceImplTest::TearDown(void)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetCapturePosition_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t frames = 0;
     AudioTimeStamp time;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetCapturePosition(frames, time));
@@ -68,6 +62,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetCapturePosition_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     vector<int8_t> frame;
     uint64_t requestBytes = 0;
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->CaptureFrame(frame, requestBytes));
@@ -81,6 +76,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_002, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     vector<int8_t> frame{1, 1, 1, 1, 1};
     uint64_t requestBytes = 0;
     audioCaptureInterfaceImpl_->captureStatus_ = CAPTURE_STATUS_START;
@@ -98,6 +94,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_002, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_003, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     vector<int8_t> frame;
     uint64_t requestBytes = 0;
     audioCaptureInterfaceImpl_->captureStatus_ = CAPTURE_STATUS_START;
@@ -113,6 +110,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_003, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Start_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Start());
 }
 
@@ -124,6 +122,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Start_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Stop_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Stop());
 }
 
@@ -135,6 +134,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Stop_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Pause_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->Pause());
 }
 
@@ -146,6 +146,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Pause_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Resume_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->Resume());
 }
 
@@ -157,6 +158,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Resume_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Flush_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->Flush());
 }
 
@@ -168,6 +170,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Flush_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, TurnStandbyMode_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->TurnStandbyMode());
 }
 
@@ -179,6 +182,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, TurnStandbyMode_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, AudioDevDump_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     int32_t range = 0;
     int32_t fd = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->AudioDevDump(range, fd));
@@ -192,6 +196,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, AudioDevDump_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, IsSupportsPauseAndResume_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     bool supportPause = true;
     bool supportResume = true;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->
@@ -206,6 +211,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, IsSupportsPauseAndResume_001, TestSize.L
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, CheckSceneCapability_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     AudioSceneDescriptor scene;
     bool support = false;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->CheckSceneCapability(scene, support));
@@ -219,6 +225,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CheckSceneCapability_001, TestSize.Level
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SelectScene_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     AudioSceneDescriptor scene;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SelectScene(scene));
 }
@@ -231,6 +238,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SelectScene_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SetMute_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     bool mute = true;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetMute(mute));
 }
@@ -243,6 +251,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetMute_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetMute_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     bool mute = true;
 
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetMute(mute));
@@ -256,6 +265,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetMute_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SetVolume_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     float volume = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetVolume(volume));
 }
@@ -268,6 +278,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetVolume_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     float volume = 0;
 
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetVolume(volume));
@@ -281,6 +292,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetVolume_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetGainThreshold_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     float min = 0;
     float max = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetGainThreshold(min, max));
@@ -294,6 +306,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetGainThreshold_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SetGain_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     float gain = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetGain(gain));
 }
@@ -306,6 +319,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetGain_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetGain_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     float gain = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetGain(gain));
 }
@@ -319,6 +333,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetGain_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameSize_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t size = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetFrameSize(size));
 }
@@ -331,6 +346,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameSize_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameCount_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t count = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetFrameCount(count));
 }
@@ -343,6 +359,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameCount_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SetSampleAttributes_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetSampleAttributes(attrs));
 }
@@ -355,6 +372,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetSampleAttributes_001, TestSize.Level1
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetSampleAttributes_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetSampleAttributes(attrs));
 }
@@ -367,6 +385,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetSampleAttributes_001, TestSize.Level1
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetCurrentChannelId_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint32_t channelId = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetCurrentChannelId(channelId));
 }
@@ -379,6 +398,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetCurrentChannelId_001, TestSize.Level1
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     std::string keyValueList;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->SetExtraParams(keyValueList));
 }
@@ -391,6 +411,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, SetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetExtraParams_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     std::string keyValueList;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetExtraParams(keyValueList));
 }
@@ -403,6 +424,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetExtraParams_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     int32_t reqSize = 0;
     AudioMmapBufferDescriptor desc;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->ReqMmapBuffer(reqSize, desc));
@@ -416,6 +438,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, ReqMmapBuffer_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetMmapPosition_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t frames = 0;
     AudioTimeStamp time;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetMmapPosition(frames, time));
@@ -429,6 +452,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetMmapPosition_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, AddAudioEffect_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t effectid = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->AddAudioEffect(effectid));
 }
@@ -441,6 +465,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, AddAudioEffect_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, RemoveAudioEffect_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t effectid = 0;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->RemoveAudioEffect(effectid));
 }
@@ -453,6 +478,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, RemoveAudioEffect_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameBufferSize_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     uint64_t bufferSize = 6;
     EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->GetFrameBufferSize(bufferSize));
 }
@@ -465,6 +491,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, GetFrameBufferSize_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, GetCaptureDesc_001, TestSize.Level1)
 {
+    audioCaptureInterfaceImpl_ = std::make_shared<AudioCaptureInterfaceImpl>(adpName_, desc_, attrs_, callback_);
     desc_.portId = 0;
     desc_.pins = PIN_NONE;
     desc_.desc = "mic";
