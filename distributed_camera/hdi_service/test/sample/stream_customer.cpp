@@ -31,9 +31,9 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer(CaptureMode mode,
     }
     sptr<IBufferConsumerListener> listener = nullptr;
     if (mode == CAPTURE_SNAPSHOT) {
-        listener = new TestBuffersConsumerListener(consumer_, callback);
+        listener = sptr<TestBuffersConsumerListener>(new TestBuffersConsumerListener(consumer_, callback));
     } else if (mode == CAPTURE_VIDEO) {
-        listener = new TestBuffersConsumerListener(consumer_, callback);
+        listener = sptr<TestBuffersConsumerListener>(new TestBuffersConsumerListener(consumer_, callback));
     }
     consumer_->RegisterConsumerListener(listener);
 
