@@ -62,7 +62,7 @@ private:
     HdfThermalCallbackInfo tzInfoEvent_;
     std::vector<int32_t> multipleList_;
     int32_t reportTime_;
-    int32_t isSim_;
+    int32_t isSim_ = 0;
     std::atomic_bool isRunning_ {true};
     std::unique_ptr<std::thread> callbackThread_ {nullptr};
 };

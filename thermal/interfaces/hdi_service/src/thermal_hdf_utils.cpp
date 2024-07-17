@@ -49,27 +49,6 @@ bool ThermalHdfUtils::ReadNode(const std::string& path, std::string& out)
     return ret;
 }
 
-int32_t ThermalHdfUtils::WriteNode(const std::string& path, std::string& data)
-{
-    FILE* fp;
-    int32_t ret = HDF_FAILURE;
-    if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed");
-        return ret;
-    }
-
-    if (fwrite(data.c_str(), sizeof(data.c_str()), 1, fp) == 0) {
-        THERMAL_HILOGW(COMP_HDI, "write node failed");
-    } else {
-        ret = HDF_SUCCESS;
-    }
-
-    if (fclose(fp) != 0) {
-        THERMAL_HILOGW(COMP_HDI, "close file stream failed");
-    }
-    return ret;
-}
-
 void ThermalHdfUtils::TrimStr(std::string& str)
 {
     if (str.empty()) {

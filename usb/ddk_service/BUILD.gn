@@ -56,7 +56,6 @@ ohos_shared_library("libusb_ddk_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "access_token:libaccesstoken_sdk",
       "drivers_interface_usb:usb_ddk_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -73,6 +72,29 @@ ohos_shared_library("libusb_ddk_service_1.0") {
     }
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_usb"
+}
+
+ohos_shared_library("usb_ddk_dynamic_library_wrapper") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [ "src/usb_ddk_dynamic_library_wrapper.cpp" ]
+
+  external_deps = [ "access_token:libaccesstoken_sdk" ]
+  if (usb_c_utils_enable) {
+    external_deps += [ "c_utils:utils" ]
   }
 
   install_images = [ chipset_base_dir ]
@@ -121,5 +143,6 @@ group("usb_ddk_target") {
   deps = [
     ":libusb_ddk_driver",
     ":libusb_ddk_service_1.0",
+    ":usb_ddk_dynamic_library_wrapper",
   ]
 }

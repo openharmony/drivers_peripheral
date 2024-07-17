@@ -265,7 +265,7 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_013, TestSize.Level1)
 
 /**
  * @tc.name: SetFlashlight
- * @tc.desc: SetFlashlight, cameraId null
+ * @tc.desc: SetFlashlight, cameraId is not found
  * @tc.size: MediumTest
  * @tc.type: Function
  */
@@ -298,8 +298,8 @@ HWTEST_F(HdiHostUtTest, Camera_Host_Hdi_015, TestSize.Level1)
 }
 
 /**
- * @tc.name: Open all Cameras
- * @tc.desc: Open every Cameras what the getCameraId get.
+ * @tc.name: GetCameraAbility
+ * @tc.desc: GetCameraAbility, normal cameraId
  * @tc.size: MediumTest
  * @tc.type: Function
  */

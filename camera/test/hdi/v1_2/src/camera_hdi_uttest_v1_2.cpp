@@ -542,18 +542,15 @@ static std::string TranslateXMageAbilityToString(camera_xmage_color_type mode)
     std::string res;
 
     switch (mode) {
-        case CAMERA_CUSTOM_COLOR_NORMAL:
-        {
+        case CAMERA_CUSTOM_COLOR_NORMAL: {
             res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_NORMAL);
             break;
         }
-        case CAMERA_CUSTOM_COLOR_BRIGHT:
-        {
+        case CAMERA_CUSTOM_COLOR_BRIGHT: {
             res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_BRIGHT);
             break;
         }
-        case CAMERA_CUSTOM_COLOR_SOFT:
-        {
+        case CAMERA_CUSTOM_COLOR_SOFT: {
             res = TODEFINESTRING(CAMERA_CUSTOM_COLOR_SOFT);
             break;
         }

@@ -21,6 +21,7 @@ namespace OHOS::Camera {
 Test::ResultCallback Test::resultCallback_ = 0;
 OHOS::HDI::Camera::V1_0::FlashlightStatus Test::statusCallback =
                 static_cast<OHOS::HDI::Camera::V1_0::FlashlightStatus>(0);
+
 uint64_t Test::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =

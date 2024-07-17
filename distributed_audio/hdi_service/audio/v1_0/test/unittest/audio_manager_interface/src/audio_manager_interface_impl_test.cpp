@@ -37,10 +37,7 @@ void AudioManagerInterfaceImplTest::SetUpTestCase(void) {}
 
 void AudioManagerInterfaceImplTest::TearDownTestCase(void) {}
 
-void AudioManagerInterfaceImplTest::SetUp(void)
-{
-    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
-}
+void AudioManagerInterfaceImplTest::SetUp(void) {}
 
 void AudioManagerInterfaceImplTest::TearDown(void)
 {
@@ -55,6 +52,7 @@ void AudioManagerInterfaceImplTest::TearDown(void)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, GetAllAdapters_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::vector<AudioAdapterDescriptor> descriptors;
     EXPECT_EQ(HDF_SUCCESS, audioManagerInterfaceImpl_->GetAllAdapters(descriptors));
 }
@@ -67,6 +65,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, GetAllAdapters_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, LoadAdapter_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName = "adpName";
     AudioAdapterDescriptor descriptor;
     descriptor.adapterName = adpName;
@@ -89,6 +88,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, LoadAdapter_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, ReleaseAudioManagerObject_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     EXPECT_EQ(HDF_SUCCESS, audioManagerInterfaceImpl_->ReleaseAudioManagerObject());
 }
 
@@ -100,6 +100,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, ReleaseAudioManagerObject_001, TestSize.
  */
 HWTEST_F(AudioManagerInterfaceImplTest, LoadAdapter_002, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName = "adpName";
     AudioAdapterDescriptor descriptor;
     descriptor.adapterName = adpName;
@@ -125,6 +126,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, LoadAdapter_002, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, AddAudioDevice_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName;
     uint32_t devId = 0;
     std::string caps;
@@ -141,6 +143,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, AddAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, Notify_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName;
     uint32_t devId = 0;
     uint32_t streamId = 0;
@@ -156,6 +159,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName = "adpName";
     uint32_t devId = 0;
     uint32_t streamId = 0;
@@ -174,6 +178,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, Notify_002, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     DAudioDevEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_HDF_FAIL, audioManagerInterfaceImpl_->NotifyFwk(event));
 }
@@ -186,6 +191,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, NotifyFwk_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_001, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName;
     uint32_t devId = 0;
     sptr<IDAudioCallback> callback = nullptr;
@@ -200,6 +206,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_001, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_002, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     std::string adpName = "adpName";
     uint32_t devId = static_cast<uint32_t>(DEFAULT_RENDER_ID);
     sptr<IDAudioCallback> callback = new MockIDAudioCallback();
@@ -214,6 +221,7 @@ HWTEST_F(AudioManagerInterfaceImplTest, CreateAdapter_002, TestSize.Level1)
  */
 HWTEST_F(AudioManagerInterfaceImplTest, SetDeviceObject_002, TestSize.Level1)
 {
+    audioManagerInterfaceImpl_ = std::make_shared<AudioManagerInterfaceImpl>();
     struct HdfDeviceObject deviceObject;
     audioManagerInterfaceImpl_->SetDeviceObject(&deviceObject);
     DAudioDevEvent event;

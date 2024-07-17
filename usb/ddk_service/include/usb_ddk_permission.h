@@ -25,7 +25,8 @@ namespace Ddk {
 namespace V1_0 {
 class DdkPermissionManager {
 public:
-    static bool VerifyPermission(std::string permissionName);
+    static bool VerifyPermission(const std::string &permissionName);
+    static void Reset();
 };
 } // namespace V1_0
 } // namespace Ddk

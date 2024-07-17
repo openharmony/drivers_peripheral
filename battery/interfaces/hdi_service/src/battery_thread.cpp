@@ -284,7 +284,7 @@ void BatteryThread::StartThread(void* service)
 
 void BatteryThread::Run(void* service)
 {
-    std::thread batteryThread(&BatteryThread::LoopingThreadEntry, this, service);
+    std::thread batteryThread([this, service] { this->LoopingThreadEntry(service); });
     pthread_setname_np(batteryThread.native_handle(), "battery_thread");
     batteryThread.detach();
 }

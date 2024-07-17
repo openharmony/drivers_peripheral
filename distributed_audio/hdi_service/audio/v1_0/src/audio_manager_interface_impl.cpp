@@ -79,6 +79,11 @@ int32_t AudioManagerInterfaceImpl::LoadAdapter(const AudioAdapterDescriptor &des
         return HDF_FAILURE;
     }
 
+    if (adp->second == nullptr) {
+        DHLOGE("adapterimpl is nullptr.");
+        return HDF_FAILURE;
+    }
+
     int32_t ret = adp->second->AdapterLoad();
     if (ret != DH_SUCCESS) {
         DHLOGE("Load audio adapter failed, adapter return: %{public}d.", ret);
@@ -102,6 +107,11 @@ int32_t AudioManagerInterfaceImpl::UnloadAdapter(const std::string &adapterName)
         return HDF_SUCCESS;
     }
 
+    if (adp->second == nullptr) {
+        DHLOGE("adapterimpl is nullptr.");
+        return HDF_FAILURE;
+    }
+    
     int32_t ret = adp->second->AdapterUnload();
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload audio adapter failed, adapter return: %{public}d.", ret);
@@ -256,7 +266,7 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, const uint32_t devId,
     const sptr<IDAudioCallback> &callback)
 {
-    DHLOGI("Create adapter, pin id: %{public}d.", devId);
+    DHLOGI("Create adapter, pin id: %{public}s.", GetChangeDevIdMap(static_cast<int32_t>(devId)).c_str());
     if (callback == nullptr) {
         DHLOGE("Adapter callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;

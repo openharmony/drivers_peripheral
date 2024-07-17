@@ -26,7 +26,8 @@ namespace DistributedHardware {
 DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &sinkAbilityInfo)
 {
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
-    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, FAILED);
+    CHECK_NULL_RETURN_LOG(rootValue, FAILED, "The sinkAbilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, FAILED, "The sinkAbilityInfo is not object.");
     cJSON *metaObj = cJSON_GetObjectItemCaseSensitive(rootValue, "MetaData");
     if (metaObj == nullptr || !cJSON_IsString(metaObj) || (metaObj->valuestring == nullptr)) {
         cJSON_Delete(rootValue);
@@ -157,7 +158,8 @@ void DMetadataProcessor::SetFpsRanges()
 bool DMetadataProcessor::GetInfoFromJson(const std::string& sinkAbilityInfo)
 {
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
-    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, false);
+    CHECK_NULL_RETURN_LOG(rootValue, false, "The sinkAbilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, false, "The sinkAbilityInfo is not object.");
     cJSON *verObj = cJSON_GetObjectItemCaseSensitive(rootValue, "ProtocolVer");
     if (verObj == nullptr || !cJSON_IsString(verObj) || (verObj->valuestring == nullptr)) {
         cJSON_Delete(rootValue);
@@ -810,7 +812,8 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
 {
     std::map<int, std::vector<DCResolution>> supportedFormats;
     cJSON *rootValue = cJSON_Parse(abilityInfo.c_str());
-    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, supportedFormats);
+    CHECK_NULL_RETURN_LOG(rootValue, supportedFormats, "The abilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, supportedFormats, "The abilityInfo is not object.");
     ParsePhotoFormats(rootValue, supportedFormats);
     ParsePreviewFormats(rootValue, supportedFormats);
     ParseVideoFormats(rootValue, supportedFormats);
@@ -826,12 +829,7 @@ void DMetadataProcessor::ParsePhotoFormats(cJSON* rootValue,
         DHLOGE("Input Photo info is null.");
         return;
     }
-    
-    if (!cJSON_IsObject(photoObj)) {
-        cJSON_Delete(photoObj);
-        DHLOGE("Photo error.");
-        return;
-    }
+
     cJSON *formatObj = cJSON_GetObjectItemCaseSensitive(photoObj, "OutputFormat");
     if (formatObj == nullptr || !cJSON_IsArray(formatObj) || cJSON_GetArraySize(formatObj) == 0 ||
         static_cast<uint32_t>(cJSON_GetArraySize(formatObj)) > JSON_ARRAY_MAX_SIZE) {

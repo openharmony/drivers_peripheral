@@ -17,7 +17,7 @@
 #define AUDIO_CAPTURE_VDI_H
 
 #include "iaudio_capture_vdi.h"
-#include "v3_0/iaudio_capture.h"
+#include "v4_0/iaudio_capture.h"
 
 struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
     struct IAudioCaptureVdi *vdiCapture, const struct AudioDeviceDescriptor *desc);

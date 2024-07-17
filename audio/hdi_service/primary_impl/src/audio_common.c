@@ -21,7 +21,7 @@
 #include "securec.h"
 #include "audio_uhdf_log.h"
 #include "audio_internal.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/audio_types.h"
 
 #define FILE_NAME_LEN 256
 #define TIME_LEN      32

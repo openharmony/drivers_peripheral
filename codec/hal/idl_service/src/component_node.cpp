@@ -305,7 +305,7 @@ int32_t ComponentNode::ComponentDeInit()
 
 int32_t ComponentNode::OnEvent(CodecEventType event, uint32_t data1, uint32_t data2, void *eventData)
 {
-    CODEC_LOGI("eventType: [%{public}d], data1: [%{public}x], data2: [%{public}x]", event, data1, data2);
+    CODEC_LOGD("eventType: [%{public}d], data1: [%{public}x], data2: [%{public}x]", event, data1, data2);
     if (omxCallback_ == nullptr) {
         CODEC_LOGE("omxCallback_ is null");
         return OMX_ErrorNone;

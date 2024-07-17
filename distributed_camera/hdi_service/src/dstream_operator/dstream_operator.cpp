@@ -568,7 +568,8 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
 {
     dhBase_ = dhBase;
     cJSON *rootValue = cJSON_Parse(sinkAbilityInfo.c_str());
-    CHECK_NULL_AND_OBJECT_FREE_RETURN(rootValue, DCamRetCode::INVALID_ARGUMENT);
+    CHECK_NULL_RETURN_LOG(rootValue, DCamRetCode::INVALID_ARGUMENT, "The sinkAbilityInfo is null.");
+    CHECK_OBJECT_FREE_RETURN(rootValue, DCamRetCode::INVALID_ARGUMENT, "The sinkAbilityInfo is not object.");
 
     cJSON *srcRootValue = cJSON_Parse(sourceCodecInfo.c_str());
     CHECK_NULL_FREE_RETURN(srcRootValue, DCamRetCode::INVALID_ARGUMENT, rootValue);

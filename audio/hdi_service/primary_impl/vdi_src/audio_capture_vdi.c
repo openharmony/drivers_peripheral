@@ -87,6 +87,45 @@ int32_t AudioCaptureFrameVdi(struct IAudioCapture *capture, int8_t *frame, uint3
     return HDF_SUCCESS;
 }
 
+int32_t AudioCaptureFrameEcVdi(struct IAudioCapture *capture, const struct AudioFrameLen *frameLen,
+    struct AudioCaptureFrameInfo *frameInfo)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frameInfo, HDF_ERR_INVALID_PARAM);
+
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct IAudioCaptureVdi *vdiCapture = captureInfo->vdiCapture;
+    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(vdiCapture->CaptureFrameEc, HDF_ERR_INVALID_PARAM);
+    struct AudioCaptureFrameInfoVdi frameInfoVdi;
+    (void)memset_s((void *)&frameInfoVdi, sizeof(frameInfoVdi), 0, sizeof(frameInfoVdi));
+    int32_t ret = AudioCommonFrameInfoToVdiFrameInfoVdi(frameLen, &frameInfoVdi);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture FrameInfo To VdiFrameInfo fail");
+        return ret;
+    }
+
+    HdfAudioStartTrace("Hdi:AudioCaptureFrameEcVdi", 0);
+    ret = vdiCapture->CaptureFrameEc(vdiCapture, &frameInfoVdi);
+    HdfAudioFinishTrace();
+    if (ret != HDF_SUCCESS) {
+        OsalMemFree((void *)frameInfoVdi.frame);
+        OsalMemFree((void *)frameInfoVdi.frameEc);
+        AUDIO_FUNC_LOGE("audio capture EC frame fail, ret=%{public}d", ret);
+        return ret;
+    }
+
+    ret = AudioCommonVdiFrameInfoToFrameInfoVdi(&frameInfoVdi, frameInfo);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture VdiFrameInfo To FrameInfo fail");
+    }
+    OsalMemFree((void *)frameInfoVdi.frame);
+    OsalMemFree((void *)frameInfoVdi.frameEc);
+
+    return ret;
+}
+
 int32_t AudioGetCapturePositionVdi(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
@@ -468,6 +507,10 @@ int32_t AudioCaptureReqMmapBufferVdi(struct IAudioCapture *capture, int32_t reqS
     desc->transferFrameSize = vdiDesc.transferFrameSize;
     desc->isShareable = vdiDesc.isShareable;
     desc->filePath = strdup("");  // which will be released after send reply
+    if (desc->filePath == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail");
+        return HDF_FAILURE;
+    }
     if (desc->totalBufferFrames < 0) {
         // make the totalBufferFrames valid
         desc->totalBufferFrames *= -1;
@@ -707,6 +750,7 @@ int32_t AudioCaptureIsSupportsPauseAndResumeVdi(struct IAudioCapture *capture, b
 static void AudioInitCaptureInstanceVdi(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioCaptureFrameVdi;
+    capture->CaptureFrameEc = AudioCaptureFrameEcVdi;
     capture->GetCapturePosition = AudioGetCapturePositionVdi;
     capture->CheckSceneCapability = AudioCaptureCheckSceneCapabilityVdi;
     capture->SelectScene = AudioCaptureSelectSceneVdi;
@@ -794,6 +838,12 @@ struct IAudioCapture *AudioCreateCaptureByIdVdi(const struct AudioSampleAttribut
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
+    if (priv->captureInfos[*captureId]->desc.desc == NULL) {
+        AUDIO_FUNC_LOGE("strdup fail, desc->desc = %{public}s", desc->desc);
+        OsalMemFree(priv->captureInfos[*captureId]);
+        priv->captureInfos[*captureId] = NULL;
+        return NULL;
+    }
     priv->captureInfos[*captureId]->captureId = *captureId;
     priv->captureInfos[*captureId]->usrCount = 1;
     capture = &(priv->captureInfos[*captureId]->capture);

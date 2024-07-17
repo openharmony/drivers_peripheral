@@ -17,6 +17,7 @@
 #define HDI_STREAM_STILL_CAPTURE_H
 
 #include "stream_base.h"
+#include "camera_hal_hisysevent.h"
 
 namespace OHOS::Camera {
 class StreamStillCapture : public StreamBase {

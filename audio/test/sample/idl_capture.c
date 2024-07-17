@@ -32,8 +32,8 @@
 #include "ioservstat_listener.h"
 #include "osal_mem.h"
 #include "svcmgr_ioservice.h"
-#include "v3_0/iaudio_manager.h"
-#include "v3_0/audio_types.h"
+#include "v4_0/iaudio_manager.h"
+#include "v4_0/audio_types.h"
 
 #define MOVE_LEFT_NUM                   8
 #define AUDIO_CHANNELCOUNT              2

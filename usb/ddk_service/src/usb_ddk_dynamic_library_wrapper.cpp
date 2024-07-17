@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_MANAGER_VDI_H
-#define AUDIO_MANAGER_VDI_H
+#include "accesstoken_kit.h"
 
-#include "iaudio_manager_vdi.h"
-#include "v4_0/iaudio_manager.h"
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-#define AUDIO_VDI_ADAPTER_NUM_MAX  20 // Limit the number of sound cards supported to a maximum of 20
-#define AUDIO_VDI_PORT_NUM_MAX    10
-#define AUDIO_VDI_STREAM_NUM_MAX  10
+int VerifyAccessToken(uint32_t callerToken, const std::string &permissionName)
+{
+    return OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+}
 
-struct IAudioManager *AudioManagerCreateIfInstance(void);
-int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager);
-
-#endif // AUDIO_MANAGER_VDI_H
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */

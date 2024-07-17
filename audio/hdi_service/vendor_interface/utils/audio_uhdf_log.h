@@ -67,7 +67,7 @@
 #define CHECK_NULL_PTR_RETURN_VALUE(pointer, ret)          \
     do {                                                      \
         if ((pointer) == NULL) {                              \
-            AUDIO_FUNC_LOGE("pointer is null and return ret=%{public}d", ret); \
+            AUDIO_FUNC_LOGE("%{public}s is null and return ret=%{public}d", #pointer, ret); \
             return (ret);                                     \
         }                                                     \
     } while (0)
