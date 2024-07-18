@@ -1513,6 +1513,17 @@ static int32_t ProcessEventWpaWpsTimeout(struct HdfWpaRemoteNode *node,
     return ret;
 }
 
+static int32_t ProcessEventWpaAuthTimeout(struct HdfWpaRemoteNode *node, const char *ifName)
+{
+    int32_t ret = HDF_FAILURE;
+    if (node == NULL || node->callbackObj == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = node->callbackObj->OnEventAuthTimeout(node->callbackObj, ifName);
+    return ret;
+}
+
 static int32_t ProcessEventWpaRecvScanResult(struct HdfWpaRemoteNode *node,
     struct WpaRecvScanResultParam *recvScanResultParam, const char *ifName)
 {
@@ -1687,6 +1698,9 @@ static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
             break;
         case WPA_EVENT_WPS_TIMEMOUT:
             ret = ProcessEventWpaWpsTimeout(pos, ifName);
+            break;
+        case WPA_EVENT_AUTH_TIMEMOUT:
+            ProcessEventWpaAuthTimeout(pos, ifName);
             break;
         case WPA_EVENT_RECV_SCAN_RESULT:
             ret = ProcessEventWpaRecvScanResult(pos, (struct WpaRecvScanResultParam *)data, ifName);
