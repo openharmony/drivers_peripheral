@@ -73,7 +73,7 @@ typedef enum {
     WPA_EVENT_STA_AUTH_REJECT,
     WPA_EVENT_STA_NOTIFY,
     WPA_EVENT_VENDOR_EXT,
-    WPA_EVENT_AUTH_TIMEMOUT,
+    WPA_EVENT_AUTH_TIMEOUT,
 } WpaCallBackEventType;
 
 enum WpaClientType {
