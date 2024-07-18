@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/license/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language gocerning permissions and
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -36,9 +36,9 @@ void UtestLogicCameraTest::TearDown(void)
 }
 
 /**
-  * @tc.name: test logic camera
+  * @tc.name: test logic csamera
   * @tc.desc: single stream
-  * @tc.level: level0
+  * @tc.level: Level0
   * @tc.size: MediumTest
   * @tc.type: Function
   */
@@ -47,17 +47,17 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     std::cout << "==========[test log] test single stream"<< std::endl;
     // Get the stream manager
     cameraBase->AchieveStreamOperator();
-    // configure preciew stream information
+    // Configure preview stream information
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(QUEUE_SIZE);
     if (producer->GetQueueSize() != QUEUE_SIZE) {
-        std::cout "~~~~~~~" << std::endl;
+        std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
-        cameraBase->BufferCallback(b, caneraBase->preview_mode);
+        cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SerCallback(callback);
+    producer->SetCallback(callback);
     std::shared_ptr<StreamInfo> streamInfoPre = std::make_shared<StreamInfo>();
     streamInfoPre->streamId_ = cameraBase->STREAM_ID_PREVIEW;
     streamInfoPre->width_ = DEFAULT_TEST_WIDTH_VALUE;
@@ -68,23 +68,27 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     streamInfoPre->tunneledMode_ = DEFAULT_TEST_TUNNELEDMODE_VALUE;
     streamInfoPre->bufferQueue_ = producer;
     cameraBase->streamInfos.push_back(streamInfoPre);
-    camera->rc = cameraBase->streamOperator->CreateStreams(cameraBase->stramInfos);
+    cameraBase->rc = cameraBase->streamOperator->CreateStreams(cameraBase->stramInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
-    if (caneraBase->rc == NO_ERROR) {
+    if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success, streamId = ";
+        std::cout << cameraBase->STREAM_ID_CAPTURE, <<", intent = STILL_CAPTURE" << std::endl;
+    } else {
+        std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc <<" , streamId = ";
         std::cout << cameraBase->STREAM_ID_CAPTURE, <<", intent = STILL_CAPTURE" << std::endl;
     }
     // Submit stream information
     cameraBase->rc = cameraBase->streamOperator->CommitStreams(DUAL, nullptr);
-    EXPECT_EQ(false, cameraBase->rc != NO_ERROR) {
+    EXPECT_EQ(false, cameraBase->rc != NO_ERROR);
+    if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CommitStreams DUAL success." << std::endl;
     } else {
-        std::cout << "==========[test log] CommitStreams DUAL fail, rc = " << cameraBase->rc << endl;
+        std::cout << "==========[test log] CommitStreams DUAL fail, rc = " << cameraBase->rc << std::endl;
     }
     // capture
     cameraBase->StartCapture(cameraBase->STREAM_ID_PREVIEW, cameraBase->CAPTURE_ID_PREVIEW, false, true);
     // post-processing
     cameraBase->captureIds = {cameraBase->CAPTURE_ID_PREVIEW};
-    cameraBase->streamIds = {caneraBase->STREAM_ID_PREVIEW};
+    cameraBase->streamIds = {cameraBase->STREAM_ID_PREVIEW};
     cameraBase->StopStream(cameraBase->captureIds, cameraBase->streamIds);
 }
