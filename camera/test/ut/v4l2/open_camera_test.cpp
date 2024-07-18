@@ -63,7 +63,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0010)
 {
     CAMERA_LOGD("OpenCamera, cameraID is not found.");
     std::string cameraId = "qwerty";
-    OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallbcak();
+    OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
     CAMERA_LOGD("opencamera begin");
     cameraBase->rc = (CamRetCode)cameraBase->cameraHost->OpenCamera(cameraId, callback, cameraBase->cameraDevice);
     CAMERA_LOGD("opencamera end");
