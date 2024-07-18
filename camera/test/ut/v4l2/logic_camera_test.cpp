@@ -68,7 +68,7 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     streamInfoPre->tunneledMode_ = DEFAULT_TEST_TUNNELEDMODE_VALUE;
     streamInfoPre->bufferQueue_ = producer;
     cameraBase->streamInfos.push_back(streamInfoPre);
-    cameraBase->rc = cameraBase->streamOperator->CreateStreams(cameraBase->stramInfos);
+    cameraBase->rc = cameraBase->streamOperator->CreateStreams(cameraBase->streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success, streamId = ";
