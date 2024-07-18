@@ -80,7 +80,9 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON/cJSON.c",
       ]
       if (defined(is_emulator) && is_emulator) {
-        sources += [ "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_capture.c" ]
+        sources += [
+          "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_capture.c",
+        ]
       } else {
         sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_capture.c" ]
       }
@@ -106,7 +108,8 @@ if (defined(ohos_lite)) {
       if (defined(is_emulator) && is_emulator) {
         include_dirs += [ "//device/hmos_emulator/hardware/audio/audio_alsa" ]
       } else {
-        include_dirs += [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
       }
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
@@ -155,7 +158,9 @@ if (defined(ohos_lite)) {
         "//third_party/cJSON/cJSON.c",
       ]
       if (defined(is_emulator) && is_emulator) {
-        sources += [ "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_render.c" ]
+        sources += [
+          "//device/hmos_emulator/hardware/audio/audio_alsa/vendor_render.c",
+        ]
       } else {
         sources += [ "//device/board/${product_company}/${device_name}/audio_alsa/vendor_render.c" ]
       }
@@ -182,7 +187,8 @@ if (defined(ohos_lite)) {
       if (defined(is_emulator) && is_emulator) {
         include_dirs += [ "//device/hmos_emulator/hardware/audio/audio_alsa" ]
       } else {
-        include_dirs += [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
+        include_dirs +=
+            [ "//device/board/${product_company}/${device_name}/audio_alsa" ]
       }
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
