@@ -16,6 +16,7 @@
 #include "codec_log_wrapper.h"
 #include "codec_image_service.h"
 #include "hitrace_meter.h"
+#include "codec_xcollie.h"
 #include <unistd.h>
 
 namespace OHOS {
@@ -68,6 +69,7 @@ int32_t CodecImageService::DoJpegDecode(const CodecImageBuffer& inBuffer, const 
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HdfCodecDoJpegDecode");
     CODEC_LOGI("servcie impl!");
+    XCOLLIE_LISTENER("DoJpegDecode");
     if (inBuffer.fenceFd >= 0) {
         close(inBuffer.fenceFd);
     }
