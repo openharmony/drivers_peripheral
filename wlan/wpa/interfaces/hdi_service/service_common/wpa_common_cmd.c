@@ -1699,7 +1699,7 @@ static int32_t HdfStaDealEvent(uint32_t event, struct HdfWpaRemoteNode *pos, voi
         case WPA_EVENT_WPS_TIMEMOUT:
             ret = ProcessEventWpaWpsTimeout(pos, ifName);
             break;
-        case WPA_EVENT_AUTH_TIMEMOUT:
+        case WPA_EVENT_AUTH_TIMEOUT:
             ProcessEventWpaAuthTimeout(pos, ifName);
             break;
         case WPA_EVENT_RECV_SCAN_RESULT:
