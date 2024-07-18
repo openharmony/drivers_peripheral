@@ -61,6 +61,7 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
     constexpr char CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT[] = "canSwapWidthHeight";
 
+    constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH[] = "isSupportPassthrough";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY[] = "isSupportLowLatency";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_TSVC[] = "isSupportTSVC";
     constexpr char CODEC_CONFIG_KEY_IS_SUPPORT_LTR[] = "isSupportLTR";
@@ -358,6 +359,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
             return HDF_FAILURE;
         }
     }
+    cap.port.video.isSupportPassthrough = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_PASSTHROUGH);
     cap.port.video.isSupportLowLatency = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LOW_LATENCY);
     cap.port.video.isSupportTSVC = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_TSVC);
     cap.port.video.isSupportLTR = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SUPPORT_LTR);
