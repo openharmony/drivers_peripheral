@@ -18,8 +18,10 @@
 constexpr int ITEM_CAPACITY_SIZE = 100;
 constexpr int DATA_CAPACITY_SIZE = 2000;
 
-void UtestHdiTest::SetUpTestCase(void){}
-void UtestHdiTest::TearDownTestCase(void){}
+void UtestHdiTest::SetUpTestCase(void)
+{}
+void UtestHdiTest::TearDownTestCase(void)
+{}
 void UtestHdiTest::SetUp(void)
 {
     if (cameraBase == nullptr)
