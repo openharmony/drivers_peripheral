@@ -97,7 +97,7 @@ TEST_F(UtestHdiTest, camera_hdi_0021)
 
 /**
   * @tc.name: GetCameraAbility
-  * @tc.desc: GetCameraAbility, abnormal cameraId = ""
+  * @tc.desc: GetCameraAbility, abnormal cameraId = ''
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -482,12 +482,12 @@ TEST_F(UtestHdiTest, camera_hdi_0091)
 
     // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
-    cameraBase->rc = cameraBase->cameraDevice->DisabledReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->DisableResult(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     EXPECT_GT(results.size(), 0);
 
