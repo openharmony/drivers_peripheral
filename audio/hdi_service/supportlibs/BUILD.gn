@@ -119,6 +119,10 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
 
+    if (defined(is_emulator) && is_emulator) {
+      defines += [ "AUDIO_HDF_EMULATOR" ]
+    }
+
     if (is_standard_system) {
       external_deps = [
         "drivers_interface_audio:libaudio_proxy_4.0",
@@ -189,6 +193,10 @@ if (defined(ohos_lite)) {
 
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
+    }
+
+    if (defined(is_emulator) && is_emulator) {
+      defines += [ "AUDIO_HDF_EMULATOR" ]
     }
 
     if (is_standard_system) {

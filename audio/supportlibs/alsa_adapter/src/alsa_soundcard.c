@@ -471,7 +471,6 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
 {
     int32_t ret;
     enum SndCardType cardType;
-    //struct AlsaAdapterCfgInfo *info = NULL;
     struct AlsaDevInfo *devInfo = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(adapterName);
