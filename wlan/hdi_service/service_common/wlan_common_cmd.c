@@ -134,8 +134,7 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
     if (ifeature->ifName == NULL) {
         return HDF_FAILURE;
     }
-    HDF_LOGI("hal exit %{public}s, apFeatureCount:%{public}u staFeatureCount:%{public}u p2pFeatureCount:%{public}u",
-        __FUNCTION__, g_apFeatureCount, g_staFeatureCount, g_p2pFeatureCount);
+    HDF_LOGI("ap:%{public}u sta:%{public}u p2p:%{public}u",g_apFeatureCount, g_staFeatureCount, g_p2pFeatureCount);
     return ret;
 }
 
