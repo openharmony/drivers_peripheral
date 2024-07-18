@@ -131,22 +131,23 @@ static enum SndCardType CfgGetAdapterCardType(const char* adapterName)
     return SND_CARD_UNKNOWN;
 }
 
-static struct AlsaAdapterCfgInfo *CfgGetAdapterInfo(const char* adapterName)
+static int CfgGetAdapterInfo(const char* adapterName, struct AlsaAdapterCfgInfo infos[])
 {
     if (adapterName == NULL) {
-        return NULL;
+        return 0;
     }
 
     struct AlsaAdapterCfgInfo *info;
+    int index = 0;
     for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
         for (int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
             info = &g_alsaAdapterList[type].list[i];
             if (strncmp(adapterName, info->adapterName, strlen(info->adapterName)) == 0) {
-                return info;
+                infos[index++] = *info;
             }
         }
     }
-    return NULL;
+    return index;
 }
 
 static int32_t CfgDumpAdapterInfo(struct AlsaAdapterCfgInfo *info)
@@ -297,14 +298,16 @@ int32_t CfgSaveAdapterFromFile(void)
     return HDF_SUCCESS;
 }
 
-static struct AlsaDevInfo *DevGetInfoByCardId(int32_t cardId)
+static struct AlsaDevInfo *DevGetInfoByAdapter(struct AlsaAdapterCfgInfo infos[], int32_t size)
 {
     struct AlsaDevInfo *info = NULL;
     int num = g_alsaCardsDevList.num;
     for (int i = 0; i < num; ++i) {
         info = &g_alsaCardsDevList.alsaDevIns[i];
-        if (info->card == cardId) {
-            return info;
+        for (int j = 0; j < size; ++j) {
+            if (info->card == infos[j].cardId) {
+                return info;
+            }
         }
     }
     return NULL;
@@ -468,7 +471,7 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
 {
     int32_t ret;
     enum SndCardType cardType;
-    struct AlsaAdapterCfgInfo *info = NULL;
+    //struct AlsaAdapterCfgInfo *info = NULL;
     struct AlsaDevInfo *devInfo = NULL;
     CHECK_NULL_PTR_RETURN_DEFAULT(cardIns);
     CHECK_NULL_PTR_RETURN_DEFAULT(adapterName);
@@ -480,13 +483,14 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
     }
     cardIns->cardType = cardType;
 
-    info = CfgGetAdapterInfo(adapterName);
-    if (info == NULL) {
+    struct AlsaAdapterCfgInfo adapterInfos[g_alsaAdapterList[cardType].num];
+    int32_t num = CfgGetAdapterInfo(adapterName, adapterInfos);
+    if (num == 0) {
         AUDIO_FUNC_LOGE("adapter %{public}s is not exits.", cardIns->adapterName);
         return HDF_FAILURE;
     }
 
-    devInfo = DevGetInfoByCardId(info->cardId);
+    devInfo = DevGetInfoByAdapter(adapterInfos, num);
     if (devInfo == NULL) {
         AUDIO_FUNC_LOGE("adapter %{public}s cant not find sound card device.", cardIns->adapterName);
         return HDF_FAILURE;
