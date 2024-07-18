@@ -60,9 +60,9 @@ TEST_F(UtestPipelineTest, camera_ppl_0001)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestPipelineTest, camera_ppl_002)
+TEST_F(UtestPipelineTest, camera_ppl_0002)
 {
-    std::out << "==========[test log] Check ppl: preview + capture success." << std::endl;
+    std::cout << "==========[test log] Check ppl: preview + capture success." << std::endl;
     // Get the stream manager
     cameraBase->AchieveStreamOperator();
     // start stream
@@ -84,7 +84,7 @@ TEST_F(UtestPipelineTest, camera_ppl_002)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestPipelineTest, camera_ppl_003)
+TEST_F(UtestPipelineTest, camera_ppl_0003)
 {
     std::cout << "==========[test log] Check ppl: preview + video success." << std::endl;
     // Get the stream manager
@@ -108,9 +108,9 @@ TEST_F(UtestPipelineTest, camera_ppl_003)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestPipelineTest, camera_ppl_004)
+TEST_F(UtestPipelineTest, camera_ppl_0004)
 {
-    std::cout << "==========[test log] Video mode without preview, system not support, " << std::endl;
+    std::cout << "==========[test log] Video mode without preview, system not support, ";
     std::cout << "expected return fail." << std::endl;
 
     EXPECT_EQ(true, cameraBase->cameraDevice != nullptr);
