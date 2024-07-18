@@ -120,7 +120,7 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(is_emulator) && is_emulator) {
-      defines += [ "AUDIO_HDF_EMULATOR" ]
+      defines += [ "EMULATOR_ENABLED" ]
     }
 
     if (is_standard_system) {
@@ -196,7 +196,7 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(is_emulator) && is_emulator) {
-      defines += [ "AUDIO_HDF_EMULATOR" ]
+      defines += [ "EMULATOR_ENABLED" ]
     }
 
     if (is_standard_system) {
