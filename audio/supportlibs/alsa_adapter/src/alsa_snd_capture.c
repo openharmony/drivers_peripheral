@@ -521,7 +521,13 @@ static int32_t CheckPcmStatus(snd_pcm_t *capturePcmHandle)
 {
     int32_t ret;
     CHECK_NULL_PTR_RETURN_DEFAULT(capturePcmHandle);
-
+#ifndef AUDIO_HDF_EMULATOR
+    ret = snd_pcm_wait(capturePcmHandle, -1); /* -1 for timeout, Waiting forever */
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("snd_pcm_wait failed: %{public}s.", snd_strerror(ret));
+        return HDF_FAILURE;
+    }
+#endif
     if (snd_pcm_state(capturePcmHandle) == SND_PCM_STATE_SETUP) {
         ret = snd_pcm_prepare(capturePcmHandle);
         if (ret < 0) {
@@ -529,13 +535,13 @@ static int32_t CheckPcmStatus(snd_pcm_t *capturePcmHandle)
             return HDF_FAILURE;
         }
     }
-
+#ifdef AUDIO_HDF_EMULATOR
     ret = snd_pcm_wait(capturePcmHandle, PCM_WAIT_TIME); /* -1 for timeout, Waiting forever */
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_pcm_wait failed: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
-
+#endif
     return HDF_SUCCESS;
 }
 
