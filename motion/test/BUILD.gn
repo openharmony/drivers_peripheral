@@ -12,10 +12,6 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-declare_args() {
-  drivers_peripheral_motion_feature_model = false
-}
-
 group("hdf_test_motion") {
   deps = []
   if (drivers_peripheral_motion_feature_model) {
