@@ -130,11 +130,8 @@ int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, st
             ifeature->type = g_p2pFeature->baseFeature.type;
             ifeature->ifName = strdup((g_p2pFeature->baseFeature).ifName);
         }
-    } else {
-        HDF_LOGE("%{public}s: wlan type is Invalid", __func__);
     }
     if (ifeature->ifName == NULL) {
-        HDF_LOGE("%{public}s: ifeature->ifName is NULL", __func__);
         return HDF_FAILURE;
     }
     HDF_LOGI("hal exit %{public}s, apFeatureCount:%{public}u staFeatureCount:%{public}u p2pFeatureCount:%{public}u",
