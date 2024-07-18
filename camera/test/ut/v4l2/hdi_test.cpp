@@ -3,9 +3,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,7 +97,7 @@ TEST_F(UtestHdiTest, camera_hdi_0021)
 
 /**
   * @tc.name: GetCameraAbility
-  * @tc.desc: GetCameraAbility, abnormal cameraId = ''
+  * @tc.desc: GetCameraAbility, abnormal cameraId = ""
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -107,7 +107,7 @@ TEST_F(UtestHdiTest, camera_hdi_0022)
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = ''." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (cameraBase->cameraDevice == nullptr) {
-        std::string cameraId = '';
+        std::string cameraId = "";
         sleep(2); // waiting 2s, prepare for execute GetCameraAbility.
         cameraBase->rc = cameraBase->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] cameraBase->rc ="<< cameraBase->rc << std::endl;
@@ -124,20 +124,20 @@ TEST_F(UtestHdiTest, camera_hdi_0022)
   */
 TEST_F(UtestHdiTest, camera_hdi_0030)
 {
-    std::cout << "==========[test log] OpenCamera, normal cameraId." << std::endl;
+    std::cout << "==========[test log] OpenCamera, normal cameraId."<< std::endl;
     if (cameraBase->cameraDevice == nullptr) {
         sleep(3); // waiting 3s, prepare for execute GetCameraIds.
         cameraBase->cameraHost->GetCameraIds(cameraBase->cameraIds);
-        const std::shared_ptr<ICameraDeviceCallback> callback = 
+        const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
         cameraBase->rc = cameraBase->cameraHost->OpenCamera(cameraBase->cameraIds.front(),
-                callback, cameraBase->cameraDevice);
+            callback, cameraBase->cameraDevice);
         EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
         if (cameraBase->rc != NO_ERROR || cameraBase->cameraDevice == nullptr) {
             std::cout << "==========[test log] OpenCamera failed." << std::endl;
             return;
         }
-        std::cout << "==========[test log] OpenCamera success." << endl;
+        std::cout << "==========[test log] OpenCamera success." << std::endl;
     }
 }
 
@@ -170,7 +170,7 @@ TEST_F(UtestHdiTest, camera_hdi_0031)
   */
 TEST_F(UtestHdiTest, camera_hdi_0032)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is illegal." << std::endl;
+    std::cout << "==========[test log] OpenCamera, cameraID is illegal."<< std::endl;
     if (cameraBase->cameraDevice == nullptr) {
         std::string cameraId = "1";
         const std::shared_ptr<ICameraDeviceCallback> callback =
@@ -190,7 +190,7 @@ TEST_F(UtestHdiTest, camera_hdi_0032)
   */
 TEST_F(UtestHdiTest, camera_hdi_0033)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is Empty." << std::endl;
+    std::cout << "==========[test log] OpenCamera, cameraID is Empty."<< std::endl;
     if (cameraBase->cameraDevice == nullptr) {
         std::string cameraId = "";
         const std::shared_ptr<ICameraDeviceCallback> callback =
@@ -251,7 +251,7 @@ TEST_F(UtestHdiTest, camera_hdi_0050)
 {
     std::cout << "==========[test log] GetStreamOprator, normal callback input." << std::endl;
     sleep(3); // waiting 3s, prepare for execute OpenCamera.
-    cameraBase->Opencamera();
+    cameraBase->OpenCamera();
     cameraBase->streamOperatorCallback = std::make_shared<IStreamOperatorCallback>();
     cameraBase->rc = cameraBase->cameraDevice->GetStreamOperator(cameraBase->streamOperatorCallback,
         cameraBase->streamOperator);
@@ -269,7 +269,7 @@ TEST_F(UtestHdiTest, camera_hdi_0051)
 {
     std::cout << "==========[test log] GetStreamOprator, normal callback input." << std::endl;
     sleep(3); // waiting 3s, prepare for execute OpenCamera.
-    cameraBase->Opencamera();
+    cameraBase->OpenCamera();
     cameraBase->streamOperatorCallback = nullptr;
     cameraBase->rc = cameraBase->cameraDevice->GetStreamOperator(cameraBase->streamOperatorCallback,
         cameraBase->streamOperator);
@@ -279,7 +279,7 @@ TEST_F(UtestHdiTest, camera_hdi_0051)
 /**
   * @tc.name: UpdateSettings
   * @tc.desc: UpdateSettings, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION.
-  * @tc.level: level1
+  * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
   */
@@ -413,7 +413,7 @@ TEST_F(UtestHdiTest, camera_hdi_0071)
     std::cout << "==========[test log] SetResultMode is PER_FRAME." << std::endl;
     EXPECT_EQ(true, cameraBase->cameraDevice != nullptr);
     std::vector<OHOS::Camera::MetaType> enableTypes;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslt(enableTypes);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(enableTypes);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     for (const auto &type : enableTypes) {
         std::cout << "==========[test log] type = " << type << std::endl;
@@ -454,7 +454,7 @@ TEST_F(UtestHdiTest, camera_hdi_0090)
     // Get the parameter tag currently supported by the device
     std::cout << "==========[test log] 1. Get the tags..." << std::endl;
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
     std::cout << "resultsOriginal.size = " << resultsOriginal.size() << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     // add this tag
@@ -477,33 +477,33 @@ TEST_F(UtestHdiTest, camera_hdi_0091)
     std::cout << "==========[test log] EnableResult multiple tags, success." << std::endl;
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
-    cameraBase->rc = cameraBase->cameraDevice->DisableReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->DisabledReuslts(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     EXPECT_GT(results.size(), 0);
 
     // Add multiple tags
     std::cout << "then, enable the tag..." << std::endl;
-    cameraBase->rc = cameraBase->cameraDevice->EnableResults(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->EnableResult(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslts(results);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 }
 
 /**
   * @tc.name: EnableResult
-  * @tc.desc: EnableResult error tag, expect success .
+  * @tc.desc: EnableResult error tag, expected success .
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -513,7 +513,7 @@ TEST_F(UtestHdiTest, camera_hdi_0092)
     std::cout << "==========[test log] EnableResult error tag, expected fail." << std::endl;
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
-    cameraBase->rc = cameraBase->cameraDevice->GetEnableReuslts(resultsOriginal);
+    cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // add a tag
@@ -546,7 +546,7 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
     cameraBase->rc = cameraBase->cameraDevice->DisableResult(disableTag);
     std::cout << "rc = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
-    std::cout << "==========[test log] DisableResults the tag:" << resoultsOriginal[0] << std::endl;
+    std::cout << "==========[test log] DisableResult the tag:" << resultsOriginal[0] << std::endl;
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
@@ -589,7 +589,7 @@ TEST_F(UtestHdiTest, camera_hdi_0101)
   */
 TEST_F(UtestHdiTest, camera_hdi_0102)
 {
-    std::cout << "==========[test log] DsableResult error tag, expected fail." << std::endl;
+    std::cout << "==========[test log] DisableResult error tag, expected fail." << std::endl;
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     cameraBase->rc = cameraBase->cameraDevice->GetEnabledReuslts(resultsOriginal);
