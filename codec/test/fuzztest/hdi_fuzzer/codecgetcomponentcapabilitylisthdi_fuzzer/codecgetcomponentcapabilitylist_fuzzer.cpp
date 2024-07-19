@@ -28,7 +28,7 @@ namespace Codec {
 
         OHOS::sptr<OHOS::HDI::Codec::V3_0::ICodecComponentManager> omxMgr_ = nullptr;
 
-        omxMgr_ = ICodecComponentManager::Get(false);
+        omxMgr_ = ICodecComponentManager::Get(true);
         if (omxMgr_ == nullptr) {
             HDF_LOGE("%{public}s: ICodecComponentManager failed\n", __func__);
             return false;
