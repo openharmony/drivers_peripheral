@@ -722,7 +722,7 @@ int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankI
 
 int32_t DisplayComposerService::ClearClientBuffer(uint32_t devId)
 {
-    DISPLAY_LOGI("ClearClientBuffer enter. devId:%{public}u", devId);
+    DISPLAY_LOGI("enter, devId %{public}u", devId);
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
     std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
     DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
@@ -733,7 +733,7 @@ int32_t DisplayComposerService::ClearClientBuffer(uint32_t devId)
 
 int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerId)
 {
-    DISPLAY_LOGI("ClearClientBuffer enter. devId:%{public}u, layerId:%{public}u", devId, layerId);
+    DISPLAY_LOGI("enter, devId %{public}u, layerId %{public}u", devId, layerId);
     CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
     std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
     DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
