@@ -20,7 +20,6 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
-#include "idm_database.h"
 #include "token_key.h"
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
@@ -46,7 +45,7 @@ IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
     return true;
 }
 
-IAM_STATIC ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
+IAM_STATIC ResultCode UserAuthTokenHmac(UserAuthTokenHal *userAuthToken, HksAuthTokenKey *tokenKey)
 {
     Buffer *sign = NULL;
 
@@ -175,26 +174,6 @@ ResultCode UserAuthTokenVerify(UserAuthTokenHal *userAuthToken, UserAuthTokenPla
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataPlain(UserAuthContext *context, uint32_t authMode, UserAuthTokenHal *authToken)
-{
-    authToken->version = TOKEN_VERSION;
-    if (memcpy_s(authToken->tokenDataPlain.challenge, CHALLENGE_LEN, context->challenge, CHALLENGE_LEN) != EOK) {
-        LOG_ERROR("failed to copy challenge");
-        return RESULT_BAD_COPY;
-    }
-    authToken->tokenDataPlain.time = GetSystemTime();
-    authToken->tokenDataPlain.authTrustLevel = context->authTrustLevel;
-    authToken->tokenDataPlain.authType = context->authType;
-    authToken->tokenDataPlain.authMode = authMode;
-    if (memcmp(context->localUdid, context->collectorUdid, sizeof(context->localUdid)) == 0) {
-        authToken->tokenDataPlain.tokenType = TOKEN_TYPE_LOCAL_AUTH;
-    } else {
-        authToken->tokenDataPlain.tokenType = TOKEN_TYPE_COAUTH;
-    }
-    LOG_ERROR("signed token type %{public}u", authToken->tokenDataPlain.tokenType);
-    return RESULT_SUCCESS;
-}
-
 IAM_STATIC ResultCode InitAesGcmParam(AesGcmParam *aesGcmParam, const HksAuthTokenKey *tokenKey)
 {
     int32_t ret = RESULT_GENERAL_ERROR;
@@ -248,43 +227,6 @@ IAM_STATIC ResultCode CopyTokenCipherParam(const Buffer *ciphertext, const Buffe
     return RESULT_SUCCESS;
 }
 
-IAM_STATIC ResultCode GetTokenDataToEncrypt(const UserAuthContext *context, uint64_t credentialId,
-    TokenDataToEncrypt *data)
-{
-    EnrolledInfoHal enrolledInfo = {};
-    int32_t ret = GetEnrolledInfoAuthType(context->userId, context->authType, &enrolledInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get enrolled info failed");
-        return ret;
-    }
-
-    uint64_t secureUid;
-    ret = GetSecureUid(context->userId, &secureUid);
-
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get secure uid failed");
-        return ret;
-    }
-
-    data->userId = context->userId;
-    data->secureUid = secureUid;
-    data->enrolledId = enrolledInfo.enrolledId;
-    data->credentialId = credentialId;
-
-    if (memcpy_s(data->collectorUdid, sizeof(data->collectorUdid),
-        context->collectorUdid, sizeof(context->collectorUdid)) != EOK) {
-        LOG_ERROR("copy collectorUdid failed");
-        return RESULT_GENERAL_ERROR;
-    }
-
-    if (memcpy_s(data->verifierUdid, sizeof(data->verifierUdid),
-        context->localUdid, sizeof(context->localUdid)) != EOK) {
-        LOG_ERROR("copy verifierUdid failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    return RESULT_SUCCESS;
-}
-
 IAM_STATIC ResultCode GetTokenDataCipherResult(const TokenDataToEncrypt *data, UserAuthTokenHal *authToken,
     const HksAuthTokenKey *tokenKey)
 {
@@ -315,30 +257,13 @@ EXIT:
     return ret;
 }
 
-IAM_STATIC ResultCode GetTokenDataCipher(const UserAuthContext *context, uint64_t credentialId,
-    UserAuthTokenHal *authToken, const HksAuthTokenKey *tokenKey)
+ResultCode UserAuthTokenSign(UserAuthTokenPlain *tokenPlain, UserAuthTokenHal *authToken)
 {
-    TokenDataToEncrypt data = {0};
-    int32_t ret = GetTokenDataToEncrypt(context, credentialId, &data);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataToEncrypt failed");
-        return ret;
-    }
-    ret = GetTokenDataCipherResult(&data, authToken, tokenKey);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataCipherResult failed");
-    }
-    (void)memset_s(&data, sizeof(TokenDataToEncrypt), 0, sizeof(TokenDataToEncrypt));
-    return ret;
-}
-
-ResultCode GetTokenDataAndSign(UserAuthContext *context,
-    uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken)
-{
-    if (context == NULL || authToken == NULL) {
-        LOG_ERROR("context or authToken is null");
+    if (tokenPlain == NULL || authToken == NULL) {
+        LOG_ERROR("bad param");
         return RESULT_BAD_PARAM;
     }
+
     (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     HksAuthTokenKey tokenKey = {};
     ResultCode ret = GetTokenKey(&tokenKey);
@@ -346,19 +271,21 @@ ResultCode GetTokenDataAndSign(UserAuthContext *context,
         LOG_ERROR("GetTokenKey fail");
         goto FAIL;
     }
-    ret = GetTokenDataPlain(context, authMode, authToken);
+
+    authToken->version = TOKEN_VERSION;
+    authToken->tokenDataPlain = tokenPlain->tokenDataPlain;
+    authToken->tokenDataPlain.time = GetSystemTime();
+    LOG_INFO("signed token type %{public}u", authToken->tokenDataPlain.tokenType);
+
+    ret = GetTokenDataCipherResult(&(tokenPlain->tokenDataToEncrypt), authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataPlain fail");
+        LOG_ERROR("GetTokenDataCipherResult failed");
         goto FAIL;
     }
-    ret = GetTokenDataCipher(context, credentialId, authToken, &tokenKey);
+
+    ret = UserAuthTokenHmac(authToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetTokenDataCipher fail");
-        goto FAIL;
-    }
-    ret = UserAuthTokenSign(authToken, &tokenKey);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("UserAuthTokenSign fail");
+        LOG_ERROR("UserAuthTokenHmac fail");
         goto FAIL;
     }
     (void)memset_s(&tokenKey, sizeof(HksAuthTokenKey), 0, sizeof(HksAuthTokenKey));
@@ -382,7 +309,7 @@ ResultCode ReuseUnlockTokenSign(UserAuthTokenHal *reuseToken)
         LOG_ERROR("GetTokenKey fail");
         goto FAIL;
     }
-    ret = UserAuthTokenSign(reuseToken, &tokenKey);
+    ret = UserAuthTokenHmac(reuseToken, &tokenKey);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("ReuseUnlockTokenSign fail");
         goto FAIL;
