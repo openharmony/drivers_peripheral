@@ -17,5 +17,4 @@ declare_args() {
   drivers_peripheral_codec_feature_support_hdi_v1 = false
   drivers_peripheral_codec_feature_support_dma_buffer = false
   drivers_peripheral_codec_feature_support_high_work_frequency = false
-  drivers_peripheral_codec_feature_support_xcollie = true
 }
