@@ -45,7 +45,6 @@ ohos_shared_library("libcodec_component_manager_service_3.0") {
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
-      "hicollie:libhicollie",
       "hilog:libhilog",
       "hitrace:hitrace_meter",
       "ipc:ipc_single",
@@ -63,9 +62,6 @@ ohos_shared_library("libcodec_component_manager_service_3.0") {
   }
   if (use_musl && use_jemalloc && use_jemalloc_dfx_intf) {
     defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
-  }
-  if (drivers_peripheral_codec_feature_support_xcollie) {
-    defines += [ "HICOLLIE_ENABLE" ]
   }
   innerapi_tags = [ "passthrough_indirect" ]
   install_images = [ chipset_base_dir ]
