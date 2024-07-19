@@ -18,6 +18,8 @@
 
 #include "isecure_element_vendor.h"
 
+#include "remote_death_recipient.h"
+
 namespace OHOS {
 namespace HDI {
 namespace SecureElement {
@@ -46,6 +48,13 @@ public:
     int32_t reset(SecureElementStatus& status) override;
 
     SecureElementStatus getStatusBySW(uint8_t sw1, uint8_t sw2) const;
+
+private:
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
+    int32_t AddSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj);
+    int32_t RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj);
+
+    sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
 };
 } // SecureElement
 } // HDI
