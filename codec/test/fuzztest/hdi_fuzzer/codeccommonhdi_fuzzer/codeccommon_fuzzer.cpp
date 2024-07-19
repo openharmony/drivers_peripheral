@@ -61,7 +61,7 @@ namespace Codec {
 
     bool Preconditions()
     {
-        g_manager = ICodecComponentManager::Get(false);
+        g_manager = ICodecComponentManager::Get(true);
         if (g_manager == nullptr) {
             HDF_LOGE("%{public}s: ICodecComponentManager failed", __func__);
             return false;
