@@ -82,6 +82,10 @@ HWTEST_F(BatterySysTest, BatteryConfig001, TestSize.Level1)
     }
     for (auto it = chargeSceneConfigMap.begin(); it != chargeSceneConfigMap.end(); it++) {
         ASSERT_TRUE(!(it->first).empty());
+
+        auto chargeSceneConfig = it->second;
+        ASSERT_TRUE(!chargeSceneConfig.setPath.empty() || !chargeSceneConfig.getPath.empty()
+            || !chargeSceneConfig.supportPath.empty());
     }
     BATTERY_HILOGI(LABEL_TEST, "BatteryConfig001 end");
 }
