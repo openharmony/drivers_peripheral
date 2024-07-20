@@ -2244,6 +2244,10 @@ err:
 
 static int32_t InstallWlanExtParam(const char *ifName, const int8_t *data, uint32_t dataLen)
 {
+    if (dataLen > sizeof(InstallWlanParam) || dataLen < sizeof(InstallWlanParam) - MAX_BUF_LEN) {
+        HILOG_ERROR(LOG_CORE, "%s: dataLen error", __FUNCTION__);
+        return HDF_FAILURE;
+    }
     uint8_t newData[dataLen];
     int32_t ret = memset_s(newData, dataLen, 0, dataLen);
     if (ret != EOK) {
