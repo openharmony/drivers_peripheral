@@ -113,6 +113,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/double_preview_test.cpp",
       "$ut_root_path/v4l2/hdfcamera_facedetect.cpp",
       "$ut_root_path/v4l2/meta_data_test.cpp",
+      "$ut_root_path/v4l2/open_camera_test.cpp",
       "$ut_root_path/v4l2/stream_customer.cpp",
       "$ut_root_path/v4l2/test_camera_base.cpp",
       "$ut_root_path/v4l2/usb_camera_3a_test.cpp",
