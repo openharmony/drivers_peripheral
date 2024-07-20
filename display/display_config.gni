@@ -13,8 +13,8 @@
 
 declare_args() {
   drivers_peripheral_display_community = false
-  drivers_peripheral_display_vdi_default = false
   drivers_peripheral_display_hicollie_enable = false
+  drivers_peripheral_display_vdi_default = false
 }
 
 if (drivers_peripheral_display_community) {
