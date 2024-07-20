@@ -43,7 +43,7 @@ ohos_shared_library("libpower_interface_service_1.2") {
   if (drivers_peripheral_power_wakeup_cause_path) {
     sources += [ "src/power_config.cpp" ]
 
-    deps += [ "//third_party/jsoncpp:jsoncpp" ]
+    deps = [ "//third_party/jsoncpp:jsoncpp" ]
 
     if (has_power_config_policy_part) {
       external_deps += [ "config_policy:configpolicy_util" ]
@@ -60,13 +60,13 @@ ohos_shared_library("libpower_interface_service_1.2") {
     defines += [ "FASTER_RETRY_OF_SLEEP" ]
   }
 
-  if (drivers_peripheral_power_slower_retry_of_sleep) {
-    defines += [ "SLOWER_RETRY_OF_SLEEP" ]
-  }
-
   if (drivers_peripheral_power_enable_s4) {
     sources += [ "src/hibernate.cpp" ]
     defines += [ "DRIVERS_PERIPHERAL_POWER_ENABLE_S4" ]
+  }
+
+  if (drivers_peripheral_power_slower_retry_of_sleep) {
+    defines += [ "SLOWER_RETRY_OF_SLEEP" ]
   }
 
   install_images = [ chipset_base_dir ]
