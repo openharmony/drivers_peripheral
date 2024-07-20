@@ -680,7 +680,10 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = path_ + "/" + path;
-
+    if (batteryPath.c_str() == nullptr) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "the batteryPath is empty.");
+        return;
+    }
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "subfolder file is not exist.");
