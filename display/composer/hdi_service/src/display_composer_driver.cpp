@@ -66,8 +66,8 @@ static int32_t DisplayComposerDriverDispatch(
         return HDF_FAILURE;
     }
 #ifdef DISPLAY_HICOLLIE_ENABLE
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("HDI::Display::Composer::SendRequest",
+        HICOLLIE_TIMEOUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
 #endif
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 #ifdef DISPLAY_HICOLLIE_ENABLE
