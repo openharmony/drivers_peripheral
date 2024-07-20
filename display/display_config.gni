@@ -31,8 +31,6 @@ if (drivers_peripheral_display_vdi_default) {
 }
 
 if (defined(global_parts_info) && defined(global_parts_info.hiviewdfx_hicollie)) {
-  if (drivers_peripheral_display_community) {
-    drivers_peripheral_display_hicollie_enable = true
-    display_defines += [ "DISPLAY_HICOLLIE_ENABLE" ]
-  }
+  drivers_peripheral_display_hicollie_enable = true
+  display_defines += [ "DISPLAY_HICOLLIE_ENABLE" ]
 }
