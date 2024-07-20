@@ -28,7 +28,7 @@
 #define POLL_EVENT_DEF false
 #define AUDIO_BUFFER_TIME_DEF 500000
 #define AUDIO_PERIOD_TIME_DEF 100000
-#define PCM_WAIT_TIME         100
+#define PCM_WAIT_TIME         5000
 
 static struct AlsaCapture *g_alsaCaptureList = NULL;
 static void RegisterCaptureImpl(struct AlsaCapture *captureIns);
