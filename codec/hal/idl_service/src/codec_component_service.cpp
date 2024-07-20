@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <hitrace_meter.h>
 #include "codec_log_wrapper.h"
-#include "codec_xcollie.h"
 
 #define AUDIO_CODEC_NAME "OMX.audio"
 
@@ -72,7 +71,6 @@ int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param,
 {
     HITRACE_METER_NAME(HITRACE_TAG_HDF, "HDFCodecSendCommand");
     CODEC_LOGI("commandType: [%{public}d], command [%{public}d]", cmd, param);
-    XCOLLIE_LISTENER("SendCommand");
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
 }
 
