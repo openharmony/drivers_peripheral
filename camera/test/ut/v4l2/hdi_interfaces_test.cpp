@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file expected in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -46,27 +46,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0130)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -76,9 +76,9 @@ TEST_F(UtestHdiIterTest, camera_hdi_0130)
     }
     // release stream
     std::vector<int> streamIds;
-    streamIds>push_back(cameraBsae->streamInfo->streamId_);
+    streamIds.push_back(cameraBase->streamInfo->streamId_);
     cameraBase->rc = cameraBase->streamOperator->ReleaseStreams(streamIds);
-    EXPECE_EQ(true, cameraBase->rc ==NO_ERROR);
+    EXPECT_EQ(true, cameraBase->rc ==NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
@@ -99,34 +99,34 @@ TEST_F(UtestHdiIterTest, camera_hdi_0131)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = -1;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
 }
 
@@ -144,16 +144,16 @@ TEST_F(UtestHdiIterTest, camera_hdi_0132)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
     streamInfo->streamId_ = INVALID_VALUE_TEST;
@@ -162,12 +162,12 @@ TEST_F(UtestHdiIterTest, camera_hdi_0132)
     streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = PREVIEW;
-    streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
 
     std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
-    cameraBase->rc = cameraBase->streamOperator->CreateStreams(stremaInfos);
+    cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -186,38 +186,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0132)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0133)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->width = -1, return error." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->width = -1, return error." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = -1;
     cameraBase->streamInfo->height_ = 640; // 640:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
 }
 
@@ -230,38 +230,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0133)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0134)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->width = 2147483647, success." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->width = 2147483647, success." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
     // release stream
     std::vector<int> streamIds;
@@ -284,38 +284,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0134)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0135)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->height = -1, return error." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->height = -1, return error." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = -1;
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
 }
 
@@ -328,38 +328,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0135)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0136)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->height = 2147483647, success." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->height = 2147483647, success." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 }
 
@@ -372,38 +372,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0136)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0137)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->format = -1, return error." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->format = -1, return error." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = -1;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
 }
 
@@ -416,38 +416,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0137)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0138)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->format = 2147483647, success." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->format = 2147483647, success." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     // release stream
     std::vector<int> streamIds;
@@ -470,38 +470,38 @@ TEST_F(UtestHdiIterTest, camera_hdi_0138)
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0139)
 {
-    std::cout << "==========[test log] CreateStreams, streamInfo->dataspace = -1, return error." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->dataspace = -1, return error." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = -1;
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "StreamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
 }
 
@@ -519,27 +519,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0140)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -574,27 +574,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0141)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -629,27 +629,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0142)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = VIDEO;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -684,27 +684,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0143)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = STILL_CAPTURE;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -739,34 +739,34 @@ TEST_F(UtestHdiIterTest, camera_hdi_0144)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = POST_VIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << cameraBase->rc << std::endl;
     }
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     // release stream
     std::vector<int> streamIds;
@@ -794,29 +794,29 @@ TEST_F(UtestHdiIterTest, camera_hdi_0145)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = ANALYZE;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -849,16 +849,16 @@ TEST_F(UtestHdiIterTest, camera_hdi_0146)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
     streamInfo->streamId_ = DEFAULT_STREAM_ID;
@@ -867,13 +867,13 @@ TEST_F(UtestHdiIterTest, camera_hdi_0146)
     streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = Camera::CUSTOM;
-    streamInfo->tunneldMode_ = 5; // 5:tunnel mode
+    streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
 
     std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -896,29 +896,29 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = Camera::CUSTOM;
-    cameraBase->streamInfo->tunneldMode_ = false;
+    cameraBase->streamInfo->tunneledMode_ = false;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -941,30 +941,30 @@ TEST_F(UtestHdiIterTest, camera_hdi_0148)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 1000; // 1000:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = Camera::CUSTOM;
-    cameraBase->streamInfo->tunneldMode_ = 0;
+    cameraBase->streamInfo->tunneledMode_ = 0;
     cameraBase->streamInfo->minFramerDuration_ = -1;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -987,30 +987,30 @@ TEST_F(UtestHdiIterTest, camera_hdi_0149)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 0;
+    cameraBase->streamInfo->tunneledMode_ = 0;
     cameraBase->streamInfo->minFramerDuration_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
-    std::cout << "streamOperator->CreateStream's RetCode = " << cameraBase->rc << std::endl;
+    std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == Camera::METHOD_NOT_SUPPORTED);
     if (cameraBase->rc == Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -1032,27 +1032,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0160)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:picture tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1085,27 +1085,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0161)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:picture tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1151,27 +1151,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:picture tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1205,27 +1205,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:picture tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1289,27 +1289,27 @@ TEST_F(UtestHdiIterTest, camera_hdi_0180)
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
-    std::shared_ptr<IBufferProducer> producer = IBufferProduccer::CreateBufferQueue();
+    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
-    if (producer->GetQueueSize() != 8) { // 8:set bufferQueue size
+    if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
         cameraBase->BufferCallback(b, cameraBase->preview_mode);
         return;
     };
-    producer->SetCallbcak(callback);
+    producer->SetCallback(callback);
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    cameraBase->streamInfo = std::maker_shared<StreamInfo>();
+    cameraBase->streamInfo = std::make_shared<StreamInfo>();
     cameraBase->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     cameraBase->streamInfo->width_ = 640; // 640:picture width
     cameraBase->streamInfo->height_ = 480; // 480:picture height
     cameraBase->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     cameraBase->streamInfo->dataspace_ = 8; // 8:picture dataspace
     cameraBase->streamInfo->intent_ = PREVIEW;
-    cameraBase->streamInfo->tunneldMode_ = 5; // 5:picture tunnel mode
+    cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(caneraBase->streamInfo);
+    stremInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
