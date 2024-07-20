@@ -718,6 +718,28 @@ int32_t DisplayComposerService::RegDisplayVBlankIdleCallback(const sptr<IVBlankI
     return ret;
 }
 
+int32_t DisplayComposerService::ClearClientBuffer(uint32_t devId)
+{
+    DISPLAY_LOGI("enter, devId %{public}u", devId);
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
+    DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
+    DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
+
+    return devCache->ClearClientCache();
+}
+
+int32_t DisplayComposerService::ClearLayerBuffer(uint32_t devId, uint32_t layerId)
+{
+    DISPLAY_LOGI("enter, devId %{public}u, layerId %{public}u", devId, layerId);
+    CHECK_NULLPOINTER_RETURN_VALUE(cacheMgr_, HDF_FAILURE);
+    std::lock_guard<std::mutex> lock(cacheMgr_->GetCacheMgrMutex());
+    DeviceCache* devCache = cacheMgr_->DeviceCacheInstance(devId);
+    DISPLAY_CHK_RETURN(devCache == nullptr, HDF_FAILURE, DISPLAY_LOGE("fail"));
+
+    return devCache->ClearLayerBuffer(layerId);
+}
+
 } // namespace Composer
 } // namespace Display
 } // namespace HDI
