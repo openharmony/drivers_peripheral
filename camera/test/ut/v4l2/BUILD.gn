@@ -172,7 +172,6 @@ if (defined(ohos_lite)) {
 
       # metadata manager includes
       "$camera_path/metadata_manager/include",
-      "$camera_path/adapter/platform/v4l2/src/device_manager/include/",
     ]
 
     deps = [
