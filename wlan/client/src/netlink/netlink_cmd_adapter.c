@@ -2169,7 +2169,7 @@ static int32_t InstallParam(struct nl_msg *msg, struct nl_msg *keyMsg)
     }
     struct nlmsghdr *hdr = nlmsg_hdr(keyMsg);
     void *data = nlmsg_data(hdr);
-    int len = hdr->nlmsg_len - NLMSG_HDRLEN;
+    int len = (int)hdr->nlmsg_len - NLMSG_HDRLEN;
     if (memset_s(data, len, 0, len) != 0) {
         HILOG_ERROR(LOG_CORE, "%s: memset_s failed", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -2244,8 +2244,18 @@ err:
 
 static int32_t InstallWlanExtParam(const char *ifName, const int8_t *data, uint32_t dataLen)
 {
+    if (dataLen > UINT32_MAX){
+        HILOG_ERROR(LOG_CORE, "%s: dataLen err", __FUNCTION__);
+        return HDF_FAILURE;
+    }
+
     uint8_t newData[dataLen];
-    for (int i = 0; i < dataLen; i++) {
+    int32_t ret = memset_s(newData, dataLen, 0, dataLen);
+    if (ret != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s failed", __FUNCTION__);
+        return HDF_FAILURE;
+    }
+    for (uint32_t i = 0; i < dataLen; i++) {
         newData[i] = (uint8_t)(data[i]);
     }
 
