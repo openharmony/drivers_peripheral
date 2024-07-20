@@ -14,6 +14,7 @@
 declare_args() {
   drivers_peripheral_display_community = false
   drivers_peripheral_display_vdi_default = false
+  drivers_peripheral_display_hicollie_enable = false
 }
 
 if (drivers_peripheral_display_community) {
@@ -27,4 +28,9 @@ if (drivers_peripheral_display_vdi_default) {
     "COMPOSER_VDI_DEFAULT_LIBRARY_ENABLE",
     "BUFFER_VDI_DEFAULT_LIBRARY_ENABLE",
   ]
+}
+
+if (defined(global_parts_info) && defined(global_parts_info.hiviewdfx_hicollie)) {
+  drivers_peripheral_display_hicollie_enable = true
+  display_defines += [ "DISPLAY_HICOLLIE_ENABLE" ]
 }

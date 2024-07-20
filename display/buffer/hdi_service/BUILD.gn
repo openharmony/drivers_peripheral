@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("./../../display_config.gni")
 
 group("hdf_display_buffer_service") {
   deps = [
@@ -44,6 +45,10 @@ ohos_shared_library("liballocator_service_1.0") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
+
+  if (drivers_peripheral_display_hicollie_enable) {
+    external_deps += [ "hicollie:libhicollie" ]
+  }
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

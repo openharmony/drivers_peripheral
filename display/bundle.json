@@ -17,7 +17,8 @@
     "ram": "7700KB",
     "features": [
       "drivers_peripheral_display_community",
-      "drivers_peripheral_display_vdi_default"
+      "drivers_peripheral_display_vdi_default",
+      "drivers_peripheral_display_hicollie_enable"
     ],
     "deps": {
       "components": [
@@ -29,7 +30,8 @@
         "graphic_surface",
         "init",
         "hitrace",
-        "libdrm"
+        "libdrm",
+        "hicollie"
       ],
       "third_party": []
     },

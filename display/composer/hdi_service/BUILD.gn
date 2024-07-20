@@ -90,6 +90,10 @@ ohos_shared_library("libdisplay_composer_driver_1.0") {
     "ipc:ipc_single",
   ]
 
+  if (drivers_peripheral_display_hicollie_enable) {
+    external_deps += [ "hicollie:libhicollie" ]
+  }
+
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
