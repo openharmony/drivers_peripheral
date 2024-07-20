@@ -26,6 +26,10 @@
 #include "display_log.h"
 #include "hdf_trace.h"
 #include "hdf_remote_service.h"
+#ifdef DISPLAY_HICOLLIE_ENABLE
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_SRV"
@@ -33,6 +37,7 @@
 #define LOG_DOMAIN 0xD002515
 #define TIME_1000 1000
 #define TIME_10 10
+#define HICOLLIE_TIMEOUT 5
 #define BUFF_SIZE 16
 
 namespace OHOS {
@@ -139,6 +144,23 @@ int32_t AllocatorService::TimeEnd(struct timeval &firstTimeStamp)
         (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
 }
 
+int32_t AllocatorService::SetTimer(std::string name)
+{
+    int32_t id = -1;
+#ifdef DISPLAY_HICOLLIE_ENABLE
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+#endif
+    return id;
+}
+
+void AllocatorService::CancelTimer(int32_t id)
+{
+#ifdef DISPLAY_HICOLLIE_ENABLE
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+#endif
+}
+
 void AllocatorService::FreeMemVdi(BufferHandle* handle)
 {
     struct timeval firstTimeStamp;
@@ -159,6 +181,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
 
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    int32_t id = SetTimer("HDI::Display::AllocatorService::AllocMem");
     struct timeval firstTimeStamp;
     TimeBegin(&firstTimeStamp);
     {
@@ -171,6 +194,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
                     __func__, runTime, info.usage, info.format, info.expectedSize);
             }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
+            CancelTimer(id);
             return ec;
         }
     }
@@ -180,19 +204,25 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
             __func__, runTime, info.usage, info.format, info.expectedSize);
     }
 
-    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s: AllocMem buffer is null", __func__);
+        CancelTimer(id);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
     WriteAllocPidToDma(buffer->fd);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         FreeMemVdi(buffer);
+        CancelTimer(id);
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
         FreeMemVdi(freeBuffer);
     });
+    CancelTimer(id);
     return HDF_SUCCESS;
 }
 } // namespace V1_0

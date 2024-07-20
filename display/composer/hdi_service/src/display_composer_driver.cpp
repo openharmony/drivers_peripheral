@@ -18,11 +18,16 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "v1_2/display_composer_stub.h"
+#ifdef DISPLAY_HICOLLIE_ENABLE
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "COMPOSER_DRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
+#define HICOLLIE_TIMEOUT 5
 
 struct HdfDisplayComposerHost {
     struct IDeviceIoService ioService;
@@ -60,7 +65,14 @@ static int32_t DisplayComposerDriverDispatch(
         HDF_LOGE("%{public}s:hdfDisplayComposerHost nullptr, stop: %{public}d", __func__, g_stop);
         return HDF_FAILURE;
     }
+#ifdef DISPLAY_HICOLLIE_ENABLE
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+#endif
     int32_t ret = hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+#ifdef DISPLAY_HICOLLIE_ENABLE
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+#endif
     pthread_rwlock_unlock(&g_rwLock);
     return ret;
 }

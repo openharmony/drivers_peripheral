@@ -38,7 +38,8 @@ private:
     int32_t TimeEnd(struct timeval &firstTimeStamp);
     void FreeMemVdi(BufferHandle* handle);
     void WriteAllocPidToDma(int32_t fd);
-
+    int32_t SetTimer(std::string name);
+    void CancelTimer(int32_t id);
     std::mutex mutex_;
     void *libHandle_;
     IDisplayBufferVdi *vdiImpl_;
