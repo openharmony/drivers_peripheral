@@ -131,7 +131,7 @@ static enum SndCardType CfgGetAdapterCardType(const char* adapterName)
     return SND_CARD_UNKNOWN;
 }
 
-static int CfgGetAdapterInfo(const char* adapterName, struct AlsaAdapterCfgInfo infos[])
+static int CfgGetAdapterInfo(const char* adapterName, struct AlsaAdapterCfgInfo infos[], int infoLen)
 {
     if (adapterName == NULL) {
         return 0;
@@ -142,7 +142,8 @@ static int CfgGetAdapterInfo(const char* adapterName, struct AlsaAdapterCfgInfo 
     for (enum SndCardType type = SND_CARD_PRIMARY; type < SND_CARD_MAX; ++type) {
         for (int32_t i = 0; i < g_alsaAdapterList[type].num; ++i) {
             info = &g_alsaAdapterList[type].list[i];
-            if (strncmp(adapterName, info->adapterName, strlen(info->adapterName)) == 0) {
+            if (strncmp(adapterName, info->adapterName, strlen(info->adapterName)) == 0
+                && index < infoLen) {
                 infos[index++] = *info;
             }
         }
@@ -483,7 +484,7 @@ int32_t SndMatchSelAdapter(struct AlsaSoundCard *cardIns, const char *adapterNam
     cardIns->cardType = cardType;
 
     struct AlsaAdapterCfgInfo adapterInfos[g_alsaAdapterList[cardType].num];
-    int32_t num = CfgGetAdapterInfo(adapterName, adapterInfos);
+    int32_t num = CfgGetAdapterInfo(adapterName, adapterInfos, g_alsaAdapterList[cardType].num);
     if (num == 0) {
         AUDIO_FUNC_LOGE("adapter %{public}s is not exits.", cardIns->adapterName);
         return HDF_FAILURE;
