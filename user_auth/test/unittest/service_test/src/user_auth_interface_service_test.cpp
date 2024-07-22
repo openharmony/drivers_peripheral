@@ -1361,6 +1361,7 @@ HWTEST_F(UserAuthInterfaceServiceTest, TestSetGlobalConfigParam_001, TestSize.Le
     param.authTypes.push_back(2);
     param.authTypes.push_back(4);
     param.authTypes.push_back(4);
+    param.authTypes.push_back(8);
     EXPECT_EQ(service->SetGlobalConfigParam(param), RESULT_BAD_PARAM);
 
     for (uint32_t i = 0; i <= MAX_USER; i++) {
