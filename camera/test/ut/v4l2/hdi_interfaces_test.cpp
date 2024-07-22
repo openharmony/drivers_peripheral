@@ -727,7 +727,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0143)
 
 /**
   * @tc.name: CreateStreams
-  * @tc.desc: CreateStreams, StreamInfo->StreamIntent = POST_VIEW, success.
+  * @tc.desc: CreateStreams, StreamInfo->StreamIntent = POST_VIEW;, success.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -735,7 +735,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0143)
 TEST_F(UtestHdiIterTest, camera_hdi_0144)
 {
     std::cout << "==========[test log] CreateStreams,";
-    std::cout << "StreamInfo->StreamIntent = POST_VIEW, success." << std::endl;
+    std::cout << "StreamInfo->StreamIntent = POST_VIEW;, success." << std::endl;
     // Create and get streamOperator information
     cameraBase->AchieveStreamOperator();
     // Create data stream
@@ -919,11 +919,11 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
-    EXPECT_EQ(true, cameraBase->rc == Camrea::METHOD_NOT_SUPPORTED);
-    if (cameraBase->rc == Camrea::METHOD_NOT_SUPPORTED) {
+    EXPECT_EQ(true, cameraBase->rc == Camera::METHOD_NOT_SUPPORTED);
+    if (cameraBase->rc == Cameraa::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams fail." << std::endl;
     } else {
-        std::cout << "==========[test log] CreateStreams success. " << cameraBase->rc << std::endl;
+        std::cout << "==========[test log] CreateStreams success. " << std::endl;
     }
 }
 
@@ -1128,7 +1128,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0161)
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
 
     // release stream
-    cameraBase->rc = cameraBase->streamOperator->ReleaseStreams((-1));
+    cameraBase->rc = cameraBase->streamOperator->ReleaseStreams({-1});
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     std::cout << "streamOperator->ReleaseStreams's RetCode = " << cameraBase->rc << std::endl;
     if (cameraBase->rc == NO_ERROR) {
