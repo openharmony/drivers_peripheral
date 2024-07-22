@@ -22,22 +22,15 @@
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
-#include <sys/time.h>
 #include "display_log.h"
 #include "hdf_trace.h"
 #include "hdf_remote_service.h"
-#ifdef DISPLAY_HICOLLIE_ENABLE
-#include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
-#endif
+#include "display_buffer_dfx.h"
 
 #undef LOG_TAG
 #define LOG_TAG "ALLOC_SRV"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002515
-#define TIME_1000 1000
-#define TIME_10 10
-#define HICOLLIE_TIMEOUT 5
 #define BUFF_SIZE 16
 
 namespace OHOS {
@@ -130,48 +123,13 @@ void AllocatorService::WriteAllocPidToDma(int32_t fd)
     }
 }
 
-void AllocatorService::TimeBegin(struct timeval *firstTimeStamp)
-{
-    gettimeofday(firstTimeStamp, nullptr);
-    return;
-}
-
-int32_t AllocatorService::TimeEnd(struct timeval &firstTimeStamp)
-{
-    struct timeval secondTimeStamp;
-    gettimeofday(&secondTimeStamp, nullptr);
-    return (int32_t)((secondTimeStamp.tv_sec - firstTimeStamp.tv_sec) * TIME_1000 +
-        (secondTimeStamp.tv_usec - firstTimeStamp.tv_usec) / TIME_1000);
-}
-
-int32_t AllocatorService::SetTimer(std::string name)
-{
-    int32_t id = -1;
-#ifdef DISPLAY_HICOLLIE_ENABLE
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name, HICOLLIE_TIMEOUT, nullptr, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY);
-#endif
-    return id;
-}
-
-void AllocatorService::CancelTimer(int32_t id)
-{
-#ifdef DISPLAY_HICOLLIE_ENABLE
-    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
-#endif
-}
-
 void AllocatorService::FreeMemVdi(BufferHandle* handle)
 {
-    struct timeval firstTimeStamp;
-    TimeBegin(&firstTimeStamp);
+    DisplayBufferDfx dfxIns("HDI:Display:FreeMemVdi:FreeMem")
+    dfxIns.TimeBegin();
     {
         HdfTrace traceTwo("FreeMem", "HDI:VDI:");
         vdiImpl_->FreeMem(*handle);
-    }
-    int32_t runTime = TimeEnd(firstTimeStamp);
-    if (runTime > TIME_10) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", __func__, runTime);
     }
 }
 
@@ -181,48 +139,32 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
 
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t id = SetTimer("HDI::Display::AllocatorService::AllocMem");
-    struct timeval firstTimeStamp;
-    TimeBegin(&firstTimeStamp);
+    DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:AllocMem")
+    dfxIns.SetTimer();
+    dfxIns.TimeBegin();
     {
         HdfTrace traceOne("AllocMem-VDI", "HDI:VDI:");
         int32_t ec = vdiImpl_->AllocMem(info, buffer);
         if (ec != HDF_SUCCESS) {
-            int32_t runTime = TimeEnd(firstTimeStamp);
-            if (runTime > TIME_10) {
-                HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
-                    __func__, runTime, info.usage, info.format, info.expectedSize);
-            }
             HDF_LOGE("%{public}s: AllocMem failed, ec = %{public}d", __func__, ec);
-            CancelTimer(id);
             return ec;
         }
     }
-    int32_t runTime = TimeEnd(firstTimeStamp);
-    if (runTime > TIME_10) {
-        HDF_LOGW("%{public}s: runTime[%{public}d], usage[%{public}llu], format[%{public}d], size[%{public}u]",
-            __func__, runTime, info.usage, info.format, info.expectedSize);
-    }
+    dfxIns.TimeEnd();
 
-    if (buffer == nullptr) {
-        HDF_LOGE("%{public}s: AllocMem buffer is null", __func__);
-        CancelTimer(id);
-        return HDF_DEV_ERR_NO_MEMORY;
-    }
+    CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_DEV_ERR_NO_MEMORY);
     WriteAllocPidToDma(buffer->fd);
 
     handle = new NativeBuffer();
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         FreeMemVdi(buffer);
-        CancelTimer(id);
         return HDF_FAILURE;
     }
 
     handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
         FreeMemVdi(freeBuffer);
     });
-    CancelTimer(id);
     return HDF_SUCCESS;
 }
 } // namespace V1_0
