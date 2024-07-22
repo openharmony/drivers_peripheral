@@ -262,6 +262,7 @@ SecureElementStatus SeVendorAdaptions::getStatusBySW(uint8_t sw1, uint8_t sw2) c
 void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     HDF_LOGI("OnRemoteDied");
+#ifdef SE_VENDOR_ADAPTION_USE_CA
     SecureElementStatus status = SecureElementStatus::SE_GENERAL_ERROR;
     for (size_t i = 0; i < MAX_CHANNEL_NUM; i++) {
         if (g_openedChannels[i]) {
@@ -269,6 +270,7 @@ void SeVendorAdaptions::OnRemoteDied(const wptr<IRemoteObject> &object)
             HDF_LOGI("OnRemoteDied, close channel [%{public}zu], status = %{public}d", i, status);
         }
     }
+#endif
     g_callbackV1_0 = nullptr;
 }
 
@@ -289,6 +291,10 @@ int32_t SeVendorAdaptions::AddSecureElementDeathRecipient(const sptr<ISecureElem
 
 int32_t SeVendorAdaptions::RemoveSecureElementDeathRecipient(const sptr<ISecureElementCallback> &callbackObj)
 {
+    if (callbackObj == nullptr) {
+        HDF_LOGE("SeVendorAdaptions remote is nullptr!");
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISecureElementCallback>(callbackObj);
     bool result = remote->RemoveDeathRecipient(remoteDeathRecipient_);
     if (!result) {
