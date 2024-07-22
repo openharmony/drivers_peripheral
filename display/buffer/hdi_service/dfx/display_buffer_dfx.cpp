@@ -14,6 +14,7 @@
  */
 
 #include "display_buffer_dfx.h"
+#include <hdf_log.h>
 
 #define TIME_1000 1000
 #define TIME_10 10
