@@ -58,7 +58,7 @@ void DisplayBufferDfx::CancelTimer()
 
 void DisplayBufferDfx::TimeBegin()
 {
-    gettimeofday(beginTimeStamp, nullptr);
+    gettimeofday(&beginTimeStamp, nullptr);
     flag_ = true;
 }
 
@@ -68,7 +68,7 @@ void DisplayBufferDfx::TimeEnd()
     int32_t runTime = (int32_t)((endTimeStamp.tv_sec - beginTimeStamp.tv_sec) * TIME_1000 +
         (endTimeStamp.tv_usec - beginTimeStamp.tv_usec) / TIME_1000);
     if (runTime > TIME_10) {
-        HDF_LOGW("run %{public}s over time, [%{public}d]ms", dfxName_.cstr(), runTime);
+        HDF_LOGW("run %{public}s over time, [%{public}d]ms", dfxName_.c_str(), runTime);
     }
     flag_ = false;
 }
