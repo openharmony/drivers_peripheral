@@ -42,12 +42,13 @@ ohos_unittest("UserAuthAttributeTest") {
     "attribute_test.cpp",
   ]
 
-  deps = [ "//third_party/googletest:gmock" ]
+  deps = []
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
+    "googletest:gmock",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
   ]
