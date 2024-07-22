@@ -66,7 +66,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0130)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -78,7 +78,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0130)
     std::vector<int> streamIds;
     streamIds.push_back(cameraBase->streamInfo->streamId_);
     cameraBase->rc = cameraBase->streamOperator->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, cameraBase->rc ==NO_ERROR);
+    EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
@@ -119,7 +119,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0131)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -210,7 +210,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0133)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -254,7 +254,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0134)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -308,7 +308,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0135)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -352,7 +352,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0136)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -396,7 +396,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0137)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -440,7 +440,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0138)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -494,7 +494,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0139)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -539,7 +539,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0140)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -594,7 +594,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0141)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -649,7 +649,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0142)
     cameraBase->streamInfo->intent_ = VIDEO;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -704,7 +704,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0143)
     cameraBase->streamInfo->intent_ = STILL_CAPTURE;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -759,7 +759,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0144)
     cameraBase->streamInfo->intent_ = POST_VIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     if (cameraBase->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
@@ -814,7 +814,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0145)
     cameraBase->streamInfo->intent_ = ANALYZE;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -871,7 +871,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0146)
     streamInfo->bufferQueue_ = producer;
 
     std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -916,7 +916,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     cameraBase->streamInfo->intent_ = Camera::CUSTOM;
     cameraBase->streamInfo->tunneledMode_ = false;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
@@ -962,7 +962,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0148)
     cameraBase->streamInfo->tunneledMode_ = 0;
     cameraBase->streamInfo->minFramerDuration_ = -1;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(INVALID_ARGUMENT, cameraBase->rc);
@@ -1008,7 +1008,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0149)
     cameraBase->streamInfo->tunneledMode_ = 0;
     cameraBase->streamInfo->minFramerDuration_ = INVALID_VALUE_TEST;
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == Camera::METHOD_NOT_SUPPORTED);
@@ -1052,7 +1052,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0160)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1105,7 +1105,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0161)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1171,7 +1171,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1225,7 +1225,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
@@ -1309,7 +1309,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0180)
     cameraBase->streamInfo->intent_ = PREVIEW;
     cameraBase->streamInfo->tunneledMode_ = 5; // 5:picture tunnel mode
     cameraBase->streamInfo->bufferQueue_ = producer;
-    stremInfos.push_back(cameraBase->streamInfo);
+    streamInfos.push_back(cameraBase->streamInfo);
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, cameraBase->rc == NO_ERROR);
     if (cameraBase->rc == NO_ERROR) {
