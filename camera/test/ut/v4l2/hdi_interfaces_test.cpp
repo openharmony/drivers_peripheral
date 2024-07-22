@@ -920,10 +920,10 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     cameraBase->rc = cameraBase->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << cameraBase->rc << std::endl;
     EXPECT_EQ(true, cameraBase->rc == Camera::METHOD_NOT_SUPPORTED);
-    if (cameraBase->rc == Cameraa::METHOD_NOT_SUPPORTED) {
+    if (cameraBase->rc == Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams fail." << std::endl;
     } else {
-        std::cout << "==========[test log] CreateStreams success. " << std::endl;
+        std::cout << "==========[test log] CreateStreams success " << std::endl;
     }
 }
 
