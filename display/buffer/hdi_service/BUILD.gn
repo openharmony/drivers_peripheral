@@ -28,10 +28,14 @@ group("hdf_display_buffer_service") {
 
 ohos_shared_library("liballocator_service_1.0") {
   include_dirs = [
+    "dfx",
     "include",
     "../../utils/include",
   ]
-  sources = [ "src/allocator_service.cpp" ]
+  sources = [
+    "dfx/display_buffer_dfx.cpp",
+    "src/allocator_service.cpp",
+  ]
 
   external_deps = [
     "c_utils:utils",
