@@ -1055,8 +1055,10 @@ HWTEST_F(WifiClientTest, WpaRegisterEventCallback01, TestSize.Level1)
 
     ret = WpaRegisterEventCallback(nullptr, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
-    ret = WifiRegisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, nullptr);
-    EXPECT_EQ(RET_CODE_INVALID_PARAM, ret);
+    ret = WpaRegisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, nullptr);
+    EXPECT_EQ(RET_CODE_FAILURE, ret);
+    WpaRegisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
+    WpaUnregisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
     WpaUnregisterEventCallback(nullptr, WIFI_WPA_TO_HAL_CLIENT, WLAN_IFNAME);
     WpaUnregisterEventCallback(WpaEventCb, WIFI_WPA_TO_HAL_CLIENT, nullptr);
 }
@@ -1089,6 +1091,8 @@ HWTEST_F(WifiClientTest, HostapdRegisterEventCallback03, TestSize.Level1)
     EXPECT_EQ(RET_CODE_FAILURE, ret);
     ret = HostapdRegisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, nullptr);
     EXPECT_EQ(RET_CODE_FAILURE, ret);
+    HostapdRegisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
+    HostapdUnregisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
     HostapdUnregisterEventCallback(nullptr, WIFI_HOSTAPD_TO_HAL_CLIENT, WLAN_IFNAME);
     HostapdUnregisterEventCallback(WpaEventCb, WIFI_HOSTAPD_TO_HAL_CLIENT, nullptr);
 }
