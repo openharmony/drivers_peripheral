@@ -125,8 +125,7 @@ void AllocatorService::WriteAllocPidToDma(int32_t fd)
 
 void AllocatorService::FreeMemVdi(BufferHandle* handle)
 {
-    std::string dfxName = "HDI:Display:FreeMemVdi:FreeMem";
-    DisplayBufferDfx dfxIns(dfxName);
+    DisplayBufferDfx dfxIns("HDI:Display:FreeMemVdi:FreeMem");
     dfxIns.TimeBegin();
     {
         HdfTrace traceTwo("FreeMem", "HDI:VDI:");
@@ -140,8 +139,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
 
     BufferHandle* buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    std::string dfxName = "HDI:Display:AllocatorService:AllocMem";
-    DisplayBufferDfx dfxIns(dfxName);
+    DisplayBufferDfx dfxIns("HDI:Display:AllocatorService:AllocMem");
     dfxIns.SetTimer();
     dfxIns.TimeBegin();
     {
