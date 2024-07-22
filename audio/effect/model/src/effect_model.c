@@ -22,7 +22,6 @@
 #include "parse_effect_config.h"
 #include "audio_uhdf_log.h"
 
-#define AUDIO_EFFECT_CONFIG  HDF_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
 struct ConfigDescriptor *g_cfgDescs = NULL;
 
@@ -286,8 +285,16 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
 
 void ModelInit(void)
 {
+    FILE *file;
+    char filename = "/chip_prod/etc/hdfconfig/audio_effect.json";
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        filename = "/vendor/etc/hdfconfig/audio_effect.json";
+    }
+    (void)fclose(file);
+    HDF_LOGE("%{public}s: %{public}s", __func__, filename);
     struct ConfigDescriptor *cfgDesc = NULL;
-    if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {
+    if (AudioEffectGetConfigDescriptor(filename, &cfgDesc) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
         return;
     }
