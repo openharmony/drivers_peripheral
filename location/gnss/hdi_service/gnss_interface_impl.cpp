@@ -576,6 +576,7 @@ void GnssInterfaceImpl::ResetGnss()
     HDF_LOGI("%{public}s called.", __func__);
     ResetGnssDeathRecipient();
     StopGnss(GNSS_START_TYPE_NORMAL);
+    DisableGnssMeasurement();
     DisableGnss();
 }
 } // V2_0
