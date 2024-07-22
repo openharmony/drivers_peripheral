@@ -137,32 +137,10 @@ static int32_t StartHostapdHal(int id)
 static int32_t StartHostapd(void)
 {
     char startCmd[WIFI_MULTI_CMD_MAX_LEN] = {0};
-    char *p = startCmd;
-    int onceMove = 0;
-    int sumMove = 0;
-    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, "%s", WPA_HOSTAPD_NAME);
-    if (onceMove < 0) {
-        HDF_LOGE("%{public}s:snprintf_s WPA_HOSTAPD_NAME fail", __func__);
+    if (memcpy_s(startCmd, WIFI_MULTI_CMD_MAX_LEN, HOSTAPD_START_CMD,
+        strlen(HOSTAPD_START_CMD)) != EOK) {
+        HDF_LOGI("memcpy start cmd failed");
         return HDF_FAILURE;
-    }
-    p = p + onceMove;
-    sumMove = sumMove + onceMove;
-    int num;
-    const WifiHostapdHalDeviceInfo *cfg = GetWifiCfg(&num);
-    if (cfg == NULL) {
-        HDF_LOGE("%{public}s:cfg is NULL", __func__);
-        return HDF_FAILURE;
-    }
-    for (int i = 0; i < num; i++) {
-        onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-            WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, " %s", cfg[i].config);
-        if (onceMove < 0) {
-            HDF_LOGE("%{public}s:snprintf_s config fail", __func__);
-            return HDF_FAILURE;
-        }
-        p = p + onceMove;
-        sumMove = sumMove + onceMove;
     }
     HDF_LOGI("Cmd is %{public}s", startCmd);
     int32_t ret = StartApMain(WPA_HOSTAPD_NAME, startCmd);
@@ -252,14 +230,6 @@ int32_t HostapdInterfaceStartApWithCmd(struct IHostapdInterface *self, const cha
     if (hostapdHalDevice == NULL) {
         HDF_LOGE("hostapdHalDevice is NULL");
         return HDF_FAILURE;
-    }
-
-    if (GetIfaceState(ifName) == 0) {
-        ret = hostapdHalDevice->enableAp(id);
-        if (ret != 0) {
-            HDF_LOGE("enableAp failed, ret = %{public}d", ret);
-            return HDF_FAILURE;
-        }
     }
     HDF_LOGI("%{public}s: hostapd start successfully", __func__);
     return HDF_SUCCESS;
