@@ -923,7 +923,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     if (cameraBase->rc == Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams fail." << std::endl;
     } else {
-        std::cout << "==========[test log] CreateStreams success" << std::endl;
+        std::cout << "==========[test log] CreateStreams success"<< std::endl;
     }
 }
 
