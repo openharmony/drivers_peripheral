@@ -140,13 +140,8 @@ void Hibernate::InitSwap()
         HDF_LOGI("swap file is ready, do nothing.");
         return;
     }
-    auto ret = InitResumeInfo();
-    if (ret != HDF_SUCCESS) {
-        return;
-    }
-
     bool needToCreateSwapFile;
-    ret = CheckSwapFile(needToCreateSwapFile);
+    auto ret = CheckSwapFile(needToCreateSwapFile);
     if (ret != HDF_SUCCESS) {
         return;
     }
