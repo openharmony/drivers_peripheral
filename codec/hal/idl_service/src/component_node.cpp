@@ -283,6 +283,10 @@ int32_t ComponentNode::ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t in
     CHECK_AND_RETURN_RET_LOG(index < ROLE_MAX_LEN, HDF_ERR_INVALID_PARAM, "index is too large");
     uint8_t omxRole[ROLE_MAX_LEN] = {0};
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
+    if (comType->ComponentRoleEnum == nullptr) {
+        CODEC_LOGE("The requested function is not implemented.");
+        return OMX_ErrorNotImplemented;
+    }
     int32_t err = comType->ComponentRoleEnum(comp_, omxRole, index);
     if (err != OMX_ErrorNone) {
         CODEC_LOGE("ComponentRoleEnum ret err [0x%{public}x] ", err);
@@ -683,7 +687,6 @@ int32_t ComponentNode::ReleaseAllBuffer()
     HDF_LOGI("Release OMXBuffer and CodecBuffer success!");
     return HDF_SUCCESS;
 }
-
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS
