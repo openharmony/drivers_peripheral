@@ -607,7 +607,6 @@ int32_t WpaInterfaceP2pStopFind(struct IWpaInterface *self, const char *ifName)
     return HDF_SUCCESS;
 }
 
-
 int32_t WpaInterfaceP2pFlush(struct IWpaInterface *self, const char *ifName)
 {
     HDF_LOGI("Ready to enter hdi %{public}s", __func__);
@@ -969,7 +968,7 @@ int32_t WpaInterfaceP2pHid2dConnect(struct IWpaInterface *self, const char *ifNa
     }
     HDF_LOGI("hid2dconnect freq=%{public}d, isLegacyGo=%{public}d", freq, isLegacyGo);
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s MAGICLINK \"%s\"\n%s\n\"%s\"\n%d\n%d", ifName,
-        (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
+            (char *)info->ssid, macToStr(info->bssid), (char *)info->passphrase, freq, isLegacyGo) < 0) {
         HDF_LOGE("%{public}s snprintf_s failed, cmd: %{private}s.", __func__, cmd);
         return HDF_FAILURE;
     }
@@ -1544,6 +1543,12 @@ static int32_t WpaFillP2pDeviceLostParam(struct P2pDeviceLostParam  *deviceLostP
         deviceLostParam->p2pDeviceAddress, ETH_ADDR_LEN) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: fill bssid fail!", __func__);
             ret = HDF_FAILURE;
+    }
+    if (ret != HDF_SUCCESS) {
+        if (hdiP2pDeviceLostParam->p2pDeviceAddress != NULL) {
+            OsalMemFree(hdiP2pDeviceLostParam->p2pDeviceAddress);
+            hdiP2pDeviceLostParam->p2pDeviceAddress = NULL;
+        }
     }
     return ret;
 }

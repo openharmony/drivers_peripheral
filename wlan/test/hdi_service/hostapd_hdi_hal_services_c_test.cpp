@@ -247,4 +247,16 @@ HWTEST_F(HdfHostapdHostCTest, HostApdShellCmdTest_015, TestSize.Level1)
     int32_t rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, IFNAME, "");
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: ReloadApConfigInfo_016
+ * @tc.desc: Wifi hdi ReloadApConfigInfo function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostCTest, ReloadApConfigInfo_016, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->ReloadApConfigInfo(g_hostapdObj, IFNAME, 1);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
 };

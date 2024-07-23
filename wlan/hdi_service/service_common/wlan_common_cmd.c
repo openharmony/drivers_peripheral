@@ -746,7 +746,7 @@ static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t 
         ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
     }
     HdfWifiScanResultsFree(scanResults, true);
-    HDF_LOGI("%{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
+    HDF_LOGD("hal exit %{public}s, wifiScanResults num:%{public}u", __FUNCTION__, wifiScanResults->num);
     return ret;
 }
 

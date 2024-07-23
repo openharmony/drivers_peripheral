@@ -283,4 +283,56 @@ HWTEST_F(HdfHostapdHostDirectTest, HostApdShellCmdTest_015, TestSize.Level1)
     rc = g_hostapdObj->HostApdShellCmd(g_hostapdObj, IFNAME, nullptr);
     ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
 }
+
+/**
+ * @tc.name: StartApTest_016
+ * @tc.desc: Wifi hdi StartAp function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostDirectTest, StartApTest_016, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->StartAp(g_hostapdObj);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+/**
+ * @tc.name: StartApWithCmdTest_017
+ * @tc.desc: Wifi hdi StartApWithCmd function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostDirectTest, StartApWithCmdTest_017, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->StartApWithCmd(g_hostapdObj, IFNAME, 1);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    rc = g_hostapdObj->StartApWithCmd(g_hostapdObj, nullptr, 1);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: StopApTest_018
+ * @tc.desc: Wifi hdi StopAp function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostDirectTest, StopApTest_018, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->StopAp(g_hostapdObj);
+    ASSERT_EQ(rc, HDF_FAILURE);
+}
+
+/**
+ * @tc.name: ReloadApConfigInfoTest_019
+ * @tc.desc: Wifi hdi ReloadApConfigInfo function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfHostapdHostDirectTest, ReloadApConfigInfoTest_019, TestSize.Level1)
+{
+    int32_t rc = g_hostapdObj->ReloadApConfigInfo(g_hostapdObj, IFNAME, 1);
+    ASSERT_EQ(rc, HDF_FAILURE);
+    rc = g_hostapdObj->ReloadApConfigInfo(g_hostapdObj, nullptr, 1);
+    ASSERT_EQ(rc, HDF_ERR_INVALID_PARAM);
+}
 };
