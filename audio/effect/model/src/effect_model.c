@@ -286,7 +286,7 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
 void ModelInit(void)
 {
     FILE *file;
-    char filename = "/chip_prod/etc/hdfconfig/audio_effect.json";
+    char *filename = "/chip_prod/etc/hdfconfig/audio_effect.json";
     file = fopen(filename, "r");
     if (file == NULL) {
         filename = "/vendor/etc/hdfconfig/audio_effect.json";
