@@ -28,6 +28,25 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V3_0 {
+
+std::mutex g_mapperMtx;
+sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> g_mapperService;
+
+sptr<OHOS::HDI::Display::Buffer::V1_0::IMapper> GetMapperService()
+{
+    std::lock_guard<std::mutex> lk(g_mapperMtx);
+    if (g_mapperService) {
+        return g_mapperService;
+    }
+    g_mapperService = OHOS::HDI::Display::Buffer::V1_0::IMapper::Get(true);
+    if (g_mapperService) {
+        CODEC_LOGI("get IMapper succ");
+        return g_mapperService;
+    }
+    CODEC_LOGE("get IMapper failed");
+    return nullptr;
+}
+
 CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
     const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name)
 {
@@ -270,7 +289,7 @@ void CodecComponentService::SetComponentRole()
 int32_t CodecComponentService::SetParameterWithBuffer(uint32_t index, const std::vector<int8_t>& paramStruct,
                                                       const OmxCodecBuffer& inBuffer)
 {
-    return OMX_ErrorNotImplemented;
+    return node_->SetParameterWithBuffer(index, paramStruct, inBuffer);
 }
 
 const std::string &CodecComponentService::GetComponentCompName() const
