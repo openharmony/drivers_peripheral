@@ -1244,7 +1244,7 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
     uint8_t configIdOld = 0;
@@ -1316,7 +1316,7 @@ int32_t UsbImpl::ClaimInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t 
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
     if (interfaceId >= USB_MAX_INTERFACES) {
         HDF_LOGE("%{public}s:interfaceId larger then max num", __func__);
@@ -1394,7 +1394,7 @@ int32_t UsbImpl::SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t al
     }
     if (!port->initFlag) {
         HDF_LOGE("%{public}s: openPort failed", __func__);
-        return HDF_DEV_ERR_NO_DEVICE;
+        return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
     UsbInterfaceHandle *interfaceHandle = InterfaceIdToHandle(port, interfaceId);
