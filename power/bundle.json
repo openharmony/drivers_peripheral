@@ -28,6 +28,7 @@
           "config_policy",
           "drivers_interface_power",
           "hdf_core",
+          "hicollie",
           "hilog", 
           "hisysevent",
           "libxml2",
