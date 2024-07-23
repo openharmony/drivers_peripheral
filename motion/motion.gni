@@ -7,10 +7,4 @@ declare_args() {
       !defined(global_parts_info.commonlibrary_c_utils)) {
     motion_c_utils_enable = false
   }
-
-  motion_hilog_enable = true
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.hiviewdfx_hilog)) {
-    motion_hilog_enable = false
-  }
 }
