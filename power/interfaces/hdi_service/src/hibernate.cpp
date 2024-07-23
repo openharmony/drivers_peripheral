@@ -111,12 +111,12 @@ int32_t Hibernate::GetResumeInfo(std::string &resumeInfo)
     }
     while ((me = getmntent(fp))) {
         if (strcmp(me->mnt_dir, "/data") == 0) {
-            char resolved_path[PATH_MAX];
-            if (realpath(me->mnt_fsname, resolved_path) == NULL) {
+            char resolvedPath[PATH_MAX] = {0};
+            if (realpath(me->mnt_fsname, resolvedPath) == NULL) {
                 HDF_LOGE("realpath error, errno = %{public}d", errno);
                 break;
             }
-            std::string fileSystemInfo = resolved_path;
+            std::string fileSystemInfo = resolvedPath;
             auto index = fileSystemInfo.find_last_of('/');
             if (index == std::string::npos) {
                 HDF_LOGE("file system info error");
